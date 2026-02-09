@@ -106,7 +106,7 @@ const SubscriptionDetails = (
     onManageSubscription,
     simulateNativeMobileApp
   }: Props,
-): renders* => {
+): React.Node => {
   const {
     openSubscriptionDialog,
     getUserSubscriptionPlanEvenIfLegacy,

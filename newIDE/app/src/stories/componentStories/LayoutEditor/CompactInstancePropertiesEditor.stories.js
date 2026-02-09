@@ -18,7 +18,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const InstanceSprite2d = (): renders* => (
+export const InstanceSprite2d = (): React.Node => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (
@@ -47,7 +47,7 @@ export const InstanceSprite2d = (): renders* => (
   </DragAndDropContextProvider>
 );
 
-export const InstanceCube3d = (): renders* => (
+export const InstanceCube3d = (): React.Node => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (
@@ -76,7 +76,7 @@ export const InstanceCube3d = (): renders* => (
   </DragAndDropContextProvider>
 );
 
-export const InstanceTextInput = (): renders* => (
+export const InstanceTextInput = (): React.Node => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (

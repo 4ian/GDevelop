@@ -30,7 +30,7 @@ export const getElectronUpdateNotificationBody = (updateStatus: ElectronUpdateSt
   return '';
 };
 
-export const getElectronUpdateStatusLabel = (status: string): string | renders* => {
+export const getElectronUpdateStatusLabel = (status: string): string | React.Node => {
   if (status === 'checking-for-update')
     return <Trans>Checking for update...</Trans>;
   if (status === 'update-available')
@@ -49,7 +49,7 @@ export const getElectronUpdateStatusLabel = (status: string): string | renders* 
   return '';
 };
 
-export const getElectronUpdateButtonLabel = (status: string): renders* => {
+export const getElectronUpdateButtonLabel = (status: string): React.Node => {
   if (status === 'update-available')
     return <Trans>Update GDevelop to latest version</Trans>;
   return <Trans>Check again for new updates</Trans>;
@@ -99,7 +99,7 @@ export const useServiceWorkerUpdateStatus = (): ServiceWorkerUpdateStatus => {
   return serviceWorkerUpdateStatus;
 };
 
-export const getServiceWorkerStatusLabel = (status: ServiceWorkerUpdateStatus): renders* => {
+export const getServiceWorkerStatusLabel = (status: ServiceWorkerUpdateStatus): React.Node => {
   if (status === 'not-installed') {
     return <Trans>Not installed as an app. No updates available.</Trans>;
   } else if (status === 'installed') {

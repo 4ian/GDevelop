@@ -277,7 +277,7 @@ const fakeOutputWithFunctionCallWithSameCallId = [
   },
 ];
 
-export const ReadyAiRequestWithFunctionCallWithoutAutoProcess = (): renders* => (
+export const ReadyAiRequestWithFunctionCallWithoutAutoProcess = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -293,7 +293,7 @@ export const ReadyAiRequestWithFunctionCallWithoutAutoProcess = (): renders* => 
   />
 );
 
-export const ReadyAiRequestWithWorkingFunctionCall = (): renders* => (
+export const ReadyAiRequestWithWorkingFunctionCall = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -315,7 +315,7 @@ export const ReadyAiRequestWithWorkingFunctionCall = (): renders* => (
     isAutoProcessingFunctionCalls={true}
   />
 );
-export const ReadyAiRequestWithFinishedFunctionCallAndLaunchingRequest = (): renders* => (
+export const ReadyAiRequestWithFinishedFunctionCallAndLaunchingRequest = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -343,7 +343,7 @@ export const ReadyAiRequestWithFinishedFunctionCallAndLaunchingRequest = (): ren
   />
 );
 
-export const WorkingAiRequestWithFinishedFunctionCall = (): renders* => (
+export const WorkingAiRequestWithFinishedFunctionCall = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -370,7 +370,7 @@ export const WorkingAiRequestWithFinishedFunctionCall = (): renders* => (
   />
 );
 
-export const ReadyAiRequestWithIgnoredFunctionCall = (): renders* => (
+export const ReadyAiRequestWithIgnoredFunctionCall = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -393,7 +393,7 @@ export const ReadyAiRequestWithIgnoredFunctionCall = (): renders* => (
   />
 );
 
-export const ReadyAiRequestWithFailedFunctionCall = (): renders* => (
+export const ReadyAiRequestWithFailedFunctionCall = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -420,7 +420,7 @@ export const ReadyAiRequestWithFailedFunctionCall = (): renders* => (
   />
 );
 
-export const ReadyAiRequestWithFunctionCallAndOutput = (): renders* => (
+export const ReadyAiRequestWithFunctionCallAndOutput = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -437,7 +437,7 @@ export const ReadyAiRequestWithFunctionCallAndOutput = (): renders* => (
   />
 );
 
-export const ReadyAiRequestWithFunctionCallWithSameCallId = (): renders* => (
+export const ReadyAiRequestWithFunctionCallWithSameCallId = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -464,42 +464,42 @@ export const ReadyAiRequestWithFunctionCallWithSameCallId = (): renders* => (
   />
 );
 
-export const ReadyAiRequestWithFailedAndIgnoredFunctionCallOutputs = (): renders* => (
+export const ReadyAiRequestWithFailedAndIgnoredFunctionCallOutputs = (): React.Node => (
   <WrappedChatComponent
     aiRequest={agentAiRequestWithFailedAndIgnoredFunctionCallOutputs}
   />
 );
 
-export const LongReadyAiRequest = (): renders* => (
+export const LongReadyAiRequest = (): React.Node => (
   <WrappedChatComponent
     aiRequest={agentAiRequest}
     isAutoProcessingFunctionCalls={true}
   />
 );
 
-export const LongReadyAiRequestForAnotherProject = (): renders* => (
+export const LongReadyAiRequestForAnotherProject = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{ ...agentAiRequest, gameId: 'another-project-uuid' }}
     isAutoProcessingFunctionCalls={true}
   />
 );
 
-export const LongReadyAiRequestWithFunctionCallToDo = (): renders* => (
+export const LongReadyAiRequestWithFunctionCallToDo = (): React.Node => (
   <WrappedChatComponent aiRequest={agentAiRequestWithFunctionCallToDo} />
 );
 
-export const LaunchingFollowupAiRequest = (): renders* => (
+export const LaunchingFollowupAiRequest = (): React.Node => (
   <WrappedChatComponent aiRequest={agentAiRequest} isSending={true} />
 );
 
-export const ErrorLaunchingFollowupAiRequest = (): renders* => (
+export const ErrorLaunchingFollowupAiRequest = (): React.Node => (
   <WrappedChatComponent
     aiRequest={agentAiRequest}
     lastSendError={new Error('fake error while sending request')}
   />
 );
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCredits = (): renders* => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCredits = (): React.Node => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -533,7 +533,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCredits = (): renders* => {
   );
 };
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): renders* => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): React.Node => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -567,7 +567,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftNoSubscrip
   );
 };
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): renders* => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): React.Node => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -601,7 +601,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilver
   );
 };
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): renders* => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): React.Node => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -635,7 +635,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartu
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = (): renders* => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = (): React.Node => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -669,7 +669,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = (): renders* =>
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): renders* => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): React.Node => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -703,7 +703,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubsc
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): renders* => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): React.Node => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -737,7 +737,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSil
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): renders* => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): React.Node => {
   const quota = {
     limitReached: true,
     current: 100,

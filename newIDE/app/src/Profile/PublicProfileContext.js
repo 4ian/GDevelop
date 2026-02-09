@@ -50,7 +50,7 @@ type Props = {|
   children: React.Node,
 |};
 
-export const PublicProfileProvider = ({children}: Props): renders Fragment => {
+export const PublicProfileProvider = ({children}: Props): React.Node => {
   const [
     visitedPublicProfileUserId,
     setVisitedPublicProfileUserId,

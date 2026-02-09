@@ -15,7 +15,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const DefaultStringNoScope = (): renders* => (
+export const DefaultStringNoScope = (): React.Node => (
   <FixedHeightFlexContainer height={400}>
     <I18n>
       {({ i18n }) => (
@@ -32,7 +32,7 @@ export const DefaultStringNoScope = (): renders* => (
   </FixedHeightFlexContainer>
 );
 
-export const DefaultNumberNoScope = (): renders* => (
+export const DefaultNumberNoScope = (): React.Node => (
   <FixedHeightFlexContainer height={400}>
     <I18n>
       {({ i18n }) => (

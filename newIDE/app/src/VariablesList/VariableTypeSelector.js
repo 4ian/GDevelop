@@ -84,7 +84,7 @@ const getVariableTypeToString = () => {
   return variableTypeToString;
 };
 
-const VariableTypeSelector: component(...Props) renders* = React.memo<Props>((props: Props) => {
+const VariableTypeSelector: React.ComponentType<Props> = React.memo<Props>((props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const Icon = getVariableTypeToIcon()[props.variableType];
 

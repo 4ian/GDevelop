@@ -218,7 +218,7 @@ export const CompactEffectsListEditor = (
     layerRenderingType,
     target
   }: Props,
-): renders Fragment => {
+): React.Node => {
   const forceUpdate = useForceUpdate();
   const [isEffectsFolded, setEffectsFolded] = React.useState(false);
 

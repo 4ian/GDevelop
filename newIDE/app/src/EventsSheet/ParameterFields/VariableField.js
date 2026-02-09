@@ -471,7 +471,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
   },
 ) as component(
   ...{ ...Props, +ref?: React.RefSetter<VariableFieldInterface> }
-) renders*;
+) React.Node;
 
 export const renderVariableWithIcon = (
   {

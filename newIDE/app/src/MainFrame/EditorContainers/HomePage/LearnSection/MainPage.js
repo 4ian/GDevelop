@@ -93,7 +93,7 @@ const MainPage = (
     onSelectPrivateGameTemplateListingData,
     onSelectExampleShortHeader
   }: Props,
-): renders* => {
+): React.Node => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const {
     palette: { type: paletteType },

@@ -32,7 +32,7 @@ type Props = {|
 const getExtensionName = (extensionShortHeader: ExtensionShortHeader) =>
   extensionShortHeader.name;
 
-export const ExtensionStore = ({isInstalling, project, onInstall, showOnlyWithBehaviors}: Props): renders Fragment => {
+export const ExtensionStore = ({isInstalling, project, onInstall, showOnlyWithBehaviors}: Props): React.Node => {
   const preferences = React.useContext(PreferencesContext);
   const [
     selectedExtensionShortHeader,

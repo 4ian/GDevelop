@@ -161,7 +161,7 @@ export const Default = (
     leaderboards: 'None' | 'Some' | 'Too many',
     exports: 'None' | 'Some ongoing' | 'All complete',
   |},
-): renders* => {
+): React.Node => {
   const [game, setGame] = React.useState<Game>(game1);
   const [tab, setTab] = React.useState<GameDetailsTab>('details');
   const [renderCount, setRenderCount] = React.useState<number>(0);

@@ -290,7 +290,7 @@ const SpritesList = (
     objectName,
     animationName
   }: Props,
-): renders* => {
+): React.Node => {
   // It's important to save the selected sprites in a ref, so that
   // we can update the selection when a context menu is opened without relying on the state.
   // Otherwise, the selection would be updated after the context menu is opened.

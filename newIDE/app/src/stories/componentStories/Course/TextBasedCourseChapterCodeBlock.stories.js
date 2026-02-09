@@ -9,7 +9,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders* => (
+export const Default = (): React.Node => (
   <TextBasedCourseChapterCodeBlock
     language="javascript"
     code={`// Example GDevelop JavaScript code
@@ -20,7 +20,7 @@ if (player.getX() < 100) {
   />
 );
 
-export const LongCode = (): renders* => (
+export const LongCode = (): React.Node => (
   <TextBasedCourseChapterCodeBlock
     language="javascript"
     code={`// Longer example to test scrolling and layout
@@ -33,7 +33,7 @@ for (let i = 0; i < 10; i++) {
   />
 );
 
-export const NonHighlightedCode = (): renders* => (
+export const NonHighlightedCode = (): React.Node => (
   <TextBasedCourseChapterCodeBlock
     language="python"
     code={`# Example Python code (no JS highlighting)

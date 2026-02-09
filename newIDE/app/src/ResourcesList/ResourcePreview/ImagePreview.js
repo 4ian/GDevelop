@@ -137,7 +137,7 @@ const ImagePreview = (
     onImageLoaded,
     hideLoader
   }: Props,
-): renders* => {
+): React.Node => {
   const [errored, setErrored] = React.useState<boolean>(false);
   const [imageWidth, setImageWidth] = React.useState<?number>(null);
   const [imageHeight, setImageHeight] = React.useState<?number>(null);

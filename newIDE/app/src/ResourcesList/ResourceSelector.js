@@ -68,7 +68,7 @@ export type ResourceSelectorInterface = {| focus: FieldFocusFunction |};
 
 const ResourceSelector: component(
   ...{ ...Props, +ref?: React.RefSetter<ResourceSelectorInterface> }
-) renders* = React.forwardRef<Props, ResourceSelectorInterface>(
+) React.Node = React.forwardRef<Props, ResourceSelectorInterface>(
   (props, ref) => {
     const {
       project,

@@ -27,7 +27,7 @@ export const checkIfHasTooManyCloudProjects = (authenticatedUser: AuthenticatedU
     : false;
 };
 
-export const MaxProjectCountAlertMessage = ({margin}: Props): null | renders* => {
+export const MaxProjectCountAlertMessage = ({margin}: Props): null | React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { limits, subscription } = authenticatedUser;
   if (!limits) return null;

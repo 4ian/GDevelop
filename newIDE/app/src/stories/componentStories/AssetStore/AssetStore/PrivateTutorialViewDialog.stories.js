@@ -64,7 +64,7 @@ const PrivateTutorialViewDialogStory = ({
   );
 };
 
-export const Unauthenticated = (): renders* => (
+export const Unauthenticated = (): React.Node => (
   <PrivateTutorialViewDialogStory
     tutorial={fakeEducationCurriculumPrivateTutorial}
     privatePdfTutorial={fakeEducationCurriculumPrivatePdfTutorial}
@@ -72,7 +72,7 @@ export const Unauthenticated = (): renders* => (
   />
 );
 
-export const WithAccess = (): renders* => (
+export const WithAccess = (): React.Node => (
   <PrivateTutorialViewDialogStory
     authenticatedUser={fakeAuthenticatedTeacherFromEducationPlan}
     tutorial={fakeEducationCurriculumPrivateTutorial}
@@ -82,7 +82,7 @@ export const WithAccess = (): renders* => (
   />
 );
 
-export const Errored = (): renders* => (
+export const Errored = (): React.Node => (
   <PrivateTutorialViewDialogStory
     authenticatedUser={fakeAuthenticatedTeacherFromEducationPlan}
     tutorial={fakeEducationCurriculumPrivateTutorial}

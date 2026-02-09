@@ -162,7 +162,7 @@ const ImageTileGrid = (
     getColumnsFromWindowSize,
     getLimitFromWindowSize
   }: ImageTileGridProps,
-): renders* => {
+): React.Node => {
   const { windowSize, isLandscape } = useResponsiveWindowSize();
   const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', isLandscape);
   const limit = getLimitFromWindowSize

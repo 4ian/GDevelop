@@ -162,7 +162,7 @@ export const RangeFilter = (
     valueLabelFormat,
     marks
   }: RangeFilterProps,
-): renders* => {
+): React.Node => {
   return (
     <Accordion key={filterKey} defaultExpanded>
       <AccordionHeader>
@@ -229,7 +229,7 @@ export const AssetStoreFilterPanel = (
   }: {
     assetSwappedObject?: ?gdObject,
   },
-): renders* => {
+): React.Node => {
   const {
     assetFiltersState,
     assetPackFiltersState,

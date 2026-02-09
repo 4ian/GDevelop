@@ -609,7 +609,7 @@ export type VariablesListInterface = {|
 
 const VariablesList: component(
   ...{ ...Props, +ref?: React.RefSetter<VariablesListInterface> }
-) renders* = React.forwardRef<Props, VariablesListInterface>(
+) React.Node = React.forwardRef<Props, VariablesListInterface>(
   (props, ref) => {
     const historyRef = useRefWithInit(() =>
       getHistoryInitialState(props.variablesContainer, {

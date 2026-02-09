@@ -31,7 +31,7 @@ const EventsBasedObjectScenePropertiesDialog = (
     getContentAABB,
     onEventsBasedObjectChildrenEdited
   }: Props,
-): renders* => {
+): React.Node => {
   const [areaMinX, setAreaMinX] = React.useState<number>(
     eventsBasedObjectVariant.getAreaMinX()
   );

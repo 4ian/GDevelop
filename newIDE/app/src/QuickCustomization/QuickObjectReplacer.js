@@ -35,7 +35,7 @@ export const QuickObjectReplacer = (
     onWillInstallExtension,
     onExtensionInstalled
   }: Props,
-): renders* => {
+): React.Node => {
   const [selectedObjectToSwap, setSelectedObjectToSwap] = React.useState(null);
 
   return (

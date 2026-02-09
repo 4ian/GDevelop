@@ -12,14 +12,14 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders* => {
+export const Default = (): React.Node => {
   return (
     <PlaceholderError>
       <Text>This is an error</Text>
     </PlaceholderError>
   );
 };
-export const WithRetryButton = (): renders* => {
+export const WithRetryButton = (): React.Node => {
   return (
     <PlaceholderError onRetry={() => action('retry')()}>
       <Text>This is an error, but you can retry the failed action</Text>

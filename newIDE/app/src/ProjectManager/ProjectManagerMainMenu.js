@@ -41,7 +41,7 @@ const ProjectManagerMainMenu = (
     selectedMainMenuItemIndices,
     setSelectedMainMenuItemIndices
   }: Props,
-): renders* => {
+): React.Node => {
   const mainMenuItems = React.useMemo(
     () =>
       adaptFromDeclarativeTemplate(

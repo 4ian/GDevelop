@@ -62,7 +62,7 @@ const CompactTextField: component(
     ...CompactTextFieldProps,
     +ref?: React.RefSetter<CompactTextFieldInterface>,
   }
-) renders* = React.forwardRef<
+) React.Node = React.forwardRef<
   CompactTextFieldProps,
   CompactTextFieldInterface
 >(

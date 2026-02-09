@@ -238,7 +238,7 @@ const TileSetVisualizer = (
     onAtlasImageLoaded,
     onScrollY
   }: Props,
-): renders* => {
+): React.Node => {
   const forceUpdate = useForceUpdate();
   const atlasResourceName = objectConfiguration
     .getProperties()

@@ -64,7 +64,7 @@ type Props = {|
   multiSelection: boolean,
 |};
 
-const ProjectResourcesChooser = ({project, onResourcesSelected, resourceKind, multiSelection}: Props): renders* => {
+const ProjectResourcesChooser = ({project, onResourcesSelected, resourceKind, multiSelection}: Props): React.Node => {
   const [searchText, setSearchText] = React.useState<string>('');
 
   const searchResults = React.useMemo(

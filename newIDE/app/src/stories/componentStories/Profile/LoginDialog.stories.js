@@ -20,9 +20,9 @@ const defaultProps = {
   error: null,
 };
 
-export const Default = (): renders* => <LoginDialog {...defaultProps} />;
+export const Default = (): React.Node => <LoginDialog {...defaultProps} />;
 
-export const WeakPasswordErrorFromBackend = (): renders* => (
+export const WeakPasswordErrorFromBackend = (): React.Node => (
   <LoginDialog
     {...defaultProps}
     error={{
@@ -31,7 +31,7 @@ export const WeakPasswordErrorFromBackend = (): renders* => (
   />
 );
 
-export const InvalidEmailErrorFromBackend = (): renders* => (
+export const InvalidEmailErrorFromBackend = (): React.Node => (
   <LoginDialog
     {...defaultProps}
     error={{
@@ -40,7 +40,7 @@ export const InvalidEmailErrorFromBackend = (): renders* => (
   />
 );
 
-export const AccountExistsWithDifferentCredentialErrorFromBackend = (): renders* => (
+export const AccountExistsWithDifferentCredentialErrorFromBackend = (): React.Node => (
   <LoginDialog
     {...defaultProps}
     error={{
@@ -49,6 +49,6 @@ export const AccountExistsWithDifferentCredentialErrorFromBackend = (): renders*
   />
 );
 
-export const Submitting = (): renders* => (
+export const Submitting = (): React.Node => (
   <LoginDialog {...defaultProps} loginInProgress />
 );

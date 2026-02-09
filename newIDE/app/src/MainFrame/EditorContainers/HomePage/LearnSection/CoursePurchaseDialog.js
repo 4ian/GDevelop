@@ -26,7 +26,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const CoursePurchaseDialog = ({course, courseListingData, onClose}: Props): renders Fragment => {
+const CoursePurchaseDialog = ({course, courseListingData, onClose}: Props): React.Node => {
   const {
     profile,
     onOpenLoginDialog,

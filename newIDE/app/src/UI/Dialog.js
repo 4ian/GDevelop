@@ -525,7 +525,7 @@ const DialogWithoutWindowSizeProvider = ({
  * A enhanced material-ui Dialog that can have optional secondary actions
  * and no margins if required.
  */
-const Dialog = (props: DialogProps): renders* => {
+const Dialog = (props: DialogProps): React.Node => {
   return (
     <TopLevelWindowSizeProvider>
       <DialogWithoutWindowSizeProvider {...props} />

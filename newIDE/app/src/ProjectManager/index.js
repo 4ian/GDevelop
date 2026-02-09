@@ -1548,7 +1548,7 @@ const MemoizedProjectManager = React.memo<Props, ProjectManagerInterface>(
 
 const ProjectManagerWithErrorBoundary: component(
   ...{ ...Props, +ref?: React.RefSetter<ProjectManagerInterface> }
-) renders* = React.forwardRef<
+) React.Node = React.forwardRef<
   Props,
   ProjectManagerInterface
 >((props, outerRef) => {

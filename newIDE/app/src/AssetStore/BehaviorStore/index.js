@@ -87,7 +87,7 @@ export const BehaviorStore = (
     onInstall,
     onChoose
   }: Props,
-): renders Fragment => {
+): React.Node => {
   const preferences = React.useContext(PreferencesContext);
   const [
     selectedBehaviorShortHeader,

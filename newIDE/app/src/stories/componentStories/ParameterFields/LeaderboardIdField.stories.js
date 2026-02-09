@@ -81,7 +81,7 @@ const MockLeaderboardProvider = ({ children }: {| children: React.Node |}) => {
   );
 };
 
-export const Default = (): renders* => (
+export const Default = (): React.Node => (
   <MockLeaderboardProvider>
     <ValueStateHolder
       initialValue={''}
@@ -105,7 +105,7 @@ export const Default = (): renders* => (
   </MockLeaderboardProvider>
 );
 
-export const InitialValidLeaderboard = (): renders* => (
+export const InitialValidLeaderboard = (): React.Node => (
   <MockLeaderboardProvider>
     <ValueStateHolder
       initialValue={'"489165zad49-a8ad6-4a984-dcz8da-hjqn983qh2"'}
@@ -129,7 +129,7 @@ export const InitialValidLeaderboard = (): renders* => (
   </MockLeaderboardProvider>
 );
 
-export const InitialInvalidLeaderboard = (): renders* => (
+export const InitialInvalidLeaderboard = (): React.Node => (
   <MockLeaderboardProvider>
     <ValueStateHolder
       initialValue={'5032ff25-6cd7-4adb-978d-8d2e532b16cf'}

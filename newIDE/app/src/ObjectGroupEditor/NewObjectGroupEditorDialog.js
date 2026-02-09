@@ -37,7 +37,7 @@ const NewObjectGroupEditorDialog = (
     objectsContainer,
     isGroupAlreadyAdded
   }: Props,
-): renders* => {
+): React.Node => {
   const forceUpdate = useForceUpdate();
 
   const [objectGroupName, setObjectGroupName] = React.useState<string>('');

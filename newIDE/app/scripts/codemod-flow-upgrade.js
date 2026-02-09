@@ -265,9 +265,15 @@ function run() {
   if (ensureGDevelopShims()) updatedFiles += 1;
 
   const renderReplacements = [
-    { searchValue: /renders any\b/g, replaceValue: 'renders*' },
-    { searchValue: /renders React\.Node\b/g, replaceValue: 'renders*' },
-    { searchValue: /renders React\$Node\b/g, replaceValue: 'renders*' },
+    {
+      searchValue: /:\s*component\(\.\.\.([A-Za-z0-9_$]+)\)\s*renders\*/g,
+      replaceValue: ': React.ComponentType<$1>',
+    },
+    { searchValue: /renders\*/g, replaceValue: 'React.Node' },
+    { searchValue: /renders React\.Node\b/g, replaceValue: 'React.Node' },
+    { searchValue: /renders React\$Node\b/g, replaceValue: 'React.Node' },
+    { searchValue: /renders Fragment\b/g, replaceValue: 'React.Node' },
+    { searchValue: /renders any\b/g, replaceValue: 'React.Node' },
   ];
 
   const srcFiles = collectJsFiles(SRC_DIR);

@@ -328,7 +328,7 @@ const ProjectFileList = ({
   );
 };
 
-const ProjectFileListWithErrorBoundary = (props: Props): renders* => (
+const ProjectFileListWithErrorBoundary = (props: Props): React.Node => (
   <ErrorBoundary
     componentTitle={<Trans>Project file list</Trans>}
     scope="project-file-list"

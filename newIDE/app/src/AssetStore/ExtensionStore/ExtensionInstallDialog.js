@@ -83,7 +83,7 @@ const ExtensionInstallDialog = (
     onEdit,
     project
   }: Props,
-): renders* => {
+): React.Node => {
   const isAlreadyInstalled: boolean = project.hasEventsFunctionsExtensionNamed(
     extensionShortHeader.name
   );

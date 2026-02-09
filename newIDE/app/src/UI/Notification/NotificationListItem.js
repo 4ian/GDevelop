@@ -204,7 +204,7 @@ type Props = {|
   onMarkNotificationAsSeen: () => void,
 |};
 
-const NotificationListItem = ({notification, onCloseNotificationList, onMarkNotificationAsSeen}: Props): null | renders* => {
+const NotificationListItem = ({notification, onCloseNotificationList, onMarkNotificationAsSeen}: Props): null | React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { addRouteArguments } = React.useContext(RouterContext);
   const onClickNotification = getNotificationClickCallback({

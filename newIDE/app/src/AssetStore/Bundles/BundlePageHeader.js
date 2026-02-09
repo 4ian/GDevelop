@@ -81,7 +81,7 @@ const BundlePageHeader = (
     fastCheckout,
     onCloseAfterPurchaseDone
   }: Props,
-): renders* => {
+): React.Node => {
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
   );

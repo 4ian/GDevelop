@@ -61,7 +61,7 @@ const MarketingPlanFeatures = (
     isPlanActive,
     hideBorder
   }: Props,
-): renders* => {
+): React.Node => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const {

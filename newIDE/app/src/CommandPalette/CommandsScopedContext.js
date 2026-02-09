@@ -70,7 +70,7 @@ type Props = {|
   active: boolean,
 |};
 
-const CommandsContextScopedProvider = (props: Props): renders* => {
+const CommandsContextScopedProvider = (props: Props): React.Node => {
   const centralManager = React.useContext(CommandsContext);
   const scopedManager = useValueWithInit(
     () => new ScopedCommandManager(centralManager)

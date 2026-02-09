@@ -12,7 +12,7 @@ import Window from '../../Utils/Window';
 import RaisedButton from '../../UI/RaisedButton';
 import { type ExportFlowProps } from '../ExportPipeline.flow';
 
-export const ExplanationHeader = (): renders* => (
+export const ExplanationHeader = (): React.Node => (
   <Text align="center">
     <Trans>
       This will export your game so that you can package it for Windows, macOS
@@ -35,7 +35,7 @@ export const ExportFlow = (
     exportStep,
     exportPipelineName
   }: ElectronExportFlowProps,
-): renders* | null =>
+): React.Node | null =>
   exportStep !== 'done' ? (
     <Line justifyContent="center">
       <RaisedButton
@@ -60,7 +60,7 @@ export const DoneFooter = (
   }: {|
     renderGameButton: () => React.Node,
   |},
-): renders* => {
+): React.Node => {
   const openLearnMore = () => {
     Window.openExternalURL(
       getHelpLink('/publishing/windows-macos-linux-with-electron')
@@ -97,7 +97,7 @@ export const DoneFooter = (
 
 export const electronExporter = {
   key: 'electronexport',
-  tabName: <Trans>Desktop</Trans> as renders*,
-  name: <Trans>Windows/macOS/Linux (manual)</Trans> as renders*,
+  tabName: <Trans>Desktop</Trans> as React.Node,
+  name: <Trans>Windows/macOS/Linux (manual)</Trans> as React.Node,
   helpPage: '/publishing/windows-macos-linux-with-electron',
 };

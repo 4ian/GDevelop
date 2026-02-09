@@ -47,7 +47,7 @@ const AlertMessage = (
     markdownImageOnly,
     background = 'dark'
   }: Props,
-): renders* => {
+): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const theme = useTheme();
   const paperStyle: {|

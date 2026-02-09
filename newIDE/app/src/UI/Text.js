@@ -110,7 +110,7 @@ const getTextColorFromColor = (color: ?TextColor) => {
 // consistency of text in the whole app.
 const Text: component(
   ...{ ...Props, +ref?: React.RefSetter<Interface> }
-) renders* = React.forwardRef<Props, Interface>(
+) React.Node = React.forwardRef<Props, Interface>(
   (
     {
       children,

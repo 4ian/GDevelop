@@ -48,7 +48,7 @@ const BundlePurchaseDialog = (
     fastCheckout,
     onCloseAfterPurchaseDone
   }: Props,
-): renders Fragment => {
+): React.Node => {
   const {
     profile,
     onOpenLoginDialog,

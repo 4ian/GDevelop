@@ -447,7 +447,7 @@ const nodes: Node[] = [
     id: 'root-22000',
   },
 ];
-export const Default = (): renders* => {
+export const Default = (): React.Node => {
   const [searchText, setSearchText] = React.useState<string>('');
   const [multiSelect, setMultiSelect] = React.useState<boolean>(true);
   const [selectedItems, setSelectedItems] = React.useState<Node[]>([]);

@@ -12,7 +12,7 @@ export default {
   decorators: [getPaperDecorator('medium') as StoryDecorator],
 };
 
-export const Default = (): renders* => (
+export const Default = (): React.Node => (
   <ColumnStackLayout>
     <AlertMessage>Hello World, this is an alert text</AlertMessage>
     <AlertMessage onHide={() => {}}>

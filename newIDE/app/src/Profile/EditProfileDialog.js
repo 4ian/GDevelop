@@ -261,7 +261,7 @@ const EditProfileDialog = (
     actionInProgress,
     error
   }: EditProfileDialogProps,
-): renders* => {
+): React.Node => {
   const { showDeleteConfirmation, showAlert } = useAlertDialog();
 
   const communityLinks = profile.communityLinks || {};

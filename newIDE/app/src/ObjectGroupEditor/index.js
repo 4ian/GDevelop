@@ -41,7 +41,7 @@ const ObjectGroupEditor = (
     onObjectRemoved,
     isObjectListLocked
   }: Props,
-): renders* => {
+): React.Node => {
   const [objectName, setObjectName] = React.useState<string>('');
 
   const addObject = React.useCallback(

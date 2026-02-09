@@ -159,7 +159,7 @@ export function ClosableTab({
   onActivated,
   onHover,
   maxWidth,
-}: ClosableTabProps): renders Fragment {
+}: ClosableTabProps): React.Node {
   React.useEffect(
     () => {
       if (active) {

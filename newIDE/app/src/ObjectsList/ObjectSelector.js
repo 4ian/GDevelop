@@ -166,7 +166,7 @@ export type ObjectSelectorInterface = {| focus: FieldFocusFunction |};
 
 const ObjectSelector: component(
   ...{ ...Props, +ref?: React.RefSetter<ObjectSelectorInterface> }
-) renders* = React.forwardRef<Props, ObjectSelectorInterface>(
+) React.Node = React.forwardRef<Props, ObjectSelectorInterface>(
   (props, ref) => {
     const fieldRef = React.useRef<?SemiControlledAutoCompleteInterface>(null);
 

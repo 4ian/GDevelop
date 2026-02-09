@@ -144,7 +144,7 @@ export const CompactLayerPropertiesEditor = (
     onLayersModified,
     onEffectAdded
   }: Props,
-): renders* => {
+): React.Node => {
   const forceUpdate = useForceUpdate();
   const [isPropertiesFoldedOrDefault, setIsPropertiesFolded] = React.useState<
     boolean | null

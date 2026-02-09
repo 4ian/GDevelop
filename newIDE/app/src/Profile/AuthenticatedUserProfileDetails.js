@@ -15,7 +15,7 @@ type Props = {|
   authenticatedUser: AuthenticatedUser,
 |};
 
-const AuthenticatedUserProfileDetails = ({onOpenEditProfileDialog, onOpenChangeEmailDialog, authenticatedUser}: Props): renders* => {
+const AuthenticatedUserProfileDetails = ({onOpenEditProfileDialog, onOpenChangeEmailDialog, authenticatedUser}: Props): React.Node => {
   const profile = authenticatedUser.profile;
   const firebaseUser = authenticatedUser.firebaseUser;
   const openEmailVerificationDialog = React.useCallback(

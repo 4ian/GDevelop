@@ -54,7 +54,7 @@ const PurchaseClaimDialog = (
     claimedProductOptions: {productListingData, purchaseId, claimableToken},
     onClose
   }: Props,
-): null | renders Fragment => {
+): null | React.Node => {
   const {
     getAuthorizationHeader,
     profile,

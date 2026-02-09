@@ -627,7 +627,7 @@ const tiktokUsernameFormattingErrorMessage = (
 );
 
 export const donateLinkConfig = {
-  getFormattingError: (value: string): renders* | void =>
+  getFormattingError: (value: string): React.Node | void =>
     value && !simpleUrlRegex.test(value)
       ? profileLinkFormattingErrorMessage
       : undefined,
@@ -640,23 +640,23 @@ export const discordUsernameConfig = {
 
 export const communityLinksConfig = {
   personalWebsiteLink: {
-    icon: <Planet /> as renders*,
-    getFormattingError: (value: string): renders* | void =>
+    icon: <Planet /> as React.Node,
+    getFormattingError: (value: string): React.Node | void =>
       value && !simpleUrlRegex.test(value)
         ? profileLinkFormattingErrorMessage
         : undefined,
     maxLength: 150,
   },
   personalWebsite2Link: {
-    icon: <Planet /> as renders*,
-    getFormattingError: (value: string): renders* | void =>
+    icon: <Planet /> as React.Node,
+    getFormattingError: (value: string): React.Node | void =>
       value && !simpleUrlRegex.test(value)
         ? profileLinkFormattingErrorMessage
         : undefined,
     maxLength: 150,
   },
   githubUsername: {
-    icon: <GitHub style={{ width: 24, height: 24 }} /> as renders*,
+    icon: <GitHub style={{ width: 24, height: 24 }} /> as React.Node,
     prefix: 'https://github.com/',
     maxLength: 39,
     getMessageFromUpdate: (responseCode: string): null | { message: any, title: any } => {
@@ -687,7 +687,7 @@ export const communityLinksConfig = {
         : t`Thank you for supporting the GDevelop open-source community. Credits were added to your account as a thank you.`,
   },
   twitterUsername: {
-    icon: <Twitter /> as renders*,
+    icon: <Twitter /> as React.Node,
     prefix: 'https://twitter.com/',
     maxLength: 15,
     getMessageFromUpdate: (responseCode: string): null | { message: any, title: any } => {
@@ -719,12 +719,12 @@ export const communityLinksConfig = {
         : t`Thank you for supporting GDevelop. Credits were added to your account as a thank you.`,
   },
   facebookUsername: {
-    icon: <Facebook /> as renders*,
+    icon: <Facebook /> as React.Node,
     prefix: 'https://facebook.com/',
     maxLength: 50,
   },
   youtubeUsername: {
-    icon: <YouTube /> as renders*,
+    icon: <YouTube /> as React.Node,
     prefix: 'https://youtube.com/@',
     maxLength: 100,
     getMessageFromUpdate: (responseCode: string): null | { message: any, title: any } => {
@@ -758,9 +758,9 @@ export const communityLinksConfig = {
         : t`Thank you for supporting GDevelop. Credits were added to your account as a thank you.`,
   },
   tiktokUsername: {
-    icon: <TikTok /> as renders*,
+    icon: <TikTok /> as React.Node,
     prefix: 'https://tiktok.com/@',
-    getFormattingError: (value: string): renders* | void =>
+    getFormattingError: (value: string): React.Node | void =>
       !tiktokUsernameEmptyOrNoAtRegex.test(value)
         ? tiktokUsernameFormattingErrorMessage
         : undefined,
@@ -794,23 +794,23 @@ export const communityLinksConfig = {
         : t`Thank you for supporting GDevelop. Credits were added to your account as a thank you.`,
   },
   instagramUsername: {
-    icon: <Instagram /> as renders*,
+    icon: <Instagram /> as React.Node,
     prefix: 'https://instagram.com/',
     maxLength: 30,
   },
   redditUsername: {
-    icon: <Reddit /> as renders*,
+    icon: <Reddit /> as React.Node,
     prefix: 'https://reddit.com/user/',
     maxLength: 20,
   },
   snapchatUsername: {
-    icon: <Snapchat /> as renders*,
+    icon: <Snapchat /> as React.Node,
     prefix: 'https://snapchat.com/add/',
     maxLength: 15,
   },
   discordServerLink: {
-    icon: <Discord /> as renders*,
-    getFormattingError: (value: string): renders* | void =>
+    icon: <Discord /> as React.Node,
+    getFormattingError: (value: string): React.Node | void =>
       value && !simpleDiscordUrlRegex.test(value)
         ? discordServerLinkFormattingErrorMessage
         : undefined,

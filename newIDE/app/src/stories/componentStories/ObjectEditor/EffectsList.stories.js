@@ -10,7 +10,7 @@ import fakeResourceManagementProps from '../../FakeResourceManagement';
 import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
 
-export const withSomeEffectsForAMixedLayer = (): renders* => (
+export const withSomeEffectsForAMixedLayer = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
@@ -30,7 +30,7 @@ export const withSomeEffectsForAMixedLayer = (): renders* => (
   </DragAndDropContextProvider>
 );
 
-export const withSomeEffectsForA2DLayer = (): renders* => (
+export const withSomeEffectsForA2DLayer = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
@@ -53,7 +53,7 @@ export const withSomeEffectsForA2DLayer = (): renders* => (
 // TODO Add a story with 2 effects of the same type that should be unique.
 // Note that this can't be done until the list of unique effect is hardcoded.
 
-export const withSomeEffectsForA3DLayer = (): renders* => (
+export const withSomeEffectsForA3DLayer = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
@@ -73,7 +73,7 @@ export const withSomeEffectsForA3DLayer = (): renders* => (
   </DragAndDropContextProvider>
 );
 
-export const withSomeEffectsForAnObject = (): renders* => (
+export const withSomeEffectsForAnObject = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
@@ -93,7 +93,7 @@ export const withSomeEffectsForAnObject = (): renders* => (
   </DragAndDropContextProvider>
 );
 
-export const withAnEffectWithoutEffectTypeForALayer = (): renders* => (
+export const withAnEffectWithoutEffectTypeForALayer = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
@@ -113,7 +113,7 @@ export const withAnEffectWithoutEffectTypeForALayer = (): renders* => (
   </DragAndDropContextProvider>
 );
 
-export const withoutEffectsForAMixedLayer = (): renders* => (
+export const withoutEffectsForAMixedLayer = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
@@ -133,7 +133,7 @@ export const withoutEffectsForAMixedLayer = (): renders* => (
   </DragAndDropContextProvider>
 );
 
-export const withoutEffectsForA2DLayer = (): renders* => (
+export const withoutEffectsForA2DLayer = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
@@ -163,7 +163,7 @@ export const withoutEffectsForA2DLayer = (): renders* => (
   </DragAndDropContextProvider>
 );
 
-export const withoutEffectsForA3DLayer = (): renders* => (
+export const withoutEffectsForA3DLayer = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
@@ -193,7 +193,7 @@ export const withoutEffectsForA3DLayer = (): renders* => (
   </DragAndDropContextProvider>
 );
 
-export const withoutEffectsForAnObject = (): renders* => (
+export const withoutEffectsForAnObject = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList

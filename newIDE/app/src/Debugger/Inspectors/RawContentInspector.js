@@ -15,7 +15,7 @@ type Props = {|
  * A very simple inspector that display the raw information given by the gameData
  * object.
  */
-const RawContentInspector = ({gameData, onEdit}: Props): renders Fragment => (
+const RawContentInspector = ({gameData, onEdit}: Props): React.Node => (
   <React.Fragment>
     <EmptyMessage>
       <Trans>

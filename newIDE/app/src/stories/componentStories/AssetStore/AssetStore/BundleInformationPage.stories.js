@@ -196,34 +196,34 @@ const BundleInformationPageStory = ({
   );
 };
 
-export const Default = (): renders* => (
+export const Default = (): React.Node => (
   <BundleInformationPageStory
     bundleListingDataToDisplay={fakeBundleListingData}
   />
 );
 
-export const ForAlreadyPurchasedBundle = (): renders* => (
+export const ForAlreadyPurchasedBundle = (): React.Node => (
   <BundleInformationPageStory
     bundleListingDataToDisplay={fakeBundleListingData}
     receivedBundles={[fakeBundle]}
   />
 );
 
-export const Loading = (): renders* => (
+export const Loading = (): React.Node => (
   <BundleInformationPageStory
     bundleListingDataToDisplay={fakeBundleListingData}
     delayResponse={10000}
   />
 );
 
-export const With404 = (): renders* => (
+export const With404 = (): React.Node => (
   <BundleInformationPageStory
     bundleListingDataToDisplay={fakeBundleListingData}
     errorCode={404}
   />
 );
 
-export const WithUnknownError = (): renders* => (
+export const WithUnknownError = (): React.Node => (
   <BundleInformationPageStory
     bundleListingDataToDisplay={fakeBundleListingData}
     errorCode={500}

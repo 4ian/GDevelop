@@ -57,7 +57,7 @@ const SpriteSelector = (
     setSameForAllSpritesLabel,
     hideControlsForSprite
   }: Props,
-): renders Fragment => {
+): React.Node => {
   const { animation, direction, sprite } = getCurrentElements(
     animations,
     animationIndex,

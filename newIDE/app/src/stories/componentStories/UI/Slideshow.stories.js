@@ -39,7 +39,7 @@ const items = [
   },
 ];
 
-export const Loading = (): renders* => {
+export const Loading = (): React.Node => {
   return (
     <Slideshow
       items={null}
@@ -49,7 +49,7 @@ export const Loading = (): renders* => {
   );
 };
 
-export const Loaded = (): renders* => {
+export const Loaded = (): React.Node => {
   return (
     <Slideshow
       items={items}
@@ -59,7 +59,7 @@ export const Loaded = (): renders* => {
   );
 };
 
-export const WithOnly1Item = (): renders* => {
+export const WithOnly1Item = (): React.Node => {
   return (
     <Slideshow
       items={[items[0]]}

@@ -96,7 +96,7 @@ type ChartProps = {|
   fontSize?: 'small' | 'medium',
 |};
 
-export const SessionsChart = ({i18n, chartData, height, fontSize}: ChartProps): renders* => {
+export const SessionsChart = ({i18n, chartData, height, fontSize}: ChartProps): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
 
@@ -150,7 +150,7 @@ export const SessionsChart = ({i18n, chartData, height, fontSize}: ChartProps): 
   );
 };
 
-export const BounceRateChart = ({i18n, chartData, height, fontSize}: ChartProps): renders* => {
+export const BounceRateChart = ({i18n, chartData, height, fontSize}: ChartProps): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
 
@@ -195,7 +195,7 @@ export const BounceRateChart = ({i18n, chartData, height, fontSize}: ChartProps)
   );
 };
 
-export const MeanPlayTimeChart = ({i18n, chartData, height, fontSize}: ChartProps): renders* => {
+export const MeanPlayTimeChart = ({i18n, chartData, height, fontSize}: ChartProps): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
 
@@ -240,7 +240,7 @@ export const MeanPlayTimeChart = ({i18n, chartData, height, fontSize}: ChartProp
   );
 };
 
-export const PlayersRepartitionPerDurationChart = ({i18n, chartData, height, fontSize}: ChartProps): renders* => {
+export const PlayersRepartitionPerDurationChart = ({i18n, chartData, height, fontSize}: ChartProps): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
   return (
@@ -289,7 +289,7 @@ export const PlayersRepartitionPerDurationChart = ({i18n, chartData, height, fon
   );
 };
 
-export const PlayersDurationPerDayChart = ({i18n, chartData, height, fontSize}: ChartProps): renders* => {
+export const PlayersDurationPerDayChart = ({i18n, chartData, height, fontSize}: ChartProps): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
 

@@ -137,4 +137,4 @@ export default React.forwardRef<Props, ScrollViewInterface>(
   },
 ) as component(
   ...{ ...Props, +ref?: React.RefSetter<ScrollViewInterface> }
-) renders*;
+) React.Node;

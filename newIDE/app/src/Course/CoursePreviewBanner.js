@@ -161,7 +161,7 @@ const CoursePreviewBanner = (
     getCourseChapterCompletion,
     onDisplayCourse
   }: Props,
-): renders* => {
+): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { achievements, badges } = React.useContext(AuthenticatedUserContext);
   const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();

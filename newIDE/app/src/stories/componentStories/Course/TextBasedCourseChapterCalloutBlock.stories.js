@@ -9,7 +9,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Info = (): renders* => (
+export const Info = (): React.Node => (
   <TextBasedCourseChapterCalloutBlock
     kind="info"
     text={`**Notice**

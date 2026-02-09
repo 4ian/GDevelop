@@ -11,7 +11,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const WrongEditorInfo = (): renders Fragment => {
+export const WrongEditorInfo = (): React.Node => {
   return (
     <>
       <div id="step-text">Test text</div>
@@ -27,7 +27,7 @@ export const WrongEditorInfo = (): renders Fragment => {
   );
 };
 
-export const WrongEditorInfoWithSceneName = (): renders Fragment => {
+export const WrongEditorInfoWithSceneName = (): React.Node => {
   return (
     <>
       <div id="step-text">Test text</div>
@@ -43,7 +43,7 @@ export const WrongEditorInfoWithSceneName = (): renders Fragment => {
   );
 };
 
-export const StandaloneTooltip = (): renders Fragment => {
+export const StandaloneTooltip = (): React.Node => {
   return (
     <>
       <div id="step-text">Test text</div>

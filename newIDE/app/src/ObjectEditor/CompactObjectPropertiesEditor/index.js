@@ -275,7 +275,7 @@ export const CompactObjectPropertiesEditor = (
     isVariableListLocked,
     isBehaviorListLocked
   }: Props,
-): renders* => {
+): React.Node => {
   const forceUpdate = useForceUpdate();
   const [isPropertiesFolded, setIsPropertiesFolded] = React.useState(false);
   const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(false);

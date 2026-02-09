@@ -29,7 +29,7 @@ type Props = {|
   isAutomatic?: boolean,
 |};
 
-const PointRow = ({pointX, pointY, ...props}: Props): renders* => {
+const PointRow = ({pointX, pointY, ...props}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <TableRow

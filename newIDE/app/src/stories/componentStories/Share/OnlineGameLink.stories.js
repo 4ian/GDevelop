@@ -56,7 +56,7 @@ const Wrapper = ({ children }: {| children: React.Node |}) => {
   return <>{children}</>;
 };
 
-export const Export = (): renders Fragment => {
+export const Export = (): React.Node => {
   return (
     <Wrapper>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -76,7 +76,7 @@ export const Export = (): renders Fragment => {
     </Wrapper>
   );
 };
-export const SavingProject = (): renders Fragment => {
+export const SavingProject = (): React.Node => {
   return (
     <Wrapper>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -96,7 +96,7 @@ export const SavingProject = (): renders Fragment => {
     </Wrapper>
   );
 };
-export const ResourcesDownload = (): renders Fragment => {
+export const ResourcesDownload = (): React.Node => {
   return (
     <Wrapper>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -116,7 +116,7 @@ export const ResourcesDownload = (): renders Fragment => {
     </Wrapper>
   );
 };
-export const Compress = (): renders Fragment => {
+export const Compress = (): React.Node => {
   return (
     <Wrapper>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -136,7 +136,7 @@ export const Compress = (): renders Fragment => {
     </Wrapper>
   );
 };
-export const Upload = (): renders Fragment => {
+export const Upload = (): React.Node => {
   return (
     <Wrapper>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -156,7 +156,7 @@ export const Upload = (): renders Fragment => {
     </Wrapper>
   );
 };
-export const WaitingForBuild = (): renders Fragment => {
+export const WaitingForBuild = (): React.Node => {
   return (
     <Wrapper>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -176,7 +176,7 @@ export const WaitingForBuild = (): renders Fragment => {
     </Wrapper>
   );
 };
-export const Build = (): renders Fragment => {
+export const Build = (): React.Node => {
   return (
     <Wrapper>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -196,7 +196,7 @@ export const Build = (): renders Fragment => {
     </Wrapper>
   );
 };
-export const DoneWithPublicBuild = (): renders Fragment => {
+export const DoneWithPublicBuild = (): React.Node => {
   return (
     <Wrapper>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -216,7 +216,7 @@ export const DoneWithPublicBuild = (): renders Fragment => {
     </Wrapper>
   );
 };
-export const DoneWithPrivateBuild = (): renders Fragment => {
+export const DoneWithPrivateBuild = (): React.Node => {
   return (
     <Wrapper>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>

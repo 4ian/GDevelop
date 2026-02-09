@@ -44,7 +44,7 @@ export const CompactEventsBasedObjectVariantPropertiesEditor = (
     getContentAABB,
     onEventsBasedObjectChildrenEdited
   }: Props,
-): renders* => {
+): React.Node => {
   const forceUpdate = useForceUpdate();
 
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);

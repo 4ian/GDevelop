@@ -49,7 +49,7 @@ type Props = {|
   editorCallbacks: EditorCallbacks,
 |};
 
-export const FunctionCallRow: component(...Props) renders* = React.memo<Props>(function FunctionCallRow({
+export const FunctionCallRow: React.ComponentType<Props> = React.memo<Props>(function FunctionCallRow({
   project,
   functionCall,
   editorFunctionCallResult,

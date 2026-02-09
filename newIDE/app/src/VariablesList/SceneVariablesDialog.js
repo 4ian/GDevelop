@@ -30,7 +30,7 @@ const SceneVariablesDialog = (
     shouldCreateInitiallySelectedVariable,
     isListLocked
   }: Props,
-): renders* => {
+): React.Node => {
   const onComputeAllVariableNames = React.useCallback(
     () =>
       EventsRootVariablesFinder.findAllLayoutVariables(

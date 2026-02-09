@@ -140,7 +140,7 @@ export const Default = (
     recommendedPlanId: string,
     excludePlanId: string,
   },
-): renders* => {
+): React.Node => {
   const Component = () => {
     const {
       getSubscriptionPlansWithPricingSystems,

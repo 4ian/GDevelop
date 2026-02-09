@@ -13,7 +13,7 @@ export default {
   decorators: [getPaperDecorator('medium') as StoryDecorator],
 };
 
-export const Default = (): renders* => (
+export const Default = (): React.Node => (
   <ColumnStackLayout>
     <HotMessage
       title="Get 2 months free!"

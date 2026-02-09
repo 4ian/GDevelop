@@ -10,7 +10,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const WithSingleExtensionError = (): renders* => {
+export const WithSingleExtensionError = (): React.Node => {
   const erroredExtensionLoadingResults = [
     {
       extensionModulePath: 'Physics2Behavior/Physics2Tools.js',
@@ -31,7 +31,7 @@ export const WithSingleExtensionError = (): renders* => {
   );
 };
 
-export const WithMultipleExtensionErrors = (): renders* => {
+export const WithMultipleExtensionErrors = (): React.Node => {
   const erroredExtensionLoadingResults = [
     {
       extensionModulePath: 'Physics2Behavior/Physics2Tools.js',
@@ -68,7 +68,7 @@ export const WithMultipleExtensionErrors = (): renders* => {
   );
 };
 
-export const WithGenericError = (): renders* => {
+export const WithGenericError = (): React.Node => {
   const erroredExtensionLoadingResults = [];
   const genericError = new Error(
     'Some extension modules could not be loaded. Please check the console for more details.'
@@ -83,7 +83,7 @@ export const WithGenericError = (): renders* => {
   );
 };
 
-export const WithBothExtensionAndGenericErrors = (): renders* => {
+export const WithBothExtensionAndGenericErrors = (): React.Node => {
   const erroredExtensionLoadingResults = [
     {
       extensionModulePath: 'Physics2Behavior/Physics2Tools.js',

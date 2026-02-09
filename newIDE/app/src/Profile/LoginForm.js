@@ -45,7 +45,7 @@ const getStyles = ({ verticalDesign }) => ({
   },
 });
 
-export const accountsAlreadyExistsWithDifferentProviderCopy: renders* = (
+export const accountsAlreadyExistsWithDifferentProviderCopy: React.Node = (
   <Trans>
     You already have an account for this email address with a different provider
     (Google, Apple or GitHub). Please try with one of those.
@@ -78,7 +78,7 @@ const LoginForm = (
     error,
     onGoToCreateAccount
   }: Props,
-): renders Fragment => {
+): React.Node => {
   const [
     isForgotPasswordDialogOpen,
     setIsForgotPasswordDialogOpen,

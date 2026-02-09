@@ -28,7 +28,7 @@ const GlobalVariablesDialog = (
     shouldCreateInitiallySelectedVariable,
     isListLocked
   }: Props,
-): renders* => {
+): React.Node => {
   const onComputeAllVariableNames = React.useCallback(
     () =>
       EventsRootVariablesFinder.findAllGlobalVariables(

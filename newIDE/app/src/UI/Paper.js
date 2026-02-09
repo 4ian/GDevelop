@@ -27,7 +27,7 @@ export const getBackgroundColor = (
     ? gdevelopTheme.paper.backgroundColor.medium
     : gdevelopTheme.paper.backgroundColor.light;
 
-const Paper: component(...{ ...Props, +ref?: React.RefSetter<any> }) renders* = React.forwardRef<Props, HTMLDivElement>(
+const Paper: component(...{ ...Props, +ref?: React.RefSetter<any> }) React.Node = React.forwardRef<Props, HTMLDivElement>(
   ({ id, children, background, elevation, variant, style, square }, ref) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const backgroundColor = getBackgroundColor(gdevelopTheme, background);

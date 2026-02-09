@@ -23,7 +23,7 @@ const styles = {
   },
 };
 
-export const Toolbar: component(...ToolbarProps) renders* = React.memo<ToolbarProps>(
+export const Toolbar: React.ComponentType<ToolbarProps> = React.memo<ToolbarProps>(
   ({
     children,
     borderBottomColor,
@@ -78,7 +78,7 @@ type ToolbarGroupProps = {|
   spaceOut?: boolean,
 |};
 
-export const ToolbarGroup: component(...ToolbarGroupProps) renders* = React.memo<ToolbarGroupProps>(
+export const ToolbarGroup: React.ComponentType<ToolbarGroupProps> = React.memo<ToolbarGroupProps>(
   (props: ToolbarGroupProps) => (
     <span style={toolbarGroupStyle(props)}>{props.children}</span>
   )

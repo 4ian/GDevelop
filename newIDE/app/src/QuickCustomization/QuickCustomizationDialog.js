@@ -52,7 +52,7 @@ export const QuickCustomizationDialog = (
     onWillInstallExtension,
     onExtensionInstalled
   }: Props,
-): renders* => {
+): React.Node => {
   const { triggerUnsavedChanges } = React.useContext(UnsavedChangesContext);
   const gameAndBuildsManager = useGameAndBuildsManager({
     project,

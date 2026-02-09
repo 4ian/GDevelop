@@ -9,7 +9,7 @@ type Props = {
   onClose: () => void,
 };
 
-export const InGameEditorWarningDialog = ({onClose}: Props): renders* => {
+export const InGameEditorWarningDialog = ({onClose}: Props): React.Node => {
   return (
     <Dialog
       open

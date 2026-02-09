@@ -42,7 +42,7 @@ const Card = (
     disabled,
     padding
   }: Props,
-): renders* => {
+): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const cardContentStyle: {|

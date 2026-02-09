@@ -26,7 +26,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const CloudProjectRecoveryDialog = ({cloudProjectId, onClose, onOpenPreviousVersion}: Props): renders* => {
+const CloudProjectRecoveryDialog = ({cloudProjectId, onClose, onOpenPreviousVersion}: Props): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile } = authenticatedUser;
   const [

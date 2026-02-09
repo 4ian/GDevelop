@@ -386,7 +386,7 @@ const getNodeKey = ({ treeIndex }) => treeIndex;
  */
 const EventsTree: component(
   ...{ ...EventsTreeProps, +ref?: React.RefSetter<EventsTreeInterface> }
-) renders* = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
+) React.Node = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
   (props, ref) => {
     const forceUpdate = useForceUpdate();
 

@@ -452,7 +452,7 @@ export const DayGroupRow = (
     usersPublicProfileByIds,
     getAnonymousAvatar
   }: DayGroupRowProps,
-): renders* => {
+): React.Node => {
   const [isOpen, setIsOpen] = React.useState<boolean>(isOpenedInitially);
   const displayYear = new Date(day).getFullYear() !== thisYear;
   const namedVersions = React.useMemo(

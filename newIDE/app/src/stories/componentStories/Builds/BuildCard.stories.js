@@ -23,7 +23,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const WebBuildCard = (): renders* => (
+export const WebBuildCard = (): React.Node => (
   <BuildCard
     build={completeWebBuild}
     game={{ ...game1, acceptsBuildComments: true }}
@@ -35,7 +35,7 @@ export const WebBuildCard = (): renders* => (
   />
 );
 
-export const WebCurrentlyOnlineBuildCard = (): renders* => (
+export const WebCurrentlyOnlineBuildCard = (): React.Node => (
   <BuildCard
     build={completeWebBuild}
     game={{
@@ -50,7 +50,7 @@ export const WebCurrentlyOnlineBuildCard = (): renders* => (
   />
 );
 
-export const ElectronBuildCard = (): renders* => (
+export const ElectronBuildCard = (): React.Node => (
   <BuildCard
     build={completeElectronBuild}
     game={game1}
@@ -61,7 +61,7 @@ export const ElectronBuildCard = (): renders* => (
     authenticatedUser={fakeSilverAuthenticatedUser}
   />
 );
-export const PendingElectronBuildCard = (): renders* => (
+export const PendingElectronBuildCard = (): React.Node => (
   <BuildCard
     build={pendingElectronBuild}
     game={game1}
@@ -72,7 +72,7 @@ export const PendingElectronBuildCard = (): renders* => (
     authenticatedUser={fakeSilverAuthenticatedUser}
   />
 );
-export const CordovaBuildCard = (): renders* => (
+export const CordovaBuildCard = (): React.Node => (
   <BuildCard
     build={completeCordovaBuild}
     game={game1}
@@ -83,7 +83,7 @@ export const CordovaBuildCard = (): renders* => (
     authenticatedUser={fakeSilverAuthenticatedUser}
   />
 );
-export const pendingCordovaBuildCard = (): renders* => (
+export const pendingCordovaBuildCard = (): React.Node => (
   <BuildCard
     build={pendingCordovaBuild}
     game={game1}
@@ -94,7 +94,7 @@ export const pendingCordovaBuildCard = (): renders* => (
     authenticatedUser={fakeSilverAuthenticatedUser}
   />
 );
-export const ErroredCordovaBuildCard = (): renders* => (
+export const ErroredCordovaBuildCard = (): React.Node => (
   <BuildCard
     build={erroredCordovaBuild}
     game={game1}

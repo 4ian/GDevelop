@@ -64,7 +64,7 @@ const LayerEditorDialog = (
     resourceManagementProps,
     projectScopedContainersAccessor
   }: Props,
-): renders* => {
+): React.Node => {
   const forceUpdate = useForceUpdate();
   const {
     onCancelChanges,

@@ -89,7 +89,7 @@ export const allInAppTutorialsCards = [
     description: t`Make a knight jump and run in this platformer game.` as any,
     shortDescription: t`Make a knight jump and run.` as any,
     durationInMinutes: 1,
-    renderImage: (props: any): renders* => <Platformer {...props} />,
+    renderImage: (props: any): React.Node => <Platformer {...props} />,
   },
   {
     id: CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
@@ -97,7 +97,7 @@ export const allInAppTutorialsCards = [
     shortDescription: t`Follow a character with scrolling background.` as any,
     description: t`Follow this Castlevania-type character with the camera, while the background scrolls.` as any,
     durationInMinutes: 2,
-    renderImage: (props: any): renders* => <Parallax {...props} />,
+    renderImage: (props: any): React.Node => <Parallax {...props} />,
   },
   {
     id: TOP_DOWN_RPG_MOVEMENT_ID,
@@ -105,7 +105,7 @@ export const allInAppTutorialsCards = [
     shortDescription: t`Move like in retro Pokemon games.` as any,
     description: t`Make a character move like in a retro Pokemon game.` as any,
     durationInMinutes: 2,
-    renderImage: (props: any): renders* => <TopDownRPGMovement {...props} />,
+    renderImage: (props: any): React.Node => <TopDownRPGMovement {...props} />,
   },
   {
     id: JOYSTICK_IN_APP_TUTORIAL_ID,
@@ -113,7 +113,7 @@ export const allInAppTutorialsCards = [
     shortDescription: t`Control a spaceship with a joystick.` as any,
     description: t`Control your spaceship with a joystick, while avoiding asteroids.` as any,
     durationInMinutes: 1,
-    renderImage: (props: any): renders* => <Joystick {...props} />,
+    renderImage: (props: any): React.Node => <Joystick {...props} />,
   },
   {
     id: OBJECT_3D_IN_APP_TUTORIAL_ID,
@@ -121,7 +121,7 @@ export const allInAppTutorialsCards = [
     shortDescription: t`Place 3D platforms in a 2D game.` as any,
     description: t`Place 3D platforms in this 2D platformer, creating a path to the end.` as any,
     durationInMinutes: 2,
-    renderImage: (props: any): renders* => <Object3D {...props} />,
+    renderImage: (props: any): React.Node => <Object3D {...props} />,
   },
   {
     id: HEALTH_BAR_IN_APP_TUTORIAL_ID,
@@ -129,7 +129,7 @@ export const allInAppTutorialsCards = [
     shortDescription: t`Add a health bar for handle damage.` as any,
     description: t`Add a health bar to this jumping character, losing health when hitting spikes.` as any,
     durationInMinutes: 2,
-    renderImage: (props: any): renders* => <HealthBar {...props} />,
+    renderImage: (props: any): React.Node => <HealthBar {...props} />,
   },
   {
     id: TILEMAP_PLATFORMER_ID,
@@ -137,7 +137,7 @@ export const allInAppTutorialsCards = [
     shortDescription: t`Build dynamic levels with tiles.` as any,
     description: t`Use a Tilemap to build a level and change it dynamically during the game.` as any,
     durationInMinutes: 2,
-    renderImage: (props: any): renders* => <TilemapPlatformer {...props} />,
+    renderImage: (props: any): React.Node => <TilemapPlatformer {...props} />,
   },
   {
     id: FIRE_A_BULLET_ID,
@@ -145,7 +145,7 @@ export const allInAppTutorialsCards = [
     shortDescription: t`Fire bullets in an Asteroids game.` as any,
     description: t`Fire bullets in this Asteroids game. Get ready for a Star Wars show.` as any,
     durationInMinutes: 2,
-    renderImage: (props: any): renders* => <FireABullet {...props} />,
+    renderImage: (props: any): React.Node => <FireABullet {...props} />,
   },
   {
     id: TIMER_IN_APP_TUTORIAL_ID,
@@ -153,7 +153,7 @@ export const allInAppTutorialsCards = [
     shortDescription: t`Add a time attack mode.` as any,
     description: t`Add a time attack mode, where you have to reach the end as fast as possible.` as any,
     durationInMinutes: 2,
-    renderImage: (props: any): renders* => <Timer {...props} />,
+    renderImage: (props: any): React.Node => <Timer {...props} />,
   },
   {
     id: COOP_PLATFORMER_ID,
@@ -161,7 +161,7 @@ export const allInAppTutorialsCards = [
     shortDescription: t`Transform a game into a multiplayer experience.` as any,
     description: t`Transform this platformer into a co-op game, where two players can play together.` as any,
     durationInMinutes: 3,
-    renderImage: (props: any): renders* => <CoopPlatformer {...props} />,
+    renderImage: (props: any): React.Node => <CoopPlatformer {...props} />,
   },
   {
     id: PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
@@ -169,7 +169,7 @@ export const allInAppTutorialsCards = [
     shortDescription: t`Multiply scores with collectibles.` as any,
     description: t`Transform this Plinko game with collectibles that multiply your score.` as any,
     durationInMinutes: 3,
-    renderImage: (props: any): renders* => <MultiplierScore {...props} />,
+    renderImage: (props: any): React.Node => <MultiplierScore {...props} />,
   },
 ];
 
@@ -180,7 +180,7 @@ type Props = {|
   displayAsCarousel?: boolean,
 |};
 
-const GuidedLessons = ({selectInAppTutorial, lessonsIds, displayAsCarousel}: Props): renders* => {
+const GuidedLessons = ({selectInAppTutorial, lessonsIds, displayAsCarousel}: Props): React.Node => {
   const isOnline = useOnlineStatus();
   const {
     inAppTutorialShortHeaders,

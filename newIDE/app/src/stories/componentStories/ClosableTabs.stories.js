@@ -24,7 +24,7 @@ export default {
   decorators: [GDevelopJsInitializerDecorator],
 };
 
-export const ThreeTabs = (): renders* => (
+export const ThreeTabs = (): React.Node => (
   <ValueStateHolder
     initialValue={0}
     render={(value, onChange) => (
@@ -110,7 +110,7 @@ export const ThreeTabs = (): renders* => (
   />
 );
 
-export const LongLabels = (): renders* => (
+export const LongLabels = (): React.Node => (
   <ValueStateHolder
     initialValue={0}
     render={(value, onChange) => (
@@ -227,7 +227,7 @@ const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = {
   ),
 };
 
-export const WithObjectsList = (): renders* => (
+export const WithObjectsList = (): React.Node => (
   <ValueStateHolder
     initialValue={0}
     render={(value, onChange) => (

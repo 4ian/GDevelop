@@ -54,7 +54,7 @@ export default function SpriteEditor({
   onObjectUpdated,
   isChildObject,
   renderObjectNameField,
-}: SpriteEditorProps): renders* {
+}: SpriteEditorProps): React.Node {
   const [pointsEditorOpen, setPointsEditorOpen] = React.useState(false);
   const [advancedOptionsOpen, setAdvancedOptionsOpen] = React.useState(false);
   const [

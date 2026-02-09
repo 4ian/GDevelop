@@ -26,7 +26,7 @@ const CompactSearchBar: component(
     ...CompactSearchBarProps,
     +ref?: React.RefSetter<CompactSearchBarInterface>,
   }
-) renders* = React.forwardRef<
+) React.Node = React.forwardRef<
   CompactSearchBarProps,
   CompactSearchBarInterface
 >(({ value, onChange, id, disabled, errored, placeholder }, ref) => {

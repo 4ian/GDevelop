@@ -555,7 +555,7 @@ export const getSummaryLines = (
       | CreditsPackageListingData
       | CourseListingData>,
   |},
-): { desktopLines: Array<renders*>, mobileLines: Array<renders*> } => {
+): { desktopLines: Array<React.Node>, mobileLines: Array<React.Node> } => {
   const includedListableProducts =
     bundleListingData.includedListableProducts || [];
   const summaryLineItems = [];

@@ -11,7 +11,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const MarketingPlansDialog = ({game, onClose}: Props): renders* => {
+const MarketingPlansDialog = ({game, onClose}: Props): React.Node => {
   return (
     <Dialog
       title={<Trans>Marketing campaigns</Trans>}

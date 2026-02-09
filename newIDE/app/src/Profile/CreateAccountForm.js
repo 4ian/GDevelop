@@ -87,7 +87,7 @@ const CreateAccountForm = (
     error,
     onGoToLogin
   }: Props,
-): renders* => {
+): React.Node => {
   const accountsExistsWithOtherCredentials = error
     ? error.code === 'auth/account-exists-with-different-credential'
     : false;

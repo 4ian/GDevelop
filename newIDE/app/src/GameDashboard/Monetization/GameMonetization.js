@@ -15,7 +15,7 @@ type Props = {|
   onGameUpdated: (updatedGame: Game) => void,
 |};
 
-const GameMonetization = ({game, onGameUpdated}: Props): null | renders* => {
+const GameMonetization = ({game, onGameUpdated}: Props): null | React.Node => {
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );

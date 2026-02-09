@@ -69,7 +69,7 @@ const editors = {
   },
 };
 
-const BottomToolbar: component(...Props) renders* = React.memo<Props>((props: Props) => {
+const BottomToolbar: React.ComponentType<Props> = React.memo<Props>((props: Props) => {
   return (
     <Paper background="medium" square style={styles.container}>
       <Toolbar height={toolbarHeight} paddingBottom={toolbarPaddingBottom}>

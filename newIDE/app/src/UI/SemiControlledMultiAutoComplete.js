@@ -80,7 +80,7 @@ const SemiControlledMultiAutoComplete: component(
     ...Props,
     +ref?: React.RefSetter<SemiControlledMultiAutoCompleteInterface>,
   }
-) renders* = React.forwardRef<
+) React.Node = React.forwardRef<
   Props,
   SemiControlledMultiAutoCompleteInterface
 >((props, ref) => {

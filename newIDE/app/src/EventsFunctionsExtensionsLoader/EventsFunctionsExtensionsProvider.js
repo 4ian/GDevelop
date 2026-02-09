@@ -44,7 +44,7 @@ export const EventsFunctionsExtensionsProvider = (
     eventsFunctionsExtensionWriter,
     eventsFunctionsExtensionOpener
   }: Props,
-): renders* => {
+): React.Node => {
   const [
     eventsFunctionsExtensionsError,
     setEventsFunctionsExtensionsError,

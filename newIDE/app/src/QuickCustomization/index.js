@@ -171,7 +171,7 @@ export const renderQuickCustomization = (
     onWillInstallExtension,
     onExtensionInstalled
   }: Props,
-): { content: renders Fragment, showPreview: boolean, title: React.Node } => {
+): { content: React.Node, showPreview: boolean, title: React.Node } => {
   return {
     title: quickCustomizationState.step.title,
     content: (

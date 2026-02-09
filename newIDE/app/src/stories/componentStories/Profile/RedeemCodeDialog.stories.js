@@ -13,7 +13,7 @@ export default {
   component: RedeemCodeDialog,
 };
 
-export const WorkingCode = (): renders* => {
+export const WorkingCode = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 100 });
   mock
     .onPost(`${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`)
@@ -31,7 +31,7 @@ export const WorkingCode = (): renders* => {
   );
 };
 
-export const CodeDoesNotExist = (): renders* => {
+export const CodeDoesNotExist = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 100 });
   mock
     .onPost(`${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`)
@@ -49,7 +49,7 @@ export const CodeDoesNotExist = (): renders* => {
   );
 };
 
-export const UnknownError = (): renders* => {
+export const UnknownError = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 100 });
   mock
     .onPost(`${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`)
@@ -67,7 +67,7 @@ export const UnknownError = (): renders* => {
   );
 };
 
-export const CannotBeRedeemedAnymoreError = (): renders* => {
+export const CannotBeRedeemedAnymoreError = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 100 });
   mock
     .onPost(`${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`)
@@ -87,7 +87,7 @@ export const CannotBeRedeemedAnymoreError = (): renders* => {
   );
 };
 
-export const AlreadyRedeemedByUser = (): renders* => {
+export const AlreadyRedeemedByUser = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 100 });
   mock
     .onPost(`${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`)

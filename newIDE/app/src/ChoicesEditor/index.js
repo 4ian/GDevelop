@@ -27,7 +27,7 @@ type ChoicesEditorProps = {|
   isNumber: boolean,
 |};
 
-const ChoicesEditor = ({choices, setChoices, disabled, hideLabels, isNumber}: ChoicesEditorProps): renders* => {
+const ChoicesEditor = ({choices, setChoices, disabled, hideLabels, isNumber}: ChoicesEditorProps): React.Node => {
   const updateChoices = () => setChoices(choices);
 
   return (

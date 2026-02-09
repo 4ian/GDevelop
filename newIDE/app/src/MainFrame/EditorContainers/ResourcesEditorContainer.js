@@ -105,4 +105,4 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
   }
 }
 
-export const renderResourcesEditorContainer = (props: RenderEditorContainerPropsWithRef): renders* => <ResourcesEditorContainer {...props} />;
+export const renderResourcesEditorContainer = (props: RenderEditorContainerPropsWithRef): React.Node => <ResourcesEditorContainer {...props} />;

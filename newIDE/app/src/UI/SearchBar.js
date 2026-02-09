@@ -62,7 +62,7 @@ const noop = () => {};
  */
 const SearchBar: component(
   ...{ ...Props, +ref?: React.RefSetter<SearchBarInterface> }
-) renders* = React.forwardRef<Props, SearchBarInterface>(
+) React.Node = React.forwardRef<Props, SearchBarInterface>(
   (
     {
       id,

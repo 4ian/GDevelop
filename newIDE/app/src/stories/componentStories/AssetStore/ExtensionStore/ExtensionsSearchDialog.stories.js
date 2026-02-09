@@ -21,7 +21,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders* => {
+export const Default = (): React.Node => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -80,7 +80,7 @@ export const Default = (): renders* => {
   );
 };
 
-export const WithServerSideError = (): renders* => {
+export const WithServerSideError = (): React.Node => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,

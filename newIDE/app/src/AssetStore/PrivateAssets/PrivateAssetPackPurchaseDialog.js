@@ -37,7 +37,7 @@ const PrivateAssetPackPurchaseDialog = (
     onClose,
     simulateAppStoreProduct
   }: Props,
-): renders Fragment => {
+): React.Node => {
   const {
     profile,
     onOpenLoginDialog,

@@ -68,7 +68,7 @@ const SpineEditor = (
     projectScopedContainersAccessor,
     renderObjectNameField
   }: EditorProps,
-): renders* => {
+): React.Node => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
     justAddedAnimationName,

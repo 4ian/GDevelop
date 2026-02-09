@@ -134,7 +134,7 @@ const useStylesForGreyedListItem = makeStyles(theme => {
  */
 export const ListItem: component(
   ...{ ...ListItemProps, +ref?: React.RefSetter<ListItemRefType> }
-) renders* = React.forwardRef<ListItemProps, ListItemRefType>(
+) React.Node = React.forwardRef<ListItemProps, ListItemRefType>(
   (props: ListItemProps, ref) => {
     const [isOpen, setIsOpen] = React.useState(!!props.initiallyOpen);
     const elementWithMenu = React.useRef<?ElementWithMenu>(null);
@@ -381,7 +381,7 @@ type ListProps = {|
 /**
  * List based on Material-UI List.
  */
-export const List = (props: ListProps): renders* => {
+export const List = (props: ListProps): React.Node => {
   let listStyle = { ...props.style };
   if (props.useGap) {
     listStyle = { ...listStyle, ...styles.listWithGap };

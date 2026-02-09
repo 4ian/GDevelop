@@ -16,7 +16,7 @@ const SecureCheckout = (
     includeCancelInformation?: boolean,
     noMargin?: boolean,
   |},
-): renders* => {
+): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <LineStackLayout

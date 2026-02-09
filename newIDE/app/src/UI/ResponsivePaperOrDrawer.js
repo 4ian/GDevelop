@@ -36,7 +36,7 @@ export const ResponsivePaperOrDrawer = (
     onClose: () => void,
     children: React.Node,
   |},
-): null | renders* => {
+): null | React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   if (!isMobile) {
     if (!open) return null;

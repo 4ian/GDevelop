@@ -24,7 +24,7 @@ type ContributionLineProps = {|
   shortDescription?: string,
 |};
 
-export const ContributionLine = ({fullName, previewIconUrl, shortDescription}: ContributionLineProps): renders* => (
+export const ContributionLine = ({fullName, previewIconUrl, shortDescription}: ContributionLineProps): React.Node => (
   <Line>
     {previewIconUrl && (
       <IconContainer alt={fullName} src={previewIconUrl} size={64} />
@@ -43,7 +43,7 @@ type ExamplesAccordionProps = {|
   exampleError: ?Error,
 |};
 
-export const ExamplesAccordion = ({examples, exampleError}: ExamplesAccordionProps): renders* => {
+export const ExamplesAccordion = ({examples, exampleError}: ExamplesAccordionProps): React.Node => {
   if (exampleError)
     return (
       <Column>
@@ -91,7 +91,7 @@ type ExtensionsAccordionProps = {|
   extensionError: ?Error,
 |};
 
-export const ExtensionsAccordion = ({extensions, extensionError}: ExtensionsAccordionProps): renders* => {
+export const ExtensionsAccordion = ({extensions, extensionError}: ExtensionsAccordionProps): React.Node => {
   if (extensionError)
     return (
       <Column>
@@ -151,7 +151,7 @@ type Props = {|
   userId: string,
 |};
 
-const ContributionDetails = ({userId}: Props): renders* => {
+const ContributionDetails = ({userId}: Props): React.Node => {
   const [
     extensions,
     setExtensions,

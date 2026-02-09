@@ -15,7 +15,7 @@ const PrivateAssetPackAudioFilesDownloadButton = (
   }: {|
     assetPack: PrivateAssetPack,
   |},
-): renders* => {
+): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const { getPrivateAssetPackAudioArchiveUrl } = React.useContext(
     PrivateAssetsAuthorizationContext

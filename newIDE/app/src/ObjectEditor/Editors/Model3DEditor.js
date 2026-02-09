@@ -109,7 +109,7 @@ const Model3DEditor = (
     projectScopedContainersAccessor,
     renderObjectNameField
   }: EditorProps,
-): renders Fragment => {
+): React.Node => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
 
   const [

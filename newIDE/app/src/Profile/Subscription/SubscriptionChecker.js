@@ -38,7 +38,7 @@ type Props = {|
 
 const SubscriptionChecker: component(
   ...{ ...Props, +ref?: React.RefSetter<SubscriptionCheckerInterface> }
-) renders* = React.forwardRef<
+) React.Node = React.forwardRef<
   Props,
   SubscriptionCheckerInterface
 >(

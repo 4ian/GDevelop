@@ -44,7 +44,7 @@ export const ExtensionListItem = (
     onChoose,
     onHeightComputed
   }: Props,
-): renders* => {
+): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(

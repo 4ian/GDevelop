@@ -219,7 +219,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const ObjectExporterDialog = ({project, layout: scene, onClose}: Props): renders* => {
+const ObjectExporterDialog = ({project, layout: scene, onClose}: Props): React.Node => {
   const [
     zippedSceneAssetsBlob,
     setZippedSceneAssetsBlob,

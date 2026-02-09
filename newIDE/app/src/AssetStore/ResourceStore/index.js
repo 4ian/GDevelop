@@ -385,7 +385,7 @@ type Props = {
   resourceKind: ResourceKindSupportedByResourceStore,
 };
 
-export const ResourceStore = ({onSelectResource, selectedResourceIndex, resourceKind}: Props): renders* => {
+export const ResourceStore = ({onSelectResource, selectedResourceIndex, resourceKind}: Props): React.Node => {
   const {
     searchResults,
     fetchResourcesAndFilters,

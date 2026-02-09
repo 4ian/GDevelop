@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders* => {
+export const Default = (): React.Node => {
   const [chosenLayer, setChosenLayer] = React.useState<string>('');
   const [selectLayer, setSelectLayer] = React.useState<gdLayer | null>(null);
   return (
@@ -53,7 +53,7 @@ export const Default = (): renders* => {
   );
 };
 
-export const SmallWidthAndHeight = (): renders* => {
+export const SmallWidthAndHeight = (): React.Node => {
   const [chosenLayer, setChosenLayer] = React.useState<string>('');
   const [selectLayer, setSelectLayer] = React.useState<gdLayer | null>(null);
 

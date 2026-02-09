@@ -25,7 +25,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders* => {
+export const Default = (): React.Node => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -78,7 +78,7 @@ export const Default = (): renders* => {
   );
 };
 
-export const WithCommunityExtensions = (): renders* => {
+export const WithCommunityExtensions = (): React.Node => {
   const [
     showExperimentalExtensions,
     setShowExperimentalExtensions,
@@ -143,7 +143,7 @@ export const WithCommunityExtensions = (): renders* => {
   );
 };
 
-export const WithServerSideErrors = (): renders* => {
+export const WithServerSideErrors = (): React.Node => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -181,7 +181,7 @@ export const WithServerSideErrors = (): renders* => {
   );
 };
 
-export const ShowingAnAlreadyInstalledExtension = (): renders* => {
+export const ShowingAnAlreadyInstalledExtension = (): React.Node => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -237,7 +237,7 @@ export const ShowingAnAlreadyInstalledExtension = (): renders* => {
   );
 };
 
-export const ExtensionBeingInstalled = (): renders* => {
+export const ExtensionBeingInstalled = (): React.Node => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -290,7 +290,7 @@ export const ExtensionBeingInstalled = (): renders* => {
   );
 };
 
-export const OnlyWithBehaviors = (): renders* => {
+export const OnlyWithBehaviors = (): React.Node => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,

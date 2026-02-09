@@ -51,7 +51,7 @@ const dialogContent = {
   ],
 };
 
-export const CheckpointDialog = (): renders* => {
+export const CheckpointDialog = (): React.Node => {
   return (
     <InAppTutorialDialog
       endTutorial={() => action('end tutorial')()}
@@ -60,7 +60,7 @@ export const CheckpointDialog = (): renders* => {
     />
   );
 };
-export const EndDialog = (): renders* => {
+export const EndDialog = (): React.Node => {
   return (
     <InAppTutorialDialog
       isLastStep

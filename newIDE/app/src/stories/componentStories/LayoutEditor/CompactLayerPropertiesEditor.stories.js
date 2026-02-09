@@ -18,7 +18,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Layer = (): renders* => (
+export const Layer = (): React.Node => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (
@@ -41,7 +41,7 @@ export const Layer = (): renders* => (
   </DragAndDropContextProvider>
 );
 
-export const LightingLayer = (): renders* => (
+export const LightingLayer = (): React.Node => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (

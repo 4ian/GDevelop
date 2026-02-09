@@ -85,7 +85,7 @@ const useNewProjectDialog = (
     }
   ) => void,
   openNewProjectDialog: () => void,
-  renderNewProjectDialog: () => renders Fragment,
+  renderNewProjectDialog: () => React.Node,
   selectedExampleShortHeader: ?ExampleShortHeader,
   selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
 } => {

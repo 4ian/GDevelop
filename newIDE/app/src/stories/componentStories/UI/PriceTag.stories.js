@@ -14,7 +14,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders* => (
+export const Default = (): React.Node => (
   <ColumnStackLayout>
     <LineStackLayout>
       <PriceTag label={<Text>$8</Text>} />

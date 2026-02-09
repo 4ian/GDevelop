@@ -214,7 +214,7 @@ export type InstructionOrObjectSelectorInterface = {|
 
 const InstructionOrObjectSelector: component(
   ...{ ...Props, +ref?: React.RefSetter<InstructionOrObjectSelectorInterface> }
-) renders* = React.forwardRef<
+) React.Node = React.forwardRef<
   Props,
   InstructionOrObjectSelectorInterface
 >(

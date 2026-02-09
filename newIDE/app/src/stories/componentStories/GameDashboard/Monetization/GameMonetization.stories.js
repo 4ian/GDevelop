@@ -23,7 +23,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const AdsEnabled = (): renders* => {
+export const AdsEnabled = (): React.Node => {
   const game = gameWithDisplayAdsOnGamePageEnabled;
   const mock = new MockAdapter(axios, { delayResponse: 1000 });
   mock
@@ -42,7 +42,7 @@ export const AdsEnabled = (): renders* => {
   );
 };
 
-export const AdsDisabled = (): renders* => {
+export const AdsDisabled = (): React.Node => {
   const game = gameWithDisplayAdsOnGamePageDisabled;
   const mock = new MockAdapter(axios, { delayResponse: 1000 });
   mock
@@ -61,7 +61,7 @@ export const AdsDisabled = (): renders* => {
   );
 };
 
-export const ErrorWhenUpdatingGame = (): renders* => {
+export const ErrorWhenUpdatingGame = (): React.Node => {
   const game = gameWithDisplayAdsOnGamePageEnabled;
   const mock = new MockAdapter(axios, { delayResponse: 1000 });
   mock

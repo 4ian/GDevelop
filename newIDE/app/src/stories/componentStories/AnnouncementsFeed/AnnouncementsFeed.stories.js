@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders* => {
+export const Default = (): React.Node => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -34,7 +34,7 @@ export const Default = (): renders* => {
   );
 };
 
-export const WithClosableItems = (): renders* => {
+export const WithClosableItems = (): React.Node => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -51,7 +51,7 @@ export const WithClosableItems = (): renders* => {
   );
 };
 
-export const ErrorLoadingAnnouncements = (): renders* => {
+export const ErrorLoadingAnnouncements = (): React.Node => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -68,7 +68,7 @@ export const ErrorLoadingAnnouncements = (): renders* => {
   );
 };
 
-export const LoadingAnnouncements = (): renders* => {
+export const LoadingAnnouncements = (): React.Node => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -85,7 +85,7 @@ export const LoadingAnnouncements = (): renders* => {
   );
 };
 
-export const DefaultWithMargins = (): renders* => {
+export const DefaultWithMargins = (): React.Node => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -102,7 +102,7 @@ export const DefaultWithMargins = (): renders* => {
   );
 };
 
-export const OnlyUrgent = (): renders* => {
+export const OnlyUrgent = (): React.Node => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{

@@ -95,7 +95,7 @@ const addSceneEventsFunctionCallMessage = {
   ],
 };
 
-export const addSceneEventsWithNewlyAddedResources = (): renders* => (
+export const addSceneEventsWithNewlyAddedResources = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -120,7 +120,7 @@ export const addSceneEventsWithNewlyAddedResources = (): renders* => (
   />
 );
 
-export const addSceneEventsWithNewlyAddedResourcesWithEditorFunctionCallResult = (): renders* => (
+export const addSceneEventsWithNewlyAddedResourcesWithEditorFunctionCallResult = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',

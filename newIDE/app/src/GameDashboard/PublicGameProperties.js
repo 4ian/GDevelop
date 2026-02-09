@@ -137,7 +137,7 @@ export function PublicGameProperties({
   onGameUpdated,
   onUpdatingGame,
   canBePublishedOnGdGames,
-}: Props): renders* {
+}: Props): React.Node {
   const [categoryInput, setCategoryInput] = React.useState('');
   const { profile } = React.useContext(AuthenticatedUserContext);
 

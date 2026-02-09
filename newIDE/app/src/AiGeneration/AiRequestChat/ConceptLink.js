@@ -145,7 +145,7 @@ const getConceptParent = (conceptMetadata: ConceptMetadata) => {
 /**
  * A link to a GDevelop concept.
  */
-export const ConceptLink = ({conceptMetadata, forceNoLink}: ConceptLinkProps): null | renders* => {
+export const ConceptLink = ({conceptMetadata, forceNoLink}: ConceptLinkProps): null | React.Node => {
   if (!conceptMetadata) return null;
 
   const helpLink = forceNoLink ? '' : getHelpLink(conceptMetadata.helpPath);

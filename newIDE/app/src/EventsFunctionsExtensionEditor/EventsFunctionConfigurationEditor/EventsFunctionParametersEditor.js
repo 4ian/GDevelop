@@ -156,7 +156,7 @@ export const EventsFunctionParametersEditor = (
     children,
     onFunctionParameterTypeChanged
   }: Props,
-): renders* => {
+): React.Node => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
     justAddedParameterName,

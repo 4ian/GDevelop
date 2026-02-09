@@ -38,7 +38,7 @@ export const CompactTextAreaFieldWithControls: component(
     ...CompactTextAreaFieldWithControlsProps,
     +ref?: React.RefSetter<CompactTextAreaFieldWithControlsInterface>,
   }
-) renders* = React.forwardRef<
+) React.Node = React.forwardRef<
   CompactTextAreaFieldWithControlsProps,
   CompactTextAreaFieldWithControlsInterface
 >(

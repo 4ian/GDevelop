@@ -24,7 +24,7 @@ import {
 import { textEllipsisStyle } from './TextEllipsis';
 import Paper from './Paper';
 
-export const AutocompletePaperComponent = (props: any): renders* => (
+export const AutocompletePaperComponent = (props: any): React.Node => (
   // Use light background so that it's in contrast with background that
   // is either dark or medium (in dialogs).
   <Paper {...props} background="light" />
@@ -407,4 +407,4 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
   },
 ) as component(
   ...{ ...Props, +ref?: React.RefSetter<SemiControlledAutoCompleteInterface> }
-) renders*;
+) React.Node;

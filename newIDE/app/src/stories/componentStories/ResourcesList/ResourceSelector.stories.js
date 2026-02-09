@@ -16,7 +16,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const ImageNotSelected = (): renders* => (
+export const ImageNotSelected = (): React.Node => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
@@ -30,7 +30,7 @@ export const ImageNotSelected = (): renders* => (
   />
 );
 
-export const ImageSelected = (): renders* => (
+export const ImageSelected = (): React.Node => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
@@ -44,7 +44,7 @@ export const ImageSelected = (): renders* => (
   />
 );
 
-export const ImageWithMultipleExternalEditors = (): renders* => (
+export const ImageWithMultipleExternalEditors = (): React.Node => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
@@ -80,7 +80,7 @@ export const ImageWithMultipleExternalEditors = (): renders* => (
   />
 );
 
-export const NotExisting = (): renders* => (
+export const NotExisting = (): React.Node => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
@@ -94,7 +94,7 @@ export const NotExisting = (): renders* => (
   />
 );
 
-export const ImageNoMargin = (): renders* => (
+export const ImageNoMargin = (): React.Node => (
   <ResourceSelector
     margin="none"
     resourceKind="image"
@@ -109,7 +109,7 @@ export const ImageNoMargin = (): renders* => (
   />
 );
 
-export const ImageWithThumbnail = (): renders* => (
+export const ImageWithThumbnail = (): React.Node => (
   <ResourceSelectorWithThumbnail
     resourceKind="image"
     project={testProject.project}
@@ -122,7 +122,7 @@ export const ImageWithThumbnail = (): renders* => (
   />
 );
 
-export const Audio = (): renders* => (
+export const Audio = (): React.Node => (
   <ResourceSelector
     resourceKind="audio"
     project={testProject.project}
@@ -136,7 +136,7 @@ export const Audio = (): renders* => (
   />
 );
 
-export const FontWithResetButton = (): renders* => (
+export const FontWithResetButton = (): React.Node => (
   <ResourceSelector
     canBeReset
     resourceKind="font"
@@ -151,7 +151,7 @@ export const FontWithResetButton = (): renders* => (
   />
 );
 
-export const FontNoMarginWithResetButton = (): renders* => (
+export const FontNoMarginWithResetButton = (): React.Node => (
   <ResourceSelector
     canBeReset
     margin="none"

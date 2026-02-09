@@ -65,7 +65,7 @@ const SwipeableDrawerEditorsDisplay: component(
     ...SceneEditorsDisplayProps,
     +ref?: React.RefSetter<SceneEditorsDisplayInterface>,
   }
-) renders* = React.forwardRef<
+) React.Node = React.forwardRef<
   SceneEditorsDisplayProps,
   SceneEditorsDisplayInterface
 >((props, ref) => {

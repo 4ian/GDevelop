@@ -25,7 +25,7 @@ export const renderInstructionOrExpressionListItem = (
     selectedValue,
     matches
   }: Props,
-): renders* => {
+): React.Node => {
   const getRenderedText = (field: 'displayedName' | 'fullGroupName') => {
     let text = instructionOrExpressionMetadata[field];
     if (matches && matches.length) {

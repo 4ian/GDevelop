@@ -14,7 +14,7 @@ export type ExportState = {|
   targets: Array<TargetName>,
 |};
 
-export const SetupExportHeader = ({exportState, updateExportState, isExporting, build}: HeaderProps<ExportState>): null | renders Fragment => {
+export const SetupExportHeader = ({exportState, updateExportState, isExporting, build}: HeaderProps<ExportState>): null | React.Node => {
   // Build is finished, hide options.
   if (!!build && build.status === 'complete') return null;
 
@@ -96,7 +96,7 @@ export const ExportFlow = (
     stepCurrentProgress,
     errored
   }: OnlineElectronExportFlowProps,
-): renders* => {
+): React.Node => {
   const isExportingOrbuildRunningOrFinished =
     isExporting || (!!build && build.status !== 'error');
 
@@ -131,7 +131,7 @@ export const ExportFlow = (
 
 export const onlineElectronExporter = {
   key: 'onlineelectronexport',
-  tabName: <Trans>Desktop</Trans> as renders*,
-  name: <Trans>Windows, macOS &amp; Linux</Trans> as renders*,
+  tabName: <Trans>Desktop</Trans> as React.Node,
+  name: <Trans>Windows, macOS &amp; Linux</Trans> as React.Node,
   helpPage: '/publishing/windows-macos-linux',
 };

@@ -55,7 +55,7 @@ const SignedInWithSubscription = () => {
   );
 };
 
-export const UserChips = (): renders* => (
+export const UserChips = (): React.Node => (
   <ColumnStackLayout>
     <Text>Logged Out</Text>
     <LoggedOut />

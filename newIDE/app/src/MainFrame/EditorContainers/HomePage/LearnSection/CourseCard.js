@@ -144,7 +144,7 @@ const CourseCard = (
     discountedPrice,
     disabled
   }: Props,
-): renders* => {
+): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const specializationConfig = getSpecializationConfig(
     course ? course.specializationId : 'loading'

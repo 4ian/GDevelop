@@ -34,7 +34,7 @@ type ChipInterface = {|
 
 const Chip: component(
   ...{ ...Props, +ref?: React.RefSetter<ChipInterface> }
-) renders* = React.forwardRef<Props, ChipInterface>((props, ref) => {
+) React.Node = React.forwardRef<Props, ChipInterface>((props, ref) => {
   const chipRef = React.useRef<?HTMLDivElement>(null);
   const muiTheme = useTheme();
   const focus = () => {

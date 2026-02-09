@@ -16,7 +16,7 @@ type Props = {|
   show: boolean,
 |};
 
-const DismissableInfoBar = ({identifier, show, touchScreenMessage, message}: Props): null | renders* => {
+const DismissableInfoBar = ({identifier, show, touchScreenMessage, message}: Props): null | React.Node => {
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
   );

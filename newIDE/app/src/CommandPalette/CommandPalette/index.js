@@ -52,7 +52,7 @@ type PaletteMode = 'closed' | 'command' | 'option';
 
 const CommandPalette: component(
   '(Reason.OrdinaryName "ref")'?: React.RefSetter<CommandPaletteInterface>,
-) renders* = React.forwardRef<{||}, CommandPaletteInterface>(
+) React.Node = React.forwardRef<{||}, CommandPaletteInterface>(
   (props, ref) => {
     const classes = useStyles();
     const paperClasses = useStylesForPaper();
@@ -218,7 +218,7 @@ const CommandPalette: component(
 
 export const CommandPaletteWithAlgoliaSearch: component(
   '(Reason.OrdinaryName "ref")'?: React.RefSetter<CommandPaletteInterface>,
-) renders* = React.forwardRef<
+) React.Node = React.forwardRef<
   {},
   CommandPaletteInterface
 >((props, ref) => (

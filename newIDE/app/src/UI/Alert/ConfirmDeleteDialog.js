@@ -26,7 +26,7 @@ type Props = {|
   header?: React.Node,
 |};
 
-function ConfirmDeleteDialog(props: Props): renders* {
+function ConfirmDeleteDialog(props: Props): React.Node {
   const { open, confirmText } = props;
   const [textInput, setTextInput] = React.useState<string>('');
   const confirmButtonRef = React.useRef<?ButtonInterface>(null);

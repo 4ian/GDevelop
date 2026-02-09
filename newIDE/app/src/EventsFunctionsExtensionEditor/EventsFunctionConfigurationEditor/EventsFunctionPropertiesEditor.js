@@ -160,7 +160,7 @@ export const EventsFunctionPropertiesEditor = (
     getFunctionGroupNames,
     eventsFunctionsContainer
   }: Props,
-): renders* => {
+): React.Node => {
   const forceUpdate = useForceUpdate();
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
   const { isMobile } = useResponsiveWindowSize();

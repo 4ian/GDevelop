@@ -60,7 +60,7 @@ type Props = {|
   onOpenEditProfileDialog?: () => void,
 |};
 
-const ProfileDetails = ({authenticatedUser, onOpenChangeEmailDialog, onOpenEditProfileDialog}: Props): renders* => {
+const ProfileDetails = ({authenticatedUser, onOpenChangeEmailDialog, onOpenEditProfileDialog}: Props): React.Node => {
   const {
     firebaseUser,
     achievements,

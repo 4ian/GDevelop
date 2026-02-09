@@ -180,7 +180,7 @@ const CompactPropertiesEditor = (
     removeSpacers,
     isHidden
   }: Props,
-): null | renders* => {
+): null | React.Node => {
   const forceUpdate = useForceUpdate();
 
   const onFieldChanged = React.useCallback(

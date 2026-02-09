@@ -50,7 +50,7 @@ export function DraggableEditorTabs({
   onTabActivated,
   onDropTab,
   onHoverTab,
-}: DraggableEditorTabsProps): renders* {
+}: DraggableEditorTabsProps): React.Node {
   let draggedTabIndex: ?number = null;
 
   // Ensure the component is re-rendered when the window is resized.
@@ -162,7 +162,7 @@ export function DraggableClosableTab({
   onDrop,
   onHover,
   maxWidth,
-}: DraggableClosableTabProps): renders* {
+}: DraggableClosableTabProps): React.Node {
   return (
     <ScreenTypeMeasurer>
       {screenType => (

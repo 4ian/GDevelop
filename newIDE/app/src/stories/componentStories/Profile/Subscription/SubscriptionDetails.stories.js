@@ -128,7 +128,7 @@ export const Default = (
     userState: string,
     pricingSystem: string,
   |},
-): renders* => {
+): React.Node => {
   const authenticatedUser = loading
     ? fakeAuthenticatedUserLoggingIn
     : getUserFromState(userState);

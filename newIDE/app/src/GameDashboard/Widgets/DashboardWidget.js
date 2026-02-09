@@ -70,7 +70,7 @@ const DashboardWidget = (
     minHeight,
     widgetName
   }: Props,
-): renders* => {
+): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   return (
     <Grid

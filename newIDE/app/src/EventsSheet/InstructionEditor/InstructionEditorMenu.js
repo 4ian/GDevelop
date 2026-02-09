@@ -83,7 +83,7 @@ const InstructionEditorMenu = (
     onExtensionInstalled,
     i18n
   }: Props,
-): renders* => {
+): React.Node => {
   const forceUpdate = useForceUpdate();
   const [
     instructionEditorState,

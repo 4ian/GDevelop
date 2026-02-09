@@ -183,7 +183,7 @@ export const ErrorFallbackComponent = (
     onClose?: () => void,
     showOnTop?: boolean,
   |},
-): renders* => {
+): React.Node => {
   const isCriticalError = error.stack && error.stack.includes('.wasm');
   return (
     <PlaceholderMessage showOnTop={showOnTop} data={{ errorBoundary: 'true' }}>
@@ -246,7 +246,7 @@ type Props = {|
   showOnTop?: boolean,
 |};
 
-const ErrorBoundary = (props: Props): renders* => {
+const ErrorBoundary = (props: Props): React.Node => {
   const uniqueErrorIdRef = React.useRef(generateUUID());
   return (
     <ReactErrorBoundary

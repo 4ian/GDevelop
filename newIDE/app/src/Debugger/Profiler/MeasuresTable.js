@@ -31,7 +31,7 @@ type ProfilerRowData = {|
   isCollapsed: boolean,
 |};
 
-const MeasuresTable = (props: Props): null | renders* => {
+const MeasuresTable = (props: Props): null | React.Node => {
   const [collapsedPaths, setCollapsedPaths] = React.useState({});
 
   const convertToDataRows = (

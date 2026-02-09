@@ -165,7 +165,7 @@ const SubscriptionPlanPricingSummary = (
       [pricingSystemId: string]: PricingSystemDiscount,
     },
   |},
-): null | renders* => {
+): null | React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const selectedPricingSystem = subscriptionPlanWithPricingSystems.pricingSystems.find(
     pricingSystem => pricingSystem.period === period

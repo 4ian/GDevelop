@@ -42,7 +42,7 @@ export const HomePageHeader = (
     onSave,
     canSave
   }: Props,
-): renders* => {
+): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const { profile } = React.useContext(AuthenticatedUserContext);
 

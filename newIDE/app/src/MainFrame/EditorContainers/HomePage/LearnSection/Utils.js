@@ -24,45 +24,45 @@ export type LearnCategory =
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
-    title: <Trans>Make an entire game</Trans> as renders*,
-    description: <Trans>Make complete games step by step</Trans> as renders*,
+    title: <Trans>Make an entire game</Trans> as React.Node,
+    description: <Trans>Make complete games step by step</Trans> as React.Node,
   },
   'game-mechanic': {
-    title: <Trans>Specific game mechanics</Trans> as renders*,
+    title: <Trans>Specific game mechanics</Trans> as React.Node,
     description: (
       <Trans>
   Find how to implement the most common game mechanics and more
-</Trans> as renders*
+</Trans> as React.Node
     ),
   },
   'official-beginner': {
-    title: <Trans>Beginner course</Trans> as renders*,
-    description: <Trans>Learn the fundamental principles of GDevelop</Trans> as renders*,
+    title: <Trans>Beginner course</Trans> as React.Node,
+    description: <Trans>Learn the fundamental principles of GDevelop</Trans> as React.Node,
   },
   'official-intermediate': {
-    title: <Trans>Intermediate course</Trans> as renders*,
+    title: <Trans>Intermediate course</Trans> as React.Node,
     description: (
-      <Trans>Learn all the game-building mechanics of GDevelop</Trans> as renders*
+      <Trans>Learn all the game-building mechanics of GDevelop</Trans> as React.Node
     ),
   },
   'official-advanced': {
-    title: <Trans>Advanced course</Trans> as renders*,
-    description: <Trans>The icing on the cake</Trans> as renders*,
+    title: <Trans>Advanced course</Trans> as React.Node,
+    description: <Trans>The icing on the cake</Trans> as React.Node,
   },
   'education-curriculum': {
-    title: <Trans>Education curriculum and resources</Trans> as renders*,
+    title: <Trans>Education curriculum and resources</Trans> as React.Node,
     description: (
       <Trans>
   For teachers and educators having the GDevelop Education subscription. Ready to use resources for teaching.
-</Trans> as renders*
+</Trans> as React.Node
     ),
   },
   course: {
-    title: <Trans>Loading</Trans> as renders*,
-    description: <Trans>Loading course...</Trans> as renders*,
+    title: <Trans>Loading</Trans> as React.Node,
+    description: <Trans>Loading course...</Trans> as React.Node,
   },
   recommendations: {
-    title: <Trans>Recommendations</Trans> as renders*,
+    title: <Trans>Recommendations</Trans> as React.Node,
     description: null,
   },
 };

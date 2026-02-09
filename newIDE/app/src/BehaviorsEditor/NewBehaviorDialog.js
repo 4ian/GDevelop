@@ -53,7 +53,7 @@ export default function NewBehaviorDialog({
   isChildObject,
   onWillInstallExtension,
   onExtensionInstalled,
-}: Props): null | renders* {
+}: Props): null | React.Node {
   const [isInstalling, setIsInstalling] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {

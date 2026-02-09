@@ -60,7 +60,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   },
 ) as component(
   ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
-) renders*;
+) React.Node;
 
 export const renderInlineMouse = ({value, InvalidParameterValue}: ParameterInlineRendererProps): string | React.MixedElement => {
   return value ? (

@@ -62,7 +62,7 @@ const DirectionTools = (
     onEditWith,
     onDirectionUpdated
   }: Props,
-): renders* => {
+): React.Node => {
   const forceUpdate = useForceUpdate();
   const [previewOpen, setPreviewOpen] = React.useState(false);
   const currentTimeBetweenFrames = direction.getTimeBetweenFrames();

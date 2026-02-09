@@ -161,7 +161,7 @@ const SearchBarContainer = (
     onCancel,
     renderSubLine
   }: Props,
-): renders* => {
+): React.Node => {
   const GDevelopTheme = React.useContext(GDevelopThemeContext);
 
   const styles = getStyles({

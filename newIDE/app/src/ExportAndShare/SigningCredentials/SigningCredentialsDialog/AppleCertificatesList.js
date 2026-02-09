@@ -49,7 +49,7 @@ export const AppleCertificatesList = (
     onRefreshSigningCredentials,
     onAddNew
   }: Props,
-): renders* => {
+): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { showConfirmation } = useAlertDialog();
 

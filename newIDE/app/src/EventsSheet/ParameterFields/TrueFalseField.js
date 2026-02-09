@@ -68,9 +68,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   },
 ) as component(
   ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
-) renders*;
+) React.Node;
 
-export const renderInlineTrueFalse = ({value, parameterMetadata}: ParameterInlineRendererProps): renders* => {
+export const renderInlineTrueFalse = ({value, parameterMetadata}: ParameterInlineRendererProps): React.Node => {
   if (getParameterValueOrDefault(value, parameterMetadata) === 'True') {
     return <Trans>true</Trans>;
   } else {

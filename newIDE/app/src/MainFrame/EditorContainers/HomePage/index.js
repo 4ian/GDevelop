@@ -219,7 +219,7 @@ export type HomePageEditorInterface = {|
   ) => void,
 |};
 
-export const HomePage: component(...Props) renders* = React.memo<Props>(
+export const HomePage: React.ComponentType<Props> = React.memo<Props>(
   React.forwardRef<Props, HomePageEditorInterface>(
     (
       {

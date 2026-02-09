@@ -33,7 +33,7 @@ export type PreviewAndShareButtonsProps = {|
   isSharingEnabled: boolean,
 |};
 
-const PreviewAndShareButtons: component(...PreviewAndShareButtonsProps) renders* = React.memo<PreviewAndShareButtonsProps>(
+const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> = React.memo<PreviewAndShareButtonsProps>(
   function PreviewAndShareButtons({
     onPreviewWithoutHotReload,
     onNetworkPreview,

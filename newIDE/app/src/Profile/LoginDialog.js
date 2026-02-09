@@ -49,7 +49,7 @@ const LoginDialog = (
     loginInProgress,
     error
   }: Props,
-): renders* => {
+): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');

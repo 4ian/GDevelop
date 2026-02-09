@@ -11,7 +11,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders* => (
+export const Default = (): React.Node => (
   <ImageThumbnail
     project={testProject.project}
     resourceName="res/icon128.png"
@@ -20,7 +20,7 @@ export const Default = (): renders* => (
   />
 );
 
-export const Small = (): renders* => (
+export const Small = (): React.Node => (
   <ImageThumbnail
     project={testProject.project}
     resourceName="res/icon128.png"
@@ -29,7 +29,7 @@ export const Small = (): renders* => (
   />
 );
 
-export const Selectable = (): renders* => (
+export const Selectable = (): React.Node => (
   <ImageThumbnail
     selectable
     project={testProject.project}

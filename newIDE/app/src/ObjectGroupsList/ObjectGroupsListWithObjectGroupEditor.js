@@ -46,7 +46,7 @@ const ObjectGroupsListWithObjectGroupEditor = (
     canSetAsGlobalGroup,
     unsavedChanges
   }: Props,
-): renders Fragment => {
+): React.Node => {
   const [editedGroup, setEditedGroup] = React.useState<gdObjectGroup | null>(
     null
   );

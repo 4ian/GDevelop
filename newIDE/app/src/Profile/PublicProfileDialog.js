@@ -35,7 +35,7 @@ const PublicProfileDialog = (
     onGameOpen,
     onExampleOpen
   }: Props,
-): renders* => {
+): React.Node => {
   const callbacks = React.useMemo(
     () => ({
       openAssetPack: onAssetPackOpen

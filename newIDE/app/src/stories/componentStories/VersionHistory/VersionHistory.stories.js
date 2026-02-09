@@ -146,7 +146,7 @@ const userPublicProfilesByIds = {
   },
 };
 
-export const Default = (): renders* => {
+export const Default = (): React.Node => {
   const [versions, setVersions] = React.useState<ExpandedCloudProjectVersion[]>(
     initialVersions
   );

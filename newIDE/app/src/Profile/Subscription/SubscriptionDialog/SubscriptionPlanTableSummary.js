@@ -51,7 +51,7 @@ const SubscriptionPlanTableSummary = (
     hideFullTableLink?: boolean,
     actionLabel?: React.Node,
   |},
-): renders* => {
+): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
 

@@ -14,7 +14,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders* => (
+export const Default = (): React.Node => (
   <ColumnStackLayout>
     <Text>Default</Text>
     <ValueStateHolder

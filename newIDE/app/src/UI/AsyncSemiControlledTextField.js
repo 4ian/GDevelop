@@ -37,7 +37,7 @@ const AsyncSemiControlledTextField = (
     onCancel,
     ...textFieldProps
   }: Props,
-): renders* => {
+): React.Node => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [internalErrorText, setInternalErrorText] = React.useState<?React.Node>(
     null

@@ -369,4 +369,4 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
   }
 }
 
-export const renderCustomObjectEditorContainer = (props: RenderEditorContainerPropsWithRef): renders* => <CustomObjectEditorContainer {...props} />;
+export const renderCustomObjectEditorContainer = (props: RenderEditorContainerPropsWithRef): React.Node => <CustomObjectEditorContainer {...props} />;

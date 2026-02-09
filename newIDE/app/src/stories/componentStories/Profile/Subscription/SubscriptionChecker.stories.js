@@ -20,7 +20,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const NotAuthenticatedTryMode = (): renders* => {
+export const NotAuthenticatedTryMode = (): React.Node => {
   const checkerRef = React.useRef<?SubscriptionCheckerInterface>(null);
 
   const onClick = () => {
@@ -42,7 +42,7 @@ export const NotAuthenticatedTryMode = (): renders* => {
     </AuthenticatedUserContext.Provider>
   );
 };
-export const NotAuthenticatedMandatoryMode = (): renders* => {
+export const NotAuthenticatedMandatoryMode = (): React.Node => {
   const checkerRef = React.useRef(null);
 
   const onClick = () => {
@@ -64,7 +64,7 @@ export const NotAuthenticatedMandatoryMode = (): renders* => {
     </AuthenticatedUserContext.Provider>
   );
 };
-export const UserWithNoSubscription = (): renders* => {
+export const UserWithNoSubscription = (): React.Node => {
   const checkerRef = React.useRef(null);
 
   const onClick = () => {
@@ -88,7 +88,7 @@ export const UserWithNoSubscription = (): renders* => {
     </AuthenticatedUserContext.Provider>
   );
 };
-export const UserWithGoldSubscription = (): renders* => {
+export const UserWithGoldSubscription = (): React.Node => {
   const checkerRef = React.useRef(null);
 
   const onClick = () => {

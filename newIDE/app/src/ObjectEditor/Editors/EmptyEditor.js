@@ -8,7 +8,7 @@ export default function EmptyEditor({
   renderObjectNameField,
 }: {
   renderObjectNameField?: () => React.Node,
-}): renders* {
+}): React.Node {
   return (
     <Column noMargin>
       {renderObjectNameField && renderObjectNameField()}

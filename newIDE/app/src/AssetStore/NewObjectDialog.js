@@ -630,7 +630,7 @@ function NewObjectDialog({
   );
 }
 
-const NewObjectDialogWithErrorBoundary = (props: Props): renders* => (
+const NewObjectDialogWithErrorBoundary = (props: Props): React.Node => (
   <ErrorBoundary
     componentTitle={<Trans>New Object dialog</Trans>}
     scope="new-object-dialog"

@@ -60,7 +60,7 @@ const PropertiesEditorByVisibility = (
     resourceManagementProps,
     placeholder
   }: Props,
-): ?(false | 0 | "" | React$Portal | renders*) => {
+): ?(false | 0 | "" | React$Portal | React.Node) => {
   const [
     shouldShowDeprecatedProperties,
     setShouldShowDeprecatedProperties,

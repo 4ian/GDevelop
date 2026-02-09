@@ -115,7 +115,7 @@ export default function SubscriptionDialog({
   recommendedPlanId,
   onOpenPendingDialog,
   couponCode,
-}: Props): renders* {
+}: Props): React.Node {
   const [isChangingSubscription, setIsChangingSubscription] = React.useState(
     false
   );

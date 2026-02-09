@@ -72,7 +72,7 @@ export const CompactBehaviorPropertiesEditor = (
     onBehaviorUpdated: () => void,
     resourceManagementProps: ResourceManagementProps,
   |},
-): renders* => {
+): React.Node => {
   const fullEditorLabel = behaviorMetadata.getOpenFullEditorLabel();
 
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();

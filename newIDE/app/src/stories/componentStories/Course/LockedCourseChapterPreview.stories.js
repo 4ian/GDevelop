@@ -15,7 +15,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders* => {
+export const Default = (): React.Node => {
   return (
     <LockedCourseChapterPreview
       course={premiumCourse}

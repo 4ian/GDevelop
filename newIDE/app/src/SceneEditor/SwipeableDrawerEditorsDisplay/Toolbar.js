@@ -44,7 +44,7 @@ type Props = {|
   onOpenSceneVariables: () => void,
 |};
 
-const Toolbar: component(...Props) renders* = React.memo<Props>(function(props) {
+const Toolbar: React.ComponentType<Props> = React.memo<Props>(function(props) {
   return (
     <>
       <ToolbarCommands

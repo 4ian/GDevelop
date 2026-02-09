@@ -419,7 +419,7 @@ export const renderNewProjectSaveAsLocationChooser = (
     setSaveAsLocation: (?SaveAsLocation) => void,
     newProjectsDefaultFolder?: string,
   |},
-): renders* => {
+): React.Node => {
   const projectLocation = getProjectLocation({
     projectName,
     saveAsLocation,

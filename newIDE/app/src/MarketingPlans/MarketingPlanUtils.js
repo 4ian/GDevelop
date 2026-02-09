@@ -18,7 +18,7 @@ const styles = {
   iconStyle: { width: 40, height: 40 },
 };
 
-export const getIconForMarketingPlan = (marketingPlan: MarketingPlan): null | renders* => {
+export const getIconForMarketingPlan = (marketingPlan: MarketingPlan): null | React.Node => {
   switch (marketingPlan.icon) {
     case 'speaker':
       return <Speaker style={styles.iconStyle} />;
@@ -105,7 +105,7 @@ export const getActiveMessage = (
     hasErrors: boolean,
     activeGameFeaturings: Array<GameFeaturing>,
   |},
-): null | renders* => {
+): null | React.Node => {
   if (hasErrors) {
     return <Trans>Fix those issues to get the campaign up!</Trans>;
   }

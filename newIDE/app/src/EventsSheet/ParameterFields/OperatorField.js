@@ -90,7 +90,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   },
 ) as component(
   ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
-) renders*;
+) React.Node;
 
 export const renderInlineOperator = (
   {
@@ -99,7 +99,7 @@ export const renderInlineOperator = (
     useAssignmentOperators,
     parameterMetadata
   }: ParameterInlineRendererProps,
-): string | React.MixedElement | renders* => {
+): string | React.MixedElement | React.Node => {
   const comparedValueType = parameterMetadata
     ? parameterMetadata.getExtraInfo()
     : 'unknown';

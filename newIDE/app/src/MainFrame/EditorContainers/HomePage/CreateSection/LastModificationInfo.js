@@ -41,7 +41,7 @@ const LastModificationInfo = (
     textSize = 'body',
     textPrefix
   }: LastModificationInfoProps,
-): null | renders* => {
+): null | React.Node => {
   const isProjectSavedOnCloud =
     !!storageProvider && storageProvider.internalName === 'Cloud';
   const isCurrentProjectOpened =

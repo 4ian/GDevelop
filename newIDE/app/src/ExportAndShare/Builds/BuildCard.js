@@ -136,7 +136,7 @@ export const BuildCard = (
     onBuildDeleted,
     authenticatedUser
   }: Props,
-): renders* => {
+): React.Node => {
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const defaultBuildName = `${game.gameName
     .toLowerCase()

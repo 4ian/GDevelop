@@ -177,7 +177,7 @@ export const CompactPropertiesEditorByVisibility = (
     object?: ?gdObject,
     resourceManagementProps?: ?ResourceManagementProps,
   |},
-): renders* => {
+): React.Node => {
   const basicPropertiesSchema = React.useMemo(
     () => {
       const basicSchema = filterSchema(schema, 'basic');

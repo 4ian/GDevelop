@@ -1385,7 +1385,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
 
 const PropertyListEditorWithErrorBoundary: component(
   ...{ ...Props, +ref?: React.RefSetter<PropertyListEditorInterface> }
-) renders* = React.forwardRef<
+) React.Node = React.forwardRef<
   Props,
   PropertyListEditorInterface
 >((props, ref) => (

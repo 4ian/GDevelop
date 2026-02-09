@@ -22,7 +22,7 @@ export const Default = (
     helperMarkdownText?: string,
     required?: boolean,
   |},
-): renders* => {
+): React.Node => {
   const [value, setValue] = React.useState('Hello world');
   const [isEditing, setIsEditing] = React.useState<boolean>(false);
 
@@ -69,7 +69,7 @@ export const NoMargin = (
     helperMarkdownText?: string,
     required?: boolean,
   |},
-): renders* => {
+): React.Node => {
   const [value, setValue] = React.useState('Hello world');
   const [isEditing, setIsEditing] = React.useState<boolean>(false);
 

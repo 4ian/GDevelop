@@ -331,7 +331,7 @@ export type AiRequestChatInterface = {|
 
 export const AiRequestChat: component(
   ...{ ...Props, +ref?: React.RefSetter<AiRequestChatInterface> }
-) renders* = React.forwardRef<Props, AiRequestChatInterface>(
+) React.Node = React.forwardRef<Props, AiRequestChatInterface>(
   (
     {
       aiConfigurationPresetsWithAvailability,

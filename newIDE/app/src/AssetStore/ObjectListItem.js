@@ -49,7 +49,7 @@ export const ObjectListItem = (
     onHeightComputed,
     platform
   }: Props,
-): renders* => {
+): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const isEngineCompatible = isCompatibleWithGDevelopVersion(

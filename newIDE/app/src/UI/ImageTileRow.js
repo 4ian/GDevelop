@@ -40,7 +40,7 @@ const ImageTileRow = (
     seeAllLabel,
     margin
   }: ImageTileRowProps,
-): renders Fragment => {
+): React.Node => {
   return (
     <>
       <LineStackLayout

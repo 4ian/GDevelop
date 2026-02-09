@@ -104,7 +104,7 @@ export const PublicGamePropertiesDialog = (
     canBePublishedOnGdGames,
     onUnregisterGame
   }: Props,
-): renders* => {
+): React.Node => {
   const { profile } = React.useContext(AuthenticatedUserContext);
 
   const publicGameAuthorIds = publicGame.authors.map(author => author.id);

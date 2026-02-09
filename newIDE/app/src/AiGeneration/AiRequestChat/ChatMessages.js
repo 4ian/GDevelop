@@ -223,7 +223,7 @@ type Props = {|
   |}) => Promise<void>,
 |};
 
-export const ChatMessages: component(...Props) renders* = React.memo<Props>(function ChatMessages({
+export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(function ChatMessages({
   aiRequest,
   onSendFeedback,
   editorFunctionCallResults,

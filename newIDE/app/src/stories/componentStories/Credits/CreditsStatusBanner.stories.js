@@ -16,7 +16,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Loading = (): renders* => {
+export const Loading = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <CreditsStatusBanner displayPurchaseAction />
@@ -24,7 +24,7 @@ export const Loading = (): renders* => {
   );
 };
 
-export const Default = (): renders* => {
+export const Default = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider
       value={fakeAuthenticatedUserWithNoSubscription}
@@ -34,7 +34,7 @@ export const Default = (): renders* => {
   );
 };
 
-export const WithCredits = (): renders* => {
+export const WithCredits = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider
       value={fakeAuthenticatedUserWithNoSubscriptionAndCredits}
@@ -44,7 +44,7 @@ export const WithCredits = (): renders* => {
   );
 };
 
-export const WithoutPurchaseAction = (): renders* => {
+export const WithoutPurchaseAction = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider
       value={fakeAuthenticatedUserWithNoSubscriptionAndCredits}

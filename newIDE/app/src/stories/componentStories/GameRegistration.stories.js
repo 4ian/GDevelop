@@ -21,13 +21,13 @@ export default {
   decorators: [paperDecorator, GDevelopJsInitializerDecorator],
 };
 
-export const NoProjectLoaded = (): renders* => (
+export const NoProjectLoaded = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameRegistration project={null} onGameRegistered={() => {}} />
   </AuthenticatedUserContext.Provider>
 );
 
-export const NotLoggedIn = (): renders* => (
+export const NotLoggedIn = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <GameRegistration
       project={testProject.project}
@@ -36,7 +36,7 @@ export const NotLoggedIn = (): renders* => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const NotAuthorized = (): renders* => {
+export const NotAuthorized = (): React.Node => {
   const gameServiceMock = new MockAdapter(gameApiClient, {
     delayResponse: 500,
   });
@@ -54,7 +54,7 @@ export const NotAuthorized = (): renders* => {
   );
 };
 
-export const GameNotExisting = (): renders* => {
+export const GameNotExisting = (): React.Node => {
   const gameServiceMock = new MockAdapter(gameApiClient, {
     delayResponse: 500,
   });
@@ -72,7 +72,7 @@ export const GameNotExisting = (): renders* => {
   );
 };
 
-export const ErrorLoadingGame = (): renders* => {
+export const ErrorLoadingGame = (): React.Node => {
   const gameServiceMock = new MockAdapter(gameApiClient, {
     delayResponse: 500,
   });
@@ -90,7 +90,7 @@ export const ErrorLoadingGame = (): renders* => {
   );
 };
 
-export const RegisteredWithAdditionalActions = (): renders* => {
+export const RegisteredWithAdditionalActions = (): React.Node => {
   const gameServiceMock = new MockAdapter(gameApiClient, {
     delayResponse: 500,
   });
@@ -112,7 +112,7 @@ export const RegisteredWithAdditionalActions = (): renders* => {
   );
 };
 
-export const RegisteredWithLoader = (): renders* => {
+export const RegisteredWithLoader = (): React.Node => {
   const gameServiceMock = new MockAdapter(gameApiClient, {
     delayResponse: 500,
   });
@@ -133,7 +133,7 @@ export const RegisteredWithLoader = (): renders* => {
   );
 };
 
-export const RegisteredWithoutLoader = (): renders* => {
+export const RegisteredWithoutLoader = (): React.Node => {
   const gameServiceMock = new MockAdapter(gameApiClient, {
     delayResponse: 500,
   });

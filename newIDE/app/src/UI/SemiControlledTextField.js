@@ -68,7 +68,7 @@ export type SemiControlledTextFieldInterface = {|
  */
 const SemiControlledTextField: component(
   ...{ ...Props, +ref?: React.RefSetter<SemiControlledTextFieldInterface> }
-) renders* = React.forwardRef<
+) React.Node = React.forwardRef<
   Props,
   SemiControlledTextFieldInterface
 >((props, ref) => {

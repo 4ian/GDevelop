@@ -67,7 +67,7 @@ const LoginWithPurchaseClaimDialog = (
     error,
     claimedProductOptions: {productListingData: claimedProduct}
   }: Props,
-): renders* => {
+): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');

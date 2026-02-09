@@ -16,7 +16,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const DefaultFreeFunction = (): renders* => (
+export const DefaultFreeFunction = (): React.Node => (
   <FixedHeightFlexContainer height={500}>
     <EventsFunctionConfigurationEditor
       project={testProject.project}
@@ -40,7 +40,7 @@ export const DefaultFreeFunction = (): renders* => (
   </FixedHeightFlexContainer>
 );
 
-export const DefaultBehaviorFunction = (): renders* => (
+export const DefaultBehaviorFunction = (): React.Node => (
   <FixedHeightFlexContainer height={500}>
     <EventsFunctionConfigurationEditor
       project={testProject.project}
@@ -64,7 +64,7 @@ export const DefaultBehaviorFunction = (): renders* => (
   </FixedHeightFlexContainer>
 );
 
-export const DefaultBehaviorLifecycleFunction = (): renders* => (
+export const DefaultBehaviorLifecycleFunction = (): React.Node => (
   <FixedHeightFlexContainer height={500}>
     <EventsFunctionConfigurationEditor
       project={testProject.project}
@@ -88,7 +88,7 @@ export const DefaultBehaviorLifecycleFunction = (): renders* => (
   </FixedHeightFlexContainer>
 );
 
-export const DefaultObjectFunction = (): renders* => (
+export const DefaultObjectFunction = (): React.Node => (
   <FixedHeightFlexContainer height={500}>
     <EventsFunctionConfigurationEditor
       project={testProject.project}

@@ -27,7 +27,7 @@ type Props = {
   ) => void,
 };
 
-export const FeedbackBanner = ({onSendFeedback}: Props): renders Fragment => {
+export const FeedbackBanner = ({onSendFeedback}: Props): React.Node => {
   const [currentFeedback, setCurrentFeedback] = React.useState<
     'like' | 'dislike' | null
   >(null);

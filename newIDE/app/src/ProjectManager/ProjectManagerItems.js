@@ -62,7 +62,7 @@ export const ProjectStructureItem = (
     primaryText,
     renderNestedItems
   }: ProjectStructureItemProps,
-): renders* => {
+): React.Node => {
   return (
     <ListItem
       id={id}
@@ -145,7 +145,7 @@ export const Item = (
     isLastItem,
     dragAndDropProps: {DragSourceAndDropTarget, onBeginDrag, onDrop}
   }: ItemProps,
-): renders* => {
+): React.Node => {
   const textFieldRef = React.useRef<?TextFieldInterface>(null);
   const shouldDiscardChanges = React.useRef<boolean>(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -372,7 +372,7 @@ export const EventFunctionExtensionItem = (
     isLastItem,
     dragAndDropProps
   }: EventFunctionExtensionItemProps,
-): renders* => {
+): React.Node => {
   const name = eventsFunctionsExtension.getName();
   const iconUrl = eventsFunctionsExtension.getIconUrl();
 

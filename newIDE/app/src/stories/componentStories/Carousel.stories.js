@@ -25,7 +25,7 @@ const getRandomItem = (id: string) => (
   </GridListTile>
 );
 
-export const Default = (): renders* => {
+export const Default = (): React.Node => {
   const items = new Array(15).fill(null).map((_, index) => ({
     renderItem: () => getRandomItem(`item-${index}`),
   }));

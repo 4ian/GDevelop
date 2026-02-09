@@ -11,7 +11,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders* => (
+export const Default = (): React.Node => (
   <PlaceholderMessage>
     <p>
       Neque porro quisquam est qui dolorem ipsum quia dolor sit amet,

@@ -129,7 +129,7 @@ type Props = {|
 /**
  * Display a markdown text for a AI chat bubble.
  */
-export const ChatMarkdownText: component(...Props) renders* = React.memo<Props>((props: Props) => {
+export const ChatMarkdownText: React.ComponentType<Props> = React.memo<Props>((props: Props) => {
   const { getConceptMetadataFromHref } = useGetConceptMetadata();
   const renderChatLink = React.useMemo(
     () => makeRenderChatLink({ getConceptMetadataFromHref }),

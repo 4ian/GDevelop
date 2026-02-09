@@ -477,7 +477,8 @@ export const EventsFunctionPropertiesEditor = ({
                           value={helpUrl}
                           onChange={text => {
                             eventsFunction.setHelpUrl(text);
-                            if (onConfigurationUpdated) onConfigurationUpdated();
+                            if (onConfigurationUpdated)
+                              onConfigurationUpdated();
                             forceUpdate();
                           }}
                         />

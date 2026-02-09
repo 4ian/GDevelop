@@ -56,7 +56,8 @@ export const renderInstructionOrExpressionTree = <
         const value = getInstructionListItemValue(instructionOrGroup.type);
         const selected = selectedValue === value;
         const helpPath = instructionMetadata.metadata.getHelpPath();
-        const hasCustomHelpUrl = helpPath && isDocumentationAbsoluteUrl(helpPath);
+        const hasCustomHelpUrl =
+          helpPath && isDocumentationAbsoluteUrl(helpPath);
         return (
           <ListItem
             key={value}

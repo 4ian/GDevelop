@@ -84,6 +84,11 @@ export const isAnyPropertyModified = (
   instances: Instances
 ): boolean => {
   for (const field of schema) {
+    if (field.children) {
+      if (isAnyPropertyModified(field.children, instances)) {
+        return true;
+      }
+    }
     if (
       !field.getValue ||
       !field.setValue ||

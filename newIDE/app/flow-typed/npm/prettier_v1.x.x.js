@@ -80,21 +80,21 @@ declare module "prettier" {
 
   declare type CursorOptions = {|
     cursorOffset: number,
-    printWidth?: $PropertyType<Options, "printWidth">,
-    tabWidth?: $PropertyType<Options, "tabWidth">,
-    useTabs?: $PropertyType<Options, "useTabs">,
-    semi?: $PropertyType<Options, "semi">,
-    singleQuote?: $PropertyType<Options, "singleQuote">,
-    trailingComma?: $PropertyType<Options, "trailingComma">,
-    bracketSpacing?: $PropertyType<Options, "bracketSpacing">,
-    jsxBracketSameLine?: $PropertyType<Options, "jsxBracketSameLine">,
-    arrowParens?: $PropertyType<Options, "arrowParens">,
-    parser?: $PropertyType<Options, "parser">,
-    filepath?: $PropertyType<Options, "filepath">,
-    requirePragma?: $PropertyType<Options, "requirePragma">,
-    insertPragma?: $PropertyType<Options, "insertPragma">,
-    proseWrap?: $PropertyType<Options, "proseWrap">,
-    plugins?: $PropertyType<Options, "plugins">
+    printWidth?: any,
+    tabWidth?: any,
+    useTabs?: any,
+    semi?: any,
+    singleQuote?: any,
+    trailingComma?: any,
+    bracketSpacing?: any,
+    jsxBracketSameLine?: any,
+    arrowParens?: any,
+    parser?: any,
+    filepath?: any,
+    requirePragma?: any,
+    insertPragma?: any,
+    proseWrap?: any,
+    plugins?: any
   |};
 
   declare type CursorResult = {|

@@ -44,19 +44,19 @@ type ReactTestInstance = {
 type ReactTestRenderer = {
   toJSON(): null | ReactTestRendererJSON,
   toTree(): null | ReactTestRendererTree,
-  unmount(nextElement?: React$Element<any>): void,
-  update(nextElement: React$Element<any>): void,
+  unmount(nextElement?: any): void,
+  update(nextElement: any): void,
   getInstance(): null | ReactTestInstance,
   root: ReactTestInstance
 };
 
 type TestRendererOptions = {
-  createNodeMock(element: React$Element<any>): any
+  createNodeMock(element: any): any
 };
 
 declare module "react-test-renderer" {
   declare function create(
-    nextElement: React$Element<any>,
+    nextElement: any,
     options?: TestRendererOptions
   ): ReactTestRenderer;
 }
@@ -65,9 +65,9 @@ declare module "react-test-renderer/shallow" {
   declare export default class ShallowRenderer {
     static createRenderer(): ShallowRenderer;
     getMountedInstance(): ReactTestInstance;
-    getRenderOutput<E: React$Element<any>>(): E;
-    getRenderOutput(): React$Element<any>;
-    render(element: React$Element<any>, context?: any): void;
+    getRenderOutput<E: any>(): E;
+    getRenderOutput(): any;
+    render(element: any, context?: any): void;
     unmount(): void;
   }
 }

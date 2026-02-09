@@ -11,7 +11,7 @@ declare type $npm$reactDnd$NativeTypes =
 
 declare module "react-dnd-html5-backend" {
   declare module.exports: {
-    getEmptyImage(): Image,
+    getEmptyImage(): any,
     NativeTypes: {
       FILE: $npm$reactDnd$NativeTypes$FILE,
       URL: $npm$reactDnd$NativeTypes$URL,

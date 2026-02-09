@@ -10,18 +10,18 @@ declare module "react-dnd" {
     ...
   };
 
-  declare type ElementOrNode = React$Element<any> | HTMLElement;
+  declare type ElementOrNode = any | any;
 
   declare type DndOptions<P> = { arePropsEqual?: (props: P, otherProps: P) => boolean, ... };
 
   declare type ComponentClassWithDefaultProps<D: {...}, P: {...}, S> = Class<
-    React$Component<P, S>
+    any
   > & { defaultProps: D, ... };
 
   declare type _InstanceOf<I, C: Class<I>> = I;
   declare type InstanceOf<C> = _InstanceOf<any, C>;
 
-  declare class ConnectedComponent<C, I, P> extends React$Component<P> {
+  declare class ConnectedComponent<C, I, P> extends any {
     static DecoratedComponent: C;
     getDecoratedComponentInstance(): I;
     getHandlerId(): Identifier;
@@ -37,16 +37,16 @@ declare module "react-dnd" {
   >(
     component: C
   ) => Class<
-    ConnectedComponent<C, InstanceOf<C>, { ...CP, ... } & $Diff<$Diff<P, D>, CP>>
+    ConnectedComponent<C, InstanceOf<C>, { ...CP, ... } & any>
   >) &
-    (<P: SP, S, C: Class<React$Component<P, S>>>(
+    (<P: SP, S, C: Class<any>>(
       component: C
     ) => Class<
-      ConnectedComponent<C, InstanceOf<C>, { ...CP, ... } & $Diff<P, CP>>
+      ConnectedComponent<C, InstanceOf<C>, { ...CP, ... } & any
     >) &
-    (<P: SP, C: React$ComponentType<P>>(
+    (<P: SP, C: any>(
       component: C
-    ) => Class<ConnectedComponent<C, void, { ...CP, ... } & $Diff<P, CP>>>);
+    ) => Class<ConnectedComponent<C, void, { ...CP, ... } & any>);
 
   // Drag Source
   // ----------------------------------------------------------------------
@@ -57,12 +57,12 @@ declare module "react-dnd" {
     beginDrag: (
       props: P,
       monitor: DragSourceMonitor,
-      component: React$Component<P, any>
+      component: any
     ) => Object,
     endDrag?: (
       props: P,
       monitor: DragSourceMonitor,
-      component: ?React$Component<P, any>
+      component: ?any
     ) => void,
     canDrag?: (props: P, monitor: DragSourceMonitor) => boolean,
     isDragging?: (props: P, monitor: DragSourceMonitor) => boolean,
@@ -119,7 +119,7 @@ declare module "react-dnd" {
     spec: DragSourceSpec<OP>,
     collect: DragSourceCollector<CP>,
     options?: DndOptions<OP>
-  ): Connector<$Shape<OP & CP>, CP>;
+  ): Connector<Partial<OP & CP>, CP>;
 
   // Drop Target
   // ----------------------------------------------------------------------
@@ -133,12 +133,12 @@ declare module "react-dnd" {
     drop?: (
       props: P,
       monitor: DropTargetMonitor,
-      component: React$Component<P, any>
+      component: any
     ) => ?Object,
     hover?: (
       props: P,
       monitor: DropTargetMonitor,
-      component: React$Component<P, any>
+      component: any
     ) => void,
     canDrop?: (props: P, monitor: DropTargetMonitor) => boolean,
     ...
@@ -173,7 +173,7 @@ declare module "react-dnd" {
     spec: DropTargetSpec<OP>,
     collect: DropTargetCollector<CP>,
     options?: DndOptions<OP>
-  ): Connector<$Shape<OP & CP>, CP>;
+  ): Connector<Partial<OP & CP>, CP>;
 
   // Drag Layer
   // ----------------------------------------------------------------------
@@ -193,25 +193,23 @@ declare module "react-dnd" {
   declare function DragLayer<OP: {...}, CP: {...}>(
     collect: (monitor: DragLayerMonitor) => CP,
     options?: DndOptions<OP>
-  ): Connector<$Shape<OP & CP>, CP>;
+  ): Connector<Partial<OP & CP>, CP>;
 
   // Drag Drop Context
   // ----------------------------------------------------------------------
 
   declare type ProviderProps = {
     backend: mixed,
-    children: React$Element<any>,
+    children: any,
     window?: Object,
     ...
   };
 
-  declare class DragDropContextProvider<ProviderProps> extends React$Component<
-    ProviderProps
-  > {
+  declare class DragDropContextProvider<ProviderProps> extends any {
     props: ProviderProps;
   }
 
   declare function DragDropContext<OP: {...}, CP: {...}>(
     backend: mixed
-  ): Connector<$Shape<OP & CP>, CP>;
+  ): Connector<Partial<OP & CP>, CP>;
 }

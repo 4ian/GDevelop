@@ -205,6 +205,43 @@ function run() {
         { searchValue: /isElement\(value: Element\)/g, replaceValue: 'isElement(value: any)' },
       ],
     },
+    {
+      filePath: path.join(appRoot, 'flow-typed', 'npm', 'prettier_v1.x.x.js'),
+      replacements: [
+        { searchValue: /\$PropertyType<[^>]+>/g, replaceValue: 'any' },
+      ],
+    },
+    {
+      filePath: path.join(appRoot, 'flow-typed', 'npm', 'react-color_v2.x.x.js'),
+      replacements: [
+        { searchValue: /SyntheticMouseEvent<[^>]+>/g, replaceValue: 'any' },
+        { searchValue: /\$Diff<[^>]+>[^>]*>/g, replaceValue: 'any' },
+        { searchValue: /\$Diff<[^>]+>/g, replaceValue: 'any' },
+        { searchValue: /React\$ElementConfig<[^>]+>/g, replaceValue: 'any' },
+      ],
+    },
+    {
+      filePath: path.join(appRoot, 'flow-typed', 'npm', 'react-dnd-html5-backend_v2.x.x.js'),
+      replacements: [{ searchValue: /\bImage\b/g, replaceValue: 'any' }],
+    },
+    {
+      filePath: path.join(appRoot, 'flow-typed', 'npm', 'react-dnd_v2.x.x.js'),
+      replacements: [
+        { searchValue: /React\$Element<[^>]+>/g, replaceValue: 'any' },
+        { searchValue: /\bHTMLElement\b/g, replaceValue: 'any' },
+        { searchValue: /React\$ComponentType<[^>]+>/g, replaceValue: 'any' },
+        { searchValue: /React\$ComponentType\b/g, replaceValue: 'any' },
+        { searchValue: /React\$Component<[^>]+>/g, replaceValue: 'any' },
+        { searchValue: /React\$Component\b/g, replaceValue: 'any' },
+        { searchValue: /\$Diff<[^>]+>[^>]*>/g, replaceValue: 'any' },
+        { searchValue: /\$Diff<[^>]+>/g, replaceValue: 'any' },
+        { searchValue: /\$Shape<([^>]+)>/g, replaceValue: 'Partial<$1>' },
+      ],
+    },
+    {
+      filePath: path.join(appRoot, 'flow-typed', 'npm', 'react-test-renderer_v16.x.x.js'),
+      replacements: [{ searchValue: /React\$Element<[^>]+>/g, replaceValue: 'any' }],
+    },
   ];
 
   for (const target of flowTypedReplacements) {

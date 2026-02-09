@@ -117,6 +117,14 @@ function applyTextReplacements(filePath, replacements) {
   return true;
 }
 
+function ensureFileEndsWith(filePath, suffix) {
+  if (!fs.existsSync(filePath)) return false;
+  const source = fs.readFileSync(filePath, 'utf8');
+  if (source.trimEnd().endsWith(suffix)) return false;
+  fs.writeFileSync(filePath, `${source.trimEnd()}\n${suffix}\n`, 'utf8');
+  return true;
+}
+
 function ensureGDevelopShims() {
   const filePath = path.join(repoRoot, 'GDevelop.js', 'types', 'flow-upgrade-shims.js');
   const declarations = [
@@ -346,18 +354,34 @@ function run() {
         searchValue:
           /const className = classNames[\s\S]*?return <span className=\{className\}>\{markdownElement\}<\/span>;/g,
         replaceValue:
-          `const className = classNames(
-  ({
+          `const className = classNames(({
     'gd-markdown': true,
     [classes.chatMarkdown]: true,
-  }: {[string]: boolean})
-);
+  }: {[string]: boolean}));
 
   return <span className={className}>{markdownElement}</span>;`,
       },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  if (ensureFileEndsWith(chatMarkdownTextPath, '});')) updatedFiles += 1;
+
+  const aiRequestChatIndexPath = path.join(
+    appRoot,
+    'src',
+    'AiGeneration',
+    'AiRequestChat',
+    'index.js'
+  );
+  if (
+    applyTextReplacements(aiRequestChatIndexPath, [
       {
-        searchValue: '\\n}: {[string]: boolean}));',
-        replaceValue: '',
+        searchValue:
+          /export const AiRequestChat: component[\s\S]*?\)\s*React\.Node\s*=\s*React\.forwardRef/g,
+        replaceValue:
+          'export const AiRequestChat: React.AbstractComponent<Props, AiRequestChatInterface> = React.forwardRef',
       },
     ])
   ) {

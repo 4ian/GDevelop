@@ -329,9 +329,7 @@ export type AiRequestChatInterface = {|
   resetUserInput: (aiRequestId: string | null) => void,
 |};
 
-export const AiRequestChat: component(
-  ...{ ...Props, +ref?: React.RefSetter<AiRequestChatInterface> }
-) React.Node = React.forwardRef<Props, AiRequestChatInterface>(
+export const AiRequestChat: React.AbstractComponent<Props, AiRequestChatInterface> = React.forwardRef<Props, AiRequestChatInterface>(
   (
     {
       aiConfigurationPresetsWithAvailability,

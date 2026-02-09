@@ -1374,7 +1374,7 @@ const EventsFunctionsList = React.forwardRef<
               <div style={styles.autoSizerContainer}>
                 <AutoSizer style={styles.autoSizer} disableWidth>
                   {({ height }) => (
-                    // $FlowFixMe[incompatible-exact] 
+                    // $FlowFixMe[incompatible-type] 
                     <TreeView
                       key={listKey}
                       ref={treeViewRef}
@@ -1439,7 +1439,7 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
 
 // $FlowFixMe[incompatible-type]
 const MemoizedObjectsList = React.memo<Props, EventsFunctionsListInterface>(
-  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-exact]
   EventsFunctionsList,
   arePropsEqual
 );

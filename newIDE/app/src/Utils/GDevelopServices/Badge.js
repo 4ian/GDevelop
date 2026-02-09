@@ -122,9 +122,10 @@ export const addCreateBadgePreHookIfNotClaimed = <
     return callback;
   }
 
-  // $FlowFixMe[missing-local-annot] - hard to (or can't?) express the exact function being passed.
+  // $FlowFixMe[incompatible-type] - hard to (or can't?) express the exact function being passed.
   return (...args) => {
     try {
+      // $FlowFixMe[incompatible-type]
       createOrEnsureBadgeForUser(authenticatedUser, achievementId);
     } catch (err) {
       console.error(`Couldn't create badge ${achievementId}; ${err}`);

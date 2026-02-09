@@ -9,9 +9,9 @@ export const fakeEventsFunctionsExtensionsState: EventsFunctionsExtensionsState 
   unloadProjectEventsFunctionsExtension: (project, extensionName) => {},
   reloadProjectEventsFunctionsExtensions: async project => {},
   reloadProjectEventsFunctionsExtensionMetadata: (project, extension) => {},
-  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-exact]
   getEventsFunctionsExtensionWriter: () => LocalEventsFunctionsExtensionWriter,
-  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-exact]
   getEventsFunctionsExtensionOpener: () => LocalEventsFunctionsExtensionOpener,
   ensureLoadFinished: async () => {},
   getIncludeFileHashs: () => ({}),

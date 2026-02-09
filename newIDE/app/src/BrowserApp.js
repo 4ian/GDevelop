@@ -56,9 +56,9 @@ export const create = (authentication: Authentication): React.Node => {
           ? makeBrowserSWEventsFunctionCodeWriter
           : makeBrowserS3EventsFunctionCodeWriter
       }
-      // $FlowFixMe[incompatible-exact]
+      // $FlowFixMe[incompatible-type]
       eventsFunctionsExtensionWriter={BrowserEventsFunctionsExtensionWriter}
-      // $FlowFixMe[incompatible-exact]
+      // $FlowFixMe[incompatible-type]
       eventsFunctionsExtensionOpener={BrowserEventsFunctionsExtensionOpener}
     >
       {({ i18n }) => (

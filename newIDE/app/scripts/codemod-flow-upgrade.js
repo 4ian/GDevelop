@@ -520,6 +520,20 @@ function run() {
     if (applyTextReplacements(filePath, literalReplacements)) updatedFiles += 1;
   }
 
+  const arrayCastReplacements = [
+    {
+      searchValue: /:\s*\[\](\s*\/\/[^\n]*)?\s*\n\s*as Array<empty>/g,
+      replaceValue: ': ([]: Array<any>),$1',
+    },
+    {
+      searchValue: /:\s*\(\[\]: Array<any>\)(\s*\/\/)/g,
+      replaceValue: ': ([]: Array<any>),$1',
+    },
+  ];
+  for (const filePath of srcFiles) {
+    if (applyTextReplacements(filePath, arrayCastReplacements)) updatedFiles += 1;
+  }
+
   const chatMarkdownTextPath = path.join(
     appRoot,
     'src',

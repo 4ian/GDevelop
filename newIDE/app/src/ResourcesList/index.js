@@ -77,9 +77,9 @@ type Props = {|
   getResourceActionsSpecificToStorageProvider?: ?ResourcesActionsMenuBuilder,
 |};
 
-// $FlowFixMe[invalid-render]
+// $FlowFixMe[incompatible-type]
 const ResourcesList: component(...Props) renders ResourcesListInterface = React.memo<Props, ResourcesListInterface>(
-  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-exact]
   React.forwardRef<Props, ResourcesListInterface>(
     (
       {

@@ -12,7 +12,7 @@ import { type EnumeratedExpressionMetadata } from './EnumeratedInstructionOrExpr
 const gd: libGDevelop = global.gd;
 
 // $FlowFixMe[incompatible-type]
-// $FlowFixMe[missing-local-annot]
+// $FlowFixMe[cannot-resolve-name]
 const makeFakeI18n = (fakeI18n): I18nType => ({
   ...fakeI18n,
   _: message => message.id,

@@ -719,7 +719,7 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
 
 // $FlowFixMe[incompatible-type]
 const MemoizedObjectGroupsList = React.memo<Props, ObjectGroupsListInterface>(
-  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-exact]
   ObjectGroupsList,
   arePropsEqual
 );

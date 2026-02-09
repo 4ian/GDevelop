@@ -155,7 +155,7 @@ const getCodeFromEvent = (e: KeyEventLike): string => {
     typeof e.keyCode === 'number' &&
     e.keyCode.toString() in eventKeyCodeToCode
   )
-    // $FlowFixMe[invalid-computed-prop]
+    // $FlowFixMe[incompatible-use]
     return eventKeyCodeToCode[e.keyCode.toString()];
   if (typeof e.which === 'number' && e.which.toString() in eventKeyCodeToCode)
     // $FlowFixMe[incompatible-use]

@@ -1338,7 +1338,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
                 >
                   <AutoSizer style={styles.autoSizer} disableWidth>
                     {({ height }) => (
-                      // $FlowFixMe[incompatible-exact] 
+                      // $FlowFixMe[incompatible-type] 
                       <TreeView
                         key={listKey}
                         ref={treeViewRef}

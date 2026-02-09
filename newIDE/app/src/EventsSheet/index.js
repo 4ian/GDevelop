@@ -248,7 +248,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _eventsTree: ?EventsTreeInterface;
   _eventSearcher: ?EventsSearcher;
   _searchPanel: ?SearchPanelInterface;
-  // $FlowFixMe[missing-local-annot]
+  // $FlowFixMe[cannot-resolve-name]
   _containerDiv = React.createRef<HTMLDivElement>() as React$RefObject<any | null>;
   // $FlowFixMe[missing-local-annot]
   _containerDivLastKnownSize = null;
@@ -372,7 +372,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     }
   }
 
-  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
   onResourceExternallyChanged = resourceInfo => {
     if (this._eventsTree) this._eventsTree.forceEventsUpdate();
   };

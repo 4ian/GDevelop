@@ -52,7 +52,7 @@ export const initialLeaderboardState = {
   updateLeaderboard: async () => {},
   resetLeaderboard: async () => {},
   deleteLeaderboard: async () => {},
-  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
   deleteLeaderboardEntry: async entryId => {},
   fetchLeaderboardEntries: async () => {},
 };

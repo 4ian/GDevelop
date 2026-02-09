@@ -42,6 +42,7 @@ export const AuthenticatedUserWithSilverSubscriptionButWithoutDiscordUsername = 
   <SubscriptionPendingDialog
     authenticatedUser={{
       ...fakeSilverAuthenticatedUser,
+      // $FlowFixMe[incompatible-type]
       profile: fakeProfileWithoutDiscordUsername,
     }}
     onClose={action('on close')}
@@ -53,6 +54,7 @@ export const AuthenticatedUserWithStartupSubscriptionButWithoutDiscordUsername =
   <SubscriptionPendingDialog
     authenticatedUser={{
       ...fakeStartupAuthenticatedUser,
+      // $FlowFixMe[incompatible-type]
       profile: fakeProfileWithoutDiscordUsername,
     }}
     onClose={action('on close')}

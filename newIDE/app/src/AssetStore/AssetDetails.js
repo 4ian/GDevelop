@@ -352,6 +352,7 @@ export const AssetDetails: component(
                           ({ name }) => name
                         )}
                         getImageResourceSource={(resourceName: string) => {
+                          // $FlowFixMe[invalid-computed-prop]
                           const resource = assetResources[resourceName];
                           return resource ? resource.file : '';
                         }}

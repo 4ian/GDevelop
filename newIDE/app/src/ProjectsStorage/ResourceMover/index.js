@@ -13,6 +13,7 @@ export type MoveAllProjectResourcesOptionsWithoutProgress = {|
   newFileMetadata: FileMetadata,
   newStorageProvider: StorageProvider,
   newStorageProviderOperations: StorageProviderOperations,
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
 |};
 

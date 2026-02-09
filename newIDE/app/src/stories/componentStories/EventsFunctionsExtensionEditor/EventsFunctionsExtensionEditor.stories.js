@@ -50,6 +50,7 @@ export const Default = (): React.Node => (
 );
 
 export const WithObjectEditor = (): React.Node => {
+  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
   };

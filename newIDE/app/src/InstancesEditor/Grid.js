@@ -9,6 +9,7 @@ type Props = {|
 |};
 
 export default class Grid {
+  // $FlowFixMe[missing-local-annot]
   pixiGrid = new PIXI.Graphics() as any;
   instancesEditorSettings: InstancesEditorSettings;
   viewPosition: ViewPosition;

@@ -90,6 +90,7 @@ const AnimationPreview = (
   const isLoopingRef = React.useRef(isLooping);
   const animationNameRef = React.useRef(animationName);
   const imagesLoadedArray = React.useRef(
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     new Array(resourceNames.length).fill(false)
   );
   const loaderTimeout = React.useRef<?TimeoutID>(null);
@@ -106,6 +107,7 @@ const AnimationPreview = (
       }
       if (animationName !== animationNameRef.current) {
         animationNameRef.current = animationName;
+        // $FlowFixMe[underconstrained-implicit-instantiation]
         imagesLoadedArray.current = new Array(resourceNames.length).fill(false);
       }
     },
@@ -122,6 +124,8 @@ const AnimationPreview = (
   // Variables used inside the requestAnimationFrame callback
   // must be declared as mutable with useRef, otherwise they
   // will not update between calls.
+  // $FlowFixMe[recursive-definition]
+  // $FlowFixMe[definition-cycle]
   const updateAnimation = React.useCallback(
     (updateTimeInMs: number) => {
       // Mutable variables used inside the requestAnimationFrame callback
@@ -135,6 +139,7 @@ const AnimationPreview = (
 
       const hasCurrentImageLoaded =
         imagesLoadedArray.current[currentFrameIndex];
+      // $FlowFixMe[constant-condition]
       if (previousUpdateTimeInMs && hasCurrentImageLoaded) {
         const elapsedTime = (updateTimeInMs - previousUpdateTimeInMs) / 1000;
 
@@ -188,7 +193,9 @@ const AnimationPreview = (
           forceUpdate();
         }
       }
+      // $FlowFixMe[incompatible-type]
       requestRef.current = requestAnimationFrame(updateAnimation);
+      // $FlowFixMe[incompatible-type]
       previousTimeRef.current = updateTimeInMs;
     },
     [forceUpdate, resourceNames]
@@ -196,6 +203,7 @@ const AnimationPreview = (
 
   React.useEffect(
     () => {
+      // $FlowFixMe[incompatible-type]
       requestRef.current = requestAnimationFrame(updateAnimation);
       return () => {
         if (requestRef.current) cancelAnimationFrame(requestRef.current);

@@ -111,10 +111,14 @@ const getObjectsAndGroupsDataSource = ({
       : [...objects, { type: 'separator' }, ...groups];
 
   return excludedObjectOrGroupNames
+    // $FlowFixMe[incompatible-type]
     ? fullList.filter(
-        //$FlowFixMe
+        // $FlowFixMe[incompatible-type]
+        //$FlowFixMe[incompatible-type]
+        // $FlowFixMe[incompatible-type]
         ({ value }) => !excludedObjectOrGroupNames.includes(value)
       )
+    // $FlowFixMe[incompatible-type]
     : fullList;
 };
 

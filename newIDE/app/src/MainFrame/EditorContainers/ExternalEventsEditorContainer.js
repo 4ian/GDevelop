@@ -53,6 +53,7 @@ export class ExternalEventsEditorContainer extends React.Component<
   editor: ?EventsSheetInterface;
   resourceExternallyChangedCallbackId: ?string;
 
+  // $FlowFixMe[missing-local-annot]
   state = {
     externalPropertiesDialogOpen: false,
   };
@@ -225,10 +226,12 @@ export class ExternalEventsEditorContainer extends React.Component<
             onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
             unsavedChanges={this.props.unsavedChanges}
             project={project}
+            // $FlowFixMe[incompatible-type]
             scope={scope}
             globalObjectsContainer={project.getObjects()}
             objectsContainer={layout.getObjects()}
             projectScopedContainersAccessor={
+              // $FlowFixMe[incompatible-type]
               new ProjectScopedContainersAccessor(scope)
             }
             events={externalEvents.getEvents()}

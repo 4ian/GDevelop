@@ -119,6 +119,7 @@ export type TreeItemProps = {|
   forceUpdateList: () => void,
   unsavedChanges?: ?UnsavedChanges,
   preferences: Preferences,
+  // $FlowFixMe[value-as-type]
   gdevelopTheme: GDevelopTheme,
   editName: (itemId: string) => void,
   scrollToItem: (itemId: string) => void,
@@ -139,6 +140,7 @@ class LeafTreeViewItem implements TreeViewItem {
   }
 }
 
+// $FlowFixMe[incompatible-type]
 class PlaceHolderTreeViewItem implements TreeViewItem {
   isPlaceholder = true;
   content: TreeViewItemContent;
@@ -182,6 +184,7 @@ const createTreeViewItem = ({
   }
 };
 
+// $FlowFixMe[incompatible-type]
 class PropertyFolderTreeViewItem implements TreeViewItem {
   isRoot: boolean;
   isPlaceholder = false;
@@ -248,6 +251,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     this.id = id;
     this.label = label;
     this.buildMenuTemplateFunction = (i18n: I18nType, index: number) =>
+      // $FlowFixMe[incompatible-type]
       [
         rightButton
           ? {
@@ -288,6 +292,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
 
   onClick(): void {}
 
+  // $FlowFixMe[missing-local-annot]
   buildMenuTemplate(i18n: I18nType, index: number) {
     return this.buildMenuTemplateFunction(i18n, index);
   }
@@ -384,6 +389,7 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
     this.onClickCallback();
   }
 
+  // $FlowFixMe[missing-local-annot]
   buildMenuTemplate(i18n: I18nType, index: number) {
     return this.buildMenuTemplateFunction(i18n, index);
   }
@@ -724,7 +730,8 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
           isSharedProperties
         );
       }
-      // $FlowFixMe - We are confident this TreeView item is in fact a PropertyFolderOrPropertyWithContext
+      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-type] - We are confident this TreeView item is in fact a PropertyFolderOrPropertyWithContext
       return topToBottomAscendanceId[firstClosedFolderIndex];
     };
 
@@ -965,6 +972,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
           !propertiesTreeViewItemProps ||
           !propertyFolderTreeViewItemProps
           ? []
+          // $FlowFixMe[incompatible-type]
           : [
               new LeafTreeViewItem(
                 new ActionTreeViewItemContent(
@@ -1332,6 +1340,8 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
                 >
                   <AutoSizer style={styles.autoSizer} disableWidth>
                     {({ height }) => (
+                      // $FlowFixMe[incompatible-type]
+                      // $FlowFixMe[incompatible-exact]
                       <TreeView
                         key={listKey}
                         ref={treeViewRef}

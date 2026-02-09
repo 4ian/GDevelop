@@ -66,6 +66,7 @@ const AsyncSemiControlledTextField = (
   };
 
   const onChangeValue = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     (e, _value) => {
       if (errorText) {
         setInternalErrorText(null);

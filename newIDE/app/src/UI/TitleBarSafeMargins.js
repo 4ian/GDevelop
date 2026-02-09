@@ -39,7 +39,9 @@ export const TitleBarLeftSafeMargins = (
   } else {
     // Otherwise, the windowControlsOverlay tells us how much space is needed.
     // This can happen for mac apps, or installed PWA.
-    // $FlowFixMe - this API is not handled by Flow.
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type] - this API is not handled by Flow.
+    // $FlowFixMe[prop-missing]
     const { windowControlsOverlay } = navigator;
     if (windowControlsOverlay) {
       if (windowControlsOverlay.visible) {
@@ -85,7 +87,9 @@ export const TitleBarRightSafeMargins = (
 
   // An installed PWA can have window controls displayed as overlay,
   // which we measure here to set the offsets.
-  // $FlowFixMe - this API is not handled by Flow.
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-type] - this API is not handled by Flow.
+  // $FlowFixMe[prop-missing]
   const { windowControlsOverlay } = navigator;
   if (windowControlsOverlay) {
     if (windowControlsOverlay.visible) {

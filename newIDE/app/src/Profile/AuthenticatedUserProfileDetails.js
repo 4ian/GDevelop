@@ -12,6 +12,7 @@ import RaisedButton from '../UI/RaisedButton';
 type Props = {|
   onOpenEditProfileDialog: () => void,
   onOpenChangeEmailDialog: () => void,
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
 |};
 

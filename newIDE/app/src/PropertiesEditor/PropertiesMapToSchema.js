@@ -85,6 +85,7 @@ const createField = (
         ? (instance: gdInitialInstance) => {
             return getValue(instance) === defaultValueNumber
               ? null
+              // $FlowFixMe[missing-local-annot]
               : className => <Restore className={className} />;
           }
         : undefined;
@@ -97,6 +98,7 @@ const createField = (
             setValue(instance, defaultValueNumber);
           }
         : undefined;
+    // $FlowFixMe[incompatible-type]
     return {
       name,
       valueType,
@@ -146,11 +148,16 @@ const createField = (
     };
   } else if (valueType === 'choice' || valueType === 'numberwithchoices') {
     // Choice is a "string" (with a selector for the user in the UI)
+    // $FlowFixMe[incompatible-exact]
     const choices = mapVector(property.getChoices(), choice => ({
+      // $FlowFixMe[incompatible-use]
       value: choice.getValue(),
       label:
+        // $FlowFixMe[incompatible-use]
         choice.getValue() +
+        // $FlowFixMe[incompatible-use]
         (choice.getLabel() && choice.getLabel() !== choice.getValue()
+          // $FlowFixMe[incompatible-use]
           ? ` — ${choice.getLabel()}`
           : ''),
     }));
@@ -160,6 +167,7 @@ const createField = (
       .toJSArray()
       .map(value => ({ value, label: value }));
 
+    // $FlowFixMe[incompatible-type]
     return {
       name,
       valueType: 'string',
@@ -220,7 +228,9 @@ const createField = (
   } else if (valueType === 'resource') {
     // Resource is a "string" (with a selector in the UI)
     const extraInfos = property.getExtraInfo().toJSArray();
-    // $FlowFixMe - assume the passed resource kind is always valid.
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type] - assume the passed resource kind is always valid.
+    // $FlowFixMe[incompatible-type]
     const kind: ResourceKind = extraInfos[0] || '';
     return {
       name,
@@ -262,6 +272,7 @@ const createField = (
       visibility,
     };
   } else if (valueType === 'objectanimationname') {
+    // $FlowFixMe[incompatible-type]
     return {
       getChoices: () => {
         if (!object) {
@@ -294,6 +305,7 @@ const createField = (
       visibility,
     };
   } else if (valueType === 'keyboardkey') {
+    // $FlowFixMe[incompatible-type]
     return {
       getChoices: () => {
         const choices = keyNames.map(keyName => ({
@@ -347,6 +359,7 @@ const propertyKeywordCouples: Array<Array<string>> = [
   ['5', '6'],
 ];
 
+// $FlowFixMe[missing-local-annot]
 const uncapitalize = str => {
   if (!str) return str;
   return str[0].toLowerCase() + str.substr(1);

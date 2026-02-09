@@ -108,6 +108,7 @@ export const QuickCustomizationGameTiles = (
                   />
                 )
               )
+            // $FlowFixMe[underconstrained-implicit-instantiation]
             : new Array(quickCustomizationRecommendation.list.length)
                 .fill(0)
                 .map((_, index) => (

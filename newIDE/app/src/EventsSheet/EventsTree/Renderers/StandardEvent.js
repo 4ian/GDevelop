@@ -21,6 +21,7 @@ const styles = {
 
 export default class StandardEvent extends React.Component<
   EventRendererProps,
+  // $FlowFixMe[unsupported-syntax]
   *
 > {
   render(): any {

@@ -84,6 +84,7 @@ const isLocalFile = (urlOrFilename: string) => {
  * (notably images).
  */
 export default class ResourcesLoader {
+  // $FlowFixMe[missing-local-annot]
   static _cache = new UrlsCache() as UrlsCache;
 
   /**

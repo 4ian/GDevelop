@@ -77,6 +77,7 @@ export const makeBrowserS3EventsFunctionCodeWriter = ({
       const key = getPathFor(functionCodeNamespace);
       onWriteFile({ includeFile: key, content: code });
       console.log(`Uploading function generated code to ${key}...`);
+      // $FlowFixMe[incompatible-type]
       return uploadObjectInNextBatch({
         Key: getPathFor(functionCodeNamespace),
         Body: code,
@@ -90,6 +91,7 @@ export const makeBrowserS3EventsFunctionCodeWriter = ({
       const key = getPathFor(behaviorCodeNamespace);
       onWriteFile({ includeFile: key, content: code });
       console.log(`Uploading behavior generated code to ${key}...`);
+      // $FlowFixMe[incompatible-type]
       return uploadObjectInNextBatch({
         Key: getPathFor(behaviorCodeNamespace),
         Body: code,
@@ -103,6 +105,7 @@ export const makeBrowserS3EventsFunctionCodeWriter = ({
       const key = getPathFor(objectCodeNamespace);
       onWriteFile({ includeFile: key, content: code });
       console.log(`Uploading object generated code to ${key}...`);
+      // $FlowFixMe[incompatible-type]
       return uploadObjectInNextBatch({
         Key: getPathFor(objectCodeNamespace),
         Body: code,

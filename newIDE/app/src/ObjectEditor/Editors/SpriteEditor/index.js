@@ -180,6 +180,7 @@ export default function SpriteEditor({
                   onClick={() => setCollisionMasksEditorOpen(true)}
                   disabled={!hasAnyFrame(animations)}
                   buildMenuTemplate={i18n =>
+                    // $FlowFixMe[incompatible-type]
                     [
                       {
                         label: i18n._(t`Edit points`),

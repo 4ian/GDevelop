@@ -59,6 +59,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       },
     );
     
+    // $FlowFixMe[missing-local-annot]
     const onChangeSelectValue = (event, value) => {
       props.onChange(event.target.value);
     };

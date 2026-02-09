@@ -308,6 +308,7 @@ const InstructionParametersEditor: component(
                   }}
                 />
                 <Column expand>
+                  // $FlowFixMe[incompatible-type]
                   <Text style={styles.description}>
                     {instructionMetadata.getDescription()}
                   </Text>
@@ -422,6 +423,7 @@ const InstructionParametersEditor: component(
                     label={<Trans>Invert condition</Trans>}
                     labelPosition="right"
                     toggled={instruction.isInverted()}
+                    // $FlowFixMe[incompatible-type]
                     style={styles.invertToggle}
                     onToggle={(e, enabled) => {
                       instruction.setInverted(enabled);
@@ -439,6 +441,7 @@ const InstructionParametersEditor: component(
                     }
                     labelPosition="right"
                     toggled={instruction.isAwaited()}
+                    // $FlowFixMe[incompatible-type]
                     style={styles.invertToggle}
                     onToggle={(e, enabled) => {
                       instruction.setAwaited(enabled);

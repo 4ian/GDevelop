@@ -14,6 +14,7 @@ const makeMarkdownCustomComponents = (
   withTextEllipsis: boolean
 ) => ({
   // Ensure link are opened in a new page
+  // $FlowFixMe[missing-local-annot]
   a: props =>
     props.href ? (
       <a
@@ -31,6 +32,7 @@ const makeMarkdownCustomComponents = (
       props.children
     ),
   // Add paragraphs only if we explicitly opt in.
+  // $FlowFixMe[missing-local-annot]
   p: props => {
     // Hack to make sure an indent is added to isolated piece of markdown
     // that starts with a tab character. Used for the premium courses that include
@@ -63,7 +65,9 @@ const makeMarkdownCustomComponents = (
     );
   },
   // eslint-disable-next-line jsx-a11y/alt-text
+  // $FlowFixMe[missing-local-annot]
   img: ({ node, ...props }) => <img style={{ display: 'flex' }} {...props} />,
+  // $FlowFixMe[missing-local-annot]
   code: ({ node, ...props }) => (
     <code
       style={{

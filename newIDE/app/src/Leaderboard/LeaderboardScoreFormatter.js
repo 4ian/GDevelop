@@ -30,12 +30,14 @@ export const formatDuration = (
   const smallestUnitIndex = orderedTimeUnits.indexOf(options.smallestUnit);
   for (let index = biggestUnitIndex; index <= smallestUnitIndex; index++) {
     const unit = orderedTimeUnits[index];
+    // $FlowFixMe[invalid-computed-prop]
     const divider = unitToDivider[unit];
     const remainder = durationInMs % divider;
     const quotient = (durationInMs - remainder) / divider;
     formattedDuration += `${quotient
       .toString()
       .padStart(unit === 'millisecond' ? 3 : 2, '0')}${
+      // $FlowFixMe[invalid-computed-prop]
       index === smallestUnitIndex ? '' : unitToNextSeparator[unit]
     }`;
     durationInMs = remainder;

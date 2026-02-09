@@ -65,6 +65,7 @@ export class LogsManager {
       this._onNewGroup.forEach(f => f());
     }
     if (!this._pendingCommit) {
+      // $FlowFixMe[method-unbinding]
       setTimeout(this._commitLogs.bind(this), 200);
       this._pendingCommit = true;
     }
@@ -171,6 +172,7 @@ export const DebuggerConsole = (
   };
 
   const [editingHiddenGroups, setEditingHiddenGroups] = React.useState(false);
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const hiddenGroups = React.useRef(new Set()).current;
   React.useEffect(
     () => {

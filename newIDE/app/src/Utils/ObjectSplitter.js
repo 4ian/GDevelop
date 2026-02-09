@@ -45,12 +45,14 @@ export const split = (
   }: SplitConfiguration
 ): Array<PartialObjectDescription> => {
   const partialObjects = [];
+  // $FlowFixMe[missing-local-annot]
   const createReference = (reference, object): Reference => {
     partialObjects.push({
       reference,
       object,
     });
 
+    // $FlowFixMe[incompatible-indexer]
     return {
       [isReferenceMagicPropertyName]: true,
       referenceTo: reference,
@@ -211,12 +213,16 @@ export const getSlugifiedUniqueNameFromProperty = (propertyName: string): ((obje
       throw new Error(`Property ${propertyName} is not a string`);
     }
 
+    // $FlowFixMe[prop-missing]
     existingNamesForReference[currentReference] =
+      // $FlowFixMe[invalid-computed-prop]
       existingNamesForReference[currentReference] || {};
     const newName = newNameGenerator(
       slugs(property),
+      // $FlowFixMe[invalid-computed-prop]
       name => !!existingNamesForReference[currentReference][name]
     );
+    // $FlowFixMe[invalid-computed-prop]
     existingNamesForReference[currentReference][newName] = true;
     return newName;
   };

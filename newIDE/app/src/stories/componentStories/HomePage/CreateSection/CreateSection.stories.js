@@ -28,6 +28,7 @@ import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWin
 import { type Game } from '../../../../Utils/GDevelopServices/Game';
 
 const getRecentProjectFiles = (count: number) =>
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   new Array(count).fill(0).map((_, index) => ({
     fileMetadata: {
       fileIdentifier: `Users/me/Desktop/Gdevelop/project ${index}`,
@@ -37,6 +38,7 @@ const getRecentProjectFiles = (count: number) =>
   }));
 
 const getPartiallySavedRecentProjectFiles = (count: number) =>
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   new Array(count).fill(0).map((_, index) => ({
     fileMetadata: {
       fileIdentifier: `Users/Gdevelop/project ${index}`,
@@ -52,6 +54,7 @@ const WrappedCreateSection = (
   {
     project,
     recentProjectFiles,
+    // $FlowFixMe[incompatible-type]
     tutorialProgress = undefined,
     inAppTutorialsFetchingError = null,
     user,
@@ -61,6 +64,7 @@ const WrappedCreateSection = (
     recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
     tutorialProgress?: InAppTutorialUserProgress,
     inAppTutorialsFetchingError?: string | null,
+    // $FlowFixMe[value-as-type]
     user: AuthenticatedUser,
     games?: ?Array<Game>,
   |},
@@ -73,6 +77,7 @@ const WrappedCreateSection = (
       {({ i18n }) => (
         <FixedHeightFlexContainer height={fixedHeight}>
           <PreferencesContext.Provider
+            // $FlowFixMe[incompatible-type]
             value={{
               ...initialPreferences,
               getRecentProjectFiles: () => recentProjectFiles,
@@ -144,6 +149,7 @@ export default {
 export const CreateSectionLoading = (): React.Node => (
   <WrappedCreateSection
     project={null}
+    // $FlowFixMe[incompatible-type]
     recentProjectFiles={getRecentProjectFiles(5)}
     user={fakeAuthenticatedUserLoggingIn}
     games={null}
@@ -152,6 +158,7 @@ export const CreateSectionLoading = (): React.Node => (
 export const NoProjectOpened = (): React.Node => (
   <WrappedCreateSection
     project={null}
+    // $FlowFixMe[incompatible-type]
     recentProjectFiles={getRecentProjectFiles(5)}
     user={fakeSilverAuthenticatedUser}
   />
@@ -159,6 +166,7 @@ export const NoProjectOpened = (): React.Node => (
 export const ProjectOpened = (): React.Node => (
   <WrappedCreateSection
     project={testProject.project}
+    // $FlowFixMe[incompatible-type]
     recentProjectFiles={getRecentProjectFiles(5)}
     user={fakeSilverAuthenticatedUser}
   />
@@ -173,6 +181,7 @@ export const NoRecentFiles = (): React.Node => (
 export const LotOfRecentFiles = (): React.Node => (
   <WrappedCreateSection
     project={testProject.project}
+    // $FlowFixMe[incompatible-type]
     recentProjectFiles={getRecentProjectFiles(20)}
     user={fakeSilverAuthenticatedUser}
   />
@@ -180,6 +189,7 @@ export const LotOfRecentFiles = (): React.Node => (
 export const SomeRecentFilesNotSavedYet = (): React.Node => (
   <WrappedCreateSection
     project={testProject.project}
+    // $FlowFixMe[incompatible-type]
     recentProjectFiles={getPartiallySavedRecentProjectFiles(20)}
     user={fakeSilverAuthenticatedUser}
   />

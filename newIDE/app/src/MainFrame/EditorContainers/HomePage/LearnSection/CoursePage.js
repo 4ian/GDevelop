@@ -147,7 +147,9 @@ const CoursePage = (
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const courseCompletion = getCourseCompletion();
   const firstIncompleteChapterIdRef = React.useRef<string | null>(
+    // $FlowFixMe[incompatible-type]
     courseChapters.reduce((alreadyFoundIncompleteChapterId, chapter, index) => {
+      // $FlowFixMe[constant-condition]
       if (alreadyFoundIncompleteChapterId)
         return alreadyFoundIncompleteChapterId;
       const chapterCompletion = getChapterCompletion(chapter.id);
@@ -232,6 +234,7 @@ const CoursePage = (
   const onScroll = React.useCallback((e: Event) => {
     setActiveChapterId(() => {
       // $FlowIgnore
+      // $FlowFixMe[prop-missing]
       const { scrollTop, offsetHeight } = e.target;
       if (scrollTop === undefined) return;
 
@@ -375,6 +378,7 @@ const CoursePage = (
                         chapterIndex={index}
                         course={course}
                         // $FlowIgnore - Flow does not conclude this chapter can only be text-based.
+                        // $FlowFixMe[incompatible-type]
                         courseChapter={chapter}
                         onOpenTemplate={(templateId?: string) => {
                           onOpenTemplateFromCourseChapter(chapter, templateId);
@@ -430,6 +434,7 @@ const CoursePage = (
                           <LinearProgress
                             value={courseCompletion.percentage * 100}
                             variant="determinate"
+                            // $FlowFixMe[incompatible-type]
                             style={styles.progress}
                             color="success"
                           />
@@ -490,6 +495,7 @@ const CoursePage = (
                           <LinearProgress
                             value={courseCompletion.percentage * 100}
                             variant="determinate"
+                            // $FlowFixMe[incompatible-type]
                             style={styles.progress}
                             color="success"
                           />

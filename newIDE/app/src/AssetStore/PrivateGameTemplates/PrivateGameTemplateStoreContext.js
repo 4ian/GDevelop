@@ -21,7 +21,9 @@ import { PRIVATE_GAME_TEMPLATES_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTim
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 
 const defaultSearchText = '';
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const excludedTiers = new Set(); // No tiers for game templates.
+// $FlowFixMe[missing-empty-array-annot]
 const firstGameTemplateIds = [];
 
 const getPrivateGameTemplateListingDataSearchTerms = (
@@ -153,6 +155,7 @@ export const PrivateGameTemplateStoreStateProvider = ({children}: PrivateGameTem
             fetchedPrivateGameTemplateListingDatas
           );
           const defaultTags = fetchedPrivateGameTemplateListingDatas.reduce(
+            // $FlowFixMe[missing-local-annot]
             (allCategories, privateGameTemplateListingData) => {
               return allCategories.concat(
                 privateGameTemplateListingData.categories.map(category =>
@@ -269,12 +272,14 @@ export const PrivateGameTemplateStoreStateProvider = ({children}: PrivateGameTem
       privateGameTemplateListingDatas.forEach(
         privateGameTemplateListingData => {
           const id = privateGameTemplateListingData.id;
+          // $FlowFixMe[invalid-computed-prop]
           if (privateGameTemplateListingDatasById[id]) {
             console.warn(
               `Multiple private game templates with the same id: ${id}`
             );
           }
           privateGameTemplateListingDatasById[
+            // $FlowFixMe[prop-missing]
             id
           ] = privateGameTemplateListingData;
         }
@@ -293,6 +298,7 @@ export const PrivateGameTemplateStoreStateProvider = ({children}: PrivateGameTem
     chosenCategory: filtersStateForExampleStore.chosenCategory,
     chosenFilters: filtersStateForExampleStore.chosenFilters,
     excludedTiers,
+    // $FlowFixMe[incompatible-type]
     defaultFirstSearchItemIds: firstGameTemplateIds,
     shuffleResults: false,
   });
@@ -349,6 +355,7 @@ export const PrivateGameTemplateStoreStateProvider = ({children}: PrivateGameTem
 
   return (
     <PrivateGameTemplateStoreContext.Provider
+      // $FlowFixMe[incompatible-type]
       value={PrivateGameTemplateStoreState}
     >
       {children}

@@ -33,6 +33,7 @@ const AuthorizedAssetImage = ({url, style, alt, onError, onLoad, hideLoader}: Pr
       if (!authorizationToken) {
         updateAuthorizationToken();
       } else {
+        // $FlowFixMe[incompatible-type]
         setAuthorizedUrl(createProductAuthorizedUrl(url, authorizationToken));
       }
     },

@@ -109,6 +109,7 @@ export default function InstructionsList({
 
   const addNewInstruction = React.useCallback(
     () => {
+      // $FlowFixMe[constant-condition]
       if (onAddNewInstruction)
         onAddNewInstruction({
           instrsList,

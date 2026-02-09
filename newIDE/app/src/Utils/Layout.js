@@ -8,10 +8,14 @@ export const getInstanceInLayoutWithPersistentUuid = (
   if (initialInstancesContainer.getInstancesCount() === 0) return null;
   let matchingInstance = null;
   const instanceGetter = new gd.InitialInstanceJSFunctor();
-  // $FlowFixMe - invoke is not writable
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-type] - invoke is not writable
+  // $FlowFixMe[cannot-write]
   instanceGetter.invoke = instancePtr => {
-    // $FlowFixMe - wrapPointer is not exposed
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
     const instance: gdInitialInstance = gd.wrapPointer(
+      // $FlowFixMe[incompatible-type]
       instancePtr,
       gd.InitialInstance
     );
@@ -19,7 +23,9 @@ export const getInstanceInLayoutWithPersistentUuid = (
       matchingInstance = instance;
     }
   };
-  // $FlowFixMe - JSFunctor is incompatible with Functor
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-type] - JSFunctor is incompatible with Functor
+  // $FlowFixMe[incompatible-type]
   initialInstancesContainer.iterateOverInstances(instanceGetter);
   instanceGetter.delete();
   return matchingInstance;
@@ -32,10 +38,14 @@ export const getInstancesInLayoutForObject = (
   if (initialInstancesContainer.getInstancesCount() === 0) return [];
   const objectInstances = [];
   const instanceGetter = new gd.InitialInstanceJSFunctor();
-  // $FlowFixMe - invoke is not writable
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-type] - invoke is not writable
+  // $FlowFixMe[cannot-write]
   instanceGetter.invoke = instancePtr => {
-    // $FlowFixMe - wrapPointer is not exposed
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
     const instance: gdInitialInstance = gd.wrapPointer(
+      // $FlowFixMe[incompatible-type]
       instancePtr,
       gd.InitialInstance
     );
@@ -43,7 +53,9 @@ export const getInstancesInLayoutForObject = (
       objectInstances.push(instance);
     }
   };
-  // $FlowFixMe - JSFunctor is incompatible with Functor
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-type] - JSFunctor is incompatible with Functor
+  // $FlowFixMe[incompatible-type]
   initialInstancesContainer.iterateOverInstances(instanceGetter);
   instanceGetter.delete();
   return objectInstances;
@@ -56,10 +68,14 @@ export const getInstancesInLayoutForLayer = (
   if (initialInstancesContainer.getInstancesCount() === 0) return [];
   const objectInstances = [];
   const instanceGetter = new gd.InitialInstanceJSFunctor();
-  // $FlowFixMe - invoke is not writable
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-type] - invoke is not writable
+  // $FlowFixMe[cannot-write]
   instanceGetter.invoke = instancePtr => {
-    // $FlowFixMe - wrapPointer is not exposed
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
     const instance: gdInitialInstance = gd.wrapPointer(
+      // $FlowFixMe[incompatible-type]
       instancePtr,
       gd.InitialInstance
     );
@@ -67,7 +83,9 @@ export const getInstancesInLayoutForLayer = (
       objectInstances.push(instance);
     }
   };
-  // $FlowFixMe - JSFunctor is incompatible with Functor
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-type] - JSFunctor is incompatible with Functor
+  // $FlowFixMe[incompatible-type]
   initialInstancesContainer.iterateOverInstances(instanceGetter);
   instanceGetter.delete();
   return objectInstances;

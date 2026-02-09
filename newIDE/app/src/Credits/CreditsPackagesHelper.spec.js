@@ -4,6 +4,7 @@ const { getItemsSplitInLines } = require('./CreditsPackagesHelper');
 describe('getItemsSplitInLines', () => {
   describe('loading', () => {
     it('returns null if loading', () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       const results = getItemsSplitInLines(null, false);
       expect(results).toEqual(null);
     });

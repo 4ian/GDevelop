@@ -34,6 +34,7 @@ const ObjectPropertiesEditor = (props: Props): React.Node => {
   // the arguments will be mismatched. To workaround this, always cast the object to
   // a base gdObject to ensure C++ methods are called.
   const objectConfigurationAsGd = gd.castObject(
+    // $FlowFixMe[incompatible-exact]
     objectConfiguration,
     gd.ObjectConfiguration
   );

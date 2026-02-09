@@ -28,6 +28,7 @@ export const getStartupTimesSummary = (): Summary => {
       elapsedTime: step[1] - previousStep[1],
     };
 
+    // $FlowFixMe[incompatible-type]
     previousStep = step;
     return stepSummary;
   });

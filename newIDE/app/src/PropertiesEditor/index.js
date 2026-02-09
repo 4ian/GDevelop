@@ -149,6 +149,7 @@ export const getFieldValue = ({
     return mixedValueFallback;
   }
   let value = getValue(instances[0]);
+  // $FlowFixMe[invalid-compare]
   if (value === null) {
     value = defaultValue;
   }
@@ -404,6 +405,7 @@ const PropertiesEditor = (
         />
       ));
 
+      // $FlowFixMe[invalid-compare]
       if (field.valueType === 'number') {
         const { setValue } = field;
         return (
@@ -417,6 +419,7 @@ const PropertiesEditor = (
               instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
               _onInstancesModified(instances);
             }}
+            // $FlowFixMe[incompatible-type]
             style={styles.field}
             disabled={field.disabled}
           >
@@ -440,6 +443,7 @@ const PropertiesEditor = (
               instances.forEach(i => setValue(i, newValue || ''));
               _onInstancesModified(instances);
             }}
+            // $FlowFixMe[incompatible-type]
             style={styles.field}
             disabled={getDisabled({ instances, field })}
           >

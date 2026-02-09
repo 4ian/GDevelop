@@ -11,6 +11,7 @@ import {
   applyChildLayouts,
   ChildInstance,
   type ChildLayout,
+  // $FlowFixMe[import-type-as-value]
   LayoutedParent,
   getProportionalPositionX,
   getProportionalPositionY,
@@ -45,7 +46,9 @@ export default class LegacyRenderedCustomObjectInstance
     project: gdProject,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
+    // $FlowFixMe[value-as-type]
     pixiContainer: PIXI.Container,
+    // $FlowFixMe[value-as-type]
     threeGroup: THREE.Group,
     pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {
@@ -147,7 +150,9 @@ export default class LegacyRenderedCustomObjectInstance
       const childInstance = new ChildInstance();
       const renderer = ObjectsRenderingService.createNewInstanceRenderer(
         project,
-        // $FlowFixMe Use real object instances.
+        // $FlowFixMe[incompatible-type]
+        // $FlowFixMe[incompatible-type] Use real object instances.
+        // $FlowFixMe[incompatible-type]
         childInstance,
         childObjectConfiguration,
         this._pixiObject,
@@ -165,6 +170,7 @@ export default class LegacyRenderedCustomObjectInstance
         renderer._pixiObject.style.align = 'center';
       }
       this.childrenInstances.push(childInstance);
+      // $FlowFixMe[incompatible-type]
       this.childrenLayouts.push(childLayout);
       this.childrenRenderedInstances.push(renderer);
       this.childrenRenderedInstanceByNames.set(childObject.getName(), renderer);

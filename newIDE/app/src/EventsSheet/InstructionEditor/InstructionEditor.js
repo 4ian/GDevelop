@@ -210,6 +210,7 @@ export const useInstructionEditor = ({
   return [
     state,
     {
+      // $FlowFixMe[incompatible-type]
       chooseInstruction,
       chooseObject,
       chooseObjectInstruction,

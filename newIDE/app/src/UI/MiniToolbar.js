@@ -44,6 +44,7 @@ type MiniToolbarTextProps = {|
 export const MiniToolbarText = ({children, firstChild}: MiniToolbarTextProps): React.Node => (
   <Text
     noShrink
+    // $FlowFixMe[incompatible-type]
     style={firstChild ? firstChildToolbarTextStyle : toolbarTextStyle}
   >
     {children}

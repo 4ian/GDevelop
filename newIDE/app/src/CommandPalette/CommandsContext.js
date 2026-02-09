@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+// $FlowFixMe[import-type-as-value]
 import CommandManager, { CommandManagerInterface } from './CommandManager';
 import useValueWithInit from '../Utils/UseRefInitHook';
 

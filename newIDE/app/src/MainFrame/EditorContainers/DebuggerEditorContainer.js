@@ -30,6 +30,7 @@ export class DebuggerEditorContainer extends React.Component<
 > {
   editor: ?Debugger;
   _subscriptionChecker: ?SubscriptionCheckerInterface;
+  // $FlowFixMe[missing-local-annot]
   state = {
     subscriptionChecked: false,
   };

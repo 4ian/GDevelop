@@ -2,7 +2,8 @@
 import { type I18n as I18nType } from '@lingui/core';
 import { selectMessageByLocale } from './MessageByLocale';
 
-// $FlowExpectedError
+// $FlowFixMe[incompatible-type]
+// $FlowFixMe[missing-local-annot]
 const makeFakeI18n = (fakeI18n): I18nType => fakeI18n;
 
 describe('MessageByLocale', () => {
@@ -71,38 +72,38 @@ describe('MessageByLocale', () => {
     });
     test('handles type errors gracefully', () => {
       expect(
-        // $FlowExpectedError
+        // $FlowFixMe[incompatible-type]
         selectMessageByLocale(makeFakeI18n({ language: 'fr' }), 'Test')
       ).toBe('Test');
 
-      // $FlowExpectedError
+      // $FlowFixMe[incompatible-type]
       expect(selectMessageByLocale(makeFakeI18n({ language: 'fr' }), 0)).toBe(
         ''
       );
 
-      // $FlowExpectedError
+      // $FlowFixMe[incompatible-type]
       expect(selectMessageByLocale(makeFakeI18n({ language: 'fr' }), 123)).toBe(
         ''
       );
 
-      // $FlowExpectedError
+      // $FlowFixMe[incompatible-type]
       expect(selectMessageByLocale(makeFakeI18n({ language: 'fr' }), [])).toBe(
         ''
       );
       expect(
-        // $FlowExpectedError
+        // $FlowFixMe[incompatible-type]
         selectMessageByLocale(makeFakeI18n({ language: 'fr' }), null)
       ).toBe('');
       expect(
-        // $FlowExpectedError
+        // $FlowFixMe[incompatible-type]
         selectMessageByLocale(makeFakeI18n({ language: 'fr' }), undefined)
       ).toBe('');
       expect(
-        // $FlowExpectedError
+        // $FlowFixMe[incompatible-type]
         selectMessageByLocale(makeFakeI18n({ language: 'fr' }), false)
       ).toBe('');
       expect(
-        // $FlowExpectedError
+        // $FlowFixMe[incompatible-type]
         selectMessageByLocale(makeFakeI18n({ language: 'fr' }), true)
       ).toBe('');
     });

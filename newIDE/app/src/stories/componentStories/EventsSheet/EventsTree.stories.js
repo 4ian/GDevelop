@@ -47,6 +47,7 @@ export const DefaultMediumScreenScopeInLayout = (): React.Node => (
           }
           globalObjectsContainer={testProject.project.getObjects()}
           objectsContainer={testProject.testLayout.getObjects()}
+          // $FlowFixMe[incompatible-type]
           selection={getInitialSelection()}
           onAddNewInstruction={action('add new instruction')}
           onPasteInstructions={action('paste instructions')}
@@ -75,6 +76,7 @@ export const DefaultMediumScreenScopeInLayout = (): React.Node => (
           eventsSheetHeight={500}
           eventsSheetWidth={500}
           indentScale={1}
+          // $FlowFixMe[incompatible-type]
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}
@@ -103,6 +105,7 @@ export const DefaultSmallScreenScopeInLayout = (): React.Node => (
           }
           globalObjectsContainer={testProject.project.getObjects()}
           objectsContainer={testProject.testLayout.getObjects()}
+          // $FlowFixMe[incompatible-type]
           selection={getInitialSelection()}
           onAddNewInstruction={action('add new instruction')}
           onPasteInstructions={action('paste instructions')}
@@ -131,6 +134,7 @@ export const DefaultSmallScreenScopeInLayout = (): React.Node => (
           eventsSheetHeight={500}
           eventsSheetWidth={500}
           indentScale={1}
+          // $FlowFixMe[incompatible-type]
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}
@@ -156,6 +160,7 @@ export const DefaultMediumScreenScopeNotInLayout = (): React.Node => (
           }
           globalObjectsContainer={testProject.project.getObjects()}
           objectsContainer={testProject.testLayout.getObjects()}
+          // $FlowFixMe[incompatible-type]
           selection={getInitialSelection()}
           onAddNewInstruction={action('add new instruction')}
           onPasteInstructions={action('paste instructions')}
@@ -184,6 +189,7 @@ export const DefaultMediumScreenScopeNotInLayout = (): React.Node => (
           eventsSheetHeight={500}
           eventsSheetWidth={500}
           indentScale={1}
+          // $FlowFixMe[incompatible-type]
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}
@@ -212,6 +218,7 @@ export const EmptySmallScreenScopeInALayout = (): React.Node => (
           }
           globalObjectsContainer={testProject.project.getObjects()}
           objectsContainer={testProject.testLayout.getObjects()}
+          // $FlowFixMe[incompatible-type]
           selection={getInitialSelection()}
           onAddNewInstruction={action('add new instruction')}
           onPasteInstructions={action('paste instructions')}
@@ -240,6 +247,7 @@ export const EmptySmallScreenScopeInALayout = (): React.Node => (
           eventsSheetHeight={500}
           eventsSheetWidth={500}
           indentScale={1}
+          // $FlowFixMe[incompatible-type]
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}

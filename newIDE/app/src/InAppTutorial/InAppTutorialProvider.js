@@ -108,6 +108,7 @@ const InAppTutorialProvider = (props: Props): React.Node => {
         filters: [{ name: 'GDevelop 5 in-app tutorial', extensions: ['json'] }],
       });
       if (!filePath) return;
+      // $FlowFixMe[incompatible-type]
       const inAppTutorial = await readJSONFile(filePath);
       const errors = checkInAppTutorialFileJsonSchema(inAppTutorial);
       if (errors.length) {

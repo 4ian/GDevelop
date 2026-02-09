@@ -121,6 +121,7 @@ const AlertMessage = (
                       )}
                     </React.Fragment>
                   )}
+                  // $FlowFixMe[incompatible-type]
                   <Text style={styles.content}>{children}</Text>
                 </Line>
                 {renderRightButton && renderRightButton()}

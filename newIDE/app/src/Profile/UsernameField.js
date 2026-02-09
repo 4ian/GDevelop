@@ -150,6 +150,7 @@ export const UsernameField = (
       }
       endAdornment={
         isValidatingUsername && (
+          // $FlowFixMe[incompatible-type]
           <CircularProgress style={styles.circularProgress} />
         )
       }

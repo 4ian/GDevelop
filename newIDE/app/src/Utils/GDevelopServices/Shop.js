@@ -20,6 +20,7 @@ import {
   ensureIsString,
 } from '../DataValidator';
 
+// $FlowFixMe[cannot-resolve-name]
 export const client: Axios = axios.create({
   baseURL: GDevelopShopApi.baseUrl,
 });
@@ -533,6 +534,7 @@ export const fetchTokenForPrivateGameTemplateAuthorizationIfNeeded = async ({
   authenticatedUser,
   allResourcePaths,
 }: {|
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   allResourcePaths: Array<string>,
 |}): Promise<?string> => {
@@ -626,6 +628,7 @@ export const canRedeemProduct = ({
     // Condition should look like `gdevelop_gold,gdevelop_startup`.
     const requiredPlanIds = redeemCondition.condition.split(',');
     if (subscription && !subscription.benefitsFromEducationPlan) {
+      // $FlowFixMe[incompatible-type]
       if (requiredPlanIds.includes(subscription.planId)) {
         return { canRedeem: true };
       } else {

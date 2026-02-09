@@ -184,6 +184,7 @@ export function ClosableTab({
     [maxWidth]
   );
 
+  // $FlowFixMe[missing-local-annot]
   const openContextMenu = event => {
     event.stopPropagation();
     if (contextMenu.current) {
@@ -192,6 +193,7 @@ export function ClosableTab({
   };
 
   const closeOnMiddleClick = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     event => {
       if (event.nativeEvent && event.nativeEvent.button === 1) {
         onClose();

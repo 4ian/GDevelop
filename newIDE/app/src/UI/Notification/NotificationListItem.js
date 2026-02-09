@@ -182,6 +182,7 @@ const getNotificationClickCallback = ({
       } else return null; // should not happen.
     }
     if (
+      // $FlowFixMe[invalid-compare]
       notification.data.gameCount === 'all' ||
       Number.isInteger(notification.data.gameCount)
     ) {

@@ -52,6 +52,7 @@ const CompactPropertiesEditorRowField = (props: Props): React.Node => {
             },
           }}
         >
+          // $FlowFixMe[incompatible-type]
           <Text noMargin style={styles.label}>
             {props.label}
           </Text>

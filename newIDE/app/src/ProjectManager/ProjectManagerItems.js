@@ -45,6 +45,7 @@ const styles = {
 type ProjectStructureItemProps = {|
   id?: string,
   autoGenerateNestedIndicator?: boolean,
+  // $FlowFixMe[prop-missing]
   renderNestedItems: () => Array<React.Element<any> | null>,
   primaryText: React.Node,
   error?: ?Error,
@@ -64,6 +65,7 @@ export const ProjectStructureItem = (
   }: ProjectStructureItemProps,
 ): React.Node => {
   return (
+    // $FlowFixMe[incompatible-type]
     <ListItem
       id={id}
       open={open}
@@ -93,6 +95,7 @@ type ItemProps = {|
   primaryText: string,
   textEndAdornment?: React.Node,
   editingName: boolean,
+  // $FlowFixMe[prop-missing]
   leftIcon: React.Element<any>,
   onEdit: () => void,
   onDelete: () => void,
@@ -164,6 +167,7 @@ export const Item = (
   );
 
   const label = editingName ? (
+    // $FlowFixMe[incompatible-type]
     <TextField
       id="rename-item-field"
       margin="none"

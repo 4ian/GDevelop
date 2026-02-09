@@ -21,6 +21,7 @@ import { CorsAwareImage } from '../UI/CorsAwareImage';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { type ClaimedProductOptions } from './PurchaseClaimDialog';
 
+// $FlowFixMe[missing-local-annot]
 const getStyles = ({ isMobile }) => {
   return {
     formContainer: {

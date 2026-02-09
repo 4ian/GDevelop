@@ -43,10 +43,12 @@ export const getDefaultResourceThumbnail = (resource: gdResource): string => {
       return 'JsPlatform/Extensions/videoicon24.png';
     case 'font':
       return 'res/actions/font24.png';
+    // $FlowFixMe[invalid-compare]
     case 'bitmapFont':
       return 'JsPlatform/Extensions/bitmapfont32.png';
     case 'model3D':
       return 'JsPlatform/Extensions/3d_model.svg';
+    // $FlowFixMe[invalid-compare]
     case 'javascript':
       return 'res/javascript.svg';
     default:
@@ -75,7 +77,10 @@ type Props = {|
   getResourceActionsSpecificToStorageProvider?: ?ResourcesActionsMenuBuilder,
 |};
 
+// $FlowFixMe[incompatible-type]
 const ResourcesList: component(...Props) = React.memo<Props, ResourcesListInterface>(
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-exact]
   React.forwardRef<Props, ResourcesListInterface>(
     (
       {
@@ -105,6 +110,7 @@ const ResourcesList: component(...Props) = React.memo<Props, ResourcesListInterf
       );
 
       const editName = React.useCallback((resource: ?gdResource) => {
+        // $FlowFixMe[incompatible-type]
         setRenamedResource(resource);
         if (sortableListRef.current) sortableListRef.current.forceUpdateGrid();
       }, []);
@@ -193,6 +199,7 @@ const ResourcesList: component(...Props) = React.memo<Props, ResourcesListInterf
                 .map(({ displayName, kind }) => ({
                   label: i18n._(displayName),
                   click: () => {
+                    // $FlowFixMe[incompatible-type]
                     onRemoveUnusedResources(kind);
                   },
                 }))
@@ -202,6 +209,7 @@ const ResourcesList: component(...Props) = React.memo<Props, ResourcesListInterf
                     click: () => {
                       allResourceKindsAndMetadata.forEach(
                         resourceKindAndMetadata => {
+                          // $FlowFixMe[incompatible-type]
                           onRemoveUnusedResources(resourceKindAndMetadata.kind);
                         }
                       );
@@ -212,18 +220,21 @@ const ResourcesList: component(...Props) = React.memo<Props, ResourcesListInterf
           ];
           if (getResourceActionsSpecificToStorageProvider && fileMetadata) {
             menu.push({ type: 'separator' });
+            // $FlowFixMe[incompatible-type]
             menu = menu.concat(
               getResourceActionsSpecificToStorageProvider({
                 project,
                 fileMetadata,
                 resource,
                 i18n,
+                // $FlowFixMe[incompatible-type]
                 informUser: setInfoBarContent,
                 updateInterface: () => forceUpdateList(),
                 cleanUserSelectionOfResources: () => onSelectResource(null),
               })
             );
           }
+          // $FlowFixMe[incompatible-type]
           return menu;
         },
         [
@@ -246,6 +257,7 @@ const ResourcesList: component(...Props) = React.memo<Props, ResourcesListInterf
             .toJSArray();
           const newResourcesWithErrors = {};
           resourceNames.forEach(resourceName => {
+            // $FlowFixMe[prop-missing]
             newResourcesWithErrors[resourceName] = getResourceFilePathStatus(
               project,
               resourceName
@@ -301,6 +313,7 @@ const ResourcesList: component(...Props) = React.memo<Props, ResourcesListInterf
                   {({ i18n }) => (
                     <SortableVirtualizedItemList
                       key={listKey}
+                      // $FlowFixMe[incompatible-type]
                       ref={sortableListRef}
                       fullList={filteredList}
                       width={width}
@@ -321,6 +334,7 @@ const ResourcesList: component(...Props) = React.memo<Props, ResourcesListInterf
               )}
             </AutoSizer>
           </div>
+          // $FlowFixMe[constant-condition]
           {!!infoBarContent && (
             <InfoBar
               duration={7000}

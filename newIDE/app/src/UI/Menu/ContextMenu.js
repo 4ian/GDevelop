@@ -43,6 +43,7 @@ const MaterialUIContextMenu = React.forwardRef<
     onClose: () => setOpenMenu(false),
   });
 
+  // $FlowFixMe[missing-local-annot]
   const open = (x, y, options) => {
     setAnchorPosition([x, y]);
     setBuildOptions(options);
@@ -131,6 +132,7 @@ const ElectronContextMenu = React.forwardRef<
 >((props, ref) => {
   const menuImplementation = new ElectronMenuImplementation();
 
+  // $FlowFixMe[missing-local-annot]
   const open = (x, y, options) => {
     menuImplementation.buildFromTemplate(
       props.buildMenuTemplate(props.i18n, options)

@@ -19,6 +19,7 @@ export default class ViewPosition {
   _width: number;
   _height: number;
   instancesEditorSettings: InstancesEditorSettings;
+  // $FlowFixMe[missing-local-annot]
   _pixiContainer = new PIXI.Container() as any;
 
   constructor({
@@ -150,6 +151,7 @@ export default class ViewPosition {
     return this.viewY;
   }
 
+  // $FlowFixMe[value-as-type]
   applyTransformationToPixi(container: PIXI.Container) {
     container.position.x =
       -this.viewX * this.instancesEditorSettings.zoomFactor;
@@ -162,7 +164,9 @@ export default class ViewPosition {
   }
 
   applyTransformationToThree(
+    // $FlowFixMe[value-as-type]
     threeCamera: THREE.Camera,
+    // $FlowFixMe[value-as-type]
     threePlaneMesh: THREE.Mesh
   ) {
     threeCamera.aspect = this._width / this._height;

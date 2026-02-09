@@ -86,6 +86,7 @@ const DashboardWidget = (
           ...styles.maxHeightNotWrapped,
           ...(minHeight && !isMobile
             ? {
+                // $FlowFixMe[constant-condition]
                 minHeight: minHeight ? fixedHeight : 120,
               }
             : {}),

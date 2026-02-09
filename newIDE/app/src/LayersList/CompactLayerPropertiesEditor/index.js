@@ -223,6 +223,7 @@ export const CompactLayerPropertiesEditor = (
                     schema={layerPropertiesSchema}
                     instances={[layer]}
                     onInstancesModified={onLayersModified}
+                    // $FlowFixMe[incompatible-type]
                     onRefreshAllFields={forceRecomputeSchema}
                   />
                 </ColumnStackLayout>

@@ -1,4 +1,5 @@
 // @flow
+// $FlowFixMe[import-type-as-value]
 import { TagSearchFilter, SearchFilter } from '../UI/Search/UseSearchItem';
 import {
   type AssetShortHeader,
@@ -42,6 +43,7 @@ export class LicenseAssetStoreSearchFilter
   implements SearchFilter<AssetShortHeader> {
   attributionFreeOnly: boolean;
 
+  // $FlowFixMe[missing-local-annot]
   static noAttributionLicenses = [
     'CC0 (public domain)',
     'Apache 2.0',
@@ -250,6 +252,7 @@ export class ColorAssetStoreSearchFilter
     let scoreMax = Number.MIN_VALUE;
     for (const dominantColor of searchItem.dominantColors) {
       const dominantRgb = hexNumberToRGBColor(dominantColor);
+      // $FlowFixMe[incompatible-type]
       const score = getColorSimilitude(dominantRgb, color);
       scoreMax = Math.max(scoreMax, score);
     }
@@ -500,6 +503,7 @@ export class SimilarAssetStoreSearchFilter
         const dominantRgb = hexNumberToRGBColor(dominantColor);
         for (const otherDominantColor of this.other.dominantColors) {
           const otherDominantRgb = hexNumberToRGBColor(otherDominantColor);
+          // $FlowFixMe[incompatible-type]
           const score = getColorSimilitude(dominantRgb, otherDominantRgb);
           scoreMax = Math.max(scoreMax, score);
         }

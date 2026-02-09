@@ -5,6 +5,7 @@ import ResourcesLoader from '../../ResourcesLoader';
 import * as PIXI from 'pixi.js-legacy';
 const gd: libGDevelop = global.gd;
 
+// $FlowFixMe[value-as-type]
 type StretchedSprite = PIXI.Sprite | PIXI.TilingSprite;
 
 /**
@@ -31,6 +32,7 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     project: gdProject,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
+    // $FlowFixMe[value-as-type]
     pixiContainer: PIXI.Container,
     pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {
@@ -294,6 +296,7 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
       return;
     }
 
+    // $FlowFixMe[missing-local-annot]
     function makeInsideTexture(rect) {
       if (rect.width < 0) rect.width = 0;
       if (rect.height < 0) rect.height = 0;

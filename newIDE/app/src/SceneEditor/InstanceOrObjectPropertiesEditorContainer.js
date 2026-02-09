@@ -100,6 +100,7 @@ export const InstanceOrObjectPropertiesEditorContainer: component(
   InstanceOrObjectPropertiesEditorInterface
 >((props, ref) => {
   const forceUpdate = useForceUpdate();
+  // $FlowFixMe[incompatible-type]
   React.useImperativeHandle(ref, () => ({
     forceUpdate,
     getEditorTitle: () =>

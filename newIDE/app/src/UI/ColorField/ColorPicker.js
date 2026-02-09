@@ -115,7 +115,9 @@ const ColorPicker = (
           style={styles.popover}
         >
           <SketchPicker
+            // $FlowFixMe[incompatible-type]
             color={displayedColor}
+            // $FlowFixMe[incompatible-type]
             onChange={onChange}
             onChangeComplete={onChangeComplete}
             disableAlpha={disableAlpha}

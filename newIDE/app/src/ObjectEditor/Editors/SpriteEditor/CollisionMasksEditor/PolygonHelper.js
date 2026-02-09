@@ -84,7 +84,9 @@ export const findNearestEdgePoint = (
   let foundPolygonIndex = 0;
   let foundEndVertexIndex = 0;
   let projectedPoint = [0, 0];
+  // $FlowFixMe[incompatible-exact]
   mapVector(polygons, (polygon, polygonIndex) => {
+    // $FlowFixMe[incompatible-use]
     const vertices = polygon.getVertices();
     const previousVertex = vertices.at(vertices.size() - 1);
     let previousX = previousVertex.x;
@@ -93,6 +95,7 @@ export const findNearestEdgePoint = (
       const vertexX = vertex.x;
       const vertexY = vertex.y;
 
+      // $FlowFixMe[incompatible-type]
       projectedPoint = projectToSegment(
         cursorX,
         cursorY,
@@ -140,6 +143,7 @@ export const findNearestEdgePoint = (
       mod(foundEndVertexIndex - 1, vertices.size())
     );
     const endVertex = vertices.at(foundEndVertexIndex);
+    // $FlowFixMe[incompatible-type]
     projectedPoint = projectToSegment(
       cursorX,
       cursorY,

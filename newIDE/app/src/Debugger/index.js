@@ -63,6 +63,7 @@ type State = {|
  * Start the debugger server, listen to commands received and issue commands to it.
  */
 export default class Debugger extends React.Component<Props, State> {
+  // $FlowFixMe[missing-local-annot]
   state = {
     debuggerServerState: this.props.previewDebuggerServer.getServerState() as "started" | "stopped",
     debuggerServerError: null,

@@ -298,6 +298,7 @@ export const BehaviorStore = (
             filteredSearchResults.map(({ item }) => item)
           }
           getSearchItemUniqueId={getBehaviorType}
+          // $FlowFixMe[missing-local-annot]
           renderSearchItem={(behaviorShortHeader, onHeightComputed) => (
             <BehaviorListItem
               id={

@@ -124,7 +124,7 @@ const SemiControlledTextField: component(
   } = props;
 
   return (
-    // $FlowFixMe
+    // $FlowFixMe[incompatible-type]
     <TextField
       {...otherProps}
       type={type || 'text'}

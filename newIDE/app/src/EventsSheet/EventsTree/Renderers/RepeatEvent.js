@@ -36,9 +36,11 @@ const styles = {
 
 export default class RepeatEvent extends React.Component<
   EventRendererProps,
+  // $FlowFixMe[unsupported-syntax]
   *
 > {
   _field: ?ParameterFieldInterface = null;
+  // $FlowFixMe[missing-local-annot]
   state = {
     editing: false,
     editingPreviousValue: null,
@@ -88,7 +90,7 @@ export default class RepeatEvent extends React.Component<
     const { anchorEl } = this.state;
 
     // Put back the focus after closing the inline popover.
-    // $FlowFixMe
+    // $FlowFixMe[incompatible-type]
     if (anchorEl) anchorEl.focus();
 
     this.setState({
@@ -268,6 +270,7 @@ export default class RepeatEvent extends React.Component<
               repeatEvent.setRepeatExpressionPlainString(text);
               this.props.onUpdate();
             }}
+            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             isInline
             ref={field => (this._field = field)}

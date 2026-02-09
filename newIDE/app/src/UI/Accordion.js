@@ -149,6 +149,7 @@ type AccordionProps = {|
  */
 export const Accordion: component(
   ...{ ...AccordionProps, +ref?: React.RefSetter<any> }
+// $FlowFixMe[value-as-type]
 ) = React.forwardRef<AccordionProps, MUIAccordion>(
   (props, ref) => {
     const { costlyBody, noMargin, kind, ...otherProps } = props;

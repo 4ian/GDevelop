@@ -8,7 +8,9 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 
 const gd: libGDevelop = global.gd;
 
-// $FlowExpectedError
+// $FlowFixMe[incompatible-type]
+// $FlowFixMe[missing-local-annot]
+// $FlowFixMe[cannot-resolve-name]
 const makeFakeI18n = (fakeI18n): I18nType => ({
   ...fakeI18n,
   _: message => message.id,
@@ -16,6 +18,7 @@ const makeFakeI18n = (fakeI18n): I18nType => ({
 
 describe('setupInstructionParameters', () => {
   it('sets the proper number of parameters', () => {
+    // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Scene', 0);
     const objectName = 'MySpriteObject';
@@ -58,6 +61,7 @@ describe('setupInstructionParameters', () => {
   });
 
   it('sets the proper number of parameters and the object name', () => {
+    // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Scene', 0);
     const objectName = 'MySpriteObject';
@@ -108,6 +112,7 @@ describe('setupInstructionParameters', () => {
   });
 
   it('sets the proper parameters for a behavior', () => {
+    // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Scene', 0);
     const objectName = 'MySpriteObject';
@@ -163,6 +168,7 @@ describe('setupInstructionParameters', () => {
   });
 
   it('sets the proper parameters for a behavior, selecting the first behavior if multiple', () => {
+    // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Scene', 0);
     const objectName = 'MySpriteObject';
@@ -221,6 +227,7 @@ describe('setupInstructionParameters', () => {
   });
 
   it('sets the proper parameters for a behavior, changing it if a wrong behavior name is entered', () => {
+    // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Scene', 0);
     const objectName = 'MySpriteObject';
@@ -282,6 +289,7 @@ describe('setupInstructionParameters', () => {
   });
 
   it('sets the proper parameters for a behavior, letting an existing behavior name if it is valid', () => {
+    // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Scene', 0);
     const objectName = 'MySpriteObject';

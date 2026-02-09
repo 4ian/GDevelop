@@ -86,10 +86,14 @@ export const ChoiceProperty = (
       onChange={onUpdate}
       disabled={disabled}
     >
+      // $FlowFixMe[incompatible-exact]
       {mapVector(property.getChoices(), choice => (
         <SelectOption
+          // $FlowFixMe[incompatible-use]
           key={choice.getValue().toLowerCase()}
+          // $FlowFixMe[incompatible-use]
           value={choice.getValue()}
+          // $FlowFixMe[incompatible-use]
           label={choice.getLabel()}
         />
       ))}
@@ -171,6 +175,7 @@ const Physics2Editor = (props: Props): React.Node => {
   const forceUpdate = useForceUpdate();
 
   const updateBehaviorProperty = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     (property, value) => {
       behavior.updateProperty(property, value);
       forceUpdate();

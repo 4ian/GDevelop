@@ -117,6 +117,7 @@ export const TutorialsRow = (
         <ImageTileRow
           title={title}
           description={description}
+          // $FlowFixMe[incompatible-type]
           items={getItems(i18n)}
           isLoading={!tutorials}
           onShowAll={() => onSelectCategory(category)}

@@ -557,6 +557,7 @@ const SpritesList = (
   );
 
   const addSpriteToSelection = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     (sprite, selected) => {
       selectedSprites.current = {
         ...selectedSprites.current,
@@ -578,6 +579,7 @@ const SpritesList = (
   );
 
   const openSpriteContextMenu = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     (x, y, sprite) => {
       // If the sprite is not selected, select only it.
       if (!selectedSprites.current[sprite.ptr]) {

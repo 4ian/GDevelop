@@ -153,6 +153,7 @@ const MosaicEditorsDisplay: component(
         ];
   }, []);
   const _onInstancesModified = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     instances => {
       if (onInstancesModified) onInstancesModified(instances);
       forceUpdateInstancesList();
@@ -162,6 +163,7 @@ const MosaicEditorsDisplay: component(
   const toggleEditorView = React.useCallback((editorId: EditorId) => {
     if (!editorMosaicRef.current) return;
     const config = defaultPanelConfigByEditor[editorId];
+    // $FlowFixMe[incompatible-type]
     editorMosaicRef.current.toggleEditor(editorId, config.position);
   }, []);
   const isEditorVisible = React.useCallback((editorId: EditorId) => {
@@ -199,6 +201,7 @@ const MosaicEditorsDisplay: component(
     [isEditorVisible, toggleEditorView, objectsListDoNowOrAfterRender]
   );
 
+  // $FlowFixMe[incompatible-type]
   React.useImperativeHandle(ref, () => {
     const { current: editor } = editorRef;
     return {
@@ -537,9 +540,11 @@ const MosaicEditorsDisplay: component(
 
   return (
     <EditorMosaic
+      // $FlowFixMe[incompatible-type]
       editors={editors}
       centralNodeId="instances-editor"
       initialNodes={
+        // $FlowFixMe[incompatible-type]
         getDefaultEditorMosaicNode('scene-editor') || initialMosaicEditorNodes
       }
       isTransparent={gameEditorMode === 'embedded-game'}

@@ -212,6 +212,7 @@ export default function TabsTitlebar({
     >
       {isLeftMostPane && <TitleBarLeftSafeMargins />}
       {displayMenuIcon && (
+        // $FlowFixMe[incompatible-type]
         <IconButton
           size="small"
           // Even if not in the toolbar, keep this ID for backward compatibility for tutorials.

@@ -19,6 +19,7 @@ const gd: libGDevelop = global.gd;
 
 const emptySearchText = '';
 
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const noExcludedTiers = new Set();
 const excludedExperimentalTiers = new Set(['experimental']);
 
@@ -134,6 +135,7 @@ export const BehaviorStoreStateProvider = ({children, i18n, defaultSearchText}: 
               englishDescription: behaviorShortHeader.description,
             };
             translatedBehaviorShortHeadersByType[
+              // $FlowFixMe[prop-missing]
               behaviorShortHeader.type
             ] = translatedBehaviorShortHeader;
           });
@@ -274,6 +276,7 @@ export const BehaviorStoreStateProvider = ({children, i18n, defaultSearchText}: 
           : installedBehaviorMetadata;
         allTranslatedBehaviors[
           installedBehaviorMetadata.type
+        // $FlowFixMe[incompatible-type]
         ] = behaviorMetadata;
       }
       return allTranslatedBehaviors;
@@ -283,6 +286,7 @@ export const BehaviorStoreStateProvider = ({children, i18n, defaultSearchText}: 
 
   const allCategories = React.useMemo(
     () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       const categoriesSet = new Set();
       for (const type in allTranslatedBehaviors) {
         categoriesSet.add(allTranslatedBehaviors[type].category);
@@ -297,6 +301,7 @@ export const BehaviorStoreStateProvider = ({children, i18n, defaultSearchText}: 
 
   const filters = React.useMemo(
     () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       const tagsSet = new Set();
       for (const type in allTranslatedBehaviors) {
         const behavior = allTranslatedBehaviors[type];
@@ -316,6 +321,7 @@ export const BehaviorStoreStateProvider = ({children, i18n, defaultSearchText}: 
       return {
         allTags: sortedTags,
         defaultTags: sortedTags,
+        // $FlowFixMe[missing-empty-array-annot]
         tagsTree: [],
       };
     },
@@ -384,6 +390,7 @@ export const BehaviorStoreStateProvider = ({children, i18n, defaultSearchText}: 
   );
 
   return (
+    // $FlowFixMe[incompatible-type]
     <BehaviorStoreContext.Provider value={behaviorStoreState}>
       {children}
     </BehaviorStoreContext.Provider>

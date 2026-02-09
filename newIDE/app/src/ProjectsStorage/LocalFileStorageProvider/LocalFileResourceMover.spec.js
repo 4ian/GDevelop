@@ -4,6 +4,7 @@ import optionalRequire from '../../Utils/OptionalRequire';
 import { moveUrlResourcesToLocalFiles } from './LocalFileResourceMover';
 import { makeTestProject } from '../../fixtures/TestProject';
 import { fakeSilverAuthenticatedUser } from '../../fixtures/GDevelopServicesTestData';
+// $FlowFixMe[cannot-resolve-module]
 import path from 'path';
 const gd: libGDevelop = global.gd;
 
@@ -123,6 +124,7 @@ const makeTestProjectWitheBlobResourcesFailingToDownload = () => {
 
 const makeMoveAllProjectResourcesOptions = (project: gdProject) => ({
   project,
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   onProgress: jest.fn(),
   fileMetadata: { fileIdentifier: 'fake-file' },
   authenticatedUser: fakeSilverAuthenticatedUser,
@@ -134,6 +136,7 @@ describe('LocalResourceMover', () => {
     mockFn(optionalRequire.mockFsExtra.ensureDir).mockReset();
     mockFn(optionalRequire.mockFsExtra.existsSync).mockReset();
     mockFn(optionalRequire.mockElectron.ipcRenderer.invoke).mockReset();
+    // $FlowFixMe[method-unbinding]
     mockFn(axios.get).mockReset();
   });
   afterEach(() => {
@@ -148,7 +151,9 @@ describe('LocalResourceMover', () => {
     mockFn(optionalRequire.mockFsExtra.existsSync).mockReturnValue(false);
     mockFn(optionalRequire.mockElectron.ipcRenderer.invoke).mockResolvedValue();
 
+    // $FlowFixMe[incompatible-type]
     const options = makeMoveAllProjectResourcesOptions(project);
+    // $FlowFixMe[incompatible-type]
     const fetchedResources = await moveUrlResourcesToLocalFiles(options);
 
     // Verify that download was done
@@ -186,7 +191,9 @@ describe('LocalResourceMover', () => {
       new Error('Fake download failure')
     );
 
+    // $FlowFixMe[incompatible-type]
     const options = makeMoveAllProjectResourcesOptions(project);
+    // $FlowFixMe[incompatible-type]
     const fetchedResources = await moveUrlResourcesToLocalFiles(options);
 
     // Verify that download was done and reported as failed, even after 2 tries for each file.
@@ -234,7 +241,9 @@ describe('LocalResourceMover', () => {
       .mockRejectedValueOnce(new Error('Fake download failure'))
       .mockImplementationOnce(() => Promise.resolve());
 
+    // $FlowFixMe[incompatible-type]
     const options = makeMoveAllProjectResourcesOptions(project);
+    // $FlowFixMe[incompatible-type]
     const fetchedResources = await moveUrlResourcesToLocalFiles(options);
 
     // Verify that download was done (including a failure that was retried).
@@ -275,11 +284,14 @@ describe('LocalResourceMover', () => {
       mockFn(
         optionalRequire.mockElectron.ipcRenderer.invoke
       ).mockResolvedValue();
+      // $FlowFixMe[method-unbinding]
       mockFn(axios.get).mockResolvedValue({
         data: 'fake-array-buffer-content',
       });
 
+      // $FlowFixMe[incompatible-type]
       const options = makeMoveAllProjectResourcesOptions(project);
+      // $FlowFixMe[incompatible-type]
       const fetchedResources = await moveUrlResourcesToLocalFiles(options);
 
       // Verify that download was done
@@ -317,11 +329,14 @@ describe('LocalResourceMover', () => {
       mockFn(
         optionalRequire.mockElectron.ipcRenderer.invoke
       ).mockResolvedValueOnce();
+      // $FlowFixMe[method-unbinding]
       mockFn(axios.get).mockResolvedValue({
         data: 'fake-array-buffer-content',
       });
 
+      // $FlowFixMe[incompatible-type]
       const options = makeMoveAllProjectResourcesOptions(project);
+      // $FlowFixMe[incompatible-type]
       const fetchedResources = await moveUrlResourcesToLocalFiles(options);
 
       // Verify that one download was attempted and the other done

@@ -52,6 +52,7 @@ import {
   type TextBasedCourseChapter,
 } from '../../Utils/GDevelopServices/Asset';
 
+// $FlowFixMe[value-as-type]
 export const indieFirebaseUser: FirebaseUser = {
   uid: 'indie-user',
   providerId: 'fake-provider.com',
@@ -59,6 +60,7 @@ export const indieFirebaseUser: FirebaseUser = {
   emailVerified: false,
 };
 
+// $FlowFixMe[value-as-type]
 export const indieVerifiedFirebaseUser: FirebaseUser = {
   uid: 'indie-user',
   providerId: 'fake-provider.com',
@@ -603,6 +605,7 @@ export const limitsForNoSubscriptionUser: Limits = {
     userBalance: {
       amount: 0,
     },
+    // $FlowFixMe[incompatible-type]
     prices,
     purchasableQuantities: {},
   },
@@ -664,6 +667,7 @@ export const limitsForSilverUser: Limits = {
     userBalance: {
       amount: 0,
     },
+    // $FlowFixMe[incompatible-type]
     prices,
     purchasableQuantities: {},
   },
@@ -725,6 +729,7 @@ export const limitsForGoldUser: Limits = {
     userBalance: {
       amount: 0,
     },
+    // $FlowFixMe[incompatible-type]
     prices,
     purchasableQuantities: {},
   },
@@ -798,6 +803,7 @@ export const limitsForTeacherUser: Limits = {
     userBalance: {
       amount: 0,
     },
+    // $FlowFixMe[incompatible-type]
     prices,
     purchasableQuantities: {},
   },
@@ -868,6 +874,7 @@ export const limitsForStudentUser: Limits = {
     userBalance: {
       amount: 0,
     },
+    // $FlowFixMe[incompatible-type]
     prices,
     purchasableQuantities: {},
   },
@@ -929,6 +936,7 @@ export const limitsForStartupUser: Limits = {
     userBalance: {
       amount: 0,
     },
+    // $FlowFixMe[incompatible-type]
     prices,
     purchasableQuantities: {},
   },
@@ -985,6 +993,7 @@ export const limitsReached: Limits = {
     userBalance: {
       amount: 0,
     },
+    // $FlowFixMe[incompatible-type]
     prices,
     purchasableQuantities: {},
   },
@@ -1041,12 +1050,14 @@ export const limitsForNoSubscriptionUserWithCredits: Limits = {
     userBalance: {
       amount: 1000,
     },
+    // $FlowFixMe[incompatible-type]
     prices,
     purchasableQuantities: {},
   },
   message: undefined,
 };
 
+// $FlowFixMe[value-as-type]
 export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
@@ -1176,18 +1187,21 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   achievements: fakeAchievements,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeSilverAuthenticatedUser: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   subscription: subscriptionForSilverUser,
   subscriptionPricingSystem: silverMonthlyPricingSystem,
   limits: limitsForSilverUser,
 };
+// $FlowFixMe[value-as-type]
 export const fakeSilverButCancelAtPeriodEndAuthenticatedUser: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   subscription: silverSubscriptionButCancelAtPeriodEnd,
   subscriptionPricingSystem: silverMonthlyPricingSystem,
   limits: limitsForSilverUser,
 };
+// $FlowFixMe[value-as-type]
 export const fakeSilverAuthenticatedUserWithCloudProjects: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   subscription: subscriptionForSilverUser,
@@ -1195,30 +1209,35 @@ export const fakeSilverAuthenticatedUserWithCloudProjects: AuthenticatedUser = {
   cloudProjects: tenCloudProjects,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeGoldAuthenticatedUser: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForGoldUser,
   subscriptionPricingSystem: goldMonthlyPricingSystem,
   limits: limitsForGoldUser,
 };
+// $FlowFixMe[value-as-type]
 export const fakeStartupAuthenticatedUser: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForStartupUser,
   subscriptionPricingSystem: startupMonthlyPricingSystem,
   limits: limitsForStartupUser,
 };
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithEducationPlan: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForEducationPlan,
   subscriptionPricingSystem: educationMonthlyPricingSystem,
   limits: limitsForTeacherUser,
 };
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedStudentFromEducationPlan: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForGoldUserFromEducationPlan,
   subscriptionPricingSystem: goldMonthlyPricingSystem,
   limits: limitsForStudentUser,
 };
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedTeacherFromEducationPlan: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForGoldUserFromEducationPlan,
@@ -1226,6 +1245,7 @@ export const fakeAuthenticatedTeacherFromEducationPlan: AuthenticatedUser = {
   limits: limitsForTeacherUser,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeGoldWithPurchaselyAuthenticatedUser: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: purchaselyGoldSubscription,
@@ -1233,18 +1253,21 @@ export const fakeGoldWithPurchaselyAuthenticatedUser: AuthenticatedUser = {
   limits: limitsForGoldUser,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: noSubscription,
   limits: limitsForNoSubscriptionUser,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithValidSilverRedemptionCode: AuthenticatedUser = {
   ...fakeAuthenticatedUserWithNoSubscription,
   subscription: silverSubscriptionWithRedemptionCode,
   limits: limitsForSilverUser,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithExpiredSilverRedemptionCode: AuthenticatedUser = {
   ...fakeAuthenticatedUserWithNoSubscription,
   subscription: silverSubscriptionWithExpiredRedemptionCode,
@@ -1265,6 +1288,7 @@ export const fakeAuthenticatedUserWithLegacyProSubscription = {
   limits: limitsForGoldUser,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   cloudProjects: tenCloudProjects,
@@ -1272,11 +1296,13 @@ export const fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects: Aut
   limits: limitsReached,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithEmailVerified: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   firebaseUser: indieVerifiedFirebaseUser,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserLoggingIn: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   authenticated: true,
@@ -1291,6 +1317,7 @@ export const fakeAuthenticatedUserLoggingIn: AuthenticatedUser = {
   limits: null,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithBadges: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   badges: [
@@ -1303,6 +1330,7 @@ export const fakeAuthenticatedUserWithBadges: AuthenticatedUser = {
   ],
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithGitHubStarBadge: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   badges: [
@@ -1315,12 +1343,14 @@ export const fakeAuthenticatedUserWithGitHubStarBadge: AuthenticatedUser = {
   ],
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithNoSubscriptionAndCredits: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: noSubscription,
   limits: limitsForNoSubscriptionUserWithCredits,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithQuestionsQuotaReached: AuthenticatedUser = {
   ...fakeAuthenticatedUserWithNoSubscription,
   limits: {
@@ -1335,6 +1365,7 @@ export const fakeAuthenticatedUserWithQuestionsQuotaReached: AuthenticatedUser =
   },
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeNotAuthenticatedUser: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   authenticated: false,
@@ -1349,6 +1380,7 @@ export const fakeNotAuthenticatedUser: AuthenticatedUser = {
   limits: null,
 };
 
+// $FlowFixMe[incompatible-type]
 export const release: Release = {
   name: '5.0.0-beta62',
   publishedAt: '2019-01-14T23:32:41Z',
@@ -1357,6 +1389,7 @@ export const release: Release = {
     '> 💌Before listing the new features/improvements/bug fixes, a huge thanks to the contributors that allowed this new version to be what it is: @blurymind, @Bouh, @Lizard-13, @Wend1go, @zatsme 👏 GDevelop is growing thanks to you!\r\n\r\n## ✨New features\r\n\r\n* **Functions** are now "out of alpha testing" and always shown in the project manager. Functions are a powerful way to create new conditions, actions and expression using events. This allow to make your events and the logic of your game easier to understand and create. This also allow you to share common functions between games and create advanced features that are easy to use. [Learn more about functions on the wiki](https://wiki.gdevelop.io/gdevelop5/events/functions)\r\n* A brand new Physics engine: **Physics Engine 2.0**. (Thanks @Lizard-13 for creating it, testing it, improving it and creating examples and tests, and @zatsme for various update and examples!). While still based on the same internal physics engine, it is much more complete and powerful than the previous one:\r\n  * Support for a lot of joints (revolute, gear, mouse, prismatic, rope, pulley, wheel and more!)\r\n  * Support more options for bodies\r\n  * Support more shape and even custom polygons for objects.\r\n  * Look at the updated and **new examples** to learn how to use it and to see what\'s possible!\r\n\r\n  > Your existing games will continue to work with the old physics engine. You can still continue to use it. For new games, prefer to use the new Physics Engine 2.0. In your existing game, you can also replace *the behavior of all of your objects* by the new behavior, and replace *all the conditions and actions* by the conditions and actions from the new engine.\r\n* New **Screenshot** action, to take in-game screenshot for games running on Windows/macOS/Linux. (thanks @Wend1go!)\r\n  * This also come with new expressions to access to the **file system paths**, useful to save the screenshots in a folder of the user.\r\n\r\n## 💝 Improvements\r\n\r\n* Display missing files in resource editor as red (thanks @blurymind!)\r\n* Add option to set scale mode ("sampling") of the game to nearest (for "pixel perfect" or 8bit games) in the game properties.\r\n* Usability: autoclose project manager when opening an editor (thanks @blurymind!)\r\n* Add button to choose a new file for a resource in the resource editor (thanks @blurymind!)\r\n* New "Pixel perfect platform engine" example.\r\n* Usability: add shortcut to open Project Manager and focus search field when opening it.\r\n* Updated "Isometric Game" starter game to have better collision handling and mobile support.\r\n* Add GetAngle/GetXVelocity and GetYVelocity expressions to top-down movement behavior.\r\n* Extensions written in JavaScript can now be used to create new type of objects.\r\n* Usability: icons in the list of instructions or expressions are now displayed.\r\n\r\n## 🐛 Bug fixes \r\n\r\n* Update **Facebook Instant Games export** to have the now required bundle file (fbapp-config.json).\r\n* Fix the sentence in the events sheet of a Facebook Instant Games action. (thanks @Bouh!)\r\n* Fix descriptions of Storage actions to make clear that no "real" files are written.\r\n* Fix Left Shift key\r\n* Fix middle mouse button (thanks @Bouh!)\r\n* Fix visual artifacts when rendering rescaled games\r\n* Fix platform engine 1-pixel offset bug\r\n* Fix initial opacity undefined for text objects (thanks @Lizard-13)\r\n* Fix the condition checking if the cursor is on an object (thanks @Lizard-13)\r\n* Avoid crash of the debugger with Particle Emitters\r\n* Add explicit "OK" button in message box to fix issue on Linux\r\n* Usability: hide object drop-down list after an object is selected\r\n* Fix login dialog not showing on top of export dialog',
 };
 
+// $FlowFixMe[incompatible-type]
 export const releaseWithBreakingChange: Release = {
   name: '5.0.0-beta60',
   publishedAt: '2019-01-07T23:32:41Z',
@@ -1365,6 +1398,7 @@ export const releaseWithBreakingChange: Release = {
     '> ⚠️ Blabla, beware there is a breaking change!!!\r\n\r\n## ✨New features\r\n\r\n* **Functions** are now "out of alpha testing" and always shown in the project manager. Functions are a powerful way to create new conditions, actions and expression using events. This allow to make your events and the logic of your game easier to understand and create. This also allow you to share common functions between games and create advanced features that are easy to use. [Learn more about functions on the wiki](https://wiki.gdevelop.io/gdevelop5/events/functions)\r\n* A brand new Physics engine: **Physics Engine 2.0**. (Thanks @Lizard-13 for creating it, testing it, improving it and creating examples and tests, and @zatsme for various update and examples!). While still based on the same internal physics engine, it is much more complete and powerful than the previous one:\r\n  * Support for a lot of joints (revolute, gear, mouse, prismatic, rope, pulley, wheel and more!)\r\n  * Support more options for bodies\r\n  * Support more shape and even custom polygons for objects.\r\n  * Look at the updated and **new examples** to learn how to use it and to see what\'s possible!\r\n\r\n  > Your existing games will continue to work with the old physics engine. You can still continue to use it. For new games, prefer to use the new Physics Engine 2.0. In your existing game, you can also replace *the behavior of all of your objects* by the new behavior, and replace *all the conditions and actions* by the conditions and actions from the new engine.\r\n* New **Screenshot** action, to take in-game screenshot for games running on Windows/macOS/Linux. (thanks @Wend1go!)\r\n  * This also come with new expressions to access to the **file system paths**, useful to save the screenshots in a folder of the user.\r\n\r\n## 💝 Improvements\r\n\r\n* Display missing files in resource editor as red (thanks @blurymind!)\r\n* Add option to set scale mode ("sampling") of the game to nearest (for "pixel perfect" or 8bit games) in the game properties.\r\n* Usability: autoclose project manager when opening an editor (thanks @blurymind!)\r\n* Add button to choose a new file for a resource in the resource editor (thanks @blurymind!)\r\n* New "Pixel perfect platform engine" example.\r\n* Usability: add shortcut to open Project Manager and focus search field when opening it.\r\n* Updated "Isometric Game" starter game to have better collision handling and mobile support.\r\n* Add GetAngle/GetXVelocity and GetYVelocity expressions to top-down movement behavior.\r\n* Extensions written in JavaScript can now be used to create new type of objects.\r\n* Usability: icons in the list of instructions or expressions are now displayed.\r\n\r\n## 🐛 Bug fixes \r\n\r\n* Update **Facebook Instant Games export** to have the now required bundle file (fbapp-config.json).\r\n* Fix the sentence in the events sheet of a Facebook Instant Games action. (thanks @Bouh!)\r\n* Fix descriptions of Storage actions to make clear that no "real" files are written.\r\n* Fix Left Shift key\r\n* Fix middle mouse button (thanks @Bouh!)\r\n* Fix visual artifacts when rendering rescaled games\r\n* Fix platform engine 1-pixel offset bug\r\n* Fix initial opacity undefined for text objects (thanks @Lizard-13)\r\n* Fix the condition checking if the cursor is on an object (thanks @Lizard-13)\r\n* Avoid crash of the debugger with Particle Emitters\r\n* Add explicit "OK" button in message box to fix issue on Linux\r\n* Usability: hide object drop-down list after an object is selected\r\n* Fix login dialog not showing on top of export dialog',
 };
 
+// $FlowFixMe[incompatible-type]
 export const releaseWithoutDescription: Release = {
   name: '5.0.0-beta60',
   publishedAt: '2019-01-07T23:32:41Z',
@@ -2044,6 +2078,7 @@ export const game2: Game = {
 };
 
 export const getPublicGameFromGame = (game: Game): PublicGame => {
+  // $FlowFixMe[incompatible-type]
   const publicGame: PublicGame = {
     ...game,
     donateLink: null,
@@ -2187,6 +2222,7 @@ export const allGameCategoriesMocked = [
 class NumberGenerator {
   x: number;
 
+  // $FlowFixMe[missing-local-annot]
   constructor(x = 1) {
     this.x = x % 2 ** 15;
   }
@@ -2288,8 +2324,10 @@ const deleteDurationMetrics = (
   return gameMetrics;
 };
 
+// $FlowFixMe[incompatible-type]
 export const gameRollingMetricsFor364Days: GameMetrics[] = generateGameRollingMetricsFor364Days();
 export const gameRollingMetricsWithUndefinedDurationMetrics: GameMetrics[] = deleteDurationMetrics(
+  // $FlowFixMe[incompatible-type]
   generateGameRollingMetricsFor364Days(),
   17
 );

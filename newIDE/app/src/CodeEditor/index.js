@@ -36,6 +36,7 @@ let monacoCompletionsInitialized = false;
 let monacoThemesInitialized = false;
 
 export class CodeEditor extends React.Component<Props, State> {
+  // $FlowFixMe[missing-local-annot]
   state = {
     MonacoEditor: null,
     error: null,
@@ -128,6 +129,7 @@ export class CodeEditor extends React.Component<Props, State> {
           MonacoEditor: module.default,
         })
       )
+      // $FlowFixMe[method-unbinding]
       .catch(this.handleLoadError);
   }
 
@@ -148,6 +150,7 @@ export class CodeEditor extends React.Component<Props, State> {
           </Text>
           <RaisedButton
             label={<Trans>Retry</Trans>}
+            // $FlowFixMe[method-unbinding]
             onClick={this.loadMonacoEditor}
           />
         </React.Fragment>

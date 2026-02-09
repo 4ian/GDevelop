@@ -133,6 +133,7 @@ const inAppTutorialDecorator: StoryDecorator = (Story, context) => {
         currentlyRunningInAppTutorial: null,
         getInAppTutorialShortHeader: (tutorialId: string) => {
           return (
+            // $FlowFixMe[incompatible-type]
             inAppTutorialShortHeaders.find(
               header => header.id === tutorialId
             ) || null
@@ -144,6 +145,7 @@ const inAppTutorialDecorator: StoryDecorator = (Story, context) => {
         endTutorial: () => {
           action('End tutorial')();
         },
+        // $FlowFixMe[incompatible-type]
         inAppTutorialShortHeaders,
         startStepIndex: 0,
         startProjectData: {},

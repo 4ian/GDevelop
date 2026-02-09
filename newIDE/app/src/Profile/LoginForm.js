@@ -28,6 +28,7 @@ import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasur
 import RaisedButton from '../UI/RaisedButton';
 import ResponsiveDelimiter from './ResponsiveDelimiter';
 
+// $FlowFixMe[missing-local-annot]
 const getStyles = ({ verticalDesign }) => ({
   createAccountContainer: {
     width: '100%',

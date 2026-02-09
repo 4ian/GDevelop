@@ -169,6 +169,7 @@ export const useGameManager = ({
           await registerGame(
             getAuthorizationHeader,
             userId,
+            // $FlowFixMe[incompatible-type]
             getDefaultRegisterGameProperties({
               projectId: gameId,
               projectName: project.getName(),

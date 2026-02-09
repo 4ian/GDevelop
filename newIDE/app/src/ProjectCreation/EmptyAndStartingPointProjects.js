@@ -20,6 +20,7 @@ import FlatButton from '../UI/FlatButton';
 import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
 
 const ITEMS_SPACING = 5;
+// $FlowFixMe[value-as-type]
 const getStyles = (theme: GDevelopTheme) => ({
   grid: {
     width: `calc(100% + ${2 * ITEMS_SPACING}px)`, // This is needed to compensate for the `margin: -5px` added by MUI related to spacing.

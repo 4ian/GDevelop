@@ -14,7 +14,8 @@ type TimersHashtable = {|
 const transform = (timersHashtable: TimersHashtable) => {
   if (!timersHashtable) return null;
   return Object.entries(timersHashtable.items).map(
-    // $FlowExpectedError - Object.entries does not infer well the type of the value.
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type] - Object.entries does not infer well the type of the value.
     ([timerName, timer]: [string, Timer]) => ({
       'Timer name': timer._name,
       'Time (in seconds)': timer._time / 1000,

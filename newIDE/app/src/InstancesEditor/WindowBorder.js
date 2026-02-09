@@ -16,6 +16,7 @@ export default class WindowBorder {
   layout: gdLayout | null;
   eventsBasedObjectVariant: gdEventsBasedObjectVariant | null;
   toCanvasCoordinates: (x: number, y: number) => [number, number];
+  // $FlowFixMe[missing-local-annot]
   pixiRectangle = new PIXI.Graphics() as any;
   windowRectangle: Rectangle = new Rectangle();
 

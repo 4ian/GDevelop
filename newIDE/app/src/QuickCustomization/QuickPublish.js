@@ -142,8 +142,10 @@ export const QuickPublish = (
 
         setBuildOrGameUrl(
           game
+            // $FlowFixMe[incompatible-type]
             ? getGameUrl(game)
             : build
+            // $FlowFixMe[incompatible-type]
             ? getBuildArtifactUrl(build, 's3Key')
             : ''
         );

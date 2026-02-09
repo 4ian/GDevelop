@@ -262,6 +262,7 @@ const BundleInformationPage = (
 
   const customSectionPaperStyle = {
     // $FlowIgnore
+    // $FlowFixMe[exponential-spread]
     ...(noPadding
       ? {
           padding: 0,

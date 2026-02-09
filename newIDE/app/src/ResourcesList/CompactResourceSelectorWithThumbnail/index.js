@@ -305,6 +305,7 @@ export const CompactResourceSelectorWithThumbnail = (
                 },
               ]
             : []),
+          // $FlowFixMe[incompatible-type]
           ...externalEditors.map(externalEditor => ({
             label: resourceName
               ? i18n._(externalEditor.editDisplayName)

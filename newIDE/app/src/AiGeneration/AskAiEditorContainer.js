@@ -501,6 +501,7 @@ export const AskAiEditor: component(...Props) = React.memo<Props>(
                   preparedAiUserContent.projectSpecificExtensionsSummaryJson,
                 payWithCredits,
                 gameId: project ? project.getProjectUuid() : null,
+                // $FlowFixMe[incompatible-type]
                 fileMetadata,
                 storageProviderName,
                 mode,
@@ -891,6 +892,7 @@ export const AskAiEditor: component(...Props) = React.memo<Props>(
 
       const updateToolbar = React.useCallback(
         () => {
+          // $FlowFixMe[constant-condition]
           if (setToolbar) {
             setToolbar(
               <Toolbar
@@ -906,6 +908,7 @@ export const AskAiEditor: component(...Props) = React.memo<Props>(
 
       React.useEffect(updateToolbar, [updateToolbar]);
 
+      // $FlowFixMe[incompatible-type]
       React.useImperativeHandle(ref, () => ({
         getProject: noop,
         updateToolbar,
@@ -924,10 +927,15 @@ export const AskAiEditor: component(...Props) = React.memo<Props>(
 
       const onSendFeedback = React.useCallback(
         async (
+          // $FlowFixMe[missing-local-annot]
           aiRequestId,
+          // $FlowFixMe[missing-local-annot]
           messageIndex,
+          // $FlowFixMe[missing-local-annot]
           feedback,
+          // $FlowFixMe[missing-local-annot]
           reason,
+          // $FlowFixMe[missing-local-annot]
           freeFormDetails
         ) => {
           if (!profile) return;
@@ -1304,6 +1312,7 @@ export const AskAiEditor: component(...Props) = React.memo<Props>(
 export const renderAskAiEditorContainer = (props: RenderEditorContainerPropsWithRef): React.Node => (
   <I18n>
     {({ i18n }) => (
+      // $FlowFixMe[incompatible-type]
       <AskAiEditor
         ref={props.ref}
         i18n={i18n}

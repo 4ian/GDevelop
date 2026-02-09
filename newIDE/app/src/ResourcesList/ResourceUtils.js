@@ -70,6 +70,7 @@ export const copyAllToProjectFolder = (
 
   const projectPath = path.dirname(project.getProjectFile());
 
+  // $FlowFixMe[incompatible-type]
   return Promise.all(
     resourcePaths.map(resourcePath => {
       if (isPathInProjectFolder(project, resourcePath)) {

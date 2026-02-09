@@ -71,6 +71,7 @@ type Props = {|
   loading?: boolean,
 |};
 
+// $FlowFixMe[missing-local-annot]
 const getTextStyle = disabled => (disabled ? { opacity: 0.4 } : undefined);
 
 const InAppTutorialPhaseCard = (
@@ -153,6 +154,7 @@ const InAppTutorialPhaseCard = (
                     noMargin
                     color="primary"
                     align="left"
+                    // $FlowFixMe[incompatible-type]
                     style={getTextStyle(shouldTextBeDisabled)}
                   >
                     {i18n._(title)}
@@ -174,6 +176,7 @@ const InAppTutorialPhaseCard = (
                             key={`key-point-${index}`}
                             size="body2"
                             noMargin
+                            // $FlowFixMe[incompatible-type]
                             style={getTextStyle(shouldTextBeDisabled)}
                             color="secondary"
                             displayAsListItem

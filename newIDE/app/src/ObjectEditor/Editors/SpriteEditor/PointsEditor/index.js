@@ -116,17 +116,20 @@ const PointsEditor = ({animations, resourcesLoader, project, onPointsUpdated, on
     [animation, sprite, animations, forceUpdate, onPointsUpdated]
   );
 
+  // $FlowFixMe[missing-local-annot]
   const chooseAnimation = index => {
     setAnimationIndex(index);
     setDirectionIndex(0);
     setSpriteIndex(0);
   };
 
+  // $FlowFixMe[missing-local-annot]
   const chooseDirection = index => {
     setDirectionIndex(index);
     setSpriteIndex(0);
   };
 
+  // $FlowFixMe[missing-local-annot]
   const chooseSprite = index => {
     setSpriteIndex(index);
   };

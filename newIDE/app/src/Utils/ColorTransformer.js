@@ -99,6 +99,7 @@ export const rgbColorToHex = (r: number, g: number, b: number): string => {
  */
 export const hexNumberToRGBString = (hex: number): string => {
   const rgbColor = hexNumberToRGBColor(hex);
+  // $FlowFixMe[incompatible-type]
   return rgbColorToRGBString(rgbColor);
 };
 
@@ -134,6 +135,7 @@ export const rgbStringAndAlphaToRGBColor = (
   const g = parseInt(colors[1], 10);
   const b = parseInt(colors[2], 10);
   // alpha can be 0, and we need to handle this case.
+  // $FlowFixMe[invalid-compare]
   const a = alpha === undefined || alpha === null ? 1 : alpha;
 
   // Check if parsing of number was done properly (if not,
@@ -162,6 +164,7 @@ export const hslToRgb = (h: number, s: number, l: number): number[] => {
   if (s === 0) {
     r = g = b = l; // achromatic
   } else {
+    // $FlowFixMe[missing-local-annot]
     let hue2rgb = function hue2rgb(p, q, t) {
       if (t < 0) t += 1;
       if (t > 1) t -= 1;

@@ -32,6 +32,7 @@ export interface Promotion {
 }
 
 export const listAllAnnouncements = async (): Promise<Array<Announcement>> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(
     `${GDevelopReleaseApi.baseUrl}/announcement`
   );
@@ -42,6 +43,7 @@ export const listAllAnnouncements = async (): Promise<Array<Announcement>> => {
 };
 
 export const listAllPromotions = async (): Promise<Array<Promotion>> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(`${GDevelopReleaseApi.baseUrl}/promotion`);
   return ensureIsArray({
     data: response.data,

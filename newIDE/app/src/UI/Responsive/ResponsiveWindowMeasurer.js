@@ -51,7 +51,9 @@ const getOrientationAndWindowSizeFromDimensions = (
       ? 'large'
       : 'xlarge';
 
-  // $FlowFixMe - this is guaranteed to be a valid OrientationAndWindowSizeType.
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-type] - this is guaranteed to be a valid OrientationAndWindowSizeType.
+  // $FlowFixMe[incompatible-type]
   return sizeType + '-' + orientation;
 };
 

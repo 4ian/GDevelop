@@ -293,6 +293,7 @@ export const EarnCredits = ({achievements, badges, onOpenProfile, showRandomItem
   const badgesToShow = React.useMemo(
     () => {
       if (!!randomItemToShow && randomItemToShow !== 'badge') {
+        // $FlowFixMe[missing-empty-array-annot]
         return [];
       }
 

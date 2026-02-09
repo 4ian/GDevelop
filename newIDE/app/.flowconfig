@@ -26,6 +26,8 @@
 <PROJECT_ROOT>/../../GDevelop.js/types/.*
 # Old Flow lib files (DOM, BOM, etc.) have deprecated syntax
 <PROJECT_ROOT>/flow-libs/.*
+# fbjs has @flow weak which is no longer supported
+<PROJECT_ROOT>/node_modules/fbjs/.*
 
 [libs]
 ../../GDevelop.js/types
@@ -34,3 +36,5 @@ flow-libs
 [options]
 module.ignore_non_literal_requires=true
 sharedmemory.hash_table_pow=22
+
+[lints]

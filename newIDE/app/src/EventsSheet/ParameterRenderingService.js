@@ -210,6 +210,7 @@ const ParameterRenderingService = {
       ? 'object'
       : rawType;
 
+    // $FlowFixMe[invalid-computed-prop]
     if (components.hasOwnProperty(fieldType)) return components[fieldType];
     else return components.default;
   },

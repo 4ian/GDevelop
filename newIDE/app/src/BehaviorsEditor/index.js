@@ -447,7 +447,9 @@ export const useManageObjectBehaviors = ({
     () => {
       Clipboard.set(
         BEHAVIORS_CLIPBOARD_KIND,
+        // $FlowFixMe[incompatible-exact]
         mapVector(object.getAllBehaviorNames(), behaviorName => {
+          // $FlowFixMe[incompatible-type]
           const behavior = object.getBehavior(behaviorName);
           if (behavior.isDefaultBehavior()) {
             return null;

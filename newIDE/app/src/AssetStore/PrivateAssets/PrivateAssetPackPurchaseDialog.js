@@ -353,6 +353,7 @@ const PrivateAssetPackPurchaseDialog = (
         maxWidth="sm"
         open
         onRequestClose={onClose}
+        // $FlowFixMe[incompatible-type]
         actions={dialogActions}
         onApply={purchaseSuccessful ? onClose : onWillPurchase}
         cannotBeDismissed // Prevent the user from continuing by clicking outside.

@@ -128,6 +128,7 @@ const BundlePurchaseDialog = (
           password: password || undefined,
         });
         // Mark the Url as opening if opening in the same tab, as it can take some time to load.
+        // $FlowFixMe[incompatible-type]
         setIsOpeningUrl(willReceiveAnEmailForThePurchase);
         Window.openExternalURL(checkoutUrl, {
           shouldOpenInSameTabIfPossible: willReceiveAnEmailForThePurchase,
@@ -463,6 +464,7 @@ const BundlePurchaseDialog = (
         maxWidth="sm"
         open
         onRequestClose={onCloseDialog}
+        // $FlowFixMe[incompatible-type]
         actions={dialogActions}
         onApply={purchaseSuccessful ? onCloseDialog : onWillPurchase}
         flexColumnBody

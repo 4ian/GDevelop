@@ -17,12 +17,15 @@ const fetchers: {
 } = {
   // The Cloud file storage provider fetches the resources that are
   // private URLs by downloading them and reuploading them to the cloud.
+  // $FlowFixMe[incompatible-type]
   [CloudStorageProvider.internalName]: moveUrlResourcesToCloudFilesIfPrivate,
   // The local file storage provider fetches the resources that are URLs
   // by downloading them locally.
+  // $FlowFixMe[incompatible-type]
   [LocalFileStorageProvider.internalName]: moveUrlResourcesToLocalFiles,
   // The URL storage consider relative resources to be relative to the project
   // URL. This allows to open local projects uploaded to GitHub for example.
+  // $FlowFixMe[incompatible-type]
   [UrlStorageProvider.internalName]: fetchRelativeResourcesToFullUrls,
 };
 
@@ -32,6 +35,7 @@ const LocalResourceFetcher: ResourceFetcher = {
   ): Promise<FetchAllProjectResourcesResult> => {
     const { storageProvider } = options;
     const fetcher = fetchers[storageProvider.internalName];
+    // $FlowFixMe[constant-condition]
     if (!fetcher)
       throw new Error(
         `Can't find a ResourceFetcher for ${

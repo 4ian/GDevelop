@@ -120,12 +120,18 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
     };
   }
 
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const InnerDragSourceAndDropTarget = DragSource(
     reactDndType,
+    // $FlowFixMe[incompatible-variance]
+    // $FlowFixMe[incompatible-type]
     sourceSpec,
     sourceCollect
   )(
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-variance]
     DropTarget(reactDndType, targetSpec, targetCollect)(
+      // $FlowFixMe[missing-local-annot]
       ({
         children,
         connectDragSource,

@@ -1,6 +1,7 @@
 // @flow
 import type { AiRequest } from '../../Utils/GDevelopServices/Generation';
 
+// $FlowFixMe[incompatible-type]
 export const agentAiRequest: AiRequest = {
   id: '01JT3FTKKTTR99BW00PW7VA0TS',
   createdAt: '2025-04-30T13:57:49.818Z',
@@ -692,6 +693,7 @@ export const agentAiRequest: AiRequest = {
   },
 };
 
+// $FlowFixMe[incompatible-type]
 export const agentAiRequestWithFunctionCallToDo: AiRequest = {
   id: '01JTBDS436B6M695G44BMTHW5D',
   createdAt: '2025-05-03T15:55:59.462Z',
@@ -900,6 +902,7 @@ export const agentAiRequestWithFunctionCallToDo: AiRequest = {
   },
 };
 
+// $FlowFixMe[incompatible-type]
 export const agentAiRequestWithFailedAndIgnoredFunctionCallOutputs: AiRequest = {
   id: '01JVHV6WW8M30ZZN0B3DSJZVAG',
   createdAt: '2025-05-18T14:01:50.728Z',

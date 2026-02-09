@@ -229,6 +229,7 @@ const ExtensionInstallDialog = (
           </LeftLoader>
         ) : null,
       ]}
+      // $FlowFixMe[incompatible-type]
       secondaryActions={[
         onEdit ? (
           <FlatButton

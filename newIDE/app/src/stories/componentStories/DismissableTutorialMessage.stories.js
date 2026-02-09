@@ -47,6 +47,7 @@ type Props = {|
 const WrappedDismissableTutorialMessage = (
   {
     tutorials = defaultTutorials,
+    // $FlowFixMe[incompatible-type]
     preferences = initialPreferences,
     tutorialId
   }: Props,
@@ -81,8 +82,10 @@ export const NoTutorialsFound = (): React.Node => (
 export const HiddenTutorial = (): React.Node => (
   <WrappedDismissableTutorialMessage
     tutorialId="tutorial-1"
+    // $FlowFixMe[incompatible-type]
     preferences={{
       ...initialPreferences,
+      // $FlowFixMe[incompatible-type]
       values: {
         ...initialPreferences.values,
         hiddenTutorialHints: { 'tutorial-1': true },

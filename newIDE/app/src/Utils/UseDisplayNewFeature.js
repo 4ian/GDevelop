@@ -68,6 +68,7 @@ const useDisplayNewFeature = (): {
         ...newFeaturesAcknowledgements,
         [featureId]: {
           ...acknowledgments,
+          // $FlowFixMe[invalid-tuple-arity]
           dates: [...acknowledgments.dates, Date.now()],
         },
       });

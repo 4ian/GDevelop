@@ -91,9 +91,11 @@ export const AskAiHistoryContent = ({onSelectAiRequest, selectedAiRequestId}: As
       error,
     },
   } = React.useContext(AiRequestContext);
-  // $FlowFixMe - Flow loses type with Object.values
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-type] - Flow loses type with Object.values
   const aiRequestsArray: AiRequest[] = Object.values(aiRequests).sort(
-    // $FlowFixMe - Object.values() loses the type of aiRequests.
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type] - Object.values() loses the type of aiRequests.
     (a: AiRequest, b: AiRequest) => {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     }

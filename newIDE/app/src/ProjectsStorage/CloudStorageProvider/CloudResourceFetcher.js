@@ -31,6 +31,7 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async (
   }: {|
     project: gdProject,
     fileMetadata: FileMetadata,
+    // $FlowFixMe[value-as-type]
     authenticatedUser: AuthenticatedUser,
     onProgress: (number, number) => void,
   |},
@@ -93,6 +94,7 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async (
             }
           } else {
             // Local resource: unsupported.
+            // $FlowFixMe[incompatible-type]
             result.erroredResources.push({
               resourceName: resource.getName(),
               error: new Error('Unsupported relative file.'),
@@ -110,6 +112,7 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async (
   // Download all the project resources as blob (much like what is done during an export).
   const downloadedBlobsAndResourcesToUpload: Array<
     ItemResult<ResourceToFetchAndUpload>
+  // $FlowFixMe[incompatible-type]
   > = await downloadUrlsToBlobs({
     urlContainers: resourcesToFetchAndUpload,
     onProgress: (count, total) => {
@@ -118,9 +121,11 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async (
   });
 
   // Transform Blobs into Files.
+  // $FlowFixMe[incompatible-type]
   const downloadedFilesAndResourcesToUpload = convertBlobToFiles(
     downloadedBlobsAndResourcesToUpload,
     (resourceName, error) => {
+      // $FlowFixMe[incompatible-type]
       result.erroredResources.push({
         resourceName,
         error,
@@ -143,6 +148,7 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async (
   uploadedProjectResourceFiles.forEach(({ url, error }, index) => {
     const resource = downloadedFilesAndResourcesToUpload[index].resource;
     if (error || !url) {
+      // $FlowFixMe[incompatible-type]
       result.erroredResources.push({
         resourceName: resource.getName(),
         error: error || new Error('Unknown error during upload.'),

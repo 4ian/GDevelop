@@ -35,6 +35,7 @@ export type AllExamples = {|
 |};
 
 export const listAllExamples = async (): Promise<AllExamples> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(`${GDevelopAssetApi.baseUrl}/example`, {
     params: {
       // Could be changed according to the editor environment, but keep
@@ -47,8 +48,10 @@ export const listAllExamples = async (): Promise<AllExamples> => {
   const [exampleShortHeaders, filters] = await Promise.all([
     retryIfFailed(
       { times: 2 },
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       async () => (await axios.get(exampleShortHeadersUrl)).data
     ),
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     retryIfFailed({ times: 2 }, async () => (await axios.get(filtersUrl)).data),
   ]);
 
@@ -63,6 +66,7 @@ export const listAllExamples = async (): Promise<AllExamples> => {
 export const getExample = async (
   exampleShortHeader: ExampleShortHeader
 ): Promise<Example> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(
     `${GDevelopAssetApi.baseUrl}/example-v2/${exampleShortHeader.id}`
   );
@@ -73,6 +77,7 @@ export const getExample = async (
 export const getUserExampleShortHeaders = async (
   authorId: string
 ): Promise<Array<ExampleShortHeader>> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(
     `${GDevelopAssetApi.baseUrl}/example-short-header`,
     {

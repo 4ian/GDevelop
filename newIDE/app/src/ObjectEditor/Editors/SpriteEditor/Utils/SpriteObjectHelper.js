@@ -76,6 +76,7 @@ export const getTotalSpritesCount = (animations: gdSpriteAnimationList): number 
  * Return all the point names
  */
 export const getAllPointNames = (animations: gdSpriteAnimationList): Array<any> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const allPointNames = new Set();
   for (
     let animationIndex = 0;
@@ -129,7 +130,9 @@ export const copySpritePoints = (
   );
 
   destinationSprite.getAllNonDefaultPoints().clear();
+  // $FlowFixMe[incompatible-exact]
   mapVector(originalSprite.getAllNonDefaultPoints(), originalPoint => {
+    // $FlowFixMe[incompatible-type]
     destinationSprite.addPoint(originalPoint);
   });
 };
@@ -169,11 +172,15 @@ export const haveSamePoints = (sprite1: gdSprite, sprite2: gdSprite): any | bool
     return false;
 
   return every(
+    // $FlowFixMe[incompatible-exact]
     mapVector(sprite1.getAllNonDefaultPoints(), sprite1Point => {
+      // $FlowFixMe[incompatible-use]
       if (!sprite2.hasPoint(sprite1Point.getName())) return false;
 
       return isSamePoint(
+        // $FlowFixMe[incompatible-type]
         sprite1Point,
+        // $FlowFixMe[incompatible-use]
         sprite2.getPoint(sprite1Point.getName())
       );
     })
@@ -227,7 +234,9 @@ export const copySpritePolygons = (
   );
 
   destinationSprite.getCustomCollisionMask().clear();
+  // $FlowFixMe[incompatible-exact]
   mapVector(originalSprite.getCustomCollisionMask(), originalPolygon => {
+    // $FlowFixMe[incompatible-type]
     destinationSprite.getCustomCollisionMask().push_back(originalPolygon);
   });
 };
@@ -253,9 +262,11 @@ export const isSamePolygon = (polygon1: gdPolygon2d, polygon2: gdPolygon2d): any
   if (polygon1Vertices.size() !== polygon2Vertices.size()) return false;
 
   return every(
+    // $FlowFixMe[incompatible-exact]
     mapVector(polygon1Vertices, (point1, index) => {
       const point2 = polygon2Vertices.at(index);
       return (
+        // $FlowFixMe[incompatible-use]
         point1.get_x() === point2.get_x() && point1.get_y() === point2.get_y()
       );
     })
@@ -278,7 +289,9 @@ export const haveSameCollisionMasks = (
   if (sprite1CollisionMask.size() !== sprite2CollisionMask.size()) return false;
 
   return every(
+    // $FlowFixMe[incompatible-exact]
     mapVector(sprite1CollisionMask, (sprite1Polygon, index) => {
+      // $FlowFixMe[incompatible-type]
       return isSamePolygon(sprite1Polygon, sprite2CollisionMask.at(index));
     })
   );

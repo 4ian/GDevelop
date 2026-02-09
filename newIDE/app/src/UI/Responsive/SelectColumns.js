@@ -24,6 +24,7 @@ export const SelectColumns = ({columnsRenderer, getColumns}: Props<string>): Rea
       {columns.map(({ columnName }, index) => {
         const columnRenderer = columnsRenderer[columnName];
         const columnRatio = columns[index].ratio || 1;
+        // $FlowFixMe[constant-condition]
         if (!columnRenderer) return null;
         const isFirst = index === 0;
         const isLast = index === columns.length - 1;

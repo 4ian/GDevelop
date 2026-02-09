@@ -120,6 +120,7 @@ const InviteHome = ({cloudProjectId}: Props): React.Node => {
               projectUserAcl => projectUserAcl.feature === 'collaboration'
             )
           : [];
+        // $FlowFixMe[incompatible-type]
         setProjectUserAcls(collaboratorProjectUserAcls);
       } catch (error) {
         console.error('Unable to fetch the project user acls', error);
@@ -151,9 +152,11 @@ const InviteHome = ({cloudProjectId}: Props): React.Node => {
 
   const fetchCollaboratorPublicProfileByIds = React.useCallback(
     async () => {
+      // $FlowFixMe[constant-condition]
       if (!projectUserAcls || !projectUserAcls.length) return;
 
       const userIds = projectUserAcls.map(
+        // $FlowFixMe[missing-local-annot]
         projectUserAcl => projectUserAcl.userId
       );
       try {
@@ -309,6 +312,7 @@ const InviteHome = ({cloudProjectId}: Props): React.Node => {
   const hasSufficientPermissionsWithSubscription =
     limits.capabilities.cloudProjects.maximumGuestCollaboratorsPerProject > 0;
   const currentUserLevel =
+    // $FlowFixMe[constant-condition]
     projectUserAcls && fetchError !== 'project-not-owned' ? 'owner' : null;
 
   return (
@@ -364,9 +368,11 @@ const InviteHome = ({cloudProjectId}: Props): React.Node => {
               collaborators.
             </Trans>
           </AlertMessage>
+        // $FlowFixMe[constant-condition]
         ) : !projectUserAcls ? (
           <PlaceholderLoader />
         ) : (
+          // $FlowFixMe[missing-local-annot]
           projectUserAcls.map(projectUserAcl => (
             <UserLine
               username={getCollaboratorUsername(projectUserAcl.userId)}
@@ -459,6 +465,7 @@ const InviteHome = ({cloudProjectId}: Props): React.Node => {
                 value={collaboratorLevel}
                 onChange={(e, i, newCollaboratorLevel: string) =>
                   // $FlowIgnore - We know this is a valid level.
+                  // $FlowFixMe[incompatible-type]
                   setCollaboratorLevel(newCollaboratorLevel)
                 }
                 fullWidth
@@ -469,6 +476,7 @@ const InviteHome = ({cloudProjectId}: Props): React.Node => {
                   <SelectOption
                     key={level}
                     value={level}
+                    // $FlowFixMe[incompatible-type]
                     label={getTranslatableLevel(level)}
                   />
                 ))}

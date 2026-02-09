@@ -93,7 +93,9 @@ export const mergeBasicProfilingCounters = (
           totalUpdateTime: 0,
         };
       }
+      // $FlowFixMe[incompatible-type]
       destinationInstanceCounter.updateCount += instanceCounter.updateCount;
+      // $FlowFixMe[incompatible-type]
       destinationInstanceCounter.totalUpdateTime +=
         instanceCounter.totalUpdateTime;
     }

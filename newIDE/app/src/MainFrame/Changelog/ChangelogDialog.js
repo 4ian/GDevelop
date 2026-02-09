@@ -37,6 +37,7 @@ const ChangelogDialog = ({open, onClose}: Props): React.Node => {
   return (
     <Dialog
       title={<Trans>What's new in GDevelop?</Trans>}
+      // $FlowFixMe[incompatible-type]
       actions={actions}
       open={open}
       onRequestClose={onClose}

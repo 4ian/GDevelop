@@ -161,6 +161,7 @@ const Slideshow = (
 
   React.useEffect(
     () => {
+      // $FlowFixMe[incompatible-type]
       nextSlideTimeoutId.current = setTimeout(() => {
         handleRightArrowClick();
       }, 5000);
@@ -193,6 +194,7 @@ const Slideshow = (
       // so just return.
       if (!isFocusingOrOverContainer || leftImageRecentlyTimeoutId.current)
         return;
+      // $FlowFixMe[incompatible-type]
       leftImageRecentlyTimeoutId.current = setTimeout(() => {
         setIsFocusingContainer(false);
       }, 1000);

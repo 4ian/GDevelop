@@ -33,6 +33,7 @@ const DetectShortcutDialog = (props: Props): React.Node => {
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       e.preventDefault();
+      // $FlowFixMe[incompatible-exact]
       const metadata = getShortcutMetadataFromEvent(e);
       if (e.type === 'keyup') return;
       setIsValid(metadata.isValid);

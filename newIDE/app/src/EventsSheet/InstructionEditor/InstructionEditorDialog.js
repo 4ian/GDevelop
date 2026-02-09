@@ -369,6 +369,7 @@ const InstructionEditorDialog = ({
           }}
           getColumns={() => {
             if (isLargeScreen) {
+              // $FlowFixMe[incompatible-type]
               return [
                 {
                   columnName: 'instruction-or-object-selector',
@@ -392,6 +393,7 @@ const InstructionEditorDialog = ({
                   },
                 ];
               } else {
+                // $FlowFixMe[incompatible-type]
                 return [
                   chosenObjectName
                     ? { columnName: 'object-instruction-selector' }

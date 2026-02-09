@@ -73,6 +73,7 @@ export const createOrEnsureBadgeForUser = async (
   const userId = profile.id;
   try {
     const authorizationHeader = await getAuthorizationHeader();
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     const response = await axios.post(
       `${GDevelopUserApi.baseUrl}/user/${userId}/badge`,
       {
@@ -110,6 +111,7 @@ export const createOrEnsureBadgeForUser = async (
 export const addCreateBadgePreHookIfNotClaimed = <
   T: (...args: Array<any>) => any
 >(
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   achievementId: string,
   callback: T
@@ -120,7 +122,10 @@ export const addCreateBadgePreHookIfNotClaimed = <
     return callback;
   }
 
-  // $FlowFixMe - hard to (or can't?) express the exact function being passed.
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-type] - hard to (or can't?) express the exact function being passed.
+  // $FlowFixMe[missing-local-annot]
+  // $FlowFixMe[incompatible-type]
   return (...args) => {
     try {
       createOrEnsureBadgeForUser(authenticatedUser, achievementId);
@@ -132,6 +137,7 @@ export const addCreateBadgePreHookIfNotClaimed = <
 };
 
 export const getAchievements = async (): Promise<Array<Achievement>> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(`${GDevelopUserApi.baseUrl}/achievement`);
 
   return ensureIsArray({
@@ -141,6 +147,7 @@ export const getAchievements = async (): Promise<Array<Achievement>> => {
 };
 
 export const markBadgesAsSeen = async (
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser
 ): Promise<?void> => {
   const {
@@ -157,6 +164,7 @@ export const markBadgesAsSeen = async (
   const userId = firebaseUser.uid;
   try {
     const authorizationHeader = await getAuthorizationHeader();
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     const response = await axios.patch(
       `${GDevelopUserApi.baseUrl}/user/${userId}/badge`,
       unseenBadges.map(badge => ({
@@ -186,6 +194,7 @@ export const compareAchievements = (
   b: AchievementWithBadgeData
 ): any | number => {
   if (b.unlockedAt && a.unlockedAt) {
+    // $FlowFixMe[unsafe-arithmetic]
     return b.unlockedAt - a.unlockedAt;
   } else if (a.unlockedAt && !b.unlockedAt) {
     return -1;

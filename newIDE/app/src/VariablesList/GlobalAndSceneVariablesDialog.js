@@ -120,6 +120,7 @@ const GlobalAndSceneVariablesDialog = (
           <Trans>Extension variables</Trans>
         )
       }
+      // $FlowFixMe[incompatible-type]
       tabs={tabs}
       initiallyOpenTabId={
         isGlobalTabInitiallyOpen ? 'global-variables' : 'scene-variables'

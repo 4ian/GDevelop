@@ -265,6 +265,7 @@ export type RedemptionCode = {|
 
 export const EDUCATION_PLAN_MIN_SEATS = 5;
 export const EDUCATION_PLAN_MAX_SEATS = 300;
+// $FlowFixMe[cannot-resolve-name]
 export const apiClient: Axios = axios.create({
   baseURL: GDevelopUsageApi.baseUrl,
 });
@@ -696,6 +697,7 @@ export const canBenefitFromDiscordRole = (subscription: ?Subscription): false | 
   return (
     !!subscription &&
     ['gdevelop_education', 'gdevelop_startup', 'gdevelop_gold'].includes(
+      // $FlowFixMe[incompatible-type]
       subscription.planId
     ) &&
     !subscription.benefitsFromEducationPlan
@@ -705,6 +707,7 @@ export const canBenefitFromDiscordRole = (subscription: ?Subscription): false | 
 export const canUpgradeSubscription = (subscription: ?Subscription): false | true | boolean => {
   return (
     !!subscription &&
+    // $FlowFixMe[incompatible-type]
     !['gdevelop_education', 'gdevelop_startup'].includes(subscription.planId) &&
     !subscription.benefitsFromEducationPlan
   );
@@ -756,18 +759,23 @@ export function getSummarizedSubscriptionPlanFeatures(
     };
 
     if (feature.enabled) {
+      // $FlowFixMe[prop-missing]
       planFeature.enabled = feature.enabled;
     }
     if (feature.unlimited) {
+      // $FlowFixMe[prop-missing]
       planFeature.unlimited = feature.unlimited;
     }
     if (feature.upcoming) {
+      // $FlowFixMe[prop-missing]
       planFeature.upcoming = feature.upcoming;
     }
     if (feature.trialLike) {
+      // $FlowFixMe[prop-missing]
       planFeature.trialLike = feature.trialLike;
     }
     if (feature.descriptionByLocale) {
+      // $FlowFixMe[prop-missing]
       planFeature.description = selectMessageByLocale(
         i18n,
         feature.descriptionByLocale

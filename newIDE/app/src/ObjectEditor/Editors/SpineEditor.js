@@ -34,6 +34,7 @@ import Window from '../../Utils/Window';
 
 const gd: libGDevelop = global.gd;
 
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget(
   'spine-animations-list'
 );
@@ -237,6 +238,7 @@ const SpineEditor = (
   );
 
   const removeAnimation = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     animationIndex => {
       setNameErrors({});
 
@@ -265,6 +267,7 @@ const SpineEditor = (
   );
 
   const changeAnimationName = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     (animationIndex, newName) => {
       const currentName = spineConfiguration
         .getAnimation(animationIndex)
@@ -331,6 +334,7 @@ const SpineEditor = (
           kind="warning"
           renderRightButton={() => (
             <FlatButton
+              // $FlowFixMe[incompatible-type]
               style={styles.neverShrinkingButton}
               label={<Trans>Purchase Spine</Trans>}
               onClick={() =>

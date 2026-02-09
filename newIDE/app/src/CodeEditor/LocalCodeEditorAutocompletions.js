@@ -54,6 +54,7 @@ export const setupAutocompletions = (monaco: any) => {
       });
     });
 
+  // $FlowFixMe[recursive-definition]
   const importAllJsFilesFromFolderRecursively = (folderPath: string) =>
     fs.readdir(folderPath, (error: ?Error, filenames: Array<string>) => {
       if (error) {

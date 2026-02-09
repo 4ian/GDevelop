@@ -15,6 +15,7 @@ export default class WindowMask {
   project: gdProject;
   instancesEditorSettings: InstancesEditorSettings;
   viewPosition: ViewPosition;
+  // $FlowFixMe[missing-local-annot]
   pixiRectangle = new PIXI.Graphics() as any;
   windowRectangle: Rectangle = new Rectangle();
 

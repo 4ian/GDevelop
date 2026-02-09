@@ -71,6 +71,7 @@ const initialMosaicEditorNodes = {
  * currently selected inspector.
  */
 export default class DebuggerContent extends React.Component<Props, State> {
+  // $FlowFixMe[missing-local-annot]
   state = {
     selectedInspector: null,
     selectedInspectorFullPath: [] as Array<empty>,
@@ -250,9 +251,11 @@ export default class DebuggerContent extends React.Component<Props, State> {
         {({ getDefaultEditorMosaicNode, setDefaultEditorMosaicNode }) => (
           <EditorMosaic
             ref={editors => (this._editors = editors)}
+            // $FlowFixMe[incompatible-type]
             editors={editors}
             centralNodeId="selected-inspector"
             initialNodes={
+              // $FlowFixMe[incompatible-type]
               getDefaultEditorMosaicNode('debugger') || initialMosaicEditorNodes
             }
             onPersistNodes={node =>

@@ -12,6 +12,7 @@ import { client as assetApiClient } from '../../../../Utils/GDevelopServices/Ass
 export default {
   title: 'AssetStore/ResourceStore',
   component: ResourceStore,
+  // $FlowFixMe[cannot-resolve-name]
   decorators: [getPaperDecorator('medium') as StoryDecorator],
 };
 
@@ -23,6 +24,7 @@ const ResourceStoreStory = ({ kind }: {| kind: 'audio' | 'font' | 'svg' |}) => {
   return (
     <FixedHeightFlexContainer height={600}>
       <ResourceStoreStateProvider>
+        // $FlowFixMe[incompatible-type]
         <ResourceStore
           onChoose={action('onChoose')}
           resourceKind={kind}

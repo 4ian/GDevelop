@@ -515,7 +515,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
   );
 
   React.useImperativeHandle(
-    // $FlowFixMe
+    // $FlowFixMe[incompatible-type]
     ref,
     () => ({
       forceUpdateList: forceUpdate,
@@ -690,7 +690,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
         itemKey={index => flattenedData[index].id}
         // Flow does not seem to accept the generic used in VariableSizeList
         // can itself use a generic.
-        // $FlowFixMe
+        // $FlowFixMe[incompatible-type]
         itemData={itemData}
         ref={listRef}
         // Keep overscanCount relatively high so that:
@@ -705,7 +705,8 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
   );
 };
 
-// $FlowFixMe
+// $FlowFixMe[incompatible-type]
 export default React.forwardRef(ReadOnlyTreeView) as component(
   ...{ ...Props<any>, +ref?: React.RefSetter<any> }
+// $FlowFixMe[incompatible-type]
 ) React.Node;

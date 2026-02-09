@@ -5,9 +5,11 @@ const { getFolderTagsFromAssetShortHeaders } = require('./TagsHelper');
 describe('getFolderTagsFromAssetShortHeaders', () => {
   it('should return an empty array if no assets', () => {
     const selectedFolders = ['pack-tag'];
+    // $FlowFixMe[missing-empty-array-annot]
     const assetShortHeaders = [];
     const result = getFolderTagsFromAssetShortHeaders({
       selectedFolders,
+      // $FlowFixMe[incompatible-type]
       assetShortHeaders,
     });
     expect(result).toEqual([]);

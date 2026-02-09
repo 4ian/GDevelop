@@ -58,6 +58,7 @@ const LocalFilePicker = ({value, onChange, title, message, defaultPath, fullWidt
         width: fullWidth ? '100%' : undefined,
       }}
     >
+      // $FlowFixMe[incompatible-type]
       <TextField
         margin="dense"
         style={styles.textField}
@@ -68,6 +69,7 @@ const LocalFilePicker = ({value, onChange, title, message, defaultPath, fullWidt
       />
       <FlatButton
         label={<Trans>Choose</Trans>}
+        // $FlowFixMe[incompatible-type]
         style={styles.button}
         onClick={onChooseFolder}
       />

@@ -59,6 +59,7 @@ const SearchPanel = (
     onGoToNextSearchResult,
     searchFocusOffset,
   }: Props,
+  // $FlowFixMe[missing-local-annot]
   ref
 ) => {
   const { isMobile } = useResponsiveWindowSize();

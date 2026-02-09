@@ -59,6 +59,7 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
         };
 
       const leaderboardsByIds = leaderboards.reduce((acc, leaderboard) => {
+        // $FlowFixMe[prop-missing]
         acc[leaderboard.id] = leaderboard;
         return acc;
       }, {});
@@ -68,6 +69,7 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
         leaderboard => leaderboard.primary
       );
       const currentLeaderboardUpdated = state.currentLeaderboard
+        // $FlowFixMe[invalid-computed-prop]
         ? leaderboardsByIds[state.currentLeaderboard.id]
         : undefined;
       const fallBackLeaderboard =
@@ -131,14 +133,17 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
       if (state.leaderboardsByIds) {
         Object.entries(state.leaderboardsByIds).forEach(
           ([leaderboardId, leaderboard]) => {
+            // $FlowFixMe[prop-missing]
             leaderboardsByIdsWithUpdatedPrimaryFlags[leaderboardId] = {
               ...leaderboard,
-              // $FlowFixMe: known error where Flow returns mixed for object value https://github.com/facebook/flow/issues/2221
+              // $FlowFixMe[incompatible-type]
+              // $FlowFixMe[incompatible-type]: known error where Flow returns mixed for object value https://github.com/facebook/flow/issues/2221
               primary: action.payload.primary ? undefined : leaderboard.primary,
             };
           }
         );
       }
+      // $FlowFixMe[prop-missing]
       leaderboardsByIdsWithUpdatedPrimaryFlags[action.payload.id] =
         action.payload;
 
@@ -151,6 +156,7 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
       };
     case 'REMOVE_LEADERBOARD':
       const newLeaderboardsByIds = { ...state.leaderboardsByIds };
+      // $FlowFixMe[prop-missing]
       delete newLeaderboardsByIds[action.payload];
       const leaderboardsIds = Object.keys(newLeaderboardsByIds);
       if (leaderboardsIds.length === 0) {
@@ -165,9 +171,11 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
       return {
         ...state,
         displayOnlyBestEntry: shouldDisplayOnlyBestEntries(
+          // $FlowFixMe[invalid-computed-prop]
           newLeaderboardsByIds[leaderboardsIds[0]]
         ),
         leaderboardsByIds: newLeaderboardsByIds,
+        // $FlowFixMe[invalid-computed-prop]
         currentLeaderboard: newLeaderboardsByIds[leaderboardsIds[0]],
         currentLeaderboardId: leaderboardsIds[0],
       };
@@ -419,7 +427,7 @@ const LeaderboardProvider = ({gameId, children}: Props): React.Node => {
     },
     !leaderboardsByIds ||
       Object.values(leaderboardsByIds).every(
-        // $FlowFixMe
+        // $FlowFixMe[incompatible-type]
         (leaderboard: Leaderboard) => !leaderboard.resetLaunchedAt
       )
       ? null
@@ -430,7 +438,8 @@ const LeaderboardProvider = ({gameId, children}: Props): React.Node => {
     <LeaderboardContext.Provider
       value={{
         leaderboards: !!leaderboardsByIds
-          ? // $FlowFixMe
+          // $FlowFixMe[incompatible-type]
+          ? // $FlowFixMe[incompatible-type]
             Object.values(leaderboardsByIds)
           : null,
         currentLeaderboard,

@@ -51,6 +51,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
   Props,
   State
 > {
+  // $FlowFixMe[missing-local-annot]
   state = {
     eventsFunction: null,
     extensionName: '',

@@ -87,6 +87,7 @@ export const downloadResourcesAsBlobs = async (
 
   const downloadedBlobsAndResources: Array<
     ItemResult<ResourceToFetch>
+  // $FlowFixMe[incompatible-type]
   > = await downloadUrlsToBlobs({
     urlContainers: resourcesToFetchAndUpload,
     onProgress: (count, total) => {
@@ -97,6 +98,7 @@ export const downloadResourcesAsBlobs = async (
   downloadedBlobsAndResources.forEach(({ item, error, blob }) => {
     const { resource } = item;
     if (error || !blob) {
+      // $FlowFixMe[incompatible-type]
       result.erroredResources.push({
         resourceName: resource.getName(),
         error: error || new Error('Unknown error during download.'),
@@ -231,6 +233,7 @@ const ObjectExporterDialog = ({project, layout: scene, onClose}: Props): React.N
     {
       onDoProcess: React.useCallback(
         (options, onProgress) =>
+          // $FlowFixMe[incompatible-type]
           downloadResourcesAsBlobs({ ...options, onProgress }),
         []
       ),

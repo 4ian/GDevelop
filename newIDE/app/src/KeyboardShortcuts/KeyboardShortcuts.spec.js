@@ -11,13 +11,19 @@ import {
  * functions that take event objects as input
  */
 const makeKeyEvent = (
+  // $FlowFixMe[missing-local-annot]
   ctrlKey,
+  // $FlowFixMe[missing-local-annot]
   shiftKey,
+  // $FlowFixMe[missing-local-annot]
   altKey,
+  // $FlowFixMe[missing-local-annot]
   code,
+  // $FlowFixMe[missing-local-annot]
   keyCode
 ): KeyboardEvent => {
   // $FlowIgnore - create fake KeyboardEvent object
+  // $FlowFixMe[incompatible-type]
   return { ctrlKey, shiftKey, altKey, code, keyCode };
 };
 
@@ -60,75 +66,105 @@ const altSpace = makeKeyEvent(false, false, true, 'Space', ' '); // Alt+Space
 describe('KeyboardShortcuts', () => {
   it('creates shortcut strings from events correctly', () => {
     // Action key, with modifiers
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutStringFromEvent(keyA)).toBe('KeyA');
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutStringFromEvent(ctrlA)).toBe('CmdOrCtrl+KeyA');
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutStringFromEvent(shiftA)).toBe('Shift+KeyA');
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutStringFromEvent(altA)).toBe('Alt+KeyA');
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutStringFromEvent(ctrlShiftAltA)).toBe(
       'CmdOrCtrl+Shift+Alt+KeyA'
     );
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutDisplayName(getShortcutStringFromEvent(keyA))).toBe('A');
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutDisplayName(getShortcutStringFromEvent(ctrlA))).toBe(
       'Ctrl + A'
     );
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutDisplayName(getShortcutStringFromEvent(shiftA))).toBe(
       'Shift + A'
     );
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutDisplayName(getShortcutStringFromEvent(altA))).toBe(
       'Alt + A'
     );
     expect(
+      // $FlowFixMe[incompatible-exact]
       getShortcutDisplayName(getShortcutStringFromEvent(ctrlShiftAltA))
     ).toBe('Ctrl + Shift + Alt + A');
 
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutStringFromEvent(keyM)).toBe('KeyM');
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutStringFromEvent(ctrlM)).toBe('CmdOrCtrl+KeyM');
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutStringFromEvent(shiftM)).toBe('Shift+KeyM');
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutStringFromEvent(altM)).toBe('Alt+KeyM');
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutStringFromEvent(ctrlShiftAltM)).toBe(
       'CmdOrCtrl+Shift+Alt+KeyM'
     );
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutDisplayName(getShortcutStringFromEvent(keyM))).toBe('M');
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutDisplayName(getShortcutStringFromEvent(ctrlM))).toBe(
       'Ctrl + M'
     );
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutDisplayName(getShortcutStringFromEvent(shiftM))).toBe(
       'Shift + M'
     );
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutDisplayName(getShortcutStringFromEvent(altM))).toBe(
       'Alt + M'
     );
     expect(
+      // $FlowFixMe[incompatible-exact]
       getShortcutDisplayName(getShortcutStringFromEvent(ctrlShiftAltM))
     ).toBe('Ctrl + Shift + Alt + M');
 
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutStringFromEvent(keyComma)).toBe('Comma');
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutStringFromEvent(ctrlComma)).toBe('CmdOrCtrl+Comma');
     // TODO: Find a way to handle using Question mark in azerty.
     // expect(getShortcutStringFromEvent(shiftComma)).toBe('Shift+Comma');
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutStringFromEvent(altComma)).toBe('Alt+Comma');
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutStringFromEvent(ctrlShiftAltComma)).toBe(
       'CmdOrCtrl+Shift+Alt+Comma'
     );
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutDisplayName(getShortcutStringFromEvent(keyComma))).toBe(
       ','
     );
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutDisplayName(getShortcutStringFromEvent(ctrlComma))).toBe(
       'Ctrl + ,'
     );
     // TODO: Find a way to handle using Question mark in azerty.
     // expect(getShortcutDisplayName(getShortcutStringFromEvent(shiftComma))).toBe('Shift + ,');
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutDisplayName(getShortcutStringFromEvent(altComma))).toBe(
       'Alt + ,'
     );
     expect(
+      // $FlowFixMe[incompatible-exact]
       getShortcutDisplayName(getShortcutStringFromEvent(ctrlShiftAltComma))
     ).toBe('Ctrl + Shift + Alt + ,');
 
     // Partial or incorrect shortcut keypresses
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutStringFromEvent(ctrlShiftAlt)).toBe(
       'CmdOrCtrl+Shift+Alt+'
     );
+    // $FlowFixMe[incompatible-exact]
     expect(getShortcutStringFromEvent(ctrlShiftAltUp)).toBe(
       'CmdOrCtrl+Shift+Alt+'
     );
@@ -136,21 +172,34 @@ describe('KeyboardShortcuts', () => {
 
   it('validates shortcut presses correctly', () => {
     // Action key, with modifiers
+    // $FlowFixMe[incompatible-exact]
     expect(isValidShortcutEvent(keyA)).toBe(true);
+    // $FlowFixMe[incompatible-exact]
     expect(isValidShortcutEvent(ctrlA)).toBe(true);
+    // $FlowFixMe[incompatible-exact]
     expect(isValidShortcutEvent(shiftA)).toBe(true);
+    // $FlowFixMe[incompatible-exact]
     expect(isValidShortcutEvent(altA)).toBe(true);
+    // $FlowFixMe[incompatible-exact]
     expect(isValidShortcutEvent(ctrlShiftAltA)).toBe(true);
 
     // Invalid shortcut keypresses...
+    // $FlowFixMe[incompatible-exact]
     expect(isValidShortcutEvent(keyTab)).toBe(false);
+    // $FlowFixMe[incompatible-exact]
     expect(isValidShortcutEvent(keySpace)).toBe(false);
+    // $FlowFixMe[incompatible-exact]
     expect(isValidShortcutEvent(shiftTab)).toBe(false);
+    // $FlowFixMe[incompatible-exact]
     expect(isValidShortcutEvent(shiftSpace)).toBe(false);
     // .. and valid edge cases
+    // $FlowFixMe[incompatible-exact]
     expect(isValidShortcutEvent(ctrlTab)).toBe(true);
+    // $FlowFixMe[incompatible-exact]
     expect(isValidShortcutEvent(altTab)).toBe(true);
+    // $FlowFixMe[incompatible-exact]
     expect(isValidShortcutEvent(ctrlSpace)).toBe(true);
+    // $FlowFixMe[incompatible-exact]
     expect(isValidShortcutEvent(altSpace)).toBe(true);
   });
 

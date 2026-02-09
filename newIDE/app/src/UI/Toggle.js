@@ -19,6 +19,7 @@ const useSwitchStyles = ({
   toggled,
   disabled,
 }: {
+  // $FlowFixMe[value-as-type]
   theme: GDevelopTheme,
   toggled: boolean,
   disabled: boolean,

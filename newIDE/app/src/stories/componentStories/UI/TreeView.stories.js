@@ -18,6 +18,7 @@ import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 export default {
   title: 'UI Building Blocks/TreeView',
   component: TreeView,
+  // $FlowFixMe[cannot-resolve-name]
   decorators: [getPaperDecorator('dark') as StoryDecorator],
 };
 
@@ -483,6 +484,7 @@ export const Default = (): React.Node => {
             {({ height, width }) => (
               <Line expand>
                 <Column expand noMargin>
+                  // $FlowFixMe[incompatible-type]
                   <TreeView
                     multiSelect={multiSelect}
                     height={height}

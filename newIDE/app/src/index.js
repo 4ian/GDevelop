@@ -1,5 +1,6 @@
 // @flow
 import 'element-closest';
+// $FlowFixMe[missing-export]
 import React, { Component, type Element } from 'react';
 import ReactDOM from 'react-dom';
 import Authentication from './Utils/GDevelopServices/Authentication';
@@ -68,10 +69,12 @@ type State = {|
 |};
 
 class Bootstrapper extends Component<{}, State> {
+  // $FlowFixMe[missing-local-annot]
   state = {
     loadingMessage: '',
     App: null,
   };
+  // $FlowFixMe[missing-local-annot]
   authentication = new Authentication();
 
   componentDidMount() {
@@ -133,6 +136,7 @@ class Bootstrapper extends Component<{}, State> {
     }, this.handleEditorLoadError);
   }
 
+  // $FlowFixMe[missing-local-annot]
   handleEditorLoadError = rawError => {
     const message = !electron
       ? 'Please check your internet connectivity, close the tab and reopen it.'
@@ -148,6 +152,7 @@ class Bootstrapper extends Component<{}, State> {
     });
   };
 
+  // $FlowFixMe[missing-local-annot]
   render() {
     const { App, loadingMessage } = this.state;
 

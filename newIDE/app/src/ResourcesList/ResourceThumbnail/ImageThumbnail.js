@@ -95,6 +95,7 @@ const ImageThumbnail = (props: Props): React.MixedElement => {
         alt={resourceName}
         src={resourcesLoader.getResourceFullUrl(project, resourceName, {})}
         onError={error => {
+          // $FlowFixMe[incompatible-type]
           setError(error);
         }}
         onLoad={() => {

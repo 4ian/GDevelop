@@ -85,11 +85,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         // If the instruction targets a group, we check that every object of the
         // group is a sprite and get the points that they all have in common.
         const pointsNamesByObject = mapVector(
+          // $FlowFixMe[incompatible-exact]
           group.getAllObjectsNames(),
           objectName => {
             const object = getObjectByName(
               project.getObjects(),
               scope.layout ? scope.layout.getObjects() : null,
+              // $FlowFixMe[incompatible-type]
               objectName,
             );
             if (!object || object.getType() !== 'Sprite') {
@@ -110,7 +112,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         
         // Flow fears that pointsNamesByObject contains null values but this
         // possibility should be handled above.
-        // $FlowExpectedError[incompatible-call]
+        // $FlowFixMe[incompatible-call]
         return intersection<string>(...pointsNamesByObject).sort().map(
           pointName => ({
             kind: 'Text',

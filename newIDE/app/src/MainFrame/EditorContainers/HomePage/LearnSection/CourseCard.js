@@ -104,6 +104,7 @@ export const getSpecializationConfig = (
     specializationId === 'loading' ? (
       <Trans>Loading</Trans>
     ) : (
+      // $FlowFixMe[invalid-computed-prop]
       specializationLabels[specializationId]
     );
   if (!label) {
@@ -119,6 +120,7 @@ export const getSpecializationConfig = (
       </Trans>
     );
   }
+  // $FlowFixMe[invalid-computed-prop]
   const color = specializationColors[specializationId] || '#4F28CD';
   return {
     label,

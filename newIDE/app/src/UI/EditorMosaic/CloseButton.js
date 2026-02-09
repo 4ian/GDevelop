@@ -23,6 +23,7 @@ export default function CloseButton(props: Props): React.Node {
   const { mosaicWindowActions } = React.useContext(MosaicWindowContext);
 
   return (
+    // $FlowFixMe[incompatible-type]
     <IconButton
       onClick={() => {
         mosaicActions.remove(mosaicWindowActions.getPath());

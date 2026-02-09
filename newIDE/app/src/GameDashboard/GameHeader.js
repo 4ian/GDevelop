@@ -68,6 +68,7 @@ const GameHeader = ({game, onEditGame, gameUrl, onPublishOnGdGames}: Props): Rea
       >
         <div style={styles.iconAndText}>
           <DiscoverabilityIcon {...iconProps} />
+          // $FlowFixMe[incompatible-type]
           <Text {...textProps}>
             {game.discoverable && gameUrl ? (
               <Trans>Public on gd.games</Trans>
@@ -80,6 +81,7 @@ const GameHeader = ({game, onEditGame, gameUrl, onPublishOnGdGames}: Props): Rea
         </div>
         <div style={styles.iconAndText}>
           <AdsIcon {...iconProps} />
+          // $FlowFixMe[incompatible-type]
           <Text {...textProps}>
             {game.displayAdsOnGamePage ? (
               <Trans>Ad revenue sharing on</Trans>
@@ -90,6 +92,7 @@ const GameHeader = ({game, onEditGame, gameUrl, onPublishOnGdGames}: Props): Rea
         </div>
         <div style={styles.iconAndText}>
           <PlayerFeedbackIcon {...iconProps} />
+          // $FlowFixMe[incompatible-type]
           <Text {...textProps}>
             {game.acceptsGameComments ? (
               <Trans>Player feedback on</Trans>

@@ -9,9 +9,11 @@ export const unzipFirstEntryOfBlob = async (
 
   return new Promise((resolve, reject) => {
     zipJs.createReader(
+      // $FlowFixMe[invalid-constructor]
       new zipJs.BlobReader(zippedBlob),
       zipReader => {
         zipReader.getEntries(entries => {
+          // $FlowFixMe[invalid-constructor]
           entries[0].getData(new zipJs.TextWriter(), result => {
             resolve(result);
           });
@@ -30,10 +32,12 @@ export const createZipWithSingleTextFile = async (
   fileName: string = 'file.txt'
 ): Promise<Blob> => {
   const zipJs: ZipJs = await initializeZipJs();
+  // $FlowFixMe[invalid-constructor]
   const textReader = new zipJs.TextReader(textFileContent);
 
   return new Promise((resolve, reject) => {
     zipJs.createWriter(
+      // $FlowFixMe[invalid-constructor]
       new zipJs.BlobWriter('application/zip'),
       zipWriter => {
         zipWriter.add(fileName, textReader, () => {

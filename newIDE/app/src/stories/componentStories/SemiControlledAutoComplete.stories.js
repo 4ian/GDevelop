@@ -95,6 +95,7 @@ export const WithOnClickForSomeElements = (): React.Node => (
         <SemiControlledAutoComplete
           value={value}
           onChange={onChange}
+          // $FlowFixMe[incompatible-type]
           dataSource={[
             {
               text: '',
@@ -130,6 +131,7 @@ export const WithOnClickLongTextsAndRenderIcon = (): React.Node => (
         <SemiControlledAutoComplete
           value={value}
           onChange={onChange}
+          // $FlowFixMe[incompatible-type]
           dataSource={[
             {
               text: '',
@@ -181,6 +183,7 @@ export const InDialog = (): React.Node => (
         <SemiControlledAutoComplete
           value={value}
           onChange={onChange}
+          // $FlowFixMe[incompatible-type]
           dataSource={[
             {
               text: '',

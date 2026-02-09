@@ -28,6 +28,7 @@ export const uploadObjects = async (
 
   await Promise.all(
     uploadedObjects.map((params, index) =>
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       axios.put(signedUrls[index], params.Body, {
         headers: {
           'Content-Type': params.ContentType,

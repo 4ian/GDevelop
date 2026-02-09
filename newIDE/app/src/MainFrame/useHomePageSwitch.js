@@ -39,6 +39,7 @@ const useHomePageSwitch = (
       const initialDialog = routeArguments['initial-dialog'];
       if (!initialDialog) return;
 
+      // $FlowFixMe[incompatible-type]
       if (homePageRoutes.includes(initialDialog)) {
         closeDialogs();
         openHomePage();

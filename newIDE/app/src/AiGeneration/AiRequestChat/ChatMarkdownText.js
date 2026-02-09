@@ -84,6 +84,7 @@ function parseMarkdownLinks({
     const label = match[1];
     const url = match[2];
     elements.push(
+      // $FlowFixMe[incompatible-type]
       renderLink({ children: label, node: { properties: { href: url } } })
     );
 
@@ -144,6 +145,7 @@ export const ChatMarkdownText: component(...Props) = React.memo<Props>((props: P
     () => ({
       a: renderChatLink,
       code: renderChatCodeBlockWithChatLinks,
+      // $FlowFixMe[missing-local-annot]
       img: ({ node, ...props }) => (
         // eslint-disable-next-line jsx-a11y/alt-text
         <img style={{ display: 'flex' }} {...props} />
@@ -167,6 +169,7 @@ export const ChatMarkdownText: component(...Props) = React.memo<Props>((props: P
 
   const className = classNames({
     'gd-markdown': true,
+    // $FlowFixMe[invalid-computed-prop]
     [classes.chatMarkdown]: true,
   });
 

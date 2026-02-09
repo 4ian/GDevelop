@@ -185,6 +185,7 @@ export type GameLeaderboard = {
   topGameCommentQualityRatings: GameLeaderboardEntry[],
 };
 
+// $FlowFixMe[cannot-resolve-name]
 export const client: Axios = axios.create({
   baseURL: GDevelopGameApi.baseUrl,
 });
@@ -266,10 +267,12 @@ export const listAllShowcasedGames = async (): Promise<AllShowcasedGames> => {
 
   const responsesData = await Promise.all([
     axios
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       .get(gamesShowcaseUrl)
       .then(response => response.data)
       .catch(e => e),
     axios
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       .get(filtersUrl)
       .then(response => response.data)
       .catch(e => e),

@@ -107,6 +107,7 @@ export const NoProjectOpen = (): React.Node => {
                     isApplicationTopLevelMenu: false,
                     hideAskAi: false,
                   }}
+                  // $FlowFixMe[incompatible-type]
                   mainMenuCallbacks={mainMenuCallbacks}
                 />
               </FixedWidthFlexContainer>
@@ -182,6 +183,7 @@ export const ProjectOpen = (): React.Node => {
                     isApplicationTopLevelMenu: false,
                     hideAskAi: false,
                   }}
+                  // $FlowFixMe[incompatible-type]
                   mainMenuCallbacks={mainMenuCallbacks}
                 />
               </FixedWidthFlexContainer>

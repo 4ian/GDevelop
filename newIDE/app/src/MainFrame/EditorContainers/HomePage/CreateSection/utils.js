@@ -224,6 +224,7 @@ export const getExampleAndTemplateTiles = ({
   ) => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
   i18n: I18nType,
+  // $FlowFixMe[value-as-type]
   gdevelopTheme: GDevelopTheme,
   numberOfItemsExclusivelyInCarousel?: number,
   numberOfItemsInCarousel?: number,

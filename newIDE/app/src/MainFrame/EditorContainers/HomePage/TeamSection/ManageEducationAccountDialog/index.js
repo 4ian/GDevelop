@@ -195,6 +195,7 @@ const AddTeacherDialog = ({ onClose, onAddTeacher }: AddTeacherDialogProps) => {
           } else {
             error = 'unexpected';
           }
+          // $FlowFixMe[incompatible-type]
           setAddError(error);
         }
       } finally {
@@ -369,10 +370,13 @@ const ManageEducationAccountDialog = ({onClose}: Props): React.Node => {
     () => {
       if (!members) return;
       let content = 'Username,Full Name,Email,Password';
+      // $FlowFixMe[missing-empty-array-annot]
       let membersToConsider = [];
       if (selectedUserIds.length === 0) {
+        // $FlowFixMe[incompatible-type]
         membersToConsider = members.filter(member => !member.deactivatedAt);
       } else {
+        // $FlowFixMe[incompatible-type]
         membersToConsider = members.filter(member =>
           selectedUserIds.includes(member.id)
         );
@@ -449,6 +453,7 @@ const ManageEducationAccountDialog = ({onClose}: Props): React.Node => {
           } else {
             error = 'unexpected';
           }
+          // $FlowFixMe[incompatible-type]
           setRemoveAdminError(error);
         }
       } finally {

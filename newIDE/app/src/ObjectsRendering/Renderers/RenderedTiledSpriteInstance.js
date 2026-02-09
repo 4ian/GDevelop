@@ -9,12 +9,14 @@ const gd: libGDevelop = global.gd;
  * Renderer for gd.TiledSpriteObject
  */
 export default class RenderedTiledSpriteInstance extends RenderedInstance {
+  // $FlowFixMe[value-as-type]
   _texture: PIXI.Texture;
 
   constructor(
     project: gdProject,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
+    // $FlowFixMe[value-as-type]
     pixiContainer: PIXI.Container,
     pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {

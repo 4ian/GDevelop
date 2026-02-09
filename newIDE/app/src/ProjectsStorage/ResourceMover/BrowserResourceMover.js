@@ -37,9 +37,11 @@ const movers: {
 
   // Saving to "DownloadFile" will *not* change any resources, as it's a
   // "temporary save" that is made and given to the user.
+  // $FlowFixMe[incompatible-type]
   [`${CloudStorageProvider.internalName}=>${
     DownloadFileStorageProvider.internalName
   }`]: moveNothing,
+  // $FlowFixMe[incompatible-type]
   [`${UrlStorageProvider.internalName}=>${
     DownloadFileStorageProvider.internalName
   }`]: moveNothing,
@@ -54,6 +56,7 @@ const BrowserResourceMover: ResourceMover = {
       movers[
         `${oldStorageProvider.internalName}=>${newStorageProvider.internalName}`
       ];
+    // $FlowFixMe[constant-condition]
     if (!mover)
       throw new Error(
         `Can't find a ResourceMover for ${oldStorageProvider.internalName} to ${

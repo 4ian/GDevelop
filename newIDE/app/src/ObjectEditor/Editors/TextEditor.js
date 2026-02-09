@@ -113,6 +113,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
                 textObjectConfiguration.setBold(checked);
                 this.forceUpdate();
               }}
+              // $FlowFixMe[incompatible-type]
               style={styles.checkbox}
             />
             <Checkbox
@@ -122,6 +123,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
                 textObjectConfiguration.setItalic(checked);
                 this.forceUpdate();
               }}
+              // $FlowFixMe[incompatible-type]
               style={styles.checkbox}
             />
           </Line>

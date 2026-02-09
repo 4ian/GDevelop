@@ -17,6 +17,7 @@ export default class InstancesSelection {
 
   isInstanceSelected(instance: gdInitialInstance): any {
     for (var i = 0; i < this.selection.length; i++) {
+      // $FlowFixMe[incompatible-exact]
       if (gd.compare(this.selection[i], instance)) return true;
     }
 
@@ -109,11 +110,13 @@ export default class InstancesSelection {
   cleanNonExistingInstances(instancesContainer: gdInitialInstancesContainer) {
     const allExistingInstancePointers = new Set<number>();
     const functor = new gd.InitialInstanceJSFunctor();
-    // $FlowFixMe - typing is not correct.
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type] - typing is not correct.
+    // $FlowFixMe[cannot-write]
     functor.invoke = (instancePtr: number) => {
       allExistingInstancePointers.add(instancePtr);
     };
-    // $FlowFixMe
+    // $FlowFixMe[incompatible-type]
     instancesContainer.iterateOverInstances(functor);
     functor.delete();
 

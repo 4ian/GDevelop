@@ -184,6 +184,7 @@ export const authenticatedUserLoggedOutAttributes = {
   badges: null,
   cloudProjects: [] // Initialize to empty array to indicate that the loading is done.
  as Array<empty>
+  // $FlowFixMe[incompatible-type]
   cloudProjectsFetchingErrorLabel: null,
   receivedAssetPacks: [] // Initialize to empty array to indicate that the loading is done.
  as Array<empty>

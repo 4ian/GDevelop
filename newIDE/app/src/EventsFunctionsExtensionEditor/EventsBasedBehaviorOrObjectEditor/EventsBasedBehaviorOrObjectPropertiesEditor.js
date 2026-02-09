@@ -94,8 +94,11 @@ const getValidatedPropertyName = (
 const getChoicesArray = (
   property: gdNamedPropertyDescriptor
 ): Array<Choice> => {
+  // $FlowFixMe[incompatible-exact]
   return mapVector(property.getChoices(), choice => ({
+    // $FlowFixMe[incompatible-use]
     value: choice.getValue(),
+    // $FlowFixMe[incompatible-use]
     label: choice.getLabel(),
   }));
 };
@@ -152,6 +155,7 @@ export const EventsBasedBehaviorPropertiesEditor: component(
         const property = properties.insertNew(newName, index);
         property.setType('Number');
         forceUpdate();
+        // $FlowFixMe[constant-condition]
         onPropertiesUpdated && onPropertiesUpdated();
         //setJustAddedPropertyName(newName);
       },
@@ -201,6 +205,7 @@ export const EventsBasedBehaviorPropertiesEditor: component(
       (property: gdNamedPropertyDescriptor, enable: boolean) => {
         property.setHidden(enable);
         forceUpdate();
+        // $FlowFixMe[constant-condition]
         onPropertiesUpdated && onPropertiesUpdated();
       },
       [forceUpdate, onPropertiesUpdated]
@@ -210,6 +215,7 @@ export const EventsBasedBehaviorPropertiesEditor: component(
       (property: gdNamedPropertyDescriptor, enable: boolean) => {
         property.setAdvanced(enable);
         forceUpdate();
+        // $FlowFixMe[constant-condition]
         onPropertiesUpdated && onPropertiesUpdated();
       },
       [forceUpdate, onPropertiesUpdated]
@@ -219,6 +225,7 @@ export const EventsBasedBehaviorPropertiesEditor: component(
       (property: gdNamedPropertyDescriptor, enable: boolean) => {
         property.setDeprecated(enable);
         forceUpdate();
+        // $FlowFixMe[constant-condition]
         onPropertiesUpdated && onPropertiesUpdated();
       },
       [forceUpdate, onPropertiesUpdated]
@@ -237,6 +244,7 @@ export const EventsBasedBehaviorPropertiesEditor: component(
             {properties.getCount() > 0 ? (
               <Column noMargin expand>
                 {mapVector(
+                  // $FlowFixMe[incompatible-exact]
                   properties.getAllPropertyFolderOrProperty(),
                   (
                     propertyFolderOrProperty: gdPropertyFolderOrProperty,
@@ -290,6 +298,7 @@ export const EventsBasedBehaviorPropertiesEditor: component(
                                       property.setName(validatedNewName);
 
                                       forceUpdate();
+                                      // $FlowFixMe[constant-condition]
                                       onPropertiesUpdated &&
                                         onPropertiesUpdated();
                                     }}
@@ -384,6 +393,7 @@ export const EventsBasedBehaviorPropertiesEditor: component(
                                     }
                                     forceUpdate();
                                     onPropertyTypeChanged(property.getName());
+                                    // $FlowFixMe[constant-condition]
                                     onPropertiesUpdated &&
                                       onPropertiesUpdated();
                                   }}
@@ -480,6 +490,7 @@ export const EventsBasedBehaviorPropertiesEditor: component(
                                         )
                                       );
                                       forceUpdate();
+                                      // $FlowFixMe[constant-condition]
                                       onPropertiesUpdated &&
                                         onPropertiesUpdated();
                                     }}
@@ -537,6 +548,7 @@ export const EventsBasedBehaviorPropertiesEditor: component(
                                     onChange={newValue => {
                                       property.setValue(newValue);
                                       forceUpdate();
+                                      // $FlowFixMe[constant-condition]
                                       onPropertiesUpdated &&
                                         onPropertiesUpdated();
                                     }}
@@ -562,6 +574,7 @@ export const EventsBasedBehaviorPropertiesEditor: component(
                                     onChange={(e, i, value) => {
                                       property.setValue(value);
                                       forceUpdate();
+                                      // $FlowFixMe[constant-condition]
                                       onPropertiesUpdated &&
                                         onPropertiesUpdated();
                                     }}
@@ -615,6 +628,7 @@ export const EventsBasedBehaviorPropertiesEditor: component(
                                         behaviorMetadata.getFullName()
                                       );
                                       forceUpdate();
+                                      // $FlowFixMe[constant-condition]
                                       onPropertiesUpdated &&
                                         onPropertiesUpdated();
                                     }}
@@ -635,6 +649,7 @@ export const EventsBasedBehaviorPropertiesEditor: component(
                                     onChange={color => {
                                       property.setValue(color);
                                       forceUpdate();
+                                      // $FlowFixMe[constant-condition]
                                       onPropertiesUpdated &&
                                         onPropertiesUpdated();
                                     }}
@@ -650,6 +665,7 @@ export const EventsBasedBehaviorPropertiesEditor: component(
                                     onChange={(e, i, value) => {
                                       setExtraInfoString(property, value);
                                       forceUpdate();
+                                      // $FlowFixMe[constant-condition]
                                       onPropertiesUpdated &&
                                         onPropertiesUpdated();
                                     }}
@@ -670,6 +686,7 @@ export const EventsBasedBehaviorPropertiesEditor: component(
                                     onChange={(e, i, value) => {
                                       property.setValue(value);
                                       forceUpdate();
+                                      // $FlowFixMe[constant-condition]
                                       onPropertiesUpdated &&
                                         onPropertiesUpdated();
                                     }}

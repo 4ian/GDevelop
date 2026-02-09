@@ -8,9 +8,11 @@ import Physics3DEditor from './Editors/Physics3DEditor';
  */
 const BehaviorsEditorService = {
   getEditor(behaviorType: string): any {
+    // $FlowFixMe[object-this-reference]
     if (!this.components[behaviorType]) {
       return BehaviorPropertiesEditor; // Default properties editor
     }
+    // $FlowFixMe[object-this-reference]
     return this.components[behaviorType].component; // Custom  behavior editor
   },
   components: {

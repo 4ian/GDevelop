@@ -149,6 +149,7 @@ export const EventsBasedBehaviorOrObjectEditor: component(
         const property = properties.insertNew(newName, properties.getCount());
         property.setType('Number');
         forceUpdate();
+        // $FlowFixMe[constant-condition]
         onPropertiesUpdated && onPropertiesUpdated();
 
         // Scroll to the selected property.

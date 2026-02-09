@@ -314,29 +314,42 @@ export const getLayouts = (
       }
       if (layoutField === 'Show') {
         if (propertyValueString !== 'true') {
+          // $FlowFixMe[incompatible-type]
           layout.isShown = false;
         }
       } else if (layoutField === 'LeftPadding') {
+        // $FlowFixMe[prop-missing]
         layout.horizontalLayout.minSideAbsoluteMargin = propertyValueNumber;
       } else if (layoutField === 'RightPadding') {
+        // $FlowFixMe[prop-missing]
         layout.horizontalLayout.maxSideAbsoluteMargin = propertyValueNumber;
       } else if (layoutField === 'TopPadding') {
+        // $FlowFixMe[prop-missing]
         layout.verticalLayout.minSideAbsoluteMargin = propertyValueNumber;
       } else if (layoutField === 'BottomPadding') {
+        // $FlowFixMe[prop-missing]
         layout.verticalLayout.maxSideAbsoluteMargin = propertyValueNumber;
       } else if (layoutField === 'AnchorDeltaX') {
+        // $FlowFixMe[prop-missing]
         layout.horizontalLayout.anchorDelta = propertyValueNumber;
       } else if (layoutField === 'AnchorDeltaY') {
+        // $FlowFixMe[prop-missing]
         layout.verticalLayout.anchorDelta = propertyValueNumber;
       } else if (layoutField === 'IsScaledProportionallyOnX') {
+        // $FlowFixMe[prop-missing]
         layout.horizontalLayout.isScaledProportionally = propertyValueBoolean;
       } else if (layoutField === 'IsScaledProportionallyOnY') {
+        // $FlowFixMe[prop-missing]
         layout.verticalLayout.isScaledProportionally = propertyValueBoolean;
       } else if (layoutField === 'IsScaledProportionallyOnZ') {
+        // $FlowFixMe[prop-missing]
         layout.depthLayout.isScaledProportionally = propertyValueBoolean;
       } else if (layoutField === 'IsScaledProportionally') {
+        // $FlowFixMe[prop-missing]
         layout.horizontalLayout.isScaledProportionally = propertyValueBoolean;
+        // $FlowFixMe[prop-missing]
         layout.verticalLayout.isScaledProportionally = propertyValueBoolean;
+        // $FlowFixMe[prop-missing]
         layout.depthLayout.isScaledProportionally = propertyValueBoolean;
       } else {
         if (
@@ -349,12 +362,16 @@ export const getLayouts = (
               instanceProperties,
               horizontalAnchorTarget
             ) || propertyValueNumber;
+          // $FlowFixMe[invalid-compare]
           if (anchorOrigin !== null) {
+            // $FlowFixMe[prop-missing]
             layout.horizontalLayout.anchorOrigin = anchorOrigin;
           }
           if (horizontalAnchorTarget !== null) {
+            // $FlowFixMe[prop-missing]
             layout.horizontalLayout.anchorTarget = horizontalAnchorTarget;
           }
+          // $FlowFixMe[prop-missing]
           layout.horizontalLayout.anchorTargetObject = targetObjectName;
         }
         if (
@@ -367,12 +384,16 @@ export const getLayouts = (
               instanceProperties,
               horizontalAnchorTarget
             ) || propertyValueNumber;
+          // $FlowFixMe[invalid-compare]
           if (anchorOrigin !== null) {
+            // $FlowFixMe[prop-missing]
             layout.verticalLayout.anchorOrigin = anchorOrigin;
           }
           if (verticalAnchorTarget !== null) {
+            // $FlowFixMe[prop-missing]
             layout.verticalLayout.anchorTarget = verticalAnchorTarget;
           }
+          // $FlowFixMe[prop-missing]
           layout.verticalLayout.anchorTargetObject = targetObjectName;
         }
       }

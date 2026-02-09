@@ -64,6 +64,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
       this._setPreviewedLayout();
     }
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
+      // $FlowFixMe[method-unbinding]
       this.onResourceExternallyChanged.bind(this)
     );
   }

@@ -184,6 +184,7 @@ export const prepareAiUserContent = async (
     await Promise.all([
       gameProjectJsonSignedUrl
         ? retryIfFailed({ times: 3 }, () =>
+            // $FlowFixMe[underconstrained-implicit-instantiation]
             axios.put(gameProjectJsonSignedUrl, simplifiedProjectJson, {
               headers: {
                 'Content-Type': 'application/json',
@@ -200,6 +201,7 @@ export const prepareAiUserContent = async (
         : null,
       projectSpecificExtensionsSummaryJsonSignedUrl
         ? retryIfFailed({ times: 3 }, () =>
+            // $FlowFixMe[underconstrained-implicit-instantiation]
             axios.put(
               projectSpecificExtensionsSummaryJsonSignedUrl,
               projectSpecificExtensionsSummaryJson,
@@ -224,6 +226,7 @@ export const prepareAiUserContent = async (
         : null,
       eventsJsonSignedUrl
         ? retryIfFailed({ times: 3 }, () =>
+            // $FlowFixMe[underconstrained-implicit-instantiation]
             axios.put(eventsJsonSignedUrl, eventsJson, {
               headers: {
                 'Content-Type': 'application/json',

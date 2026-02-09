@@ -56,6 +56,7 @@ export default class CommentEvent extends React.Component<
   EventRendererProps,
   State
 > {
+  // $FlowFixMe[missing-local-annot]
   state = {
     editing: false,
     editingPreviousValue: null,

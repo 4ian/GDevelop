@@ -61,6 +61,7 @@ export const getOtherProductsFromSameAuthorTiles = <
     return null;
   }
 
+  // $FlowFixMe[incompatible-type]
   return otherProductListingDatasFromSameCreator
     .filter(
       // Filter out the current product.
@@ -399,6 +400,7 @@ export const getProductsIncludedInBundleTiles = ({
     return null;
   }
 
+  // $FlowFixMe[incompatible-type]
   return productsIncludedInBundle
     .map(includedProductListingData => {
       const isProductOwned =
@@ -768,6 +770,7 @@ export const getProductMediaItems = <
   if (product.previewSoundUrls) {
     uniqueMediaItems.push(
       ...product.previewSoundUrls.map(url => ({
+        // $FlowFixMe[incompatible-type]
         kind: 'audio',
         url,
       }))

@@ -272,7 +272,7 @@ export const EventsFunctionPropertiesEditor = (
                         fullWidth
                         disabled={!!freezeEventsFunctionType}
                         onChange={(e, i, valueString: string) => {
-                          // $FlowFixMe
+                          // $FlowFixMe[incompatible-type]
                           const value: EventsFunction_FunctionType = valueString;
                           eventsFunction.setFunctionType(value);
                           if (onConfigurationUpdated)

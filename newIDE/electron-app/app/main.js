@@ -46,6 +46,32 @@ const {
 } = require('./LocalGDJSDevelopmentWatcher');
 const { setupWatcher, disableWatcher } = require('./LocalFilesystemWatcher');
 
+const isMac = process.platform === 'darwin';
+
+/**
+ * Ensures paste operations work in all web content (notably Monaco editor)
+ * by intercepting Cmd/Ctrl+V before Electron's menu accelerators consume the
+ * event, and explicitly calling webContents.paste().
+ * See https://github.com/microsoft/monaco-editor/issues/4855
+ *
+ * This may be fixed in future monaco-editor versions, starting from 0.56.0 when it's released.
+ */
+const setupPasteHandler = window => {
+  window.webContents.on('before-input-event', (event, input) => {
+    const isCmdOrCtrl = isMac ? input.meta === true : input.control === true;
+    const hasShift = input.shift === true;
+    const hasAlt = input.alt === true;
+    const isV = input.code === 'KeyV' || input.key === 'v';
+    const shouldPaste =
+      input.type === 'keyDown' && isCmdOrCtrl && !hasShift && !hasAlt && isV;
+
+    if (shouldPaste) {
+      window.webContents.paste();
+      event.preventDefault();
+    }
+  });
+};
+
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
 
@@ -206,6 +232,9 @@ function createNewWindow(windowArgs = args) {
 
   // Enable `@electron/remote` module for renderer process
   require('@electron/remote/main').enable(newWindow.webContents);
+
+  // Ensure paste works in web content (e.g., Monaco editor).
+  setupPasteHandler(newWindow);
 
   // Log process ID to verify separate renderer processes
   newWindow.webContents.once('did-finish-load', () => {
@@ -664,10 +693,22 @@ app.on('ready', function() {
     try {
       if (platform === 'win32') {
         // Windows: open cmd window that stays open after npm command
-        child_process.spawn('cmd.exe', ['/c', 'start', 'cmd.exe', '/k', `cd ${projectPath} && ${npmCommand}`], {
-          detached: true,
-          stdio: 'ignore',
-        }).unref();
+        child_process
+          .spawn(
+            'cmd.exe',
+            [
+              '/c',
+              'start',
+              'cmd.exe',
+              '/k',
+              `cd ${projectPath} && ${npmCommand}`,
+            ],
+            {
+              detached: true,
+              stdio: 'ignore',
+            }
+          )
+          .unref();
       } else if (platform === 'darwin') {
         const escapedPath = projectPath.replace(/'/g, "'\\''");
         const script = `tell application "Terminal" to do script "cd '${escapedPath}' && ${npmCommand}"`;
@@ -679,13 +720,16 @@ app.on('ready', function() {
         // Linux: try common terminal emulators
         const bashCommand = `cd "${projectPath}" && ${npmCommand}; exec bash`;
         const terminals = [
-          { cmd: 'x-terminal-emulator', args: ['-e', 'bash', '-c', bashCommand] },
+          {
+            cmd: 'x-terminal-emulator',
+            args: ['-e', 'bash', '-c', bashCommand],
+          },
           { cmd: 'gnome-terminal', args: ['--', 'bash', '-c', bashCommand] },
           { cmd: 'konsole', args: ['-e', 'bash', '-c', bashCommand] },
           { cmd: 'xterm', args: ['-e', 'bash', '-c', bashCommand] },
         ];
 
-        const tryTerminal = (index) => {
+        const tryTerminal = index => {
           if (index >= terminals.length) {
             log.error('No terminal emulator found');
             return;

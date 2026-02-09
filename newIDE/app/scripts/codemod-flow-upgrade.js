@@ -343,8 +343,21 @@ function run() {
         replaceValue: 'img: ({ node, ...props }: any) => (',
       },
       {
-        searchValue: /const className = classNames\(\{\n([\s\S]*?)\n\}\);/g,
-        replaceValue: 'const className = classNames(({\\n$1\\n}: {[string]: boolean}));',
+        searchValue:
+          /const className = classNames[\s\S]*?return <span className=\{className\}>\{markdownElement\}<\/span>;/g,
+        replaceValue:
+          `const className = classNames(
+  ({
+    'gd-markdown': true,
+    [classes.chatMarkdown]: true,
+  }: {[string]: boolean})
+);
+
+  return <span className={className}>{markdownElement}</span>;`,
+      },
+      {
+        searchValue: '\\n}: {[string]: boolean}));',
+        replaceValue: '',
       },
     ])
   ) {
@@ -371,6 +384,10 @@ function run() {
       {
         searchValue: /let pendingFunctionCallItems = \[\];/g,
         replaceValue: 'let pendingFunctionCallItems: Array<any> = [];',
+      },
+      {
+        searchValue: /return \[\];/g,
+        replaceValue: 'return ([]: Array<any>);',
       },
       {
         searchValue: /React\.useState\(\{\}\)/g,

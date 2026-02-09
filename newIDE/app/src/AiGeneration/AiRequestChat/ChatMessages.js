@@ -907,7 +907,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(functi
             ];
           }
 
-          return [];
+          return ([]: Array<any>);
         })
         .filter(Boolean)}
 

@@ -165,8 +165,11 @@ export const ChatMarkdownText: React.ComponentType<Props> = React.memo<Props>((p
     </I18n>
   );
 
-  const className = classNames(({\n    'gd-markdown': true,
+  const className = classNames(
+  ({
+    'gd-markdown': true,
     [classes.chatMarkdown]: true,
-  });
+  }: {[string]: boolean})
+);
 
-  return <span className={className}>{markdownElement}</span>;\n}: {[string]: boolean}));
+  return <span className={className}>{markdownElement}</span>;

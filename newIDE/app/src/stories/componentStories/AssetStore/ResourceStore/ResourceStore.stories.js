@@ -34,13 +34,13 @@ const ResourceStoreStory = ({ kind }: {| kind: 'audio' | 'font' | 'svg' |}) => {
   );
 };
 
-export const AudioResource = (): renders any => <ResourceStoreStory kind="audio" />;
+export const AudioResource = (): renders* => <ResourceStoreStory kind="audio" />;
 
-export const FontResource = (): renders any => <ResourceStoreStory kind="font" />;
+export const FontResource = (): renders* => <ResourceStoreStory kind="font" />;
 
-export const SvgResource = (): renders any => <ResourceStoreStory kind="svg" />;
+export const SvgResource = (): renders* => <ResourceStoreStory kind="svg" />;
 
-export const FontResourceWithLoadingError = (): renders any => {
+export const FontResourceWithLoadingError = (): renders* => {
   const axiosMock = new MockAdapter(assetApiClient, { delayResponse: 500 });
   axiosMock.onAny().reply(500);
 

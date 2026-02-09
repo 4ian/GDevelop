@@ -132,7 +132,7 @@ const AskAIHistoryContentStoryTemplate = ({
   </FixedHeightFlexContainer>
 );
 
-export const Loading = (): renders any => (
+export const Loading = (): renders* => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{}}
     isLoading={true}
@@ -142,7 +142,7 @@ export const Loading = (): renders any => (
   />
 );
 
-export const Errored = (): renders any => (
+export const Errored = (): renders* => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{}}
     isLoading={false}
@@ -152,7 +152,7 @@ export const Errored = (): renders any => (
   />
 );
 
-export const Empty = (): renders any => (
+export const Empty = (): renders* => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{}}
     isLoading={false}
@@ -162,7 +162,7 @@ export const Empty = (): renders any => (
   />
 );
 
-export const SingleAiRequest = (): renders any => (
+export const SingleAiRequest = (): renders* => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
       'request-1': createFakeAiRequest({
@@ -178,7 +178,7 @@ export const SingleAiRequest = (): renders any => (
   />
 );
 
-export const MultipleAiRequests = (): renders any => (
+export const MultipleAiRequests = (): renders* => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
       'request-1': createFakeAiRequest({
@@ -203,7 +203,7 @@ export const MultipleAiRequests = (): renders any => (
   />
 );
 
-export const WithSelectedRequest = (): renders any => (
+export const WithSelectedRequest = (): renders* => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
       'request-1': createFakeAiRequest({
@@ -224,7 +224,7 @@ export const WithSelectedRequest = (): renders any => (
   />
 );
 
-export const WithWorkingRequest = (): renders any => (
+export const WithWorkingRequest = (): renders* => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
       'request-1': createFakeAiRequest({
@@ -245,7 +245,7 @@ export const WithWorkingRequest = (): renders any => (
   />
 );
 
-export const WithErroredRequest = (): renders any => (
+export const WithErroredRequest = (): renders* => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
       'request-1': createFakeAiRequest({
@@ -267,7 +267,7 @@ export const WithErroredRequest = (): renders any => (
   />
 );
 
-export const RefreshingRequests = (): renders any => (
+export const RefreshingRequests = (): renders* => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
       'request-1': createFakeAiRequest({

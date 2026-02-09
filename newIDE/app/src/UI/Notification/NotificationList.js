@@ -31,7 +31,7 @@ const NotificationList = (
     onMarkNotificationAsSeen,
     onCloseNotificationList
   }: Props,
-): renders any => {
+): renders* => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [showAll, setShowAll] = React.useState<boolean>(false);
 

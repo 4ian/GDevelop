@@ -59,7 +59,7 @@ const ScenePropertiesDialog = (
     projectScopedContainersAccessor,
     onBackgroundColorChanged
   }: Props,
-): renders any => {
+): renders* => {
   const [windowTitle, setWindowTitle] = React.useState<string>(
     layout.getWindowDefaultTitle()
   );

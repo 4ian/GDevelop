@@ -21,7 +21,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <FeedbackCard
     comment={commentUnprocessed}
     authenticatedUser={fakeSilverAuthenticatedUser}
@@ -29,7 +29,7 @@ export const Default = (): renders any => (
   />
 );
 
-export const WithoutText = (): renders any => (
+export const WithoutText = (): renders* => (
   <FeedbackCard
     comment={commentWithNoTextUnprocessed}
     authenticatedUser={fakeSilverAuthenticatedUser}
@@ -37,7 +37,7 @@ export const WithoutText = (): renders any => (
   />
 );
 
-export const Processed = (): renders any => (
+export const Processed = (): renders* => (
   <FeedbackCard
     comment={commentProcessed}
     authenticatedUser={fakeSilverAuthenticatedUser}
@@ -45,7 +45,7 @@ export const Processed = (): renders any => (
   />
 );
 
-export const WithContact = (): renders any => (
+export const WithContact = (): renders* => (
   <FeedbackCard
     comment={{
       ...commentUnprocessed,
@@ -56,7 +56,7 @@ export const WithContact = (): renders any => (
   />
 );
 
-export const WithNamedBuild = (): renders any => (
+export const WithNamedBuild = (): renders* => (
   <FeedbackCard
     comment={commentUnprocessed}
     buildProperties={{
@@ -69,7 +69,7 @@ export const WithNamedBuild = (): renders any => (
   />
 );
 
-export const WithAuthenticatedPlayer = (): renders any => (
+export const WithAuthenticatedPlayer = (): renders* => (
   <FeedbackCard
     comment={{
       ...commentUnprocessed,
@@ -80,7 +80,7 @@ export const WithAuthenticatedPlayer = (): renders any => (
   />
 );
 
-export const WithAuthenticatedPlayerAndContact = (): renders any => (
+export const WithAuthenticatedPlayerAndContact = (): renders* => (
   <FeedbackCard
     comment={{
       ...commentUnprocessed,
@@ -92,7 +92,7 @@ export const WithAuthenticatedPlayerAndContact = (): renders any => (
   />
 );
 
-export const FeedbackCardWithUnnamedBuild = (): renders any => (
+export const FeedbackCardWithUnnamedBuild = (): renders* => (
   <FeedbackCard
     comment={commentUnprocessed}
     buildProperties={{ id: 'build-id', isDeleted: false }}
@@ -101,7 +101,7 @@ export const FeedbackCardWithUnnamedBuild = (): renders any => (
   />
 );
 
-export const FeedbackCardWithDeletedBuild = (): renders any => (
+export const FeedbackCardWithDeletedBuild = (): renders* => (
   <FeedbackCard
     comment={commentUnprocessed}
     buildProperties={{ id: 'build-id', isDeleted: true }}

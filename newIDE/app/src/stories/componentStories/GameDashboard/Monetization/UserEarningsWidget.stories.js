@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Errored = (): renders any => {
+export const Errored = (): renders* => {
   const mock = new MockAdapter(axios, { delayResponse: 500 });
   mock
     .onGet(`${GDevelopUsageApi.baseUrl}/user-earnings-balance`)
@@ -35,7 +35,7 @@ export const Errored = (): renders any => {
   );
 };
 
-export const NoEarnings = (): renders any => {
+export const NoEarnings = (): renders* => {
   const mock = new MockAdapter(axios, { delayResponse: 500 });
   mock
     .onGet(`${GDevelopUsageApi.baseUrl}/user-earnings-balance`)
@@ -63,7 +63,7 @@ export const NoEarnings = (): renders any => {
   );
 };
 
-export const LittleEarnings = (): renders any => {
+export const LittleEarnings = (): renders* => {
   const mock = new MockAdapter(axios, { delayResponse: 500 });
   mock
     .onGet(`${GDevelopUsageApi.baseUrl}/user-earnings-balance`)
@@ -91,7 +91,7 @@ export const LittleEarnings = (): renders any => {
   );
 };
 
-export const SomeEarnings = (): renders any => {
+export const SomeEarnings = (): renders* => {
   const mock = new MockAdapter(axios, { delayResponse: 500 });
   mock
     .onGet(`${GDevelopUsageApi.baseUrl}/user-earnings-balance`)
@@ -119,7 +119,7 @@ export const SomeEarnings = (): renders any => {
   );
 };
 
-export const ALotOfEarnings = (): renders any => {
+export const ALotOfEarnings = (): renders* => {
   const mock = new MockAdapter(axios, { delayResponse: 500 });
   mock
     .onGet(`${GDevelopUsageApi.baseUrl}/user-earnings-balance`)

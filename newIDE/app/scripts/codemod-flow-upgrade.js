@@ -14,6 +14,7 @@ const TARGET_DIRS = [
   path.join(appRoot, 'flow-typed'),
   path.join(repoRoot, 'GDevelop.js', 'types'),
 ];
+const SRC_DIR = path.join(appRoot, 'src');
 
 function collectJsFiles(directory) {
   if (!fs.existsSync(directory)) return [];
@@ -229,6 +230,8 @@ function run() {
             /declare type Connector<SP: \{\.\.\.\}, CP: \{\.\.\.\}> = [\s\S]*?\);\n/,
           replaceValue: 'declare type Connector<SP: {...}, CP: {...}> = any;\n',
         },
+        { searchValue: /DropTargetTypes<[^>]+>/g, replaceValue: 'any' },
+        { searchValue: /\bDropTargetTypes\b/g, replaceValue: 'any' },
         { searchValue: /React\$Element<[^>]+>/g, replaceValue: 'any' },
         { searchValue: /\bHTMLElement\b/g, replaceValue: 'any' },
         { searchValue: /React\$ComponentType<[^>]+>/g, replaceValue: 'any' },
@@ -260,6 +263,35 @@ function run() {
   }
 
   if (ensureGDevelopShims()) updatedFiles += 1;
+
+  const renderReplacements = [
+    { searchValue: /renders any\b/g, replaceValue: 'renders*' },
+    { searchValue: /renders React\.Node\b/g, replaceValue: 'renders*' },
+    { searchValue: /renders React\$Node\b/g, replaceValue: 'renders*' },
+  ];
+
+  const srcFiles = collectJsFiles(SRC_DIR);
+  for (const filePath of srcFiles) {
+    if (applyTextReplacements(filePath, renderReplacements)) updatedFiles += 1;
+  }
+
+  const chatMarkdownTextPath = path.join(
+    appRoot,
+    'src',
+    'AiGeneration',
+    'AiRequestChat',
+    'ChatMarkdownText.js'
+  );
+  if (
+    applyTextReplacements(chatMarkdownTextPath, [
+      {
+        searchValue: /const elements = \[\];/g,
+        replaceValue: 'const elements: Array<React.Node> = [];',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
 
   for (const filePath of jsFiles) {
     if (replaceExistentials(filePath)) updatedFiles += 1;

@@ -45,7 +45,7 @@ type Props = {|
   onOpenProfile: () => void,
 |};
 
-const UserChip = ({onOpenProfile}: Props): React.MixedElement | renders any => {
+const UserChip = ({onOpenProfile}: Props): React.MixedElement | renders* => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
     profile,

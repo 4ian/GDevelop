@@ -8,7 +8,7 @@ import VariablesList from '../../VariablesList/VariablesList';
 import DragAndDropContextProvider from '../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList
@@ -30,7 +30,7 @@ export const Default = (): renders any => (
   </DragAndDropContextProvider>
 );
 
-export const Compact = (): renders any => (
+export const Compact = (): renders* => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList
@@ -53,7 +53,7 @@ export const Compact = (): renders any => (
   </DragAndDropContextProvider>
 );
 
-export const InstanceWithObjectVariables = (): renders any => (
+export const InstanceWithObjectVariables = (): renders* => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList
@@ -77,7 +77,7 @@ export const InstanceWithObjectVariables = (): renders any => (
   </DragAndDropContextProvider>
 );
 
-export const Locked = (): renders any => (
+export const Locked = (): renders* => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList
@@ -99,7 +99,7 @@ export const Locked = (): renders any => (
   </DragAndDropContextProvider>
 );
 
-export const LockedCompact = (): renders any => (
+export const LockedCompact = (): renders* => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList
@@ -122,7 +122,7 @@ export const LockedCompact = (): renders any => (
   </DragAndDropContextProvider>
 );
 
-export const LockedInstanceWithObjectVariables = (): renders any => (
+export const LockedInstanceWithObjectVariables = (): renders* => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList

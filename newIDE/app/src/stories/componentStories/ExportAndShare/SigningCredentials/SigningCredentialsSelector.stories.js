@@ -23,7 +23,7 @@ export default {
   decorators: [alertDecorator, paperDecorator],
 };
 
-export const Errored = (): renders any => {
+export const Errored = (): renders* => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock.onAny().reply(500);
 
@@ -41,7 +41,7 @@ export const Errored = (): renders any => {
   );
 };
 
-export const WithSigningCredentialsButNonePreSelected = (): renders any => {
+export const WithSigningCredentialsButNonePreSelected = (): renders* => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock
     .onGet(`${GDevelopBuildApi.baseUrl}/signing-credential`)
@@ -78,7 +78,7 @@ export const WithSigningCredentialsButNonePreSelected = (): renders any => {
   );
 };
 
-export const WithSigningCredentialsAndOnePreSelected = (): renders any => {
+export const WithSigningCredentialsAndOnePreSelected = (): renders* => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock
     .onGet(`${GDevelopBuildApi.baseUrl}/signing-credential`)

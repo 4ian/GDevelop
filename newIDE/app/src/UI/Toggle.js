@@ -58,7 +58,7 @@ type Props = {|
 /**
  * A toggle based on Material-UI Toggle.
  */
-const Toggle = ({label, toggled, onToggle, disabled, labelPosition, style}: Props): renders any => {
+const Toggle = ({label, toggled, onToggle, disabled, labelPosition, style}: Props): renders* => {
   const formClasses = useFormStyles();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const switchClasses = useSwitchStyles({

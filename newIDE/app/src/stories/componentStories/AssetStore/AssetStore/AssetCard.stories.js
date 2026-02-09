@@ -11,6 +11,6 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <AssetCard size={128} assetShortHeader={fakeAssetShortHeader1} />
 );

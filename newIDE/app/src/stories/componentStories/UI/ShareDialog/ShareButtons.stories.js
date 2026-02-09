@@ -10,6 +10,6 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const DefaultSocialShareButtons = (): renders any => (
+export const DefaultSocialShareButtons = (): renders* => (
   <SocialShareButtons url={'https://gd.games/username/game-slug'} />
 );

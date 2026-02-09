@@ -46,7 +46,7 @@ type Props = {|
   disableQuitting: boolean,
 |};
 
-const OpenedVersionStatusChip = ({openedVersionStatus, onQuit, disableQuitting}: Props): null | renders any => {
+const OpenedVersionStatusChip = ({openedVersionStatus, onQuit, disableQuitting}: Props): null | renders* => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const classes = useStylesCloseIconButton();
   if (!openedVersionStatus) return null;

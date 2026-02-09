@@ -265,7 +265,7 @@ type Props = {|
 
 const AssetsList: component(
   ...{ ...Props, +ref?: React.RefSetter<AssetsListInterface> }
-) renders React$Node = React.forwardRef<Props, AssetsListInterface>(
+) renders* = React.forwardRef<Props, AssetsListInterface>(
   (
     {
       assetShortHeaders,

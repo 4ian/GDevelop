@@ -27,7 +27,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const NoGamesOrProjects = (): renders any => {
+export const NoGamesOrProjects = (): renders* => {
   const projectFiles = [];
 
   const preferences: Preferences = {
@@ -74,7 +74,7 @@ export const NoGamesOrProjects = (): renders any => {
   );
 };
 
-export const WithOnlyGames = (): renders any => {
+export const WithOnlyGames = (): renders* => {
   const projectFiles = [
     {
       ...fakeFileMetadataAndStorageProviderNameForLocalProject,
@@ -129,7 +129,7 @@ export const WithOnlyGames = (): renders any => {
   );
 };
 
-export const WithOnlyProjects = (): renders any => {
+export const WithOnlyProjects = (): renders* => {
   const projectFiles = [
     fakeFileMetadataAndStorageProviderNameForCloudProject,
     fakeFileMetadataAndStorageProviderNameForLocalProject,
@@ -179,7 +179,7 @@ export const WithOnlyProjects = (): renders any => {
   );
 };
 
-export const WithGamesAndProjects = (): renders any => {
+export const WithGamesAndProjects = (): renders* => {
   const projectFiles = [
     fakeFileMetadataAndStorageProviderNameForCloudProject,
     fakeFileMetadataAndStorageProviderNameForLocalProject,

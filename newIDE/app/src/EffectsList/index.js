@@ -772,7 +772,7 @@ type Props = {|
  *
  * All available effects are fetched from the project's platform.
  */
-export default function EffectsList(props: Props): renders any {
+export default function EffectsList(props: Props): renders* {
   const {
     effectsContainer,
     onEffectsUpdated,

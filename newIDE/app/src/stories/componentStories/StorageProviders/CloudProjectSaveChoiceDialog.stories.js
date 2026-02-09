@@ -11,7 +11,7 @@ export default {
   component: CloudProjectSaveChoiceDialog,
 };
 
-export const Default = (): renders any => {
+export const Default = (): renders* => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   React.useEffect(

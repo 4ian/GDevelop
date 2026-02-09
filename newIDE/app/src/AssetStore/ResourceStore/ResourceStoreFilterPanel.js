@@ -168,7 +168,7 @@ export const ResourceStoreFilterPanel = (
   }: {
     resourceKind: 'audio' | 'font',
   },
-): renders any => {
+): renders* => {
   const {
     audioFiltersState,
     fontFiltersState,

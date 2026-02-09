@@ -150,7 +150,7 @@ type Props = {|
   onSelectCourse: (courseListingData: CourseListingData) => void,
 |};
 
-const TutorialsCategoryPage = ({category, onBack, onOpenTemplateFromTutorial, onSelectCourse}: Props): renders any => {
+const TutorialsCategoryPage = ({category, onBack, onOpenTemplateFromTutorial, onSelectCourse}: Props): renders* => {
   const { listedCourses } = React.useContext(CourseStoreContext);
   const { limits } = React.useContext(AuthenticatedUserContext);
   const { tutorials } = React.useContext(TutorialContext);

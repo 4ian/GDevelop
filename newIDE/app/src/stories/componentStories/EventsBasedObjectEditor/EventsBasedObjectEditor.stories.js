@@ -15,7 +15,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <EventsBasedObjectEditor
     eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
     eventsBasedObject={testProject.testEventsBasedObject}

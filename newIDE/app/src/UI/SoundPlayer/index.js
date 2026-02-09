@@ -63,7 +63,7 @@ export type SoundPlayerInterface = {|
 
 const SoundPlayer: component(
   ...{ ...Props, +ref?: React.RefSetter<SoundPlayerInterface> }
-) renders React$Node = React.forwardRef<Props, SoundPlayerInterface>(
+) renders* = React.forwardRef<Props, SoundPlayerInterface>(
   (
     {
       soundSrc,

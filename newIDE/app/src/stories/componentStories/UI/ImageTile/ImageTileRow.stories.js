@@ -31,7 +31,7 @@ const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
   }
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <ImageTileRow
     items={itemsWithJustImage}
     title="Recommended templates"
@@ -42,7 +42,7 @@ export const Default = (): renders any => (
   />
 );
 
-export const Loading = (): renders any => (
+export const Loading = (): renders* => (
   <ImageTileRow
     items={itemsWithJustImage}
     isLoading
@@ -54,7 +54,7 @@ export const Loading = (): renders any => (
   />
 );
 
-export const WithDescription = (): renders any => (
+export const WithDescription = (): renders* => (
   <ImageTileRow
     items={itemsWithJustImage}
     title="Recommended templates"
@@ -66,7 +66,7 @@ export const WithDescription = (): renders any => (
   />
 );
 
-export const WithTitleAndDescription = (): renders any => (
+export const WithTitleAndDescription = (): renders* => (
   <ImageTileRow
     items={itemsWithTitleAndDescription}
     title="Recommended templates"
@@ -77,7 +77,7 @@ export const WithTitleAndDescription = (): renders any => (
   />
 );
 
-export const WithOverlay = (): renders any => (
+export const WithOverlay = (): renders* => (
   <ImageTileRow
     items={itemsWithOverlay}
     title="Recommended templates"
@@ -88,7 +88,7 @@ export const WithOverlay = (): renders any => (
   />
 );
 
-export const WithLocks = (): renders any => (
+export const WithLocks = (): renders* => (
   <ImageTileRow
     items={itemsWithLocks}
     title="Recommended templates"
@@ -99,7 +99,7 @@ export const WithLocks = (): renders any => (
   />
 );
 
-export const WithNoCroppingOnMobile = (): renders any => (
+export const WithNoCroppingOnMobile = (): renders* => (
   <ImageTileRow
     items={itemsWithJustImage}
     title="Recommended templates"

@@ -49,7 +49,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const NotLoggedInOrOffline = (): renders any => {
+export const NotLoggedInOrOffline = (): renders* => {
   return (
     <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <InviteHome cloudProjectId="owned-project-id" />
@@ -57,7 +57,7 @@ export const NotLoggedInOrOffline = (): renders any => {
   );
 };
 
-export const ProjectNotSaved = (): renders any => {
+export const ProjectNotSaved = (): renders* => {
   return (
     <AuthenticatedUserContext.Provider value={fakeStartupAuthenticatedUser}>
       <InviteHome cloudProjectId={null} />
@@ -65,7 +65,7 @@ export const ProjectNotSaved = (): renders any => {
   );
 };
 
-export const NoStartupSubscription = (): renders any => {
+export const NoStartupSubscription = (): renders* => {
   const projectApiMock = React.useMemo(() => {
     const mock = new MockAdapter(projectApiClient, {
       delayResponse: 500,
@@ -99,7 +99,7 @@ export const NoStartupSubscription = (): renders any => {
   );
 };
 
-export const NotOwnerOfProject = (): renders any => {
+export const NotOwnerOfProject = (): renders* => {
   const projectApiMock = React.useMemo(() => {
     const mock = new MockAdapter(projectApiClient, {
       delayResponse: 500,
@@ -133,7 +133,7 @@ export const NotOwnerOfProject = (): renders any => {
   );
 };
 
-export const Errored = (): renders any => {
+export const Errored = (): renders* => {
   const projectApiMock = React.useMemo(() => {
     const mock = new MockAdapter(projectApiClient, {
       delayResponse: 500,
@@ -167,7 +167,7 @@ export const Errored = (): renders any => {
   );
 };
 
-export const WithCollaborators = (): renders any => {
+export const WithCollaborators = (): renders* => {
   const projectApiMock = React.useMemo(() => {
     const mock = new MockAdapter(projectApiClient, {
       delayResponse: 500,

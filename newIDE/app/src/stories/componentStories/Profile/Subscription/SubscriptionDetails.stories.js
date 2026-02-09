@@ -128,7 +128,7 @@ export const Default = (
     userState: string,
     pricingSystem: string,
   |},
-): renders any => {
+): renders* => {
   const authenticatedUser = loading
     ? fakeAuthenticatedUserLoggingIn
     : getUserFromState(userState);

@@ -45,7 +45,7 @@ const getStyles = ({ verticalDesign }) => ({
   },
 });
 
-export const accountsAlreadyExistsWithDifferentProviderCopy: renders any = (
+export const accountsAlreadyExistsWithDifferentProviderCopy: renders* = (
   <Trans>
     You already have an account for this email address with a different provider
     (Google, Apple or GitHub). Please try with one of those.

@@ -2371,4 +2371,4 @@ const EventsSheet = (props, ref) => {
 
 export default React.forwardRef<Props, EventsSheetInterface>(EventsSheet) as component(
   ...{ ...Props, +ref?: React.RefSetter<EventsSheetInterface> }
-) renders React$Node;
+) renders*;

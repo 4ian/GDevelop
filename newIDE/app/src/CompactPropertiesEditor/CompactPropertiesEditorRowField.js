@@ -24,7 +24,7 @@ type Props = {|
   field: React.Node,
 |};
 
-const CompactPropertiesEditorRowField = (props: Props): renders any => {
+const CompactPropertiesEditorRowField = (props: Props): renders* => {
   const title = !props.markdownDescription
     ? props.label
     : [

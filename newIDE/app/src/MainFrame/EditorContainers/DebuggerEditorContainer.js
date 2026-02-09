@@ -141,4 +141,4 @@ export class DebuggerEditorContainer extends React.Component<
   }
 }
 
-export const renderDebuggerEditorContainer = (props: RenderEditorContainerPropsWithRef): renders any => <DebuggerEditorContainer {...props} />;
+export const renderDebuggerEditorContainer = (props: RenderEditorContainerPropsWithRef): renders* => <DebuggerEditorContainer {...props} />;

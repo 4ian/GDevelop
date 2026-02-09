@@ -189,7 +189,7 @@ const PropertiesEditor = (
     projectScopedContainersAccessor,
     resourceManagementProps
   }: Props,
-): renders any => {
+): renders* => {
   const forceUpdate = useForceUpdate();
 
   const _onInstancesModified = React.useCallback(

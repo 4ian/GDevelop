@@ -127,7 +127,7 @@ const SubscriptionOptions = (
     onClick: (string) => void,
     disabled?: boolean,
   |},
-): renders any => {
+): renders* => {
   return (
     <I18n>
       {({ i18n }) => (

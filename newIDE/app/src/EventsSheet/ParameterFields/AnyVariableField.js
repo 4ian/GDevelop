@@ -131,7 +131,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   },
 ) as component(
   ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
-) renders React$Node;
+) renders*;
 
 export const getVariableSourceFromIdentifier = (
   variableName: string,

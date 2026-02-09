@@ -277,7 +277,7 @@ const fakeOutputWithFunctionCallWithSameCallId = [
   },
 ];
 
-export const ReadyAiRequestWithFunctionCallWithoutAutoProcess = (): renders any => (
+export const ReadyAiRequestWithFunctionCallWithoutAutoProcess = (): renders* => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -293,7 +293,7 @@ export const ReadyAiRequestWithFunctionCallWithoutAutoProcess = (): renders any 
   />
 );
 
-export const ReadyAiRequestWithWorkingFunctionCall = (): renders any => (
+export const ReadyAiRequestWithWorkingFunctionCall = (): renders* => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -315,7 +315,7 @@ export const ReadyAiRequestWithWorkingFunctionCall = (): renders any => (
     isAutoProcessingFunctionCalls={true}
   />
 );
-export const ReadyAiRequestWithFinishedFunctionCallAndLaunchingRequest = (): renders any => (
+export const ReadyAiRequestWithFinishedFunctionCallAndLaunchingRequest = (): renders* => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -343,7 +343,7 @@ export const ReadyAiRequestWithFinishedFunctionCallAndLaunchingRequest = (): ren
   />
 );
 
-export const WorkingAiRequestWithFinishedFunctionCall = (): renders any => (
+export const WorkingAiRequestWithFinishedFunctionCall = (): renders* => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -370,7 +370,7 @@ export const WorkingAiRequestWithFinishedFunctionCall = (): renders any => (
   />
 );
 
-export const ReadyAiRequestWithIgnoredFunctionCall = (): renders any => (
+export const ReadyAiRequestWithIgnoredFunctionCall = (): renders* => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -393,7 +393,7 @@ export const ReadyAiRequestWithIgnoredFunctionCall = (): renders any => (
   />
 );
 
-export const ReadyAiRequestWithFailedFunctionCall = (): renders any => (
+export const ReadyAiRequestWithFailedFunctionCall = (): renders* => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -420,7 +420,7 @@ export const ReadyAiRequestWithFailedFunctionCall = (): renders any => (
   />
 );
 
-export const ReadyAiRequestWithFunctionCallAndOutput = (): renders any => (
+export const ReadyAiRequestWithFunctionCallAndOutput = (): renders* => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -437,7 +437,7 @@ export const ReadyAiRequestWithFunctionCallAndOutput = (): renders any => (
   />
 );
 
-export const ReadyAiRequestWithFunctionCallWithSameCallId = (): renders any => (
+export const ReadyAiRequestWithFunctionCallWithSameCallId = (): renders* => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -464,42 +464,42 @@ export const ReadyAiRequestWithFunctionCallWithSameCallId = (): renders any => (
   />
 );
 
-export const ReadyAiRequestWithFailedAndIgnoredFunctionCallOutputs = (): renders any => (
+export const ReadyAiRequestWithFailedAndIgnoredFunctionCallOutputs = (): renders* => (
   <WrappedChatComponent
     aiRequest={agentAiRequestWithFailedAndIgnoredFunctionCallOutputs}
   />
 );
 
-export const LongReadyAiRequest = (): renders any => (
+export const LongReadyAiRequest = (): renders* => (
   <WrappedChatComponent
     aiRequest={agentAiRequest}
     isAutoProcessingFunctionCalls={true}
   />
 );
 
-export const LongReadyAiRequestForAnotherProject = (): renders any => (
+export const LongReadyAiRequestForAnotherProject = (): renders* => (
   <WrappedChatComponent
     aiRequest={{ ...agentAiRequest, gameId: 'another-project-uuid' }}
     isAutoProcessingFunctionCalls={true}
   />
 );
 
-export const LongReadyAiRequestWithFunctionCallToDo = (): renders any => (
+export const LongReadyAiRequestWithFunctionCallToDo = (): renders* => (
   <WrappedChatComponent aiRequest={agentAiRequestWithFunctionCallToDo} />
 );
 
-export const LaunchingFollowupAiRequest = (): renders any => (
+export const LaunchingFollowupAiRequest = (): renders* => (
   <WrappedChatComponent aiRequest={agentAiRequest} isSending={true} />
 );
 
-export const ErrorLaunchingFollowupAiRequest = (): renders any => (
+export const ErrorLaunchingFollowupAiRequest = (): renders* => (
   <WrappedChatComponent
     aiRequest={agentAiRequest}
     lastSendError={new Error('fake error while sending request')}
   />
 );
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCredits = (): renders any => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCredits = (): renders* => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -533,7 +533,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCredits = (): renders any =>
   );
 };
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): renders any => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): renders* => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -567,7 +567,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftNoSubscrip
   );
 };
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): renders any => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): renders* => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -601,7 +601,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilver
   );
 };
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): renders any => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): renders* => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -635,7 +635,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartu
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = (): renders any => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = (): renders* => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -669,7 +669,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = (): renders any
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): renders any => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): renders* => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -703,7 +703,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubsc
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): renders any => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): renders* => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -737,7 +737,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSil
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): renders any => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): renders* => {
   const quota = {
     limitReached: true,
     current: 100,

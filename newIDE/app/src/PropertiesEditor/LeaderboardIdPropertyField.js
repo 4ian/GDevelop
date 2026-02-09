@@ -153,4 +153,4 @@ export default React.forwardRef<Props, LeaderboardIdPropertyFieldInterface>(
   },
 ) as component(
   ...{ ...Props, +ref?: React.RefSetter<LeaderboardIdPropertyFieldInterface> }
-) renders React$Node;
+) renders*;

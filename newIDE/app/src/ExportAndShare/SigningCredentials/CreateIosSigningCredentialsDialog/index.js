@@ -15,7 +15,7 @@ type Props = {
   initialTab: string,
 };
 
-export const CreateIosSigningCredentialsDialog = ({onClose, initialTab, authenticatedUser}: Props): renders any => {
+export const CreateIosSigningCredentialsDialog = ({onClose, initialTab, authenticatedUser}: Props): renders* => {
   const [currentTab, setCurrentTab] = React.useState<string>(initialTab);
 
   return (

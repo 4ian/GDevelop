@@ -1434,7 +1434,7 @@ const MemoizedObjectsList = React.memo<Props, EventsFunctionsListInterface>(
 
 const EventsFunctionsListWithErrorBoundary: component(
   ...{ ...Props, +ref?: React.RefSetter<EventsFunctionsListInterface> }
-) renders React$Node = React.forwardRef<
+) renders* = React.forwardRef<
   Props,
   EventsFunctionsListInterface
 >((props, ref) => (

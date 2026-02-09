@@ -50,7 +50,7 @@ type AccordionHeadProps = {|
  * The header of an accordion section.
  * Based on Material-UI AccordionSummary (but we could almost remove it).
  */
-export const AccordionHeader = (props: AccordionHeadProps): renders any => {
+export const AccordionHeader = (props: AccordionHeadProps): renders* => {
   const classes = useStylesForExpandIcon();
 
   return (
@@ -91,7 +91,7 @@ type AccordionBodyProps = {|
  * The collapsible contents of an accordion section.
  * Based on Material-UI AccordionDetails.
  */
-export const AccordionBody = (props: AccordionBodyProps): renders any => {
+export const AccordionBody = (props: AccordionBodyProps): renders* => {
   return (
     <MUIAccordionDetails
       style={{ ...(props.disableGutters && styles.bodyRoot), ...props.style }}
@@ -111,7 +111,7 @@ type AccordionActionsProps = {|
  * actions specific to the accordion contents.
  * Based on Material-UI AccordionActions.
  */
-export const AccordionActions = (props: AccordionActionsProps): renders any => {
+export const AccordionActions = (props: AccordionActionsProps): renders* => {
   const accordionActions = props.secondaryActions ? (
     <React.Fragment>
       <div key="secondary-actions">{props.secondaryActions}</div>
@@ -149,7 +149,7 @@ type AccordionProps = {|
  */
 export const Accordion: component(
   ...{ ...AccordionProps, +ref?: React.RefSetter<any> }
-) renders React$Node = React.forwardRef<AccordionProps, MUIAccordion>(
+) renders* = React.forwardRef<AccordionProps, MUIAccordion>(
   (props, ref) => {
     const { costlyBody, noMargin, kind, ...otherProps } = props;
     const gdevelopTheme = React.useContext(GDevelopThemeContext);

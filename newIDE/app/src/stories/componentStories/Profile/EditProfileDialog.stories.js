@@ -83,13 +83,13 @@ const defaultProps: EditProfileDialogProps = {
   },
   limits: limitsForNoSubscriptionUser,
 };
-export const WithSubscription = (): renders any => <EditProfileDialog {...defaultProps} />;
+export const WithSubscription = (): renders* => <EditProfileDialog {...defaultProps} />;
 
-export const WithoutSubscription = (): renders any => (
+export const WithoutSubscription = (): renders* => (
   <EditProfileDialog {...defaultProps} subscription={null} />
 );
 
-export const WithoutGithubUsernameAndNoGithubStarBadge = (): renders any => (
+export const WithoutGithubUsernameAndNoGithubStarBadge = (): renders* => (
   <EditProfileDialog
     {...defaultProps}
     badges={[]}
@@ -98,7 +98,7 @@ export const WithoutGithubUsernameAndNoGithubStarBadge = (): renders any => (
   />
 );
 
-export const WithGithubUsernameButNoGithubStarBadge = (): renders any => (
+export const WithGithubUsernameButNoGithubStarBadge = (): renders* => (
   <EditProfileDialog
     {...defaultProps}
     subscription={null}
@@ -109,7 +109,7 @@ export const WithGithubUsernameButNoGithubStarBadge = (): renders any => (
   />
 );
 
-export const WithGithubUsernameButErrorWhenGivingGithubStarBadge = (): renders any => (
+export const WithGithubUsernameButErrorWhenGivingGithubStarBadge = (): renders* => (
   <EditProfileDialog
     {...defaultProps}
     subscription={null}
@@ -120,7 +120,7 @@ export const WithGithubUsernameButErrorWhenGivingGithubStarBadge = (): renders a
   />
 );
 
-export const WithGithubUsernameButUserNotFoundWhenGivingGithubStarBadge = (): renders any => (
+export const WithGithubUsernameButUserNotFoundWhenGivingGithubStarBadge = (): renders* => (
   <EditProfileDialog
     {...defaultProps}
     subscription={null}
@@ -131,7 +131,7 @@ export const WithGithubUsernameButUserNotFoundWhenGivingGithubStarBadge = (): re
   />
 );
 
-export const WithNoTiktokBadge = (): renders any => (
+export const WithNoTiktokBadge = (): renders* => (
   <EditProfileDialog
     {...defaultProps}
     subscription={null}
@@ -142,7 +142,7 @@ export const WithNoTiktokBadge = (): renders any => (
   />
 );
 
-export const WithErrorWhenGivingTiktokBadge = (): renders any => (
+export const WithErrorWhenGivingTiktokBadge = (): renders* => (
   <EditProfileDialog
     {...defaultProps}
     subscription={null}
@@ -153,7 +153,7 @@ export const WithErrorWhenGivingTiktokBadge = (): renders any => (
   />
 );
 
-export const WithUserNotFoundWhenGivingTiktokBadge = (): renders any => (
+export const WithUserNotFoundWhenGivingTiktokBadge = (): renders* => (
   <EditProfileDialog
     {...defaultProps}
     subscription={null}
@@ -164,13 +164,13 @@ export const WithUserNotFoundWhenGivingTiktokBadge = (): renders any => (
   />
 );
 
-export const ErrorFromBackend = (): renders any => (
+export const ErrorFromBackend = (): renders* => (
   <EditProfileDialog {...defaultProps} error={{ code: 'auth/username-used' }} />
 );
 
-export const Submitting = (): renders any => (
+export const Submitting = (): renders* => (
   <EditProfileDialog {...defaultProps} actionInProgress />
 );
-export const WithStudentUser = (): renders any => (
+export const WithStudentUser = (): renders* => (
   <EditProfileDialog {...defaultProps} limits={limitsForStudentUser} />
 );

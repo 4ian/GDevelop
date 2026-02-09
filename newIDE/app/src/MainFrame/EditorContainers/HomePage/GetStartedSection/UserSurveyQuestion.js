@@ -76,7 +76,7 @@ export const TitleAndSubtitle = (
     answers: Array<AnswerData>,
     textAlign: 'center' | 'left',
   },
-): renders any => (
+): renders* => (
   <ColumnStackLayout noMargin>
     <Text size="block-title" align={textAlign} noMargin>
       {i18n._(text)}
@@ -357,7 +357,7 @@ type Props = {|
   onChangeUserInputValue?: string => void,
 |};
 
-const UserSurveyQuestion: component(...{ ...Props, +ref?: React.RefSetter<any> }) renders React$Node = React.forwardRef<Props, HTMLDivElement>(
+const UserSurveyQuestion: component(...{ ...Props, +ref?: React.RefSetter<any> }) renders* = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       questionData,

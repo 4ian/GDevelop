@@ -88,7 +88,7 @@ const InAppTutorialPhaseCard = (
     renderImage,
     loading
   }: Props,
-): renders any => {
+): renders* => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const shouldTextBeDisabled = loading || disabled || locked;
   const { isMobile } = useResponsiveWindowSize();

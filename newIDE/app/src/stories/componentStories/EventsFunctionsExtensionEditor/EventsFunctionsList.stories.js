@@ -17,7 +17,7 @@ export default {
   decorators: [alertDecorator],
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={500}>
       <EventsFunctionsListWithErrorBoundary

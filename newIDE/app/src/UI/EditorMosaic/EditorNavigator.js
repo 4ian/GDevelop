@@ -121,4 +121,4 @@ export default React.forwardRef<Props, EditorNavigatorInterface>(
   },
 ) as component(
   ...{ ...Props, +ref?: React.RefSetter<EditorNavigatorInterface> }
-) renders React$Node;
+) renders*;

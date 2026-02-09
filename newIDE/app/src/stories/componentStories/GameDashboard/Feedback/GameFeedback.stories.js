@@ -26,7 +26,7 @@ export default {
   decorators: [getPaperDecorator('medium') as StoryDecorator],
 };
 
-export const DefaultGameFeedback = (): renders any => {
+export const DefaultGameFeedback = (): renders* => {
   const mock = new MockAdapter(Axios);
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)
@@ -51,7 +51,7 @@ export const DefaultGameFeedback = (): renders any => {
   );
 };
 
-export const GameFeedbackOneSolvedComment = (): renders any => {
+export const GameFeedbackOneSolvedComment = (): renders* => {
   const mock = new MockAdapter(Axios);
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)
@@ -76,7 +76,7 @@ export const GameFeedbackOneSolvedComment = (): renders any => {
   );
 };
 
-export const GameFeedbackWithError = (): renders any => {
+export const GameFeedbackWithError = (): renders* => {
   const mock = new MockAdapter(Axios);
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)
@@ -101,7 +101,7 @@ export const GameFeedbackWithError = (): renders any => {
   );
 };
 
-export const GameFeedbackEmpty = (): renders any => {
+export const GameFeedbackEmpty = (): renders* => {
   const mock = new MockAdapter(Axios);
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)

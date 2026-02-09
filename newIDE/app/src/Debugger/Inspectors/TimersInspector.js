@@ -27,7 +27,7 @@ type Props = {|
   timers: ?TimersHashtable,
 |};
 
-const TimersInspector = (props: Props): renders any => (
+const TimersInspector = (props: Props): renders* => (
   <ReactJsonView
     collapsed={false}
     name={false}

@@ -268,7 +268,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const ManageEducationAccountDialog = ({onClose}: Props): null | renders any => {
+const ManageEducationAccountDialog = ({onClose}: Props): null | renders* => {
   const { profile, subscription } = React.useContext(AuthenticatedUserContext);
   const {
     openSubscriptionDialog,

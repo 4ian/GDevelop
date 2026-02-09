@@ -77,7 +77,7 @@ const VariablesEditorDialog = (
     initialInstances,
     isListLocked
   }: Props,
-): renders any => {
+): renders* => {
   const serializableObjects = React.useMemo(
     () =>
       new Map(

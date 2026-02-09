@@ -49,7 +49,7 @@ export const QuickCustomizationGameTiles = (
     quickCustomizationRecommendation,
     disabled
   }: Props,
-): renders any => {
+): renders* => {
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
   const { windowSize, isLandscape } = useResponsiveWindowSize();
   const columnsCount = getColumnsCount(windowSize, isLandscape);

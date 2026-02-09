@@ -10,6 +10,6 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const DefaultShareLink = (): renders any => (
+export const DefaultShareLink = (): renders* => (
   <ShareLink url={'https://gd.games/username/game-slug'} />
 );

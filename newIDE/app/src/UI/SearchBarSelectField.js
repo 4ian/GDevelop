@@ -76,7 +76,7 @@ type Props = {|
  */
 const SearchBarSelectField: component(
   ...{ ...Props, +ref?: React.RefSetter<SearchBarSelectFieldInterface> }
-) renders React$Node = React.forwardRef<
+) renders* = React.forwardRef<
   Props,
   SearchBarSelectFieldInterface
 >((props, ref) => {

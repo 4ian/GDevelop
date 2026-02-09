@@ -28,7 +28,7 @@ const LocalVariablesDialog = (
     shouldCreateInitiallySelectedVariable,
     isListLocked
   }: Props,
-): renders any => {
+): renders* => {
   const tabs = React.useMemo(
     () => [
       {

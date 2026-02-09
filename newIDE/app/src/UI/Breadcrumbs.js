@@ -13,7 +13,7 @@ type Props = {|
   steps: Array<BreadcrumbStep>,
 |};
 
-const Breadcrumbs = ({steps}: Props): renders any => {
+const Breadcrumbs = ({steps}: Props): renders* => {
   return (
     <MuiBreadcrumbs separator=">" aria-label="breadcrumb">
       {steps.map((step, index) =>

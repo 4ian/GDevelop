@@ -32,7 +32,7 @@ export const checkIfHasTooManyLeaderboards = (
   );
 };
 
-const MaxLeaderboardCountAlertMessage = (): null | renders any => {
+const MaxLeaderboardCountAlertMessage = (): null | renders* => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { limits, subscription } = authenticatedUser;
   if (!limits) return null;

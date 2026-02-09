@@ -12,7 +12,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders any => {
+export const Default = (): renders* => {
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
   const [canEndTutorial, setCanEndTutorial] = React.useState<boolean>(false);
   return (

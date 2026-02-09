@@ -42,7 +42,7 @@ const ExpressionParametersEditor = (
     parameterRenderingService,
     onChangeParameter
   }: Props,
-): null | renders any => {
+): null | renders* => {
   if (!parameterRenderingService) {
     console.error(
       'Missing parameterRenderingService for ExpressionParametersEditor'

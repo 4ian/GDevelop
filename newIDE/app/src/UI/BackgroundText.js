@@ -12,7 +12,7 @@ type Props = {|
   align?: 'center' | 'left' | 'right',
 |};
 
-const BackgroundText = (props: Props): renders any => {
+const BackgroundText = (props: Props): renders* => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <Typography

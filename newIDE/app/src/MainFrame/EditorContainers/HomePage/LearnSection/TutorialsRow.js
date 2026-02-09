@@ -46,7 +46,7 @@ export const TutorialsRow = (
     onSelectTutorial,
     getColumnsFromWindowSize
   }: TutorialsRowProps,
-): renders any => {
+): renders* => {
   const {
     tutorials,
     error: tutorialLoadingError,

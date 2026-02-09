@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const WithThumbnailSetByHref = (): renders any => {
+export const WithThumbnailSetByHref = (): renders* => {
   const [anchorEl, setAnchorEl] = React.useState<?HTMLDivElement>(null);
   return (
     <FixedHeightFlexContainer height={300}>
@@ -63,7 +63,7 @@ export const WithThumbnailSetByHref = (): renders any => {
   );
 };
 
-export const WithThumbnailSetInContent = (): renders any => {
+export const WithThumbnailSetInContent = (): renders* => {
   const [anchorEl, setAnchorEl] = React.useState<?HTMLDivElement>(null);
   return (
     <FixedHeightFlexContainer height={300}>

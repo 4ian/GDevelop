@@ -20,54 +20,54 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Errored = (): renders any => (
+export const Errored = (): renders* => (
   <BuildProgressAndActions build={erroredCordovaBuild} game={game1} />
 );
 
-export const PendingElectronBuild = (): renders any => (
+export const PendingElectronBuild = (): renders* => (
   <BuildProgressAndActions
     build={{ ...pendingElectronBuild, updatedAt: Date.now() }}
     game={game1}
   />
 );
 
-export const PendingCordovaBuild = (): renders any => (
+export const PendingCordovaBuild = (): renders* => (
   <BuildProgressAndActions
     build={{ ...pendingCordovaBuild, updatedAt: Date.now() }}
     game={game1}
   />
 );
 
-export const SlowPendingCordovaBuild = (): renders any => (
+export const SlowPendingCordovaBuild = (): renders* => (
   <BuildProgressAndActions
     build={{ ...pendingCordovaBuild, updatedAt: Date.now() - 1000 * 400 }}
     game={game1}
   />
 );
 
-export const TimedOutPendingCordovaBuild = (): renders any => (
+export const TimedOutPendingCordovaBuild = (): renders* => (
   <BuildProgressAndActions
     build={{ ...pendingCordovaBuild, updatedAt: Date.now() - 1000 * 3600 * 24 }}
     game={game1}
   />
 );
 
-export const CompleteCordovaBuild = (): renders any => (
+export const CompleteCordovaBuild = (): renders* => (
   <BuildProgressAndActions build={completeCordovaBuild} game={game1} />
 );
 
-export const CompleteElectronBuild = (): renders any => (
+export const CompleteElectronBuild = (): renders* => (
   <BuildProgressAndActions build={completeElectronBuild} game={game1} />
 );
 
-export const CompleteUnpublishedWebBuild = (): renders any => (
+export const CompleteUnpublishedWebBuild = (): renders* => (
   <BuildProgressAndActions
     build={completeWebBuild}
     game={{ ...game1, publicWebBuildId: 'other-build-id' }}
   />
 );
 
-export const CompletePublishedWebBuild = (): renders any => (
+export const CompletePublishedWebBuild = (): renders* => (
   <BuildProgressAndActions
     build={completeWebBuild}
     game={{ ...game1, publicWebBuildId: completeWebBuild.id }}

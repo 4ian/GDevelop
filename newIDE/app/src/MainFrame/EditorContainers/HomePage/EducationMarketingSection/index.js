@@ -87,7 +87,7 @@ const EducationMarketingSection = (
     formStatus,
     onLogin
   }: Props,
-): renders any => {
+): renders* => {
   const { isMobile } = useResponsiveWindowSize();
   const { limits } = React.useContext(AuthenticatedUserContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

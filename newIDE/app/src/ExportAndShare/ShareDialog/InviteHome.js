@@ -69,7 +69,7 @@ type Props = {|
   cloudProjectId: ?string,
 |};
 
-const InviteHome = ({cloudProjectId}: Props): renders any | renders Fragment => {
+const InviteHome = ({cloudProjectId}: Props): renders* | renders Fragment => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile, limits } = authenticatedUser;
   const isOnline = useOnlineStatus();

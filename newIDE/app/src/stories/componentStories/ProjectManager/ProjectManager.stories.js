@@ -43,7 +43,7 @@ const mainMenuCallbacks = {
   setElectronUpdateStatus: () => action('setElectronUpdateStatus'),
 };
 
-export const NoProjectOpen = (): renders any => {
+export const NoProjectOpen = (): renders* => {
   const shortcutMap = useShortcutMap();
   return (
     <I18n>
@@ -118,7 +118,7 @@ export const NoProjectOpen = (): renders any => {
   );
 };
 
-export const ProjectOpen = (): renders any => {
+export const ProjectOpen = (): renders* => {
   const shortcutMap = useShortcutMap();
   return (
     <I18n>

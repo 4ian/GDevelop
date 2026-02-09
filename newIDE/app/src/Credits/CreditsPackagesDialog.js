@@ -83,7 +83,7 @@ type Props = {|
   showCalloutTip?: boolean,
 |};
 
-const CreditsPackagesDialog = ({onClose, suggestedPackage, missingCredits, showCalloutTip}: Props): renders any => {
+const CreditsPackagesDialog = ({onClose, suggestedPackage, missingCredits, showCalloutTip}: Props): renders* => {
   const {
     error,
     fetchCreditsPackages,

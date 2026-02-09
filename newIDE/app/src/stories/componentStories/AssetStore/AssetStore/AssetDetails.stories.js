@@ -30,7 +30,7 @@ const Wrapper = ({ children }: {| children: React.Node |}) => {
   );
 };
 
-export const PublicAsset = (): renders any => {
+export const PublicAsset = (): renders* => {
   const assetCdnMock = new MockAdapter(assetCdnClient);
   assetCdnMock
     .onGet(
@@ -53,7 +53,7 @@ export const PublicAsset = (): renders any => {
   );
 };
 
-export const PrivateAsset = (): renders any => {
+export const PrivateAsset = (): renders* => {
   const userServiceMock = new MockAdapter(userApiClient);
   userServiceMock
     .onGet('/user-public-profile', {
@@ -106,7 +106,7 @@ export const PrivateAsset = (): renders any => {
   );
 };
 
-export const AssetWithMultipleAuthors = (): renders any => {
+export const AssetWithMultipleAuthors = (): renders* => {
   const userServiceMock = new MockAdapter(userApiClient);
   userServiceMock
     .onGet('/user-public-profile', {

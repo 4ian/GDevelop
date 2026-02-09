@@ -48,7 +48,7 @@ const ExpressionParametersEditorDialog = (
     expressionMetadata,
     parameterRenderingService
   }: Props,
-): renders any => {
+): renders* => {
   const [parameterValues, setParameterValues] = React.useState<Array<string>>(
     Array(expressionMetadata.getParametersCount()).fill('')
   );

@@ -70,7 +70,7 @@ type Props = {|
  */
 const SelectField: component(
   ...{ ...Props, +ref?: React.RefSetter<SelectFieldInterface> }
-) renders React$Node = React.forwardRef<Props, SelectFieldInterface>(
+) renders* = React.forwardRef<Props, SelectFieldInterface>(
   (props, ref) => {
     const inputRef = React.useRef<?HTMLInputElement>(null);
 

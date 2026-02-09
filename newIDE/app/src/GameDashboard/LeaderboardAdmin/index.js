@@ -186,7 +186,7 @@ type Props = {|
   leaderboardIdToSelectAtOpening?: string,
 |};
 
-export const LeaderboardAdmin = ({onLoading, project, leaderboardIdToSelectAtOpening}: Props): renders any => {
+export const LeaderboardAdmin = ({onLoading, project, leaderboardIdToSelectAtOpening}: Props): renders* => {
   const isOnline = useOnlineStatus();
   const { isMobile } = useResponsiveWindowSize();
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
@@ -1132,7 +1132,7 @@ export const LeaderboardAdmin = ({onLoading, project, leaderboardIdToSelectAtOpe
 
 type ContainerProps = {| ...Props, gameId: string |};
 
-const LeaderboardAdminContainer = ({gameId, ...otherProps}: ContainerProps): renders any => (
+const LeaderboardAdminContainer = ({gameId, ...otherProps}: ContainerProps): renders* => (
   <LeaderboardProvider gameId={gameId}>
     <LeaderboardAdmin {...otherProps} />
   </LeaderboardProvider>

@@ -16,7 +16,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const ImageNotSelected = (): renders any => (
+export const ImageNotSelected = (): renders* => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
@@ -30,7 +30,7 @@ export const ImageNotSelected = (): renders any => (
   />
 );
 
-export const ImageSelected = (): renders any => (
+export const ImageSelected = (): renders* => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
@@ -44,7 +44,7 @@ export const ImageSelected = (): renders any => (
   />
 );
 
-export const ImageWithMultipleExternalEditors = (): renders any => (
+export const ImageWithMultipleExternalEditors = (): renders* => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
@@ -80,7 +80,7 @@ export const ImageWithMultipleExternalEditors = (): renders any => (
   />
 );
 
-export const NotExisting = (): renders any => (
+export const NotExisting = (): renders* => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
@@ -94,7 +94,7 @@ export const NotExisting = (): renders any => (
   />
 );
 
-export const ImageNoMargin = (): renders any => (
+export const ImageNoMargin = (): renders* => (
   <ResourceSelector
     margin="none"
     resourceKind="image"
@@ -109,7 +109,7 @@ export const ImageNoMargin = (): renders any => (
   />
 );
 
-export const ImageWithThumbnail = (): renders any => (
+export const ImageWithThumbnail = (): renders* => (
   <ResourceSelectorWithThumbnail
     resourceKind="image"
     project={testProject.project}
@@ -122,7 +122,7 @@ export const ImageWithThumbnail = (): renders any => (
   />
 );
 
-export const Audio = (): renders any => (
+export const Audio = (): renders* => (
   <ResourceSelector
     resourceKind="audio"
     project={testProject.project}
@@ -136,7 +136,7 @@ export const Audio = (): renders any => (
   />
 );
 
-export const FontWithResetButton = (): renders any => (
+export const FontWithResetButton = (): renders* => (
   <ResourceSelector
     canBeReset
     resourceKind="font"
@@ -151,7 +151,7 @@ export const FontWithResetButton = (): renders any => (
   />
 );
 
-export const FontNoMarginWithResetButton = (): renders any => (
+export const FontNoMarginWithResetButton = (): renders* => (
   <ResourceSelector
     canBeReset
     margin="none"

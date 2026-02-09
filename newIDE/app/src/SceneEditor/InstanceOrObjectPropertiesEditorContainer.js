@@ -95,7 +95,7 @@ export const InstanceOrObjectPropertiesEditorContainer: component(
     ...Props,
     +ref?: React.RefSetter<InstanceOrObjectPropertiesEditorInterface>,
   }
-) renders React$Node = React.forwardRef<
+) renders* = React.forwardRef<
   Props,
   InstanceOrObjectPropertiesEditorInterface
 >((props, ref) => {

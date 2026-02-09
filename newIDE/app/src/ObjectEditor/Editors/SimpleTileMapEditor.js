@@ -29,7 +29,7 @@ const SimpleTileMapEditor = (
     projectScopedContainersAccessor,
     renderObjectNameField
   }: EditorProps,
-): renders any => {
+): renders* => {
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
   const forceUpdate = useForceUpdate();
   const objectProperties = objectConfiguration.getProperties();

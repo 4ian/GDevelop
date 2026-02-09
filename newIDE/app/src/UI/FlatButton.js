@@ -37,7 +37,7 @@ export type FlatButtonProps = {|
  */
 const FlatButton: component(
   ...{ ...FlatButtonProps, +ref?: React.RefSetter<ButtonInterface> }
-) renders React$Node = React.forwardRef<FlatButtonProps, ButtonInterface>(
+) renders* = React.forwardRef<FlatButtonProps, ButtonInterface>(
   (
     {
       label,

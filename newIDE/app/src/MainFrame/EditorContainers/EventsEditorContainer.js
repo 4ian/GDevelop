@@ -172,4 +172,4 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
   }
 }
 
-export const renderEventsEditorContainer = (props: RenderEditorContainerPropsWithRef): renders any => <EventsEditorContainer {...props} />;
+export const renderEventsEditorContainer = (props: RenderEditorContainerPropsWithRef): renders* => <EventsEditorContainer {...props} />;

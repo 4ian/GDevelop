@@ -80,7 +80,7 @@ type AskAiHistoryContentProps = {|
   selectedAiRequestId: string | null,
 |};
 
-export const AskAiHistoryContent = ({onSelectAiRequest, selectedAiRequestId}: AskAiHistoryContentProps): renders any => {
+export const AskAiHistoryContent = ({onSelectAiRequest, selectedAiRequestId}: AskAiHistoryContentProps): renders* => {
   const {
     aiRequestStorage: {
       aiRequests,
@@ -198,7 +198,7 @@ export const AskAiHistoryContent = ({onSelectAiRequest, selectedAiRequestId}: As
   );
 };
 
-export const AskAiHistory = ({open, onClose, onSelectAiRequest, selectedAiRequestId}: Props): renders any => {
+export const AskAiHistory = ({open, onClose, onSelectAiRequest, selectedAiRequestId}: Props): renders* => {
   const { isMobile } = useResponsiveWindowSize();
 
   const handleSelectAiRequest = (aiRequest: AiRequest) => {

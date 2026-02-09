@@ -30,7 +30,7 @@ export const SetupExportHeader = (
     build,
     quota
   }: HeaderProps<ExportState>,
-): null | renders any => {
+): null | renders* => {
   // Build is finished, hide options.
   if (!!build && build.status === 'complete') return null;
 
@@ -107,7 +107,7 @@ export const ExportFlow = (
     stepCurrentProgress,
     errored
   }: OnlineCordovaIosExportFlowProps,
-): renders any => {
+): renders* => {
   const isExportingOrbuildRunningOrFinished =
     isExporting || (!!build && build.status !== 'error');
 
@@ -142,7 +142,7 @@ export const ExportFlow = (
 
 export const onlineCordovaIosExporter = {
   key: 'onlinecordovaiosexport',
-  tabName: <Trans>iOS</Trans> as renders any,
-  name: <Trans>iOS</Trans> as renders any,
+  tabName: <Trans>iOS</Trans> as renders*,
+  name: <Trans>iOS</Trans> as renders*,
   helpPage: '/publishing/ios',
 };

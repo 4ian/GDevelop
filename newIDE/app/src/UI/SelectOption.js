@@ -16,7 +16,7 @@ type Props = {|
 /**
  * A native select option to be used with `SelectField`.
  */
-const SelectOption = (props: Props): renders any => {
+const SelectOption = (props: Props): renders* => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (

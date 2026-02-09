@@ -41,7 +41,7 @@ type Props = {|
   onComplete: boolean => void,
 |};
 
-const TextBasedCourseChapterTaskItem = ({task, isComplete, onComplete}: Props): renders any => {
+const TextBasedCourseChapterTaskItem = ({task, isComplete, onComplete}: Props): renders* => {
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

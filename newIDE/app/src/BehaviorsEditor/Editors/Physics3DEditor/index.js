@@ -91,7 +91,7 @@ const enableBit = (bitsValue: number, pos: number, enable: boolean) => {
   return bitsValue;
 };
 
-const Physics3DEditor = (props: Props): renders any => {
+const Physics3DEditor = (props: Props): renders* => {
   const {
     object,
     behavior,

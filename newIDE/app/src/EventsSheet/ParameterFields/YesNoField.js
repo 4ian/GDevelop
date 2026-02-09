@@ -76,9 +76,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   },
 ) as component(
   ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
-) renders React$Node;
+) renders*;
 
-export const renderInlineYesNo = ({value, parameterMetadata}: ParameterInlineRendererProps): renders any => {
+export const renderInlineYesNo = ({value, parameterMetadata}: ParameterInlineRendererProps): renders* => {
   if (getParameterValueOrDefault(value, parameterMetadata) === 'yes') {
     return <Trans>yes</Trans>;
   } else {

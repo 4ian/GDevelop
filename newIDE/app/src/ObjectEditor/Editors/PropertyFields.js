@@ -23,7 +23,7 @@ type PropertyFieldProps = {|
   onChange?: () => void,
 |};
 
-export const PropertyField = ({objectConfiguration, propertyName, onChange}: PropertyFieldProps): renders any => {
+export const PropertyField = ({objectConfiguration, propertyName, onChange}: PropertyFieldProps): renders* => {
   const forceUpdate = useForceUpdate();
   const properties = objectConfiguration.getProperties();
 
@@ -75,7 +75,7 @@ export const PropertyField = ({objectConfiguration, propertyName, onChange}: Pro
   );
 };
 
-export const PropertyCheckbox = ({objectConfiguration, propertyName}: PropertyFieldProps): renders any => {
+export const PropertyCheckbox = ({objectConfiguration, propertyName}: PropertyFieldProps): renders* => {
   const forceUpdate = useForceUpdate();
   const properties = objectConfiguration.getProperties();
 
@@ -124,7 +124,7 @@ export const PropertyResourceSelector = (
     resourceManagementProps,
     onChange
   }: PropertyResourceSelectorProps,
-): renders any => {
+): renders* => {
   const forceUpdate = useForceUpdate();
   const { current: resourcesLoader } = React.useRef(ResourcesLoader);
   const properties = objectConfiguration.getProperties();

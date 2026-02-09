@@ -20,7 +20,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const DetectShortcutDialog = (props: Props): renders any => {
+const DetectShortcutDialog = (props: Props): renders* => {
   const [shortcutString, setShortcutString] = React.useState('');
   const [isValid, setIsValid] = React.useState(false);
 

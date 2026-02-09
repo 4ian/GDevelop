@@ -35,7 +35,7 @@ export const openExampleInWebApp = (exampleShortHeader: ExampleShortHeader) => {
   );
 };
 
-const ExampleInformationPage = ({exampleShortHeader}: Props): renders any => {
+const ExampleInformationPage = ({exampleShortHeader}: Props): renders* => {
   const isCompatible = isCompatibleWithGDevelopVersion(
     getIDEVersion(),
     exampleShortHeader.gdevelopVersion

@@ -21,7 +21,7 @@ type Props = {|
   onCloseAfterSuccess: () => void,
 |};
 
-const CancelReasonDialog = ({onClose, onCloseAfterSuccess}: Props): renders any => {
+const CancelReasonDialog = ({onClose, onCloseAfterSuccess}: Props): renders* => {
   const [isCancelingSubscription, setIsCancelingSubscription] = React.useState(
     false
   );

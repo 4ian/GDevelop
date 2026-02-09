@@ -51,7 +51,7 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
 |};
 
-export const ExtensionDependenciesEditor = ({eventsFunctionsExtension, project, resourceManagementProps}: Props): renders any => {
+export const ExtensionDependenciesEditor = ({eventsFunctionsExtension, project, resourceManagementProps}: Props): renders* => {
   const deps = eventsFunctionsExtension.getAllDependencies();
   const forceUpdate = useForceUpdate();
 

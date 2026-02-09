@@ -18,7 +18,7 @@ type Props = {|
   onGameUpdated: (game: Game) => void,
 |};
 
-const BuildsDialog = ({authenticatedUser, game, open, onClose, onGameUpdated}: Props): null | renders any => {
+const BuildsDialog = ({authenticatedUser, game, open, onClose, onGameUpdated}: Props): null | renders* => {
   const forceUpdate = useForceUpdate();
   if (!open) return null;
 

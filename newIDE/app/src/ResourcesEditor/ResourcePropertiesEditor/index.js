@@ -46,7 +46,7 @@ const renderEmpty = () => {
 
 const ResourcePropertiesEditor: component(
   ...{ ...Props, +ref?: React.RefSetter<ResourcePropertiesEditorInterface> }
-) renders React$Node = React.forwardRef<
+) renders* = React.forwardRef<
   Props,
   ResourcePropertiesEditorInterface
 >(

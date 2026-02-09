@@ -39,7 +39,7 @@ const enrichAssetWithAuthorizedResourceUrls = (
   };
 };
 
-const PrivateAssetsAuthorizationProvider = ({children}: Props): renders any => {
+const PrivateAssetsAuthorizationProvider = ({children}: Props): renders* => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const profile = authenticatedUser.profile;
   const [authorizationToken, setAuthorizationToken] = React.useState<?string>(

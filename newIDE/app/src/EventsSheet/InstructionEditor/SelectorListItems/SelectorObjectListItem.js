@@ -38,7 +38,7 @@ export const renderObjectListItem = (
     withIndent,
     keyPrefix
   }: Props,
-): renders any => {
+): renders* => {
   const objectName: string = objectWithContext.object.getName();
   return (
     <ListItem

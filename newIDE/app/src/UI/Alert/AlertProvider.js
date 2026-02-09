@@ -14,7 +14,7 @@ import YesNoCancelDialog from './YesNoCancelDialog';
 
 type Props = {| children: React.Node |};
 
-function ConfirmProvider({ children }: Props): renders any {
+function ConfirmProvider({ children }: Props): renders* {
   // Alert
   const [alertDialogOpen, setAlertDialogOpen] = React.useState<boolean>(false);
   const [

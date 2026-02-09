@@ -190,7 +190,7 @@ export type TextFieldInterface = {|
  */
 const TextField: component(
   ...{ ...Props, +ref?: React.RefSetter<TextFieldInterface> }
-) renders React$Node = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
+) renders* = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
   const muiTextFieldRef = React.useRef<?MUITextField>(null);
   const [isPasswordVisible, setIsPasswordVisible] = React.useState<boolean>(

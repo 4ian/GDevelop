@@ -24,7 +24,7 @@ const fakeLeaderboard: Leaderboard = {
   visibility: 'PUBLIC',
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <LeaderboardOptionsDialog
     open
     onClose={() => action('onClose')()}
@@ -35,7 +35,7 @@ export const Default = (): renders any => (
   />
 );
 
-export const WithProSubscription = (): renders any => (
+export const WithProSubscription = (): renders* => (
   <AuthenticatedUserContext.Provider value={fakeStartupAuthenticatedUser}>
     <LeaderboardOptionsDialog
       open

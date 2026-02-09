@@ -24,7 +24,7 @@ type Props = {|
   onPointerLeave: () => void,
 |};
 
-const VerticeRow = ({verticeX, verticeY, parentVerticeId, ...props}: Props): renders any => {
+const VerticeRow = ({verticeX, verticeY, parentVerticeId, ...props}: Props): renders* => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (

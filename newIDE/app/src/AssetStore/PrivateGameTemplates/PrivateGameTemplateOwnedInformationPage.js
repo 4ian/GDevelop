@@ -34,7 +34,7 @@ const PrivateGameTemplateOwnedInformationPage = (
     purchaseUsageType,
     onStoreProductOpened
   }: Props,
-): renders any => {
+): renders* => {
   const shouldUseOrSimulateAppStoreProduct = shouldUseAppStoreProduct();
   const { navigateToRoute } = React.useContext(RouterContext);
 

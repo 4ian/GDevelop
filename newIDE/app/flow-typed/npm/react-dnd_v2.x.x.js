@@ -71,7 +71,7 @@ declare module "react-dnd" {
   ) => T;
 
   declare function DropTarget<OP: {...}, CP: {...}>(
-    types: DropTargetTypes<OP>,
+    types: any,
     spec: DropTargetSpec<OP>,
     collect: DropTargetCollector<CP>,
     options?: DndOptions<OP>

@@ -66,7 +66,7 @@ const CreateAccountWithPurchaseClaimDialog = (
     error,
     claimedProductOptions: {productListingData: claimedProduct}
   }: Props,
-): renders any => {
+): renders* => {
   const { isMobile } = useResponsiveWindowSize();
   const styles = getStyles({ isMobile });
   const [email, setEmail] = React.useState<string>('');

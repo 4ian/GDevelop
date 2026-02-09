@@ -14,7 +14,7 @@ const gameName = 'Bark and sea';
 const thumbnailUrl =
   'https://games.gdevelop-app.com/game-14f30268-f976-4e84-8c09-2e391b1f3907/BarkAndSail2.png';
 
-export const Published = (): renders any => {
+export const Published = (): renders* => {
   const buildOrGameUrl = 'https://gd.games/alex_/bark-and-sea';
   return (
     <ShareOnlineGameDialog
@@ -28,7 +28,7 @@ export const Published = (): renders any => {
     />
   );
 };
-export const PublishedWithThumbnail = (): renders any => {
+export const PublishedWithThumbnail = (): renders* => {
   const buildOrGameUrl = 'https://gd.games/alex_/bark-and-sea';
   return (
     <ShareOnlineGameDialog
@@ -43,7 +43,7 @@ export const PublishedWithThumbnail = (): renders any => {
   );
 };
 
-export const Private = (): renders any => {
+export const Private = (): renders* => {
   const buildOrGameUrl = `https://gd.games/instant-builds/${
     completeWebBuild.id
   }`;
@@ -60,7 +60,7 @@ export const Private = (): renders any => {
   );
 };
 
-export const Loading = (): renders any => {
+export const Loading = (): renders* => {
   const buildOrGameUrl = 'https://gd.games/alex_/bark-and-sea';
   return (
     <ShareOnlineGameDialog

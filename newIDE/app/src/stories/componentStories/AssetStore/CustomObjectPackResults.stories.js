@@ -24,7 +24,7 @@ const Wrapper = ({ children }: {| children: React.Node |}) => {
   );
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <Wrapper>
     <CustomObjectPackResults
       packTag="multitouch joysticks"
@@ -35,7 +35,7 @@ export const Default = (): renders any => (
   </Wrapper>
 );
 
-export const Installing = (): renders any => (
+export const Installing = (): renders* => (
   <Wrapper>
     <CustomObjectPackResults
       packTag="multitouch joysticks"

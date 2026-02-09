@@ -118,7 +118,7 @@ const BuildProgressAndActions = (
     setGameUpdating,
     onCopyToClipboard
   }: Props,
-): renders any => {
+): renders* => {
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );

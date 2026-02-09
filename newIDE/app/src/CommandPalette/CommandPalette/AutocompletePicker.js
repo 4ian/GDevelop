@@ -89,7 +89,7 @@ type Props<T> = {|
 
 type AlgoliaSearchHitItemProps = {| hit: AlgoliaSearchHitType |};
 
-export const AlgoliaSearchHit = ({hit}: AlgoliaSearchHitItemProps): renders any => {
+export const AlgoliaSearchHit = ({hit}: AlgoliaSearchHitItemProps): renders* => {
   const { isMobile } = useResponsiveWindowSize();
   const classes = useStyles();
   let secondaryText;
@@ -124,7 +124,7 @@ export const AlgoliaSearchHit = ({hit}: AlgoliaSearchHitItemProps): renders any 
   );
 };
 
-const AutocompletePicker = (props: Props<NamedCommand | GoToWikiCommand> | Props<CommandOption>): renders any => {
+const AutocompletePicker = (props: Props<NamedCommand | GoToWikiCommand> | Props<CommandOption>): renders* => {
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();
   const shouldAutofocusInput = useShouldAutofocusInput();
   const [open, setOpen] = React.useState(true);

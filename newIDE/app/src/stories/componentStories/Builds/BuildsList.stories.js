@@ -34,7 +34,7 @@ const buildArray = [
   completeWebBuild,
 ];
 
-export const DefaultBuildsList = (): renders any => (
+export const DefaultBuildsList = (): renders* => (
   <BuildsList
     builds={buildArray}
     authenticatedUser={fakeSilverAuthenticatedUser}
@@ -46,7 +46,7 @@ export const DefaultBuildsList = (): renders any => (
   />
 );
 
-export const ErroredBuildsList = (): renders any => (
+export const ErroredBuildsList = (): renders* => (
   <BuildsList
     builds={null}
     authenticatedUser={fakeSilverAuthenticatedUser}

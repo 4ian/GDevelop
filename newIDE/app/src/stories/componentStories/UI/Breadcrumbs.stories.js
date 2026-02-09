@@ -13,7 +13,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <Column>
     <Line>
       <Breadcrumbs

@@ -18,7 +18,7 @@ type Props = {|
   showAllItems?: boolean,
 |};
 
-const WalletWidget = ({onOpenProfile, size, showOneItem, showAllItems}: Props): renders any => {
+const WalletWidget = ({onOpenProfile, size, showOneItem, showAllItems}: Props): renders* => {
   const {
     profile,
     limits,

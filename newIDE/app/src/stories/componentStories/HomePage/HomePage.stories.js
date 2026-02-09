@@ -36,7 +36,7 @@ const WrappedHomePage = (
     inAppTutorialsFetchingError?: string | null,
     user: AuthenticatedUser,
   |},
-): renders any => {
+): renders* => {
   const assetApiMock = React.useMemo(() => {
     const mock = new MockAdapter(assetClient, {
       delayResponse: 250,
@@ -152,14 +152,14 @@ export default {
   decorators: [GDevelopJsInitializerDecorator, inAppTutorialDecorator],
 };
 
-export const Connected = (): renders any => (
+export const Connected = (): renders* => (
   <WrappedHomePage
     project={testProject.project}
     user={fakeSilverAuthenticatedUser}
   />
 );
 
-export const ConnectedWithInAppTutorialCompleted = (): renders any => (
+export const ConnectedWithInAppTutorialCompleted = (): renders* => (
   <WrappedHomePage
     project={testProject.project}
     user={fakeSilverAuthenticatedUser}
@@ -175,7 +175,7 @@ export const ConnectedWithInAppTutorialCompleted = (): renders any => (
   />
 );
 
-export const NetworkError = (): renders any => {
+export const NetworkError = (): renders* => {
   const tutorialApiMock = React.useMemo(() => {
     const mock = new MockAdapter(tutorialClient, {
       delayResponse: 250,

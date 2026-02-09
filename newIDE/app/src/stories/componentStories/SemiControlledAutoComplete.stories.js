@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const DefaultWithText = (): renders any => (
+export const DefaultWithText = (): renders* => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -36,7 +36,7 @@ export const DefaultWithText = (): renders any => (
   />
 );
 
-export const WithError = (): renders any => (
+export const WithError = (): renders* => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -56,7 +56,7 @@ export const WithError = (): renders any => (
   />
 );
 
-export const WithTranslatableElementsAndSeparator = (): renders any => (
+export const WithTranslatableElementsAndSeparator = (): renders* => (
   <ValueStateHolder
     initialValue={''}
     render={(value, onChange) => (
@@ -87,7 +87,7 @@ export const WithTranslatableElementsAndSeparator = (): renders any => (
   />
 );
 
-export const WithOnClickForSomeElements = (): renders any => (
+export const WithOnClickForSomeElements = (): renders* => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -122,7 +122,7 @@ export const WithOnClickForSomeElements = (): renders any => (
   />
 );
 
-export const WithOnClickLongTextsAndRenderIcon = (): renders any => (
+export const WithOnClickLongTextsAndRenderIcon = (): renders* => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -173,7 +173,7 @@ export const WithOnClickLongTextsAndRenderIcon = (): renders any => (
   />
 );
 
-export const InDialog = (): renders any => (
+export const InDialog = (): renders* => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -208,7 +208,7 @@ export const InDialog = (): renders any => (
   />
 );
 
-export const WithReducedMarginInMiniToolbar = (): renders any => (
+export const WithReducedMarginInMiniToolbar = (): renders* => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -231,7 +231,7 @@ export const WithReducedMarginInMiniToolbar = (): renders any => (
   />
 );
 
-export const WithMarkdownHelperText = (): renders any => (
+export const WithMarkdownHelperText = (): renders* => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -251,7 +251,7 @@ export const WithMarkdownHelperText = (): renders any => (
   />
 );
 
-export const WithFloatingLabel = (): renders any => (
+export const WithFloatingLabel = (): renders* => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -272,7 +272,7 @@ export const WithFloatingLabel = (): renders any => (
   />
 );
 
-export const WithInputValueListener = (): renders any => {
+export const WithInputValueListener = (): renders* => {
   const [value, setValue] = React.useState('Choice 6');
   const [inputValue, setInputValue] = React.useState('Choice 6');
 

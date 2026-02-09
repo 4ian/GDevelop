@@ -11,4 +11,4 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders any => <EmptyEditor renderObjectNameField={() => null} />;
+export const Default = (): renders* => <EmptyEditor renderObjectNameField={() => null} />;

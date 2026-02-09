@@ -113,7 +113,7 @@ const isParameterVisible = (
 
 const InstructionParametersEditor: component(
   ...{ ...Props, +ref?: React.RefSetter<InstructionParametersEditorInterface> }
-) renders React$Node = React.forwardRef<
+) renders* = React.forwardRef<
   Props,
   InstructionParametersEditorInterface
 >(

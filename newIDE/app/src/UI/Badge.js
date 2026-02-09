@@ -13,7 +13,7 @@ type Props = {|
   overlap?: 'circle',
 |};
 
-const Badge = ({forcedColor, ...otherProps}: Props): renders any => {
+const Badge = ({forcedColor, ...otherProps}: Props): renders* => {
   const stylesForBadge = React.useMemo(
     () =>
       forcedColor

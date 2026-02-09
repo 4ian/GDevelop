@@ -63,7 +63,7 @@ export const GameThumbnail = (
     fullWidthOnMobile,
     width
   }: Props,
-): renders any => {
+): renders* => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext

@@ -99,7 +99,7 @@ export type AssetDetailsInterface = {|
 
 export const AssetDetails: component(
   ...{ ...Props, +ref?: React.RefSetter<AssetDetailsInterface> }
-) renders React$Node = React.forwardRef<Props, AssetDetailsInterface>(
+) renders* = React.forwardRef<Props, AssetDetailsInterface>(
   (
     {
       onTagSelection,

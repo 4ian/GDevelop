@@ -14,7 +14,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const LayerWithInstances = (): renders any => {
+export const LayerWithInstances = (): renders* => {
   const instance1 = new gd.InitialInstance();
   instance1.setObjectName('Object');
   instance1.setLayer('GUI');
@@ -55,7 +55,7 @@ export const LayerWithInstances = (): renders any => {
     />
   );
 };
-export const LayerWithoutInstances = (): renders any => {
+export const LayerWithoutInstances = (): renders* => {
   const project = new gd.Project();
   const layout = project.insertNewLayout('NewScene', 0);
   layout.insertNewLayer('GUI', 0);

@@ -31,7 +31,7 @@ const eventsTreeTutorials: Array<Tutorial> = [
   },
 ];
 
-export const DefaultMediumScreenScopeInLayout = (): renders any => (
+export const DefaultMediumScreenScopeInLayout = (): renders* => (
   <DragAndDropContextProvider>
     <div className="gd-events-sheet">
       <FixedHeightFlexContainer height={500}>
@@ -87,7 +87,7 @@ export const DefaultMediumScreenScopeInLayout = (): renders any => (
   </DragAndDropContextProvider>
 );
 
-export const DefaultSmallScreenScopeInLayout = (): renders any => (
+export const DefaultSmallScreenScopeInLayout = (): renders* => (
   <DragAndDropContextProvider>
     <div className="gd-events-sheet">
       <FixedHeightFlexContainer height={500}>
@@ -143,7 +143,7 @@ export const DefaultSmallScreenScopeInLayout = (): renders any => (
   </DragAndDropContextProvider>
 );
 
-export const DefaultMediumScreenScopeNotInLayout = (): renders any => (
+export const DefaultMediumScreenScopeNotInLayout = (): renders* => (
   <DragAndDropContextProvider>
     <div className="gd-events-sheet">
       <FixedHeightFlexContainer height={500}>
@@ -196,7 +196,7 @@ export const DefaultMediumScreenScopeNotInLayout = (): renders any => (
   </DragAndDropContextProvider>
 );
 
-export const EmptySmallScreenScopeInALayout = (): renders any => (
+export const EmptySmallScreenScopeInALayout = (): renders* => (
   <DragAndDropContextProvider>
     <div className="gd-events-sheet">
       <FixedHeightFlexContainer height={500}>

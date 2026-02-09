@@ -18,7 +18,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const WithSubscriptionLimitNotReached = (): renders any => (
+export const WithSubscriptionLimitNotReached = (): renders* => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={{
@@ -35,7 +35,7 @@ export const WithSubscriptionLimitNotReached = (): renders any => (
   />
 );
 
-export const WithoutSubscriptionLimitNotReached = (): renders any => (
+export const WithoutSubscriptionLimitNotReached = (): renders* => (
   <CurrentUsageDisplayer
     subscription={noSubscription}
     quota={{
@@ -52,7 +52,7 @@ export const WithoutSubscriptionLimitNotReached = (): renders any => (
   />
 );
 
-export const WithSubscriptionLimitNotReached30Days = (): renders any => (
+export const WithSubscriptionLimitNotReached30Days = (): renders* => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={{
@@ -69,7 +69,7 @@ export const WithSubscriptionLimitNotReached30Days = (): renders any => (
   />
 );
 
-export const WithSubscription1BuildRemaining = (): renders any => (
+export const WithSubscription1BuildRemaining = (): renders* => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={{
@@ -86,7 +86,7 @@ export const WithSubscription1BuildRemaining = (): renders any => (
   />
 );
 
-export const WithSubscription1BuildRemaining30Days = (): renders any => (
+export const WithSubscription1BuildRemaining30Days = (): renders* => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={{
@@ -103,7 +103,7 @@ export const WithSubscription1BuildRemaining30Days = (): renders any => (
   />
 );
 
-export const WithSubscriptionRedemptionCode = (): renders any => (
+export const WithSubscriptionRedemptionCode = (): renders* => (
   <CurrentUsageDisplayer
     subscription={silverSubscriptionWithRedemptionCode}
     quota={{
@@ -120,7 +120,7 @@ export const WithSubscriptionRedemptionCode = (): renders any => (
   />
 );
 
-export const WithSubscriptionExpiredRedemptionCode = (): renders any => (
+export const WithSubscriptionExpiredRedemptionCode = (): renders* => (
   <CurrentUsageDisplayer
     subscription={silverSubscriptionWithExpiredRedemptionCode}
     quota={{
@@ -137,7 +137,7 @@ export const WithSubscriptionExpiredRedemptionCode = (): renders any => (
   />
 );
 
-export const WithSubscriptionLimitReached = (): renders any => (
+export const WithSubscriptionLimitReached = (): renders* => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={limitsReached.quotas['cordova-build']}
@@ -149,7 +149,7 @@ export const WithSubscriptionLimitReached = (): renders any => (
   />
 );
 
-export const WithProSubscriptionLimitReached = (): renders any => (
+export const WithProSubscriptionLimitReached = (): renders* => (
   <CurrentUsageDisplayer
     subscription={subscriptionForStartupUser}
     quota={limitsReached.quotas['cordova-build']}
@@ -161,7 +161,7 @@ export const WithProSubscriptionLimitReached = (): renders any => (
   />
 );
 
-export const WithoutSubscriptionLimitsReached = (): renders any => (
+export const WithoutSubscriptionLimitsReached = (): renders* => (
   <CurrentUsageDisplayer
     subscription={noSubscription}
     quota={limitsReached.quotas['cordova-build']}

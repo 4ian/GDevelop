@@ -23,7 +23,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const WebBuildCard = (): renders any => (
+export const WebBuildCard = (): renders* => (
   <BuildCard
     build={completeWebBuild}
     game={{ ...game1, acceptsBuildComments: true }}
@@ -35,7 +35,7 @@ export const WebBuildCard = (): renders any => (
   />
 );
 
-export const WebCurrentlyOnlineBuildCard = (): renders any => (
+export const WebCurrentlyOnlineBuildCard = (): renders* => (
   <BuildCard
     build={completeWebBuild}
     game={{
@@ -50,7 +50,7 @@ export const WebCurrentlyOnlineBuildCard = (): renders any => (
   />
 );
 
-export const ElectronBuildCard = (): renders any => (
+export const ElectronBuildCard = (): renders* => (
   <BuildCard
     build={completeElectronBuild}
     game={game1}
@@ -61,7 +61,7 @@ export const ElectronBuildCard = (): renders any => (
     authenticatedUser={fakeSilverAuthenticatedUser}
   />
 );
-export const PendingElectronBuildCard = (): renders any => (
+export const PendingElectronBuildCard = (): renders* => (
   <BuildCard
     build={pendingElectronBuild}
     game={game1}
@@ -72,7 +72,7 @@ export const PendingElectronBuildCard = (): renders any => (
     authenticatedUser={fakeSilverAuthenticatedUser}
   />
 );
-export const CordovaBuildCard = (): renders any => (
+export const CordovaBuildCard = (): renders* => (
   <BuildCard
     build={completeCordovaBuild}
     game={game1}
@@ -83,7 +83,7 @@ export const CordovaBuildCard = (): renders any => (
     authenticatedUser={fakeSilverAuthenticatedUser}
   />
 );
-export const pendingCordovaBuildCard = (): renders any => (
+export const pendingCordovaBuildCard = (): renders* => (
   <BuildCard
     build={pendingCordovaBuild}
     game={game1}
@@ -94,7 +94,7 @@ export const pendingCordovaBuildCard = (): renders any => (
     authenticatedUser={fakeSilverAuthenticatedUser}
   />
 );
-export const ErroredCordovaBuildCard = (): renders any => (
+export const ErroredCordovaBuildCard = (): renders* => (
   <BuildCard
     build={erroredCordovaBuild}
     game={game1}

@@ -538,7 +538,7 @@ const MarketingPlansStory = ({
   );
 };
 
-export const LoadingAndError = (): renders any => {
+export const LoadingAndError = (): renders* => {
   return (
     <MarketingPlansStory
       gameFeaturings={[]}
@@ -549,11 +549,11 @@ export const LoadingAndError = (): renders any => {
   );
 };
 
-export const Default = (): renders any => {
+export const Default = (): renders* => {
   return <MarketingPlansStory gameFeaturings={[]} delayResponse={1000} />;
 };
 
-export const WithOwnedActiveBasicPlanIncompleteGame = (): renders any => {
+export const WithOwnedActiveBasicPlanIncompleteGame = (): renders* => {
   return (
     <MarketingPlansStory
       gameFeaturings={[
@@ -570,7 +570,7 @@ export const WithOwnedActiveBasicPlanIncompleteGame = (): renders any => {
   );
 };
 
-export const WithOwnedActiveBasicPlanFullGame = (): renders any => {
+export const WithOwnedActiveBasicPlanFullGame = (): renders* => {
   return (
     <MarketingPlansStory
       gameFeaturings={[
@@ -586,7 +586,7 @@ export const WithOwnedActiveBasicPlanFullGame = (): renders any => {
   );
 };
 
-export const WithOwnedExpiredBasicPlan = (): renders any => {
+export const WithOwnedExpiredBasicPlan = (): renders* => {
   return (
     <MarketingPlansStory
       gameFeaturings={[
@@ -602,7 +602,7 @@ export const WithOwnedExpiredBasicPlan = (): renders any => {
   );
 };
 
-export const WithOwnedProPlan = (): renders any => {
+export const WithOwnedProPlan = (): renders* => {
   return (
     <MarketingPlansStory
       gameFeaturings={[
@@ -639,7 +639,7 @@ export const WithOwnedProPlan = (): renders any => {
   );
 };
 
-export const WithOwnedPremiumPlan = (): renders any => {
+export const WithOwnedPremiumPlan = (): renders* => {
   return (
     <MarketingPlansStory
       gameFeaturings={[

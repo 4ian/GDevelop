@@ -49,7 +49,7 @@ const FunctionListItem = ({
 export default function EventsBasedObjectSelectorDialog({
   onChoose,
   onCancel,
-}: Props): renders any {
+}: Props): renders* {
   return (
     <Dialog
       title={<Trans>Choose a new object type</Trans>}

@@ -96,7 +96,7 @@ export const ExportFlow = (
     stepCurrentProgress,
     errored
   }: OnlineElectronExportFlowProps,
-): renders any => {
+): renders* => {
   const isExportingOrbuildRunningOrFinished =
     isExporting || (!!build && build.status !== 'error');
 
@@ -131,7 +131,7 @@ export const ExportFlow = (
 
 export const onlineElectronExporter = {
   key: 'onlineelectronexport',
-  tabName: <Trans>Desktop</Trans> as renders any,
-  name: <Trans>Windows, macOS &amp; Linux</Trans> as renders any,
+  tabName: <Trans>Desktop</Trans> as renders*,
+  name: <Trans>Windows, macOS &amp; Linux</Trans> as renders*,
   helpPage: '/publishing/windows-macos-linux',
 };

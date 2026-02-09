@@ -13,7 +13,7 @@ type Props = {
 };
 
 /* Display a rating between 1 and 10. */
-const Rating = ({value, label}: Props): renders any => {
+const Rating = ({value, label}: Props): renders* => {
   return (
     <Column expand noMargin>
       <Line justifyContent="space-between">

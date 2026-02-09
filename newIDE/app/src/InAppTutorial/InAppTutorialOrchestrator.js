@@ -487,7 +487,7 @@ export type InAppTutorialOrchestratorInterface = {|
 
 const InAppTutorialOrchestrator: component(
   ...{ ...Props, +ref?: React.RefSetter<InAppTutorialOrchestratorInterface> }
-) renders React$Node = React.forwardRef<
+) renders* = React.forwardRef<
   Props,
   InAppTutorialOrchestratorInterface
 >(

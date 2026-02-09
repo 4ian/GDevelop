@@ -144,7 +144,7 @@ const StartInAppTutorialDialog = (
     startTutorial,
     isProjectOpening
   }: Props,
-): null | renders any => {
+): null | renders* => {
   const { getInAppTutorialShortHeader } = React.useContext(
     InAppTutorialContext
   );

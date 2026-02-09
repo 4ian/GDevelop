@@ -42,7 +42,7 @@ export const GameRegistration = (
     onGameRegistered,
     customRegistrationMessage
   }: GameRegistrationProps,
-): null | renders any | renders Fragment => {
+): null | renders* | renders Fragment => {
   const {
     onOpenLoginDialog,
     onOpenCreateAccountDialog,

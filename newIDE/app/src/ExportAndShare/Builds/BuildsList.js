@@ -110,7 +110,7 @@ const BuildsList = (
     onBuildUpdated,
     onBuildDeleted
   }: Props,
-): renders any => {
+): renders* => {
   const [gameUpdating, setGameUpdating] = React.useState(false);
   const [buildFilter, setBuildFilter] = React.useState<BuildFilter>(
     'all-build'

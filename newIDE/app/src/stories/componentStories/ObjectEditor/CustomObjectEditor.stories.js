@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const ButtonObject = (): renders any => (
+export const ButtonObject = (): renders* => (
   <SerializedObjectDisplay object={testProject.customObject.getConfiguration()}>
     <CustomObjectPropertiesEditor
       objectConfiguration={testProject.customObject.getConfiguration()}

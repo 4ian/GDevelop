@@ -28,7 +28,7 @@ const getErrorMessage = (error: ?Error) => {
   if (error) return 'Error while loading users';
 };
 
-export const UsersAutocomplete = ({userIds, onChange, floatingLabelText, helperText, disabled}: Props): renders any => {
+export const UsersAutocomplete = ({userIds, onChange, floatingLabelText, helperText, disabled}: Props): renders* => {
   const forceUpdate = useForceUpdate();
   const [users, setUsers] = React.useState<Array<AutocompleteOption>>([]);
   const [userInput, setUserInput] = useState('');

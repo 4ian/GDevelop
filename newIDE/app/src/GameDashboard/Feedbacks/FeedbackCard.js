@@ -61,7 +61,7 @@ type Props = {|
   onCommentUpdated: (comment: Comment) => void,
 |};
 
-export const getRatings = (ratings: ?GameRatings): ?Array<{ key: string, label: renders any, value: number }> => {
+export const getRatings = (ratings: ?GameRatings): ?Array<{ key: string, label: renders*, value: number }> => {
   if (!ratings) return null;
   if (ratings.version === 1) {
     return [
@@ -85,7 +85,7 @@ export const getRatings = (ratings: ?GameRatings): ?Array<{ key: string, label: 
   }
 };
 
-const FeedbackCard = ({comment, buildProperties, authenticatedUser, onCommentUpdated}: Props): renders any => {
+const FeedbackCard = ({comment, buildProperties, authenticatedUser, onCommentUpdated}: Props): renders* => {
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const ratings = getRatings(comment.ratings);
   const theme = React.useContext(GDevelopThemeContext);

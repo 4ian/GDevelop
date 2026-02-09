@@ -20,7 +20,7 @@ type Props = {|
   }) => React.Node,
 |};
 
-const EditorMosaicPlayground = ({renderButtons, renderEditorMosaic}: Props): renders any => {
+const EditorMosaicPlayground = ({renderButtons, renderEditorMosaic}: Props): renders* => {
   const editorRef = React.useRef<
     EditorMosaicInterface | EditorNavigatorInterface | null
   >(null);

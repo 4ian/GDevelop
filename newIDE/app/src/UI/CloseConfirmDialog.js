@@ -72,4 +72,4 @@ export default React.memo<Props>(
     
     return null;
   },
-) as component(...Props) renders React.Node;
+) as component(...Props) renders*;

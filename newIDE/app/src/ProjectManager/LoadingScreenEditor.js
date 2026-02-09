@@ -69,7 +69,7 @@ export const LoadingScreenEditor = (
     resourceManagementProps,
     projectScopedContainersAccessor
   }: Props,
-): renders any => {
+): renders* => {
   const subscriptionChecker = React.useRef<?SubscriptionCheckerInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const forceUpdate = useForceUpdate();

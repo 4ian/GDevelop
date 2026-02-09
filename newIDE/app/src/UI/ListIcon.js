@@ -107,5 +107,5 @@ function ListIcon(props: Props) {
   );
 }
 
-const ListIconMemo: component(...Props) renders React.Node = React.memo<Props>(ListIcon);
+const ListIconMemo: component(...Props) renders* = React.memo<Props>(ListIcon);
 export default ListIconMemo;

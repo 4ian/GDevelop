@@ -29,7 +29,7 @@ export type TwoStatesButtonInterface = {| focusLeftButton: () => void |};
 
 const TwoStatesButton: component(
   ...{ ...Props, +ref?: React.RefSetter<TwoStatesButtonInterface> }
-) renders React$Node = React.forwardRef<Props, TwoStatesButtonInterface>(
+) renders* = React.forwardRef<Props, TwoStatesButtonInterface>(
   ({ leftButton, rightButton, onChange, value, disabled }, ref) => {
     const leftButtonRef = React.useRef<?Button>(null);
 

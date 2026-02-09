@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders any => {
+export const Default = (): renders* => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -34,7 +34,7 @@ export const Default = (): renders any => {
   );
 };
 
-export const ErrorLoadingPromotions = (): renders any => {
+export const ErrorLoadingPromotions = (): renders* => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -51,7 +51,7 @@ export const ErrorLoadingPromotions = (): renders any => {
   );
 };
 
-export const LoadingPromotions = (): renders any => {
+export const LoadingPromotions = (): renders* => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -68,7 +68,7 @@ export const LoadingPromotions = (): renders any => {
   );
 };
 
-export const OnlyGame = (): renders any => {
+export const OnlyGame = (): renders* => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -85,7 +85,7 @@ export const OnlyGame = (): renders any => {
   );
 };
 
-export const OnlyAssetPack = (): renders any => {
+export const OnlyAssetPack = (): renders* => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{

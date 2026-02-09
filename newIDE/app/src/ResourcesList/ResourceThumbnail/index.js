@@ -36,7 +36,7 @@ const ResourceThumbnail = (
     onContextMenu,
     size
   }: Props,
-): null | renders any => {
+): null | renders* => {
   switch (resourceKind) {
     case 'image':
       return (

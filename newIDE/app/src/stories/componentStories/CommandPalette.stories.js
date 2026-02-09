@@ -18,7 +18,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <I18n>
     {({ i18n }) => (
       <AutocompletePicker
@@ -56,7 +56,7 @@ export const Default = (): renders any => (
   </I18n>
 );
 
-export const SelectingOption = (): renders any => (
+export const SelectingOption = (): renders* => (
   <I18n>
     {({ i18n }) => (
       <AutocompletePicker

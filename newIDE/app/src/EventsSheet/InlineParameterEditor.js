@@ -56,7 +56,7 @@ const InlineParameterEditor = (
     anchorEl,
     resourceManagementProps
   }: Props,
-): null | renders any => {
+): null | renders* => {
   const [
     parameterMetadata,
     setParameterMetadata,

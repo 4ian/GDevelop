@@ -34,7 +34,7 @@ import BrowserLoginProvider from './LoginProvider/BrowserLoginProvider';
 import { isServiceWorkerSupported } from './ServiceWorkerSetup';
 import { ensureBrowserSWPreviewSession } from './ExportAndShare/BrowserExporters/BrowserSWPreviewLauncher/BrowserSWPreviewIndexedDB';
 
-export const create = (authentication: Authentication): renders any => {
+export const create = (authentication: Authentication): renders* => {
   Window.setUpContextMenu();
   const loginProvider = new BrowserLoginProvider(authentication.auth);
   authentication.setLoginProvider(loginProvider);

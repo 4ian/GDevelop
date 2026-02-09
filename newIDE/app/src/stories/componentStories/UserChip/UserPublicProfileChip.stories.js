@@ -11,7 +11,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const UserPublicProfileChip = (): renders any => (
+export const UserPublicProfileChip = (): renders* => (
   <UserPublicProfileChipComponent
     user={{
       id: '123',

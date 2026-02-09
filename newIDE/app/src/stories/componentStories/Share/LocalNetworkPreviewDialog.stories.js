@@ -11,7 +11,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <LocalNetworkPreviewDialog
     open
     url="192.168.0.1:2929"
@@ -21,7 +21,7 @@ export const Default = (): renders any => (
     onClose={action('on close')}
   />
 );
-export const WaitingForUrl = (): renders any => (
+export const WaitingForUrl = (): renders* => (
   <LocalNetworkPreviewDialog
     open
     url=""
@@ -31,7 +31,7 @@ export const WaitingForUrl = (): renders any => (
     onClose={action('on close')}
   />
 );
-export const Error = (): renders any => (
+export const Error = (): renders* => (
   <LocalNetworkPreviewDialog
     open
     url="192.168.0.1:2929"

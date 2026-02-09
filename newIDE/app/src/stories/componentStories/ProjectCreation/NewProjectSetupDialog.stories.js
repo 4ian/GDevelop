@@ -23,7 +23,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const OpenAndNotAuthenticated = (): renders any => {
+export const OpenAndNotAuthenticated = (): renders* => {
   return (
     <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <NewProjectSetupDialog
@@ -58,7 +58,7 @@ export const OpenAndNotAuthenticated = (): renders any => {
   );
 };
 
-export const OpenAndAuthenticated = (): renders any => {
+export const OpenAndAuthenticated = (): renders* => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <NewProjectSetupDialog
@@ -93,7 +93,7 @@ export const OpenAndAuthenticated = (): renders any => {
   );
 };
 
-export const Opening = (): renders any => {
+export const Opening = (): renders* => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <NewProjectSetupDialog
@@ -129,7 +129,7 @@ export const Opening = (): renders any => {
   );
 };
 
-export const LimitsReached = (): renders any => {
+export const LimitsReached = (): renders* => {
   return (
     <AuthenticatedUserContext.Provider
       value={fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects}
@@ -166,7 +166,7 @@ export const LimitsReached = (): renders any => {
   );
 };
 
-export const FromExample = (): renders any => {
+export const FromExample = (): renders* => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <NewProjectSetupDialog
@@ -201,7 +201,7 @@ export const FromExample = (): renders any => {
   );
 };
 
-export const FromExampleWithoutGoingBack = (): renders any => {
+export const FromExampleWithoutGoingBack = (): renders* => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <NewProjectSetupDialog
@@ -237,7 +237,7 @@ export const FromExampleWithoutGoingBack = (): renders any => {
   );
 };
 
-export const FromPrivateGameTemplate = (): renders any => {
+export const FromPrivateGameTemplate = (): renders* => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <NewProjectSetupDialog
@@ -274,7 +274,7 @@ export const FromPrivateGameTemplate = (): renders any => {
   );
 };
 
-export const FromPrivateGameTemplateWithoutGoingBack = (): renders any => {
+export const FromPrivateGameTemplateWithoutGoingBack = (): renders* => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <NewProjectSetupDialog

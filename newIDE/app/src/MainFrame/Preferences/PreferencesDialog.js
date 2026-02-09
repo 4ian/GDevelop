@@ -671,7 +671,7 @@ const PreferencesDialog = ({
   );
 };
 
-const PreferencesDialogWithErrorBoundary = (props: Props): renders any => (
+const PreferencesDialogWithErrorBoundary = (props: Props): renders* => (
   <ErrorBoundary
     componentTitle={<Trans>Preferences</Trans>}
     scope="preferences"

@@ -25,7 +25,7 @@ export default {
   component: CloudProjectRecoveryDialog,
 };
 
-export const Default = (): renders any => {
+export const Default = (): renders* => {
   const projectId = 'fb4d878a-1935-4916-b681-f9235475d354';
   const versions: Array<ExpandedCloudProjectVersion> = [
     {
@@ -95,7 +95,7 @@ export const Default = (): renders any => {
   );
 };
 
-export const NoFallbackVersion = (): renders any => {
+export const NoFallbackVersion = (): renders* => {
   const projectId = 'fb4d878a-1935-4916-b681-f9235475d354';
   const versions: Array<ExpandedCloudProjectVersion> = [
     {
@@ -175,7 +175,7 @@ export const NoFallbackVersion = (): renders any => {
   );
 };
 
-export const Errored = (): renders any => {
+export const Errored = (): renders* => {
   const projectId = 'projectId';
 
   const assetServiceMock = new MockAdapter(projectApiAxiosClient, {

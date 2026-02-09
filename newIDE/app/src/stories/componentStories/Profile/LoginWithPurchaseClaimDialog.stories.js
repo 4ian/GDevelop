@@ -28,9 +28,9 @@ const defaultProps = {
   claimedProductOptions,
 };
 
-export const Default = (): renders any => <LoginWithPurchaseClaimDialog {...defaultProps} />;
+export const Default = (): renders* => <LoginWithPurchaseClaimDialog {...defaultProps} />;
 
-export const WeakPasswordErrorFromBackend = (): renders any => (
+export const WeakPasswordErrorFromBackend = (): renders* => (
   <LoginWithPurchaseClaimDialog
     {...defaultProps}
     error={{
@@ -39,7 +39,7 @@ export const WeakPasswordErrorFromBackend = (): renders any => (
   />
 );
 
-export const InvalidEmailErrorFromBackend = (): renders any => (
+export const InvalidEmailErrorFromBackend = (): renders* => (
   <LoginWithPurchaseClaimDialog
     {...defaultProps}
     error={{
@@ -48,7 +48,7 @@ export const InvalidEmailErrorFromBackend = (): renders any => (
   />
 );
 
-export const AccountExistsWithDifferentCredentialErrorFromBackend = (): renders any => (
+export const AccountExistsWithDifferentCredentialErrorFromBackend = (): renders* => (
   <LoginWithPurchaseClaimDialog
     {...defaultProps}
     error={{
@@ -57,6 +57,6 @@ export const AccountExistsWithDifferentCredentialErrorFromBackend = (): renders 
   />
 );
 
-export const Submitting = (): renders any => (
+export const Submitting = (): renders* => (
   <LoginWithPurchaseClaimDialog {...defaultProps} loginInProgress />
 );

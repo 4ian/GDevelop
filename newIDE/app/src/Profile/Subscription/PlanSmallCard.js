@@ -299,7 +299,7 @@ const PlanSmallCard = (
     hidePrice = false,
     background
   }: Props,
-): renders any => {
+): renders* => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { isMobile } = useResponsiveWindowSize();
 

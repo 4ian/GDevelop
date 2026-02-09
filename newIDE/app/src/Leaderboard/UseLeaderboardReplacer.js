@@ -31,7 +31,7 @@ type ReplacePromptDialogProps = {|
   onTriggerReplace: () => void,
 |};
 
-export const ReplacePromptDialog = ({leaderboardsToReplace, onClose, onTriggerReplace}: ReplacePromptDialogProps): renders any => {
+export const ReplacePromptDialog = ({leaderboardsToReplace, onClose, onTriggerReplace}: ReplacePromptDialogProps): renders* => {
   const { authenticated, onOpenLoginDialog } = React.useContext(
     AuthenticatedUserContext
   );
@@ -111,7 +111,7 @@ export const LeaderboardReplacerProgressDialog = (
     onAbandon,
     progress
   }: LeaderboardReplacerProgressDialogProps,
-): renders any => {
+): renders* => {
   const hasErrors = erroredLeaderboards.length > 0;
 
   return (

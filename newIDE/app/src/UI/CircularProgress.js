@@ -17,7 +17,7 @@ type Props = {|
   |},
 |};
 
-function CircularProgress(props: Props): renders any {
+function CircularProgress(props: Props): renders* {
   return (
     <MuiCircularProgress
       color="secondary"

@@ -28,7 +28,7 @@ export default function EmailVerificationDialog({
   sendEmailAutomatically,
   showSendEmailButton,
   onSendEmail,
-}: Props): renders any {
+}: Props): renders* {
   const isVerified =
     !!authenticatedUser.firebaseUser &&
     !!authenticatedUser.firebaseUser.emailVerified;

@@ -22,7 +22,7 @@ export default function MeasurementUnitDocumentation({
   label,
   description,
   elementsWithWords,
-}: Props): renders any {
+}: Props): renders* {
   return (
     <Column noMargin>
       <Text size="sub-title">{label}</Text>

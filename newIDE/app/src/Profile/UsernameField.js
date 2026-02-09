@@ -24,14 +24,14 @@ export const isUsernameValid = (
   return !!username && /^[\w|-]+$/.test(username) && username.length < 31;
 };
 
-export const usernameFormatErrorMessage: renders any = (
+export const usernameFormatErrorMessage: renders* = (
   <Trans>
     Please pick a short username with only alphanumeric characters as well as _
     and -
   </Trans>
 );
 
-export const usernameAvailabilityErrorMessage: renders any = (
+export const usernameAvailabilityErrorMessage: renders* = (
   <Trans>This username is already used, please pick another one.</Trans>
 );
 
@@ -59,7 +59,7 @@ export const UsernameField = (
     isValidatingUsername,
     disabled
   }: Props,
-): renders any => {
+): renders* => {
   const usernameFormattingError = isUsernameValid(value, {
     allowEmpty: !!allowEmpty,
   })

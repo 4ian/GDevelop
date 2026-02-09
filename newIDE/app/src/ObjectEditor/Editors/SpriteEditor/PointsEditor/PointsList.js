@@ -190,7 +190,7 @@ type PointsListProps = {|
   spriteSize: [number, number],
 |};
 
-const PointsList = (props: PointsListProps): renders any => {
+const PointsList = (props: PointsListProps): renders* => {
   return (
     <Column expand>
       <Table>

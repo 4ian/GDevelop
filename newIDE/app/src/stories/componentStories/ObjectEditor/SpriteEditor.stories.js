@@ -22,7 +22,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
     <DragAndDropContextProvider>
       <SpriteEditor
@@ -44,7 +44,7 @@ export const Default = (): renders any => (
   </SerializedObjectDisplay>
 );
 
-export const AnimationLocked = (): renders any => (
+export const AnimationLocked = (): renders* => (
   <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
     <DragAndDropContextProvider>
       <SpriteEditor
@@ -67,7 +67,7 @@ export const AnimationLocked = (): renders any => (
   </SerializedObjectDisplay>
 );
 
-export const Empty = (): renders any => (
+export const Empty = (): renders* => (
   <SerializedObjectDisplay object={testProject.emptySpriteObjectConfiguration}>
     <DragAndDropContextProvider>
       <SpriteEditor
@@ -89,7 +89,7 @@ export const Empty = (): renders any => (
   </SerializedObjectDisplay>
 );
 
-export const Points = (): renders any => (
+export const Points = (): renders* => (
   <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>
@@ -104,7 +104,7 @@ export const Points = (): renders any => (
   </SerializedObjectDisplay>
 );
 
-export const CollisionMasks = (): renders any => (
+export const CollisionMasks = (): renders* => (
   <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>

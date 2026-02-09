@@ -64,7 +64,7 @@ const WrappedCreateSection = (
     user: AuthenticatedUser,
     games?: ?Array<Game>,
   |},
-): renders any => {
+): renders* => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   // Adapt height for storybook to see the bottom menu on mobile.
   const fixedHeight = isMobile ? (isLandscape ? 400 : 850) : 1080;
@@ -141,7 +141,7 @@ export default {
   decorators: [GDevelopJsInitializerDecorator, inAppTutorialDecorator],
 };
 
-export const CreateSectionLoading = (): renders any => (
+export const CreateSectionLoading = (): renders* => (
   <WrappedCreateSection
     project={null}
     recentProjectFiles={getRecentProjectFiles(5)}
@@ -149,35 +149,35 @@ export const CreateSectionLoading = (): renders any => (
     games={null}
   />
 );
-export const NoProjectOpened = (): renders any => (
+export const NoProjectOpened = (): renders* => (
   <WrappedCreateSection
     project={null}
     recentProjectFiles={getRecentProjectFiles(5)}
     user={fakeSilverAuthenticatedUser}
   />
 );
-export const ProjectOpened = (): renders any => (
+export const ProjectOpened = (): renders* => (
   <WrappedCreateSection
     project={testProject.project}
     recentProjectFiles={getRecentProjectFiles(5)}
     user={fakeSilverAuthenticatedUser}
   />
 );
-export const NoRecentFiles = (): renders any => (
+export const NoRecentFiles = (): renders* => (
   <WrappedCreateSection
     project={testProject.project}
     recentProjectFiles={[]}
     user={fakeSilverAuthenticatedUser}
   />
 );
-export const LotOfRecentFiles = (): renders any => (
+export const LotOfRecentFiles = (): renders* => (
   <WrappedCreateSection
     project={testProject.project}
     recentProjectFiles={getRecentProjectFiles(20)}
     user={fakeSilverAuthenticatedUser}
   />
 );
-export const SomeRecentFilesNotSavedYet = (): renders any => (
+export const SomeRecentFilesNotSavedYet = (): renders* => (
   <WrappedCreateSection
     project={testProject.project}
     recentProjectFiles={getPartiallySavedRecentProjectFiles(20)}

@@ -176,4 +176,4 @@ export default React.forwardRef<ContextMenuWrapperProps, ContextMenuInterface>(
     ...ContextMenuWrapperProps,
     +ref?: React.RefSetter<ContextMenuInterface>,
   }
-) renders React$Node;
+) renders*;

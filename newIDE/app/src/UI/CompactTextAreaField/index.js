@@ -50,7 +50,7 @@ export const CompactTextAreaField = (
     maxLength,
     onSubmit
   }: CompactTextAreaFieldProps,
-): renders any => {
+): renders* => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
 
   const title = !markdownDescription

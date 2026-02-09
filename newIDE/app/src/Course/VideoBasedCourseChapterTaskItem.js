@@ -25,7 +25,7 @@ type Props = {|
   onComplete: boolean => void,
 |};
 
-const VideoBasedCourseChapterTaskItem = ({courseChapterTask, isOpen, isComplete, onComplete}: Props): renders any => {
+const VideoBasedCourseChapterTaskItem = ({courseChapterTask, isOpen, isComplete, onComplete}: Props): renders* => {
   const [isOpenIndividually, setIsOpenIndividually] = React.useState<boolean>(
     isOpen
   );

@@ -18,7 +18,7 @@ type DislikeFeedbackDialogProps = {|
   mode: 'chat' | 'agent',
 |};
 
-export const DislikeFeedbackDialog = ({mode, open, onClose, onSendFeedback}: DislikeFeedbackDialogProps): renders any => {
+export const DislikeFeedbackDialog = ({mode, open, onClose, onSendFeedback}: DislikeFeedbackDialogProps): renders* => {
   const [selectedReason, setSelectedReason] = React.useState<?string>(null);
   const [freeFormDetails, setFreeFormDetails] = React.useState<string>('');
 

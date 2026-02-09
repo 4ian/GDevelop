@@ -100,7 +100,7 @@ export const AskAiStandAloneForm = (
     onWillInstallExtension,
     onExtensionInstalled
   }: Props,
-): null | renders any => {
+): null | renders* => {
   const onCreateProject = React.useCallback(
     async ({
       name,

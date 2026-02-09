@@ -256,7 +256,7 @@ export const IosSigningCredentialsSelector = (
     onSelectBuildSigningOptions,
     disabled
   }: Props,
-): renders any => {
+): renders* => {
   const {
     signingCredentials,
     error,

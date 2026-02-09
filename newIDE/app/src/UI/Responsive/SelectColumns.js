@@ -16,7 +16,7 @@ type Props<TColumnName> = {|
 
 const columnsPadding = 4;
 
-export const SelectColumns = ({columnsRenderer, getColumns}: Props<string>): renders any => {
+export const SelectColumns = ({columnsRenderer, getColumns}: Props<string>): renders* => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const columns = getColumns();
   return (

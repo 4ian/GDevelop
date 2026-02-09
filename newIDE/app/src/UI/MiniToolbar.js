@@ -41,7 +41,7 @@ type MiniToolbarTextProps = {|
   children: React.Node,
 |};
 
-export const MiniToolbarText = ({children, firstChild}: MiniToolbarTextProps): renders any => (
+export const MiniToolbarText = ({children, firstChild}: MiniToolbarTextProps): renders* => (
   <Text
     noShrink
     style={firstChild ? firstChildToolbarTextStyle : toolbarTextStyle}

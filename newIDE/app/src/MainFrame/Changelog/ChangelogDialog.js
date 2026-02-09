@@ -15,7 +15,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const ChangelogDialog = ({open, onClose}: Props): null | renders any => {
+const ChangelogDialog = ({open, onClose}: Props): null | renders* => {
   const forceUpdate = useForceUpdate();
   if (!open) {
     // Don't render anything, to avoid in particular sending useless requests.

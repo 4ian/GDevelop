@@ -51,7 +51,7 @@ type Props = {
   authenticatedUser: AuthenticatedUser,
 };
 
-export const CreateIosCertificateSteps = ({authenticatedUser}: Props): renders any => {
+export const CreateIosCertificateSteps = ({authenticatedUser}: Props): renders* => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { showConfirmation } = useAlertDialog();
   const userId = authenticatedUser.profile

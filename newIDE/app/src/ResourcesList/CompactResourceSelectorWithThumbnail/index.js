@@ -52,7 +52,7 @@ export const CompactResourceSelectorWithThumbnail = (
     onChange,
     id
   }: Props,
-): renders any => {
+): renders* => {
   const resourcesLoader = ResourcesLoader;
   const forceUpdate = useForceUpdate();
   const displayThumbnail = resourcesKindsWithThumbnail.includes(resourceKind);

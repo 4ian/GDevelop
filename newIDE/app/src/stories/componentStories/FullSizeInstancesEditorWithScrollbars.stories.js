@@ -36,7 +36,7 @@ export default {
   decorators: [paperDecorator, GDevelopJsInitializerDecorator],
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <FixedHeightFlexContainer height={600}>
     <DragAndDropContextProvider>
       <FullSizeInstancesEditorWithScrollbars

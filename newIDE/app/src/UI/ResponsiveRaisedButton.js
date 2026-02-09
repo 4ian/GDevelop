@@ -7,7 +7,7 @@ import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
  * A button which hides its label on small screens.
  * Same interface as RaisedButton.
  */
-const ResponsiveRaisedButton = (props: RaisedButtonProps): renders any => {
+const ResponsiveRaisedButton = (props: RaisedButtonProps): renders* => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   return (
     <RaisedButton

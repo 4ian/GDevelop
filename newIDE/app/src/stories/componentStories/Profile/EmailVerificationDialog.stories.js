@@ -15,7 +15,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const EmailAlreadySentNoButton = (): renders any => (
+export const EmailAlreadySentNoButton = (): renders* => (
   <EmailVerificationDialog
     onClose={action('onClose')}
     authenticatedUser={fakeSilverAuthenticatedUser}
@@ -25,7 +25,7 @@ export const EmailAlreadySentNoButton = (): renders any => (
   />
 );
 
-export const EmailAlreadySentWithButton = (): renders any => (
+export const EmailAlreadySentWithButton = (): renders* => (
   <EmailVerificationDialog
     onClose={action('onClose')}
     authenticatedUser={fakeSilverAuthenticatedUser}
@@ -35,7 +35,7 @@ export const EmailAlreadySentWithButton = (): renders any => (
   />
 );
 
-export const SendEmailOnOpeningNoButton = (): renders any => (
+export const SendEmailOnOpeningNoButton = (): renders* => (
   <EmailVerificationDialog
     onClose={action('onClose')}
     authenticatedUser={fakeSilverAuthenticatedUser}
@@ -45,7 +45,7 @@ export const SendEmailOnOpeningNoButton = (): renders any => (
   />
 );
 
-export const VerifiedUser = (): renders any => (
+export const VerifiedUser = (): renders* => (
   <EmailVerificationDialog
     onClose={action('onClose')}
     authenticatedUser={fakeAuthenticatedUserWithEmailVerified}

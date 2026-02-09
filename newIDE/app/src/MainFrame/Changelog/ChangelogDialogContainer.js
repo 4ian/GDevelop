@@ -19,7 +19,7 @@ const ChangelogDialogInnerContainer = ({
  * The container showing the ChangelogDialog only if a a new version
  * of GDevelop is detected.
  */
-const ChangelogDialogContainer = (props: {||}): renders any => (
+const ChangelogDialogContainer = (props: {||}): renders* => (
   <PreferencesContext.Consumer>
     {({ values, verifyIfIsNewVersion }) => (
       <ChangelogDialogInnerContainer

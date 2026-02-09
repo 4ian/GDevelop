@@ -61,7 +61,7 @@ const CoursesPage = (
     getCourseChapterCompletion,
     getCourseCompletion
   }: Props,
-): renders any => {
+): renders* => {
   const { listedCourses } = React.useContext(CourseStoreContext);
   const { windowSize, isLandscape } = useResponsiveWindowSize();
   const numberOfItemsOnOneRow = getColumnsFromWindowSize(

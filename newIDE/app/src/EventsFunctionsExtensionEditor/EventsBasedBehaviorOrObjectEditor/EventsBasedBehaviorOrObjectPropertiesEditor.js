@@ -110,7 +110,7 @@ export const EventsBasedBehaviorPropertiesEditor: component(
     ...Props,
     +ref?: React.RefSetter<EventsBasedBehaviorPropertiesEditorInterface>,
   }
-) renders React$Node = React.forwardRef<
+) renders* = React.forwardRef<
   Props,
   EventsBasedBehaviorPropertiesEditorInterface
 >(

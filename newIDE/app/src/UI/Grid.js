@@ -101,7 +101,7 @@ const spacerStyle = {
  * Check `Layout` first to see if there is already a layout made
  * specifically for your components (like `TextFieldWithButton`).
  */
-export const Spacer: component(...NoProps) renders React.Node = React.memo<NoProps>(() => <span style={spacerStyle} />);
+export const Spacer: component(...NoProps) renders* = React.memo<NoProps>(() => <span style={spacerStyle} />);
 
 const largeSpacerStyle = {
   width: 24,
@@ -110,7 +110,7 @@ const largeSpacerStyle = {
 };
 
 /** A large spacer that is 24px width. */
-export const LargeSpacer: component(...NoProps) renders React.Node = React.memo<NoProps>(() => (
+export const LargeSpacer: component(...NoProps) renders* = React.memo<NoProps>(() => (
   <span style={largeSpacerStyle} />
 ));
 

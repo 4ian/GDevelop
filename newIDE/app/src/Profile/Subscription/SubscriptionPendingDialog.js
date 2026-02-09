@@ -30,7 +30,7 @@ export default function SubscriptionPendingDialog({
   authenticatedUser,
   onSuccess,
   immediatelyShowSuccessMessage,
-}: Props): renders any {
+}: Props): renders* {
   const userPlanIdAtOpening = React.useRef<?string>(
     !!authenticatedUser.subscription
       ? authenticatedUser.subscription.planId

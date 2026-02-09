@@ -137,7 +137,7 @@ const CoursePage = (
     simulateAppStoreProduct,
     onOpenAskAi
   }: Props,
-): renders any => {
+): renders* => {
   const { profile } = React.useContext(AuthenticatedUserContext);
   const userId = (profile && profile.id) || null;
   const {

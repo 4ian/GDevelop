@@ -32,7 +32,7 @@ const sounds = [
   },
 ];
 
-export const Default = (): renders any => {
+export const Default = (): renders* => {
   const [currentSoundIndex, setCurrentSoundIndex] = React.useState<number>(0);
   const onSkipBack = () => {
     setCurrentSoundIndex(_currentSoundIndex => {

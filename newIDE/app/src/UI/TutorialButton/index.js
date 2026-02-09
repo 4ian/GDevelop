@@ -26,7 +26,7 @@ const TutorialButton = (props: PropsType):
   | $Iterable<?React$Node, void, void>
   | React.MixedElement
   | React$Portal
-  | renders any => {
+  | renders* => {
   const { tutorials } = React.useContext(TutorialContext);
   if (!tutorials || !props.tutorialId) return props.renderIfNotFound || null; // Loading or errored, do not display the tutorial.
   const tutorial: ?Tutorial = tutorials.find(

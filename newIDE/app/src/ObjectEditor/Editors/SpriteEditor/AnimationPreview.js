@@ -73,7 +73,7 @@ const AnimationPreview = (
     isAssetPrivate,
     hideAnimationLoader
   }: Props,
-): renders any => {
+): renders* => {
   const forceUpdate = useForceUpdate();
 
   const fps = Number.parseFloat((1 / timeBetweenFrames).toFixed(4));

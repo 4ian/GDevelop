@@ -84,7 +84,7 @@ export const FileToCloudProjectResourceUploader = (
     createNewResource,
     automaticallyOpenInput
   }: FileToCloudProjectResourceUploaderProps,
-): renders any => {
+): renders* => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
   const hasAutomaticallyOpenedInput = React.useRef(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

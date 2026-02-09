@@ -149,7 +149,7 @@ const PrivateGameTemplateInformationPage = (
     onCreateWithGameTemplate,
     simulateAppStoreProduct
   }: Props,
-): renders any => {
+): renders* => {
   const { id, name, sellerId } = privateGameTemplateListingData;
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext

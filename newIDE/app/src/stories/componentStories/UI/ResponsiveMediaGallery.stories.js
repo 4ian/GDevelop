@@ -12,7 +12,7 @@ export default {
   component: ResponsiveMediaGallery,
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <Paper background="dark">
     <Column>
       <ResponsiveLineStackLayout noColumnMargin>

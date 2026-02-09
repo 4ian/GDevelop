@@ -13,7 +13,7 @@ export default {
   component: ScenePropertiesDialog,
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <ScenePropertiesDialog
     open
     project={testProject.project}
@@ -29,7 +29,7 @@ export const Default = (): renders any => (
   />
 );
 
-export const MoreSettings = (): renders any => (
+export const MoreSettings = (): renders* => (
   <ScenePropertiesDialog
     open
     project={testProject.project}

@@ -4,7 +4,7 @@ import { Column } from '../UI/Grid';
 import Text from '../UI/Text';
 import AlertMessage from '../UI/AlertMessage';
 
-export default function Welcome(): renders any {
+export default function Welcome(): renders* {
   return (
     <Column>
       <Text size="title">Welcome to GDevelop Storybook</Text>

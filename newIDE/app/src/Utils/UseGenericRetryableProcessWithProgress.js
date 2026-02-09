@@ -46,7 +46,7 @@ export const GenericRetryableProcessWithProgressDialog = (
     onRetry,
     genericError
   }: GenericRetryableProcessWithProgressProps,
-): renders any => {
+): renders* => {
   const hasErrors =
     (result && result.erroredResources.length > 0) || !!genericError;
 

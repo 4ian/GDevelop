@@ -14,7 +14,7 @@ import {
 
 const ImageResourceField: component(
   ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
-) renders React$Node = React.forwardRef<
+) renders* = React.forwardRef<
   ParameterFieldProps,
   ParameterFieldInterface
 >((props, ref) => {

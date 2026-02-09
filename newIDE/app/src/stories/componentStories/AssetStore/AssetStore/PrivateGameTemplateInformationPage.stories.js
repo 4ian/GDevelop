@@ -318,19 +318,19 @@ const PrivateGameTemplateInformationPageStory = ({
   );
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <PrivateGameTemplateInformationPageStory
     privateGameTemplateListingData={privateGameTemplate1ListingData}
   />
 );
 
-export const ForABundle = (): renders any => (
+export const ForABundle = (): renders* => (
   <PrivateGameTemplateInformationPageStory
     privateGameTemplateListingData={privateGameTemplateBundleListingData}
   />
 );
 
-export const ForAlreadyPurchasedGameTemplate = (): renders any => (
+export const ForAlreadyPurchasedGameTemplate = (): renders* => (
   <PrivateGameTemplateInformationPageStory
     privateGameTemplateListingData={privateGameTemplate1ListingData}
     receivedGameTemplates={[
@@ -348,7 +348,7 @@ export const ForAlreadyPurchasedGameTemplate = (): renders any => (
     ]}
   />
 );
-export const ForAlreadyPurchasedBundle = (): renders any => (
+export const ForAlreadyPurchasedBundle = (): renders* => (
   <PrivateGameTemplateInformationPageStory
     privateGameTemplateListingData={privateGameTemplateBundleListingData}
     receivedGameTemplates={[
@@ -367,21 +367,21 @@ export const ForAlreadyPurchasedBundle = (): renders any => (
   />
 );
 
-export const Loading = (): renders any => (
+export const Loading = (): renders* => (
   <PrivateGameTemplateInformationPageStory
     privateGameTemplateListingData={privateGameTemplate1ListingData}
     delayResponse={10000}
   />
 );
 
-export const With404 = (): renders any => (
+export const With404 = (): renders* => (
   <PrivateGameTemplateInformationPageStory
     privateGameTemplateListingData={privateGameTemplate1ListingData}
     errorCode={404}
   />
 );
 
-export const WithUnknownError = (): renders any => (
+export const WithUnknownError = (): renders* => (
   <PrivateGameTemplateInformationPageStory
     privateGameTemplateListingData={privateGameTemplate1ListingData}
     errorCode={500}

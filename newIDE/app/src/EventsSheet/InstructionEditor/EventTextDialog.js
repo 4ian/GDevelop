@@ -48,7 +48,7 @@ export const filterEditableWithEventTextDialog = (
   );
 };
 
-const EventTextDialog = (props: Props): renders any => {
+const EventTextDialog = (props: Props): renders* => {
   const { event, onClose } = props;
 
   const [textValue, setTextValue] = React.useState<string>('');

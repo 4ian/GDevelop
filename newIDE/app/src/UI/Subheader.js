@@ -11,7 +11,7 @@ const style = {
 };
 
 // A Subheader to be displayed in a List.
-const Subheader = ({children}: Props): renders any | null =>
+const Subheader = ({children}: Props): renders* | null =>
   children ? (
     <Typography variant={'overline'} style={style}>
       {children}

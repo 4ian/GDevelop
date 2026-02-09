@@ -22,7 +22,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const UnpublishedGame = (): renders any => (
+export const UnpublishedGame = (): renders* => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       storageProviders={[CloudStorageProvider]}
@@ -47,7 +47,7 @@ export const UnpublishedGame = (): renders any => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const PublishedGame = (): renders any => (
+export const PublishedGame = (): renders* => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       storageProviders={[CloudStorageProvider]}
@@ -72,7 +72,7 @@ export const PublishedGame = (): renders any => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const CurrentlyOpenedGame = (): renders any => (
+export const CurrentlyOpenedGame = (): renders* => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       storageProviders={[CloudStorageProvider]}
@@ -97,7 +97,7 @@ export const CurrentlyOpenedGame = (): renders any => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const SavingGame = (): renders any => (
+export const SavingGame = (): renders* => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       storageProviders={[CloudStorageProvider]}
@@ -122,7 +122,7 @@ export const SavingGame = (): renders any => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const DisabledGame = (): renders any => (
+export const DisabledGame = (): renders* => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       storageProviders={[CloudStorageProvider]}
@@ -147,7 +147,7 @@ export const DisabledGame = (): renders any => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const LocalProject = (): renders any => (
+export const LocalProject = (): renders* => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       dashboardItem={{
@@ -172,7 +172,7 @@ export const LocalProject = (): renders any => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const OpenedLocalProject = (): renders any => (
+export const OpenedLocalProject = (): renders* => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       dashboardItem={{
@@ -197,7 +197,7 @@ export const OpenedLocalProject = (): renders any => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const DisabledLocalProject = (): renders any => (
+export const DisabledLocalProject = (): renders* => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       dashboardItem={{
@@ -222,7 +222,7 @@ export const DisabledLocalProject = (): renders any => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const CloudProject = (): renders any => (
+export const CloudProject = (): renders* => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       dashboardItem={{
@@ -247,7 +247,7 @@ export const CloudProject = (): renders any => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const OpenedCloudProject = (): renders any => (
+export const OpenedCloudProject = (): renders* => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       dashboardItem={{
@@ -272,7 +272,7 @@ export const OpenedCloudProject = (): renders any => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const DisabledCloudProject = (): renders any => (
+export const DisabledCloudProject = (): renders* => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       dashboardItem={{

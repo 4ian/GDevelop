@@ -153,10 +153,10 @@ const WrappedChatComponent = (allProps: any) => {
   );
 };
 
-export const LoggedOut = (): renders any => (
+export const LoggedOut = (): renders* => (
   <WrappedChatComponent aiRequest={null} quota={null} />
 );
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <WrappedChatComponent
     aiRequest={null}
     quota={{
@@ -169,7 +169,7 @@ export const Default = (): renders any => (
   />
 );
 
-export const AlmostReachedQuota = (): renders any => {
+export const AlmostReachedQuota = (): renders* => {
   const quota = {
     limitReached: false,
     current: 40,
@@ -200,7 +200,7 @@ export const AlmostReachedQuota = (): renders any => {
   );
 };
 
-export const QuotaLimitReachedAndAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): renders any => {
+export const QuotaLimitReachedAndAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): renders* => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -234,7 +234,7 @@ export const QuotaLimitReachedAndAutomaticallyUsingCreditsButNoneLeftNoSubscript
   );
 };
 
-export const QuotaLimitReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): renders any => {
+export const QuotaLimitReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): renders* => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -268,7 +268,7 @@ export const QuotaLimitReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverS
   );
 };
 
-export const QuotaLimitReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): renders any => {
+export const QuotaLimitReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): renders* => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -302,7 +302,7 @@ export const QuotaLimitReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartup
   );
 };
 
-export const QuotaLimitReachedAndNotAutomaticallyUsingCredits = (): renders any => {
+export const QuotaLimitReachedAndNotAutomaticallyUsingCredits = (): renders* => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -335,7 +335,7 @@ export const QuotaLimitReachedAndNotAutomaticallyUsingCredits = (): renders any 
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): renders any => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): renders* => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -369,7 +369,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubsc
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): renders any => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): renders* => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -403,7 +403,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSil
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): renders any => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): renders* => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -437,11 +437,11 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSta
   );
 };
 
-export const Launching = (): renders any => (
+export const Launching = (): renders* => (
   <WrappedChatComponent aiRequest={null} isSending={true} />
 );
 
-export const ErrorLaunching = (): renders any => (
+export const ErrorLaunching = (): renders* => (
   <WrappedChatComponent
     aiRequest={null}
     lastSendError={new Error('Fake error while sending request')}

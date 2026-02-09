@@ -37,7 +37,7 @@ const ObjectVariablesDialog = (
     onComputeAllVariableNames,
     isListLocked
   }: Props,
-): renders any => {
+): renders* => {
   const tabs = React.useMemo(
     () => [
       {

@@ -231,7 +231,7 @@ const ExtensionsSearchDialog = ({
   );
 };
 
-const ExtensionsSearchDialogWithErrorBoundary = (props: Props): renders any => (
+const ExtensionsSearchDialogWithErrorBoundary = (props: Props): renders* => (
   <ErrorBoundary
     componentTitle={<Trans>Extensions search</Trans>}
     scope="extensions-search-dialog"

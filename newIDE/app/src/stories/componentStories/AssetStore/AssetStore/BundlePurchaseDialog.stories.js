@@ -22,7 +22,7 @@ export default {
   },
 };
 
-export const NotLoggedIn = (): renders any => {
+export const NotLoggedIn = (): renders* => {
   return (
     <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <BundlePurchaseDialog
@@ -34,7 +34,7 @@ export const NotLoggedIn = (): renders any => {
   );
 };
 
-export const LoggedIn = (): renders any => {
+export const LoggedIn = (): renders* => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <BundlePurchaseDialog
@@ -46,7 +46,7 @@ export const LoggedIn = (): renders any => {
   );
 };
 
-export const FastCheckout = (): renders any => {
+export const FastCheckout = (): renders* => {
   return (
     <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <BundlePurchaseDialog

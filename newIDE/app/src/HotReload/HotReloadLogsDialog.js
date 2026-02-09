@@ -24,7 +24,7 @@ export default function HotReloadLogsDialog({
   onClose,
   onLaunchNewPreview,
   logs,
-}: Props): null | renders any {
+}: Props): null | renders* {
   if (!shouldDisplayDialogForLogs(logs)) {
     return null;
   }

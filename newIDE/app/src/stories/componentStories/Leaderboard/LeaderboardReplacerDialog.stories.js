@@ -16,7 +16,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const IsReplacingLeaderboards = (): renders any => (
+export const IsReplacingLeaderboards = (): renders* => (
   <LeaderboardReplacerProgressDialog
     progress={30}
     onAbandon={null}
@@ -27,7 +27,7 @@ export const IsReplacingLeaderboards = (): renders any => (
   />
 );
 
-export const WithErrors = (): renders any => (
+export const WithErrors = (): renders* => (
   <LeaderboardReplacerProgressDialog
     progress={100}
     onAbandon={action('onAbandon')}
@@ -38,7 +38,7 @@ export const WithErrors = (): renders any => (
   />
 );
 
-export const ReplacerPromptAuthenticatedUser = (): renders any => (
+export const ReplacerPromptAuthenticatedUser = (): renders* => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <ReplacePromptDialog
       leaderboardsToReplace={['leaderboard-to-replace']}
@@ -48,7 +48,7 @@ export const ReplacerPromptAuthenticatedUser = (): renders any => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const ReplacerPromptNotAuthenticatedUser = (): renders any => (
+export const ReplacerPromptNotAuthenticatedUser = (): renders* => (
   <AuthenticatedUserContext.Provider
     value={{ ...fakeSilverAuthenticatedUser, authenticated: false }}
   >

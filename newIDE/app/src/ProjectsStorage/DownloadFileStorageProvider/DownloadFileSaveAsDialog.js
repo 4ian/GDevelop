@@ -156,7 +156,7 @@ type Props = {|
   onDone: () => void,
 |};
 
-export default function DownloadFileSaveAsDialog({ project, onDone }: Props): renders any {
+export default function DownloadFileSaveAsDialog({ project, onDone }: Props): renders* {
   const [zippedProjectBlob, setZippedProjectBlob] = React.useState<?Blob>(null);
   const {
     ensureProcessIsDone,

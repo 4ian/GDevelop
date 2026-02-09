@@ -21,7 +21,7 @@ export type ExportState = {|
   signingDialogOpen: boolean,
 |};
 
-export const SetupExportHeader = ({exportState, updateExportState, isExporting, build}: HeaderProps<ExportState>): null | renders any => {
+export const SetupExportHeader = ({exportState, updateExportState, isExporting, build}: HeaderProps<ExportState>): null | renders* => {
   // Build is finished, hide options.
   if (!!build && build.status === 'complete') return null;
 
@@ -175,7 +175,7 @@ export const ExportFlow = (
     stepCurrentProgress,
     errored
   }: OnlineCordovaExportFlowProps,
-): renders any => {
+): renders* => {
   const isExportingOrbuildRunningOrFinished =
     isExporting || (!!build && build.status !== 'error');
 
@@ -210,7 +210,7 @@ export const ExportFlow = (
 
 export const onlineCordovaExporter = {
   key: 'onlinecordovaexport',
-  tabName: <Trans>Mobile</Trans> as renders any,
-  name: <Trans>Android</Trans> as renders any,
+  tabName: <Trans>Mobile</Trans> as renders*,
+  name: <Trans>Android</Trans> as renders*,
   helpPage: '/publishing/android',
 };

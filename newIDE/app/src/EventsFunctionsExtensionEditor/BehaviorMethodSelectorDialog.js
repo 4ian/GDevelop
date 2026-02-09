@@ -67,7 +67,7 @@ export default function BehaviorMethodSelectorDialog({
   eventsBasedBehavior,
   onChoose,
   onCancel,
-}: Props): renders any {
+}: Props): renders* {
   const eventsFunctions = eventsBasedBehavior.getEventsFunctions();
   const [showAdvanced, setShowAdvanced] = React.useState(false);
 

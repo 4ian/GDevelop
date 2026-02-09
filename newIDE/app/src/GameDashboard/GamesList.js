@@ -295,7 +295,7 @@ const GamesList = (
     searchText,
     setSearchText
   }: Props,
-): renders any => {
+): renders* => {
   const { cloudProjects, profile, onCloudProjectsChanged } = React.useContext(
     AuthenticatedUserContext
   );

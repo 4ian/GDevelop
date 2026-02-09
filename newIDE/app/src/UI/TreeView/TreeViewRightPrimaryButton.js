@@ -19,7 +19,7 @@ export const TreeViewRightPrimaryButton: component(
     ...TreeViewRightPrimaryButtonProps,
     +ref?: React.RefSetter<ButtonInterface>,
   }
-) renders React$Node = React.forwardRef<
+) renders* = React.forwardRef<
   TreeViewRightPrimaryButtonProps,
   ButtonInterface
 >(

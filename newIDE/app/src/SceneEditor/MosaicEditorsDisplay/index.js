@@ -73,7 +73,7 @@ const MosaicEditorsDisplay: component(
     ...SceneEditorsDisplayProps,
     +ref?: React.RefSetter<SceneEditorsDisplayInterface>,
   }
-) renders React$Node = React.forwardRef<
+) renders* = React.forwardRef<
   SceneEditorsDisplayProps,
   SceneEditorsDisplayInterface
 >((props, ref) => {

@@ -26,7 +26,7 @@ export default {
   component: NewBehaviorDialog,
 };
 
-export const DefaultForSpriteObject = (): renders any => {
+export const DefaultForSpriteObject = (): renders* => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -86,7 +86,7 @@ export const DefaultForSpriteObject = (): renders any => {
   );
 };
 
-export const WithCommunityExtensions = (): renders any => {
+export const WithCommunityExtensions = (): renders* => {
   const [
     showExperimentalExtensions,
     setShowExperimentalExtensions,
@@ -160,7 +160,7 @@ export const WithCommunityExtensions = (): renders any => {
   );
 };
 
-export const WithServerSideErrors = (): renders any => {
+export const WithServerSideErrors = (): renders* => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,

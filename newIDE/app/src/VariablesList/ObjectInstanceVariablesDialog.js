@@ -39,7 +39,7 @@ const ObjectInstanceVariablesDialog = (
     onEditObjectVariables,
     isListLocked
   }: Props,
-): renders any => {
+): renders* => {
   const tabs = React.useMemo(
     () => {
       const objectName = objectInstance.getObjectName();

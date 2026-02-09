@@ -65,7 +65,7 @@ const TeamMemberProjectsView = (
     onRefreshProjects,
     isLoadingProjects
   }: Props,
-): renders any => {
+): renders* => {
   const { isMobile } = useResponsiveWindowSize();
   const skeletonLineHeight = getProjectLineHeight({ isMobile });
   const contextMenu = React.useRef<?ContextMenuInterface>(null);

@@ -31,7 +31,7 @@ const styles = {
   unlockedAchievement: {},
 };
 
-const AchievementList = ({badges, achievements}: Props): renders any => {
+const AchievementList = ({badges, achievements}: Props): renders* => {
   const [
     achievementsWithBadgeData,
     setAchievementsWithBadgeData,

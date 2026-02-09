@@ -52,7 +52,7 @@ export const EventsBasedBehaviorOrObjectEditor: component(
     ...Props,
     +ref?: React.RefSetter<EventsBasedBehaviorOrObjectEditorInterface>,
   }
-) renders React$Node = React.forwardRef<
+) renders* = React.forwardRef<
   Props,
   EventsBasedBehaviorOrObjectEditorInterface
 >(

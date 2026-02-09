@@ -20,7 +20,7 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
-export const Default = (): renders any => {
+export const Default = (): renders* => {
   return (
     <ElementHighlighterProvider
       elements={[{ label: 'Default', id: 'default' }]}

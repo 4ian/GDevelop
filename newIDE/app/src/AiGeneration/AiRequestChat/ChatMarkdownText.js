@@ -70,7 +70,7 @@ function parseMarkdownLinks({
   renderLink: ChatLinkProps => React.Node,
 |}) {
   const pattern = /\[([^\]]+)\]\(([^)]+)\)/g;
-  const elements = [];
+  const elements: Array<React.Node> = [];
 
   let lastIndex = 0;
   let match;
@@ -129,7 +129,7 @@ type Props = {|
 /**
  * Display a markdown text for a AI chat bubble.
  */
-export const ChatMarkdownText: component(...Props) renders React.Node = React.memo<Props>((props: Props) => {
+export const ChatMarkdownText: component(...Props) renders* = React.memo<Props>((props: Props) => {
   const { getConceptMetadataFromHref } = useGetConceptMetadata();
   const renderChatLink = React.useMemo(
     () => makeRenderChatLink({ getConceptMetadataFromHref }),

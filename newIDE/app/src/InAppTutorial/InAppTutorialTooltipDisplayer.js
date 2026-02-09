@@ -312,7 +312,7 @@ const InAppTutorialTooltipDisplayer = (
     fillAutomatically,
     isBlockingLayerDisplayed
   }: Props,
-): renders any => {
+): renders* => {
   const { isMobile } = useResponsiveWindowSize();
   const {
     palette: { type: paletteType },

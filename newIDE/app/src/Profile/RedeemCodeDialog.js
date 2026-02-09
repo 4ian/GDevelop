@@ -21,7 +21,7 @@ type Props = {|
   autoSubmit?: boolean,
 |};
 
-export const getRedeemCodeErrorText = (error: ?Error): void | renders any => {
+export const getRedeemCodeErrorText = (error: ?Error): void | renders* => {
   if (!error) return undefined;
 
   const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);

@@ -572,7 +572,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
   }
 );
 
-const TeamSectionWithErrorBoundary = (props: Props): renders any => (
+const TeamSectionWithErrorBoundary = (props: Props): renders* => (
   <ErrorBoundary
     componentTitle={<Trans>Team section</Trans>}
     scope="start-page-team"

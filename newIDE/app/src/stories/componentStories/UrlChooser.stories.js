@@ -13,7 +13,7 @@ export default {
   component: UrlChooser,
   decorators: [paperDecorator],
 };
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <UrlChooser
     createNewResource={() => new gd.ImageResource()}
     onChooseResources={action('onChooseResources')}
@@ -25,7 +25,7 @@ export const Default = (): renders any => (
   />
 );
 
-export const Multiselection = (): renders any => (
+export const Multiselection = (): renders* => (
   <UrlChooser
     createNewResource={() => new gd.ImageResource()}
     onChooseResources={action('onChooseResources')}

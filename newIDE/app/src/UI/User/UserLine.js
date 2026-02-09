@@ -27,7 +27,7 @@ const UserLine = (
     onDelete?: () => Promise<void> | void,
     disabled?: boolean,
   |},
-): renders any => (
+): renders* => (
   <I18n>
     {({ i18n }) => (
       <Line justifyContent="space-between">

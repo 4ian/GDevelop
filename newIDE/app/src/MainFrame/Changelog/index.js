@@ -14,7 +14,7 @@ type Props = {|
 /**
  * Load information about latest releases and display them.
  */
-const Changelog = ({onUpdated}: Props): renders any => {
+const Changelog = ({onUpdated}: Props): renders* => {
   const [releases, setReleases] = React.useState<?Array<Release>>(null);
   const [error, setError] = React.useState<?Error>(null);
 

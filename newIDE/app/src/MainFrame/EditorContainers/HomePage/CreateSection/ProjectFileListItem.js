@@ -83,7 +83,7 @@ export const ProjectFileListItem = (
     isLoading,
     onOpenContextMenu
   }: ProjectFileListItemProps,
-): renders any => {
+): renders* => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const storageProvider = getStorageProviderByInternalName(

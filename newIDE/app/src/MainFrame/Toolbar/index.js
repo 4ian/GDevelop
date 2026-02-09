@@ -221,4 +221,4 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
   },
 ) as component(
   ...{ ...MainFrameToolbarProps, +ref?: React.RefSetter<ToolbarInterface> }
-) renders React$Node;
+) renders*;

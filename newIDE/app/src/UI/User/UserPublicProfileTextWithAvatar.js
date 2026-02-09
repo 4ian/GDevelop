@@ -15,7 +15,7 @@ type Props = {|
   expand?: boolean,
 |};
 
-export const UserPublicProfileTextWithAvatar = ({user, avatarSize, expand}: Props): renders any => {
+export const UserPublicProfileTextWithAvatar = ({user, avatarSize, expand}: Props): renders* => {
   const { openUserPublicProfile } = React.useContext(PublicProfileContext);
 
   return (

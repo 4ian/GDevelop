@@ -15,4 +15,4 @@ export default React.memo<Props>(
       strokeWidth="0.1"
     />
   </SvgIcon>,
-) as component(...Props) renders React.Node;
+) as component(...Props) renders*;

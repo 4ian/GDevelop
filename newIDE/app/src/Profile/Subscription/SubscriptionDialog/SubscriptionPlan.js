@@ -70,7 +70,7 @@ const SubscriptionPlan = (
     isValidatingCoupon: boolean,
     onClearCoupon: () => void,
   |},
-): renders any => {
+): renders* => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { windowSize } = useResponsiveWindowSize();
   const isLargeScreen = windowSize === 'large' || windowSize === 'xlarge';

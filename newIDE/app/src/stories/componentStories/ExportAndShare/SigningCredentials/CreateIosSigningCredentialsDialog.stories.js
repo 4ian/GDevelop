@@ -19,7 +19,7 @@ export default {
   decorators: [alertDecorator, paperDecorator],
 };
 
-export const AlwaysError = (): renders any => {
+export const AlwaysError = (): renders* => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock.onAny().reply(500);
 
@@ -37,7 +37,7 @@ export const AlwaysError = (): renders any => {
   );
 };
 
-export const WorkingCertificateRequestButCertificateError = (): renders any => {
+export const WorkingCertificateRequestButCertificateError = (): renders* => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock
     .onPost(`${GDevelopBuildApi.baseUrl}/signing-credential/action/create-csr`)
@@ -62,7 +62,7 @@ export const WorkingCertificateRequestButCertificateError = (): renders any => {
   );
 };
 
-export const WorkingCertificateRequestButCertificateUnknownKind = (): renders any => {
+export const WorkingCertificateRequestButCertificateUnknownKind = (): renders* => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock
     .onPost(`${GDevelopBuildApi.baseUrl}/signing-credential/action/create-csr`)
@@ -94,7 +94,7 @@ export const WorkingCertificateRequestButCertificateUnknownKind = (): renders an
   );
 };
 
-export const AllWorking = (): renders any => {
+export const AllWorking = (): renders* => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock
     .onPost(`${GDevelopBuildApi.baseUrl}/signing-credential/action/create-csr`)

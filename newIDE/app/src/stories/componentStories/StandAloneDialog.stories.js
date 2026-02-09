@@ -204,8 +204,8 @@ const StandAloneDialogStory = ({
   );
 };
 
-export const Default = (): renders any => <StandAloneDialogStory bundleCategory="starter" />;
+export const Default = (): renders* => <StandAloneDialogStory bundleCategory="starter" />;
 
-export const Loading = (): renders any => (
+export const Loading = (): renders* => (
   <StandAloneDialogStory bundleCategory="starter" delayResponse={10000} />
 );

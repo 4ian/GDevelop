@@ -33,7 +33,7 @@ export default {
   ],
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <AuthenticatedUserContext.Provider
     value={fakeAuthenticatedUserWithNoSubscription}
   >
@@ -84,7 +84,7 @@ export const Default = (): renders any => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const NotAuthenticated = (): renders any => (
+export const NotAuthenticated = (): renders* => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <PreferencesContext.Provider value={initialPreferences}>
       <TutorialContext.Provider
@@ -133,7 +133,7 @@ export const NotAuthenticated = (): renders any => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const EducationSubscriber = (): renders any => (
+export const EducationSubscriber = (): renders* => (
   <AuthenticatedUserContext.Provider
     value={fakeAuthenticatedUserWithEducationPlan}
   >
@@ -184,7 +184,7 @@ export const EducationSubscriber = (): renders any => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const EducationTeacher = (): renders any => (
+export const EducationTeacher = (): renders* => (
   <AuthenticatedUserContext.Provider
     value={fakeAuthenticatedTeacherFromEducationPlan}
   >
@@ -235,7 +235,7 @@ export const EducationTeacher = (): renders any => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const LoadingTutorials = (): renders any => (
+export const LoadingTutorials = (): renders* => (
   <PreferencesContext.Provider value={initialPreferences}>
     <TutorialContext.Provider
       value={{
@@ -279,7 +279,7 @@ export const LoadingTutorials = (): renders any => (
   </PreferencesContext.Provider>
 );
 
-export const LoadingCourses = (): renders any => (
+export const LoadingCourses = (): renders* => (
   <PreferencesContext.Provider value={initialPreferences}>
     <TutorialContext.Provider
       value={{

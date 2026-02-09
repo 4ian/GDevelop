@@ -32,7 +32,7 @@ const CreditsUsageDialog = (
     successMessage,
     closeAutomaticallyAfterSuccess
   }: Props,
-): renders any => {
+): renders* => {
   const [isPurchasing, setIsPurchasing] = React.useState(false);
   const [isPurchaseSuccessful, setIsPurchaseSuccessful] = React.useState(false);
   const { showAlert } = useAlertDialog();

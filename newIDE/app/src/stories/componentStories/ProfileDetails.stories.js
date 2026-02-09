@@ -17,21 +17,21 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const MyCompleteProfileWithoutSubscription = (): renders any => (
+export const MyCompleteProfileWithoutSubscription = (): renders* => (
   <ProfileDetails
     authenticatedUser={defaultAuthenticatedUserWithNoSubscription}
   />
 );
 
-export const MyCompleteProfileWithSilverSubscription = (): renders any => (
+export const MyCompleteProfileWithSilverSubscription = (): renders* => (
   <ProfileDetails authenticatedUser={fakeSilverAuthenticatedUser} />
 );
 
-export const MyCompleteProfileWithProSubscription = (): renders any => (
+export const MyCompleteProfileWithProSubscription = (): renders* => (
   <ProfileDetails authenticatedUser={fakeStartupAuthenticatedUser} />
 );
 
-export const MyProfileWithoutDiscordUsernameNorSubscription = (): renders any => (
+export const MyProfileWithoutDiscordUsernameNorSubscription = (): renders* => (
   <ProfileDetails
     authenticatedUser={{
       ...defaultAuthenticatedUserWithNoSubscription,
@@ -40,7 +40,7 @@ export const MyProfileWithoutDiscordUsernameNorSubscription = (): renders any =>
   />
 );
 
-export const MyProfileWithoutDiscordUsernameWithStartupSubscription = (): renders any => (
+export const MyProfileWithoutDiscordUsernameWithStartupSubscription = (): renders* => (
   <ProfileDetails
     authenticatedUser={{
       ...fakeStartupAuthenticatedUser,
@@ -49,7 +49,7 @@ export const MyProfileWithoutDiscordUsernameWithStartupSubscription = (): render
   />
 );
 
-export const Loading = (): renders any => (
+export const Loading = (): renders* => (
   <ProfileDetails
     authenticatedUser={{
       ...defaultAuthenticatedUserWithNoSubscription,

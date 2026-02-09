@@ -16,7 +16,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders any => {
+export const Default = (): renders* => {
   return (
     <VideoBasedCourseChapterView
       course={premiumCourse}
@@ -31,7 +31,7 @@ export const Default = (): renders any => {
   );
 };
 
-export const Locked = (): renders any => {
+export const Locked = (): renders* => {
   return (
     <VideoBasedCourseChapterView
       course={premiumCourse}

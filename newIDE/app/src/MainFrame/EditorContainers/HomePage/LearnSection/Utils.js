@@ -24,45 +24,45 @@ export type LearnCategory =
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
-    title: <Trans>Make an entire game</Trans> as renders any,
-    description: <Trans>Make complete games step by step</Trans> as renders any,
+    title: <Trans>Make an entire game</Trans> as renders*,
+    description: <Trans>Make complete games step by step</Trans> as renders*,
   },
   'game-mechanic': {
-    title: <Trans>Specific game mechanics</Trans> as renders any,
+    title: <Trans>Specific game mechanics</Trans> as renders*,
     description: (
       <Trans>
   Find how to implement the most common game mechanics and more
-</Trans> as renders any
+</Trans> as renders*
     ),
   },
   'official-beginner': {
-    title: <Trans>Beginner course</Trans> as renders any,
-    description: <Trans>Learn the fundamental principles of GDevelop</Trans> as renders any,
+    title: <Trans>Beginner course</Trans> as renders*,
+    description: <Trans>Learn the fundamental principles of GDevelop</Trans> as renders*,
   },
   'official-intermediate': {
-    title: <Trans>Intermediate course</Trans> as renders any,
+    title: <Trans>Intermediate course</Trans> as renders*,
     description: (
-      <Trans>Learn all the game-building mechanics of GDevelop</Trans> as renders any
+      <Trans>Learn all the game-building mechanics of GDevelop</Trans> as renders*
     ),
   },
   'official-advanced': {
-    title: <Trans>Advanced course</Trans> as renders any,
-    description: <Trans>The icing on the cake</Trans> as renders any,
+    title: <Trans>Advanced course</Trans> as renders*,
+    description: <Trans>The icing on the cake</Trans> as renders*,
   },
   'education-curriculum': {
-    title: <Trans>Education curriculum and resources</Trans> as renders any,
+    title: <Trans>Education curriculum and resources</Trans> as renders*,
     description: (
       <Trans>
   For teachers and educators having the GDevelop Education subscription. Ready to use resources for teaching.
-</Trans> as renders any
+</Trans> as renders*
     ),
   },
   course: {
-    title: <Trans>Loading</Trans> as renders any,
-    description: <Trans>Loading course...</Trans> as renders any,
+    title: <Trans>Loading</Trans> as renders*,
+    description: <Trans>Loading course...</Trans> as renders*,
   },
   recommendations: {
-    title: <Trans>Recommendations</Trans> as renders any,
+    title: <Trans>Recommendations</Trans> as renders*,
     description: null,
   },
 };

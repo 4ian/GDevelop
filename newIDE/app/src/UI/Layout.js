@@ -62,7 +62,7 @@ export const TextFieldWithButtonLayout = (
     renderTextField,
     renderButton
   }: TextFieldWithButtonLayoutProps,
-): renders any => {
+): renders* => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   return (
     <ResponsiveLineStackLayout
@@ -111,7 +111,7 @@ export const LineStackLayout = (
     overflow,
     neverShrink
   }: LineStackLayoutProps,
-): renders any => {
+): renders* => {
   let isFirstChild = true;
   return (
     <Line
@@ -171,7 +171,7 @@ export const ResponsiveLineStackLayout = (
     useLargeSpacer,
     children
   }: ResponsiveLineStackLayoutProps,
-): renders any => {
+): renders* => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const assumeMobileScreen = forceMobileLayout || isMobile;
   const shouldPreventSwitchingToColumn = noResponsiveLandscape && isLandscape;
@@ -226,7 +226,7 @@ export const ColumnStackLayout = (
     useFullHeight,
     useLargeSpacer
   }: ColumnStackLayoutProps,
-): renders any => {
+): renders* => {
   let isFirstChild = true;
   return (
     <Column

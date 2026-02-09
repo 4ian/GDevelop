@@ -14,7 +14,7 @@ export default {
   component: ExtensionFunctionSelectorDialog,
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <I18n>
     {({ i18n }) => (
       <ExtensionFunctionSelectorDialog

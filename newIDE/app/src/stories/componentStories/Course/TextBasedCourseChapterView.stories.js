@@ -18,7 +18,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Chapter1 = (): renders any => {
+export const Chapter1 = (): renders* => {
   return (
     <TextBasedCourseChapterView
       course={premiumCourse}
@@ -33,7 +33,7 @@ export const Chapter1 = (): renders any => {
   );
 };
 
-export const Chapter2 = (): renders any => {
+export const Chapter2 = (): renders* => {
   return (
     <TextBasedCourseChapterView
       course={premiumCourse}
@@ -48,7 +48,7 @@ export const Chapter2 = (): renders any => {
   );
 };
 
-export const Chapter3 = (): renders any => {
+export const Chapter3 = (): renders* => {
   return (
     <TextBasedCourseChapterView
       course={premiumCourse}
@@ -63,7 +63,7 @@ export const Chapter3 = (): renders any => {
   );
 };
 
-export const Chapter4 = (): renders any => {
+export const Chapter4 = (): renders* => {
   return (
     <TextBasedCourseChapterView
       course={premiumCourse}

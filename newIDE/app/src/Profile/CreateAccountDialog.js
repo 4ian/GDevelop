@@ -39,7 +39,7 @@ type Props = {|
   error: ?AuthError,
 |};
 
-export const getEmailErrorText = (error: ?AuthError): void | renders any => {
+export const getEmailErrorText = (error: ?AuthError): void | renders* => {
   if (!error) return undefined;
 
   if (error.code === 'auth/invalid-email')
@@ -76,7 +76,7 @@ export const getEmailErrorText = (error: ?AuthError): void | renders any => {
   return undefined;
 };
 
-export const getPasswordErrorText = (error: ?AuthError): void | renders any => {
+export const getPasswordErrorText = (error: ?AuthError): void | renders* => {
   if (!error) return undefined;
 
   if (error.code === 'auth/too-many-requests')
@@ -114,7 +114,7 @@ const CreateAccountDialog = (
     createAccountInProgress,
     error
   }: Props,
-): renders any => {
+): renders* => {
   const { isMobile } = useResponsiveWindowSize();
   const styles = getStyles({ isMobile });
   const [email, setEmail] = React.useState<string>('');

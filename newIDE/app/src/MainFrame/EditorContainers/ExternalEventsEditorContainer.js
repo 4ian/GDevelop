@@ -288,4 +288,4 @@ export class ExternalEventsEditorContainer extends React.Component<
   }
 }
 
-export const renderExternalEventsEditorContainer = (props: RenderEditorContainerPropsWithRef): renders any => <ExternalEventsEditorContainer {...props} />;
+export const renderExternalEventsEditorContainer = (props: RenderEditorContainerPropsWithRef): renders* => <ExternalEventsEditorContainer {...props} />;

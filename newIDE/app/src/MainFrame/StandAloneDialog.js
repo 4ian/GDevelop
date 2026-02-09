@@ -112,7 +112,7 @@ const StandaloneDialog = ({ onClose }: Props) => {
   );
 };
 
-const StandaloneDialogWithErrorBoundary = (props: Props): renders any => (
+const StandaloneDialogWithErrorBoundary = (props: Props): renders* => (
   <ErrorBoundary
     componentTitle={<Trans>Standalone dialog</Trans>}
     scope="standalone"

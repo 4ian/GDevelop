@@ -30,7 +30,7 @@ const GlobalAndSceneVariablesDialog = (
     shouldCreateInitiallySelectedVariable,
     isListLocked
   }: Props,
-): renders any => {
+): renders* => {
   const {
     project,
     layout,

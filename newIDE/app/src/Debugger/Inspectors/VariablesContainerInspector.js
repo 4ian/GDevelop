@@ -162,7 +162,7 @@ type Props = {|
   onEdit: EditFunction,
 |};
 
-const VariablesContainerInspector = (props: Props): renders any => (
+const VariablesContainerInspector = (props: Props): renders* => (
   <ReactJsonView
     collapsed={false}
     name={false}

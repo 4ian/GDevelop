@@ -44,7 +44,7 @@ export const EventsFunctionsExtensionsProvider = (
     eventsFunctionsExtensionWriter,
     eventsFunctionsExtensionOpener
   }: Props,
-): renders any => {
+): renders* => {
   const [
     eventsFunctionsExtensionsError,
     setEventsFunctionsExtensionsError,

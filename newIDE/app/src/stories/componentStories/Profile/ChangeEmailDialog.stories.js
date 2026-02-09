@@ -20,15 +20,15 @@ const defaultProps = {
   onChangeEmail: action('onChangeEmail'),
   error: null,
 };
-export const Default = (): renders any => <ChangeEmailDialog {...defaultProps} />;
+export const Default = (): renders* => <ChangeEmailDialog {...defaultProps} />;
 
-export const ErrorFromBackend = (): renders any => (
+export const ErrorFromBackend = (): renders* => (
   <ChangeEmailDialog
     {...defaultProps}
     error={{ code: 'auth/requires-recent-login' }}
   />
 );
 
-export const Submitting = (): renders any => (
+export const Submitting = (): renders* => (
   <ChangeEmailDialog {...defaultProps} changeEmailInProgress />
 );

@@ -33,7 +33,7 @@ type Props = {|
  */
 const TextButton: component(
   ...{ ...Props, +ref?: React.RefSetter<ButtonInterface> }
-) renders React$Node = React.forwardRef<Props, ButtonInterface>(
+) renders* = React.forwardRef<Props, ButtonInterface>(
   (
     {
       label,

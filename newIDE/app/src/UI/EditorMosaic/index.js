@@ -305,7 +305,7 @@ type Props = {|
  */
 const EditorMosaic: component(
   ...{ ...Props, +ref?: React.RefSetter<EditorMosaicInterface> }
-) renders React$Node = React.forwardRef<Props, EditorMosaicInterface>(
+) renders* = React.forwardRef<Props, EditorMosaicInterface>(
   (
     {
       initialNodes,

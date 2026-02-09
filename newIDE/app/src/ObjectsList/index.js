@@ -1681,7 +1681,7 @@ const MemoizedObjectsList = React.memo<Props, ObjectsListInterface>(
 
 const ObjectsListWithErrorBoundary: component(
   ...{ ...Props, +ref?: React.RefSetter<ObjectsListInterface> }
-) renders React$Node = React.forwardRef<
+) renders* = React.forwardRef<
   Props,
   ObjectsListInterface
 >((props, ref) => (

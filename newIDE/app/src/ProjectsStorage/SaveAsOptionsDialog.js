@@ -21,7 +21,7 @@ type Props = {|
   displayOptionToGenerateNewProjectUuid: boolean,
 |};
 
-const SaveAsOptionsDialog = (props: Props): renders any => {
+const SaveAsOptionsDialog = (props: Props): renders* => {
   const [name, setName] = React.useState<string>(props.nameSuggestion);
   const [
     generateNewProjectUuid,

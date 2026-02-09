@@ -14,7 +14,7 @@ type Props = {|
   value?: ?number,
 |};
 
-function ColoredLinearProgress(props: Props): renders any {
+function ColoredLinearProgress(props: Props): renders* {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const classes = makeStyles({
     root: {

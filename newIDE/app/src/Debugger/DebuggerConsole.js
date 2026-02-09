@@ -129,7 +129,7 @@ export const DebuggerConsole = (
   }: {
     logsManager: LogsManager,
   },
-): renders any => {
+): renders* => {
   const forceUpdate = useForceUpdate();
 
   const { logs, groups } = logsManager;

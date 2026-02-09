@@ -60,7 +60,7 @@ type Props = {|
 
 const transitionDuration = { enter: 0, exit: 150 };
 
-const LoaderModal = ({progress, message, showImmediately, showAfterDelay}: Props): renders any => {
+const LoaderModal = ({progress, message, showImmediately, showAfterDelay}: Props): renders* => {
   const delayedShow = useDelayedBoolean(!!showAfterDelay, 150);
   const isInfinite = progress === null || progress === undefined;
 

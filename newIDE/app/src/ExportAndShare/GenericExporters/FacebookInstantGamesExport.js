@@ -21,7 +21,7 @@ const styles = {
   },
 };
 
-export const ExplanationHeader = (): renders any => {
+export const ExplanationHeader = (): renders* => {
   return (
     <Column noMargin>
       <Line>
@@ -52,7 +52,7 @@ export const ExportFlow = (
     isExporting,
     exportPipelineName
   }: FacebookInstantGamesExportFlowProps,
-): renders any => (
+): renders* => (
   <Line justifyContent="center">
     <RaisedButton
       label={
@@ -76,7 +76,7 @@ export const DoneFooter = (
   }: {|
     renderGameButton: () => React.Node,
   |},
-): renders any => {
+): renders* => {
   const openLearnMore = () => {
     Window.openExternalURL(
       getHelpLink('/publishing/publishing-to-facebook-instant-games')
@@ -112,7 +112,7 @@ export const DoneFooter = (
 
 export const facebookInstantGamesExporter = {
   key: 'facebookinstantgamesexport',
-  tabName: <Trans>Instant Games</Trans> as renders any,
-  name: <Trans>Facebook Instant Games</Trans> as renders any,
+  tabName: <Trans>Instant Games</Trans> as renders*,
+  name: <Trans>Facebook Instant Games</Trans> as renders*,
   helpPage: '/publishing/publishing-to-facebook-instant-games',
 };

@@ -87,7 +87,7 @@ export const CompactInstancePropertiesEditor = (
     onSelectTileMapTile,
     isVariableListLocked
   }: Props,
-): null | renders any => {
+): null | renders* => {
   const forceUpdate = useForceUpdate();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
 

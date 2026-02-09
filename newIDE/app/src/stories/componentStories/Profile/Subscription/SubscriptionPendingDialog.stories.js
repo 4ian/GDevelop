@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const DefaultNoSubscription = (): renders any => (
+export const DefaultNoSubscription = (): renders* => (
   <SubscriptionPendingDialog
     authenticatedUser={fakeAuthenticatedUserWithNoSubscription}
     onClose={action('on close')}
@@ -25,7 +25,7 @@ export const DefaultNoSubscription = (): renders any => (
   />
 );
 
-export const AuthenticatedUserWithSubscriptionAndDiscordUsernameAlreadyFilled = (): renders any => (
+export const AuthenticatedUserWithSubscriptionAndDiscordUsernameAlreadyFilled = (): renders* => (
   <SubscriptionPendingDialog
     authenticatedUser={fakeSilverAuthenticatedUser}
     onClose={action('on close')}
@@ -38,7 +38,7 @@ const fakeProfileWithoutDiscordUsername = {
   discordUsername: '',
 };
 
-export const AuthenticatedUserWithSilverSubscriptionButWithoutDiscordUsername = (): renders any => (
+export const AuthenticatedUserWithSilverSubscriptionButWithoutDiscordUsername = (): renders* => (
   <SubscriptionPendingDialog
     authenticatedUser={{
       ...fakeSilverAuthenticatedUser,
@@ -49,7 +49,7 @@ export const AuthenticatedUserWithSilverSubscriptionButWithoutDiscordUsername = 
   />
 );
 
-export const AuthenticatedUserWithStartupSubscriptionButWithoutDiscordUsername = (): renders any => (
+export const AuthenticatedUserWithStartupSubscriptionButWithoutDiscordUsername = (): renders* => (
   <SubscriptionPendingDialog
     authenticatedUser={{
       ...fakeStartupAuthenticatedUser,

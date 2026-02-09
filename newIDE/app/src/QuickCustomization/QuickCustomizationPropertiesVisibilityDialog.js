@@ -32,7 +32,7 @@ export default function QuickCustomizationPropertiesVisibilityDialog({
   onClose,
   propertyNames,
   propertiesQuickCustomizationVisibilities,
-}: Props): renders any {
+}: Props): renders* {
   const forceUpdate = useForceUpdate();
 
   return (

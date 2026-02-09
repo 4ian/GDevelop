@@ -10,7 +10,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const WithGameTemplates = (): renders any => (
+export const WithGameTemplates = (): renders* => (
   <PublicProfileDialog
     userId={'IRIhkkTTl2UHhfjrLTTH5GYwkYu1'}
     onClose={action('onClose')}
@@ -19,7 +19,7 @@ export const WithGameTemplates = (): renders any => (
   />
 );
 
-export const WithAssetPacks = (): renders any => (
+export const WithAssetPacks = (): renders* => (
   <PublicProfileDialog
     userId={'30NWiFZ3GWNGb1Rs0PzBTHx7jsT2'}
     onClose={action('onClose')}
@@ -28,7 +28,7 @@ export const WithAssetPacks = (): renders any => (
   />
 );
 
-export const WithGames = (): renders any => (
+export const WithGames = (): renders* => (
   <PublicProfileDialog
     userId={'9MGDlUQAh8QUilno4JPycekjRCJ3'}
     onClose={action('onClose')}

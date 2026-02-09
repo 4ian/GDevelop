@@ -50,7 +50,7 @@ const WrappedDismissableTutorialMessage = (
     preferences = initialPreferences,
     tutorialId
   }: Props,
-): renders any => (
+): renders* => (
   <PreferencesContext.Provider value={preferences}>
     <TutorialContext.Provider
       value={{
@@ -70,15 +70,15 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const NoTutorialsLoaded = (): renders any => (
+export const NoTutorialsLoaded = (): renders* => (
   <WrappedDismissableTutorialMessage tutorials={null} tutorialId="tutorial-1" />
 );
 
-export const NoTutorialsFound = (): renders any => (
+export const NoTutorialsFound = (): renders* => (
   <WrappedDismissableTutorialMessage tutorials={[]} tutorialId="tutorial-1" />
 );
 
-export const HiddenTutorial = (): renders any => (
+export const HiddenTutorial = (): renders* => (
   <WrappedDismissableTutorialMessage
     tutorialId="tutorial-1"
     preferences={{
@@ -91,14 +91,14 @@ export const HiddenTutorial = (): renders any => (
   />
 );
 
-export const TutorialNotInList = (): renders any => (
+export const TutorialNotInList = (): renders* => (
   <WrappedDismissableTutorialMessage tutorialId="tutorial-3" />
 );
 
-export const DefaultVideo = (): renders any => (
+export const DefaultVideo = (): renders* => (
   <WrappedDismissableTutorialMessage tutorialId="tutorial-1" />
 );
 
-export const DefaultText = (): renders any => (
+export const DefaultText = (): renders* => (
   <WrappedDismissableTutorialMessage tutorialId="tutorial-2" />
 );

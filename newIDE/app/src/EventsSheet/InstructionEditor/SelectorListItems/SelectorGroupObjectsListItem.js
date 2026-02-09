@@ -30,7 +30,7 @@ export const renderGroupObjectsListItem = (
     id,
     data
   }: Props,
-): renders any => {
+): renders* => {
   const groupName: string = groupWithContext.group.getName();
   return (
     <ListItem

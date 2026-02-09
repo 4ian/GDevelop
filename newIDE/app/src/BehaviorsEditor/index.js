@@ -644,7 +644,7 @@ type Props = {|
   isListLocked: boolean,
 |};
 
-const BehaviorsEditor = (props: Props): renders any => {
+const BehaviorsEditor = (props: Props): renders* => {
   const { isMobile } = useResponsiveWindowSize();
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const justAddedBehaviorAccordionElement = React.useRef<?BehaviorConfigurationEditorInterface>(

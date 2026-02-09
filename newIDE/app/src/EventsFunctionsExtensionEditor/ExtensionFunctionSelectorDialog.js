@@ -62,7 +62,7 @@ export default function ExtensionFunctionSelectorDialog({
   eventsFunctionsContainer,
   onChoose,
   onCancel,
-}: Props): renders any {
+}: Props): renders* {
   const [showAdvanced, setShowAdvanced] = React.useState(false);
 
   return (

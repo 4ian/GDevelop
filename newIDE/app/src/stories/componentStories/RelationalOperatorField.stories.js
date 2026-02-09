@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const RelationalOperatorFieldString = (): renders any => (
+export const RelationalOperatorFieldString = (): renders* => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (
@@ -37,7 +37,7 @@ export const RelationalOperatorFieldString = (): renders any => (
     )}
   />
 );
-export const RelationalOperatorFieldNumber = (): renders any => (
+export const RelationalOperatorFieldNumber = (): renders* => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (
@@ -57,7 +57,7 @@ export const RelationalOperatorFieldNumber = (): renders any => (
     )}
   />
 );
-export const RelationalOperatorFieldColor = (): renders any => (
+export const RelationalOperatorFieldColor = (): renders* => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (
@@ -75,7 +75,7 @@ export const RelationalOperatorFieldColor = (): renders any => (
     )}
   />
 );
-export const RelationalOperatorFieldUnknownType = (): renders any => (
+export const RelationalOperatorFieldUnknownType = (): renders* => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (

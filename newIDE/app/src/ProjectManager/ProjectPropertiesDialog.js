@@ -928,7 +928,7 @@ const ProjectPropertiesDialog = (props: Props) => {
   );
 };
 
-const ProjectPropertiesDialogWithErrorBoundary = (props: Props): renders any => (
+const ProjectPropertiesDialogWithErrorBoundary = (props: Props): renders* => (
   <ErrorBoundary
     componentTitle={<Trans>Project properties</Trans>}
     scope="project-properties"

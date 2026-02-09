@@ -66,7 +66,7 @@ export default function ObjectMethodSelectorDialog({
   eventsBasedObject,
   onChoose,
   onCancel,
-}: Props): renders any {
+}: Props): renders* {
   const eventsFunctions = eventsBasedObject.getEventsFunctions();
   const [showAdvanced, setShowAdvanced] = React.useState(false);
 

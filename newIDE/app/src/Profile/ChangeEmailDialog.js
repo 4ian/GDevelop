@@ -24,7 +24,7 @@ type Props = {|
   error: ?AuthError,
 |};
 
-const ChangeEmailDialog = ({onClose, onChangeEmail, firebaseUser, changeEmailInProgress, error}: Props): renders any => {
+const ChangeEmailDialog = ({onClose, onChangeEmail, firebaseUser, changeEmailInProgress, error}: Props): renders* => {
   const [email, setEmail] = React.useState(firebaseUser.email);
   const [isEmailValid, setIsEmailValid] = React.useState<boolean>(true);
 

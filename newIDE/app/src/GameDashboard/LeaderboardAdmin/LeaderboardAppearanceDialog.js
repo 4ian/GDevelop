@@ -100,7 +100,7 @@ function LeaderboardAppearanceDialog({
   onClose,
   onSave,
   leaderboardCustomizationSettings,
-}: Props): renders any {
+}: Props): renders* {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { canUseTheme, canUseCustomCss } = canUserCustomizeLeaderboardTheme(

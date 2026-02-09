@@ -15,7 +15,7 @@ type Props = {|
   isDuplicationBeforeEdition?: boolean,
 |};
 
-const NewVariantDialog = ({initialName, onApply, onCancel, isDuplicationBeforeEdition}: Props): renders any => {
+const NewVariantDialog = ({initialName, onApply, onCancel, isDuplicationBeforeEdition}: Props): renders* => {
   const [variantName, setVariantName] = React.useState<string>(initialName);
 
   const apply = React.useCallback(

@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const ForFreeUser = (): renders any => (
+export const ForFreeUser = (): renders* => (
   <AuthenticatedUserContext.Provider
     value={defaultAuthenticatedUserWithNoSubscription}
   >
@@ -25,31 +25,31 @@ export const ForFreeUser = (): renders any => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const ForIndieUser = (): renders any => (
+export const ForIndieUser = (): renders* => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <MaxProjectCountAlertMessage />
   </AuthenticatedUserContext.Provider>
 );
 
-export const ForGoldUser = (): renders any => (
+export const ForGoldUser = (): renders* => (
   <AuthenticatedUserContext.Provider value={fakeGoldAuthenticatedUser}>
     <MaxProjectCountAlertMessage />
   </AuthenticatedUserContext.Provider>
 );
 
-export const ForProUser = (): renders any => (
+export const ForProUser = (): renders* => (
   <AuthenticatedUserContext.Provider value={fakeStartupAuthenticatedUser}>
     <MaxProjectCountAlertMessage />
   </AuthenticatedUserContext.Provider>
 );
 
-export const DenseMargins = (): renders any => (
+export const DenseMargins = (): renders* => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <MaxProjectCountAlertMessage margin="dense" />
   </AuthenticatedUserContext.Provider>
 );
 
-export const DenseMarginsOnSmallDialog = (): renders any => (
+export const DenseMarginsOnSmallDialog = (): renders* => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FixedWidthFlexContainer width={500}>
       <MaxProjectCountAlertMessage margin="dense" />

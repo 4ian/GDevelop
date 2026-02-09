@@ -296,7 +296,7 @@ const PublishHome = (
     allExportersRequireOnline,
     showOnlineWebExporterOnly
   }: PublishHomeProps,
-): renders any => {
+): renders* => {
   const { isMobile } = useResponsiveWindowSize();
   const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);

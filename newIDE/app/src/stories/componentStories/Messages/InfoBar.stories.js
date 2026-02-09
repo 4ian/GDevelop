@@ -16,7 +16,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders any => {
+export const Default = (): renders* => {
   const [infoBarOpen, setInfoBarOpen] = React.useState<boolean>(false);
   const [
     infoBarWithActionOpen,

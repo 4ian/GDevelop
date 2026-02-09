@@ -40,7 +40,7 @@ const SubscriptionDialogTestOpener = ({ label }: {| label: string |}) => {
   return <Text>{label}</Text>;
 };
 
-export const NotAuthenticated = (): renders any => {
+export const NotAuthenticated = (): renders* => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
@@ -53,7 +53,7 @@ export const NotAuthenticated = (): renders any => {
     </AlertProvider>
   );
 };
-export const NoSubscriptionUser = (): renders any => {
+export const NoSubscriptionUser = (): renders* => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider
@@ -68,7 +68,7 @@ export const NoSubscriptionUser = (): renders any => {
     </AlertProvider>
   );
 };
-export const GoldSubscribedUser = (): renders any => {
+export const GoldSubscribedUser = (): renders* => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={fakeGoldAuthenticatedUser}>
@@ -81,7 +81,7 @@ export const GoldSubscribedUser = (): renders any => {
     </AlertProvider>
   );
 };
-export const GoldWithPurchaselySubscribedUser = (): renders any => {
+export const GoldWithPurchaselySubscribedUser = (): renders* => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider
@@ -95,7 +95,7 @@ export const GoldWithPurchaselySubscribedUser = (): renders any => {
   );
 };
 
-export const NotAuthenticatedOnMobile = (): renders any => {
+export const NotAuthenticatedOnMobile = (): renders* => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
@@ -110,7 +110,7 @@ export const NotAuthenticatedOnMobile = (): renders any => {
     </AlertProvider>
   );
 };
-export const NoSubscriptionUserOnMobile = (): renders any => {
+export const NoSubscriptionUserOnMobile = (): renders* => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider
@@ -127,7 +127,7 @@ export const NoSubscriptionUserOnMobile = (): renders any => {
     </AlertProvider>
   );
 };
-export const GoldSubscribedUserOnMobile = (): renders any => {
+export const GoldSubscribedUserOnMobile = (): renders* => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={fakeGoldAuthenticatedUser}>
@@ -138,7 +138,7 @@ export const GoldSubscribedUserOnMobile = (): renders any => {
     </AlertProvider>
   );
 };
-export const GoldWithPurchaselySubscribedUserOnMobile = (): renders any => {
+export const GoldWithPurchaselySubscribedUserOnMobile = (): renders* => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider

@@ -38,7 +38,7 @@ type Props = {|
   id?: string,
 |};
 
-const VerticalTabButton = ({label, getIcon, onClick, isActive, hideLabel, id}: Props): renders any => {
+const VerticalTabButton = ({label, getIcon, onClick, isActive, hideLabel, id}: Props): renders* => {
   return (
     <Button
       variant={isActive ? 'contained' : 'text'}

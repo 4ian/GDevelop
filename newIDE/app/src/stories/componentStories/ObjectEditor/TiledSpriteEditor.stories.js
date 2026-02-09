@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <SerializedObjectDisplay object={testProject.tiledSpriteObjectConfiguration}>
     <TiledSpriteEditor
       objectConfiguration={testProject.tiledSpriteObjectConfiguration}

@@ -85,7 +85,7 @@ const Cube3DEditor = (
     objectName,
     renderObjectNameField
   }: EditorProps,
-): renders any => {
+): renders* => {
   const forceUpdate = useForceUpdate();
   const properties = objectConfiguration.getProperties();
 

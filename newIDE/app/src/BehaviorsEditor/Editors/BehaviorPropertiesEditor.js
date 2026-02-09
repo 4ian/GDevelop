@@ -20,7 +20,7 @@ const BehaviorPropertiesEditor = (
     resourceManagementProps,
     projectScopedContainersAccessor
   }: Props,
-): renders any => {
+): renders* => {
   const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
     gd.JsPlatform.get(),
     behavior.getTypeName()

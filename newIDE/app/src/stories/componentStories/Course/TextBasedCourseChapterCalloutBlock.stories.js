@@ -9,7 +9,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Info = (): renders any => (
+export const Info = (): renders* => (
   <TextBasedCourseChapterCalloutBlock
     kind="info"
     text={`**Notice**

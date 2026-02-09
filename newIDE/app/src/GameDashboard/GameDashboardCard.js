@@ -201,7 +201,7 @@ const GameDashboardCard = (
     onDeleteCloudProject,
     onRegisterProject
   }: Props,
-): renders any => {
+): renders* => {
   useOnResize(useForceUpdate());
   const projectsList = React.useMemo(() => dashboardItem.projectFiles || [], [
     dashboardItem.projectFiles,

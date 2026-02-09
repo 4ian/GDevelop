@@ -56,7 +56,7 @@ const privateAssetPackListingData: PrivateAssetPackListingData = {
   stripeProductId: 'stripeProductId',
 };
 
-export const NotLoggedIn = (): renders any => {
+export const NotLoggedIn = (): renders* => {
   return (
     <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <PrivateAssetPackPurchaseDialog
@@ -68,7 +68,7 @@ export const NotLoggedIn = (): renders any => {
   );
 };
 
-export const LoggedIn = (): renders any => {
+export const LoggedIn = (): renders* => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <PrivateAssetPackPurchaseDialog

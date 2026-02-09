@@ -69,7 +69,7 @@ const PlaySection = ({ gamesPlatformFrameTools }: Props) => {
   );
 };
 
-const PlaySectionWithErrorBoundary = (props: Props): renders any => {
+const PlaySectionWithErrorBoundary = (props: Props): renders* => {
   return (
     <ErrorBoundary
       componentTitle={<Trans>Play section</Trans>}

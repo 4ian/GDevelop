@@ -39,7 +39,7 @@ export type RaisedButtonProps = {|
  */
 const RaisedButton: component(
   ...{ ...RaisedButtonProps, +ref?: React.RefSetter<ButtonInterface> }
-) renders React$Node = React.forwardRef<RaisedButtonProps, ButtonInterface>(
+) renders* = React.forwardRef<RaisedButtonProps, ButtonInterface>(
   (
     {
       label,

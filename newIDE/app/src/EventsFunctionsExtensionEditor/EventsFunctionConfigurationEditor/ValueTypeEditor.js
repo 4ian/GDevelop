@@ -59,7 +59,7 @@ export default function ValueTypeEditor({
   onTypeUpdated,
   getLastObjectParameterObjectType,
   isExpressionType,
-}: Props): renders any {
+}: Props): renders* {
   const forceUpdate = useForceUpdate();
 
   const type = convertTypeToSelectorValue(valueTypeMetadata.getName());

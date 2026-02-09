@@ -17,7 +17,7 @@ type PropsType = {
 /**
  * The button that can be used in any dialog to open a help page
  */
-const HelpButton = (props: PropsType): null | renders any => {
+const HelpButton = (props: PropsType): null | renders* => {
   const { isMobile } = useResponsiveWindowSize();
   if (!props.helpPagePath) return null;
   const helpLink = getHelpLink(props.helpPagePath, props.anchor);

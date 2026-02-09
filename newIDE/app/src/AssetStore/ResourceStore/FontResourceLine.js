@@ -53,7 +53,7 @@ type Props = {|
   onSelect: () => void,
 |};
 
-const FontResourceLine = ({fontResource, isSelected, onSelect}: Props): renders any => {
+const FontResourceLine = ({fontResource, isSelected, onSelect}: Props): renders* => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const fontNameWithoutExtension = fontResource.name.replace(
     fontExtensionRegex,

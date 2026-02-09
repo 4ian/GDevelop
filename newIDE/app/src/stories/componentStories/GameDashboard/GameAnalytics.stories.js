@@ -26,7 +26,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const ErrorLoadingAnalytics = (): renders any => {
+export const ErrorLoadingAnalytics = (): renders* => {
   const mock = new MockAdapter(axios);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
@@ -44,7 +44,7 @@ export const ErrorLoadingAnalytics = (): renders any => {
   );
 };
 
-export const MissingAnalytics = (): renders any => {
+export const MissingAnalytics = (): renders* => {
   const mock = new MockAdapter(axios);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
@@ -62,7 +62,7 @@ export const MissingAnalytics = (): renders any => {
   );
 };
 
-export const WithPartialAnalytics = (): renders any => {
+export const WithPartialAnalytics = (): renders* => {
   const mock = new MockAdapter(axios);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
@@ -80,7 +80,7 @@ export const WithPartialAnalytics = (): renders any => {
   );
 };
 
-export const WithAnalytics = (): renders any => {
+export const WithAnalytics = (): renders* => {
   const mock = new MockAdapter(axios);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
@@ -98,7 +98,7 @@ export const WithAnalytics = (): renders any => {
   );
 };
 
-export const WithAnalyticsWithMissingNewMetrics = (): renders any => {
+export const WithAnalyticsWithMissingNewMetrics = (): renders* => {
   const mock = new MockAdapter(axios);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
@@ -116,7 +116,7 @@ export const WithAnalyticsWithMissingNewMetrics = (): renders any => {
   );
 };
 
-export const WithAnalyticsOnlyFor19Days = (): renders any => {
+export const WithAnalyticsOnlyFor19Days = (): renders* => {
   const mock = new MockAdapter(axios);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
@@ -134,7 +134,7 @@ export const WithAnalyticsOnlyFor19Days = (): renders any => {
   );
 };
 
-export const WithAnalyticsWithHoles = (): renders any => {
+export const WithAnalyticsWithHoles = (): renders* => {
   const mock = new MockAdapter(axios);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
@@ -152,7 +152,7 @@ export const WithAnalyticsWithHoles = (): renders any => {
   );
 };
 
-export const WithAnalyticsOnlyFor1Day = (): renders any => {
+export const WithAnalyticsOnlyFor1Day = (): renders* => {
   const mock = new MockAdapter(axios);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
@@ -170,7 +170,7 @@ export const WithAnalyticsOnlyFor1Day = (): renders any => {
   );
 };
 
-export const WithAnalyticsLongLoading = (): renders any => {
+export const WithAnalyticsLongLoading = (): renders* => {
   const mock = new MockAdapter(axios, { delayResponse: 2000 });
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)

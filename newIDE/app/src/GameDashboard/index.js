@@ -125,7 +125,7 @@ const GameDashboard = (
     disabled,
     initialWidgetToScrollTo
   }: Props,
-): renders any => {
+): renders* => {
   const grid = React.useRef<?HTMLDivElement>(null);
   const { isMobile } = useResponsiveWindowSize();
   const [widgetToScrollTo, setWidgetToScrollTo] = React.useState<?string>(

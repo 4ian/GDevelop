@@ -70,7 +70,7 @@ const Providers = (
     eventsFunctionsExtensionWriter,
     eventsFunctionsExtensionOpener
   }: Props,
-): renders any => {
+): renders* => {
   return (
     <DragAndDropContextProvider>
       <UnsavedChangesContextProvider>

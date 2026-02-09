@@ -118,7 +118,7 @@ type AnimationListProps = {|
 
 const AnimationList: component(
   ...{ ...AnimationListProps, +ref?: React.RefSetter<AnimationListInterface> }
-) renders React$Node = React.forwardRef<
+) renders* = React.forwardRef<
   AnimationListProps,
   AnimationListInterface
 >(

@@ -42,7 +42,7 @@ export const AppleAuthKeysList = (
     onRefreshSigningCredentials,
     onAddNew
   }: Props,
-): renders any => {
+): renders* => {
   const appleAuthKeySigningCredentials = filterAppleAuthKeySigningCredentials(
     signingCredentials
   );

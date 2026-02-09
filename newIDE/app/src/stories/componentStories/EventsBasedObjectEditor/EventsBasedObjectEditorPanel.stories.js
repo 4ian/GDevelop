@@ -14,7 +14,7 @@ export default {
   component: EventsBasedBehaviorOrObjectEditor,
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <DragAndDropContextProvider>
     <EventsBasedBehaviorOrObjectEditor
       project={testProject.project}

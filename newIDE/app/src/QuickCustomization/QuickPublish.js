@@ -64,7 +64,7 @@ export const QuickPublish = (
     onScreenshotsClaimed,
     onLaunchPreview
   }: Props,
-): renders any => {
+): renders* => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
     profile,

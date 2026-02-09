@@ -16,7 +16,7 @@ type Props = {|
  * Show an alert that can be permanently hidden. Hidden messages
  * will be stored in preferences.
  */
-const DismissableAlertMessage = ({identifier, kind, children}: Props): renders any => (
+const DismissableAlertMessage = ({identifier, kind, children}: Props): renders* => (
   <PreferencesContext.Consumer>
     {({ values, showAlertMessage }) =>
       !values.hiddenAlertMessages[identifier] && (

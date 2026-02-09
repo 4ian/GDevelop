@@ -13,7 +13,7 @@ export default {
   component: ObjectExporterDialog,
 };
 
-export const Default = (): renders any => (
+export const Default = (): renders* => (
   <ObjectExporterDialog
     project={testProject.project}
     layout={testProject.testLayout}

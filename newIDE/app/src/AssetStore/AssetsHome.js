@@ -73,19 +73,19 @@ const getShopItemsColumns = (
 export const gameTemplatesCategoryId = 'game-template';
 
 export const shopCategories: {
-  background: { imageAlt: string, imageSource: string, title: renders any },
-  character: { imageAlt: string, imageSource: string, title: renders any },
+  background: { imageAlt: string, imageSource: string, title: renders* },
+  character: { imageAlt: string, imageSource: string, title: renders* },
   "full-game-pack": {
     imageAlt: string,
     imageSource: string,
-    title: renders any,
+    title: renders*,
   },
-  "game-template": { imageAlt: string, imageSource: string, title: renders any },
-  interface: { imageAlt: string, imageSource: string, title: renders any },
-  prefab: { imageAlt: string, imageSource: string, title: renders any },
-  props: { imageAlt: string, imageSource: string, title: renders any },
-  sounds: { imageAlt: string, imageSource: string, title: renders any },
-  "visual-effect": { imageAlt: string, imageSource: string, title: renders any },
+  "game-template": { imageAlt: string, imageSource: string, title: renders* },
+  interface: { imageAlt: string, imageSource: string, title: renders* },
+  prefab: { imageAlt: string, imageSource: string, title: renders* },
+  props: { imageAlt: string, imageSource: string, title: renders* },
+  sounds: { imageAlt: string, imageSource: string, title: renders* },
+  "visual-effect": { imageAlt: string, imageSource: string, title: renders* },
 } = {
   [gameTemplatesCategoryId]: {
     title: <Trans>Ready-made games</Trans>,
@@ -191,7 +191,7 @@ type Props = {|
 
 export const AssetsHome: component(
   ...{ ...Props, +ref?: React.RefSetter<AssetsHomeInterface> }
-) renders React$Node = React.forwardRef<Props, AssetsHomeInterface>(
+) renders* = React.forwardRef<Props, AssetsHomeInterface>(
   (
     {
       publicAssetPacks: { starterPacks },

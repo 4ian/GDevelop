@@ -56,7 +56,7 @@ export const BehaviorListItem = (
     onHeightComputed,
     platform
   }: Props,
-): renders any => {
+): renders* => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const alreadyAdded = objectBehaviorsTypes.includes(behaviorShortHeader.type);

@@ -39,7 +39,7 @@ declare module "axios" {
     maxRedirects?: number;
     params?: Object;
     paramsSerializer?: (params: Object) => string;
-    progress?: (progressEvent: Event) => void | mixed;
+    progress?: (progressEvent: any) => void | mixed;
     proxy?: ProxyConfig | false;
     responseType?:
       | "arraybuffer"
@@ -69,7 +69,7 @@ declare module "axios" {
     headers?: Object;
     status: number;
     statusText: string;
-    request: http$ClientRequest | XMLHttpRequest;
+    request: any;
   }
   declare type $AxiosXHR<T> = AxiosXHR<T>;
   declare type AxiosInterceptorIdent = number;

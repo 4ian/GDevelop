@@ -17,7 +17,7 @@ declare module '@storybook/react' {
   declare type Renderable =
     | string
     | number
-    | React$Element<any>
+    | any
     | Iterable<?Renderable>;
   declare type RenderCallback = (
     context: Context

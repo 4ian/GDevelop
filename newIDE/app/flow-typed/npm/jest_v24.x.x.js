@@ -195,7 +195,7 @@ type EnzymeMatchersType = {
  toContainMatchingElement(selector: string): void,
  toContainMatchingElements(n: number, selector: string): void,
  toContainExactlyOneMatchingElement(selector: string): void,
- toContainReact(element: React$Element<any>): void,
+ toContainReact(element: any): void,
  toExist(): void,
  toHaveClassName(className: string): void,
  toHaveHTML(html: string): void,
@@ -211,7 +211,7 @@ type EnzymeMatchersType = {
  toHaveValue(value: any): void,
  toIncludeText(text: string): void,
  toMatchElement(
-   element: React$Element<any>,
+   element: any,
    options?: {| ignoreProps?: boolean, verbose?: boolean |}
  ): void,
  toMatchSelector(selector: string): void,
@@ -226,7 +226,7 @@ type DomTestingLibraryType = {
  /**
   * @deprecated
   */
- toBeInTheDOM(container?: HTMLElement): void,
+ toBeInTheDOM(container?: any): void,
  toBeInTheDocument(): void,
  toBeVisible(): void,
  toBeEmpty(): void,
@@ -235,7 +235,7 @@ type DomTestingLibraryType = {
  toBeInvalid(): void,
  toBeRequired(): void,
  toBeValid(): void,
- toContainElement(element: HTMLElement | null): void,
+ toContainElement(element: any | null): void,
  toContainHTML(htmlText: string): void,
  toHaveAttribute(attr: string, value?: any): void,
  toHaveClass(...classNames: string[]): void,

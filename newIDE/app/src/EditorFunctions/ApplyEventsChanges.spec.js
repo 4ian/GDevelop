@@ -35,7 +35,7 @@ describe('applyEventsChanges', () => {
   };
 
   const getEventTypes = (list: gdEventsList): Array<string> => {
-    const types = [];
+    const types: Array<any> = [];
     for (let i = 0; i < list.getEventsCount(); i++) {
       types.push(list.getEventAt(i).getType());
     }

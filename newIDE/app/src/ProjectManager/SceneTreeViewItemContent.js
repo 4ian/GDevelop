@@ -200,7 +200,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   renderRightComponent(i18n: I18nType): ?React.Node {
-    const icons = [];
+    const icons: Array<any> = [];
 
     if (this._isFirstScene()) {
       icons.push(

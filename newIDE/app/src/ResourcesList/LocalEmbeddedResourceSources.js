@@ -46,7 +46,7 @@ export async function copyAllEmbeddedResourcesToProjectFolder(
   }
 
   const projectPath = path.dirname(project.getProjectFile());
-  const copies = [];
+  const copies: Array<any> = [];
 
   for (const {
     hasAnyEmbeddedResourceOutsideProjectFolder,
@@ -99,7 +99,7 @@ export function createAndMapEmbeddedResources(
 
   const filesWithMappedResources = new Map<string, MappedResources>();
   for (const [filePath, { embeddedResources }] of filesWithEmbeddedResources) {
-    const mapping = {};
+    const mapping: {[string]: any} = {};
     for (let {
       resourceKind,
       resourceName,

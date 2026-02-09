@@ -14,8 +14,8 @@ const getList = (
     return [];
   }
 
-  const currentSceneExternalEvents = [];
-  const otherScenesExternalEvents = [];
+  const currentSceneExternalEvents: Array<any> = [];
+  const otherScenesExternalEvents: Array<any> = [];
   for (const externalEvents of enumerateExternalEvents(project)) {
     if (externalEvents.getName() === currentExternalEventName) {
       continue;

@@ -1100,7 +1100,7 @@ export default class InstancesEditor extends Component<Props, State> {
 
   _getLayersLocks = (): any => {
     const { layersContainer } = this.props;
-    const layersLocks = {};
+    const layersLocks: {[string]: any} = {};
     for (let i = 0; i < layersContainer.getLayersCount(); i++) {
       const layer = layersContainer.getLayerAt(i);
       layersLocks[layersContainer.getLayerAt(i).getName()] =

@@ -116,7 +116,7 @@ const renderModel = async resourceUrl => {
         // the model's scale and position.
         // So we need to compute the bounding box from the meshes in the model.
         const box = new THREE.Box3();
-        const meshes = [];
+        const meshes: Array<any> = [];
         model.traverse(child => {
           if (child.isMesh) {
             meshes.push(child);

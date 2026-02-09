@@ -73,7 +73,7 @@ export const getRequirementsErrors = (
   game: Game,
   marketingPlan: MarketingPlan
 ): React.Node[] => {
-  const requirementsErrors = [];
+  const requirementsErrors: Array<any> = [];
   const marketingPlanGameRequirements = marketingPlan.gameRequirements;
   if (
     !!marketingPlanGameRequirements.hasThumbnail &&

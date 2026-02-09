@@ -14,7 +14,7 @@ const mapFor = /*:: <T> */ (
   end /*: number */,
   func /*: (number) => T */
 ) /*: Array<T> */ => {
-  const result = [];
+  const result: Array<any> = [];
   for (let i = start; i < end; i++) {
     result.push(func(i));
   }
@@ -33,7 +33,7 @@ const mapReverseFor = /*:: <T> */ (
   end /*: number */,
   func /*: (number) => T */
 ) /*: Array<T> */ => {
-  const result = [];
+  const result: Array<any> = [];
   for (let i = end - 1; i >= start; i--) {
     result.push(func(i));
   }

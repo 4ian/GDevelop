@@ -44,7 +44,7 @@ export const split = (
     isReferenceMagicPropertyName,
   }: SplitConfiguration
 ): Array<PartialObjectDescription> => {
-  const partialObjects = [];
+  const partialObjects: Array<any> = [];
   const createReference = (reference, object): Reference => {
     partialObjects.push({
       reference,
@@ -203,7 +203,7 @@ export const getNameFromProperty = (propertyName: string): ((object: any) => str
  * A helper that can be used to get the name of items in array using an hardcoded property name.
  */
 export const getSlugifiedUniqueNameFromProperty = (propertyName: string): ((object: any, currentReference: string) => string) => {
-  const existingNamesForReference = {};
+  const existingNamesForReference: {[string]: any} = {};
 
   return (object: Object, currentReference: string): string => {
     const property = object[propertyName];

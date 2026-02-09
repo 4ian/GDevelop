@@ -109,7 +109,7 @@ export const ExtensionStoreStateProvider = ({children, i18n, defaultSearchText}:
           const extensionRegistry: ExtensionsRegistry = await getExtensionsRegistry();
           const { headers } = extensionRegistry;
 
-          const translatedExtensionShortHeadersByName = {};
+          const translatedExtensionShortHeadersByName: {[string]: any} = {};
           headers.forEach(extensionShortHeader => {
             const translatedExtensionShortHeader: ExtensionShortHeader = {
               ...extensionShortHeader,

@@ -10,7 +10,7 @@ const getRouteNavigationParamsFromLink = (
     const url = new URL(link);
     // $FlowFixMe - Assume that the arguments are always valid.
     const route: ?Route = url.searchParams.get('initial-dialog');
-    const otherParams = {};
+    const otherParams: {[string]: any} = {};
     url.searchParams.forEach((value, key) => {
       if (key !== 'initial-dialog') otherParams[key] = value;
     });

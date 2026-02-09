@@ -50,7 +50,7 @@ export const enumerateObjectsInFolder = (
   folder: gdObjectFolderOrObject
 ): gdObject[] => {
   if (!folder.isFolder()) return [];
-  const result = [];
+  const result: Array<any> = [];
   recursivelyEnumerateObjectsInFolder(folder, result);
   return result;
 };
@@ -59,7 +59,7 @@ export const enumerateFoldersInFolder = (
   folder: gdObjectFolderOrObject
 ): {| path: string, folder: gdObjectFolderOrObject |}[] => {
   if (!folder.isFolder()) return [];
-  const result = [];
+  const result: Array<any> = [];
   recursivelyEnumerateFoldersInFolder(folder, '', result);
   return result;
 };
@@ -68,7 +68,7 @@ export const enumerateFoldersInContainer = (
   container: gdObjectsContainer
 ): {| path: string, folder: gdObjectFolderOrObject |}[] => {
   const rootFolder = container.getRootFolder();
-  const result = [];
+  const result: Array<any> = [];
   recursivelyEnumerateFoldersInFolder(rootFolder, '', result);
   return result;
 };

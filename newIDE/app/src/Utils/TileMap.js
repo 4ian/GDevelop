@@ -61,7 +61,7 @@ export const optimizeTilesGridCoordinates = ({
   minY: number,
   maxY: number,
 |}): TileMapTilePatch[] => {
-  const newTileMapTilePatches = [];
+  const newTileMapTilePatches: Array<any> = [];
 
   while (tileMapTilePatches[0]) {
     const referencePatch = tileMapTilePatches[0];
@@ -120,7 +120,7 @@ export const optimizeTilesGridCoordinates = ({
     }
 
     let isWholeRectangleOfSameTile = true;
-    const patchIndices = [];
+    const patchIndices: Array<any> = [];
     for (let deltaX = 0; deltaX <= expandRight; deltaX++) {
       for (let deltaY = 0; deltaY <= expandBottom; deltaY++) {
         if (deltaX === 0 && deltaY === 0) {

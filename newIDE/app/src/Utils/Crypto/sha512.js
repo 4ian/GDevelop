@@ -604,7 +604,7 @@ function y(n) {
 }
 function T(n, t) {
   let e, r, i, s, o, w, u, c, y, T, F, b;
-  const m = [];
+  const m: Array<any> = [];
   for (
     e = t[0],
       r = t[1],

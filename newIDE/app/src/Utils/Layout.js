@@ -30,7 +30,7 @@ export const getInstancesInLayoutForObject = (
   objectName: string
 ): Array<gdInitialInstance> => {
   if (initialInstancesContainer.getInstancesCount() === 0) return [];
-  const objectInstances = [];
+  const objectInstances: Array<any> = [];
   const instanceGetter = new gd.InitialInstanceJSFunctor();
   // $FlowFixMe - invoke is not writable
   instanceGetter.invoke = instancePtr => {
@@ -54,7 +54,7 @@ export const getInstancesInLayoutForLayer = (
   layerName: string
 ): Array<gdInitialInstance> => {
   if (initialInstancesContainer.getInstancesCount() === 0) return [];
-  const objectInstances = [];
+  const objectInstances: Array<any> = [];
   const instanceGetter = new gd.InitialInstanceJSFunctor();
   // $FlowFixMe - invoke is not writable
   instanceGetter.invoke = instancePtr => {

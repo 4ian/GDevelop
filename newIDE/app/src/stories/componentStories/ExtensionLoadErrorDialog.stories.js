@@ -69,7 +69,7 @@ export const WithMultipleExtensionErrors = (): React.Node => {
 };
 
 export const WithGenericError = (): React.Node => {
-  const erroredExtensionLoadingResults = [];
+  const erroredExtensionLoadingResults: Array<any> = [];
   const genericError = new Error(
     'Some extension modules could not be loaded. Please check the console for more details.'
   );

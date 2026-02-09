@@ -28,7 +28,7 @@ export default {
 };
 
 export const NoGamesOrProjects = (): React.Node => {
-  const projectFiles = [];
+  const projectFiles: Array<any> = [];
 
   const preferences: Preferences = {
     ...initialPreferences,

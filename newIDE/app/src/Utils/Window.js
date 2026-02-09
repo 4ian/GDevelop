@@ -210,7 +210,7 @@ export default class Window {
       return remote.getGlobal('args');
     }
 
-    const argumentsObject = {};
+    const argumentsObject: {[string]: any} = {};
     const params = new URLSearchParams(window.location.search);
     params.forEach((value, name) => (argumentsObject[name] = value));
 

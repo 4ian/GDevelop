@@ -15,6 +15,7 @@ const TARGET_DIRS = [
   path.join(repoRoot, 'GDevelop.js', 'types'),
 ];
 const SRC_DIR = path.join(appRoot, 'src');
+const APP_FLOW_SHIMS_PATH = path.join(appRoot, 'flow-typed', 'flow-upgrade-shims.js');
 
 function collectJsFiles(directory) {
   if (!fs.existsSync(directory)) return [];
@@ -149,6 +150,34 @@ function ensureGDevelopShims() {
   return true;
 }
 
+function ensureAppShims() {
+  const declarations = ['declare var navigator: any;'];
+
+  if (!fs.existsSync(APP_FLOW_SHIMS_PATH)) {
+    const contents = [
+      '// Added by codemod-flow-upgrade.js for Flow 0.299',
+      ...declarations,
+      '',
+    ].join('\n');
+    fs.writeFileSync(APP_FLOW_SHIMS_PATH, contents, 'utf8');
+    return true;
+  }
+
+  const source = fs.readFileSync(APP_FLOW_SHIMS_PATH, 'utf8');
+  let updated = source;
+  let changed = false;
+
+  for (const declaration of declarations) {
+    if (updated.includes(declaration)) continue;
+    updated = `${updated.trimEnd()}\n${declaration}\n`;
+    changed = true;
+  }
+
+  if (!changed) return false;
+  fs.writeFileSync(APP_FLOW_SHIMS_PATH, updated, 'utf8');
+  return true;
+}
+
 function run() {
   const jsFiles = TARGET_DIRS.flatMap(collectJsFiles);
   let updatedFiles = 0;
@@ -263,6 +292,7 @@ function run() {
   }
 
   if (ensureGDevelopShims()) updatedFiles += 1;
+  if (ensureAppShims()) updatedFiles += 1;
 
   const renderReplacements = [
     {
@@ -281,6 +311,20 @@ function run() {
     if (applyTextReplacements(filePath, renderReplacements)) updatedFiles += 1;
   }
 
+  const literalReplacements = [
+    {
+      searchValue: /(const|let)\s+([A-Za-z0-9_$]+)\s*=\s*\{\}\s*;?/g,
+      replaceValue: '$1 $2: {[string]: any} = {};',
+    },
+    {
+      searchValue: /(const|let)\s+([A-Za-z0-9_$]+)\s*=\s*\[\]\s*;?/g,
+      replaceValue: '$1 $2: Array<any> = [];',
+    },
+  ];
+  for (const filePath of srcFiles) {
+    if (applyTextReplacements(filePath, literalReplacements)) updatedFiles += 1;
+  }
+
   const chatMarkdownTextPath = path.join(
     appRoot,
     'src',
@@ -293,6 +337,49 @@ function run() {
       {
         searchValue: /const elements = \[\];/g,
         replaceValue: 'const elements: Array<React.Node> = [];',
+      },
+      {
+        searchValue: /img: \(\{ node, \.\.\.props \}\) => \(/g,
+        replaceValue: 'img: ({ node, ...props }: any) => (',
+      },
+      {
+        searchValue: /const className = classNames\(\{\n([\s\S]*?)\n\}\);/g,
+        replaceValue: 'const className = classNames(({\\n$1\\n}: {[string]: boolean}));',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const chatMessagesPath = path.join(
+    appRoot,
+    'src',
+    'AiGeneration',
+    'AiRequestChat',
+    'ChatMessages.js'
+  );
+  if (
+    applyTextReplacements(chatMessagesPath, [
+      {
+        searchValue: /const items = \[\];/g,
+        replaceValue: 'const items: Array<any> = [];',
+      },
+      {
+        searchValue: /let currentFunctionCallItems = \[\];/g,
+        replaceValue: 'let currentFunctionCallItems: Array<any> = [];',
+      },
+      {
+        searchValue: /let pendingFunctionCallItems = \[\];/g,
+        replaceValue: 'let pendingFunctionCallItems: Array<any> = [];',
+      },
+      {
+        searchValue: /React\.useState\(\{\}\)/g,
+        replaceValue: "React.useState<{[string]: 'like' | 'dislike'}>({})",
+      },
+      {
+        searchValue: /React\.useState\(null\)/g,
+        replaceValue:
+          "React.useState<?{| aiRequestId: string, messageIndex: number |}>(null)",
       },
     ])
   ) {

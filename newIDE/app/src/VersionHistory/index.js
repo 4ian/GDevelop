@@ -47,7 +47,7 @@ const groupVersionsByDay = (
 ): VersionsGroupedByDay => {
   if (versions.length === 0) return {};
 
-  const versionsGroupedByDay = {};
+  const versionsGroupedByDay: {[string]: any} = {};
   versions.forEach(version => {
     const dayDate = new Date(version.createdAt.slice(0, 10)).getTime();
     if (!versionsGroupedByDay[dayDate]) {

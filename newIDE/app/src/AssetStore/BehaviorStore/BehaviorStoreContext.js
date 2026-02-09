@@ -124,7 +124,7 @@ export const BehaviorStoreStateProvider = ({children, i18n, defaultSearchText}: 
           const behaviorsRegistry: BehaviorsRegistry = await getBehaviorsRegistry();
           const behaviorShortHeaders = behaviorsRegistry.headers;
 
-          const translatedBehaviorShortHeadersByType = {};
+          const translatedBehaviorShortHeadersByType: {[string]: any} = {};
           behaviorShortHeaders.forEach(behaviorShortHeader => {
             const translatedBehaviorShortHeader: TranslatedBehaviorShortHeader = {
               ...behaviorShortHeader,

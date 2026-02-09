@@ -44,7 +44,7 @@ export const createTree = <T: EnumeratedInstructionOrExpressionMetadata>(
   allExpressions: Array<T>,
   i18n: I18nType
 ): TreeNode<T> => {
-  const tree = {};
+  const tree: {[string]: any} = {};
   const sortedFreeInstructionsTopLevelGroups = getSortedFreeInstructionsTopLevelGroups(
     i18n
   );

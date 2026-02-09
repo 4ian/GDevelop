@@ -154,7 +154,7 @@ const fillMissingDays = (
   gameMetrics: Array<GameMetrics>,
   todayDate: Date
 ): Array<GameMetrics> => {
-  const filledGameMetrics = [];
+  const filledGameMetrics: Array<any> = [];
   // TODO In some timezones, it might start the wrong day.
   let previousMetricDate = addDays(todayDate, 1);
   for (const metric of gameMetrics) {

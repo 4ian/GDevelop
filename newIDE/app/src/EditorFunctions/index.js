@@ -461,8 +461,8 @@ const verifyPropertyChange = ({
     };
   }
 
-  const propertyWarnings = [];
-  const propertyChanges = [];
+  const propertyWarnings: Array<any> = [];
+  const propertyChanges: Array<any> = [];
 
   const actualNewValue = foundProperty.getValue();
 
@@ -1380,8 +1380,8 @@ const changeObjectProperty: EditorFunction = {
       );
     }
 
-    const warnings = [];
-    const changes = [];
+    const warnings: Array<any> = [];
+    const changes: Array<any> = [];
 
     changed_properties.forEach(changed_property => {
       if (!object) return;
@@ -2103,8 +2103,8 @@ const changeBehaviorProperty: EditorFunction = {
       behaviorSharedDataProperties = behaviorSharedData.getProperties();
     }
 
-    const warnings = [];
-    const changes = [];
+    const warnings: Array<any> = [];
+    const changes: Array<any> = [];
 
     changedProperties.forEach(changed_property => {
       const propertyName = SafeExtractor.extractStringProperty(
@@ -2244,7 +2244,7 @@ const describeInstances: EditorFunction = {
     const layout = project.getLayout(scene_name);
     const initialInstances = layout.getInitialInstances();
 
-    const instances = [];
+    const instances: Array<any> = [];
 
     // For each layer
     mapFor(0, layout.getLayersCount(), i => {
@@ -2560,7 +2560,7 @@ const put2dInstances: EditorFunction = {
       }
 
       // Track changes for detailed success message
-      const changes = [];
+      const changes: Array<any> = [];
 
       if (newInstancesCount > 0 && !object_name) {
         changes.push(
@@ -3099,7 +3099,7 @@ const put3dInstances: EditorFunction = {
       }
 
       // Track changes for detailed success message
-      const changes = [];
+      const changes: Array<any> = [];
 
       if (newInstancesCount > 0 && !object_name) {
         changes.push(
@@ -4092,8 +4092,8 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
     }
     const scene = project.getLayout(scene_name);
 
-    const changes = [];
-    const warnings = [];
+    const changes: Array<any> = [];
+    const warnings: Array<any> = [];
 
     const changed_properties = SafeExtractor.extractArrayProperty(
       args,
@@ -4792,7 +4792,7 @@ const initializeProject: EditorFunctionWithoutProject = {
       };
 
       if (also_read_existing_events) {
-        const eventsAsTextByScene = {};
+        const eventsAsTextByScene: {[string]: any} = {};
         mapFor(0, createdProject.getLayoutsCount(), i => {
           const scene = createdProject.getLayoutAt(i);
           const events = scene.getEvents();

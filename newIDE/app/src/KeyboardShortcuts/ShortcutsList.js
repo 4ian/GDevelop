@@ -38,7 +38,7 @@ const getPatchedShortcutString = (
 const sortCommandsIntoAreasAndGetReverseMap = (
   userShortcutMap: ShortcutMap
 ) => {
-  const areaWiseCommands = {};
+  const areaWiseCommands: {[string]: any} = {};
   const shortcutStringToCommands: { [string]: Array<CommandName> } = {};
   Object.keys(commandsList)
     .filter(name => !commandsList[name].noShortcut)

@@ -83,7 +83,7 @@ export const getVariableContextFromNodeId = (
   let parentVariable = null;
   let currentVariable = null;
   let currentVariableName = null;
-  let lineage = [];
+  let lineage: Array<any> = [];
   let name = null;
   let depth = -1;
 

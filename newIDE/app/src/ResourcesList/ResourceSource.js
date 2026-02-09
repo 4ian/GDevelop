@@ -116,7 +116,7 @@ export const allResourceKindsAndMetadata = [
   },
 ];
 
-const constructors = {};
+const constructors: {[string]: any} = {};
 for (const { kind, createNewResource } of allResourceKindsAndMetadata) {
   constructors[kind] = createNewResource;
 }

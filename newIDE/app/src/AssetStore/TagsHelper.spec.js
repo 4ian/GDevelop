@@ -5,7 +5,7 @@ const { getFolderTagsFromAssetShortHeaders } = require('./TagsHelper');
 describe('getFolderTagsFromAssetShortHeaders', () => {
   it('should return an empty array if no assets', () => {
     const selectedFolders = ['pack-tag'];
-    const assetShortHeaders = [];
+    const assetShortHeaders: Array<any> = [];
     const result = getFolderTagsFromAssetShortHeaders({
       selectedFolders,
       assetShortHeaders,

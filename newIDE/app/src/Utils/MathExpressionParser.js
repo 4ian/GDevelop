@@ -189,7 +189,7 @@ export function evalReversePolishNotation(tokens: string[]): number {
     const op = ops[token];
 
     if (op !== undefined) {
-      const parameters = [];
+      const parameters: Array<any> = [];
       for (let i = 0; i < op.arity; i++) {
         parameters.push(stack.pop());
       }
@@ -217,7 +217,7 @@ export function tokenize(expression: string): Array<string> {
   // "1  +" => "1 +"
   const expr = expression.replace(/\s+/g, ' ');
 
-  const tokens = [];
+  const tokens: Array<any> = [];
 
   let acc = '';
   let currentNumber = '';

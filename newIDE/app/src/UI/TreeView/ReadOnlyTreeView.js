@@ -196,7 +196,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
       const canHaveChildren = Array.isArray(children);
       const collapsed = !forceAllOpened && !openedNodeIds.includes(id);
       const openedDuringSearch = openedDuringSearchNodeIds.includes(id);
-      let flattenedChildren = [];
+      let flattenedChildren: Array<any> = [];
       /*
        * Compute children nodes flattening if:
        * - node has children;
@@ -548,7 +548,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
       if (!searchText) {
         setOpenedDuringSearchNodeIds([]);
       } else {
-        const openedNodes = [];
+        const openedNodes: Array<any> = [];
         browseTree(items, getItemChildren, item => {
           const itemName = getItemName(item);
           if (

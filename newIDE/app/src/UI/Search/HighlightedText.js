@@ -42,7 +42,7 @@ const HighlightedText = ({
 
   if (matchesCoordinates.length === 0) return [text];
 
-  const returnText = [];
+  const returnText: Array<any> = [];
 
   for (let i = 0; i < matchesCoordinates.length; i++) {
     const startIndexOfNextMatch = matchesCoordinates[i + 1]

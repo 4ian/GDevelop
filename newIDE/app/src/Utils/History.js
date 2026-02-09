@@ -83,7 +83,7 @@ export const saveToHistory = (
       changeContext,
     },
   ];
-  const newFutureActions = []; // Empty the future actions on save.
+  const newFutureActions: Array<any> = []; // Empty the future actions on save.
   // If we reach the max size, remove the oldest action.
   if (newPreviousActions.length > history.maxSize) {
     newPreviousActions.splice(0, newPreviousActions.length - history.maxSize);

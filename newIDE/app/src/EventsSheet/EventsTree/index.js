@@ -844,7 +844,7 @@ const EventsTree: component(
           }
         }
 
-        const childrenTreeData = [];
+        const childrenTreeData: Array<any> = [];
         buildEventsTreeData(
           childrenTreeData,
           projectScopedContainersAccessor,

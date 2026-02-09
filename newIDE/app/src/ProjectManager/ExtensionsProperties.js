@@ -13,7 +13,7 @@ type Props = {|
 function ExtensionsProperties(props: Props): React.Node | null {
   const { project } = props;
   const allExtensions = project.getCurrentPlatform().getAllPlatformExtensions();
-  const propertyList = [];
+  const propertyList: Array<any> = [];
   for (let i = 0; i < allExtensions.size(); i++) {
     const extension = allExtensions.at(i);
     const properties = project

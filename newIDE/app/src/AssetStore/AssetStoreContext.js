@@ -322,7 +322,7 @@ export const AssetStoreStateProvider = ({children}: AssetStoreStateProviderProps
   // list of all assets by ids.
   React.useEffect(
     () => {
-      const assetShortHeadersById = {};
+      const assetShortHeadersById: {[string]: any} = {};
       if (publicAssetShortHeaders) {
         publicAssetShortHeaders.forEach(assetShortHeader => {
           assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
@@ -426,7 +426,7 @@ export const AssetStoreStateProvider = ({children}: AssetStoreStateProviderProps
       if (!publicAssetPacks || !publicAssetPacks.starterPacks) {
         return null;
       }
-      const publicAssetPacksByTag = {};
+      const publicAssetPacksByTag: {[string]: any} = {};
       publicAssetPacks.starterPacks.forEach(assetPack => {
         const tag = assetPack.tag;
         if (
@@ -447,7 +447,7 @@ export const AssetStoreStateProvider = ({children}: AssetStoreStateProviderProps
       if (!privateAssetPackListingDatas) {
         return null;
       }
-      const privateAssetPackListingDatasById = {};
+      const privateAssetPackListingDatasById: {[string]: any} = {};
       if (hidePremiumProducts) return privateAssetPackListingDatasById;
       privateAssetPackListingDatas.forEach(privateAssetPackListingData => {
         const id = privateAssetPackListingData.id;

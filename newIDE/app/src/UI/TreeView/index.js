@@ -244,7 +244,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
       const canHaveChildren = Array.isArray(children);
       const collapsed = !forceAllOpened && !openedNodeIds.includes(id);
       const openedDuringSearch = openedDuringSearchNodeIds.includes(id);
-      let flattenedChildren = [];
+      let flattenedChildren: Array<any> = [];
       /*
        * Compute children nodes flattening if:
        * - node has children;

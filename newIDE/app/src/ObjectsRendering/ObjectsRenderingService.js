@@ -35,7 +35,7 @@ const PIXI = { ...PIXI_LEGACY, ...PIXI_SPINE };
 // This can be removed if no more extension PixiJS plugin requires this.
 global.PIXI = PIXI;
 
-const requirableModules = {};
+const requirableModules: {[string]: any} = {};
 
 /**
  * A service containing functions that are called to render instances

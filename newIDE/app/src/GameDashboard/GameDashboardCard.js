@@ -421,7 +421,7 @@ const GameDashboardCard = (
   const buildOpenProjectContextMenu = (
     i18n: I18nType
   ): Array<MenuItemTemplate> => {
-    const actions = [];
+    const actions: Array<any> = [];
     if (projectsList.length > 1) {
       actions.push(
         ...projectsList.slice(0, 3).map(fileMetadataAndStorageProviderName => {
@@ -462,7 +462,7 @@ const GameDashboardCard = (
           </IconButton>
         }
         buildMenuTemplate={(i18n: I18nType) => {
-          const actions = [];
+          const actions: Array<any> = [];
 
           // Close action
           if (isCurrentProjectOpened) {

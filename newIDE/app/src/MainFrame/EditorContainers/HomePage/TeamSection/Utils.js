@@ -23,7 +23,7 @@ export const groupMembersByGroupId = ({
   const membersByGroupId = {
     NONE: { group: { id: 'none', name: 'none' }, members: [] },
   };
-  const deactivatedMembers = [];
+  const deactivatedMembers: Array<any> = [];
   members.forEach(member => {
     const membership = memberships.find(
       membership => membership.userId === member.id

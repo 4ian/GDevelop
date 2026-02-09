@@ -29,7 +29,7 @@ export const getBreakingChanges = (
   if (!extension.changelog) {
     return [];
   }
-  const breakingChanges = [];
+  const breakingChanges: Array<any> = [];
   for (const { version, breaking } of extension.changelog) {
     if (breaking && semverGreaterThan(version, installedVersion)) {
       breakingChanges.push({ version, changes: breaking });

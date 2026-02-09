@@ -153,8 +153,8 @@ export const addAssetToProject = async ({
   targetObjectFolderOrObject,
   requestedObjectName,
 }: InstallAssetArgs): Promise<AddAssetOutput> => {
-  const objectNewNames = {};
-  const resourceNewNames = {};
+  const objectNewNames: {[string]: any} = {};
+  const resourceNewNames: {[string]: any} = {};
   const createdObjects: Array<gdObject> = [];
 
   // Create objects (and their behaviors)

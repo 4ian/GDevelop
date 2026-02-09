@@ -12,8 +12,8 @@ const filterOptions = <T: Object>(
   const searchText = state.inputValue.toLowerCase();
   if (searchText === '') return options;
 
-  const directMatches = [];
-  const fuzzyMatches = [];
+  const directMatches: Array<any> = [];
+  const fuzzyMatches: Array<any> = [];
   options.forEach(option => {
     if (option.hit) return directMatches.push(option);
     const optionText = state.getOptionLabel(option).toLowerCase();

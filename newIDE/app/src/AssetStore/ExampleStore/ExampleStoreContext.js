@@ -14,7 +14,7 @@ import { EXAMPLES_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 
 const defaultSearchText = '';
 const excludedTiers = new Set(); // No tiers for examples.
-const firstExampleIds = [];
+const firstExampleIds: Array<any> = [];
 
 type ExampleStoreState = {|
   exampleFilters: ?Filters,
@@ -93,7 +93,7 @@ export const ExampleStoreStateProvider = ({children}: ExampleStoreStateProviderP
           setExampleShortHeaders(fetchedExampleShortHeaders);
           setExampleFilters(fetchedFilters);
 
-          const exampleShortHeadersById = {};
+          const exampleShortHeadersById: {[string]: any} = {};
           fetchedExampleShortHeaders.forEach(exampleShortHeader => {
             exampleShortHeadersById[exampleShortHeader.id] = exampleShortHeader;
           });

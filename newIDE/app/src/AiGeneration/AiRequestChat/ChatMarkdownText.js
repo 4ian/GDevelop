@@ -144,7 +144,7 @@ export const ChatMarkdownText: React.ComponentType<Props> = React.memo<Props>((p
     () => ({
       a: renderChatLink,
       code: renderChatCodeBlockWithChatLinks,
-      img: ({ node, ...props }) => (
+      img: ({ node, ...props }: any) => (
         // eslint-disable-next-line jsx-a11y/alt-text
         <img style={{ display: 'flex' }} {...props} />
       ),
@@ -165,10 +165,8 @@ export const ChatMarkdownText: React.ComponentType<Props> = React.memo<Props>((p
     </I18n>
   );
 
-  const className = classNames({
-    'gd-markdown': true,
+  const className = classNames(({\n    'gd-markdown': true,
     [classes.chatMarkdown]: true,
   });
 
-  return <span className={className}>{markdownElement}</span>;
-});
+  return <span className={className}>{markdownElement}</span>;\n}: {[string]: boolean}));

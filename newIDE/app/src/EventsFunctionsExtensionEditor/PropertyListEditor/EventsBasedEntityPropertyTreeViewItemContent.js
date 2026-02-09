@@ -370,7 +370,7 @@ export class EventsBasedEntityPropertyTreeViewItemContent
   }
 
   renderRightComponent(i18n: I18nType): ?React.Node {
-    const icons = [];
+    const icons: Array<any> = [];
     if (this.property.getProperty().isHidden()) {
       icons.push(
         <Tooltip

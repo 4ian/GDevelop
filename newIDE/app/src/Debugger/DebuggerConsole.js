@@ -332,7 +332,7 @@ export const DebuggerConsole = (
         >
           <Column>
             {(() => {
-              const list = [];
+              const list: Array<any> = [];
               for (const group of groups.values())
                 list.push(
                   <Line key={group}>

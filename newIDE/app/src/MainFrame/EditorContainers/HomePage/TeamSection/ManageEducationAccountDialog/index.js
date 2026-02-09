@@ -369,7 +369,7 @@ const ManageEducationAccountDialog = ({onClose}: Props): null | React.Node => {
     () => {
       if (!members) return;
       let content = 'Username,Full Name,Email,Password';
-      let membersToConsider = [];
+      let membersToConsider: Array<any> = [];
       if (selectedUserIds.length === 0) {
         membersToConsider = members.filter(member => !member.deactivatedAt);
       } else {

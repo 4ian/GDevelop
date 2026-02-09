@@ -7,7 +7,7 @@ import { formatISO, subDays } from 'date-fns';
 
 describe('GameAnalyticsEvaluator', () => {
   const generateGameRollingMetrics1 = (count, todayDate) => {
-    const metrics = [];
+    const metrics: Array<any> = [];
     for (let index = 0; index < count; index++) {
       metrics.push({
         date: formatISO(subDays(todayDate, index)),

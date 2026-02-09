@@ -661,7 +661,7 @@ export const getOpenedAskAiEditor = (
 };
 
 export const getAllEditorTabs = (state: EditorTabsState): Array<EditorTab> => {
-  const allEditors = [];
+  const allEditors: Array<any> = [];
   for (const paneIdentifier in state.panes) {
     const pane = state.panes[paneIdentifier];
     allEditors.push(...pane.editors);

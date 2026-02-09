@@ -22,7 +22,7 @@ import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 
 const defaultSearchText = '';
 const excludedTiers = new Set(); // No tiers for game templates.
-const firstGameTemplateIds = [];
+const firstGameTemplateIds: Array<any> = [];
 
 const getPrivateGameTemplateListingDataSearchTerms = (
   privateGameTemplate: PrivateGameTemplateListingData
@@ -264,7 +264,7 @@ export const PrivateGameTemplateStoreStateProvider = ({children}: PrivateGameTem
       if (!privateGameTemplateListingDatas) {
         return null;
       }
-      const privateGameTemplateListingDatasById = {};
+      const privateGameTemplateListingDatasById: {[string]: any} = {};
       if (hidePremiumProducts) return privateGameTemplateListingDatasById;
       privateGameTemplateListingDatas.forEach(
         privateGameTemplateListingData => {

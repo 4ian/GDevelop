@@ -558,7 +558,7 @@ export const getSummaryLines = (
 ): { desktopLines: Array<React.Node>, mobileLines: Array<React.Node> } => {
   const includedListableProducts =
     bundleListingData.includedListableProducts || [];
-  const summaryLineItems = [];
+  const summaryLineItems: Array<any> = [];
 
   const includedCourseListableProducts = includedListableProducts.filter(
     product => product.productType === 'COURSE'
@@ -673,8 +673,8 @@ export const getSummaryLines = (
     );
   }
 
-  const mobileLineItems = [];
-  const desktopLineItems = [];
+  const mobileLineItems: Array<any> = [];
+  const desktopLineItems: Array<any> = [];
   summaryLineItems.forEach((item, index) => {
     if (index !== 0) {
       desktopLineItems.push(
@@ -703,14 +703,14 @@ export const getSummaryLines = (
   });
 
   // Desktop, everything on one line.
-  const desktopLines = [];
+  const desktopLines: Array<any> = [];
   desktopLines.push(
     <ResponsiveLineStackLayout expand key="desktop-line">
       {desktopLineItems}
     </ResponsiveLineStackLayout>
   );
   // Mobile, 3 items by line (2 + 1 divider)
-  const mobileLines = [];
+  const mobileLines: Array<any> = [];
   for (let i = 0; i < mobileLineItems.length; i += 3) {
     mobileLines.push(
       <LineStackLayout key={`mobile-line-${i}`} expand>

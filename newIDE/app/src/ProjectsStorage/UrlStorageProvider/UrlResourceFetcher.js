@@ -22,7 +22,7 @@ export const fetchRelativeResourcesToFullUrls = async ({project, fileMetadata, o
   | Promise<{ erroredResources: Array<{ error: any, resourceName: string }> }> => {
   const resourcesManager = project.getResourcesManager();
   const allResourceNames = resourcesManager.getAllResourceNames().toJSArray();
-  const erroredResources = [];
+  const erroredResources: Array<any> = [];
 
   const projectFileUrl = fileMetadata.fileIdentifier;
   const projectBaseUrl = projectFileUrl.substr(

@@ -345,7 +345,7 @@ function InAppTutorialStepDisplayer({
 
   const updateBlockingLayerVisibility = React.useCallback(
     (entries: IntersectionObserverEntry[]) => {
-      let holes = [];
+      let holes: Array<any> = [];
       if (
         anchorElement &&
         !expectedEditor &&

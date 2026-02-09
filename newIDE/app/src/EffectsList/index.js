@@ -442,9 +442,9 @@ export const useManageEffects = ({
 
   const all3DEffectMetadata = React.useMemo(
     () => {
-      const lightEffectMetadata = [];
-      const fogEffectMetadata = [];
-      const otherEffectMetadata = [];
+      const lightEffectMetadata: Array<any> = [];
+      const fogEffectMetadata: Array<any> = [];
+      const otherEffectMetadata: Array<any> = [];
       for (const effect of allEffectMetadata) {
         if (!effect.isMarkedAsOnlyWorkingFor3D) {
           continue;
@@ -702,7 +702,7 @@ export const useManageEffects = ({
       if (effectsContainer.getEffectsCount() < 2) {
         return null;
       }
-      const uniqueEffectTypes = [];
+      const uniqueEffectTypes: Array<any> = [];
       for (let i = 0; i < effectsContainer.getEffectsCount(); i++) {
         const effect: gdEffect = effectsContainer.getEffectAt(i);
         const effectType = effect.getEffectType();

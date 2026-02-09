@@ -21,7 +21,7 @@ const getTransparentMaterial = () => {
   return transparentMaterial;
 };
 
-const vertexColors = [];
+const vertexColors: Array<any> = [];
 
 /**
  * Renderer for gd.SpriteObject

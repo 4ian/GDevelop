@@ -127,7 +127,7 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
         displayOnlyBestEntry: action.payload,
       };
     case 'UPDATE_OR_CREATE_LEADERBOARD':
-      const leaderboardsByIdsWithUpdatedPrimaryFlags = {};
+      const leaderboardsByIdsWithUpdatedPrimaryFlags: {[string]: any} = {};
       if (state.leaderboardsByIds) {
         Object.entries(state.leaderboardsByIds).forEach(
           ([leaderboardId, leaderboard]) => {

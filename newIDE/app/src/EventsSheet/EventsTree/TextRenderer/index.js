@@ -198,7 +198,7 @@ const convertVariableToJsObject = (variable: gdVariable) => {
     return variable.getBool();
   } else if (variable.getType() === gd.Variable.Structure) {
     const childrenNames = variable.getAllChildrenNames().toJSArray();
-    const object = {};
+    const object: {[string]: any} = {};
     childrenNames.forEach(childName => {
       object[childName] = convertVariableToJsObject(
         variable.getChild(childName)

@@ -34,7 +34,7 @@ const PolygonEditor = ({vertices, onChangeVertexX, onChangeVertexY, onAdd, onRem
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const isPolygonConvex = (vertices: Array<Vertex>) => {
     // Get edges
-    let edges = [];
+    let edges: Array<any> = [];
     let v1 = null;
     let v2 = null;
     for (let i = 0; i < vertices.length; i++) {

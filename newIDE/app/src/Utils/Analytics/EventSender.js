@@ -87,7 +87,7 @@ export const setCurrentlyRunningInAppTutorial = (tutorial: string | null): strin
   (currentlyRunningInAppTutorial = tutorial);
 
 const makeCanSendEvent = (options: {| minimumTimeBetweenEvents: number |}) => {
-  const lastSentEventTimestamps = {};
+  const lastSentEventTimestamps: {[string]: any} = {};
   return (eventName: string) => {
     const now = Date.now();
     if (lastSentEventTimestamps[eventName]) {

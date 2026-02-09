@@ -68,7 +68,7 @@ const allPrivateAssetPackListingData = [
 
 const allPrivateGameTemplateListingData = [fakePrivateGameTemplateListingData];
 
-const mockCourses = [];
+const mockCourses: Array<any> = [];
 
 const StandAloneDialogStory = ({
   bundleCategory,

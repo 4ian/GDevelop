@@ -231,7 +231,7 @@ export const BundleStoreStateProvider = ({children}: BundleStoreStateProviderPro
       if (!bundleListingDatas) {
         return null;
       }
-      const bundleListingDatasById = {};
+      const bundleListingDatasById: {[string]: any} = {};
       if (hidePremiumProducts) return bundleListingDatasById;
       bundleListingDatas.forEach(bundleListingData => {
         const id = bundleListingData.id;

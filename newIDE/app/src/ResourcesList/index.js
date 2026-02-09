@@ -244,7 +244,7 @@ const ResourcesList: component(...Props) renders ResourcesListInterface = React.
           const resourceNames = resourcesManager
             .getAllResourceNames()
             .toJSArray();
-          const newResourcesWithErrors = {};
+          const newResourcesWithErrors: {[string]: any} = {};
           resourceNames.forEach(resourceName => {
             newResourcesWithErrors[resourceName] = getResourceFilePathStatus(
               project,

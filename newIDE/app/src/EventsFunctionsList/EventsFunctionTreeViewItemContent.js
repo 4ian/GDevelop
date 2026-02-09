@@ -293,7 +293,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
   }
 
   renderRightComponent(i18n: I18nType): ?React.Node {
-    const icons = [];
+    const icons: Array<any> = [];
     if (this.eventsFunction.isPrivate()) {
       icons.push(
         <Tooltip

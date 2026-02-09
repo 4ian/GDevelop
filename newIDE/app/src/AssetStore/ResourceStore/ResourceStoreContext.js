@@ -181,9 +181,9 @@ export const ResourceStoreStateProvider = ({children}: ResourceStoreStateProvide
           const authors = await listAllAuthors({ environment });
           const licenses = await listAllLicenses({ environment });
 
-          const svgResourcesByUrl = {};
-          const fontResourcesByUrl = {};
-          const audioResourcesByUrl = {};
+          const svgResourcesByUrl: {[string]: any} = {};
+          const fontResourcesByUrl: {[string]: any} = {};
+          const audioResourcesByUrl: {[string]: any} = {};
           resources.forEach(resource => {
             if (resource.type === 'font') {
               fontResourcesByUrl[resource.url] = resource;
@@ -196,7 +196,7 @@ export const ResourceStoreStateProvider = ({children}: ResourceStoreStateProvide
               svgResourcesByUrl[resource.url] = resource;
             }
           });
-          const authorsByAuthorName = {};
+          const authorsByAuthorName: {[string]: any} = {};
           authors.forEach(author => {
             authorsByAuthorName[author.name] = author;
           });

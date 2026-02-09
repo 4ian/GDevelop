@@ -45,7 +45,7 @@ export const enumeratePropertiesInFolder = (
   folder: gdPropertyFolderOrProperty
 ): gdNamedPropertyDescriptor[] => {
   if (!folder.isFolder()) return [];
-  const result = [];
+  const result: Array<any> = [];
   recursivelyEnumeratePropertiesInFolder(folder, result);
   return result;
 };
@@ -54,7 +54,7 @@ export const enumerateFoldersInFolder = (
   folder: gdPropertyFolderOrProperty
 ): {| path: string, folder: gdPropertyFolderOrProperty |}[] => {
   if (!folder.isFolder()) return [];
-  const result = [];
+  const result: Array<any> = [];
   recursivelyEnumerateFoldersInFolder(folder, '', result);
   return result;
 };
@@ -63,7 +63,7 @@ export const enumerateFoldersInContainer = (
   container: gdPropertiesContainer
 ): {| path: string, folder: gdPropertyFolderOrProperty |}[] => {
   const rootFolder = container.getRootFolder();
-  const result = [];
+  const result: Array<any> = [];
   recursivelyEnumerateFoldersInFolder(rootFolder, '', result);
   return result;
 };

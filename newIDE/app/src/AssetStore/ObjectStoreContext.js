@@ -95,7 +95,7 @@ const getItemIdsGroupedByCategory = (
     }
     categoryObjects.push(objectShortHeader);
   }
-  const itemIdsGroupedByCategory = [];
+  const itemIdsGroupedByCategory: Array<any> = [];
   for (const [category, objectShortHeaders] of objectsByCategory) {
     if (objectShortHeaders.length === 0) {
       continue;
@@ -217,7 +217,7 @@ export const ObjectStoreStateProvider = ({children, i18n, defaultSearchText}: Ob
           const objectsRegistry: ObjectsRegistry = await getObjectsRegistry();
           const objectShortHeaders = objectsRegistry.headers;
 
-          const translatedObjectShortHeadersByType = {};
+          const translatedObjectShortHeadersByType: {[string]: any} = {};
           objectShortHeaders.forEach(objectShortHeader => {
             const translatedObjectShortHeader: TranslatedObjectShortHeader = {
               ...objectShortHeader,

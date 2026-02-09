@@ -47,7 +47,7 @@ export type UserAnswers = Array<{|
 |}>;
 
 export const formatUserAnswers = (userAnswers: UserAnswers): UserSurveyType => {
-  const userSurvey = {};
+  const userSurvey: {[string]: any} = {};
   userAnswers.forEach(({ questionId, answers, userInput }) => {
     // Remove `input` choice from answers since input content should be handled differently.
     let cleanedAnswers = answers.filter(answer => answer !== 'input');

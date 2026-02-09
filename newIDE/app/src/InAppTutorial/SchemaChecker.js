@@ -34,7 +34,7 @@ const flowStepKeys = [
   'disableBlockingLayer',
 ];
 export const checkInAppTutorialFileJsonSchema = (object: Object): Array<string> => {
-  const errors = [];
+  const errors: Array<any> = [];
   topLevelKeys.forEach(topLevelKey => {
     if (!object[topLevelKey]) {
       errors.push(`Top level key ${topLevelKey} missing in file.`);

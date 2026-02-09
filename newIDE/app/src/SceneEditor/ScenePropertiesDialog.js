@@ -173,7 +173,7 @@ const ScenePropertiesDialog = (
       });
       const tutorialIds = getBehaviorTutorialIds(behaviorTypeName);
       // TODO Make this a functional component to use PreferencesContext
-      const enabledTutorialIds = [];
+      const enabledTutorialIds: Array<any> = [];
       const iconUrl = behaviorMetadata.getIconFilename();
 
       return (

@@ -97,7 +97,7 @@ const getMessageSuggestionsLines = ({
   ) => Promise<void>,
   editorCallbacks: EditorCallbacks,
 |}) => {
-  const lines = [];
+  const lines: Array<any> = [];
   const suggestions = message.suggestions;
 
   if (suggestions && suggestions.explanationMessage) {
@@ -328,11 +328,11 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(functi
   const [isRestoring, setIsRestoring] = React.useState(false);
   const disabled = isWorking || isForAnotherProject || isRestoring;
 
-  const [messageFeedbacks, setMessageFeedbacks] = React.useState({});
+  const [messageFeedbacks, setMessageFeedbacks] = React.useState<{[string]: 'like' | 'dislike'}>({});
   const [
     dislikeFeedbackDialogOpenedFor,
     setDislikeFeedbackDialogOpenedFor,
-  ] = React.useState(null);
+  ] = React.useState<?{| aiRequestId: string, messageIndex: number |}>(null);
 
   const onRestoreVersion = React.useCallback(
     async (params: {| message: AiRequestMessage, aiRequest: AiRequest |}) => {
@@ -359,8 +359,8 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(functi
   // Group consecutive function calls.
   const renderItems = React.useMemo(
     () => {
-      const items = [];
-      let currentFunctionCallItems = [];
+      const items: Array<any> = [];
+      let currentFunctionCallItems: Array<any> = [];
       const forkedAfterNewMessageId = aiRequest.forkedAfterNewMessageId;
 
       const flushFunctionCallGroup = () => {
@@ -384,7 +384,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(functi
             message,
           });
         } else if (message.type === 'message' && message.role === 'assistant') {
-          let pendingFunctionCallItems = [];
+          let pendingFunctionCallItems: Array<any> = [];
 
           message.content.forEach((messageContent, messageContentIndex) => {
             if (messageContent.type === 'function_call') {

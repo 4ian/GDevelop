@@ -2212,7 +2212,7 @@ const interpolateWithNoise = (
 
 const generateGameRollingMetricsFor364Days = () => {
   const numberGenerator = new NumberGenerator();
-  const metrics = [];
+  const metrics: Array<any> = [];
   const count = 364;
   for (let index = 0; index < count; index++) {
     const ratio = 1 - index / count;

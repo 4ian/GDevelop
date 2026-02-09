@@ -33,7 +33,7 @@ const BackgroundHighlighting = ({value, style, highlights}: Props): React.MixedE
     .slice()
     .sort((highlight1, highlight2) => highlight1.begin - highlight2.begin);
 
-  const elements = [];
+  const elements: Array<any> = [];
   let lastPos = 0;
 
   sortedHighlights.forEach((highlight, i) => {

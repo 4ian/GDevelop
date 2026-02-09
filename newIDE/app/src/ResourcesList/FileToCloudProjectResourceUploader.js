@@ -247,8 +247,8 @@ export const FileToCloudProjectResourceUploader = (
               ref={inputRef}
               disabled={!canChooseFiles}
               onChange={event => {
-                const files = [];
-                const newFilteredOutFiles = [];
+                const files: Array<any> = [];
+                const newFilteredOutFiles: Array<any> = [];
                 for (let i = 0; i < event.currentTarget.files.length; i++) {
                   const selectedFile = event.currentTarget.files[i];
                   if (

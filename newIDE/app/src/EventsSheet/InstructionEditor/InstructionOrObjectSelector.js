@@ -521,7 +521,7 @@ const InstructionOrObjectSelector: component(
 
     const isSearching = !!searchText;
 
-    let filteredInstructionsList = [];
+    let filteredInstructionsList: Array<any> = [];
 
     if (isSearching) {
       filteredInstructionsList = searchResults.instructions;

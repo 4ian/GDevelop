@@ -106,7 +106,7 @@ const mergeAnimations = function<A: { name: string }>(
     assetAnimation: A
   ) => A
 ) {
-  const animations = [];
+  const animations: Array<any> = [];
   // Ensure the object don't loose any animation.
   for (const objectAnimation of objectAnimations) {
     const assetAnimation = assetAnimations.find(

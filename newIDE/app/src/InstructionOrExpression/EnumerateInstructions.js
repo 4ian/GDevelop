@@ -144,7 +144,7 @@ const enumerateExtraBehaviorInstructions = (
 
   // Get the map containing the metadata of the instructions provided by the extension...
   const instructionsTypes = instructions.keys();
-  const allInstructions = [];
+  const allInstructions: Array<any> = [];
 
   //... and add each instruction
   for (let j = 0; j < instructionsTypes.size(); ++j) {
@@ -179,7 +179,7 @@ const enumerateExtraObjectInstructions = (
 
   // Get the map containing the metadata of the instructions provided by the extension...
   const instructionsTypes = instructions.keys();
-  const allInstructions = [];
+  const allInstructions: Array<any> = [];
 
   //... and add each instruction
   for (let j = 0; j < instructionsTypes.size(); ++j) {
@@ -216,7 +216,7 @@ const enumerateFreeInstructionsWithoutExtra = (
 
   // Get the map containing the metadata of the instructions provided by the extension...
   const instructionsTypes = instructions.keys();
-  const allInstructions = [];
+  const allInstructions: Array<any> = [];
 
   //... and add each instruction
   for (let j = 0; j < instructionsTypes.size(); ++j) {
@@ -307,7 +307,7 @@ const enumerateExtensionInstructions = (
 ): Array<EnumeratedInstructionMetadata> => {
   //Get the map containing the metadata of the instructions provided by the extension...
   const instructionsTypes = instructions.keys();
-  const allInstructions = [];
+  const allInstructions: Array<any> = [];
 
   //... and add each instruction
   for (let j = 0; j < instructionsTypes.size(); ++j) {
@@ -344,7 +344,7 @@ export const enumerateAllInstructions = (
   isCondition: boolean,
   i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
-  let allInstructions = [];
+  let allInstructions: Array<any> = [];
 
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
@@ -629,7 +629,7 @@ export const enumerateFreeInstructions = (
   isCondition: boolean,
   i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
-  let allFreeInstructions = [];
+  let allFreeInstructions: Array<any> = [];
 
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())

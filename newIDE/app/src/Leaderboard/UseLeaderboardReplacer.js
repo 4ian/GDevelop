@@ -229,7 +229,7 @@ export const replaceLeaderboardsInProject = async (
   const totalSteps = leaderboardsToReplace.length + 2;
   const progressStep = (1 / totalSteps) * 100;
 
-  const replacedLeaderboardsMap = {};
+  const replacedLeaderboardsMap: {[string]: any} = {};
 
   setProgress(0);
 

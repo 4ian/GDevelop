@@ -24,7 +24,7 @@ const enumerateExpressionMetadataMap = (
       return null; // Skip hidden expressions
     }
 
-    let parameters = [];
+    let parameters: Array<any> = [];
     for (let i = 0; i < exprMetadata.getParametersCount(); i++) {
       if (scope.objectMetadata && i === 0) continue;
       if (scope.behaviorMetadata && i <= 1) continue; //Skip object and behavior parameters
@@ -191,8 +191,8 @@ export const enumerateAllExpressions = (
   type: string,
   i18n: I18nType
 ): Array<EnumeratedExpressionMetadata> => {
-  const objectsExpressions = [];
-  const behaviorsExpressions = [];
+  const objectsExpressions: Array<any> = [];
+  const behaviorsExpressions: Array<any> = [];
   const freeExpressions = enumerateFreeExpressions(type, i18n);
 
   const allExtensions = gd

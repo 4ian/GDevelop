@@ -26,7 +26,7 @@ type Props = {|
 
 const getExtraInfoArray = (type: gdValueTypeMetadata) => {
   const extraInfoJson = type.getExtraInfo();
-  let array = [];
+  let array: Array<any> = [];
   try {
     if (extraInfoJson !== '') array = JSON.parse(extraInfoJson);
     if (!Array.isArray(array)) array = [];

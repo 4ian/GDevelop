@@ -28,7 +28,7 @@ describe('UseSearchItem', () => {
 
 describe('partialQuickSort', () => {
   test('Sort an empty search result', () => {
-    const elements = [];
+    const elements: Array<any> = [];
     partialQuickSort(elements, a => a, 1, 0);
     expect(elements).toStrictEqual([]);
   });
@@ -39,12 +39,12 @@ describe('partialQuickSort', () => {
   });
   [0.4, 0.6, 1].forEach(pertinence => {
     test(`Sort search results with same pertinence: ${pertinence}`, () => {
-      const elements = [];
+      const elements: Array<any> = [];
       elements.length = 8;
       elements.fill(pertinence);
       partialQuickSort(elements, a => a, pertinence, pertinence);
 
-      const expectedElements = [];
+      const expectedElements: Array<any> = [];
       expectedElements.length = 8;
       expectedElements.fill(pertinence);
       expect(elements).toStrictEqual(expectedElements);

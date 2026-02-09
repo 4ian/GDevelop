@@ -572,7 +572,7 @@ type ExpressionAndCaretLocation = {|
  */
 const findLastNodeStartPosition = (expression: string) => {
   let match;
-  let indexes = [];
+  let indexes: Array<any> = [];
   // We consider that expressions are composed of letters, digits, dot or colons
   const expressionSeparatorRegex = new RegExp(/[^\w\d.:]/g);
   while ((match = expressionSeparatorRegex.exec(expression))) {

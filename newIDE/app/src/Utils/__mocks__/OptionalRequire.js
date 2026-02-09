@@ -18,7 +18,7 @@ const mockFs = {
     ),
   },
 };
-const mockProcess = {};
+const mockProcess: {[string]: any} = {};
 const mockOs = {
   tmpdir: () => '/some/fake-tmp-dir',
 };

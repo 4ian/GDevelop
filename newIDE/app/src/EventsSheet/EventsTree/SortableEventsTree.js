@@ -203,7 +203,7 @@ const getSearchMatches = ({
     return { matchIndexes: [], matchIndexSet: new Set() };
   }
 
-  const matchIndexes = [];
+  const matchIndexes: Array<any> = [];
   flatData.forEach((entry, index) => {
     if (
       searchMethod({

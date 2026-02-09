@@ -24,7 +24,7 @@ const getAdaptedMessageAndRouteNavigationParams = (
       );
       // $FlowFixMe - Assume that the arguments are always valid.
       const route: ?Route = urlParams.get('initial-dialog');
-      const otherParams = {};
+      const otherParams: {[string]: any} = {};
       urlParams.forEach((value, key) => {
         if (key !== 'initial-dialog') otherParams[key] = value;
       });

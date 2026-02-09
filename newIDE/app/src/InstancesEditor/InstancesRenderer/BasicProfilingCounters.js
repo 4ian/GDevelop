@@ -109,7 +109,7 @@ export const mergeBasicProfilingCounters = (
 export const getBasicProfilingCountersText = (
   basicProfilingCounters: BasicProfilingCounters
 ): string => {
-  const texts = [];
+  const texts: Array<any> = [];
   texts.push(
     `Instances update count: ${
       basicProfilingCounters.totalInstancesUpdateCount

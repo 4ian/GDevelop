@@ -686,7 +686,7 @@ const VariablesList: component(
 
     const triggerSearch = React.useCallback(
       () => {
-        let matchingInheritedNodes = [];
+        let matchingInheritedNodes: Array<any> = [];
         const matchingNodes = generateListOfNodesMatchingSearchInVariablesContainer(
           props.variablesContainer,
           normalizeString(searchText)
@@ -843,7 +843,7 @@ const VariablesList: component(
     const pasteClipboardContent = React.useCallback(
       () => {
         if (!Clipboard.has(CLIPBOARD_KIND)) return;
-        const newSelectedNodes = [];
+        const newSelectedNodes: Array<any> = [];
 
         const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
         const variablesContent = SafeExtractor.extractArray(clipboardContent);
@@ -1832,7 +1832,7 @@ const VariablesList: component(
         isInherited && props.inheritedVariablesContainer
           ? props.inheritedVariablesContainer
           : props.variablesContainer;
-      const allRows = [];
+      const allRows: Array<any> = [];
       mapFor(0, variablesContainer.count(), index => {
         const variable = variablesContainer.getAt(index);
         const name = variablesContainer.getNameAt(index);

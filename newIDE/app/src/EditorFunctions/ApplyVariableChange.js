@@ -33,7 +33,7 @@ const readOrInferVariableType = (
 const parseVariablePath = (
   variablePath: string
 ): Array<{| type: 'property' | 'index', value: string |}> => {
-  const segments = [];
+  const segments: Array<any> = [];
   let currentSegment = '';
   let i = 0;
 

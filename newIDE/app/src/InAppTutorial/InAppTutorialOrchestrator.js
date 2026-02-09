@@ -655,7 +655,7 @@ const InAppTutorialOrchestrator: component(
     // Compute phases start positions on flow change.
     React.useEffect(
       () => {
-        const indices = [];
+        const indices: Array<any> = [];
         for (
           let flowStepIndex = 0;
           flowStepIndex < tutorial.flow.length;

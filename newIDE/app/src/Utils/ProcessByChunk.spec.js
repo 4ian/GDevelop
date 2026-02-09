@@ -15,7 +15,7 @@ describe('ProcessByChunk', () => {
   });
 
   test('chunk never too big', async () => {
-    let results = [];
+    let results: Array<any> = [];
     const processChunk = async chunk => {
       results = [...results, ...chunk];
     };
@@ -38,7 +38,7 @@ describe('ProcessByChunk', () => {
   });
 
   test('chunks of 2', async () => {
-    let results = [];
+    let results: Array<any> = [];
     const processChunk = async chunk => {
       results = [...results, ...chunk];
     };
@@ -61,7 +61,7 @@ describe('ProcessByChunk', () => {
   });
 
   test('chunks of 2, transformed items', async () => {
-    let results = [];
+    let results: Array<any> = [];
     const processChunk = async chunk => {
       expect(chunk.length <= 2).toBe(true);
       results = [...results, ...chunk];

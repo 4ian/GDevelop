@@ -60,7 +60,7 @@ export const EducationCurriculum = (
 ): React.MixedElement => {
   const listItems: React.Node[] = React.useMemo(
     () => {
-      const items = [];
+      const items: Array<any> = [];
       let currentSection = null;
       let sectionIndex = 0;
 

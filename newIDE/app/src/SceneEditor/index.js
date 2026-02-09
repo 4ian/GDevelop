@@ -1042,7 +1042,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onObjectFolderOrObjectWithContextSelected = (
     objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext = null
   ) => {
-    const selectedObjectFolderOrObjectsWithContext = [];
+    const selectedObjectFolderOrObjectsWithContext: Array<any> = [];
     if (objectFolderOrObjectWithContext) {
       selectedObjectFolderOrObjectsWithContext.push(
         objectFolderOrObjectWithContext
@@ -1860,7 +1860,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const highestZOrderFinder = new gd.HighestZOrderFinder();
 
-    const extremeZOrderByLayerName = {};
+    const extremeZOrderByLayerName: {[string]: any} = {};
     layerNames.forEach(layerName => {
       highestZOrderFinder.reset();
       highestZOrderFinder.restrictSearchToLayer(layerName);

@@ -86,7 +86,7 @@ export const getSentenceErrorText = (
 
   const parametersLength = eventsFunction.getParameters().getParametersCount();
   const paramsMatches = sentence.matchAll(/_PARAM(\d+)_/g);
-  const nonExpectedParameters = [];
+  const nonExpectedParameters: Array<any> = [];
   for (const paramsMatch of paramsMatches) {
     const paramIndex = parseInt(paramsMatch[1], 10);
     if (

@@ -83,7 +83,7 @@ type Props = {|
 const getObjectAssetResourcesByName = (
   objectAsset: ObjectAsset
 ): { [string]: any /*(serialized gdResource)*/ } => {
-  const resourcesByName = {};
+  const resourcesByName: {[string]: any} = {};
 
   objectAsset.resources.forEach(resource => {
     resourcesByName[resource.name] = resource;

@@ -4,7 +4,7 @@ import { selectMessageByLocale } from './MessageByLocale';
 
 // $FlowFixMe[incompatible-type]
 // $FlowFixMe[missing-local-annot]
-const makeFakeI18n = (fakeI18n): I18nType => fakeI18n;
+const makeFakeI18n = (fakeI18n: any): any => fakeI18n;
 
 describe('MessageByLocale', () => {
   describe('selectMessageByLocale', () => {

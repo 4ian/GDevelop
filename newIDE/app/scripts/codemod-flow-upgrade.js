@@ -534,6 +534,36 @@ function run() {
     if (applyTextReplacements(filePath, arrayCastReplacements)) updatedFiles += 1;
   }
 
+  const fakeI18nReplacements = [
+    {
+      searchValue: /const makeFakeI18n = \(fakeI18n\): I18nType =>/g,
+      replaceValue: 'const makeFakeI18n = (fakeI18n: any): any =>',
+    },
+  ];
+  for (const filePath of srcFiles) {
+    if (applyTextReplacements(filePath, fakeI18nReplacements)) updatedFiles += 1;
+  }
+
+  const memoReplacements = [
+    {
+      searchValue: /React\.memo<([^,>]+),\s*[^>]+>/g,
+      replaceValue: 'React.memo<$1, any>',
+    },
+  ];
+  for (const filePath of srcFiles) {
+    if (applyTextReplacements(filePath, memoReplacements)) updatedFiles += 1;
+  }
+
+  const mapVectorReplacements = [
+    {
+      searchValue: /mapVector\(property\.getChoices\(\)/g,
+      replaceValue: 'mapVector((property.getChoices(): any)',
+    },
+  ];
+  for (const filePath of srcFiles) {
+    if (applyTextReplacements(filePath, mapVectorReplacements)) updatedFiles += 1;
+  }
+
   const chatMarkdownTextPath = path.join(
     appRoot,
     'src',
@@ -657,6 +687,130 @@ function run() {
       {
         searchValue: /hasDetailsToShow = result\.hasDetailsToShow;/g,
         replaceValue: 'hasDetailsToShow = !!result.hasDetailsToShow;',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const providersPath = path.join(appRoot, 'src', 'MainFrame', 'Providers.js');
+  if (
+    applyTextReplacements(providersPath, [
+      {
+        searchValue: /eventsFunctionsExtensionWriter: \?EventsFunctionsExtensionWriter,/g,
+        replaceValue: 'eventsFunctionsExtensionWriter: any,',
+      },
+      {
+        searchValue: /eventsFunctionsExtensionOpener: \?EventsFunctionsExtensionOpener,/g,
+        replaceValue: 'eventsFunctionsExtensionOpener: any,',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const variablesInspectorPath = path.join(
+    appRoot,
+    'src',
+    'Debugger',
+    'Inspectors',
+    'VariablesContainerInspector.js'
+  );
+  if (
+    applyTextReplacements(variablesInspectorPath, [
+      {
+        searchValue: /const transformVariable = \(variable: Variable\) => \{/g,
+        replaceValue: 'const transformVariable = (variable: Variable): any => {',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const keyboardShortcutsPath = path.join(appRoot, 'src', 'KeyboardShortcuts', 'index.js');
+  if (
+    applyTextReplacements(keyboardShortcutsPath, [
+      {
+        searchValue: /const eventKeyCodeToCode = \{/g,
+        replaceValue: 'const eventKeyCodeToCode: {[string]: string} = {',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const leaderboardContextPath = path.join(
+    appRoot,
+    'src',
+    'Leaderboard',
+    'LeaderboardContext.js'
+  );
+  if (
+    applyTextReplacements(leaderboardContextPath, [
+      {
+        searchValue: /deleteLeaderboardEntry: async entryId => \{\},/g,
+        replaceValue: 'deleteLeaderboardEntry: async (entryId: any): Promise<void> => {},',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const preferencesContextPath = path.join(
+    appRoot,
+    'src',
+    'MainFrame',
+    'Preferences',
+    'PreferencesContext.js'
+  );
+  if (
+    applyTextReplacements(preferencesContextPath, [
+      {
+        searchValue: /getRecentProjectFiles: options => \[\],/g,
+        replaceValue: 'getRecentProjectFiles: (options: any) => ([]: Array<any>),',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const extensionSummaryPath = path.join(
+    appRoot,
+    'src',
+    'EditorFunctions',
+    'SimplifiedProject',
+    'ExtensionSummary.js'
+  );
+  if (
+    applyTextReplacements(extensionSummaryPath, [
+      {
+        searchValue: /getPropertySummary\(namedProperty\.getName\(\), namedProperty\)/g,
+        replaceValue: 'getPropertySummary(namedProperty.getName(), (namedProperty: any))',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const pinchHandlerPath = path.join(appRoot, 'src', 'InstancesEditor', 'PinchHandler.js');
+  if (
+    applyTextReplacements(pinchHandlerPath, [
+      {
+        searchValue: /var interval = now - lastPinch\.p\.date;/g,
+        replaceValue: 'var interval = now.getTime() - lastPinch.p.date.getTime();',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const treeViewPath = path.join(appRoot, 'src', 'UI', 'TreeView', 'index.js');
+  if (
+    applyTextReplacements(treeViewPath, [
+      {
+        searchValue:
+          /type TreeViewComponent = <Item: ItemBaseAttributes>[\s\S]*?=> React\.Node;\n/g,
+        replaceValue: 'type TreeViewComponent = any;\n',
       },
     ])
   ) {

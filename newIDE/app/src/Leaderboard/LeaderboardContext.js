@@ -53,7 +53,7 @@ export const initialLeaderboardState = {
   resetLeaderboard: async () => {},
   deleteLeaderboard: async () => {},
   // $FlowFixMe[missing-local-annot]
-  deleteLeaderboardEntry: async entryId => {},
+  deleteLeaderboardEntry: async (entryId: any): Promise<void> => {},
   fetchLeaderboardEntries: async () => {},
 };
 

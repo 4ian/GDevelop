@@ -1438,7 +1438,7 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.eventsFunctionsExtension === nextProps.eventsFunctionsExtension;
 
 // $FlowFixMe[incompatible-type]
-const MemoizedObjectsList = React.memo<Props, EventsFunctionsListInterface>(
+const MemoizedObjectsList = React.memo<Props, any>(
   // $FlowFixMe[incompatible-exact]
   EventsFunctionsList,
   arePropsEqual

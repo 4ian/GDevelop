@@ -236,7 +236,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
   const [animatedItemId, setAnimatedItemId] = React.useState<string>('');
 
   const isSearching = !!searchText;
-  // $FlowFixMe[definition-cycle]
+  // $FlowFixMe[recursive-definition]
   const flattenNode = React.useCallback(
     (
       item: Item,
@@ -772,13 +772,10 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
 };
 
 // Define the polymorphic component type that will be exported:
-type TreeViewComponent = <Item: ItemBaseAttributes>(
-  // $FlowFixMe[prop-missing]
-  Props<Item> & { +ref?: React.Ref<TreeViewInterface<Item>> }
-) => React.Node;
+type TreeViewComponent = any;
 
 // Search for "treeview typing issues" in the codebase.
-// $FlowFixMe[incompatible-exact] - InnerTreeView ref is not properly typed.
+// $FlowFixMe[incompatible-type] - InnerTreeView ref is not properly typed.
 const TreeView: TreeViewComponent = (React.forwardRef(InnerTreeView): any);
 
 // ✅ Properly-typed generic export:

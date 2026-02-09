@@ -23,7 +23,7 @@ type VariablesContainer = {|
 |};
 
 // $FlowFixMe[definition-cycle]
-const transformVariable = (variable: Variable) => {
+const transformVariable = (variable: Variable): any => {
   if (!variable) return null;
 
   const transformedVariable: any = {

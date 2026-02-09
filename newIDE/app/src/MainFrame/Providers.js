@@ -50,8 +50,8 @@ type Props = {|
   authentication: Authentication,
   disableCheckForUpdates: boolean,
   makeEventsFunctionCodeWriter: EventsFunctionCodeWriterCallbacks => ?EventsFunctionCodeWriter,
-  eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
-  eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
+  eventsFunctionsExtensionWriter: any,
+  eventsFunctionsExtensionOpener: any,
   children: ({|
     i18n: I18nType,
   |}) => React.Node,

@@ -122,7 +122,7 @@ export const addCreateBadgePreHookIfNotClaimed = <
     return callback;
   }
 
-  // $FlowFixMe[incompatible-type] - hard to (or can't?) express the exact function being passed.
+  // $FlowFixMe[missing-local-annot] - hard to (or can't?) express the exact function being passed.
   return (...args) => {
     try {
       // $FlowFixMe[incompatible-type]

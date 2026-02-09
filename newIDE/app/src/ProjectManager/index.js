@@ -1553,7 +1553,7 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   !nextProps.isOpen;
 
 // $FlowFixMe[incompatible-type]
-const MemoizedProjectManager = React.memo<Props, ProjectManagerInterface>(
+const MemoizedProjectManager = React.memo<Props, any>(
   // $FlowFixMe[incompatible-exact]
   ProjectManager,
   arePropsEqual

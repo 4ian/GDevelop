@@ -62,7 +62,7 @@ const ObjectGroupEditor = (
         .get()
         .getObjectsContainersList()
         .getTypeOfObject(objectName);
-      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[invalid-compare]
       if (type === undefined || objectType === type) type = objectType;
       // $FlowFixMe[incompatible-type]
       else type = '';

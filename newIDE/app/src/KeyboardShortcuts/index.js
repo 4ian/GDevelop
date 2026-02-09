@@ -26,7 +26,7 @@ type KeyType =
  * as defined by browsers (and user friendly enough to be shown to the user
  * and used to store shortcuts as strings).
  */
-const eventKeyCodeToCode = {
+const eventKeyCodeToCode: {[string]: string} = {
   // Digits
   '48': 'Digit0',
   '49': 'Digit1',

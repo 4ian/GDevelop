@@ -95,7 +95,7 @@ const getChoicesArray = (
   property: gdNamedPropertyDescriptor
 ): Array<Choice> => {
   // $FlowFixMe[incompatible-exact]
-  return mapVector(property.getChoices(), choice => ({
+  return mapVector((property.getChoices(): any), choice => ({
     // $FlowFixMe[incompatible-use]
     value: choice.getValue(),
     // $FlowFixMe[incompatible-use]

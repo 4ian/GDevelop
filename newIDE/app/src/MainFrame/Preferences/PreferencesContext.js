@@ -453,7 +453,7 @@ export const initialPreferences = {
     node: ?EditorMosaicNode
   ) => {},
   // $FlowFixMe[missing-local-annot]
-  getRecentProjectFiles: options => [],
+  getRecentProjectFiles: (options: any): Array<any> => ([]: Array<any>),
   insertRecentProjectFile: () => {},
   removeRecentProjectFile: () => {},
   getAutoOpenMostRecentProject: (): boolean => true,
@@ -492,7 +492,7 @@ export const initialPreferences = {
   setWatchProjectFolderFilesForLocalProjects: () => {},
   setNewFeaturesAcknowledgements: () => {},
   setDisplaySaveReminder: () => {},
-  // $FlowFixMe[missing-local-annot]
+  // $FlowFixMe[signature-verification-failure]
   getEditorStateForProject: projectId => {},
   setEditorStateForProject: (projectId: any, editorState: any) => {},
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => {},

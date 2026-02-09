@@ -149,7 +149,7 @@ const createField = (
   } else if (valueType === 'choice' || valueType === 'numberwithchoices') {
     // Choice is a "string" (with a selector for the user in the UI)
     // $FlowFixMe[incompatible-exact]
-    const choices = mapVector(property.getChoices(), choice => ({
+    const choices = mapVector((property.getChoices(): any), choice => ({
       // $FlowFixMe[incompatible-use]
       value: choice.getValue(),
       label:

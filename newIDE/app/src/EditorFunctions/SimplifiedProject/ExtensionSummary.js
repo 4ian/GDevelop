@@ -164,7 +164,7 @@ const getPropertySummary = (
   }
   if (property.getChoices().size() > 0) {
     // $FlowFixMe[incompatible-exact]
-    propertySummary.choices = mapVector(property.getChoices(), choice => ({
+    propertySummary.choices = mapVector((property.getChoices(): any), choice => ({
       // $FlowFixMe[incompatible-use]
       value: choice.getValue(),
       // $FlowFixMe[incompatible-use]
@@ -207,8 +207,8 @@ const getPropertiesSummary = ({
   if (propertiesContainer)
     // $FlowFixMe[incompatible-exact]
     return mapVector(propertiesContainer, namedProperty => {
-      // $FlowFixMe[incompatible-type]
-      return getPropertySummary(namedProperty.getName(), namedProperty);
+      // $FlowFixMe[incompatible-use]
+      return getPropertySummary(namedProperty.getName(), (namedProperty: any));
     });
 
   return [];

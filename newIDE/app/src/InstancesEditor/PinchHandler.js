@@ -56,7 +56,7 @@ const registerCanvasPinchDetector = ({
     }
     var now = new Date();
     // $FlowFixMe[incompatible-use]
-    var interval = now - lastPinch.p.date;
+    var interval = now.getTime() - lastPinch.p.date.getTime();
     if (interval < 12) {
       return;
     }

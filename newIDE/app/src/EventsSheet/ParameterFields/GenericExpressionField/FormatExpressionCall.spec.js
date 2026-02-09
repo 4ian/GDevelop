@@ -12,7 +12,7 @@ import {
 
 // $FlowFixMe[incompatible-type]
 // $FlowFixMe[cannot-resolve-name]
-const makeFakeI18n = (fakeI18n): I18nType => ({
+const makeFakeI18n = (fakeI18n: any): any => ({
   ...fakeI18n,
   _: message => message.id,
 });

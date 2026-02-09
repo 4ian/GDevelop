@@ -77,7 +77,7 @@ const unitSelectOptions = orderedTimeUnits.reduce(
         biggestUnit: orderedTimeUnits[currentUnitIndex],
         smallestUnit: orderedTimeUnits[otherUnitIndex],
       };
-      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[prop-missing]
       acc[getIdentifierFromUnits(selectedUnits)] = selectedUnits;
     }
     return acc;

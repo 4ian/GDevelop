@@ -1682,7 +1682,7 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.objectsContainer === nextProps.objectsContainer;
 
 // $FlowFixMe[incompatible-type]
-const MemoizedObjectsList = React.memo<Props, ObjectsListInterface>(
+const MemoizedObjectsList = React.memo<Props, any>(
   // $FlowFixMe[incompatible-exact]
   ObjectsList,
   arePropsEqual

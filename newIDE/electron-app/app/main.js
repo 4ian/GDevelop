@@ -99,6 +99,8 @@ const args = parseArgs(process.argv.slice(isDev ? 2 : 1), {
   string: '_', // Files are always strings
 });
 
+const devTools = !!args['dev-tools'];
+
 // See registerGdideProtocol (used for HTML modules support)
 protocol.registerSchemesAsPrivileged([{ scheme: 'gdide' }]);
 
@@ -154,7 +156,6 @@ app.on('window-all-closed', function() {
 // Function to create a new GDevelop window
 function createNewWindow(windowArgs = args) {
   const isIntegrated = windowArgs.mode === 'integrated';
-  const devTools = !!windowArgs['dev-tools'];
 
   if (isIntegrated && app.dock) {
     app.dock.hide();

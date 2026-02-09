@@ -8,7 +8,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 const gd: libGDevelop = global.gd;
 
 // $FlowFixMe[incompatible-type]
-// $FlowFixMe[cannot-resolve-name][missing-local-annot]
+// $FlowFixMe[missing-local-annot]
 const makeFakeI18n = (fakeI18n): I18nType => ({
   ...fakeI18n,
   _: message => message.id,

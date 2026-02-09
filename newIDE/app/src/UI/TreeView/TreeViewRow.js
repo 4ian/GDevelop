@@ -279,7 +279,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
               name: node.name,
               thumbnail: node.thumbnailSrc || undefined,
               is3D:
-                // $FlowFixMe[incompatible-type][prop-missing]
+                // $FlowFixMe[prop-missing]
                 !!node.item.content &&
                 !!node.item.content.is3D &&
                 // $FlowFixMe[incompatible-type]
@@ -588,5 +588,5 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   );
 };
 
-// $FlowFixMe[incompatible-type][missing-type-arg] - memo does not support having a generic in the props.
+// $FlowFixMe[missing-type-arg] - memo does not support having a generic in the props.
 export default React.memo<Props>(TreeViewRow, areEqual) as React.ComponentType<any>;

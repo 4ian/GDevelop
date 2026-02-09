@@ -1185,12 +1185,12 @@ const VariablesList: React.ComponentType<any> = React.forwardRef<Props, Variable
           case 'TopLevelToStructure':
             newName = newNameGenerator(
               draggedName,
-              // $FlowFixMe[incompatible-type][incompatible-use] - Regarding movement type, we are confident that the variable will exist
+              // $FlowFixMe[incompatible-use] - Regarding movement type, we are confident that the variable will exist
               name => targetVariableParentVariable.hasChild(name),
               'CopyOf'
             );
 
-            // $FlowFixMe[incompatible-type][incompatible-use] - Regarding movement type, we are confident that the variable will exist
+            // $FlowFixMe[incompatible-use] - Regarding movement type, we are confident that the variable will exist
             targetVariableParentVariable.insertChild(newName, draggedVariable);
 
             props.variablesContainer.remove(draggedName);
@@ -1214,7 +1214,7 @@ const VariablesList: React.ComponentType<any> = React.forwardRef<Props, Variable
               props.variablesContainer.getPosition(targetName)
             );
 
-            // $FlowFixMe[incompatible-type][incompatible-use] - Regarding movement type, we are confident that the variable will exist
+            // $FlowFixMe[incompatible-use] - Regarding movement type, we are confident that the variable will exist
             draggedVariableParentVariable.removeChild(draggedName);
             updateExpandedAndSelectedNodesFollowingNodeMove(
               current,
@@ -1225,14 +1225,14 @@ const VariablesList: React.ComponentType<any> = React.forwardRef<Props, Variable
           case 'FromStructureToAnotherStructure':
             newName = newNameGenerator(
               draggedName,
-              // $FlowFixMe[incompatible-type][incompatible-use] - Regarding movement type, we are confident that the variable will exist
+              // $FlowFixMe[incompatible-use] - Regarding movement type, we are confident that the variable will exist
               name => targetVariableParentVariable.hasChild(name),
               'CopyOf'
             );
-            // $FlowFixMe[incompatible-type][incompatible-use] - Regarding movement type, we are confident that the variable will exist
+            // $FlowFixMe[incompatible-use] - Regarding movement type, we are confident that the variable will exist
             targetVariableParentVariable.insertChild(newName, draggedVariable);
 
-            // $FlowFixMe[incompatible-type][incompatible-use] - Regarding movement type, we are confident that the variable will exist
+            // $FlowFixMe[incompatible-use] - Regarding movement type, we are confident that the variable will exist
             draggedVariableParentVariable.removeChild(draggedName);
             parentNodeId = getDirectParentNodeId(targetLineage);
             if (parentNodeId)
@@ -1246,13 +1246,13 @@ const VariablesList: React.ComponentType<any> = React.forwardRef<Props, Variable
             draggedIndex = parseInt(draggedName, 10);
             targetIndex = parseInt(targetName, 10);
             correctedTargetIndex = targetIndex + (where === 'after' ? 1 : 0);
-            // $FlowFixMe[incompatible-type][incompatible-use] - Regarding movement type, we are confident that the variable will exist
+            // $FlowFixMe[incompatible-use] - Regarding movement type, we are confident that the variable will exist
             targetVariableParentVariable.insertAtIndex(
               draggedVariable,
               correctedTargetIndex
             );
 
-            // $FlowFixMe[incompatible-type][incompatible-use] - Regarding movement type, we are confident that the variable will exist
+            // $FlowFixMe[incompatible-use] - Regarding movement type, we are confident that the variable will exist
             draggedVariableParentVariable.removeAtIndex(draggedIndex);
             targetParentNodeId = getDirectParentNodeId(targetLineage);
             if (targetParentNodeId)
@@ -1268,7 +1268,7 @@ const VariablesList: React.ComponentType<any> = React.forwardRef<Props, Variable
             correctedTargetIndex =
               (targetIndex > draggedIndex ? targetIndex - 1 : targetIndex) +
               (where === 'after' ? 1 : 0);
-            // $FlowFixMe[incompatible-type][incompatible-use] - Regarding movement type, we are confident that the variable will exist
+            // $FlowFixMe[incompatible-use] - Regarding movement type, we are confident that the variable will exist
             targetVariableParentVariable.moveChildInArray(
               draggedIndex,
               correctedTargetIndex

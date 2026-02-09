@@ -47,9 +47,9 @@ export const create = (authentication: Authentication): React.Node => {
       authentication={authentication}
       disableCheckForUpdates={!!appArguments['disable-update-check']}
       makeEventsFunctionCodeWriter={makeLocalEventsFunctionCodeWriter}
-      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-exact]
       eventsFunctionsExtensionWriter={LocalEventsFunctionsExtensionWriter}
-      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-exact]
       eventsFunctionsExtensionOpener={LocalEventsFunctionsExtensionOpener}
     >
       {({ i18n }) => (

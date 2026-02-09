@@ -1378,7 +1378,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     >
                       <AutoSizer style={styles.autoSizer} disableWidth>
                         {({ height }) => (
-                          // $FlowFixMe[incompatible-type] 
+                          // $FlowFixMe[incompatible-exact] 
                           <TreeView
                             key={listKey}
                             ref={treeViewRef}
@@ -1554,7 +1554,7 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
 
 // $FlowFixMe[incompatible-type]
 const MemoizedProjectManager = React.memo<Props, ProjectManagerInterface>(
-  // $FlowFixMe[incompatible-exact][incompatible-type]
+  // $FlowFixMe[incompatible-type]
   ProjectManager,
   arePropsEqual
 );

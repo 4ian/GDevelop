@@ -3,6 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const recast = require('recast');
 const flowParser = require('recast/parsers/flow');
 const { execFileSync } = require('child_process');
@@ -128,10 +129,12 @@ function ensureFileEndsWith(filePath, suffix) {
 
 function collectFlowErrors() {
   let output = '';
+  const flowTempDir = path.join(os.tmpdir(), `flow-upgrade-${Date.now()}`);
   try {
     output = execFileSync('npx', ['flow', 'status', '--json'], {
       cwd: appRoot,
       maxBuffer: FLOW_JSON_MAX_BUFFER,
+      env: { ...process.env, FLOW_TEMP_DIR: flowTempDir },
     }).toString();
   } catch (error) {
     if (error.stdout) {
@@ -145,21 +148,12 @@ function collectFlowErrors() {
   return parsed.errors || [];
 }
 
-function mergeFlowFixMeCodes(line, codes) {
+function formatFlowFixMeComment(line, codes) {
   const match = line.match(/^(\s*\/\/\s*\$FlowFixMe)(\[[^\]]+\])*(.*)$/);
   if (!match) return line;
   const prefix = match[1];
   const suffix = match[3] || '';
-  const existingCodes = new Set();
-  const codeMatches = match[2] ? match[2].match(/\[[^\]]+\]/g) : null;
-  if (codeMatches) {
-    for (const codeMatch of codeMatches) {
-      existingCodes.add(codeMatch.slice(1, -1));
-    }
-  }
-  for (const code of codes) existingCodes.add(code);
-  const mergedCodes = Array.from(existingCodes).sort();
-  const codeString = mergedCodes.map(code => `[${code}]`).join('');
+  const codeString = codes.map(code => `[${code}]`).join('');
   return `${prefix}${codeString}${suffix}`;
 }
 
@@ -184,10 +178,10 @@ function applyFlowSuppressions(errors) {
       errorsByFile.set(sourcePath, new Map());
     }
     const byLine = errorsByFile.get(sourcePath);
-    if (!byLine.has(line)) byLine.set(line, new Set());
-    const codesSet = byLine.get(line);
+    if (!byLine.has(line)) byLine.set(line, []);
+    const codesList = byLine.get(line);
     for (const code of codes) {
-      codesSet.add(code);
+      if (!codesList.includes(code)) codesList.push(code);
     }
   }
 
@@ -196,9 +190,9 @@ function applyFlowSuppressions(errors) {
     if (!fs.existsSync(filePath)) continue;
     const lines = fs.readFileSync(filePath, 'utf8').split('\n');
     const entries = Array.from(byLine.entries())
-      .map(([line, codesSet]) => ({
+      .map(([line, codesList]) => ({
         line,
-        codes: Array.from(codesSet).sort(),
+        codes: codesList,
       }))
       .sort((a, b) => a.line - b.line);
 
@@ -210,9 +204,9 @@ function applyFlowSuppressions(errors) {
       const previousLineIndex = targetIndex - 1;
       const previousLine = previousLineIndex >= 0 ? lines[previousLineIndex] : '';
       if (previousLine.includes('$FlowFixMe')) {
-        const merged = mergeFlowFixMeCodes(previousLine, entry.codes);
-        if (merged !== previousLine) {
-          lines[previousLineIndex] = merged;
+        const formatted = formatFlowFixMeComment(previousLine, entry.codes);
+        if (formatted !== previousLine) {
+          lines[previousLineIndex] = formatted;
           changed = true;
         }
         continue;

@@ -101,7 +101,7 @@ const SearchBarSelectField: React.ComponentType<any> = React.forwardRef<
   // Dig into children props to see if the current value is valid or not.
   let hasValidValue = true;
   const childrenValues = React.Children.map(props.children, child => {
-    // $FlowFixMe[prop-missing]
+    // $FlowFixMe[incompatible-type]
     if (child === null || !child.props) return null;
 
     // $FlowFixMe[incompatible-use]

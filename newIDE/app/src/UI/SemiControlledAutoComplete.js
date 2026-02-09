@@ -402,6 +402,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
                   },
                 }}
                 {...otherStylingProps}
+                // $FlowFixMe[incompatible-type]
                 {...computeTextFieldStyleProps(props)}
                 style={props.textFieldStyle}
                 label={props.floatingLabelText}

@@ -36,7 +36,9 @@ export default class InspectorsList extends React.Component<Props, void> {
     gameData: GameData,
     getInspectorDescriptions: InspectorDescriptionsGetter,
     path: Array<string>
+  // $FlowFixMe[cannot-resolve-name]
   ): Array<React$Element<any> | null> {
+    // $FlowFixMe[missing-local-annot]
     return getInspectorDescriptions(gameData).map(inspectorDescription => {
       if (!inspectorDescription) return null;
       const fullInspectorPath = path.concat(inspectorDescription.key);

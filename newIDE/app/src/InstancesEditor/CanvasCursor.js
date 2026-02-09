@@ -1,6 +1,7 @@
 // @flow
 
 type Props = {|
+  // $FlowFixMe[cannot-resolve-name]
   canvas: HTMLDivElement,
   shouldMoveView: () => boolean,
 |};
@@ -12,6 +13,7 @@ type Props = {|
  * can also set their own cursor - this class is only for the canvas.
  */
 export default class CanvasCursor {
+  // $FlowFixMe[cannot-resolve-name]
   canvas: HTMLDivElement;
   shouldMoveView: () => boolean;
 

@@ -36,6 +36,7 @@ let monacoCompletionsInitialized = false;
 let monacoThemesInitialized = false;
 
 export class CodeEditor extends React.Component<Props, State> {
+  // $FlowFixMe[missing-local-annot]
   state = {
     MonacoEditor: null,
     error: null,
@@ -116,6 +117,7 @@ export class CodeEditor extends React.Component<Props, State> {
 
     // Define the global variable used by Monaco Editor to find its worker
     // (used, at least, for auto-completions).
+    // $FlowFixMe[cannot-resolve-name]
     window.MonacoEnvironment = {
       getWorkerUrl: function(workerId, label) {
         return 'external/monaco-editor-min/vs/base/worker/workerMain.js';
@@ -128,9 +130,11 @@ export class CodeEditor extends React.Component<Props, State> {
           MonacoEditor: module.default,
         })
       )
+      // $FlowFixMe[method-unbinding]
       .catch(this.handleLoadError);
   }
 
+  // $FlowFixMe[cannot-resolve-name]
   _handleContextMenu = (event: SyntheticEvent<>) => {
     // Prevent right click to bubble up and trigger the context menu
     // of the event.

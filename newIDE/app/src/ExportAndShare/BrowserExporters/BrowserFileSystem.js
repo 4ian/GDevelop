@@ -4,6 +4,7 @@ const gd: libGDevelop = global.gd;
 
 export type BlobFileDescriptor = {|
   filePath: string,
+  // $FlowFixMe[cannot-resolve-name]
   blob: Blob,
 |};
 

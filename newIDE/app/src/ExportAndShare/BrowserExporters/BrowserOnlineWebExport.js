@@ -45,6 +45,7 @@ type ResourcesDownloadOutput = {|
   blobFiles: Array<BlobFileDescriptor>,
 |};
 
+// $FlowFixMe[cannot-resolve-name]
 type CompressionOutput = Blob;
 
 const exportPipelineName = 'browser-online-web';
@@ -78,6 +79,7 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
   ): Promise<PreparedExporter> => {
+    // $FlowFixMe[incompatible-type]
     return findGDJS('web').then(({ gdjsRoot, filesContent }) => {
       console.info('GDJS found in ', gdjsRoot);
 
@@ -89,6 +91,7 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
         new gd.AbstractFileSystemJS(),
         abstractFileSystem
       );
+      // $FlowFixMe[extra-arg]
       const exporter = new gd.Exporter(fileSystem, gdjsRoot);
 
       return {
@@ -138,6 +141,7 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
   launchCompression: (
     context: ExportPipelineContext<ExportState>,
     { textFiles, blobFiles }: ResourcesDownloadOutput
+  // $FlowFixMe[cannot-resolve-name]
   ): Promise<Blob> => {
     return archiveFiles({
       blobFiles,
@@ -150,11 +154,13 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
 
   launchUpload: (
     context: ExportPipelineContext<ExportState>,
+    // $FlowFixMe[cannot-resolve-name]
     blobFile: Blob
   ): Promise<string> => {
     return getBuildFileUploadOptions().then(uploadOptions => {
       return uploadBlobFile(
         blobFile,
+        // $FlowFixMe[incompatible-type]
         uploadOptions,
         context.updateStepProgress
       ).then(() => uploadOptions.key);
@@ -163,6 +169,7 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
 
   launchOnlineBuild: (
     exportState: ExportState,
+    // $FlowFixMe[value-as-type]
     authenticatedUser: AuthenticatedUser,
     uploadBucketKey: string,
     gameId: string,

@@ -539,7 +539,7 @@ const EventsTree: component(
           if (!_hoverTimerId.current && !node.expanded) {
             if (!isNodeTemporaryUnfolded) {
               _hoverTimerId.current = window.setTimeout(() => {
-                // $FlowFixMe - Per the condition above, we are confident that node.event is not null.
+                // $FlowFixMe[incompatible-type] - Per the condition above, we are confident that node.event is not null.
                 event.setFolded(false);
                 temporaryUnfoldedNodes.current.push(node);
                 forceEventsUpdate();

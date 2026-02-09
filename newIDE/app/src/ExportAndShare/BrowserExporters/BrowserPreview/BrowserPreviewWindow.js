@@ -10,13 +10,17 @@ let nextPreviewWindowId = 0;
  */
 export const immediatelyOpenNewPreviewWindow = (
   project: gdProject
+// $FlowFixMe[cannot-resolve-name]
 ): WindowProxy => {
   const width = project.getGameResolutionWidth();
   const height = project.getGameResolutionHeight();
+  // $FlowFixMe[cannot-resolve-name]
   const left = window.screenX + window.innerWidth / 2 - width / 2;
+  // $FlowFixMe[cannot-resolve-name]
   const top = window.screenY + window.innerHeight / 2 - height / 2;
 
   const targetId = 'GDevelopPreview' + nextPreviewWindowId++;
+  // $FlowFixMe[cannot-resolve-name]
   const previewWindow = window.open(
     'about:blank',
     targetId,

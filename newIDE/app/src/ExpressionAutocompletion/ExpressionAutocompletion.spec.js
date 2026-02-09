@@ -8,6 +8,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 const gd: libGDevelop = global.gd;
 
 // $FlowExpectedError
+// $FlowFixMe[cannot-resolve-name][missing-local-annot]
 const makeFakeI18n = (fakeI18n): I18nType => ({
   ...fakeI18n,
   _: message => message.id,
@@ -68,6 +69,7 @@ describe('ExpressionAutocompletion', () => {
 
       const expressionNode = parser.parseExpression('My').get();
       const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+        // $FlowFixMe[incompatible-type]
         scope
       );
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
@@ -82,6 +84,7 @@ describe('ExpressionAutocompletion', () => {
           gd,
           project: project,
           projectScopedContainersAccessor,
+          // $FlowFixMe[incompatible-type]
           scope,
         },
         completionDescriptions,
@@ -116,6 +119,7 @@ describe('ExpressionAutocompletion', () => {
           gd,
           project: project,
           projectScopedContainersAccessor,
+          // $FlowFixMe[incompatible-type]
           scope,
         },
         completionDescriptions2,
@@ -139,6 +143,7 @@ describe('ExpressionAutocompletion', () => {
 
       const expressionNode = parser.parseExpression('To').get();
       const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+        // $FlowFixMe[incompatible-type]
         scope
       );
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
@@ -153,6 +158,7 @@ describe('ExpressionAutocompletion', () => {
           gd,
           project: project,
           projectScopedContainersAccessor,
+          // $FlowFixMe[incompatible-type]
           scope,
         },
         completionDescriptions,
@@ -194,6 +200,7 @@ describe('ExpressionAutocompletion', () => {
 
       const expressionNode = parser.parseExpression('MouseX("Ba').get();
       const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+        // $FlowFixMe[incompatible-type]
         scope
       );
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
@@ -208,6 +215,7 @@ describe('ExpressionAutocompletion', () => {
           gd,
           project: project,
           projectScopedContainersAccessor,
+          // $FlowFixMe[incompatible-type]
           scope,
         },
         completionDescriptions,
@@ -229,6 +237,7 @@ describe('ExpressionAutocompletion', () => {
 
       const expressionNode = parser.parseExpression('MySpriteObject.Ani').get();
       const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+        // $FlowFixMe[incompatible-type]
         scope
       );
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
@@ -243,6 +252,7 @@ describe('ExpressionAutocompletion', () => {
           gd,
           project: project,
           projectScopedContainersAccessor,
+          // $FlowFixMe[incompatible-type]
           scope,
         },
         completionDescriptions,
@@ -268,6 +278,7 @@ describe('ExpressionAutocompletion', () => {
         .parseExpression('MySpriteObjectWithBehaviors.Speed')
         .get();
       const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+        // $FlowFixMe[incompatible-type]
         scope
       );
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
@@ -282,6 +293,7 @@ describe('ExpressionAutocompletion', () => {
           gd,
           project: project,
           projectScopedContainersAccessor,
+          // $FlowFixMe[incompatible-type]
           scope,
         },
         completionDescriptions,
@@ -317,6 +329,7 @@ describe('ExpressionAutocompletion', () => {
         .parseExpression('MySpriteObject.PointX("He')
         .get();
       const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+        // $FlowFixMe[incompatible-type]
         scope
       );
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
@@ -331,6 +344,7 @@ describe('ExpressionAutocompletion', () => {
           gd,
           project: project,
           projectScopedContainersAccessor,
+          // $FlowFixMe[incompatible-type]
           scope,
         },
         completionDescriptions,
@@ -354,6 +368,7 @@ describe('ExpressionAutocompletion', () => {
         .parseExpression('MySpriteObjectWithBehaviors.Plat')
         .get();
       const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+        // $FlowFixMe[incompatible-type]
         scope
       );
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
@@ -368,6 +383,7 @@ describe('ExpressionAutocompletion', () => {
           gd,
           project: project,
           projectScopedContainersAccessor,
+          // $FlowFixMe[incompatible-type]
           scope,
         },
         completionDescriptions,
@@ -392,6 +408,7 @@ describe('ExpressionAutocompletion', () => {
         .parseExpression('MySpriteObjectWithBehaviors.plat')
         .get();
       const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+        // $FlowFixMe[incompatible-type]
         scope
       );
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
@@ -406,6 +423,7 @@ describe('ExpressionAutocompletion', () => {
           gd,
           project: project,
           projectScopedContainersAccessor,
+          // $FlowFixMe[incompatible-type]
           scope,
         },
         completionDescriptions,
@@ -430,6 +448,7 @@ describe('ExpressionAutocompletion', () => {
         .parseExpression('MySpriteObjectWithBehaviors.a')
         .get();
       const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+        // $FlowFixMe[incompatible-type]
         scope
       );
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
@@ -444,6 +463,7 @@ describe('ExpressionAutocompletion', () => {
           gd,
           project: project,
           projectScopedContainersAccessor,
+          // $FlowFixMe[incompatible-type]
           scope,
         },
         completionDescriptions,
@@ -473,6 +493,7 @@ describe('ExpressionAutocompletion', () => {
         .parseExpression('MySpriteObjectWithBehaviors.PlatformerObject::Jum')
         .get();
       const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+        // $FlowFixMe[incompatible-type]
         scope
       );
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
@@ -487,6 +508,7 @@ describe('ExpressionAutocompletion', () => {
           gd,
           project: project,
           projectScopedContainersAccessor,
+          // $FlowFixMe[incompatible-type]
           scope,
         },
         completionDescriptions,

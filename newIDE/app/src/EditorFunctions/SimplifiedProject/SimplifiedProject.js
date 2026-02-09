@@ -122,6 +122,7 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop): {
   const getSimplifiedVariable = (
     name: string,
     variable: gdVariable,
+    // $FlowFixMe[missing-local-annot]
     depth = 0
   ): SimplifiedVariable => {
     const isCollection = isCollectionVariable(variable);
@@ -304,10 +305,11 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop): {
     const instancesCountPerLayer: { [string]: { [string]: number } } = {};
 
     const instancesListerFunctor = new gd.InitialInstanceJSFunctor();
-    // $FlowFixMe - invoke is not writable
+    // $FlowFixMe[cannot-write][incompatible-type] - invoke is not writable
     instancesListerFunctor.invoke = instancePtr => {
-      // $FlowFixMe - wrapPointer is not exposed
+      // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
       const instance: gdInitialInstance = gd.wrapPointer(
+        // $FlowFixMe[incompatible-type]
         instancePtr,
         gd.InitialInstance
       );
@@ -321,7 +323,7 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop): {
       layerInstancesCount[name] = (layerInstancesCount[name] || 0) + 1;
       isEmpty = false;
     };
-    // $FlowFixMe - JSFunctor is incompatible with Functor
+    // $FlowFixMe[incompatible-type] - JSFunctor is incompatible with Functor
     scene.getInitialInstances().iterateOverInstances(instancesListerFunctor);
     instancesListerFunctor.delete();
 
@@ -427,9 +429,12 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop): {
       })
     );
 
+    // $FlowFixMe[incompatible-type]
     const projectSpecificExtensions: Array<gdPlatformExtension> = mapVector(
+      // $FlowFixMe[incompatible-exact]
       allExtensions,
       extension => {
+        // $FlowFixMe[incompatible-use]
         if (projectExtensionNames.has(extension.getName())) {
           return extension;
         }

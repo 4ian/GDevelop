@@ -70,6 +70,7 @@ export const getSelectedEvents = (
 
 export const getLastSelectedEvent = (
   selection: SelectionState
+// $FlowFixMe[cannot-resolve-name]
 ): Event | null => {
   if (!selection.selectedEvents.length) return null;
 
@@ -283,6 +284,7 @@ export const hasSomethingSelected = (selection: SelectionState): boolean => {
 };
 
 export const clearSelection = (): SelectionState => {
+  // $FlowFixMe[incompatible-type]
   return getInitialSelection();
 };
 
@@ -347,6 +349,7 @@ export const selectEventsAfterHistoryChange = (eventContexts: Array<EventContext
   let newSelection = getInitialSelection();
 
   eventContexts.forEach(eventContext => {
+    // $FlowFixMe[incompatible-type]
     newSelection.selectedEvents.push(eventContext);
   });
 

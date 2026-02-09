@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+// $FlowFixMe[untyped-type-import]
 import type { AuthenticatedUser } from '../../../Profile/AuthenticatedUserContext';
 import { Trans } from '@lingui/macro';
 import { registerUserInterest } from '../../../Utils/GDevelopServices/User';
@@ -24,6 +25,7 @@ const emptyForm = {
   email: '',
 };
 
+// $FlowFixMe[value-as-type]
 type Props = {| authenticatedUser: AuthenticatedUser |};
 
 const useEducationForm = ({authenticatedUser: {authenticated, profile, getAuthorizationHeader}}: Props): {

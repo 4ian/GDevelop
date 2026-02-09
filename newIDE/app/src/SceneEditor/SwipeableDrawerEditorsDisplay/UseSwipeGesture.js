@@ -5,6 +5,7 @@ import * as React from 'react';
 type Props = {|
   onSwipeUp: () => void,
   onSwipeDown: () => void,
+  // $FlowFixMe[cannot-resolve-name]
   containerRef: {| current: ?HTMLDivElement |},
 |};
 
@@ -21,6 +22,7 @@ const useSwipeGesture = ({containerRef, onSwipeDown, onSwipeUp}: Props): {
   const startYRef = React.useRef<?number>(null);
 
   const onTouchStart = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (event: TouchEvent) => {
       startTimeRef.current = Date.now();
       startYRef.current = event.touches[0].clientY;
@@ -34,6 +36,7 @@ const useSwipeGesture = ({containerRef, onSwipeDown, onSwipeUp}: Props): {
   );
 
   const onTouchMove = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (event: TouchEvent) => {
       const currentY = event.touches[0].clientY;
       const startY = startYRef.current || currentY;
@@ -53,6 +56,7 @@ const useSwipeGesture = ({containerRef, onSwipeDown, onSwipeUp}: Props): {
   );
 
   const onTouchEnd = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (event: TouchEvent) => {
       if (!startYRef.current || !startTimeRef.current) return;
       const { current: startY } = startYRef;

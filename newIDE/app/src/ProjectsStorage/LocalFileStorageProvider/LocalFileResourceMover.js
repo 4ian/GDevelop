@@ -32,6 +32,7 @@ type Options = {|
   project: gdProject,
   fileMetadata: FileMetadata,
   onProgress: (number, number) => void,
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
 |};
 
@@ -57,6 +58,7 @@ const downloadBlobToLocalFile = async (
 ): Promise<void> => {
   if (!ipcRenderer) throw new Error('Not supported');
 
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(blobUrl, {
     responseType: 'arraybuffer',
   });
@@ -157,6 +159,7 @@ export const moveUrlResourcesToLocalFiles = async ({project, fileMetadata, onPro
           try {
             await retryIfFailed({ times: 2 }, async () => {
               await fs.ensureDir(baseAssetsPath);
+              // $FlowFixMe[cannot-resolve-name]
               const resourceUrl = new URL(resourceFile);
               if (
                 isPrivateGameTemplateResourceAuthorizedUrl(resourceUrl.href) &&

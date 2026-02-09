@@ -6,6 +6,7 @@ const gd: libGDevelop = global.gd;
 // 25% of 255 to accept pixels that are not fully transparent (like effects)
 const PIXEL_TRANSPARENCY_THRESHOLD = 64;
 
+// $FlowFixMe[cannot-resolve-name]
 const loadImage = (img: Image, pathToFile: string) => {
   return new Promise((resolve, reject) => {
     img.addEventListener('load', () => resolve(img));
@@ -34,6 +35,7 @@ export const getMatchingCollisionMask = async (
   // This will be used to crop the image.
   // To do so, we scan the image starting from the borders and going to the center,
   // until we find a non-transparent pixel. (To avoid going through the whole image)
+  // $FlowFixMe[cannot-resolve-name]
   const img = new Image();
 
   if (pathToFile.startsWith('http://') || pathToFile.startsWith('https://')) {
@@ -45,6 +47,7 @@ export const getMatchingCollisionMask = async (
   try {
     await loadImage(img, pathToFile);
 
+    // $FlowFixMe[cannot-resolve-name]
     const canvas = document.createElement('canvas');
     const width = img.width;
     const height = img.height;

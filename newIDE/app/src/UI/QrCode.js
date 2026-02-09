@@ -16,6 +16,7 @@ type Props = {|
 const QrCode = ({url, size = 128}: Props): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
+  // $FlowFixMe[cannot-resolve-name]
   const containerRef = React.useRef<?HTMLDivElement>(null);
   React.useEffect(
     () => {

@@ -5,6 +5,7 @@ const TEN_MINUTES = 10 * 60 * 1000;
 
 export const getRecentPersistedState = (): any | null => {
   try {
+    // $FlowFixMe[cannot-resolve-name]
     const serializedState = localStorage.getItem(localStoreUserSurveyKey);
     if (!serializedState) return null;
     const state = JSON.parse(serializedState);
@@ -28,6 +29,7 @@ export const persistState = (state: {|
   questionId: string,
 |}) => {
   try {
+    // $FlowFixMe[cannot-resolve-name]
     localStorage.setItem(
       localStoreUserSurveyKey,
       JSON.stringify({
@@ -45,6 +47,7 @@ export const persistState = (state: {|
 
 export const clearUserSurveyPersistedState = () => {
   try {
+    // $FlowFixMe[cannot-resolve-name]
     localStorage.removeItem(localStoreUserSurveyKey);
   } catch (error) {
     console.log(
@@ -56,6 +59,7 @@ export const clearUserSurveyPersistedState = () => {
 
 export const hasStartedUserSurvey = (): any | void => {
   try {
+    // $FlowFixMe[cannot-resolve-name]
     return localStorage.hasOwnProperty(localStoreUserSurveyKey);
   } catch (error) {
     console.log(

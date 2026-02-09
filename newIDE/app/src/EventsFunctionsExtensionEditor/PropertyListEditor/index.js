@@ -724,7 +724,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
           isSharedProperties
         );
       }
-      // $FlowFixMe - We are confident this TreeView item is in fact a PropertyFolderOrPropertyWithContext
+      // $FlowFixMe[incompatible-type] - We are confident this TreeView item is in fact a PropertyFolderOrPropertyWithContext
       return topToBottomAscendanceId[firstClosedFolderIndex];
     };
 

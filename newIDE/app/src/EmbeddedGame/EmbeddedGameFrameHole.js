@@ -29,9 +29,11 @@ const notifyActiveEmbeddedGameFrameHoleCountCallbacks = () => {
   );
 };
 
+// $FlowFixMe[cannot-resolve-name]
 export const getActiveEmbeddedGameFrameHoleRect = (): ?ClientRect => {
   // There is only one embedded game frame hole active at a time,
   // so we don't need to check if the parent scene editor is active.
+  // $FlowFixMe[cannot-resolve-name]
   const activeEmbeddedGameFrameHole = document.querySelector(
     `#${embeddedGameFrameHoleId}`
   );

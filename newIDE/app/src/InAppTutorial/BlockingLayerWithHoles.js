@@ -7,10 +7,12 @@ const blockingLayerZIndex = aboveMaterialUiMaxZIndex;
 export const itemAboveBlockingLayerZIndex = blockingLayerZIndex + 1;
 
 type Props = {|
+  // $FlowFixMe[cannot-resolve-name]
   elements: Array<HTMLElement>,
 |};
 
 const BlockingLayerWithHoles = ({elements}: Props): null | React.MixedElement => {
+  // $FlowFixMe[missing-empty-array-annot]
   const [holes, setHoles] = React.useState([]);
 
   const updateHoles = React.useCallback(
@@ -34,14 +36,20 @@ const BlockingLayerWithHoles = ({elements}: Props): null | React.MixedElement =>
       if (!elements.length) return;
 
       // Update hole position on scroll & resize
+      // $FlowFixMe[cannot-resolve-name]
       window.addEventListener('wheel', updateHoles);
+      // $FlowFixMe[cannot-resolve-name]
       window.addEventListener('touchmove', updateHoles);
+      // $FlowFixMe[cannot-resolve-name]
       window.addEventListener('resize', updateHoles);
       updateHoles(); // Initial position update
 
       return () => {
+        // $FlowFixMe[cannot-resolve-name]
         window.removeEventListener('wheel', updateHoles);
+        // $FlowFixMe[cannot-resolve-name]
         window.removeEventListener('touchmove', updateHoles);
+        // $FlowFixMe[cannot-resolve-name]
         window.removeEventListener('resize', updateHoles);
       };
     },

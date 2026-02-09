@@ -98,6 +98,7 @@ export const localHTML5ExportPipeline: ExportPipeline<
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
   ): Promise<PreparedExporter> => {
+    // $FlowFixMe[incompatible-type]
     return findGDJS().then(({ gdjsRoot }) => {
       console.info('GDJS found in ', gdjsRoot);
 
@@ -109,6 +110,7 @@ export const localHTML5ExportPipeline: ExportPipeline<
         new gd.AbstractFileSystemJS(),
         localFileSystem
       );
+      // $FlowFixMe[extra-arg]
       const exporter = new gd.Exporter(fileSystem, gdjsRoot);
 
       return {

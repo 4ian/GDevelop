@@ -69,6 +69,7 @@ export default class BrowserSWFileSystem {
 
   // Store a set of all external URLs copied so that we can simulate
   // readDir result.
+  // $FlowFixMe[missing-local-annot]
   _allCopiedExternalUrls = new Set<string>() as Set<string>;
 
   constructor({ filesContent, rootUrl }: ConstructorArgs) {
@@ -85,6 +86,7 @@ export default class BrowserSWFileSystem {
   /**
    * Uploads all pending files to IndexedDB.
    */
+  // $FlowFixMe[missing-local-annot]
   applyPendingOperations = async () => {
     try {
       await Promise.all(this._pendingDeleteOperations);
@@ -105,6 +107,7 @@ export default class BrowserSWFileSystem {
       let totalBytes = 0;
       const uploadPromises = this._pendingFiles.map(async file => {
         const fullPath = `/${file.path}`;
+        // $FlowFixMe[cannot-resolve-name]
         const encoder = new TextEncoder();
         const bytes = encoder.encode(file.content).buffer;
 

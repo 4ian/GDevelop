@@ -74,6 +74,7 @@ export default class CommandManager implements CommandManagerInterface {
   };
 
   getAllNamedCommands = (): any => {
+    // $FlowFixMe[missing-type-arg]
     return Object.keys(this._commands).map<NamedCommand>(commandName => {
       const command = this._commands[commandName];
       return { ...(command: Command), name: commandName };

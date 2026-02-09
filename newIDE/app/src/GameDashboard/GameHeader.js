@@ -129,6 +129,7 @@ const GameHeader = ({game, onEditGame, gameUrl, onPublishOnGdGames}: Props): Rea
       gameId={game.id}
       thumbnailUrl={gameMainImageUrl}
       background="medium"
+      // $FlowFixMe[cannot-resolve-name]
       width={Math.min(272, Math.max(150, window.innerWidth / 4.5))}
     />
   );

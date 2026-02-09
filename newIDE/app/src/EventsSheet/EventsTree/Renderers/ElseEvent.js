@@ -23,6 +23,7 @@ const styles = {
   },
 };
 
+// $FlowFixMe[unsupported-syntax]
 export default class ElseEvent extends React.Component<EventRendererProps, *> {
   render(): any {
     const elseEvent = gd.asElseEvent(this.props.event);

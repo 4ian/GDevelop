@@ -47,6 +47,7 @@ export const CompactEventsBasedObjectVariantPropertiesEditor = (
 ): React.Node => {
   const forceUpdate = useForceUpdate();
 
+  // $FlowFixMe[value-as-type]
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
 
   const instanceSchema = React.useMemo<Schema>(

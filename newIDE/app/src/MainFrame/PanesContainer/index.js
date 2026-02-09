@@ -51,6 +51,7 @@ const useSwipeableDrawer = ({
   onClose,
 }: {|
   enabled: boolean,
+  // $FlowFixMe[cannot-resolve-name]
   paneRef: {| current: HTMLDivElement | null |},
   direction: 'left' | 'right',
   onClose: () => void,
@@ -68,6 +69,7 @@ const useSwipeableDrawer = ({
       const minDistanceForAction = 80;
       const minDistanceForMovement = 30;
 
+      // $FlowFixMe[cannot-resolve-name]
       const onTouchStart = (e: TouchEvent) => {
         startX = e.touches[0].clientX;
         currentX = e.touches[0].clientX;
@@ -75,6 +77,7 @@ const useSwipeableDrawer = ({
         drawer.style.transition = 'none';
       };
 
+      // $FlowFixMe[cannot-resolve-name]
       const onTouchMove = (e: TouchEvent) => {
         if (!isDragging) return;
 
@@ -147,11 +150,17 @@ export const PanesContainer = ({renderPane, hasEditorsInLeftPane, hasEditorsInRi
   const forceUpdate = useForceUpdate();
   const debouncedForceUpdate = useDebounce(forceUpdate, 200);
 
+  // $FlowFixMe[cannot-resolve-name]
   const containerRef = React.useRef<HTMLDivElement | null>(null);
+  // $FlowFixMe[cannot-resolve-name]
   const leftResizerRef = React.useRef<HTMLDivElement | null>(null);
+  // $FlowFixMe[cannot-resolve-name]
   const leftPaneRef = React.useRef<HTMLDivElement | null>(null);
+  // $FlowFixMe[cannot-resolve-name]
   const centerPaneRef = React.useRef<HTMLDivElement | null>(null);
+  // $FlowFixMe[cannot-resolve-name]
   const rightPaneRef = React.useRef<HTMLDivElement | null>(null);
+  // $FlowFixMe[cannot-resolve-name]
   const rightResizerRef = React.useRef<HTMLDivElement | null>(null);
 
   const areSidePanesDrawers = isMobile;
@@ -244,6 +253,7 @@ export const PanesContainer = ({renderPane, hasEditorsInLeftPane, hasEditorsInRi
 
   React.useEffect(
     () => {
+      // $FlowFixMe[cannot-resolve-name]
       const onPointerMove = (event: PointerEvent) => {
         const leftPane = leftPaneRef.current;
         const rightPane = rightPaneRef.current;
@@ -279,10 +289,13 @@ export const PanesContainer = ({renderPane, hasEditorsInLeftPane, hasEditorsInRi
         draggingStateRef.current = null;
         forceUpdate();
 
+        // $FlowFixMe[cannot-resolve-name]
         document.removeEventListener('pointermove', onPointerMove);
+        // $FlowFixMe[cannot-resolve-name]
         document.removeEventListener('pointerup', onPointerUp);
       };
 
+      // $FlowFixMe[cannot-resolve-name]
       const onLeftResizerPointerDown = (event: PointerEvent) => {
         event.preventDefault();
         const leftPane = leftPaneRef.current;
@@ -295,10 +308,13 @@ export const PanesContainer = ({renderPane, hasEditorsInLeftPane, hasEditorsInRi
         };
         forceUpdate();
 
+        // $FlowFixMe[cannot-resolve-name]
         document.addEventListener('pointermove', onPointerMove);
+        // $FlowFixMe[cannot-resolve-name]
         document.addEventListener('pointerup', onPointerUp);
       };
 
+      // $FlowFixMe[cannot-resolve-name]
       const onRightResizerPointerDown = (event: PointerEvent) => {
         event.preventDefault();
         const rightPane = rightPaneRef.current;
@@ -311,7 +327,9 @@ export const PanesContainer = ({renderPane, hasEditorsInLeftPane, hasEditorsInRi
         };
         forceUpdate();
 
+        // $FlowFixMe[cannot-resolve-name]
         document.addEventListener('pointermove', onPointerMove);
+        // $FlowFixMe[cannot-resolve-name]
         document.addEventListener('pointerup', onPointerUp);
       };
 

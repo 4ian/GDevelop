@@ -61,6 +61,7 @@ type Props = {|
   editInstanceVariables: gdInitialInstance => void,
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
+  // $FlowFixMe[value-as-type]
   historyHandler?: HistoryHandler,
   tileMapTileSelection: ?TileMapTileSelection,
   onSelectTileMapTile: (?TileMapTileSelection) => void,
@@ -89,8 +90,10 @@ export const CompactInstancePropertiesEditor = (
   }: Props,
 ): null | React.Node => {
   const forceUpdate = useForceUpdate();
+  // $FlowFixMe[value-as-type]
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
+  // $FlowFixMe[value-as-type]
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
   const instance = instances[0];
   /**
@@ -101,6 +104,7 @@ export const CompactInstancePropertiesEditor = (
    */
   const shouldDisplayVariablesList = instances.length === 1;
 
+  // $FlowFixMe[missing-local-annot]
   const onScrollY = React.useCallback(deltaY => {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollBy(deltaY);

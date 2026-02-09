@@ -73,6 +73,7 @@ const DirectionTools = (
   const hasNoSprites = direction.getSpritesCount() === 0;
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
+  // $FlowFixMe[missing-local-annot]
   const saveTimeBetweenFrames = newTimeBetweenFramesString => {
     if (!newTimeBetweenFramesString) return;
     const newTimeBetweenFrames = Math.max(

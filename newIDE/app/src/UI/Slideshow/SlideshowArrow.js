@@ -66,6 +66,7 @@ const SlideshowArrow = ({onClick, position, classes}: SlideshowArrowProps): Reac
       }}
       onClick={onClick}
       tabIndex={0}
+      // $FlowFixMe[cannot-resolve-name]
       onKeyUp={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
         if (shouldValidate(event)) {
           onClick();

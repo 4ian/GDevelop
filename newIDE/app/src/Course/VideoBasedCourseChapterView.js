@@ -67,8 +67,10 @@ type Props = {|
   onClickUnlock: () => void,
 |};
 
-const VideoBasedCourseChapterView: component(...{ ...Props, +ref?: React.RefSetter<any> }) React.Node = React.forwardRef<Props, HTMLDivElement>(
+// $FlowFixMe[cannot-resolve-name]
+const VideoBasedCourseChapterView: React.ComponentType<Props> = React.forwardRef<Props, HTMLDivElement>(
   (
+    // $FlowFixMe[missing-local-annot]
     {
       chapterIndex,
       course,
@@ -79,6 +81,7 @@ const VideoBasedCourseChapterView: component(...{ ...Props, +ref?: React.RefSett
       getChapterCompletion,
       onClickUnlock,
     },
+    // $FlowFixMe[missing-local-annot]
     ref
   ) => {
     const {
@@ -92,6 +95,7 @@ const VideoBasedCourseChapterView: component(...{ ...Props, +ref?: React.RefSett
 
     return (
       <ColumnStackLayout expand noMargin>
+        // $FlowFixMe[incompatible-type]
         <CourseChapterTitle
           course={course}
           chapterIndex={chapterIndex}

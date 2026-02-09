@@ -39,6 +39,7 @@ export const groupMembersByGroupId = ({
       membersByGroupId['NONE'] = {
         members: [
           ...((itemWithoutGroup && itemWithoutGroup.members) || []),
+          // $FlowFixMe[incompatible-type]
           member,
         ],
         group: { id: 'none', name: 'none' },
@@ -47,18 +48,22 @@ export const groupMembersByGroupId = ({
     }
     const group = groups.find(group => group.id === memberGroups[0]);
     if (!group) return;
+    // $FlowFixMe[invalid-computed-prop]
     const item = membersByGroupId[group.id];
     if (item) {
       item.members = [...item.members, member];
     } else {
+      // $FlowFixMe[prop-missing]
       membersByGroupId[group.id] = { group, members: [member] };
     }
   });
   groups.forEach(group => {
     if (!(group.id in membersByGroupId)) {
+      // $FlowFixMe[prop-missing]
       membersByGroupId[group.id] = { group, members: [] };
     }
   });
+  // $FlowFixMe[incompatible-type]
   return { active: membersByGroupId, inactive: deactivatedMembers };
 };
 

@@ -67,14 +67,19 @@ const initialMosaicEditorNodes = {
 };
 
 export default class ResourcesEditor extends React.Component<Props, State> {
+  // $FlowFixMe[missing-local-annot]
   static defaultProps = {
     setToolbar: () => {},
   };
   resourceExternallyChangedCallbackId: ?string;
+  // $FlowFixMe[value-as-type]
   editorMosaic: ?EditorMosaicInterface = null;
+  // $FlowFixMe[value-as-type]
   _propertiesEditor: ?ResourcePropertiesEditorInterface = null;
   _resourcesList: ?ResourcesListInterface = null;
+  // $FlowFixMe[missing-local-annot]
   resourcesLoader = ResourcesLoader;
+  // $FlowFixMe[missing-local-annot]
   state = {
     selectedResource: null,
   };
@@ -165,6 +170,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
     // The selectedResource might be *invalid* now if it was removed.
     // Be sure to drop the reference to it if that's the case.
+    // $FlowFixMe[incompatible-type]
     if (removedResourceNames.includes(selectedResourceName)) {
       this._onResourceSelected(null);
     }
@@ -197,6 +203,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
     // The selectedResource might be *invalid* now if it was removed.
     // Be sure to drop the reference to it if that's the case.
+    // $FlowFixMe[incompatible-type]
     if (removedResourceNames.includes(selectedResourceName)) {
       this._onResourceSelected(null);
     }
@@ -273,6 +280,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         type: 'primary',
         noTitleBar: true,
         renderEditor: () => (
+          // $FlowFixMe[incompatible-type]
           <ResourcesList
             project={project}
             fileMetadata={fileMetadata}
@@ -280,6 +288,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
             onRenameResource={onRenameResource}
             onSelectResource={this._onResourceSelected}
             selectedResource={selectedResource}
+            // $FlowFixMe[missing-local-annot]
             ref={resourcesList => (this._resourcesList = resourcesList)}
             onRemoveUnusedResources={this._removeUnusedResources}
             onRemoveAllResourcesWithInvalidPath={

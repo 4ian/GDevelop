@@ -53,11 +53,13 @@ export default class InstancesRenderer {
    * But, as only the last rendered container is used for interactions,
    * all layers are included in the last render call with an opacity of 0.
    */
+  // $FlowFixMe[value-as-type]
   pixiContainer: PIXI.Container;
 
   temporaryRectangle: Rectangle;
   instanceMeasurer: InstanceMeasurer;
 
+  // $FlowFixMe[missing-local-annot]
   _basicProfilingCounters = makeBasicProfilingCounters() as BasicProfilingCounters;
 
   constructor({
@@ -192,10 +194,14 @@ export default class InstancesRenderer {
   }
 
   render(
+    // $FlowFixMe[value-as-type]
     pixiRenderer: PIXI.Renderer,
+    // $FlowFixMe[value-as-type]
     threeRenderer: THREE.WebGLRenderer | null,
     viewPosition: ViewPosition,
+    // $FlowFixMe[value-as-type]
     uiPixiContainer: PIXI.Container,
+    // $FlowFixMe[value-as-type]
     backgroundPixiContainer: PIXI.Container
   ) {
     resetBasicProfilingCounters(this._basicProfilingCounters);
@@ -278,10 +284,12 @@ export default class InstancesRenderer {
 
       if (!threeRenderer) {
         // Render a layer with 2D rendering (PixiJS) only.
+        // $FlowFixMe[cannot-resolve-name]
         const time = performance.now();
         pixiRenderer.render(layerContainer, { clear: false });
         increasePixiRenderingTime(
           this._basicProfilingCounters,
+          // $FlowFixMe[cannot-resolve-name]
           performance.now() - time
         );
       } else {
@@ -299,6 +307,7 @@ export default class InstancesRenderer {
           // Do the rendering of the PixiJS objects of the layer on the render texture.
           // Then, update the texture of the plane showing the PixiJS rendering,
           // so that the 2D rendering made by PixiJS can be shown in the 3D world.
+          // $FlowFixMe[cannot-resolve-name]
           const pixiStartTime = performance.now();
           layerRenderer.renderOnPixiRenderTexture(pixiRenderer);
           layerRenderer.updateThreePlaneTextureFromPixiRenderTexture(
@@ -308,6 +317,7 @@ export default class InstancesRenderer {
           );
           increasePixiRenderingTime(
             this._basicProfilingCounters,
+            // $FlowFixMe[cannot-resolve-name]
             performance.now() - pixiStartTime
           );
 
@@ -320,10 +330,12 @@ export default class InstancesRenderer {
           // even 3D objects.
           threeRenderer.clearDepth();
 
+          // $FlowFixMe[cannot-resolve-name]
           const threeStartTime = performance.now();
           threeRenderer.render(threeScene, threeCamera);
           increaseThreeRenderingTime(
             this._basicProfilingCounters,
+            // $FlowFixMe[cannot-resolve-name]
             performance.now() - threeStartTime
           );
         }
@@ -338,10 +350,12 @@ export default class InstancesRenderer {
       pixiRenderer.reset();
     }
 
+    // $FlowFixMe[cannot-resolve-name]
     const time = performance.now();
     pixiRenderer.render(uiPixiContainer);
     increasePixiUiRenderingTime(
       this._basicProfilingCounters,
+      // $FlowFixMe[cannot-resolve-name]
       performance.now() - time
     );
 

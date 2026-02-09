@@ -367,6 +367,7 @@ const DialogWithoutWindowSizeProvider = ({
   );
 
   const handleKeyDown = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (event: SyntheticKeyboardEvent<HTMLElement>) => {
       // When specifying a onKeyDown props, the MUIDialog does not handle
       // the close on escape key feature anymore so it should be handled here.
@@ -378,6 +379,7 @@ const DialogWithoutWindowSizeProvider = ({
 
       if (onApply && shouldSubmit(event)) {
         event.stopPropagation();
+        // $FlowFixMe[cannot-resolve-name]
         const element = document.activeElement;
         if (element) element.blur();
 

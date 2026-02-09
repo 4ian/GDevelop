@@ -11,20 +11,24 @@ export const setLanguageInDOM = (language: string): void => {
   const formattedLanguage = language.replace('_', '-');
 
   // <html lang=... xml:lang=... >
+  // $FlowFixMe[cannot-resolve-name]
   const htmlTag = document.getElementsByTagName('html')[0];
   htmlTag.setAttribute('lang', formattedLanguage);
   htmlTag.setAttribute('xml:lang', formattedLanguage);
 
   // <meta httpEquiv="Content-Language" content=... >
+  // $FlowFixMe[cannot-resolve-name]
   let metaContentLanguage = document.querySelector(
     'meta[http-equiv="Content-Language"]'
   );
   if (metaContentLanguage) {
     metaContentLanguage.setAttribute('content', formattedLanguage);
   } else {
+    // $FlowFixMe[cannot-resolve-name]
     metaContentLanguage = document.createElement('meta');
     metaContentLanguage.setAttribute('http-equiv', 'Content-Language');
     metaContentLanguage.setAttribute('content', formattedLanguage);
+    // $FlowFixMe[cannot-resolve-name]
     document.getElementsByTagName('head')[0].appendChild(metaContentLanguage);
   }
 };

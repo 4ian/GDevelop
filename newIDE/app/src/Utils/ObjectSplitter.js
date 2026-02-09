@@ -45,12 +45,14 @@ export const split = (
   }: SplitConfiguration
 ): Array<PartialObjectDescription> => {
   const partialObjects: Array<any> = [];
+  // $FlowFixMe[missing-local-annot]
   const createReference = (reference, object): Reference => {
     partialObjects.push({
       reference,
       object,
     });
 
+    // $FlowFixMe[incompatible-indexer]
     return {
       [isReferenceMagicPropertyName]: true,
       referenceTo: reference,

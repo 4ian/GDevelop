@@ -83,6 +83,7 @@ const getInitialStepName = (isNewInstruction: boolean): StepName => {
 const getInitialTab = (
   isNewInstruction: boolean,
   hasObjectChosen: boolean
+// $FlowFixMe[value-as-type]
 ): TabName => {
   if (isNewInstruction) return 'objects';
   return hasObjectChosen ? 'objects' : 'free-instructions';
@@ -143,6 +144,7 @@ const InstructionEditorDialog = ({
         chosenObjectName
       )
     : null;
+  // $FlowFixMe[value-as-type]
   const freeInstructionComponentRef = React.useRef<?InstructionOrObjectSelectorInterface>(
     null
   );
@@ -206,6 +208,7 @@ const InstructionEditorDialog = ({
     chooseObject(chosenObject.getName());
   };
 
+  // $FlowFixMe[value-as-type]
   const instructionParametersEditor = React.useRef<?InstructionParametersEditorInterface>(
     null
   );
@@ -369,6 +372,7 @@ const InstructionEditorDialog = ({
           }}
           getColumns={() => {
             if (isLargeScreen) {
+              // $FlowFixMe[incompatible-type]
               return [
                 {
                   columnName: 'instruction-or-object-selector',
@@ -392,6 +396,7 @@ const InstructionEditorDialog = ({
                   },
                 ];
               } else {
+                // $FlowFixMe[incompatible-type]
                 return [
                   chosenObjectName
                     ? { columnName: 'object-instruction-selector' }

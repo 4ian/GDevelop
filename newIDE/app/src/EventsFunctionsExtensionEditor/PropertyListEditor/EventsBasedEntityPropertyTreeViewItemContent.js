@@ -142,6 +142,7 @@ export const pasteProperties = async (
 };
 
 export type EventsBasedEntityPropertyTreeViewItemProps = {|
+  // $FlowFixMe[value-as-type]
   ...TreeItemProps,
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
@@ -172,6 +173,7 @@ export const getEventsBasedEntityPropertyTreeViewItemId = (
 };
 
 export class EventsBasedEntityPropertyTreeViewItemContent
+  // $FlowFixMe[value-as-type]
   implements TreeViewItemContent {
   property: gdPropertyFolderOrProperty;
   props: EventsBasedEntityPropertyTreeViewItemProps;
@@ -188,6 +190,7 @@ export class EventsBasedEntityPropertyTreeViewItemContent
     return this.property;
   }
 
+  // $FlowFixMe[value-as-type]
   isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean {
     const propertyFolderOrProperty = treeViewItemContent.getPropertyFolderOrProperty();
     return (
@@ -196,6 +199,7 @@ export class EventsBasedEntityPropertyTreeViewItemContent
     );
   }
 
+  // $FlowFixMe[value-as-type]
   isSibling(treeViewItemContent: TreeViewItemContent): boolean {
     const propertyFolderOrProperty = treeViewItemContent.getPropertyFolderOrProperty();
     return (

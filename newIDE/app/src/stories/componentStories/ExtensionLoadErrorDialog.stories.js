@@ -24,6 +24,7 @@ export const WithSingleExtensionError = (): React.Node => {
 
   return (
     <ExtensionLoadErrorDialog
+      // $FlowFixMe[incompatible-type]
       erroredExtensionLoadingResults={erroredExtensionLoadingResults}
       genericError={null}
       onClose={action('On close')}
@@ -61,6 +62,7 @@ export const WithMultipleExtensionErrors = (): React.Node => {
 
   return (
     <ExtensionLoadErrorDialog
+      // $FlowFixMe[incompatible-type]
       erroredExtensionLoadingResults={erroredExtensionLoadingResults}
       genericError={null}
       onClose={action('On close')}
@@ -100,6 +102,7 @@ export const WithBothExtensionAndGenericErrors = (): React.Node => {
 
   return (
     <ExtensionLoadErrorDialog
+      // $FlowFixMe[incompatible-type]
       erroredExtensionLoadingResults={erroredExtensionLoadingResults}
       genericError={genericError}
       onClose={action('On close')}

@@ -66,7 +66,9 @@ export default function SpriteEditor({
   const animations = spriteConfiguration.getAnimations();
   const { isMobile } = useResponsiveWindowSize();
 
+  // $FlowFixMe[value-as-type]
   const scrollView = React.useRef<?ScrollViewInterface>(null);
+  // $FlowFixMe[value-as-type]
   const animationList = React.useRef<?AnimationListInterface>(null);
 
   const [
@@ -180,6 +182,7 @@ export default function SpriteEditor({
                   onClick={() => setCollisionMasksEditorOpen(true)}
                   disabled={!hasAnyFrame(animations)}
                   buildMenuTemplate={i18n =>
+                    // $FlowFixMe[incompatible-type]
                     [
                       {
                         label: i18n._(t`Edit points`),

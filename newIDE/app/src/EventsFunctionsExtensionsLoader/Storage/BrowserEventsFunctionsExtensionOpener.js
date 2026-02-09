@@ -4,7 +4,9 @@ import { type SerializedExtension } from '../../Utils/GDevelopServices/Extension
 export default class BrowserEventsFunctionsExtensionOpener {
   static chooseEventsFunctionExtensionFile = (): Promise<Array<any>> => {
     return new Promise(resolve => {
+      // $FlowFixMe[cannot-resolve-name]
       if (window.showOpenFilePicker) {
+        // $FlowFixMe[cannot-resolve-name]
         window
           .showOpenFilePicker({
             types: [
@@ -26,6 +28,7 @@ export default class BrowserEventsFunctionsExtensionOpener {
             resolve([]);
           });
       } else {
+        // $FlowFixMe[cannot-resolve-name]
         const adhocInput = document.createElement('input');
         adhocInput.type = 'file';
         adhocInput.multiple = true;
@@ -42,8 +45,11 @@ export default class BrowserEventsFunctionsExtensionOpener {
         // by double-clicking it.
 
         const onFocusBackWindow = () => {
+          // $FlowFixMe[cannot-resolve-name]
           window.removeEventListener('focus', onFocusBackWindow);
+          // $FlowFixMe[cannot-resolve-name]
           if (document.body) {
+            // $FlowFixMe[cannot-resolve-name]
             document.body.addEventListener(
               'pointermove',
               onFilePickingDialogFinishedClosing
@@ -52,7 +58,9 @@ export default class BrowserEventsFunctionsExtensionOpener {
         };
 
         const onFilePickingDialogFinishedClosing = () => {
+          // $FlowFixMe[cannot-resolve-name]
           if (document.body) {
+            // $FlowFixMe[cannot-resolve-name]
             document.body.removeEventListener(
               'pointermove',
               onFilePickingDialogFinishedClosing
@@ -63,6 +71,7 @@ export default class BrowserEventsFunctionsExtensionOpener {
           }
         };
 
+        // $FlowFixMe[cannot-resolve-name]
         window.addEventListener('focus', onFocusBackWindow);
         adhocInput.click();
       }
@@ -72,6 +81,7 @@ export default class BrowserEventsFunctionsExtensionOpener {
   static readEventsFunctionExtensionFile = async (
     file: any
   ): Promise<SerializedExtension> => {
+    // $FlowFixMe[cannot-resolve-name]
     if (!(file instanceof File)) {
       console.error('Given file is not a JS File object. Instead it is:', {
         file,

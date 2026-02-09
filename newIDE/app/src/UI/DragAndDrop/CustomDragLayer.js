@@ -66,6 +66,7 @@ type XYCoord = {|
 
 type InternalCustomDragLayerProps = {|
   item?: DraggedItem,
+  // $FlowFixMe[value-as-type]
   itemType?: Identifier | null,
   initialOffset?: XYCoord | null,
   currentOffset?: XYCoord | null,
@@ -94,6 +95,7 @@ const shouldHidePreviewBecauseDraggingOnSceneEditorCanvas = ({
 
   // Otherwise, this means the classic "2D" editor is used:
 
+  // $FlowFixMe[cannot-resolve-name]
   const swipeableDrawerContainer = document.querySelector(
     `#${swipeableDrawerContainerId}`
   );
@@ -115,6 +117,7 @@ const shouldHidePreviewBecauseDraggingOnSceneEditorCanvas = ({
 
   // Otherwise, we are on desktop, and we want to hide the preview when the user
   // is dragging on the canvas.
+  // $FlowFixMe[cannot-resolve-name]
   const activeCanvas = document.querySelector(
     `#scene-editor[data-active=true] #${instancesEditorId}`
   );
@@ -202,7 +205,7 @@ const collect = (monitor: any): InternalCustomDragLayerProps => ({
   isDragging: monitor.isDragging(),
 });
 
-// $FlowFixMe - Forcing the type of the component, unsure how to make the DragLayer happy.
+// $FlowFixMe[incompatible-type][underconstrained-implicit-instantiation] - Forcing the type of the component, unsure how to make the DragLayer happy.
 const ExternalCustomDragLayer: ({||}) => React.Node = DragLayer(collect)(
   CustomDragLayer
 );

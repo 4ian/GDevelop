@@ -118,6 +118,7 @@ export default function TabsTitlebar({
   const preferences = React.useContext(PreferencesContext);
   const { limits } = React.useContext(AuthenticatedUserContext);
   const [tooltipData, setTooltipData] = React.useState<?{|
+    // $FlowFixMe[cannot-resolve-name]
     element: HTMLElement,
     editorTab: EditorTab,
   |}>(null);
@@ -139,6 +140,7 @@ export default function TabsTitlebar({
       }
 
       if (editorTab && isLabelTruncated) {
+        // $FlowFixMe[cannot-resolve-name]
         const element = document.getElementById(getTabId(editorTab));
         if (element) {
           tooltipTimeoutId.current = setTimeout(
@@ -212,6 +214,7 @@ export default function TabsTitlebar({
     >
       {isLeftMostPane && <TitleBarLeftSafeMargins />}
       {displayMenuIcon && (
+        // $FlowFixMe[incompatible-type]
         <IconButton
           size="small"
           // Even if not in the toolbar, keep this ID for backward compatibility for tutorials.

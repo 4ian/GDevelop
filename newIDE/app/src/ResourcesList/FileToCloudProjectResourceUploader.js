@@ -65,6 +65,7 @@ const getAcceptedExtensions = (
 };
 
 const getAcceptedMimeTypes = (resourceKind: ResourceKind): string[] => {
+  // $FlowFixMe[incompatible-type]
   return resourceKindToInputAcceptedMimes[resourceKind] || [];
 };
 
@@ -85,13 +86,16 @@ export const FileToCloudProjectResourceUploader = (
     automaticallyOpenInput
   }: FileToCloudProjectResourceUploaderProps,
 ): React.Node => {
+  // $FlowFixMe[cannot-resolve-name]
   const inputRef = React.useRef<?HTMLInputElement>(null);
   const hasAutomaticallyOpenedInput = React.useRef(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [error, setError] = React.useState<?Error>(null);
   const [isUploading, setIsUploading] = React.useState(false);
+  // $FlowFixMe[cannot-resolve-name]
   const [selectedFiles, setSelectedFiles] = React.useState<File[]>([]);
+  // $FlowFixMe[cannot-resolve-name]
   const [filteredOutFiles, setFilteredOutFiles] = React.useState<File[]>([]);
   const hasSelectedFiles = selectedFiles.length > 0;
   const storageProvider = React.useMemo(getStorageProvider, [
@@ -205,6 +209,7 @@ export const FileToCloudProjectResourceUploader = (
   );
 
   const validateFilePostPicking = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (file: File) => {
       const acceptedExtensions = getAcceptedExtensions(
         options.resourceKind,

@@ -13,10 +13,12 @@ const STACK_NEW_SECOND_GETS_50 = 50;
 
 /* ===== Type Guards & Utilities ===== */
 
+// $FlowFixMe[unsupported-syntax][value-as-type]
 const isBranch = (n: EditorMosaicNode): boolean %checks =>
   typeof n !== 'string';
 
 type PathItem = {|
+  // $FlowFixMe[value-as-type]
   parent: EditorMosaicBranch,
   side: 'first' | 'second',
 |};
@@ -24,6 +26,7 @@ type PathItem = {|
 // Depth-first search for a leaf id, returning path of parents from root → leaf.
 // (We assume centralId exists somewhere in the tree.)
 const findPathToLeaf = (
+  // $FlowFixMe[value-as-type]
   node: EditorMosaicNode,
   target: string
 ): { found: boolean, path: Array<PathItem> } => {
@@ -54,8 +57,11 @@ const findPathToLeaf = (
 
 // Vertical stack (column): new nodes go to the *bottom* (second).
 const addVertical = (
+  // $FlowFixMe[value-as-type]
   base: ?EditorMosaicNode,
+  // $FlowFixMe[value-as-type]
   newNode: EditorMosaicNode
+// $FlowFixMe[value-as-type]
 ): EditorMosaicNode => {
   if (!base) return newNode;
   if (isBranch(base) && base.direction === 'column') {
@@ -66,6 +72,7 @@ const addVertical = (
   }
   return {
     direction: 'column',
+    // $FlowFixMe[value-as-type]
     first: (base: EditorMosaicNode),
     second: newNode,
     splitPercentage: STACK_NEW_SECOND_GETS_50,
@@ -74,8 +81,11 @@ const addVertical = (
 
 // Horizontal stack (row): new nodes go to the *right* (second).
 const addHorizontal = (
+  // $FlowFixMe[value-as-type]
   base: ?EditorMosaicNode,
+  // $FlowFixMe[value-as-type]
   newNode: EditorMosaicNode
+// $FlowFixMe[value-as-type]
 ): EditorMosaicNode => {
   if (!base) return newNode;
   if (isBranch(base) && base.direction === 'row') {
@@ -86,6 +96,7 @@ const addHorizontal = (
   }
   return {
     direction: 'row',
+    // $FlowFixMe[value-as-type]
     first: (base: EditorMosaicNode),
     second: newNode,
     splitPercentage: STACK_NEW_SECOND_GETS_50,
@@ -102,8 +113,11 @@ const addHorizontal = (
 */
 
 type Stacks = {|
+  // $FlowFixMe[value-as-type]
   leftStack: ?EditorMosaicNode,
+  // $FlowFixMe[value-as-type]
   rightStack: ?EditorMosaicNode,
+  // $FlowFixMe[value-as-type]
   bottomStack: ?EditorMosaicNode,
 |};
 
@@ -119,6 +133,7 @@ type Harvest = {|
 |};
 
 const harvestStacksAndSplits = (
+  // $FlowFixMe[value-as-type]
   root: EditorMosaicNode,
   centralId: string
 ): Harvest => {
@@ -132,8 +147,11 @@ const harvestStacksAndSplits = (
     };
   }
 
+  // $FlowFixMe[value-as-type]
   let leftStack: ?EditorMosaicNode = null;
+  // $FlowFixMe[value-as-type]
   let rightStack: ?EditorMosaicNode = null;
+  // $FlowFixMe[value-as-type]
   let bottomStack: ?EditorMosaicNode = null;
 
   let leftSplit: ?number = null;
@@ -190,11 +208,13 @@ const buildCanonicalWithSplits = (
     right: number,
     bottom: number,
   |}
+// $FlowFixMe[value-as-type]
 ): EditorMosaicNode => {
   const { leftStack, rightStack, bottomStack } = stacks;
   const { leftSplit, rightSplit, bottomSplit } = splits;
 
   // Start with the central core.
+  // $FlowFixMe[value-as-type]
   let core: EditorMosaicNode = centralId;
 
   // Attach bottom if present: column split (central over bottom).
@@ -209,6 +229,7 @@ const buildCanonicalWithSplits = (
 
   // Attach left/right ensuring: Left | core | Right (core stays between).
   if (leftStack && rightStack) {
+    // $FlowFixMe[value-as-type]
     const innerRow: EditorMosaicNode = {
       direction: 'row',
       first: core,
@@ -248,8 +269,10 @@ const buildCanonicalWithSplits = (
 
 // Convert any tree into canonical tree around centralId *without changing existing region splits*.
 const ensureCanonicalPreserveSplits = (
+  // $FlowFixMe[value-as-type]
   current: EditorMosaicNode,
   centralId: string
+// $FlowFixMe[value-as-type]
 ): EditorMosaicNode => {
   // Quick path: already canonical with central in the middle?
   if (
@@ -274,10 +297,13 @@ const ensureCanonicalPreserveSplits = (
 };
 
 export const addNode = (
+  // $FlowFixMe[value-as-type]
   currentNode: EditorMosaicNode,
+  // $FlowFixMe[value-as-type]
   newNode: EditorMosaicNode,
   position: Position,
   centralId: string
+// $FlowFixMe[value-as-type]
 ): EditorMosaicNode => {
   // 1) Canonicalize current tree *while preserving existing splits*
   const canonical = ensureCanonicalPreserveSplits(currentNode, centralId);

@@ -34,6 +34,7 @@ import Window from '../../Utils/Window';
 
 const gd: libGDevelop = global.gd;
 
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget(
   'spine-animations-list'
 );
@@ -69,6 +70,7 @@ const SpineEditor = (
     renderObjectNameField
   }: EditorProps,
 ): React.Node => {
+  // $FlowFixMe[value-as-type]
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
     justAddedAnimationName,
@@ -237,6 +239,7 @@ const SpineEditor = (
   );
 
   const removeAnimation = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     animationIndex => {
       setNameErrors({});
 
@@ -265,6 +268,7 @@ const SpineEditor = (
   );
 
   const changeAnimationName = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     (animationIndex, newName) => {
       const currentName = spineConfiguration
         .getAnimation(animationIndex)

@@ -31,6 +31,7 @@ const DetectShortcutDialog = (props: Props): React.Node => {
   };
 
   React.useEffect(() => {
+    // $FlowFixMe[cannot-resolve-name]
     const handler = (e: KeyboardEvent) => {
       e.preventDefault();
       const metadata = getShortcutMetadataFromEvent(e);
@@ -38,10 +39,14 @@ const DetectShortcutDialog = (props: Props): React.Node => {
       setIsValid(metadata.isValid);
       setShortcutString(metadata.shortcutString);
     };
+    // $FlowFixMe[cannot-resolve-name]
     document.addEventListener('keyup', handler);
+    // $FlowFixMe[cannot-resolve-name]
     document.addEventListener('keydown', handler);
     return () => {
+      // $FlowFixMe[cannot-resolve-name]
       document.removeEventListener('keydown', handler);
+      // $FlowFixMe[cannot-resolve-name]
       document.removeEventListener('keyup', handler);
     };
   }, []);

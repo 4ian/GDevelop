@@ -68,6 +68,7 @@ type State = {|
   editingKeyIteratorVariableName: boolean,
   editingIterableVariableName: boolean,
   editingPreviousValue: ?string,
+  // $FlowFixMe[cannot-resolve-name]
   anchorEl: ?HTMLSpanElement,
 |};
 
@@ -79,6 +80,7 @@ export default class ForEachChildVariableEvent extends React.Component<
   _keyIteratorField: ?ParameterFieldInterface = null;
   _iterableField: ?ParameterFieldInterface = null;
 
+  // $FlowFixMe[missing-local-annot]
   state = {
     editingValueIteratorVariableName: false,
     editingKeyIteratorVariableName: false,
@@ -89,6 +91,7 @@ export default class ForEachChildVariableEvent extends React.Component<
 
   edit = (
     variable: 'iterable' | 'iteratorValue' | 'iteratorKey',
+    // $FlowFixMe[cannot-resolve-name]
     anchorEl: HTMLSpanElement
   ) => {
     const forEachChildVariableEvent = gd.asForEachChildVariableEvent(
@@ -165,7 +168,7 @@ export default class ForEachChildVariableEvent extends React.Component<
   endEditing = () => {
     const { anchorEl } = this.state;
     // Put back the focus after closing the inline popover.
-    // $FlowFixMe
+    // $FlowFixMe[incompatible-type]
     if (anchorEl) anchorEl.focus();
 
     this.setState({

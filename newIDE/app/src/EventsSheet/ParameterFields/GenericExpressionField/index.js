@@ -144,9 +144,13 @@ const extractErrors = (
   expressionNode.visit(expressionValidator);
   const errors = expressionValidator.getAllErrors();
 
+  // $FlowFixMe[incompatible-exact]
   const errorHighlights: Array<Highlight> = mapVector(errors, error => ({
+    // $FlowFixMe[incompatible-use]
     begin: error.getStartPosition(),
+    // $FlowFixMe[incompatible-use]
     end: error.getEndPosition() + 1,
+    // $FlowFixMe[incompatible-use]
     message: error.getMessage(),
     type: 'error',
   }));
@@ -174,10 +178,13 @@ const extractErrors = (
 };
 
 export default class ExpressionField extends React.Component<Props, State> {
+  // $FlowFixMe[value-as-type]
   _field: ?SemiControlledTextFieldInterface = null;
   _fieldElementWidth: ?number = null;
+  // $FlowFixMe[cannot-resolve-name]
   _inputElement: ?HTMLInputElement = null;
 
+  // $FlowFixMe[missing-local-annot]
   state = {
     popoverOpen: false,
     parametersDialogOpen: false,
@@ -266,6 +273,7 @@ export default class ExpressionField extends React.Component<Props, State> {
   _handleExpressionChosen = (expressionInfo: EnumeratedExpressionMetadata) => {
     let newState = { popoverOpen: false };
     if (this._shouldOpenParametersDialog(expressionInfo)) {
+      // $FlowFixMe[incompatible-type]
       newState = {
         ...newState,
         parametersDialogOpen: true,
@@ -419,6 +427,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     );
   };
 
+  // $FlowFixMe[missing-local-annot]
   _enqueueValidation = debounce(
   () => {
     this._doValidation();
@@ -494,7 +503,7 @@ export default class ExpressionField extends React.Component<Props, State> {
         scope,
       },
       completionDescriptions,
-      // $FlowFixMe The autocompletion doesn't display the groups so it doesn't need to be able to translate them.
+      // $FlowFixMe[incompatible-type] The autocompletion doesn't display the groups so it doesn't need to be able to translate them.
       null
     );
 
@@ -743,6 +752,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                       selectedExpressionInfo: null,
                     });
                   }}
+                  // $FlowFixMe[incompatible-type]
                   parameterRenderingService={parameterRenderingService}
                 />
               )}

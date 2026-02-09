@@ -73,8 +73,10 @@ type Props = {|
   showUrgentAnnouncements?: boolean,
 |};
 
-const SectionContainer: component(...{ ...Props, +ref?: React.RefSetter<any> }) React.Node = React.forwardRef<Props, HTMLDivElement>(
+// $FlowFixMe[cannot-resolve-name]
+const SectionContainer: React.ComponentType<Props> = React.forwardRef<Props, HTMLDivElement>(
   (
+    // $FlowFixMe[missing-local-annot]
     {
       children,
       chipText,
@@ -90,6 +92,7 @@ const SectionContainer: component(...{ ...Props, +ref?: React.RefSetter<any> }) 
       applyTopSpacingAsMarginOnChildrenContainer,
       showUrgentAnnouncements,
     },
+    // $FlowFixMe[missing-local-annot]
     ref
   ) => {
     const { isMobile } = useResponsiveWindowSize();
@@ -133,6 +136,7 @@ const SectionContainer: component(...{ ...Props, +ref?: React.RefSetter<any> }) 
 
     return (
       <Column expand useFullHeight noMargin>
+        // $FlowFixMe[incompatible-type]
         <Paper style={paperStyle} square background="dark" ref={ref}>
           <div style={childrenContainerStyle}>
             {showUrgentAnnouncements && !shouldHideAnnouncements && (

@@ -28,6 +28,7 @@ export type ExtensionTreeViewItemCallbacks = {|
 |};
 
 export type ExtensionTreeViewItemCommonProps = {|
+  // $FlowFixMe[value-as-type]
   ...TreeItemProps,
   ...ExtensionTreeViewItemCallbacks,
 |};
@@ -48,6 +49,7 @@ export const getExtensionTreeViewItemId = (
   return `extension-${eventsFunctionsExtension.ptr}`;
 };
 
+// $FlowFixMe[value-as-type]
 export class ExtensionTreeViewItemContent implements TreeViewItemContent {
   eventsFunctionsExtension: gdEventsFunctionsExtension;
   props: ExtensionTreeViewItemProps;
@@ -60,6 +62,7 @@ export class ExtensionTreeViewItemContent implements TreeViewItemContent {
     this.props = props;
   }
 
+  // $FlowFixMe[value-as-type]
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return itemContent.getId() === extensionsRootFolderId;
   }

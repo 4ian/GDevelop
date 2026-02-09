@@ -83,6 +83,7 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
   ): Promise<PreparedExporter> => {
+    // $FlowFixMe[incompatible-type]
     return findGDJS().then(({ gdjsRoot }) => {
       console.info('GDJS found in ', gdjsRoot);
 
@@ -93,6 +94,7 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
         new gd.AbstractFileSystemJS(),
         localFileSystem
       );
+      // $FlowFixMe[extra-arg]
       const exporter = new gd.Exporter(fileSystem, gdjsRoot);
       const temporaryOutputDir = path.join(
         fileSystem.getTempDir(),
@@ -166,6 +168,7 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
     return getBuildFileUploadOptions().then(uploadOptions => {
       return uploadLocalFile(
         outputFile,
+        // $FlowFixMe[incompatible-type]
         uploadOptions,
         context.updateStepProgress
       ).then(() => uploadOptions.key);
@@ -174,6 +177,7 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
 
   launchOnlineBuild: (
     exportState: ExportState,
+    // $FlowFixMe[value-as-type]
     authenticatedUser: AuthenticatedUser,
     uploadBucketKey: string,
     gameId: string,

@@ -357,8 +357,10 @@ type Props = {|
   onChangeUserInputValue?: string => void,
 |};
 
-const UserSurveyQuestion: component(...{ ...Props, +ref?: React.RefSetter<any> }) React.Node = React.forwardRef<Props, HTMLDivElement>(
+// $FlowFixMe[cannot-resolve-name]
+const UserSurveyQuestion: React.ComponentType<Props> = React.forwardRef<Props, HTMLDivElement>(
   (
+    // $FlowFixMe[missing-local-annot]
     {
       questionData,
       onSelectAnswer,
@@ -370,6 +372,7 @@ const UserSurveyQuestion: component(...{ ...Props, +ref?: React.RefSetter<any> }
       userInputValue,
       onChangeUserInputValue,
     },
+    // $FlowFixMe[missing-local-annot]
     ref
   ) => {
     const { text, answers, multi } = questionData;

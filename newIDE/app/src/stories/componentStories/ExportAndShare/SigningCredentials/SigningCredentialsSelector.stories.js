@@ -35,6 +35,7 @@ export const Errored = (): React.Node => {
         targets={['iosAppStore']}
         authenticatedUser={fakeSilverAuthenticatedUser}
         buildSigningOptions={buildSigningOptions}
+        // $FlowFixMe[incompatible-type]
         onSelectBuildSigningOptions={setBuildSigningOptions}
       />
     </AuthenticatedUserContext.Provider>
@@ -72,6 +73,7 @@ export const WithSigningCredentialsButNonePreSelected = (): React.Node => {
         targets={targets}
         authenticatedUser={fakeSilverAuthenticatedUser}
         buildSigningOptions={buildSigningOptions}
+        // $FlowFixMe[incompatible-type]
         onSelectBuildSigningOptions={setBuildSigningOptions}
       />
     </AuthenticatedUserContext.Provider>
@@ -111,7 +113,9 @@ export const WithSigningCredentialsAndOnePreSelected = (): React.Node => {
       <IosSigningCredentialsSelector
         targets={targets}
         authenticatedUser={fakeSilverAuthenticatedUser}
+        // $FlowFixMe[incompatible-type]
         buildSigningOptions={buildSigningOptions}
+        // $FlowFixMe[incompatible-type]
         onSelectBuildSigningOptions={setBuildSigningOptions}
       />
     </AuthenticatedUserContext.Provider>

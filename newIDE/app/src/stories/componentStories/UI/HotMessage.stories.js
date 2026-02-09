@@ -10,6 +10,7 @@ import { ColumnStackLayout } from '../../../UI/Layout';
 export default {
   title: 'UI Building Blocks/HotMessage',
   component: HotMessage,
+  // $FlowFixMe[cannot-resolve-name]
   decorators: [getPaperDecorator('medium') as StoryDecorator],
 };
 

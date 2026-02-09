@@ -122,6 +122,7 @@ export type UpdateYoutubeSubscriptionResponse = {|
 export type IdentityProvider = 'google' | 'apple' | 'github';
 
 export default class Authentication {
+  // $FlowFixMe[value-as-type]
   auth: Auth;
   _onUserLogoutCallbacks: Array<() => void | Promise<void>> = [];
   _onUserUpdateCallbacks: Array<() => void | Promise<void>> = [];
@@ -257,6 +258,7 @@ export default class Authentication {
     signal,
   }: {|
     provider: IdentityProvider,
+    // $FlowFixMe[cannot-resolve-name]
     signal?: AbortSignal,
   |}): Promise<void> => {
     const { loginProvider } = this;
@@ -281,6 +283,7 @@ export default class Authentication {
     return sendPasswordResetEmail(this.auth, form.email);
   };
 
+  // $FlowFixMe[value-as-type]
   getFirebaseUser = async (): Promise<?FirebaseUser> => {
     const { currentUser } = this.auth;
     if (!currentUser) {
@@ -397,6 +400,7 @@ export default class Authentication {
     const { uid } = currentUser;
 
     const authorizationHeader = await getAuthorizationHeader();
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     const response = await axios.post(
       `${GDevelopUserApi.baseUrl}/user/${uid}/action/update-github-star`,
       {},
@@ -422,6 +426,7 @@ export default class Authentication {
     const { uid } = currentUser;
 
     const authorizationHeader = await getAuthorizationHeader();
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     const response = await axios.post(
       `${GDevelopUserApi.baseUrl}/user/${uid}/action/update-tiktok-follow`,
       {},
@@ -449,6 +454,7 @@ export default class Authentication {
     const { uid } = currentUser;
 
     const authorizationHeader = await getAuthorizationHeader();
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     const response = await axios.post(
       `${GDevelopUserApi.baseUrl}/user/${uid}/action/update-twitter-follow`,
       {},
@@ -476,6 +482,7 @@ export default class Authentication {
     const { uid } = currentUser;
 
     const authorizationHeader = await getAuthorizationHeader();
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     const response = await axios.post(
       `${
         GDevelopUserApi.baseUrl
@@ -527,10 +534,12 @@ export default class Authentication {
       });
   };
 
+  // $FlowFixMe[value-as-type]
   getFirebaseUserSync = (): ?FirebaseUser => {
     return this.auth.currentUser || null;
   };
 
+  // $FlowFixMe[missing-local-annot]
   logout = async () => {
     try {
       await signOut(this.auth);
@@ -541,6 +550,7 @@ export default class Authentication {
     }
   };
 
+  // $FlowFixMe[missing-local-annot]
   deleteAccount = async (getAuthorizationHeader: () => Promise<string>) => {
     const { currentUser } = this.auth;
     if (!currentUser) {
@@ -549,6 +559,7 @@ export default class Authentication {
 
     try {
       const authorizationHeader = await getAuthorizationHeader();
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       await axios.delete(`${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`, {
         params: {
           userId: currentUser.uid,

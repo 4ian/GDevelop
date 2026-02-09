@@ -14,6 +14,7 @@ type Props = {|
     index: number,
     text: string
   ) => void,
+  // $FlowFixMe[cannot-resolve-name]
   onFocus?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
   fullWidth?: boolean,
 |};

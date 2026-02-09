@@ -143,6 +143,7 @@ const ProductLicenseOptionButton = ({
       style={styles.buttonBase}
       classes={classes}
       tabIndex={0}
+      // $FlowFixMe[cannot-resolve-name]
       onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
         if (shouldValidate(event) && !selected) {
           onClick();

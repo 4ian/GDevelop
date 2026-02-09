@@ -47,6 +47,7 @@ type ResourcesDownloadOutput = {|
   blobFiles: Array<BlobFileDescriptor>,
 |};
 
+// $FlowFixMe[cannot-resolve-name]
 type CompressionOutput = Blob;
 
 const exportPipelineName = 'browser-html5';
@@ -75,6 +76,7 @@ export const browserHTML5ExportPipeline: ExportPipeline<
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
   ): Promise<PreparedExporter> => {
+    // $FlowFixMe[incompatible-type]
     return findGDJS('web').then(({ gdjsRoot, filesContent }) => {
       console.info('GDJS found in ', gdjsRoot);
 
@@ -87,6 +89,7 @@ export const browserHTML5ExportPipeline: ExportPipeline<
         new gd.AbstractFileSystemJS(),
         abstractFileSystem
       );
+      // $FlowFixMe[extra-arg]
       const exporter = new gd.Exporter(fileSystem, gdjsRoot);
 
       return {
@@ -136,6 +139,7 @@ export const browserHTML5ExportPipeline: ExportPipeline<
   launchCompression: (
     context: ExportPipelineContext<ExportState>,
     { textFiles, blobFiles }: ResourcesDownloadOutput
+  // $FlowFixMe[cannot-resolve-name]
   ): Promise<Blob> => {
     return archiveFiles({
       blobFiles,

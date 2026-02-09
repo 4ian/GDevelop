@@ -19,9 +19,11 @@ const useClickDragAsControl = ({onChange, onGetInitialValue}: Props): {
   |}>(null);
 
   const start = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (e: MouseEvent) => {
       const target = e.currentTarget;
       if (
+        // $FlowFixMe[cannot-resolve-name]
         target instanceof Element &&
         // requestPointerLock does not exist no mobile devices.
         target.requestPointerLock
@@ -38,6 +40,7 @@ const useClickDragAsControl = ({onChange, onGetInitialValue}: Props): {
   );
 
   const onMove = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (e: MouseEvent) => {
       if (!clickDragOrigin.current) return;
 
@@ -65,6 +68,7 @@ const useClickDragAsControl = ({onChange, onGetInitialValue}: Props): {
 
   const clear = React.useCallback(() => {
     if (clickDragOrigin.current) {
+      // $FlowFixMe[cannot-resolve-name]
       document.exitPointerLock();
       clickDragOrigin.current = null;
     }

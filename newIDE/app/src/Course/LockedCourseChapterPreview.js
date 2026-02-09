@@ -74,7 +74,9 @@ type Props = {|
   onClickUnlock: () => void,
 |};
 
-const LockedCourseChapterPreview: component(...{ ...Props, +ref?: React.RefSetter<any> }) React.Node = React.forwardRef<Props, HTMLDivElement>(
+// $FlowFixMe[cannot-resolve-name]
+const LockedCourseChapterPreview: React.ComponentType<Props> = React.forwardRef<Props, HTMLDivElement>(
+  // $FlowFixMe[missing-local-annot]
   ({ course, courseChapter, onClickUnlock }, ref) => {
     const { windowSize } = useResponsiveWindowSize();
     const youtubeVideoId = courseChapter.videoUrl

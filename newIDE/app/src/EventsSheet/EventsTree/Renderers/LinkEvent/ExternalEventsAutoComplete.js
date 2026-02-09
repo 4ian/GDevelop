@@ -9,6 +9,7 @@ const getList = (
   currentSceneName: ?string,
   currentExternalEventName: ?string,
   project: ?gdProject
+// $FlowFixMe[value-as-type]
 ): DataSource => {
   if (!project || !currentSceneName) {
     return [];

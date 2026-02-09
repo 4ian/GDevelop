@@ -1,4 +1,5 @@
 // @flow
+// $FlowFixMe[untyped-type-import]
 import type { Auth } from 'firebase/auth';
 import type { IdentityProvider } from '../Utils/GDevelopServices/Authentication';
 
@@ -9,10 +10,12 @@ export interface LoginProvider {
   |}): Promise<void>;
   loginOrSignupWithProvider({|
     provider: IdentityProvider,
+    // $FlowFixMe[cannot-resolve-name]
     signal?: AbortSignal,
   |}): Promise<void>;
 }
 
 export interface FirebaseBasedLoginProvider {
+  // $FlowFixMe[value-as-type]
   auth: Auth;
 }

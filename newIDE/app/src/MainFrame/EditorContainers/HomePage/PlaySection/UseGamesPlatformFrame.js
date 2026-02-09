@@ -22,6 +22,7 @@ const electron = optionalRequire('electron');
 const TIMEOUT_TO_UNLOAD_IFRAME_IN_MS = 2000;
 
 let gdevelopGamesMonetization: {|
+  // $FlowFixMe[cannot-resolve-name]
   initialize: (rootElement: HTMLElement) => Promise<void>,
   sendCommand: (command: any) => Promise<void>,
 |} | null = null;
@@ -48,10 +49,12 @@ const ensureGDevelopGamesMonetizationReady = async () => {
         { times: 2 },
         async () =>
           // $FlowExpectedError - Remote script cannot be found.
+          // $FlowFixMe[cannot-resolve-module]
           (await import(/* webpackIgnore: true */ 'https://resources.gdevelop.io/a/ggm-web.js'))
             .default
       );
       if (module) {
+        // $FlowFixMe[cannot-resolve-name]
         await module.initialize(document.body);
         gdevelopGamesMonetization = module;
       }
@@ -123,6 +126,7 @@ const useUserCustomToken = (): {|
           const userCustomToken = await retryIfFailed({ times: 2 }, () =>
             generateCustomAuthToken(getAuthorizationHeader, userId)
           );
+          // $FlowFixMe[incompatible-type]
           setUserCustomToken(userCustomToken);
           setLastTokenGenerationTime(Date.now());
           setCustomTokenUserId(userId);
@@ -141,7 +145,7 @@ const useUserCustomToken = (): {|
 };
 
 const sendSoftKeyboardOffsetToFrame = async (offset: number) => {
-  // $FlowFixMe - we know it's an iframe.
+  // $FlowFixMe[cannot-resolve-name][incompatible-type] - we know it's an iframe.
   const iframe: ?HTMLIFrameElement = document.getElementById(
     GAMES_PLATFORM_IFRAME_ID
   );
@@ -282,7 +286,7 @@ const useGamesPlatformFrame = ({
   const notifyIframeToChangeGame = React.useCallback(
     (gameId: string) => {
       if (iframeLoaded) {
-        // $FlowFixMe - we know it's an iframe.
+        // $FlowFixMe[cannot-resolve-name][incompatible-type] - we know it's an iframe.
         const iframe: ?HTMLIFrameElement = document.getElementById(
           GAMES_PLATFORM_IFRAME_ID
         );
@@ -407,9 +411,11 @@ const useGamesPlatformFrame = ({
 
   React.useEffect(
     () => {
+      // $FlowFixMe[cannot-resolve-name]
       window.addEventListener('message', handleIframeMessage);
 
       return () => {
+        // $FlowFixMe[cannot-resolve-name]
         window.removeEventListener('message', handleIframeMessage);
       };
     },
@@ -429,7 +435,7 @@ const useGamesPlatformFrame = ({
       // to automatically log the user in the frame,
       // or notify it the user is not connected (or just disconnected).
 
-      // $FlowFixMe - we know it's an iframe.
+      // $FlowFixMe[cannot-resolve-name][incompatible-type] - we know it's an iframe.
       const iframe: ?HTMLIFrameElement = document.getElementById(
         GAMES_PLATFORM_IFRAME_ID
       );
@@ -559,6 +565,7 @@ const useGamesPlatformFrame = ({
     ]
   );
 
+  // $FlowFixMe[incompatible-type]
   return gamesPlatformFrameTools;
 };
 

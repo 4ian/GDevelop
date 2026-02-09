@@ -19,7 +19,9 @@ export default {
 };
 
 export const Default = (): React.Node => {
+  // $FlowFixMe[value-as-type]
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
+  // $FlowFixMe[cannot-resolve-name]
   const onContextMenu = (event: MouseEvent) => {
     event.preventDefault();
     if (contextMenu.current) {

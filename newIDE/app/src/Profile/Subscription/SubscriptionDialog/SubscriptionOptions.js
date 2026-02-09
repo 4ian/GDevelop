@@ -96,6 +96,7 @@ const SubscriptionOptionButton = ({
               : gdevelopTheme.paper.backgroundColor.medium,
           }}
           tabIndex={0}
+          // $FlowFixMe[cannot-resolve-name]
           onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
             if (shouldValidate(event) && !selected) {
               onClick();

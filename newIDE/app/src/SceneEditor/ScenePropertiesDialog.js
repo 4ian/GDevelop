@@ -151,6 +151,7 @@ const ScenePropertiesDialog = (
     .map(behaviorName => {
       const behaviorSharedData = layout.getBehaviorSharedData(behaviorName);
 
+      // $FlowFixMe[incompatible-exact]
       if (isNullPtr(gd, behaviorSharedData)) return null;
 
       const behaviorTypeName = behaviorSharedData.getTypeName();
@@ -353,6 +354,7 @@ const ScenePropertiesDialog = (
             primary
             fullWidth
             onClick={() => {
+              // $FlowFixMe[constant-condition]
               if (onOpenMoreSettings) onOpenMoreSettings();
               onClose();
             }}

@@ -59,9 +59,11 @@ export type EventsBasedBehaviorCallbacks = {|
 |};
 
 export type EventsBasedBehaviorProps = {|
+  // $FlowFixMe[value-as-type]
   ...TreeItemProps,
   ...EventsBasedBehaviorCallbacks,
   addNewEventsFunction: ({|
+    // $FlowFixMe[value-as-type]
     itemContent: ?TreeViewItemContent,
     eventsBasedBehavior: ?gdEventsBasedBehavior,
     eventsBasedObject: ?gdEventsBasedObject,
@@ -71,6 +73,7 @@ export type EventsBasedBehaviorProps = {|
 |};
 
 export class EventsBasedBehaviorTreeViewItemContent
+  // $FlowFixMe[value-as-type]
   implements TreeViewItemContent {
   eventsBasedBehavior: gdEventsBasedBehavior;
   props: EventsBasedBehaviorProps;
@@ -99,6 +102,7 @@ export class EventsBasedBehaviorTreeViewItemContent
     return null;
   }
 
+  // $FlowFixMe[value-as-type]
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return itemContent.getId() === extensionBehaviorsRootFolderId;
   }

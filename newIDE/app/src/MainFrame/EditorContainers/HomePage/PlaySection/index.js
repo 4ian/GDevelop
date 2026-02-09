@@ -30,6 +30,7 @@ const PlaySection = ({ gamesPlatformFrameTools }: Props) => {
   // If on a "mobile" screen (either a real mobile, or a desktop that has a small
   // window, or an editor tab that is too narrow), communicate this so that the
   // iframe can be shown from the top of the screen.
+  // $FlowFixMe[cannot-resolve-name]
   const iframePositionRef = React.useRef<?HTMLDivElement>(null);
   React.useLayoutEffect(() => {
     if (iframePositionRef.current) {

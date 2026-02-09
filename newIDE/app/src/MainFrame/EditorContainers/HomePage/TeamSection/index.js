@@ -69,6 +69,7 @@ const sortMembersByNameOrEmail = (a: User, b: User) => {
   return (a.username || a.email).localeCompare(b.username || b.email);
 };
 
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const DropTarget = makeDropTarget('team-groups');
 
 type Props = {|
@@ -115,6 +116,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
     ] = React.useState<boolean>(false);
     const forceUpdate = useForceUpdate();
     const { isMobile } = useResponsiveWindowSize();
+    // $FlowFixMe[value-as-type]
     const contextMenu = React.useRef<?ContextMenuInterface>(null);
 
     React.useImperativeHandle(ref, () => ({

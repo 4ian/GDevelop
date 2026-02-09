@@ -67,6 +67,7 @@ export default ({
       setDialog,
       closeDialog,
     }),
+    // $FlowFixMe[incompatible-type]
     onSaveProjectAs: generateOnSaveProjectAs(
       authenticatedUser,
       setDialog,
@@ -81,5 +82,6 @@ export default ({
     },
     getWriteErrorMessage,
   }),
+  // $FlowFixMe[incompatible-type]
   createResourceOperations: generateGetResourceActions,
 }: StorageProvider);

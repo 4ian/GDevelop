@@ -43,6 +43,7 @@ const ResourceStoreChooser = ({
       onSelectResource={onSelectResource}
       resourceKind={
         // $FlowIgnore - Flow does not understand the check above restricts the resource kind.
+        // $FlowFixMe[incompatible-type]
         resourceKind
       }
     />
@@ -67,6 +68,7 @@ export const UrlChooser = ({options, onChooseResources, createNewResource}: Reso
     try {
       const responses = await Promise.all(
         urls.map(async url => {
+          // $FlowFixMe[underconstrained-implicit-instantiation]
           return await axios.get(url, {
             timeout: 1000,
             validateStatus: status => true,
@@ -180,6 +182,7 @@ const browserResourceSources: Array<ResourceSource> = [
       displayTab: 'import',
       shouldCreateResource: true,
       shouldGuessAnimationsFromName: true,
+      // $FlowFixMe[incompatible-type]
       kind,
       renderComponent: (props: ResourceSourceComponentProps) => (
         <FileToCloudProjectResourceUploader
@@ -206,6 +209,7 @@ const browserResourceSources: Array<ResourceSource> = [
       );
       if (!source) return null;
       const sourceName = `resource-store-${kind}`;
+      // $FlowFixMe[incompatible-type]
       return {
         name: sourceName,
         displayName: t`Choose from asset store`,
@@ -263,6 +267,7 @@ const browserResourceSources: Array<ResourceSource> = [
     .filter(Boolean),
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => {
     const sourceName = `project-resources-${kind}`;
+    // $FlowFixMe[incompatible-type]
     return {
       name: sourceName,
       displayName: t`Project resources`,
@@ -275,6 +280,7 @@ const browserResourceSources: Array<ResourceSource> = [
         <ProjectResourcesChooser
           project={props.project}
           onResourcesSelected={props.onResourcesSelected}
+          // $FlowFixMe[incompatible-type]
           resourceKind={kind}
           key={`project-resources-${kind}`}
           multiSelection={props.options.multiSelection}
@@ -310,6 +316,7 @@ const browserResourceSources: Array<ResourceSource> = [
   }),
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => {
     const sourceName = `url-chooser-${kind}`;
+    // $FlowFixMe[incompatible-type]
     return {
       name: sourceName,
       displayName: t`Use a public URL`,

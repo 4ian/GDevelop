@@ -211,7 +211,7 @@ const interpolateElementId = ({
   ) {
     const splittedElementId = elementId.split(':');
     const sceneKey = splittedElementId[1];
-    // $FlowFixMe - We're confident the data is reliable
+    // $FlowFixMe[incompatible-type] - We're confident the data is reliable
     const editorType: EditorIdentifier = splittedElementId[2];
     if (!editorType) {
       throw new Error(
@@ -268,7 +268,7 @@ const containsProjectDataToDisplay = (text?: TranslatedText): boolean => {
   if (!text) return false;
   if (text.messageByLocale) {
     return Object.values(text.messageByLocale).some(localizedText =>
-      // $FlowFixMe - known error where Flow returns mixed for object value https://github.com/facebook/flow/issues/2221
+      // $FlowFixMe[incompatible-type] - known error where Flow returns mixed for object value https://github.com/facebook/flow/issues/2221
       localizedText.includes(
         `$(${textInterpolationProjectDataAccessors.instancesCount}`
       )
@@ -346,7 +346,7 @@ const getInputValue = (element: HTMLElement): any => {
   }
   // Flow errors on missing value prop in generic type HTMLElement but this
   // line cannot break.
-  // $FlowFixMe
+  // $FlowFixMe[incompatible-type]
   return element.value;
 };
 
@@ -371,7 +371,7 @@ const gatherProjectDataOnMultipleSteps = ({
 
     if (mapProjectData) {
       Object.entries(mapProjectData).forEach(
-        // $FlowFixMe - Object.entries does not keep value type
+        // $FlowFixMe[incompatible-type] - Object.entries does not keep value type
         ([key, dataAccessor]: [string, string]) => {
           if (dataAccessor === 'projectLastSceneName') {
             if (!project) return;

@@ -117,6 +117,7 @@ export const enumerateObjectFolderOrObjects = (
 
       enumerateObjectFolderOrObjects(child).forEach(
         ({ folderName, objects }) => {
+          // $FlowFixMe[method-unbinding]
           currentFolderObjects.push.apply(currentFolderObjects, objects);
         }
       );

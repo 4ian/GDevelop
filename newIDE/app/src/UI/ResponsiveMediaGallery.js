@@ -172,6 +172,7 @@ const ResponsiveMediaGallery = ({mediaItems, altTextTemplate, horizontalOuterMar
                 spacing={GRID_SPACING}
                 wrap="nowrap"
                 style={styles.mobileGrid}
+                // $FlowFixMe[cannot-resolve-name]
                 onScroll={(event: SyntheticEvent<HTMLDivElement>) =>
                   setMobileGridScrollX(event.currentTarget.scrollLeft)
                 }
@@ -251,6 +252,7 @@ const ResponsiveMediaGallery = ({mediaItems, altTextTemplate, horizontalOuterMar
                 index === selectedMediaIndex ? 'solid 1px white' : undefined,
             }}
             onKeyPress={(
+              // $FlowFixMe[cannot-resolve-name]
               event: SyntheticKeyboardEvent<HTMLLIElement>
             ): void => {
               if (shouldValidate(event)) {

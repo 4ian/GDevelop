@@ -11,11 +11,17 @@ import {
  * functions that take event objects as input
  */
 const makeKeyEvent = (
+  // $FlowFixMe[missing-local-annot]
   ctrlKey,
+  // $FlowFixMe[missing-local-annot]
   shiftKey,
+  // $FlowFixMe[missing-local-annot]
   altKey,
+  // $FlowFixMe[missing-local-annot]
   code,
+  // $FlowFixMe[missing-local-annot]
   keyCode
+// $FlowFixMe[cannot-resolve-name]
 ): KeyboardEvent => {
   // $FlowIgnore - create fake KeyboardEvent object
   return { ctrlKey, shiftKey, altKey, code, keyCode };

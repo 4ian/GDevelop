@@ -159,6 +159,7 @@ function AssetSwappingDialog({
     [isAssetBeingInstalled, openedAssetShortHeader]
   );
 
+  // $FlowFixMe[value-as-type]
   const assetStore = React.useRef<?AssetStoreInterface>(null);
   const handleClose = React.useCallback(
     () => {

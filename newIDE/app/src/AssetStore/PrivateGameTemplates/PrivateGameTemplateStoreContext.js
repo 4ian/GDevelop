@@ -21,6 +21,7 @@ import { PRIVATE_GAME_TEMPLATES_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTim
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 
 const defaultSearchText = '';
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const excludedTiers = new Set(); // No tiers for game templates.
 const firstGameTemplateIds: Array<any> = [];
 
@@ -153,6 +154,7 @@ export const PrivateGameTemplateStoreStateProvider = ({children}: PrivateGameTem
             fetchedPrivateGameTemplateListingDatas
           );
           const defaultTags = fetchedPrivateGameTemplateListingDatas.reduce(
+            // $FlowFixMe[missing-local-annot]
             (allCategories, privateGameTemplateListingData) => {
               return allCategories.concat(
                 privateGameTemplateListingData.categories.map(category =>
@@ -349,6 +351,7 @@ export const PrivateGameTemplateStoreStateProvider = ({children}: PrivateGameTem
 
   return (
     <PrivateGameTemplateStoreContext.Provider
+      // $FlowFixMe[incompatible-type]
       value={PrivateGameTemplateStoreState}
     >
       {children}

@@ -136,7 +136,7 @@ export const FunctionCallRow: React.ComponentType<Props> = React.memo<Props>(fun
 
       text = result.text;
       details = result.details;
-      hasDetailsToShow = result.hasDetailsToShow;
+      hasDetailsToShow = !!result.hasDetailsToShow;
     } catch (error) {
       console.error('Error rendering function call:', error);
       text = (

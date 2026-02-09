@@ -242,6 +242,7 @@ const getDefaultOrValidBuildSigningOptionsFor = (
 
 type Props = {
   targets: Array<TargetName>,
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   buildSigningOptions: BuildSigningOptions | null,
   onSelectBuildSigningOptions: (BuildSigningOptions | null) => void,

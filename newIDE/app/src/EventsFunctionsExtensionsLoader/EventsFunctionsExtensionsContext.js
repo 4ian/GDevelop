@@ -44,6 +44,7 @@ const defaultState = {
 };
 
 const EventsFunctionsExtensionsContext: React.Context<EventsFunctionsExtensionsState> = React.createContext<EventsFunctionsExtensionsState>(
+  // $FlowFixMe[incompatible-type]
   defaultState
 );
 

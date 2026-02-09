@@ -20,6 +20,7 @@ import {
   ensureIsString,
 } from '../DataValidator';
 
+// $FlowFixMe[cannot-resolve-name]
 export const client: Axios = axios.create({
   baseURL: GDevelopShopApi.baseUrl,
 });
@@ -484,6 +485,7 @@ export const getPurchaseCheckoutUrl = ({
   userEmail: string,
   password?: string,
 |}): string => {
+  // $FlowFixMe[cannot-resolve-name]
   const url = new URL(
     `${GDevelopShopApi.baseUrl}/purchase/action/redirect-to-checkout`
   );
@@ -514,6 +516,7 @@ export const getStripeCheckoutUrl = (
     password?: string,
   |},
 ): any => {
+  // $FlowFixMe[cannot-resolve-name]
   const url = new URL(
     `${GDevelopShopApi.baseUrl}/purchase/action/redirect-to-stripe-checkout`
   );
@@ -533,6 +536,7 @@ export const fetchTokenForPrivateGameTemplateAuthorizationIfNeeded = async ({
   authenticatedUser,
   allResourcePaths,
 }: {|
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   allResourcePaths: Array<string>,
 |}): Promise<?string> => {
@@ -626,6 +630,7 @@ export const canRedeemProduct = ({
     // Condition should look like `gdevelop_gold,gdevelop_startup`.
     const requiredPlanIds = redeemCondition.condition.split(',');
     if (subscription && !subscription.benefitsFromEducationPlan) {
+      // $FlowFixMe[incompatible-type]
       if (requiredPlanIds.includes(subscription.planId)) {
         return { canRedeem: true };
       } else {

@@ -46,6 +46,7 @@ type ResourcesDownloadOutput = {|
   blobFiles: Array<BlobFileDescriptor>,
 |};
 
+// $FlowFixMe[cannot-resolve-name]
 type CompressionOutput = Blob;
 
 const exportPipelineName = 'browser-online-cordova-ios';
@@ -89,6 +90,7 @@ export const browserOnlineCordovaIosExportPipeline: ExportPipeline<
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
   ): Promise<PreparedExporter> => {
+    // $FlowFixMe[incompatible-type]
     return findGDJS('cordova').then(({ gdjsRoot, filesContent }) => {
       console.info('GDJS found in ', gdjsRoot);
 
@@ -100,6 +102,7 @@ export const browserOnlineCordovaIosExportPipeline: ExportPipeline<
         new gd.AbstractFileSystemJS(),
         abstractFileSystem
       );
+      // $FlowFixMe[extra-arg]
       const exporter = new gd.Exporter(fileSystem, gdjsRoot);
 
       return {
@@ -150,6 +153,7 @@ export const browserOnlineCordovaIosExportPipeline: ExportPipeline<
   launchCompression: (
     context: ExportPipelineContext<ExportState>,
     { textFiles, blobFiles }: ResourcesDownloadOutput
+  // $FlowFixMe[cannot-resolve-name]
   ): Promise<Blob> => {
     return archiveFiles({
       blobFiles,
@@ -161,11 +165,13 @@ export const browserOnlineCordovaIosExportPipeline: ExportPipeline<
 
   launchUpload: (
     context: ExportPipelineContext<ExportState>,
+    // $FlowFixMe[cannot-resolve-name]
     blobFile: Blob
   ): Promise<string> => {
     return getBuildFileUploadOptions().then(uploadOptions => {
       return uploadBlobFile(
         blobFile,
+        // $FlowFixMe[incompatible-type]
         uploadOptions,
         context.updateStepProgress
       ).then(() => uploadOptions.key);
@@ -174,6 +180,7 @@ export const browserOnlineCordovaIosExportPipeline: ExportPipeline<
 
   launchOnlineBuild: (
     exportState: ExportState,
+    // $FlowFixMe[value-as-type]
     authenticatedUser: AuthenticatedUser,
     uploadBucketKey: string,
     gameId: string,

@@ -79,8 +79,10 @@ export const getFuseSearchQueryForMultipleKeys = (
 ): { $or: Array<{ $or: Array<any> }> } => {
   const tokenisedSearchQuery = searchText.trim().split(' ');
   const searchQuery: {
+    // $FlowFixMe[value-as-type]
     $or: Fuse.Expression[],
   }[] = tokenisedSearchQuery.map((searchToken: string) => {
+    // $FlowFixMe[value-as-type]
     const orFields: Fuse.Expression[] = keys.map(key => ({
       [key]: searchToken,
     }));
@@ -195,6 +197,7 @@ export const augmentSearchResult = <T>(
 };
 
 export const tuneMatches = <T>(result: SearchResult<T>, searchText: string): any =>
+  // $FlowFixMe[missing-type-arg]
   result.matches.map<SearchMatch>(match => ({
     key: match.key,
     value: match.value,
@@ -208,6 +211,7 @@ export const sortResultsUsingExactMatches = (orderedKeys: Array<string>): (<T>(
   return <T>(
     resultA: AugmentedSearchResult<T>,
     resultB: AugmentedSearchResult<T>
+  // $FlowFixMe[missing-local-annot]
   ) => {
     // First give priority to result that have an exact match at start of word and not the other.
     const resultAExactMatchesAtStartOfWordCount = resultA.matches.filter(
@@ -328,6 +332,7 @@ export const filterSearchResults = <SearchItem: SearchableItem>(
 ): ?Array<SearchResult<SearchItem>> => {
   if (!searchResults) return null;
 
+  // $FlowFixMe[cannot-resolve-name]
   const startTime = performance.now();
   const filteredSearchResults = searchResults
     .filter(({ item }) => {
@@ -384,11 +389,12 @@ export const filterSearchResults = <SearchItem: SearchableItem>(
       return passTier && passChosenFilters;
     })
     .filter(({ item }) => {
-      //$FlowFixMe Only categories are excluded.
+      // $FlowFixMe[incompatible-type] Only categories are excluded.
       const category: ObjectCategory = item;
       return (isSearchTextEmpty && !chosenItemCategory) || !category.categoryId;
     });
 
+  // $FlowFixMe[cannot-resolve-name]
   const totalTime = performance.now() - startTime;
   console.info(
     `Filtered items by category/filters/tier in ${totalTime.toFixed(3)}ms.`
@@ -452,6 +458,7 @@ export const useSearchStructuredItem = <SearchItem: SearchableItem>(
         return;
       }
 
+      // $FlowFixMe[cannot-resolve-name]
       const startTime = performance.now();
       if (searchApiRef.current) {
         searchApiRef.current = null;
@@ -473,6 +480,7 @@ export const useSearchStructuredItem = <SearchItem: SearchableItem>(
           findAllMatches: true,
         });
 
+        // $FlowFixMe[cannot-resolve-name]
         const totalTime = performance.now() - startTime;
         console.info(
           `Indexed ${
@@ -512,6 +520,7 @@ export const useSearchStructuredItem = <SearchItem: SearchableItem>(
           return;
         }
 
+        // $FlowFixMe[cannot-resolve-name]
         const startTime = performance.now();
         const results = searchApi.search(
           getFuseSearchQueryForMultipleKeys(searchText, [
@@ -521,6 +530,7 @@ export const useSearchStructuredItem = <SearchItem: SearchableItem>(
             'tags',
           ])
         );
+        // $FlowFixMe[cannot-resolve-name]
         const totalTime = performance.now() - startTime;
         console.info(
           `Found ${results.length} items in ${totalTime.toFixed(3)}ms.`

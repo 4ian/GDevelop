@@ -44,6 +44,7 @@ type Props = {|
   isCondition: boolean,
   resourceManagementProps: ResourceManagementProps,
   style?: Object,
+  // $FlowFixMe[cannot-resolve-name]
   anchorEl: ?HTMLElement,
   isNewInstruction: boolean,
   onCancel: () => void,
@@ -115,6 +116,7 @@ const InstructionEditorMenu = (
   const [
     currentInstructionOrObjectSelectorTab,
     setCurrentInstructionOrObjectSelectorTab,
+  // $FlowFixMe[value-as-type]
   ] = React.useState<TabName>('objects');
   const instructionType: string = instruction.getType();
 

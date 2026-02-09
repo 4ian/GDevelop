@@ -43,7 +43,9 @@ type Props<Item> = {|
 export default class SortableVirtualizedItemList<Item> extends React.Component<
   Props<Item>
 > {
+  // $FlowFixMe[value-as-type]
   _list: ?List;
+  // $FlowFixMe[missing-local-annot]
   DragSourceAndDropTarget = makeDragSourceAndDropTarget<Item>(this.props.reactDndType) as any;
 
   forceUpdateGrid() {
@@ -123,6 +125,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     const { DragSourceAndDropTarget } = this;
 
     // Create an empty pixel image once to override the default drag preview of all items.
+    // $FlowFixMe[cannot-resolve-name]
     const emptyImage = new Image();
     emptyImage.src =
       'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
@@ -222,7 +225,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                                 ? getItemThumbnail(item)
                                 : undefined,
                           };
-                          // $FlowFixMe
+                          // $FlowFixMe[incompatible-type]
                           return draggedItem;
                         }}
                         canDrag={() => canDrag}

@@ -9,6 +9,7 @@ import ColorPicker from '../UI/ColorField/ColorPicker';
 
 export const backgroundColorId = 'background-color';
 
+// $FlowFixMe[value-as-type]
 export class BackgroundColorTreeViewItemContent implements TreeViewItemContent {
   layout: gdLayout;
   onBackgroundColorChanged: () => void;
@@ -84,6 +85,7 @@ export class BackgroundColorTreeViewItemContent implements TreeViewItemContent {
 
   moveAt(destinationIndex: number): void {}
 
+  // $FlowFixMe[value-as-type]
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return false;
   }

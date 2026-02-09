@@ -62,6 +62,7 @@ const ColorPicker = (
     size
   }: Props,
 ): React.Node => {
+  // $FlowFixMe[cannot-resolve-name]
   const swatchRef = React.useRef<?HTMLDivElement>(null);
   const [displayColorPicker, setDisplayColorPicker] = React.useState(false);
 
@@ -115,7 +116,9 @@ const ColorPicker = (
           style={styles.popover}
         >
           <SketchPicker
+            // $FlowFixMe[incompatible-type]
             color={displayedColor}
+            // $FlowFixMe[incompatible-type]
             onChange={onChange}
             onChangeComplete={onChangeComplete}
             disableAlpha={disableAlpha}

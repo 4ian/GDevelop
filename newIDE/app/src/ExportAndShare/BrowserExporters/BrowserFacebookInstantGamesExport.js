@@ -47,6 +47,7 @@ type ResourcesDownloadOutput = {|
   blobFiles: Array<BlobFileDescriptor>,
 |};
 
+// $FlowFixMe[cannot-resolve-name]
 type CompressionOutput = Blob;
 
 const exportPipelineName = 'browser-facebook-instant-games';
@@ -75,6 +76,7 @@ export const browserFacebookInstantGamesExportPipeline: ExportPipeline<
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
   ): Promise<PreparedExporter> => {
+    // $FlowFixMe[incompatible-type]
     return findGDJS('facebook-instant-games').then(
       ({ gdjsRoot, filesContent }) => {
         console.info('GDJS found in ', gdjsRoot);
@@ -88,6 +90,7 @@ export const browserFacebookInstantGamesExportPipeline: ExportPipeline<
           new gd.AbstractFileSystemJS(),
           abstractFileSystem
         );
+        // $FlowFixMe[extra-arg]
         const exporter = new gd.Exporter(fileSystem, gdjsRoot);
 
         return {
@@ -139,6 +142,7 @@ export const browserFacebookInstantGamesExportPipeline: ExportPipeline<
   launchCompression: (
     context: ExportPipelineContext<ExportState>,
     { textFiles, blobFiles }: ResourcesDownloadOutput
+  // $FlowFixMe[cannot-resolve-name]
   ): Promise<Blob> => {
     return archiveFiles({
       blobFiles,

@@ -18,6 +18,7 @@ global.gd = {
 // Will contain the result of makeTestProject
 export let testProject: TestProject =
   // $FlowExpectedError - make a "bad" object on purpose to ease debugging
+  // $FlowFixMe[incompatible-type]
   {
     I_AM_NOT_YET_INITIALIZED_YOU_MUST_USE_TESTPROJECT_INSIDE_A_STORY_ONLY: true,
   };
@@ -38,8 +39,10 @@ const GDevelopJsInitializer = ({ children }: GDevelopJsInitializerProps) => {
     console.info(
       'Loading GDevelop.js and creating test extensions/test project...'
     );
+    // $FlowFixMe[cannot-resolve-name]
     GD_STARTUP_TIMES.push(['initializeGDevelopJsCall', performance.now()]);
     initializeGDevelopJs().then(gd => {
+      // $FlowFixMe[cannot-resolve-name]
       GD_STARTUP_TIMES.push(['initializeGDevelopJsDone', performance.now()]);
       // We're **updating** the global "gd" object here. This is done so that
       // the source files that are using `global.gd` have the proper reference to the
@@ -57,9 +60,11 @@ const GDevelopJsInitializer = ({ children }: GDevelopJsInitializerProps) => {
       // already got a reference to it.
       const newTestProject = makeTestProject(gd);
       for (let key in newTestProject) {
+        // $FlowFixMe[invalid-computed-prop][prop-missing]
         testProject[key] = newTestProject[key];
       }
       // $FlowExpectedError - clean the "bad" object made on purpose to ease debugging
+      // $FlowFixMe[prop-missing]
       delete testProject.I_AM_NOT_YET_INITIALIZED_YOU_MUST_USE_TESTPROJECT_INSIDE_A_STORY_ONLY;
 
       console.info(
@@ -68,6 +73,7 @@ const GDevelopJsInitializer = ({ children }: GDevelopJsInitializerProps) => {
 
       GD_STARTUP_TIMES.push([
         'initializeTestExtensionsAndProject',
+        // $FlowFixMe[cannot-resolve-name]
         performance.now(),
       ]);
       console.info('Startup times summary:', getStartupTimesSummary());

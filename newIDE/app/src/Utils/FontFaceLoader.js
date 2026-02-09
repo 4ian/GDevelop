@@ -7,8 +7,9 @@ import { checkIfCredentialsRequired } from './CrossOrigin';
  * to load a font from an url and be notified when loading is done (or failed).
  */
 export const loadFontFace = (fontFamily: string, src: string): any => {
-  // $FlowFixMe - FontFace not recognised by Flow.
+  // $FlowFixMe[cannot-resolve-name][incompatible-type] - FontFace not recognised by Flow.
   if (typeof FontFace !== 'undefined') {
+    // $FlowFixMe[cannot-resolve-name]
     return fetch(src, {
       credentials: checkIfCredentialsRequired(src)
         ? // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
@@ -32,9 +33,10 @@ export const loadFontFace = (fontFamily: string, src: string): any => {
         return response.arrayBuffer();
       })
       .then(arrayBuffer => {
+        // $FlowFixMe[cannot-resolve-name]
         const fontFace = new FontFace(fontFamily, arrayBuffer, {});
 
-        // $FlowFixMe - FontFace not recognised by Flow.
+        // $FlowFixMe[cannot-resolve-name][incompatible-type] - FontFace not recognised by Flow.
         document.fonts.add(fontFace);
       });
   } else {
@@ -44,8 +46,10 @@ export const loadFontFace = (fontFamily: string, src: string): any => {
 
     // Add @font-face and use FontFaceObserver to be notified when the
     // font is ready.
+    // $FlowFixMe[cannot-resolve-name]
     const newStyle = document.createElement('style');
     newStyle.appendChild(
+      // $FlowFixMe[cannot-resolve-name]
       document.createTextNode(
         `@font-face {
           font-family: ${fontFamily};
@@ -54,7 +58,7 @@ export const loadFontFace = (fontFamily: string, src: string): any => {
       )
     );
 
-    // $FlowFixMe
+    // $FlowFixMe[cannot-resolve-name][incompatible-type]
     document.head.appendChild(newStyle);
     return new FontFaceObserver(fontFamily, {}).load().catch(err => {
       console.warn(`Error while loading font ${fontFamily}`, err);

@@ -938,6 +938,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(functi
       ) : shouldBeWorkingIfNotPaused ? (
         <Line justifyContent="flex-start">
           <div className={classes.thinkingText}>
+            // $FlowFixMe[constant-condition]
             {onPause && aiRequest.mode === 'agent' && (
               <IconButton
                 onClick={() => onPause(!isPaused)}

@@ -288,7 +288,9 @@ const CustomObjectPropertiesEditor = (props: Props): React.Node => {
     [animations, project, forceUpdate]
   );
 
+  // $FlowFixMe[value-as-type]
   const scrollView = React.useRef<?ScrollViewInterface>(null);
+  // $FlowFixMe[value-as-type]
   const animationList = React.useRef<?AnimationListInterface>(null);
 
   const [

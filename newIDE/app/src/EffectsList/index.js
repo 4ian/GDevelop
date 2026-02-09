@@ -50,6 +50,7 @@ import {
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
 import CopyIcon from '../UI/CustomSvgIcons/Copy';
+// $FlowFixMe[missing-export]
 import { type ConnectDragSource } from 'react-dnd';
 import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
@@ -62,9 +63,11 @@ const gd: libGDevelop = global.gd;
 
 const EFFECTS_CLIPBOARD_KIND = 'Effects';
 
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget2D = makeDragSourceAndDropTarget(
   '2d-effects-list'
 );
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget3D = makeDragSourceAndDropTarget(
   '3d-effects-list'
 );
@@ -135,6 +138,7 @@ const Effect = React.forwardRef(
       setNameErrors: (nameErrors: { [number]: React.Node }) => void,
       connectDragSource: ConnectDragSource,
     |},
+    // $FlowFixMe[missing-local-annot]
     ref
   ) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -565,6 +569,7 @@ export const useManageEffects = ({
   );
 
   const pasteEffects = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     async effectInsertionIndex => {
       const clipboardContent = Clipboard.get(EFFECTS_CLIPBOARD_KIND);
       const effectContents = SafeExtractor.extractArray(clipboardContent);
@@ -646,6 +651,7 @@ export const useManageEffects = ({
         setJustAddedEffectName(existingNamedEffects[0].name);
       }
       if (firstAddedEffectName || shouldOverrideEffects) {
+        // $FlowFixMe[constant-condition]
         if (onEffectsUpdated) onEffectsUpdated();
       }
     },
@@ -781,6 +787,7 @@ export default function EffectsList(props: Props): React.Node {
     project,
     target,
   } = props;
+  // $FlowFixMe[value-as-type]
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const justAddedEffectElement = React.useRef<?any>(null);
 

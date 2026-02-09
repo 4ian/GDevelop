@@ -12,6 +12,7 @@ import { type EnumeratedExpressionMetadata } from './EnumeratedInstructionOrExpr
 const gd: libGDevelop = global.gd;
 
 // $FlowExpectedError
+// $FlowFixMe[cannot-resolve-name][missing-local-annot]
 const makeFakeI18n = (fakeI18n): I18nType => ({
   ...fakeI18n,
   _: message => message.id,
@@ -223,7 +224,7 @@ describe('EnumerateExpressions', () => {
     // Check that some free expressions are there
     expect(allExpressionsTree).toHaveProperty('General');
     const generalTreeNode: TreeNode<EnumeratedExpressionMetadata> =
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
       allExpressionsTree['General'];
     expect(generalTreeNode).toMatchObject({
       'Timers and time': {
@@ -245,7 +246,7 @@ describe('EnumerateExpressions', () => {
     // Check that some base object expressions are there
     expect(generalTreeNode).toHaveProperty('Objects');
     expect(
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
       generalTreeNode['Objects']
     ).toMatchObject({
       Angle: {
@@ -265,7 +266,7 @@ describe('EnumerateExpressions', () => {
 
     // Check that some Sprite object expressions are there
     expect(generalTreeNode).toHaveProperty('Sprite');
-    // $FlowFixMe
+    // $FlowFixMe[incompatible-type]
     expect(generalTreeNode['Sprite']).toMatchObject({
       Position: {
         PointX: {
@@ -284,10 +285,10 @@ describe('EnumerateExpressions', () => {
 
     // Check that some behavior expressions are there
     const movementTreeNode: TreeNode<EnumeratedExpressionMetadata> =
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
       allExpressionsTree['Movement'];
     expect(movementTreeNode).toHaveProperty('Platform behavior');
-    // $FlowFixMe
+    // $FlowFixMe[incompatible-type]
     expect(movementTreeNode['Platform behavior']).toMatchObject({
       'Platformer configuration': {
         MaxSpeed: {

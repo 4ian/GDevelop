@@ -57,7 +57,9 @@ const getIdentifierFromUnits = (units: {|
   let identifier = '';
   for (let index = biggestUnitIndex; index <= smallestUnitIndex; index++) {
     const unit = orderedTimeUnits[index];
+    // $FlowFixMe[invalid-computed-prop]
     identifier += `${unitToAbbreviation[unit]}${
+      // $FlowFixMe[invalid-computed-prop]
       index === smallestUnitIndex ? '' : unitToNextSeparator[unit]
     }`;
   }
@@ -75,6 +77,7 @@ const unitSelectOptions = orderedTimeUnits.reduce(
         biggestUnit: orderedTimeUnits[currentUnitIndex],
         smallestUnit: orderedTimeUnits[otherUnitIndex],
       };
+      // $FlowFixMe[incompatible-type][prop-missing]
       acc[getIdentifierFromUnits(selectedUnits)] = selectedUnits;
     }
     return acc;
@@ -224,6 +227,7 @@ function LeaderboardAppearanceDialog({
               suffix,
               precision,
             }
+          // $FlowFixMe[invalid-computed-prop]
           : { type: scoreType, ...unitSelectOptions[timeUnits] },
       theme: canUseTheme
         ? {
@@ -594,6 +598,7 @@ function LeaderboardAppearanceDialog({
                   scoreType === 'time'
                     ? {
                         type: scoreType,
+                        // $FlowFixMe[invalid-computed-prop]
                         ...unitSelectOptions[timeUnits],
                       }
                     : {

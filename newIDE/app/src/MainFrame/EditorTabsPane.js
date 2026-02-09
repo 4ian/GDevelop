@@ -297,7 +297,7 @@ type Props = {|
   ) => void,
 |};
 
-const EditorTabsPane: component(...{ ...Props, +ref?: React.RefSetter<{}> }) React.Node = React.forwardRef<Props, {||}>((props, ref) => {
+const EditorTabsPane: React.ComponentType<Props> = React.forwardRef<Props, {||}>((props, ref) => {
   const {
     editorTabs,
     currentProject,
@@ -398,9 +398,11 @@ const EditorTabsPane: component(...{ ...Props, +ref?: React.RefSetter<{}> }) Rea
     projectPath,
   } = props;
 
+  // $FlowFixMe[value-as-type]
   const toolbarRef = React.useRef<?ToolbarInterface>(null);
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const askAiPaneIdentifier = getEditorTabOpenedWithKey(editorTabs, 'ask-ai');
+  // $FlowFixMe[cannot-resolve-name]
   const containerRef = React.useRef<?HTMLDivElement>(null);
 
   const [

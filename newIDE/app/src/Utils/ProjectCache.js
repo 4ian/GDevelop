@@ -9,21 +9,27 @@ const keyName = 'userProjectKey';
 type ProjectCacheKey = {| userId: string, cloudProjectId: string |};
 
 class ProjectCache {
+  // $FlowFixMe[cannot-resolve-name]
   databasePromise: Promise<IDBDatabase> | null;
 
   static isAvailable(): any {
     return (
+      // $FlowFixMe[cannot-resolve-name]
       typeof window !== 'undefined' &&
+      // $FlowFixMe[cannot-resolve-name]
       'indexedDB' in window &&
       // Firefox <= 125 does not support the `databases()` method that is necessary to
       // fix the issue of corrupted databases (that do not contain the object store `objectStoreScope`).
+      // $FlowFixMe[cannot-resolve-name]
       'databases' in window.indexedDB &&
+      // $FlowFixMe[cannot-resolve-name]
       typeof window.indexedDB.databases === 'function'
     );
   }
 
   static async burst(): any {
     if (!ProjectCache.isAvailable()) return;
+    // $FlowFixMe[cannot-resolve-name]
     const databases = await window.indexedDB.databases();
     if (
       !databases.find(
@@ -34,6 +40,7 @@ class ProjectCache {
       return;
     }
     return new Promise(resolve => {
+      // $FlowFixMe[cannot-resolve-name]
       const request = window.indexedDB.open(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
       request.onsuccess = event => {
         const db = event.target.result;
@@ -61,6 +68,7 @@ class ProjectCache {
   }
 
   static async _removeDatabaseIfCorrupt(): Promise<void> {
+    // $FlowFixMe[cannot-resolve-name]
     const databases = await window.indexedDB.databases();
     if (
       !databases.find(
@@ -74,6 +82,7 @@ class ProjectCache {
     // not exist. If it does not exist, the autosave feature won't work and the database
     // needs to be removed and recreated.
     await new Promise((resolve, reject) => {
+      // $FlowFixMe[cannot-resolve-name]
       const request = window.indexedDB.open(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
       request.onsuccess = event => {
         const db = event.target.result;
@@ -85,6 +94,7 @@ class ProjectCache {
             'The cloud project autosave indexed db exist but the object store is not available. Deleting the indexedDB...'
           );
           db.close();
+          // $FlowFixMe[cannot-resolve-name]
           const req = window.indexedDB.deleteDatabase(
             CLOUD_PROJECT_AUTOSAVE_CACHE_KEY
           );
@@ -110,9 +120,11 @@ class ProjectCache {
 
   _initializeDatabase(): any {
     if (!this.databasePromise) {
+      // $FlowFixMe[cannot-resolve-name][missing-local-annot]
       this.databasePromise = new Promise<IDBDatabase>((resolve, reject) => {
         ProjectCache._removeDatabaseIfCorrupt().then(
           () => {
+            // $FlowFixMe[cannot-resolve-name]
             const request = window.indexedDB.open(
               CLOUD_PROJECT_AUTOSAVE_CACHE_KEY
             );

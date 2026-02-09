@@ -33,6 +33,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
 > {
   canDoNetworkPreview = (): any => false;
 
+  // $FlowFixMe[missing-local-annot]
   state = {
     error: null,
   };
@@ -42,6 +43,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
     exporter: gdjsExporter,
     browserS3FileSystem: BrowserS3FileSystem,
   |}> => {
+    // $FlowFixMe[incompatible-type]
     return findGDJS('preview').then(({ gdjsRoot, filesContent }) => {
       console.info('GDJS found in ', gdjsRoot);
 
@@ -57,7 +59,9 @@ export default class BrowserS3PreviewLauncher extends React.Component<
         new gd.AbstractFileSystemJS(),
         browserS3FileSystem
       );
+      // $FlowFixMe[extra-arg]
       const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+      // $FlowFixMe[prop-missing]
       exporter.setCodeOutputDirectory(outputDir);
 
       return {
@@ -113,6 +117,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
 
     try {
       await this.getPreviewDebuggerServer().startServer({
+        // $FlowFixMe[cannot-resolve-name]
         origin: new URL(getBaseUrl()).origin,
       });
     } catch (err) {
@@ -243,6 +248,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
 
       // Change the HTML file displayed by the preview window so that it starts loading
       // the game.
+      // $FlowFixMe[cannot-resolve-name]
       previewWindows.forEach((previewWindow: WindowProxy) => {
         previewWindow.location = outputDir + '/index.html';
         try {
@@ -253,6 +259,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       // If the preview windows are new, register them so that they can be accessed
       // by the debugger and for the captures to be detected when they close.
       if (!existingPreviewWindow) {
+        // $FlowFixMe[cannot-resolve-name]
         previewWindows.forEach((previewWindow: WindowProxy) => {
           const debuggerId = registerNewPreviewWindow(previewWindow);
           browserPreviewDebuggerServer.registerCallbacks({

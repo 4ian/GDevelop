@@ -6,10 +6,12 @@ export type ClientCoordinates = {|
   +clientX: number,
   /* The Y position, relative to the viewport, not including scroll offset, of the long touch */
   +clientY: number,
+  // $FlowFixMe[cannot-resolve-name]
   +currentTarget: EventTarget,
 |};
 
 // Find the position of an event on the screen
+// $FlowFixMe[cannot-resolve-name]
 const getClientXY = (event: TouchEvent): ClientCoordinates => {
   if (event.touches && event.touches.length > 0) {
     return {
@@ -74,6 +76,7 @@ export const useLongTouch = (
       // Cancel the long touch if scrolling (otherwise we can get a long touch
       // being activated while scroll and maintaining the touch on an element,
       // which is weird for the user that just want to scroll).
+      // $FlowFixMe[cannot-resolve-name]
       document.addEventListener('scroll', clear, {
         // Get notified as soon as the scroll happens.
         capture: true,
@@ -89,6 +92,7 @@ export const useLongTouch = (
         clear();
 
         // Remove the listener for the scroll
+        // $FlowFixMe[cannot-resolve-name]
         document.removeEventListener('scroll', clear, { capture: true });
       };
     },
@@ -96,6 +100,7 @@ export const useLongTouch = (
   );
 
   const start = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (event: TouchEvent) => {
       // Ensure we remove the timeout waiting for the long press
       // if there is one already. This can happen if start is called
@@ -116,6 +121,7 @@ export const useLongTouch = (
   );
 
   const onMove = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (event: TouchEvent) => {
       // If more than one touch,
       // it's not a long press anymore.

@@ -91,6 +91,7 @@ export const getObjectFolderTreeViewItemId = (
   return `object-folder-${objectFolder.ptr}`;
 };
 
+// $FlowFixMe[value-as-type]
 export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   objectFolder: gdObjectFolderOrObject;
   _isGlobal: boolean;
@@ -110,6 +111,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     return this.objectFolder;
   }
 
+  // $FlowFixMe[value-as-type]
   isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean {
     const objectFolderOrObject = treeViewItemContent.getObjectFolderOrObject();
     return (
@@ -118,6 +120,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     );
   }
 
+  // $FlowFixMe[value-as-type]
   isSibling(treeViewItemContent: TreeViewItemContent): boolean {
     const objectFolderOrObject = treeViewItemContent.getObjectFolderOrObject();
     return (

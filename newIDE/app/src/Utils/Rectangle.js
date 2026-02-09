@@ -23,6 +23,7 @@ export default class Rectangle {
     this.zMax = zMax;
   }
 
+  // $FlowFixMe[cannot-resolve-name]
   static fromDOMRect(domRect: DOMRect | ClientRect): any {
     return new this(domRect.left, domRect.top, domRect.right, domRect.bottom);
   }

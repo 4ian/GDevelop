@@ -214,14 +214,18 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     shouldHideMenuIcon,
   }: Props<Item>,
   ref: TreeViewInterface<Item>
+// $FlowFixMe[missing-local-annot]
 ) => {
   const selectedNodeIds = selectedItems.map(getItemId);
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>(
     initiallyOpenedNodeIds || []
   );
   const [renamedItemId, setRenamedItemId] = React.useState<?string>(null);
+  // $FlowFixMe[value-as-type]
   const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
+  // $FlowFixMe[cannot-resolve-name]
   const containerRef = React.useRef<?HTMLDivElement>(null);
+  // $FlowFixMe[value-as-type]
   const listRef = React.useRef<?FixedSizeList>(null);
   const [
     openedDuringSearchNodeIds,
@@ -232,6 +236,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
   const [animatedItemId, setAnimatedItemId] = React.useState<string>('');
 
   const isSearching = !!searchText;
+  // $FlowFixMe[definition-cycle][recursive-definition]
   const flattenNode = React.useCallback(
     (
       item: Item,
@@ -439,7 +444,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
       if (list) {
         // Browse flattenedData in reverse order since scrollToItem is mainly used
         // to scroll to newly added object that is appended at the end of the list.
-        // $FlowFixMe - Method introduced in 2022.
+        // $FlowFixMe[incompatible-type] - Method introduced in 2022.
         const index = flattenedData.findLastIndex(node => node.id === itemId);
         if (index >= 0) {
           list.scrollToItem(index, placement);
@@ -533,7 +538,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
   );
 
   React.useImperativeHandle(
-    // $FlowFixMe
+    // $FlowFixMe[incompatible-type]
     ref,
     () => ({
       forceUpdateList: forceUpdate,
@@ -552,6 +557,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
 
   const DragSourceAndDropTarget = React.useMemo(
     () =>
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       makeDragSourceAndDropTarget(reactDndType, {
         vibrate: 100,
       }),
@@ -614,6 +620,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
   );
 
   const onKeyDown = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (event: KeyboardEvent) => {
       if (!navigationKeys.includes(event.key)) return;
       let newFocusedItem;
@@ -635,6 +642,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
         ) {
           i += 1;
           if (i > flattenedData.length - 1) {
+            // $FlowFixMe[incompatible-type]
             newFocusedNode = null;
           }
           newFocusedNode = flattenedData[i];
@@ -652,6 +660,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
             (newFocusedNode.item.isRoot || newFocusedNode.item.isPlaceholder)
           ) {
             if (itemIndexInFlattenedData + delta > flattenedData.length - 1) {
+              // $FlowFixMe[incompatible-type]
               newFocusedNode = null;
             }
             delta += 1;
@@ -671,6 +680,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
             (newFocusedNode.item.isRoot || newFocusedNode.item.isPlaceholder)
           ) {
             if (itemIndexInFlattenedData + delta < 0) {
+              // $FlowFixMe[incompatible-type]
               newFocusedNode = null;
             }
             delta -= 1;
@@ -737,7 +747,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
           itemKey={index => flattenedData[index].id}
           // Flow does not seem to accept the generic used in FixedSizeList
           // can itself use a generic.
-          // $FlowFixMe
+          // $FlowFixMe[incompatible-type]
           itemData={itemData}
           ref={listRef}
           // Keep overscanCount relatively high so that:
@@ -763,11 +773,12 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
 
 // Define the polymorphic component type that will be exported:
 type TreeViewComponent = <Item: ItemBaseAttributes>(
+  // $FlowFixMe[prop-missing]
   Props<Item> & { +ref?: React.Ref<TreeViewInterface<Item>> }
 ) => React.Node;
 
 // Search for "treeview typing issues" in the codebase.
-// $FlowFixMe - InnerTreeView ref is not properly typed.
+// $FlowFixMe[incompatible-exact][incompatible-type] - InnerTreeView ref is not properly typed.
 const TreeView: TreeViewComponent = (React.forwardRef(InnerTreeView): any);
 
 // ✅ Properly-typed generic export:

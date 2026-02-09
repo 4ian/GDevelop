@@ -30,6 +30,7 @@ const getErrorMessage = (error: ?Error) => {
 
 export const UsersAutocomplete = ({userIds, onChange, floatingLabelText, helperText, disabled}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
+  // $FlowFixMe[value-as-type]
   const [users, setUsers] = React.useState<Array<AutocompleteOption>>([]);
   const [userInput, setUserInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -47,6 +48,7 @@ export const UsersAutocomplete = ({userIds, onChange, floatingLabelText, helperT
     setCompletionUserPublicProfiles,
   ] = React.useState<Array<UserPublicProfile>>([]);
   const [error, setError] = React.useState(null);
+  // $FlowFixMe[value-as-type]
   const autocompleteRef = React.useRef<?SemiControlledMultiAutoCompleteInterface>(
     null
   );

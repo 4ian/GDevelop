@@ -52,11 +52,13 @@ export const initialLeaderboardState = {
   updateLeaderboard: async () => {},
   resetLeaderboard: async () => {},
   deleteLeaderboard: async () => {},
+  // $FlowFixMe[missing-local-annot][signature-verification-failure]
   deleteLeaderboardEntry: async entryId => {},
   fetchLeaderboardEntries: async () => {},
 };
 
 const LeaderboardContext: React.Context<LeaderboardState> = React.createContext<LeaderboardState>(
+  // $FlowFixMe[incompatible-type]
   initialLeaderboardState
 );
 

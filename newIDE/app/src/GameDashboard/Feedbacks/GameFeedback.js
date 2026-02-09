@@ -47,6 +47,7 @@ const styles = {
 };
 
 type Props = {|
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   game: Game,
   i18n: I18nType,
@@ -79,6 +80,7 @@ const groupFeedbacks = (
 ): { [buildIdOrDate: string]: Array<Comment> } => {
   const feedbacksByBuild = feedbacks
     .slice(pageSize * (currentPage - 1), pageSize * currentPage)
+    // $FlowFixMe[incompatible-type]
     .reduce((acc, feedback) => {
       if (build) {
         if (!feedback.buildId) {
@@ -123,6 +125,7 @@ const getDisplayedFeedbacks = (
 };
 
 const GameFeedback = ({i18n, authenticatedUser, game}: Props): React.Node => {
+  // $FlowFixMe[value-as-type]
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const [showProcessed, setShowProcessed] = React.useState(false);
@@ -174,6 +177,7 @@ const GameFeedback = ({i18n, authenticatedUser, game}: Props): React.Node => {
   );
 
   const onCurrentPageChange = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     newPage => {
       const minPage = 1;
       const maxPage = totalNumberOfPages;
@@ -236,6 +240,7 @@ const GameFeedback = ({i18n, authenticatedUser, game}: Props): React.Node => {
         ]);
         setFeedbacks(feedbacks);
         const buildsByIds = builds.reduce((acc, build) => {
+          // $FlowFixMe[prop-missing]
           acc[build.id] = build;
           return acc;
         }, {});
@@ -280,6 +285,7 @@ const GameFeedback = ({i18n, authenticatedUser, game}: Props): React.Node => {
     [loadFeedbacksAndBuilds]
   );
 
+  // $FlowFixMe[cannot-resolve-name]
   const openOptionsContextMenu = (event: MouseEvent) => {
     if (contextMenu.current) {
       contextMenu.current.open(event.clientX, event.clientY);
@@ -553,6 +559,7 @@ const GameFeedback = ({i18n, authenticatedUser, game}: Props): React.Node => {
                                 <FeedbackCard
                                   key={comment.id}
                                   comment={comment}
+                                  // $FlowFixMe[incompatible-type]
                                   buildProperties={getBuildPropertiesForComment(
                                     comment
                                   )}

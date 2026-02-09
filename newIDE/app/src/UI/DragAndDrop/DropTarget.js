@@ -61,6 +61,7 @@ export const makeDropTarget = <DraggedItemType>(
     };
   }
 
+  // $FlowFixMe[incompatible-variance]
   const InnerDropTarget = DropTarget(reactDndType, targetSpec, targetCollect)(
     ({ children, connectDropTarget, isOver, isOverLazy, canDrop }) => {
       return children({

@@ -70,6 +70,7 @@ export const LoadingScreenEditor = (
     projectScopedContainersAccessor
   }: Props,
 ): React.Node => {
+  // $FlowFixMe[value-as-type]
   const subscriptionChecker = React.useRef<?SubscriptionCheckerInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const forceUpdate = useForceUpdate();

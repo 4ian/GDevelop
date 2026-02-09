@@ -63,6 +63,7 @@ type State = {|
  * Start the debugger server, listen to commands received and issue commands to it.
  */
 export default class Debugger extends React.Component<Props, State> {
+  // $FlowFixMe[missing-local-annot]
   state = {
     debuggerServerState: this.props.previewDebuggerServer.getServerState() as "started" | "stopped",
     debuggerServerError: null,
@@ -204,6 +205,7 @@ export default class Debugger extends React.Component<Props, State> {
       onConnectionErrored: ({ id, errorMessage }) => {
         this._getLogsManager(id).addLog({
           type: 'error',
+          // $FlowFixMe[cannot-resolve-name]
           timestamp: performance.now(),
           group: 'Debugger connection',
           message: 'The debugger connection errored: ' + errorMessage,

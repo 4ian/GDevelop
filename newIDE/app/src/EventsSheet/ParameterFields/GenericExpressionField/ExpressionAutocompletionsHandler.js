@@ -83,6 +83,7 @@ export const handleAutocompletionsKeyDown = (
     onUpdateAutocompletions,
     onInsertAutocompletion,
   }: {|
+    // $FlowFixMe[cannot-resolve-name]
     event: SyntheticKeyboardEvent<>,
     onUpdateAutocompletions: () => void,
     onInsertAutocompletion: ExpressionAutocompletion => void,

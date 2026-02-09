@@ -3,15 +3,18 @@
 import { initializeZipJs } from '.';
 
 export const unzipFirstEntryOfBlob = async (
+  // $FlowFixMe[cannot-resolve-name]
   zippedBlob: Blob
 ): Promise<string> => {
   const zipJs: ZipJs = await initializeZipJs();
 
   return new Promise((resolve, reject) => {
     zipJs.createReader(
+      // $FlowFixMe[invalid-constructor]
       new zipJs.BlobReader(zippedBlob),
       zipReader => {
         zipReader.getEntries(entries => {
+          // $FlowFixMe[invalid-constructor]
           entries[0].getData(new zipJs.TextWriter(), result => {
             resolve(result);
           });
@@ -28,12 +31,16 @@ export const unzipFirstEntryOfBlob = async (
 export const createZipWithSingleTextFile = async (
   textFileContent: string,
   fileName: string = 'file.txt'
+// $FlowFixMe[cannot-resolve-name]
 ): Promise<Blob> => {
   const zipJs: ZipJs = await initializeZipJs();
+  // $FlowFixMe[invalid-constructor]
   const textReader = new zipJs.TextReader(textFileContent);
 
+  // $FlowFixMe[missing-local-annot]
   return new Promise((resolve, reject) => {
     zipJs.createWriter(
+      // $FlowFixMe[invalid-constructor]
       new zipJs.BlobWriter('application/zip'),
       zipWriter => {
         zipWriter.add(fileName, textReader, () => {

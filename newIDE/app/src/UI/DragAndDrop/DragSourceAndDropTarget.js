@@ -1,14 +1,19 @@
 // @flow
 import * as React from 'react';
 import {
+  // $FlowFixMe[missing-export]
   DragSource,
+  // $FlowFixMe[missing-export]
   type DragSourceMonitor,
+  // $FlowFixMe[missing-export]
   type DragSourceConnector,
+  // $FlowFixMe[missing-export]
   type ConnectDragSource,
   DropTarget,
   type DropTargetMonitor,
   type DropTargetConnector,
   type ConnectDropTarget,
+  // $FlowFixMe[missing-export]
   type ConnectDragPreview,
 } from 'react-dnd';
 import { hapticFeedback } from '../../Utils/Haptic';
@@ -125,6 +130,7 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
     sourceSpec,
     sourceCollect
   )(
+    // $FlowFixMe[incompatible-variance]
     DropTarget(reactDndType, targetSpec, targetCollect)(
       ({
         children,

@@ -62,9 +62,9 @@ export const mosaicContainsNode = (
   return (
     !!mosaic &&
     (mosaic === node ||
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
       ((!!mosaic.first && mosaicContainsNode(mosaic.first, node)) ||
-        // $FlowFixMe
+        // $FlowFixMe[incompatible-type]
         (!!mosaic.second && mosaicContainsNode(mosaic.second, node))))
   );
 };

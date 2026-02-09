@@ -61,6 +61,7 @@ const shell = remote ? remote.shell : null;
 const path = optionalRequire('path');
 
 export const getThumbnailWidth = ({isMobile}: {| isMobile: boolean |}): void | number =>
+  // $FlowFixMe[cannot-resolve-name]
   isMobile ? undefined : Math.min(245, Math.max(130, window.innerWidth / 4));
 
 export const getProjectDisplayDate = (i18n: I18nType, date: number): React.Node =>

@@ -38,8 +38,10 @@ const ProfileDialog = ({ onClose }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
 
   const isUserLoading = authenticatedUser.loginState !== 'done';
+  // $FlowFixMe[cannot-resolve-name]
   const userAchievementsContainerRef = React.useRef<?HTMLDivElement>(null);
   const markBadgesAsSeen = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (entries: IntersectionObserverEntry[]) => {
       if (!(authenticatedUser.authenticated && authenticatedUser.profile)) {
         // If not connected (or loading), do nothing.

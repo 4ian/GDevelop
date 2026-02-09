@@ -112,7 +112,7 @@ const getObjectsAndGroupsDataSource = ({
 
   return excludedObjectOrGroupNames
     ? fullList.filter(
-        //$FlowFixMe
+        // $FlowFixMe[incompatible-type]
         ({ value }) => !excludedObjectOrGroupNames.includes(value)
       )
     : fullList;

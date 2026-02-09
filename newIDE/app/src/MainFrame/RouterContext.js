@@ -62,14 +62,14 @@ type Props = {|
 export const RouterContextProvider = ({children}: Props): React.MixedElement => {
   // Put value in the state, so we can control when the DOM re-renders.
   const [routeArguments, setRouteArguments] = React.useState<RouteArguments>(
-    // $FlowFixMe - Assume that the arguments are always valid.
+    // $FlowFixMe[incompatible-type] - Assume that the arguments are always valid.
     Window.getArguments()
   );
 
   const removeRouteArguments = React.useCallback(
     (argumentsToRemove: RouteKey[]) => {
       // Remove them from the window. (only for web)
-      // $FlowFixMe - Assume that the arguments are always valid.
+      // $FlowFixMe[incompatible-type] - Assume that the arguments are always valid.
       Window.removeArguments(argumentsToRemove);
       // Update the state accordingly, based on the previous state.
       setRouteArguments(oldArguments => {
@@ -86,7 +86,7 @@ export const RouterContextProvider = ({children}: Props): React.MixedElement => 
   const addRouteArguments = React.useCallback(
     (argumentsToAdd: RouteArguments) => {
       // Add them to the window. (only for web)
-      // $FlowFixMe - Assume that the arguments are always valid.
+      // $FlowFixMe[incompatible-type] - Assume that the arguments are always valid.
       Window.addArguments(argumentsToAdd);
       // Update the state accordingly, based on the previous state.
       setRouteArguments(oldArguments => ({

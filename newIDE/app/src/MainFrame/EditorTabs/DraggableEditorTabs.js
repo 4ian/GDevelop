@@ -60,6 +60,7 @@ export function DraggableEditorTabs({
   React.useEffect(
     () => {
       if (!currentTab) return;
+      // $FlowFixMe[cannot-resolve-name]
       const tabElement = document.getElementById(getTabId(currentTab));
       if (tabElement) {
         tabElement.scrollIntoView({

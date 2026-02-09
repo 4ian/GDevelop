@@ -21,6 +21,7 @@ export default {
 };
 
 export const NotAuthenticatedTryMode = (): React.Node => {
+  // $FlowFixMe[value-as-type]
   const checkerRef = React.useRef<?SubscriptionCheckerInterface>(null);
 
   const onClick = () => {

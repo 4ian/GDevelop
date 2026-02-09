@@ -15,6 +15,7 @@ type Props = {|
   renderButtons: ({| openEditor: OpenEditorFunction |}) => React.Node,
   renderEditorMosaic: ({
     editorRef: {
+      // $FlowFixMe[value-as-type]
       current: EditorMosaicInterface | EditorNavigatorInterface | null,
     },
   }) => React.Node,
@@ -22,6 +23,7 @@ type Props = {|
 
 const EditorMosaicPlayground = ({renderButtons, renderEditorMosaic}: Props): React.Node => {
   const editorRef = React.useRef<
+    // $FlowFixMe[value-as-type]
     EditorMosaicInterface | EditorNavigatorInterface | null
   >(null);
   const openEditor = (

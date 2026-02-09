@@ -139,6 +139,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   Props,
   State
 > {
+  // $FlowFixMe[missing-local-annot]
   state = {
     selectedEventsFunction: null,
     selectedEventsBasedBehavior: null,
@@ -154,12 +155,19 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     onAddEventsFunctionCb: null,
     onAddEventsBasedObjectCb: null,
   };
+  // $FlowFixMe[value-as-type]
   editor: ?EventsSheetInterface;
+  // $FlowFixMe[value-as-type]
   eventsFunctionList: ?EventsFunctionsListInterface;
+  // $FlowFixMe[value-as-type]
   eventsBasedBehaviorEditor: ?EventsBasedBehaviorOrObjectEditorInterface;
+  // $FlowFixMe[value-as-type]
   eventsBasedObjectEditor: ?EventsBasedBehaviorOrObjectEditorInterface;
+  // $FlowFixMe[value-as-type]
   propertyListEditor: ?PropertyListEditorInterface;
+  // $FlowFixMe[value-as-type]
   _editorMosaic: ?EditorMosaicInterface;
+  // $FlowFixMe[value-as-type]
   _editorNavigator: ?EditorNavigatorInterface;
   // Create an empty "context" of objects.
   // Avoid recreating containers if they were already created, so that
@@ -243,6 +251,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       eventsFunction,
     };
     this._projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+      // $FlowFixMe[incompatible-type]
       scope,
       this._objectsContainer,
       this._parameterVariablesContainer,
@@ -369,8 +378,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             selectedEventsFunction &&
             !selectedEventsFunction.getEvents().getEventsCount()
           ) {
+            // $FlowFixMe[incompatible-use]
             this._editorNavigator.openEditor('parameters');
           } else {
+            // $FlowFixMe[incompatible-use]
             this._editorNavigator.openEditor('events-sheet');
           }
         }
@@ -598,6 +609,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   ) => {
     if (
       this.state.selectedEventsFunction &&
+      // $FlowFixMe[incompatible-exact]
       gd.compare(eventsFunction, this.state.selectedEventsFunction)
     ) {
       this._selectEventsFunction(null, null, null);
@@ -858,6 +870,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   ) => {
     if (
       this.state.selectedEventsBasedBehavior &&
+      // $FlowFixMe[incompatible-exact]
       gd.compare(eventsBasedBehavior, this.state.selectedEventsBasedBehavior)
     ) {
       this._selectEventsBasedBehavior(null);
@@ -872,6 +885,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   ) => {
     if (
       this.state.selectedEventsBasedObject &&
+      // $FlowFixMe[incompatible-exact]
       gd.compare(eventsBasedObject, this.state.selectedEventsBasedObject)
     ) {
       this._selectEventsBasedObject(null);

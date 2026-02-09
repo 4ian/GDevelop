@@ -1,7 +1,7 @@
 // @flow
 // Mock for Resource3DPreview.worker.js to prevent "self is not defined" errors in tests
 
-// $FlowFixMe - Mock worker for tests
+// $FlowFixMe[incompatible-type][underconstrained-implicit-instantiation] - Mock worker for tests
 const MockWorker: JestMockFn<any, any> = jest.fn().mockImplementation(() => {
   return {
     postMessage: jest.fn(),

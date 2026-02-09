@@ -9,6 +9,7 @@ import {
 const gd: libGDevelop = global.gd;
 
 // $FlowExpectedError
+// $FlowFixMe[cannot-resolve-name][missing-local-annot]
 const makeFakeI18n = (fakeI18n): I18nType => ({
   ...fakeI18n,
   _: message => message.id,
@@ -18,7 +19,7 @@ describe('EnumerateInstructions', () => {
   it('can enumerate instructions being conditions', () => {
     const instructions = enumerateAllInstructions(
       true,
-      // $FlowFixMe The fake I18n translates groups to empty strings.
+      // $FlowFixMe[incompatible-type] The fake I18n translates groups to empty strings.
       null
     );
 
@@ -71,7 +72,7 @@ describe('EnumerateInstructions', () => {
   it('can enumerate instructions being actions', () => {
     const instructions = enumerateAllInstructions(
       false,
-      // $FlowFixMe The fake I18n translates groups to empty strings.
+      // $FlowFixMe[incompatible-type] The fake I18n translates groups to empty strings.
       null
     );
 
@@ -157,6 +158,7 @@ describe('EnumerateInstructions', () => {
 
   it('can enumerate instructions for an object (Sprite)', () => {
     makeTestExtensions(gd);
+    // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Scene', 0);
     layout.getObjects().insertNewObject(project, 'Sprite', 'MySpriteObject', 0);

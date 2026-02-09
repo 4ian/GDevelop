@@ -23,6 +23,7 @@ import { getPaperDecorator } from '../../../PaperDecorator';
 export default {
   title: 'GameDashboard/Feedback/GameFeedback',
   component: GameFeedback,
+  // $FlowFixMe[cannot-resolve-name]
   decorators: [getPaperDecorator('medium') as StoryDecorator],
 };
 

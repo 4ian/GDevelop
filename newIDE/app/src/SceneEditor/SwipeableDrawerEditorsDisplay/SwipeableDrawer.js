@@ -47,6 +47,7 @@ type SwipeableDrawerTopBarProps = {|
   onClick: () => void,
   onSwipeUp: () => void,
   onSwipeDown: () => void,
+  // $FlowFixMe[cannot-resolve-name]
   containerRef: {| current: ?HTMLDivElement |},
   controls: ?React.Node,
 |};
@@ -126,6 +127,7 @@ function useAnimationOpeningState(openingState: DrawerOpeningState) {
 }
 
 const SwipeableDrawer = (props: Props): React.MixedElement => {
+  // $FlowFixMe[cannot-resolve-name]
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const { openingState, setOpeningState } = props;
   const height =

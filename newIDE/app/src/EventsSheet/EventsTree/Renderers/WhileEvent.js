@@ -27,6 +27,7 @@ const styles = {
   },
 };
 
+// $FlowFixMe[unsupported-syntax]
 export default class WhileEvent extends React.Component<EventRendererProps, *> {
   render(): any {
     var whileEvent = gd.asWhileEvent(this.props.event);

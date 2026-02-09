@@ -70,6 +70,7 @@ export const GameThumbnail = (
   );
   const [isLoading, setIsLoading] = React.useState(false);
   const { showAlert } = useAlertDialog();
+  // $FlowFixMe[cannot-resolve-name]
   const gamesPlatformThumbnailFileInputRef = React.useRef<HTMLInputElement | null>(
     null
   );

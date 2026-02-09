@@ -50,6 +50,7 @@ const styles = {
 };
 
 type Props = {|
+  // $FlowFixMe[cannot-resolve-name]
   anchorElement: HTMLElement,
   editorTab: EditorTab,
 |};
@@ -115,6 +116,7 @@ const TabsTitlebarTooltip = ({anchorElement, editorTab}: Props): React.Node => {
           },
           preventOverflow: {
             enabled: true,
+            // $FlowFixMe[cannot-resolve-name]
             boundariesElement: document.querySelector('.main-frame'),
           },
         },

@@ -60,6 +60,7 @@ function ItemRow<Item>({
   onEdit,
   hideMenuButton,
 }: Props<Item>): any {
+  // $FlowFixMe[value-as-type]
   const textFieldRef = React.useRef<?TextFieldInterface>(null);
   const shouldDiscardChanges = React.useRef<boolean>(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -158,6 +159,7 @@ function ItemRow<Item>({
       }
       buildMenuTemplate={buildMenuTemplate}
       onClick={() => {
+        // $FlowFixMe[constant-condition]
         if (!onItemSelected) return;
         if (editingName) return;
 

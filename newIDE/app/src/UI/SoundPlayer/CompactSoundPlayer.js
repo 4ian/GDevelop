@@ -14,11 +14,13 @@ type Props = {|
 |};
 
 const CompactSoundPlayer = ({soundSrc, onSoundLoaded, onSoundError}: Props): null | React.Node => {
+  // $FlowFixMe[cannot-resolve-name]
   const audioRef = React.useRef<?HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isAudioLoaded, setIsAudioLoaded] = React.useState(false);
   const isMountedRef = useIsMounted();
+  // $FlowFixMe[cannot-resolve-name]
   const abortControllerRef = React.useRef<?AbortController>(null);
 
   const cleanupAudioAndListeners = React.useCallback(() => {
@@ -41,9 +43,11 @@ const CompactSoundPlayer = ({soundSrc, onSoundLoaded, onSoundError}: Props): nul
       if (!soundSrc || audioRef.current) return;
 
       setIsLoading(true);
+      // $FlowFixMe[cannot-resolve-name]
       const audio = new Audio(soundSrc);
       audio.loop = false;
 
+      // $FlowFixMe[cannot-resolve-name]
       const abortController = new AbortController();
       abortControllerRef.current = abortController;
 

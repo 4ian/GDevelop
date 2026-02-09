@@ -35,6 +35,7 @@ export const downloadUrlsToLocalFiles = async <
 
       try {
         await retryIfFailed({ times: 2 }, async () => {
+          // $FlowFixMe[cannot-resolve-name]
           const encodedUrl = new URL(url).href; // Encode the URL to support special characters in file names.
           await ipcRenderer.invoke('local-file-download', encodedUrl, filePath);
         });

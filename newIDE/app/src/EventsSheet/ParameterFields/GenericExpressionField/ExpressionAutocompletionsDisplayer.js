@@ -47,6 +47,7 @@ const getTypeToIcon = (type: string) => {
   }
 };
 
+// $FlowFixMe[missing-local-annot]
 const AutocompletionIcon = React.memo(({ src }) => {
   const {
     palette: { type: paletteType },
@@ -102,6 +103,7 @@ const AutocompletionRow = React.forwardRef(
       isSelected: boolean,
       onClick: () => void,
     |},
+    // $FlowFixMe[missing-local-annot]
     ref
   ) => {
     const trimmedLabel = label.length > 46 ? label.substr(0, 46) + '…' : label;
@@ -198,6 +200,7 @@ type Props = {|
   expressionAutocompletions: Array<ExpressionAutocompletion>,
   remainingCount: number,
   selectedCompletionIndex: number,
+  // $FlowFixMe[cannot-resolve-name]
   anchorEl: Element,
   onChoose: (chosenExpressionAutocompletion: ExpressionAutocompletion) => void,
   onScroll: () => void,
@@ -241,8 +244,10 @@ export default function ExpressionAutocompletionsDisplayer({
   onScroll,
   parameterRenderingService,
 }: Props): null | React.Node {
+  // $FlowFixMe[value-as-type]
   const scrollView = React.useRef((null: ?ScrollViewInterface));
   const selectedAutocompletionElement = React.useRef(
+    // $FlowFixMe[cannot-resolve-name]
     (null: ?React$Component<any, any>)
   );
   React.useEffect(
@@ -386,6 +391,7 @@ export default function ExpressionAutocompletionsDisplayer({
               )}
             </ScrollView>
           </Paper>
+          // $FlowFixMe[invalid-compare]
           {selectedCompletionIndex !== null &&
             expressionAutocompletions[selectedCompletionIndex].kind ===
               'Expression' &&

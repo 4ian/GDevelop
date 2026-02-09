@@ -32,6 +32,7 @@ export type EventRendererProps = {
   onInstructionDoubleClick: InstructionContext => void,
   onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
   onAddInstructionContextMenu: (
+    // $FlowFixMe[cannot-resolve-name]
     HTMLButtonElement,
     InstructionsListContext
   ) => void,

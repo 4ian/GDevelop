@@ -37,6 +37,7 @@ export type EditorProps = {|
   onSizeUpdated: () => void,
   onObjectUpdated?: () => void,
   unsavedChanges?: UnsavedChanges,
+  // $FlowFixMe[value-as-type]
   scrollView?: ScrollViewInterface,
   renderObjectNameField?: () => React.Node,
   isChildObject?: boolean,

@@ -120,6 +120,7 @@ const useCapturesManager = (
         > = await Promise.all(
           screenshotPublicUrls.map(
             async (screenshotUrl): Promise<string | null> => {
+              // $FlowFixMe[cannot-resolve-name]
               const response = await fetch(screenshotUrl, { method: 'HEAD' });
               if (!response.ok) {
                 return null;

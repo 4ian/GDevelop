@@ -12,13 +12,16 @@ export type ButtonInterface = { focus: () => void };
  */
 export const focusButton = (button: ButtonInterface) => {
   const element = ReactDOM.findDOMNode(button);
+  // $FlowFixMe[cannot-resolve-name]
   if (element instanceof HTMLButtonElement) {
     element.focus();
+  // $FlowFixMe[cannot-resolve-name]
   } else if (element instanceof HTMLElement) {
     const children = element.getElementsByTagName('button');
     if (
       children &&
       children.length &&
+      // $FlowFixMe[cannot-resolve-name]
       children[0] instanceof HTMLButtonElement
     ) {
       children[0].focus();

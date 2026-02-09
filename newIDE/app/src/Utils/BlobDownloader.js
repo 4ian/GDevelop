@@ -23,6 +23,7 @@ type Input<Item> = {|
 
 export type ItemResult<Item> = {|
   item: Item,
+  // $FlowFixMe[cannot-resolve-name]
   blob?: Blob,
   error?: Error,
 |};
@@ -63,6 +64,7 @@ export const downloadUrlsToBlobs = async <Item: { url: string }>({
           'export'
         );
 
+        // $FlowFixMe[cannot-resolve-name]
         const response = await fetch(urlWithParameters, {
           // Include credentials so that resources on GDevelop cloud are properly fetched
           // with the cookie obtained for the project.
@@ -120,15 +122,18 @@ export const convertBlobToFiles = <
 
       return {
         resource: item.resource,
+        // $FlowFixMe[cannot-resolve-name]
         file: new File([blob], item.filename, { type: blob.type }),
       };
     })
     .filter(Boolean);
 
+// $FlowFixMe[cannot-resolve-name]
 export function convertBlobToDataURL(blob: Blob): Promise<string> {
   return new Promise<string>((resolve, reject) => {
+    // $FlowFixMe[cannot-resolve-name]
     const reader = new FileReader();
-    // $FlowFixMe - it's guaranted for reader.result to be a string.
+    // $FlowFixMe[incompatible-type] - it's guaranted for reader.result to be a string.
     reader.onload = _e => resolve(reader.result);
     reader.onerror = _e => reject(reader.error);
     reader.onabort = _e => reject(new Error('Read aborted'));
@@ -136,6 +141,7 @@ export function convertBlobToDataURL(blob: Blob): Promise<string> {
   });
 }
 
+// $FlowFixMe[cannot-resolve-name]
 export function convertDataURLtoBlob(dataUrl: string): ?Blob {
   const arr = dataUrl.split(',');
   if (arr.length < 2) return null;
@@ -150,5 +156,6 @@ export function convertDataURLtoBlob(dataUrl: string): ?Blob {
   while (n--) {
     u8arr[n] = bstr.charCodeAt(n);
   }
+  // $FlowFixMe[cannot-resolve-name]
   return new Blob([u8arr], { type: mime });
 }

@@ -9,6 +9,7 @@ import { ColumnStackLayout } from '../../../UI/Layout';
 export default {
   title: 'UI Building Blocks/AlertMessage',
   component: AlertMessage,
+  // $FlowFixMe[cannot-resolve-name]
   decorators: [getPaperDecorator('medium') as StoryDecorator],
 };
 

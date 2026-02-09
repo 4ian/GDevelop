@@ -62,6 +62,7 @@ type Props = {|
     ref?: (list: {
       scrollToRow: (row: number) => void,
       recomputeRowHeights: () => void,
+      // $FlowFixMe[cannot-resolve-name]
       container: ?HTMLDivElement,
     }) => void,
     onScroll?: (event: {
@@ -109,6 +110,7 @@ const walkNodes = (
     if (result === false) return false;
 
     if (node.children.length > 0 && (!ignoreCollapsed || node.expanded)) {
+      // $FlowFixMe[incompatible-type]
       currentIndex = walkNodes(
         node.children,
         callback,
@@ -200,6 +202,7 @@ const getSearchMatches = ({
   searchQuery?: any,
 }) => {
   if (!searchMethod || !searchQuery) {
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     return { matchIndexes: [], matchIndexSet: new Set() };
   }
 
@@ -358,7 +361,9 @@ const SortableEventsTree = (
     reactVirtualizedListProps
   }: Props,
 ): React.MixedElement => {
+  // $FlowFixMe[value-as-type]
   const listRef = React.useRef<?VariableSizeList>(null);
+  // $FlowFixMe[cannot-resolve-name]
   const outerRef = React.useRef<?HTMLDivElement>(null);
   const alignment =
     (reactVirtualizedListProps &&
@@ -429,6 +434,7 @@ const SortableEventsTree = (
     () => ({
       flatData,
       matchIndexSet,
+      // $FlowFixMe[incompatible-type]
       matchIndexes,
       onVisibilityToggle,
       scaffoldBlockPxWidth,

@@ -19,11 +19,15 @@ export const useOnlineStatus = (): boolean => {
   const goOffline = () => setOnlineStatus(false);
 
   React.useEffect(() => {
+    // $FlowFixMe[cannot-resolve-name]
     window.addEventListener('online', goOnline);
+    // $FlowFixMe[cannot-resolve-name]
     window.addEventListener('offline', goOffline);
 
     return () => {
+      // $FlowFixMe[cannot-resolve-name]
       window.removeEventListener('online', goOnline);
+      // $FlowFixMe[cannot-resolve-name]
       window.removeEventListener('offline', goOffline);
     };
   }, []);

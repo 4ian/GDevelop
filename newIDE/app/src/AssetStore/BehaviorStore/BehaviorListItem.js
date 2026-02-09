@@ -88,6 +88,7 @@ export const BehaviorListItem = (
   );
 
   // Report the height of the item once it's known.
+  // $FlowFixMe[cannot-resolve-name]
   const containerRef = React.useRef<?HTMLDivElement>(null);
   React.useLayoutEffect(() => {
     if (containerRef.current)

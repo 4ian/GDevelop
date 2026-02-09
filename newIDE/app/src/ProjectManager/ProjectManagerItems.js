@@ -45,6 +45,7 @@ const styles = {
 type ProjectStructureItemProps = {|
   id?: string,
   autoGenerateNestedIndicator?: boolean,
+  // $FlowFixMe[cannot-resolve-name]
   renderNestedItems: () => Array<React$Element<any> | null>,
   primaryText: React.Node,
   error?: ?Error,
@@ -93,6 +94,7 @@ type ItemProps = {|
   primaryText: string,
   textEndAdornment?: React.Node,
   editingName: boolean,
+  // $FlowFixMe[prop-missing]
   leftIcon: React.Element<any>,
   onEdit: () => void,
   onDelete: () => void,
@@ -146,6 +148,7 @@ export const Item = (
     dragAndDropProps: {DragSourceAndDropTarget, onBeginDrag, onDrop}
   }: ItemProps,
 ): React.Node => {
+  // $FlowFixMe[value-as-type]
   const textFieldRef = React.useRef<?TextFieldInterface>(null);
   const shouldDiscardChanges = React.useRef<boolean>(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

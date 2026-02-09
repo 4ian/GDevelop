@@ -85,6 +85,7 @@ type ClosableTabsProps = {|
 
 export const ClosableTabs = ({hideLabels, renderTabs}: ClosableTabsProps): React.MixedElement => {
   const forceUpdate = useForceUpdate();
+  // $FlowFixMe[cannot-resolve-name]
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const tabItemContainerStyle = {
     maxWidth: '100%', // Tabs should take all width
@@ -96,6 +97,7 @@ export const ClosableTabs = ({hideLabels, renderTabs}: ClosableTabsProps): React
     marginTop: 7, // Chosen to align with the size of controls in the titlebar.
   };
 
+  // $FlowFixMe[cannot-resolve-name]
   const onScroll = React.useCallback((event: WheelEvent) => {
     const divElement = containerRef.current;
     if (divElement) {
@@ -168,7 +170,9 @@ export function ClosableTab({
     },
     [active, onActivated]
   );
+  // $FlowFixMe[value-as-type]
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
+  // $FlowFixMe[cannot-resolve-name]
   const spanLabelRef = React.useRef<?HTMLSpanElement>(null);
   const [isLabelTruncated, setIsLabelTruncated] = React.useState(false);
 
@@ -184,6 +188,7 @@ export function ClosableTab({
     [maxWidth]
   );
 
+  // $FlowFixMe[missing-local-annot]
   const openContextMenu = event => {
     event.stopPropagation();
     if (contextMenu.current) {
@@ -192,6 +197,7 @@ export function ClosableTab({
   };
 
   const closeOnMiddleClick = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     event => {
       if (event.nativeEvent && event.nativeEvent.button === 1) {
         onClose();

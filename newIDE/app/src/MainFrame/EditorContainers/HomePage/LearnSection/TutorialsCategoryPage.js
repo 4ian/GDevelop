@@ -84,6 +84,7 @@ export const EducationCurriculum = (
             </div>
           );
           sectionIndex = 0;
+          // $FlowFixMe[definition-cycle]
           currentSection = section;
         }
         items.push(

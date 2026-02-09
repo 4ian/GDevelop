@@ -4,6 +4,7 @@ export const getYoutubeVideoIdFromUrl = (youtubeUrl: ?string): ?string => {
   if (!youtubeUrl || !youtubeUrl.startsWith('https://youtu.be/')) return null;
 
   try {
+    // $FlowFixMe[cannot-resolve-name]
     const url = new URL(youtubeUrl);
 
     const lastPartOfUrl = url.pathname.split('/').pop();

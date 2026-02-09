@@ -26,6 +26,7 @@ const getRandomItem = (id: string) => (
 );
 
 export const Default = (): React.Node => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const items = new Array(15).fill(null).map((_, index) => ({
     renderItem: () => getRandomItem(`item-${index}`),
   }));

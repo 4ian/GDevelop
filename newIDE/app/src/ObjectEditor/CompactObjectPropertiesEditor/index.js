@@ -228,6 +228,7 @@ type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
+  // $FlowFixMe[value-as-type]
   historyHandler?: HistoryHandler,
 
   objects: Array<gdObject>,
@@ -286,6 +287,7 @@ export const CompactObjectPropertiesEditor = (
     setDuplicateAndEditVariantDialogOpen,
   ] = React.useState(false);
   const { showDeleteConfirmation } = useAlertDialog();
+  // $FlowFixMe[value-as-type]
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
   const object = objects[0];
   const objectConfiguration = object.getConfiguration();
@@ -308,6 +310,7 @@ export const CompactObjectPropertiesEditor = (
   // the arguments will be mismatched. To workaround this, always cast the object to
   // a base gdObject to ensure C++ methods are called.
   const objectConfigurationAsGd = gd.castObject(
+    // $FlowFixMe[incompatible-exact]
     objectConfiguration,
     gd.ObjectConfiguration
   );
@@ -584,6 +587,7 @@ export const CompactObjectPropertiesEditor = (
                       onEditObject,
                     })
                   }
+                  // $FlowFixMe[incompatible-type]
                   onRefreshAllFields={forceRecomputeSchema}
                 />
                 {shouldDisplayVariant && (

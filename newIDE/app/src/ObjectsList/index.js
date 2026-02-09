@@ -813,7 +813,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // If all parents are open, return the objectFolderOrObject given as input.
         return getTreeViewItemIdFromObjectFolderOrObject(objectFolderOrObject);
       }
-      // $FlowFixMe - We are confident this TreeView item is in fact a ObjectFolderOrObjectWithContext
+      // $FlowFixMe[incompatible-type] - We are confident this TreeView item is in fact a ObjectFolderOrObjectWithContext
       return topToBottomAscendanceId[firstClosedFolderIndex];
     };
 
@@ -1242,7 +1242,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             objectFolderTreeViewItemProps,
           }),
         ].filter(Boolean);
-        // $FlowFixMe
+        // $FlowFixMe[incompatible-type]
         return treeViewItems;
       },
       [

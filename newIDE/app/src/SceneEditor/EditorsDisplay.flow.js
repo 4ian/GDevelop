@@ -140,6 +140,7 @@ export type SceneEditorsDisplayProps = {|
   onInstancesEditorSettingsMutated: InstancesEditorSettings => void,
   editorViewPosition2D: EditorViewPosition2D,
 
+  // $FlowFixMe[value-as-type]
   historyHandler: HistoryHandler,
   unsavedChanges?: ?UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,

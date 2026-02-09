@@ -194,6 +194,7 @@ export type PreferencesValues = {|
   eventsSheetZoomLevel: number,
   showEffectParameterNames: boolean,
   projectLastUsedPaths: { [string]: { [ResourceKind]: string } },
+  // $FlowFixMe[value-as-type]
   defaultEditorMosaicNodes: { [EditorMosaicName]: ?EditorMosaicNode },
   recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
   autoOpenMostRecentProject: boolean,
@@ -237,6 +238,7 @@ export type PreferencesValues = {|
 /**
  * Partial PreferencesValues that can be overridden per-project via preferences block in gdevelop-settings.yaml.
  */
+// $FlowFixMe[deprecated-utility]
 export type ProjectSpecificPreferencesValues = $Shape<PreferencesValues>;
 
 /**
@@ -273,9 +275,11 @@ export type Preferences = {|
     kind: ResourceKind,
     path: string
   ) => void,
+  // $FlowFixMe[value-as-type]
   getDefaultEditorMosaicNode: (name: EditorMosaicName) => ?EditorMosaicNode,
   setDefaultEditorMosaicNode: (
     name: EditorMosaicName,
+    // $FlowFixMe[value-as-type]
     node: ?EditorMosaicNode
   ) => void,
   getRecentProjectFiles: (
@@ -358,7 +362,9 @@ export const initialPreferences = {
     language: 'en',
     autoDownloadUpdates: true,
     themeName:
+      // $FlowFixMe[cannot-resolve-name]
       (typeof window !== 'undefined' &&
+  // $FlowFixMe[cannot-resolve-name]
   window.matchMedia('(prefers-color-scheme: dark)').matches
   ? 'GDevelop default Dark'
   : // TODO: Use the light theme back when it's adapted to the modern theme.
@@ -443,8 +449,10 @@ export const initialPreferences = {
   getDefaultEditorMosaicNode: (name: EditorMosaicName): null => null,
   setDefaultEditorMosaicNode: (
     name: EditorMosaicName,
+    // $FlowFixMe[value-as-type]
     node: ?EditorMosaicNode
   ) => {},
+  // $FlowFixMe[missing-local-annot][signature-verification-failure]
   getRecentProjectFiles: options => [],
   insertRecentProjectFile: () => {},
   removeRecentProjectFile: () => {},
@@ -484,6 +492,7 @@ export const initialPreferences = {
   setWatchProjectFolderFilesForLocalProjects: () => {},
   setNewFeaturesAcknowledgements: () => {},
   setDisplaySaveReminder: () => {},
+  // $FlowFixMe[missing-local-annot][signature-verification-failure]
   getEditorStateForProject: projectId => {},
   setEditorStateForProject: (projectId: any, editorState: any) => {},
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => {},
@@ -498,6 +507,7 @@ export const initialPreferences = {
   setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
 };
 
+// $FlowFixMe[incompatible-type]
 const PreferencesContext: React.Context<Preferences> = React.createContext<Preferences>(initialPreferences);
 
 export default PreferencesContext;

@@ -1,4 +1,5 @@
 // @flow
+// $FlowFixMe[underconstrained-implicit-instantiation]
 let testExtensionsAdded = new WeakSet();
 
 /**
@@ -163,6 +164,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     );
     const fakeBehavior = new gd.BehaviorJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    // $FlowFixMe[cannot-write]
     fakeBehavior.updateProperty = function(
       behaviorContent,
       propertyName,
@@ -180,6 +182,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       return false;
     };
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    // $FlowFixMe[cannot-write]
     fakeBehavior.getProperties = function(behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
@@ -198,6 +201,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       return behaviorProperties;
     };
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    // $FlowFixMe[cannot-write]
     fakeBehavior.initializeContent = function(behaviorContent) {
       behaviorContent.setStringAttribute('property1', 'Initial value 1');
       behaviorContent.setBoolAttribute('property2', true);
@@ -247,6 +251,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     );
     const fakeBehavior = new gd.BehaviorJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    // $FlowFixMe[cannot-write]
     fakeBehavior.updateProperty = function(
       behaviorContent,
       propertyName,
@@ -255,11 +260,13 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       return false;
     };
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    // $FlowFixMe[cannot-write]
     fakeBehavior.getProperties = function(behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
       return behaviorProperties;
     };
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    // $FlowFixMe[cannot-write]
     fakeBehavior.initializeContent = function(behaviorContent) {};
 
     extension
@@ -291,10 +298,12 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     const fakeObject = new gd.ObjectJsImplementation();
 
     // $FlowExpectedError
+    // $FlowFixMe[cannot-write]
     fakeObject.updateProperty = function(propertyName, newValue) {
       return false;
     };
     // $FlowExpectedError
+    // $FlowFixMe[cannot-write][missing-this-annot]
     fakeObject.getProperties = function() {
       const objectProperties = new gd.MapStringPropertyDescriptor();
       const objectContent = this.content;
@@ -308,11 +317,13 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       return objectProperties;
     };
     // $FlowExpectedError
+    // $FlowFixMe[prop-missing]
     fakeObject.content = {
       text: 'Some text.',
     };
 
     // $FlowExpectedError
+    // $FlowFixMe[cannot-write]
     fakeObject.updateInitialInstanceProperty = function(
       instance,
       propertyName,
@@ -321,6 +332,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       return false;
     };
     // $FlowExpectedError
+    // $FlowFixMe[cannot-write]
     fakeObject.getInitialInstanceProperties = function(instance) {
       var instanceProperties = new gd.MapStringPropertyDescriptor();
       return instanceProperties;
@@ -364,11 +376,13 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       .setIcon('res/conditions/3d_box.svg');
     const Cube3DObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError
+    // $FlowFixMe[cannot-write]
     Cube3DObject.getProperties = function(objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
       return objectProperties;
     };
     // $FlowExpectedError
+    // $FlowFixMe[cannot-write]
     Cube3DObject.getInitialInstanceProperties = function(
       content,
       instance,
@@ -409,14 +423,17 @@ export const makeTestExtensions = (gd: libGDevelop) => {
 
     const textInputObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError
+    // $FlowFixMe[cannot-write]
     textInputObject.getProperties = function() {
       const objectProperties = new gd.MapStringPropertyDescriptor();
       return objectProperties;
     };
     // $FlowExpectedError
+    // $FlowFixMe[prop-missing]
     textInputObject.content = {};
 
     // $FlowExpectedError
+    // $FlowFixMe[cannot-write]
     textInputObject.getInitialInstanceProperties = function(
       instance,
       project,
@@ -440,6 +457,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     };
 
     // $FlowExpectedError
+    // $FlowFixMe[cannot-write]
     textInputObject.updateInitialInstanceProperty = function(
       instance,
       propertyName,

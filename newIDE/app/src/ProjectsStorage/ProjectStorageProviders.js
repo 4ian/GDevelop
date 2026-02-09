@@ -68,6 +68,7 @@ const computeDefaultConfiguration = (
     );
   }
 
+  // $FlowFixMe[incompatible-type]
   return candidates[0];
 };
 

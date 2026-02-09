@@ -153,6 +153,7 @@ const ImagePreview = (
   const previousSingleTouchCoordinates = React.useRef<?[number, number]>(null);
   const previousPointerCoordinates = React.useRef<?[number, number]>(null);
   const hasZoomBeenAdaptedToImageRef = React.useRef<boolean>(false);
+  // $FlowFixMe[cannot-resolve-name]
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const handleImageError = () => {
     setErrored(true);
@@ -260,6 +261,7 @@ const ImagePreview = (
   );
 
   const handleWheel = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (event: WheelEvent) => {
       const { deltaY, deltaX, clientX, clientY } = event;
       event.preventDefault();
@@ -282,6 +284,7 @@ const ImagePreview = (
   );
 
   const handleTouchMove = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     async (event: TouchEvent) => {
       if (event.touches.length === 2 && containerRef.current) {
         const containerRect = containerRef.current.getBoundingClientRect();
@@ -334,8 +337,9 @@ const ImagePreview = (
       }
       if (
         event.target &&
+        // $FlowFixMe[cannot-resolve-name]
         (event.target instanceof HTMLElement ||
-          // $FlowFixMe - Flow does not know about SVGElement
+          // $FlowFixMe[cannot-resolve-name][incompatible-type] - Flow does not know about SVGElement
           event.target instanceof SVGElement) &&
         event.target.dataset &&
         'draggable' in event.target.dataset
@@ -426,6 +430,7 @@ const ImagePreview = (
     [onImageLoaded, onImageSize]
   );
 
+  // $FlowFixMe[cannot-resolve-name]
   const onTouchEnd = React.useCallback((event: TouchEvent) => {
     if (event.touches.length === 1) {
       previousSingleTouchCoordinates.current = [
@@ -436,6 +441,7 @@ const ImagePreview = (
     previousDoubleTouchInfo.current = null;
   }, []);
 
+  // $FlowFixMe[cannot-resolve-name]
   const onTouchStart = React.useCallback((event: TouchEvent) => {
     if (event.touches.length === 1) {
       previousSingleTouchCoordinates.current = [
@@ -448,6 +454,7 @@ const ImagePreview = (
   }, []);
 
   const onPointerDown = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (event: PointerEvent) => {
       if (containerRef.current) {
         containerRef.current.focus();
@@ -459,6 +466,7 @@ const ImagePreview = (
     [shouldMoveView]
   );
   const onPointerMove = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (event: PointerEvent) => {
       if (shouldMoveView && previousPointerCoordinates.current) {
         const [previousX, previousY] = previousPointerCoordinates.current;
@@ -473,9 +481,11 @@ const ImagePreview = (
     },
     [shouldMoveView]
   );
+  // $FlowFixMe[cannot-resolve-name]
   const onPointerUp = React.useCallback((event: PointerEvent) => {
     previousPointerCoordinates.current = null;
   }, []);
+  // $FlowFixMe[cannot-resolve-name]
   const onPointerLeave = React.useCallback((event: PointerEvent) => {
     previousPointerCoordinates.current = null;
     setShouldMoveView(false);

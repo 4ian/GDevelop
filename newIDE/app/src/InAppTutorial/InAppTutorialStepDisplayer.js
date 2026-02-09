@@ -45,7 +45,9 @@ const ELEMENT_QUERY_FREQUENCY = 500;
 const HIDE_QUERY_FREQUENCY = 1000;
 
 const getElementToHighlightRootDialog = (
+  // $FlowFixMe[cannot-resolve-name]
   element: HTMLElement
+// $FlowFixMe[cannot-resolve-name]
 ): Element | null => {
   const elementAncestry = getElementAncestry(element, []);
   // Ancestry is starting from direct parent to furthest parent.
@@ -63,6 +65,7 @@ const getElementToHighlightRootDialog = (
 };
 
 const isThereAnOpenDialogInTheFollowingSiblings = (
+  // $FlowFixMe[cannot-resolve-name]
   element: Element
 ): boolean => {
   let nextElement = element.nextElementSibling;
@@ -77,6 +80,7 @@ const isThereAnOpenDialogInTheFollowingSiblings = (
 };
 
 const isThereAnErrorBoundarySomewhere = () =>
+  // $FlowFixMe[cannot-resolve-name]
   !!document.querySelector('[data-error-boundary]');
 
 const getWrongEditorTooltip = (
@@ -109,23 +113,30 @@ const getWrongEditorTooltip = (
 export const queryElementOrItsMostVisuallySignificantParent = (
   elementToHighlightId: string
 ): {|
+  // $FlowFixMe[cannot-resolve-name]
   elementToHighlight: ?HTMLElement,
+  // $FlowFixMe[cannot-resolve-name]
   elementWithId: ?HTMLElement,
 |} => {
+  // $FlowFixMe[cannot-resolve-name]
   let foundElement = document.querySelector(elementToHighlightId);
+  // $FlowFixMe[cannot-resolve-name]
   if (foundElement instanceof HTMLTextAreaElement) {
     // In this case, the element to highlight is a Material UI multiline text field
     // and the textarea only occupies a fraction of the whole input. So we're going
     // to highlight the parent div.
     const parentDiv = foundElement.closest('div');
+    // $FlowFixMe[cannot-resolve-name]
     if (parentDiv instanceof HTMLElement && isElementAMuiInput(parentDiv)) {
       return { elementToHighlight: parentDiv, elementWithId: foundElement };
     }
   } else if (
+    // $FlowFixMe[cannot-resolve-name]
     foundElement instanceof HTMLInputElement &&
     'searchBar' in foundElement.dataset
   ) {
     const containerDiv = foundElement.closest('div[data-search-bar-container]');
+    // $FlowFixMe[cannot-resolve-name]
     if (containerDiv instanceof HTMLElement) {
       return { elementToHighlight: containerDiv, elementWithId: foundElement };
     }
@@ -163,17 +174,22 @@ function InAppTutorialStepDisplayer({
   const [
     elementToHighlight,
     setElementToHighlight,
+  // $FlowFixMe[cannot-resolve-name]
   ] = React.useState<?HTMLElement>(null);
+  // $FlowFixMe[cannot-resolve-name]
   const [elementWithId, setElementWithId] = React.useState<?HTMLElement>(null);
   const [
     hideBehindPriorityElement,
     setHideBehindPriorityElement,
   ] = React.useState<boolean>(false);
+  // $FlowFixMe[cannot-resolve-name]
   const [assistantImage, setAssistantImage] = React.useState<?HTMLDivElement>(
     null
   );
+  // $FlowFixMe[missing-empty-array-annot]
   const [blockingLayerHoles, setBlockingLayerHoles] = React.useState([]);
 
+  // $FlowFixMe[missing-local-annot]
   const defineAssistantImage = React.useCallback(node => {
     if (node) {
       setAssistantImage(node);
@@ -260,6 +276,7 @@ function InAppTutorialStepDisplayer({
       return null;
     }
     if (expectedEditor) {
+      // $FlowFixMe[cannot-resolve-name]
       const tabToHighlight = document.querySelector(
         getEditorTabSelector({
           editor: expectedEditor.editor,
@@ -295,6 +312,7 @@ function InAppTutorialStepDisplayer({
       // $FlowIgnore - checked above that valueEquals in in nextStepTrigger.
       const { valueEquals } = nextStepTrigger;
       if (
+        // $FlowFixMe[invalid-compare]
         valueEquals === null ||
         valueEquals === undefined ||
         typeof valueEquals !== 'string'
@@ -303,7 +321,9 @@ function InAppTutorialStepDisplayer({
       }
 
       if (
+        // $FlowFixMe[cannot-resolve-name]
         !(elementWithId instanceof HTMLInputElement) &&
+        // $FlowFixMe[cannot-resolve-name]
         !(elementWithId instanceof HTMLTextAreaElement)
       ) {
         return undefined;
@@ -320,6 +340,7 @@ function InAppTutorialStepDisplayer({
         valueSetter.call(elementWithId, valueEquals);
         // Trigger blur to make sure the value is taken into account
         // by the React input.
+        // $FlowFixMe[cannot-resolve-name]
         elementWithId.dispatchEvent(new Event('blur', { bubbles: true }));
       };
     },
@@ -333,17 +354,21 @@ function InAppTutorialStepDisplayer({
     : null;
 
   // Check if the "classic" or "3D" editor are shown:
+  // $FlowFixMe[cannot-resolve-name]
   const activeInstancesEditorCanvas = document.querySelector(
     `#scene-editor[data-active=true] #${instancesEditorId}`
   );
+  // $FlowFixMe[cannot-resolve-name]
   const activeEmbeddedGameFrameHole = document.querySelector(
     `#scene-editor[data-active=true] #${embeddedGameFrameHoleId}`
   );
+  // $FlowFixMe[cannot-resolve-name]
   const swipeableDrawerContainer = document.querySelector(
     `#${swipeableDrawerContainerId}`
   );
 
   const updateBlockingLayerVisibility = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (entries: IntersectionObserverEntry[]) => {
       let holes: Array<any> = [];
       if (

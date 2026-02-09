@@ -366,6 +366,7 @@ const NewProjectSetupDialog = ({
   );
 
   const onCheckOptimizeForPixelArt = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     (e, checked) => {
       if (!!linkedNonPixelArtExampleShortHeader && !checked) {
         // If trying to uncheck the optimization for pixel art, on a template
@@ -515,6 +516,7 @@ const NewProjectSetupDialog = ({
   );
 
   const onChangeProjectName = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     (event, text) => {
       if (projectNameError) setProjectNameError(null);
       setProjectName(text);

@@ -31,7 +31,7 @@ const setupWindowControlsOverlayWatcher = () => {
     return;
   }
 
-  // $FlowFixMe - this API is not handled by Flow.
+  // $FlowFixMe[incompatible-type] - this API is not handled by Flow.
   const { windowControlsOverlay } = navigator;
 
   if (windowControlsOverlay) {
@@ -90,6 +90,7 @@ export default class Window {
         );
       }
     } else {
+      // $FlowFixMe[cannot-resolve-name]
       document.title = title;
     }
   }
@@ -104,6 +105,7 @@ export default class Window {
       // Update the window controls colors on Windows.
       ipcRenderer.invoke('titlebar-set-overlay-options', {
         color: newColor,
+        // $FlowFixMe[incompatible-type]
         symbolColor: isLightRgbColor(hexToRGBColor(newColor))
           ? '#000000'
           : '#ffffff',
@@ -111,6 +113,7 @@ export default class Window {
     }
 
     // Update the PWA titlebar/controls color (if it's an installed PWA).
+    // $FlowFixMe[cannot-resolve-name]
     const metaElement = document.querySelector('meta[name="theme-color"]');
     if (metaElement) {
       metaElement.setAttribute('content', newColor);
@@ -118,11 +121,14 @@ export default class Window {
 
     // Update the window background color. Update both `body` and `html` elements
     // to ensure the background color is visible when resized.
+    // $FlowFixMe[cannot-resolve-name]
     const body = document.body;
     if (body) {
       body.style.backgroundColor = newColor;
     }
+    // $FlowFixMe[cannot-resolve-name]
     if (document.documentElement) {
+      // $FlowFixMe[cannot-resolve-name]
       document.documentElement.style.backgroundColor = newColor;
     }
 
@@ -211,6 +217,7 @@ export default class Window {
     }
 
     const argumentsObject: {[string]: any} = {};
+    // $FlowFixMe[cannot-resolve-name]
     const params = new URLSearchParams(window.location.search);
     params.forEach((value, name) => (argumentsObject[name] = value));
 
@@ -230,10 +237,12 @@ export default class Window {
     // On Electron, we don't have a way to modify global args.
     if (remote) return;
 
+    // $FlowFixMe[cannot-resolve-name]
     const url = new URL(window.location.href);
     for (const argumentName of argumentNames) {
       url.searchParams.delete(argumentName);
     }
+    // $FlowFixMe[cannot-resolve-name]
     window.history.replaceState({}, document.title, url.toString());
   }
 
@@ -241,10 +250,12 @@ export default class Window {
     // On Electron, we don't have a way to modify global args.
     if (remote) return;
 
+    // $FlowFixMe[cannot-resolve-name]
     const url = new URL(window.location.href);
     for (const argumentName in argumentNamesAndValues) {
       url.searchParams.set(argumentName, argumentNamesAndValues[argumentName]);
     }
+    // $FlowFixMe[cannot-resolve-name]
     window.history.replaceState({}, document.title, url.toString());
   }
 
@@ -253,6 +264,7 @@ export default class Window {
     type?: 'none' | 'info' | 'error' | 'question' | 'warning'
   ) {
     if (!dialog || !electron) {
+      // $FlowFixMe[cannot-resolve-name]
       alert(message);
       return;
     }
@@ -272,6 +284,7 @@ export default class Window {
     if (!dialog || !electron) {
       // TODO: Find a way to display an alert with 3 buttons (not possible with the 3 native js method confirm, alert and prompt)
       // eslint-disable-next-line
+      // $FlowFixMe[cannot-resolve-name]
       const answer = confirm(message);
       if (answer) return 'yes';
       return 'no';
@@ -303,6 +316,7 @@ export default class Window {
   ): any {
     if (!dialog || !electron) {
       // eslint-disable-next-line
+      // $FlowFixMe[cannot-resolve-name]
       return confirm(message);
     }
 
@@ -325,6 +339,7 @@ export default class Window {
         'electron-editor-context-menu'
       );
 
+      // $FlowFixMe[cannot-resolve-name]
       window.addEventListener('contextmenu', function(e) {
         // Only show the context menu in text editors.
         if (!e.target.closest(textEditorSelectors)) return;
@@ -338,7 +353,9 @@ export default class Window {
           menu.popup({ window: remote.getCurrentWindow() });
         }, 30);
       });
+    // $FlowFixMe[cannot-resolve-name]
     } else if (document) {
+      // $FlowFixMe[cannot-resolve-name]
       document.addEventListener('contextmenu', function(e: any) {
         // Only show the context menu in text editors.
         if (!e.target.closest(textEditorSelectors)) {
@@ -366,11 +383,13 @@ export default class Window {
       return;
     }
 
+    // $FlowFixMe[cannot-resolve-name]
     window.open(url, shouldOpenInSameTabIfPossible ? '_self' : '_blank');
   }
 
   static getOrientation(): 'portrait' | 'landscape' {
     try {
+      // $FlowFixMe[cannot-resolve-name]
       return window.screen.orientation.type.split('-')[0];
     } catch (error) {
       console.warn('An error occurred when reading screen orientation', error);
@@ -384,6 +403,7 @@ export default class Window {
 
   static isDev(): boolean {
     if (!electron || !remote)
+      // $FlowFixMe[cannot-resolve-name]
       return !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
     try {

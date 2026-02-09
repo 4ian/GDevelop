@@ -212,6 +212,7 @@ const enumerateFreeInstructionsWithoutExtra = (
     : extension.getAllActions();
   const prefix = getExtensionPrefix(extension, i18n);
   const extensionInstructionsToKeep =
+    // $FlowFixMe[invalid-computed-prop]
     freeInstructionsToKeep[extension.getName()];
 
   // Get the map containing the metadata of the instructions provided by the extension...
@@ -263,6 +264,7 @@ const enumerateInstruction = (
   instrMetadata: gdInstructionMetadata,
   scope: InstructionOrExpressionScope,
   i18n: I18nType,
+  // $FlowFixMe[missing-local-annot]
   ignoresGroups = false
 ): EnumeratedInstructionMetadata => {
   const displayedName = instrMetadata.getFullName();
@@ -386,6 +388,7 @@ export const enumerateAllInstructions = (
           isCondition
             ? extension.getAllConditionsForObject(objectType)
             : extension.getAllActionsForObject(objectType),
+          // $FlowFixMe[incompatible-type]
           scope,
           i18n
         ),
@@ -411,6 +414,7 @@ export const enumerateAllInstructions = (
           isCondition
             ? extension.getAllConditionsForBehavior(behaviorType)
             : extension.getAllActionsForBehavior(behaviorType),
+          // $FlowFixMe[incompatible-type]
           scope,
           i18n
         ),
@@ -497,6 +501,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
       isCondition
         ? extension.getAllConditionsForObject(objectType)
         : extension.getAllActionsForObject(objectType),
+      // $FlowFixMe[incompatible-type]
       scope,
       i18n
     ),
@@ -523,6 +528,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
         extension,
         objectType,
         objectBehaviorTypes,
+        // $FlowFixMe[incompatible-type]
         scope,
         i18n
       ),
@@ -545,6 +551,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
         isCondition
           ? baseObjectExtension.getAllConditionsForObject(baseObjectType)
           : baseObjectExtension.getAllActionsForObject(baseObjectType),
+        // $FlowFixMe[incompatible-type]
         scope,
         i18n
       ),
@@ -575,6 +582,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
       const freeBehaviorInstructions: Array<EnumeratedInstructionMetadata> = [];
       for (let i = 0; i < allExtensions.size(); ++i) {
         const extension = allExtensions.at(i);
+        // $FlowFixMe[method-unbinding]
         freeBehaviorInstructions.push.apply(
           freeBehaviorInstructions,
           enumerateExtraBehaviorInstructions(
@@ -582,6 +590,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
             extension,
             behaviorType,
             prefix,
+            // $FlowFixMe[incompatible-type]
             scope,
             i18n
           )
@@ -595,6 +604,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
           isCondition
             ? extension.getAllConditionsForBehavior(behaviorType)
             : extension.getAllActionsForBehavior(behaviorType),
+          // $FlowFixMe[incompatible-type]
           scope,
           i18n,
           // Allow behaviors to have some of their instruction to be restricted
@@ -637,6 +647,7 @@ export const enumerateFreeInstructions = (
   for (let i = 0; i < allExtensions.size(); ++i) {
     const extension = allExtensions.at(i);
 
+    // $FlowFixMe[method-unbinding]
     allFreeInstructions.push.apply(
       allFreeInstructions,
       enumerateFreeInstructionsWithoutExtra(

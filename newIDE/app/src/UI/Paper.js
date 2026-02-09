@@ -27,7 +27,9 @@ export const getBackgroundColor = (
     ? gdevelopTheme.paper.backgroundColor.medium
     : gdevelopTheme.paper.backgroundColor.light;
 
-const Paper: component(...{ ...Props, +ref?: React.RefSetter<any> }) React.Node = React.forwardRef<Props, HTMLDivElement>(
+// $FlowFixMe[cannot-resolve-name]
+const Paper: React.ComponentType<Props> = React.forwardRef<Props, HTMLDivElement>(
+  // $FlowFixMe[missing-local-annot]
   ({ id, children, background, elevation, variant, style, square }, ref) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const backgroundColor = getBackgroundColor(gdevelopTheme, background);

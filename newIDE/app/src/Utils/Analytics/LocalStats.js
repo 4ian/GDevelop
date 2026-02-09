@@ -3,6 +3,7 @@ const localStorageLocalStatsPrefix = 'gd-local-stats';
 
 export const getProgramOpeningCount = (): number => {
   try {
+    // $FlowFixMe[cannot-resolve-name]
     const count = localStorage.getItem(
       `${localStorageLocalStatsPrefix}-program-opening`
     );
@@ -18,6 +19,7 @@ export const incrementProgramOpeningCount = () => {
   const count = getProgramOpeningCount() + 1;
 
   try {
+    // $FlowFixMe[cannot-resolve-name]
     localStorage.setItem(
       `${localStorageLocalStatsPrefix}-program-opening`,
       '' + count

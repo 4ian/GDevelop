@@ -291,6 +291,7 @@ const TooltipHeader = ({
 };
 
 type Props = {|
+  // $FlowFixMe[cannot-resolve-name]
   anchorElement: HTMLElement,
   tooltip: InAppTutorialFormattedTooltip,
   buttonLabel?: string,
@@ -320,6 +321,7 @@ const InAppTutorialTooltipDisplayer = (
   const [show, setShow] = React.useState<boolean>(false);
   const [folded, setFolded] = React.useState<boolean>(false);
   const updateVisibility = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (entries: IntersectionObserverEntry[]) => {
       setShow(entries[0].isIntersecting);
     },
@@ -366,6 +368,7 @@ const InAppTutorialTooltipDisplayer = (
           },
           preventOverflow: {
             enabled: true,
+            // $FlowFixMe[cannot-resolve-name]
             boundariesElement: document.querySelector('.main-frame'),
           },
         },

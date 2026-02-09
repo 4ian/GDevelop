@@ -41,9 +41,13 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props): React.Node => {
   const isMounted = useIsMounted();
 
   const editorRef = React.useRef<?InstancesEditor>(null);
+  // $FlowFixMe[cannot-resolve-name]
   const xScrollbarTrack = React.useRef<?HTMLDivElement>(null);
+  // $FlowFixMe[cannot-resolve-name]
   const xScrollbarThumb = React.useRef<?HTMLDivElement>(null);
+  // $FlowFixMe[cannot-resolve-name]
   const yScrollbarTrack = React.useRef<?HTMLDivElement>(null);
+  // $FlowFixMe[cannot-resolve-name]
   const yScrollbarThumb = React.useRef<?HTMLDivElement>(null);
 
   const showScrollbars = React.useRef<boolean>(false);
@@ -113,6 +117,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props): React.Node => {
   );
 
   const onMouseMoveOverInstanceEditor = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (event: MouseEvent) => {
       if (!editorRef.current) {
         return;
@@ -158,6 +163,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props): React.Node => {
   const makeMouseMoveXHandler = React.useCallback(
     (initialMousePosition: number, initialXValue: number) =>
       throttle(
+        // $FlowFixMe[cannot-resolve-name]
         (e: MouseEvent) => {
           if (!canvasWidth.current) {
             console.error('canvasWidth not initialized');
@@ -184,6 +190,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props): React.Node => {
   const makeMouseMoveYHandler = React.useCallback(
     (initialMousePosition: number, initialYValue: number) =>
       throttle(
+        // $FlowFixMe[cannot-resolve-name]
         (e: MouseEvent) => {
           if (!canvasHeight.current) {
             console.error('canvasHeight not initialized');
@@ -210,7 +217,9 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props): React.Node => {
 
   // When the user releases the thumb, we need to stop listening to mouse move and up events.
   const makeMouseUpXThumbHandler = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     mouseMoveHandler =>
+      // $FlowFixMe[cannot-resolve-name]
       function mouseUpHandler(e: MouseEvent) {
         isDragging.current = false;
         if (
@@ -219,13 +228,17 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props): React.Node => {
         ) {
           hideScrollbarsAfterDelay();
         }
+        // $FlowFixMe[cannot-resolve-name]
         document.removeEventListener('mousemove', mouseMoveHandler);
+        // $FlowFixMe[cannot-resolve-name]
         document.removeEventListener('mouseup', mouseUpHandler);
       },
     [hideScrollbarsAfterDelay]
   );
   const makeMouseUpYThumbHandler = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     mouseMoveHandler =>
+      // $FlowFixMe[cannot-resolve-name]
       function mouseUpHandler(e: MouseEvent) {
         isDragging.current = false;
         if (
@@ -234,7 +247,9 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props): React.Node => {
         ) {
           hideScrollbarsAfterDelay();
         }
+        // $FlowFixMe[cannot-resolve-name]
         document.removeEventListener('mousemove', mouseMoveHandler);
+        // $FlowFixMe[cannot-resolve-name]
         document.removeEventListener('mouseup', mouseUpHandler);
       },
     [hideScrollbarsAfterDelay]
@@ -246,6 +261,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props): React.Node => {
   // We also note down where the user clicked on the thumb, so that we can
   // move the thumb relative to this position.
   const mouseDownXThumbHandler = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (e: MouseEvent) => {
       isDragging.current = true;
       const initialDragPosition = e.clientX;
@@ -256,12 +272,15 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props): React.Node => {
 
       const mouseUpHandler = makeMouseUpXThumbHandler(mouseMoveHandler);
 
+      // $FlowFixMe[cannot-resolve-name]
       document.addEventListener('mousemove', mouseMoveHandler);
+      // $FlowFixMe[cannot-resolve-name]
       document.addEventListener('mouseup', mouseUpHandler);
     },
     [makeMouseMoveXHandler, makeMouseUpXThumbHandler]
   );
   const mouseDownYThumbHandler = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (e: MouseEvent) => {
       isDragging.current = true;
       const initialDragPosition = e.clientY;
@@ -272,7 +291,9 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props): React.Node => {
 
       const mouseUpHandler = makeMouseUpYThumbHandler(mouseMoveHandler);
 
+      // $FlowFixMe[cannot-resolve-name]
       document.addEventListener('mousemove', mouseMoveHandler);
+      // $FlowFixMe[cannot-resolve-name]
       document.addEventListener('mouseup', mouseUpHandler);
     },
     [makeMouseMoveYHandler, makeMouseUpYThumbHandler]
@@ -361,11 +382,13 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props): React.Node => {
     [setAndAdjust]
   );
 
+  // $FlowFixMe[cannot-resolve-name]
   const onMouseEnterThumb = (event: MouseEvent) => {
     if (timeoutHidingScrollbarsId.current) {
       clearTimeout(timeoutHidingScrollbarsId.current);
     }
   };
+  // $FlowFixMe[cannot-resolve-name]
   const onMouseLeaveThumb = (event: MouseEvent) => {
     if (!isDragging.current) hideScrollbarsAfterDelay();
   };
@@ -413,17 +436,18 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props): React.Node => {
                 height={height}
                 screenType={screenType}
                 onMouseMove={onMouseMoveOverInstanceEditor}
+                // $FlowFixMe[cannot-resolve-name]
                 onMouseLeave={(event: MouseEvent) => {
                   const { relatedTarget } = event;
                   if (!isDragging.current && relatedTarget) {
                     if (
                       // Flow says className is not present in ElementTarget but this piece
                       // of code cannot break.
-                      // $FlowFixMe
+                      // $FlowFixMe[incompatible-type]
                       relatedTarget.className &&
                       typeof relatedTarget.className === 'string' &&
                       // Hide only if the mouse is not leaving to go on one of the scrollbars' thumb.
-                      // $FlowFixMe
+                      // $FlowFixMe[incompatible-type]
                       !relatedTarget.className.includes(
                         'canvas-scrollbar-thumb'
                       )

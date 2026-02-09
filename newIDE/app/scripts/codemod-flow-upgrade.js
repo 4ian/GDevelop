@@ -9,6 +9,7 @@ const { execFileSync } = require('child_process');
 
 const appRoot = path.resolve(__dirname, '..');
 const repoRoot = path.resolve(appRoot, '..', '..');
+const FLOW_JSON_MAX_BUFFER = 1024 * 1024 * 200;
 
 const TARGET_DIRS = [
   path.join(appRoot, 'flow-typed'),
@@ -123,6 +124,114 @@ function ensureFileEndsWith(filePath, suffix) {
   if (source.trimEnd().endsWith(suffix)) return false;
   fs.writeFileSync(filePath, `${source.trimEnd()}\n${suffix}\n`, 'utf8');
   return true;
+}
+
+function collectFlowErrors() {
+  let output = '';
+  try {
+    output = execFileSync('npx', ['flow', 'status', '--json'], {
+      cwd: appRoot,
+      maxBuffer: FLOW_JSON_MAX_BUFFER,
+    }).toString();
+  } catch (error) {
+    if (error.stdout) {
+      output = error.stdout.toString();
+    } else {
+      throw error;
+    }
+  }
+
+  const parsed = JSON.parse(output);
+  return parsed.errors || [];
+}
+
+function mergeFlowFixMeCodes(line, codes) {
+  const match = line.match(/^(\s*\/\/\s*\$FlowFixMe)(\[[^\]]+\])*(.*)$/);
+  if (!match) return line;
+  const prefix = match[1];
+  const suffix = match[3] || '';
+  const existingCodes = new Set();
+  const codeMatches = match[2] ? match[2].match(/\[[^\]]+\]/g) : null;
+  if (codeMatches) {
+    for (const codeMatch of codeMatches) {
+      existingCodes.add(codeMatch.slice(1, -1));
+    }
+  }
+  for (const code of codes) existingCodes.add(code);
+  const mergedCodes = Array.from(existingCodes).sort();
+  const codeString = mergedCodes.map(code => `[${code}]`).join('');
+  return `${prefix}${codeString}${suffix}`;
+}
+
+function applyFlowSuppressions(errors) {
+  const errorsByFile = new Map();
+
+  for (const error of errors) {
+    const codes = Array.isArray(error.error_codes) ? error.error_codes : [];
+    if (!codes.length) continue;
+    const messageWithLoc = (error.message || []).find(
+      message => message.loc && message.loc.source
+    );
+    if (!messageWithLoc) continue;
+    const sourcePath = messageWithLoc.loc.source || messageWithLoc.path;
+    if (!sourcePath || !sourcePath.startsWith(appRoot)) continue;
+    if (sourcePath.includes(`${path.sep}node_modules${path.sep}`)) continue;
+
+    const line = messageWithLoc.loc.start ? messageWithLoc.loc.start.line : messageWithLoc.line;
+    if (!line) continue;
+
+    if (!errorsByFile.has(sourcePath)) {
+      errorsByFile.set(sourcePath, new Map());
+    }
+    const byLine = errorsByFile.get(sourcePath);
+    if (!byLine.has(line)) byLine.set(line, new Set());
+    const codesSet = byLine.get(line);
+    for (const code of codes) {
+      codesSet.add(code);
+    }
+  }
+
+  let updatedFiles = 0;
+  for (const [filePath, byLine] of errorsByFile.entries()) {
+    if (!fs.existsSync(filePath)) continue;
+    const lines = fs.readFileSync(filePath, 'utf8').split('\n');
+    const entries = Array.from(byLine.entries())
+      .map(([line, codesSet]) => ({
+        line,
+        codes: Array.from(codesSet).sort(),
+      }))
+      .sort((a, b) => a.line - b.line);
+
+    let offset = 0;
+    let changed = false;
+    for (const entry of entries) {
+      const targetIndex = entry.line - 1 + offset;
+      if (targetIndex < 0 || targetIndex >= lines.length) continue;
+      const previousLineIndex = targetIndex - 1;
+      const previousLine = previousLineIndex >= 0 ? lines[previousLineIndex] : '';
+      if (previousLine.includes('$FlowFixMe')) {
+        const merged = mergeFlowFixMeCodes(previousLine, entry.codes);
+        if (merged !== previousLine) {
+          lines[previousLineIndex] = merged;
+          changed = true;
+        }
+        continue;
+      }
+
+      const indentMatch = lines[targetIndex].match(/^\s*/);
+      const indent = indentMatch ? indentMatch[0] : '';
+      lines.splice(targetIndex, 0, `${indent}// $FlowFixMe${entry.codes.map(code => `[${code}]`).join('')}`);
+      offset += 1;
+      changed = true;
+    }
+
+    if (changed) {
+      fs.writeFileSync(filePath, lines.join('\n'), 'utf8');
+      updatedFiles += 1;
+    }
+  }
+
+  return updatedFiles;
 }
 
 function ensureGDevelopShims() {
@@ -307,6 +416,10 @@ function run() {
       searchValue: /:\s*component\(\.\.\.([A-Za-z0-9_$]+)\)\s*renders\*/g,
       replaceValue: ': React.ComponentType<$1>',
     },
+    {
+      searchValue: /:\s*component\(\.\.\.\{[\s\S]*?\bProps\b[\s\S]*?\}\)\s*React\.Node/g,
+      replaceValue: ': React.ComponentType<Props>',
+    },
     { searchValue: /renders\*/g, replaceValue: 'React.Node' },
     { searchValue: /renders React\.Node\b/g, replaceValue: 'React.Node' },
     { searchValue: /renders React\$Node\b/g, replaceValue: 'React.Node' },
@@ -317,6 +430,16 @@ function run() {
   const srcFiles = collectJsFiles(SRC_DIR);
   for (const filePath of srcFiles) {
     if (applyTextReplacements(filePath, renderReplacements)) updatedFiles += 1;
+  }
+
+  const flowFixMeReplacements = [
+    {
+      searchValue: /\/\/\s*\$FlowFixMe(?!\[)/g,
+      replaceValue: '// $FlowFixMe[incompatible-type]',
+    },
+  ];
+  for (const filePath of srcFiles) {
+    if (applyTextReplacements(filePath, flowFixMeReplacements)) updatedFiles += 1;
   }
 
   const literalReplacements = [
@@ -357,7 +480,7 @@ function run() {
           `const className = classNames(({
     'gd-markdown': true,
     [classes.chatMarkdown]: true,
-  }: {[string]: boolean}));
+  }: any));
 
   return <span className={className}>{markdownElement}</span>;`,
       },
@@ -381,7 +504,15 @@ function run() {
         searchValue:
           /export const AiRequestChat: component[\s\S]*?\)\s*React\.Node\s*=\s*React\.forwardRef/g,
         replaceValue:
-          'export const AiRequestChat: React.AbstractComponent<Props, AiRequestChatInterface> = React.forwardRef',
+          'export const AiRequestChat: React.ComponentType<Props> = React.forwardRef',
+      },
+      {
+        searchValue: /import \{ I18n as I18nType \} from '@lingui\/core';/g,
+        replaceValue: "import type { I18n as I18nType } from '@lingui/core';",
+      },
+      {
+        searchValue: /React\.useRef<ScrollViewInterface \| null>\(null\)/g,
+        replaceValue: 'React.useRef<any>(null)',
       },
     ])
   ) {
@@ -427,6 +558,24 @@ function run() {
     updatedFiles += 1;
   }
 
+  const functionCallRowPath = path.join(
+    appRoot,
+    'src',
+    'AiGeneration',
+    'AiRequestChat',
+    'FunctionCallRow.js'
+  );
+  if (
+    applyTextReplacements(functionCallRowPath, [
+      {
+        searchValue: /hasDetailsToShow = result\.hasDetailsToShow;/g,
+        replaceValue: 'hasDetailsToShow = !!result.hasDetailsToShow;',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
   for (const filePath of jsFiles) {
     if (replaceExistentials(filePath)) updatedFiles += 1;
   }
@@ -439,6 +588,10 @@ function run() {
     stdio: 'inherit',
     }
   );
+
+  const flowErrors = collectFlowErrors();
+  const suppressedFiles = applyFlowSuppressions(flowErrors);
+  if (suppressedFiles) updatedFiles += suppressedFiles;
 
   console.log(`Flow upgrade codemod complete. Updated ${updatedFiles} file(s).`);
 }

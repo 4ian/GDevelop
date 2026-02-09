@@ -56,9 +56,11 @@ export type EventsBasedObjectCallbacks = {|
 |};
 
 export type EventsBasedObjectProps = {|
+  // $FlowFixMe[value-as-type]
   ...TreeItemProps,
   ...EventsBasedObjectCallbacks,
   addNewEventsFunction: ({|
+    // $FlowFixMe[value-as-type]
     itemContent: ?TreeViewItemContent,
     eventsBasedBehavior: ?gdEventsBasedBehavior,
     eventsBasedObject: ?gdEventsBasedObject,
@@ -76,6 +78,7 @@ export const getObjectTreeViewItemId = (
 };
 
 export class EventsBasedObjectTreeViewItemContent
+  // $FlowFixMe[value-as-type]
   implements TreeViewItemContent {
   eventsBasedObject: gdEventsBasedObject;
   props: EventsBasedObjectProps;
@@ -104,6 +107,7 @@ export class EventsBasedObjectTreeViewItemContent
     return this.eventsBasedObject;
   }
 
+  // $FlowFixMe[value-as-type]
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return itemContent.getId() === extensionObjectsRootFolderId;
   }

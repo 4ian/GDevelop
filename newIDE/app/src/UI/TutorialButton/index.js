@@ -23,6 +23,7 @@ const TutorialButton = (props: PropsType):
   | boolean
   | number
   | string
+  // $FlowFixMe[internal-type]
   | $Iterable<?React$Node, void, void>
   | React.MixedElement
   | React$Portal

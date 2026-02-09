@@ -40,6 +40,7 @@ export type SceneTreeViewItemCallbacks = {|
 |};
 
 export type SceneTreeViewItemCommonProps = {|
+  // $FlowFixMe[value-as-type]
   ...TreeItemProps,
   ...SceneTreeViewItemCallbacks,
 |};
@@ -57,6 +58,7 @@ export const getSceneTreeViewItemId = (scene: gdLayout): string => {
   return `scene-${scene.ptr}`;
 };
 
+// $FlowFixMe[value-as-type]
 export class SceneTreeViewItemContent implements TreeViewItemContent {
   scene: gdLayout;
   props: SceneTreeViewItemProps;
@@ -66,6 +68,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     this.props = props;
   }
 
+  // $FlowFixMe[value-as-type]
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return itemContent.getId() === scenesRootFolderId;
   }

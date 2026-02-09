@@ -209,6 +209,7 @@ export const LeaderboardAdmin = ({onLoading, project, leaderboardIdToSelectAtOpe
   );
   const [newName, setNewName] = React.useState<string>('');
   const [newNameError, setNewNameError] = React.useState<?string>(null);
+  // $FlowFixMe[value-as-type]
   const newNameTextFieldRef = React.useRef<?TextFieldInterface>(null);
   const [apiError, setApiError] = React.useState<?ApiError>(null);
   const [
@@ -845,7 +846,7 @@ export const LeaderboardAdmin = ({onLoading, project, leaderboardIdToSelectAtOpe
           value={currentLeaderboard.playerUnicityDisplayChoice}
           onChange={(e, i, value) => {
             onUpdateLeaderboard(i18n, {
-              // $FlowFixMe
+              // $FlowFixMe[incompatible-type]
               playerUnicityDisplayChoice: value,
             });
           }}

@@ -147,7 +147,9 @@ const CoursePage = (
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const courseCompletion = getCourseCompletion();
   const firstIncompleteChapterIdRef = React.useRef<string | null>(
+    // $FlowFixMe[incompatible-type]
     courseChapters.reduce((alreadyFoundIncompleteChapterId, chapter, index) => {
+      // $FlowFixMe[constant-condition]
       if (alreadyFoundIncompleteChapterId)
         return alreadyFoundIncompleteChapterId;
       const chapterCompletion = getChapterCompletion(chapter.id);
@@ -167,12 +169,15 @@ const CoursePage = (
       return null;
     }, null)
   );
+  // $FlowFixMe[cannot-resolve-name]
   const scrollingContainerRef = React.useRef<?HTMLDivElement>(null);
   const chapterTitleRefs = React.useRef<
     {|
       chapterId: string,
+      // $FlowFixMe[cannot-resolve-name]
       ref: HTMLDivElement,
     |}[]
+  // $FlowFixMe[incompatible-type]
   >(new Array(courseChapters.length));
   const [activeChapterId, setActiveChapterId] = React.useState<?string>(null);
 
@@ -229,6 +234,7 @@ const CoursePage = (
     );
   });
 
+  // $FlowFixMe[cannot-resolve-name]
   const onScroll = React.useCallback((e: Event) => {
     setActiveChapterId(() => {
       // $FlowIgnore
@@ -312,6 +318,7 @@ const CoursePage = (
     <I18n>
       {({ i18n }) => (
         <>
+          // $FlowFixMe[incompatible-type]
           <SectionContainer
             ref={scrollingContainerRef}
             applyTopSpacingAsMarginOnChildrenContainer
@@ -349,6 +356,7 @@ const CoursePage = (
                     key={chapter.id}
                   >
                     {chapter.videoUrl ? (
+                      // $FlowFixMe[incompatible-type]
                       <VideoBasedCourseChapterView
                         chapterIndex={index}
                         course={course}
@@ -361,6 +369,7 @@ const CoursePage = (
                         getChapterCompletion={getChapterCompletion}
                         key={chapter.id}
                         onClickUnlock={onClickUnlock}
+                        // $FlowFixMe[missing-local-annot]
                         ref={_ref => {
                           if (_ref) {
                             chapterTitleRefs.current[index] = {
@@ -371,10 +380,12 @@ const CoursePage = (
                         }}
                       />
                     ) : (
+                      // $FlowFixMe[incompatible-type]
                       <TextBasedCourseChapterView
                         chapterIndex={index}
                         course={course}
                         // $FlowIgnore - Flow does not conclude this chapter can only be text-based.
+                        // $FlowFixMe[incompatible-type]
                         courseChapter={chapter}
                         onOpenTemplate={(templateId?: string) => {
                           onOpenTemplateFromCourseChapter(chapter, templateId);
@@ -384,6 +395,7 @@ const CoursePage = (
                         getChapterCompletion={getChapterCompletion}
                         key={chapter.id}
                         onClickUnlock={onClickUnlock}
+                        // $FlowFixMe[missing-local-annot]
                         ref={_ref => {
                           if (_ref) {
                             chapterTitleRefs.current[index] = {
@@ -430,6 +442,7 @@ const CoursePage = (
                           <LinearProgress
                             value={courseCompletion.percentage * 100}
                             variant="determinate"
+                            // $FlowFixMe[incompatible-type]
                             style={styles.progress}
                             color="success"
                           />
@@ -490,6 +503,7 @@ const CoursePage = (
                           <LinearProgress
                             value={courseCompletion.percentage * 100}
                             variant="determinate"
+                            // $FlowFixMe[incompatible-type]
                             style={styles.progress}
                             color="success"
                           />

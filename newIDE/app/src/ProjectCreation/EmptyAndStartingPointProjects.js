@@ -49,6 +49,7 @@ const EmptyProjectTile = ({
           className={classes.emptyProject}
           onClick={disabled ? undefined : onSelectEmptyProject}
           tabIndex={0}
+          // $FlowFixMe[cannot-resolve-name]
           onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
             if (shouldValidate(event) && !disabled) {
               onSelectEmptyProject();

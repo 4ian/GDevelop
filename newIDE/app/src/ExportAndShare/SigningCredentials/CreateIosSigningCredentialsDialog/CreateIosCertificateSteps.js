@@ -19,8 +19,10 @@ import { type AuthenticatedUser } from '../../../Profile/AuthenticatedUserContex
 import { signingCredentialApi } from '../../../Utils/GDevelopServices/Build';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 
+// $FlowFixMe[cannot-resolve-name]
 export const getBase64FromFile = async (file: File): Promise<unknown> => {
   return new Promise((resolve, reject) => {
+    // $FlowFixMe[cannot-resolve-name]
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result !== 'string')
@@ -48,6 +50,7 @@ const styles = {
 };
 
 type Props = {
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
 };
 
@@ -126,6 +129,7 @@ export const CreateIosCertificateSteps = ({authenticatedUser}: Props): React.Nod
   ] = React.useState(false);
 
   const onUploadCertificate = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     async (certificateFile: File) => {
       if (!userId) return;
 
@@ -141,6 +145,7 @@ export const CreateIosCertificateSteps = ({authenticatedUser}: Props): React.Nod
           authenticatedUser.getAuthorizationHeader,
           userId,
           {
+            // $FlowFixMe[incompatible-type]
             certificateAsBase64,
           }
         );
@@ -180,6 +185,7 @@ export const CreateIosCertificateSteps = ({authenticatedUser}: Props): React.Nod
   );
 
   const onUploadMobileProvision = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     async (mobileProvisionFile: File) => {
       if (!userId) return;
 
@@ -194,6 +200,7 @@ export const CreateIosCertificateSteps = ({authenticatedUser}: Props): React.Nod
           authenticatedUser.getAuthorizationHeader,
           userId,
           {
+            // $FlowFixMe[incompatible-type]
             mobileProvisionAsBase64,
           }
         );

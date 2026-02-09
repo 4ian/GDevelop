@@ -71,12 +71,14 @@ const initialMosaicEditorNodes = {
  * currently selected inspector.
  */
 export default class DebuggerContent extends React.Component<Props, State> {
+  // $FlowFixMe[missing-local-annot]
   state = {
     selectedInspector: null,
     selectedInspectorFullPath: [] as Array<empty>,
     rawMode: false,
   };
 
+  // $FlowFixMe[value-as-type]
   _editors: ?EditorMosaicInterface = null;
 
   isProfilerShown = (): any => {

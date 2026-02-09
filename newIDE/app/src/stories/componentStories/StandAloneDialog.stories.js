@@ -79,6 +79,7 @@ const StandAloneDialogStory = ({
   errorMessage,
 }: {
   bundleCategory: string,
+  // $FlowFixMe[value-as-type]
   authenticatedUser?: AuthenticatedUser,
   receivedBundles?: Array<Bundle>,
   delayResponse?: number,

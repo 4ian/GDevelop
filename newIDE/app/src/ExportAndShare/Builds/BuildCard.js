@@ -122,6 +122,7 @@ type Props = {|
   setGameUpdating: boolean => void,
   onBuildUpdated: Build => void,
   onBuildDeleted: Build => void,
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
 |};
 
@@ -153,6 +154,7 @@ export const BuildCard = (
     differenceInCalendarDays(Date.now(), build.updatedAt) > 6;
 
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  // $FlowFixMe[value-as-type]
   const nameInput = React.useRef<?TextFieldInterface>(null);
   const { isMobile } = useResponsiveWindowSize();
 
@@ -324,6 +326,7 @@ export const BuildCard = (
                     {gameUpdating && (
                       <>
                         <Spacer />
+                        // $FlowFixMe[incompatible-type]
                         <CircularProgress style={styles.circularProgress} />
                       </>
                     )}

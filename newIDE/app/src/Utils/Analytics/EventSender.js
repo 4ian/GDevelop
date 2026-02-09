@@ -31,6 +31,7 @@ let posthogLastPropertiesSent = '';
 let currentlyRunningInAppTutorial = null;
 
 let gdevelopEditorAnalytics: {|
+  // $FlowFixMe[cannot-resolve-name]
   initialize: (rootElement: HTMLElement) => Promise<void>,
   identify: (
     userId: string,
@@ -58,11 +59,13 @@ const ensureGDevelopEditorAnalyticsReady = async () => {
         { times: 2 },
         async () =>
           // $FlowExpectedError - Remote script cannot be found.
+          // $FlowFixMe[cannot-resolve-module]
           (await import(/* webpackIgnore: true */ 'https://resources.gdevelop.io/a/gea.js'))
             .default
       );
       if (module) {
         await module.initialize({
+          // $FlowFixMe[cannot-resolve-name]
           documentBody: document.body,
           isNativeMobileApp: isNativeMobileApp(),
           isElectronApp,
@@ -179,6 +182,7 @@ export const installAnalyticsEvents = () => {
  * We can safely call it multiple times, as it will only send the user properties if they changed.
  */
 export const identifyUserForAnalytics = (
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser
 ) => {
   if (isDev) {
@@ -255,6 +259,7 @@ export const identifyUserForAnalytics = (
  * This is only done on signup as an ID can only be an alias of another ID once.
  */
 export const aliasUserForAnalyticsAfterSignUp = (
+  // $FlowFixMe[value-as-type]
   firebaseUser: FirebaseUser
 ) => {
   if (isDev) {

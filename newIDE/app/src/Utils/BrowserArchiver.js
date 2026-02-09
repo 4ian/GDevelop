@@ -6,6 +6,7 @@ import { shortenString } from './StringHelpers.js';
 
 export type BlobFileDescriptor = {|
   filePath: string,
+  // $FlowFixMe[cannot-resolve-name]
   blob: Blob,
 |};
 
@@ -53,6 +54,7 @@ export const downloadUrlFilesToBlobFiles = async ({
 |}): Promise<Array<BlobFileDescriptor>> => {
   const downloadedBlobs: Array<
     ItemResult<UrlFileDescriptor>
+  // $FlowFixMe[incompatible-type]
   > = await downloadUrlsToBlobs({
     urlContainers: urlFiles.filter(({ url }) => url.indexOf('.h') === -1), // Should be useless now, still keep it by safety.
     onProgress,
@@ -79,7 +81,7 @@ export const downloadUrlFilesToBlobFiles = async ({
 
   return downloadedBlobs.map(({ item, blob }) => {
     return {
-      // $FlowFixMe - any non existing blob is discarded before.
+      // $FlowFixMe[incompatible-type] - any non existing blob is discarded before.
       blob,
       filePath: item.filePath,
     };
@@ -102,14 +104,17 @@ export const archiveFiles = async ({
   basePath: string,
   onProgress: (count: number, total: number) => void,
   sizeLimit?: number,
+// $FlowFixMe[cannot-resolve-name]
 |}): Promise<Blob> => {
   const zipJs: ZipJs = await initializeZipJs();
 
   let zippedFilesCount = 0;
   let totalFilesCount = blobFiles.length + textFiles.length;
 
+  // $FlowFixMe[missing-local-annot]
   return new Promise((resolve, reject) => {
     zipJs.createWriter(
+      // $FlowFixMe[invalid-constructor]
       new zipJs.BlobWriter('application/zip'),
       function(zipWriter) {
         eachCallback(
@@ -120,6 +125,7 @@ export const archiveFiles = async ({
 
             zipWriter.add(
               relativeFilePath,
+              // $FlowFixMe[invalid-constructor]
               new zipJs.BlobReader(blob),
               () => {
                 zippedFilesCount++;
@@ -140,6 +146,7 @@ export const archiveFiles = async ({
 
                 zipWriter.add(
                   relativeFilePath,
+                  // $FlowFixMe[invalid-constructor]
                   new zipJs.TextReader(text),
                   () => {
                     zippedFilesCount++;
@@ -152,6 +159,7 @@ export const archiveFiles = async ({
                 );
               },
               () => {
+                // $FlowFixMe[cannot-resolve-name]
                 zipWriter.close((blob: Blob) => {
                   const fileSize = blob.size;
                   if (sizeLimit && fileSize > sizeLimit) {

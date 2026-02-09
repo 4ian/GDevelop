@@ -92,6 +92,7 @@ type Props = {|
   thumbnailSource?: string,
   thumbnailAlt?: string,
   content: React.Node,
+  // $FlowFixMe[cannot-resolve-name]
   anchorElement: HTMLElement,
   onClose: () => void,
   placement: 'left' | 'top' | 'bottom' | 'right',
@@ -134,6 +135,7 @@ const HighlightingTooltip = (
           },
           preventOverflow: {
             enabled: true,
+            // $FlowFixMe[cannot-resolve-name]
             boundariesElement: document.querySelector('.main-frame'),
           },
         },

@@ -164,6 +164,7 @@ export const addSerializedObjectToObjectsContainer = ({
   return { object: newObject, global };
 };
 
+// $FlowFixMe[value-as-type]
 export class ObjectTreeViewItemContent implements TreeViewItemContent {
   object: gdObjectFolderOrObject;
   _isGlobal: boolean;
@@ -183,6 +184,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     return this.object;
   }
 
+  // $FlowFixMe[value-as-type]
   isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean {
     const objectFolderOrObject = treeViewItemContent.getObjectFolderOrObject();
     return (
@@ -191,6 +193,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     );
   }
 
+  // $FlowFixMe[value-as-type]
   isSibling(treeViewItemContent: TreeViewItemContent): boolean {
     const objectFolderOrObject = treeViewItemContent.getObjectFolderOrObject();
     return (

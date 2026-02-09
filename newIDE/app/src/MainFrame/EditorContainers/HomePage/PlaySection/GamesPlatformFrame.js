@@ -40,6 +40,7 @@ const GamesPlatformFrame = ({initialGameId, loaded, visible, iframePosition}: Pr
   // when the game id changes.
   const gameId = React.useRef(initialGameId);
 
+  // $FlowFixMe[cannot-resolve-name]
   const url = new URL(
     gameId.current
       ? `/app-embedded/${gamesPlatformEmbeddedVersion}/games/${gameId.current}`

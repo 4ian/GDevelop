@@ -6,6 +6,7 @@ const fs = optionalRequire('fs');
 const readLocalFileToArrayBuffer = async (
   filePath: string
 ): Promise<ArrayBuffer> => {
+  // $FlowFixMe[cannot-resolve-name]
   const buffer: Buffer = await new Promise((resolve, reject) => {
     fs.readFile(filePath, function(err, buffer) {
       if (err) {
@@ -56,9 +57,11 @@ const extensionToMimeType = {
   js: 'application/javascript',
 };
 
+// $FlowFixMe[cannot-resolve-name]
 export const readLocalFileToFile = async (filePath: string): Promise<File> => {
   const arrayBuffer = await readLocalFileToArrayBuffer(filePath);
   const extensionWithoutLeadingDot = path.extname(filePath).replace(/^\./, '');
+  // $FlowFixMe[cannot-resolve-name]
   return new File([arrayBuffer], path.basename(filePath), {
     type:
       extensionToMimeType[extensionWithoutLeadingDot] ||

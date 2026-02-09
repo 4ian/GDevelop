@@ -56,6 +56,7 @@ export const initialTeamState = {
   onEditUser: async () => {},
 };
 
+// $FlowFixMe[incompatible-type]
 const TeamContext: React.Context<TeamState> = React.createContext<TeamState>(initialTeamState);
 
 export default TeamContext;

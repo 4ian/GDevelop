@@ -27,6 +27,7 @@ import { client as assetClient } from '../../../Utils/GDevelopServices/Asset';
 const WrappedHomePage = (
   {
     project,
+    // $FlowFixMe[incompatible-type]
     tutorialProgress = undefined,
     inAppTutorialsFetchingError = null,
     user
@@ -34,6 +35,7 @@ const WrappedHomePage = (
     project: ?gdProject,
     tutorialProgress?: InAppTutorialUserProgress,
     inAppTutorialsFetchingError?: string | null,
+    // $FlowFixMe[value-as-type]
     user: AuthenticatedUser,
   |},
 ): React.Node => {
@@ -62,6 +64,7 @@ const WrappedHomePage = (
   return (
     <FixedHeightFlexContainer height={fixedHeight}>
       <PreferencesContext.Provider
+        // $FlowFixMe[incompatible-type]
         value={{
           ...initialPreferences,
           getTutorialProgress: () => tutorialProgress,

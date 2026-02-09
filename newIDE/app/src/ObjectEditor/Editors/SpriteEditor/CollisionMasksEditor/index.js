@@ -42,6 +42,7 @@ const styles = {
   },
 };
 
+// $FlowFixMe[value-as-type]
 const horizontalMosaicNodes: EditorMosaicNode = {
   direction: 'row',
   first: 'preview',
@@ -49,6 +50,7 @@ const horizontalMosaicNodes: EditorMosaicNode = {
   splitPercentage: 66.67,
 };
 
+// $FlowFixMe[value-as-type]
 const verticalMosaicNodes: EditorMosaicNode = {
   direction: 'column',
   first: 'preview',
@@ -117,6 +119,7 @@ const CollisionMasksEditor = (
   );
 
   const updateCollisionMasks = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     (sameCollisionMasksForAnimations, sameCollisionMasksForSprites) => {
       if (animation && sprite) {
         if (sameCollisionMasksForAnimations) {
@@ -135,17 +138,20 @@ const CollisionMasksEditor = (
     [animation, sprite, animations, forceUpdate, onMasksUpdated]
   );
 
+  // $FlowFixMe[missing-local-annot]
   const chooseAnimation = index => {
     setAnimationIndex(index);
     setDirectionIndex(0);
     setSpriteIndex(0);
   };
 
+  // $FlowFixMe[missing-local-annot]
   const chooseDirection = index => {
     setDirectionIndex(index);
     setSpriteIndex(0);
   };
 
+  // $FlowFixMe[missing-local-annot]
   const chooseSprite = index => {
     setSpriteIndex(index);
   };
@@ -245,6 +251,7 @@ const CollisionMasksEditor = (
   );
 
   const onSetAutomaticallyAdaptCollisionMasks = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     async value => {
       // If enabling automatic while custom was selected, then ask for confirmation.
       if (value && sprite && !sprite.isFullImageCollisionMask()) {
@@ -309,6 +316,7 @@ const CollisionMasksEditor = (
   if (!animations.getAnimationsCount()) return null;
   const resourceName = sprite ? sprite.getImageName() : '';
 
+  // $FlowFixMe[value-as-type]
   const editors: { [string]: Editor | null } = {
     preview: {
       type: 'primary',

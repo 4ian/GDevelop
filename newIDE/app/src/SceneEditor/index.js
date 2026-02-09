@@ -296,6 +296,7 @@ const editSceneIconReactNode = <EditSceneIcon />;
 
 export default class SceneEditor extends React.Component<Props, State> {
   instancesSelection: InstancesSelection;
+  // $FlowFixMe[value-as-type]
   contextMenu: ?ContextMenuInterface;
   editorDisplay: ?SceneEditorsDisplayInterface;
   resourceExternallyChangedCallbackId: ?string;
@@ -619,6 +620,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           resourceName
         );
         // $FlowIgnore - Flow does not know ObjectsUsingResourceCollector inherits from ArbitraryObjectsWorker
+        // $FlowFixMe[incompatible-type]
         gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
         const objectNames = objectsCollector.getObjectNames().toJSArray();
         objectsCollector.delete();
@@ -975,6 +977,7 @@ export default class SceneEditor extends React.Component<Props, State> {
    * bottleneck. We let the mutations be done and trigger an update only when the user
    * is done.
    */
+  // $FlowFixMe[missing-local-annot]
   _onInstancesEditorSettingsMutated = debounce(
   (instancesEditorSettings: InstancesEditorSettings) => {
     this.setInstancesEditorSettings(instancesEditorSettings);
@@ -1086,6 +1089,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const viewPosition = this.editorDisplay.viewControls.getViewPosition();
     let position = [0, 0];
     if (viewPosition) {
+      // $FlowFixMe[incompatible-type]
       position = viewPosition.toSceneCoordinates(
         viewPosition.getWidth() / 2,
         viewPosition.getHeight() /
@@ -1291,6 +1295,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._sendUpdatedInstances(instances);
   };
 
+  // $FlowFixMe[missing-local-annot]
   _exportDataOnly = debounce(
   () => {
     this.props.hotReloadPreviewButtonProps.launchProjectDataOnlyPreview();
@@ -2549,6 +2554,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       onExtractAsEventBasedObject,
     } = this.props;
     const { editorDisplay, deleteSelection, instancesSelection } = this;
+    // $FlowFixMe[constant-condition]
     if (!onExtractAsEventBasedObject) return;
 
     let selectionAABB = new Rectangle();

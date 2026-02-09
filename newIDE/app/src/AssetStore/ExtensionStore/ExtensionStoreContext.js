@@ -17,6 +17,7 @@ import { EXTENSIONS_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 
 const emptySearchText = '';
 
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const noExcludedTiers = new Set();
 const excludedExperimentalTiers = new Set(['experimental']);
 
@@ -179,6 +180,7 @@ export const ExtensionStoreStateProvider = ({children, i18n, defaultSearchText}:
 
   const allCategories = React.useMemo(
     () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       const categoriesSet = new Set();
       for (const name in translatedExtensionShortHeadersByName) {
         categoriesSet.add(translatedExtensionShortHeadersByName[name].category);
@@ -193,6 +195,7 @@ export const ExtensionStoreStateProvider = ({children, i18n, defaultSearchText}:
 
   const filters = React.useMemo(
     () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       const tagsSet = new Set();
       for (const name in translatedExtensionShortHeadersByName) {
         translatedExtensionShortHeadersByName[name].tags.forEach(tag =>
@@ -205,6 +208,7 @@ export const ExtensionStoreStateProvider = ({children, i18n, defaultSearchText}:
       return {
         allTags: sortedTags,
         defaultTags: sortedTags,
+        // $FlowFixMe[missing-empty-array-annot]
         tagsTree: [],
       };
     },
@@ -262,6 +266,7 @@ export const ExtensionStoreStateProvider = ({children, i18n, defaultSearchText}:
   );
 
   return (
+    // $FlowFixMe[incompatible-type]
     <ExtensionStoreContext.Provider value={extensionStoreState}>
       {children}
     </ExtensionStoreContext.Provider>

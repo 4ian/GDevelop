@@ -69,10 +69,12 @@ const prepareExporter = async ({
     fileSystem.getTempDir(),
     isForInGameEdition ? 'in-game-editor-preview' : 'preview'
   );
+  // $FlowFixMe[extra-arg]
   const exporter = new gd.Exporter(fileSystem, gdjsRoot);
 
   return {
     outputDir,
+    // $FlowFixMe[incompatible-type]
     exporter,
     gdjsRoot,
   };
@@ -84,6 +86,7 @@ export default class LocalPreviewLauncher extends React.Component<
 > {
   canDoNetworkPreview = (): any => true;
 
+  // $FlowFixMe[missing-local-annot]
   state = {
     networkPreviewDialogOpen: false,
     networkPreviewHost: null,
@@ -97,7 +100,9 @@ export default class LocalPreviewLauncher extends React.Component<
     numberOfWindows: 1,
     captureOptions: null,
   };
+  // $FlowFixMe[value-as-type]
   _networkPreviewSubscriptionChecker: ?SubscriptionCheckerInterface = null;
+  // $FlowFixMe[value-as-type]
   _hotReloadSubscriptionChecker: ?SubscriptionCheckerInterface = null;
 
   _openPreviewBrowserWindow = () => {
@@ -155,6 +160,7 @@ export default class LocalPreviewLauncher extends React.Component<
     options: PreviewOptions
   ): void => {
     this.setState(
+      // $FlowFixMe[incompatible-type]
       {
         previewBrowserWindowOptions: {
           width: project.getGameResolutionWidth(),
@@ -247,6 +253,7 @@ export default class LocalPreviewLauncher extends React.Component<
       isForInGameEdition: previewOptions.isForInGameEdition,
     });
 
+    // $FlowFixMe[cannot-resolve-name]
     var previewStartTime = performance.now();
 
     const previewExportOptions = new gd.PreviewExportOptions(
@@ -450,6 +457,7 @@ export default class LocalPreviewLauncher extends React.Component<
     exporter.delete();
     previewExportOptions.delete();
 
+    // $FlowFixMe[cannot-resolve-name]
     const previewStopTime = performance.now();
     console.info(
       `[LocalPreviewLauncher] Preview #${previewId} took ${previewStopTime -

@@ -78,6 +78,7 @@ export const QuickObjectReplacer = (
                           primary
                           label={<Trans>Replace</Trans>}
                           onClick={() => {
+                            // $FlowFixMe[incompatible-type]
                             setSelectedObjectToSwap({ object, layout });
                           }}
                         />
@@ -90,6 +91,7 @@ export const QuickObjectReplacer = (
           </ColumnStackLayout>
         );
       })}
+      // $FlowFixMe[constant-condition]
       {selectedObjectToSwap && (
         <AssetSwappingDialog
           project={project}

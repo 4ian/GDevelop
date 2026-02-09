@@ -5,17 +5,21 @@ export type PanMoveEvent = {|
   deltaX: number,
   deltaY: number,
   velocity: number,
+  // $FlowFixMe[value-as-type]
   data: PIXI.FederatedPointerEvent,
 |};
 
 export default function panable(
+  // $FlowFixMe[value-as-type]
   sprite: PIXI.DisplayObject,
   inertia: boolean = false
 ) {
+  // $FlowFixMe[value-as-type]
   function pointerDown(e: PIXI.FederatedPointerEvent) {
     start(e.data.originalEvent.nativeEvent);
   }
 
+  // $FlowFixMe[cannot-resolve-name]
   function start(t: Touch) {
     if (sprite._pan) {
       if (!sprite._pan.intervalId) {
@@ -34,6 +38,7 @@ export default function panable(
     sprite.addEventListener('globalpointermove', pointerMove);
   }
 
+  // $FlowFixMe[value-as-type]
   function pointerMove(e: PIXI.FederatedPointerEvent) {
     let touch = e.data.originalEvent.nativeEvent;
     if (!e.data.isPrimary) {
@@ -43,6 +48,7 @@ export default function panable(
     move(e, touch);
   }
 
+  // $FlowFixMe[cannot-resolve-name][value-as-type]
   function move(e: PIXI.FederatedPointerEvent, t: Touch) {
     let now = new Date();
     let interval = now - sprite._pan.p.date;
@@ -53,6 +59,7 @@ export default function panable(
     let dy = t.clientY - sprite._pan.p.y;
     let distance = Math.sqrt(dx * dx + dy * dy);
     if (!sprite._pan.pp) {
+      // $FlowFixMe[cannot-resolve-name]
       let threshold = t instanceof window.MouseEvent ? 2 : 7;
       if (distance > threshold) {
         sprite.emit('panstart');
@@ -80,10 +87,12 @@ export default function panable(
     };
   }
 
+  // $FlowFixMe[value-as-type]
   function pointerUp(e: PIXI.FederatedPointerEvent) {
     end(e, e.data.originalEvent.nativeEvent);
   }
 
+  // $FlowFixMe[cannot-resolve-name][value-as-type]
   function end(e: PIXI.FederatedPointerEvent, t: Touch) {
     sprite.removeEventListener('globalpointermove', pointerMove);
     if (!sprite._pan || !sprite._pan.pp) {
@@ -108,7 +117,7 @@ export default function panable(
           clientX: sprite._pan.p.x + vx * 12,
           clientY: sprite._pan.p.y + vy * 12,
         };
-        // $FlowFixMe
+        // $FlowFixMe[incompatible-type]
         move(e, touch);
         vx *= 0.9;
         vy *= 0.9;

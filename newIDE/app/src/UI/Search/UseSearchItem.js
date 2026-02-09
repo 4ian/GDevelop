@@ -130,6 +130,7 @@ export const filterSearchItems = <SearchItem: SearchableItem>(
 ): ?Array<SearchItem> => {
   if (!searchItems) return null;
 
+  // $FlowFixMe[cannot-resolve-name]
   const startTime = performance.now();
   // TODO do only one call to filter for efficiency.
   const filteredSearchItems = searchItems
@@ -172,6 +173,7 @@ export const filterSearchItems = <SearchItem: SearchableItem>(
           searchItem.tags.some(tag => chosenFilters.has(tag))) ||
         (searchItem.categories &&
           // $FlowIgnore - Flow seems unable to consider `categories` type.
+          // $FlowFixMe[incompatible-use]
           searchItem.categories.some(category => chosenFilters.has(category)))
       );
     });
@@ -205,6 +207,7 @@ export const filterSearchItems = <SearchItem: SearchableItem>(
     );
   }
 
+  // $FlowFixMe[cannot-resolve-name]
   const totalTime = performance.now() - startTime;
   console.info(
     `Filtered items by category/filters in ${totalTime.toFixed(3)}ms.`
@@ -264,6 +267,7 @@ export const useSearchItem = <SearchItem: SearchableItem>(
         return;
       }
 
+      // $FlowFixMe[cannot-resolve-name]
       const startTime = performance.now();
       if (searchApiRef.current) {
         searchApiRef.current.terminate();
@@ -279,6 +283,7 @@ export const useSearchItem = <SearchItem: SearchableItem>(
           newSearchApi.indexDocument(id, getItemDescription(searchItem));
         });
 
+        // $FlowFixMe[cannot-resolve-name]
         const totalTime = performance.now() - startTime;
         console.info(
           `Indexed ${allIds.length} items in ${totalTime.toFixed(3)}ms.`
@@ -312,6 +317,7 @@ export const useSearchItem = <SearchItem: SearchableItem>(
           return;
         }
 
+        // $FlowFixMe[cannot-resolve-name]
         const startTime = performance.now();
         searchApi
           .search(searchText)
@@ -327,6 +333,7 @@ export const useSearchItem = <SearchItem: SearchableItem>(
               .map(id => searchItemsById[id])
               .filter(Boolean);
 
+            // $FlowFixMe[cannot-resolve-name]
             const totalTime = performance.now() - startTime;
             console.info(
               `Found ${

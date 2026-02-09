@@ -58,6 +58,7 @@ export const Toolbar: React.ComponentType<ToolbarProps> = React.memo<ToolbarProp
   }
 );
 
+// $FlowFixMe[missing-local-annot]
 const toolbarGroupStyle = props => ({
   flex: 1,
   display: 'flex',

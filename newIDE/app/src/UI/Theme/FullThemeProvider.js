@@ -65,6 +65,7 @@ export const FullThemeProvider = ({children, forcedThemeName}: Props): React.Nod
       });
 
       try {
+        // $FlowFixMe[cannot-resolve-name]
         const { body } = document;
         if (!body) throw new Error('Document has no body.');
         body.className = fullTheme.gdevelopTheme.uiRootClassName;

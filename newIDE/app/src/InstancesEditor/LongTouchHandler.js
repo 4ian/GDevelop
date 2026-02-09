@@ -8,6 +8,7 @@ type CallbackEvent = {|
 |};
 
 type Props = {|
+  // $FlowFixMe[cannot-resolve-name]
   canvas: HTMLCanvasElement,
   onLongTouch: (event: CallbackEvent) => void,
 |};
@@ -25,6 +26,7 @@ export default class LongTouchHandler {
   _lastTouchX: number = 0;
   _lastTouchY: number = 0;
   _longTouchTimeoutID: TimeoutID;
+  // $FlowFixMe[cannot-resolve-name]
   _canvas: HTMLCanvasElement;
   _onLongTouch: ?(event: CallbackEvent) => void;
 
@@ -37,6 +39,7 @@ export default class LongTouchHandler {
     canvas.addEventListener('touchend', this._clear);
   }
 
+  // $FlowFixMe[cannot-resolve-name]
   _onTouchStart = (event: TouchEvent) => {
     // If more than one touch,
     // it's not a long press.
@@ -58,6 +61,7 @@ export default class LongTouchHandler {
     }, delay);
   };
 
+  // $FlowFixMe[cannot-resolve-name]
   _onTouchMove = (event: TouchEvent) => {
     // If more than one touch,
     // it's not a long press anymore.

@@ -22,6 +22,7 @@ type VariablesContainer = {|
   _variables: { items: { [string]: Variable } },
 |};
 
+// $FlowFixMe[definition-cycle][recursive-definition]
 const transformVariable = (variable: Variable) => {
   if (!variable) return null;
 
@@ -67,6 +68,7 @@ const constructPathToVariable = (
 ): {| path: ?Array<string>, variable: ?Variable |} => {
   const variableInContainerName = editPath.shift();
   const path = ['_variables', 'items', variableInContainerName];
+  // $FlowFixMe[incompatible-type]
   let variable = variablesContainer._variables.items[variableInContainerName];
   let skip = false;
 
@@ -89,9 +91,11 @@ const constructPathToVariable = (
     else return { path: null, variable: null };
   }
 
+  // $FlowFixMe[incompatible-type]
   return { path, variable };
 };
 
+// $FlowFixMe[missing-local-annot]
 const handleEdit = (edit, { onCall, onEdit, variablesContainer }: Props) => {
   if (!variablesContainer) return;
 

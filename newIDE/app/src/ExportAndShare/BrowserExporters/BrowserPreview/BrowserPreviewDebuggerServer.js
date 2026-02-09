@@ -14,9 +14,11 @@ const responseCallbacks = new Map<number, (value: Object) => void>();
 let nextMessageWithResponseId = 1;
 
 const existingPreviewWindows: {
+  // $FlowFixMe[cannot-resolve-name]
   [DebuggerId]: WindowProxy,
 } = {};
 
+// $FlowFixMe[cannot-resolve-name]
 let embbededGameFrameWindow: WindowProxy | null = null;
 
 const getExistingDebuggerIds = (): Array<DebuggerId> => [
@@ -93,12 +95,14 @@ let previewOrigin = null;
  * from popup windows in the browser.
  */
 class BrowserPreviewDebuggerServer {
+  // $FlowFixMe[missing-local-annot]
   async startServer({ origin }) {
     if (debuggerServerState === 'started') return;
     debuggerServerState = 'started';
 
     previewOrigin = origin;
 
+    // $FlowFixMe[cannot-resolve-name]
     window.addEventListener('message', event => {
       if (event.origin !== previewOrigin) return;
 
@@ -166,18 +170,23 @@ class BrowserPreviewDebuggerServer {
     });
     return promise;
   }
+  // $FlowFixMe[missing-local-annot]
   getServerState() {
     return debuggerServerState;
   }
+  // $FlowFixMe[missing-local-annot]
   getExistingDebuggerIds() {
     return getExistingDebuggerIds();
   }
+  // $FlowFixMe[missing-local-annot]
   getExistingEmbeddedGameFrameDebuggerIds() {
     return getExistingEmbeddedGameFrameDebuggerIds();
   }
+  // $FlowFixMe[missing-local-annot]
   getExistingPreviewDebuggerIds() {
     return getExistingPreviewDebuggerIds();
   }
+  // $FlowFixMe[missing-local-annot]
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks) {
     callbacksList.push(callbacks);
 
@@ -186,6 +195,7 @@ class BrowserPreviewDebuggerServer {
       if (callbacksIndex !== -1) callbacksList.splice(callbacksIndex, 1);
     };
   }
+  // $FlowFixMe[cannot-resolve-name]
   registerEmbeddedGameFrame(window: WindowProxy) {
     if (window === embbededGameFrameWindow) return;
 
@@ -194,6 +204,7 @@ class BrowserPreviewDebuggerServer {
     );
     embbededGameFrameWindow = window;
   }
+  // $FlowFixMe[cannot-resolve-name]
   unregisterEmbeddedGameFrame(window: WindowProxy) {
     if (embbededGameFrameWindow !== window) {
       if (!!embbededGameFrameWindow) {
@@ -243,6 +254,7 @@ class BrowserPreviewDebuggerServer {
 export const browserPreviewDebuggerServer: PreviewDebuggerServer = new BrowserPreviewDebuggerServer();
 
 export const registerNewPreviewWindow = (
+  // $FlowFixMe[cannot-resolve-name]
   previewWindow: WindowProxy
 ): DebuggerId => {
   const existingId = getDebuggerIdForPreviewWindow(previewWindow);
@@ -273,6 +285,7 @@ export const registerNewPreviewWindow = (
 
 export const getExistingPreviewWindowForDebuggerId = (
   id: ?DebuggerId
+// $FlowFixMe[cannot-resolve-name]
 ): ?WindowProxy => {
   if (id == null) return null;
 

@@ -1,6 +1,7 @@
 // @flow
 import ViewPosition from './ViewPosition';
 
+// $FlowFixMe[cannot-resolve-name]
 export const shouldBeHandledByPinch = (event: ?TouchEvent): boolean => {
   if (!event) return false;
 
@@ -9,6 +10,7 @@ export const shouldBeHandledByPinch = (event: ?TouchEvent): boolean => {
 };
 
 type PinchDetectorArgs = {|
+  // $FlowFixMe[cannot-resolve-name]
   canvas: HTMLCanvasElement,
   onPinchStart: () => void,
   onPinchMove: (x: number, y: number, scale: number) => void,
@@ -32,6 +34,7 @@ const registerCanvasPinchDetector = ({
     canvas.addEventListener('touchmove', move);
   }
 
+  // $FlowFixMe[cannot-resolve-name]
   function move(e: TouchEvent) {
     if (!shouldBeHandledByPinch(e)) {
       return;
@@ -52,6 +55,7 @@ const registerCanvasPinchDetector = ({
       return;
     }
     var now = new Date();
+    // $FlowFixMe[incompatible-use][unsafe-arithmetic]
     var interval = now - lastPinch.p.date;
     if (interval < 12) {
       return;
@@ -60,15 +64,18 @@ const registerCanvasPinchDetector = ({
       x: (t[0].clientX + t[1].clientX) / 2,
       y: (t[0].clientY + t[1].clientY) / 2,
     };
+    // $FlowFixMe[incompatible-use]
     const scaleChange = distance / lastPinch.p.distance;
 
     onPinchMove(newCenter.x, newCenter.y, scaleChange);
+    // $FlowFixMe[incompatible-use]
     lastPinch.p = {
       distance: distance,
       date: now,
     };
   }
 
+  // $FlowFixMe[cannot-resolve-name]
   function end(e: TouchEvent) {
     canvas.removeEventListener('touchmove', move);
     if (!lastPinch) {
@@ -92,6 +99,7 @@ const registerCanvasPinchDetector = ({
 };
 
 type Props = {|
+  // $FlowFixMe[cannot-resolve-name]
   canvas: HTMLCanvasElement,
   setZoomFactor: number => void,
   getZoomFactor: () => number,

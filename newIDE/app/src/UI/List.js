@@ -247,7 +247,7 @@ export const ListItem: component(
           disabled={props.disabled}
           selected={props.selected}
           style={{
-            // $FlowFixMe - Flow is not happy about two spreads.
+            // $FlowFixMe[incompatible-type] - Flow is not happy about two spreads.
             ...noPaddingStyle,
             ...props.style,
           }}
@@ -303,7 +303,7 @@ export const ListItem: component(
             onClick={onClickItem}
             disabled={props.disabled}
             style={{
-              // $FlowFixMe - Flow is not happy about two spreads.
+              // $FlowFixMe[incompatible-type] - Flow is not happy about two spreads.
               ...noPaddingStyle,
               ...props.style,
             }}

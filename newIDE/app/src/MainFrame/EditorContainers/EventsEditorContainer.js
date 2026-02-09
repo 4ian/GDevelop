@@ -18,6 +18,7 @@ import {
 } from '../../EmbeddedGame/EmbeddedGameFrame';
 
 export class EventsEditorContainer extends React.Component<RenderEditorContainerProps> {
+  // $FlowFixMe[value-as-type]
   editor: ?EventsSheetInterface;
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
@@ -143,6 +144,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
       layout,
     };
     const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+      // $FlowFixMe[incompatible-type]
       scope
     );
 

@@ -19,10 +19,11 @@ const getAdaptedMessageAndRouteNavigationParams = (
     // so we don't open a new link, and instead use the internal router
     // to navigate to the right page/dialog.
     if (groups.linkHref.startsWith('https://editor.gdevelop.io')) {
+      // $FlowFixMe[cannot-resolve-name]
       const urlParams = new URLSearchParams(
         groups.linkHref.replace(/.*\?/, '')
       );
-      // $FlowFixMe - Assume that the arguments are always valid.
+      // $FlowFixMe[incompatible-type] - Assume that the arguments are always valid.
       const route: ?Route = urlParams.get('initial-dialog');
       const otherParams: {[string]: any} = {};
       urlParams.forEach((value, key) => {
@@ -35,6 +36,7 @@ const getAdaptedMessageAndRouteNavigationParams = (
         );
         return {
           message: messageWithoutHref,
+          // $FlowFixMe[incompatible-type]
           routeNavigationParams: { route, params: otherParams },
           isClickableContent: true,
         };

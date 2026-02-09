@@ -76,6 +76,7 @@ const PlatformSpecificAssets = ({
   onIosIconResourceNamesChanged,
 }: Props) => {
   const { showAlert } = useAlertDialog();
+  // $FlowFixMe[cannot-resolve-name]
   const generateIconFileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const [isLoading, setIsLoading] = React.useState(false);
@@ -89,6 +90,7 @@ const PlatformSpecificAssets = ({
       console.error("Could't find selected file. Aborting icon generation.");
       return;
     }
+    // $FlowFixMe[cannot-resolve-name]
     const chosenFileAsBlobDataUrl = URL.createObjectURL(
       generateIconFileInputRef.current.files[0]
     );
@@ -184,6 +186,7 @@ const PlatformSpecificAssets = ({
       setIsLoading(false);
     } finally {
       // Revoke the blob URL to free memory.
+      // $FlowFixMe[cannot-resolve-name]
       URL.revokeObjectURL(chosenFileAsBlobDataUrl);
       // Reset input value so that if the user selects the same file again,
       // the onChange callback is called.

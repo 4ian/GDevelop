@@ -6,6 +6,7 @@ export const containsSubInstructions = (
   instructionsList: gdInstructionsList
 ): boolean => {
   const subInstructionsList = instruction.getSubInstructions();
+  // $FlowFixMe[incompatible-exact]
   if (gd.compare(subInstructionsList, instructionsList)) return true;
 
   for (let i = 0; i < subInstructionsList.size(); ++i) {

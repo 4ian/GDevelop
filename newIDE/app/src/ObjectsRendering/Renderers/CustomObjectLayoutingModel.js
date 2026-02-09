@@ -68,10 +68,12 @@ export const getObjectAnchor = (
 ): ObjectAnchor => {
   const objects = eventBasedObjectVariant.getObjects();
   if (!objects.hasObjectNamed(objectName)) {
+    // $FlowFixMe[incompatible-type]
     return getDefaultAnchor();
   }
   const childObject = objects.getObject(objectName);
   if (!childObject.hasBehaviorNamed('Anchor')) {
+    // $FlowFixMe[incompatible-type]
     return getDefaultAnchor();
   }
   const properties = childObject.getBehavior('Anchor').getProperties();

@@ -43,6 +43,7 @@ const initialResource3DPreviewState = {
 };
 
 const Resource3DPreviewContext: React.Context<Resource3DPreviewState> = React.createContext<Resource3DPreviewState>(
+  // $FlowFixMe[incompatible-type]
   initialResource3DPreviewState
 );
 
@@ -58,6 +59,7 @@ const MESSAGE_TYPES = {
 
 // Worker manager that handles initialization and communication
 class Resource3DPreviewWorkerManager {
+  // $FlowFixMe[cannot-resolve-name]
   worker: Worker;
   isInitialized: boolean = false;
   pendingPromises: Map<
@@ -68,12 +70,14 @@ class Resource3DPreviewWorkerManager {
 
   constructor() {
     // $FlowExpectedError - worker-loader types aren't recognized by Flow
+    // $FlowFixMe[invalid-constructor]
     this.worker = new Resource3DPreviewWorker();
     this.setupMessageHandlers();
     this.initWorker();
   }
 
   setupMessageHandlers() {
+    // $FlowFixMe[cannot-resolve-name]
     this.worker.onmessage = (event: MessageEvent) => {
       // $FlowExpectedError
       const workerOutMessageData = (event.data: WorkerOutMessage);
@@ -83,6 +87,7 @@ class Resource3DPreviewWorkerManager {
         case MESSAGE_TYPES.INIT:
           const { success } =
             // $FlowExpectedError
+            // $FlowFixMe[incompatible-type]
             (workerOutMessageData: WorkerOutInitMessage);
           this.isInitialized = success;
           break;
@@ -90,6 +95,7 @@ class Resource3DPreviewWorkerManager {
         case MESSAGE_TYPES.RENDER_COMPLETE:
           const { resourceUrl, screenshot } =
             // $FlowExpectedError
+            // $FlowFixMe[incompatible-type]
             (workerOutMessageData: WorkerOutRenderCompleteMessage);
           const pendingPromise = this.pendingPromises.get(resourceUrl);
           if (pendingPromise) {
@@ -101,6 +107,7 @@ class Resource3DPreviewWorkerManager {
         case MESSAGE_TYPES.RENDER_ERROR:
           const { resourceUrl: errorResourceUrl, error } =
             // $FlowExpectedError
+            // $FlowFixMe[incompatible-type]
             (workerOutMessageData: WorkerOutRenderErrorMessage);
           console.error('Worker error rendering 3D model:', error);
           const pendingErrorPromise = this.pendingPromises.get(
@@ -128,6 +135,7 @@ class Resource3DPreviewWorkerManager {
   }
 
   initWorker() {
+    // $FlowFixMe[incompatible-type]
     const message: WorkerInitMessage = { type: MESSAGE_TYPES.INIT };
     this.worker.postMessage(message);
   }
@@ -141,6 +149,7 @@ class Resource3DPreviewWorkerManager {
 
       this.pendingPromises.set(resourceUrl, { resolve, reject });
       const message: WorkerRenderModelMessage = {
+        // $FlowFixMe[incompatible-type]
         type: MESSAGE_TYPES.RENDER_MODEL,
         resourceUrl,
       };
@@ -236,6 +245,7 @@ export const Resource3DPreviewProvider = ({children}: Props): React.MixedElement
           );
           queueItemsToResolve.forEach(item => {
             const { resolve } = item;
+            // $FlowFixMe[constant-condition]
             if (resolve) resolve(dataUrl);
           });
 

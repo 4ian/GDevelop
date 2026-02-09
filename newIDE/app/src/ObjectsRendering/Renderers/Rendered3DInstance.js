@@ -12,10 +12,14 @@ export default class Rendered3DInstance {
   _project: gdProject;
   _instance: gdInitialInstance;
   _associatedObjectConfiguration: gdObjectConfiguration;
+  // $FlowFixMe[value-as-type]
   _pixiContainer: PIXI.Container;
+  // $FlowFixMe[value-as-type]
   _threeGroup: THREE.Group;
   _pixiResourcesLoader: Class<PixiResourcesLoader>;
+  // $FlowFixMe[value-as-type]
   _pixiObject: PIXI.DisplayObject;
+  // $FlowFixMe[value-as-type]
   _threeObject: THREE.Object3D | null;
   wasUsed: boolean;
   _wasDestroyed: boolean;
@@ -25,7 +29,9 @@ export default class Rendered3DInstance {
     project: gdProject,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
+    // $FlowFixMe[value-as-type]
     pixiContainer: PIXI.Container,
+    // $FlowFixMe[value-as-type]
     threeGroup: THREE.Group,
     pixiResourcesLoader: Class<PixiResourcesLoader>,
     getPropertyOverridings: (() => Map<string, string>) | null = null

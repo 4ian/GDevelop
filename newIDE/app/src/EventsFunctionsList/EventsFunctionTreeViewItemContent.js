@@ -66,6 +66,7 @@ export type EventsFunctionCallbacks = {|
 |};
 
 export type EventFunctionCommonProps = {|
+  // $FlowFixMe[value-as-type]
   ...TreeItemProps,
   ...EventsFunctionCallbacks,
 |};
@@ -101,6 +102,7 @@ export const canFunctionBeRenamed = (
   return !gd.MetadataDeclarationHelper.isExtensionLifecycleEventsFunction(name);
 };
 
+// $FlowFixMe[value-as-type]
 export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
   eventsFunction: gdEventsFunction;
   props: EventsFunctionProps;
@@ -126,6 +128,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     return this.props.eventsBasedObject;
   }
 
+  // $FlowFixMe[value-as-type]
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return (
       itemContent.getEventsFunction() === null &&

@@ -26,6 +26,7 @@ export type ExternalEventsTreeViewItemCallbacks = {|
 |};
 
 export type ExternalEventsTreeViewItemCommonProps = {|
+  // $FlowFixMe[value-as-type]
   ...TreeItemProps,
   ...ExternalEventsTreeViewItemCallbacks,
 |};
@@ -43,6 +44,7 @@ export const getExternalEventsTreeViewItemId = (
   return `external-events-${externalEvents.ptr}`;
 };
 
+// $FlowFixMe[value-as-type]
 export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
   externalEvents: gdExternalEvents;
   props: ExternalEventsTreeViewItemProps;
@@ -55,6 +57,7 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
     this.props = props;
   }
 
+  // $FlowFixMe[value-as-type]
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return itemContent.getId() === externalEventsRootFolderId;
   }

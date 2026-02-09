@@ -96,6 +96,7 @@ export const scanForNewResources = async ({
     });
 
     const filesToCheck = new gd.VectorString();
+    // $FlowFixMe[incompatible-use][missing-local-annot]
     allFiles.forEach(filePath =>
       filesToCheck.push_back(path.relative(projectPath, filePath))
     );
@@ -104,6 +105,7 @@ export const scanForNewResources = async ({
       .findFilesNotInResources(filesToCheck);
     filesToCheck.delete();
 
+    // $FlowFixMe[incompatible-exact]
     mapVector(filePathsNotInResources, (relativeFilePath: string) => {
       const resourceName = newNameGenerator(relativeFilePath, name =>
         resourcesManager.hasResource(name)

@@ -22,7 +22,9 @@ const authenticationPortalUrl = 'https://auth.gdevelop.io';
 
 class BrowserLoginProvider
   implements LoginProvider, FirebaseBasedLoginProvider {
+  // $FlowFixMe[value-as-type]
   auth: Auth;
+  // $FlowFixMe[value-as-type]
   constructor(auth: Auth) {
     this.auth = auth;
   }
@@ -33,6 +35,7 @@ class BrowserLoginProvider
   }: {|
     email: string,
     password: string,
+  // $FlowFixMe[missing-local-annot]
   |}) {
     try {
       await signInWithEmailAndPassword(this.auth, email, password);
@@ -48,6 +51,7 @@ class BrowserLoginProvider
     signal,
   }: {|
     provider: IdentityProvider,
+    // $FlowFixMe[cannot-resolve-name]
     signal?: AbortSignal,
   |}): any {
     if (signal && signal.aborted) {
@@ -65,9 +69,12 @@ class BrowserLoginProvider
       }
       const width = 400;
       const height = 600;
+      // $FlowFixMe[cannot-resolve-name]
       const left = window.screenX + window.innerWidth / 2 - width / 2;
+      // $FlowFixMe[cannot-resolve-name]
       const top = window.screenY + window.innerHeight / 2 - height / 2;
 
+      // $FlowFixMe[cannot-resolve-name]
       const authWindow = window.open(
         'about:blank',
         null,
@@ -79,6 +86,7 @@ class BrowserLoginProvider
       setupAuthenticationWebSocket({
         onConnectionEstablished: connectionId => {
           if (signal && signal.aborted) return;
+          // $FlowFixMe[cannot-resolve-name]
           const url = new URL(authenticationPortalUrl);
           url.searchParams.set('connection-id', connectionId);
           url.searchParams.set('provider', provider);

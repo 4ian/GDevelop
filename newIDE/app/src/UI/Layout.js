@@ -74,13 +74,18 @@ export const TextFieldWithButtonLayout = (
       {renderTextField()}
       {renderButton(
         isMobile && !isLandscape
+          // $FlowFixMe[incompatible-type]
           ? textFieldWithButtonLayoutStyles.textFieldOnMobileMargins
           : margin === 'none'
           ? noFloatingLabelText
+            // $FlowFixMe[incompatible-type]
             ? textFieldWithButtonLayoutStyles.standardTextFieldWithoutLabelRightButtonMargins
+            // $FlowFixMe[incompatible-type]
             : textFieldWithButtonLayoutStyles.standardTextFieldWithLabelRightButtonMargins
           : noFloatingLabelText
+          // $FlowFixMe[incompatible-type]
           ? textFieldWithButtonLayoutStyles.filledTextFieldWithoutLabelRightButtonMargins
+          // $FlowFixMe[incompatible-type]
           : textFieldWithButtonLayoutStyles.filledTextFieldWithLabelRightButtonMargins
       )}
     </ResponsiveLineStackLayout>

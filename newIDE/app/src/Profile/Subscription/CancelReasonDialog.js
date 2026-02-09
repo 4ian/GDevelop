@@ -154,6 +154,7 @@ const CancelReasonDialog = ({onClose, onCloseAfterSuccess}: Props): React.Node =
         <Dialog
           title={null}
           actions={actions}
+          // $FlowFixMe[incompatible-type]
           secondaryActions={secondaryActions}
           open
           cannotBeDismissed

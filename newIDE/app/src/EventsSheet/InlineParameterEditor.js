@@ -153,6 +153,7 @@ const InlineParameterEditor = (
   );
 
   if (
+    // $FlowFixMe[constant-condition]
     !ParameterComponent ||
     !open ||
     !instruction ||

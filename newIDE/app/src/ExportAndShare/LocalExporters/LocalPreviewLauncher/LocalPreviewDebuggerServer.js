@@ -16,6 +16,7 @@ const debuggerIds: Array<DebuggerId> = [];
 const responseCallbacks = new Map<number, (value: Object) => void>();
 let nextMessageWithResponseId = 1;
 
+// $FlowFixMe[cannot-resolve-name]
 let embeddedGameFrameWindow: WindowProxy | null = null;
 let isWindowMessageListenerRegistered = false;
 
@@ -80,11 +81,13 @@ const removeServerListeners = () => {
  * communicating through events with it).
  */
 class LocalPreviewDebuggerServer {
+  // $FlowFixMe[missing-local-annot]
   startServer() {
     if (!ipcRenderer) return Promise.reject();
     if (debuggerServerState === 'started') return Promise.resolve();
 
     if (!isWindowMessageListenerRegistered) {
+      // $FlowFixMe[cannot-resolve-name]
       window.addEventListener('message', event => {
         if (!embeddedGameFrameWindow) return;
         if (event.source !== embeddedGameFrameWindow) return;
@@ -236,18 +239,23 @@ class LocalPreviewDebuggerServer {
     });
     return promise;
   }
+  // $FlowFixMe[missing-local-annot]
   getServerState() {
     return debuggerServerState;
   }
+  // $FlowFixMe[missing-local-annot]
   getExistingDebuggerIds() {
     return getExistingDebuggerIds();
   }
+  // $FlowFixMe[missing-local-annot]
   getExistingEmbeddedGameFrameDebuggerIds() {
     return getExistingEmbeddedGameFrameDebuggerIds();
   }
+  // $FlowFixMe[missing-local-annot]
   getExistingPreviewDebuggerIds() {
     return getExistingPreviewDebuggerIds();
   }
+  // $FlowFixMe[missing-local-annot]
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks) {
     callbacksList.push(callbacks);
 
@@ -256,6 +264,7 @@ class LocalPreviewDebuggerServer {
       if (callbacksIndex !== -1) callbacksList.splice(callbacksIndex, 1);
     };
   }
+  // $FlowFixMe[cannot-resolve-name]
   registerEmbeddedGameFrame(embeddedWindow: WindowProxy) {
     if (embeddedWindow === embeddedGameFrameWindow) return;
 
@@ -273,6 +282,7 @@ class LocalPreviewDebuggerServer {
       })
     );
   }
+  // $FlowFixMe[cannot-resolve-name]
   unregisterEmbeddedGameFrame(embeddedWindow: WindowProxy) {
     if (embeddedGameFrameWindow !== embeddedWindow) {
       if (!!embeddedGameFrameWindow) {

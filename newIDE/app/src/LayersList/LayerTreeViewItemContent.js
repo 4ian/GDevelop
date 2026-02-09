@@ -17,6 +17,7 @@ const styles = {
 };
 
 export type LayerTreeViewItemProps = {|
+  // $FlowFixMe[value-as-type]
   ...TreeItemProps,
   layersContainer: gdLayersContainer,
   chosenLayer: string,
@@ -35,6 +36,7 @@ export const getLayerTreeViewItemId = (layer: gdLayer): string => {
   return `layer-${layer.ptr}`;
 };
 
+// $FlowFixMe[value-as-type]
 export class LayerTreeViewItemContent implements TreeViewItemContent {
   layer: gdLayer;
   props: LayerTreeViewItemProps;
@@ -44,6 +46,7 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
     this.props = props;
   }
 
+  // $FlowFixMe[value-as-type]
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return itemContent.getId() === layersRootFolderId;
   }

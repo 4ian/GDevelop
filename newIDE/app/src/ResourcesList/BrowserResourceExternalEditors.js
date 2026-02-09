@@ -39,6 +39,7 @@ const openAndWaitForExternalEditorWindow = async ({
   externalEditorWindow: any,
   externalEditorName: 'piskel' | 'yarn' | 'jfxr',
   externalEditorInput: ExternalEditorInput,
+  // $FlowFixMe[cannot-resolve-name]
   signal: AbortSignal,
 |}): Promise<?ExternalEditorOutput> => {
   if (signal.aborted) {
@@ -49,6 +50,7 @@ const openAndWaitForExternalEditorWindow = async ({
     let externalEditorClosed = false;
     let externalEditorOutput: ?ExternalEditorOutput = null;
 
+    // $FlowFixMe[cannot-resolve-name]
     const onMessageEvent = (event: MessageEvent) => {
       if (event.source !== externalEditorWindow) {
         return;
@@ -81,19 +83,21 @@ const openAndWaitForExternalEditorWindow = async ({
           },
           // Ensure only external editors hosted on the same server as the GDevelop editor
           // can receive the message:
+          // $FlowFixMe[cannot-resolve-name]
           window.location.origin
         );
       } else if (id === `save-external-editor-output`) {
         console.info(
           `Received data from external editor "${externalEditorName}."`
         );
-        // $FlowFixMe - assuming the typing is good.
+        // $FlowFixMe[incompatible-type] - assuming the typing is good.
         externalEditorOutput = payload;
       } else if (event.data.id === 'close') {
         externalEditorWindow.close();
         onExternalEditorWindowClosed();
       }
     };
+    // $FlowFixMe[cannot-resolve-name]
     window.addEventListener('message', onMessageEvent);
 
     const onExternalEditorWindowClosed = () => {
@@ -103,6 +107,7 @@ const openAndWaitForExternalEditorWindow = async ({
       }
       externalEditorClosed = true;
       console.info(`External editor "${externalEditorName}" closed.`);
+      // $FlowFixMe[cannot-resolve-name]
       window.removeEventListener('message', onMessageEvent);
       resolve(externalEditorOutput);
     };
@@ -185,6 +190,7 @@ export const downloadAndPrepareExternalEditorBase64Resources = async ({
 
   const downloadedBlobs: Array<
     ItemResult<ResourceToDownload>
+  // $FlowFixMe[incompatible-type]
   > = await downloadUrlsToBlobs({
     urlContainers: urlsToDownload,
     onProgress: (count, total) => {},
@@ -343,9 +349,12 @@ const immediatelyOpenLoadingWindowForExternalEditor = () => {
   const targetId = 'GDevelopExternalEditor' + nextExternalEditorWindowId++;
   const width = 800;
   const height = 600;
+  // $FlowFixMe[cannot-resolve-name]
   const left = window.screenX + window.innerWidth / 2 - width / 2;
+  // $FlowFixMe[cannot-resolve-name]
   const top = window.screenY + window.innerHeight / 2 - height / 2;
 
+  // $FlowFixMe[cannot-resolve-name]
   const externalEditorWindow = window.open(
     'about:blank',
     targetId,
@@ -382,6 +391,7 @@ const editors: Array<ResourceExternalEditor> = [
       }
 
       const externalEditorWindow = immediatelyOpenLoadingWindowForExternalEditor();
+      // $FlowFixMe[incompatible-type]
       return await editWithBrowserExternalEditor({
         options,
         externalEditorWindow,

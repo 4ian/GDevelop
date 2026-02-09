@@ -37,6 +37,7 @@ type ResourcesDownloadOutput = {|
   blobFiles: Array<BlobFileDescriptor>,
 |};
 
+// $FlowFixMe[cannot-resolve-name]
 type CompressionOutput = Blob;
 
 const exportPipelineName = 'browser-online-web';
@@ -79,9 +80,11 @@ export const fakeBrowserOnlineWebExportPipeline: ExportPipeline<
       new gd.AbstractFileSystemJS(),
       abstractFileSystem
     );
+    // $FlowFixMe[extra-arg]
     const exporter = new gd.Exporter(fileSystem, null);
 
     return {
+      // $FlowFixMe[incompatible-type]
       exporter,
       outputDir: '/export/',
       abstractFileSystem,
@@ -108,13 +111,16 @@ export const fakeBrowserOnlineWebExportPipeline: ExportPipeline<
   launchCompression: async (
     context: ExportPipelineContext<ExportState>,
     { textFiles, blobFiles }: ResourcesDownloadOutput
+  // $FlowFixMe[cannot-resolve-name]
   ): Promise<Blob> => {
     await delay(1000);
+    // $FlowFixMe[cannot-resolve-name]
     return new Blob();
   },
 
   launchUpload: async (
     context: ExportPipelineContext<ExportState>,
+    // $FlowFixMe[cannot-resolve-name]
     blobFile: Blob
   ): Promise<string> => {
     await delay(1000);
@@ -123,6 +129,7 @@ export const fakeBrowserOnlineWebExportPipeline: ExportPipeline<
 
   launchOnlineBuild: async (
     exportState: ExportState,
+    // $FlowFixMe[value-as-type]
     authenticatedUser: AuthenticatedUser,
     uploadBucketKey: string,
     gameId: string,

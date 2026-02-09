@@ -45,9 +45,13 @@ import WaveSurfer, { type WaveSurferOptions } from 'wavesurfer.js';
  * Use wavesurfer instance
  */
 function useWavesurferInstance(
+  // $FlowFixMe[cannot-resolve-name]
   containerRef: {| current: HTMLDivElement | null |},
+  // $FlowFixMe[value-as-type]
   options: WaveSurferOptions
+// $FlowFixMe[value-as-type]
 ): WaveSurfer | null {
+  // $FlowFixMe[value-as-type]
   const [wavesurfer, setWavesurfer] = React.useState<WaveSurfer | null>(null);
   // Flatten options object to an array of keys and values to compare them deeply in the hook deps
   const flatOptions = React.useMemo(() => Object.entries(options).flat(), [
@@ -80,6 +84,7 @@ function useWavesurferInstance(
  * Use wavesurfer state
  */
 function useWavesurferState(
+  // $FlowFixMe[value-as-type]
   wavesurfer: WaveSurfer | null
 ): {|
   isReady: boolean,
@@ -176,6 +181,7 @@ function useWavesurferProps(props: Props): [any, any] {
 /**
  * Subscribe to wavesurfer events
  */
+// $FlowFixMe[value-as-type]
 function useWavesurferEvents(wavesurfer: WaveSurfer | null, events: any) {
   const flatEvents = React.useMemo(() => Object.entries(events).flat(), [
     events,
@@ -194,6 +200,7 @@ function useWavesurferEvents(wavesurfer: WaveSurfer | null, events: any) {
           const event = getEventName(name);
           return wavesurfer.on(event, (...args) =>
             // $FlowIgnore
+            // $FlowFixMe[not-a-function]
             handler(wavesurfer, ...args)
           );
         }
@@ -213,7 +220,9 @@ function useWavesurferEvents(wavesurfer: WaveSurfer | null, events: any) {
  * @public
  */
 const WavesurferPlayer: React.ComponentType<Props> = React.memo<Props>(
+  // $FlowFixMe[cannot-resolve-name]
   (props: Props): React$Element<any> => {
+    // $FlowFixMe[cannot-resolve-name]
     const containerRef = React.useRef<HTMLDivElement | null>(null);
     const [options, events] = useWavesurferProps(props);
     const wavesurfer = useWavesurferInstance(containerRef, options);

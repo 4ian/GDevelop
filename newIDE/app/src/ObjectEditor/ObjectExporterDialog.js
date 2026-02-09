@@ -40,6 +40,7 @@ const excludedObjectType = [
 type DownloadResourcesAsBlobsOptionsWithoutProgress = {
   project: gdProject,
   resourceNames: Array<string>,
+  // $FlowFixMe[cannot-resolve-name]
   onAddBlobFile: (resourceName: string, blob: Blob) => void,
 };
 
@@ -87,6 +88,7 @@ export const downloadResourcesAsBlobs = async (
 
   const downloadedBlobsAndResources: Array<
     ItemResult<ResourceToFetch>
+  // $FlowFixMe[incompatible-type]
   > = await downloadUrlsToBlobs({
     urlContainers: resourcesToFetchAndUpload,
     onProgress: (count, total) => {
@@ -97,6 +99,7 @@ export const downloadResourcesAsBlobs = async (
   downloadedBlobsAndResources.forEach(({ item, error, blob }) => {
     const { resource } = item;
     if (error || !blob) {
+      // $FlowFixMe[incompatible-type]
       result.erroredResources.push({
         resourceName: resource.getName(),
         error: error || new Error('Unknown error during download.'),
@@ -157,6 +160,7 @@ const zipAssets = async (
   ensureDownloadResourcesAsBlobsIsDone: (
     options: DownloadResourcesAsBlobsOptionsWithoutProgress
   ) => Promise<void>
+// $FlowFixMe[cannot-resolve-name]
 ): Promise<Blob | null> => {
   const blobFiles = new Map<string, BlobFileDescriptor>();
   const textFiles: Array<TextFileDescriptor> = [];
@@ -173,10 +177,12 @@ const zipAssets = async (
         );
 
         // Download resources to blobs and update the resources.
+        // $FlowFixMe[cannot-resolve-name]
         const blobByResourceName: Map<string, Blob> = new Map();
         await ensureDownloadResourcesAsBlobsIsDone({
           project,
           resourceNames: usedResourceNames,
+          // $FlowFixMe[cannot-resolve-name]
           onAddBlobFile: (resourceName: string, blob: Blob) => {
             blobByResourceName.set(resourceName, blob);
           },
@@ -223,6 +229,7 @@ const ObjectExporterDialog = ({project, layout: scene, onClose}: Props): React.N
   const [
     zippedSceneAssetsBlob,
     setZippedSceneAssetsBlob,
+  // $FlowFixMe[cannot-resolve-name]
   ] = React.useState<?Blob>(null);
   const {
     ensureProcessIsDone: ensureDownloadResourcesAsBlobsIsDone,
@@ -231,6 +238,7 @@ const ObjectExporterDialog = ({project, layout: scene, onClose}: Props): React.N
     {
       onDoProcess: React.useCallback(
         (options, onProgress) =>
+          // $FlowFixMe[incompatible-type]
           downloadResourcesAsBlobs({ ...options, onProgress }),
         []
       ),

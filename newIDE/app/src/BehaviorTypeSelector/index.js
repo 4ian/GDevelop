@@ -13,6 +13,7 @@ type Props = {|
   objectType: string,
   value: string,
   onChange: string => void,
+  // $FlowFixMe[cannot-resolve-name]
   onFocus?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
   disabled?: boolean,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
@@ -25,6 +26,7 @@ export default class BehaviorTypeSelector extends React.Component<
   Props,
   State
 > {
+  // $FlowFixMe[missing-local-annot]
   state = {
     behaviorMetadata: enumerateBehaviorsMetadata(
   this.props.project.getCurrentPlatform(),

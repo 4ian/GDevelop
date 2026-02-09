@@ -31,10 +31,12 @@ const styles = {
   },
 };
 
+// $FlowFixMe[cannot-resolve-name]
 const shouldGoLeft = (event: SyntheticKeyboardEvent<HTMLLIElement>) => {
   return event.key === 'ArrowLeft';
 };
 
+// $FlowFixMe[cannot-resolve-name]
 const shouldGoRight = (event: SyntheticKeyboardEvent<HTMLLIElement>) => {
   return event.key === 'ArrowRight';
 };
@@ -102,6 +104,7 @@ const Slideshow = (
 ): null | React.Node => {
   // Ensure the component is re-rendered when the window is resized.
   useOnResize(useForceUpdate());
+  // $FlowFixMe[cannot-resolve-name]
   const windowInnerWidth = window.innerWidth;
 
   const classesForArrowButtons = useStylesForArrowButtons();
@@ -161,6 +164,7 @@ const Slideshow = (
 
   React.useEffect(
     () => {
+      // $FlowFixMe[incompatible-type]
       nextSlideTimeoutId.current = setTimeout(() => {
         handleRightArrowClick();
       }, 5000);
@@ -193,6 +197,7 @@ const Slideshow = (
       // so just return.
       if (!isFocusingOrOverContainer || leftImageRecentlyTimeoutId.current)
         return;
+      // $FlowFixMe[incompatible-type]
       leftImageRecentlyTimeoutId.current = setTimeout(() => {
         setIsFocusingContainer(false);
       }, 1000);
@@ -233,6 +238,7 @@ const Slideshow = (
         onPointerOver={handleOverOrFocusContainer}
         onPointerLeave={handleLeaveOrBlurContainer}
         tabIndex={0}
+        // $FlowFixMe[cannot-resolve-name]
         onKeyUp={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
           if (shouldValidate(event)) {
             const item = items[currentSlide];

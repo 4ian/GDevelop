@@ -69,6 +69,7 @@ export const CompactResourceSelectorWithThumbnail = (
 
   // TODO: move in a hook?
   const { showConfirmation } = useAlertDialog();
+  // $FlowFixMe[cannot-resolve-name]
   const abortControllerRef = React.useRef<?AbortController>(null);
   const [
     externalEditorOpened,
@@ -158,6 +159,7 @@ export const CompactResourceSelectorWithThumbnail = (
   // TODO: move in a hook?
   const editWith = React.useCallback(
     async (i18n: I18nType, resourceExternalEditor: ResourceExternalEditor) => {
+      // $FlowFixMe[cannot-resolve-name]
       abortControllerRef.current = new AbortController();
       const { signal } = abortControllerRef.current;
       const resourcesManager = project.getResourcesManager();
@@ -305,6 +307,7 @@ export const CompactResourceSelectorWithThumbnail = (
                 },
               ]
             : []),
+          // $FlowFixMe[incompatible-type]
           ...externalEditors.map(externalEditor => ({
             label: resourceName
               ? i18n._(externalEditor.editDisplayName)

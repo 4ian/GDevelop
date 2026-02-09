@@ -9,8 +9,11 @@ const isDialogOpen = (): any | false => {
   // But clicking on some empty spaces like in properties panel leads
   // to <body> element getting focused, so we also need to check if
   // currently focused element is <body>.
+  // $FlowFixMe[cannot-resolve-name]
   const body = document.body;
+  // $FlowFixMe[cannot-resolve-name]
   const activeEl = document.activeElement;
+  // $FlowFixMe[cannot-resolve-name]
   const mainFrame = document.querySelector('div.main-frame');
   const isInMainframe = mainFrame && mainFrame.contains(activeEl);
   const isBody = activeEl === body;

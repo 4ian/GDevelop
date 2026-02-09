@@ -6,6 +6,7 @@ export const classNameToStillAllowRenderingInstancesEditor =
 
 export const shouldPreventRenderingInstanceEditors = (): boolean => {
   // Fast check: if no dialog is opened, rendering is not prevented.
+  // $FlowFixMe[cannot-resolve-name]
   const dialogElement = document.querySelector(
     'body > div[role="presentation"].MuiDialog-root'
   );
@@ -20,6 +21,7 @@ export const shouldPreventRenderingInstanceEditors = (): boolean => {
 };
 
 export const isElementADialog = (
+  // $FlowFixMe[cannot-resolve-name]
   element: Element,
   options?: { isVisible: true }
 ): any | boolean => {
@@ -36,6 +38,7 @@ export const isElementADialog = (
 /**
  * Checks if an input element is a Material UI checkbox.
  */
+// $FlowFixMe[cannot-resolve-name]
 export const isMuiCheckbox = (element: HTMLElement): boolean => {
   const typeAttribute = element.attributes.getNamedItem('type');
   return (
@@ -51,6 +54,7 @@ export const isMuiCheckbox = (element: HTMLElement): boolean => {
  * (See https://v4.mui.com/api/checkbox/#props) so we have to check
  * the classes of the grand parent of the input element.
  */
+// $FlowFixMe[cannot-resolve-name]
 export const getMuiCheckboxValue = (element: HTMLElement): boolean => {
   const { parentElement } = element;
   if (parentElement) {
@@ -62,6 +66,7 @@ export const getMuiCheckboxValue = (element: HTMLElement): boolean => {
   return true;
 };
 
+// $FlowFixMe[cannot-resolve-name]
 export const doesPathContainDialog = (path: Array<Element>): boolean => {
   // Dialogs root elements are directly placed in the body element.
   // So the path is global > document > html > body > dialog.
@@ -78,6 +83,7 @@ export const doesPathContainDialog = (path: Array<Element>): boolean => {
   }
 };
 
+// $FlowFixMe[cannot-resolve-name]
 export const isElementAMuiInput = (element: Element): boolean => {
   return element.classList.contains('MuiInputBase-root');
 };

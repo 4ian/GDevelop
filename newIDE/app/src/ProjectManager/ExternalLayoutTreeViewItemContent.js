@@ -27,6 +27,7 @@ export type ExternalLayoutTreeViewItemCallbacks = {|
 |};
 
 export type ExternalLayoutTreeViewItemCommonProps = {|
+  // $FlowFixMe[value-as-type]
   ...TreeItemProps,
   ...ExternalLayoutTreeViewItemCallbacks,
 |};
@@ -44,6 +45,7 @@ export const getExternalLayoutTreeViewItemId = (
   return `external-layout-${externalLayout.ptr}`;
 };
 
+// $FlowFixMe[value-as-type]
 export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
   externalLayout: gdExternalLayout;
   props: ExternalLayoutTreeViewItemProps;
@@ -56,6 +58,7 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
     this.props = props;
   }
 
+  // $FlowFixMe[value-as-type]
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return itemContent.getId() === externalLayoutsRootFolderId;
   }

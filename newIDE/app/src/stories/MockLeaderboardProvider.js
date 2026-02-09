@@ -26,6 +26,7 @@ export const mockedLeaderboards: Leaderboard[] = Array(5)
   }));
 export const mockedEntries: LeaderboardEntry[] = Array(8)
   .fill(0)
+  // $FlowFixMe[incompatible-type]
   .map((_, index) => ({
     leaderboardId: '489165zad49-a8ad6-4a984-dcz8da-hjqn983qh0',
     id: `fze8f4ze9f489ze4f9zef4${index}`,
@@ -37,6 +38,7 @@ export const mockedEntries: LeaderboardEntry[] = Array(8)
   }))
   .sort((a, b) => a.score - b.score);
 const leaderboardsByIds = mockedLeaderboards.reduce((acc, leaderboard) => {
+  // $FlowFixMe[prop-missing]
   acc[leaderboard.id] = leaderboard;
   return acc;
 }, {});
@@ -65,6 +67,7 @@ const MockLeaderboardProvider = ({children}: {| children: React.Node |}): React.
         },
         listLeaderboards: action('listLeaderboards'),
         selectLeaderboard: leaderboardId => {
+          // $FlowFixMe[invalid-computed-prop]
           setCurrentLeaderboard(leaderboardsByIds[leaderboardId]);
         },
         updateLeaderboard: () => {

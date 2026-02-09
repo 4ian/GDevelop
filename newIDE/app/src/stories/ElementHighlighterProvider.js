@@ -29,6 +29,7 @@ const ElementHighlighterProvider = (props: Props): React.Node => {
         return;
       }
       const element = elementToHighlightId
+        // $FlowFixMe[cannot-resolve-name]
         ? document.getElementById(elementToHighlightId)
         : null;
       setElementToHighlight(element);

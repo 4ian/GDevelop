@@ -635,9 +635,9 @@ const VariablesList: component(
       // the new variable value field needs to be focused.
       [number]: SimpleTextFieldInterface,
     |}>({});
-    // $FlowFixMe - Hard to fix issue regarding strict checking with interface.
+    // $FlowFixMe[incompatible-type] - Hard to fix issue regarding strict checking with interface.
     const refocusNameField = useRefocusField(variableNameInputRefs);
-    // $FlowFixMe - Hard to fix issue regarding strict checking with interface.
+    // $FlowFixMe[incompatible-type] - Hard to fix issue regarding strict checking with interface.
     const refocusValueField = useRefocusField(topLevelVariableValueInputRefs);
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const draggedNodeId = React.useRef<?string>(null);
@@ -1174,12 +1174,12 @@ const VariablesList: component(
           case 'TopLevelToStructure':
             newName = newNameGenerator(
               draggedName,
-              // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
+              // $FlowFixMe[incompatible-type] - Regarding movement type, we are confident that the variable will exist
               name => targetVariableParentVariable.hasChild(name),
               'CopyOf'
             );
 
-            // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
+            // $FlowFixMe[incompatible-type] - Regarding movement type, we are confident that the variable will exist
             targetVariableParentVariable.insertChild(newName, draggedVariable);
 
             props.variablesContainer.remove(draggedName);
@@ -1203,7 +1203,7 @@ const VariablesList: component(
               props.variablesContainer.getPosition(targetName)
             );
 
-            // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
+            // $FlowFixMe[incompatible-type] - Regarding movement type, we are confident that the variable will exist
             draggedVariableParentVariable.removeChild(draggedName);
             updateExpandedAndSelectedNodesFollowingNodeMove(
               current,
@@ -1214,14 +1214,14 @@ const VariablesList: component(
           case 'FromStructureToAnotherStructure':
             newName = newNameGenerator(
               draggedName,
-              // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
+              // $FlowFixMe[incompatible-type] - Regarding movement type, we are confident that the variable will exist
               name => targetVariableParentVariable.hasChild(name),
               'CopyOf'
             );
-            // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
+            // $FlowFixMe[incompatible-type] - Regarding movement type, we are confident that the variable will exist
             targetVariableParentVariable.insertChild(newName, draggedVariable);
 
-            // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
+            // $FlowFixMe[incompatible-type] - Regarding movement type, we are confident that the variable will exist
             draggedVariableParentVariable.removeChild(draggedName);
             parentNodeId = getDirectParentNodeId(targetLineage);
             if (parentNodeId)
@@ -1235,13 +1235,13 @@ const VariablesList: component(
             draggedIndex = parseInt(draggedName, 10);
             targetIndex = parseInt(targetName, 10);
             correctedTargetIndex = targetIndex + (where === 'after' ? 1 : 0);
-            // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
+            // $FlowFixMe[incompatible-type] - Regarding movement type, we are confident that the variable will exist
             targetVariableParentVariable.insertAtIndex(
               draggedVariable,
               correctedTargetIndex
             );
 
-            // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
+            // $FlowFixMe[incompatible-type] - Regarding movement type, we are confident that the variable will exist
             draggedVariableParentVariable.removeAtIndex(draggedIndex);
             targetParentNodeId = getDirectParentNodeId(targetLineage);
             if (targetParentNodeId)
@@ -1257,7 +1257,7 @@ const VariablesList: component(
             correctedTargetIndex =
               (targetIndex > draggedIndex ? targetIndex - 1 : targetIndex) +
               (where === 'after' ? 1 : 0);
-            // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
+            // $FlowFixMe[incompatible-type] - Regarding movement type, we are confident that the variable will exist
             targetVariableParentVariable.moveChildInArray(
               draggedIndex,
               correctedTargetIndex

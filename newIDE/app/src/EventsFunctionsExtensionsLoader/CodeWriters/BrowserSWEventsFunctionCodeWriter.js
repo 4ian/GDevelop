@@ -31,6 +31,7 @@ const flushBatchedWrites = debounce(async () => {
   // Write all files to IndexedDB in parallel
   const results = await Promise.allSettled(
     writes.map(async write => {
+      // $FlowFixMe[cannot-resolve-name]
       const encoder = new TextEncoder();
       const bytes = encoder.encode(write.content).buffer;
       await putFile(write.path, bytes, 'text/javascript; charset=utf-8');
@@ -98,6 +99,7 @@ export const makeBrowserSWEventsFunctionCodeWriter = ({
       onWriteFile({ includeFile: path, content: code });
       const relativePath = path.replace(rootUrl, '');
 
+      // $FlowFixMe[incompatible-type]
       return writeFileInNextBatch(relativePath, code);
     },
 
@@ -109,6 +111,7 @@ export const makeBrowserSWEventsFunctionCodeWriter = ({
       onWriteFile({ includeFile: path, content: code });
       const relativePath = path.replace(rootUrl, '');
 
+      // $FlowFixMe[incompatible-type]
       return writeFileInNextBatch(relativePath, code);
     },
 
@@ -120,6 +123,7 @@ export const makeBrowserSWEventsFunctionCodeWriter = ({
       onWriteFile({ includeFile: path, content: code });
       const relativePath = path.replace(rootUrl, '');
 
+      // $FlowFixMe[incompatible-type]
       return writeFileInNextBatch(relativePath, code);
     },
   };

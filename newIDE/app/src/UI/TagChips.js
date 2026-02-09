@@ -26,6 +26,7 @@ type Props = {|
 
 const TagChips = ({tags, tagsWithLabel, onRemove}: Props): null | React.MixedElement => {
   const [focusedTag, setFocusedTag] = React.useState<?string>(null);
+  // $FlowFixMe[missing-empty-array-annot]
   const tagsRefs = React.useRef([]);
 
   const getChipStyle = React.useCallback(
@@ -39,10 +40,12 @@ const TagChips = ({tags, tagsWithLabel, onRemove}: Props): null | React.MixedEle
     [focusedTag]
   );
 
+  // $FlowFixMe[missing-local-annot]
   const handleDeleteTag = (tag: string) => event => {
     if (!tags) return;
     const deletedTagIndex = tags.indexOf(tag);
     tagsRefs.current.splice(deletedTagIndex, 1);
+    // $FlowFixMe[cannot-resolve-name]
     if (event.nativeEvent instanceof KeyboardEvent) {
       const newIndexToFocus = Math.min(
         tagsRefs.current.length - 1,
@@ -56,12 +59,14 @@ const TagChips = ({tags, tagsWithLabel, onRemove}: Props): null | React.MixedEle
     onRemove(tag);
   };
 
+  // $FlowFixMe[missing-local-annot]
   const handleDeleteTagWithLabel = (tagValue: string) => event => {
     if (!tagsWithLabel) return;
     const deletedTagIndex = tagsWithLabel.findIndex(
       tagWithLabel => tagWithLabel.value === tagValue
     );
     tagsRefs.current.splice(deletedTagIndex, 1);
+    // $FlowFixMe[cannot-resolve-name]
     if (event.nativeEvent instanceof KeyboardEvent) {
       const newIndexToFocus = Math.min(
         tagsRefs.current.length - 1,
@@ -82,6 +87,7 @@ const TagChips = ({tags, tagsWithLabel, onRemove}: Props): null | React.MixedEle
     <div style={styles.chipContainer}>
       {tags &&
         tags.map((tag, index) => {
+          // $FlowFixMe[underconstrained-implicit-instantiation]
           const newRef = React.createRef();
           tagsRefs.current[index] = newRef;
           return (
@@ -99,6 +105,7 @@ const TagChips = ({tags, tagsWithLabel, onRemove}: Props): null | React.MixedEle
         })}
       {tagsWithLabel &&
         tagsWithLabel.map((tag, index) => {
+          // $FlowFixMe[underconstrained-implicit-instantiation]
           const newRef = React.createRef();
           tagsRefs.current[index] = newRef;
           return (

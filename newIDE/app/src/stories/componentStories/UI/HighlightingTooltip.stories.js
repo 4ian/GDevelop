@@ -18,6 +18,7 @@ export default {
 };
 
 export const WithThumbnailSetByHref = (): React.Node => {
+  // $FlowFixMe[cannot-resolve-name]
   const [anchorEl, setAnchorEl] = React.useState<?HTMLDivElement>(null);
   return (
     <FixedHeightFlexContainer height={300}>
@@ -64,6 +65,7 @@ export const WithThumbnailSetByHref = (): React.Node => {
 };
 
 export const WithThumbnailSetInContent = (): React.Node => {
+  // $FlowFixMe[cannot-resolve-name]
   const [anchorEl, setAnchorEl] = React.useState<?HTMLDivElement>(null);
   return (
     <FixedHeightFlexContainer height={300}>

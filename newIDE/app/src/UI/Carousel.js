@@ -92,6 +92,7 @@ const Carousel = ({items}: Props): React.MixedElement => {
   );
   const { windowSize, isMobile, isLandscape } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  // $FlowFixMe[cannot-resolve-name]
   const scrollView = React.useRef<?HTMLUListElement>(null);
   const initialColumnsToDisplay = React.useMemo(
     () => getCarouselColumnsFromWindowSize(windowSize, isLandscape),
@@ -131,11 +132,13 @@ const Carousel = ({items}: Props): React.MixedElement => {
         checkScrollability();
       };
 
+      // $FlowFixMe[cannot-resolve-name]
       window.addEventListener('resize', handleResize);
 
       return () => {
         if (element) {
           element.removeEventListener('scroll', checkScrollability);
+          // $FlowFixMe[cannot-resolve-name]
           window.removeEventListener('resize', handleResize);
         }
       };

@@ -7,10 +7,13 @@ import React from 'react';
 const listeners: Set<() => void> = new Set();
 
 // Event listener set-up
+// $FlowFixMe[cannot-resolve-name]
 if (typeof window !== 'undefined') {
   const callListeners = () => listeners.forEach(callback => callback());
   let timeout;
+  // $FlowFixMe[cannot-resolve-name]
   window.addEventListener('resize', () => {
+    // $FlowFixMe[cannot-resolve-name]
     const activeElement = document.activeElement;
     if (
       activeElement &&

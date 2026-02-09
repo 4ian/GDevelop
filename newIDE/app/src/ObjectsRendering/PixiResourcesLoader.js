@@ -15,6 +15,7 @@ import { type ResourceKind } from '../ResourcesList/ResourceSource';
 const gd: libGDevelop = global.gd;
 
 type SpineTextureAtlasOrLoadingError = {|
+  // $FlowFixMe[value-as-type]
   textureAtlas: ?TextureAtlas,
   loadingError: ?Error,
   loadingErrorReason:
@@ -25,6 +26,7 @@ type SpineTextureAtlasOrLoadingError = {|
 |};
 
 export type SpineDataOrLoadingError = {|
+  // $FlowFixMe[value-as-type]
   skeleton: ?ISkeleton,
   loadingError: ?Error,
   loadingErrorReason:
@@ -47,12 +49,16 @@ const invalidTexture = PIXI.Texture.from('res/invalid_texture.png');
 const loadingTexture = PIXI.Texture.from(
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAAA1BMVEXX19f5cgrAAAAAAXRSTlMz/za5cAAAAApJREFUCNdjQAMAABAAAbSqgB8AAAAASUVORK5CYII='
 );
+// $FlowFixMe[value-as-type]
 let loadedOrLoadingThreeTextures: ResourcePromise<THREE.Texture> = {};
+// $FlowFixMe[value-as-type]
 let loadedOrLoadingThreeMaterials: ResourcePromise<THREE.Material> = {};
+// $FlowFixMe[value-as-type]
 let loadedOrLoading3DModelPromises: ResourcePromise<THREE.THREE_ADDONS.GLTF> = {};
 let spineAtlasPromises: ResourcePromise<SpineTextureAtlasOrLoadingError> = {};
 let spineDataPromises: ResourcePromise<SpineDataOrLoadingError> = {};
 
+// $FlowFixMe[value-as-type]
 const createInvalidModel = (): GLTF => {
   /**
    * The invalid model is a box with magenta (#ff00ff) faces, to be
@@ -75,6 +81,7 @@ const createInvalidModel = (): GLTF => {
     parser: null,
   };
 };
+// $FlowFixMe[value-as-type]
 const invalidModel: GLTF = createInvalidModel();
 
 let gltfLoader = null;
@@ -91,6 +98,7 @@ const getOrCreateGltfLoader = () => {
 const load3DModel = (
   project: gdProject,
   resourceName: string
+// $FlowFixMe[value-as-type]
 ): Promise<THREE.THREE_ADDONS.GLTF> => {
   if (
     resourceName.length === 0 ||
@@ -144,6 +152,7 @@ const applyPixiTextureSettings = (resource: gdResource, texture: any) => {
 
 const applyThreeTextureSettings = (
   resource: gdResource,
+  // $FlowFixMe[value-as-type]
   threeTexture: THREE.Texture
 ) => {
   if (resource.getKind() !== 'image') return;
@@ -156,6 +165,7 @@ const applyThreeTextureSettings = (
 };
 
 // If modifying this function, make sure to update Resource3DPreview.worker.js copy.
+// $FlowFixMe[value-as-type]
 const removeMetalness = (material: THREE.Material): void => {
   if (material.metalness) {
     material.metalness = 0;
@@ -163,7 +173,9 @@ const removeMetalness = (material: THREE.Material): void => {
 };
 
 // If modifying this function, make sure to update Resource3DPreview.worker.js copy.
+// $FlowFixMe[value-as-type]
 const removeMetalnessFromMesh = (node: THREE.Object3D): void => {
+  // $FlowFixMe[value-as-type]
   const mesh = (node: THREE.Mesh);
   if (!mesh.material) {
     return;
@@ -177,6 +189,7 @@ const removeMetalnessFromMesh = (node: THREE.Object3D): void => {
   }
 };
 
+// $FlowFixMe[value-as-type]
 const traverseToRemoveMetalnessFromMeshes = (node: THREE.Object3D) =>
   node.traverse(removeMetalnessFromMesh);
 
@@ -512,8 +525,10 @@ export default class PixiResourcesLoader {
   static async getThreeTexture(
     project: gdProject,
     resourceName: string
+  // $FlowFixMe[value-as-type]
   ): Promise<THREE.Texture> {
     const loadedOrLoadingPromise = loadedOrLoadingThreeTextures[resourceName];
+    // $FlowFixMe[constant-condition]
     if (loadedOrLoadingPromise) return loadedOrLoadingPromise;
 
     // Texture is not loaded, load it now from the PixiJS texture.
@@ -535,6 +550,7 @@ export default class PixiResourcesLoader {
 
     // @ts-ignore - source does exist on resource.
     const image = pixiTexture.baseTexture.resource.source;
+    // $FlowFixMe[cannot-resolve-name]
     if (!(image instanceof HTMLImageElement)) {
       throw new Error(
         `Can't load texture for resource "${resourceName}" as it's not an image.`
@@ -572,9 +588,11 @@ export default class PixiResourcesLoader {
     }: {|
       useTransparentTexture: boolean,
     |}
+  // $FlowFixMe[value-as-type]
   ): Promise<THREE.Material> {
     const cacheKey = `${resourceName}|transparent:${useTransparentTexture.toString()}`;
     const loadedOrLoadingPromise = loadedOrLoadingThreeMaterials[cacheKey];
+    // $FlowFixMe[constant-condition]
     if (loadedOrLoadingPromise) return loadedOrLoadingPromise;
 
     return (loadedOrLoadingThreeMaterials[cacheKey] = this.getThreeTexture(
@@ -602,8 +620,10 @@ export default class PixiResourcesLoader {
   static get3DModel(
     project: gdProject,
     resourceName: string
+  // $FlowFixMe[value-as-type]
   ): Promise<THREE.THREE_ADDONS.GLTF> {
     const promise = loadedOrLoading3DModelPromises[resourceName];
+    // $FlowFixMe[constant-condition]
     if (promise) return promise;
 
     const loadingPromise = load3DModel(project, resourceName);
@@ -622,6 +642,7 @@ export default class PixiResourcesLoader {
     spineTextureAtlasName: string
   ): Promise<SpineTextureAtlasOrLoadingError> {
     const promise = spineAtlasPromises[spineTextureAtlasName];
+    // $FlowFixMe[constant-condition]
     if (promise) return promise;
 
     if (!spineTextureAtlasName) {
@@ -752,6 +773,7 @@ export default class PixiResourcesLoader {
     spineName: string
   ): Promise<SpineDataOrLoadingError> {
     const promise = spineDataPromises[spineName];
+    // $FlowFixMe[constant-condition]
     if (promise) return promise;
 
     const resourceManager = project.getResourcesManager();
@@ -979,6 +1001,7 @@ export default class PixiResourcesLoader {
       );
 
     const resource = project.getResourcesManager().getResource(resourceName);
+    // $FlowFixMe[invalid-compare]
     if (resource.getKind() !== 'bitmapFont')
       return Promise.reject(
         new Error(
@@ -998,6 +1021,7 @@ export default class PixiResourcesLoader {
     }
 
     return axios
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       .get(fullUrl, {
         withCredentials: checkIfCredentialsRequired(fullUrl),
       })
@@ -1044,6 +1068,7 @@ export default class PixiResourcesLoader {
       isResourceForPixi: true,
     });
     return axios
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       .get(fullUrl, {
         withCredentials: checkIfCredentialsRequired(fullUrl),
       })

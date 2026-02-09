@@ -72,6 +72,7 @@ export type PreviewOptions = {|
   numberOfWindows: number,
 
   // Only for the web-app:
+  // $FlowFixMe[cannot-resolve-name]
   previewWindows: Array<WindowProxy> | null,
 |};
 
@@ -140,7 +141,9 @@ export interface PreviewDebuggerServer {
   sendMessage(id: DebuggerId, message: Object): void;
   sendMessageWithResponse(message: Object): Promise<Object>;
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks): () => void;
+  // $FlowFixMe[cannot-resolve-name]
   registerEmbeddedGameFrame(window: WindowProxy): void;
+  // $FlowFixMe[cannot-resolve-name]
   unregisterEmbeddedGameFrame(window: WindowProxy): void;
   closeAllConnections(): void;
 }
@@ -159,6 +162,7 @@ export type HotReloaderLog = {|
 export type PreviewLauncherInterface = {
   +immediatelyPreparePreviewWindows?: (
     options: PreparePreviewWindowsOptions
+  // $FlowFixMe[cannot-resolve-name]
   ) => Array<WindowProxy> | null,
   launchPreview: (previewOptions: PreviewOptions) => Promise<any>,
   canDoNetworkPreview: () => boolean,
@@ -171,6 +175,7 @@ export type PreviewLauncherInterface = {
  * A PreviewLaunchComponent supports the props and has at least the functions exposed in PreviewLauncherInterface.
  * This is important as MainFrame is keeping ref to it to launch previews.
  */
+// $FlowFixMe[prop-missing]
 export type PreviewLauncherComponent = React.AbstractComponent<
   PreviewLauncherProps,
   PreviewLauncherInterface

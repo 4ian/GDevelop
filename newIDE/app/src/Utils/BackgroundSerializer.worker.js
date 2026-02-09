@@ -15,16 +15,18 @@ const getLibGDevelop = (versionWithHash /*: string */) => {
       const url = `/libGD.js?cache-buster=${versionWithHash}`;
       // Load libGD.js in the worker context.
       // eslint-disable-next-line no-undef
+      // $FlowFixMe[cannot-resolve-name]
       importScripts(url);
 
       // eslint-disable-next-line no-undef
-      // $FlowFixMe
+      // $FlowFixMe[cannot-resolve-name][incompatible-type]
       if (typeof initializeGDevelopJs !== 'function') {
         reject(new Error('Missing initializeGDevelopJs in worker'));
         return;
       }
 
       // eslint-disable-next-line no-undef
+      // $FlowFixMe[cannot-resolve-name]
       initializeGDevelopJs({
         // Override the resolved URL for the .wasm file,
         // to ensure a new version is fetched when the version changes.
@@ -80,6 +82,7 @@ const unserializeBinarySnapshotToJson = (
 };
 
 // eslint-disable-next-line no-restricted-globals
+// $FlowFixMe[cannot-resolve-name]
 self.onmessage = async (event /*: MessageEvent */) => {
   // $FlowExpectedError
   const { type, binary, requestId, versionWithHash } = event.data || {};
@@ -98,6 +101,7 @@ self.onmessage = async (event /*: MessageEvent */) => {
     log(`Request #${requestId} done in ${Date.now() - startTime}ms.`);
 
     // eslint-disable-next-line no-restricted-globals
+    // $FlowFixMe[cannot-resolve-name]
     self.postMessage({
       type: 'DONE',
       result,
@@ -106,6 +110,7 @@ self.onmessage = async (event /*: MessageEvent */) => {
     });
   } catch (error) {
     // eslint-disable-next-line no-restricted-globals
+    // $FlowFixMe[cannot-resolve-name]
     self.postMessage({
       type: 'ERROR',
       requestId,

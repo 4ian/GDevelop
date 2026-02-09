@@ -72,8 +72,11 @@ const InstructionOrExpressionSelector = <
     id
   }: Props<T>,
 ): any => {
+  // $FlowFixMe[value-as-type]
   const searchBarRef = React.useRef<?SearchBarInterface>(null);
+  // $FlowFixMe[value-as-type]
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
+  // $FlowFixMe[value-as-type]
   const selectedItemRef = React.useRef<?ListItemRefType>(null);
   const [searchText, setSearchText] = React.useState<string>('');
   const searchApi = React.useMemo(

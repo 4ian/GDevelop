@@ -47,6 +47,7 @@ type ResourcesDownloadOutput = {|
   blobFiles: Array<BlobFileDescriptor>,
 |};
 
+// $FlowFixMe[cannot-resolve-name]
 type CompressionOutput = Blob;
 
 const exportPipelineName = 'browser-electron';
@@ -76,6 +77,7 @@ export const browserElectronExportPipeline: ExportPipeline<
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
   ): Promise<PreparedExporter> => {
+    // $FlowFixMe[incompatible-type]
     return findGDJS('electron').then(({ gdjsRoot, filesContent }) => {
       console.info('GDJS found in ', gdjsRoot);
 
@@ -88,6 +90,7 @@ export const browserElectronExportPipeline: ExportPipeline<
         new gd.AbstractFileSystemJS(),
         abstractFileSystem
       );
+      // $FlowFixMe[extra-arg]
       const exporter = new gd.Exporter(fileSystem, gdjsRoot);
 
       return {
@@ -138,6 +141,7 @@ export const browserElectronExportPipeline: ExportPipeline<
   launchCompression: (
     context: ExportPipelineContext<ExportState>,
     { textFiles, blobFiles }: ResourcesDownloadOutput
+  // $FlowFixMe[cannot-resolve-name]
   ): Promise<Blob> => {
     return archiveFiles({
       blobFiles,

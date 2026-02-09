@@ -167,8 +167,9 @@ export const ChatMarkdownText: React.ComponentType<Props> = React.memo<Props>((p
 
   const className = classNames(({
     'gd-markdown': true,
+    // $FlowFixMe[invalid-computed-prop]
     [classes.chatMarkdown]: true,
-  }: {[string]: boolean}));
+  }: any));
 
   return <span className={className}>{markdownElement}</span>;
 });

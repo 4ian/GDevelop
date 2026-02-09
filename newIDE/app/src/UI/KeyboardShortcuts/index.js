@@ -42,7 +42,9 @@ type ShortcutCallbacks = {|
   onUndo?: () => void | Promise<void>,
   onRedo?: () => void | Promise<void>,
   onSearch?: () => void | Promise<void>,
+  // $FlowFixMe[cannot-resolve-name]
   onZoomOut?: KeyboardEvent => void | Promise<void>,
+  // $FlowFixMe[cannot-resolve-name]
   onZoomIn?: KeyboardEvent => void | Promise<void>,
   onEscape?: () => void | Promise<void>,
   onShift1?: () => void | Promise<void>,
@@ -148,6 +150,7 @@ export default class KeyboardShortcuts {
     }
   }
 
+  // $FlowFixMe[cannot-resolve-name]
   shouldZoom(evt: WheelEvent): any {
     // Browsers trigger a wheel event with ctrlKey or metaKey to true when the user
     // does a pinch gesture on a trackpad. If this is the case, we zoom.
@@ -182,6 +185,7 @@ export default class KeyboardShortcuts {
     this._setSpacePressed(false);
   };
 
+  // $FlowFixMe[cannot-resolve-name]
   _updateModifiersFromEvent = (evt: KeyboardEvent | DragEvent): any => {
     const hasModifierChanged =
       this._metaPressed !== evt.metaKey ||
@@ -197,6 +201,7 @@ export default class KeyboardShortcuts {
     return hasModifierChanged;
   };
 
+  // $FlowFixMe[cannot-resolve-name]
   _updateSpecialKeysStatus = (evt: KeyboardEvent, isDown: boolean) => {
     if (evt.which === SPACE_KEY) {
       if (this._shortcutCallbacks.onToggleGrabbingTool) {
@@ -214,6 +219,7 @@ export default class KeyboardShortcuts {
     return this._metaPressed || this._ctrlPressed;
   };
 
+  // $FlowFixMe[cannot-resolve-name]
   onMouseDown = (evt: MouseEvent) => {
     if (evt.button === MID_MOUSE_BUTTON) {
       this._setMouseMidButtonPressed(true);
@@ -222,28 +228,32 @@ export default class KeyboardShortcuts {
     }
   };
 
+  // $FlowFixMe[cannot-resolve-name]
   onMouseUp = (evt: MouseEvent) => {
     if (evt.button === MID_MOUSE_BUTTON) {
       this._setMouseMidButtonPressed(false);
     }
   };
 
+  // $FlowFixMe[cannot-resolve-name]
   onDragOver = (evt: DragEvent) => {
     this._updateModifiersFromEvent(evt);
   };
 
+  // $FlowFixMe[cannot-resolve-name]
   onKeyUp = (evt: KeyboardEvent) => {
     this._updateModifiersFromEvent(evt);
     this._updateSpecialKeysStatus(evt, false);
   };
 
+  // $FlowFixMe[cannot-resolve-name]
   onKeyDown = (evt: KeyboardEvent) => {
     this._updateModifiersFromEvent(evt);
 
     if (this._isActive && !this._isActive()) return;
 
     const textEditorSelectors = 'textarea, input, [contenteditable="true"]';
-    // $FlowFixMe
+    // $FlowFixMe[incompatible-type]
     if (evt.target && evt.target.closest(textEditorSelectors)) {
       return; // Something else is currently being edited.
     }

@@ -17,6 +17,7 @@ import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasur
 import Text from '../UI/Text';
 
 type Props = {|
+  // $FlowFixMe[cannot-resolve-name]
   element: HTMLElement,
 |};
 
@@ -85,6 +86,7 @@ function InAppTutorialElementHighlighter({ element }: Props): React.Node {
   >(computeScrollDirection());
 
   const updateHighlighterVisibility = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (entries: IntersectionObserverEntry[]) => {
       const { isIntersecting } = entries[0];
       setShowHighlighter(isIntersecting);
@@ -109,6 +111,7 @@ function InAppTutorialElementHighlighter({ element }: Props): React.Node {
     },
     [scrollParent, forceUpdate]
   );
+  // $FlowFixMe[cannot-resolve-name]
   const elementComputedStyle = getComputedStyle(element);
 
   const Icon = React.useMemo(

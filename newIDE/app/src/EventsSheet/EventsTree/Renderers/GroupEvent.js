@@ -35,11 +35,14 @@ const styles = {
   },
 };
 
+// $FlowFixMe[unsupported-syntax]
 export default class GroupEvent extends React.Component<EventRendererProps, *> {
+  // $FlowFixMe[missing-local-annot]
   state = {
     editing: false,
     editingPreviousValue: null,
   };
+  // $FlowFixMe[value-as-type]
   _textField: ?TextFieldInterface = null;
 
   edit = () => {

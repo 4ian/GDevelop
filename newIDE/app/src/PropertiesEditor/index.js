@@ -149,6 +149,7 @@ export const getFieldValue = ({
     return mixedValueFallback;
   }
   let value = getValue(instances[0]);
+  // $FlowFixMe[invalid-compare]
   if (value === null) {
     value = defaultValue;
   }
@@ -404,6 +405,7 @@ const PropertiesEditor = (
         />
       ));
 
+      // $FlowFixMe[invalid-compare]
       if (field.valueType === 'number') {
         const { setValue } = field;
         return (

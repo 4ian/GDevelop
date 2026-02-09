@@ -2,18 +2,21 @@
 import * as React from 'react';
 
 type Props = {
+  // $FlowFixMe[cannot-resolve-name]
   blob: ?Blob,
   children: (blobDownloadUrl: string) => React.Node,
 };
 
 export const BlobDownloadUrlHolder = ({blob, children}: Props): React.Node => {
   const [blobDownloadUrl, setBlobDownloadUrl] = React.useState('');
+  // $FlowFixMe[cannot-resolve-name]
   const [currentBlob, setCurrentBlob] = React.useState<?Blob>(null);
   React.useEffect(
     () => {
       // This effect function does not look at the blobDownloadUrl, to avoid infinite loops.
       // It is only in charge of updating the Url when the blob changes.
       if (blob && blob !== currentBlob) {
+        // $FlowFixMe[cannot-resolve-name]
         setBlobDownloadUrl(URL.createObjectURL(blob));
         setCurrentBlob(blob);
       }
@@ -28,6 +31,7 @@ export const BlobDownloadUrlHolder = ({blob, children}: Props): React.Node => {
       // See https://reactjs.org/docs/hooks-effect.html#explanation-why-effects-run-on-each-update
       return () => {
         if (blobDownloadUrl) {
+          // $FlowFixMe[cannot-resolve-name]
           URL.revokeObjectURL(blobDownloadUrl);
         }
       };
@@ -42,11 +46,13 @@ export const BlobDownloadUrlHolder = ({blob, children}: Props): React.Node => {
  * Open an URL generated from a blob, to download it with the specified filename.
  */
 export const openBlobDownloadUrl = (url: string, filename: string) => {
+  // $FlowFixMe[cannot-resolve-name]
   const { body } = document;
   if (!body) return;
 
   // Not using Window.openExternalURL because blob urls are blocked
   // by Adblock Plus (and maybe other ad blockers).
+  // $FlowFixMe[cannot-resolve-name]
   const a = document.createElement('a');
   body.appendChild(a);
   a.style.display = 'none';

@@ -246,6 +246,7 @@ const ShareDialog = ({
       minHeight={'lg'}
       title={<Trans>Share</Trans>}
       actions={mainActions}
+      // $FlowFixMe[incompatible-type]
       secondaryActions={secondaryActions}
       onRequestClose={onClose}
       open

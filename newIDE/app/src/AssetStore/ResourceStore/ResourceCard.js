@@ -178,7 +178,9 @@ export const ResourceCard = ({resource, onChoose, size, isSelected}: Props): nul
           size={size}
           imageStyle={
             theme.palette.type === 'light'
+              // $FlowFixMe[incompatible-type]
               ? styles.previewIconLightTheme
+              // $FlowFixMe[incompatible-type]
               : styles.previewIconDarkTheme
           }
         />

@@ -102,11 +102,12 @@ export const ExtensionDependenciesEditor = ({eventsFunctionsExtension, project, 
             </TableRow>
           </TableHeader>
           <TableBody>
-            {// $FlowFixMe - unsure why Flow complains about TableRow.
+            {// $FlowFixMe[incompatible-type] - unsure why Flow complains about TableRow.
             mapVector<gdDependencyMetadata, TableRow>(
+              // $FlowFixMe[incompatible-exact]
               eventsFunctionsExtension.getAllDependencies(),
               (dependency, index) => (
-                // $FlowFixMe - unsure why Flow complains about TableRow.
+                // $FlowFixMe[incompatible-type] - unsure why Flow complains about TableRow.
                 <TableRow key={dependency.getName()}>
                   <TableRowColumn>
                     <CompactSemiControlledTextField
@@ -229,11 +230,12 @@ export const ExtensionDependenciesEditor = ({eventsFunctionsExtension, project, 
             </TableRow>
           </TableHeader>
           <TableBody>
-            {// $FlowFixMe - unsure why Flow complains about TableRow.
+            {// $FlowFixMe[incompatible-type] - unsure why Flow complains about TableRow.
             mapVector<gdSourceFileMetadata, TableRow>(
+              // $FlowFixMe[incompatible-exact]
               eventsFunctionsExtension.getAllSourceFiles(),
               (sourceFile, index) => (
-                // $FlowFixMe - unsure why Flow complains about TableRow.
+                // $FlowFixMe[incompatible-type] - unsure why Flow complains about TableRow.
                 <TableRow key={sourceFile.getResourceName()}>
                   <TableRowColumn>
                     <CompactResourceSelectorWithThumbnail

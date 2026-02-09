@@ -45,12 +45,14 @@ export const GdGamesFrame = ({loadErrorMessage, path, onMessageReceived, support
   const isMounted = useIsMounted();
   const forceUpdate = useForceUpdate();
 
+  // $FlowFixMe[cannot-resolve-name]
   const url = new URL(path, gdGamesHost);
   url.searchParams.set('supportedMessageIds', supportedMessageIds.join(','));
   url.searchParams.set('theme', paletteType);
 
   React.useEffect(
     () => {
+      // $FlowFixMe[cannot-resolve-name]
       const callback = (event: MessageEvent) => {
         if (
           event.origin === gdGamesHost &&
@@ -61,14 +63,16 @@ export const GdGamesFrame = ({loadErrorMessage, path, onMessageReceived, support
             loadState.current = 'loaded';
             forceUpdate();
           } else {
-            // $FlowFixMe - Trust gd.games to send the right data shapes.
+            // $FlowFixMe[incompatible-type] - Trust gd.games to send the right data shapes.
             onMessageReceived(event.data);
           }
         }
       };
 
+      // $FlowFixMe[cannot-resolve-name]
       window.addEventListener('message', callback);
 
+      // $FlowFixMe[cannot-resolve-name]
       return () => window.removeEventListener('message', callback);
     },
     [forceUpdate, onMessageReceived]

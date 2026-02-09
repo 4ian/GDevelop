@@ -37,7 +37,7 @@ export type BoxSearchResultsInterface = {|
 export const BoxSearchResults: component(
   ...{ ...Props<any>, +ref?: React.RefSetter<BoxSearchResultsInterface> }
 ) React.Node = React.forwardRef<
-  // $FlowFixMe The generic type can't pass through.
+  // $FlowFixMe[incompatible-type] The generic type can't pass through.
   Props<SearchItem>,
   BoxSearchResultsInterface
 >(

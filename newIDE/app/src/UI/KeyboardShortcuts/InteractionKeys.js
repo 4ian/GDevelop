@@ -3,6 +3,7 @@
 // These functions are very simple, but are there to ensure consistency
 // in the codebase when dealing with keys.
 
+// $FlowFixMe[cannot-resolve-name]
 type SupportedEvent = KeyboardEvent | SyntheticKeyboardEvent<any>;
 
 /**
@@ -45,6 +46,7 @@ export const shouldSubmit = (event: SupportedEvent): boolean => {
 /**
  * Check if the user wants to zoom when scrolling.
  */
+// $FlowFixMe[cannot-resolve-name]
 export const shouldZoom = (event: SupportedEvent | WheelEvent): any => {
   return event.metaKey || event.ctrlKey;
 };

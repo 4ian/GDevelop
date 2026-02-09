@@ -132,7 +132,9 @@ type Props = {|
   width: number,
   height: number,
   onViewPositionChanged?: ViewPosition => void,
+  // $FlowFixMe[cannot-resolve-name]
   onMouseMove?: MouseEvent => void,
+  // $FlowFixMe[cannot-resolve-name]
   onMouseLeave?: MouseEvent => void,
   screenType: ScreenType,
   showObjectInstancesIn3D: boolean,
@@ -151,9 +153,13 @@ export default class InstancesEditor extends Component<Props, State> {
   lastContextMenuY = 0;
   lastCursorX: number | null = null;
   lastCursorY: number | null = null;
+  // $FlowFixMe[missing-local-annot]
   fpsLimiter = new FpsLimiter({ maxFps: 60, idleFps: 10 }) as FpsLimiter;
+  // $FlowFixMe[cannot-resolve-name]
   canvasArea: ?HTMLDivElement;
+  // $FlowFixMe[value-as-type]
   pixiRenderer: PIXI.Renderer;
+  // $FlowFixMe[value-as-type]
   threeRenderer: THREE.WebGLRenderer | null = null;
   keyboardShortcuts: KeyboardShortcuts;
   pinchHandler: PinchHandler;
@@ -171,8 +177,11 @@ export default class InstancesEditor extends Component<Props, State> {
   windowMask: WindowMask;
   statusBar: StatusBar;
   profilerBar: ProfilerBar;
+  // $FlowFixMe[value-as-type]
   uiPixiContainer: PIXI.Container;
+  // $FlowFixMe[value-as-type]
   backgroundPixiContainer: PIXI.Container;
+  // $FlowFixMe[value-as-type]
   backgroundArea: PIXI.Container;
   instancesRenderer: InstancesRenderer;
   viewPosition: ViewPosition;
@@ -181,11 +190,13 @@ export default class InstancesEditor extends Component<Props, State> {
   background: Background;
   _unmounted = false;
   _renderingPaused = false;
+  // $FlowFixMe[cannot-resolve-name]
   nextFrame: AnimationFrameID;
   contextMenuLongTouchTimeoutID: TimeoutID;
   hasCursorMovedSinceItIsDown = false;
   _showObjectInstancesIn3D: boolean = false;
 
+  // $FlowFixMe[missing-local-annot]
   state = {
     renderingError: null,
   };
@@ -223,10 +234,12 @@ export default class InstancesEditor extends Component<Props, State> {
       },
     });
 
+    // $FlowFixMe[cannot-resolve-name]
     let gameCanvas: HTMLCanvasElement;
     this._showObjectInstancesIn3D = this.props.showObjectInstancesIn3D;
     // TODO (3D): Should it handle preference changes without needing to reopen tabs?
     if (this._showObjectInstancesIn3D) {
+      // $FlowFixMe[cannot-resolve-name]
       gameCanvas = document.createElement('canvas');
       const threeRenderer = new THREE.WebGLRenderer({
         canvas: gameCanvas,
@@ -286,6 +299,7 @@ export default class InstancesEditor extends Component<Props, State> {
         this.props.onContextMenu(event.clientX, event.clientY),
     });
 
+    // $FlowFixMe[cannot-resolve-name]
     this.pixiRenderer.view.onwheel = (event: WheelEvent) => {
       this.fpsLimiter.notifyInteractionHappened();
       const zoomFactor = this.getZoomFactor();
@@ -352,6 +366,7 @@ export default class InstancesEditor extends Component<Props, State> {
     );
     this.backgroundArea.addEventListener(
       'rightclick',
+      // $FlowFixMe[value-as-type]
       (interactionEvent: PIXI.InteractionEvent) => {
         const {
           data: { originalEvent: event },
@@ -633,6 +648,7 @@ export default class InstancesEditor extends Component<Props, State> {
     if (this.longTouchHandler) {
       this.longTouchHandler.unmount();
     }
+    // $FlowFixMe[cannot-resolve-name]
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     stopPIXITicker();
     if (this.uiPixiContainer) {
@@ -832,10 +848,10 @@ export default class InstancesEditor extends Component<Props, State> {
     if (
       object.getType() === 'TileMap::SimpleTileMap' &&
       renderedInstance &&
-      // $FlowFixMe - We are confident the renderedInstance is an instance of RenderedSimpleTileMapInstance.
+      // $FlowFixMe[incompatible-type] - We are confident the renderedInstance is an instance of RenderedSimpleTileMapInstance.
       !!renderedInstance.getEditableTileMap
     ) {
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
       const editableTileMap = renderedInstance.getEditableTileMap();
       if (!editableTileMap) {
         console.error(
@@ -847,7 +863,7 @@ export default class InstancesEditor extends Component<Props, State> {
       const tileMapToSceneTransformation = new AffineTransformation();
       const scales = updateSceneToTileMapTransformation(
         selectedInstance,
-        // $FlowFixMe
+        // $FlowFixMe[incompatible-type]
         renderedInstance,
         sceneToTileMapTransformation,
         tileMapToSceneTransformation
@@ -1050,6 +1066,7 @@ export default class InstancesEditor extends Component<Props, State> {
     );
   };
 
+  // $FlowFixMe[cannot-resolve-name]
   _onDownBackground = (x: number, y: number, event?: PointerEvent) => {
     this.lastCursorX = x;
     this.lastCursorY = y;
@@ -1109,6 +1126,7 @@ export default class InstancesEditor extends Component<Props, State> {
     return layersLocks;
   };
 
+  // $FlowFixMe[cannot-resolve-name]
   _onUpBackground = (x: number, y: number, event?: PointerEvent) => {
     if (this.selectionRectangle.hasStartedSelectionRectangle()) {
       this._selectInstanceInsideSelectionRectangle();
@@ -1398,6 +1416,7 @@ export default class InstancesEditor extends Component<Props, State> {
 
   // Debounce function to avoid storing history for each pixel move when user
   // keeps pressing an arrow key.
+  // $FlowFixMe[missing-local-annot]
   onInstancesMovedDebounced = debounce(
   this.props.onInstancesMoved,
   50,
@@ -1467,10 +1486,11 @@ export default class InstancesEditor extends Component<Props, State> {
     const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
     let contentAABB: Rectangle | null = null;
     const getInstanceRectangle = new gd.InitialInstanceJSFunctor();
-    // $FlowFixMe - invoke is not writable
+    // $FlowFixMe[cannot-write][incompatible-type] - invoke is not writable
     getInstanceRectangle.invoke = instancePtr => {
-      // $FlowFixMe - wrapPointer is not exposed
+      // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
       const instance: gdInitialInstance = gd.wrapPointer(
+        // $FlowFixMe[incompatible-type]
         instancePtr,
         gd.InitialInstance
       );
@@ -1485,7 +1505,7 @@ export default class InstancesEditor extends Component<Props, State> {
         );
       }
     };
-    // $FlowFixMe - JSFunctor is incompatible with Functor
+    // $FlowFixMe[incompatible-type] - JSFunctor is incompatible with Functor
     initialInstances.iterateOverInstances(getInstanceRectangle);
     getInstanceRectangle.delete();
     return contentAABB;
@@ -1621,6 +1641,7 @@ export default class InstancesEditor extends Component<Props, State> {
       editorViewPosition2D.viewX = this.viewPosition.viewX;
       editorViewPosition2D.viewY = this.viewPosition.viewY;
 
+      // $FlowFixMe[cannot-resolve-name]
       this.nextFrame = requestAnimationFrame(this._renderScene);
     } catch (error) {
       console.error('Exception caught while doing the rendering:', error);
@@ -1631,6 +1652,7 @@ export default class InstancesEditor extends Component<Props, State> {
   };
 
   pauseSceneRendering = () => {
+    // $FlowFixMe[cannot-resolve-name]
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     this._renderingPaused = true;
     // Deactivate interactions when the scene is paused.

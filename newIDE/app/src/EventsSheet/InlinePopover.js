@@ -35,6 +35,7 @@ const styles = {
 
 type Props = {|
   children: React.Node,
+  // $FlowFixMe[cannot-resolve-name]
   anchorEl: ?HTMLElement,
   open: boolean,
   onRequestClose: () => void,
@@ -48,7 +49,9 @@ type Props = {|
  * dismissed on click/touch outside) but positioned under the edited parameter.
  */
 export default function InlinePopover(props: Props): React.Node {
+  // $FlowFixMe[cannot-resolve-name]
   const startSentinel = React.useRef<?HTMLDivElement>(null);
+  // $FlowFixMe[cannot-resolve-name]
   const endSentinel = React.useRef<?HTMLDivElement>(null);
   const { isMobile } = useResponsiveWindowSize();
 
@@ -73,6 +76,7 @@ export default function InlinePopover(props: Props): React.Node {
         // For a popover, clicking/touching away means validating,
         // as it's very easy to do it and almost the only way to do it on a touch screen.
         // The user can cancel with Escape.
+        // $FlowFixMe[cannot-resolve-name]
         if (event instanceof MouseEvent) {
           // onClickAway is triggered on a "click" (which can actually happen
           // on a touchscreen too!).

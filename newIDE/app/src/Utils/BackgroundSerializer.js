@@ -10,6 +10,7 @@ type BackgroundSerializerWorkerOutMessage =
   | {| type: 'DONE', requestId: number, result: any |}
   | {| type: 'ERROR', requestId: number, message: string |};
 
+// $FlowFixMe[cannot-resolve-name]
 let serializerWorker: ?Worker = null;
 let nextRequestId = 1;
 const pendingRequests: Map<
@@ -21,15 +22,18 @@ const log = (message: string) => {
   console.log(`[BackgroundSerializer] ${message}`);
 };
 
+// $FlowFixMe[cannot-resolve-name]
 const getOrCreateBackgroundSerializerWorker = (): Worker => {
   if (serializerWorker) {
     return serializerWorker;
   }
 
   // $FlowExpectedError - worker-loader types aren't recognized by Flow
+  // $FlowFixMe[invalid-constructor]
   serializerWorker = new BackgroundSerializerWorker();
 
   // Set up message handler
+  // $FlowFixMe[cannot-resolve-name]
   serializerWorker.onmessage = (event: MessageEvent) => {
     const data: BackgroundSerializerWorkerOutMessage = (event.data: any);
 
@@ -85,6 +89,7 @@ export async function serializeInBackground(
   const binaryPtr = gd.BinarySerializer.createBinarySnapshot(serializedElement);
   const binarySize = gd.BinarySerializer.getLastBinarySnapshotSize();
   serializedElement.delete();
+  // $FlowFixMe[incompatible-type]
   serializedElement = null;
 
   if (!binaryPtr) {

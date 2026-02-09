@@ -56,6 +56,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
 > {
   editor: ?SceneEditor;
   resourceExternallyChangedCallbackId: ?string;
+  // $FlowFixMe[missing-local-annot]
   state = {
     externalPropertiesDialogOpen: false,
   };
@@ -80,6 +81,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
       this._setPreviewedLayout();
     }
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
+      // $FlowFixMe[method-unbinding]
       this.onResourceExternallyChanged.bind(this)
     );
   }

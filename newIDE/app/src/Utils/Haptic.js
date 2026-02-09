@@ -7,7 +7,9 @@ export const hapticFeedback: ?({
 }) => void = !isNativeMobileApp()
   ? ({ durationInMs }) => {
       try {
+        // $FlowFixMe[cannot-resolve-name]
         if (window.navigator && window.navigator.vibrate) {
+          // $FlowFixMe[cannot-resolve-name]
           window.navigator.vibrate(durationInMs);
         }
       } catch (error) {

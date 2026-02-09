@@ -50,12 +50,15 @@ const groupVersionsByDay = (
   const versionsGroupedByDay: {[string]: any} = {};
   versions.forEach(version => {
     const dayDate = new Date(version.createdAt.slice(0, 10)).getTime();
+    // $FlowFixMe[incompatible-type]
     if (!versionsGroupedByDay[dayDate]) {
+      // $FlowFixMe[incompatible-type]
       versionsGroupedByDay[dayDate] = [version];
     } else {
       versionsGroupedByDay[dayDate].push(version);
     }
   });
+  // $FlowFixMe[incompatible-type]
   return versionsGroupedByDay;
 };
 
@@ -111,6 +114,7 @@ const VersionHistory: React.ComponentType<Props> = React.memo<Props>(
       isLoadingMoreVersions,
       setIsLoadingMoreVersions,
     ] = React.useState<boolean>(false);
+    // $FlowFixMe[value-as-type]
     const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
 
     const userIdsToFetch = React.useMemo(

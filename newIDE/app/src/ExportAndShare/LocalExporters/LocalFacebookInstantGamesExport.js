@@ -110,6 +110,7 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
   ): Promise<PreparedExporter> => {
+    // $FlowFixMe[incompatible-type]
     return findGDJS().then(({ gdjsRoot }) => {
       console.info('GDJS found in ', gdjsRoot);
 
@@ -121,6 +122,7 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
         new gd.AbstractFileSystemJS(),
         localFileSystem
       );
+      // $FlowFixMe[extra-arg]
       const exporter = new gd.Exporter(fileSystem, gdjsRoot);
       const temporaryOutputDir = path.join(
         fileSystem.getTempDir(),

@@ -51,7 +51,7 @@ const getOrientationAndWindowSizeFromDimensions = (
       ? 'large'
       : 'xlarge';
 
-  // $FlowFixMe - this is guaranteed to be a valid OrientationAndWindowSizeType.
+  // $FlowFixMe[incompatible-type] - this is guaranteed to be a valid OrientationAndWindowSizeType.
   return sizeType + '-' + orientation;
 };
 
@@ -109,12 +109,15 @@ const keyToSize: { [OrientationAndWindowSizeType]: WindowSize } = {
 };
 
 const getWindowSizeFromTopLevelWindow = (): WindowSize | null => {
+  // $FlowFixMe[cannot-resolve-name]
   if (typeof window === 'undefined') {
     return null;
   }
   return keyToSize[
     getOrientationAndWindowSizeFromDimensions(
+      // $FlowFixMe[cannot-resolve-name]
       window.innerWidth,
+      // $FlowFixMe[cannot-resolve-name]
       window.innerHeight
     )
   ];

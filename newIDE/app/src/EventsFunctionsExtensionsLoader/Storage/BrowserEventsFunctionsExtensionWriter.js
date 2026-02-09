@@ -4,13 +4,18 @@ const downloadStringContentAsFile = async (
   filename: string,
   content: string
 ): Promise<void> => {
+  // $FlowFixMe[cannot-resolve-name]
   const blob = new Blob([content], { type: 'application/json' });
+  // $FlowFixMe[cannot-resolve-name]
   const blobUrl = URL.createObjectURL(blob);
 
+  // $FlowFixMe[cannot-resolve-name]
   const adhocLink = document.createElement('a');
   adhocLink.href = blobUrl;
   adhocLink.download = filename;
+  // $FlowFixMe[cannot-resolve-name]
   if (document.body) {
+    // $FlowFixMe[cannot-resolve-name]
     document.body.appendChild(adhocLink);
     adhocLink.click();
     adhocLink.remove();

@@ -116,6 +116,7 @@ export const BundleStoreStateProvider = ({children}: BundleStoreStateProviderPro
 
           setBundleListingDatas(fetchedBundleListingDatas);
           const defaultTags = fetchedBundleListingDatas.reduce(
+            // $FlowFixMe[missing-local-annot]
             (allCategories, bundleListingData) => {
               return allCategories.concat(
                 bundleListingData.categories.map(category =>
@@ -286,6 +287,7 @@ export const BundleStoreStateProvider = ({children}: BundleStoreStateProviderPro
   );
 
   return (
+    // $FlowFixMe[incompatible-type]
     <BundleStoreContext.Provider value={BundleStoreState}>
       {children}
     </BundleStoreContext.Provider>

@@ -53,6 +53,7 @@ const ObjectGroupsListWithObjectGroupEditor = (
   const [isCreatingNewGroup, setCreatingNewGroup] = React.useState<boolean>(
     false
   );
+  // $FlowFixMe[value-as-type]
   const objectGroupsListInterface = React.useRef<ObjectGroupsListInterface | null>(
     null
   );

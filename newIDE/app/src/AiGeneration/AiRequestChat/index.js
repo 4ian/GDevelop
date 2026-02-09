@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { I18n as I18nType } from '@lingui/core';
+import type { I18n as I18nType } from '@lingui/core';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
 import { Trans, t } from '@lingui/macro';
@@ -329,6 +329,7 @@ export type AiRequestChatInterface = {|
   resetUserInput: (aiRequestId: string | null) => void,
 |};
 
+// $FlowFixMe[prop-missing]
 export const AiRequestChat: React.AbstractComponent<Props, AiRequestChatInterface> = React.forwardRef<Props, AiRequestChatInterface>(
   (
     {
@@ -424,7 +425,7 @@ export const AiRequestChat: React.AbstractComponent<Props, AiRequestChatInterfac
       setUserRequestTextPerRequestId,
     ] = React.useState<{ [string]: string }>({});
 
-    const scrollViewRef = React.useRef<ScrollViewInterface | null>(null);
+    const scrollViewRef = React.useRef<any>(null);
     const [shouldAutoScroll, setShouldAutoScroll] = React.useState<boolean>(
       true
     );
@@ -1026,6 +1027,7 @@ export const AiRequestChat: React.AbstractComponent<Props, AiRequestChatInterfac
             alignItems="stretch"
             noMargin
           >
+            // $FlowFixMe[constant-condition]
             {!standAloneForm && (
               <CompactTextAreaFieldWithControls
                 maxLength={6000}

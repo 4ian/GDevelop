@@ -40,12 +40,15 @@ const AchievementList = ({badges, achievements}: Props): React.Node => {
   React.useEffect(
     () => {
       const badgeByAchievementId = badges.reduce((acc, badge) => {
+        // $FlowFixMe[prop-missing]
         acc[badge.achievementId] = badge;
         return acc;
       }, {});
 
       const achievementsWithBadgeData = achievements.reduce(
+        // $FlowFixMe[missing-local-annot]
         (acc, achievement) => {
+          // $FlowFixMe[invalid-computed-prop]
           const badge = badgeByAchievementId[achievement.id];
           const hasBadge = !!badge;
           acc.push({

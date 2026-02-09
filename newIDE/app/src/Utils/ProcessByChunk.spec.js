@@ -4,6 +4,7 @@ import { processByChunk } from './ProcessByChunk';
 
 describe('ProcessByChunk', () => {
   test('empty array', async () => {
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     const processChunk = jest.fn().mockImplementation(async () => {});
     await processByChunk([], {
       transformItem: async item => item,
@@ -16,6 +17,7 @@ describe('ProcessByChunk', () => {
 
   test('chunk never too big', async () => {
     let results: Array<any> = [];
+    // $FlowFixMe[missing-local-annot]
     const processChunk = async chunk => {
       results = [...results, ...chunk];
     };
@@ -39,6 +41,7 @@ describe('ProcessByChunk', () => {
 
   test('chunks of 2', async () => {
     let results: Array<any> = [];
+    // $FlowFixMe[missing-local-annot]
     const processChunk = async chunk => {
       results = [...results, ...chunk];
     };
@@ -62,6 +65,7 @@ describe('ProcessByChunk', () => {
 
   test('chunks of 2, transformed items', async () => {
     let results: Array<any> = [];
+    // $FlowFixMe[missing-local-annot]
     const processChunk = async chunk => {
       expect(chunk.length <= 2).toBe(true);
       results = [...results, ...chunk];

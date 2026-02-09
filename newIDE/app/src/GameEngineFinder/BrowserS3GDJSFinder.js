@@ -58,6 +58,7 @@ export const findGDJS = (
       const url = gdjsRoot + relativeFilePath;
 
       // Don't do any caching, rely on the browser cache only.
+      // $FlowFixMe[cannot-resolve-name]
       return fetch(url).then(response => {
         if (!response.ok) {
           console.error(`Error while downloading "${url}"`, response);

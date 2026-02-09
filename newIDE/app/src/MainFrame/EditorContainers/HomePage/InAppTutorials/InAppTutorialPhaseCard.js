@@ -71,6 +71,7 @@ type Props = {|
   loading?: boolean,
 |};
 
+// $FlowFixMe[missing-local-annot]
 const getTextStyle = disabled => (disabled ? { opacity: 0.4 } : undefined);
 
 const InAppTutorialPhaseCard = (

@@ -46,6 +46,7 @@ const Link = (props: Props): React.Node => {
     props.color || 'primary',
     !!props.disabled
   );
+  // $FlowFixMe[cannot-resolve-name]
   const onClick = (event: MouseEvent) => {
     event.preventDefault(); // Avoid triggering the href (avoids a warning on mobile in case of unsaved changes).
     if (!props.disabled) {

@@ -10,6 +10,7 @@ import { type I18n as I18nType } from '@lingui/core';
 // We support a subset of the props supported by Material-UI v0.x RaisedButton
 // They should be self descriptive - refer to Material UI docs otherwise.
 type Props = {|
+  // $FlowFixMe[value-as-type]
   ...RaisedButtonPropsWithoutOnClick,
   buildMenuTemplate: (i18n: I18nType) => Array<MenuItemTemplate>,
 |};

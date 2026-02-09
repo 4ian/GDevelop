@@ -651,8 +651,9 @@ export const getOpenedAskAiEditor = (
   const editorTabOpened = getEditorTabOpenedWithKey(state, 'ask-ai');
   if (!editorTabOpened) return null;
 
+  // $FlowFixMe[incompatible-type]
   return {
-    // $FlowFixMe - the key ensures that the editor is an AskAiEditorInterface.
+    // $FlowFixMe[incompatible-type] - the key ensures that the editor is an AskAiEditorInterface.
     askAiEditor: editorTabOpened.editorTab.editorRef,
     editorTab: editorTabOpened.editorTab,
     paneIdentifier: editorTabOpened.paneIdentifier,

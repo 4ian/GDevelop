@@ -58,10 +58,13 @@ const prepareExporter = async ({
     new gd.AbstractFileSystemJS(),
     browserSWFileSystem
   );
+  // $FlowFixMe[extra-arg]
   const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+  // $FlowFixMe[prop-missing]
   exporter.setCodeOutputDirectory(outputDir);
 
   return {
+    // $FlowFixMe[incompatible-type]
     exporter,
     outputDir,
     browserSWFileSystem,
@@ -78,6 +81,7 @@ export default class BrowserSWPreviewLauncher extends React.Component<
 > {
   canDoNetworkPreview = (): any => false;
 
+  // $FlowFixMe[missing-local-annot]
   state = {
     error: null,
   };
@@ -138,6 +142,7 @@ export default class BrowserSWPreviewLauncher extends React.Component<
 
     try {
       await this.getPreviewDebuggerServer().startServer({
+        // $FlowFixMe[cannot-resolve-name]
         origin: new URL(getBrowserSWPreviewBaseUrl()).origin,
       });
     } catch (err) {
@@ -345,6 +350,7 @@ export default class BrowserSWPreviewLauncher extends React.Component<
         console.log(
           '[BrowserSWPreviewLauncher] Opening new preview window(s)...'
         );
+        // $FlowFixMe[cannot-resolve-name]
         previewWindows.forEach((previewWindow: WindowProxy) => {
           // Change the HTML file displayed by the preview window so that it starts loading
           // the game.

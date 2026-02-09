@@ -30,6 +30,7 @@ const SimpleTileMapEditor = (
     renderObjectNameField
   }: EditorProps,
 ): React.Node => {
+  // $FlowFixMe[value-as-type]
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
   const forceUpdate = useForceUpdate();
   const objectProperties = objectConfiguration.getProperties();
@@ -132,6 +133,7 @@ const SimpleTileMapEditor = (
     [columnCount, objectConfiguration, forceUpdate, onObjectUpdated]
   );
 
+  // $FlowFixMe[missing-local-annot]
   const onScrollY = React.useCallback(deltaY => {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollBy(deltaY);
@@ -159,6 +161,7 @@ const SimpleTileMapEditor = (
   );
 
   const onAtlasImageLoaded = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (e: SyntheticEvent<HTMLImageElement>, atlasResourceName: string) => {
       setError(null);
       const newDimensions = {
@@ -214,6 +217,7 @@ const SimpleTileMapEditor = (
             <TileSetVisualizer
               project={project}
               objectConfiguration={objectConfiguration}
+              // $FlowFixMe[incompatible-type]
               tileMapTileSelection={tileMapTileSelection}
               onSelectTileMapTile={onChangeTilesWithHitBox}
               showPaintingToolbar={false}

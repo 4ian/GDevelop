@@ -6,12 +6,15 @@ export type ScreenType = 'normal' | 'touch';
 let userHasTouchedScreen = false;
 let userHasMovedMouse = false;
 
+// $FlowFixMe[cannot-resolve-name]
 if (typeof window !== 'undefined') {
+  // $FlowFixMe[cannot-resolve-name]
   window.addEventListener(
     'touchstart',
     function onFirstTouch() {
       console.info('Touch detected, considering the screen as touch enabled.');
       userHasTouchedScreen = true;
+      // $FlowFixMe[cannot-resolve-name]
       window.removeEventListener('touchstart', onFirstTouch, false);
     },
     false
@@ -23,8 +26,10 @@ if (typeof window !== 'undefined') {
   // will never be considered as mouse-enabled.
   // Note: mousemove cannot be used since browsers emulate the mouse movement when
   // the screen is touched.
+  // $FlowFixMe[cannot-resolve-name]
   window.addEventListener(
     'pointermove',
+    // $FlowFixMe[cannot-resolve-name]
     function onPointerMove(event: PointerEvent) {
       console.info('Pointer move detected.');
       if (event.pointerType === 'mouse') {
@@ -33,6 +38,7 @@ if (typeof window !== 'undefined') {
         );
         userHasMovedMouse = true;
       }
+      // $FlowFixMe[cannot-resolve-name]
       window.removeEventListener('pointermove', onPointerMove, false);
     },
     false
@@ -56,6 +62,7 @@ export const useScreenType = (): ScreenType => {
   // Note: this is not a React hook but is named as one to encourage
   // components to use it as such, so that it could be reworked
   // at some point to use a context (verify in this case all usages).
+  // $FlowFixMe[cannot-resolve-name]
   if (typeof window === 'undefined') return 'normal';
 
   return userHasTouchedScreen ? 'touch' : 'normal';

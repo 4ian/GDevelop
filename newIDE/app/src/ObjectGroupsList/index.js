@@ -566,7 +566,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
             children:
               globalObjectGroupsList.length > 0
                 ? globalObjectGroupsList
-                : // $FlowFixMe
+                : // $FlowFixMe[incompatible-type]
                   [getGlobalGroupsEmptyPlaceholder(i18n)],
             isRoot: true,
             id: globalGroupsRootFolderId,
@@ -576,7 +576,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
             children:
               objectGroupsList.length > 0
                 ? objectGroupsList
-                : // $FlowFixMe
+                : // $FlowFixMe[incompatible-type]
                   [getSceneGroupsEmptyPlaceholder(i18n)],
             isRoot: true,
             id: sceneGroupsRootFolderId,

@@ -17,6 +17,7 @@ import {
   listListedPrivateAssetPacks,
   type PrivateAssetPackListingData,
 } from '../Utils/GDevelopServices/Shop';
+// $FlowFixMe[import-type-as-value]
 import { useSearchItem, SearchFilter } from '../UI/Search/UseSearchItem';
 import {
   TagAssetStoreSearchFilter,
@@ -478,7 +479,7 @@ export const AssetStoreStateProvider = ({children}: AssetStoreStateProviderProps
     searchText,
     chosenCategory,
     null,
-    // $FlowFixMe - this filter works for both public and private packs
+    // $FlowFixMe[incompatible-type] - this filter works for both public and private packs
     assetPackSearchFilters
   );
 
@@ -488,7 +489,7 @@ export const AssetStoreStateProvider = ({children}: AssetStoreStateProviderProps
     searchText,
     chosenCategory,
     null,
-    // $FlowFixMe - this filter works for both public and private packs
+    // $FlowFixMe[incompatible-type] - this filter works for both public and private packs
     assetPackSearchFilters
   );
 
@@ -578,9 +579,13 @@ export const AssetStoreStateProvider = ({children}: AssetStoreStateProviderProps
       assetPackFiltersState,
       clearAllFilters,
       useSearchItem: (
+        // $FlowFixMe[missing-local-annot]
         searchText,
+        // $FlowFixMe[missing-local-annot]
         chosenCategory,
+        // $FlowFixMe[missing-local-annot]
         chosenFilters,
+        // $FlowFixMe[missing-local-annot]
         searchFilters
       ) =>
         useSearchItem(
@@ -617,6 +622,7 @@ export const AssetStoreStateProvider = ({children}: AssetStoreStateProviderProps
   );
 
   return (
+    // $FlowFixMe[incompatible-type]
     <AssetStoreContext.Provider value={assetStoreState}>
       {children}
     </AssetStoreContext.Provider>

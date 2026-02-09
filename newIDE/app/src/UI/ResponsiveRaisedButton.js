@@ -7,6 +7,7 @@ import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
  * A button which hides its label on small screens.
  * Same interface as RaisedButton.
  */
+// $FlowFixMe[value-as-type]
 const ResponsiveRaisedButton = (props: RaisedButtonProps): React.Node => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   return (

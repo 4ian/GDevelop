@@ -88,6 +88,7 @@ export type EditWithExternalEditorOptions = {|
   i18n: I18nType,
   getStorageProvider: () => StorageProvider,
   resourceManagementProps: ResourceManagementProps,
+  // $FlowFixMe[cannot-resolve-name]
   signal: AbortSignal,
 
   resourceNames: Array<string>,
@@ -138,6 +139,7 @@ export const saveBlobUrlsFromExternalEditorBase64Resources = async ({
     .map(({ name, dataUrl, localFilePath, extension, originalIndex }) => {
       // Convert the data url to a blob URL.
       const blob = convertDataURLtoBlob(dataUrl);
+      // $FlowFixMe[cannot-resolve-name]
       const blobUrl = blob ? URL.createObjectURL(blob) : '';
 
       if (!name || !resourcesManager.hasResource(name)) {
@@ -219,6 +221,7 @@ export const freeBlobsAndUpdateMetadata = ({
     // If we don't revoke these blob urls, they will stay in memory forever, despite
     // being used only temporarily as a temporary storage before they are uploaded somewhere
     // (Cloud) or written to the disk (LocalFile).
+    // $FlowFixMe[cannot-resolve-name]
     URL.revokeObjectURL(blobUrl);
 
     // Update the modified resources with the metadata of the editor.

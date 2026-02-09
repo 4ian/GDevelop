@@ -125,9 +125,11 @@ const getGridCoordinatesFromPointerCoordinates = ({
 };
 
 const getImageCoordinatesFromPointerEvent = (
+  // $FlowFixMe[cannot-resolve-name]
   event: PointerEvent | MouseEvent | ClientCoordinates
 ) => {
   const divContainer = event.currentTarget;
+  // $FlowFixMe[cannot-resolve-name]
   if (!(divContainer instanceof HTMLDivElement)) {
     return;
   }
@@ -215,6 +217,7 @@ type Props = {|
   showPaintingToolbar: boolean,
   interactive: boolean,
   onAtlasImageLoaded?: (
+    // $FlowFixMe[cannot-resolve-name]
     e: SyntheticEvent<HTMLImageElement>,
     atlasResourceName: string
   ) => void,
@@ -256,7 +259,9 @@ const TileSetVisualizer = (
     lastSelection,
     setLastSelection,
   ] = React.useState<?TileMapTileSelection>(null);
+  // $FlowFixMe[cannot-resolve-name]
   const tilesetContainerRef = React.useRef<?HTMLDivElement>(null);
+  // $FlowFixMe[cannot-resolve-name]
   const tilesetAndTooltipContainerRef = React.useRef<?HTMLDivElement>(null);
   const [tooltipContent, setTooltipContent] = React.useState<?{|
     label: string,
@@ -302,6 +307,7 @@ const TileSetVisualizer = (
     ? tilesetContainerRef.current.getElementsByTagName('img')[0]
     : null;
   const imageWidth = imageElement
+    // $FlowFixMe[cannot-resolve-name]
     ? parseFloat(getComputedStyle(imageElement).width.replace('px', ''))
     : 0;
   const imageNaturalWidth = imageElement ? imageElement.naturalWidth : 1;
@@ -311,6 +317,7 @@ const TileSetVisualizer = (
       : null;
 
   const _onAtlasImageLoaded = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     e => {
       if (onAtlasImageLoaded) onAtlasImageLoaded(e, atlasResourceName);
     },
@@ -365,6 +372,7 @@ const TileSetVisualizer = (
   );
 
   const onPointerDown = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (event: PointerEvent) => {
       if (isBadlyConfigured) return;
       const coordinates = getImageCoordinatesFromPointerEvent(event);
@@ -378,6 +386,7 @@ const TileSetVisualizer = (
   );
 
   const onPointerMove = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (event: PointerEvent) => {
       if (
         isBadlyConfigured ||
@@ -450,6 +459,7 @@ const TileSetVisualizer = (
   );
 
   const onPointerUp = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (event: PointerEvent) => {
       try {
         if (!displayedTileSize || isBadlyConfigured) return;
@@ -519,6 +529,7 @@ const TileSetVisualizer = (
               }
             }
           }
+          // $FlowFixMe[incompatible-type]
           onSelectTileMapTile(newSelection);
         } else if (allowRectangleSelection) {
           const shouldRemoveSelection =
@@ -548,6 +559,7 @@ const TileSetVisualizer = (
               flipHorizontally: shouldFlipHorizontally,
               flipVertically: shouldFlipVertically,
             };
+            // $FlowFixMe[incompatible-type]
             onSelectTileMapTile(newSelection);
           }
         }
@@ -581,6 +593,7 @@ const TileSetVisualizer = (
   );
 
   const onHoverAtlas = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (event: MouseEvent) => {
       if (!displayedTileSize) return;
 
@@ -599,6 +612,7 @@ const TileSetVisualizer = (
   );
 
   const onMouseMove = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     event => {
       if (!displayedTileSize) return;
       onHoverAtlas(event);
@@ -630,6 +644,7 @@ const TileSetVisualizer = (
     [onHoverAtlas, rowCount, columnCount, displayedTileSize]
   );
   const onMouseEnter = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     event => {
       if (!displayedTileSize) return;
       const imageCoordinates = getImageCoordinatesFromPointerEvent(event);

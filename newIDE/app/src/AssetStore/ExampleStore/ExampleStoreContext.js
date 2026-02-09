@@ -13,6 +13,7 @@ import {
 import { EXAMPLES_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 
 const defaultSearchText = '';
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const excludedTiers = new Set(); // No tiers for examples.
 const firstExampleIds: Array<any> = [];
 
@@ -162,6 +163,7 @@ export const ExampleStoreStateProvider = ({children}: ExampleStoreStateProviderP
   );
 
   return (
+    // $FlowFixMe[incompatible-type]
     <ExampleStoreContext.Provider value={exampleStoreState}>
       {children}
     </ExampleStoreContext.Provider>

@@ -14,11 +14,13 @@ type FileRecord = {|
   contentType: string,
 |};
 
+// $FlowFixMe[cannot-resolve-name]
 let dbInstance: ?IDBDatabase = null;
 let currentInstanceId: ?string = null;
 let initializationPromise: ?Promise<void> = null;
 let heartbeatIntervalId: ?IntervalID = null;
 
+// $FlowFixMe[cannot-resolve-name]
 const requestToPromise = (request: IDBRequest): Promise<any> => {
   return new Promise((resolve, reject) => {
     request.onsuccess = () => resolve(request.result);
@@ -29,6 +31,7 @@ const requestToPromise = (request: IDBRequest): Promise<any> => {
   });
 };
 
+// $FlowFixMe[cannot-resolve-name]
 const transactionToPromise = (transaction: IDBTransaction): Promise<void> => {
   return new Promise((resolve, reject) => {
     transaction.oncomplete = () => resolve();
@@ -44,6 +47,7 @@ const transactionToPromise = (transaction: IDBTransaction): Promise<void> => {
 };
 
 export const getBrowserSWPreviewRootUrl = (): string => {
+  // $FlowFixMe[cannot-resolve-name]
   const origin = window.location.origin;
   return `${origin}/browser_sw_preview`;
 };
@@ -59,6 +63,7 @@ export const getBrowserSWPreviewBaseUrl = (): string => {
     );
   }
 
+  // $FlowFixMe[incompatible-type]
   return `${getBrowserSWPreviewRootUrl()}/${currentInstanceId}`;
 };
 
@@ -66,14 +71,16 @@ export const getBrowserSWPreviewBaseUrl = (): string => {
  * Opens or returns the existing IndexedDB database connection.
  * Handles database upgrades and version management.
  */
+// $FlowFixMe[cannot-resolve-name]
 const openBrowserSWPreviewIndexedDB = (): Promise<IDBDatabase> => {
   if (dbInstance && dbInstance.version === DB_VERSION) {
     return Promise.resolve(dbInstance);
   }
 
+  // $FlowFixMe[missing-local-annot]
   return new Promise((resolve, reject) => {
     try {
-      // $FlowFixMe - indexedDB is available in all browsers
+      // $FlowFixMe[cannot-resolve-name][incompatible-type] - indexedDB is available in all browsers
       const request = indexedDB.open(DB_NAME, DB_VERSION);
 
       request.onerror = () => {
@@ -87,6 +94,7 @@ const openBrowserSWPreviewIndexedDB = (): Promise<IDBDatabase> => {
         console.log('[BrowserSWIndexedDB] Database opened successfully');
 
         // Handle unexpected close
+        // $FlowFixMe[incompatible-use]
         dbInstance.onclose = () => {
           console.warn(
             '[BrowserSWIndexedDB] Database connection closed unexpectedly'
@@ -95,6 +103,7 @@ const openBrowserSWPreviewIndexedDB = (): Promise<IDBDatabase> => {
         };
 
         // Handle version change (e.g., if another tab upgrades the DB)
+        // $FlowFixMe[incompatible-use]
         dbInstance.onversionchange = () => {
           console.warn(
             '[BrowserSWIndexedDB] Database version changed, closing connection'
@@ -310,9 +319,9 @@ const acquireInstanceIdAndCleanup = async (
   const store = transaction.objectStore(INSTANCES_STORE_NAME);
 
   const [keys, records] = await Promise.all([
-    // $FlowFixMe - outdated Flow types.
+    // $FlowFixMe[incompatible-type] - outdated Flow types.
     requestToPromise(store.getAllKeys()),
-    // $FlowFixMe - outdated Flow types.
+    // $FlowFixMe[incompatible-type] - outdated Flow types.
     requestToPromise(store.getAll()),
   ]);
 

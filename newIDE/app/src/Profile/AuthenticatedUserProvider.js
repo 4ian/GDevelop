@@ -74,6 +74,7 @@ type Props = {|
 |};
 
 type State = {|
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   loginDialogOpen: boolean,
   loginWithPurchaseClaimDialogOpen: boolean,
@@ -111,6 +112,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   Props,
   State
 > {
+  // $FlowFixMe[missing-local-annot]
   state = {
     authenticatedUser: initialAuthenticatedUser,
     loginDialogOpen: false,
@@ -136,6 +138,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   };
   _automaticallyUpdateUserProfile = true;
   _hasNotifiedUserAboutEmailVerification = false;
+  // $FlowFixMe[cannot-resolve-name]
   _abortController: ?AbortController = null;
   _notificationPollingIntervalId: ?IntervalID = null;
 
@@ -143,6 +146,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   // - First one comes from user authenticating and automatically fetching
   //   their cloud projects;
   // - Second one comes from the homepage fetching the cloud projects regularly.
+  // $FlowFixMe[missing-local-annot]
   _cloudProjectListingDeduplicator = new RequestDeduplicator<Array<CloudProjectWithUserAccessInfo>>(
   listUserCloudProjects,
 ) as RequestDeduplicator<Array<CloudProjectWithUserAccessInfo>>;
@@ -305,6 +309,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     );
   }
 
+  // $FlowFixMe[value-as-type]
   _reloadFirebaseProfile = async (): Promise<?FirebaseUser> => {
     const { authentication } = this.props;
 
@@ -355,10 +360,12 @@ export default class AuthenticatedUserProvider extends React.Component<
        */
       resetState?: boolean,
     }
+  // $FlowFixMe[missing-local-annot]
   ) => {
     const { authentication } = this.props;
 
     this.setState(({ authenticatedUser }) => {
+      // $FlowFixMe[value-as-type]
       let newAuthenticatedUser: AuthenticatedUser = {
         ...authenticatedUser,
         loginState: 'loggingIn',
@@ -423,6 +430,7 @@ export default class AuthenticatedUserProvider extends React.Component<
             subscription.pricingSystemId
           )
         ) {
+          // $FlowFixMe[incompatible-type]
           getSubscriptionPlanPricingSystem(subscription.pricingSystemId).then(
             subscriptionPricingSystem => {
               this.setState(({ authenticatedUser }) => ({
@@ -674,6 +682,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     if (!this._notificationPollingIntervalId) {
       this._notificationPollingIntervalId = setInterval(() => {
         // This property is correctly updated by Electron, browsers and capacitor.
+        // $FlowFixMe[cannot-resolve-name]
         if (document.visibilityState === 'visible') {
           this._fetchUserNotifications();
         }
@@ -726,6 +735,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         )
       ) {
         const subscriptionPricingSystem = await getSubscriptionPlanPricingSystem(
+          // $FlowFixMe[incompatible-type]
           subscription.pricingSystemId
         );
         this.setState(({ authenticatedUser }) => ({
@@ -1159,6 +1169,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
+  // $FlowFixMe[value-as-type]
   _showLoginSnackbar = (authenticatedUser: AuthenticatedUser) => {
     const username = authenticatedUser.profile
       ? authenticatedUser.profile.username
@@ -1189,6 +1200,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
     this._automaticallyUpdateUserProfile = false;
     try {
+      // $FlowFixMe[cannot-resolve-name]
       this._abortController = new AbortController();
       await authentication.loginWithProvider({
         provider,
@@ -1286,6 +1298,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   _doEdit = async (
     payload: EditUserChanges,
     preferences: PreferencesValues
+  // $FlowFixMe[missing-local-annot]
   ) => {
     const { authentication } = this.props;
     if (!authentication) return;

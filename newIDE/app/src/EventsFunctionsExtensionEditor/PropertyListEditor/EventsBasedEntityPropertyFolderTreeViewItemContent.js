@@ -36,6 +36,7 @@ export const expandAllSubfolders = (
 };
 
 export type EventsBasedEntityPropertyFolderTreeViewItemProps = {|
+  // $FlowFixMe[value-as-type]
   ...TreeItemProps,
   project: gdProject,
   properties: gdPropertiesContainer,
@@ -79,6 +80,7 @@ export const getEventsBasedEntityPropertyFolderTreeViewItemId = (
 };
 
 export class EventsBasedEntityPropertyFolderTreeViewItemContent
+  // $FlowFixMe[value-as-type]
   implements TreeViewItemContent {
   propertyFolder: gdPropertyFolderOrProperty;
   props: EventsBasedEntityPropertyFolderTreeViewItemProps;
@@ -95,6 +97,7 @@ export class EventsBasedEntityPropertyFolderTreeViewItemContent
     return this.propertyFolder;
   }
 
+  // $FlowFixMe[value-as-type]
   isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean {
     const propertyFolderOrProperty = treeViewItemContent.getPropertyFolderOrProperty();
     return (
@@ -103,6 +106,7 @@ export class EventsBasedEntityPropertyFolderTreeViewItemContent
     );
   }
 
+  // $FlowFixMe[value-as-type]
   isSibling(treeViewItemContent: TreeViewItemContent): boolean {
     const propertyFolderOrProperty = treeViewItemContent.getPropertyFolderOrProperty();
     return (

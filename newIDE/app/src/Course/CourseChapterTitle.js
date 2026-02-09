@@ -30,7 +30,9 @@ type Props = {|
   getChapterCompletion: (chapterId: string) => CourseChapterCompletion | null,
 |};
 
-const CourseChapterTitle: component(...{ ...Props, +ref?: React.RefSetter<any> }) React.Node = React.forwardRef<Props, HTMLDivElement>(
+// $FlowFixMe[cannot-resolve-name]
+const CourseChapterTitle: React.ComponentType<Props> = React.forwardRef<Props, HTMLDivElement>(
+  // $FlowFixMe[missing-local-annot]
   ({ course, chapterIndex, courseChapter, getChapterCompletion }, ref) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const { isMobile, isLandscape } = useResponsiveWindowSize();

@@ -379,6 +379,7 @@ const TextBasedCourseChapterCodeBlock = ({code, language}: Props): React.MixedEl
         language.toLowerCase() !== 'javascript' &&
         language.toLowerCase() !== 'js'
       ) {
+        // $FlowFixMe[incompatible-type]
         return normalizedCode
           .replace(/\r\n/g, '\n')
           .split('\n')
@@ -457,8 +458,10 @@ const TextBasedCourseChapterCodeBlock = ({code, language}: Props): React.MixedEl
                   key={`token-${lineIndex}-${tokenIndex}`}
                   style={{
                     color:
+                      // $FlowFixMe[incompatible-type]
                       (tokenStyleMap[token.type] || {}).color ||
                       tokenStyleMap.plain.color,
+                    // $FlowFixMe[incompatible-type]
                     fontStyle: (tokenStyleMap[token.type] || {}).fontStyle,
                     ...styles.token,
                   }}

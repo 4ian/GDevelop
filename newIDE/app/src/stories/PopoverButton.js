@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 
+// $FlowFixMe[cannot-resolve-name]
 type ChildrenProps = {| buttonElement: ?HTMLElement, onClose: () => void |};
 
 type Props = {|
@@ -9,6 +10,7 @@ type Props = {|
 
 export function PopoverButton({ children }: Props): React.Node {
   const [buttonElement, setButtonElement] = React.useState(
+    // $FlowFixMe[cannot-resolve-name]
     (null: ?HTMLElement)
   );
 

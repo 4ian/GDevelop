@@ -42,6 +42,7 @@ const fakeEditorToolbar = (
   </span>
 );
 
+// $FlowFixMe[value-as-type]
 const defaultProps: MainFrameToolbarProps = {
   showProjectButtons: true,
   openShareDialog: () => {},
@@ -78,6 +79,7 @@ export const NoProjectOpen = (): React.Node => (
 );
 
 export const NoProjectOpenWithFakeButtons = (): React.Node => {
+  // $FlowFixMe[value-as-type]
   const toolbar = React.useRef<?ToolbarInterface>(null);
   React.useEffect(
     () => {
@@ -170,6 +172,7 @@ export const ProjectOpenPreviewOverridenOnExternalLayout = (): React.Node => (
 );
 
 export const ProjectOpenWithFakeButtons = (): React.Node => {
+  // $FlowFixMe[value-as-type]
   const toolbar = React.useRef<?ToolbarInterface>(null);
   React.useEffect(
     () => {

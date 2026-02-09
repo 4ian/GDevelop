@@ -195,6 +195,7 @@ const AddTeacherDialog = ({ onClose, onAddTeacher }: AddTeacherDialogProps) => {
           } else {
             error = 'unexpected';
           }
+          // $FlowFixMe[incompatible-type]
           setAddError(error);
         }
       } finally {
@@ -449,6 +450,7 @@ const ManageEducationAccountDialog = ({onClose}: Props): null | React.Node => {
           } else {
             error = 'unexpected';
           }
+          // $FlowFixMe[incompatible-type]
           setRemoveAdminError(error);
         }
       } finally {

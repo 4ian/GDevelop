@@ -189,6 +189,7 @@ const ProjectVersionRow = ({
   openedVersionStatus,
   getAnonymousAvatar,
 }: Props) => {
+  // $FlowFixMe[value-as-type]
   const textFieldRef = React.useRef<?TextFieldInterface>(null);
   const [newLabel, setNewLabel] = React.useState<string>(version.label || '');
   const authorPublicProfile = version.userId

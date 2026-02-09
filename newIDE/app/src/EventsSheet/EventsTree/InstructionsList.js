@@ -45,6 +45,7 @@ type Props = {|
   onInstructionDoubleClick: InstructionContext => void,
   onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
   onAddInstructionContextMenu: (
+    // $FlowFixMe[cannot-resolve-name]
     HTMLButtonElement,
     InstructionsListContext
   ) => void,
@@ -109,6 +110,7 @@ export default function InstructionsList({
 
   const addNewInstruction = React.useCallback(
     () => {
+      // $FlowFixMe[constant-condition]
       if (onAddNewInstruction)
         onAddNewInstruction({
           instrsList,
@@ -191,6 +193,7 @@ export default function InstructionsList({
     isCondition: areConditions,
   };
 
+  // $FlowFixMe[cannot-resolve-name]
   const addButton = React.useRef<?HTMLButtonElement>(null);
   const addButtonDefaultLabel = areConditions ? (
     <Trans>Add condition</Trans>

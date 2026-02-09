@@ -1,5 +1,6 @@
 // @flow
 import 'element-closest';
+// $FlowFixMe[missing-export]
 import React, { Component, type Element } from 'react';
 import ReactDOM from 'react-dom';
 import Authentication from './Utils/GDevelopServices/Authentication';
@@ -45,6 +46,7 @@ try {
   }
 } catch {}
 
+// $FlowFixMe[cannot-resolve-name]
 document.getElementsByTagName('body')[0].style.backgroundColor = color;
 
 const styles = {
@@ -64,24 +66,29 @@ const styles = {
 
 type State = {|
   loadingMessage: string,
+  // $FlowFixMe[unsupported-syntax]
   App: ?Element<*>,
 |};
 
 class Bootstrapper extends Component<{}, State> {
+  // $FlowFixMe[missing-local-annot]
   state = {
     loadingMessage: '',
     App: null,
   };
+  // $FlowFixMe[missing-local-annot]
   authentication = new Authentication();
 
   componentDidMount() {
     installAnalyticsEvents();
+    // $FlowFixMe[cannot-resolve-name]
     GD_STARTUP_TIMES.push(['bootstrapperComponentDidMount', performance.now()]);
 
     // Load GDevelop.js, ensuring a new version is fetched when the version changes.
     loadScript(
       `./libGD.js?cache-buster=${VersionMetadata.versionWithHash}`
     ).then(() => {
+      // $FlowFixMe[cannot-resolve-name]
       GD_STARTUP_TIMES.push(['libGDLoadedTime', performance.now()]);
       const initializeGDevelopJs = global.initializeGDevelopJs;
       if (!initializeGDevelopJs) {
@@ -106,6 +113,7 @@ class Bootstrapper extends Component<{}, State> {
         global.gd = gd;
         GD_STARTUP_TIMES.push([
           'libGD.js initialization done',
+          // $FlowFixMe[cannot-resolve-name]
           performance.now(),
         ]);
         sendProgramOpening();
@@ -133,6 +141,7 @@ class Bootstrapper extends Component<{}, State> {
     }, this.handleEditorLoadError);
   }
 
+  // $FlowFixMe[missing-local-annot]
   handleEditorLoadError = rawError => {
     const message = !electron
       ? 'Please check your internet connectivity, close the tab and reopen it.'
@@ -148,6 +157,7 @@ class Bootstrapper extends Component<{}, State> {
     });
   };
 
+  // $FlowFixMe[missing-local-annot]
   render() {
     const { App, loadingMessage } = this.state;
 
@@ -162,8 +172,10 @@ class Bootstrapper extends Component<{}, State> {
   }
 }
 
+// $FlowFixMe[cannot-resolve-name]
 const rootElement = document.getElementById('root');
 if (rootElement) {
+  // $FlowFixMe[cannot-resolve-name]
   GD_STARTUP_TIMES.push(['reactDOMRenderCall', performance.now()]);
   ReactDOM.render(<Bootstrapper />, rootElement);
 } else console.error('No root element defined in index.html');

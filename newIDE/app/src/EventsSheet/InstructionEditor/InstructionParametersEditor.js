@@ -298,8 +298,8 @@ const InstructionParametersEditor = React.forwardRef<
       <I18n>
         {({ i18n }) => (
           <ScrollView autoHideScrollbar id={id}>
-            <Column expand>
-              <Line alignItems="flex-start">
+            <ColumnStackLayout expand>
+              <Line alignItems="flex-start" noMargin>
                 <img
                   src={iconFilename}
                   alt=""
@@ -311,8 +311,8 @@ const InstructionParametersEditor = React.forwardRef<
                   }}
                 />
                 <Column expand>
-                  <Line noMargin alignItems="center">
-                    <Text style={styles.description}>
+                  <Line noMargin alignItems="flex-start">
+                    <Text style={styles.description} noMargin>
                       {instructionMetadata.getDescription()}
                     </Text>
                     {helpPage && isDocumentationAbsoluteUrl(helpPage) && (
@@ -489,7 +489,7 @@ const InstructionParametersEditor = React.forwardRef<
                     />
                   )}
               </Line>
-            </Column>
+            </ColumnStackLayout>
           </ScrollView>
         )}
       </I18n>

@@ -321,6 +321,34 @@ namespace gdjs {
       return new pixi_spine.Vector2(scaleX, scaleY);
     }
 
+    setSkin(skinName: string): void {
+ 
+      if (!isSpine(this._rendererObject)) return;
+
+      const skeleton = this._rendererObject.skeleton;
+
+      const skin = skeleton.data.findSkin(skinName);
+      if (!skin) {
+        console.warn(
+          `[Spine] Skin "${skinName}" not found. Available skins: ${this.getAvailableSkins().join(', ')}`
+        );
+        return;
+      }
+      skeleton.setSkinByName(skinName);
+      skeleton.setSlotsToSetupPose();
+      this._rendererObject.update(0);
+    }
+
+    getSkin(): string {
+      if (!isSpine(this._rendererObject)) return '';
+      return this._rendererObject.skeleton.skin.name;
+    }
+
+    getAvailableSkins(): string[] {
+      if (!isSpine(this._rendererObject)) return [];
+      return this._rendererObject.skeleton.data.skins.map((skin) => skin.name);
+    }
+
     private constructRendererObject(): pixi_spine.Spine | PIXI.Container {
       const game = this.instanceContainer.getGame();
       const spineManager = game.getSpineManager();

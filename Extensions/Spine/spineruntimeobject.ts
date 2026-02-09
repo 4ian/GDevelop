@@ -8,6 +8,7 @@ namespace gdjs {
       scale: float;
       timeScale: float;
       spineResourceName: string;
+      skinName: string;
       animations: SpineAnimation[];
     };
   };
@@ -81,6 +82,13 @@ namespace gdjs {
         this,
         instanceContainer
       );
+
+      // Apply default skin if specified in the configuration.
+      const skinName = objectData.content.skinName;
+      if (skinName) {
+        this._renderer.setSkin(skinName);
+      }
+
       this.setAnimationIndex(0);
       this._renderer.updateAnimation(0);
 
@@ -608,6 +616,15 @@ namespace gdjs {
       return this._renderer.getAnimationDuration(
         this._animations[this._currentAnimationIndex].source
       );
+    }
+
+    setSkin(skinName: string): void {
+      this._renderer.setSkin(skinName);
+      this.invalidateHitboxes();
+    }
+
+    getSkin(): string {
+      return this._renderer.getSkin();
     }
   }
 

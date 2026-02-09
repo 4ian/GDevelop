@@ -214,6 +214,37 @@ module.exports = {
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('getPointAttachmentRotationLocal');
 
+    object
+      .addExpressionAndCondition(
+        'string',
+        'getSkin',
+        _('Get skin name'),
+        _('the skin of the object'),
+        _('the skin'),
+        _('Animations and images'),
+        'JsPlatform/Extensions/spine.svg'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .useStandardParameters(
+        'string',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Skin name'))
+      )
+      .setFunctionName('getSkin');
+
+    object
+      .addAction(
+        'SetSkin',
+        _('Set skin'),
+        _('Set the skin of a Spine object.'),
+        _('Set the skin of _PARAM0_ to _PARAM1_'),
+        _('Animations and images'),
+        'JsPlatform/Extensions/spine.svg',
+        'JsPlatform/Extensions/spine.svg'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .addParameter('objectSkinName', _('Skin name'))
+      .setFunctionName('setSkin');
+
     return extension;
   },
 
@@ -254,6 +285,8 @@ module.exports = {
       _animationIndex = -1;
       _spineOriginOffsetX = 0;
       _spineOriginOffsetY = 0;
+      /** @type {string} */
+      _skinName = RenderedSpineInstance.getDefaultSkinName();
 
       constructor(
         project,
@@ -283,6 +316,10 @@ module.exports = {
         this._loadSpine();
       }
 
+      static getDefaultSkinName() {
+        return 'default';
+      }
+
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
         return 'JsPlatform/Extensions/spine.svg';
       }
@@ -297,6 +334,21 @@ module.exports = {
         if (this._spineResourceName !== spineResourceName) {
           this._spineResourceName = spineResourceName;
           this._loadSpine();
+        }
+
+        // Apply skin if it changed.
+        const skinName = object.getSkinName();
+        if (this._skinName !== skinName && this._spine) {
+          this._skinName = skinName;
+          try {
+            this._spine.skeleton.setSkinByName(
+              skinName || RenderedSpineInstance.getDefaultSkinName()
+            );
+            this._spine.skeleton.setSlotsToSetupPose();
+            this._spine.update(0);
+          } catch (skinError) {
+            console.warn('Unable to set skin "' + skinName + '":', skinError);
+          }
         }
 
         this._pixiObject.position.set(
@@ -461,6 +513,21 @@ module.exports = {
 
             try {
               this._spine = new PIXI.Spine(spineDataOrLoadingError.skeleton);
+
+              // Apply the default skin if configured.
+              const skinName = object.getSkinName();
+              if (skinName) {
+                try {
+                  this._spine.skeleton.setSkinByName(skinName);
+                  this._spine.skeleton.setSlotsToSetupPose();
+                } catch (skinError) {
+                  console.warn(
+                    'Unable to set skin "' + skinName + '":',
+                    skinError
+                  );
+                }
+              }
+
               this._pixiObject.addChild(this._spine);
               this._placeholder.alpha = 0;
             } catch (error) {

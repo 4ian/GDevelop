@@ -12,6 +12,7 @@ declare class gdSpineObjectConfiguration extends gdObjectConfiguration {
   moveAnimation(oldIndex: number, newIndex: number): void;
   getScale(): number;
   getSpineResourceName(): string;
+  getSkinName(): string;
   delete(): void;
   ptr: number;
 };

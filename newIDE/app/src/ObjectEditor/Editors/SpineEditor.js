@@ -139,6 +139,49 @@ const SpineEditor = ({
     [project, spineResourceName, setSourceSelectOptions]
   );
 
+  /**
+   * Manage Spine skins
+   *
+   * @skinsSelectOptionsList - evaluated skins list from spineData.skeleton
+   * @skinName - current used skinName (in the first open - is "" empty string, because the next step we set first default skinName in useEffect)
+   * @handleChangeSkinSelect - handler for change (select) event of skins
+   */
+
+  const skinsSelectOptionsList = React.useMemo(
+    () => {
+      if (spineData.skeleton && spineData.skeleton.skins) {
+        return spineData.skeleton.skins.map(skin => skin.name);
+      } else {
+        return [];
+      }
+    },
+    [spineData.skeleton]
+  );
+
+  const skinName = spineConfiguration.getSkinName();
+
+  const changeSpineSkin = React.useCallback(
+    skinName => {
+      objectConfiguration.updateProperty('skinName', skinName);
+      if (onObjectUpdated) onObjectUpdated();
+      forceUpdate();
+    },
+    [objectConfiguration, onObjectUpdated, forceUpdate]
+  );
+
+  React.useEffect(
+    () => {
+      if (
+        skinsSelectOptionsList.length &&
+        (!skinName || !skinsSelectOptionsList.includes(skinName))
+      ) {
+        const defaultSkinObject = skinsSelectOptionsList[0] || '';
+        changeSpineSkin(defaultSkinObject);
+      }
+    },
+    [changeSpineSkin, skinName, skinsSelectOptionsList]
+  );
+
   const onChangeSpineResourceName = React.useCallback(
     () => {
       spineConfiguration.removeAllAnimations();
@@ -394,6 +437,35 @@ const SpineEditor = ({
           objectConfiguration={objectConfiguration}
           propertyName="scale"
         />
+        {skinsSelectOptionsList.length > 0 && (
+          <>
+            <Text size="block-title">
+              <Trans>Skins</Trans>
+            </Text>
+            <SelectField
+              id="skin-name-field"
+              value={skinName}
+              onChange={event => {
+                changeSpineSkin(event.target.value);
+              }}
+              margin="dense"
+              fullWidth
+              floatingLabelText={<Trans>Default skin</Trans>}
+              translatableHintText={t`Choose a skin`}
+            >
+              {skinsSelectOptionsList.map(skinName => {
+                return (
+                  <SelectOption
+                    key={skinName}
+                    value={skinName}
+                    label={skinName}
+                    shouldNotTranslate
+                  />
+                );
+              })}
+            </SelectField>
+          </>
+        )}
         {sourceSelectOptions.length && (
           <>
             <Text size="block-title">Animations</Text>

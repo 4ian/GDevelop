@@ -585,9 +585,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       setProjectVariablesEditorOpen(true);
     }, []);
 
-    const [editedPropertiesLayout, setEditedPropertiesLayout] = React.useState(
-      null
-    );
+    const [editedPropertiesLayout, setEditedPropertiesLayout] = React.useState<any>(null);
     const [editedVariablesLayout, setEditedVariablesLayout] = React.useState(
       null
     );

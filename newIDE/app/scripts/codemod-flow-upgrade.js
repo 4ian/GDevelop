@@ -950,16 +950,7 @@ function run() {
   }
 
   const userUuidPath = path.join(appRoot, 'src', 'Utils', 'Analytics', 'UserUUID.js');
-  if (
-    applyTextReplacements(userUuidPath, [
-      {
-        searchValue: /\(\[1e7\] \+ -1e3 \+ -4e3 \+ -8e3 \+ -1e11\)\.replace/g,
-        replaceValue: 'String([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace',
-      },
-    ])
-  ) {
-    updatedFiles += 1;
-  }
+  
 
   const badgePath = path.join(appRoot, 'src', 'Utils', 'GDevelopServices', 'Badge.js');
   if (
@@ -1021,6 +1012,11 @@ function run() {
         searchValue:
           /export const SimpleTextField: component\(\.\.\.SimpleTextFieldProps\) renders SimpleTextFieldInterface = React\.memo</g,
         replaceValue: 'export const SimpleTextField: any = React.memo',
+      },
+      {
+        searchValue:
+          /export const SimpleTextField: any = React\.memo[\s\S]*?SimpleTextFieldProps, any>\(/g,
+        replaceValue: 'export const SimpleTextField: any = React.memo(',
       },
     ])
   ) {
@@ -1164,7 +1160,7 @@ function run() {
     applyTextReplacements(projectManagerPath, [
       {
         searchValue:
-          /const \[editedPropertiesLayout, setEditedPropertiesLayout\] = React\.useState\(null\)/g,
+          /const \[editedPropertiesLayout, setEditedPropertiesLayout\] = React\.useState\(\s*null\s*\)/g,
         replaceValue:
           'const [editedPropertiesLayout, setEditedPropertiesLayout] = React.useState<any>(null)',
       },
@@ -1305,6 +1301,10 @@ function run() {
       {
         searchValue: /String\(\[1e7\] \+ -1e3 \+ -4e3 \+ -8e3 \+ -1e11\)\.replace/g,
         replaceValue: 'String((([1e7]: any) + -1e3 + -4e3 + -8e3 + -1e11)).replace',
+      },
+      {
+        searchValue: /StringString/g,
+        replaceValue: 'String',
       },
     ])
   ) {

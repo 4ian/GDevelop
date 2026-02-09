@@ -241,7 +241,7 @@ const renderEventAsText = ({
   event: gdBaseEvent,
   padding: string,
   eventPath: string,
-|}) => {
+|}): string => {
   const isDisabled = event.isDisabled();
   if (isDisabled) return `${padding}(This event is disabled - ignored)`;
 

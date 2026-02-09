@@ -6,7 +6,7 @@ const generateUUID = (a): string => {
     ? // eslint-disable-next-line
       (a ^ ((Math.random() * 16) >> (a / 4))).toString(16)
     : // $FlowFixMe[incompatible-type]
-      StringString((([1e7]: any) + -1e3 + -4e3 + -8e3 + -1e11)).replace(/[018]/g, generateUUID);
+      String((([1e7]: any) + -1e3 + -4e3 + -8e3 + -1e11)).replace(/[018]/g, generateUUID);
 };
 
 const localStorageKey = 'gd-user-uuid';

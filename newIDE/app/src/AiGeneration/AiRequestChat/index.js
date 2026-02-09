@@ -1029,7 +1029,7 @@ export const AiRequestChat: component(
             alignItems="stretch"
             noMargin
           >
-            // $FlowFixMe[constant-condition]
+            {/* $FlowFixMe[constant-condition] */}
             {!standAloneForm && (
               <CompactTextAreaFieldWithControls
                 maxLength={6000}

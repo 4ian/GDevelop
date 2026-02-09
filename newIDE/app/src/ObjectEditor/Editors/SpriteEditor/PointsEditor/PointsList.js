@@ -210,19 +210,19 @@ const PointsList = (props: PointsListProps): React.Node => {
       <Table>
         <TableHeader>
           <TableRow>
-            // $FlowFixMe[incompatible-type]
+            {/* $FlowFixMe[incompatible-type] */}
             <TableHeaderColumn style={styles.nameColumn}>
               <Trans>Point name</Trans>
             </TableHeaderColumn>
-            // $FlowFixMe[incompatible-type]
+            {/* $FlowFixMe[incompatible-type] */}
             <TableHeaderColumn style={styles.coordinateColumn} padding="none">
               <Column>X</Column>
             </TableHeaderColumn>
-            // $FlowFixMe[incompatible-type]
+            {/* $FlowFixMe[incompatible-type] */}
             <TableHeaderColumn style={styles.coordinateColumn} padding="none">
               <Column>Y</Column>
             </TableHeaderColumn>
-            // $FlowFixMe[incompatible-type]
+            {/* $FlowFixMe[incompatible-type] */}
             <TableHeaderColumn style={styles.toolColumn} />
           </TableRow>
         </TableHeader>

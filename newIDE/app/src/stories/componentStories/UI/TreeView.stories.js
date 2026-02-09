@@ -484,7 +484,7 @@ export const Default = (): React.Node => {
             {({ height, width }) => (
               <Line expand>
                 <Column expand noMargin>
-                  // $FlowFixMe[incompatible-type]
+                  {/* $FlowFixMe[incompatible-type] */}
                   <TreeView
                     multiSelect={multiSelect}
                     height={height}

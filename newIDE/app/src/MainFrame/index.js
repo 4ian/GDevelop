@@ -5028,7 +5028,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           )}
         />
       </LeaderboardProvider>
-      // $FlowFixMe[incompatible-type]
+      {/* $FlowFixMe[incompatible-type] */}
       <CommandPaletteWithAlgoliaSearch ref={commandPaletteRef} />
       <LoaderModal
         showImmediately={showLoaderImmediately}

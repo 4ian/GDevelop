@@ -775,7 +775,7 @@ const EventsTree: component(
                     props.highlightedAiGeneratedEventIds
                   }
                 />
-                // $FlowFixMe[constant-condition]
+                {/* $FlowFixMe[constant-condition] */}
                 {draggedNode && (
                   <DropContainer
                     node={node}

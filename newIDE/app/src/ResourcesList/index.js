@@ -334,7 +334,7 @@ const ResourcesList: component(...Props) = React.memo<Props, ResourcesListInterf
               )}
             </AutoSizer>
           </div>
-          // $FlowFixMe[constant-condition]
+          {/* $FlowFixMe[constant-condition] */}
           {!!infoBarContent && (
             <InfoBar
               duration={7000}

@@ -332,6 +332,7 @@ export const AssetStoreStateProvider = ({children}: AssetStoreStateProviderProps
       }
       if (receivedAssetShortHeaders) {
         receivedAssetShortHeaders.forEach(assetShortHeader => {
+          // $FlowFixMe[prop-missing]
           assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
         });
       }

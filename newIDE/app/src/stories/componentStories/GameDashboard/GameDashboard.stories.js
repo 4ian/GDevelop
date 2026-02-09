@@ -305,13 +305,16 @@ export const Default = (
     ...fakeSilverAuthenticatedUser,
     userEarningsBalance: userEarningsBalanceToDisplay,
     // $FlowIgnore - We know those fields are filled.
+    // $FlowFixMe[incompatible-type]
     limits: {
       ...fakeSilverAuthenticatedUser.limits,
       capabilities: {
         // $FlowIgnore - We know those fields are filled.
+        // $FlowFixMe[incompatible-use]
         ...fakeSilverAuthenticatedUser.limits.capabilities,
         leaderboards: {
           // $FlowIgnore - We know those fields are filled.
+          // $FlowFixMe[incompatible-use]
           ...fakeSilverAuthenticatedUser.limits.capabilities.leaderboards,
           maximumCountPerGame: leaderboards === 'Too many' ? 3 : -1,
         },

@@ -96,7 +96,7 @@ const LocalFolderPicker = ({type, value, onChange, defaultPath, fullWidth}: Prop
               width: fullWidth ? '100%' : undefined,
             }}
           >
-            // $FlowFixMe[incompatible-type]
+            {/* $FlowFixMe[incompatible-type] */}
             <TextField
               margin="dense"
               style={styles.textField}

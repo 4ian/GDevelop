@@ -737,7 +737,7 @@ const ObjectGroupsListWithErrorBoundary: component(
     componentTitle={<Trans>Object groups list</Trans>}
     scope="scene-editor-object-groups-list"
   >
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     <MemoizedObjectGroupsList ref={ref} {...props} />
   </ErrorBoundary>
 ));

@@ -317,7 +317,7 @@ const CollisionMasksPreview = (props: Props): React.MixedElement => {
   const renderPolygons = () => {
     return (
       <React.Fragment>
-        // $FlowFixMe[incompatible-exact]
+        {/* $FlowFixMe[incompatible-exact] */}
         {mapVector(polygons, (polygon, i) => {
           // $FlowFixMe[incompatible-use]
           const vertices = polygon.getVertices();

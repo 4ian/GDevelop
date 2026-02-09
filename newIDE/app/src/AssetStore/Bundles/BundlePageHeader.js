@@ -412,7 +412,7 @@ const BundlePageHeader = (
                 justifyContent="flex-start"
                 noMargin={isMobile}
               >
-                // $FlowFixMe[incompatible-type]
+                {/* $FlowFixMe[incompatible-type] */}
                 <Text size="title" noMargin style={styles.title}>
                   {selectMessageByLocale(i18n, bundle.nameByLocale)}
                 </Text>

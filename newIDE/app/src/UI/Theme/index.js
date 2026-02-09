@@ -17,8 +17,7 @@ import './Global/Table.css';
 import './Global/Font.css';
 
 type Theme = $Exact<typeof DefaultLightTheme>;
-// $FlowFixMe[incompatible-type]
-export type GDevelopTheme = ;
+export type GDevelopTheme = Theme['gdevelopTheme'];
 type FullTheme = {| gdevelopTheme: GDevelopTheme, muiTheme: Object |};
 const defaultThemeName = 'GDevelop default Dark';
 

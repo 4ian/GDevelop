@@ -360,7 +360,7 @@ const VariableRow = React.memo<VariableRowProps>(
                   >
                     <Line alignItems="center" noMargin expand>
                       {shouldWrap ? null : <Spacer />}
-                      // $FlowFixMe[incompatible-type]
+                      {/* $FlowFixMe[incompatible-type] */}
                       <SimpleTextField
                         type="text"
                         // $FlowFixMe[missing-local-annot]
@@ -434,7 +434,7 @@ const VariableRow = React.memo<VariableRowProps>(
                               {isInherited && !isTopLevel ? null : (
                                 <>
                                   <Spacer />
-                                  // $FlowFixMe[incompatible-type]
+                                  {/* $FlowFixMe[incompatible-type] */}
                                   <IconButton
                                     size="small"
                                     style={styles.inlineIcon}

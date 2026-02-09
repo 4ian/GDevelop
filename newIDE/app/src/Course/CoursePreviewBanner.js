@@ -125,7 +125,7 @@ const ChapterTile = ({
       <Spacer />
       <Line noMargin>
         <Text color="secondary" noMargin>
-          // $FlowFixMe[invalid-computed-prop]
+          {/* $FlowFixMe[invalid-computed-prop] */}
           {rankLabel[chapterIndex + 1]}
         </Text>
         &nbsp;

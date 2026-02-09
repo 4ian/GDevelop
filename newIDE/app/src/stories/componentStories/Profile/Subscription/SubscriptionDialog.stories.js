@@ -184,14 +184,17 @@ export const Default = (
       authenticatedUser.subscription.redemptionCodeValidUntil =
         Date.now() + (cancelAtPeriodEnd ? -1 : 1) * 7 * 24 * 3600 * 1000;
       // $FlowIgnore
+      // $FlowFixMe[incompatible-type]
       authenticatedUser.subscriptionPricingSystem = null;
     } else if (pricingSystem === 'team member') {
       authenticatedUser.subscription.pricingSystemId = 'TEAM_MEMBER';
       // $FlowIgnore
+      // $FlowFixMe[incompatible-type]
       authenticatedUser.subscriptionPricingSystem = null;
     } else if (pricingSystem === 'manually added') {
       authenticatedUser.subscription.pricingSystemId = 'MANUALLY_ADDED';
       // $FlowIgnore
+      // $FlowFixMe[incompatible-type]
       authenticatedUser.subscriptionPricingSystem = null;
     } else {
       authenticatedUser.subscription.cancelAtPeriodEnd = cancelAtPeriodEnd;
@@ -255,6 +258,7 @@ export const Default = (
 
   return (
     <AlertProvider>
+      {/* $FlowFixMe[incompatible-type] */}
       <AuthenticatedUserContext.Provider value={authenticatedUser}>
         <SubscriptionProvider>
           <Component />

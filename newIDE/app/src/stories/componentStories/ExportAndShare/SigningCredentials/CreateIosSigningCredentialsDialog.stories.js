@@ -25,7 +25,7 @@ export const AlwaysError = (): React.Node => {
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      // $FlowFixMe[incompatible-type]
+      {/* $FlowFixMe[incompatible-type] */}
       <CreateIosSigningCredentialsDialog
         initialTab={'apple-certificate'}
         authenticatedUser={fakeSilverAuthenticatedUser}
@@ -51,7 +51,7 @@ export const WorkingCertificateRequestButCertificateError = (): React.Node => {
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      // $FlowFixMe[incompatible-type]
+      {/* $FlowFixMe[incompatible-type] */}
       <CreateIosSigningCredentialsDialog
         initialTab={'apple-certificate'}
         authenticatedUser={fakeSilverAuthenticatedUser}
@@ -84,7 +84,7 @@ export const WorkingCertificateRequestButCertificateUnknownKind = (): React.Node
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      // $FlowFixMe[incompatible-type]
+      {/* $FlowFixMe[incompatible-type] */}
       <CreateIosSigningCredentialsDialog
         initialTab={'apple-certificate'}
         authenticatedUser={fakeSilverAuthenticatedUser}
@@ -133,7 +133,7 @@ export const AllWorking = (): React.Node => {
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      // $FlowFixMe[incompatible-type]
+      {/* $FlowFixMe[incompatible-type] */}
       <CreateIosSigningCredentialsDialog
         initialTab={'apple-certificate'}
         authenticatedUser={fakeSilverAuthenticatedUser}

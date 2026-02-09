@@ -128,6 +128,7 @@ export const addCreateBadgePreHookIfNotClaimed = <
   // $FlowFixMe[incompatible-type]
   return (...args) => {
     try {
+      // $FlowFixMe[incompatible-type]
       createOrEnsureBadgeForUser(authenticatedUser, achievementId);
     } catch (err) {
       console.error(`Couldn't create badge ${achievementId}; ${err}`);

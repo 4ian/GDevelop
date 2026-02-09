@@ -624,7 +624,7 @@ const CompactPropertiesEditor = (
 
       return (
         <React.Fragment key={`toggle-buttons-${field.name}`}>
-          // $FlowFixMe[incompatible-type]
+          {/* $FlowFixMe[incompatible-type] */}
           <CompactToggleButtons id={field.name} buttons={buttons} expand />
         </React.Fragment>
       );

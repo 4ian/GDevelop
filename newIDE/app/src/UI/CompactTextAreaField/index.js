@@ -89,7 +89,7 @@ export const CompactTextAreaField = (
                 },
               }}
             >
-              // $FlowFixMe[incompatible-type]
+              {/* $FlowFixMe[incompatible-type] */}
               <Text noMargin style={styles.label}>
                 {label}
               </Text>

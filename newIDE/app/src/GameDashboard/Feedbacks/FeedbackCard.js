@@ -314,7 +314,7 @@ const FeedbackCard = ({comment, buildProperties, authenticatedUser, onCommentUpd
                 </ResponsiveLineStackLayout>
               )}
               <LargeSpacer />
-              // $FlowFixMe[incompatible-type]
+              {/* $FlowFixMe[incompatible-type] */}
               <Text style={styles.textComment} allowSelection>
                 {comment.text}
               </Text>

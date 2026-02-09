@@ -308,7 +308,7 @@ const InstructionParametersEditor: component(
                   }}
                 />
                 <Column expand>
-                  // $FlowFixMe[incompatible-type]
+                  {/* $FlowFixMe[incompatible-type] */}
                   <Text style={styles.description}>
                     {instructionMetadata.getDescription()}
                   </Text>

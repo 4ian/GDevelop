@@ -298,7 +298,7 @@ export const BuildCard = (
               <Line noMargin>
                 {isEditingName ? (
                   <Line noMargin expand>
-                    // $FlowFixMe[incompatible-type]
+                    {/* $FlowFixMe[incompatible-type] */}
                     <TextField
                       ref={nameInput}
                       style={styles.textField}
@@ -326,7 +326,7 @@ export const BuildCard = (
                     {gameUpdating && (
                       <>
                         <Spacer />
-                        // $FlowFixMe[incompatible-type]
+                        {/* $FlowFixMe[incompatible-type] */}
                         <CircularProgress style={styles.circularProgress} />
                       </>
                     )}

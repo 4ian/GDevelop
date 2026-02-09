@@ -166,6 +166,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     arrowKeyNavigationProps,
   }: Props<Item>,
   ref: ReadOnlyTreeViewInterface<Item>
+// $FlowFixMe[missing-local-annot]
 ) => {
   const selectedNodeIds = selectedItems.map(getItemId);
   const [isRendered, setIsRendered] = React.useState<boolean>(false);
@@ -174,6 +175,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     initiallyOpenedNodeIds || []
   );
   const containerRef = React.useRef<?HTMLDivElement>(null);
+  // $FlowFixMe[value-as-type]
   const listRef = React.useRef<?VariableSizeList>(null);
   const [
     openedDuringSearchNodeIds,
@@ -184,6 +186,8 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
   const [animatedItemId, setAnimatedItemId] = React.useState<string>('');
 
   const isSearching = !!searchText;
+  // $FlowFixMe[recursive-definition]
+  // $FlowFixMe[definition-cycle]
   const flattenNode = React.useCallback(
     (
       item: Item,
@@ -196,6 +200,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
       const canHaveChildren = Array.isArray(children);
       const collapsed = !forceAllOpened && !openedNodeIds.includes(id);
       const openedDuringSearch = openedDuringSearchNodeIds.includes(id);
+      // $FlowFixMe[missing-empty-array-annot]
       let flattenedChildren = [];
       /*
        * Compute children nodes flattening if:
@@ -588,6 +593,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
         ) {
           i += 1;
           if (i > flattenedData.length - 1) {
+            // $FlowFixMe[incompatible-type]
             newFocusedNode = null;
           }
           newFocusedNode = flattenedData[i];
@@ -605,6 +611,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
             (newFocusedNode.item.isRoot || newFocusedNode.item.isPlaceholder)
           ) {
             if (itemIndexInFlattenedData + delta > flattenedData.length - 1) {
+              // $FlowFixMe[incompatible-type]
               newFocusedNode = null;
             }
             delta += 1;
@@ -624,6 +631,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
             (newFocusedNode.item.isRoot || newFocusedNode.item.isPlaceholder)
           ) {
             if (itemIndexInFlattenedData + delta < 0) {
+              // $FlowFixMe[incompatible-type]
               newFocusedNode = null;
             }
             delta -= 1;
@@ -706,7 +714,6 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
 };
 
 // $FlowFixMe[incompatible-type]
-export default React.forwardRef(ReadOnlyTreeView) as component(
-  ...{ ...Props<any>, +ref?: React.RefSetter<any> }
-// $FlowFixMe[incompatible-type]
-) React.Node;
+// $FlowFixMe[signature-verification-failure]
+// $FlowFixMe[incompatible-exact]
+export default React.forwardRef(ReadOnlyTreeView);

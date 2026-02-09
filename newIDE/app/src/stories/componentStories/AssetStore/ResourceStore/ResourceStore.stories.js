@@ -24,7 +24,7 @@ const ResourceStoreStory = ({ kind }: {| kind: 'audio' | 'font' | 'svg' |}) => {
   return (
     <FixedHeightFlexContainer height={600}>
       <ResourceStoreStateProvider>
-        // $FlowFixMe[incompatible-type]
+        {/* $FlowFixMe[incompatible-type] */}
         <ResourceStore
           onChoose={action('onChoose')}
           resourceKind={kind}

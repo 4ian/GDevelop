@@ -286,6 +286,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       clearInterval(this._notificationPollingIntervalId);
       this._notificationPollingIntervalId = null;
     }
+    // $FlowFixMe[incompatible-type]
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
         ...authenticatedUser,

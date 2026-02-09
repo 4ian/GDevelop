@@ -231,7 +231,7 @@ const SearchBarContainer = (
               size="small"
             />
           )}
-          // $FlowFixMe[incompatible-type]
+          {/* $FlowFixMe[incompatible-type] */}
           <IconButton
             onClick={onCancel}
             style={styles.iconButtonClose.style}

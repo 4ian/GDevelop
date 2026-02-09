@@ -96,7 +96,7 @@ const TextBasedCourseChapterTaskItem = ({task, isComplete, onComplete}: Props): 
             </div>
             <ColumnStackLayout expand noMargin noOverflowParent>
               <TextBasedCourseChapterItems items={task.items} />
-              // $FlowFixMe[constant-condition]
+              {/* $FlowFixMe[constant-condition] */}
               {isOpen && task.answer && (
                 <Accordion kind="answer" noMargin>
                   <AccordionHeader>

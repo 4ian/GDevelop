@@ -1466,7 +1466,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       isListLocked={false}
                     />
                   )}
-                  // $FlowFixMe[constant-condition]
+                  {/* $FlowFixMe[constant-condition] */}
                   {!!editedPropertiesLayout &&
                     project &&
                     projectScopedContainersAccessor && (
@@ -1588,7 +1588,7 @@ const ProjectManagerWithErrorBoundary: component(
       componentTitle={<Trans>Project manager</Trans>}
       scope="project-manager"
     >
-      // $FlowFixMe[incompatible-type]
+      {/* $FlowFixMe[incompatible-type] */}
       <MemoizedProjectManager
         // $FlowFixMe[missing-local-annot]
         ref={ref => {

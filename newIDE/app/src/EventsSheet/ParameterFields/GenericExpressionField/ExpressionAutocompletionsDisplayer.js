@@ -122,7 +122,7 @@ const AutocompletionRow = React.forwardRef(
         <LineStackLayout noMargin expand>
           {icon || (iconSrc ? <AutocompletionIcon src={iconSrc} /> : null)}
           {secondaryIcon}
-          // $FlowFixMe[incompatible-type]
+          {/* $FlowFixMe[incompatible-type] */}
           <Text style={defaultTextStyle} noMargin align="left">
             {isSelected ? <b>{trimmedLabel}</b> : trimmedLabel}
             {parametersLabel && (
@@ -166,7 +166,7 @@ const ExpressionDocumentation = ({
 }: ExpressionDocumentationProps) => {
   return (
     <Column noMargin>
-      // $FlowFixMe[incompatible-type]
+      {/* $FlowFixMe[incompatible-type] */}
       <Text style={defaultTextStyle} size="body2">
         {expressionMetadata.getDescription()}
       </Text>
@@ -391,7 +391,7 @@ export default function ExpressionAutocompletionsDisplayer({
               )}
             </ScrollView>
           </Paper>
-          // $FlowFixMe[invalid-compare]
+          {/* $FlowFixMe[invalid-compare] */}
           {selectedCompletionIndex !== null &&
             expressionAutocompletions[selectedCompletionIndex].kind ===
               'Expression' &&

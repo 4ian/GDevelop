@@ -142,6 +142,7 @@ const CreditsPackagePurchaseDialog = (
     () => {
       (async () => {
         if (limits && initialCreditsAmount === null) {
+          // $FlowFixMe[incompatible-type]
           setInitialCreditsAmount(limits.credits.userBalance.amount);
         }
       })();

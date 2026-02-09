@@ -109,11 +109,11 @@ export const GenericRetryableProcessWithProgressDialog = (
               {result
                 ? result.erroredResources.map(({ resourceName, error }) => (
                     <TableRow key={resourceName}>
-                      // $FlowFixMe[incompatible-type]
+                      {/* $FlowFixMe[incompatible-type] */}
                       <TableRowColumn style={styles.tableCell}>
                         {resourceName}
                       </TableRowColumn>
-                      // $FlowFixMe[incompatible-type]
+                      {/* $FlowFixMe[incompatible-type] */}
                       <TableRowColumn style={styles.tableCell}>
                         {error.toString()}
                       </TableRowColumn>
@@ -122,9 +122,9 @@ export const GenericRetryableProcessWithProgressDialog = (
                 : null}
               {genericError ? (
                 <TableRow>
-                  // $FlowFixMe[incompatible-type]
+                  {/* $FlowFixMe[incompatible-type] */}
                   <TableRowColumn style={styles.tableCell}>-</TableRowColumn>
-                  // $FlowFixMe[incompatible-type]
+                  {/* $FlowFixMe[incompatible-type] */}
                   <TableRowColumn style={styles.tableCell}>
                     {genericError.toString()}
                   </TableRowColumn>

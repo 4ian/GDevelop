@@ -58,7 +58,7 @@ const LocalFilePicker = ({value, onChange, title, message, defaultPath, fullWidt
         width: fullWidth ? '100%' : undefined,
       }}
     >
-      // $FlowFixMe[incompatible-type]
+      {/* $FlowFixMe[incompatible-type] */}
       <TextField
         margin="dense"
         style={styles.textField}

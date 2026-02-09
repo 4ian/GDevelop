@@ -1457,7 +1457,7 @@ const EventsFunctionsListWithErrorBoundary: component(
     componentTitle={<Trans>Objects list</Trans>}
     scope="scene-editor-objects-list"
   >
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     <MemoizedObjectsList ref={ref} {...props} />
   </ErrorBoundary>
 ));

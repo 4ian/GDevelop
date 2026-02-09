@@ -227,7 +227,7 @@ export const CommandPaletteWithAlgoliaSearch: component(
   CommandPaletteInterface
 >((props, ref) => (
   <InstantSearch searchClient={searchClient} indexName={indexName}>
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     <CommandPalette ref={ref} />
   </InstantSearch>
 ));

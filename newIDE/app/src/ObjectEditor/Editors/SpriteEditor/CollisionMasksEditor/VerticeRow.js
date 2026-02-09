@@ -38,7 +38,7 @@ const VerticeRow = ({verticeX, verticeY, parentVerticeId, ...props}: Props): Rea
       onPointerLeave={props.onPointerLeave}
       onClick={props.onClick}
     >
-      // $FlowFixMe[incompatible-type]
+      {/* $FlowFixMe[incompatible-type] */}
       <TableRowColumn style={styles.coordinateColumn}>
         <SemiControlledTextField
           margin="none"
@@ -60,7 +60,7 @@ const VerticeRow = ({verticeX, verticeY, parentVerticeId, ...props}: Props): Rea
           }}
         />
       </TableRowColumn>
-      // $FlowFixMe[incompatible-type]
+      {/* $FlowFixMe[incompatible-type] */}
       <TableRowColumn style={styles.coordinateColumn}>
         <SemiControlledTextField
           margin="none"
@@ -82,7 +82,7 @@ const VerticeRow = ({verticeX, verticeY, parentVerticeId, ...props}: Props): Rea
           }}
         />
       </TableRowColumn>
-      // $FlowFixMe[incompatible-type]
+      {/* $FlowFixMe[incompatible-type] */}
       <TableRowColumn style={styles.toolColumn}>
         {!!props.onRemove && (
           <IconButton

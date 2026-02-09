@@ -35,6 +35,7 @@ import { type ClaimedProductOptions } from './PurchaseClaimDialog';
 
 export type AuthenticatedUser = {|
   authenticated: boolean,
+  // $FlowFixMe[value-as-type]
   firebaseUser: ?FirebaseUser,
   profile: ?Profile,
   loginState: null | 'loggingIn' | 'done',
@@ -182,18 +183,17 @@ export const authenticatedUserLoggedOutAttributes = {
   // Use this loginState to make sure this is understood by the app as a user logged out, and not loading.
   loginState: 'done',
   badges: null,
-  cloudProjects: [] // Initialize to empty array to indicate that the loading is done.
- as Array<empty>
-  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[signature-verification-failure]
+  cloudProjects: [], // Initialize to empty array to indicate that the loading is done.
   cloudProjectsFetchingErrorLabel: null,
-  receivedAssetPacks: [] // Initialize to empty array to indicate that the loading is done.
- as Array<empty>
-  receivedAssetShortHeaders: [] // Initialize to empty array to indicate that the loading is done.
- as Array<empty>
-  receivedGameTemplates: [] // Initialize to empty array to indicate that the loading is done.
- as Array<empty>
-  receivedBundles: [] // Initialize to empty array to indicate that the loading is done.
- as Array<empty>
+  // $FlowFixMe[signature-verification-failure]
+  receivedAssetPacks: [], // Initialize to empty array to indicate that the loading is done.
+  // $FlowFixMe[signature-verification-failure]
+  receivedAssetShortHeaders: [], // Initialize to empty array to indicate that the loading is done.
+  // $FlowFixMe[signature-verification-failure]
+  receivedGameTemplates: [], // Initialize to empty array to indicate that the loading is done.
+  // $FlowFixMe[signature-verification-failure]
+  receivedBundles: [], // Initialize to empty array to indicate that the loading is done.
   subscription: null,
   subscriptionPricingSystem: null,
   userEarningsBalance: null,
@@ -202,6 +202,7 @@ export const authenticatedUserLoggedOutAttributes = {
 };
 
 const AuthenticatedUserContext: React.Context<AuthenticatedUser> = React.createContext<AuthenticatedUser>(
+  // $FlowFixMe[incompatible-type]
   initialAuthenticatedUser
 );
 

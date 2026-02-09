@@ -101,7 +101,7 @@ export const ExtensionDependenciesEditor = ({eventsFunctionsExtension, project, 
               </TableHeaderColumn>
             </TableRow>
           </TableHeader>
-          // $FlowFixMe[incompatible-type]
+          {/* $FlowFixMe[incompatible-type] */}
           <TableBody>
             // $FlowFixMe[incompatible-type]
             {// $FlowFixMe[incompatible-type] - unsure why Flow complains about TableRow.
@@ -234,7 +234,7 @@ export const ExtensionDependenciesEditor = ({eventsFunctionsExtension, project, 
               </TableHeaderColumn>
             </TableRow>
           </TableHeader>
-          // $FlowFixMe[incompatible-type]
+          {/* $FlowFixMe[incompatible-type] */}
           <TableBody>
             // $FlowFixMe[incompatible-type]
             {// $FlowFixMe[incompatible-type] - unsure why Flow complains about TableRow.

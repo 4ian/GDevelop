@@ -305,7 +305,7 @@ const ProjectVersionRow = ({
                   </Column>
                 )}
                 <div style={styles.dateContainer}>
-                  // $FlowFixMe[incompatible-type]
+                  {/* $FlowFixMe[incompatible-type] */}
                   <Text noMargin style={styles.greyed}>
                     {displayFullDate
                       ? i18n.date(version.createdAt, {
@@ -356,7 +356,7 @@ const ProjectVersionRow = ({
                   src={authorPublicProfile.iconUrl}
                   style={styles.avatar}
                 />
-                // $FlowFixMe[incompatible-type]
+                {/* $FlowFixMe[incompatible-type] */}
                 <Text noMargin style={styles.greyed}>
                   {authorPublicProfile.username ||
                     (version.userId === authenticatedUserId ? (
@@ -373,7 +373,7 @@ const ProjectVersionRow = ({
                   alt={anonymousAvatar.alt}
                   style={styles.avatar}
                 />
-                // $FlowFixMe[incompatible-type]
+                {/* $FlowFixMe[incompatible-type] */}
                 <Text noMargin style={styles.greyed}>
                   <Trans>Anonymous</Trans>
                 </Text>

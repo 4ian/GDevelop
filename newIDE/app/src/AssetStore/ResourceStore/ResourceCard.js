@@ -108,11 +108,11 @@ const ImageCard = ({
           />
         </div>
         <div style={styles.titleContainer}>
-          // $FlowFixMe[incompatible-type]
+          {/* $FlowFixMe[incompatible-type] */}
           <Text noMargin style={styles.title} color="inherit">
             {resource.name}
           </Text>
-          // $FlowFixMe[incompatible-type]
+          {/* $FlowFixMe[incompatible-type] */}
           <Text noMargin style={styles.title} color="inherit" size="body2">
             {resource.license}
           </Text>
@@ -139,11 +139,11 @@ const GenericCard = ({
     <div style={{ ...styles.cardContainer, width: size, height: size }}>
       <Column>{children}</Column>
       <div style={styles.titleContainer}>
-        // $FlowFixMe[incompatible-type]
+        {/* $FlowFixMe[incompatible-type] */}
         <Text noMargin style={styles.title}>
           {resource.name}
         </Text>
-        // $FlowFixMe[incompatible-type]
+        {/* $FlowFixMe[incompatible-type] */}
         <Text noMargin style={styles.title} size="body2">
           {resource.license}
         </Text>

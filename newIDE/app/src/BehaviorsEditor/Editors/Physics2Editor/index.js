@@ -86,7 +86,7 @@ export const ChoiceProperty = (
       onChange={onUpdate}
       disabled={disabled}
     >
-      // $FlowFixMe[incompatible-exact]
+      {/* $FlowFixMe[incompatible-exact] */}
       {mapVector(property.getChoices(), choice => (
         <SelectOption
           // $FlowFixMe[incompatible-use]

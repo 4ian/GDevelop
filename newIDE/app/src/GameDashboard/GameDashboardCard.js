@@ -270,7 +270,7 @@ const GameDashboardCard = (
       <ResponsiveLineStackLayout alignItems="center" noColumnMargin>
         <div style={styles.iconAndText}>
           <DiscoverabilityIcon {...iconProps} />
-          // $FlowFixMe[incompatible-type]
+          {/* $FlowFixMe[incompatible-type] */}
           <Text {...textProps}>
             {game && game.discoverable && gameUrl ? (
               <Trans>Public on gd.games</Trans>
@@ -284,7 +284,7 @@ const GameDashboardCard = (
         {game && (
           <div style={styles.iconAndText}>
             <AdsIcon {...iconProps} />
-            // $FlowFixMe[incompatible-type]
+            {/* $FlowFixMe[incompatible-type] */}
             <Text {...textProps}>
               {game.displayAdsOnGamePage ? (
                 <Trans>Ad revenue sharing on</Trans>
@@ -297,7 +297,7 @@ const GameDashboardCard = (
         {game && (
           <div style={styles.iconAndText}>
             <PlayerFeedbackIcon {...iconProps} />
-            // $FlowFixMe[incompatible-type]
+            {/* $FlowFixMe[incompatible-type] */}
             <Text {...textProps}>
               {game.acceptsGameComments ? (
                 <Trans>Player feedback on</Trans>

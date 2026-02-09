@@ -699,7 +699,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
                     role="assistant"
                     feedbackButtons={
                       <div className={classes.feedbackButtonsContainer}>
-                        // $FlowFixMe[constant-condition]
+                        {/* $FlowFixMe[constant-condition] */}
                         {isLastMessage && shouldDisplayFeedbackBanner && (
                           <Text size="body-small" color="secondary" noMargin>
                             <Trans>Did it work?</Trans>
@@ -778,7 +778,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
                     }
                   >
                     <Column noMargin>
-                      // $FlowFixMe[constant-condition]
+                      {/* $FlowFixMe[constant-condition] */}
                       {functionCallItems && functionCallItems.length > 0 && (
                         <FunctionCallsGroup>
                           {functionCallItems.map(
@@ -817,7 +817,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
               return [
                 <Line key={key} justifyContent="flex-start">
                   <ChatBubble role="assistant">
-                    // $FlowFixMe[incompatible-use]
+                    {/* $FlowFixMe[incompatible-use] */}
                     <ChatMarkdownText source={messageContent.summary.text} />
                   </ChatBubble>
                 </Line>,
@@ -896,7 +896,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
                       </Text>
                     </LineStackLayout>
                   )}
-                  // $FlowFixMe[constant-condition]
+                  {/* $FlowFixMe[constant-condition] */}
                   {isRestored && !isForking && forkedFromAiRequestId && (
                     <LineStackLayout
                       noMargin
@@ -988,7 +988,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
       ) : shouldBeWorkingIfNotPaused ? (
         <Line justifyContent="flex-start">
           <div className={classes.thinkingText}>
-            // $FlowFixMe[constant-condition]
+            {/* $FlowFixMe[constant-condition] */}
             {onPause && aiRequest.mode === 'agent' && (
               <IconButton
                 onClick={() => onPause(!isPaused)}
@@ -1160,7 +1160,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
         </Line>
       )}
 
-      // $FlowFixMe[constant-condition]
+      {/* $FlowFixMe[constant-condition] */}
       {dislikeFeedbackDialogOpenedFor && (
         <DislikeFeedbackDialog
           mode={aiRequest.mode || 'chat'}

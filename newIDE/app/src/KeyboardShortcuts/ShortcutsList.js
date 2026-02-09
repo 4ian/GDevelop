@@ -124,7 +124,7 @@ const ShortcutsList = (props: Props): React.Node => {
             <Text size="block-title">
               {props.i18n._(commandAreas[areaName])}
             </Text>
-            // $FlowFixMe[missing-local-annot]
+            {/* $FlowFixMe[missing-local-annot] */}
             {areaWiseCommands[areaName].map(commandName => {
               // Get default and user-set shortcuts
               const userShortcut = props.userShortcutMap[commandName];

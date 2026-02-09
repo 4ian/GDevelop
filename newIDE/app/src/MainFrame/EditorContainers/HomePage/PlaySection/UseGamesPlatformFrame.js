@@ -128,6 +128,7 @@ const useUserCustomToken = (): {|
           // $FlowFixMe[incompatible-type]
           setUserCustomToken(userCustomToken);
           setLastTokenGenerationTime(Date.now());
+          // $FlowFixMe[incompatible-type]
           setCustomTokenUserId(userId);
         } catch (error) {
           console.error(

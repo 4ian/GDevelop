@@ -64,20 +64,20 @@ const VerticesTable = (props: VerticesTableProps) => {
       <Table>
         <TableHeader>
           <TableRow>
-            // $FlowFixMe[incompatible-type]
+            {/* $FlowFixMe[incompatible-type] */}
             <TableHeaderColumn style={styles.coordinateColumn}>
               X
             </TableHeaderColumn>
-            // $FlowFixMe[incompatible-type]
+            {/* $FlowFixMe[incompatible-type] */}
             <TableHeaderColumn style={styles.coordinateColumn}>
               Y
             </TableHeaderColumn>
-            // $FlowFixMe[incompatible-type]
+            {/* $FlowFixMe[incompatible-type] */}
             <TableRowColumn style={styles.toolColumn} />
           </TableRow>
         </TableHeader>
         <TableBody>
-          // $FlowFixMe[incompatible-exact]
+          {/* $FlowFixMe[incompatible-exact] */}
           {mapVector(props.vertices, (vertice, verticeIndex) => (
             <VerticeRow
               // $FlowFixMe[incompatible-use]
@@ -177,7 +177,7 @@ const PolygonSection = (props: PolygonSectionProps) => {
 
   return (
     <Accordion defaultExpanded>
-      // $FlowFixMe[incompatible-type]
+      {/* $FlowFixMe[incompatible-type] */}
       <AccordionHeader actions={polygonActions}>
         <Text displayInlineAsSpan>
           {verticesCount === 3 && <Trans>Triangle</Trans>}
@@ -267,7 +267,7 @@ const PolygonsList = (props: PolygonsListProps): React.Node => {
     <React.Fragment>
       <Column noMargin expand useFullHeight>
         <ScrollView>
-          // $FlowFixMe[incompatible-exact]
+          {/* $FlowFixMe[incompatible-exact] */}
           {mapVector(polygons, (polygon, i) => (
             <PolygonSection
               key={`polygon-${i}`}

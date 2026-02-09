@@ -34,7 +34,9 @@ export type BoxSearchResultsInterface = {|
   scrollToPosition: (y: number) => void,
 |};
 
-export const BoxSearchResults = React.forwardRef<
+export const BoxSearchResults: component(
+  ...{ ...Props<any>, +ref?: React.RefSetter<BoxSearchResultsInterface> }
+) = React.forwardRef<
   // $FlowFixMe The generic type can't pass through.
   Props<SearchItem>,
   BoxSearchResultsInterface

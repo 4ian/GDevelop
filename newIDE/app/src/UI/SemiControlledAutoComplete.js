@@ -24,7 +24,7 @@ import {
 import { textEllipsisStyle } from './TextEllipsis';
 import Paper from './Paper';
 
-export const AutocompletePaperComponent = (props: any) => (
+export const AutocompletePaperComponent = (props: any): React.Node => (
   // Use light background so that it's in contrast with background that
   // is either dark or medium (in dialogs).
   <Paper {...props} background="light" />
@@ -258,7 +258,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
     const [inputValue, setInputValue] = useState((null: string | null));
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const classes = useStyles();
-
+    
     const focus: FieldFocusFunction = options => {
       const inputElement = input.current;
       if (inputElement) {
@@ -268,28 +268,31 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
         }
       }
     };
-
-    React.useImperativeHandle(ref, () => ({
-      focus,
-      forceInputValueTo: (newValue: string) => {
-        if (inputValue !== null) setInputValue(newValue);
-        if (props.onInputValueChange) {
-          props.onInputValueChange(newValue);
-        }
-      },
-      getInputValue: () => (input.current ? input.current.value : ''),
-    }));
-
+    
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        focus,
+        forceInputValueTo: (newValue: string) => {
+          if (inputValue !== null) setInputValue(newValue);
+          if (props.onInputValueChange) {
+            props.onInputValueChange(newValue);
+          }
+        },
+        getInputValue: () => input.current ? input.current.value : '',
+      }),
+    );
+    
     const currentInputValue = inputValue !== null ? inputValue : props.value;
-
-    const helperText = props.helperMarkdownText ? (
-      <MarkdownText source={props.helperMarkdownText} />
-    ) : null;
-
+    
+    const helperText = props.helperMarkdownText
+      ? <MarkdownText source={props.helperMarkdownText} />
+      : null;
+    
     const handleInputChange = (
       event: SyntheticKeyboardEvent<HTMLInputElement>,
       value: string,
-      reason: string
+      reason: string,
     ): void => {
       setInputValue(value);
       if (props.onInputValueChange) {
@@ -298,109 +301,110 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
       if (!isMenuOpen) setIsMenuOpen(true);
       if (props.commitOnInputChange) props.onChange(value);
     };
-
+    
     return (
       <I18n>
-        {({ i18n }) => (
-          <Autocomplete
-            freeSolo
-            classes={classes}
-            onChange={(
-              event: SyntheticKeyboardEvent<HTMLInputElement>,
-              option: AutoCompleteOption | null
-            ) => {
-              if (option === null || !input.current) return;
-
-              handleChange(input.current, option, props);
-              setInputValue(null);
-              setIsMenuOpen(false);
-            }}
-            onFocus={props.onFocus}
-            open={isMenuOpen}
-            style={{
-              ...props.style,
-              ...autocompleteStyles.container,
-            }}
-            inputValue={currentInputValue}
-            value={currentInputValue}
-            onInputChange={handleInputChange}
-            PaperComponent={AutocompletePaperComponent}
-            options={props.dataSource}
-            renderOption={makeRenderItem(i18n)}
-            getOptionDisabled={isOptionDisabled}
-            getOptionLabel={(option: AutoCompleteOption) =>
-              getOptionLabel(option, currentInputValue)
-            }
-            filterOptions={(options: DataSource, state) =>
-              filterFunction(options, state, currentInputValue)
-            }
-            id={props.id}
-            renderInput={params => {
-              const {
-                InputProps,
-                inputProps,
-                ...otherStylingProps
-              } = getDefaultStylingProps(params, props);
-              return (
-                <TextField
-                  color="secondary"
-                  InputProps={{
-                    ...InputProps,
-                    placeholder:
-                      typeof props.hintText === 'string'
-                        ? props.hintText
-                        : i18n._(props.hintText),
-                  }}
-                  inputProps={{
-                    ...inputProps,
-                    onClick: props.onClick,
-                    onFocus: (
-                      event: SyntheticFocusEvent<HTMLInputElement>
-                    ): void => {
-                      setIsMenuOpen(true);
-                      if (input.current)
-                        input.current.selectionStart =
-                          input.current.value.length;
-                    },
-                    // Redefine onBlur to call onChange when the component is blurred.
-                    // We do this because the default behavior of the Autocomplete is not
-                    // to call onChange when blurred (though it should according to the docs?).
-                    onBlur: (
-                      event: SyntheticFocusEvent<HTMLInputElement>
-                    ): void => {
-                      setInputValue(null);
-                      setIsMenuOpen(false);
-
-                      // Use the value of the input, rather than inputValue
-                      // that could be not updated.
-                      // Search for "blur-value" in this file for the rest of this "workaround".
-                      props.onChange(event.currentTarget.value);
-
-                      if (props.onBlur) props.onBlur(event);
-                    },
-                    onMouseDown: (
-                      event: SyntheticMouseEvent<HTMLInputElement>
-                    ): void => {
-                      // Toggle the menu when clicked and empty
-                      if (input.current && !input.current.value.length)
-                        setIsMenuOpen(!isMenuOpen);
-                    },
-                  }}
-                  {...otherStylingProps}
-                  {...computeTextFieldStyleProps(props)}
-                  style={props.textFieldStyle}
-                  label={props.floatingLabelText}
-                  inputRef={input}
-                  disabled={props.disabled}
-                  error={!!props.errorText}
-                  helperText={helperText || props.errorText}
-                  fullWidth={props.fullWidth}
-                />
-              );
-            }}
-          />
-        )}
+        {({i18n}) => <Autocomplete
+          freeSolo
+          classes={classes}
+          onChange={(
+            event: SyntheticKeyboardEvent<HTMLInputElement>,
+            option: AutoCompleteOption | null,
+          ) => {
+            if (option === null || !input.current) return;
+            
+            handleChange(input.current, option, props);
+            setInputValue(null);
+            setIsMenuOpen(false);
+          }}
+          onFocus={props.onFocus}
+          open={isMenuOpen}
+          style={{
+            ...props.style,
+            ...autocompleteStyles.container,
+          }}
+          inputValue={currentInputValue}
+          value={currentInputValue}
+          onInputChange={handleInputChange}
+          PaperComponent={AutocompletePaperComponent}
+          options={props.dataSource}
+          renderOption={makeRenderItem(i18n)}
+          getOptionDisabled={isOptionDisabled}
+          getOptionLabel={(option: AutoCompleteOption) => getOptionLabel(
+            option,
+            currentInputValue,
+          )}
+          filterOptions={(options: DataSource, state) => filterFunction(
+            options,
+            state,
+            currentInputValue,
+          )}
+          id={props.id}
+          renderInput={params => {
+            const {
+              InputProps,
+              inputProps,
+              ...otherStylingProps
+            } = getDefaultStylingProps(params, props);
+            return (
+              <TextField
+                color="secondary"
+                InputProps={{
+                  ...InputProps,
+                  placeholder: typeof props.hintText === 'string'
+                    ? props.hintText
+                    : i18n._(props.hintText),
+                }}
+                inputProps={{
+                  ...inputProps,
+                  onClick: props.onClick,
+                  onFocus: (
+                    event: SyntheticFocusEvent<HTMLInputElement>,
+                  ): void => {
+                    setIsMenuOpen(true);
+                    if (input.current)
+                      input.current.selectionStart = input.current.value.length;
+                  },
+                  // Redefine onBlur to call onChange when the component is blurred.
+                  // We do this because the default behavior of the Autocomplete is not
+                  // to call onChange when blurred (though it should according to the docs?).
+                  onBlur: (
+                    event: SyntheticFocusEvent<HTMLInputElement>,
+                  ): void => {
+                    setInputValue(null);
+                    setIsMenuOpen(false);
+                    
+                    // Use the value of the input, rather than inputValue
+                    // that could be not updated.
+                    // Search for "blur-value" in this file for the rest of this "workaround".
+                    props.onChange(event.currentTarget.value);
+                    
+                    if (props.onBlur) props.onBlur(event);
+                  },
+                  onMouseDown: (
+                    event: SyntheticMouseEvent<HTMLInputElement>,
+                  ): void => {
+                    // Toggle the menu when clicked and empty
+                    if (input.current && !input.current.value.length)
+                      setIsMenuOpen(!isMenuOpen);
+                  },
+                }}
+                {...otherStylingProps}
+                {...computeTextFieldStyleProps(props)}
+                style={props.textFieldStyle}
+                label={props.floatingLabelText}
+                inputRef={input}
+                disabled={props.disabled}
+                error={!!props.errorText}
+                helperText={helperText || props.errorText}
+                fullWidth={props.fullWidth}
+              />
+            );
+          }}
+        />}
       </I18n>
     );
-  }
+  },
+) as component(
+  ...{ ...Props, +ref?: React.RefSetter<SemiControlledAutoCompleteInterface> }
 );

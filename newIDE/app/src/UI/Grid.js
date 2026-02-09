@@ -8,17 +8,19 @@ export const marginsSize = 8;
  * Check `Layout` first to see if there is already a layout made
  * specifically for your components (like `TextFieldWithButton`).
  */
-export const Line = (props: {|
-  children?: React.Node,
-  noMargin?: boolean,
-  alignItems?: string,
-  justifyContent?: string,
-  expand?: boolean,
-  overflow?: string,
-  useFullHeight?: boolean,
-  neverShrink?: boolean,
-  id?: string,
-|}) => (
+export const Line = (
+  props: {|
+    children?: React.Node,
+    noMargin?: boolean,
+    alignItems?: string,
+    justifyContent?: string,
+    expand?: boolean,
+    overflow?: string,
+    useFullHeight?: boolean,
+    neverShrink?: boolean,
+    id?: string,
+  |},
+): React.MixedElement => (
   <div
     id={props.id}
     style={{
@@ -49,16 +51,18 @@ export const Line = (props: {|
  * Check `Layout` first to see if there is already a layout made
  * specifically for your components (like `TextFieldWithButton`).
  */
-export const Column = (props: {|
-  children?: React.Node,
-  noMargin?: boolean,
-  alignItems?: string,
-  justifyContent?: string,
-  expand?: boolean,
-  useFullHeight?: boolean,
-  noOverflowParent?: boolean,
-  id?: string,
-|}) => (
+export const Column = (
+  props: {|
+    children?: React.Node,
+    noMargin?: boolean,
+    alignItems?: string,
+    justifyContent?: string,
+    expand?: boolean,
+    useFullHeight?: boolean,
+    noOverflowParent?: boolean,
+    id?: string,
+  |},
+): React.MixedElement => (
   <div
     id={props.id}
     style={{
@@ -97,7 +101,7 @@ const spacerStyle = {
  * Check `Layout` first to see if there is already a layout made
  * specifically for your components (like `TextFieldWithButton`).
  */
-export const Spacer = React.memo<NoProps>(() => <span style={spacerStyle} />);
+export const Spacer: component(...NoProps) = React.memo<NoProps>(() => <span style={spacerStyle} />);
 
 const largeSpacerStyle = {
   width: 24,
@@ -106,7 +110,7 @@ const largeSpacerStyle = {
 };
 
 /** A large spacer that is 24px width. */
-export const LargeSpacer = React.memo<NoProps>(() => (
+export const LargeSpacer: component(...NoProps) = React.memo<NoProps>(() => (
   <span style={largeSpacerStyle} />
 ));
 
@@ -120,10 +124,7 @@ type FixedHeightFlexContainerProps = {|
   |},
 |};
 
-export const FixedHeightFlexContainer = ({
-  children,
-  heights,
-}: FixedHeightFlexContainerProps) => {
+export const FixedHeightFlexContainer = ({children, heights}: FixedHeightFlexContainerProps): React.MixedElement => {
   const { windowSize } = useResponsiveWindowSize();
   const height =
     windowSize === 'xlarge'

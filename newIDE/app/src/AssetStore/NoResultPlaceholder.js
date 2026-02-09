@@ -10,7 +10,7 @@ type Props = {|
   message?: React.Node,
 |};
 
-export const NoResultPlaceholder = (props: Props) => (
+export const NoResultPlaceholder = (props: Props): React.Node => (
   <Column noMargin expand justifyContent="center">
     <EmptyPlaceholder
       title={<Trans>No result</Trans>}

@@ -457,7 +457,7 @@ const deleteItem = (item: TreeViewItem) => {
 const getTreeViewItemRightButton = (i18n: I18nType) => (item: TreeViewItem) =>
   item.content.getRightButton(i18n);
 
-export const usePropertyOverridingAlertDialog = () => {
+export const usePropertyOverridingAlertDialog = (): ((existingPropertyNames: Array<string>) => Promise<boolean>) => {
   const { showConfirmation } = useAlertDialog();
   return async (existingPropertyNames: Array<string>): Promise<boolean> => {
     return await showConfirmation({
@@ -1383,7 +1383,9 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
   }
 );
 
-const PropertyListEditorWithErrorBoundary = React.forwardRef<
+const PropertyListEditorWithErrorBoundary: component(
+  ...{ ...Props, +ref?: React.RefSetter<PropertyListEditorInterface> }
+) = React.forwardRef<
   Props,
   PropertyListEditorInterface
 >((props, ref) => (

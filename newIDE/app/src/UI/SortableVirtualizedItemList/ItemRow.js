@@ -59,7 +59,7 @@ function ItemRow<Item>({
   buildMenuTemplate,
   onEdit,
   hideMenuButton,
-}: Props<Item>) {
+}: Props<Item>): any {
   const textFieldRef = React.useRef<?TextFieldInterface>(null);
   const shouldDiscardChanges = React.useRef<boolean>(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

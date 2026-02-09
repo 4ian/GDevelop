@@ -461,7 +461,7 @@ export const initialAiRequestContextState: AiRequestContextState = {
   },
   getAiSettings: () => null,
 };
-export const AiRequestContext = React.createContext<AiRequestContextState>(
+export const AiRequestContext: React.Context<AiRequestContextState> = React.createContext<AiRequestContextState>(
   initialAiRequestContextState
 );
 
@@ -469,7 +469,7 @@ type AiRequestProviderProps = {|
   children: React.Node,
 |};
 
-export const AiRequestProvider = ({ children }: AiRequestProviderProps) => {
+export const AiRequestProvider = ({children}: AiRequestProviderProps): React.MixedElement => {
   const editorFunctionCallResultsStorage = useEditorFunctionCallResultsStorage();
   const aiRequestStorage = useAiRequestsStorage();
   const aiRequestHistory = useAiRequestHistory(aiRequestStorage);

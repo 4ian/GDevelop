@@ -70,7 +70,7 @@ export type ParameterFieldInterface = {|
 export const getParameterValueOrDefault = (
   value: string,
   parameterMetadata: ?gdParameterMetadata
-) => {
+): string => {
   if (value) return value;
 
   const defaultValue =

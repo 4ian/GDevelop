@@ -42,7 +42,7 @@ export default class LayerRemoveDialog extends Component<Props, State> {
     }
   }
 
-  render() {
+  render(): any {
     if (!this.props.layersContainer || !this.props.open) return null;
 
     const instancesCountInLayout = this.props.layout

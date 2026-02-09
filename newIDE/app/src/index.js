@@ -64,7 +64,7 @@ const styles = {
 
 type State = {|
   loadingMessage: string,
-  App: ?Element<*>,
+  App: ?Element<any>,
 |};
 
 class Bootstrapper extends Component<{}, State> {

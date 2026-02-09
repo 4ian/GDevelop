@@ -18,7 +18,7 @@ export default function HotReloadPreviewButton({
   launchProjectCodeAndDataPreview,
   hasPreviewsRunning,
   isCodeGenerationRequired,
-}: HotReloadPreviewButtonProps) {
+}: HotReloadPreviewButtonProps): React.Node {
   const icon = hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />;
   const label = hasPreviewsRunning ? (
     <Trans>Apply changes to preview</Trans>

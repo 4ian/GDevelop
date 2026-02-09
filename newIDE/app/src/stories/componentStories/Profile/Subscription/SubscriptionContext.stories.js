@@ -40,7 +40,7 @@ const SubscriptionDialogTestOpener = ({ label }: {| label: string |}) => {
   return <Text>{label}</Text>;
 };
 
-export const NotAuthenticated = () => {
+export const NotAuthenticated = (): React.Node => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
@@ -53,7 +53,7 @@ export const NotAuthenticated = () => {
     </AlertProvider>
   );
 };
-export const NoSubscriptionUser = () => {
+export const NoSubscriptionUser = (): React.Node => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider
@@ -68,7 +68,7 @@ export const NoSubscriptionUser = () => {
     </AlertProvider>
   );
 };
-export const GoldSubscribedUser = () => {
+export const GoldSubscribedUser = (): React.Node => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={fakeGoldAuthenticatedUser}>
@@ -81,7 +81,7 @@ export const GoldSubscribedUser = () => {
     </AlertProvider>
   );
 };
-export const GoldWithPurchaselySubscribedUser = () => {
+export const GoldWithPurchaselySubscribedUser = (): React.Node => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider
@@ -95,7 +95,7 @@ export const GoldWithPurchaselySubscribedUser = () => {
   );
 };
 
-export const NotAuthenticatedOnMobile = () => {
+export const NotAuthenticatedOnMobile = (): React.Node => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
@@ -110,7 +110,7 @@ export const NotAuthenticatedOnMobile = () => {
     </AlertProvider>
   );
 };
-export const NoSubscriptionUserOnMobile = () => {
+export const NoSubscriptionUserOnMobile = (): React.Node => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider
@@ -127,7 +127,7 @@ export const NoSubscriptionUserOnMobile = () => {
     </AlertProvider>
   );
 };
-export const GoldSubscribedUserOnMobile = () => {
+export const GoldSubscribedUserOnMobile = (): React.Node => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={fakeGoldAuthenticatedUser}>
@@ -138,7 +138,7 @@ export const GoldSubscribedUserOnMobile = () => {
     </AlertProvider>
   );
 };
-export const GoldWithPurchaselySubscribedUserOnMobile = () => {
+export const GoldWithPurchaselySubscribedUserOnMobile = (): React.Node => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider

@@ -50,7 +50,9 @@ export type CommandPaletteInterface = {|
 
 type PaletteMode = 'closed' | 'command' | 'option';
 
-const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
+const CommandPalette: component(
+  '(Reason.OrdinaryName "ref")'?: React.RefSetter<CommandPaletteInterface>,
+) = React.forwardRef<{||}, CommandPaletteInterface>(
   (props, ref) => {
     const classes = useStyles();
     const paperClasses = useStylesForPaper();
@@ -214,7 +216,9 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
   }
 );
 
-export const CommandPaletteWithAlgoliaSearch = React.forwardRef<
+export const CommandPaletteWithAlgoliaSearch: component(
+  '(Reason.OrdinaryName "ref")'?: React.RefSetter<CommandPaletteInterface>,
+) = React.forwardRef<
   {},
   CommandPaletteInterface
 >((props, ref) => (

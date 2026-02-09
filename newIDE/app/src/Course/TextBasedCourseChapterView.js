@@ -54,7 +54,9 @@ type Props = {|
   onClickUnlock: () => void,
 |};
 
-const TextBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
+const TextBasedCourseChapterView: component(
+  ...{ ...Props, +ref?: React.RefSetter<HTMLDivElement> }
+) = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       chapterIndex,

@@ -18,7 +18,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => (
+export const Default = (): React.Node => (
   <I18n>
     {({ i18n }) => (
       <AutocompletePicker
@@ -56,7 +56,7 @@ export const Default = () => (
   </I18n>
 );
 
-export const SelectingOption = () => (
+export const SelectingOption = (): React.Node => (
   <I18n>
     {({ i18n }) => (
       <AutocompletePicker

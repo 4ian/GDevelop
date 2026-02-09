@@ -130,7 +130,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
     return [...groupNames].sort((a, b) => a.localeCompare(b));
   };
 
-  render() {
+  render(): any {
     const { project, onClose, onCreate } = this.props;
     const { eventsFunction, extensionName, createNewExtension } = this.state;
     if (!eventsFunction) return null;

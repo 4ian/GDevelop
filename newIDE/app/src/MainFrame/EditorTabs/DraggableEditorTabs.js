@@ -34,7 +34,7 @@ type DraggableEditorTabsProps = {|
   ) => void,
 |};
 
-export const getTabId = (editorTab: EditorTab) =>
+export const getTabId = (editorTab: EditorTab): string =>
   `tab-${editorTab.key.replace(/\s/g, '-')}`;
 
 const homeTabApproximateWidth = 35;
@@ -50,7 +50,7 @@ export function DraggableEditorTabs({
   onTabActivated,
   onDropTab,
   onHoverTab,
-}: DraggableEditorTabsProps) {
+}: DraggableEditorTabsProps): React.Node {
   let draggedTabIndex: ?number = null;
 
   // Ensure the component is re-rendered when the window is resized.
@@ -162,7 +162,7 @@ export function DraggableClosableTab({
   onDrop,
   onHover,
   maxWidth,
-}: DraggableClosableTabProps) {
+}: DraggableClosableTabProps): React.Node {
   return (
     <ScreenTypeMeasurer>
       {screenType => (

@@ -54,7 +54,7 @@ const Disabled = () => {
   );
 };
 
-export const AllOptions = () => (
+export const AllOptions = (): React.Node => (
   <ColumnStackLayout>
     <WithLeftLabel />
     <WithRightLabel />

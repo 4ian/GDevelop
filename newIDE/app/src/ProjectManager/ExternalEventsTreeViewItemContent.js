@@ -101,7 +101,7 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
     this.props.editName(this.getId());
   }
 
-  buildMenuTemplate(i18n: I18nType, index: number) {
+  buildMenuTemplate(i18n: I18nType, index: number): any {
     return [
       {
         label: i18n._(t`Rename`),
@@ -222,7 +222,7 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
     this.props.forceUpdate();
   }
 
-  getRightButton(i18n: I18nType) {
+  getRightButton(i18n: I18nType): any {
     return null;
   }
 }

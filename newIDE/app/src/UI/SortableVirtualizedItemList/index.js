@@ -44,9 +44,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
   Props<Item>
 > {
   _list: ?List;
-  DragSourceAndDropTarget = makeDragSourceAndDropTarget<Item>(
-    this.props.reactDndType
-  );
+  DragSourceAndDropTarget = makeDragSourceAndDropTarget<Item>(this.props.reactDndType) as any;
 
   forceUpdateGrid() {
     if (this._list) this._list.forceUpdateGrid();
@@ -62,7 +60,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     }
   }
 
-  _renderItemRow(item: Item, index: number, isMobile: boolean) {
+  _renderItemRow(item: Item, index: number, isMobile: boolean): any {
     const {
       selectedItems,
       getItemThumbnail,
@@ -107,7 +105,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     );
   }
 
-  render() {
+  render(): any {
     const {
       height,
       width,

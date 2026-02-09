@@ -92,7 +92,7 @@ type Props = {|
 /**
  * Display a markdown text
  */
-export const MarkdownText = (props: Props) => {
+export const MarkdownText = (props: Props): React.MixedElement => {
   const markdownCustomComponents = React.useMemo(
     () =>
       makeMarkdownCustomComponents(

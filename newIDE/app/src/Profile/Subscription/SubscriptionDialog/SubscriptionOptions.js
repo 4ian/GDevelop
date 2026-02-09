@@ -111,21 +111,23 @@ const SubscriptionOptionButton = ({
   );
 };
 
-const SubscriptionOptions = ({
-  subscriptionPlansWithPricingSystems,
-  ownedPlanId,
-  selectedPlanId,
-  recommendedPlanId,
-  onClick,
-  disabled,
-}: {|
-  subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSystems[],
-  ownedPlanId: ?string,
-  selectedPlanId: string,
-  recommendedPlanId: ?string,
-  onClick: string => void,
-  disabled?: boolean,
-|}) => {
+const SubscriptionOptions = (
+  {
+    subscriptionPlansWithPricingSystems,
+    ownedPlanId,
+    selectedPlanId,
+    recommendedPlanId,
+    onClick,
+    disabled
+  }: {|
+    subscriptionPlansWithPricingSystems: Array<SubscriptionPlanWithPricingSystems>,
+    ownedPlanId: ?string,
+    selectedPlanId: string,
+    recommendedPlanId: ?string,
+    onClick: (string) => void,
+    disabled?: boolean,
+  |},
+): React.Node => {
   return (
     <I18n>
       {({ i18n }) => (

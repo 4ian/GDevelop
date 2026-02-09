@@ -16,74 +16,76 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(ref, () => ({
-      focus,
-    }));
-
-    const { parameterMetadata } = props;
-    const allowedParameterTypes =
-      parameterMetadata && parameterMetadata.getExtraInfo()
-        ? parameterMetadata.getExtraInfo().split(',')
-        : [];
-
-    const eventsBasedEntity =
-      props.scope.eventsBasedBehavior || props.scope.eventsBasedObject;
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        focus,
+      }),
+    );
+    
+    const {parameterMetadata} = props;
+    const allowedParameterTypes = parameterMetadata &&
+      parameterMetadata.getExtraInfo()
+      ? parameterMetadata.getExtraInfo().split(',')
+      : [];
+    
+    const eventsBasedEntity = props.scope.eventsBasedBehavior ||
+      props.scope.eventsBasedObject;
     const functionsContainer = eventsBasedEntity
       ? eventsBasedEntity.getEventsFunctions()
       : props.scope.eventsFunctionsExtension
-      ? props.scope.eventsFunctionsExtension.getEventsFunctions()
-      : null;
-    const parameters: Array<gdParameterMetadata> =
-      props.scope.eventsFunction && functionsContainer
-        ? enumerateParametersUsableInExpressions(
-            functionsContainer,
-            props.scope.eventsFunction,
-            allowedParameterTypes
-          )
-        : [];
-
-    const selectOptions = parameters.map(parameter => {
-      const parameterName = parameter.getName();
-      return (
-        <SelectOption
-          key={parameterName}
-          value={`"${parameterName}"`}
-          label={parameterName}
-          shouldNotTranslate={true}
-        />
-      );
-    });
-
+        ? props.scope.eventsFunctionsExtension.getEventsFunctions()
+        : null;
+    const parameters: Array<gdParameterMetadata> = props.scope.eventsFunction &&
+      functionsContainer
+      ? enumerateParametersUsableInExpressions(
+        functionsContainer,
+        props.scope.eventsFunction,
+        allowedParameterTypes,
+      )
+      : [];
+    
+    const selectOptions = parameters.map(
+      parameter => {
+        const parameterName = parameter.getName();
+        return (
+          <SelectOption
+            key={parameterName}
+            value={`"${parameterName}"`}
+            label={parameterName}
+            shouldNotTranslate={true}
+          />
+        );
+      },
+    );
+    
     const onChangeSelectValue = (event, value) => {
       props.onChange(event.target.value);
     };
-
+    
     const fieldLabel = props.parameterMetadata
       ? props.parameterMetadata.getDescription()
       : undefined;
-
+    
     return (
       <SelectField
         ref={field}
-        id={
-          props.parameterIndex !== undefined
-            ? `parameter-${props.parameterIndex}-function-parameter-field`
-            : undefined
-        }
+        id={props.parameterIndex !== undefined
+          ? `parameter-${props.parameterIndex}-function-parameter-field`
+          : undefined}
         value={props.value}
         onChange={onChangeSelectValue}
         margin={props.isInline ? 'none' : 'dense'}
         fullWidth
         floatingLabelText={fieldLabel}
         translatableHintText={t`Choose a parameter`}
-        helperMarkdownText={
-          (props.parameterMetadata &&
-            props.parameterMetadata.getLongDescription()) ||
-          null
-        }
-      >
+        helperMarkdownText={props.parameterMetadata &&
+          props.parameterMetadata.getLongDescription() ||
+          null}>
         {selectOptions}
       </SelectField>
     );
-  }
+  },
+) as component(
+  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
 );

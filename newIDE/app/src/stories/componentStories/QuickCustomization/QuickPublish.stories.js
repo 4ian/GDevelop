@@ -75,7 +75,7 @@ const Template = ({ children }: {| children: React.Node |}) => {
   );
 };
 
-export const NotAuthenticated = () => {
+export const NotAuthenticated = (): React.Node => {
   return (
     <Template>
       <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
@@ -98,7 +98,7 @@ export const NotAuthenticated = () => {
   );
 };
 
-export const NotAuthenticatedWithScreenshot = () => {
+export const NotAuthenticatedWithScreenshot = (): React.Node => {
   return (
     <Template>
       <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
@@ -123,7 +123,7 @@ export const NotAuthenticatedWithScreenshot = () => {
   );
 };
 
-export const AuthenticatedWithAvailableCloudProjectsRoom = () => {
+export const AuthenticatedWithAvailableCloudProjectsRoom = (): React.Node => {
   return (
     <Template>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -146,7 +146,7 @@ export const AuthenticatedWithAvailableCloudProjectsRoom = () => {
   );
 };
 
-export const AuthenticatedWithTooManyCloudProjects = () => {
+export const AuthenticatedWithTooManyCloudProjects = (): React.Node => {
   return (
     <Template>
       <AuthenticatedUserContext.Provider
@@ -176,7 +176,7 @@ export const AuthenticatedWithTooManyCloudProjects = () => {
   );
 };
 
-export const AuthenticatedWithCloudProjectsMaximumReachedButSavedAlready = () => {
+export const AuthenticatedWithCloudProjectsMaximumReachedButSavedAlready = (): React.Node => {
   return (
     <Template>
       <AuthenticatedUserContext.Provider
@@ -210,7 +210,7 @@ export const AuthenticatedWithCloudProjectsMaximumReachedButSavedAlready = () =>
   );
 };
 
-export const AuthenticatedAndLoadingUserCloudProjects = () => {
+export const AuthenticatedAndLoadingUserCloudProjects = (): React.Node => {
   return (
     <Template>
       <AuthenticatedUserContext.Provider
@@ -238,7 +238,7 @@ export const AuthenticatedAndLoadingUserCloudProjects = () => {
   );
 };
 
-export const AuthenticatedAndFails = () => {
+export const AuthenticatedAndFails = (): React.Node => {
   return (
     <Template>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -261,7 +261,7 @@ export const AuthenticatedAndFails = () => {
   );
 };
 
-export const AuthenticatedExistingGame = () => {
+export const AuthenticatedExistingGame = (): React.Node => {
   return (
     <Template>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -284,7 +284,7 @@ export const AuthenticatedExistingGame = () => {
   );
 };
 
-export const AuthenticatedNotOwnedGame = () => {
+export const AuthenticatedNotOwnedGame = (): React.Node => {
   return (
     <Template>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>

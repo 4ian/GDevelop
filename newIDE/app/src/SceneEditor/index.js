@@ -444,7 +444,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._sendSelectedInstances();
   }
 
-  getInstancesEditorSettings() {
+  getInstancesEditorSettings(): any {
     return this.state.instancesEditorSettings;
   }
 
@@ -976,12 +976,12 @@ export default class SceneEditor extends React.Component<Props, State> {
    * is done.
    */
   _onInstancesEditorSettingsMutated = debounce(
-    (instancesEditorSettings: InstancesEditorSettings) => {
-      this.setInstancesEditorSettings(instancesEditorSettings);
-    },
-    1000,
-    { leading: false, trailing: true }
-  );
+  (instancesEditorSettings: InstancesEditorSettings) => {
+    this.setInstancesEditorSettings(instancesEditorSettings);
+  },
+  1000,
+  { leading: false, trailing: true },
+) as any;
 
   undo = () => {
     // /!\ Drop the selection to avoid keeping any references to deleted instances.
@@ -1291,9 +1291,12 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._sendUpdatedInstances(instances);
   };
 
-  _exportDataOnly = debounce(() => {
+  _exportDataOnly = debounce(
+  () => {
     this.props.hotReloadPreviewButtonProps.launchProjectDataOnlyPreview();
-  }, 250);
+  },
+  250,
+) as any;
 
   _onInstancesModified = (instances: Array<gdInitialInstance>) => {
     this._sendUpdatedInstances(instances);
@@ -1698,7 +1701,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     newName: string,
     global: boolean,
     i18n: I18nType
-  ) => {
+  ): any => {
     const { project, layout, projectScopedContainersAccessor } = this.props;
 
     const projectScopedContainers = projectScopedContainersAccessor.get();
@@ -2059,7 +2062,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
-  getContextMenuZoomItems = (i18n: I18nType) => {
+  getContextMenuZoomItems = (i18n: I18nType): any => {
     return [
       {
         label: i18n._(t`Zoom in`),
@@ -2090,7 +2093,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     ];
   };
 
-  getContextMenuLayoutItems = (i18n: I18nType) => {
+  getContextMenuLayoutItems = (i18n: I18nType): any => {
     const { layout } = this.props;
 
     return [
@@ -2105,7 +2108,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     ].filter(Boolean);
   };
 
-  getContextMenuInstancesWiseItems = (i18n: I18nType) => {
+  getContextMenuInstancesWiseItems = (i18n: I18nType): any => {
     const hasSelectedInstances = this.instancesSelection.hasSelectedInstances();
     return [
       {
@@ -2249,7 +2252,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
-  isInstanceOf3DObject = (instance: gdInitialInstance) => {
+  isInstanceOf3DObject = (instance: gdInitialInstance): any => {
     const { project, globalObjectsContainer, objectsContainer } = this.props;
 
     const object = getObjectByName(
@@ -2266,7 +2269,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
-  buildContextMenu = (i18n: I18nType, options: any) => {
+  buildContextMenu = (i18n: I18nType, options: any): any => {
     if (
       options.ignoreSelectedObjectsForContextMenu ||
       !this.instancesSelection.hasSelectedInstances()
@@ -2690,7 +2693,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
-  render() {
+  render(): any {
     const {
       project,
       projectScopedContainersAccessor,

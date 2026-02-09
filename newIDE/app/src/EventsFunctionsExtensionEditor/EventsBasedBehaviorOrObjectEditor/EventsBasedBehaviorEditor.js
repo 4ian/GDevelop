@@ -38,7 +38,7 @@ export default function EventsBasedBehaviorEditor({
   eventsBasedBehavior,
   unsavedChanges,
   onConfigurationUpdated,
-}: Props) {
+}: Props): React.Node {
   const forceUpdate = useForceUpdate();
 
   const onChange = React.useCallback(

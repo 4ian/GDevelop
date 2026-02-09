@@ -155,12 +155,7 @@ type Props = {|
   isSelected?: boolean,
 |};
 
-export const ResourceCard = ({
-  resource,
-  onChoose,
-  size,
-  isSelected,
-}: Props) => {
+export const ResourceCard = ({resource, onChoose, size, isSelected}: Props): React.Node => {
   const resourceKind = resource.type;
   const theme = React.useContext(GDevelopThemeContext);
 

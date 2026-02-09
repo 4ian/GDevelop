@@ -36,10 +36,10 @@ export const resizeGrabbingRelativePositions = {
   Right: [1, 0.5],
 };
 
-export const canMoveOnX = (location: ResizeGrabbingLocation) =>
+export const canMoveOnX = (location: ResizeGrabbingLocation): false | boolean =>
   location !== 'Top' && location !== 'Bottom';
 
-export const canMoveOnY = (location: ResizeGrabbingLocation) =>
+export const canMoveOnY = (location: ResizeGrabbingLocation): false | boolean =>
   location !== 'Left' && location !== 'Right';
 
 const areAnyInstancesNotStraight = (instances: gdInitialInstance[]) => {
@@ -83,7 +83,7 @@ export default class InstancesResizer {
     this.instancesEditorSettings = instancesEditorSettings;
   }
 
-  _getOrCreateInstanceAABB(instance: gdInitialInstance) {
+  _getOrCreateInstanceAABB(instance: gdInitialInstance): any {
     const initialInstanceAABB = this._instanceAABBs[instance.ptr];
     if (initialInstanceAABB) return initialInstanceAABB;
 
@@ -92,7 +92,7 @@ export default class InstancesResizer {
     ] = this.instanceMeasurer.getInstanceAABB(instance, new Rectangle()));
   }
 
-  _getOrCreateUnrotatedInstanceAABB(instance: gdInitialInstance) {
+  _getOrCreateUnrotatedInstanceAABB(instance: gdInitialInstance): any {
     const initialUnrotatedInstanceAABB = this._unrotatedInstanceAABBs[
       instance.ptr
     ];
@@ -106,7 +106,7 @@ export default class InstancesResizer {
     ));
   }
 
-  _getOrCreateInstanceOriginPosition(instance: gdInitialInstance) {
+  _getOrCreateInstanceOriginPosition(instance: gdInitialInstance): any {
     const initialPosition = this._instancePositions[instance.ptr];
     if (initialPosition) return initialPosition;
 

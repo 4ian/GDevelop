@@ -13,7 +13,7 @@ type Props = {|
 |};
 
 export default class BrowserPreviewErrorDialog extends Component<Props> {
-  render() {
+  render(): any {
     const { error, onClose } = this.props;
 
     return (

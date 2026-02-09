@@ -49,7 +49,7 @@ export default function BottomButtons({
   DnDComponent,
   draggedNode,
   rootEventsList,
-}: Props) {
+}: Props): React.Node {
   const screenType = useScreenType();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const onDrop = () => {

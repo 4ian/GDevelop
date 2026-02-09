@@ -39,14 +39,16 @@ type Props = {|
   onCloseAfterPurchaseDone?: () => void,
 |};
 
-const BundlePurchaseDialog = ({
-  bundleListingData,
-  usageType,
-  onClose,
-  simulateAppStoreProduct,
-  fastCheckout,
-  onCloseAfterPurchaseDone,
-}: Props) => {
+const BundlePurchaseDialog = (
+  {
+    bundleListingData,
+    usageType,
+    onClose,
+    simulateAppStoreProduct,
+    fastCheckout,
+    onCloseAfterPurchaseDone
+  }: Props,
+): React.Node => {
   const {
     profile,
     onOpenLoginDialog,

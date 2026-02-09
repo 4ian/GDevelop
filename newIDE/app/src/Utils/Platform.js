@@ -42,7 +42,7 @@ export const getPlatformName = (): string => {
         'Unknown platform (web-app)';
 };
 
-export const isWindows = () => _isWindows;
-export const isMacLike = () => _isMacLike;
-export const isMobile = () => _isMobile;
-export const isNativeMobileApp = () => false;
+export const isWindows = (): boolean => _isWindows;
+export const isMacLike = (): boolean => _isMacLike;
+export const isMobile = (): boolean => _isMobile;
+export const isNativeMobileApp = (): boolean => false;

@@ -6,7 +6,7 @@ import ContextMenu, { type ContextMenuInterface } from './ContextMenu';
 import { type MenuItemTemplate } from './Menu.flow';
 
 type Props = {|
-  element: React$Element<any>,
+  element: React.Element<any>,
   buildMenuTemplate: (i18n: I18nType) => Array<MenuItemTemplate>,
   openMenuWithSecondaryClick?: boolean,
   passExtraProps?: boolean,
@@ -38,7 +38,7 @@ export default class ElementWithMenu extends React.Component<Props, State> {
     }
   };
 
-  render() {
+  render(): any {
     const {
       element,
       buildMenuTemplate,

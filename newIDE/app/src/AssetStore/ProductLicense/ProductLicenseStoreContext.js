@@ -15,7 +15,7 @@ type ProductLicenseStoreState = {|
   error: ?Error,
 |};
 
-export const ProductLicenseStoreContext = React.createContext<ProductLicenseStoreState>(
+export const ProductLicenseStoreContext: React.Context<ProductLicenseStoreState> = React.createContext<ProductLicenseStoreState>(
   {
     fetchProductLicenses: () => {},
     assetPackLicenses: null,
@@ -28,9 +28,7 @@ type ProductLicenseStoreStateProviderProps = {|
   children: React.Node,
 |};
 
-export const ProductLicenseStoreStateProvider = ({
-  children,
-}: ProductLicenseStoreStateProviderProps) => {
+export const ProductLicenseStoreStateProvider = ({children}: ProductLicenseStoreStateProviderProps): React.MixedElement => {
   const [error, setError] = React.useState<?Error>(null);
   const [
     gameTemplateLicenses,

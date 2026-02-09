@@ -49,7 +49,7 @@ const styles = {
 };
 
 export default class TextEditor extends React.Component<EditorProps, void> {
-  render() {
+  render(): any {
     const {
       objectConfiguration,
       project,

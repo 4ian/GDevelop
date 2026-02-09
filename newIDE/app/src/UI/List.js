@@ -88,7 +88,7 @@ type ListItemProps = {|
   disableAutoTranslate?: boolean,
   selected?: boolean,
   autoGenerateNestedIndicator?: boolean, // TODO: Rename?
-  renderNestedItems?: () => Array<React$Element<any> | null>,
+  renderNestedItems?: () => Array<React.Element<any> | null>,
   isGreyed?: boolean,
   open?: boolean,
   initiallyOpen?: boolean,
@@ -132,7 +132,9 @@ const useStylesForGreyedListItem = makeStyles(theme => {
  *
  * Also used outside of a List by virtualized lists.
  */
-export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
+export const ListItem: component(
+  ...{ ...ListItemProps, +ref?: React.RefSetter<ListItemRefType> }
+) = React.forwardRef<ListItemProps, ListItemRefType>(
   (props: ListItemProps, ref) => {
     const [isOpen, setIsOpen] = React.useState(!!props.initiallyOpen);
     const elementWithMenu = React.useRef<?ElementWithMenu>(null);
@@ -379,7 +381,7 @@ type ListProps = {|
 /**
  * List based on Material-UI List.
  */
-export const List = (props: ListProps) => {
+export const List = (props: ListProps): React.Node => {
   let listStyle = { ...props.style };
   if (props.useGap) {
     listStyle = { ...listStyle, ...styles.listWithGap };

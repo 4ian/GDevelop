@@ -103,8 +103,11 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   /** Functor used to render an instance */
   instancesRenderer: gdInitialInstanceJSFunctor;
 
-  layoutedInstances = new Map<number, LayoutedInstance>();
-  renderedInstances = new Map<number, RenderedInstance | Rendered3DInstance>();
+  layoutedInstances = new Map<number, LayoutedInstance>() as Map<number, LayoutedInstance>;
+  renderedInstances = new Map<number, RenderedInstance | Rendered3DInstance>() as Map<
+  number,
+  RenderedInstance | Rendered3DInstance,
+>;
   _propertyMappingRules: Array<PropertyMappingRule>;
 
   constructor(
@@ -367,7 +370,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ) {
+  ): any {
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       objectConfiguration
     );
@@ -584,17 +587,17 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     }
   }
 
-  getDefaultWidth() {
+  getDefaultWidth(): any {
     const variant = this.getVariant();
     return variant ? variant.getAreaMaxX() - variant.getAreaMinX() : 48;
   }
 
-  getDefaultHeight() {
+  getDefaultHeight(): any {
     const variant = this.getVariant();
     return variant ? variant.getAreaMaxY() - variant.getAreaMinY() : 48;
   }
 
-  getDefaultDepth() {
+  getDefaultDepth(): any {
     const variant = this.getVariant();
     return variant ? variant.getAreaMaxZ() - variant.getAreaMinZ() : 48;
   }
@@ -625,15 +628,15 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     return (-variant.getAreaMinZ() / this.getDefaultDepth()) * this.getDepth();
   }
 
-  getCenterX() {
+  getCenterX(): any {
     return this.getWidth() / 2;
   }
 
-  getCenterY() {
+  getCenterY(): any {
     return this.getHeight() / 2;
   }
 
-  getCenterZ() {
+  getCenterZ(): any {
     return this.getDepth() / 2;
   }
 }

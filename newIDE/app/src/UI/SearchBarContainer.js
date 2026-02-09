@@ -149,17 +149,19 @@ type Props = {|
   renderSubLine?: ?() => React.Node,
 |};
 
-const SearchBarContainer = ({
-  renderContent,
-  disabled,
-  isSearchBarEmpty,
-  isFocused,
-  helpPagePath,
-  aspect,
-  buildMenuTemplate,
-  onCancel,
-  renderSubLine,
-}: Props) => {
+const SearchBarContainer = (
+  {
+    renderContent,
+    disabled,
+    isSearchBarEmpty,
+    isFocused,
+    helpPagePath,
+    aspect,
+    buildMenuTemplate,
+    onCancel,
+    renderSubLine
+  }: Props,
+): React.Node => {
   const GDevelopTheme = React.useContext(GDevelopThemeContext);
 
   const styles = getStyles({

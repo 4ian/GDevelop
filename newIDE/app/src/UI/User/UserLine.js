@@ -11,21 +11,23 @@ import Trash from '../CustomSvgIcons/Trash';
 import { getTranslatableLevel } from '../../Utils/AclUtils';
 import { type Level } from '../../Utils/GDevelopServices/Project';
 
-const UserLine = ({
-  username,
-  fullName,
-  email,
-  level,
-  onDelete,
-  disabled,
-}: {|
-  username: ?string,
-  fullName: ?string,
-  email: string,
-  level: ?Level,
-  onDelete?: () => Promise<void> | void,
-  disabled?: boolean,
-|}) => (
+const UserLine = (
+  {
+    username,
+    fullName,
+    email,
+    level,
+    onDelete,
+    disabled
+  }: {|
+    username: ?string,
+    fullName: ?string,
+    email: string,
+    level: ?Level,
+    onDelete?: () => Promise<void> | void,
+    disabled?: boolean,
+  |},
+): React.Node => (
   <I18n>
     {({ i18n }) => (
       <Line justifyContent="space-between">

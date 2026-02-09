@@ -38,7 +38,7 @@ export default class ExpressionSelector extends Component<Props, {||}> {
     this.props.i18n
   );
 
-  render() {
+  render(): any {
     const { expressionType, scope, i18n, ...otherProps } = this.props;
     return (
       <InstructionOrExpressionSelector

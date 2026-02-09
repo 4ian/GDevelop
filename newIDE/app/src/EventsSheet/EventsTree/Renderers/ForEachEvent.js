@@ -100,7 +100,7 @@ export default class ForEachEvent extends React.Component<
     });
   };
 
-  render() {
+  render(): any {
     const forEachEvent = gd.asForEachEvent(this.props.event);
     const objectName = forEachEvent.getObjectToPick();
 

@@ -16,17 +16,19 @@ type Props = {|
   isListLocked: boolean,
 |};
 
-const LocalVariablesDialog = ({
-  project,
-  projectScopedContainersAccessor,
-  variablesContainer,
-  open,
-  onCancel,
-  onApply,
-  initiallySelectedVariableName,
-  shouldCreateInitiallySelectedVariable,
-  isListLocked,
-}: Props) => {
+const LocalVariablesDialog = (
+  {
+    project,
+    projectScopedContainersAccessor,
+    variablesContainer,
+    open,
+    onCancel,
+    onApply,
+    initiallySelectedVariableName,
+    shouldCreateInitiallySelectedVariable,
+    isListLocked
+  }: Props,
+): React.Node => {
   const tabs = React.useMemo(
     () => [
       {

@@ -7,15 +7,17 @@ const styles = {
   progress: { marginRight: 8, verticalAlign: 'middle' },
 };
 
-const LeftLoader = ({
-  children,
-  isLoading,
-  reserveSpace,
-}: {
-  children: React.Node,
-  isLoading: ?boolean,
-  reserveSpace?: boolean,
-}) => (
+const LeftLoader = (
+  {
+    children,
+    isLoading,
+    reserveSpace
+  }: {
+    children: React.Node,
+    isLoading: ?boolean,
+    reserveSpace?: boolean,
+  },
+): React.MixedElement => (
   <span style={styles.container}>
     {(isLoading || reserveSpace) && (
       <CircularProgress

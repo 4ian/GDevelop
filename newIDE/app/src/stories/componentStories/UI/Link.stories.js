@@ -14,7 +14,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => (
+export const Default = (): React.Node => (
   <Text>
     This is a link to{' '}
     <Link

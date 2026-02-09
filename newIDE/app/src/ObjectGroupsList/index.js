@@ -719,7 +719,9 @@ const MemoizedObjectGroupsList = React.memo<Props, ObjectGroupsListInterface>(
   arePropsEqual
 );
 
-const ObjectGroupsListWithErrorBoundary = React.forwardRef<
+const ObjectGroupsListWithErrorBoundary: component(
+  ...{ ...Props, +ref?: React.RefSetter<ObjectGroupsListInterface> }
+) = React.forwardRef<
   Props,
   ObjectGroupsListInterface
 >((props, ref) => (

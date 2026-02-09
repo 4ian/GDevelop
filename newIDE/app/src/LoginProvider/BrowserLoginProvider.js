@@ -49,7 +49,7 @@ class BrowserLoginProvider
   }: {|
     provider: IdentityProvider,
     signal?: AbortSignal,
-  |}) {
+  |}): any {
     if (signal && signal.aborted) {
       return Promise.reject(
         new Error('Login or Signup with provider already aborted.')

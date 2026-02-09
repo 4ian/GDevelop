@@ -12,7 +12,7 @@ import Window from '../../Utils/Window';
 import RaisedButton from '../../UI/RaisedButton';
 import { type ExportFlowProps } from '../ExportPipeline.flow';
 
-export const ExplanationHeader = () => (
+export const ExplanationHeader = (): React.Node => (
   <Text align="center">
     <Trans>
       This will export your game as a Cordova project. Cordova is a technology
@@ -26,13 +26,15 @@ type CordovaExportFlowProps = {|
   exportPipelineName: string,
 |};
 
-export const ExportFlow = ({
-  disabled,
-  launchExport,
-  isExporting,
-  exportStep,
-  exportPipelineName,
-}: CordovaExportFlowProps) =>
+export const ExportFlow = (
+  {
+    disabled,
+    launchExport,
+    isExporting,
+    exportStep,
+    exportPipelineName
+  }: CordovaExportFlowProps,
+): React.Node | null =>
   exportStep !== 'done' ? (
     <Line justifyContent="center">
       <RaisedButton
@@ -51,11 +53,13 @@ export const ExportFlow = ({
     </Line>
   ) : null;
 
-export const DoneFooter = ({
-  renderGameButton,
-}: {|
-  renderGameButton: () => React.Node,
-|}) => {
+export const DoneFooter = (
+  {
+    renderGameButton
+  }: {|
+    renderGameButton: () => React.Node,
+  |},
+): React.Node => {
   const openLearnMore = () => {
     Window.openExternalURL(
       getHelpLink('/publishing/android_and_ios_with_cordova')
@@ -91,7 +95,7 @@ export const DoneFooter = ({
 
 export const cordovaExporter = {
   key: 'cordovaexport',
-  tabName: <Trans>Mobile</Trans>,
-  name: <Trans>iOS &amp; Android (manual)</Trans>,
+  tabName: <Trans>Mobile</Trans> as React.Node,
+  name: <Trans>iOS &amp; Android (manual)</Trans> as React.Node,
   helpPage: '/publishing/android_and_ios_with_cordova',
 };

@@ -14,7 +14,7 @@ type Props = {|
   onApply: () => Promise<void> | void,
 |};
 
-const PasswordPromptDialog = (props: Props) => (
+const PasswordPromptDialog = (props: Props): React.Node => (
   <Dialog
     open
     maxWidth="xs"

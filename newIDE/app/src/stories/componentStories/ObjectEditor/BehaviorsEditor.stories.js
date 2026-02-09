@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => (
+export const Default = (): React.Node => (
   <SerializedObjectDisplay object={testProject.spriteObjectWithBehaviors}>
     <BehaviorsEditor
       project={testProject.project}
@@ -38,7 +38,7 @@ export const Default = () => (
   </SerializedObjectDisplay>
 );
 
-export const WithoutAnyBehaviors = () => (
+export const WithoutAnyBehaviors = (): React.Node => (
   <SerializedObjectDisplay object={testProject.spriteObjectWithoutBehaviors}>
     <BehaviorsEditor
       project={testProject.project}
@@ -59,7 +59,7 @@ export const WithoutAnyBehaviors = () => (
   </SerializedObjectDisplay>
 );
 
-export const Locked = () => (
+export const Locked = (): React.Node => (
   <SerializedObjectDisplay object={testProject.spriteObjectWithBehaviors}>
     <BehaviorsEditor
       project={testProject.project}
@@ -80,7 +80,7 @@ export const Locked = () => (
   </SerializedObjectDisplay>
 );
 
-export const LockedWithoutAnyBehaviors = () => (
+export const LockedWithoutAnyBehaviors = (): React.Node => (
   <SerializedObjectDisplay object={testProject.spriteObjectWithoutBehaviors}>
     <BehaviorsEditor
       project={testProject.project}

@@ -805,7 +805,9 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
   }
 );
 
-const LayersListWithErrorBoundary = React.forwardRef<
+const LayersListWithErrorBoundary: component(
+  ...{ ...Props, +ref?: React.RefSetter<LayersListInterface> }
+) = React.forwardRef<
   Props,
   LayersListInterface
 >((props, ref) => (

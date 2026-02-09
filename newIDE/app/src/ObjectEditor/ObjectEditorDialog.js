@@ -506,7 +506,7 @@ class ObjectEditorDialog extends React.Component<Props, State> {
   }
 }
 
-const ObjectEditorWithErrorBoundary = (props: Props) => (
+const ObjectEditorWithErrorBoundary = (props: Props): React.Node => (
   <ErrorBoundary
     componentTitle={<Trans>Object editor</Trans>}
     scope="object-details"

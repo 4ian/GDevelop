@@ -13,7 +13,7 @@ const STACK_NEW_SECOND_GETS_50 = 50;
 
 /* ===== Type Guards & Utilities ===== */
 
-const isBranch = (n: EditorMosaicNode): boolean %checks =>
+const isBranch = (n: EditorMosaicNode): boolean =>
   typeof n !== 'string';
 
 type PathItem = {|

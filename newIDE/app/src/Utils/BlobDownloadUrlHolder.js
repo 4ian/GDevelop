@@ -6,7 +6,7 @@ type Props = {
   children: (blobDownloadUrl: string) => React.Node,
 };
 
-export const BlobDownloadUrlHolder = ({ blob, children }: Props) => {
+export const BlobDownloadUrlHolder = ({blob, children}: Props): React.Node => {
   const [blobDownloadUrl, setBlobDownloadUrl] = React.useState('');
   const [currentBlob, setCurrentBlob] = React.useState<?Blob>(null);
   React.useEffect(

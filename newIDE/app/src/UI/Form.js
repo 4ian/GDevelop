@@ -9,13 +9,16 @@ type Props = {|
   fullWidth?: boolean,
 |};
 
-const Form = ({
-  onSubmit,
-  autoComplete = 'off', // Default to 'off' to avoid browser autofill.
-  name,
-  children,
-  fullWidth,
-}: Props) => {
+const Form = (
+  {
+    onSubmit,
+    autoComplete = 'off' // Default to 'off' to avoid browser autofill.
+    ,
+    name,
+    children,
+    fullWidth
+  }: Props,
+): React.MixedElement => {
   return (
     <form
       onSubmit={event => {

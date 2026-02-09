@@ -211,7 +211,7 @@ export default class MaterialUIMenuImplementation
   buildFromTemplate(
     template: Array<MenuItemTemplate>,
     forceUpdate?: () => void
-  ) {
+  ): any {
     // This is not a real hook.
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const isTouchscreen = useScreenType() === 'touch';
@@ -317,7 +317,7 @@ export default class MaterialUIMenuImplementation
     // Automatically done by IconMenu
   }
 
-  getMenuProps() {
+  getMenuProps(): any {
     return {};
   }
 }

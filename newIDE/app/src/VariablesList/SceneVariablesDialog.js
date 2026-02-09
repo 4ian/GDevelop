@@ -18,17 +18,19 @@ type Props = {|
   isListLocked: boolean,
 |};
 
-const SceneVariablesDialog = ({
-  project,
-  layout,
-  open,
-  onCancel,
-  onApply,
-  hotReloadPreviewButtonProps,
-  initiallySelectedVariableName,
-  shouldCreateInitiallySelectedVariable,
-  isListLocked,
-}: Props) => {
+const SceneVariablesDialog = (
+  {
+    project,
+    layout,
+    open,
+    onCancel,
+    onApply,
+    hotReloadPreviewButtonProps,
+    initiallySelectedVariableName,
+    shouldCreateInitiallySelectedVariable,
+    isListLocked
+  }: Props,
+): React.Node => {
   const onComputeAllVariableNames = React.useCallback(
     () =>
       EventsRootVariablesFinder.findAllLayoutVariables(

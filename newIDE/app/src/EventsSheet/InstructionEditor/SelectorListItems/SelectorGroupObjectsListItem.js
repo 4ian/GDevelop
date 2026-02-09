@@ -20,15 +20,17 @@ type Props = {|
   data?: HTMLDataset,
 |};
 
-export const renderGroupObjectsListItem = ({
-  groupWithContext,
-  iconSize,
-  onClick,
-  selectedValue,
-  matchesCoordinates,
-  id,
-  data,
-}: Props) => {
+export const renderGroupObjectsListItem = (
+  {
+    groupWithContext,
+    iconSize,
+    onClick,
+    selectedValue,
+    matchesCoordinates,
+    id,
+    data
+  }: Props,
+): React.Node => {
   const groupName: string = groupWithContext.group.getName();
   return (
     <ListItem

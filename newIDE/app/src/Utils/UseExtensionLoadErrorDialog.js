@@ -31,11 +31,13 @@ type ExtensionLoadErrorDialogProps = {|
   onClose: () => void,
 |};
 
-export const ExtensionLoadErrorDialog = ({
-  erroredExtensionLoadingResults,
-  genericError,
-  onClose,
-}: ExtensionLoadErrorDialogProps) => {
+export const ExtensionLoadErrorDialog = (
+  {
+    erroredExtensionLoadingResults,
+    genericError,
+    onClose
+  }: ExtensionLoadErrorDialogProps,
+): React.Node => {
   return (
     <Dialog
       title={

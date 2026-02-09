@@ -9,7 +9,7 @@ import AlertDialog from '../../UI/Alert/AlertDialog';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { Column, LargeSpacer } from '../../UI/Grid';
 
-export const Default = () => {
+export const Default = (): React.Node => {
   const {
     showAlert,
     showConfirmation,

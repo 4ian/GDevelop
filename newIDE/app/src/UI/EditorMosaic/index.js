@@ -303,7 +303,9 @@ type Props = {|
  * Can be used to create a mosaic of resizable editors.
  * Must be used inside a component wrapped in a DragDropContext.
  */
-const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
+const EditorMosaic: component(
+  ...{ ...Props, +ref?: React.RefSetter<EditorMosaicInterface> }
+) = React.forwardRef<Props, EditorMosaicInterface>(
   (
     {
       initialNodes,

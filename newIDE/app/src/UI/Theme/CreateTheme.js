@@ -37,7 +37,7 @@ export function getMuiOverrides({
   snackbarBackgroundColor: string,
   snackbarBorderColor: string,
   textDefaultColor: string,
-|}) {
+|}): any {
   return {
     MuiTypography: {
       h1: {
@@ -453,7 +453,7 @@ export function createGdevelopTheme({
   rootClassNameIdentifier: string,
   paletteType: string,
   gdevelopIconsCSSFilter: ?string,
-}) {
+}): any {
   return {
     gdevelopTheme: {
       palette: {

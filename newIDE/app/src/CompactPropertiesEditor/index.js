@@ -92,7 +92,7 @@ const styles = {
   },
 };
 
-export const Separator = () => {
+export const Separator = (): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <div
@@ -104,7 +104,7 @@ export const Separator = () => {
   );
 };
 
-export const Level2Separator = () => {
+export const Level2Separator = (): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <div
@@ -165,20 +165,22 @@ const getFieldLabel = ({
   return field.name;
 };
 
-const CompactPropertiesEditor = ({
-  onInstancesModified,
-  onRefreshAllFields,
-  instances,
-  schema,
-  mode,
-  renderExtraDescriptionText,
-  unsavedChanges,
-  project,
-  resourceManagementProps,
-  preventWrap,
-  removeSpacers,
-  isHidden,
-}: Props) => {
+const CompactPropertiesEditor = (
+  {
+    onInstancesModified,
+    onRefreshAllFields,
+    instances,
+    schema,
+    mode,
+    renderExtraDescriptionText,
+    unsavedChanges,
+    project,
+    resourceManagementProps,
+    preventWrap,
+    removeSpacers,
+    isHidden
+  }: Props,
+): null | React.Node => {
   const forceUpdate = useForceUpdate();
 
   const onFieldChanged = React.useCallback(

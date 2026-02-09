@@ -40,12 +40,7 @@ type Props = {|
   onPublishOnGdGames: ?() => void,
 |};
 
-const GameHeader = ({
-  game,
-  onEditGame,
-  gameUrl,
-  onPublishOnGdGames,
-}: Props) => {
+const GameHeader = ({game, onEditGame, gameUrl, onPublishOnGdGames}: Props): React.Node => {
   useOnResize(useForceUpdate());
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

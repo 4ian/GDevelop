@@ -24,46 +24,45 @@ export type LearnCategory =
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
-    title: <Trans>Make an entire game</Trans>,
-    description: <Trans>Make complete games step by step</Trans>,
+    title: <Trans>Make an entire game</Trans> as React.Node,
+    description: <Trans>Make complete games step by step</Trans> as React.Node,
   },
   'game-mechanic': {
-    title: <Trans>Specific game mechanics</Trans>,
+    title: <Trans>Specific game mechanics</Trans> as React.Node,
     description: (
       <Trans>
-        Find how to implement the most common game mechanics and more
-      </Trans>
+  Find how to implement the most common game mechanics and more
+</Trans> as React.Node
     ),
   },
   'official-beginner': {
-    title: <Trans>Beginner course</Trans>,
-    description: <Trans>Learn the fundamental principles of GDevelop</Trans>,
+    title: <Trans>Beginner course</Trans> as React.Node,
+    description: <Trans>Learn the fundamental principles of GDevelop</Trans> as React.Node,
   },
   'official-intermediate': {
-    title: <Trans>Intermediate course</Trans>,
+    title: <Trans>Intermediate course</Trans> as React.Node,
     description: (
-      <Trans>Learn all the game-building mechanics of GDevelop</Trans>
+      <Trans>Learn all the game-building mechanics of GDevelop</Trans> as React.Node
     ),
   },
   'official-advanced': {
-    title: <Trans>Advanced course</Trans>,
-    description: <Trans>The icing on the cake</Trans>,
+    title: <Trans>Advanced course</Trans> as React.Node,
+    description: <Trans>The icing on the cake</Trans> as React.Node,
   },
   'education-curriculum': {
-    title: <Trans>Education curriculum and resources</Trans>,
+    title: <Trans>Education curriculum and resources</Trans> as React.Node,
     description: (
       <Trans>
-        For teachers and educators having the GDevelop Education subscription.
-        Ready to use resources for teaching.
-      </Trans>
+  For teachers and educators having the GDevelop Education subscription. Ready to use resources for teaching.
+</Trans> as React.Node
     ),
   },
   course: {
-    title: <Trans>Loading</Trans>,
-    description: <Trans>Loading course...</Trans>,
+    title: <Trans>Loading</Trans> as React.Node,
+    description: <Trans>Loading course...</Trans> as React.Node,
   },
   recommendations: {
-    title: <Trans>Recommendations</Trans>,
+    title: <Trans>Recommendations</Trans> as React.Node,
     description: null,
   },
 };
@@ -71,7 +70,7 @@ export const TUTORIAL_CATEGORY_TEXTS = {
 export const getColumnsFromWindowSize = (
   windowSize: WindowSizeType,
   isLandscape: boolean
-) => {
+): number => {
   switch (windowSize) {
     case 'small':
       return isLandscape ? 4 : 2;
@@ -100,7 +99,7 @@ export const getChipColorFromTutorialCategory = (
 export const getChipTextFromTutorialCategory = (
   category: TutorialCategory,
   i18n: I18nType
-) => {
+): any | null => {
   if (category === 'official-beginner') return i18n._(t`Beginner`);
   if (category === 'official-intermediate') return i18n._(t`Intermediate`);
   if (category === 'official-advanced') return i18n._(t`Advanced`);

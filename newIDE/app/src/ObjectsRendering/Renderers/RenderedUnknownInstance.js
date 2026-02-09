@@ -40,7 +40,7 @@ export default class RenderedUnknownInstance extends RenderedInstance {
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ) {
+  ): any {
     return 'res/unknown32.png';
   }
 

@@ -39,22 +39,24 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
 |};
 
-const InlineParameterEditor = ({
-  project,
-  scope,
-  globalObjectsContainer,
-  objectsContainer,
-  projectScopedContainersAccessor,
-  open,
-  onRequestClose,
-  onApply,
-  onChange,
-  instruction,
-  isCondition,
-  parameterIndex,
-  anchorEl,
-  resourceManagementProps,
-}: Props) => {
+const InlineParameterEditor = (
+  {
+    project,
+    scope,
+    globalObjectsContainer,
+    objectsContainer,
+    projectScopedContainersAccessor,
+    open,
+    onRequestClose,
+    onApply,
+    onChange,
+    instruction,
+    isCondition,
+    parameterIndex,
+    anchorEl,
+    resourceManagementProps
+  }: Props,
+): React.Node => {
   const [
     parameterMetadata,
     setParameterMetadata,

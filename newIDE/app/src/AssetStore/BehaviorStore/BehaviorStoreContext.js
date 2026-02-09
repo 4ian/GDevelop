@@ -47,7 +47,7 @@ type BehaviorStoreState = {|
   filtersState: FiltersState,
 |};
 
-export const BehaviorStoreContext = React.createContext<BehaviorStoreState>({
+export const BehaviorStoreContext: React.Context<BehaviorStoreState> = React.createContext<BehaviorStoreState>({
   filters: null,
   searchResults: null,
   fetchBehaviors: () => {},
@@ -75,11 +75,7 @@ type BehaviorStoreStateProviderProps = {|
   defaultSearchText?: string,
 |};
 
-export const BehaviorStoreStateProvider = ({
-  children,
-  i18n,
-  defaultSearchText,
-}: BehaviorStoreStateProviderProps) => {
+export const BehaviorStoreStateProvider = ({children, i18n, defaultSearchText}: BehaviorStoreStateProviderProps): React.MixedElement => {
   const [
     installedBehaviorMetadataList,
     setInstalledBehaviorMetadataList,

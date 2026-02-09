@@ -245,11 +245,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _eventsTree: ?EventsTreeInterface;
   _eventSearcher: ?EventsSearcher;
   _searchPanel: ?SearchPanelInterface;
-  _containerDiv = React.createRef<HTMLDivElement>();
+  _containerDiv = React.createRef<HTMLDivElement>() as React$RefObject<HTMLDivElement | null>;
   _containerDivLastKnownSize = null;
-  _keyboardShortcuts = new KeyboardShortcuts({
-    isActive: () =>
-      !this.state.inlineEditing &&
+  _keyboardShortcuts = new KeyboardShortcuts(
+  {
+    isActive: () => !this.state.inlineEditing &&
       !this.state.editedInstruction.instruction &&
       !this.state.analyzedEventsContextResult &&
       !this.state.serializedEventsToExtract,
@@ -265,7 +265,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       onZoomIn: (event: KeyboardEvent) => this.onZoomEvent('IN')(event),
       onZoomOut: (event: KeyboardEvent) => this.onZoomEvent('OUT')(event),
     },
-  });
+  },
+) as KeyboardShortcuts;
 
   eventContextMenu: ?ContextMenuInterface;
   resourceExternallyChangedCallbackId: ?string;
@@ -276,9 +277,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   ) => Array<gdBaseEvent>;
 
   state = {
-    eventsHistory: getHistoryInitialState(this.props.events, {
-      historyMaxSize: 100,
-    }),
+    eventsHistory: getHistoryInitialState(
+  this.props.events,
+  {
+    historyMaxSize: 100,
+  },
+) as HistoryState,
 
     editedInstruction: {
       isCondition: true,
@@ -296,7 +300,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     },
     editedVariable: null,
 
-    selection: getInitialSelection(),
+    selection: getInitialSelection() as any,
 
     inlineEditing: false,
     inlineEditingAnchorEl: null,
@@ -313,7 +317,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
     layoutVariablesDialogOpen: false,
 
-    allEventsMetadata: [],
+    allEventsMetadata: [] as Array<empty>,
 
     textEditedEvent: null,
 
@@ -493,7 +497,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       });
   };
 
-  _selectionCanHaveSubEvents = () => {
+  _selectionCanHaveSubEvents = (): any => {
     const eventContext =
       getLastSelectedEventContextWhichCanHaveSubEvents(this.state.selection) ||
       getLastSelectedInstructionEventContextWhichCanHaveSubEvents(
@@ -520,7 +524,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
   };
 
-  _selectionCanHaveLocalVariables = () => {
+  _selectionCanHaveLocalVariables = (): any => {
     const eventContext =
       getLastSelectedEventContextWhichCanHaveVariables(this.state.selection) ||
       getLastSelectedInstructionEventContextWhichCanHaveVariables(
@@ -529,7 +533,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     return !!eventContext;
   };
 
-  _selectionCanToggleDisabled = () => {
+  _selectionCanToggleDisabled = (): any => {
     return getSelectedEvents(this.state.selection).some(event => {
       return event.isExecutable();
     });
@@ -649,7 +653,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     });
   };
 
-  _buildInstructionContextMenu = (i18n: I18nType) =>
+  _buildInstructionContextMenu = (i18n: I18nType): any =>
     [
       {
         label: i18n._(t`Copy`),
@@ -733,7 +737,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   openVariablesEditor = (
     eventContext: EventContext,
     variableDeclarationContext: VariableDeclarationContext,
-    shouldCreateVariable = false
+    shouldCreateVariable: any = false
   ) => {
     this.setState({
       editedVariable: {
@@ -854,7 +858,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (this._eventsTree) this._eventsTree.unfoldToLevel(level);
   };
 
-  _buildEventContextMenu = (i18n: I18nType) => [
+  _buildEventContextMenu = (i18n: I18nType): any => [
     {
       label: i18n._(t`Edit`),
       click: () => this.openEventTextDialog(),
@@ -1021,7 +1025,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     },
   ];
 
-  _selectionIsStandardEvent = () => {
+  _selectionIsStandardEvent = (): any => {
     const eventContext = getLastSelectedEventContext(this.state.selection);
     return (
       !!eventContext &&
@@ -1029,7 +1033,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
   };
 
-  _selectionIsElseEvent = () => {
+  _selectionIsElseEvent = (): any => {
     const eventContext = getLastSelectedEventContext(this.state.selection);
     return (
       !!eventContext &&
@@ -1472,7 +1476,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     });
   };
 
-  _getChangedEventRows = (events: Array<gdBaseEvent>) => {
+  _getChangedEventRows = (events: Array<gdBaseEvent>): any => {
     const eventsTree = this._eventsTree;
     if (eventsTree) {
       return events.map(event => eventsTree.getEventRow(event));
@@ -1815,7 +1819,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     });
   };
 
-  _renderInstructionEditorDialog = () => {
+  _renderInstructionEditorDialog = (): any => {
     const {
       project,
       scope,
@@ -1935,7 +1939,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     }
   };
 
-  render() {
+  render(): any {
     const {
       isActive,
       project,
@@ -2365,4 +2369,6 @@ const EventsSheet = (props, ref) => {
   );
 };
 
-export default React.forwardRef<Props, EventsSheetInterface>(EventsSheet);
+export default React.forwardRef<Props, EventsSheetInterface>(EventsSheet) as component(
+  ...{ ...Props, +ref?: React.RefSetter<EventsSheetInterface> }
+);

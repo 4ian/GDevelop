@@ -109,7 +109,7 @@ export default class CommentEvent extends React.Component<
     );
   };
 
-  _getCommentHTML = () => {
+  _getCommentHTML = (): any => {
     const commentEvent = gd.asCommentEvent(this.props.event);
     return commentEvent
       .getComment()
@@ -135,7 +135,7 @@ export default class CommentEvent extends React.Component<
     this._autoResizeTextArea();
   }
 
-  render() {
+  render(): any {
     const commentEvent = gd.asCommentEvent(this.props.event);
 
     const backgroundColor = `#${rgbToHex(

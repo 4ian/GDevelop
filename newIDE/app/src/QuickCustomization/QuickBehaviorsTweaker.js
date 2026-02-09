@@ -104,10 +104,7 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
 |};
 
-export const QuickBehaviorsTweaker = ({
-  project,
-  resourceManagementProps,
-}: Props) => {
+export const QuickBehaviorsTweaker = ({project, resourceManagementProps}: Props): React.Node => {
   return (
     <ColumnStackLayout noMargin expand>
       <TipCard

@@ -207,7 +207,7 @@ function AssetSwappingDialog({
   );
 }
 
-const AssetSwappingDialogWithErrorBoundary = (props: Props) => (
+const AssetSwappingDialogWithErrorBoundary = (props: Props): React.Node => (
   <ErrorBoundary
     componentTitle={<Trans>Asset store dialog</Trans>}
     scope="new-object-dialog"

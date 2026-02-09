@@ -15,7 +15,7 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
-export const Default = () => {
+export const Default = (): React.Node => {
   const [value, setValue] = React.useState<string>('00;00;255');
   const [value2, setValue2] = React.useState<string>('00;255;00');
   const [value3, setValue3] = React.useState<string>('255;00;00');

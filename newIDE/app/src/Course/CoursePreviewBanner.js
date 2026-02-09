@@ -153,13 +153,15 @@ type Props = {|
   onDisplayCourse: () => void,
 |};
 
-const CoursePreviewBanner = ({
-  course,
-  getCourseChapters,
-  getCourseCompletion,
-  getCourseChapterCompletion,
-  onDisplayCourse,
-}: Props) => {
+const CoursePreviewBanner = (
+  {
+    course,
+    getCourseChapters,
+    getCourseCompletion,
+    getCourseChapterCompletion,
+    onDisplayCourse
+  }: Props,
+): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { achievements, badges } = React.useContext(AuthenticatedUserContext);
   const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();

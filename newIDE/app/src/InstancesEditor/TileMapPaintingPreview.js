@@ -185,7 +185,7 @@ class TileMapPaintingPreview {
     flipVertically: boolean,
     angle: number,
     texture: PIXI.Texture,
-  |}) {
+  |}): any {
     const sprite = new PIXI.TilingSprite(texture);
     const workingPoint = [0, 0];
 

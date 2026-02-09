@@ -21,12 +21,7 @@ export type ExportState = {|
   signingDialogOpen: boolean,
 |};
 
-export const SetupExportHeader = ({
-  exportState,
-  updateExportState,
-  isExporting,
-  build,
-}: HeaderProps<ExportState>) => {
+export const SetupExportHeader = ({exportState, updateExportState, isExporting, build}: HeaderProps<ExportState>): React.Node => {
   // Build is finished, hide options.
   if (!!build && build.status === 'complete') return null;
 
@@ -168,17 +163,19 @@ type OnlineCordovaExportFlowProps = {|
   exportPipelineName: string,
 |};
 
-export const ExportFlow = ({
-  disabled,
-  launchExport,
-  isExporting,
-  exportPipelineName,
-  exportStep,
-  build,
-  stepMaxProgress,
-  stepCurrentProgress,
-  errored,
-}: OnlineCordovaExportFlowProps) => {
+export const ExportFlow = (
+  {
+    disabled,
+    launchExport,
+    isExporting,
+    exportPipelineName,
+    exportStep,
+    build,
+    stepMaxProgress,
+    stepCurrentProgress,
+    errored
+  }: OnlineCordovaExportFlowProps,
+): React.Node => {
   const isExportingOrbuildRunningOrFinished =
     isExporting || (!!build && build.status !== 'error');
 
@@ -213,7 +210,7 @@ export const ExportFlow = ({
 
 export const onlineCordovaExporter = {
   key: 'onlinecordovaexport',
-  tabName: <Trans>Mobile</Trans>,
-  name: <Trans>Android</Trans>,
+  tabName: <Trans>Mobile</Trans> as React.Node,
+  name: <Trans>Android</Trans> as React.Node,
   helpPage: '/publishing/android',
 };

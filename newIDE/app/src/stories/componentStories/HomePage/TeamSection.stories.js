@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => {
+export const Default = (): React.Node => {
   const usageApiMock = React.useMemo(() => {
     const mock = new MockAdapter(usageClient, {
       delayResponse: 250,
@@ -54,7 +54,7 @@ export const Default = () => {
   );
 };
 
-export const WithNoGroupsYet = () => {
+export const WithNoGroupsYet = (): React.Node => {
   const usageApiMock = React.useMemo(() => {
     const mock = new MockAdapter(usageClient, {
       delayResponse: 250,
@@ -91,7 +91,7 @@ export const WithNoGroupsYet = () => {
   );
 };
 
-export const WithNoStudentsYet = () => {
+export const WithNoStudentsYet = (): React.Node => {
   const usageApiMock = React.useMemo(() => {
     const mock = new MockAdapter(usageClient, {
       delayResponse: 250,
@@ -128,7 +128,7 @@ export const WithNoStudentsYet = () => {
   );
 };
 
-export const WithArchivedStudentsOnly = () => {
+export const WithArchivedStudentsOnly = (): React.Node => {
   const usageApiMock = React.useMemo(() => {
     const mock = new MockAdapter(usageClient, {
       delayResponse: 250,
@@ -165,7 +165,7 @@ export const WithArchivedStudentsOnly = () => {
   );
 };
 
-export const Loading = () => {
+export const Loading = (): React.Node => {
   const usageApiMock = React.useMemo(() => {
     const mock = new MockAdapter(usageClient, {
       delayResponse: 250,

@@ -30,28 +30,28 @@ const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
   }
 };
 
-export const Default = () => (
+export const Default = (): React.Node => (
   <ImageTileGrid
     items={itemsWithJustImage}
     getColumnsFromWindowSize={getColumnsFromWindowSize}
   />
 );
 
-export const WithTitleAndDescription = () => (
+export const WithTitleAndDescription = (): React.Node => (
   <ImageTileGrid
     items={itemsWithTitleAndDescription}
     getColumnsFromWindowSize={getColumnsFromWindowSize}
   />
 );
 
-export const WithLocks = () => (
+export const WithLocks = (): React.Node => (
   <ImageTileGrid
     items={itemsWithLocks}
     getColumnsFromWindowSize={getColumnsFromWindowSize}
   />
 );
 
-export const WithOverlay = () => (
+export const WithOverlay = (): React.Node => (
   <ImageTileGrid
     items={itemsWithOverlay}
     getColumnsFromWindowSize={getColumnsFromWindowSize}

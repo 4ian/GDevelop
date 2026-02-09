@@ -22,7 +22,7 @@ export default function MeasurementUnitDocumentation({
   label,
   description,
   elementsWithWords,
-}: Props) {
+}: Props): React.Node {
   return (
     <Column noMargin>
       <Text size="sub-title">{label}</Text>

@@ -27,7 +27,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const NoGamesOrProjects = () => {
+export const NoGamesOrProjects = (): React.Node => {
   const projectFiles = [];
 
   const preferences: Preferences = {
@@ -74,7 +74,7 @@ export const NoGamesOrProjects = () => {
   );
 };
 
-export const WithOnlyGames = () => {
+export const WithOnlyGames = (): React.Node => {
   const projectFiles = [
     {
       ...fakeFileMetadataAndStorageProviderNameForLocalProject,
@@ -129,7 +129,7 @@ export const WithOnlyGames = () => {
   );
 };
 
-export const WithOnlyProjects = () => {
+export const WithOnlyProjects = (): React.Node => {
   const projectFiles = [
     fakeFileMetadataAndStorageProviderNameForCloudProject,
     fakeFileMetadataAndStorageProviderNameForLocalProject,
@@ -179,7 +179,7 @@ export const WithOnlyProjects = () => {
   );
 };
 
-export const WithGamesAndProjects = () => {
+export const WithGamesAndProjects = (): React.Node => {
   const projectFiles = [
     fakeFileMetadataAndStorageProviderNameForCloudProject,
     fakeFileMetadataAndStorageProviderNameForLocalProject,

@@ -39,13 +39,7 @@ type TitleAndMessage = {|
   message: string,
 |};
 
-const LocalFolderPicker = ({
-  type,
-  value,
-  onChange,
-  defaultPath,
-  fullWidth,
-}: Props) => {
+const LocalFolderPicker = ({type, value, onChange, defaultPath, fullWidth}: Props): React.Node => {
   // Use an internal state to avoid validating the value when the user
   // is typing in the text field. This allows typing a "/" without the
   // formatting kicking in.

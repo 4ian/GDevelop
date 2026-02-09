@@ -107,7 +107,7 @@ export const convertBlobToFiles = <
 >(
   itemResults: Array<ItemResult<Item>>,
   onError: (resourceName: string, error: Error) => void
-) =>
+): any =>
   itemResults
     .map(({ item, blob, error }) => {
       if (error || !blob) {

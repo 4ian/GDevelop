@@ -13,7 +13,7 @@ export default {
   component: ObjectGroupEditorDialog,
 };
 
-export const Default = () => (
+export const Default = (): React.Node => (
   <ObjectGroupEditorDialog
     project={testProject.project}
     projectScopedContainersAccessor={
@@ -31,7 +31,7 @@ export const Default = () => (
   />
 );
 
-export const WithLongObjectNames = () => (
+export const WithLongObjectNames = (): React.Node => (
   <ObjectGroupEditorDialog
     project={testProject.project}
     projectScopedContainersAccessor={
@@ -49,7 +49,7 @@ export const WithLongObjectNames = () => (
   />
 );
 
-export const Empty = () => (
+export const Empty = (): React.Node => (
   <ObjectGroupEditorDialog
     project={testProject.project}
     projectScopedContainersAccessor={

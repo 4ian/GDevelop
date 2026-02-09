@@ -20,7 +20,7 @@ type Props = {|
 type State = {||};
 
 export class Toolbar extends PureComponent<Props, State> {
-  render() {
+  render(): any {
     const { canDelete, isPropertiesShown } = this.props;
 
     return (

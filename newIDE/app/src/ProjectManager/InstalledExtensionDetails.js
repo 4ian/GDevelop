@@ -31,7 +31,7 @@ function InstalledExtensionDetails({
   onWillInstallExtension,
   onExtensionInstalled,
   onOpenEventsFunctionsExtension,
-}: Props) {
+}: Props): React.Node {
   const [isInstalling, setIsInstalling] = React.useState<boolean>(false);
   const installExtension = useInstallExtension();
   const {

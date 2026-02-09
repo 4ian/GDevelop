@@ -26,7 +26,7 @@ type Props = {|
   closeProject: () => Promise<void>,
 |};
 
-const ProjectsWidget = (props: Props) => {
+const ProjectsWidget = (props: Props): React.Node => {
   return (
     <DashboardWidget
       widgetSize={'full'}

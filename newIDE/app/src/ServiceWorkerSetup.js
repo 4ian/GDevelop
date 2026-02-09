@@ -9,7 +9,7 @@ const electron = optionalRequire('electron');
 const serviceWorker =
   typeof navigator !== 'undefined' ? navigator.serviceWorker : undefined;
 
-export function isServiceWorkerSupported() {
+export function isServiceWorkerSupported(): boolean {
   return !!serviceWorker;
 }
 

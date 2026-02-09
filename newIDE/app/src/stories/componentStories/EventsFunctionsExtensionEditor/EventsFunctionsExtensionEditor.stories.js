@@ -21,7 +21,7 @@ export default {
   component: EventsFunctionsExtensionEditor,
 };
 
-export const Default = () => (
+export const Default = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={700}>
       <EventsFunctionsExtensionEditor
@@ -49,7 +49,7 @@ export const Default = () => (
   </DragAndDropContextProvider>
 );
 
-export const WithObjectEditor = () => {
+export const WithObjectEditor = (): React.Node => {
   const preferences: Preferences = {
     ...initialPreferences,
   };

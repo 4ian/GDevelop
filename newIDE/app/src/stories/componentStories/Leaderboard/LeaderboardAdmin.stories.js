@@ -13,7 +13,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const WithErrors = () => (
+export const WithErrors = (): React.Node => (
   <MockLeaderboardProvider>
     <FixedHeightFlexContainer height={600}>
       <LeaderboardAdmin onLoading={() => action('onLoading')} />

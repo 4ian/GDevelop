@@ -15,7 +15,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => (
+export const Default = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <GetSubscriptionCard
       placementId="builds"
@@ -32,7 +32,7 @@ export const Default = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const CustomLabel = () => (
+export const CustomLabel = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <GetSubscriptionCard
       placementId="builds"
@@ -50,7 +50,7 @@ export const CustomLabel = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const ButtonHidden = () => (
+export const ButtonHidden = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <GetSubscriptionCard
       placementId="builds"
@@ -68,7 +68,7 @@ export const ButtonHidden = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const PayWithCreditsOptions = () => (
+export const PayWithCreditsOptions = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <GetSubscriptionCard
       placementId="builds"
@@ -89,7 +89,7 @@ export const PayWithCreditsOptions = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const ForceColumnLayout = () => (
+export const ForceColumnLayout = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <GetSubscriptionCard
       placementId="builds"

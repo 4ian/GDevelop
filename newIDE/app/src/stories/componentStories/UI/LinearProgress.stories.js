@@ -17,7 +17,7 @@ export default {
 
 const STEP_COUNT = 10;
 
-export const Default = () => {
+export const Default = (): React.Node => {
   const [step, setStep] = React.useState<number>(0);
   useTimeout(() => {
     if (step < STEP_COUNT) setStep(step + 1);

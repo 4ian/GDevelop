@@ -34,7 +34,7 @@ export const createOrUpdateResource = (
 export const getLocalResourceFullPath = (
   project: gdProject,
   resourceName: string
-) => {
+): any => {
   let resourcePath = ResourcesLoader.getResourceFullUrl(
     project,
     resourceName,
@@ -54,7 +54,7 @@ export const getLocalResourceFullPath = (
 export const isPathInProjectFolder = (
   project: gdProject,
   resourcePath: string
-) => {
+): boolean => {
   const projectPath = path.dirname(project.getProjectFile());
   return resourcePath.includes(projectPath);
 };
@@ -119,7 +119,7 @@ export const copyAllToProjectFolder = (
 export const getResourceFilePathStatus = (
   project: gdProject,
   resourceName: string
-) => {
+): string => {
   if (!project.getResourcesManager().hasResource(resourceName)) return '';
   if (!fs) return '';
 
@@ -238,7 +238,7 @@ export const updateResourceJsonMetadata = (
   resource.setMetadata(JSON.stringify(newMetadata));
 };
 
-export const isFetchableUrl = (url: string) => {
+export const isFetchableUrl = (url: string): boolean => {
   return (
     url.startsWith('http://') ||
     url.startsWith('https://') ||
@@ -246,7 +246,7 @@ export const isFetchableUrl = (url: string) => {
   );
 };
 
-export const isURL = (filename: string) => {
+export const isURL = (filename: string): boolean => {
   return (
     filename.startsWith('http://') ||
     filename.startsWith('https://') ||
@@ -256,6 +256,6 @@ export const isURL = (filename: string) => {
   );
 };
 
-export const isBlobURL = (filename: string) => {
+export const isBlobURL = (filename: string): boolean => {
   return filename.startsWith('blob:');
 };

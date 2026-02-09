@@ -15,13 +15,15 @@ type AiConfigurationPresetSelectorProps = {
   disabled?: boolean,
 };
 
-export const AiConfigurationPresetSelector = ({
-  chosenOrDefaultAiConfigurationPresetId,
-  setAiConfigurationPresetId,
-  aiConfigurationPresetsWithAvailability,
-  aiRequestMode,
-  disabled,
-}: AiConfigurationPresetSelectorProps) => {
+export const AiConfigurationPresetSelector = (
+  {
+    chosenOrDefaultAiConfigurationPresetId,
+    setAiConfigurationPresetId,
+    aiConfigurationPresetsWithAvailability,
+    aiRequestMode,
+    disabled
+  }: AiConfigurationPresetSelectorProps,
+): React.Node => {
   const filteredAiConfigurationPresets = aiConfigurationPresetsWithAvailability.filter(
     preset => preset.mode === aiRequestMode
   );

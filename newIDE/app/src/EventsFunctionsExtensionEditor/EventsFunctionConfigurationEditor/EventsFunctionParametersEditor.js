@@ -63,7 +63,7 @@ const styles = {
   },
 };
 
-export const useParameterOverridingAlertDialog = () => {
+export const useParameterOverridingAlertDialog = (): ((existingParameterNames: Array<string>) => Promise<boolean>) => {
   const { showConfirmation } = useAlertDialog();
   return async (existingParameterNames: Array<string>): Promise<boolean> => {
     return await showConfirmation({
@@ -137,24 +137,26 @@ type Props = {|
   ) => void,
 |};
 
-export const EventsFunctionParametersEditor = ({
-  project,
-  projectScopedContainersAccessor,
-  eventsFunction,
-  eventsBasedBehavior,
-  eventsBasedObject,
-  eventsFunctionsContainer,
-  eventsFunctionsExtension,
-  onParametersUpdated,
-  helpPagePath,
-  freezeParameters,
-  onMoveFreeEventsParameter,
-  onMoveBehaviorEventsParameter,
-  onMoveObjectEventsParameter,
-  onFunctionParameterWillBeRenamed,
-  children,
-  onFunctionParameterTypeChanged,
-}: Props) => {
+export const EventsFunctionParametersEditor = (
+  {
+    project,
+    projectScopedContainersAccessor,
+    eventsFunction,
+    eventsBasedBehavior,
+    eventsBasedObject,
+    eventsFunctionsContainer,
+    eventsFunctionsExtension,
+    onParametersUpdated,
+    helpPagePath,
+    freezeParameters,
+    onMoveFreeEventsParameter,
+    onMoveBehaviorEventsParameter,
+    onMoveObjectEventsParameter,
+    onFunctionParameterWillBeRenamed,
+    children,
+    onFunctionParameterTypeChanged
+  }: Props,
+): React.Node => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
     justAddedParameterName,

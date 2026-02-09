@@ -538,7 +538,7 @@ const MarketingPlansStory = ({
   );
 };
 
-export const LoadingAndError = () => {
+export const LoadingAndError = (): React.Node => {
   return (
     <MarketingPlansStory
       gameFeaturings={[]}
@@ -549,11 +549,11 @@ export const LoadingAndError = () => {
   );
 };
 
-export const Default = () => {
+export const Default = (): React.Node => {
   return <MarketingPlansStory gameFeaturings={[]} delayResponse={1000} />;
 };
 
-export const WithOwnedActiveBasicPlanIncompleteGame = () => {
+export const WithOwnedActiveBasicPlanIncompleteGame = (): React.Node => {
   return (
     <MarketingPlansStory
       gameFeaturings={[
@@ -570,7 +570,7 @@ export const WithOwnedActiveBasicPlanIncompleteGame = () => {
   );
 };
 
-export const WithOwnedActiveBasicPlanFullGame = () => {
+export const WithOwnedActiveBasicPlanFullGame = (): React.Node => {
   return (
     <MarketingPlansStory
       gameFeaturings={[
@@ -586,7 +586,7 @@ export const WithOwnedActiveBasicPlanFullGame = () => {
   );
 };
 
-export const WithOwnedExpiredBasicPlan = () => {
+export const WithOwnedExpiredBasicPlan = (): React.Node => {
   return (
     <MarketingPlansStory
       gameFeaturings={[
@@ -602,7 +602,7 @@ export const WithOwnedExpiredBasicPlan = () => {
   );
 };
 
-export const WithOwnedProPlan = () => {
+export const WithOwnedProPlan = (): React.Node => {
   return (
     <MarketingPlansStory
       gameFeaturings={[
@@ -639,7 +639,7 @@ export const WithOwnedProPlan = () => {
   );
 };
 
-export const WithOwnedPremiumPlan = () => {
+export const WithOwnedPremiumPlan = (): React.Node => {
   return (
     <MarketingPlansStory
       gameFeaturings={[

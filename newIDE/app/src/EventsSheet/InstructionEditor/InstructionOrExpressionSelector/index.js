@@ -55,21 +55,23 @@ type Props<T> = {|
 
 const InstructionOrExpressionSelector = <
   T: EnumeratedInstructionOrExpressionMetadata
->({
-  focusOnMount,
-  instructionsInfo,
-  instructionsInfoTree,
-  selectedType,
-  onChoose,
-  iconSize,
-  useSubheaders,
-  searchPlaceholderObjectName,
-  searchPlaceholderIsCondition,
-  helpPagePath,
-  style,
-  onClickMore,
-  id,
-}: Props<T>) => {
+>(
+  {
+    focusOnMount,
+    instructionsInfo,
+    instructionsInfoTree,
+    selectedType,
+    onChoose,
+    iconSize,
+    useSubheaders,
+    searchPlaceholderObjectName,
+    searchPlaceholderIsCondition,
+    helpPagePath,
+    style,
+    onClickMore,
+    id
+  }: Props<T>,
+): any => {
   const searchBarRef = React.useRef<?SearchBarInterface>(null);
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
   const selectedItemRef = React.useRef<?ListItemRefType>(null);

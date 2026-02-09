@@ -130,19 +130,21 @@ type Props = {|
   onEffectAdded: () => void,
 |};
 
-export const CompactLayerPropertiesEditor = ({
-  project,
-  resourceManagementProps,
-  layersContainer,
-  projectScopedContainersAccessor,
-  unsavedChanges,
-  i18n,
-  layer,
-  onEditLayer,
-  onEditLayerEffects,
-  onLayersModified,
-  onEffectAdded,
-}: Props) => {
+export const CompactLayerPropertiesEditor = (
+  {
+    project,
+    resourceManagementProps,
+    layersContainer,
+    projectScopedContainersAccessor,
+    unsavedChanges,
+    i18n,
+    layer,
+    onEditLayer,
+    onEditLayerEffects,
+    onLayersModified,
+    onEffectAdded
+  }: Props,
+): React.Node => {
   const forceUpdate = useForceUpdate();
   const [isPropertiesFoldedOrDefault, setIsPropertiesFolded] = React.useState<
     boolean | null

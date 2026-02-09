@@ -18,7 +18,7 @@ import Text from '../../../UI/Text';
 export default {
   title: 'User chips/UserChip',
   component: UserChipComponent,
-  decorators: [getPaperDecorator('medium')],
+  decorators: [getPaperDecorator('medium') as StoryDecorator],
 };
 
 const LoggedOut = () => {
@@ -55,7 +55,7 @@ const SignedInWithSubscription = () => {
   );
 };
 
-export const UserChips = () => (
+export const UserChips = (): React.Node => (
   <ColumnStackLayout>
     <Text>Logged Out</Text>
     <LoggedOut />

@@ -23,7 +23,7 @@ type Props = {|
   children: React.Node,
 |};
 
-const VerticallyCenterWithBar = (props: Props) => {
+const VerticallyCenterWithBar = (props: Props): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (

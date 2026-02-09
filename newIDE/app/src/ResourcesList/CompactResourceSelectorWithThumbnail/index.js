@@ -42,15 +42,17 @@ type Props = {|
   id?: string,
 |};
 
-export const CompactResourceSelectorWithThumbnail = ({
-  project,
-  resourceManagementProps,
-  resourceKind,
-  resourceName,
-  defaultNewResourceName,
-  onChange,
-  id,
-}: Props) => {
+export const CompactResourceSelectorWithThumbnail = (
+  {
+    project,
+    resourceManagementProps,
+    resourceKind,
+    resourceName,
+    defaultNewResourceName,
+    onChange,
+    id
+  }: Props,
+): React.Node => {
   const resourcesLoader = ResourcesLoader;
   const forceUpdate = useForceUpdate();
   const displayThumbnail = resourcesKindsWithThumbnail.includes(resourceKind);

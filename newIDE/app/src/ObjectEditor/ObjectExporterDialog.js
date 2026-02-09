@@ -48,12 +48,14 @@ type DownloadResourcesAsBlobsOptions = {
   onProgress: (count: number, total: number) => void,
 };
 
-export const downloadResourcesAsBlobs = async ({
-  project,
-  resourceNames,
-  onAddBlobFile,
-  onProgress,
-}: DownloadResourcesAsBlobsOptions) => {
+export const downloadResourcesAsBlobs = async (
+  {
+    project,
+    resourceNames,
+    onAddBlobFile,
+    onProgress
+  }: DownloadResourcesAsBlobsOptions,
+): Promise<{ erroredResources: Array<empty> }> => {
   const result = {
     erroredResources: [],
   };
@@ -217,7 +219,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const ObjectExporterDialog = ({ project, layout: scene, onClose }: Props) => {
+const ObjectExporterDialog = ({project, layout: scene, onClose}: Props): React.Node => {
   const [
     zippedSceneAssetsBlob,
     setZippedSceneAssetsBlob,

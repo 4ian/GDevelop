@@ -48,7 +48,7 @@ function LeaderboardOptionsDialog({
   onClose,
   onSave,
   leaderboard,
-}: Props) {
+}: Props): React.Node {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const canDisableLoginInLeaderboard =

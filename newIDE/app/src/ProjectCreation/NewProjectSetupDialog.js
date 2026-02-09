@@ -71,11 +71,11 @@ const app = remote ? remote.app : null;
 export const getItemsColumns = (
   windowSize: WindowSizeType,
   isLandscape: boolean
-) => {
+): number => {
   return windowSize === 'small' && !isLandscape ? 2 : 4;
 };
 
-export const generateProjectName = (nameToAppend: ?string) =>
+export const generateProjectName = (nameToAppend: ?string): string =>
   (nameToAppend ? `${generateName()} (${nameToAppend})` : generateName()).slice(
     0,
     CLOUD_PROJECT_NAME_MAX_LENGTH

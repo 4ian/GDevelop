@@ -38,14 +38,7 @@ type Props = {|
   id?: string,
 |};
 
-const VerticalTabButton = ({
-  label,
-  getIcon,
-  onClick,
-  isActive,
-  hideLabel,
-  id,
-}: Props) => {
+const VerticalTabButton = ({label, getIcon, onClick, isActive, hideLabel, id}: Props): React.Node => {
   return (
     <Button
       variant={isActive ? 'contained' : 'text'}

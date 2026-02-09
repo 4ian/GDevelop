@@ -26,7 +26,7 @@ type Props = {|
 /** Below this value, rendering the grid is too costly (risk of infinite loop/memory saturation). */
 const GRID_MIN_VALUE = 0.01;
 
-export default function SetupGridDialog(props: Props) {
+export default function SetupGridDialog(props: Props): React.Node {
   const [previousOptions] = React.useState(() =>
     cloneInstancesEditorSettings(props.instancesEditorSettings)
   );

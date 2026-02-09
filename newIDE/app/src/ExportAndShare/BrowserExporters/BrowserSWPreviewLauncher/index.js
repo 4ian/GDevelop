@@ -76,7 +76,7 @@ export default class BrowserSWPreviewLauncher extends React.Component<
   PreviewLauncherProps,
   State
 > {
-  canDoNetworkPreview = () => false;
+  canDoNetworkPreview = (): any => false;
 
   state = {
     error: null,
@@ -87,9 +87,7 @@ export default class BrowserSWPreviewLauncher extends React.Component<
     browserPreviewDebuggerServer.closeAllConnections();
   };
 
-  immediatelyPreparePreviewWindows = (
-    options: PreparePreviewWindowsOptions
-  ) => {
+  immediatelyPreparePreviewWindows = (options: PreparePreviewWindowsOptions): any => {
     const debuggerIds = options.isForInGameEdition
       ? this.getPreviewDebuggerServer().getExistingEmbeddedGameFrameDebuggerIds()
       : this.getPreviewDebuggerServer().getExistingPreviewDebuggerIds();
@@ -402,11 +400,11 @@ export default class BrowserSWPreviewLauncher extends React.Component<
     }
   };
 
-  getPreviewDebuggerServer() {
+  getPreviewDebuggerServer(): any {
     return browserPreviewDebuggerServer;
   }
 
-  render() {
+  render(): any {
     const { error } = this.state;
 
     if (error) {

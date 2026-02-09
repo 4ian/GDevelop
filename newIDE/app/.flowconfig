@@ -20,9 +20,16 @@
 <PROJECT_ROOT>/node_modules/@lingui/core/.*
 # JSS triggers a Flow error
 <PROJECT_ROOT>/node_modules/jss/src/index.js
+# flow-typed definitions have deprecated syntax (existential type *, etc.)
+<PROJECT_ROOT>/flow-typed/.*
+# GDevelop.js types have some incompatibilities with newer Flow
+<PROJECT_ROOT>/../../GDevelop.js/types/.*
+# Old Flow lib files (DOM, BOM, etc.) have deprecated syntax
+<PROJECT_ROOT>/flow-libs/.*
 
 [libs]
 ../../GDevelop.js/types
+flow-libs
 
 [options]
 module.ignore_non_literal_requires=true

@@ -240,10 +240,10 @@ export default function ExpressionAutocompletionsDisplayer({
   onChoose,
   onScroll,
   parameterRenderingService,
-}: Props) {
+}: Props): React.Node {
   const scrollView = React.useRef((null: ?ScrollViewInterface));
   const selectedAutocompletionElement = React.useRef(
-    (null: ?React$Component<any, any>)
+    (null: ?React.Component<any, any>)
   );
   React.useEffect(
     () => {

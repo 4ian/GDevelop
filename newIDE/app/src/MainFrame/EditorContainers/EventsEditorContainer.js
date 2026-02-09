@@ -20,7 +20,7 @@ import {
 export class EventsEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?EventsSheetInterface;
 
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     // We stop updates when the component is inactive.
     // If it's active, was active or becoming active again we let update propagate.
     // Especially important to note that when becoming inactive, a "last" update is allowed.
@@ -122,7 +122,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     });
   };
 
-  onCreateEventsFunction = (extensionName, eventsFunction) => {
+  onCreateEventsFunction = (extensionName: any, eventsFunction: any) => {
     this.props.onCreateEventsFunction(
       extensionName,
       eventsFunction,
@@ -130,7 +130,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     );
   };
 
-  render() {
+  render(): any {
     const { project, projectItemName } = this.props;
     const layout = this.getLayout();
     if (!layout || !project) {
@@ -172,6 +172,4 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
   }
 }
 
-export const renderEventsEditorContainer = (
-  props: RenderEditorContainerPropsWithRef
-) => <EventsEditorContainer {...props} />;
+export const renderEventsEditorContainer = (props: RenderEditorContainerPropsWithRef): React.Node => <EventsEditorContainer {...props} />;

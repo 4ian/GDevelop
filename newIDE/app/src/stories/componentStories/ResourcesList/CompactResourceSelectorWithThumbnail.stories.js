@@ -20,7 +20,7 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
-export const Default = () => {
+export const Default = (): React.Node => {
   return (
     <ElementHighlighterProvider
       elements={[{ label: 'Default', id: 'default' }]}

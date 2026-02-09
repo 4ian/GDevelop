@@ -69,7 +69,7 @@ type Props = {|
   cloudProjectId: ?string,
 |};
 
-const InviteHome = ({ cloudProjectId }: Props) => {
+const InviteHome = ({cloudProjectId}: Props): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile, limits } = authenticatedUser;
   const isOnline = useOnlineStatus();

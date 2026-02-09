@@ -13,7 +13,7 @@ type Props = {|
   onClick: () => void,
 |};
 
-const PlayButton = (props: Props) => {
+const PlayButton = (props: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const playButtonTheme =
     gdevelopTheme.soundPlayer.playButton[

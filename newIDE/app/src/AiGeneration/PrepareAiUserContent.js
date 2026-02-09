@@ -90,19 +90,30 @@ const computeSha256 = (payload: string): string => {
  * so that the request will just refer to the key where it's stored, or
  * return the content so it's sent as part of the request itself (if it's small enough).
  */
-export const prepareAiUserContent = async ({
-  getAuthorizationHeader,
-  userId,
-  simplifiedProjectJson,
-  projectSpecificExtensionsSummaryJson,
-  eventsJson,
-}: {|
-  getAuthorizationHeader: () => Promise<string>,
-  userId: string,
-  simplifiedProjectJson: string | null,
-  projectSpecificExtensionsSummaryJson: string | null,
-  eventsJson?: string | null,
-|}) => {
+export const prepareAiUserContent = async (
+  {
+    getAuthorizationHeader,
+    userId,
+    simplifiedProjectJson,
+    projectSpecificExtensionsSummaryJson,
+    eventsJson
+  }: {|
+    getAuthorizationHeader: () => Promise<string>,
+    userId: string,
+    simplifiedProjectJson: string | null,
+    projectSpecificExtensionsSummaryJson: string | null,
+    eventsJson?: string | null,
+  |},
+): Promise<
+  {
+    eventsJson: null | string,
+    eventsJsonUserRelativeKey: null | string,
+    gameProjectJson: null | string,
+    gameProjectJsonUserRelativeKey: null | string,
+    projectSpecificExtensionsSummaryJson: null | string,
+    projectSpecificExtensionsSummaryJsonUserRelativeKey: null | string,
+  },
+> => {
   // Hash the contents, if provided, to then upload it only once (as long as the hash stays
   // the same, no need to re-upload it for a while).
   // If the content is not provided, no hash is computed because there is no content to upload.

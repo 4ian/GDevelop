@@ -89,16 +89,16 @@ export default class BrowserFileSystem {
       }));
   };
 
-  mkDir = (path: string) => {
+  mkDir = (path: string): any => {
     // "Directories" are assumed to exist.
     return true;
   };
-  dirExists = (path: string) => {
+  dirExists = (path: string): any => {
     // TODO: To be changed to be EnsureDirExists.
     // "Directories" are assumed to exist.
     return true;
   };
-  clearDir = (path: string) => {
+  clearDir = (path: string): any => {
     // Clear the files to be written in the specified directory.
     const filePaths = Object.keys(this._textFiles);
     filePaths.forEach(filePath => {
@@ -109,16 +109,16 @@ export default class BrowserFileSystem {
 
     return true;
   };
-  getTempDir = () => {
+  getTempDir = (): any => {
     return '/browser-file-system-tmp-dir';
   };
-  fileNameFrom = (fullpath: string) => {
+  fileNameFrom = (fullpath: string): any => {
     return pathPosix.basename(fullpath);
   };
-  dirNameFrom = (fullpath: string) => {
+  dirNameFrom = (fullpath: string): any => {
     return pathPosix.dirname(fullpath);
   };
-  makeAbsolute = (filePathOrURL: string, baseDirectoryOrURL: string) => {
+  makeAbsolute = (filePathOrURL: string, baseDirectoryOrURL: string): any => {
     // URLs are always absolute
     if (isURL(filePathOrURL)) return filePathOrURL;
 
@@ -134,7 +134,7 @@ export default class BrowserFileSystem {
       pathPosix.normalize(filePathOrURL)
     );
   };
-  makeRelative = (filePathOrURL: string, baseDirectoryOrURL: string) => {
+  makeRelative = (filePathOrURL: string, baseDirectoryOrURL: string): any => {
     if (isURL(filePathOrURL)) {
       // Cutting the start if the URL is relative to the base URL
       if (filePathOrURL.indexOf(baseDirectoryOrURL) === 0) {
@@ -154,7 +154,7 @@ export default class BrowserFileSystem {
       pathPosix.normalize(filePathOrURL)
     );
   };
-  isAbsolute = (fullpath: string) => {
+  isAbsolute = (fullpath: string): any => {
     // URLs are always absolute
     if (isURL(fullpath)) return true;
 
@@ -162,7 +162,7 @@ export default class BrowserFileSystem {
     return fullpath.length > 0 && fullpath.charAt(0) === '/';
   };
 
-  copyFile = (source: string, dest: string) => {
+  copyFile = (source: string, dest: string): any => {
     // URLs are not copied, but marked as to be downloaded.
     if (isURL(source)) {
       if (isURL(dest)) {
@@ -202,7 +202,7 @@ export default class BrowserFileSystem {
     return false;
   };
 
-  writeToFile = (filePath: string, content: string) => {
+  writeToFile = (filePath: string, content: string): any => {
     this._textFiles[pathPosix.normalize(filePath)] = content;
     return true;
   };
@@ -214,7 +214,7 @@ export default class BrowserFileSystem {
     return '';
   };
 
-  readDir = (path: string, ext: string) => {
+  readDir = (path: string, ext: string): any => {
     ext = ext.toUpperCase();
     var output = new gd.VectorString();
 
@@ -233,7 +233,7 @@ export default class BrowserFileSystem {
     return output;
   };
 
-  fileExists = (filePath: string) => {
+  fileExists = (filePath: string): any => {
     if (isURL(filePath)) return true;
 
     const normalizedFilePath = pathPosix.normalize(filePath);

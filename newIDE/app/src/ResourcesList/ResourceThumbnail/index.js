@@ -23,18 +23,20 @@ export const resourcesKindsWithThumbnail = ['image', 'model3D'];
 /**
  * Display the right thumbnail for any given resource of a project
  */
-const ResourceThumbnail = ({
-  project,
-  resourceName,
-  resourcesLoader,
-  resourceKind,
-  style,
-  selectable,
-  selected,
-  onSelect,
-  onContextMenu,
-  size,
-}: Props) => {
+const ResourceThumbnail = (
+  {
+    project,
+    resourceName,
+    resourcesLoader,
+    resourceKind,
+    style,
+    selectable,
+    selected,
+    onSelect,
+    onContextMenu,
+    size
+  }: Props,
+): React.Node => {
   switch (resourceKind) {
     case 'image':
       return (

@@ -55,7 +55,7 @@ const elementIdToTooltip = {
   },
 };
 
-export const Default = () => {
+export const Default = (): React.Node => {
   const [listItemRef, setListItemRef] = React.useState<any>(null);
   const [
     elementToHighlight,

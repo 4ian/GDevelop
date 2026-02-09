@@ -73,7 +73,7 @@ export default class SelectionRectangle {
     };
   }
 
-  hasStartedSelectionRectangle() {
+  hasStartedSelectionRectangle(): any {
     return this.selectionRectangleStart;
   }
 
@@ -89,7 +89,7 @@ export default class SelectionRectangle {
     this.selectionRectangleEnd = { x: lastX, y: lastY };
   };
 
-  endSelectionRectangle = () => {
+  endSelectionRectangle = (): any => {
     if (!this.selectionRectangleStart || !this.selectionRectangleEnd) return [];
 
     this._instancesInSelectionRectangle.length = 0;
@@ -113,7 +113,7 @@ export default class SelectionRectangle {
     return this._instancesInSelectionRectangle;
   };
 
-  getPixiObject() {
+  getPixiObject(): any {
     return this.pixiRectangle;
   }
 

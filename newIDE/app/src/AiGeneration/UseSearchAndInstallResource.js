@@ -17,13 +17,19 @@ import { applyResourceDefaults } from '../ResourcesList/ResourceUtils';
 
 import PromisePool from '@supercharge/promise-pool';
 
-export const useSearchAndInstallResource = ({
-  project,
-  resourceManagementProps,
-}: {|
-  project: ?gdProject,
-  resourceManagementProps: ResourceManagementProps,
-|}) => {
+export const useSearchAndInstallResource = (
+  {
+    project,
+    resourceManagementProps
+  }: {|
+    project: ?gdProject,
+    resourceManagementProps: ResourceManagementProps,
+  |},
+): {
+  searchAndInstallResources: (
+    ResourceSearchAndInstallOptions
+  ) => Promise<ResourceSearchAndInstallResult>,
+} => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );

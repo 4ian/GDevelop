@@ -170,7 +170,7 @@ export const initialAuthenticatedUser = {
   onSendEmailVerification: async () => {},
   onOpenEmailVerificationDialog: () => {},
   onAcceptGameStatsEmail: async () => {},
-  getAuthorizationHeader: () => Promise.reject(new Error('Unimplemented')),
+  getAuthorizationHeader: (): Promise<> => Promise.reject(new Error('Unimplemented')),
   achievements: null,
 };
 
@@ -182,12 +182,17 @@ export const authenticatedUserLoggedOutAttributes = {
   // Use this loginState to make sure this is understood by the app as a user logged out, and not loading.
   loginState: 'done',
   badges: null,
-  cloudProjects: [], // Initialize to empty array to indicate that the loading is done.
+  cloudProjects: [] // Initialize to empty array to indicate that the loading is done.
+ as Array<empty>
   cloudProjectsFetchingErrorLabel: null,
-  receivedAssetPacks: [], // Initialize to empty array to indicate that the loading is done.
-  receivedAssetShortHeaders: [], // Initialize to empty array to indicate that the loading is done.
-  receivedGameTemplates: [], // Initialize to empty array to indicate that the loading is done.
-  receivedBundles: [], // Initialize to empty array to indicate that the loading is done.
+  receivedAssetPacks: [] // Initialize to empty array to indicate that the loading is done.
+ as Array<empty>
+  receivedAssetShortHeaders: [] // Initialize to empty array to indicate that the loading is done.
+ as Array<empty>
+  receivedGameTemplates: [] // Initialize to empty array to indicate that the loading is done.
+ as Array<empty>
+  receivedBundles: [] // Initialize to empty array to indicate that the loading is done.
+ as Array<empty>
   subscription: null,
   subscriptionPricingSystem: null,
   userEarningsBalance: null,
@@ -195,7 +200,7 @@ export const authenticatedUserLoggedOutAttributes = {
   limits: null,
 };
 
-const AuthenticatedUserContext = React.createContext<AuthenticatedUser>(
+const AuthenticatedUserContext: React.Context<AuthenticatedUser> = React.createContext<AuthenticatedUser>(
   initialAuthenticatedUser
 );
 

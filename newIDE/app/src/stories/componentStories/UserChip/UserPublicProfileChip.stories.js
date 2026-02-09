@@ -11,7 +11,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const UserPublicProfileChip = () => (
+export const UserPublicProfileChip = (): React.Node => (
   <UserPublicProfileChipComponent
     user={{
       id: '123',

@@ -75,9 +75,7 @@ export const filterEnumeratedBehaviorMetadata = (
   });
 };
 
-export const isBehaviorDefaultCapability = (
-  behaviorMetadata: gdBehaviorMetadata
-) => {
+export const isBehaviorDefaultCapability = (behaviorMetadata: gdBehaviorMetadata): boolean => {
   return (
     behaviorMetadata.getName().includes('Capability') ||
     behaviorMetadata.getName() === 'Scene3D::Base3DBehavior'

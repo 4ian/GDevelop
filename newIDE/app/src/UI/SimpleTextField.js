@@ -44,7 +44,7 @@ const stopPropagation = e => e.stopPropagation();
  * A text field, inspired from Material UI, but lightweight
  * and faster to render (2 DOM elements, uncontrolled, pure CSS styling).
  */
-export const SimpleTextField = React.memo<
+export const SimpleTextField: component(...SimpleTextFieldProps) = React.memo<
   SimpleTextFieldProps,
   SimpleTextFieldInterface
 >(

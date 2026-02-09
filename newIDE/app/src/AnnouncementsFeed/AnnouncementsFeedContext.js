@@ -21,7 +21,7 @@ type AnnouncementsFeedState = {|
   fetchAnnouncementsAndPromotions: () => Promise<void>,
 |};
 
-export const AnnouncementsFeedContext = React.createContext<AnnouncementsFeedState>(
+export const AnnouncementsFeedContext: React.Context<AnnouncementsFeedState> = React.createContext<AnnouncementsFeedState>(
   {
     announcements: null,
     promotions: null,
@@ -34,9 +34,7 @@ type AnnouncementsFeedStateProviderProps = {|
   children: React.Node,
 |};
 
-export const AnnouncementsFeedStateProvider = ({
-  children,
-}: AnnouncementsFeedStateProviderProps) => {
+export const AnnouncementsFeedStateProvider = ({children}: AnnouncementsFeedStateProviderProps): React.MixedElement => {
   const [announcements, setAnnouncements] = React.useState<?(Announcement[])>(
     null
   );

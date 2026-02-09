@@ -48,12 +48,7 @@ type AnnouncementsFeedProps = {|
   hideLoader?: boolean,
 |};
 
-export const AnnouncementsFeed = ({
-  level,
-  canClose,
-  addMargins,
-  hideLoader,
-}: AnnouncementsFeedProps) => {
+export const AnnouncementsFeed = ({level, canClose, addMargins, hideLoader}: AnnouncementsFeedProps): React.Node => {
   const {
     announcements,
     error,

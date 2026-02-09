@@ -57,7 +57,12 @@ export type CompactTextFieldProps = {|
   onWheel?: WheelEvent => void,
 |};
 
-const CompactTextField = React.forwardRef<
+const CompactTextField: component(
+  ...{
+    ...CompactTextFieldProps,
+    +ref?: React.RefSetter<CompactTextFieldInterface>,
+  }
+) = React.forwardRef<
   CompactTextFieldProps,
   CompactTextFieldInterface
 >(

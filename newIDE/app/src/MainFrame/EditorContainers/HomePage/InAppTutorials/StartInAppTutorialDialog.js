@@ -134,15 +134,17 @@ type Props = {|
   startTutorial: (scenario: 'resume' | 'startOver' | 'start') => Promise<void>,
 |};
 
-const StartInAppTutorialDialog = ({
-  open,
-  tutorialId,
-  onClose,
-  tutorialCompletionStatus,
-  isProjectOpened,
-  startTutorial,
-  isProjectOpening,
-}: Props) => {
+const StartInAppTutorialDialog = (
+  {
+    open,
+    tutorialId,
+    onClose,
+    tutorialCompletionStatus,
+    isProjectOpened,
+    startTutorial,
+    isProjectOpening
+  }: Props,
+): React.Node => {
   const { getInAppTutorialShortHeader } = React.useContext(
     InAppTutorialContext
   );

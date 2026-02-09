@@ -91,10 +91,7 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
 |};
 
-export const QuickTitleTweaker = ({
-  project,
-  resourceManagementProps,
-}: Props) => {
+export const QuickTitleTweaker = ({project, resourceManagementProps}: Props): React.Node => {
   const titleObject = React.useMemo(
     () => {
       for (let i = 0; i < project.getLayoutsCount(); i++) {

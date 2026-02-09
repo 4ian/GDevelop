@@ -20,7 +20,7 @@ const gd: libGDevelop = global.gd;
 
 export const CLIPBOARD_KIND = 'EventsAndInstructions';
 
-export const hasClipboardEvents = () => {
+export const hasClipboardEvents = (): boolean => {
   if (!Clipboard.has(CLIPBOARD_KIND)) return false;
   const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
   const eventsCount = SafeExtractor.extractNumberProperty(
@@ -32,7 +32,7 @@ export const hasClipboardEvents = () => {
   return eventsCount > 0;
 };
 
-export const hasClipboardConditions = () => {
+export const hasClipboardConditions = (): boolean => {
   if (!Clipboard.has(CLIPBOARD_KIND)) return false;
   const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
   const conditionsCount = SafeExtractor.extractNumberProperty(
@@ -44,7 +44,7 @@ export const hasClipboardConditions = () => {
   return conditionsCount > 0;
 };
 
-export const hasClipboardActions = () => {
+export const hasClipboardActions = (): boolean => {
   if (!Clipboard.has(CLIPBOARD_KIND)) return false;
   const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
   const actionsCount = SafeExtractor.extractNumberProperty(
@@ -239,7 +239,7 @@ export const pasteInstructionsFromClipboardInSelection = (
 export const pasteInstructionsFromClipboardInInstructionsList = (
   project: gdProject,
   instructionsListContext: InstructionsListContext
-) => {
+): void | boolean => {
   if (!hasClipboardConditions() && !hasClipboardActions()) return false;
 
   const clipboardContent = Clipboard.get(CLIPBOARD_KIND);

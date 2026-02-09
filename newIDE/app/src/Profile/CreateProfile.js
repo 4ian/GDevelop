@@ -22,12 +22,7 @@ type Props = {|
   justifyContent?: 'center',
 |};
 
-const CreateProfile = ({
-  message,
-  onOpenLoginDialog,
-  onOpenCreateAccountDialog,
-  justifyContent,
-}: Props) => (
+const CreateProfile = ({message, onOpenLoginDialog, onOpenCreateAccountDialog, justifyContent}: Props): renders any => (
   <Column alignItems="center">
     <div style={styles.container}>
       <ColumnStackLayout>

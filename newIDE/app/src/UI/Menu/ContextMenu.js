@@ -155,18 +155,25 @@ const ContextMenu = electron ? ElectronContextMenu : MaterialUIContextMenu;
 export default React.forwardRef<ContextMenuWrapperProps, ContextMenuInterface>(
   (props, ref) => {
     const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
-    React.useImperativeHandle(ref, () => ({
-      open: (x, y, options) => {
-        if (contextMenuRef.current) contextMenuRef.current.open(x, y, options);
-      },
-    }));
-
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        open: (x, y, options) => {
+          if (contextMenuRef.current)
+            contextMenuRef.current.open(x, y, options);
+        },
+      }),
+    );
+    
     return (
       <I18n>
-        {({ i18n }) => (
-          <ContextMenu {...props} i18n={i18n} ref={contextMenuRef} />
-        )}
+        {({i18n}) => <ContextMenu {...props} i18n={i18n} ref={contextMenuRef} />}
       </I18n>
     );
+  },
+) as component(
+  ...{
+    ...ContextMenuWrapperProps,
+    +ref?: React.RefSetter<ContextMenuInterface>,
   }
-);
+) renders React$Node;

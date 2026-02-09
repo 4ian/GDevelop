@@ -96,12 +96,7 @@ type ChartProps = {|
   fontSize?: 'small' | 'medium',
 |};
 
-export const SessionsChart = ({
-  i18n,
-  chartData,
-  height,
-  fontSize,
-}: ChartProps) => {
+export const SessionsChart = ({i18n, chartData, height, fontSize}: ChartProps): renders any => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
 
@@ -155,12 +150,7 @@ export const SessionsChart = ({
   );
 };
 
-export const BounceRateChart = ({
-  i18n,
-  chartData,
-  height,
-  fontSize,
-}: ChartProps) => {
+export const BounceRateChart = ({i18n, chartData, height, fontSize}: ChartProps): renders any => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
 
@@ -205,12 +195,7 @@ export const BounceRateChart = ({
   );
 };
 
-export const MeanPlayTimeChart = ({
-  i18n,
-  chartData,
-  height,
-  fontSize,
-}: ChartProps) => {
+export const MeanPlayTimeChart = ({i18n, chartData, height, fontSize}: ChartProps): renders any => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
 
@@ -255,12 +240,7 @@ export const MeanPlayTimeChart = ({
   );
 };
 
-export const PlayersRepartitionPerDurationChart = ({
-  i18n,
-  chartData,
-  height,
-  fontSize,
-}: ChartProps) => {
+export const PlayersRepartitionPerDurationChart = ({i18n, chartData, height, fontSize}: ChartProps): renders any => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
   return (
@@ -309,12 +289,7 @@ export const PlayersRepartitionPerDurationChart = ({
   );
 };
 
-export const PlayersDurationPerDayChart = ({
-  i18n,
-  chartData,
-  height,
-  fontSize,
-}: ChartProps) => {
+export const PlayersDurationPerDayChart = ({i18n, chartData, height, fontSize}: ChartProps): renders any => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
 

@@ -18,29 +18,29 @@ const defaultProps = {
   createAccountInProgress: false,
   error: null,
 };
-export const Default = () => <CreateAccountDialog {...defaultProps} />;
+export const Default = (): renders any => <CreateAccountDialog {...defaultProps} />;
 
-export const PasswordErrorFromBackend = () => (
+export const PasswordErrorFromBackend = (): renders any => (
   <CreateAccountDialog
     {...defaultProps}
     error={{ code: 'auth/weak-password' }}
   />
 );
 
-export const EmailErrorFromBackend = () => (
+export const EmailErrorFromBackend = (): renders any => (
   <CreateAccountDialog
     {...defaultProps}
     error={{ code: 'auth/invalid-email' }}
   />
 );
 
-export const AccountExists = () => (
+export const AccountExists = (): renders any => (
   <CreateAccountDialog
     {...defaultProps}
     error={{ code: 'auth/account-exists-with-different-credential' }}
   />
 );
 
-export const Submitting = () => (
+export const Submitting = (): renders any => (
   <CreateAccountDialog {...defaultProps} createAccountInProgress />
 );

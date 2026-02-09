@@ -25,7 +25,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => {
+export const Default = (): renders any => {
   const extensionCdnMock = React.useMemo(() => {
     const mock = new MockAdapter(cdnClient, {
       delayResponse: 250,
@@ -63,7 +63,7 @@ export const Default = () => {
   );
 };
 
-export const BeingInstalled = () => {
+export const BeingInstalled = (): renders any => {
   const extensionCdnMock = React.useMemo(() => {
     const mock = new MockAdapter(cdnClient, {
       delayResponse: 250,
@@ -101,7 +101,7 @@ export const BeingInstalled = () => {
   );
 };
 
-export const IncompatibleGdevelopVersion = () => {
+export const IncompatibleGdevelopVersion = (): renders any => {
   const extensionCdnMock = React.useMemo(() => {
     const mock = new MockAdapter(cdnClient, {
       delayResponse: 250,
@@ -139,7 +139,7 @@ export const IncompatibleGdevelopVersion = () => {
   );
 };
 
-export const AlreadyInstalled = () => {
+export const AlreadyInstalled = (): renders any => {
   const extensionCdnMock = React.useMemo(() => {
     const mock = new MockAdapter(cdnClient, {
       delayResponse: 250,
@@ -177,7 +177,7 @@ export const AlreadyInstalled = () => {
   );
 };
 
-export const Outdated = () => {
+export const Outdated = (): renders any => {
   const extensionCdnMock = React.useMemo(() => {
     const mock = new MockAdapter(cdnClient, {
       delayResponse: 250,
@@ -215,7 +215,7 @@ export const Outdated = () => {
   );
 };
 
-export const AlreadyInstalledCommunityExtension = () => {
+export const AlreadyInstalledCommunityExtension = (): renders any => {
   const extensionCdnMock = React.useMemo(() => {
     const mock = new MockAdapter(cdnClient, {
       delayResponse: 250,
@@ -253,7 +253,7 @@ export const AlreadyInstalledCommunityExtension = () => {
   );
 };
 
-export const WithServerSideError = () => {
+export const WithServerSideError = (): renders any => {
   const extensionCdnMock = React.useMemo(() => {
     const mock = new MockAdapter(cdnClient, {
       delayResponse: 250,
@@ -291,7 +291,7 @@ export const WithServerSideError = () => {
   );
 };
 
-export const CommunityExtension = () => {
+export const CommunityExtension = (): renders any => {
   const extensionCdnMock = React.useMemo(() => {
     const mock = new MockAdapter(cdnClient, {
       delayResponse: 250,

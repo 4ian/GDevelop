@@ -10,10 +10,10 @@ import { ColumnStackLayout } from '../../../UI/Layout';
 export default {
   title: 'UI Building Blocks/HotMessage',
   component: HotMessage,
-  decorators: [getPaperDecorator('medium')],
+  decorators: [getPaperDecorator('medium') as StoryDecorator],
 };
 
-export const Default = () => (
+export const Default = (): renders any => (
   <ColumnStackLayout>
     <HotMessage
       title="Get 2 months free!"

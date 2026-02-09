@@ -26,11 +26,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const CoursePurchaseDialog = ({
-  course,
-  courseListingData,
-  onClose,
-}: Props) => {
+const CoursePurchaseDialog = ({course, courseListingData, onClose}: Props): renders Fragment => {
   const {
     profile,
     onOpenLoginDialog,

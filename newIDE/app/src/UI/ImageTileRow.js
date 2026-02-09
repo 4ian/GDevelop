@@ -27,18 +27,20 @@ type ImageTileRowProps = {|
   margin?: 'dense',
 |};
 
-const ImageTileRow = ({
-  title,
-  description,
-  isLoading,
-  items,
-  onShowAll,
-  showAllIcon,
-  getLimitFromWindowSize,
-  getColumnsFromWindowSize,
-  seeAllLabel,
-  margin,
-}: ImageTileRowProps) => {
+const ImageTileRow = (
+  {
+    title,
+    description,
+    isLoading,
+    items,
+    onShowAll,
+    showAllIcon,
+    getLimitFromWindowSize,
+    getColumnsFromWindowSize,
+    seeAllLabel,
+    margin
+  }: ImageTileRowProps,
+): renders Fragment => {
   return (
     <>
       <LineStackLayout

@@ -93,7 +93,7 @@ const creditsPackageListingDatas: CreditsPackageListingData[] = [
   },
 ];
 
-export const Loading = () => {
+export const Loading = (): renders any => {
   return (
     <CreditsPackageStoreContext.Provider
       value={{
@@ -114,7 +114,7 @@ export const Loading = () => {
   );
 };
 
-export const Loaded = () => {
+export const Loaded = (): renders any => {
   return (
     <CreditsPackageStoreContext.Provider
       value={{
@@ -135,7 +135,7 @@ export const Loaded = () => {
   );
 };
 
-export const WithSuggestedPackageAndMissingCredits = () => {
+export const WithSuggestedPackageAndMissingCredits = (): renders any => {
   return (
     <CreditsPackageStoreContext.Provider
       value={{

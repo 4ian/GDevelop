@@ -131,7 +131,7 @@ export const initialAssetStoreState: AssetStoreState = {
   getAssetShortHeaderFromId: (id: string) => null,
 };
 
-export const AssetStoreContext = React.createContext<AssetStoreState>(
+export const AssetStoreContext: React.Context<AssetStoreState> = React.createContext<AssetStoreState>(
   initialAssetStoreState
 );
 
@@ -156,9 +156,7 @@ const getPrivateAssetPackListingDataSearchTerms = (
   privateAssetPack: PrivateAssetPackListingData
 ) => privateAssetPack.name + '\n' + privateAssetPack.description;
 
-export const AssetStoreStateProvider = ({
-  children,
-}: AssetStoreStateProviderProps) => {
+export const AssetStoreStateProvider = ({children}: AssetStoreStateProviderProps): React.MixedElement => {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const { searchText } = shopNavigationState;
 

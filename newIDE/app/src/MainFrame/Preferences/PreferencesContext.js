@@ -358,11 +358,11 @@ export const initialPreferences = {
     language: 'en',
     autoDownloadUpdates: true,
     themeName:
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'GDevelop default Dark'
-        : // TODO: Use the light theme back when it's adapted to the modern theme.
-          'GDevelop default Dark',
+      (typeof window !== 'undefined' &&
+  window.matchMedia('(prefers-color-scheme: dark)').matches
+  ? 'GDevelop default Dark'
+  : // TODO: Use the light theme back when it's adapted to the modern theme.
+  'GDevelop default Dark') as string,
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},
@@ -379,11 +379,11 @@ export const initialPreferences = {
     showEffectParameterNames: false,
     projectLastUsedPaths: {},
     defaultEditorMosaicNodes: {},
-    recentProjectFiles: [],
+    recentProjectFiles: [] as Array<empty>,
     autoOpenMostRecentProject: true,
     hasProjectOpened: false,
     userShortcutMap: {},
-    newObjectDialogDefaultTab: electron ? 'new-object' : 'asset-store',
+    newObjectDialogDefaultTab: (electron ? 'new-object' : 'asset-store') as string,
     shareDialogDefaultTab: 'publish',
     isMenuBarHiddenInPreview: true,
     isAlwaysOnTopInPreview: false,
@@ -395,10 +395,10 @@ export const initialPreferences = {
     showInAppTutorialDeveloperMode: false,
     openDiagnosticReportAutomatically: true,
     showDeprecatedInstructionWarning: false,
-    use3DEditor: isWebGLSupported(),
+    use3DEditor: isWebGLSupported() as boolean,
     showBasicProfilingCounters: false,
     inAppTutorialsProgress: {},
-    newProjectsDefaultFolder: app ? findDefaultFolder(app) : '',
+    newProjectsDefaultFolder: (app ? findDefaultFolder(app) : '') as string,
     newProjectsDefaultStorageProviderName: 'Cloud',
     useShortcutToClosePreviewWindow: true,
     watchProjectFolderFilesForLocalProjects: true,
@@ -430,7 +430,7 @@ export const initialPreferences = {
   showAllAnnouncements: () => {},
   showAskAiStandAloneForm: (identifier: string, show: boolean) => {},
   showAllAskAiStandAloneForms: () => {},
-  verifyIfIsNewVersion: () => false,
+  verifyIfIsNewVersion: (): boolean => false,
   setEventsSheetShowObjectThumbnails: () => {},
   setAutosaveOnPreview: () => {},
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => {},
@@ -438,9 +438,9 @@ export const initialPreferences = {
   setEventsSheetIndentScale: (scale: number) => {},
   setEventsSheetZoomLevel: (zoomLevel: number) => {},
   setShowEffectParameterNames: (enabled: boolean) => {},
-  getLastUsedPath: (project: gdProject, kind: ResourceKind) => '',
+  getLastUsedPath: (project: gdProject, kind: ResourceKind): string => '',
   setLastUsedPath: (project: gdProject, kind: ResourceKind, path: string) => {},
-  getDefaultEditorMosaicNode: (name: EditorMosaicName) => null,
+  getDefaultEditorMosaicNode: (name: EditorMosaicName): null => null,
   setDefaultEditorMosaicNode: (
     name: EditorMosaicName,
     node: ?EditorMosaicNode
@@ -448,32 +448,32 @@ export const initialPreferences = {
   getRecentProjectFiles: options => [],
   insertRecentProjectFile: () => {},
   removeRecentProjectFile: () => {},
-  getAutoOpenMostRecentProject: () => true,
+  getAutoOpenMostRecentProject: (): boolean => true,
   setAutoOpenMostRecentProject: () => {},
-  hadProjectOpenedDuringLastSession: () => false,
+  hadProjectOpenedDuringLastSession: (): boolean => false,
   setHasProjectOpened: () => {},
   resetShortcutsToDefault: () => {},
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => {},
-  getNewObjectDialogDefaultTab: () => 'asset-store',
+  getNewObjectDialogDefaultTab: (): string => 'asset-store',
   setNewObjectDialogDefaultTab: () => {},
-  getShareDialogDefaultTab: () => 'invite',
+  getShareDialogDefaultTab: (): string => 'invite',
   setShareDialogDefaultTab: () => {},
-  getIsMenuBarHiddenInPreview: () => true,
+  getIsMenuBarHiddenInPreview: (): boolean => true,
   setIsMenuBarHiddenInPreview: () => {},
   setBackdropClickBehavior: () => {},
   setResourcesImporationBehavior: () => {},
-  getIsAlwaysOnTopInPreview: () => true,
+  getIsAlwaysOnTopInPreview: (): boolean => true,
   setIsAlwaysOnTopInPreview: () => {},
   setEventsSheetCancelInlineParameter: () => {},
   setShowExperimentalExtensions: () => {},
   setShowCreateSectionByDefault: (enabled: boolean) => {},
   setShowInAppTutorialDeveloperMode: (enabled: boolean) => {},
   setShowDeprecatedInstructionWarning: (enabled: boolean) => {},
-  getOpenDiagnosticReportAutomatically: () => true,
+  getOpenDiagnosticReportAutomatically: (): boolean => true,
   setOpenDiagnosticReportAutomatically: (enabled: boolean) => {},
-  getShowDeprecatedInstructionWarning: () => false,
+  getShowDeprecatedInstructionWarning: (): boolean => false,
   setUse3DEditor: (enabled: boolean) => {},
-  getUse3DEditor: () => false,
+  getUse3DEditor: (): boolean => false,
   setShowBasicProfilingCounters: (enabled: boolean) => {},
   setDisableNpmScriptConfirmation: (enabled: boolean) => {},
   saveTutorialProgress: () => {},
@@ -485,7 +485,7 @@ export const initialPreferences = {
   setNewFeaturesAcknowledgements: () => {},
   setDisplaySaveReminder: () => {},
   getEditorStateForProject: projectId => {},
-  setEditorStateForProject: (projectId, editorState) => {},
+  setEditorStateForProject: (projectId: any, editorState: any) => {},
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => {},
   setPreviewCrashReportUploadLevel: (level: string) => {},
   setGamesDashboardOrderBy: (
@@ -498,6 +498,6 @@ export const initialPreferences = {
   setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
 };
 
-const PreferencesContext = React.createContext<Preferences>(initialPreferences);
+const PreferencesContext: React.Context<Preferences> = React.createContext<Preferences>(initialPreferences);
 
 export default PreferencesContext;

@@ -78,19 +78,21 @@ type Props = {|
   disabled?: boolean,
 |};
 
-const ExampleStore = ({
-  onSelectExampleShortHeader,
-  onSelectPrivateGameTemplateListingData,
-  i18n,
-  onlyShowGames,
-  hideStartingPoints,
-  getColumnsFromWindowSize,
-  hideSearch,
-  limitRowsTo,
-  showLoadMore,
-  hidePremiumTemplates,
-  disabled,
-}: Props) => {
+const ExampleStore = (
+  {
+    onSelectExampleShortHeader,
+    onSelectPrivateGameTemplateListingData,
+    i18n,
+    onlyShowGames,
+    hideStartingPoints,
+    getColumnsFromWindowSize,
+    hideSearch,
+    limitRowsTo,
+    showLoadMore,
+    hidePremiumTemplates,
+    disabled
+  }: Props,
+): renders Fragment => {
   const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', true);
   const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
   const { windowSize, isLandscape } = useResponsiveWindowSize();

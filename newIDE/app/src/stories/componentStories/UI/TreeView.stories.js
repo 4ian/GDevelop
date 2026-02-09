@@ -18,7 +18,7 @@ import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 export default {
   title: 'UI Building Blocks/TreeView',
   component: TreeView,
-  decorators: [getPaperDecorator('dark')],
+  decorators: [getPaperDecorator('dark') as StoryDecorator],
 };
 
 type Node = {|
@@ -447,7 +447,7 @@ const nodes: Node[] = [
     id: 'root-22000',
   },
 ];
-export const Default = () => {
+export const Default = (): renders any => {
   const [searchText, setSearchText] = React.useState<string>('');
   const [multiSelect, setMultiSelect] = React.useState<boolean>(true);
   const [selectedItems, setSelectedItems] = React.useState<Node[]>([]);

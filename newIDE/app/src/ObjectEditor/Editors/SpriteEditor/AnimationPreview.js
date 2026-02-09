@@ -56,22 +56,24 @@ type Props = {|
   hideAnimationLoader?: boolean,
 |};
 
-const AnimationPreview = ({
-  animationName,
-  resourceNames,
-  getImageResourceSource,
-  isImageResourceSmooth,
-  timeBetweenFrames,
-  onChangeTimeBetweenFrames,
-  isLooping,
-  hideCheckeredBackground,
-  deactivateControls,
-  displaySpacedView,
-  fixedHeight,
-  fixedWidth,
-  isAssetPrivate,
-  hideAnimationLoader,
-}: Props) => {
+const AnimationPreview = (
+  {
+    animationName,
+    resourceNames,
+    getImageResourceSource,
+    isImageResourceSmooth,
+    timeBetweenFrames,
+    onChangeTimeBetweenFrames,
+    isLooping,
+    hideCheckeredBackground,
+    deactivateControls,
+    displaySpacedView,
+    fixedHeight,
+    fixedWidth,
+    isAssetPrivate,
+    hideAnimationLoader
+  }: Props,
+): renders any => {
   const forceUpdate = useForceUpdate();
 
   const fps = Number.parseFloat((1 / timeBetweenFrames).toFixed(4));

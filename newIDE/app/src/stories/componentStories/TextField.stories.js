@@ -42,9 +42,9 @@ const TextFieldStoryTemplate = (args: {|
   );
 };
 
-export const Default = () => <TextFieldStoryTemplate />;
+export const Default = (): renders any => <TextFieldStoryTemplate />;
 
-export const EndAdornment = () => (
+export const EndAdornment = (): renders any => (
   <TextFieldStoryTemplate
     endAdornment={
       <IconButton>
@@ -54,7 +54,7 @@ export const EndAdornment = () => (
   />
 );
 
-export const WithLoader = () => (
+export const WithLoader = (): renders any => (
   <TextFieldStoryTemplate
     endAdornment={
       <IconButton>
@@ -64,7 +64,7 @@ export const WithLoader = () => (
   />
 );
 
-export const WithoutFloatingTextAndEndAdornment = () => (
+export const WithoutFloatingTextAndEndAdornment = (): renders any => (
   <TextFieldStoryTemplate
     endAdornment={
       <IconButton edge="end" size="small">
@@ -75,8 +75,8 @@ export const WithoutFloatingTextAndEndAdornment = () => (
   />
 );
 
-export const Required = () => <TextFieldStoryTemplate required />;
+export const Required = (): renders any => <TextFieldStoryTemplate required />;
 
-export const WithMarkdownText = () => (
+export const WithMarkdownText = (): renders any => (
   <TextFieldStoryTemplate helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)." />
 );

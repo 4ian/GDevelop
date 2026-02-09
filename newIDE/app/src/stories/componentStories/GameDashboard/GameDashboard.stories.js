@@ -143,23 +143,25 @@ const fakeGameMetrics = new Array(7).fill(0).map((_, index) => {
   };
 });
 
-export const Default = ({
-  gameState,
-  isAcceptingFeedback,
-  feedbacks,
-  sessions,
-  userBalance,
-  leaderboards,
-  exports,
-}: {|
-  gameState: 'Published' | 'Not published',
-  isAcceptingFeedback: 'Yes' | 'No',
-  feedbacks: 'None' | 'Some unprocessed' | 'All processed',
-  sessions: 'None' | 'Some in the last week',
-  userBalance: 'None' | 'Some',
-  leaderboards: 'None' | 'Some' | 'Too many',
-  exports: 'None' | 'Some ongoing' | 'All complete',
-|}) => {
+export const Default = (
+  {
+    gameState,
+    isAcceptingFeedback,
+    feedbacks,
+    sessions,
+    userBalance,
+    leaderboards,
+    exports
+  }: {|
+    gameState: 'Published' | 'Not published',
+    isAcceptingFeedback: 'Yes' | 'No',
+    feedbacks: 'None' | 'Some unprocessed' | 'All processed',
+    sessions: 'None' | 'Some in the last week',
+    userBalance: 'None' | 'Some',
+    leaderboards: 'None' | 'Some' | 'Too many',
+    exports: 'None' | 'Some ongoing' | 'All complete',
+  |},
+): renders any => {
   const [game, setGame] = React.useState<Game>(game1);
   const [tab, setTab] = React.useState<GameDetailsTab>('details');
   const [renderCount, setRenderCount] = React.useState<number>(0);

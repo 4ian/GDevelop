@@ -38,13 +38,15 @@ const styles = {
   },
 };
 
-export const GenericRetryableProcessWithProgressDialog = ({
-  progress,
-  result,
-  onAbandon,
-  onRetry,
-  genericError,
-}: GenericRetryableProcessWithProgressProps) => {
+export const GenericRetryableProcessWithProgressDialog = (
+  {
+    progress,
+    result,
+    onAbandon,
+    onRetry,
+    genericError
+  }: GenericRetryableProcessWithProgressProps,
+): renders any => {
   const hasErrors =
     (result && result.erroredResources.length > 0) || !!genericError;
 

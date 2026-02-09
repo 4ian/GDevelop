@@ -71,8 +71,8 @@ export const commonProps = {
     },
   ],
   editorCallbacks: {
-    onOpenLayout: action('onOpenLayout'),
-    onCreateProject: async () => ({ exampleSlug: null, createdProject: null }),
+    onOpenLayout: action('onOpenLayout') as any,
+    onCreateProject: async (): Promise<{ createdProject: null, exampleSlug: null }> => ({ exampleSlug: null, createdProject: null }),
   },
   project: null,
   quota: {
@@ -80,10 +80,10 @@ export const commonProps = {
     current: 100,
     max: 200,
     period: '7days',
-    resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+    resetsAt: (Date.now() as number) + 1000 * 60 * 60 * 24 * 2,
   },
-  onStartNewAiRequest: action('onStartNewAiRequest'),
-  onSendUserMessage: action('onSendUserMessage'),
+  onStartNewAiRequest: action('onStartNewAiRequest') as any,
+  onSendUserMessage: action('onSendUserMessage') as any,
   isSending: false,
   price: {
     priceInCredits: 3,
@@ -106,7 +106,7 @@ export const commonProps = {
   availableCredits: 400,
   onSendFeedback: async () => {},
   hasOpenedProject: false,
-  editorFunctionCallResults: [],
+  editorFunctionCallResults: [] as Array<empty>,
   increaseQuotaOffering: 'subscribe',
   onProcessFunctionCalls: async () => {},
   setAutoProcessFunctionCalls: () => {},
@@ -277,7 +277,7 @@ const fakeOutputWithFunctionCallWithSameCallId = [
   },
 ];
 
-export const ReadyAiRequestWithFunctionCallWithoutAutoProcess = () => (
+export const ReadyAiRequestWithFunctionCallWithoutAutoProcess = (): renders any => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -293,7 +293,7 @@ export const ReadyAiRequestWithFunctionCallWithoutAutoProcess = () => (
   />
 );
 
-export const ReadyAiRequestWithWorkingFunctionCall = () => (
+export const ReadyAiRequestWithWorkingFunctionCall = (): renders any => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -315,7 +315,7 @@ export const ReadyAiRequestWithWorkingFunctionCall = () => (
     isAutoProcessingFunctionCalls={true}
   />
 );
-export const ReadyAiRequestWithFinishedFunctionCallAndLaunchingRequest = () => (
+export const ReadyAiRequestWithFinishedFunctionCallAndLaunchingRequest = (): renders any => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -343,7 +343,7 @@ export const ReadyAiRequestWithFinishedFunctionCallAndLaunchingRequest = () => (
   />
 );
 
-export const WorkingAiRequestWithFinishedFunctionCall = () => (
+export const WorkingAiRequestWithFinishedFunctionCall = (): renders any => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -370,7 +370,7 @@ export const WorkingAiRequestWithFinishedFunctionCall = () => (
   />
 );
 
-export const ReadyAiRequestWithIgnoredFunctionCall = () => (
+export const ReadyAiRequestWithIgnoredFunctionCall = (): renders any => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -393,7 +393,7 @@ export const ReadyAiRequestWithIgnoredFunctionCall = () => (
   />
 );
 
-export const ReadyAiRequestWithFailedFunctionCall = () => (
+export const ReadyAiRequestWithFailedFunctionCall = (): renders any => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -420,7 +420,7 @@ export const ReadyAiRequestWithFailedFunctionCall = () => (
   />
 );
 
-export const ReadyAiRequestWithFunctionCallAndOutput = () => (
+export const ReadyAiRequestWithFunctionCallAndOutput = (): renders any => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -437,7 +437,7 @@ export const ReadyAiRequestWithFunctionCallAndOutput = () => (
   />
 );
 
-export const ReadyAiRequestWithFunctionCallWithSameCallId = () => (
+export const ReadyAiRequestWithFunctionCallWithSameCallId = (): renders any => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -464,42 +464,42 @@ export const ReadyAiRequestWithFunctionCallWithSameCallId = () => (
   />
 );
 
-export const ReadyAiRequestWithFailedAndIgnoredFunctionCallOutputs = () => (
+export const ReadyAiRequestWithFailedAndIgnoredFunctionCallOutputs = (): renders any => (
   <WrappedChatComponent
     aiRequest={agentAiRequestWithFailedAndIgnoredFunctionCallOutputs}
   />
 );
 
-export const LongReadyAiRequest = () => (
+export const LongReadyAiRequest = (): renders any => (
   <WrappedChatComponent
     aiRequest={agentAiRequest}
     isAutoProcessingFunctionCalls={true}
   />
 );
 
-export const LongReadyAiRequestForAnotherProject = () => (
+export const LongReadyAiRequestForAnotherProject = (): renders any => (
   <WrappedChatComponent
     aiRequest={{ ...agentAiRequest, gameId: 'another-project-uuid' }}
     isAutoProcessingFunctionCalls={true}
   />
 );
 
-export const LongReadyAiRequestWithFunctionCallToDo = () => (
+export const LongReadyAiRequestWithFunctionCallToDo = (): renders any => (
   <WrappedChatComponent aiRequest={agentAiRequestWithFunctionCallToDo} />
 );
 
-export const LaunchingFollowupAiRequest = () => (
+export const LaunchingFollowupAiRequest = (): renders any => (
   <WrappedChatComponent aiRequest={agentAiRequest} isSending={true} />
 );
 
-export const ErrorLaunchingFollowupAiRequest = () => (
+export const ErrorLaunchingFollowupAiRequest = (): renders any => (
   <WrappedChatComponent
     aiRequest={agentAiRequest}
     lastSendError={new Error('fake error while sending request')}
   />
 );
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCredits = () => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCredits = (): renders any => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -533,7 +533,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCredits = () => {
   );
 };
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftNoSubscription = () => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): renders any => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -567,7 +567,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftNoSubscrip
   );
 };
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = () => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): renders any => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -601,7 +601,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilver
   );
 };
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = () => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): renders any => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -635,7 +635,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartu
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = () => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = (): renders any => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -669,7 +669,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = () => {
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubscription = () => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): renders any => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -703,7 +703,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubsc
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = () => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): renders any => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -737,7 +737,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSil
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = () => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): renders any => {
   const quota = {
     limitReached: true,
     current: 100,

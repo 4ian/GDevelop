@@ -32,12 +32,14 @@ type Props = {|
   simulateAppStoreProduct?: boolean,
 |};
 
-const CreditsPackagePurchaseDialog = ({
-  creditsPackageListingData,
-  onClose,
-  onCloseWhenPurchaseSuccessful,
-  simulateAppStoreProduct,
-}: Props) => {
+const CreditsPackagePurchaseDialog = (
+  {
+    creditsPackageListingData,
+    onClose,
+    onCloseWhenPurchaseSuccessful,
+    simulateAppStoreProduct
+  }: Props,
+): renders Fragment => {
   const {
     profile,
     onOpenLoginDialog,

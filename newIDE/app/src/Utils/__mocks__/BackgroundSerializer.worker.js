@@ -2,7 +2,7 @@
 // Mock for BackgroundSerializer.worker.js to prevent "self is not defined" errors in tests
 
 // $FlowFixMe - Mock worker for tests
-const MockWorker = jest.fn().mockImplementation(() => {
+const MockWorker: JestMockFn<any, any> = jest.fn().mockImplementation(() => {
   return {
     postMessage: jest.fn(),
     onmessage: null,

@@ -20,14 +20,16 @@ type Props = {|
   onEditObject: () => void,
 |};
 
-export const ChildObjectPropertiesEditor = ({
-  project,
-  resourceManagementProps,
-  unsavedChanges,
-  customObjectConfiguration,
-  childObject,
-  onEditObject,
-}: Props) => {
+export const ChildObjectPropertiesEditor = (
+  {
+    project,
+    resourceManagementProps,
+    unsavedChanges,
+    customObjectConfiguration,
+    childObject,
+    onEditObject
+  }: Props,
+): renders any => {
   // Don't use a memo for this because metadata from custom objects are built
   // from event-based object when extensions are refreshed after an extension
   // installation.

@@ -18,13 +18,15 @@ const homePageRoutes: Route[] = [
  * This hook is used to be able to use route arguments from anywhere to open the homepage.
  * It should close dialogs that prevent the navigation to the homepage.
  */
-const useHomePageSwitch = ({
-  openHomePage,
-  closeDialogs,
-}: {|
-  openHomePage: () => void,
-  closeDialogs: () => void,
-|}) => {
+const useHomePageSwitch = (
+  {
+    openHomePage,
+    closeDialogs
+  }: {|
+    openHomePage: () => void,
+    closeDialogs: () => void,
+  |},
+): { navigateToRoute: any } => {
   const {
     navigateToRoute,
     removeRouteArguments,

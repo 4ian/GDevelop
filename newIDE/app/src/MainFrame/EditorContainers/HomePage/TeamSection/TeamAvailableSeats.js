@@ -6,7 +6,7 @@ import { Line } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
 import TeamContext from '../../../../Profile/Team/TeamContext';
 
-const TeamAvailableSeats = () => {
+const TeamAvailableSeats = (): renders any => {
   const { getAvailableSeats } = React.useContext(TeamContext);
   const availableSeats = getAvailableSeats();
 

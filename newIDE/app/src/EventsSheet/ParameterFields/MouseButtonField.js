@@ -58,113 +58,106 @@ const isInvalidLiteralMouseButton = (expression: string): boolean => {
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function MouseButtonField(props, ref) {
-    const field = React.useRef<?(
-      | GenericExpressionField
-      | SelectFieldInterface
-    )>(null);
-
+    const field = React.useRef<
+      ?(GenericExpressionField | SelectFieldInterface),
+    >(null);
+    
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(ref, () => ({
-      focus,
-    }));
-
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        focus,
+      }),
+    );
+    
     // If the current value is not in the list, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(
-      !!props.value && !isValidLiteralMouseButton(props.value)
+      !!props.value && !isValidLiteralMouseButton(props.value),
     );
-
+    
     const switchFieldType = () => {
       setIsExpressionField(!isExpressionField);
     };
-
+    
     const onChangeSelectValue = (event, value) => {
       props.onChange(event.target.value);
     };
-
+    
     const onChangeTextValue = (value: string) => {
       props.onChange(value);
     };
-
+    
     const fieldLabel = props.parameterMetadata
       ? props.parameterMetadata.getDescription()
       : undefined;
-
-    const selectOptions = mouseButtons.map(({ value, label }) => {
-      return <SelectOption key={value} value={`"${value}"`} label={label} />;
-    });
-
+    
+    const selectOptions = mouseButtons.map(
+      ({value, label}) => {
+        return <SelectOption key={value} value={`"${value}"`} label={label} />;
+      },
+    );
+    
     return (
       <TextFieldWithButtonLayout
-        renderTextField={() =>
-          !isExpressionField ? (
-            <SelectField
-              ref={field}
-              id={
-                props.parameterIndex !== undefined
-                  ? `parameter-${props.parameterIndex}-mouse-button-field`
-                  : undefined
-              }
-              value={props.value}
-              onChange={onChangeSelectValue}
-              margin={props.isInline ? 'none' : 'dense'}
-              fullWidth
-              floatingLabelText={fieldLabel}
-              translatableHintText={t`Choose a mouse button`}
-              helperMarkdownText={
-                (props.parameterMetadata &&
-                  props.parameterMetadata.getLongDescription()) ||
-                null
-              }
-            >
-              {selectOptions}
-            </SelectField>
-          ) : (
-            <GenericExpressionField
-              ref={field}
-              id={
-                props.parameterIndex !== undefined
-                  ? `parameter-${props.parameterIndex}-mouse-button-field`
-                  : undefined
-              }
-              expressionType="string"
-              {...props}
-              onChange={onChangeTextValue}
-            />
-          )
-        }
-        renderButton={style =>
-          isExpressionField ? (
-            <FlatButton
-              id="switch-expression-select"
-              leftIcon={<TypeCursorSelect />}
-              style={style}
-              primary
-              label={<Trans>Select</Trans>}
-              onClick={switchFieldType}
-            />
-          ) : (
-            <RaisedButton
-              id="switch-expression-select"
-              icon={<Functions />}
-              style={style}
-              primary
-              label={<Trans>Use an expression</Trans>}
-              onClick={switchFieldType}
-            />
-          )
-        }
+        renderTextField={() => !isExpressionField
+          ? <SelectField
+            ref={field}
+            id={props.parameterIndex !== undefined
+              ? `parameter-${props.parameterIndex}-mouse-button-field`
+              : undefined}
+            value={props.value}
+            onChange={onChangeSelectValue}
+            margin={props.isInline ? 'none' : 'dense'}
+            fullWidth
+            floatingLabelText={fieldLabel}
+            translatableHintText={t`Choose a mouse button`}
+            helperMarkdownText={props.parameterMetadata &&
+              props.parameterMetadata.getLongDescription() ||
+              null}>
+            {selectOptions}
+          </SelectField>
+          : <GenericExpressionField
+            ref={field}
+            id={props.parameterIndex !== undefined
+              ? `parameter-${props.parameterIndex}-mouse-button-field`
+              : undefined}
+            expressionType="string"
+            {...props}
+            onChange={onChangeTextValue}
+          />}
+        renderButton={style => isExpressionField
+          ? <FlatButton
+            id="switch-expression-select"
+            leftIcon={<TypeCursorSelect />}
+            style={style}
+            primary
+            label={<Trans>Select</Trans>}
+            onClick={switchFieldType}
+          />
+          : <RaisedButton
+            id="switch-expression-select"
+            icon={<Functions />}
+            style={style}
+            primary
+            label={<Trans>Use an expression</Trans>}
+            onClick={switchFieldType}
+          />}
       />
     );
-  }
-);
+  },
+) as component(
+  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
+) renders React$Node;
 
-export const renderInlineMouseButton = ({
-  value,
-  expressionIsValid,
-  InvalidParameterValue,
-}: ParameterInlineRendererProps) => {
+export const renderInlineMouseButton = (
+  {
+    value,
+    expressionIsValid,
+    InvalidParameterValue
+  }: ParameterInlineRendererProps,
+): string | React.MixedElement => {
   if (!value) {
     return (
       <InvalidParameterValue isEmpty>

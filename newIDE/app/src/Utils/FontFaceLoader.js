@@ -6,7 +6,7 @@ import { checkIfCredentialsRequired } from './CrossOrigin';
  * A simple wrapper around FontFace (if supported) or @font-face + FontFaceObserver
  * to load a font from an url and be notified when loading is done (or failed).
  */
-export const loadFontFace = (fontFamily: string, src: string) => {
+export const loadFontFace = (fontFamily: string, src: string): any => {
   // $FlowFixMe - FontFace not recognised by Flow.
   if (typeof FontFace !== 'undefined') {
     return fetch(src, {

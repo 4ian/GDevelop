@@ -237,7 +237,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     this.refreshResourcesList();
   };
 
-  render() {
+  render(): any {
     const {
       project,
       onRenameResource,

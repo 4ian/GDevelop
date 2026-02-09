@@ -16,39 +16,46 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(ref, () => ({
-      focus,
-    }));
-
-    const { parameterMetadata } = props;
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        focus,
+      }),
+    );
+    
+    const {parameterMetadata} = props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
-
+    
     return (
       <SemiControlledTextField
         margin={props.isInline ? 'none' : 'dense'}
         commitOnBlur
         value={props.value}
         floatingLabelText={description}
-        helperMarkdownText={
-          parameterMetadata ? parameterMetadata.getLongDescription() : undefined
-        }
+        helperMarkdownText={parameterMetadata
+          ? parameterMetadata.getLongDescription()
+          : undefined}
         onChange={(text: string) => props.onChange(text)}
         ref={field}
         fullWidth
       />
     );
-  }
-);
+  },
+) as component(
+  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
+) renders React$Node;
 
-export const renderInlineDefaultField = ({
-  value,
-  expressionIsValid,
-  parameterMetadata,
-  InvalidParameterValue,
-  MissingParameterValue,
-}: ParameterInlineRendererProps) => {
+export const renderInlineDefaultField = (
+  {
+    value,
+    expressionIsValid,
+    parameterMetadata,
+    InvalidParameterValue,
+    MissingParameterValue
+  }: ParameterInlineRendererProps,
+): string | React.MixedElement => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }

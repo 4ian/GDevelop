@@ -18,7 +18,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => {
+export const Default = (): renders any => {
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
   const onContextMenu = (event: MouseEvent) => {
     event.preventDefault();

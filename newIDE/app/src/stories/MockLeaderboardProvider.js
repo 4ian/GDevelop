@@ -41,7 +41,7 @@ const leaderboardsByIds = mockedLeaderboards.reduce((acc, leaderboard) => {
   return acc;
 }, {});
 
-const MockLeaderboardProvider = ({ children }: {| children: React.Node |}) => {
+const MockLeaderboardProvider = ({children}: {| children: React.Node |}): renders any => {
   const [
     currentLeaderboard,
     setCurrentLeaderboard,

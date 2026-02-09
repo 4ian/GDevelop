@@ -3,9 +3,9 @@
 const zoomStepBasePower = 1 / 16;
 
 // See same factors in `GDJS/Runtime/InGameEditor/InGameEditor.tsx`.
-const stepZoomFactor = Math.pow(2, 2 * zoomStepBasePower);
+const stepZoomFactor: number = Math.pow(2, 2 * zoomStepBasePower);
 export const zoomInFactor = stepZoomFactor;
-export const zoomOutFactor = Math.pow(stepZoomFactor, -1);
+export const zoomOutFactor: number = Math.pow(stepZoomFactor, -1);
 const wheelStepZoomFactor = Math.pow(1.7, zoomStepBasePower);
 
 // TODO: Use absolute value of signal that should represent either:

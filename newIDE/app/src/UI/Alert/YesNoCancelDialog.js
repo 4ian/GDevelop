@@ -21,7 +21,7 @@ type Props = {|
   cancelButtonLabel?: MessageDescriptor,
 |};
 
-function YesNoCancelDialog(props: Props) {
+function YesNoCancelDialog(props: Props): renders any {
   return (
     <I18n>
       {({ i18n }) => (

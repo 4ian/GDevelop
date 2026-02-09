@@ -48,21 +48,23 @@ const getPartiallySavedRecentProjectFiles = (count: number) =>
     storageProviderName: 'test',
   }));
 
-const WrappedCreateSection = ({
-  project,
-  recentProjectFiles,
-  tutorialProgress = undefined,
-  inAppTutorialsFetchingError = null,
-  user,
-  games = [],
-}: {|
-  project: ?gdProject,
-  recentProjectFiles: FileMetadataAndStorageProviderName[],
-  tutorialProgress?: InAppTutorialUserProgress,
-  inAppTutorialsFetchingError?: string | null,
-  user: AuthenticatedUser,
-  games?: ?Array<Game>,
-|}) => {
+const WrappedCreateSection = (
+  {
+    project,
+    recentProjectFiles,
+    tutorialProgress = undefined,
+    inAppTutorialsFetchingError = null,
+    user,
+    games = []
+  }: {|
+    project: ?gdProject,
+    recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
+    tutorialProgress?: InAppTutorialUserProgress,
+    inAppTutorialsFetchingError?: string | null,
+    user: AuthenticatedUser,
+    games?: ?Array<Game>,
+  |},
+): renders any => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   // Adapt height for storybook to see the bottom menu on mobile.
   const fixedHeight = isMobile ? (isLandscape ? 400 : 850) : 1080;
@@ -139,7 +141,7 @@ export default {
   decorators: [GDevelopJsInitializerDecorator, inAppTutorialDecorator],
 };
 
-export const CreateSectionLoading = () => (
+export const CreateSectionLoading = (): renders any => (
   <WrappedCreateSection
     project={null}
     recentProjectFiles={getRecentProjectFiles(5)}
@@ -147,35 +149,35 @@ export const CreateSectionLoading = () => (
     games={null}
   />
 );
-export const NoProjectOpened = () => (
+export const NoProjectOpened = (): renders any => (
   <WrappedCreateSection
     project={null}
     recentProjectFiles={getRecentProjectFiles(5)}
     user={fakeSilverAuthenticatedUser}
   />
 );
-export const ProjectOpened = () => (
+export const ProjectOpened = (): renders any => (
   <WrappedCreateSection
     project={testProject.project}
     recentProjectFiles={getRecentProjectFiles(5)}
     user={fakeSilverAuthenticatedUser}
   />
 );
-export const NoRecentFiles = () => (
+export const NoRecentFiles = (): renders any => (
   <WrappedCreateSection
     project={testProject.project}
     recentProjectFiles={[]}
     user={fakeSilverAuthenticatedUser}
   />
 );
-export const LotOfRecentFiles = () => (
+export const LotOfRecentFiles = (): renders any => (
   <WrappedCreateSection
     project={testProject.project}
     recentProjectFiles={getRecentProjectFiles(20)}
     user={fakeSilverAuthenticatedUser}
   />
 );
-export const SomeRecentFilesNotSavedYet = () => (
+export const SomeRecentFilesNotSavedYet = (): renders any => (
   <WrappedCreateSection
     project={testProject.project}
     recentProjectFiles={getPartiallySavedRecentProjectFiles(20)}

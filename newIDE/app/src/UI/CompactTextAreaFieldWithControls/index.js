@@ -33,7 +33,12 @@ export type CompactTextAreaFieldWithControlsInterface = {|
   setCursorPosition: (position: number) => void,
 |};
 
-export const CompactTextAreaFieldWithControls = React.forwardRef<
+export const CompactTextAreaFieldWithControls: component(
+  ...{
+    ...CompactTextAreaFieldWithControlsProps,
+    +ref?: React.RefSetter<CompactTextAreaFieldWithControlsInterface>,
+  }
+) renders React$Node = React.forwardRef<
   CompactTextAreaFieldWithControlsProps,
   CompactTextAreaFieldWithControlsInterface
 >(

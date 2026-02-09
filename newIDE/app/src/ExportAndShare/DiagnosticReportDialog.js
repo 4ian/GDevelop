@@ -36,7 +36,7 @@ const addFor = (map, key, value) => {
 export default function DiagnosticReportDialog({
   wholeProjectDiagnosticReport,
   onClose,
-}: Props) {
+}: Props): renders any {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const preferences = React.useContext(PreferencesContext);
 

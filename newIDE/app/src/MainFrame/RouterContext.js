@@ -51,7 +51,7 @@ export const initialRouterState: Router = {
   navigateToRoute: () => {},
 };
 
-const RouterContext = React.createContext<Router>(initialRouterState);
+const RouterContext: React.Context<Router> = React.createContext<Router>(initialRouterState);
 
 export default RouterContext;
 
@@ -59,7 +59,7 @@ type Props = {|
   children?: React.Node,
 |};
 
-export const RouterContextProvider = ({ children }: Props) => {
+export const RouterContextProvider = ({children}: Props): React.MixedElement => {
   // Put value in the state, so we can control when the DOM re-renders.
   const [routeArguments, setRouteArguments] = React.useState<RouteArguments>(
     // $FlowFixMe - Assume that the arguments are always valid.

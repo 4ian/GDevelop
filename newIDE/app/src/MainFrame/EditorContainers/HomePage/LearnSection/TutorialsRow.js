@@ -38,13 +38,15 @@ type TutorialsRowProps = {|
   ) => number,
 |};
 
-export const TutorialsRow = ({
-  limits,
-  category,
-  onSelectCategory,
-  onSelectTutorial,
-  getColumnsFromWindowSize,
-}: TutorialsRowProps) => {
+export const TutorialsRow = (
+  {
+    limits,
+    category,
+    onSelectCategory,
+    onSelectTutorial,
+    getColumnsFromWindowSize
+  }: TutorialsRowProps,
+): renders any => {
   const {
     tutorials,
     error: tutorialLoadingError,

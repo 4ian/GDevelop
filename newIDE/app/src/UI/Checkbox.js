@@ -45,7 +45,7 @@ type Props = {|
 /**
  * A checkbox based on Material-UI checkbox.
  */
-const Checkbox = (props: Props) => {
+const Checkbox = (props: Props): renders any => {
   const { onCheck } = props;
   const classes = useStyles();
   const formGroupClasses = useFormGroupStyles();

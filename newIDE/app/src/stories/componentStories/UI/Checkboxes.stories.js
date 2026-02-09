@@ -16,7 +16,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => {
+export const Default = (): renders any => {
   const [value, setValue] = React.useState(false);
   const [inlineValue, setInlineValue] = React.useState(false);
 

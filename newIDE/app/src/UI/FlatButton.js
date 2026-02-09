@@ -35,7 +35,9 @@ export type FlatButtonProps = {|
 /**
  * A "outlined" button based on Material-UI button.
  */
-const FlatButton = React.forwardRef<FlatButtonProps, ButtonInterface>(
+const FlatButton: component(
+  ...{ ...FlatButtonProps, +ref?: React.RefSetter<ButtonInterface> }
+) renders React$Node = React.forwardRef<FlatButtonProps, ButtonInterface>(
   (
     {
       label,

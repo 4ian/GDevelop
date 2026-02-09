@@ -159,10 +159,12 @@ type Props = {|
  * 4. `TextField` can be used with `margin="none"` and also the underline hidden,
  *   in the very special case of an embedded text field in another form control (like `SearchBar`).
  */
-export const computeTextFieldStyleProps = (props: {
-  margin?: 'none' | 'dense',
-  floatingLabelText?: React.Node,
-}) => {
+export const computeTextFieldStyleProps = (
+  props: {
+    margin?: 'none' | 'dense',
+    floatingLabelText?: React.Node,
+  },
+): { hiddenLabel: false | true | boolean, margin: string, variant: string } => {
   return {
     // Use "filled" variant by default, unless `margin` is "none" (see 1. and 2.)
     variant: props.margin === 'none' ? 'standard' : 'filled',
@@ -186,7 +188,9 @@ export type TextFieldInterface = {|
 /**
  * A text field based on Material-UI text field.
  */
-const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
+const TextField: component(
+  ...{ ...Props, +ref?: React.RefSetter<TextFieldInterface> }
+) renders React$Node = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
   const muiTextFieldRef = React.useRef<?MUITextField>(null);
   const [isPasswordVisible, setIsPasswordVisible] = React.useState<boolean>(

@@ -11,7 +11,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => (
+export const Default = (): renders any => (
   <MarkdownText
     allowParagraphs
     source={`# Title 1

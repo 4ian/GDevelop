@@ -26,7 +26,7 @@ const styles = {
 
 type Props = {||};
 
-const NotificationChip = (props: Props) => {
+const NotificationChip = (props: Props): null | renders Fragment => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const {
     notifications,

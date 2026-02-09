@@ -70,15 +70,17 @@ const isMainWindow = (windowTitle: string): boolean => {
 /**
  * Create and update the editor main menu using Electron APIs.
  */
-const ElectronMainMenu = ({
-  props,
-  callbacks,
-  extraCallbacks,
-}: {|
-  props: BuildMainMenuProps,
-  callbacks: MainMenuCallbacks,
-  extraCallbacks: MainMenuExtraCallbacks,
-|}) => {
+const ElectronMainMenu = (
+  {
+    props,
+    callbacks,
+    extraCallbacks
+  }: {|
+    props: BuildMainMenuProps,
+    callbacks: MainMenuCallbacks,
+    extraCallbacks: MainMenuExtraCallbacks,
+  |},
+): null => {
   const {
     i18n,
     project,

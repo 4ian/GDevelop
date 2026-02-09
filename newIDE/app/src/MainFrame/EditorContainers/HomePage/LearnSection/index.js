@@ -334,7 +334,7 @@ const LearnSection = ({
   );
 };
 
-const LearnSectionWithErrorBoundary = (props: Props) => (
+const LearnSectionWithErrorBoundary = (props: Props): renders any => (
   <ErrorBoundary
     componentTitle={<Trans>Learn section</Trans>}
     scope="start-page-learn"

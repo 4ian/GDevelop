@@ -108,7 +108,7 @@ type SubscriptionState = {|
   |}) => void,
 |};
 
-export const SubscriptionContext = React.createContext<SubscriptionState>({
+export const SubscriptionContext: React.Context<SubscriptionState> = React.createContext<SubscriptionState>({
   getSubscriptionPlansWithPricingSystems: () => null,
   getUserSubscriptionPlanEvenIfLegacy: () => null,
   openSubscriptionDialog: () => {},
@@ -122,10 +122,7 @@ type SubscriptionProviderProps = {|
   simulateMobileApp?: true,
 |};
 
-export const SubscriptionProvider = ({
-  children,
-  simulateMobileApp,
-}: SubscriptionProviderProps) => {
+export const SubscriptionProvider = ({children, simulateMobileApp}: SubscriptionProviderProps): React.MixedElement => {
   const [
     analyticsMetadata,
     setAnalyticsMetadata,

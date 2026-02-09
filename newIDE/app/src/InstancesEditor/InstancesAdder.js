@@ -77,7 +77,7 @@ export default class InstancesAdder {
   _instances: gdInitialInstancesContainer;
   _temporaryInstances: Array<gdInitialInstance>;
   _instancesEditorSettings: InstancesEditorSettings;
-  _zOrderFinder = new gd.HighestZOrderFinder();
+  _zOrderFinder = new gd.HighestZOrderFinder() as gdHighestZOrderFinder;
 
   constructor({ instances, instancesEditorSettings }: Props) {
     this._instances = instances;

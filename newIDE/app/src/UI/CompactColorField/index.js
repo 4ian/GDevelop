@@ -21,16 +21,18 @@ export type CompactColorFieldProps = {|
   disableAlpha: true, // Support for alpha is not implemented yet.
 |};
 
-export const CompactColorField = ({
-  color,
-  alpha,
-  disableAlpha,
-  onChange,
-  id,
-  disabled,
-  errored,
-  placeholder,
-}: CompactColorFieldProps) => {
+export const CompactColorField = (
+  {
+    color,
+    alpha,
+    disableAlpha,
+    onChange,
+    id,
+    disabled,
+    errored,
+    placeholder
+  }: CompactColorFieldProps,
+): React.MixedElement => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
   const [colorValue, setColorValue] = React.useState<string>(color);
   // alpha can be equal to 0, so we have to check if it is not undefined

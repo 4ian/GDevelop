@@ -24,46 +24,45 @@ export type LearnCategory =
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
-    title: <Trans>Make an entire game</Trans>,
-    description: <Trans>Make complete games step by step</Trans>,
+    title: <Trans>Make an entire game</Trans> as renders any,
+    description: <Trans>Make complete games step by step</Trans> as renders any,
   },
   'game-mechanic': {
-    title: <Trans>Specific game mechanics</Trans>,
+    title: <Trans>Specific game mechanics</Trans> as renders any,
     description: (
       <Trans>
-        Find how to implement the most common game mechanics and more
-      </Trans>
+  Find how to implement the most common game mechanics and more
+</Trans> as renders any
     ),
   },
   'official-beginner': {
-    title: <Trans>Beginner course</Trans>,
-    description: <Trans>Learn the fundamental principles of GDevelop</Trans>,
+    title: <Trans>Beginner course</Trans> as renders any,
+    description: <Trans>Learn the fundamental principles of GDevelop</Trans> as renders any,
   },
   'official-intermediate': {
-    title: <Trans>Intermediate course</Trans>,
+    title: <Trans>Intermediate course</Trans> as renders any,
     description: (
-      <Trans>Learn all the game-building mechanics of GDevelop</Trans>
+      <Trans>Learn all the game-building mechanics of GDevelop</Trans> as renders any
     ),
   },
   'official-advanced': {
-    title: <Trans>Advanced course</Trans>,
-    description: <Trans>The icing on the cake</Trans>,
+    title: <Trans>Advanced course</Trans> as renders any,
+    description: <Trans>The icing on the cake</Trans> as renders any,
   },
   'education-curriculum': {
-    title: <Trans>Education curriculum and resources</Trans>,
+    title: <Trans>Education curriculum and resources</Trans> as renders any,
     description: (
       <Trans>
-        For teachers and educators having the GDevelop Education subscription.
-        Ready to use resources for teaching.
-      </Trans>
+  For teachers and educators having the GDevelop Education subscription. Ready to use resources for teaching.
+</Trans> as renders any
     ),
   },
   course: {
-    title: <Trans>Loading</Trans>,
-    description: <Trans>Loading course...</Trans>,
+    title: <Trans>Loading</Trans> as renders any,
+    description: <Trans>Loading course...</Trans> as renders any,
   },
   recommendations: {
-    title: <Trans>Recommendations</Trans>,
+    title: <Trans>Recommendations</Trans> as renders any,
     description: null,
   },
 };
@@ -71,7 +70,7 @@ export const TUTORIAL_CATEGORY_TEXTS = {
 export const getColumnsFromWindowSize = (
   windowSize: WindowSizeType,
   isLandscape: boolean
-) => {
+): number => {
   switch (windowSize) {
     case 'small':
       return isLandscape ? 4 : 2;
@@ -100,7 +99,7 @@ export const getChipColorFromTutorialCategory = (
 export const getChipTextFromTutorialCategory = (
   category: TutorialCategory,
   i18n: I18nType
-) => {
+): any | null => {
   if (category === 'official-beginner') return i18n._(t`Beginner`);
   if (category === 'official-intermediate') return i18n._(t`Intermediate`);
   if (category === 'official-advanced') return i18n._(t`Advanced`);

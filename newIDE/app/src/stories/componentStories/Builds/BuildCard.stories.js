@@ -23,7 +23,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const WebBuildCard = () => (
+export const WebBuildCard = (): renders any => (
   <BuildCard
     build={completeWebBuild}
     game={{ ...game1, acceptsBuildComments: true }}
@@ -35,7 +35,7 @@ export const WebBuildCard = () => (
   />
 );
 
-export const WebCurrentlyOnlineBuildCard = () => (
+export const WebCurrentlyOnlineBuildCard = (): renders any => (
   <BuildCard
     build={completeWebBuild}
     game={{
@@ -50,7 +50,7 @@ export const WebCurrentlyOnlineBuildCard = () => (
   />
 );
 
-export const ElectronBuildCard = () => (
+export const ElectronBuildCard = (): renders any => (
   <BuildCard
     build={completeElectronBuild}
     game={game1}
@@ -61,7 +61,7 @@ export const ElectronBuildCard = () => (
     authenticatedUser={fakeSilverAuthenticatedUser}
   />
 );
-export const PendingElectronBuildCard = () => (
+export const PendingElectronBuildCard = (): renders any => (
   <BuildCard
     build={pendingElectronBuild}
     game={game1}
@@ -72,7 +72,7 @@ export const PendingElectronBuildCard = () => (
     authenticatedUser={fakeSilverAuthenticatedUser}
   />
 );
-export const CordovaBuildCard = () => (
+export const CordovaBuildCard = (): renders any => (
   <BuildCard
     build={completeCordovaBuild}
     game={game1}
@@ -83,7 +83,7 @@ export const CordovaBuildCard = () => (
     authenticatedUser={fakeSilverAuthenticatedUser}
   />
 );
-export const pendingCordovaBuildCard = () => (
+export const pendingCordovaBuildCard = (): renders any => (
   <BuildCard
     build={pendingCordovaBuild}
     game={game1}
@@ -94,7 +94,7 @@ export const pendingCordovaBuildCard = () => (
     authenticatedUser={fakeSilverAuthenticatedUser}
   />
 );
-export const ErroredCordovaBuildCard = () => (
+export const ErroredCordovaBuildCard = (): renders any => (
   <BuildCard
     build={erroredCordovaBuild}
     game={game1}

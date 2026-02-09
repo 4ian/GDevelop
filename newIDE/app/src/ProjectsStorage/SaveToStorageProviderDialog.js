@@ -32,11 +32,7 @@ const fakeLocalFileStorageProvider: StorageProvider = {
   createOperations: () => ({}),
 };
 
-const SaveToStorageProviderDialog = ({
-  onClose,
-  storageProviders,
-  onChooseProvider,
-}: Props) => {
+const SaveToStorageProviderDialog = ({onClose, storageProviders, onChooseProvider}: Props): renders any => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const { profile, cloudProjects } = authenticatedUser;

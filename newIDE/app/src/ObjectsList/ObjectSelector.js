@@ -164,7 +164,9 @@ const getMissingBehaviors = ({
 
 export type ObjectSelectorInterface = {| focus: FieldFocusFunction |};
 
-const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
+const ObjectSelector: component(
+  ...{ ...Props, +ref?: React.RefSetter<ObjectSelectorInterface> }
+) renders React$Node = React.forwardRef<Props, ObjectSelectorInterface>(
   (props, ref) => {
     const fieldRef = React.useRef<?SemiControlledAutoCompleteInterface>(null);
 

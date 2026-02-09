@@ -32,12 +32,7 @@ type Props = {|
   iframePosition: ?IframePosition,
 |};
 
-const GamesPlatformFrame = ({
-  initialGameId,
-  loaded,
-  visible,
-  iframePosition,
-}: Props) => {
+const GamesPlatformFrame = ({initialGameId, loaded, visible, iframePosition}: Props): renders any => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const paletteType = gdevelopTheme.palette.type;
 

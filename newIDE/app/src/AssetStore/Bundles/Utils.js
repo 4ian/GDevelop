@@ -540,21 +540,22 @@ const CreditsLineSummary = ({
   </LineStackLayout>
 );
 
-export const getSummaryLines = ({
-  redemptionCodesIncludedInBundle,
-  bundleListingData,
-  productListingDatasIncludedInBundle,
-}: {|
-  redemptionCodesIncludedInBundle: IncludedRedemptionCode[],
-  bundleListingData: BundleListingData,
-  productListingDatasIncludedInBundle: (
-    | PrivateAssetPackListingData
-    | PrivateGameTemplateListingData
-    | BundleListingData
-    | CreditsPackageListingData
-    | CourseListingData
-  )[],
-|}) => {
+export const getSummaryLines = (
+  {
+    redemptionCodesIncludedInBundle,
+    bundleListingData,
+    productListingDatasIncludedInBundle
+  }: {|
+    redemptionCodesIncludedInBundle: Array<IncludedRedemptionCode>,
+    bundleListingData: BundleListingData,
+    productListingDatasIncludedInBundle: Array<
+      | PrivateAssetPackListingData
+      | PrivateGameTemplateListingData
+      | BundleListingData
+      | CreditsPackageListingData
+      | CourseListingData>,
+  |},
+): { desktopLines: Array<renders any>, mobileLines: Array<renders any> } => {
   const includedListableProducts =
     bundleListingData.includedListableProducts || [];
   const summaryLineItems = [];

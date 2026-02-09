@@ -72,14 +72,16 @@ type Props = {|
   onCloseAfterPurchaseDone?: () => void,
 |};
 
-const BundlePageHeader = ({
-  bundle,
-  bundleListingData,
-  simulateAppStoreProduct,
-  i18n,
-  fastCheckout,
-  onCloseAfterPurchaseDone,
-}: Props) => {
+const BundlePageHeader = (
+  {
+    bundle,
+    bundleListingData,
+    simulateAppStoreProduct,
+    i18n,
+    fastCheckout,
+    onCloseAfterPurchaseDone
+  }: Props,
+): renders any => {
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
   );

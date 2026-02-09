@@ -24,17 +24,19 @@ import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindow
 import { client as tutorialClient } from '../../../Utils/GDevelopServices/Tutorial';
 import { client as assetClient } from '../../../Utils/GDevelopServices/Asset';
 
-const WrappedHomePage = ({
-  project,
-  tutorialProgress = undefined,
-  inAppTutorialsFetchingError = null,
-  user,
-}: {|
-  project: ?gdProject,
-  tutorialProgress?: InAppTutorialUserProgress,
-  inAppTutorialsFetchingError?: string | null,
-  user: AuthenticatedUser,
-|}) => {
+const WrappedHomePage = (
+  {
+    project,
+    tutorialProgress = undefined,
+    inAppTutorialsFetchingError = null,
+    user
+  }: {|
+    project: ?gdProject,
+    tutorialProgress?: InAppTutorialUserProgress,
+    inAppTutorialsFetchingError?: string | null,
+    user: AuthenticatedUser,
+  |},
+): renders any => {
   const assetApiMock = React.useMemo(() => {
     const mock = new MockAdapter(assetClient, {
       delayResponse: 250,
@@ -150,14 +152,14 @@ export default {
   decorators: [GDevelopJsInitializerDecorator, inAppTutorialDecorator],
 };
 
-export const Connected = () => (
+export const Connected = (): renders any => (
   <WrappedHomePage
     project={testProject.project}
     user={fakeSilverAuthenticatedUser}
   />
 );
 
-export const ConnectedWithInAppTutorialCompleted = () => (
+export const ConnectedWithInAppTutorialCompleted = (): renders any => (
   <WrappedHomePage
     project={testProject.project}
     user={fakeSilverAuthenticatedUser}
@@ -173,7 +175,7 @@ export const ConnectedWithInAppTutorialCompleted = () => (
   />
 );
 
-export const NetworkError = () => {
+export const NetworkError = (): renders any => {
   const tutorialApiMock = React.useMemo(() => {
     const mock = new MockAdapter(tutorialClient, {
       delayResponse: 250,

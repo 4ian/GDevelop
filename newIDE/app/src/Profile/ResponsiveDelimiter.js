@@ -24,7 +24,7 @@ type Props = {|
   text: React.Node,
 |};
 
-const ResponsiveDelimiter = ({ text }: Props) => {
+const ResponsiveDelimiter = ({text}: Props): renders any => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
 
   const verticalDesign = isMobile && !isLandscape;

@@ -71,7 +71,7 @@ type Props = {|
   onReset: () => void,
 |};
 
-const ShortcutsList = (props: Props) => {
+const ShortcutsList = (props: Props): renders any => {
   const [
     editedShortcut,
     setEditedShortcut,

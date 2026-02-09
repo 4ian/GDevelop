@@ -116,7 +116,9 @@ type AnimationListProps = {|
   onCreateMatchingSpriteCollisionMask: () => Promise<void>,
 |};
 
-const AnimationList = React.forwardRef<
+const AnimationList: component(
+  ...{ ...AnimationListProps, +ref?: React.RefSetter<AnimationListInterface> }
+) renders React$Node = React.forwardRef<
   AnimationListProps,
   AnimationListInterface
 >(

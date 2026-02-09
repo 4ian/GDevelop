@@ -21,17 +21,24 @@ import {
 } from '../Leaderboard/UseLeaderboardReplacer';
 import { useProjectsListFor } from '../MainFrame/EditorContainers/HomePage/CreateSection/utils';
 
-export const getDefaultRegisterGameProperties = ({
-  projectId,
-  projectName,
-  projectAuthor,
-  savedStatus,
-}: {|
-  projectId: string,
-  projectName: ?string,
-  projectAuthor: ?string,
+export const getDefaultRegisterGameProperties = (
+  {
+    projectId,
+    projectName,
+    projectAuthor,
+    savedStatus
+  }: {|
+    projectId: string,
+    projectName: ?string,
+    projectAuthor: ?string,
+    savedStatus: SavedStatus,
+  |},
+): {
+  authorName: string,
+  gameId: string,
+  gameName: string,
   savedStatus: SavedStatus,
-|}) => ({
+} => ({
   gameId: projectId,
   authorName: projectAuthor || 'Unspecified publisher',
   gameName: projectName || 'Untitled game',

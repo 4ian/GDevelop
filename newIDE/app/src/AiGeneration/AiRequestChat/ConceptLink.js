@@ -145,10 +145,7 @@ const getConceptParent = (conceptMetadata: ConceptMetadata) => {
 /**
  * A link to a GDevelop concept.
  */
-export const ConceptLink = ({
-  conceptMetadata,
-  forceNoLink,
-}: ConceptLinkProps) => {
+export const ConceptLink = ({conceptMetadata, forceNoLink}: ConceptLinkProps): null | renders any => {
   if (!conceptMetadata) return null;
 
   const helpLink = forceNoLink ? '' : getHelpLink(conceptMetadata.helpPath);
@@ -324,7 +321,7 @@ const findEventsFunctionInExtensions = (
 /**
  * Gives a function that parses an url into a link to a GDevelop concept.
  */
-export const useGetConceptMetadata = () => {
+export const useGetConceptMetadata = (): { getConceptMetadataFromHref: (href: string) => ConceptMetadata | null } => {
   const {
     translatedExtensionShortHeadersByName: extensionShortHeadersByName,
   } = React.useContext(ExtensionStoreContext);

@@ -20,9 +20,9 @@ const defaultProps = {
   error: null,
 };
 
-export const Default = () => <LoginDialog {...defaultProps} />;
+export const Default = (): renders any => <LoginDialog {...defaultProps} />;
 
-export const WeakPasswordErrorFromBackend = () => (
+export const WeakPasswordErrorFromBackend = (): renders any => (
   <LoginDialog
     {...defaultProps}
     error={{
@@ -31,7 +31,7 @@ export const WeakPasswordErrorFromBackend = () => (
   />
 );
 
-export const InvalidEmailErrorFromBackend = () => (
+export const InvalidEmailErrorFromBackend = (): renders any => (
   <LoginDialog
     {...defaultProps}
     error={{
@@ -40,7 +40,7 @@ export const InvalidEmailErrorFromBackend = () => (
   />
 );
 
-export const AccountExistsWithDifferentCredentialErrorFromBackend = () => (
+export const AccountExistsWithDifferentCredentialErrorFromBackend = (): renders any => (
   <LoginDialog
     {...defaultProps}
     error={{
@@ -49,6 +49,6 @@ export const AccountExistsWithDifferentCredentialErrorFromBackend = () => (
   />
 );
 
-export const Submitting = () => (
+export const Submitting = (): renders any => (
   <LoginDialog {...defaultProps} loginInProgress />
 );

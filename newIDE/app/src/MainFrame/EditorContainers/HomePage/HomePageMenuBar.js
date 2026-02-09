@@ -87,13 +87,15 @@ type Props = {|
   onOpenHomePageMenuDrawer: () => void,
 |};
 
-const HomePageMenuBar = ({
-  setActiveTab,
-  activeTab,
-  onOpenPreferences,
-  onOpenAbout,
-  onOpenHomePageMenuDrawer,
-}: Props) => {
+const HomePageMenuBar = (
+  {
+    setActiveTab,
+    activeTab,
+    onOpenPreferences,
+    onOpenAbout,
+    onOpenHomePageMenuDrawer
+  }: Props,
+): renders any => {
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();
   const isMobileOrSmallScreen = isMobile || isMediumScreen;
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

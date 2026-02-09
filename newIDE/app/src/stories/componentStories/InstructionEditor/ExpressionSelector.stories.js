@@ -15,7 +15,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const DefaultStringNoScope = () => (
+export const DefaultStringNoScope = (): renders any => (
   <FixedHeightFlexContainer height={400}>
     <I18n>
       {({ i18n }) => (
@@ -32,7 +32,7 @@ export const DefaultStringNoScope = () => (
   </FixedHeightFlexContainer>
 );
 
-export const DefaultNumberNoScope = () => (
+export const DefaultNumberNoScope = (): renders any => (
   <FixedHeightFlexContainer height={400}>
     <I18n>
       {({ i18n }) => (

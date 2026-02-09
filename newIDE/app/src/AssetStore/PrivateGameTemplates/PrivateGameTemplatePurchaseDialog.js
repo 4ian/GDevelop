@@ -30,12 +30,14 @@ type Props = {|
   simulateAppStoreProduct?: boolean,
 |};
 
-const PrivateGameTemplatePurchaseDialog = ({
-  privateGameTemplateListingData,
-  usageType,
-  onClose,
-  simulateAppStoreProduct,
-}: Props) => {
+const PrivateGameTemplatePurchaseDialog = (
+  {
+    privateGameTemplateListingData,
+    usageType,
+    onClose,
+    simulateAppStoreProduct
+  }: Props,
+): renders Fragment => {
   const {
     profile,
     onOpenLoginDialog,

@@ -34,7 +34,7 @@ import HelpButton from '../../UI/HelpButton';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { Accordion, AccordionHeader, AccordionBody } from '../../UI/Accordion';
 
-export const useOutOfDateAlertDialog = () => {
+export const useOutOfDateAlertDialog = (): (() => Promise<boolean>) => {
   const { showConfirmation } = useAlertDialog();
   return async (): Promise<boolean> => {
     return await showConfirmation({
@@ -74,14 +74,16 @@ type Props = {|
   project: gdProject,
 |};
 
-const ExtensionInstallDialog = ({
-  extensionShortHeader,
-  isInstalling,
-  onClose,
-  onInstall,
-  onEdit,
-  project,
-}: Props) => {
+const ExtensionInstallDialog = (
+  {
+    extensionShortHeader,
+    isInstalling,
+    onClose,
+    onInstall,
+    onEdit,
+    project
+  }: Props,
+): renders any => {
   const isAlreadyInstalled: boolean = project.hasEventsFunctionsExtensionNamed(
     extensionShortHeader.name
   );

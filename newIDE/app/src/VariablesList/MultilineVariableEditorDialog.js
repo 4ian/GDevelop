@@ -9,10 +9,7 @@ type Props = {|
   onClose: (newValue: string) => void,
 |};
 
-export const MultilineVariableEditorDialog = ({
-  initialValue,
-  onClose,
-}: Props) => {
+export const MultilineVariableEditorDialog = ({initialValue, onClose}: Props): renders any => {
   const [value, setValue] = React.useState(initialValue);
 
   return (

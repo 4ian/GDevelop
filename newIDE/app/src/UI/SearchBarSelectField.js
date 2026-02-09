@@ -74,7 +74,9 @@ type Props = {|
  * A select field based on Material-UI select field.
  * To be used with `SelectOption`.
  */
-const SearchBarSelectField = React.forwardRef<
+const SearchBarSelectField: component(
+  ...{ ...Props, +ref?: React.RefSetter<SearchBarSelectFieldInterface> }
+) renders React$Node = React.forwardRef<
   Props,
   SearchBarSelectFieldInterface
 >((props, ref) => {

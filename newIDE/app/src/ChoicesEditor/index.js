@@ -27,13 +27,7 @@ type ChoicesEditorProps = {|
   isNumber: boolean,
 |};
 
-const ChoicesEditor = ({
-  choices,
-  setChoices,
-  disabled,
-  hideLabels,
-  isNumber,
-}: ChoicesEditorProps) => {
+const ChoicesEditor = ({choices, setChoices, disabled, hideLabels, isNumber}: ChoicesEditorProps): renders any => {
   const updateChoices = () => setChoices(choices);
 
   return (

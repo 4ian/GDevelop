@@ -20,7 +20,7 @@ export default {
   component: SaveToStorageProviderDialog,
 };
 
-export const UserNotAuthenticated = () => (
+export const UserNotAuthenticated = (): renders any => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <SaveToStorageProviderDialog
       storageProviders={[
@@ -34,7 +34,7 @@ export const UserNotAuthenticated = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const UserAuthenticatedWithEnoughStorage = () => (
+export const UserAuthenticatedWithEnoughStorage = (): renders any => (
   <AuthenticatedUserContext.Provider
     value={fakeAuthenticatedUserWithEmailVerified}
   >
@@ -50,7 +50,7 @@ export const UserAuthenticatedWithEnoughStorage = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const UserAuthenticatedWithNotEnoughStorage = () => (
+export const UserAuthenticatedWithNotEnoughStorage = (): renders any => (
   <AuthenticatedUserContext.Provider
     value={{
       ...fakeAuthenticatedUserWithEmailVerified,

@@ -31,7 +31,9 @@ type Props = {|
 /**
  * A "text" button based on Material-UI button.
  */
-const TextButton = React.forwardRef<Props, ButtonInterface>(
+const TextButton: component(
+  ...{ ...Props, +ref?: React.RefSetter<ButtonInterface> }
+) renders React$Node = React.forwardRef<Props, ButtonInterface>(
   (
     {
       label,

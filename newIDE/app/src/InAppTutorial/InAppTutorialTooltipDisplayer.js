@@ -301,16 +301,18 @@ type Props = {|
   isBlockingLayerDisplayed: boolean,
 |};
 
-const InAppTutorialTooltipDisplayer = ({
-  anchorElement,
-  tooltip,
-  buttonLabel,
-  progress,
-  endTutorial,
-  goToNextStep,
-  fillAutomatically,
-  isBlockingLayerDisplayed,
-}: Props) => {
+const InAppTutorialTooltipDisplayer = (
+  {
+    anchorElement,
+    tooltip,
+    buttonLabel,
+    progress,
+    endTutorial,
+    goToNextStep,
+    fillAutomatically,
+    isBlockingLayerDisplayed
+  }: Props,
+): renders any => {
   const { isMobile } = useResponsiveWindowSize();
   const {
     palette: { type: paletteType },

@@ -143,9 +143,9 @@ export default class AuthenticatedUserProvider extends React.Component<
   // - First one comes from user authenticating and automatically fetching
   //   their cloud projects;
   // - Second one comes from the homepage fetching the cloud projects regularly.
-  _cloudProjectListingDeduplicator = new RequestDeduplicator<
-    Array<CloudProjectWithUserAccessInfo>
-  >(listUserCloudProjects);
+  _cloudProjectListingDeduplicator = new RequestDeduplicator<Array<CloudProjectWithUserAccessInfo>>(
+  listUserCloudProjects,
+) as RequestDeduplicator<Array<CloudProjectWithUserAccessInfo>>;
 
   async componentDidMount() {
     // Wait for Firebase to complete its initial auth check before doing anything.
@@ -1606,7 +1606,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   _onUpdateGithubStar = async (
     githubUsername: string,
     preferences: PreferencesValues
-  ) => {
+  ): any => {
     const { authentication } = this.props;
 
     await this._doEdit(
@@ -1636,7 +1636,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   _onUpdateTiktokFollow = async (
     communityLinks: CommunityLinks,
     preferences: PreferencesValues
-  ) => {
+  ): any => {
     const { authentication } = this.props;
 
     await this._doEdit(
@@ -1666,7 +1666,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   _onUpdateTwitterFollow = async (
     communityLinks: CommunityLinks,
     preferences: PreferencesValues
-  ) => {
+  ): any => {
     const { authentication } = this.props;
 
     await this._doEdit(
@@ -1696,7 +1696,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   _onUpdateYoutubeSubscription = async (
     communityLinks: CommunityLinks,
     preferences: PreferencesValues
-  ) => {
+  ): any => {
     const { authentication } = this.props;
 
     await this._doEdit(
@@ -1723,7 +1723,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
-  render() {
+  render(): any {
     return (
       <AuthenticatedUserContext.Provider value={this.state.authenticatedUser}>
         {this.props.children}

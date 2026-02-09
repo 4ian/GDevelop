@@ -19,11 +19,7 @@ type Props = {|
   isCreatingMembers: boolean,
 |};
 
-const StudentCreationCard = ({
-  availableSeats,
-  onCreateStudentAccounts,
-  isCreatingMembers,
-}: Props) => {
+const StudentCreationCard = ({availableSeats, onCreateStudentAccounts, isCreatingMembers}: Props): renders any => {
   const [quantity, setQuantity] = React.useState<string>(
     availableSeats.toString()
   );

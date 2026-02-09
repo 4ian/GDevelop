@@ -23,10 +23,10 @@ import { getPaperDecorator } from '../../../PaperDecorator';
 export default {
   title: 'GameDashboard/Feedback/GameFeedback',
   component: GameFeedback,
-  decorators: [getPaperDecorator('medium')],
+  decorators: [getPaperDecorator('medium') as StoryDecorator],
 };
 
-export const DefaultGameFeedback = () => {
+export const DefaultGameFeedback = (): renders any => {
   const mock = new MockAdapter(Axios);
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)
@@ -51,7 +51,7 @@ export const DefaultGameFeedback = () => {
   );
 };
 
-export const GameFeedbackOneSolvedComment = () => {
+export const GameFeedbackOneSolvedComment = (): renders any => {
   const mock = new MockAdapter(Axios);
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)
@@ -76,7 +76,7 @@ export const GameFeedbackOneSolvedComment = () => {
   );
 };
 
-export const GameFeedbackWithError = () => {
+export const GameFeedbackWithError = (): renders any => {
   const mock = new MockAdapter(Axios);
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)
@@ -101,7 +101,7 @@ export const GameFeedbackWithError = () => {
   );
 };
 
-export const GameFeedbackEmpty = () => {
+export const GameFeedbackEmpty = (): renders any => {
   const mock = new MockAdapter(Axios);
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)

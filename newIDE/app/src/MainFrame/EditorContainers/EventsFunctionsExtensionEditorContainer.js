@@ -82,7 +82,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // No thing to be done.
   }
 
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     // We stop updates when the component is inactive.
     // If it's active, was active or becoming active again we let update propagate.
     // Especially important to note that when becoming inactive, a "last" update is allowed.
@@ -113,7 +113,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     }
   }
 
-  hasAnyEventBasedObject() {
+  hasAnyEventBasedObject(): any {
     const extension = this.getEventsFunctionsExtension();
     return extension ? extension.getEventsBasedObjects().getCount() > 0 : false;
   }
@@ -182,7 +182,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
       this.editor.selectEventsBasedBehaviorByName(eventBasedBehaviorName);
   }
 
-  render() {
+  render(): any {
     const { project, projectItemName } = this.props;
     const eventsFunctionsExtension = this.getEventsFunctionsExtension();
 
@@ -239,6 +239,4 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
   }
 }
 
-export const renderEventsFunctionsExtensionEditorContainer = (
-  props: RenderEditorContainerPropsWithRef
-) => <EventsFunctionsExtensionEditorContainer {...props} />;
+export const renderEventsFunctionsExtensionEditorContainer = (props: RenderEditorContainerPropsWithRef): renders any => <EventsFunctionsExtensionEditorContainer {...props} />;

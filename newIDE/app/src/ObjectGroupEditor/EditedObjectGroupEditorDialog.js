@@ -34,20 +34,22 @@ type Props = {|
   isObjectListLocked: boolean,
 |};
 
-const EditedObjectGroupEditorDialog = ({
-  project,
-  projectScopedContainersAccessor,
-  group,
-  onApply,
-  onCancel,
-  globalObjectsContainer,
-  objectsContainer,
-  initialInstances,
-  initialTab,
-  onComputeAllVariableNames,
-  isVariableListLocked,
-  isObjectListLocked,
-}: Props) => {
+const EditedObjectGroupEditorDialog = (
+  {
+    project,
+    projectScopedContainersAccessor,
+    group,
+    onApply,
+    onCancel,
+    globalObjectsContainer,
+    objectsContainer,
+    initialInstances,
+    initialTab,
+    onComputeAllVariableNames,
+    isVariableListLocked,
+    isObjectListLocked
+  }: Props,
+): renders any => {
   const forceUpdate = useForceUpdate();
   const {
     onCancelChanges,

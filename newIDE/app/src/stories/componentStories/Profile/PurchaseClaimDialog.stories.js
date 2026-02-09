@@ -26,7 +26,7 @@ export default {
 const purchaseId = 'purchase-id-123';
 const claimableToken = 'claimable-token-123';
 
-export const ReadyToActivate = () => {
+export const ReadyToActivate = (): renders any => {
   const shopServiceMock = new MockAdapter(shopApiAxiosClient, {
     delayResponse: 0,
   });
@@ -78,7 +78,7 @@ export const ReadyToActivate = () => {
   );
 };
 
-export const NotLoggedIn = () => {
+export const NotLoggedIn = (): renders any => {
   return (
     <RouterContext.Provider
       value={{
@@ -104,7 +104,7 @@ export const NotLoggedIn = () => {
   );
 };
 
-export const AlreadyClaimed = () => {
+export const AlreadyClaimed = (): renders any => {
   const shopServiceMock = new MockAdapter(shopApiAxiosClient, {
     delayResponse: 0,
   });
@@ -150,7 +150,7 @@ export const AlreadyClaimed = () => {
   );
 };
 
-export const AlreadyOwned = () => {
+export const AlreadyOwned = (): renders any => {
   const shopServiceMock = new MockAdapter(shopApiAxiosClient, {
     delayResponse: 0,
   });
@@ -196,7 +196,7 @@ export const AlreadyOwned = () => {
   );
 };
 
-export const InvalidToken = () => {
+export const InvalidToken = (): renders any => {
   const shopServiceMock = new MockAdapter(shopApiAxiosClient, {
     delayResponse: 0,
   });

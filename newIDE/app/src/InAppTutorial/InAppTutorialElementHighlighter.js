@@ -46,7 +46,7 @@ const styles = {
   },
 };
 
-function InAppTutorialElementHighlighter({ element }: Props) {
+function InAppTutorialElementHighlighter({ element }: Props): renders Fragment {
   const forceUpdate = useForceUpdate();
   useOnResize(forceUpdate);
   const [showHighlighter, setShowHighlighter] = React.useState<boolean>(true);

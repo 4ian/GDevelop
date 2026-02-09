@@ -7,7 +7,11 @@ type Props = {|
   onGetInitialValue: () => number,
 |};
 
-const useClickDragAsControl = ({ onChange, onGetInitialValue }: Props) => {
+const useClickDragAsControl = ({onChange, onGetInitialValue}: Props): {
+  onMouseDown: (e: any) => void,
+  onMouseMove: (e: any) => void,
+  onMouseUp: () => void,
+} => {
   const clickDragOrigin = React.useRef<?{|
     initialValue: number,
     accumulatedValue: number,

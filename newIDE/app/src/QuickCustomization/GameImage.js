@@ -46,13 +46,7 @@ type Props = {|
   disabled?: boolean,
 |};
 
-const GameImage = ({
-  project,
-  game,
-  previewScreenshotUrls,
-  onLaunchPreview,
-  disabled,
-}: Props) => {
+const GameImage = ({project, game, previewScreenshotUrls, onLaunchPreview, disabled}: Props): renders any => {
   const { isMobile } = useResponsiveWindowSize();
 
   const gameThumbnailUrl = React.useMemo(

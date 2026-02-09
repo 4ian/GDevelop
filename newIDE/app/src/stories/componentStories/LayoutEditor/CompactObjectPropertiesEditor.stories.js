@@ -19,7 +19,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Sprite2d = () => (
+export const Sprite2d = (): renders any => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (
@@ -58,7 +58,7 @@ export const Sprite2d = () => (
   </DragAndDropContextProvider>
 );
 
-export const Cube3d = () => (
+export const Cube3d = (): renders any => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (
@@ -97,7 +97,7 @@ export const Cube3d = () => (
   </DragAndDropContextProvider>
 );
 
-export const TextInput = () => (
+export const TextInput = (): renders any => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (
@@ -136,7 +136,7 @@ export const TextInput = () => (
   </DragAndDropContextProvider>
 );
 
-export const CustomObject = () => (
+export const CustomObject = (): renders any => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (

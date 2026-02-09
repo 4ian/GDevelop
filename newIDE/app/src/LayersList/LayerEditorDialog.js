@@ -49,20 +49,22 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
-const LayerEditorDialog = ({
-  initialTab,
-  project,
-  layout,
-  eventsFunctionsExtension,
-  eventsBasedObject,
-  layer,
-  initialInstances,
-  onCancel,
-  onApply,
-  hotReloadPreviewButtonProps,
-  resourceManagementProps,
-  projectScopedContainersAccessor,
-}: Props) => {
+const LayerEditorDialog = (
+  {
+    initialTab,
+    project,
+    layout,
+    eventsFunctionsExtension,
+    eventsBasedObject,
+    layer,
+    initialInstances,
+    onCancel,
+    onApply,
+    hotReloadPreviewButtonProps,
+    resourceManagementProps,
+    projectScopedContainersAccessor
+  }: Props,
+): renders any => {
   const forceUpdate = useForceUpdate();
   const {
     onCancelChanges,

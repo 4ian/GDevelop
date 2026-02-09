@@ -78,7 +78,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     currentTab: 'config',
   };
 
-  _getValidatedObjectOrGroupName = (newName: string) => {
+  _getValidatedObjectOrGroupName = (newName: string): any => {
     const { projectScopedContainersAccessor } = this.props;
     const objectsContainersList = projectScopedContainersAccessor
       .get()
@@ -132,12 +132,12 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     done(true);
   };
 
-  _chooseTab = (currentTab: TabNames) =>
+  _chooseTab = (currentTab: TabNames): any =>
     this.setState({
       currentTab,
     });
 
-  render() {
+  render(): any {
     const {
       project,
       projectScopedContainersAccessor,

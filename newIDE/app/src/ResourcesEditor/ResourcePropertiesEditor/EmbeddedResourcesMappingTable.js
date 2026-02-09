@@ -22,7 +22,7 @@ const styles = {
   },
 };
 
-export const EmbeddedResourcesMappingTable = ({ resources }: Props) => {
+export const EmbeddedResourcesMappingTable = ({resources}: Props): null | renders any => {
   if (resources.length !== 1) return null;
 
   const resource = resources[0];

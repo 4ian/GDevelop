@@ -109,7 +109,7 @@ export type LobbyConfiguration = {|
 export const shortenUuidForDisplay = (uuid: string): string =>
   `${uuid.split('-')[0]}-...`;
 
-export const client = axios.create({
+export const client: Axios = axios.create({
   baseURL: GDevelopPlayApi.baseUrl,
 });
 
@@ -416,7 +416,7 @@ export const updateComment = async (
     processed?: boolean,
     qualityRating?: string,
   |}
-) => {
+): Promise<any> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
       client.patch(

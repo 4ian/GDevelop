@@ -205,7 +205,7 @@ export type AskAiEditorInterface = {|
 
 const noop = () => {};
 
-export const AskAiEditor = React.memo<Props>(
+export const AskAiEditor: component(...Props) renders React.Node = React.memo<Props>(
   React.forwardRef<Props, AskAiEditorInterface>(
     (
       {
@@ -1301,9 +1301,7 @@ export const AskAiEditor = React.memo<Props>(
   (prevProps, nextProps) => prevProps.isActive || nextProps.isActive
 );
 
-export const renderAskAiEditorContainer = (
-  props: RenderEditorContainerPropsWithRef
-) => (
+export const renderAskAiEditorContainer = (props: RenderEditorContainerPropsWithRef): renders any => (
   <I18n>
     {({ i18n }) => (
       <AskAiEditor

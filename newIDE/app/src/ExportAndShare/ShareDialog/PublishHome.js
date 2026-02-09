@@ -279,22 +279,24 @@ type PublishHomeProps = {|
   showOnlineWebExporterOnly?: boolean,
 |};
 
-const PublishHome = ({
-  project,
-  onSaveProject,
-  isSavingProject,
-  gameAndBuildsManager,
-  onChangeSubscription,
-  isNavigationDisabled,
-  setIsNavigationDisabled,
-  selectedExporter,
-  onChooseSection,
-  onChooseSubSection,
-  chosenSection,
-  chosenSubSection,
-  allExportersRequireOnline,
-  showOnlineWebExporterOnly,
-}: PublishHomeProps) => {
+const PublishHome = (
+  {
+    project,
+    onSaveProject,
+    isSavingProject,
+    gameAndBuildsManager,
+    onChangeSubscription,
+    isNavigationDisabled,
+    setIsNavigationDisabled,
+    selectedExporter,
+    onChooseSection,
+    onChooseSubSection,
+    chosenSection,
+    chosenSubSection,
+    allExportersRequireOnline,
+    showOnlineWebExporterOnly
+  }: PublishHomeProps,
+): renders any => {
   const { isMobile } = useResponsiveWindowSize();
   const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);

@@ -37,15 +37,7 @@ type Props = {|
   }>,
 |};
 
-const LocalFilePicker = ({
-  value,
-  onChange,
-  title,
-  message,
-  defaultPath,
-  fullWidth,
-  filters,
-}: Props) => {
+const LocalFilePicker = ({value, onChange, title, message, defaultPath, fullWidth, filters}: Props): React.MixedElement => {
   const onChooseFolder = async () => {
     if (!dialog || !electron) return;
 

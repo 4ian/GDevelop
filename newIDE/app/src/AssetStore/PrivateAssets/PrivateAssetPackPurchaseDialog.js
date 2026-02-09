@@ -30,12 +30,14 @@ type Props = {|
   simulateAppStoreProduct?: boolean,
 |};
 
-const PrivateAssetPackPurchaseDialog = ({
-  privateAssetPackListingData,
-  usageType,
-  onClose,
-  simulateAppStoreProduct,
-}: Props) => {
+const PrivateAssetPackPurchaseDialog = (
+  {
+    privateAssetPackListingData,
+    usageType,
+    onClose,
+    simulateAppStoreProduct
+  }: Props,
+): renders Fragment => {
   const {
     profile,
     onOpenLoginDialog,

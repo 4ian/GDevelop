@@ -282,7 +282,7 @@ const WrappedChatComponent = (allProps: any) => {
   );
 };
 
-export const ReadyAiRequest = () => (
+export const ReadyAiRequest = (): renders any => (
   <WrappedChatComponent
     aiRequest={fakeAiRequest}
     quota={{
@@ -295,7 +295,7 @@ export const ReadyAiRequest = () => (
   />
 );
 
-export const ReadyAiRequestWithAiResponses = () => (
+export const ReadyAiRequestWithAiResponses = (): renders any => (
   <WrappedChatComponent
     aiRequest={aiRequestWithAiResponses}
     quota={{
@@ -308,7 +308,7 @@ export const ReadyAiRequestWithAiResponses = () => (
   />
 );
 
-export const ReadyAiRequestWithMoreAiResponses = () => (
+export const ReadyAiRequestWithMoreAiResponses = (): renders any => (
   <WrappedChatComponent
     aiRequest={aiRequestWithMoreAiResponses}
     quota={{
@@ -321,7 +321,7 @@ export const ReadyAiRequestWithMoreAiResponses = () => (
   />
 );
 
-export const ReadyAiRequestWithEvenMoreAiResponses = () => (
+export const ReadyAiRequestWithEvenMoreAiResponses = (): renders any => (
   <WrappedChatComponent
     aiRequest={aiRequestWithEvenMoreAiResponses}
     quota={{
@@ -334,18 +334,18 @@ export const ReadyAiRequestWithEvenMoreAiResponses = () => (
   />
 );
 
-export const LaunchingFollowupAiRequest = () => (
+export const LaunchingFollowupAiRequest = (): renders any => (
   <WrappedChatComponent aiRequest={aiRequestWithAiResponses} isSending={true} />
 );
 
-export const ErrorLaunchingFollowupAiRequest = () => (
+export const ErrorLaunchingFollowupAiRequest = (): renders any => (
   <WrappedChatComponent
     aiRequest={aiRequestWithAiResponses}
     lastSendError={new Error('fake error while sending request')}
   />
 );
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCredits = () => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCredits = (): renders any => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -379,7 +379,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCredits = () => {
   );
 };
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeft = () => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeft = (): renders any => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -413,7 +413,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeft = () => {
   );
 };
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = () => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): renders any => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -447,7 +447,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilver
   );
 };
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = () => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): renders any => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -481,7 +481,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartu
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = () => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = (): renders any => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -515,7 +515,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = () => {
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeft = () => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeft = (): renders any => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -549,7 +549,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeft = () =
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubscription = () => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): renders any => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -583,7 +583,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubsc
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = () => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): renders any => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -617,7 +617,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSil
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = () => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): renders any => {
   const quota = {
     limitReached: true,
     current: 100,

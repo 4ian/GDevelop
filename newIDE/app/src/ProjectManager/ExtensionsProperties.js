@@ -10,7 +10,7 @@ type Props = {|
   project: gdProject,
 |};
 
-function ExtensionsProperties(props: Props) {
+function ExtensionsProperties(props: Props): renders any | null {
   const { project } = props;
   const allExtensions = project.getCurrentPlatform().getAllPlatformExtensions();
   const propertyList = [];

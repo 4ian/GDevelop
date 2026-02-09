@@ -269,31 +269,33 @@ type Props = {|
   setSearchText: (searchText: string) => void,
 |};
 
-const GamesList = ({
-  project,
-  currentFileMetadata,
-  games,
-  onRefreshGames,
-  onOpenGameManager,
-  onOpenProject,
-  onUnregisterGame,
-  onRegisterProject,
-  onDeleteCloudProject,
-  disabled,
-  storageProviders,
-  canOpen,
-  onOpenNewProjectSetupDialog,
-  onChooseProject,
-  closeProject,
-  askToCloseProject,
-  onSaveProject,
-  canSaveProject,
-  // Make the page controlled, so that it can be saved when navigating to a game.
-  currentPage,
-  setCurrentPage,
-  searchText,
-  setSearchText,
-}: Props) => {
+const GamesList = (
+  {
+    project,
+    currentFileMetadata,
+    games,
+    onRefreshGames,
+    onOpenGameManager,
+    onOpenProject,
+    onUnregisterGame,
+    onRegisterProject,
+    onDeleteCloudProject,
+    disabled,
+    storageProviders,
+    canOpen,
+    onOpenNewProjectSetupDialog,
+    onChooseProject,
+    closeProject,
+    askToCloseProject,
+    onSaveProject,
+    canSaveProject,
+    // Make the page controlled, so that it can be saved when navigating to a game.
+    currentPage,
+    setCurrentPage,
+    searchText,
+    setSearchText
+  }: Props,
+): renders any => {
   const { cloudProjects, profile, onCloudProjectsChanged } = React.useContext(
     AuthenticatedUserContext
   );

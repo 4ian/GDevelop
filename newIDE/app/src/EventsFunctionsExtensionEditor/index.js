@@ -378,7 +378,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  _makeRenameEventsFunction = (i18n: I18nType) => (
+  _makeRenameEventsFunction = (i18n: I18nType): any => (
     eventsBasedBehavior: ?gdEventsBasedBehavior,
     eventsBasedObject: ?gdEventsBasedObject,
     eventsFunction: gdEventsFunction,
@@ -528,7 +528,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
   };
 
-  _makeMoveFreeEventsParameter = (i18n: I18nType) => (
+  _makeMoveFreeEventsParameter = (i18n: I18nType): any => (
     eventsFunction: gdEventsFunction,
     oldIndex: number,
     newIndex: number,
@@ -548,7 +548,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done(true);
   };
 
-  _makeMoveBehaviorEventsParameter = (i18n: I18nType) => (
+  _makeMoveBehaviorEventsParameter = (i18n: I18nType): any => (
     eventsBasedBehavior: gdEventsBasedBehavior,
     eventsFunction: gdEventsFunction,
     oldIndex: number,
@@ -570,7 +570,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done(true);
   };
 
-  _makeMoveObjectEventsParameter = (i18n: I18nType) => (
+  _makeMoveObjectEventsParameter = (i18n: I18nType): any => (
     eventsBasedObject: gdEventsBasedObject,
     eventsFunction: gdEventsFunction,
     oldIndex: number,
@@ -691,7 +691,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  _makeRenameEventsBasedBehavior = (i18n: I18nType) => (
+  _makeRenameEventsBasedBehavior = (i18n: I18nType): any => (
     eventsBasedBehavior: gdEventsBasedBehavior,
     newName: string,
     done: boolean => void
@@ -723,7 +723,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done(true);
   };
 
-  _makeRenameEventsBasedObject = (i18n: I18nType) => (
+  _makeRenameEventsBasedObject = (i18n: I18nType): any => (
     eventsBasedObject: gdEventsBasedObject,
     newName: string,
     done: boolean => void
@@ -1344,7 +1344,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  render() {
+  render(): any {
     const { project, eventsFunctionsExtension } = this.props;
 
     const {

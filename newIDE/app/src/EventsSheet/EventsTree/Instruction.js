@@ -204,7 +204,7 @@ const InstructionMissing = (props: {|
   }
 };
 
-const Instruction = (props: Props) => {
+const Instruction = (props: Props): renders any => {
   const {
     platform,
     instruction,

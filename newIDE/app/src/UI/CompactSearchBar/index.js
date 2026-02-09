@@ -21,7 +21,12 @@ export type CompactSearchBarProps = {|
   placeholder?: MessageDescriptor,
 |};
 
-const CompactSearchBar = React.forwardRef<
+const CompactSearchBar: component(
+  ...{
+    ...CompactSearchBarProps,
+    +ref?: React.RefSetter<CompactSearchBarInterface>,
+  }
+) renders React$Node = React.forwardRef<
   CompactSearchBarProps,
   CompactSearchBarInterface
 >(({ value, onChange, id, disabled, errored, placeholder }, ref) => {

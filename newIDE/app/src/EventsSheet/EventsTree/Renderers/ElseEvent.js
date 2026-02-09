@@ -24,7 +24,7 @@ const styles = {
 };
 
 export default class ElseEvent extends React.Component<EventRendererProps, *> {
-  render() {
+  render(): any {
     const elseEvent = gd.asElseEvent(this.props.event);
     const { isValidElseEvent } = this.props;
 

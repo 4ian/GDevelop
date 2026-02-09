@@ -31,13 +31,15 @@ import { mapVector } from '../../../Utils/MapFor';
 
 type Props = BehaviorEditorProps;
 
-export const NumericProperty = (props: {|
-  id?: string,
-  properties: gdMapStringPropertyDescriptor,
-  propertyName: string,
-  step: number,
-  onUpdate: (newValue: string) => void,
-|}) => {
+export const NumericProperty = (
+  props: {|
+    id?: string,
+    properties: gdMapStringPropertyDescriptor,
+    propertyName: string,
+    step: number,
+    onUpdate: (newValue: string) => void,
+  |},
+): renders any => {
   const { properties, propertyName, step, onUpdate, id } = props;
   const property = properties.get(propertyName);
 
@@ -56,18 +58,21 @@ export const NumericProperty = (props: {|
   );
 };
 
-export const ChoiceProperty = (props: {|
-  id?: string,
-  properties: gdMapStringPropertyDescriptor,
-  propertyName: string,
-  value?: string,
-  onUpdate: (
-    event: {| target: {| value: string |} |},
-    index: number,
-    text: string // Note that even for number values, a string is returned
-  ) => void,
-  disabled?: boolean,
-|}) => {
+export const ChoiceProperty = (
+  props: {|
+    id?: string,
+    properties: gdMapStringPropertyDescriptor,
+    propertyName: string,
+    value?: string,
+    onUpdate: (
+      event: {| target: {| value: string |} |},
+      index: number,
+      text: string // Note that even for number values, a string is returned
+      
+    ) => void,
+    disabled?: boolean,
+  |},
+): renders any => {
   const { properties, propertyName, onUpdate, id, value, disabled } = props;
   const property = properties.get(propertyName);
 
@@ -92,7 +97,7 @@ export const ChoiceProperty = (props: {|
   );
 };
 
-export const UnitAdornment = (props: {| property: gdPropertyDescriptor |}) => {
+export const UnitAdornment = (props: {| property: gdPropertyDescriptor |}): renders any => {
   const { property } = props;
   const measurementUnit = property.getMeasurementUnit();
   if (measurementUnit.isUndefined() && property.getDescription()) {
@@ -159,7 +164,7 @@ const enableBit = (bitsValue: number, pos: number, enable: boolean) => {
   return bitsValue;
 };
 
-const Physics2Editor = (props: Props) => {
+const Physics2Editor = (props: Props): renders any => {
   const { current: resourcesLoader } = React.useRef(ResourcesLoader);
   const [image, setImage] = React.useState('');
   const { behavior, onBehaviorUpdated } = props;

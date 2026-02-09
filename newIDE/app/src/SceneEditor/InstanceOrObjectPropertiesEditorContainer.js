@@ -90,7 +90,12 @@ export type InstanceOrObjectPropertiesEditorInterface = {|
   getEditorTitle: () => React.Node,
 |};
 
-export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
+export const InstanceOrObjectPropertiesEditorContainer: component(
+  ...{
+    ...Props,
+    +ref?: React.RefSetter<InstanceOrObjectPropertiesEditorInterface>,
+  }
+) renders React$Node = React.forwardRef<
   Props,
   InstanceOrObjectPropertiesEditorInterface
 >((props, ref) => {

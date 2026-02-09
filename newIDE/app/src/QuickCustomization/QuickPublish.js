@@ -49,20 +49,22 @@ type Props = {|
   onLaunchPreview: () => Promise<void>,
 |};
 
-export const QuickPublish = ({
-  project,
-  gameAndBuildsManager,
-  setIsNavigationDisabled,
-  onlineWebExporter,
-  onSaveProject,
-  isSavingProject,
-  isRequiredToSaveAsNewCloudProject,
-  onClose,
-  onContinueQuickCustomization,
-  gameScreenshotUrls,
-  onScreenshotsClaimed,
-  onLaunchPreview,
-}: Props) => {
+export const QuickPublish = (
+  {
+    project,
+    gameAndBuildsManager,
+    setIsNavigationDisabled,
+    onlineWebExporter,
+    onSaveProject,
+    isSavingProject,
+    isRequiredToSaveAsNewCloudProject,
+    onClose,
+    onContinueQuickCustomization,
+    gameScreenshotUrls,
+    onScreenshotsClaimed,
+    onLaunchPreview
+  }: Props,
+): renders any => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
     profile,

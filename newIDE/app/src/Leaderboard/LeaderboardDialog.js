@@ -14,12 +14,7 @@ type Props = {|
   leaderboardId?: string,
 |};
 
-const LeaderboardDialog = ({
-  onClose,
-  open,
-  project,
-  leaderboardId,
-}: Props) => {
+const LeaderboardDialog = ({onClose, open, project, leaderboardId}: Props): renders any => {
   const [isLoading, setIsLoading] = React.useState(false);
   return (
     <Dialog

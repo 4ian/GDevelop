@@ -57,19 +57,21 @@ type Props = {|
   targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
 |};
 
-const AssetPackInstallDialog = ({
-  assetPack,
-  assetShortHeaders,
-  addedAssetIds,
-  onClose,
-  onAssetsAdded,
-  onWillInstallExtension,
-  onExtensionInstalled,
-  project,
-  objectsContainer,
-  resourceManagementProps,
-  targetObjectFolderOrObjectWithContext,
-}: Props) => {
+const AssetPackInstallDialog = (
+  {
+    assetPack,
+    assetShortHeaders,
+    addedAssetIds,
+    onClose,
+    onAssetsAdded,
+    onWillInstallExtension,
+    onExtensionInstalled,
+    project,
+    objectsContainer,
+    resourceManagementProps,
+    targetObjectFolderOrObjectWithContext
+  }: Props,
+): renders any => {
   const missingAssetShortHeaders = assetShortHeaders.filter(
     assetShortHeader => !addedAssetIds.has(assetShortHeader.id)
   );

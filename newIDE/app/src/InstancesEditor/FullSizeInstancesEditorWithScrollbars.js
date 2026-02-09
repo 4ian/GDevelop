@@ -35,7 +35,7 @@ type Props = {|
 
 const noop = () => {};
 
-const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
+const FullSizeInstancesEditorWithScrollbars = (props: Props): renders any => {
   const { wrappedEditorRef, ...otherProps } = props;
   const { values } = React.useContext(PreferencesContext);
   const isMounted = useIsMounted();

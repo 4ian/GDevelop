@@ -25,12 +25,7 @@ type Props = {|
   type: 'credits' | 'cash',
 |};
 
-const CashOutDialog = ({
-  onClose,
-  userEarningsBalance,
-  onSuccess,
-  type,
-}: Props) => {
+const CashOutDialog = ({onClose, userEarningsBalance, onSuccess, type}: Props): renders any => {
   const [isCashingOut, setIsCashingOut] = React.useState(false);
   const [isCashOutSuccesfull, setIsCashOutSuccessful] = React.useState(false);
   const { showAlert } = useAlertDialog();

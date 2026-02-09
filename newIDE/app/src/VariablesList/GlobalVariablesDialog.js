@@ -17,16 +17,18 @@ type Props = {|
   isListLocked: boolean,
 |};
 
-const GlobalVariablesDialog = ({
-  project,
-  open,
-  onCancel,
-  onApply,
-  hotReloadPreviewButtonProps,
-  initiallySelectedVariableName,
-  shouldCreateInitiallySelectedVariable,
-  isListLocked,
-}: Props) => {
+const GlobalVariablesDialog = (
+  {
+    project,
+    open,
+    onCancel,
+    onApply,
+    hotReloadPreviewButtonProps,
+    initiallySelectedVariableName,
+    shouldCreateInitiallySelectedVariable,
+    isListLocked
+  }: Props,
+): renders any => {
   const onComputeAllVariableNames = React.useCallback(
     () =>
       EventsRootVariablesFinder.findAllGlobalVariables(

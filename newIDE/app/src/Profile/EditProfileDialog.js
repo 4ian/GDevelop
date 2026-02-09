@@ -77,7 +77,7 @@ export type EditProfileDialogProps = {|
   error: ?AuthError,
 |};
 
-export const getUsernameErrorText = (error: ?AuthError) => {
+export const getUsernameErrorText = (error: ?AuthError): any | void => {
   if (!error) return undefined;
 
   if (error.code === 'auth/username-used')
@@ -244,22 +244,24 @@ const CommunityLinkLine = ({
   );
 };
 
-const EditProfileDialog = ({
-  profile,
-  subscription,
-  limits,
-  achievements,
-  badges,
-  onClose,
-  onEdit,
-  onUpdateGitHubStar,
-  onUpdateTiktokFollow,
-  onUpdateTwitterFollow,
-  onUpdateYoutubeSubscription,
-  onDelete,
-  actionInProgress,
-  error,
-}: EditProfileDialogProps) => {
+const EditProfileDialog = (
+  {
+    profile,
+    subscription,
+    limits,
+    achievements,
+    badges,
+    onClose,
+    onEdit,
+    onUpdateGitHubStar,
+    onUpdateTiktokFollow,
+    onUpdateTwitterFollow,
+    onUpdateYoutubeSubscription,
+    onDelete,
+    actionInProgress,
+    error
+  }: EditProfileDialogProps,
+): renders any => {
   const { showDeleteConfirmation, showAlert } = useAlertDialog();
 
   const communityLinks = profile.communityLinks || {};

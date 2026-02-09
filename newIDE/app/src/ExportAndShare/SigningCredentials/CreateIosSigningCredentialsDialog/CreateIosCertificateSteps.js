@@ -19,7 +19,7 @@ import { type AuthenticatedUser } from '../../../Profile/AuthenticatedUserContex
 import { signingCredentialApi } from '../../../Utils/GDevelopServices/Build';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 
-export const getBase64FromFile = async (file: File) => {
+export const getBase64FromFile = async (file: File): Promise<unknown> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
@@ -51,7 +51,7 @@ type Props = {
   authenticatedUser: AuthenticatedUser,
 };
 
-export const CreateIosCertificateSteps = ({ authenticatedUser }: Props) => {
+export const CreateIosCertificateSteps = ({authenticatedUser}: Props): renders any => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { showConfirmation } = useAlertDialog();
   const userId = authenticatedUser.profile

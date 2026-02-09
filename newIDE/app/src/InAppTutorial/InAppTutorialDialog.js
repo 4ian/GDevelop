@@ -30,7 +30,7 @@ function InAppTutorialDialog({
   endTutorial,
   goToNextStep,
   isLastStep,
-}: Props) {
+}: Props): renders any {
   const onApply = () => {
     if (isLastStep) {
       endTutorial({ reason: 'completed' });

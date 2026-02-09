@@ -60,7 +60,7 @@ const getFieldVisibility = (field: Field): FieldVisibility | '' => {
   return '';
 };
 
-export const filterSchema = (source: Schema, visibility: FieldVisibility) => {
+export const filterSchema = (source: Schema, visibility: FieldVisibility): Schema => {
   const destination: Schema = [];
   for (const field of source) {
     if (field.children) {
@@ -142,40 +142,42 @@ export const getSchemaWithOpenFullEditorButton = ({
   return schema;
 };
 
-export const CompactPropertiesEditorByVisibility = ({
-  onInstancesModified,
-  instances,
-  schema,
-  placeholder,
-  renderExtraDescriptionText,
-  unsavedChanges,
-  project,
-  object,
-  resourceManagementProps,
-  preventWrap,
-  removeSpacers,
-  customizeBasicSchema,
-  onRefreshAllFields,
-}: {|
-  onInstancesModified?: Instances => void,
-  schema: Schema,
-  instances: Instances,
-  preventWrap?: boolean,
-  removeSpacers?: boolean,
-  customizeBasicSchema?: Schema => Schema,
-  placeholder: React.Node,
-  onRefreshAllFields: () => void,
-
-  // If set, render the "extra" description content from fields
-  // (see getExtraDescription).
-  renderExtraDescriptionText?: (extraDescription: string) => string,
-  unsavedChanges?: ?UnsavedChanges,
-
-  // Optional context:
-  project?: ?gdProject,
-  object?: ?gdObject,
-  resourceManagementProps?: ?ResourceManagementProps,
-|}) => {
+export const CompactPropertiesEditorByVisibility = (
+  {
+    onInstancesModified,
+    instances,
+    schema,
+    placeholder,
+    renderExtraDescriptionText,
+    unsavedChanges,
+    project,
+    object,
+    resourceManagementProps,
+    preventWrap,
+    removeSpacers,
+    customizeBasicSchema,
+    onRefreshAllFields
+  }: {|
+    onInstancesModified?: (Instances) => void,
+    schema: Schema,
+    instances: Instances,
+    preventWrap?: boolean,
+    removeSpacers?: boolean,
+    customizeBasicSchema?: (Schema) => Schema,
+    placeholder: React.Node,
+    onRefreshAllFields: () => void,
+    
+    // If set, render the "extra" description content from fields
+    // (see getExtraDescription).
+    renderExtraDescriptionText?: (extraDescription: string) => string,
+    unsavedChanges?: ?UnsavedChanges,
+    
+    // Optional context:
+    project?: ?gdProject,
+    object?: ?gdObject,
+    resourceManagementProps?: ?ResourceManagementProps,
+  |},
+): renders any => {
   const basicPropertiesSchema = React.useMemo(
     () => {
       const basicSchema = filterSchema(schema, 'basic');

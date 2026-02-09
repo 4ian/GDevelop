@@ -39,17 +39,19 @@ const styles = {
   },
 };
 
-const SubscriptionPlanTableSummary = ({
-  subscriptionPlanWithPricingSystems,
-  displayedFeatures,
-  hideFullTableLink,
-  actionLabel,
-}: {|
-  subscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems,
-  displayedFeatures?: Array<string>,
-  hideFullTableLink?: boolean,
-  actionLabel?: React.Node,
-|}) => {
+const SubscriptionPlanTableSummary = (
+  {
+    subscriptionPlanWithPricingSystems,
+    displayedFeatures,
+    hideFullTableLink,
+    actionLabel
+  }: {|
+    subscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems,
+    displayedFeatures?: Array<string>,
+    hideFullTableLink?: boolean,
+    actionLabel?: React.Node,
+  |},
+): renders any => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
 

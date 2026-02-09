@@ -21,7 +21,7 @@ type Props = {
   authenticatedUser: AuthenticatedUser,
 };
 
-export const CreateAuthKeySteps = ({ authenticatedUser }: Props) => {
+export const CreateAuthKeySteps = ({authenticatedUser}: Props): renders any => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const userId = authenticatedUser.profile
     ? authenticatedUser.profile.id

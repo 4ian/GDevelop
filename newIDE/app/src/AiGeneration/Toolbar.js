@@ -13,11 +13,7 @@ type Props = {|
   onOpenHistory: () => void,
 |};
 
-export const Toolbar = ({
-  onStartNewChat,
-  canStartNewChat,
-  onOpenHistory,
-}: Props) => {
+export const Toolbar = ({onStartNewChat, canStartNewChat, onOpenHistory}: Props): renders Fragment => {
   return (
     <>
       <ToolbarGroup firstChild>

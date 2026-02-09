@@ -10,7 +10,7 @@ type Props = {|
   onDismiss: () => void,
 |};
 
-const NewTeamGroupNameField = ({ onValidateGroupName, onDismiss }: Props) => {
+const NewTeamGroupNameField = ({onValidateGroupName, onDismiss}: Props): renders any => {
   return (
     <Line noMargin>
       <AsyncSemiControlledTextField

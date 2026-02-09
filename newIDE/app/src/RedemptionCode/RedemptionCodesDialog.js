@@ -32,7 +32,7 @@ type Props = {|
   onSelectCode?: (code: string) => void,
 |};
 
-const RedemptionCodesDialog = ({ onClose, onSelectCode }: Props) => {
+const RedemptionCodesDialog = ({onClose, onSelectCode}: Props): null | renders any => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );

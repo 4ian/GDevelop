@@ -18,7 +18,7 @@ type Props = {|
   codeSizeLevel: string,
 |};
 
-export const ExampleSizeChip = ({ codeSizeLevel }: Props) => {
+export const ExampleSizeChip = ({codeSizeLevel}: Props): renders any => {
   return (
     <Chip
       icon={<SizeIcon />}

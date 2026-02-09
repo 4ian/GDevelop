@@ -64,7 +64,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
     return this.props.project;
   }
 
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     if (!this.props.isActive && nextProps.isActive) {
       this._setPreviewedLayout();
     }
@@ -310,7 +310,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
     }
   };
 
-  render() {
+  render(): any {
     const { project, projectItemName, isActive } = this.props;
     const externalLayout = this.getExternalLayout();
     const layout = this.getLayout();
@@ -451,6 +451,4 @@ export class ExternalLayoutEditorContainer extends React.Component<
   }
 }
 
-export const renderExternalLayoutEditorContainer = (
-  props: RenderEditorContainerPropsWithRef
-) => <ExternalLayoutEditorContainer {...props} />;
+export const renderExternalLayoutEditorContainer = (props: RenderEditorContainerPropsWithRef): renders any => <ExternalLayoutEditorContainer {...props} />;

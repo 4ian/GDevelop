@@ -10,11 +10,11 @@ export default {
   component: LoaderModal,
 };
 
-export const Default = () => <LoaderModal showImmediately />;
+export const Default = (): renders any => <LoaderModal showImmediately />;
 
 const STEP_COUNT = 4;
 
-export const WithProgress = () => {
+export const WithProgress = (): renders any => {
   const [step, setStep] = React.useState<number>(0);
   useTimeout(() => {
     if (step < STEP_COUNT) setStep(step + 1);

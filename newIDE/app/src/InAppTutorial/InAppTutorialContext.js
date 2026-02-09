@@ -38,7 +38,7 @@ export const initialInAppTutorialState: InAppTutorialState = {
   onLoadInAppTutorialFromLocalFile: async () => {},
 };
 
-const InAppTutorialContext = React.createContext<InAppTutorialState>(
+const InAppTutorialContext: React.Context<InAppTutorialState> = React.createContext<InAppTutorialState>(
   initialInAppTutorialState
 );
 

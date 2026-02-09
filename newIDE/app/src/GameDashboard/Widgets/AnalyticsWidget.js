@@ -33,7 +33,7 @@ type Props = {|
   gameUrl: ?string,
 |};
 
-const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
+const AnalyticsWidget = ({game, onSeeAll, gameMetrics, gameUrl}: Props): renders Fragment => {
   const hasNoSession = gameMetrics && gameMetrics.length === 0;
   const { isMobile } = useResponsiveWindowSize();
   const oneWeekAgoIsoDate = new Date(

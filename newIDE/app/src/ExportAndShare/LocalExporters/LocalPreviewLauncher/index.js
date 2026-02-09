@@ -82,7 +82,7 @@ export default class LocalPreviewLauncher extends React.Component<
   PreviewLauncherProps,
   State
 > {
-  canDoNetworkPreview = () => true;
+  canDoNetworkPreview = (): any => true;
 
   state = {
     networkPreviewDialogOpen: false,
@@ -457,17 +457,17 @@ export default class LocalPreviewLauncher extends React.Component<
     );
   };
 
-  getPreviewDebuggerServer() {
+  getPreviewDebuggerServer(): any {
     return localPreviewDebuggerServer;
   }
 
-  _checkSubscriptionForNetworkPreview = () => {
+  _checkSubscriptionForNetworkPreview = (): any => {
     if (!this._networkPreviewSubscriptionChecker) return true;
 
     return this._networkPreviewSubscriptionChecker.checkUserHasSubscription();
   };
 
-  render() {
+  render(): any {
     const {
       networkPreviewDialogOpen,
       networkPreviewHost,

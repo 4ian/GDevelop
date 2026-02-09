@@ -10,7 +10,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => (
+export const Default = (): renders any => (
   <ForgotPasswordDialog
     onClose={() => action('onClose')()}
     onForgotPassword={() => action('onForgotPassword')()}

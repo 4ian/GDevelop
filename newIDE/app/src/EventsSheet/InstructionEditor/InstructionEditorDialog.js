@@ -464,7 +464,7 @@ const InstructionEditorDialog = ({
   );
 };
 
-const InstructionEditorDialogWithErrorBoundary = (props: Props) => (
+const InstructionEditorDialogWithErrorBoundary = (props: Props): renders any => (
   <ErrorBoundary
     componentTitle={<Trans>Instruction editor</Trans>}
     scope="scene-events-instruction-editor"

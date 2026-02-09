@@ -17,11 +17,13 @@ const remote = optionalRequire('@electron/remote');
 const shell = remote ? remote.shell : null;
 const app = remote ? remote.app : null;
 
-export const generateGetResourceActions = ({
-  authenticatedUser,
-}: {
-  authenticatedUser: AuthenticatedUser,
-}) => ({
+export const generateGetResourceActions = (
+  {
+    authenticatedUser
+  }: {
+    authenticatedUser: AuthenticatedUser,
+  },
+): ((ResourcesActionsProps) => Array<{ click: () => Promise<void>, label: any }>) => ({
   project,
   resource,
   i18n,

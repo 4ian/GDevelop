@@ -21,7 +21,7 @@ const styles = {
   },
 };
 
-export const ExplanationHeader = () => {
+export const ExplanationHeader = (): renders any => {
   return (
     <Column noMargin>
       <Line>
@@ -45,12 +45,14 @@ type FacebookInstantGamesExportFlowProps = {|
   exportPipelineName: string,
 |};
 
-export const ExportFlow = ({
-  disabled,
-  launchExport,
-  isExporting,
-  exportPipelineName,
-}: FacebookInstantGamesExportFlowProps) => (
+export const ExportFlow = (
+  {
+    disabled,
+    launchExport,
+    isExporting,
+    exportPipelineName
+  }: FacebookInstantGamesExportFlowProps,
+): renders any => (
   <Line justifyContent="center">
     <RaisedButton
       label={
@@ -68,11 +70,13 @@ export const ExportFlow = ({
   </Line>
 );
 
-export const DoneFooter = ({
-  renderGameButton,
-}: {|
-  renderGameButton: () => React.Node,
-|}) => {
+export const DoneFooter = (
+  {
+    renderGameButton
+  }: {|
+    renderGameButton: () => React.Node,
+  |},
+): renders any => {
   const openLearnMore = () => {
     Window.openExternalURL(
       getHelpLink('/publishing/publishing-to-facebook-instant-games')
@@ -108,7 +112,7 @@ export const DoneFooter = ({
 
 export const facebookInstantGamesExporter = {
   key: 'facebookinstantgamesexport',
-  tabName: <Trans>Instant Games</Trans>,
-  name: <Trans>Facebook Instant Games</Trans>,
+  tabName: <Trans>Instant Games</Trans> as renders any,
+  name: <Trans>Facebook Instant Games</Trans> as renders any,
   helpPage: '/publishing/publishing-to-facebook-instant-games',
 };

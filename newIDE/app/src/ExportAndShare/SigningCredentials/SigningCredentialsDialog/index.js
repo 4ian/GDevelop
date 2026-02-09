@@ -77,13 +77,15 @@ type Props = {
   onClose: () => void,
 };
 
-export const SigningCredentialsDialog = ({
-  authenticatedUser,
-  onClose,
-  signingCredentials,
-  error,
-  onRefreshSigningCredentials,
-}: Props) => {
+export const SigningCredentialsDialog = (
+  {
+    authenticatedUser,
+    onClose,
+    signingCredentials,
+    error,
+    onRefreshSigningCredentials
+  }: Props,
+): renders any => {
   const [currentTab, setCurrentTab] = React.useState<string>(
     'apple-certificate'
   );

@@ -22,7 +22,7 @@ const options = [
   <option>Troisième option</option>,
 ];
 
-export const Default = () => {
+export const Default = (): renders any => {
   const [value, setValue] = React.useState<string>('');
   const [value1, setValue1] = React.useState<string>('');
   const [value2, setValue2] = React.useState<string>('');

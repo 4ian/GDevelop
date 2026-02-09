@@ -75,7 +75,12 @@ export type SemiControlledMultiAutoCompleteInterface = {|
   focusInput: () => void,
 |};
 
-const SemiControlledMultiAutoComplete = React.forwardRef<
+const SemiControlledMultiAutoComplete: component(
+  ...{
+    ...Props,
+    +ref?: React.RefSetter<SemiControlledMultiAutoCompleteInterface>,
+  }
+) renders React$Node = React.forwardRef<
   Props,
   SemiControlledMultiAutoCompleteInterface
 >((props, ref) => {

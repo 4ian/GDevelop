@@ -27,7 +27,7 @@ type Props = {|
   game?: Game,
 |};
 
-const MarketingPlans = ({ game }: Props) => {
+const MarketingPlans = ({game}: Props): renders any => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );

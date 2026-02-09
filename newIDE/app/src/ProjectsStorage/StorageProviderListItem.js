@@ -31,11 +31,7 @@ const useListItemStyles = makeStyles(theme => {
   };
 });
 
-const StorageProviderListItem = ({
-  storageProvider,
-  onChooseProvider,
-  disabled,
-}: Props) => {
+const StorageProviderListItem = ({storageProvider, onChooseProvider, disabled}: Props): renders any => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const classesForListItem = useListItemStyles();

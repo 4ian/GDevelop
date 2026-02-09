@@ -37,7 +37,9 @@ export type RaisedButtonProps = {|
 /**
  * A raised button based on Material-UI button.
  */
-const RaisedButton = React.forwardRef<RaisedButtonProps, ButtonInterface>(
+const RaisedButton: component(
+  ...{ ...RaisedButtonProps, +ref?: React.RefSetter<ButtonInterface> }
+) renders React$Node = React.forwardRef<RaisedButtonProps, ButtonInterface>(
   (
     {
       label,

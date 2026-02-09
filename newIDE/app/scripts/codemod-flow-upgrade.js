@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const recast = require('recast');
 const flowParser = require('recast/parsers/flow');
+const { execFileSync } = require('child_process');
 
 const appRoot = path.resolve(__dirname, '..');
 const repoRoot = path.resolve(appRoot, '..', '..');
@@ -248,6 +249,10 @@ function run() {
       filePath: path.join(appRoot, 'node_modules', 'fbjs', 'lib', 'keyMirrorRecursive.js.flow'),
       replacements: [{ searchValue: '@flow weak', replaceValue: '@flow' }],
     },
+    {
+      filePath: path.join(appRoot, 'flow-typed', 'zip.js'),
+      replacements: [{ searchValue: /\bBlob\b/g, replaceValue: 'any' }],
+    },
   ];
 
   for (const target of flowTypedReplacements) {
@@ -259,6 +264,15 @@ function run() {
   for (const filePath of jsFiles) {
     if (replaceExistentials(filePath)) updatedFiles += 1;
   }
+
+  execFileSync(
+    'npx',
+    ['flow', 'codemod', 'annotate-exports', '--write', '--default-any', 'src'],
+    {
+    cwd: appRoot,
+    stdio: 'inherit',
+    }
+  );
 
   console.log(`Flow upgrade codemod complete. Updated ${updatedFiles} file(s).`);
 }

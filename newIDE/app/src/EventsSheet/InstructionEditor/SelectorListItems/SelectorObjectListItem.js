@@ -25,18 +25,20 @@ type Props = {|
   keyPrefix?: string,
 |};
 
-export const renderObjectListItem = ({
-  project,
-  objectWithContext,
-  iconSize,
-  onClick,
-  selectedValue,
-  matchesCoordinates,
-  id,
-  data,
-  withIndent,
-  keyPrefix,
-}: Props) => {
+export const renderObjectListItem = (
+  {
+    project,
+    objectWithContext,
+    iconSize,
+    onClick,
+    selectedValue,
+    matchesCoordinates,
+    id,
+    data,
+    withIndent,
+    keyPrefix
+  }: Props,
+): renders any => {
   const objectName: string = objectWithContext.object.getName();
   return (
     <ListItem

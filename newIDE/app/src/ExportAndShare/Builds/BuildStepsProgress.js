@@ -80,15 +80,17 @@ const CustomStepLabel = (props: { children: React.Node }) => {
  * Can be used in an exporter to show the overall progress of a build
  * (including local archiving/upload steps and remote build progress)
  */
-const BuildStepsProgress = ({
-  exportStep,
-  build,
-  stepMaxProgress,
-  stepCurrentProgress,
-  errored,
-  hasBuildStep,
-  showSeeAllMyBuildsExplanation,
-}: Props) => {
+const BuildStepsProgress = (
+  {
+    exportStep,
+    build,
+    stepMaxProgress,
+    stepCurrentProgress,
+    errored,
+    hasBuildStep,
+    showSeeAllMyBuildsExplanation
+  }: Props,
+): renders any => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const getActiveStep = React.useCallback(
     () =>

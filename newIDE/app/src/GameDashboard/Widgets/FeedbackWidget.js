@@ -29,13 +29,7 @@ type Props = {|
   gameUrl: ?string,
 |};
 
-const FeedbackWidget = ({
-  onSeeAll,
-  feedbacks,
-  game,
-  onUpdateGame,
-  gameUrl,
-}: Props) => {
+const FeedbackWidget = ({onSeeAll, feedbacks, game, onUpdateGame, gameUrl}: Props): renders any => {
   const unprocessedFeedbacks = feedbacks
     ? feedbacks.filter(comment => !comment.processedAt)
     : null;

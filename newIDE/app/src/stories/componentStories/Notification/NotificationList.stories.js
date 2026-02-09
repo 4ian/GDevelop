@@ -141,7 +141,7 @@ const notifications: Notification[] = [
   },
 ];
 
-export const Default = () => {
+export const Default = (): React.MixedElement => {
   return (
     <div style={{ maxWidth: 300 }}>
       <NotificationList

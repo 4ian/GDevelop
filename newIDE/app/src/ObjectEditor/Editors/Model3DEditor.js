@@ -66,7 +66,7 @@ const removeTrailingZeroes = (value: string) => {
   return value;
 };
 
-export const hasLight = (layout: ?gd.Layout) => {
+export const hasLight = (layout: ?gd.Layout): boolean => {
   if (!layout) {
     return true;
   }
@@ -95,19 +95,21 @@ export const hasLight = (layout: ?gd.Layout) => {
   return false;
 };
 
-const Model3DEditor = ({
-  objectConfiguration,
-  project,
-  layout,
-  eventsFunctionsExtension,
-  eventsBasedObject,
-  object,
-  onSizeUpdated,
-  onObjectUpdated,
-  resourceManagementProps,
-  projectScopedContainersAccessor,
-  renderObjectNameField,
-}: EditorProps) => {
+const Model3DEditor = (
+  {
+    objectConfiguration,
+    project,
+    layout,
+    eventsFunctionsExtension,
+    eventsBasedObject,
+    object,
+    onSizeUpdated,
+    onObjectUpdated,
+    resourceManagementProps,
+    projectScopedContainersAccessor,
+    renderObjectNameField
+  }: EditorProps,
+): renders Fragment => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
 
   const [

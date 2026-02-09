@@ -16,12 +16,7 @@ type Props = {|
   onSaveAsDuplicate: () => void | Promise<void>,
 |};
 
-const CloudProjectRecoveryDialog = ({
-  onClose,
-  isLoading,
-  onSaveAsDuplicate,
-  onSaveAsMainVersion,
-}: Props) => {
+const CloudProjectRecoveryDialog = ({onClose, isLoading, onSaveAsDuplicate, onSaveAsMainVersion}: Props): renders any => {
   const actions = [
     <FlatButton
       disabled={isLoading}

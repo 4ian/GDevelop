@@ -28,11 +28,14 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const focus: FieldFocusFunction = options => {
       if (button.current) button.current.focusLeftButton();
     };
-    React.useImperativeHandle(ref, () => ({
-      focus,
-    }));
-
-    const { parameterMetadata, value } = props;
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        focus,
+      }),
+    );
+    
+    const {parameterMetadata, value} = props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
@@ -40,7 +43,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? parameterMetadata.getLongDescription()
       : null;
     const effectiveValue = getParameterValueOrDefault(value, parameterMetadata);
-
+    
     return (
       <Column noMargin>
         <Line alignItems="center" justifyContent="space-between">
@@ -55,20 +58,19 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             ref={button}
           />
         </Line>
-        {longDescription ? (
-          <FormHelperText variant="filled" margin="dense">
+        {longDescription
+          ? <FormHelperText variant="filled" margin="dense">
             <MarkdownText source={longDescription} />
           </FormHelperText>
-        ) : null}
+          : null}
       </Column>
     );
-  }
-);
+  },
+) as component(
+  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
+) renders React$Node;
 
-export const renderInlineTrueFalse = ({
-  value,
-  parameterMetadata,
-}: ParameterInlineRendererProps) => {
+export const renderInlineTrueFalse = ({value, parameterMetadata}: ParameterInlineRendererProps): renders any => {
   if (getParameterValueOrDefault(value, parameterMetadata) === 'True') {
     return <Trans>true</Trans>;
   } else {

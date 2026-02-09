@@ -28,12 +28,14 @@ const styles = {
   },
 };
 
-export const QuickObjectReplacer = ({
-  project,
-  resourceManagementProps,
-  onWillInstallExtension,
-  onExtensionInstalled,
-}: Props) => {
+export const QuickObjectReplacer = (
+  {
+    project,
+    resourceManagementProps,
+    onWillInstallExtension,
+    onExtensionInstalled
+  }: Props,
+): renders any => {
   const [selectedObjectToSwap, setSelectedObjectToSwap] = React.useState(null);
 
   return (

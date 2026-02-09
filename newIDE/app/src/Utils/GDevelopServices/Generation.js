@@ -241,7 +241,7 @@ export type ResourceSearch = {
   }> | null,
 };
 
-export const apiClient = axios.create({
+export const apiClient: Axios = axios.create({
   baseURL: GDevelopGenerationApi.baseUrl,
 });
 

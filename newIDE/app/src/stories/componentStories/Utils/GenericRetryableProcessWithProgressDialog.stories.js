@@ -12,7 +12,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Starting = () => (
+export const Starting = (): renders any => (
   <GenericRetryableProcessWithProgressDialog
     progress={0}
     result={null}
@@ -22,7 +22,7 @@ export const Starting = () => (
   />
 );
 
-export const InProgress = () => (
+export const InProgress = (): renders any => (
   <GenericRetryableProcessWithProgressDialog
     progress={40}
     result={null}
@@ -32,7 +32,7 @@ export const InProgress = () => (
   />
 );
 
-export const WithErrors = () => (
+export const WithErrors = (): renders any => (
   <GenericRetryableProcessWithProgressDialog
     progress={100}
     result={{
@@ -53,7 +53,7 @@ export const WithErrors = () => (
   />
 );
 
-export const WithGenericError = () => (
+export const WithGenericError = (): renders any => (
   <GenericRetryableProcessWithProgressDialog
     progress={100}
     result={{

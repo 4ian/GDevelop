@@ -39,15 +39,17 @@ type Props = {|
   platform: gdPlatform,
 |};
 
-export const ObjectListItem = ({
-  id,
-  objectShortHeader,
-  matches,
-  onChoose,
-  onShowDetails,
-  onHeightComputed,
-  platform,
-}: Props) => {
+export const ObjectListItem = (
+  {
+    id,
+    objectShortHeader,
+    matches,
+    onChoose,
+    onShowDetails,
+    onHeightComputed,
+    platform
+  }: Props,
+): renders any => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const isEngineCompatible = isCompatibleWithGDevelopVersion(

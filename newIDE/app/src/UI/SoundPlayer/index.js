@@ -61,7 +61,9 @@ export type SoundPlayerInterface = {|
   playPause: (forcePlay: boolean) => void,
 |};
 
-const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
+const SoundPlayer: component(
+  ...{ ...Props, +ref?: React.RefSetter<SoundPlayerInterface> }
+) renders React$Node = React.forwardRef<Props, SoundPlayerInterface>(
   (
     {
       soundSrc,

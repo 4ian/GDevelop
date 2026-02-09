@@ -204,7 +204,7 @@ type PolygonsListProps = {|
   spriteSize: [number, number],
 |};
 
-const PolygonsList = (props: PolygonsListProps) => {
+const PolygonsList = (props: PolygonsListProps): renders Fragment => {
   const {
     polygons,
     spriteSize,

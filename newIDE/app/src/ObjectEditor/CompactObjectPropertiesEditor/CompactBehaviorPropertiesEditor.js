@@ -54,23 +54,25 @@ export const getSchemaWithOpenFullEditorButton = ({
   return schema;
 };
 
-export const CompactBehaviorPropertiesEditor = ({
-  project,
-  behaviorMetadata,
-  behavior,
-  object,
-  onOpenFullEditor,
-  onBehaviorUpdated,
-  resourceManagementProps,
-}: {|
-  project: gdProject,
-  behaviorMetadata: gdBehaviorMetadata,
-  behavior: gdBehavior,
-  object: gdObject,
-  onOpenFullEditor: () => void,
-  onBehaviorUpdated: () => void,
-  resourceManagementProps: ResourceManagementProps,
-|}) => {
+export const CompactBehaviorPropertiesEditor = (
+  {
+    project,
+    behaviorMetadata,
+    behavior,
+    object,
+    onOpenFullEditor,
+    onBehaviorUpdated,
+    resourceManagementProps
+  }: {|
+    project: gdProject,
+    behaviorMetadata: gdBehaviorMetadata,
+    behavior: gdBehavior,
+    object: gdObject,
+    onOpenFullEditor: () => void,
+    onBehaviorUpdated: () => void,
+    resourceManagementProps: ResourceManagementProps,
+  |},
+): renders any => {
   const fullEditorLabel = behaviorMetadata.getOpenFullEditorLabel();
 
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();

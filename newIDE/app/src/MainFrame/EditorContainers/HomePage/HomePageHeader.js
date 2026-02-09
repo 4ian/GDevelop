@@ -33,14 +33,16 @@ type Props = {|
   canSave: boolean,
 |};
 
-export const HomePageHeader = ({
-  hasProject,
-  onOpenVersionHistory,
-  onOpenProfile,
-  onOpenLanguageDialog,
-  onSave,
-  canSave,
-}: Props) => {
+export const HomePageHeader = (
+  {
+    hasProject,
+    onOpenVersionHistory,
+    onOpenProfile,
+    onOpenLanguageDialog,
+    onSave,
+    canSave
+  }: Props,
+): renders any => {
   const { isMobile } = useResponsiveWindowSize();
   const { profile } = React.useContext(AuthenticatedUserContext);
 

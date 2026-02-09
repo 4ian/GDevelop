@@ -65,7 +65,16 @@ export const getAutoSaveCreationDate = async (
   return null;
 };
 
-export const onGetAutoSave = (fileMetadata: FileMetadata) => {
+export const onGetAutoSave = (fileMetadata: FileMetadata): Promise<
+  {
+    fileIdentifier: string,
+    gameId?: string,
+    lastModifiedDate?: number,
+    name?: string,
+    ownerId?: string,
+    version?: string,
+  },
+> => {
   return Promise.resolve({
     ...fileMetadata,
     fileIdentifier: fileMetadata.fileIdentifier + '.autosave',

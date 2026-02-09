@@ -44,7 +44,7 @@ export default function ExtractAsCustomObjectDialog({
   selectedInstances,
   onApply,
   onCancel,
-}: Props) {
+}: Props): renders any {
   const [extensionName, setExtensionName] = React.useState<string>('');
   const [isNewExtension, setNewExtension] = React.useState<boolean>(true);
   const [

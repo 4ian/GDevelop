@@ -25,12 +25,7 @@ type Props = {|
   children: React.Node | null,
 |};
 
-export const ProjectManagerDrawer = ({
-  title,
-  children,
-  projectManagerOpen,
-  toggleProjectManager,
-}: Props) => {
+export const ProjectManagerDrawer = ({title, children, projectManagerOpen, toggleProjectManager}: Props): renders any => {
   const softKeyboardBottomOffset = useSoftKeyboardBottomOffset();
 
   return (

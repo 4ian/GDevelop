@@ -125,7 +125,7 @@ function useAnimationOpeningState(openingState: DrawerOpeningState) {
   return null;
 }
 
-const SwipeableDrawer = (props: Props) => {
+const SwipeableDrawer = (props: Props): React.MixedElement => {
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const { openingState, setOpeningState } = props;
   const height =

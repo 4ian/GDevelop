@@ -75,15 +75,17 @@ const facesProperties = [
   },
 ];
 
-const Cube3DEditor = ({
-  objectConfiguration,
-  project,
-  layout,
-  resourceManagementProps,
-  projectScopedContainersAccessor,
-  objectName,
-  renderObjectNameField,
-}: EditorProps) => {
+const Cube3DEditor = (
+  {
+    objectConfiguration,
+    project,
+    layout,
+    resourceManagementProps,
+    projectScopedContainersAccessor,
+    objectName,
+    renderObjectNameField
+  }: EditorProps,
+): renders any => {
   const forceUpdate = useForceUpdate();
   const properties = objectConfiguration.getProperties();
 

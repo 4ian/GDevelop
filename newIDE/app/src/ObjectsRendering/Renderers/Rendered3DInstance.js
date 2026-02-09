@@ -76,15 +76,15 @@ export default class Rendered3DInstance {
     //Nothing to do.
   }
 
-  getPixiObject() {
+  getPixiObject(): any {
     return this._pixiObject;
   }
 
-  getThreeObject() {
+  getThreeObject(): any {
     return this._threeObject;
   }
 
-  getInstance() {
+  getInstance(): any {
     return this._instance;
   }
 
@@ -100,27 +100,27 @@ export default class Rendered3DInstance {
     if (this._threeObject !== null) this._threeGroup.remove(this._threeObject);
   }
 
-  getOriginX() {
+  getOriginX(): any {
     return 0;
   }
 
-  getOriginY() {
+  getOriginY(): any {
     return 0;
   }
 
-  getOriginZ() {
+  getOriginZ(): any {
     return 0;
   }
 
-  getCenterX() {
+  getCenterX(): any {
     return this.getWidth() / 2;
   }
 
-  getCenterY() {
+  getCenterY(): any {
     return this.getHeight() / 2;
   }
 
-  getCenterZ() {
+  getCenterZ(): any {
     return this.getDepth() / 2;
   }
 
@@ -158,21 +158,21 @@ export default class Rendered3DInstance {
   /**
    * Return the width of the instance when the instance doesn't have a custom size.
    */
-  getDefaultWidth() {
+  getDefaultWidth(): any {
     return 32;
   }
 
   /**
    * Return the height of the instance when the instance doesn't have a custom size.
    */
-  getDefaultHeight() {
+  getDefaultHeight(): any {
     return 32;
   }
 
   /**
    * Return the depth of the instance when the instance doesn't have a custom size.
    */
-  getDefaultDepth() {
+  getDefaultDepth(): any {
     return 32;
   }
 

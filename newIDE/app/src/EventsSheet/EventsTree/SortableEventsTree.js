@@ -345,17 +345,19 @@ const TreeRow = ({
 
 // -- Main component --
 
-const SortableEventsTree = ({
-  treeData,
-  scaffoldBlockPxWidth,
-  onVisibilityToggle,
-  rowHeight,
-  searchMethod,
-  searchQuery,
-  searchFocusOffset,
-  className,
-  reactVirtualizedListProps,
-}: Props) => {
+const SortableEventsTree = (
+  {
+    treeData,
+    scaffoldBlockPxWidth,
+    onVisibilityToggle,
+    rowHeight,
+    searchMethod,
+    searchQuery,
+    searchFocusOffset,
+    className,
+    reactVirtualizedListProps
+  }: Props,
+): React.MixedElement => {
   const listRef = React.useRef<?VariableSizeList>(null);
   const outerRef = React.useRef<?HTMLDivElement>(null);
   const alignment =

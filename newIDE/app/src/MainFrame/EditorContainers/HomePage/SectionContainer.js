@@ -73,7 +73,7 @@ type Props = {|
   showUrgentAnnouncements?: boolean,
 |};
 
-const SectionContainer = React.forwardRef<Props, HTMLDivElement>(
+const SectionContainer: component(...{ ...Props, +ref?: React.RefSetter<any> }) renders React$Node = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       children,
@@ -200,13 +200,15 @@ const SectionContainer = React.forwardRef<Props, HTMLDivElement>(
   }
 );
 
-export const SectionRow = ({
-  children,
-  expand,
-}: {
-  children: React.Node,
-  expand?: boolean,
-}) => (
+export const SectionRow = (
+  {
+    children,
+    expand
+  }: {
+    children: React.Node,
+    expand?: boolean,
+  },
+): React.MixedElement => (
   <div
     style={{ ...styles.rowContainer, ...(expand ? { flex: 1 } : undefined) }}
   >

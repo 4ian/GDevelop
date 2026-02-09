@@ -38,7 +38,7 @@ export default class InstancesMover {
     totalDeltaX: number,
     totalDeltaY: number,
     followAxis: boolean
-  ) {
+  ): any {
     if (followAxis && Math.abs(totalDeltaX) < Math.abs(totalDeltaY)) return 0;
 
     return totalDeltaX;
@@ -48,7 +48,7 @@ export default class InstancesMover {
     totalDeltaX: number,
     totalDeltaY: number,
     followAxis: boolean
-  ) {
+  ): any {
     if (followAxis && Math.abs(totalDeltaY) < Math.abs(totalDeltaX)) return 0;
 
     return totalDeltaY;
@@ -165,7 +165,7 @@ export default class InstancesMover {
     this.endMove();
   }
 
-  isMoving() {
+  isMoving(): any {
     return !!this._initialSelectionAABB;
   }
 }

@@ -36,19 +36,21 @@ export type CompactTextAreaFieldProps = {|
   maxLength?: number,
 |};
 
-export const CompactTextAreaField = ({
-  label,
-  markdownDescription,
-  value,
-  onChange,
-  id,
-  disabled,
-  errored,
-  placeholder,
-  rows,
-  maxLength,
-  onSubmit,
-}: CompactTextAreaFieldProps) => {
+export const CompactTextAreaField = (
+  {
+    label,
+    markdownDescription,
+    value,
+    onChange,
+    id,
+    disabled,
+    errored,
+    placeholder,
+    rows,
+    maxLength,
+    onSubmit
+  }: CompactTextAreaFieldProps,
+): renders any => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
 
   const title = !markdownDescription

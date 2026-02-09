@@ -50,18 +50,20 @@ type Props = {|
   width?: number,
 |};
 
-export const GameThumbnail = ({
-  disabled,
-  canUpdateThumbnail,
-  thumbnailUrl,
-  gameName,
-  gameId,
-  onGameUpdated,
-  onUpdatingGame,
-  background = 'light',
-  fullWidthOnMobile,
-  width,
-}: Props) => {
+export const GameThumbnail = (
+  {
+    disabled,
+    canUpdateThumbnail,
+    thumbnailUrl,
+    gameName,
+    gameId,
+    onGameUpdated,
+    onUpdatingGame,
+    background = 'light',
+    fullWidthOnMobile,
+    width
+  }: Props,
+): renders any => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext

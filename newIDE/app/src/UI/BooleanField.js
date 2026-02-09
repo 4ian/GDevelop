@@ -15,7 +15,7 @@ type Props = {|
   disabled: boolean,
 |};
 
-const BooleanField = ({ value, onChange, disabled }: Props) => {
+const BooleanField = ({value, onChange, disabled}: Props): renders any => {
   return (
     <Line>
       <Column noMargin>

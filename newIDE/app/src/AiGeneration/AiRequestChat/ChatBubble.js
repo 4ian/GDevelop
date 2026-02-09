@@ -45,12 +45,7 @@ type ChatBubbleProps = {|
   |},
 |};
 
-export const ChatBubble = ({
-  children,
-  feedbackButtons,
-  role,
-  restoreProps,
-}: ChatBubbleProps) => {
+export const ChatBubble = ({children, feedbackButtons, role, restoreProps}: ChatBubbleProps): renders any => {
   const theme = React.useContext(GDevelopThemeContext);
   const isLightTheme = theme.palette.type === 'light';
 

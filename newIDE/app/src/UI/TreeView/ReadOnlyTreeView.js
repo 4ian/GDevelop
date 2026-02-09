@@ -706,4 +706,6 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
 };
 
 // $FlowFixMe
-export default React.forwardRef(ReadOnlyTreeView);
+export default React.forwardRef(ReadOnlyTreeView) as component(
+  ...{ ...Props<any>, +ref?: React.RefSetter<any> }
+) renders any;

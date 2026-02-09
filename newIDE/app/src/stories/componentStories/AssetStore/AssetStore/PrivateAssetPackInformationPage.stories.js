@@ -312,19 +312,19 @@ const PrivateAssetPackInformationPageStory = ({
   );
 };
 
-export const Default = () => (
+export const Default = (): renders any => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPack1ListingData}
   />
 );
 
-export const ForABundle = () => (
+export const ForABundle = (): renders any => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPackBundleListingData}
   />
 );
 
-export const ForAlreadyPurchasedAssetPack = () => (
+export const ForAlreadyPurchasedAssetPack = (): renders any => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPack1ListingData}
     receivedAssetPacks={[
@@ -343,14 +343,14 @@ export const ForAlreadyPurchasedAssetPack = () => (
   />
 );
 
-export const Loading = () => (
+export const Loading = (): renders any => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPack1ListingData}
     delayResponse={10000}
   />
 );
 
-export const WithRedeemableAssetPackWithoutSubscription = () => (
+export const WithRedeemableAssetPackWithoutSubscription = (): renders any => (
   <PrivateAssetPackInformationPageStory
     authenticatedUser={defaultAuthenticatedUserWithNoSubscription}
     privateAssetPackListingData={{
@@ -367,7 +367,7 @@ export const WithRedeemableAssetPackWithoutSubscription = () => (
   />
 );
 
-export const WithRedeemableAssetPackWithSilverSubscription = () => (
+export const WithRedeemableAssetPackWithSilverSubscription = (): renders any => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={{
       ...privateAssetPack1ListingData,
@@ -383,7 +383,7 @@ export const WithRedeemableAssetPackWithSilverSubscription = () => (
   />
 );
 
-export const WithRedeemableAssetPackWithGoldSubscription = () => (
+export const WithRedeemableAssetPackWithGoldSubscription = (): renders any => (
   <PrivateAssetPackInformationPageStory
     authenticatedUser={fakeGoldAuthenticatedUser}
     privateAssetPackListingData={{
@@ -400,7 +400,7 @@ export const WithRedeemableAssetPackWithGoldSubscription = () => (
   />
 );
 
-export const WithRedeemableAssetPackWithEducationSubscription = () => (
+export const WithRedeemableAssetPackWithEducationSubscription = (): renders any => (
   <PrivateAssetPackInformationPageStory
     authenticatedUser={fakeAuthenticatedUserWithEducationPlan}
     privateAssetPackListingData={{
@@ -417,14 +417,14 @@ export const WithRedeemableAssetPackWithEducationSubscription = () => (
   />
 );
 
-export const With404 = () => (
+export const With404 = (): renders any => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPack1ListingData}
     errorCode={404}
   />
 );
 
-export const WithUnknownError = () => (
+export const WithUnknownError = (): renders any => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPack1ListingData}
     errorCode={500}

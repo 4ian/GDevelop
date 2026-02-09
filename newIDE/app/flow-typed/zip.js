@@ -91,7 +91,7 @@ declare type ZipJs = {|
     dontDeflate?: boolean
   ) => void,
   TextReader: (text: string) => ZipJs$Reader,
-  BlobReader: (blob: Blob) => ZipJs$Reader,
+  BlobReader: (blob: any) => ZipJs$Reader,
   Data64URIReader: (dataURI: string) => ZipJs$Reader,
   HttpReader: (url: string) => ZipJs$Reader,
   ZipReader: () => ZipJs$ZipReader,

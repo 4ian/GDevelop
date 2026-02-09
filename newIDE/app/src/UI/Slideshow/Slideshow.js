@@ -90,14 +90,16 @@ type SlideshowProps = {|
   additionalMarginForWidthCalculation?: number,
 |};
 
-const Slideshow = ({
-  items,
-  itemDesktopRatio,
-  itemMobileRatio,
-  // The slideshow bases its width on the full window width, so if used in a
-  // container, use this prop to calculate the width accurately.
-  additionalMarginForWidthCalculation,
-}: SlideshowProps) => {
+const Slideshow = (
+  {
+    items,
+    itemDesktopRatio,
+    itemMobileRatio,
+    // The slideshow bases its width on the full window width, so if used in a
+    // container, use this prop to calculate the width accurately.
+    additionalMarginForWidthCalculation
+  }: SlideshowProps,
+): null | renders any => {
   // Ensure the component is re-rendered when the window is resized.
   useOnResize(useForceUpdate());
   const windowInnerWidth = window.innerWidth;

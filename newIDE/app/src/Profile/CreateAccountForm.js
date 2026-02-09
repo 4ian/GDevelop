@@ -68,24 +68,26 @@ type Props = {|
   onGoToLogin?: () => void,
 |};
 
-const CreateAccountForm = ({
-  onCreateAccount,
-  onLoginWithProvider,
-  email,
-  onChangeEmail,
-  password,
-  onChangePassword,
-  username,
-  onChangeUsername,
-  optInNewsletterEmail,
-  onChangeOptInNewsletterEmail,
-  onChangeUsernameAvailability,
-  isValidatingUsername,
-  onChangeIsValidatingUsername,
-  createAccountInProgress,
-  error,
-  onGoToLogin,
-}: Props) => {
+const CreateAccountForm = (
+  {
+    onCreateAccount,
+    onLoginWithProvider,
+    email,
+    onChangeEmail,
+    password,
+    onChangePassword,
+    username,
+    onChangeUsername,
+    optInNewsletterEmail,
+    onChangeOptInNewsletterEmail,
+    onChangeUsernameAvailability,
+    isValidatingUsername,
+    onChangeIsValidatingUsername,
+    createAccountInProgress,
+    error,
+    onGoToLogin
+  }: Props,
+): renders any => {
   const accountsExistsWithOtherCredentials = error
     ? error.code === 'auth/account-exists-with-different-credential'
     : false;

@@ -25,13 +25,7 @@ type Props = {|
   isSelected: boolean,
 |};
 
-const AudioResourceLine = ({
-  audioResource,
-  onClickPlay,
-  onClickLine,
-  isPlaying,
-  isSelected,
-}: Props) => {
+const AudioResourceLine = ({audioResource, onClickPlay, onClickLine, isPlaying, isSelected}: Props): renders any => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { getAuthorsDisplayLinks } = React.useContext(ResourceStoreContext);

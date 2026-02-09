@@ -37,7 +37,7 @@ export default function EventsBasedObjectEditor({
   onOpenCustomObjectEditor,
   unsavedChanges,
   onEventsBasedObjectChildrenEdited,
-}: Props) {
+}: Props): renders any {
   const forceUpdate = useForceUpdate();
 
   const onChange = React.useCallback(

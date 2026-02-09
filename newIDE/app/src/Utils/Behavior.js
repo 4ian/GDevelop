@@ -4,7 +4,7 @@ import Window from './Window';
 
 const gd: libGDevelop = global.gd;
 
-export const hasBehaviorWithType = (object: gdObject, type: string) =>
+export const hasBehaviorWithType = (object: gdObject, type: string): number =>
   object
     .getAllBehaviorNames()
     .toJSArray()

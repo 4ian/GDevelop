@@ -2,9 +2,7 @@
 
 import { mapFor } from '../../Utils/MapFor';
 
-export const getPropertyFolderOrPropertyUnifiedName = (
-  propertyFolderOrProperty: gdPropertyFolderOrProperty
-) =>
+export const getPropertyFolderOrPropertyUnifiedName = (propertyFolderOrProperty: gdPropertyFolderOrProperty): string =>
   propertyFolderOrProperty.isFolder()
     ? propertyFolderOrProperty.getFolderName()
     : propertyFolderOrProperty.getProperty().getName();

@@ -22,7 +22,7 @@ export default class Builds extends Component<Props, State> {
     builds: null,
     error: null,
   };
-  buildsWatcher = new BuildsWatcher();
+  buildsWatcher = new BuildsWatcher() as BuildsWatcher;
 
   componentDidMount() {
     this._refreshBuilds();
@@ -109,7 +109,7 @@ export default class Builds extends Component<Props, State> {
     });
   };
 
-  render() {
+  render(): any {
     return (
       <BuildsList
         builds={this.state.builds}

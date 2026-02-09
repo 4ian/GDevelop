@@ -77,15 +77,17 @@ type Props = {|
   onLogin: () => void,
 |};
 
-const EducationMarketingSection = ({
-  form,
-  formError,
-  onChangeForm,
-  onResetForm,
-  onSendForm,
-  formStatus,
-  onLogin,
-}: Props) => {
+const EducationMarketingSection = (
+  {
+    form,
+    formError,
+    onChangeForm,
+    onResetForm,
+    onSendForm,
+    formStatus,
+    onLogin
+  }: Props,
+): renders any => {
   const { isMobile } = useResponsiveWindowSize();
   const { limits } = React.useContext(AuthenticatedUserContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

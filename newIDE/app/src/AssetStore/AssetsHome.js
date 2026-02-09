@@ -72,7 +72,21 @@ const getShopItemsColumns = (
 
 export const gameTemplatesCategoryId = 'game-template';
 
-export const shopCategories = {
+export const shopCategories: {
+  background: { imageAlt: string, imageSource: string, title: renders any },
+  character: { imageAlt: string, imageSource: string, title: renders any },
+  "full-game-pack": {
+    imageAlt: string,
+    imageSource: string,
+    title: renders any,
+  },
+  "game-template": { imageAlt: string, imageSource: string, title: renders any },
+  interface: { imageAlt: string, imageSource: string, title: renders any },
+  prefab: { imageAlt: string, imageSource: string, title: renders any },
+  props: { imageAlt: string, imageSource: string, title: renders any },
+  sounds: { imageAlt: string, imageSource: string, title: renders any },
+  "visual-effect": { imageAlt: string, imageSource: string, title: renders any },
+} = {
   [gameTemplatesCategoryId]: {
     title: <Trans>Ready-made games</Trans>,
     imageAlt: 'Premium game templates category',
@@ -175,7 +189,9 @@ type Props = {|
   onOpenProfile?: () => void,
 |};
 
-export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
+export const AssetsHome: component(
+  ...{ ...Props, +ref?: React.RefSetter<AssetsHomeInterface> }
+) renders React$Node = React.forwardRef<Props, AssetsHomeInterface>(
   (
     {
       publicAssetPacks: { starterPacks },

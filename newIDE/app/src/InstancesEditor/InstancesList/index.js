@@ -354,7 +354,9 @@ class InstancesList extends Component<Props, State> {
   }
 }
 
-const InstancesListWithErrorBoundary = React.forwardRef<
+const InstancesListWithErrorBoundary: component(
+  ...{ ...Props, +ref?: React.RefSetter<InstancesListInterface> }
+) renders React$Node = React.forwardRef<
   Props,
   InstancesListInterface
 >((props, ref) => {

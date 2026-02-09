@@ -30,16 +30,18 @@ type LastModificationInfoProps = {|
   textPrefix?: React.Node,
 |};
 
-const LastModificationInfo = ({
-  file,
-  lastModifiedInfo,
-  storageProvider,
-  authenticatedUser,
-  currentFileMetadata,
-  textColor = 'primary',
-  textSize = 'body',
-  textPrefix,
-}: LastModificationInfoProps) => {
+const LastModificationInfo = (
+  {
+    file,
+    lastModifiedInfo,
+    storageProvider,
+    authenticatedUser,
+    currentFileMetadata,
+    textColor = 'primary',
+    textSize = 'body',
+    textPrefix
+  }: LastModificationInfoProps,
+): null | renders any => {
   const isProjectSavedOnCloud =
     !!storageProvider && storageProvider.internalName === 'Cloud';
   const isCurrentProjectOpened =

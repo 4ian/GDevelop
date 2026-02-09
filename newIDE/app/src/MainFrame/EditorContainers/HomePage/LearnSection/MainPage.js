@@ -79,19 +79,21 @@ type Props = {|
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
 |};
 
-const MainPage = ({
-  onSelectCategory,
-  selectInAppTutorial,
-  courses,
-  onSelectCourse,
-  onSelectBundle,
-  getCourseCompletion,
-  getCourseChapterCompletion,
-  onOpenAskAi,
-  onOpenNewProjectSetupDialog,
-  onSelectPrivateGameTemplateListingData,
-  onSelectExampleShortHeader,
-}: Props) => {
+const MainPage = (
+  {
+    onSelectCategory,
+    selectInAppTutorial,
+    courses,
+    onSelectCourse,
+    onSelectBundle,
+    getCourseCompletion,
+    getCourseChapterCompletion,
+    onOpenAskAi,
+    onOpenNewProjectSetupDialog,
+    onSelectPrivateGameTemplateListingData,
+    onSelectExampleShortHeader
+  }: Props,
+): renders any => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const {
     palette: { type: paletteType },

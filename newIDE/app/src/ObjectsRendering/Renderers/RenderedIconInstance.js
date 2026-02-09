@@ -7,7 +7,7 @@ import * as PIXI from 'pixi.js-legacy';
 /**
  * Create a renderer for an type of object displayed as an icon
  */
-export default function makeRenderer(iconPath: string) {
+export default function makeRenderer(iconPath: string): typeof RenderedIconInstance {
   class RenderedIconInstance extends RenderedInstance {
     constructor(
       project: gdProject,

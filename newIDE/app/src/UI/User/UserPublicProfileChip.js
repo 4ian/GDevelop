@@ -19,11 +19,7 @@ type Props = {|
   variant?: 'default' | 'outlined',
 |};
 
-export const UserPublicProfileChip = ({
-  user,
-  isClickable = false,
-  variant,
-}: Props) => {
+export const UserPublicProfileChip = ({user, isClickable = false, variant}: Props): renders any => {
   const { openUserPublicProfile } = React.useContext(PublicProfileContext);
 
   return (

@@ -68,7 +68,12 @@ const defaultPanelConfigByEditor = {
 };
 
 // Forward ref to allow Scene editor to force update some editors
-const MosaicEditorsDisplay = React.forwardRef<
+const MosaicEditorsDisplay: component(
+  ...{
+    ...SceneEditorsDisplayProps,
+    +ref?: React.RefSetter<SceneEditorsDisplayInterface>,
+  }
+) renders React$Node = React.forwardRef<
   SceneEditorsDisplayProps,
   SceneEditorsDisplayInterface
 >((props, ref) => {

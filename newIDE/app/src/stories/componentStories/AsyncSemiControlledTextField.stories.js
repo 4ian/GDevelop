@@ -15,12 +15,14 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (args: {|
-  floatingLabelText?: ?string,
-  endAdornment?: React.Node,
-  helperMarkdownText?: string,
-  required?: boolean,
-|}) => {
+export const Default = (
+  args: {|
+    floatingLabelText?: ?string,
+    endAdornment?: React.Node,
+    helperMarkdownText?: string,
+    required?: boolean,
+  |},
+): renders any => {
   const [value, setValue] = React.useState('Hello world');
   const [isEditing, setIsEditing] = React.useState<boolean>(false);
 
@@ -60,12 +62,14 @@ export const Default = (args: {|
     </ColumnStackLayout>
   );
 };
-export const NoMargin = (args: {|
-  floatingLabelText?: ?string,
-  endAdornment?: React.Node,
-  helperMarkdownText?: string,
-  required?: boolean,
-|}) => {
+export const NoMargin = (
+  args: {|
+    floatingLabelText?: ?string,
+    endAdornment?: React.Node,
+    helperMarkdownText?: string,
+    required?: boolean,
+  |},
+): renders any => {
   const [value, setValue] = React.useState('Hello world');
   const [isEditing, setIsEditing] = React.useState<boolean>(false);
 

@@ -16,7 +16,7 @@ type Props = {|
 |};
 
 export default class DebuggerSelector extends React.Component<Props, void> {
-  render() {
+  render(): any {
     const debuggerIds = Object.keys(this.props.debuggerStatus);
     const debuggerIdsWithoutInGameEdition = debuggerIds.filter(
       id => !this.props.debuggerStatus[id].isInGameEdition

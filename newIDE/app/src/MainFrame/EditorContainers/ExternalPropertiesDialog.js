@@ -33,7 +33,7 @@ export default function ExternalPropertiesDialog({
   project,
   title,
   helpTexts,
-}: Props) {
+}: Props): renders any {
   const initialLayoutName = layoutName || '';
   const [selectedLayoutName, setSelectedLayoutName] = React.useState<string>(
     initialLayoutName

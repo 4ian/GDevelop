@@ -7,7 +7,7 @@ import Physics3DEditor from './Editors/Physics3DEditor';
  * A service returning editor components for each behavior type.
  */
 const BehaviorsEditorService = {
-  getEditor(behaviorType: string) {
+  getEditor(behaviorType: string): any {
     if (!this.components[behaviorType]) {
       return BehaviorPropertiesEditor; // Default properties editor
     }

@@ -47,7 +47,12 @@ export type EventsBasedBehaviorOrObjectEditorInterface = {|
   scrollToProperty: (propertyName: string, isSharedProperties: boolean) => void,
 |};
 
-export const EventsBasedBehaviorOrObjectEditor = React.forwardRef<
+export const EventsBasedBehaviorOrObjectEditor: component(
+  ...{
+    ...Props,
+    +ref?: React.RefSetter<EventsBasedBehaviorOrObjectEditorInterface>,
+  }
+) renders React$Node = React.forwardRef<
   Props,
   EventsBasedBehaviorOrObjectEditorInterface
 >(

@@ -177,17 +177,19 @@ const getFieldLabel = ({
   return field.name;
 };
 
-const PropertiesEditor = ({
-  onInstancesModified,
-  instances,
-  schema,
-  mode,
-  renderExtraDescriptionText,
-  unsavedChanges,
-  project,
-  projectScopedContainersAccessor,
-  resourceManagementProps,
-}: Props) => {
+const PropertiesEditor = (
+  {
+    onInstancesModified,
+    instances,
+    schema,
+    mode,
+    renderExtraDescriptionText,
+    unsavedChanges,
+    project,
+    projectScopedContainersAccessor,
+    resourceManagementProps
+  }: Props,
+): renders any => {
   const forceUpdate = useForceUpdate();
 
   const _onInstancesModified = React.useCallback(

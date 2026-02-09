@@ -16,7 +16,7 @@ type Props = {|
   onLaunchPreview: () => Promise<void>,
 |};
 
-const PreviewLine = ({ onLaunchPreview }: Props) => {
+const PreviewLine = ({onLaunchPreview}: Props): renders any => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (

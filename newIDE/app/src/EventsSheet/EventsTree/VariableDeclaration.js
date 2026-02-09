@@ -77,7 +77,7 @@ const getVariableValueAsString = (variable: gdVariable, i18n: I18nType) => {
     : null;
 };
 
-export const VariableDeclaration = (props: Props) => {
+export const VariableDeclaration = (props: Props): renders any => {
   const { variableName, variable, id } = props;
   /**
    * Render the different parts of the text of the instruction.

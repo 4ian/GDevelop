@@ -29,9 +29,7 @@ export type InstancesEditorSettings = {|
   gameEditorMode: 'embedded-game' | 'instances-editor',
 |};
 
-export const getRecommendedInitialZoomFactor = (
-  largestSizeInPixels: number
-) => {
+export const getRecommendedInitialZoomFactor = (largestSizeInPixels: number): number => {
   // 700 is an empirical value obtained multiplying the largest size (1920) with
   // the zoom factor (0.36) so that the screen black rectangle fits nicely on the canvas
   // with only the left and right side panels opened on a Macbook screen.
@@ -68,8 +66,22 @@ export const prepareInstancesEditorSettings = (
   };
 };
 
-export const cloneInstancesEditorSettings = (
-  instancesEditorSettings: InstancesEditorSettings
-) => {
+export const cloneInstancesEditorSettings = (instancesEditorSettings: InstancesEditorSettings): {
+  gameEditorMode: "embedded-game" | "instances-editor",
+  grid: boolean,
+  gridAlpha: number,
+  gridColor: number,
+  gridDepth: number,
+  gridHeight: number,
+  gridOffsetX: number,
+  gridOffsetY: number,
+  gridOffsetZ: number,
+  gridType: "isometric" | "rectangular",
+  gridWidth: number,
+  selectedLayer: string,
+  snap: boolean,
+  windowMask: boolean,
+  zoomFactor: number,
+} => {
   return { ...instancesEditorSettings };
 };

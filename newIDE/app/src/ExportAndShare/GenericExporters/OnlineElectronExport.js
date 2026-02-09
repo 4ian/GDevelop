@@ -14,12 +14,7 @@ export type ExportState = {|
   targets: Array<TargetName>,
 |};
 
-export const SetupExportHeader = ({
-  exportState,
-  updateExportState,
-  isExporting,
-  build,
-}: HeaderProps<ExportState>) => {
+export const SetupExportHeader = ({exportState, updateExportState, isExporting, build}: HeaderProps<ExportState>): null | renders Fragment => {
   // Build is finished, hide options.
   if (!!build && build.status === 'complete') return null;
 
@@ -89,17 +84,19 @@ type OnlineElectronExportFlowProps = {|
   exportPipelineName: string,
 |};
 
-export const ExportFlow = ({
-  disabled,
-  launchExport,
-  isExporting,
-  exportPipelineName,
-  exportStep,
-  build,
-  stepMaxProgress,
-  stepCurrentProgress,
-  errored,
-}: OnlineElectronExportFlowProps) => {
+export const ExportFlow = (
+  {
+    disabled,
+    launchExport,
+    isExporting,
+    exportPipelineName,
+    exportStep,
+    build,
+    stepMaxProgress,
+    stepCurrentProgress,
+    errored
+  }: OnlineElectronExportFlowProps,
+): renders any => {
   const isExportingOrbuildRunningOrFinished =
     isExporting || (!!build && build.status !== 'error');
 
@@ -134,7 +131,7 @@ export const ExportFlow = ({
 
 export const onlineElectronExporter = {
   key: 'onlineelectronexport',
-  tabName: <Trans>Desktop</Trans>,
-  name: <Trans>Windows, macOS &amp; Linux</Trans>,
+  tabName: <Trans>Desktop</Trans> as renders any,
+  name: <Trans>Windows, macOS &amp; Linux</Trans> as renders any,
   helpPage: '/publishing/windows-macos-linux',
 };

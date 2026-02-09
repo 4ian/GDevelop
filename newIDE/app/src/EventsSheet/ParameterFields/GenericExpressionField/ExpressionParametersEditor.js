@@ -24,25 +24,25 @@ type Props = {|
   },
 |};
 
-export const hasNonCodeOnlyParameters = (
-  expressionMetadata: gdExpressionMetadata
-) =>
+export const hasNonCodeOnlyParameters = (expressionMetadata: gdExpressionMetadata): boolean =>
   mapFor(0, expressionMetadata.getParametersCount(), i => {
     const parameterMetadata = expressionMetadata.getParameter(i);
     return !parameterMetadata.isCodeOnly();
   }).filter(isVisible => isVisible).length !== 0;
 
-const ExpressionParametersEditor = ({
-  expressionMetadata,
-  parameterValues,
-  project,
-  scope,
-  globalObjectsContainer,
-  objectsContainer,
-  projectScopedContainersAccessor,
-  parameterRenderingService,
-  onChangeParameter,
-}: Props) => {
+const ExpressionParametersEditor = (
+  {
+    expressionMetadata,
+    parameterValues,
+    project,
+    scope,
+    globalObjectsContainer,
+    objectsContainer,
+    projectScopedContainersAccessor,
+    parameterRenderingService,
+    onChangeParameter
+  }: Props,
+): null | renders any => {
   if (!parameterRenderingService) {
     console.error(
       'Missing parameterRenderingService for ExpressionParametersEditor'

@@ -52,23 +52,43 @@ type Props = {|
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
-const useNewProjectDialog = ({
-  project,
-  fileMetadata,
-  resourceManagementProps,
-  isProjectOpening,
-  newProjectSetupDialogOpen,
-  setNewProjectSetupDialogOpen,
-  createEmptyProject,
-  createProjectFromExample,
-  createProjectFromPrivateGameTemplate,
-  closeAskAi,
-  storageProviders,
-  storageProvider,
-  onOpenLayout,
-  onWillInstallExtension,
-  onExtensionInstalled,
-}: Props) => {
+const useNewProjectDialog = (
+  {
+    project,
+    fileMetadata,
+    resourceManagementProps,
+    isProjectOpening,
+    newProjectSetupDialogOpen,
+    setNewProjectSetupDialogOpen,
+    createEmptyProject,
+    createProjectFromExample,
+    createProjectFromPrivateGameTemplate,
+    closeAskAi,
+    storageProviders,
+    storageProvider,
+    onOpenLayout,
+    onWillInstallExtension,
+    onExtensionInstalled
+  }: Props,
+): {
+  closeNewProjectDialog: () => void,
+  fetchAndOpenNewProjectSetupDialogForExample: (
+    exampleSlug: string
+  ) => Promise<void>,
+  onSelectExampleShortHeader: (
+    { exampleShortHeader: ?ExampleShortHeader, preventBackHome?: boolean }
+  ) => void,
+  onSelectPrivateGameTemplateListingData: (
+    {
+      preventBackHome?: boolean,
+      privateGameTemplateListingData: ?PrivateGameTemplateListingData,
+    }
+  ) => void,
+  openNewProjectDialog: () => void,
+  renderNewProjectDialog: () => renders Fragment,
+  selectedExampleShortHeader: ?ExampleShortHeader,
+  selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
+} => {
   const [isFetchingExample, setIsFetchingExample] = React.useState(false);
   const [
     selectedPrivateGameTemplateListingData,

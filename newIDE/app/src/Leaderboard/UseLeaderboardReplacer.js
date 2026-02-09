@@ -31,11 +31,7 @@ type ReplacePromptDialogProps = {|
   onTriggerReplace: () => void,
 |};
 
-export const ReplacePromptDialog = ({
-  leaderboardsToReplace,
-  onClose,
-  onTriggerReplace,
-}: ReplacePromptDialogProps) => {
+export const ReplacePromptDialog = ({leaderboardsToReplace, onClose, onTriggerReplace}: ReplacePromptDialogProps): renders any => {
   const { authenticated, onOpenLoginDialog } = React.useContext(
     AuthenticatedUserContext
   );
@@ -108,12 +104,14 @@ type LeaderboardReplacerProgressDialogProps = {|
   progress: number,
 |};
 
-export const LeaderboardReplacerProgressDialog = ({
-  erroredLeaderboards,
-  onRetry,
-  onAbandon,
-  progress,
-}: LeaderboardReplacerProgressDialogProps) => {
+export const LeaderboardReplacerProgressDialog = (
+  {
+    erroredLeaderboards,
+    onRetry,
+    onAbandon,
+    progress
+  }: LeaderboardReplacerProgressDialogProps,
+): renders any => {
   const hasErrors = erroredLeaderboards.length > 0;
 
   return (
@@ -204,19 +202,21 @@ type ErroredLeaderboard = {
  * First, register game, then copy leaderboards in database, and finally
  * replace them in events.
  */
-export const replaceLeaderboardsInProject = async ({
-  authenticatedUser,
-  project,
-  sourceGameId,
-  leaderboardsToReplace,
-  setProgress,
-}: {|
-  authenticatedUser: AuthenticatedUser,
-  project: gdProject,
-  sourceGameId: string,
-  leaderboardsToReplace: Array<string>,
-  setProgress: (percent: number | ((percent: number) => number)) => void,
-|}) => {
+export const replaceLeaderboardsInProject = async (
+  {
+    authenticatedUser,
+    project,
+    sourceGameId,
+    leaderboardsToReplace,
+    setProgress
+  }: {|
+    authenticatedUser: AuthenticatedUser,
+    project: gdProject,
+    sourceGameId: string,
+    leaderboardsToReplace: Array<string>,
+    setProgress: (percent: number | ((percent: number) => number)) => void,
+  |},
+): Promise<{ leaderboardsWithErrors: Array<ErroredLeaderboard> }> => {
   const { getAuthorizationHeader, profile } = authenticatedUser;
   if (!leaderboardsToReplace || !project || !sourceGameId) {
     throw new Error('No leaderboards found in events sheet.');
@@ -308,11 +308,13 @@ export const replaceLeaderboardsInProject = async ({
   };
 };
 
-export const findLeaderboardsToReplaceInProject = ({
-  project,
-}: {|
-  project: gdProject,
-|}) => {
+export const findLeaderboardsToReplaceInProject = (
+  {
+    project
+  }: {|
+    project: gdProject,
+  |},
+): Array<string> => {
   const leaderboardIds = gd.WholeProjectRefactorer.findAllLeaderboardIds(
     project
   )

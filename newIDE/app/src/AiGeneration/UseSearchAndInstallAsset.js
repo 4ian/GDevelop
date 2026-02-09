@@ -13,17 +13,23 @@ import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { useInstallAsset } from '../AssetStore/NewObjectDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 
-export const useSearchAndInstallAsset = ({
-  project,
-  resourceManagementProps,
-  onWillInstallExtension,
-  onExtensionInstalled,
-}: {|
-  project: ?gdProject,
-  resourceManagementProps: ResourceManagementProps,
-  onWillInstallExtension: (extensionNames: Array<string>) => void,
-  onExtensionInstalled: (extensionNames: Array<string>) => void,
-|}) => {
+export const useSearchAndInstallAsset = (
+  {
+    project,
+    resourceManagementProps,
+    onWillInstallExtension,
+    onExtensionInstalled
+  }: {|
+    project: ?gdProject,
+    resourceManagementProps: ResourceManagementProps,
+    onWillInstallExtension: (extensionNames: Array<string>) => void,
+    onExtensionInstalled: (extensionNames: Array<string>) => void,
+  |},
+): {
+  searchAndInstallAsset: (
+    AssetSearchAndInstallOptions
+  ) => Promise<AssetSearchAndInstallResult>,
+} => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );

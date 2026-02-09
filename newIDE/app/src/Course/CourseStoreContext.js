@@ -20,13 +20,13 @@ export const initialCourseStoreState: CourseChapterStoreState = {
   listedCourseChapters: null,
 };
 
-const CourseStoreContext = React.createContext<CourseChapterStoreState>(
+const CourseStoreContext: React.Context<CourseChapterStoreState> = React.createContext<CourseChapterStoreState>(
   initialCourseStoreState
 );
 
 type Props = {| children: React.Node |};
 
-export const CourseStoreStateProvider = (props: Props) => {
+export const CourseStoreStateProvider = (props: Props): React.MixedElement => {
   const [listedCourses, setListedCourses] = React.useState<
     CourseListingData[] | null
   >(null);

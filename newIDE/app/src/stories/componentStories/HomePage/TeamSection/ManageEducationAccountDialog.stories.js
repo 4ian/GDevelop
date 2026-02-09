@@ -14,7 +14,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => {
+export const Default = (): renders any => {
   return (
     <MockTeamProvider loading={false} teamSize={12}>
       <FixedHeightFlexContainer height={600}>

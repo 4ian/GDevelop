@@ -139,29 +139,33 @@ const formatPriceWithDiscount = (
   );
 };
 
-const SubscriptionPlanPricingSummary = ({
-  subscriptionPlanWithPricingSystems,
-  disabled,
-  onClickChoosePlan,
-  seatsCount,
-  setSeatsCount,
-  period,
-  setPeriod,
-  onlyShowDiscountedPrice,
-  pricingSystemDiscounts,
-}: {|
-  subscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems,
-  disabled?: boolean,
-  onClickChoosePlan: (
-    pricingSystem: SubscriptionPlanPricingSystem | null
-  ) => Promise<void>,
-  seatsCount: number,
-  setSeatsCount: (seatsCount: number) => void,
-  period: 'year' | 'month',
-  setPeriod: ('year' | 'month') => void,
-  onlyShowDiscountedPrice?: boolean,
-  pricingSystemDiscounts?: { [pricingSystemId: string]: PricingSystemDiscount },
-|}) => {
+const SubscriptionPlanPricingSummary = (
+  {
+    subscriptionPlanWithPricingSystems,
+    disabled,
+    onClickChoosePlan,
+    seatsCount,
+    setSeatsCount,
+    period,
+    setPeriod,
+    onlyShowDiscountedPrice,
+    pricingSystemDiscounts
+  }: {|
+    subscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems,
+    disabled?: boolean,
+    onClickChoosePlan: (
+      pricingSystem: SubscriptionPlanPricingSystem | null
+    ) => Promise<void>,
+    seatsCount: number,
+    setSeatsCount: (seatsCount: number) => void,
+    period: 'year' | 'month',
+    setPeriod: ('year' | 'month') => void,
+    onlyShowDiscountedPrice?: boolean,
+    pricingSystemDiscounts?: {
+      [pricingSystemId: string]: PricingSystemDiscount,
+    },
+  |},
+): null | renders any => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const selectedPricingSystem = subscriptionPlanWithPricingSystems.pricingSystems.find(
     pricingSystem => pricingSystem.period === period

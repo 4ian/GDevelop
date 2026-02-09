@@ -11,14 +11,16 @@ const gd: libGDevelop = global.gd;
 
 type Props = BehaviorEditorProps;
 
-const BehaviorPropertiesEditor = ({
-  project,
-  behavior,
-  object,
-  onBehaviorUpdated,
-  resourceManagementProps,
-  projectScopedContainersAccessor,
-}: Props) => {
+const BehaviorPropertiesEditor = (
+  {
+    project,
+    behavior,
+    object,
+    onBehaviorUpdated,
+    resourceManagementProps,
+    projectScopedContainersAccessor
+  }: Props,
+): renders any => {
   const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
     gd.JsPlatform.get(),
     behavior.getTypeName()

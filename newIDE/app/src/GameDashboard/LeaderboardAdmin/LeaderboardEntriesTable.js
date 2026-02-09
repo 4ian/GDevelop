@@ -38,14 +38,16 @@ type Props = {|
   |},
 |};
 
-const LeaderboardEntriesTable = ({
-  entries,
-  customizationSettings,
-  onDeleteEntry,
-  isLoading,
-  erroredEntry,
-  navigation,
-}: Props) => {
+const LeaderboardEntriesTable = (
+  {
+    entries,
+    customizationSettings,
+    onDeleteEntry,
+    isLoading,
+    erroredEntry,
+    navigation
+  }: Props,
+): renders any => {
   if (!entries) return <PlaceholderLoader />;
 
   return (

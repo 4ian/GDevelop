@@ -68,14 +68,7 @@ type Props = {|
   noBorder?: boolean,
 |};
 
-export const CardWidget = ({
-  children,
-  onClick,
-  size,
-  disabled,
-  useDefaultDisabledStyle,
-  noBorder,
-}: Props) => {
+export const CardWidget = ({children, onClick, size, disabled, useDefaultDisabledStyle, noBorder}: Props): renders any | React.MixedElement => {
   const classes = useStylesForWidget({
     useDefaultDisabledStyle,
     noBorder,

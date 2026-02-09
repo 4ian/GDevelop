@@ -20,7 +20,7 @@ type Props = {|
   unlocked?: boolean,
 |};
 
-export const EducationCard = ({ onSeeResources, unlocked }: Props) => {
+export const EducationCard = ({onSeeResources, unlocked}: Props): renders any => {
   if (unlocked) {
     return (
       <Paper background="medium" style={{ padding: 20 }}>

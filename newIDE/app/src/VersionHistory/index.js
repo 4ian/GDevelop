@@ -87,7 +87,7 @@ type Props = {|
   isVisible: boolean,
 |};
 
-const VersionHistory = React.memo<Props>(
+const VersionHistory: component(...Props) renders React.Node = React.memo<Props>(
   ({
     projectId,
     authenticatedUserId,

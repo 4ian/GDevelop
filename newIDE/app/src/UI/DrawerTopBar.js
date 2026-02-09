@@ -46,7 +46,7 @@ type Props = {|
   id: string,
 |};
 
-const DrawerTopBar = (props: Props) => {
+const DrawerTopBar = (props: Props): renders Fragment => {
   const closeButton = (
     <IconButton
       onClick={props.onClose}

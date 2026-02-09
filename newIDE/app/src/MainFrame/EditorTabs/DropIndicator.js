@@ -13,7 +13,7 @@ const styles = {
   },
 };
 
-export function ColumnDropIndicator() {
+export function ColumnDropIndicator(): React.MixedElement {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <div

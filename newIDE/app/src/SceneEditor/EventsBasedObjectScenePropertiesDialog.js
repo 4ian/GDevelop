@@ -21,15 +21,17 @@ type Props = {|
   ) => void,
 |};
 
-const EventsBasedObjectScenePropertiesDialog = ({
-  eventsBasedObject,
-  eventsBasedObjectVariant,
-  project,
-  onApply,
-  onClose,
-  getContentAABB,
-  onEventsBasedObjectChildrenEdited,
-}: Props) => {
+const EventsBasedObjectScenePropertiesDialog = (
+  {
+    eventsBasedObject,
+    eventsBasedObjectVariant,
+    project,
+    onApply,
+    onClose,
+    getContentAABB,
+    onEventsBasedObjectChildrenEdited
+  }: Props,
+): renders any => {
   const [areaMinX, setAreaMinX] = React.useState<number>(
     eventsBasedObjectVariant.getAreaMinX()
   );

@@ -18,7 +18,7 @@ const gd: libGDevelop = global.gd;
 
 type Props = EditorProps;
 
-const ObjectPropertiesEditor = (props: Props) => {
+const ObjectPropertiesEditor = (props: Props): renders any => {
   const {
     objectConfiguration,
     project,

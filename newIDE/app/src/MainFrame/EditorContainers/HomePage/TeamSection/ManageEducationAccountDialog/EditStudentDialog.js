@@ -22,13 +22,7 @@ type Props = {|
   error: ?Error,
 |};
 
-export const EditStudentDialog = ({
-  member,
-  onApply,
-  onClose,
-  isSaving,
-  error,
-}: Props) => {
+export const EditStudentDialog = ({member, onApply, onClose, isSaving, error}: Props): renders any => {
   const [changes, setChanges] = React.useState<EditUserChanges | null>(null);
 
   const [

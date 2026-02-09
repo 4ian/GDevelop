@@ -263,7 +263,9 @@ type Props = {|
   hideDetails?: boolean,
 |};
 
-const AssetsList = React.forwardRef<Props, AssetsListInterface>(
+const AssetsList: component(
+  ...{ ...Props, +ref?: React.RefSetter<AssetsListInterface> }
+) renders React$Node = React.forwardRef<Props, AssetsListInterface>(
   (
     {
       assetShortHeaders,

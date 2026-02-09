@@ -177,7 +177,7 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
   }
 };
 
-const LeaderboardProvider = ({ gameId, children }: Props) => {
+const LeaderboardProvider = ({gameId, children}: Props): renders any => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   // Ensure that only one request for leaderboards list is sent at the same time.
   const isListingLeaderboards = React.useRef(false);

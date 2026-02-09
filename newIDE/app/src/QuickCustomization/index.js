@@ -153,23 +153,25 @@ type Props = {|
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
-export const renderQuickCustomization = ({
-  project,
-  gameAndBuildsManager,
-  resourceManagementProps,
-  quickCustomizationState,
-  onLaunchPreview,
-  onlineWebExporter,
-  onSaveProject,
-  isSavingProject,
-  isRequiredToSaveAsNewCloudProject,
-  onClose,
-  onContinueQuickCustomization,
-  gameScreenshotUrls,
-  onScreenshotsClaimed,
-  onWillInstallExtension,
-  onExtensionInstalled,
-}: Props) => {
+export const renderQuickCustomization = (
+  {
+    project,
+    gameAndBuildsManager,
+    resourceManagementProps,
+    quickCustomizationState,
+    onLaunchPreview,
+    onlineWebExporter,
+    onSaveProject,
+    isSavingProject,
+    isRequiredToSaveAsNewCloudProject,
+    onClose,
+    onContinueQuickCustomization,
+    gameScreenshotUrls,
+    onScreenshotsClaimed,
+    onWillInstallExtension,
+    onExtensionInstalled
+  }: Props,
+): { content: renders Fragment, showPreview: boolean, title: React.Node } => {
   return {
     title: quickCustomizationState.step.title,
     content: (

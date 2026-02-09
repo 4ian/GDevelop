@@ -34,7 +34,7 @@ const onlineWebExporter: Exporter = {
   exportPipeline: fakeBrowserOnlineWebExportPipeline,
 };
 
-export const Default = () => {
+export const Default = (): renders any => {
   const [
     chosenExporterSection,
     setChosenExporterSection,
@@ -61,7 +61,7 @@ export const Default = () => {
   );
 };
 
-export const OnlineWebExporterSelected = () => {
+export const OnlineWebExporterSelected = (): renders any => {
   const [
     chosenExporterSection,
     setChosenExporterSection,
@@ -90,7 +90,7 @@ export const OnlineWebExporterSelected = () => {
   );
 };
 
-export const OnlineWebExporterSelectedForGameNotOwned = () => {
+export const OnlineWebExporterSelectedForGameNotOwned = (): renders any => {
   const [
     chosenExporterSection,
     setChosenExporterSection,
@@ -119,7 +119,7 @@ export const OnlineWebExporterSelectedForGameNotOwned = () => {
   );
 };
 
-export const OnlyOnlineWebExporter = () => {
+export const OnlyOnlineWebExporter = (): renders any => {
   const [
     chosenExporterSection,
     setChosenExporterSection,

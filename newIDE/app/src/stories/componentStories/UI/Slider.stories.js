@@ -13,7 +13,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => (
+export const Default = (): renders any => (
   <ValueStateHolder
     initialValue={1}
     render={(value, onChange) => (

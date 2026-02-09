@@ -58,14 +58,7 @@ type Props = {|
   |}) => Promise<void>,
 |};
 
-const ManageStudentRow = ({
-  member,
-  isSelected,
-  isArchived,
-  onSelect,
-  onChangePassword,
-  onEdit,
-}: Props) => {
+const ManageStudentRow = ({member, isSelected, isArchived, onSelect, onChangePassword, onEdit}: Props): renders Fragment => {
   const { isMobile } = useResponsiveWindowSize();
   const [isEditingPassword, setIsEditingPassword] = React.useState<boolean>(
     false

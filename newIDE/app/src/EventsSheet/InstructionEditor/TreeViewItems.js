@@ -256,23 +256,23 @@ export class MoreResultsTreeViewItemContent implements TreeViewItemContent {
     this.name = name;
     this.description = description;
   }
-  getName() {
+  getName(): any {
     return this.name;
   }
   getDescription(): string | null {
     return this.description;
   }
 
-  getId() {
+  getId(): any {
     return `more-results`;
   }
-  getHtmlId() {
+  getHtmlId(): any {
     return null;
   }
-  getDataSet() {
+  getDataSet(): any {
     return {};
   }
-  getThumbnail() {
+  getThumbnail(): any {
     return null;
   }
 }
@@ -283,26 +283,26 @@ export class InstructionTreeViewItemContent implements TreeViewItemContent {
   constructor(instructionMetadata: EnumeratedInstructionMetadata) {
     this.instructionMetadata = instructionMetadata;
   }
-  getInstructionMetadata() {
+  getInstructionMetadata(): any {
     return this.instructionMetadata;
   }
-  getName() {
+  getName(): any {
     return this.instructionMetadata.displayedName;
   }
   getDescription(): string | null {
     return this.instructionMetadata.fullGroupName;
   }
 
-  getId() {
+  getId(): any {
     return `instruction-item-${this.instructionMetadata.type.replace(
       /:/g,
       '-'
     )}`;
   }
-  getHtmlId() {
+  getHtmlId(): any {
     return this.getId();
   }
-  getDataSet() {
+  getDataSet(): any {
     return {
       instructionType: this.instructionMetadata.type.replace(/:/g, '-'),
       object: this.instructionMetadata.scope.objectMetadata
@@ -313,7 +313,7 @@ export class InstructionTreeViewItemContent implements TreeViewItemContent {
         : undefined,
     };
   }
-  getThumbnail() {
+  getThumbnail(): any {
     return this.instructionMetadata.iconFilename;
   }
 }

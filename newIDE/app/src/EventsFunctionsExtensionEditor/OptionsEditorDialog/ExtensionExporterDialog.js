@@ -77,7 +77,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const ExtensionExporterDialog = (props: Props) => {
+const ExtensionExporterDialog = (props: Props): renders any => {
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );

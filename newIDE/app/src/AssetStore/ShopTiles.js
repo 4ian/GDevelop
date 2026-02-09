@@ -111,21 +111,23 @@ const styles = {
   },
 };
 
-export const AssetCardTile = ({
-  assetShortHeader,
-  onOpenDetails,
-  size,
-  margin,
-  hideShortDescription,
-  disabled,
-}: {|
-  assetShortHeader: AssetShortHeader,
-  onOpenDetails: () => void,
-  size: number,
-  margin?: number,
-  hideShortDescription?: boolean,
-  disabled?: boolean,
-|}) => {
+export const AssetCardTile = (
+  {
+    assetShortHeader,
+    onOpenDetails,
+    size,
+    margin,
+    hideShortDescription,
+    disabled
+  }: {|
+    assetShortHeader: AssetShortHeader,
+    onOpenDetails: () => void,
+    size: number,
+    margin?: number,
+    hideShortDescription?: boolean,
+    disabled?: boolean,
+  |},
+): renders any => {
   return (
     <GridListTile style={{ margin }}>
       <CardWidget
@@ -145,18 +147,20 @@ export const AssetCardTile = ({
   );
 };
 
-export const AssetFolderTile = ({
-  tag,
-  onSelect,
-  style,
-  disabled,
-}: {|
-  tag: string,
-  onSelect: () => void,
-  /** Props needed so that GridList component can adjust tile size */
-  style?: any,
-  disabled?: boolean,
-|}) => {
+export const AssetFolderTile = (
+  {
+    tag,
+    onSelect,
+    style,
+    disabled
+  }: {|
+    tag: string,
+    onSelect: () => void,
+    /** Props needed so that GridList component can adjust tile size */
+    style?: any,
+    disabled?: boolean,
+  |},
+): renders any => {
   return (
     <GridListTile style={style}>
       <CardWidget
@@ -182,18 +186,20 @@ export const AssetFolderTile = ({
   );
 };
 
-export const PublicAssetPackTile = ({
-  assetPack,
-  onSelect,
-  style,
-  disabled,
-}: {|
-  assetPack: PublicAssetPack,
-  onSelect: () => void,
-  /** Props needed so that GridList component can adjust tile size */
-  style?: any,
-  disabled?: boolean,
-|}) => {
+export const PublicAssetPackTile = (
+  {
+    assetPack,
+    onSelect,
+    style,
+    disabled
+  }: {|
+    assetPack: PublicAssetPack,
+    onSelect: () => void,
+    /** Props needed so that GridList component can adjust tile size */
+    style?: any,
+    disabled?: boolean,
+  |},
+): renders any => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <GridListTile style={style}>
@@ -238,22 +244,24 @@ export const PublicAssetPackTile = ({
   );
 };
 
-export const PrivateAssetPackTile = ({
-  assetPackListingData,
-  onSelect,
-  style,
-  owned,
-  disabled,
-  discountedPrice,
-}: {|
-  assetPackListingData: PrivateAssetPackListingData,
-  onSelect: () => void,
-  /** Props needed so that GridList component can adjust tile size */
-  style?: any,
-  owned: boolean,
-  disabled?: boolean,
-  discountedPrice?: boolean,
-|}) => {
+export const PrivateAssetPackTile = (
+  {
+    assetPackListingData,
+    onSelect,
+    style,
+    owned,
+    disabled,
+    discountedPrice
+  }: {|
+    assetPackListingData: PrivateAssetPackListingData,
+    onSelect: () => void,
+    /** Props needed so that GridList component can adjust tile size */
+    style?: any,
+    owned: boolean,
+    disabled?: boolean,
+    discountedPrice?: boolean,
+  |},
+): renders any => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <GridListTile style={style}>
@@ -312,24 +320,26 @@ export const PrivateAssetPackTile = ({
   );
 };
 
-export const PromoBundleCard = ({
-  bundleProductListingData,
-  includedProductListingData,
-  onSelect,
-  owned,
-}: {|
-  bundleProductListingData:
-    | PrivateAssetPackListingData
-    | PrivateGameTemplateListingData
-    | BundleListingData,
-  includedProductListingData:
-    | PrivateAssetPackListingData
-    | PrivateGameTemplateListingData
-    | CourseListingData
-    | BundleListingData,
-  onSelect: () => void,
-  owned: boolean,
-|}) => {
+export const PromoBundleCard = (
+  {
+    bundleProductListingData,
+    includedProductListingData,
+    onSelect,
+    owned
+  }: {|
+    bundleProductListingData: 
+      | PrivateAssetPackListingData
+      | PrivateGameTemplateListingData
+      | BundleListingData,
+    includedProductListingData: 
+      | PrivateAssetPackListingData
+      | PrivateGameTemplateListingData
+      | CourseListingData
+      | BundleListingData,
+    onSelect: () => void,
+    owned: boolean,
+  |},
+): renders any => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <I18n>
@@ -411,24 +421,26 @@ export const PromoBundleCard = ({
   );
 };
 
-export const CategoryTile = ({
-  id,
-  title,
-  imageSource,
-  imageAlt,
-  onSelect,
-  style,
-  disabled,
-}: {|
-  id: string,
-  title: React.Node,
-  imageSource: string,
-  imageAlt: string,
-  onSelect: () => void,
-  /** Props needed so that GridList component can adjust tile size */
-  style?: any,
-  disabled?: boolean,
-|}) => {
+export const CategoryTile = (
+  {
+    id,
+    title,
+    imageSource,
+    imageAlt,
+    onSelect,
+    style,
+    disabled
+  }: {|
+    id: string,
+    title: React.Node,
+    imageSource: string,
+    imageAlt: string,
+    onSelect: () => void,
+    /** Props needed so that GridList component can adjust tile size */
+    style?: any,
+    disabled?: boolean,
+  |},
+): renders any => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <GridListTile style={style}>
@@ -461,22 +473,24 @@ export const CategoryTile = ({
   );
 };
 
-export const PrivateGameTemplateTile = ({
-  privateGameTemplateListingData,
-  onSelect,
-  style,
-  owned,
-  disabled,
-  discountedPrice,
-}: {|
-  privateGameTemplateListingData: PrivateGameTemplateListingData,
-  onSelect: () => void,
-  /** Props needed so that GridList component can adjust tile size */
-  style?: any,
-  owned: boolean,
-  disabled?: boolean,
-  discountedPrice?: boolean,
-|}) => {
+export const PrivateGameTemplateTile = (
+  {
+    privateGameTemplateListingData,
+    onSelect,
+    style,
+    owned,
+    disabled,
+    discountedPrice
+  }: {|
+    privateGameTemplateListingData: PrivateGameTemplateListingData,
+    onSelect: () => void,
+    /** Props needed so that GridList component can adjust tile size */
+    style?: any,
+    owned: boolean,
+    disabled?: boolean,
+    discountedPrice?: boolean,
+  |},
+): renders any => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
@@ -522,22 +536,24 @@ export const PrivateGameTemplateTile = ({
   );
 };
 
-export const CourseTile = ({
-  courseListingData,
-  onSelect,
-  style,
-  owned,
-  disabled,
-  discountedPrice,
-}: {|
-  courseListingData: CourseListingData,
-  onSelect: () => void,
-  /** Props needed so that GridList component can adjust tile size */
-  style?: any,
-  owned: boolean,
-  disabled?: boolean,
-  discountedPrice?: boolean,
-|}) => {
+export const CourseTile = (
+  {
+    courseListingData,
+    onSelect,
+    style,
+    owned,
+    disabled,
+    discountedPrice
+  }: {|
+    courseListingData: CourseListingData,
+    onSelect: () => void,
+    /** Props needed so that GridList component can adjust tile size */
+    style?: any,
+    owned: boolean,
+    disabled?: boolean,
+    discountedPrice?: boolean,
+  |},
+): renders any => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
@@ -581,22 +597,24 @@ export const CourseTile = ({
   );
 };
 
-export const BundleTile = ({
-  bundleListingData,
-  onSelect,
-  style,
-  owned,
-  disabled,
-  discountedPrice,
-}: {|
-  bundleListingData: BundleListingData,
-  onSelect: () => void,
-  /** Props needed so that GridList component can adjust tile size */
-  style?: any,
-  owned: boolean,
-  disabled?: boolean,
-  discountedPrice?: boolean,
-|}) => {
+export const BundleTile = (
+  {
+    bundleListingData,
+    onSelect,
+    style,
+    owned,
+    disabled,
+    discountedPrice
+  }: {|
+    bundleListingData: BundleListingData,
+    onSelect: () => void,
+    /** Props needed so that GridList component can adjust tile size */
+    style?: any,
+    owned: boolean,
+    disabled?: boolean,
+    discountedPrice?: boolean,
+  |},
+): renders any => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
@@ -658,24 +676,26 @@ export const BundleTile = ({
   );
 };
 
-export const ExampleTile = ({
-  exampleShortHeader,
-  onSelect,
-  style,
-  customTitle,
-  centerTitle,
-  useQuickCustomizationThumbnail,
-  disabled,
-}: {|
-  exampleShortHeader: ExampleShortHeader | null,
-  onSelect: () => void,
-  /** Props needed so that GridList component can adjust tile size */
-  style?: any,
-  customTitle?: string,
-  centerTitle?: boolean,
-  useQuickCustomizationThumbnail?: boolean,
-  disabled?: boolean,
-|}) => {
+export const ExampleTile = (
+  {
+    exampleShortHeader,
+    onSelect,
+    style,
+    customTitle,
+    centerTitle,
+    useQuickCustomizationThumbnail,
+    disabled
+  }: {|
+    exampleShortHeader: ExampleShortHeader | null,
+    onSelect: () => void,
+    /** Props needed so that GridList component can adjust tile size */
+    style?: any,
+    customTitle?: string,
+    centerTitle?: boolean,
+    useQuickCustomizationThumbnail?: boolean,
+    disabled?: boolean,
+  |},
+): renders any => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const thumbnailImgUrl = React.useMemo(

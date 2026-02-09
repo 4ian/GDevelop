@@ -36,66 +36,70 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(ref, () => ({
-      focus,
-    }));
-
-    const { parameterMetadata, value, onChange } = props;
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        focus,
+      }),
+    );
+    
+    const {parameterMetadata, value, onChange} = props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
-
+    
     const comparedValueType = parameterMetadata
       ? parameterMetadata.getExtraInfo()
       : 'unknown';
-    const operators =
-      mapTypeToOperators[comparedValueType] || mapTypeToOperators.unknown;
-
+    const operators = mapTypeToOperators[comparedValueType] ||
+      mapTypeToOperators.unknown;
+    
     React.useEffect(
       () => {
         if (comparedValueType !== 'unknown' && !value) {
           onChange(operators[0]);
         }
       },
-      [value, onChange, comparedValueType, operators]
+      [value, onChange, comparedValueType, operators],
     );
-
+    
     return (
       <SelectField
         margin={props.isInline ? 'none' : 'dense'}
         fullWidth
         floatingLabelText={description}
-        helperMarkdownText={
-          parameterMetadata ? parameterMetadata.getLongDescription() : undefined
-        }
+        helperMarkdownText={parameterMetadata
+          ? parameterMetadata.getLongDescription()
+          : undefined}
         value={operators.includes(value) ? value : ''}
         onChange={(e, i, value: string) => onChange(value)}
         ref={field}
         translatableHintText={t`Choose an operator`}
-        id={
-          props.parameterIndex !== undefined
-            ? `parameter-${props.parameterIndex}-operator-field`
-            : undefined
-        }
-      >
-        {operators.map(operator => (
-          <SelectOption
+        id={props.parameterIndex !== undefined
+          ? `parameter-${props.parameterIndex}-operator-field`
+          : undefined}>
+        {operators.map(
+          operator => <SelectOption
             key={operator}
             value={operator}
             label={operatorLabels[operator]}
-          />
-        ))}
+          />,
+        )}
       </SelectField>
     );
-  }
-);
+  },
+) as component(
+  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
+) renders React$Node;
 
-export const renderInlineOperator = ({
-  value,
-  InvalidParameterValue,
-  useAssignmentOperators,
-  parameterMetadata,
-}: ParameterInlineRendererProps) => {
+export const renderInlineOperator = (
+  {
+    value,
+    InvalidParameterValue,
+    useAssignmentOperators,
+    parameterMetadata
+  }: ParameterInlineRendererProps,
+): string | React.MixedElement | renders any => {
   const comparedValueType = parameterMetadata
     ? parameterMetadata.getExtraInfo()
     : 'unknown';

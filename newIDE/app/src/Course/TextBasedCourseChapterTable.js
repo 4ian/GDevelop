@@ -25,7 +25,7 @@ const styles = {
   },
 };
 
-const TextBasedCourseChapterTable = ({ header, rows }: Props) => {
+const TextBasedCourseChapterTable = ({header, rows}: Props): null | renders any => {
   const columnCount = React.useMemo(
     () => {
       const maxColumnsFromRows = rows.reduce(

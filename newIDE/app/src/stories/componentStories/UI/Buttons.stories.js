@@ -43,7 +43,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => (
+export const Default = (): renders any => (
   <ColumnStackLayout>
     <LineStackLayout noMargin>
       <Text size="block-title">Buttons:</Text>

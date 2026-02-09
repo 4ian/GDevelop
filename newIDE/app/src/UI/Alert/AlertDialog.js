@@ -17,7 +17,7 @@ type Props = {|
   dismissButtonLabel?: MessageDescriptor,
 |};
 
-function AlertDialog(props: Props) {
+function AlertDialog(props: Props): renders any {
   return (
     <I18n>
       {({ i18n }) => (

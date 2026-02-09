@@ -38,7 +38,7 @@ export default class ElementWithMenu extends React.Component<Props, State> {
     }
   };
 
-  render() {
+  render(): any {
     const {
       element,
       buildMenuTemplate,

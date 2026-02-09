@@ -36,17 +36,19 @@ type Props = {
   },
 };
 
-const ExpressionParametersEditorDialog = ({
-  project,
-  scope,
-  onDone,
-  onRequestClose,
-  globalObjectsContainer,
-  objectsContainer,
-  projectScopedContainersAccessor,
-  expressionMetadata,
-  parameterRenderingService,
-}: Props) => {
+const ExpressionParametersEditorDialog = (
+  {
+    project,
+    scope,
+    onDone,
+    onRequestClose,
+    globalObjectsContainer,
+    objectsContainer,
+    projectScopedContainersAccessor,
+    expressionMetadata,
+    parameterRenderingService
+  }: Props,
+): renders any => {
   const [parameterValues, setParameterValues] = React.useState<Array<string>>(
     Array(expressionMetadata.getParametersCount()).fill('')
   );

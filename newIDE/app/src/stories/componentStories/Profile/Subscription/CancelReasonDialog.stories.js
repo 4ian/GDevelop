@@ -16,7 +16,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Loading = () => (
+export const Loading = (): renders any => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <CancelReasonDialog
       onClose={() => action('on close')()}
@@ -25,7 +25,7 @@ export const Loading = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const Default = () => (
+export const Default = (): renders any => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <CancelReasonDialog
       onClose={() => action('on close')()}

@@ -369,7 +369,7 @@ const computeTokensByLine = (code: string): Token[][] => {
   return tokensByLine;
 };
 
-const TextBasedCourseChapterCodeBlock = ({ code, language }: Props) => {
+const TextBasedCourseChapterCodeBlock = ({code, language}: Props): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const normalizedCode = React.useMemo(() => code.replace(/\t/g, '  '), [code]);
   const tokensByLine = React.useMemo(

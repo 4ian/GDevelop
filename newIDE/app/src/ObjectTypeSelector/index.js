@@ -25,13 +25,12 @@ type State = {|
 
 export default class ObjectTypeSelector extends React.Component<Props, State> {
   state = {
-    objectMetadata: enumerateObjectTypes(
-      this.props.project,
-      this.props.eventsFunctionsExtension
-    ),
+    objectMetadata: enumerateObjectTypes(this.props.project, this.props.eventsFunctionsExtension) as Array<
+  EnumeratedObjectMetadata,
+>,
   };
 
-  render() {
+  render(): any {
     const {
       disabled,
       value,

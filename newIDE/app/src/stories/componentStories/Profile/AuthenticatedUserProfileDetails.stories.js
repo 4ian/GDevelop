@@ -13,14 +13,14 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => (
+export const Default = (): renders any => (
   <AuthenticatedUserProfileDetails
     authenticatedUser={fakeSilverAuthenticatedUser}
     onOpenEditProfileDialog={action('onOpenEditProfileDialog')}
     onOpenChangeEmailDialog={action('onOpenChangeEmailDialog')}
   />
 );
-export const Loading = () => (
+export const Loading = (): renders any => (
   <AuthenticatedUserProfileDetails
     authenticatedUser={fakeAuthenticatedUserLoggingIn}
     onOpenEditProfileDialog={action('onOpenEditProfileDialog')}

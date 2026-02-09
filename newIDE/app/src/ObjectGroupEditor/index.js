@@ -30,16 +30,18 @@ type Props = {|
   isObjectListLocked: boolean,
 |};
 
-const ObjectGroupEditor = ({
-  project,
-  projectScopedContainersAccessor,
-  globalObjectsContainer,
-  objectsContainer,
-  groupObjectNames,
-  onObjectAdded,
-  onObjectRemoved,
-  isObjectListLocked,
-}: Props) => {
+const ObjectGroupEditor = (
+  {
+    project,
+    projectScopedContainersAccessor,
+    globalObjectsContainer,
+    objectsContainer,
+    groupObjectNames,
+    onObjectAdded,
+    onObjectRemoved,
+    isObjectListLocked
+  }: Props,
+): renders any => {
   const [objectName, setObjectName] = React.useState<string>('');
 
   const addObject = React.useCallback(

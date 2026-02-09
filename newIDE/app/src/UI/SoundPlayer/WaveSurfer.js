@@ -212,7 +212,7 @@ function useWavesurferEvents(wavesurfer: WaveSurfer | null, events: any) {
  * @see https://wavesurfer.xyz/docs/modules/wavesurfer
  * @public
  */
-const WavesurferPlayer = React.memo<Props>(
+const WavesurferPlayer: component(...Props) renders React.Node = React.memo<Props>(
   (props: Props): React$Element<any> => {
     const containerRef = React.useRef<HTMLDivElement | null>(null);
     const [options, events] = useWavesurferProps(props);
@@ -251,7 +251,12 @@ export default WavesurferPlayer;
  *
  * @public
  */
-export function useWavesurfer({ container, ...options }: Props) {
+export function useWavesurfer({ container, ...options }: Props): {
+  currentTime: number,
+  isPlaying: boolean,
+  isReady: boolean,
+  wavesurfer: any | null,
+} {
   const wavesurfer = useWavesurferInstance(container, options);
   const state = useWavesurferState(wavesurfer);
   return React.useMemo(() => ({ ...state, wavesurfer }), [state, wavesurfer]);

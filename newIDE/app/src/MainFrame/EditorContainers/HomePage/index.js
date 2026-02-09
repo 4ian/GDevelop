@@ -219,7 +219,7 @@ export type HomePageEditorInterface = {|
   ) => void,
 |};
 
-export const HomePage = React.memo<Props>(
+export const HomePage: component(...Props) renders React.Node = React.memo<Props>(
   React.forwardRef<Props, HomePageEditorInterface>(
     (
       {
@@ -735,9 +735,7 @@ export const HomePage = React.memo<Props>(
   (prevProps, nextProps) => prevProps.isActive || nextProps.isActive
 );
 
-export const renderHomePageContainer = (
-  props: RenderEditorContainerPropsWithRef
-) => (
+export const renderHomePageContainer = (props: RenderEditorContainerPropsWithRef): React.MixedElement => (
   <HomePage
     ref={props.ref}
     project={props.project}

@@ -37,7 +37,7 @@ const Wrapper = ({ children }: {| children: React.Node |}) => {
   );
 };
 
-export const Default = () => {
+export const Default = (): renders any => {
   return (
     <Wrapper>
       <AssetStore onOpenProfile={action('onOpenProfile')} displayPromotions />
@@ -45,7 +45,7 @@ export const Default = () => {
   );
 };
 
-export const WithoutPromotions = () => {
+export const WithoutPromotions = (): renders any => {
   return (
     <Wrapper>
       <AssetStore
@@ -56,7 +56,7 @@ export const WithoutPromotions = () => {
   );
 };
 
-export const LoadingError = () => {
+export const LoadingError = (): renders any => {
   const assetCdnMock = React.useMemo(() => {
     const mock = new MockAdapter(cdnClient, {
       delayResponse: 250,

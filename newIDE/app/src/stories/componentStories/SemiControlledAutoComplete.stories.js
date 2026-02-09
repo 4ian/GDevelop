@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const DefaultWithText = () => (
+export const DefaultWithText = (): renders any => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -36,7 +36,7 @@ export const DefaultWithText = () => (
   />
 );
 
-export const WithError = () => (
+export const WithError = (): renders any => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -56,7 +56,7 @@ export const WithError = () => (
   />
 );
 
-export const WithTranslatableElementsAndSeparator = () => (
+export const WithTranslatableElementsAndSeparator = (): renders any => (
   <ValueStateHolder
     initialValue={''}
     render={(value, onChange) => (
@@ -87,7 +87,7 @@ export const WithTranslatableElementsAndSeparator = () => (
   />
 );
 
-export const WithOnClickForSomeElements = () => (
+export const WithOnClickForSomeElements = (): renders any => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -122,7 +122,7 @@ export const WithOnClickForSomeElements = () => (
   />
 );
 
-export const WithOnClickLongTextsAndRenderIcon = () => (
+export const WithOnClickLongTextsAndRenderIcon = (): renders any => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -173,7 +173,7 @@ export const WithOnClickLongTextsAndRenderIcon = () => (
   />
 );
 
-export const InDialog = () => (
+export const InDialog = (): renders any => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -208,7 +208,7 @@ export const InDialog = () => (
   />
 );
 
-export const WithReducedMarginInMiniToolbar = () => (
+export const WithReducedMarginInMiniToolbar = (): renders any => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -231,7 +231,7 @@ export const WithReducedMarginInMiniToolbar = () => (
   />
 );
 
-export const WithMarkdownHelperText = () => (
+export const WithMarkdownHelperText = (): renders any => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -251,7 +251,7 @@ export const WithMarkdownHelperText = () => (
   />
 );
 
-export const WithFloatingLabel = () => (
+export const WithFloatingLabel = (): renders any => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -272,7 +272,7 @@ export const WithFloatingLabel = () => (
   />
 );
 
-export const WithInputValueListener = () => {
+export const WithInputValueListener = (): renders any => {
   const [value, setValue] = React.useState('Choice 6');
   const [inputValue, setInputValue] = React.useState('Choice 6');
 

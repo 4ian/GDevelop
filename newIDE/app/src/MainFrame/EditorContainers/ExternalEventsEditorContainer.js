@@ -57,7 +57,7 @@ export class ExternalEventsEditorContainer extends React.Component<
     externalPropertiesDialogOpen: false,
   };
 
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     // We stop updates when the component is inactive.
     // If it's active, was active or becoming active again we let update propagate.
     // Especially important to note that when becoming inactive, a "last" update is allowed.
@@ -188,7 +188,7 @@ export class ExternalEventsEditorContainer extends React.Component<
     });
   };
 
-  onCreateEventsFunction = (extensionName, eventsFunction) => {
+  onCreateEventsFunction = (extensionName: any, eventsFunction: any) => {
     this.props.onCreateEventsFunction(
       extensionName,
       eventsFunction,
@@ -196,7 +196,7 @@ export class ExternalEventsEditorContainer extends React.Component<
     );
   };
 
-  render() {
+  render(): any {
     const { project, projectItemName } = this.props;
     const externalEvents = this.getExternalEvents();
     const layout = this.getLayout();
@@ -288,6 +288,4 @@ export class ExternalEventsEditorContainer extends React.Component<
   }
 }
 
-export const renderExternalEventsEditorContainer = (
-  props: RenderEditorContainerPropsWithRef
-) => <ExternalEventsEditorContainer {...props} />;
+export const renderExternalEventsEditorContainer = (props: RenderEditorContainerPropsWithRef): renders any => <ExternalEventsEditorContainer {...props} />;

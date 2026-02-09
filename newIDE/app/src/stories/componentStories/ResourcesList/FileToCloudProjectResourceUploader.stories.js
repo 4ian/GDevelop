@@ -20,7 +20,7 @@ export default {
   decorators: [paperDecorator, GDevelopJsInitializerDecorator],
 };
 
-export const Default = () => (
+export const Default = (): renders any => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       createNewResource={() => new gd.ImageResource()}
@@ -37,7 +37,7 @@ export const Default = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const AutomaticallyOpenInput = () => (
+export const AutomaticallyOpenInput = (): renders any => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       createNewResource={() => new gd.ImageResource()}
@@ -54,7 +54,7 @@ export const AutomaticallyOpenInput = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const SingleFile = () => (
+export const SingleFile = (): renders any => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       createNewResource={() => new gd.ImageResource()}
@@ -71,7 +71,7 @@ export const SingleFile = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const IncompatibleStorageProvider = () => (
+export const IncompatibleStorageProvider = (): renders any => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       createNewResource={() => new gd.ImageResource()}
@@ -88,7 +88,7 @@ export const IncompatibleStorageProvider = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const NotAuthenticatedUser = () => (
+export const NotAuthenticatedUser = (): renders any => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       createNewResource={() => new gd.ImageResource()}

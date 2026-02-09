@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => (
+export const Default = (): renders any => (
   <SerializedObjectDisplay object={testProject.particleEmitterConfiguration}>
     <ParticleEmitterEditor
       objectConfiguration={testProject.particleEmitterConfiguration}

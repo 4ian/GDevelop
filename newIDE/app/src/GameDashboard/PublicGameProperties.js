@@ -30,7 +30,7 @@ const isCyrillic = (text: string) =>
   /[БГДЖЗИЙЛПФЦЧШЩЫЭЮЯбвгджзийклмнптфцчшщыэюя]/.test(text);
 const cyrillicToLatinMapping = require('./CyrillicToLatin.json');
 
-export const cleanUpGameSlug = (gameSlug: string) => {
+export const cleanUpGameSlug = (gameSlug: string): string => {
   let latinGameSlug = gameSlug;
   if (isCyrillic(gameSlug)) {
     latinGameSlug = gameSlug
@@ -137,7 +137,7 @@ export function PublicGameProperties({
   onGameUpdated,
   onUpdatingGame,
   canBePublishedOnGdGames,
-}: Props) {
+}: Props): renders any {
   const [categoryInput, setCategoryInput] = React.useState('');
   const { profile } = React.useContext(AuthenticatedUserContext);
 

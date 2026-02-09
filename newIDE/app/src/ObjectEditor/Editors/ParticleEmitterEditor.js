@@ -23,7 +23,7 @@ export default class ParticleEmitterEditor extends React.Component<
   EditorProps,
   void
 > {
-  render() {
+  render(): any {
     const {
       objectConfiguration,
       project,

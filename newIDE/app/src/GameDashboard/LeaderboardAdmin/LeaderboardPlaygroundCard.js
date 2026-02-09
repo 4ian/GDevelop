@@ -8,7 +8,7 @@ import { LineStackLayout } from '../../UI/Layout';
 import Link from '../../UI/Link';
 import Window from '../../Utils/Window';
 
-const LeaderboardPlaygroundCard = () => {
+const LeaderboardPlaygroundCard = (): renders any => {
   return (
     <LineStackLayout
       expand

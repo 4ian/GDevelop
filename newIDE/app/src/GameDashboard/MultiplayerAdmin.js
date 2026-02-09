@@ -28,7 +28,7 @@ type Props = {|
   gameId: string,
 |};
 
-const MultiplayerAdmin = ({ gameId }: Props) => {
+const MultiplayerAdmin = ({gameId}: Props): renders any | renders Fragment => {
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [fetchingError, setFetchingError] = React.useState<React.Node>(null);
   const [isSaving, setIsSaving] = React.useState<boolean>(false);

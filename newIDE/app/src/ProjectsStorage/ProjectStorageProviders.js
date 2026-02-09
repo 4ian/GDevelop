@@ -71,7 +71,7 @@ const computeDefaultConfiguration = (
   return candidates[0];
 };
 
-const ProjectStorageProviders = (props: Props) => {
+const ProjectStorageProviders = (props: Props): renders Fragment => {
   const storageProviderOperations = React.useRef<?StorageProviderOperations>(
     null
   );

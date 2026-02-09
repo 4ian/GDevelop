@@ -185,11 +185,11 @@ export type GameLeaderboard = {
   topGameCommentQualityRatings: GameLeaderboardEntry[],
 };
 
-export const client = axios.create({
+export const client: Axios = axios.create({
   baseURL: GDevelopGameApi.baseUrl,
 });
 
-export const getCategoryName = (category: string, i18n: I18nType) => {
+export const getCategoryName = (category: string, i18n: I18nType): any => {
   switch (category) {
     case 'action':
       return i18n._(t`Action`);
@@ -230,7 +230,7 @@ export const getCategoryName = (category: string, i18n: I18nType) => {
   }
 };
 
-export const getGameUrl = (game: ?Game) => {
+export const getGameUrl = (game: ?Game): any | null => {
   if (!game) return null;
   const slug = game.cachedCurrentSlug;
   return slug
@@ -238,7 +238,7 @@ export const getGameUrl = (game: ?Game) => {
     : GDevelopGamesPlatform.getGameUrl(game.id);
 };
 
-export const getPublicGameUrl = (publicGame: ?PublicGame) => {
+export const getPublicGameUrl = (publicGame: ?PublicGame): any | null => {
   if (!publicGame) return null;
 
   return publicGame.gameSlug && publicGame.userSlug

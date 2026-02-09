@@ -12,10 +12,7 @@ type Props = {|
   hasFilledSurveyAlready: boolean,
 |};
 
-export const SurveyCard = ({
-  onStartSurvey,
-  hasFilledSurveyAlready,
-}: Props) => {
+export const SurveyCard = ({onStartSurvey, hasFilledSurveyAlready}: Props): renders any => {
   return (
     <CalloutCard
       renderImage={style => (

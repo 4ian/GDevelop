@@ -75,19 +75,47 @@ type Props = {|
 /**
  * Helper for Mainframe to create a new project.
  */
-const useCreateProject = ({
-  beforeCreatingProject,
-  afterCreatingProject,
-  onSuccessOrError,
-  onError,
-  getStorageProviderOperations,
-  getStorageProvider,
-  loadFromProject,
-  openFromFileMetadata,
-  onProjectSaved,
-  ensureResourcesAreMoved,
-  onGameRegistered,
-}: Props) => {
+const useCreateProject = (
+  {
+    beforeCreatingProject,
+    afterCreatingProject,
+    onSuccessOrError,
+    onError,
+    getStorageProviderOperations,
+    getStorageProvider,
+    loadFromProject,
+    openFromFileMetadata,
+    onProjectSaved,
+    ensureResourcesAreMoved,
+    onGameRegistered
+  }: Props,
+): {
+  createEmptyProject: (
+    newProjectSetup: NewProjectSetup
+  ) => Promise<CreateProjectResult>,
+  createProjectFromCourseChapter: (
+    {
+      courseChapter: CourseChapter,
+      newProjectSetup: NewProjectSetup,
+      templateId?: string,
+    }
+  ) => Promise<CreateProjectResult>,
+  createProjectFromExample: (
+    exampleProjectSetup: ExampleProjectSetup
+  ) => Promise<CreateProjectResult>,
+  createProjectFromInAppTutorial: (
+    tutorialId: string,
+    newProjectSetup: NewProjectSetup
+  ) => Promise<CreateProjectResult>,
+  createProjectFromPrivateGameTemplate: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData,
+    newProjectSetup: NewProjectSetup
+  ) => Promise<CreateProjectResult>,
+  createProjectFromTutorial: (
+    tutorialId: string,
+    newProjectSetup: NewProjectSetup
+  ) => Promise<CreateProjectResult>,
+} => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const profile = authenticatedUser.profile;
   const unsavedChanges = React.useContext(UnsavedChangesContext);

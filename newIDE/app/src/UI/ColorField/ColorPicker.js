@@ -51,15 +51,17 @@ const styles = {
   },
 };
 
-const ColorPicker = ({
-  color,
-  style,
-  onChange,
-  onChangeComplete,
-  disableAlpha,
-  disabled,
-  size,
-}: Props) => {
+const ColorPicker = (
+  {
+    color,
+    style,
+    onChange,
+    onChangeComplete,
+    disableAlpha,
+    disabled,
+    size
+  }: Props,
+): renders Fragment => {
   const swatchRef = React.useRef<?HTMLDivElement>(null);
   const [displayColorPicker, setDisplayColorPicker] = React.useState(false);
 

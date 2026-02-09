@@ -16,14 +16,16 @@ type Props = {|
   matches?: SearchMatch[],
 |};
 
-export const renderInstructionOrExpressionListItem = ({
-  id,
-  instructionOrExpressionMetadata,
-  iconSize,
-  onClick,
-  selectedValue,
-  matches,
-}: Props) => {
+export const renderInstructionOrExpressionListItem = (
+  {
+    id,
+    instructionOrExpressionMetadata,
+    iconSize,
+    onClick,
+    selectedValue,
+    matches
+  }: Props,
+): renders any => {
   const getRenderedText = (field: 'displayedName' | 'fullGroupName') => {
     let text = instructionOrExpressionMetadata[field];
     if (matches && matches.length) {

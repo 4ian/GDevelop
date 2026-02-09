@@ -12,7 +12,11 @@ const minMovement = 30; // px
 const minSpeed = 200; // px/s
 const absoluteMaxDelta = 30; // px
 
-const useSwipeGesture = ({ containerRef, onSwipeDown, onSwipeUp }: Props) => {
+const useSwipeGesture = ({containerRef, onSwipeDown, onSwipeUp}: Props): {
+  onTouchEnd: (event: any) => void,
+  onTouchMove: (event: any) => void,
+  onTouchStart: (event: any) => void,
+} => {
   const startTimeRef = React.useRef<?number>(null);
   const startYRef = React.useRef<?number>(null);
 

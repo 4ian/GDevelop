@@ -225,18 +225,20 @@ type Props = {|
   onScrollY: number => void,
 |};
 
-const TileSetVisualizer = ({
-  project,
-  objectConfiguration,
-  tileMapTileSelection,
-  onSelectTileMapTile,
-  allowMultipleSelection,
-  allowRectangleSelection,
-  showPaintingToolbar,
-  interactive,
-  onAtlasImageLoaded,
-  onScrollY,
-}: Props) => {
+const TileSetVisualizer = (
+  {
+    project,
+    objectConfiguration,
+    tileMapTileSelection,
+    onSelectTileMapTile,
+    allowMultipleSelection,
+    allowRectangleSelection,
+    showPaintingToolbar,
+    interactive,
+    onAtlasImageLoaded,
+    onScrollY
+  }: Props,
+): renders any => {
   const forceUpdate = useForceUpdate();
   const atlasResourceName = objectConfiguration
     .getProperties()

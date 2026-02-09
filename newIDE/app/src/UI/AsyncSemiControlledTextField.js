@@ -27,15 +27,17 @@ type Props = {|
   style?: TextFieldStyleProps,
 |};
 
-const AsyncSemiControlledTextField = ({
-  value,
-  callback,
-  callbackErrorText,
-  errorText,
-  emptyErrorText,
-  onCancel,
-  ...textFieldProps
-}: Props) => {
+const AsyncSemiControlledTextField = (
+  {
+    value,
+    callback,
+    callbackErrorText,
+    errorText,
+    emptyErrorText,
+    onCancel,
+    ...textFieldProps
+  }: Props,
+): renders any => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [internalErrorText, setInternalErrorText] = React.useState<?React.Node>(
     null

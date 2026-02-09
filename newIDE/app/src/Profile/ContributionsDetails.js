@@ -24,11 +24,7 @@ type ContributionLineProps = {|
   shortDescription?: string,
 |};
 
-export const ContributionLine = ({
-  fullName,
-  previewIconUrl,
-  shortDescription,
-}: ContributionLineProps) => (
+export const ContributionLine = ({fullName, previewIconUrl, shortDescription}: ContributionLineProps): renders any => (
   <Line>
     {previewIconUrl && (
       <IconContainer alt={fullName} src={previewIconUrl} size={64} />
@@ -47,10 +43,7 @@ type ExamplesAccordionProps = {|
   exampleError: ?Error,
 |};
 
-export const ExamplesAccordion = ({
-  examples,
-  exampleError,
-}: ExamplesAccordionProps) => {
+export const ExamplesAccordion = ({examples, exampleError}: ExamplesAccordionProps): renders any => {
   if (exampleError)
     return (
       <Column>
@@ -98,10 +91,7 @@ type ExtensionsAccordionProps = {|
   extensionError: ?Error,
 |};
 
-export const ExtensionsAccordion = ({
-  extensions,
-  extensionError,
-}: ExtensionsAccordionProps) => {
+export const ExtensionsAccordion = ({extensions, extensionError}: ExtensionsAccordionProps): renders any => {
   if (extensionError)
     return (
       <Column>
@@ -161,7 +151,7 @@ type Props = {|
   userId: string,
 |};
 
-const ContributionDetails = ({ userId }: Props) => {
+const ContributionDetails = ({userId}: Props): renders any => {
   const [
     extensions,
     setExtensions,

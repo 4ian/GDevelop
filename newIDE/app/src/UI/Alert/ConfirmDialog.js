@@ -22,7 +22,7 @@ type Props = {|
   makeDismissButtonPrimary?: boolean,
 |};
 
-function ConfirmDialog(props: Props) {
+function ConfirmDialog(props: Props): renders any {
   return (
     <I18n>
       {({ i18n }) => {

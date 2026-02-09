@@ -40,22 +40,24 @@ type Props = {|
  * (typically, the points or the collision masks of the sprite) should be shared between
  * all sprites of an animation, or between all sprites of all animations of the object.
  */
-const SpriteSelector = ({
-  animations,
-  animationIndex,
-  directionIndex,
-  spriteIndex,
-  sameForAllAnimations,
-  sameForAllSprites,
-  chooseAnimation,
-  chooseDirection,
-  chooseSprite,
-  setSameForAllAnimations,
-  setSameForAllSprites,
-  setSameForAllAnimationsLabel,
-  setSameForAllSpritesLabel,
-  hideControlsForSprite,
-}: Props) => {
+const SpriteSelector = (
+  {
+    animations,
+    animationIndex,
+    directionIndex,
+    spriteIndex,
+    sameForAllAnimations,
+    sameForAllSprites,
+    chooseAnimation,
+    chooseDirection,
+    chooseSprite,
+    setSameForAllAnimations,
+    setSameForAllSprites,
+    setSameForAllAnimationsLabel,
+    setSameForAllSpritesLabel,
+    hideControlsForSprite
+  }: Props,
+): renders Fragment => {
   const { animation, direction, sprite } = getCurrentElements(
     animations,
     animationIndex,

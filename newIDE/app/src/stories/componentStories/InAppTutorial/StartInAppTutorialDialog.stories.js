@@ -12,7 +12,7 @@ export default {
   decorators: [inAppTutorialDecorator, paperDecorator],
 };
 
-export const MultichapterTutorial = () => {
+export const MultichapterTutorial = (): renders any => {
   return (
     <StartInAppTutorialDialog
       open
@@ -25,7 +25,7 @@ export const MultichapterTutorial = () => {
   );
 };
 
-export const Default = () => {
+export const Default = (): renders any => {
   return (
     <StartInAppTutorialDialog
       open
@@ -38,7 +38,7 @@ export const Default = () => {
   );
 };
 
-export const Opening = () => {
+export const Opening = (): renders any => {
   return (
     <StartInAppTutorialDialog
       open
@@ -51,7 +51,7 @@ export const Opening = () => {
   );
 };
 
-export const WithTutorialAlreadyStarted = () => {
+export const WithTutorialAlreadyStarted = (): renders any => {
   return (
     <StartInAppTutorialDialog
       open
@@ -63,7 +63,7 @@ export const WithTutorialAlreadyStarted = () => {
     />
   );
 };
-export const WithTutorialCompleted = () => {
+export const WithTutorialCompleted = (): renders any => {
   return (
     <StartInAppTutorialDialog
       open

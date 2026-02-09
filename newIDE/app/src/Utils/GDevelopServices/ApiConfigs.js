@@ -8,19 +8,19 @@ export const GDevelopGamePreviews = {
 };
 
 export const GDevelopGamesPlatform = {
-  getInstantBuildUrl: (buildId: string) =>
+  getInstantBuildUrl: (buildId: string): string =>
     isDev
       ? `https://gd.games/instant-builds/${buildId}?dev=true`
       : `https://gd.games/instant-builds/${buildId}`,
-  getGameUrl: (gameId: string) =>
+  getGameUrl: (gameId: string): string =>
     isDev
       ? `https://gd.games/games/${gameId}?dev=true`
       : `https://gd.games/games/${gameId}`,
-  getGameUrlWithSlug: (userSlug: string, gameSlug: string) =>
+  getGameUrlWithSlug: (userSlug: string, gameSlug: string): string =>
     isDev
       ? `https://gd.games/${userSlug.toLowerCase()}/${gameSlug.toLowerCase()}?dev=true`
       : `https://gd.games/${userSlug.toLowerCase()}/${gameSlug.toLowerCase()}`,
-  getUserPublicProfileUrl: (userId: string, username: ?string) =>
+  getUserPublicProfileUrl: (userId: string, username: ?string): string =>
     username
       ? `https://gd.games/${username}${isDev ? '?dev=true' : ''}`
       : `https://gd.games/user/${userId}${isDev ? '?dev=true' : ''}`,
@@ -36,33 +36,27 @@ export const GDevelopFirebaseConfig = {
 };
 
 export const GDevelopAuthorizationWebSocketApi = {
-  baseUrl: isDev
-    ? 'wss://api-ws-dev.gdevelop.io/authorization'
-    : 'wss://api-ws.gdevelop.io/authorization',
+  baseUrl: (isDev
+  ? 'wss://api-ws-dev.gdevelop.io/authorization'
+  : 'wss://api-ws.gdevelop.io/authorization') as string,
 };
 
 export const GDevelopBuildApi = {
-  baseUrl: isDev
-    ? 'https://api-dev.gdevelop.io/build'
-    : 'https://api.gdevelop.io/build',
+  baseUrl: (isDev ? 'https://api-dev.gdevelop.io/build' : 'https://api.gdevelop.io/build') as string,
 };
 
 export const GDevelopUsageApi = {
-  baseUrl: isDev
-    ? 'https://api-dev.gdevelop.io/usage'
-    : 'https://api.gdevelop.io/usage',
+  baseUrl: (isDev ? 'https://api-dev.gdevelop.io/usage' : 'https://api.gdevelop.io/usage') as string,
 };
 
 export const GDevelopReleaseApi = {
-  baseUrl: isDev
-    ? 'https://api-dev.gdevelop.io/release'
-    : 'https://api.gdevelop.io/release',
+  baseUrl: (isDev
+  ? 'https://api-dev.gdevelop.io/release'
+  : 'https://api.gdevelop.io/release') as string,
 };
 
 export const GDevelopAssetApi = {
-  baseUrl: isDev
-    ? 'https://api-dev.gdevelop.io/asset'
-    : 'https://api.gdevelop.io/asset',
+  baseUrl: (isDev ? 'https://api-dev.gdevelop.io/asset' : 'https://api.gdevelop.io/asset') as string,
 };
 
 export const GDevelopAssetCdn = {
@@ -73,45 +67,37 @@ export const GDevelopAssetCdn = {
 };
 
 export const GDevelopAnalyticsApi = {
-  baseUrl: isDev
-    ? 'https://api-dev.gdevelop.io/analytics'
-    : 'https://api.gdevelop.io/analytics',
+  baseUrl: (isDev
+  ? 'https://api-dev.gdevelop.io/analytics'
+  : 'https://api.gdevelop.io/analytics') as string,
 };
 
 export const GDevelopGameApi = {
-  baseUrl: isDev
-    ? 'https://api-dev.gdevelop.io/game'
-    : 'https://api.gdevelop.io/game',
+  baseUrl: (isDev ? 'https://api-dev.gdevelop.io/game' : 'https://api.gdevelop.io/game') as string,
 };
 
 export const GDevelopUserApi = {
-  baseUrl: isDev
-    ? 'https://api-dev.gdevelop.io/user'
-    : 'https://api.gdevelop.io/user',
+  baseUrl: (isDev ? 'https://api-dev.gdevelop.io/user' : 'https://api.gdevelop.io/user') as string,
 };
 
 export const GDevelopPlayApi = {
-  baseUrl: isDev
-    ? 'https://api-dev.gdevelop.io/play'
-    : 'https://api.gdevelop.io/play',
+  baseUrl: (isDev ? 'https://api-dev.gdevelop.io/play' : 'https://api.gdevelop.io/play') as string,
 };
 
 export const GDevelopShopApi = {
-  baseUrl: isDev
-    ? 'https://api-dev.gdevelop.io/shop'
-    : 'https://api.gdevelop.io/shop',
+  baseUrl: (isDev ? 'https://api-dev.gdevelop.io/shop' : 'https://api.gdevelop.io/shop') as string,
 };
 
 export const GDevelopProjectApi = {
-  baseUrl: isDev
-    ? 'https://api-dev.gdevelop.io/project'
-    : 'https://api.gdevelop.io/project',
+  baseUrl: (isDev
+  ? 'https://api-dev.gdevelop.io/project'
+  : 'https://api.gdevelop.io/project') as string,
 };
 
 export const GDevelopGenerationApi = {
-  baseUrl: isDev
-    ? 'https://api-dev.gdevelop.io/generation'
-    : 'https://api.gdevelop.io/generation',
+  baseUrl: (isDev
+  ? 'https://api-dev.gdevelop.io/generation'
+  : 'https://api.gdevelop.io/generation') as string,
 };
 
 export const GDevelopAiCdn = {
@@ -122,21 +108,21 @@ export const GDevelopAiCdn = {
 };
 
 export const GDevelopProjectResourcesStorage = {
-  baseUrl: isDev
-    ? 'https://project-resources-dev.gdevelop.io'
-    : 'https://project-resources.gdevelop.io',
+  baseUrl: (isDev
+  ? 'https://project-resources-dev.gdevelop.io'
+  : 'https://project-resources.gdevelop.io') as string,
 };
 
 export const GDevelopPrivateAssetsStorage = {
-  baseUrl: isDev
-    ? 'https://private-assets-dev.gdevelop.io'
-    : 'https://private-assets.gdevelop.io',
+  baseUrl: (isDev
+  ? 'https://private-assets-dev.gdevelop.io'
+  : 'https://private-assets.gdevelop.io') as string,
 };
 
 export const GDevelopPrivateGameTemplatesStorage = {
-  baseUrl: isDev
-    ? 'https://private-game-templates-dev.gdevelop.io'
-    : 'https://private-game-templates.gdevelop.io',
+  baseUrl: (isDev
+  ? 'https://private-game-templates-dev.gdevelop.io'
+  : 'https://private-game-templates.gdevelop.io') as string,
 };
 
 export const GDevelopPublicAssetResourcesStorageBaseUrl =

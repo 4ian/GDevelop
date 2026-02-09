@@ -17,16 +17,18 @@ type Props = {|
   onActionClick?: () => void | Promise<void>,
 |};
 
-const InfoBar = ({
-  visible,
-  touchScreenMessage,
-  message,
-  hide,
-  actionLabel,
-  onActionClick,
-  closable,
-  duration = 3000,
-}: Props) => {
+const InfoBar = (
+  {
+    visible,
+    touchScreenMessage,
+    message,
+    hide,
+    actionLabel,
+    onActionClick,
+    closable,
+    duration = 3000
+  }: Props,
+): renders any => {
   const screenType = useScreenType();
 
   React.useEffect(

@@ -48,11 +48,13 @@ export const useCommandWithOptions = (
  * React component for using useCommand hook in
  * class components
  */
-export const UseCommandHook = (props: {|
-  name: CommandName,
-  enabled: boolean,
-  command: SimpleCommand,
-|}) => {
+export const UseCommandHook = (
+  props: {|
+    name: CommandName,
+    enabled: boolean,
+    command: SimpleCommand,
+  |},
+): null => {
   useCommand(props.name, props.enabled, props.command);
   return null;
 };
@@ -61,11 +63,13 @@ export const UseCommandHook = (props: {|
  * React component for using useCommandWithOptions
  * hook in class components
  */
-export const UseCommandWithOptionsHook = (props: {|
-  name: CommandName,
-  enabled: boolean,
-  command: CommandWithOptions,
-|}) => {
+export const UseCommandWithOptionsHook = (
+  props: {|
+    name: CommandName,
+    enabled: boolean,
+    command: CommandWithOptions,
+  |},
+): null => {
   useCommandWithOptions(props.name, props.enabled, props.command);
   return null;
 };

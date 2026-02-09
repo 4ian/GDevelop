@@ -38,15 +38,17 @@ type Props = {|
   loadingText: ?React.Node,
 |};
 
-const ShareOnlineGameDialog = ({
-  buildOrGameUrl,
-  gameThumbnailUrl,
-  gameName,
-  onOpenGameDashboard,
-  onClose,
-  isBuildPublished,
-  loadingText,
-}: Props) => {
+const ShareOnlineGameDialog = (
+  {
+    buildOrGameUrl,
+    gameThumbnailUrl,
+    gameName,
+    onOpenGameDashboard,
+    onClose,
+    isBuildPublished,
+    loadingText
+  }: Props,
+): renders any => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState<boolean>(
     false

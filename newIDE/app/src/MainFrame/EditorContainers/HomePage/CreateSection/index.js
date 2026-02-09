@@ -661,7 +661,7 @@ const CreateSection = ({
   );
 };
 
-const CreateSectionWithErrorBoundary = (props: Props) => (
+const CreateSectionWithErrorBoundary = (props: Props): renders any => (
   <ErrorBoundary
     componentTitle={<Trans>Create section</Trans>}
     scope="start-page-create"

@@ -78,7 +78,7 @@ export function Tabs<TabName>({
   onChange,
   options,
   variant,
-}: TabsProps<TabName>) {
+}: TabsProps<TabName>): any {
   const { windowSize } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 

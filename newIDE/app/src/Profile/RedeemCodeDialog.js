@@ -21,7 +21,7 @@ type Props = {|
   autoSubmit?: boolean,
 |};
 
-export const getRedeemCodeErrorText = (error: ?Error) => {
+export const getRedeemCodeErrorText = (error: ?Error): void | renders any => {
   if (!error) return undefined;
 
   const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
@@ -73,7 +73,7 @@ export default function RedeemCodeDialog({
   onClose,
   codeToPrefill,
   autoSubmit,
-}: Props) {
+}: Props): renders Fragment {
   const [redemptionCode, setRedemptionCode] = React.useState(
     codeToPrefill || ''
   );

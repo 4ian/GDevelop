@@ -21,14 +21,16 @@ export type ExportState = {|
   signing: BuildSigningOptions | null,
 |};
 
-export const SetupExportHeader = ({
-  exportState,
-  authenticatedUser,
-  updateExportState,
-  isExporting,
-  build,
-  quota,
-}: HeaderProps<ExportState>) => {
+export const SetupExportHeader = (
+  {
+    exportState,
+    authenticatedUser,
+    updateExportState,
+    isExporting,
+    build,
+    quota
+  }: HeaderProps<ExportState>,
+): null | renders any => {
   // Build is finished, hide options.
   if (!!build && build.status === 'complete') return null;
 
@@ -93,17 +95,19 @@ type OnlineCordovaIosExportFlowProps = {|
   exportPipelineName: string,
 |};
 
-export const ExportFlow = ({
-  disabled,
-  launchExport,
-  isExporting,
-  exportPipelineName,
-  exportStep,
-  build,
-  stepMaxProgress,
-  stepCurrentProgress,
-  errored,
-}: OnlineCordovaIosExportFlowProps) => {
+export const ExportFlow = (
+  {
+    disabled,
+    launchExport,
+    isExporting,
+    exportPipelineName,
+    exportStep,
+    build,
+    stepMaxProgress,
+    stepCurrentProgress,
+    errored
+  }: OnlineCordovaIosExportFlowProps,
+): renders any => {
   const isExportingOrbuildRunningOrFinished =
     isExporting || (!!build && build.status !== 'error');
 
@@ -138,7 +142,7 @@ export const ExportFlow = ({
 
 export const onlineCordovaIosExporter = {
   key: 'onlinecordovaiosexport',
-  tabName: <Trans>iOS</Trans>,
-  name: <Trans>iOS</Trans>,
+  tabName: <Trans>iOS</Trans> as renders any,
+  name: <Trans>iOS</Trans> as renders any,
   helpPage: '/publishing/ios',
 };

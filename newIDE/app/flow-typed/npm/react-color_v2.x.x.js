@@ -57,7 +57,7 @@ declare module "react-color" {
     width?: string,
     colors?: Array<string>,
     triangle?: "hide" | "top",
-    onSwatchHover?: (color: Color, event: SyntheticMouseEvent<*>) => void
+    onSwatchHover?: (color: Color, event: SyntheticMouseEvent<any>) => void
   |};
 
   declare export type ChromePickerProps = {|
@@ -72,13 +72,13 @@ declare module "react-color" {
     colors?: Array<string>,
     circleSize?: number,
     circleSpacing?: number,
-    onSwatchHover?: (color: Color, event: SyntheticMouseEvent<*>) => void
+    onSwatchHover?: (color: Color, event: SyntheticMouseEvent<any>) => void
   |};
 
   declare export type CompactPickerProps = {|
     ...ColorPickerProps,
     colors?: Array<string>,
-    onSwatchHover?: (color: Color, event: SyntheticMouseEvent<*>) => void
+    onSwatchHover?: (color: Color, event: SyntheticMouseEvent<any>) => void
   |};
 
   declare export type GithubPickerProps = {|
@@ -86,7 +86,7 @@ declare module "react-color" {
     width?: string,
     colors?: Array<string>,
     triangle?: "hide" | "top-left" | "top-right",
-    onSwatchHover?: (color: Color, event: SyntheticMouseEvent<*>) => void
+    onSwatchHover?: (color: Color, event: SyntheticMouseEvent<any>) => void
   |};
 
   declare export type HuePickerProps = {|
@@ -114,7 +114,7 @@ declare module "react-color" {
     presetColors?: Array<string | {| color: string, title: string |}>,
     width?: number,
     renderers?: Object,
-    onSwatchHover?: (color: Color, event: SyntheticMouseEvent<*>) => void
+    onSwatchHover?: (color: Color, event: SyntheticMouseEvent<any>) => void
   |};
 
   declare export type SliderPickerProps = {|
@@ -127,7 +127,7 @@ declare module "react-color" {
     width?: number,
     height?: number,
     colors?: Array<Array<string>>,
-    onSwatchHover?: (color: Color, event: SyntheticMouseEvent<*>) => void
+    onSwatchHover?: (color: Color, event: SyntheticMouseEvent<any>) => void
   |};
 
   declare export type TwitterPickerProps = {|
@@ -135,7 +135,7 @@ declare module "react-color" {
     width?: string,
     colors?: Array<string>,
     triangle?: "hide" | "top-left" | "top-right",
-    onSwatchHover?: (color: Color, event: SyntheticMouseEvent<*>) => void
+    onSwatchHover?: (color: Color, event: SyntheticMouseEvent<any>) => void
   |};
 
   declare export type ColorWrapChangeHandler = (

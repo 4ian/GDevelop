@@ -77,7 +77,7 @@ declare module "axios" {
     use(
       successHandler: ?(
         response: AxiosXHRConfig<T>
-      ) => Promise<AxiosXHRConfig<*>> | AxiosXHRConfig<*>,
+      ) => Promise<AxiosXHRConfig<any>> | AxiosXHRConfig<any>,
       errorHandler: ?(error: mixed) => mixed
     ): AxiosInterceptorIdent;
     eject(ident: AxiosInterceptorIdent): void;
@@ -119,7 +119,7 @@ declare module "axios" {
       request: AxiosRequestInterceptor<mixed>,
       response: AxiosResponseInterceptor<mixed>
     };
-    defaults: { headers: Object } & AxiosXHRConfig<*>;
+    defaults: { headers: Object } & AxiosXHRConfig<any>;
   }
 
   declare class AxiosError<T> extends Error {

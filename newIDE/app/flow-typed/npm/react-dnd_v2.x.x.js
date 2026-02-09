@@ -19,7 +19,7 @@ declare module "react-dnd" {
   > & { defaultProps: D, ... };
 
   declare type _InstanceOf<I, C: Class<I>> = I;
-  declare type InstanceOf<C> = _InstanceOf<*, C>;
+  declare type InstanceOf<C> = _InstanceOf<any, C>;
 
   declare class ConnectedComponent<C, I, P> extends React$Component<P> {
     static DecoratedComponent: C;

@@ -4,28 +4,20 @@
 declare module "lodash" {
   declare type Path = $ReadOnlyArray<string | number> | string | number;
   declare type __CurriedFunction1<A, R, AA: A> = (...r: [AA]) => R;
-  declare type CurriedFunction1<A, R> = __CurriedFunction1<A, R, *>;
+  declare type CurriedFunction1<A, R> = __CurriedFunction1<A, R, any>;
 
   declare type __CurriedFunction2<A, B, R, AA: A, BB: B> = ((
     ...r: [AA]
   ) => CurriedFunction1<BB, R>) &
     ((...r: [AA, BB]) => R);
-  declare type CurriedFunction2<A, B, R> = __CurriedFunction2<A, B, R, *, *>;
+  declare type CurriedFunction2<A, B, R> = __CurriedFunction2<A, B, R, any, any>;
 
   declare type __CurriedFunction3<A, B, C, R, AA: A, BB: B, CC: C> = ((
     ...r: [AA]
   ) => CurriedFunction2<BB, CC, R>) &
     ((...r: [AA, BB]) => CurriedFunction1<CC, R>) &
     ((...r: [AA, BB, CC]) => R);
-  declare type CurriedFunction3<A, B, C, R> = __CurriedFunction3<
-    A,
-    B,
-    C,
-    R,
-    *,
-    *,
-    *
-  >;
+  declare type CurriedFunction3<A, B, C, R> = __CurriedFunction3<A, B, C, R, any, any, any>;
 
   declare type __CurriedFunction4<
     A,
@@ -41,17 +33,7 @@ declare module "lodash" {
     ((...r: [AA, BB]) => CurriedFunction2<CC, DD, R>) &
     ((...r: [AA, BB, CC]) => CurriedFunction1<DD, R>) &
     ((...r: [AA, BB, CC, DD]) => R);
-  declare type CurriedFunction4<A, B, C, D, R> = __CurriedFunction4<
-    A,
-    B,
-    C,
-    D,
-    R,
-    *,
-    *,
-    *,
-    *
-  >;
+  declare type CurriedFunction4<A, B, C, D, R> = __CurriedFunction4<A, B, C, D, R, any, any, any, any>;
 
   declare type __CurriedFunction5<
     A,
@@ -70,19 +52,7 @@ declare module "lodash" {
     ((...r: [AA, BB, CC]) => CurriedFunction2<DD, EE, R>) &
     ((...r: [AA, BB, CC, DD]) => CurriedFunction1<EE, R>) &
     ((...r: [AA, BB, CC, DD, EE]) => R);
-  declare type CurriedFunction5<A, B, C, D, E, R> = __CurriedFunction5<
-    A,
-    B,
-    C,
-    D,
-    E,
-    R,
-    *,
-    *,
-    *,
-    *,
-    *
-  >;
+  declare type CurriedFunction5<A, B, C, D, E, R> = __CurriedFunction5<A, B, C, D, E, R, any, any, any, any, any>;
 
   declare type __CurriedFunction6<
     A,
@@ -104,21 +74,7 @@ declare module "lodash" {
     ((...r: [AA, BB, CC, DD]) => CurriedFunction2<EE, FF, R>) &
     ((...r: [AA, BB, CC, DD, EE]) => CurriedFunction1<FF, R>) &
     ((...r: [AA, BB, CC, DD, EE, FF]) => R);
-  declare type CurriedFunction6<A, B, C, D, E, F, R> = __CurriedFunction6<
-    A,
-    B,
-    C,
-    D,
-    E,
-    F,
-    R,
-    *,
-    *,
-    *,
-    *,
-    *,
-    *
-  >;
+  declare type CurriedFunction6<A, B, C, D, E, F, R> = __CurriedFunction6<A, B, C, D, E, F, R, any, any, any, any, any, any>;
 
   declare type Curry = (<A, R>((...r: [A]) => R) => CurriedFunction1<A, R>) &
     (<A, B, R>((...r: [A, B]) => R) => CurriedFunction2<A, B, R>) &
@@ -653,7 +609,7 @@ declare module "lodash" {
       array: $ReadOnlyArray<T>,
       iteratee?: ?ValueOnlyIteratee<T>
     ): { [key: V]: T, ... };
-    keyBy(array: void | null, iteratee?: ?ValueOnlyIteratee<*>): {...};
+    keyBy(array: void | null, iteratee?: ?ValueOnlyIteratee<any>): {...};
     keyBy<V, A, I, T: { [id: I]: A, ... }>(
       object: T,
       iteratee?: ?ValueOnlyIteratee<A>
@@ -682,7 +638,7 @@ declare module "lodash" {
     ): Array<T>;
     orderBy<V, T: {...}>(
       object: T,
-      iteratees?: $ReadOnlyArray<OIteratee<*>> | string,
+      iteratees?: $ReadOnlyArray<OIteratee<any>> | string,
       orders?: $ReadOnlyArray<"asc" | "desc"> | string
     ): Array<V>;
     partition<T>(
@@ -819,7 +775,7 @@ declare module "lodash" {
     wrap(value?: any, wrapper?: ?Function): Function;
 
     // Lang
-    castArray(value: *): Array<any>;
+    castArray(value: any): Array<any>;
     clone<T>(value: T): T;
     cloneDeep<T>(value: T): T;
     cloneDeepWith<T, U>(
@@ -950,14 +906,14 @@ declare module "lodash" {
     floor(number: number, precision?: number): number;
     max<T>(array: ?$ReadOnlyArray<T>): T;
     maxBy<T>(array: ?$ReadOnlyArray<T>, iteratee?: Iteratee<T>): T;
-    mean(array: Array<*>): number;
+    mean(array: Array<any>): number;
     meanBy<T>(array: Array<T>, iteratee?: Iteratee<T>): number;
     min<T>(array: ?$ReadOnlyArray<T>): T;
     minBy<T>(array: ?$ReadOnlyArray<T>, iteratee?: Iteratee<T>): T;
     multiply(multiplier: number, multiplicand: number): number;
     round(number: number, precision?: number): number;
     subtract(minuend: number, subtrahend: number): number;
-    sum(array: Array<*>): number;
+    sum(array: Array<any>): number;
     sumBy<T>(array: $ReadOnlyArray<T>, iteratee?: Iteratee<T>): number;
 
     // number
@@ -1158,14 +1114,14 @@ declare module "lodash" {
       object: void | null,
       predicate?: ?OPredicate<A, T>
     ): void;
-    forIn(object: Object, iteratee?: ?OIteratee<*>): Object;
-    forIn(object: void | null, iteratee?: ?OIteratee<*>): null;
-    forInRight(object: Object, iteratee?: ?OIteratee<*>): Object;
-    forInRight(object: void | null, iteratee?: ?OIteratee<*>): null;
-    forOwn(object: Object, iteratee?: ?OIteratee<*>): Object;
-    forOwn(object: void | null, iteratee?: ?OIteratee<*>): null;
-    forOwnRight(object: Object, iteratee?: ?OIteratee<*>): Object;
-    forOwnRight(object: void | null, iteratee?: ?OIteratee<*>): null;
+    forIn(object: Object, iteratee?: ?OIteratee<any>): Object;
+    forIn(object: void | null, iteratee?: ?OIteratee<any>): null;
+    forInRight(object: Object, iteratee?: ?OIteratee<any>): Object;
+    forInRight(object: void | null, iteratee?: ?OIteratee<any>): null;
+    forOwn(object: Object, iteratee?: ?OIteratee<any>): Object;
+    forOwn(object: void | null, iteratee?: ?OIteratee<any>): null;
+    forOwnRight(object: Object, iteratee?: ?OIteratee<any>): Object;
+    forOwnRight(object: void | null, iteratee?: ?OIteratee<any>): null;
     functions(object?: ?Object): Array<string>;
     functionsIn(object?: ?Object): Array<string>;
     get(
@@ -1191,10 +1147,10 @@ declare module "lodash" {
     keys<K>(object?: ?{ [key: K]: any, ... }): Array<K>;
     keys(object?: ?Object): Array<string>;
     keysIn(object?: ?Object): Array<string>;
-    mapKeys(object: Object, iteratee?: ?OIteratee<*>): Object;
-    mapKeys(object: void | null, iteratee?: ?OIteratee<*>): {...};
-    mapValues(object: Object, iteratee?: ?OIteratee<*>): Object;
-    mapValues(object: void | null, iteratee?: ?OIteratee<*>): {...};
+    mapKeys(object: Object, iteratee?: ?OIteratee<any>): Object;
+    mapKeys(object: void | null, iteratee?: ?OIteratee<any>): {...};
+    mapValues(object: Object, iteratee?: ?OIteratee<any>): Object;
+    mapValues(object: void | null, iteratee?: ?OIteratee<any>): {...};
     merge(object?: ?Object, ...sources?: Array<?Object>): Object;
     mergeWith(): {...};
     mergeWith<T: Object, A: Object>(
@@ -1283,16 +1239,16 @@ declare module "lodash" {
       value?: ?any,
       customizer?: ?(nsValue: any, key: string, nsObject: T) => any
     ): T;
-    toPairs(object?: ?Object | Array<*>): Array<[string, any]>;
+    toPairs(object?: ?Object | Array<any>): Array<[string, any]>;
     toPairsIn(object?: ?Object): Array<[string, any]>;
     transform(
       collection: Object | $ReadOnlyArray<any>,
-      iteratee?: ?OIteratee<*>,
+      iteratee?: ?OIteratee<any>,
       accumulator?: any
     ): any;
     transform(
       collection: void | null,
-      iteratee?: ?OIteratee<*>,
+      iteratee?: ?OIteratee<any>,
       accumulator?: ?any
     ): {...};
     unset(object: void | null, path?: ?Path): true;
@@ -1442,7 +1398,7 @@ declare module "lodash" {
     rangeRight(end?: ?number, step?: ?number): Array<number>;
     runInContext(context?: ?Object): Function;
 
-    stubArray(): Array<*>;
+    stubArray(): Array<any>;
     stubFalse(): false;
     stubObject(): {...};
     stubString(): "";
@@ -1463,28 +1419,20 @@ declare module "lodash" {
 declare module "lodash/fp" {
   declare type Path = $ReadOnlyArray<string | number> | string | number;
   declare type __CurriedFunction1<A, R, AA: A> = (...r: [AA]) => R;
-  declare type CurriedFunction1<A, R> = __CurriedFunction1<A, R, *>;
+  declare type CurriedFunction1<A, R> = __CurriedFunction1<A, R, any>;
 
   declare type __CurriedFunction2<A, B, R, AA: A, BB: B> = ((
     ...r: [AA]
   ) => CurriedFunction1<BB, R>) &
     ((...r: [AA, BB]) => R);
-  declare type CurriedFunction2<A, B, R> = __CurriedFunction2<A, B, R, *, *>;
+  declare type CurriedFunction2<A, B, R> = __CurriedFunction2<A, B, R, any, any>;
 
   declare type __CurriedFunction3<A, B, C, R, AA: A, BB: B, CC: C> = ((
     ...r: [AA]
   ) => CurriedFunction2<BB, CC, R>) &
     ((...r: [AA, BB]) => CurriedFunction1<CC, R>) &
     ((...r: [AA, BB, CC]) => R);
-  declare type CurriedFunction3<A, B, C, R> = __CurriedFunction3<
-    A,
-    B,
-    C,
-    R,
-    *,
-    *,
-    *
-  >;
+  declare type CurriedFunction3<A, B, C, R> = __CurriedFunction3<A, B, C, R, any, any, any>;
 
   declare type __CurriedFunction4<
     A,
@@ -1500,17 +1448,7 @@ declare module "lodash/fp" {
     ((...r: [AA, BB]) => CurriedFunction2<CC, DD, R>) &
     ((...r: [AA, BB, CC]) => CurriedFunction1<DD, R>) &
     ((...r: [AA, BB, CC, DD]) => R);
-  declare type CurriedFunction4<A, B, C, D, R> = __CurriedFunction4<
-    A,
-    B,
-    C,
-    D,
-    R,
-    *,
-    *,
-    *,
-    *
-  >;
+  declare type CurriedFunction4<A, B, C, D, R> = __CurriedFunction4<A, B, C, D, R, any, any, any, any>;
 
   declare type __CurriedFunction5<
     A,
@@ -1529,19 +1467,7 @@ declare module "lodash/fp" {
     ((...r: [AA, BB, CC]) => CurriedFunction2<DD, EE, R>) &
     ((...r: [AA, BB, CC, DD]) => CurriedFunction1<EE, R>) &
     ((...r: [AA, BB, CC, DD, EE]) => R);
-  declare type CurriedFunction5<A, B, C, D, E, R> = __CurriedFunction5<
-    A,
-    B,
-    C,
-    D,
-    E,
-    R,
-    *,
-    *,
-    *,
-    *,
-    *
-  >;
+  declare type CurriedFunction5<A, B, C, D, E, R> = __CurriedFunction5<A, B, C, D, E, R, any, any, any, any, any>;
 
   declare type __CurriedFunction6<
     A,
@@ -1563,21 +1489,7 @@ declare module "lodash/fp" {
     ((...r: [AA, BB, CC, DD]) => CurriedFunction2<EE, FF, R>) &
     ((...r: [AA, BB, CC, DD, EE]) => CurriedFunction1<FF, R>) &
     ((...r: [AA, BB, CC, DD, EE, FF]) => R);
-  declare type CurriedFunction6<A, B, C, D, E, F, R> = __CurriedFunction6<
-    A,
-    B,
-    C,
-    D,
-    E,
-    F,
-    R,
-    *,
-    *,
-    *,
-    *,
-    *,
-    *
-  >;
+  declare type CurriedFunction6<A, B, C, D, E, F, R> = __CurriedFunction6<A, B, C, D, E, F, R, any, any, any, any, any, any>;
 
   declare type Curry = (<A, R>((...r: [A]) => R) => CurriedFunction1<A, R>) &
     (<A, B, R>((...r: [A, B]) => R) => CurriedFunction2<A, B, R>) &
@@ -2255,7 +2167,7 @@ declare module "lodash/fp" {
     pluck(iteratee: (char: string) => any): (str: string) => string;
     pluck(iteratee: (char: string) => any, str: string): string;
     orderBy<T>(
-      iteratees: $ReadOnlyArray<Iteratee<T> | OIteratee<*>> | string
+      iteratees: $ReadOnlyArray<Iteratee<T> | OIteratee<any>> | string
     ): ((
       orders: $ReadOnlyArray<"asc" | "desc"> | string
     ) => (collection: $ReadOnlyArray<T> | { [id: any]: T, ... }) => Array<T>) &
@@ -2264,11 +2176,11 @@ declare module "lodash/fp" {
         collection: $ReadOnlyArray<T> | { [id: any]: T, ... }
       ) => Array<T>);
     orderBy<T>(
-      iteratees: $ReadOnlyArray<Iteratee<T> | OIteratee<*>> | string,
+      iteratees: $ReadOnlyArray<Iteratee<T> | OIteratee<any>> | string,
       orders: $ReadOnlyArray<"asc" | "desc"> | string
     ): (collection: $ReadOnlyArray<T> | { [id: any]: T, ... }) => Array<T>;
     orderBy<T>(
-      iteratees: $ReadOnlyArray<Iteratee<T> | OIteratee<*>> | string,
+      iteratees: $ReadOnlyArray<Iteratee<T> | OIteratee<any>> | string,
       orders: $ReadOnlyArray<"asc" | "desc"> | string,
       collection: $ReadOnlyArray<T> | { [id: any]: T, ... }
     ): Array<T>;
@@ -2403,7 +2315,7 @@ declare module "lodash/fp" {
     wrap(wrapper: Function, value: any): Function;
 
     // Lang
-    castArray(value: *): Array<any>;
+    castArray(value: any): Array<any>;
     clone<T>(value: T): T;
     cloneDeep<T>(value: T): T;
     cloneDeepWith<T, U>(
@@ -2579,7 +2491,7 @@ declare module "lodash/fp" {
     max<T>(array: Array<T>): T;
     maxBy<T>(iteratee: Iteratee<T>): (array: Array<T>) => T;
     maxBy<T>(iteratee: Iteratee<T>, array: Array<T>): T;
-    mean(array: Array<*>): number;
+    mean(array: Array<any>): number;
     meanBy<T>(iteratee: Iteratee<T>): (array: Array<T>) => number;
     meanBy<T>(iteratee: Iteratee<T>, array: Array<T>): number;
     min<T>(array: Array<T>): T;
@@ -2590,7 +2502,7 @@ declare module "lodash/fp" {
     round(number: number): number;
     subtract(minuend: number): (subtrahend: number) => number;
     subtract(minuend: number, subtrahend: number): number;
-    sum(array: Array<*>): number;
+    sum(array: Array<any>): number;
     sumBy<T>(iteratee: Iteratee<T>): (array: Array<T>) => number;
     sumBy<T>(iteratee: Iteratee<T>, array: Array<T>): number;
 
@@ -2800,14 +2712,14 @@ declare module "lodash/fp" {
       predicate: OPredicate<A>,
       object: T
     ): string | void;
-    forIn(iteratee: OIteratee<*>): (object: Object) => Object;
-    forIn(iteratee: OIteratee<*>, object: Object): Object;
-    forInRight(iteratee: OIteratee<*>): (object: Object) => Object;
-    forInRight(iteratee: OIteratee<*>, object: Object): Object;
-    forOwn(iteratee: OIteratee<*>): (object: Object) => Object;
-    forOwn(iteratee: OIteratee<*>, object: Object): Object;
-    forOwnRight(iteratee: OIteratee<*>): (object: Object) => Object;
-    forOwnRight(iteratee: OIteratee<*>, object: Object): Object;
+    forIn(iteratee: OIteratee<any>): (object: Object) => Object;
+    forIn(iteratee: OIteratee<any>, object: Object): Object;
+    forInRight(iteratee: OIteratee<any>): (object: Object) => Object;
+    forInRight(iteratee: OIteratee<any>, object: Object): Object;
+    forOwn(iteratee: OIteratee<any>): (object: Object) => Object;
+    forOwn(iteratee: OIteratee<any>, object: Object): Object;
+    forOwnRight(iteratee: OIteratee<any>): (object: Object) => Object;
+    forOwnRight(iteratee: OIteratee<any>, object: Object): Object;
     functions(object: Object): Array<string>;
     functionsIn(object: Object): Array<string>;
     get(
@@ -2895,10 +2807,10 @@ declare module "lodash/fp" {
     keys<K>(object: { [key: K]: any, ... }): Array<K>;
     keys(object: Object): Array<string>;
     keysIn(object: Object): Array<string>;
-    mapKeys(iteratee: OIteratee<*>): (object: Object) => Object;
-    mapKeys(iteratee: OIteratee<*>, object: Object): Object;
-    mapValues(iteratee: OIteratee<*>): (object: Object) => Object;
-    mapValues(iteratee: OIteratee<*>, object: Object): Object;
+    mapKeys(iteratee: OIteratee<any>): (object: Object) => Object;
+    mapKeys(iteratee: OIteratee<any>, object: Object): Object;
+    mapValues(iteratee: OIteratee<any>): (object: Object) => Object;
+    mapValues(iteratee: OIteratee<any>, object: Object): Object;
     merge(object: Object): (source: Object) => Object;
     merge(object: Object, source: Object): Object;
     mergeAll(objects: Array<Object>): Object;
@@ -3016,20 +2928,20 @@ declare module "lodash/fp" {
       value: any,
       object: T
     ): Object;
-    toPairs(object: Object | Array<*>): Array<[string, any]>;
+    toPairs(object: Object | Array<any>): Array<[string, any]>;
     toPairsIn(object: Object): Array<[string, any]>;
     transform(
-      iteratee: OIteratee<*>
+      iteratee: OIteratee<any>
     ): ((
       accumulator: any
     ) => (collection: Object | $ReadOnlyArray<any>) => any) &
       ((accumulator: any, collection: Object | $ReadOnlyArray<any>) => any);
     transform(
-      iteratee: OIteratee<*>,
+      iteratee: OIteratee<any>,
       accumulator: any
     ): (collection: Object | $ReadOnlyArray<any>) => any;
     transform(
-      iteratee: OIteratee<*>,
+      iteratee: OIteratee<any>,
       accumulator: any,
       collection: Object | $ReadOnlyArray<any>
     ): any;
@@ -3247,7 +3159,7 @@ declare module "lodash/fp" {
     rangeStepRight(step: number, start: number, end: number): Array<number>;
     runInContext(context: Object): Function;
 
-    stubArray(): Array<*>;
+    stubArray(): Array<any>;
     stubFalse(): false;
     F(): false;
     stubObject(): {...};

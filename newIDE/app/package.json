@@ -126,6 +126,7 @@
     "check-format": "prettier --list-different \"src/!(locales)/**/*.js\"",
     "test": "react-app-rewired test --env=node",
     "flow": "flow",
+    "codemod-flow-upgrade": "node scripts/codemod-flow-upgrade.js",
     "check-script-types": "cd scripts && tsc",
     "storybook": "storybook dev -p 9009",
     "build-storybook": "storybook build -o build-storybook",

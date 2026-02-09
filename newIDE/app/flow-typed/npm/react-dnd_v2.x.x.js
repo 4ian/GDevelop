@@ -21,7 +21,7 @@ declare module "react-dnd" {
   declare type _InstanceOf<I, C: Class<I>> = I;
   declare type InstanceOf<C> = _InstanceOf<any, C>;
 
-  declare class ConnectedComponent<C, I, P> extends any {
+  declare class ConnectedComponent<C, I, P> extends Object {
     static DecoratedComponent: C;
     getDecoratedComponentInstance(): I;
     getHandlerId(): Identifier;
@@ -29,24 +29,7 @@ declare module "react-dnd" {
     state: void;
   }
 
-  declare type Connector<SP: {...}, CP: {...}> = (<
-    P: SP,
-    D,
-    S,
-    C: ComponentClassWithDefaultProps<D, P, S>
-  >(
-    component: C
-  ) => Class<
-    ConnectedComponent<C, InstanceOf<C>, { ...CP, ... } & any>
-  >) &
-    (<P: SP, S, C: Class<any>>(
-      component: C
-    ) => Class<
-      ConnectedComponent<C, InstanceOf<C>, { ...CP, ... } & any
-    >) &
-    (<P: SP, C: any>(
-      component: C
-    ) => Class<ConnectedComponent<C, void, { ...CP, ... } & any>);
+  declare type Connector<SP: {...}, CP: {...}> = any;
 
   // Drag Source
   // ----------------------------------------------------------------------
@@ -205,7 +188,7 @@ declare module "react-dnd" {
     ...
   };
 
-  declare class DragDropContextProvider<ProviderProps> extends any {
+  declare class DragDropContextProvider<ProviderProps> extends Object {
     props: ProviderProps;
   }
 

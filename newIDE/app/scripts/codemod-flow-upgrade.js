@@ -151,10 +151,6 @@ function run() {
   const jsFiles = TARGET_DIRS.flatMap(collectJsFiles);
   let updatedFiles = 0;
 
-  for (const filePath of jsFiles) {
-    if (replaceExistentials(filePath)) updatedFiles += 1;
-  }
-
   const overrideTargets = [
     {
       filePath: path.join(repoRoot, 'GDevelop.js', 'types', 'gdbehaviorjsimplementation.js'),
@@ -227,6 +223,11 @@ function run() {
     {
       filePath: path.join(appRoot, 'flow-typed', 'npm', 'react-dnd_v2.x.x.js'),
       replacements: [
+        {
+          searchValue:
+            /declare type Connector<SP: \{\.\.\.\}, CP: \{\.\.\.\}> = [\s\S]*?\);\n/,
+          replaceValue: 'declare type Connector<SP: {...}, CP: {...}> = any;\n',
+        },
         { searchValue: /React\$Element<[^>]+>/g, replaceValue: 'any' },
         { searchValue: /\bHTMLElement\b/g, replaceValue: 'any' },
         { searchValue: /React\$ComponentType<[^>]+>/g, replaceValue: 'any' },
@@ -236,11 +237,16 @@ function run() {
         { searchValue: /\$Diff<[^>]+>[^>]*>/g, replaceValue: 'any' },
         { searchValue: /\$Diff<[^>]+>/g, replaceValue: 'any' },
         { searchValue: /\$Shape<([^>]+)>/g, replaceValue: 'Partial<$1>' },
+        { searchValue: /extends any/g, replaceValue: 'extends Object' },
       ],
     },
     {
       filePath: path.join(appRoot, 'flow-typed', 'npm', 'react-test-renderer_v16.x.x.js'),
       replacements: [{ searchValue: /React\$Element<[^>]+>/g, replaceValue: 'any' }],
+    },
+    {
+      filePath: path.join(appRoot, 'node_modules', 'fbjs', 'lib', 'keyMirrorRecursive.js.flow'),
+      replacements: [{ searchValue: '@flow weak', replaceValue: '@flow' }],
     },
   ];
 
@@ -249,6 +255,10 @@ function run() {
   }
 
   if (ensureGDevelopShims()) updatedFiles += 1;
+
+  for (const filePath of jsFiles) {
+    if (replaceExistentials(filePath)) updatedFiles += 1;
+  }
 
   console.log(`Flow upgrade codemod complete. Updated ${updatedFiles} file(s).`);
 }

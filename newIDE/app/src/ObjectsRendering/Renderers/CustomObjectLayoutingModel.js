@@ -153,15 +153,15 @@ export class LayoutedInstance {
   }
 
   getAngle() {
-    return 0;
+    return this.instance.getAngle();
   }
 
   getRotationX() {
-    return 0;
+    return this.instance.getRotationX();
   }
 
   getRotationY() {
-    return 0;
+    return this.instance.getRotationY();
   }
 
   getObjectName() {
@@ -193,7 +193,7 @@ export class LayoutedInstance {
   setSealed(seal: boolean) {}
 
   getZOrder() {
-    return 0;
+    return this.instance.getZOrder();
   }
 
   setZOrder(zOrder: number) {}
@@ -223,7 +223,7 @@ export class LayoutedInstance {
   setFlippedZ(flippedY: boolean) {}
 
   getLayer() {
-    return '';
+    return this.instance.getLayer();
   }
 
   setLayer(layer: string) {}

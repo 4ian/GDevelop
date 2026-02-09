@@ -61,7 +61,7 @@ const GDevelopJsInitializer = ({ children }: GDevelopJsInitializerProps) => {
       const newTestProject = makeTestProject(gd);
       for (let key in newTestProject) {
         // $FlowFixMe[invalid-computed-prop]
-        testProject[key] = newTestProject[key];
+        (testProject: any)[key] = newTestProject[key];
       }
       // $FlowFixMe[incompatible-type] - clean the "bad" object made on purpose to ease debugging
       // $FlowFixMe[prop-missing]

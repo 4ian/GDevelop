@@ -236,7 +236,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
   const [animatedItemId, setAnimatedItemId] = React.useState<string>('');
 
   const isSearching = !!searchText;
-  // $FlowFixMe[recursive-definition]
+  // $FlowFixMe[definition-cycle]
   const flattenNode = React.useCallback(
     (
       item: Item,
@@ -776,7 +776,7 @@ type TreeViewComponent = any;
 
 // Search for "treeview typing issues" in the codebase.
 // $FlowFixMe[incompatible-type] - InnerTreeView ref is not properly typed.
-const TreeView: TreeViewComponent = (React.forwardRef(InnerTreeView): any);
+const TreeView: any = (React.forwardRef((InnerTreeView: any)): any);
 
 // ✅ Properly-typed generic export:
 export default TreeView;

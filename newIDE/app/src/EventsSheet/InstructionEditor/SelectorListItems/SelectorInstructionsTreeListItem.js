@@ -47,7 +47,7 @@ export const renderInstructionOrExpressionTree = <
       // the "type" properties, but this will fail if a group is called "type"
       // (hence the flow errors, which are valid warnings)
       // $FlowFixMe[invalid-computed-prop]
-      const instructionOrGroup = instructionTreeNode[key];
+      const instructionOrGroup = ((instructionTreeNode: any)[key]: any);
       if (!instructionOrGroup) return null;
 
       if (typeof instructionOrGroup.type === 'string') {

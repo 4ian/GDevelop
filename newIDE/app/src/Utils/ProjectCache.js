@@ -10,7 +10,7 @@ type ProjectCacheKey = {| userId: string, cloudProjectId: string |};
 
 class ProjectCache {
   // $FlowFixMe[cannot-resolve-name]
-  databasePromise: Promise<IDBDatabase> | null;
+  databasePromise: Promise<any> | null;
 
   static isAvailable(): any {
     return (
@@ -121,7 +121,7 @@ class ProjectCache {
   _initializeDatabase(): any {
     if (!this.databasePromise) {
       // $FlowFixMe[missing-local-annot]
-      this.databasePromise = new Promise<IDBDatabase>((resolve, reject) => {
+      this.databasePromise = new Promise<any>((resolve, reject) => {
         ProjectCache._removeDatabaseIfCorrupt().then(
           () => {
             // $FlowFixMe[cannot-resolve-name]

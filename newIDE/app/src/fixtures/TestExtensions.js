@@ -304,7 +304,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     };
     // $FlowFixMe[incompatible-type]
     // $FlowFixMe[missing-this-annot]
-    fakeObject.getProperties = function() {
+    (fakeObject: any).getProperties = function() {
       const objectProperties = new gd.MapStringPropertyDescriptor();
       const objectContent = this.content;
 

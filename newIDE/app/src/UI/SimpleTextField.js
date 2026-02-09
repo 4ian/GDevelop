@@ -46,7 +46,8 @@ const stopPropagation = e => e.stopPropagation();
  * and faster to render (2 DOM elements, uncontrolled, pure CSS styling).
  */
 // $FlowFixMe[invalid-render]
-export const SimpleTextField: component(...SimpleTextFieldProps) renders SimpleTextFieldInterface = React.memo<
+export const SimpleTextField: any = React.memo
+  // $FlowFixMe[type-as-value][cannot-resolve-name]
   SimpleTextFieldProps, any>(
   // $FlowFixMe[incompatible-exact]
   React.forwardRef<SimpleTextFieldProps, SimpleTextFieldInterface>(

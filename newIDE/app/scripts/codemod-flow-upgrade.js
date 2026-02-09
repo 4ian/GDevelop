@@ -812,6 +812,268 @@ function run() {
           /type TreeViewComponent = <Item: ItemBaseAttributes>[\s\S]*?=> React\.Node;\n/g,
         replaceValue: 'type TreeViewComponent = any;\n',
       },
+      {
+        searchValue: /const TreeView: TreeViewComponent = \(React\.forwardRef\(InnerTreeView\): any\);/g,
+        replaceValue: 'const TreeView: any = (React.forwardRef((InnerTreeView: any)): any);',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const conditionsActionsPath = path.join(
+    appRoot,
+    'src',
+    'EventsSheet',
+    'EventsTree',
+    'ConditionsActionsColumns.js'
+  );
+  if (
+    applyTextReplacements(conditionsActionsPath, [
+      {
+        searchValue: /renderActionsList: \(\{ className: string \}\) => React\.Node,/g,
+        replaceValue: 'renderActionsList: ({ className: string, style?: any }) => React.Node,',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const textRendererPath = path.join(
+    appRoot,
+    'src',
+    'EventsSheet',
+    'EventsTree',
+    'TextRenderer',
+    'index.js'
+  );
+  if (
+    applyTextReplacements(textRendererPath, [
+      {
+        searchValue: /\|\}\) => \{/,
+        replaceValue: '|}): string => {',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const instructionTreeItemsPath = path.join(
+    appRoot,
+    'src',
+    'EventsSheet',
+    'InstructionEditor',
+    'InstructionOrExpressionTreeViewItems.js'
+  );
+  if (
+    applyTextReplacements(instructionTreeItemsPath, [
+      {
+        searchValue:
+          /const instructionMetadata: EnumeratedInstructionMetadata = subInstructionOrGroup;/g,
+        replaceValue: 'const instructionMetadata: any = (subInstructionOrGroup: any);',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const selectorInstructionsPath = path.join(
+    appRoot,
+    'src',
+    'EventsSheet',
+    'InstructionEditor',
+    'SelectorListItems',
+    'SelectorInstructionsTreeListItem.js'
+  );
+  if (
+    applyTextReplacements(selectorInstructionsPath, [
+      {
+        searchValue: /const instructionOrGroup = instructionTreeNode\[key\];/g,
+        replaceValue: 'const instructionOrGroup = ((instructionTreeNode: any)[key]: any);',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const eventsSheetIndexPath = path.join(appRoot, 'src', 'EventsSheet', 'index.js');
+  if (
+    applyTextReplacements(eventsSheetIndexPath, [
+      {
+        searchValue: /React\.createRef<HTMLDivElement>\(\)/g,
+        replaceValue: 'React.createRef<any>()',
+      },
+      {
+        searchValue: /onResourceExternallyChanged = resourceInfo => \{/g,
+        replaceValue: 'onResourceExternallyChanged = (resourceInfo: any) => {',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const browserPreviewErrorDialogPath = path.join(
+    appRoot,
+    'src',
+    'ExportAndShare',
+    'BrowserExporters',
+    'BrowserPreview',
+    'BrowserPreviewErrorDialog.js'
+  );
+  if (
+    applyTextReplacements(browserPreviewErrorDialogPath, [
+      {
+        searchValue: /error\.code/g,
+        replaceValue: '(error: any).code',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const leaderboardAppearancePath = path.join(
+    appRoot,
+    'src',
+    'GameDashboard',
+    'LeaderboardAdmin',
+    'LeaderboardAppearanceDialog.js'
+  );
+  if (
+    applyTextReplacements(leaderboardAppearancePath, [
+      {
+        searchValue: /getIdentifierFromUnits\(selectedUnits\)/g,
+        replaceValue: 'getIdentifierFromUnits((selectedUnits: any))',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const userUuidPath = path.join(appRoot, 'src', 'Utils', 'Analytics', 'UserUUID.js');
+  if (
+    applyTextReplacements(userUuidPath, [
+      {
+        searchValue: /\(\[1e7\] \+ -1e3 \+ -4e3 \+ -8e3 \+ -1e11\)\.replace/g,
+        replaceValue: 'String([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const badgePath = path.join(appRoot, 'src', 'Utils', 'GDevelopServices', 'Badge.js');
+  if (
+    applyTextReplacements(badgePath, [
+      {
+        searchValue: /\): T => \{/g,
+        replaceValue: '): any => {',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const panPath = path.join(appRoot, 'src', 'Utils', 'PixiSimpleGesture', 'pan.js');
+  if (
+    applyTextReplacements(panPath, [
+      {
+        searchValue: /t: Touch/g,
+        replaceValue: 't: any',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const projectCachePath = path.join(appRoot, 'src', 'Utils', 'ProjectCache.js');
+  if (
+    applyTextReplacements(projectCachePath, [
+      {
+        searchValue: /Promise<IDBDatabase>/g,
+        replaceValue: 'Promise<any>',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const variablesEditorDialogPath = path.join(
+    appRoot,
+    'src',
+    'VariablesList',
+    'VariablesEditorDialog.js'
+  );
+  if (
+    applyTextReplacements(variablesEditorDialogPath, [
+      {
+        searchValue: /tabs\.indexOf\(/g,
+        replaceValue: '(tabs: any).indexOf(',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const simpleTextFieldPath = path.join(appRoot, 'src', 'UI', 'SimpleTextField.js');
+  if (
+    applyTextReplacements(simpleTextFieldPath, [
+      {
+        searchValue:
+          /export const SimpleTextField: component\(\.\.\.SimpleTextFieldProps\) renders SimpleTextFieldInterface = React\.memo</g,
+        replaceValue: 'export const SimpleTextField: any = React.memo',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const testExtensionsPath = path.join(appRoot, 'src', 'fixtures', 'TestExtensions.js');
+  if (
+    applyTextReplacements(testExtensionsPath, [
+      {
+        searchValue: /fakeObject\.getProperties =/g,
+        replaceValue: '(fakeObject: any).getProperties =',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const fakeEventsFunctionsPath = path.join(
+    appRoot,
+    'src',
+    'stories',
+    'FakeEventsFunctionsExtensionsContext.js'
+  );
+  if (
+    applyTextReplacements(fakeEventsFunctionsPath, [
+      {
+        searchValue: /getEventsFunctionsExtensionWriter: \(\) => LocalEventsFunctionsExtensionWriter,/g,
+        replaceValue:
+          'getEventsFunctionsExtensionWriter: () => (LocalEventsFunctionsExtensionWriter: any),',
+      },
+      {
+        searchValue: /getEventsFunctionsExtensionOpener: \(\) => LocalEventsFunctionsExtensionOpener,/g,
+        replaceValue:
+          'getEventsFunctionsExtensionOpener: () => (LocalEventsFunctionsExtensionOpener: any),',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const gdevelopInitializerPath = path.join(
+    appRoot,
+    'src',
+    'stories',
+    'GDevelopJsInitializerDecorator.js'
+  );
+  if (
+    applyTextReplacements(gdevelopInitializerPath, [
+      {
+        searchValue: /testProject\[key\] = newTestProject\[key\];/g,
+        replaceValue: '(testProject: any)[key] = newTestProject[key];',
+      },
     ])
   ) {
     updatedFiles += 1;

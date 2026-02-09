@@ -12,7 +12,7 @@ const renderInstructionsAsText = ({
   instructionsList: gdInstructionsList,
   padding: string,
   areConditions: boolean,
-|}) => {
+|}): string => {
   const renderInstruction = (instruction: gdInstruction) => {
     const invertedText = instruction.isInverted() ? '(inverted) ' : '';
     const metadata = areConditions

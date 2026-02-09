@@ -20,7 +20,7 @@ export default function panable(
   }
 
   // $FlowFixMe[cannot-resolve-name]
-  function start(t: Touch) {
+  function start(t: any) {
     if (sprite._pan) {
       if (!sprite._pan.intervalId) {
         return;
@@ -49,7 +49,7 @@ export default function panable(
   }
 
   // $FlowFixMe[value-as-type]
-  function move(e: PIXI.FederatedPointerEvent, t: Touch) {
+  function move(e: PIXI.FederatedPointerEvent, t: any) {
     let now = new Date();
     let interval = now - sprite._pan.p.date;
     if (interval < 12) {
@@ -93,7 +93,7 @@ export default function panable(
   }
 
   // $FlowFixMe[value-as-type]
-  function end(e: PIXI.FederatedPointerEvent, t: Touch) {
+  function end(e: PIXI.FederatedPointerEvent, t: any) {
     sprite.removeEventListener('globalpointermove', pointerMove);
     if (!sprite._pan || !sprite._pan.pp) {
       sprite._pan = null;

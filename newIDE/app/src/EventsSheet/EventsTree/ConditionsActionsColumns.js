@@ -9,7 +9,7 @@ import {
 
 type Props = {|
   renderConditionsList: ({ style: Object, className: string }) => React.Node,
-  renderActionsList: ({ className: string }) => React.Node,
+  renderActionsList: ({ className: string, style?: any }) => React.Node,
   windowSize: WindowSizeType,
   className?: string,
   leftIndentWidth: number,

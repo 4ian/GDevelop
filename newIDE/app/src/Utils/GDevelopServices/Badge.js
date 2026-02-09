@@ -115,7 +115,7 @@ export const addCreateBadgePreHookIfNotClaimed = <
   authenticatedUser: AuthenticatedUser,
   achievementId: string,
   callback: T
-): T => {
+): any => {
   const { badges } = authenticatedUser;
   if (!badges) return callback;
   if (isAchievementAlreadyClaimed(badges, achievementId)) {

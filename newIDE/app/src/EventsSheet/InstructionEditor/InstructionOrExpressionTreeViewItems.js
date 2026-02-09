@@ -62,7 +62,7 @@ export const createFreeInstructionTreeViewItem = ({
       // $FlowFixMe[incompatible-type]
       if (typeof subInstructionOrGroup.type === 'string') {
         // $FlowFixMe[incompatible-type] - see above
-        const instructionMetadata: EnumeratedInstructionMetadata = subInstructionOrGroup;
+        const instructionMetadata: any = (subInstructionOrGroup: any);
         return new LeafTreeViewItem(
           new InstructionTreeViewItemContent(instructionMetadata)
         );

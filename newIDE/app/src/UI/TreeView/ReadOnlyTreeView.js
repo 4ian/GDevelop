@@ -187,7 +187,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
   const [animatedItemId, setAnimatedItemId] = React.useState<string>('');
 
   const isSearching = !!searchText;
-  // $FlowFixMe[recursive-definition]
+  // $FlowFixMe[definition-cycle]
   const flattenNode = React.useCallback(
     (
       item: Item,
@@ -713,5 +713,5 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
   );
 };
 
-// $FlowFixMe[incompatible-type]
+// $FlowFixMe[incompatible-exact]
 export default React.forwardRef(ReadOnlyTreeView) as React.ComponentType<any>;

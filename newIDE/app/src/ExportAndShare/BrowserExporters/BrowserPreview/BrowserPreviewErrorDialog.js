@@ -35,7 +35,7 @@ export default class BrowserPreviewErrorDialog extends Component<Props> {
               <Column noMargin>
                 <Text>
                   {// $FlowFixMe[incompatible-type] - AWS returned errors can have extra fields
-                  error.code === 'NetworkingError' ? (
+                  (error: any).code === 'NetworkingError' ? (
                     <Trans>
                       The preview could not be launched because you're offline.
                     </Trans>

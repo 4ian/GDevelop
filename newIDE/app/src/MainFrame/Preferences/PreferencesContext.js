@@ -492,7 +492,7 @@ export const initialPreferences = {
   setWatchProjectFolderFilesForLocalProjects: () => {},
   setNewFeaturesAcknowledgements: () => {},
   setDisplaySaveReminder: () => {},
-  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
   getEditorStateForProject: projectId => {},
   setEditorStateForProject: (projectId: any, editorState: any) => {},
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => {},

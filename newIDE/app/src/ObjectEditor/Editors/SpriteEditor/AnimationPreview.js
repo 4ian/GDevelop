@@ -125,7 +125,7 @@ const AnimationPreview = (
   // must be declared as mutable with useRef, otherwise they
   // will not update between calls.
   // $FlowFixMe[definition-cycle]
-  const updateAnimation = React.useCallback(
+  const updateAnimation: any = React.useCallback(
     (updateTimeInMs: number) => {
       // Mutable variables used inside the requestAnimationFrame callback
       const previousUpdateTimeInMs = previousTimeRef.current;

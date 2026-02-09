@@ -36,7 +36,7 @@ export const QuickObjectReplacer = (
     onExtensionInstalled
   }: Props,
 ): React.Node => {
-  const [selectedObjectToSwap, setSelectedObjectToSwap] = React.useState(null);
+  const [selectedObjectToSwap, setSelectedObjectToSwap] = React.useState<any>(null);
 
   return (
     <ColumnStackLayout noMargin expand>

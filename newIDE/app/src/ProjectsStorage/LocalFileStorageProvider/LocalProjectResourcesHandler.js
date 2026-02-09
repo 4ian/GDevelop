@@ -97,7 +97,7 @@ export const scanForNewResources = async ({
 
     const filesToCheck = new gd.VectorString();
     // $FlowFixMe[incompatible-use]
-    allFiles.forEach(filePath =>
+    allFiles.forEach((filePath: any) =>
       filesToCheck.push_back(path.relative(projectPath, filePath))
     );
     const filePathsNotInResources = project

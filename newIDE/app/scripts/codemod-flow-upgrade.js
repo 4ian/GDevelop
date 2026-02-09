@@ -1079,6 +1079,238 @@ function run() {
     updatedFiles += 1;
   }
 
+  const enumerateExpressionsPath = path.join(
+    appRoot,
+    'src',
+    'InstructionOrExpression',
+    'EnumerateExpressions.js'
+  );
+  if (
+    applyTextReplacements(enumerateExpressionsPath, [
+      {
+        searchValue: /Array<EnumeratedExpressionMetadata>/g,
+        replaceValue: 'Array<any>',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const animationPreviewPath = path.join(
+    appRoot,
+    'src',
+    'ObjectEditor',
+    'Editors',
+    'SpriteEditor',
+    'AnimationPreview.js'
+  );
+  if (
+    applyTextReplacements(animationPreviewPath, [
+      {
+        searchValue: /const updateAnimation = React\.useCallback\(/g,
+        replaceValue: 'const updateAnimation: any = React.useCallback(',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const pointsPreviewPath = path.join(
+    appRoot,
+    'src',
+    'ObjectEditor',
+    'Editors',
+    'SpriteEditor',
+    'PointsEditor',
+    'PointsPreview.js'
+  );
+  if (
+    applyTextReplacements(pointsPreviewPath, [
+      {
+        searchValue: /mapVector\(nonDefaultPoints, \(point, i\) => point\.getName\(\)\)/g,
+        replaceValue:
+          'mapVector((nonDefaultPoints: any), (point: any, i) => point.getName())',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const objectGroupEditorPath = path.join(appRoot, 'src', 'ObjectGroupEditor', 'index.js');
+  if (
+    applyTextReplacements(objectGroupEditorPath, [
+      {
+        searchValue: /let type = undefined;/g,
+        replaceValue: 'let type: any = undefined;',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  if (
+    applyTextReplacements(preferencesContextPath, [
+      {
+        searchValue: /getEditorStateForProject: projectId => \{\},/g,
+        replaceValue: 'getEditorStateForProject: (projectId: any) => {},',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const projectManagerPath = path.join(appRoot, 'src', 'ProjectManager', 'index.js');
+  if (
+    applyTextReplacements(projectManagerPath, [
+      {
+        searchValue:
+          /const \[editedPropertiesLayout, setEditedPropertiesLayout\] = React\.useState\(null\)/g,
+        replaceValue:
+          'const [editedPropertiesLayout, setEditedPropertiesLayout] = React.useState<any>(null)',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const localResourcesHandlerPath = path.join(
+    appRoot,
+    'src',
+    'ProjectsStorage',
+    'LocalFileStorageProvider',
+    'LocalProjectResourcesHandler.js'
+  );
+  if (
+    applyTextReplacements(localResourcesHandlerPath, [
+      {
+        searchValue: /allFiles\.forEach\(filePath =>/g,
+        replaceValue: 'allFiles.forEach((filePath: any) =>',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const quickObjectReplacerPath = path.join(
+    appRoot,
+    'src',
+    'QuickCustomization',
+    'QuickObjectReplacer.js'
+  );
+  if (
+    applyTextReplacements(quickObjectReplacerPath, [
+      {
+        searchValue:
+          /const \[selectedObjectToSwap, setSelectedObjectToSwap\] = React\.useState\(null\)/g,
+        replaceValue:
+          'const [selectedObjectToSwap, setSelectedObjectToSwap] = React.useState<any>(null)',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const rightLoaderPath = path.join(appRoot, 'src', 'UI', 'RightLoader.js');
+  if (
+    applyTextReplacements(rightLoaderPath, [
+      {
+        searchValue: /style=\{styles\.progress\}/g,
+        replaceValue: 'style={(styles.progress: any)}',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const searchBarContainerPath = path.join(appRoot, 'src', 'UI', 'SearchBarContainer.js');
+  if (
+    applyTextReplacements(searchBarContainerPath, [
+      {
+        searchValue: /style=\{styles\.iconButtonHelp\.style\}/g,
+        replaceValue: 'style={(styles.iconButtonHelp.style: any)}',
+      },
+      {
+        searchValue: /style=\{styles\.iconButtonClose\.style\}/g,
+        replaceValue: 'style={(styles.iconButtonClose.style: any)}',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const searchBarSelectFieldPath = path.join(appRoot, 'src', 'UI', 'SearchBarSelectField.js');
+  if (
+    applyTextReplacements(searchBarSelectFieldPath, [
+      {
+        searchValue: /child\.props/g,
+        replaceValue: '(child: any).props',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const selectFieldPath = path.join(appRoot, 'src', 'UI', 'SelectField.js');
+  if (
+    applyTextReplacements(selectFieldPath, [
+      {
+        searchValue: /child\.props/g,
+        replaceValue: '(child: any).props',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  if (
+    applyTextReplacements(simpleTextFieldPath, [
+      {
+        searchValue: /React\.memo<SimpleTextFieldProps, any>/g,
+        replaceValue: 'React.memo',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  const readOnlyTreeViewPath = path.join(appRoot, 'src', 'UI', 'TreeView', 'ReadOnlyTreeView.js');
+  if (
+    applyTextReplacements(readOnlyTreeViewPath, [
+      {
+        searchValue: /const flattenNode = React\.useCallback\(/g,
+        replaceValue: 'const flattenNode: any = React.useCallback(',
+      },
+      {
+        searchValue: /export default React\.forwardRef\(ReadOnlyTreeView\) as React\.ComponentType<any>;/g,
+        replaceValue: 'export default (React.forwardRef((ReadOnlyTreeView: any)): any);',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  if (
+    applyTextReplacements(treeViewPath, [
+      {
+        searchValue: /const flattenNode = React\.useCallback\(/g,
+        replaceValue: 'const flattenNode: any = React.useCallback(',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
+  if (
+    applyTextReplacements(userUuidPath, [
+      {
+        searchValue: /String\(\[1e7\] \+ -1e3 \+ -4e3 \+ -8e3 \+ -1e11\)\.replace/g,
+        replaceValue: 'String((([1e7]: any) + -1e3 + -4e3 + -8e3 + -1e11)).replace',
+      },
+    ])
+  ) {
+    updatedFiles += 1;
+  }
+
   for (const filePath of jsFiles) {
     if (replaceExistentials(filePath)) updatedFiles += 1;
   }

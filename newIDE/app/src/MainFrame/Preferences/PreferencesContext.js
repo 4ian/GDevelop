@@ -493,7 +493,7 @@ export const initialPreferences = {
   setNewFeaturesAcknowledgements: () => {},
   setDisplaySaveReminder: () => {},
   // $FlowFixMe[missing-local-annot]
-  getEditorStateForProject: projectId => {},
+  getEditorStateForProject: (projectId: any) => {},
   setEditorStateForProject: (projectId: any, editorState: any) => {},
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => {},
   setPreviewCrashReportUploadLevel: (level: string) => {},

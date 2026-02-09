@@ -47,7 +47,7 @@ const stopPropagation = e => e.stopPropagation();
  */
 // $FlowFixMe[invalid-render]
 export const SimpleTextField: any = React.memo
-  // $FlowFixMe[type-as-value][cannot-resolve-name]
+  // $FlowFixMe[cannot-resolve-name]
   SimpleTextFieldProps, any>(
   // $FlowFixMe[incompatible-exact]
   React.forwardRef<SimpleTextFieldProps, SimpleTextFieldInterface>(

@@ -225,14 +225,14 @@ const SearchBarContainer = (
               disabled={disabled}
               helpPagePath={helpPagePath}
               // $FlowFixMe[incompatible-type]
-              style={styles.iconButtonHelp.style}
+              style={(styles.iconButtonHelp.style: any)}
               size="small"
             />
           )}
           // $FlowFixMe[incompatible-type] 
           <IconButton
             onClick={onCancel}
-            style={styles.iconButtonClose.style}
+            style={(styles.iconButtonClose.style: any)}
             disabled={disabled}
             size="small"
           >

@@ -53,7 +53,7 @@ const ObjectGroupEditor = (
   );
 
   const renderExplanation = () => {
-    let type = undefined;
+    let type: any = undefined;
     if (groupObjectNames.length === 0) {
       return null;
     }

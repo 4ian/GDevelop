@@ -17,7 +17,7 @@ const enumerateExpressionMetadataMap = (
   prefix: string,
   expressions: gdMapStringExpressionMetadata,
   scope: InstructionOrExpressionScope
-): Array<EnumeratedExpressionMetadata> => {
+): Array<any> => {
   // $FlowFixMe[incompatible-exact]
   return mapVector(expressions.keys(), expressionType => {
     // $FlowFixMe[incompatible-type]
@@ -59,7 +59,7 @@ const enumerateExpressionMetadataMap = (
 export const enumerateFreeExpressions = (
   type: string,
   i18n: I18nType
-): Array<EnumeratedExpressionMetadata> => {
+): Array<any> => {
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
@@ -102,7 +102,7 @@ export const enumerateFreeExpressions = (
 export const enumerateObjectExpressions = (
   type: string,
   objectType: string
-): Array<EnumeratedExpressionMetadata> => {
+): Array<any> => {
   const extensionAndObjectMetadata = gd.MetadataProvider.getExtensionAndObjectMetadata(
     gd.JsPlatform.get(),
     objectType
@@ -168,7 +168,7 @@ export const enumerateObjectExpressions = (
 export const enumerateBehaviorExpressions = (
   type: string,
   behaviorType: string
-): Array<EnumeratedExpressionMetadata> => {
+): Array<any> => {
   const extensionAndBehaviorMetadata = gd.MetadataProvider.getExtensionAndBehaviorMetadata(
     gd.JsPlatform.get(),
     behaviorType
@@ -205,7 +205,7 @@ export const enumerateBehaviorExpressions = (
 export const enumerateAllExpressions = (
   type: string,
   i18n: I18nType
-): Array<EnumeratedExpressionMetadata> => {
+): Array<any> => {
   const objectsExpressions: Array<any> = [];
   const behaviorsExpressions: Array<any> = [];
   const freeExpressions = enumerateFreeExpressions(type, i18n);
@@ -301,9 +301,9 @@ export const enumerateAllExpressions = (
 };
 
 export const filterExpressions = (
-  list: Array<EnumeratedExpressionMetadata>,
+  list: Array<any>,
   searchText: string
-): Array<EnumeratedExpressionMetadata> => {
+): Array<any> => {
   if (!searchText) return list;
 
   const lowercaseSearchText = searchText.toLowerCase();
@@ -316,8 +316,8 @@ export const filterExpressions = (
   };
 
   const favorExactMatch = (
-    list: Array<EnumeratedExpressionMetadata>
-  ): Array<EnumeratedExpressionMetadata> => {
+    list: Array<any>
+  ): Array<any> => {
     // $FlowFixMe[constant-condition]
     if (!searchText) {
       return list;

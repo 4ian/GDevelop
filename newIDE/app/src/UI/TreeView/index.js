@@ -237,7 +237,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
 
   const isSearching = !!searchText;
   // $FlowFixMe[definition-cycle]
-  const flattenNode = React.useCallback(
+  const flattenNode: any = React.useCallback(
     (
       item: Item,
       depth: number,

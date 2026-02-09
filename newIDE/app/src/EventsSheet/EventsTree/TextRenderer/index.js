@@ -223,7 +223,7 @@ const renderLocalVariablesAsText = ({
 }: {|
   variables: gdVariablesContainer,
   padding: string,
-|}) => {
+|}): string => {
   return mapFor(0, variables.count(), i => {
     const variable = variables.getAt(i);
     const variableName = variables.getNameAt(i);

@@ -18,7 +18,7 @@ const RightLoader = (
   <span>
     {children}
     // $FlowFixMe[incompatible-type] 
-    {isLoading && <CircularProgress size={20} style={styles.progress} />}
+    {isLoading && <CircularProgress size={20} style={(styles.progress: any)} />}
   </span>
 );
 

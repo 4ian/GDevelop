@@ -188,7 +188,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
 
   const isSearching = !!searchText;
   // $FlowFixMe[definition-cycle]
-  const flattenNode = React.useCallback(
+  const flattenNode: any = React.useCallback(
     (
       item: Item,
       depth: number,
@@ -714,4 +714,4 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
 };
 
 // $FlowFixMe[incompatible-exact]
-export default React.forwardRef(ReadOnlyTreeView) as React.ComponentType<any>;
+export default (React.forwardRef((ReadOnlyTreeView: any)): any);

@@ -4,9 +4,12 @@ set -e
 # Flow migration fix script (0.131 -> 0.299)
 # This script is idempotent - it can be run multiple times safely.
 # It fixes Flow type errors after upgrading from Flow 0.131 to 0.299.
+#
+# Usage: cd newIDE/app && bash scripts/fix-flow-errors.sh
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+export APP_DIR
 
 cd "$APP_DIR"
 
@@ -20,12 +23,14 @@ echo ""
 echo "--- Step 1: Ensuring flow-libs are in place ---"
 if [ ! -d "$APP_DIR/flow-libs" ]; then
   echo "ERROR: flow-libs directory not found."
+  echo "Please copy the old Flow 0.131 lib files (dom.js, bom.js, cssom.js, etc.)"
+  echo "to the flow-libs/ directory."
   exit 1
 fi
-echo "flow-libs directory found."
+echo "  flow-libs directory found."
 
 ###############################################################################
-# STEP 2: Update .flowconfig  
+# STEP 2: Update .flowconfig
 ###############################################################################
 echo ""
 echo "--- Step 2: Updating .flowconfig ---"
@@ -48,16 +53,23 @@ if ! grep -q 'GDevelop.js/types/\.\*' "$APP_DIR/.flowconfig"; then
   echo "  Added GDevelop.js/types to [declarations] section"
 fi
 
-# Add flow-libs to [declarations] section (to avoid checking their internals)
+# Add flow-libs to [declarations] section
 if ! grep -q '<PROJECT_ROOT>/flow-libs/\.\*' "$APP_DIR/.flowconfig"; then
   sed -i '/^\[declarations\]/a <PROJECT_ROOT>/flow-libs/.*' "$APP_DIR/.flowconfig"
   echo "  Added flow-libs to [declarations] section"
 fi
 
-# Add node_modules/fbjs to [declarations] or [ignore]
+# Add fbjs to [declarations] section
 if ! grep -q 'fbjs' "$APP_DIR/.flowconfig"; then
   sed -i '/^\[declarations\]/a <PROJECT_ROOT>/node_modules/fbjs/.*' "$APP_DIR/.flowconfig"
   echo "  Added fbjs to [declarations] section"
+fi
+
+# Ensure [lints] section exists
+if ! grep -q '^\[lints\]' "$APP_DIR/.flowconfig"; then
+  echo "" >> "$APP_DIR/.flowconfig"
+  echo "[lints]" >> "$APP_DIR/.flowconfig"
+  echo "  Added [lints] section"
 fi
 
 echo "  .flowconfig updated."
@@ -68,19 +80,13 @@ echo "  .flowconfig updated."
 echo ""
 echo "--- Step 3: Fixing existential type * in src/ files ---"
 
-# Fix patterns like: React.Component<*, *> -> React.Component<any, any>  
-# and State = {|...|} & * -> State = {|...|} & any
-# The * existential type is replaced with 'any'
-find "$APP_DIR/src" -name "*.js" -exec perl -pi -e '
-  # Replace * in generic type params: <*> <*, *> etc.
-  # But only in type contexts (after < and before > or ,)
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
   s/(<[^>]*?)\*([,>])/${1}any${2}/g;
   s/(<[^>]*?)\*([,>])/${1}any${2}/g;
-  # Replace * after & (intersection types)
   s/& \*\b/\& any/g;
 ' {} +
 
-echo "  Fixed existential type * in src/ files."
+echo "  Done."
 
 ###############################################################################
 # STEP 4: Fix %checks predicate syntax (removed in new Flow)
@@ -88,9 +94,9 @@ echo "  Fixed existential type * in src/ files."
 echo ""
 echo "--- Step 4: Removing %checks predicate syntax ---"
 
-find "$APP_DIR/src" -name "*.js" -exec sed -i 's/ %checks//g' {} +
+find "$APP_DIR/src" -name "*.js" -type f -exec sed -i 's/ %checks//g' {} +
 
-echo "  Removed %checks syntax."
+echo "  Done."
 
 ###############################################################################
 # STEP 5: Fix React type name changes
@@ -98,8 +104,7 @@ echo "  Removed %checks syntax."
 echo ""
 echo "--- Step 5: Fixing React type names ---"
 
-# React$Element -> React.Element
-find "$APP_DIR/src" -name "*.js" -exec sed -i \
+find "$APP_DIR/src" -name "*.js" -type f -exec sed -i \
   -e 's/\bReact\$Element\b/React.Element/g' \
   -e 's/\bReact\$Component\b/React.Component/g' \
   -e 's/\bReact\$Node\b/React.Node/g' \
@@ -112,7 +117,7 @@ find "$APP_DIR/src" -name "*.js" -exec sed -i \
   -e 's/\bReact\$AbstractComponent\b/React.AbstractComponent/g' \
   {} +
 
-echo "  Fixed React type names."
+echo "  Done."
 
 ###############################################################################
 # STEP 6: Fix $PropertyType -> indexed access type
@@ -120,31 +125,44 @@ echo "  Fixed React type names."
 echo ""
 echo "--- Step 6: Fixing \$PropertyType usage ---"
 
-# $PropertyType<T, 'key'> -> T['key']
-find "$APP_DIR/src" -name "*.js" -exec perl -pi -e "
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e "
   s/\\\$PropertyType<([^,]+),\s*'([^']+)'>/\$1['\$2']/g;
   s/\\\$PropertyType<([^,]+),\s*\"([^\"]+)\">/\$1[\"\$2\"]/g;
 " {} +
 
-echo "  Fixed \$PropertyType usage."
+echo "  Done."
 
 ###############################################################################
-# STEP 7: Fix value-as-type errors (common patterns)
-###############################################################################
-echo ""
-echo "--- Step 7: Fixing value-as-type patterns ---"
-
-# For imports from pixi.js, three.js, etc. that are used as types,
-# we need to use 'typeof' or change 'import' to 'import type'
-# This is handled later in the FlowFixMe step since each case is unique
-
-###############################################################################
-# STEP 8: Fix import-type-as-value errors  
+# STEP 7: Fix $FlowExpectedError -> $FlowFixMe[incompatible-type]
 ###############################################################################
 echo ""
-echo "--- Step 8: Fixing import-type-as-value errors ---"
+echo "--- Step 7: Fixing \$FlowExpectedError and old \$FlowFixMe comments ---"
 
-# This will be handled by the Python script as it requires parsing
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
+  s/\$FlowExpectedError(?!\[)/\$FlowFixMe[incompatible-type]/g;
+  s/\$FlowExpectedError\[([^\]]+)\]/\$FlowFixMe[$1]/g;
+  s/\$FlowFixMe(?!\[)/\$FlowFixMe[incompatible-type]/g;
+' {} +
+
+echo "  Done."
+
+###############################################################################
+# STEP 8: Fix "renders any" and "renders React.Node/Fragment" patterns
+###############################################################################
+echo ""
+echo "--- Step 8: Fixing renders patterns ---"
+
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
+  s/renders any/React.Node/g;
+  s/ renders React\.Node\b//g;
+  s/ renders React\$Node\b//g;
+  s/: renders Fragment\b/: React.Node/g;
+  s/null \| renders Fragment/React.Node/g;
+  s/React\.Node \| renders Fragment/React.Node/g;
+  s/=> renders Fragment/=> React.Node/g;
+' {} +
+
+echo "  Done."
 
 ###############################################################################
 # STEP 9: Run flow codemod annotate-exports
@@ -158,40 +176,122 @@ npx flow codemod annotate-exports \
   --max-type-size 50 \
   --default-any \
   "$APP_DIR/src" \
-  2>&1 | tail -10 || echo "  annotate-exports codemod completed (with some issues)"
+  2>&1 | tail -5 || echo "  codemod completed (with some issues)"
 
 echo "  Codemod complete."
 
 ###############################################################################
-# STEP 10: Add $FlowFixMe for remaining errors
+# STEP 10: Post-codemod fixes
 ###############################################################################
 echo ""
-echo "--- Step 10: Adding \$FlowFixMe for remaining errors ---"
+echo "--- Step 10: Post-codemod fixes ---"
+
+# Re-fix renders patterns (codemod may re-introduce them)
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
+  s/renders any/React.Node/g;
+  s/ renders React\.Node\b//g;
+  s/ renders React\$Node\b//g;
+  s/: renders Fragment\b/: React.Node/g;
+  s/null \| renders Fragment/React.Node/g;
+  s/React\.Node \| renders Fragment/React.Node/g;
+  s/=> renders Fragment/=> React.Node/g;
+' {} +
+
+# Fix broken "as Array<empty>" pattern from codemod in src/ files
+# The codemod adds: [] // comment\n as Array<empty>
+# This should be: [], // comment
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -0 -e '
+  s/\[\]\s*\/\/\s*(.*?)\n\s*as Array<empty>/[], \/\/ $1/g;
+' {} +
+
+# Fix broken "as component(...)" patterns from codemod in forwardRef exports
+# The codemod adds: React.forwardRef(X) as component(...)
+# This should be just: React.forwardRef(X);
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -0 -e '
+  s/(React\.forwardRef\([^)]+\))\s*as\s*component\([^)]*\)\s*(?:\{\/\*.*?\*\/\}\s*)?(?:\)\s*React\.Node)?/\1/g;
+' {} +
+
+echo "  Post-codemod fixes applied."
+
+###############################################################################
+# STEP 11: Remove duplicate $FlowFixMe comments
+###############################################################################
+echo ""
+echo "--- Step 11: Removing duplicate \$FlowFixMe comments ---"
+
+python3 << 'PYEOF'
+import os
+
+src_dir = os.path.join(os.environ.get('APP_DIR', os.getcwd()), 'src')
+dupes_removed = 0
+
+for root, dirs, files in os.walk(src_dir):
+    for fname in files:
+        if not fname.endswith('.js'):
+            continue
+        filepath = os.path.join(root, fname)
+        try:
+            with open(filepath, 'r') as f:
+                lines = f.readlines()
+        except:
+            continue
+        
+        modified = False
+        new_lines = []
+        i = 0
+        while i < len(lines):
+            line = lines[i]
+            stripped = line.strip()
+            if i < len(lines) - 1:
+                next_stripped = lines[i + 1].strip()
+                if (stripped.startswith('// $FlowFixMe[') and 
+                    next_stripped.startswith('// $FlowFixMe[') and
+                    stripped == next_stripped):
+                    i += 1
+                    modified = True
+                    dupes_removed += 1
+                    continue
+            new_lines.append(line)
+            i += 1
+        
+        if modified:
+            with open(filepath, 'w') as f:
+                f.writelines(new_lines)
+
+print(f"  Removed {dupes_removed} duplicate FlowFixMe comments")
+PYEOF
+
+###############################################################################
+# STEP 12: Add $FlowFixMe for remaining errors (iterative)
+###############################################################################
+echo ""
+echo "--- Step 12: Adding \$FlowFixMe for remaining errors ---"
 
 npx flow stop 2>/dev/null || true
 
-# Run multiple iterations since fixing one error can reveal others
-for i in 1 2 3; do
+for i in 1 2 3 4 5 6 7 8; do
   echo "  Iteration $i..."
-  python3 "$SCRIPT_DIR/add-flow-fixme.py"
   
-  # Check if there are still errors
-  ERROR_COUNT=$(npx flow --json 2>&1 | python3 -c "
-import json, sys
-try:
-    data = json.loads(sys.stdin.read().split('\n')[-1] if '{' not in sys.stdin.read() else sys.stdin.read())
-    print(len(data.get('errors', [])))
-except:
-    print('unknown')
-" 2>/dev/null || echo "unknown")
+  # Add FlowFixMe comments
+  python3 "$SCRIPT_DIR/add-flow-fixme.py" 2>&1 | grep -E "Added|Found|No" || true
   
-  if [ "$ERROR_COUNT" = "0" ]; then
+  # Convert JSX FlowFixMe comments
+  python3 "$SCRIPT_DIR/convert-jsx-flowfixme.py" 2>&1 | grep -E "Converted" || true
+  
+  npx flow stop 2>/dev/null || true
+  
+  # Check remaining errors
+  ERROR_OUTPUT=$(npx flow 2>&1)
+  if echo "$ERROR_OUTPUT" | grep -q "No errors"; then
     echo "  No more errors!"
     break
   fi
-  echo "  Remaining errors: $ERROR_COUNT"
+  
+  ERROR_COUNT=$(echo "$ERROR_OUTPUT" | grep "Found" | grep -o '[0-9]*' | head -1)
+  echo "  Remaining errors: ${ERROR_COUNT:-unknown}"
+  npx flow stop 2>/dev/null || true
 done
 
 echo ""
 echo "=== Flow Migration Fix Script Complete ==="
-echo "Run 'npm run flow' to check for remaining errors."
+echo "Run 'npm run flow' to verify."

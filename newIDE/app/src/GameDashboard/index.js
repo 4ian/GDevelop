@@ -103,27 +103,29 @@ type Props = {|
   initialWidgetToScrollTo?: ?string,
 |};
 
-const GameDashboard = ({
-  // Project handling:
-  project,
-  currentFileMetadata,
-  onOpenProject,
-  storageProviders,
-  closeProject,
-  onDeleteCloudProject,
-
-  // Current game:
-  game,
-  onGameUpdated,
-  onUnregisterGame,
-
-  // Navigation:
-  currentView,
-  setCurrentView,
-  onBack,
-  disabled,
-  initialWidgetToScrollTo,
-}: Props) => {
+const GameDashboard = (
+  {
+    // Project handling:
+    project,
+    currentFileMetadata,
+    onOpenProject,
+    storageProviders,
+    closeProject,
+    onDeleteCloudProject,
+    
+    // Current game:
+    game,
+    onGameUpdated,
+    onUnregisterGame,
+    
+    // Navigation:
+    currentView,
+    setCurrentView,
+    onBack,
+    disabled,
+    initialWidgetToScrollTo
+  }: Props,
+): React.Node => {
   const grid = React.useRef<?HTMLDivElement>(null);
   const { isMobile } = useResponsiveWindowSize();
   const [widgetToScrollTo, setWidgetToScrollTo] = React.useState<?string>(

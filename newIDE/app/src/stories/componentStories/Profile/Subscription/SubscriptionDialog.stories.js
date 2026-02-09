@@ -126,19 +126,21 @@ const getUserFromState = (userState: string) => {
   }
 };
 
-export const Default = ({
-  userState,
-  cancelAtPeriodEnd,
-  pricingSystem,
-  recommendedPlanId,
-  excludePlanId,
-}: {
-  userState: string,
-  cancelAtPeriodEnd: boolean,
-  pricingSystem: string,
-  recommendedPlanId: string,
-  excludePlanId: string,
-}) => {
+export const Default = (
+  {
+    userState,
+    cancelAtPeriodEnd,
+    pricingSystem,
+    recommendedPlanId,
+    excludePlanId
+  }: {
+    userState: string,
+    cancelAtPeriodEnd: boolean,
+    pricingSystem: string,
+    recommendedPlanId: string,
+    excludePlanId: string,
+  },
+): React.Node => {
   const Component = () => {
     const {
       getSubscriptionPlansWithPricingSystems,

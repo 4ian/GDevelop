@@ -40,7 +40,7 @@ type ParseEmbeddedFiles = (
 export async function copyAllEmbeddedResourcesToProjectFolder(
   project: gdProject,
   filesWithEmbeddedResources: Map<string, EmbeddedResources>
-) {
+): Promise<void> | Promise<Array<Awaited<any>>> {
   if (!fs || !path) {
     return;
   }

@@ -23,11 +23,7 @@ type Props = {|
   onActionButtonClick?: () => void,
 |};
 
-const CreditsStatusBanner = ({
-  displayPurchaseAction,
-  actionButtonLabel,
-  onActionButtonClick,
-}: Props) => {
+const CreditsStatusBanner = ({displayPurchaseAction, actionButtonLabel, onActionButtonClick}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { limits, onRefreshLimits } = React.useContext(
     AuthenticatedUserContext

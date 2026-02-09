@@ -24,7 +24,7 @@ export default function HotReloadLogsDialog({
   onClose,
   onLaunchNewPreview,
   logs,
-}: Props) {
+}: Props): React.Node {
   if (!shouldDisplayDialogForLogs(logs)) {
     return null;
   }

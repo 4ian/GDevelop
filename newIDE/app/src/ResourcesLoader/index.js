@@ -7,7 +7,7 @@ const path = optionalRequire('path');
 class UrlsCache {
   projectCache: { [number]: { [string]: string } } = {};
 
-  _getProjectCache(project: gdProject) {
+  _getProjectCache(project: gdProject): any {
     const cache = this.projectCache[project.ptr];
     if (!cache) {
       return (this.projectCache[project.ptr] = {});
@@ -84,7 +84,7 @@ const isLocalFile = (urlOrFilename: string) => {
  * (notably images).
  */
 export default class ResourcesLoader {
-  static _cache = new UrlsCache();
+  static _cache = new UrlsCache() as UrlsCache;
 
   /**
    * Remove the specified resources resolved URLs from the cache. Useful if the
@@ -189,7 +189,7 @@ export default class ResourcesLoader {
     project: gdProject,
     resourceName: string,
     options: LoadingOptions
-  ) {
+  ): any {
     if (project.getResourcesManager().hasResource(resourceName)) {
       const resourceRelativePath = project
         .getResourcesManager()

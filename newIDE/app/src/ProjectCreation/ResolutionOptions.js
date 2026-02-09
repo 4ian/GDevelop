@@ -193,23 +193,25 @@ const ResolutionOptionButton = ({
   );
 };
 
-const ResolutionOptions = ({
-  selectedOption,
-  onClick,
-  disabled,
-  customWidth,
-  customHeight,
-  onCustomWidthChange,
-  onCustomHeightChange,
-}: {|
-  selectedOption: string,
-  onClick: ResolutionOption => void,
-  disabled?: boolean,
-  customWidth: ?number,
-  customHeight: ?number,
-  onCustomWidthChange: (?number) => void,
-  onCustomHeightChange: (?number) => void,
-|}) => {
+const ResolutionOptions = (
+  {
+    selectedOption,
+    onClick,
+    disabled,
+    customWidth,
+    customHeight,
+    onCustomWidthChange,
+    onCustomHeightChange
+  }: {|
+    selectedOption: string,
+    onClick: (ResolutionOption) => void,
+    disabled?: boolean,
+    customWidth: ?number,
+    customHeight: ?number,
+    onCustomWidthChange: (?number) => void,
+    onCustomHeightChange: (?number) => void,
+  |},
+): React.MixedElement => {
   return (
     <div style={styles.optionsContainer}>
       {Object.keys(resolutionOptions).map((key, index) => {

@@ -11,4 +11,4 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => <EmptyEditor renderObjectNameField={() => null} />;
+export const Default = (): React.Node => <EmptyEditor renderObjectNameField={() => null} />;

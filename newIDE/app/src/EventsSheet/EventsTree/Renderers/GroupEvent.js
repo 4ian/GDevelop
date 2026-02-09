@@ -35,7 +35,7 @@ const styles = {
   },
 };
 
-export default class GroupEvent extends React.Component<EventRendererProps, *> {
+export default class GroupEvent extends React.Component<EventRendererProps, any> {
   state = {
     editing: false,
     editingPreviousValue: null,
@@ -69,7 +69,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
     }
   };
 
-  render() {
+  render(): any {
     var groupEvent = gd.asGroupEvent(this.props.event);
 
     const r = groupEvent.getBackgroundColorR(),

@@ -108,7 +108,9 @@ const getTextColorFromColor = (color: ?TextColor) => {
 // A Text to be displayed in the app. Prefer using this
 // than a `<p>`/`<span>` or `<div>` as this will help maintain
 // consistency of text in the whole app.
-const Text = React.forwardRef<Props, Interface>(
+const Text: component(
+  ...{ ...Props, +ref?: React.RefSetter<Interface> }
+) = React.forwardRef<Props, Interface>(
   (
     {
       children,

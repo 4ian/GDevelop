@@ -26,14 +26,16 @@ type Props = {|
   onExampleOpen?: (exampleShortHeader: ExampleShortHeader) => void,
 |};
 
-const PublicProfileDialog = ({
-  userId,
-  onClose,
-  onAssetPackOpen,
-  onGameTemplateOpen,
-  onGameOpen,
-  onExampleOpen,
-}: Props) => {
+const PublicProfileDialog = (
+  {
+    userId,
+    onClose,
+    onAssetPackOpen,
+    onGameTemplateOpen,
+    onGameOpen,
+    onExampleOpen
+  }: Props,
+): React.Node => {
   const callbacks = React.useMemo(
     () => ({
       openAssetPack: onAssetPackOpen

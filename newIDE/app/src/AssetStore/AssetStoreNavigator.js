@@ -101,7 +101,7 @@ const searchPageState: AssetStorePageState = {
   displayAssets: true,
 };
 
-export const isHomePage = (pageState: AssetStorePageState) => {
+export const isHomePage = (pageState: AssetStorePageState): false | boolean => {
   return (
     pageState === assetStoreHomePageState ||
     (!pageState.openedAssetShortHeader &&
@@ -114,7 +114,7 @@ export const isHomePage = (pageState: AssetStorePageState) => {
   );
 };
 
-export const isSearchResultPage = (pageState: AssetStorePageState) => {
+export const isSearchResultPage = (pageState: AssetStorePageState): false | true => {
   return (
     !isHomePage(pageState) &&
     !pageState.openedAssetShortHeader &&
@@ -128,7 +128,7 @@ type AssetStorePageHistory = {|
   previousPages: Array<AssetStorePageState>,
 |};
 
-export const AssetStoreNavigatorContext = React.createContext<NavigationState>({
+export const AssetStoreNavigatorContext: React.Context<NavigationState> = React.createContext<NavigationState>({
   searchText: '',
   setSearchText: () => {},
   getCurrentPage: () => assetStoreHomePageState,
@@ -154,9 +154,7 @@ type AssetStoreNavigatorStateProviderProps = {|
   children: React.Node,
 |};
 
-export const AssetStoreNavigatorStateProvider = (
-  props: AssetStoreNavigatorStateProviderProps
-) => {
+export const AssetStoreNavigatorStateProvider = (props: AssetStoreNavigatorStateProviderProps): React.MixedElement => {
   const [searchText, setSearchText] = React.useState<string>('');
   const [history, setHistory] = React.useState<AssetStorePageHistory>({
     previousPages: [assetStoreHomePageState],

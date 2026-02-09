@@ -30,7 +30,7 @@ const styles = {
 };
 
 const getResourceName = (resource: gdResource) => resource.getName();
-export const getDefaultResourceThumbnail = (resource: gdResource) => {
+export const getDefaultResourceThumbnail = (resource: gdResource): string => {
   switch (resource.getKind()) {
     case 'audio':
       return 'res/actions/music24.png';
@@ -75,7 +75,7 @@ type Props = {|
   getResourceActionsSpecificToStorageProvider?: ?ResourcesActionsMenuBuilder,
 |};
 
-const ResourcesList = React.memo<Props, ResourcesListInterface>(
+const ResourcesList: component(...Props) = React.memo<Props, ResourcesListInterface>(
   React.forwardRef<Props, ResourcesListInterface>(
     (
       {

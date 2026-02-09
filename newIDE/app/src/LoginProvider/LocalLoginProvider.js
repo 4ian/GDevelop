@@ -48,7 +48,7 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
   }: {|
     provider: IdentityProvider,
     signal?: AbortSignal,
-  |}) {
+  |}): any {
     if (signal && signal.aborted) {
       return Promise.reject(
         new UserCancellationError(

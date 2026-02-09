@@ -294,11 +294,13 @@ ${padding}</event-${eventPath}>`;
   }).join('\n');
 };
 
-export const renderNonTranslatedEventsAsText = ({
-  eventsList,
-}: {
-  eventsList: gdEventsList,
-}) => {
+export const renderNonTranslatedEventsAsText = (
+  {
+    eventsList
+  }: {
+    eventsList: gdEventsList,
+  },
+): string | "Error while rendering events as text." => {
   // Temporarily override the getTranslation function to return the original
   // string, so that events are always rendered in English.
   // $FlowFixMe

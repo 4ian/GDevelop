@@ -42,12 +42,7 @@ type Props = {|
   fetchGameFeaturings?: () => Promise<void>,
 |};
 
-export const GameAnalyticsPanel = ({
-  game,
-  recommendedMarketingPlan,
-  gameFeaturings,
-  fetchGameFeaturings,
-}: Props) => {
+export const GameAnalyticsPanel = ({game, recommendedMarketingPlan, gameFeaturings, fetchGameFeaturings}: Props): React.Node => {
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );

@@ -31,7 +31,7 @@ const styles = {
   unlockedAchievement: {},
 };
 
-const AchievementList = ({ badges, achievements }: Props) => {
+const AchievementList = ({badges, achievements}: Props): React.Node => {
   const [
     achievementsWithBadgeData,
     setAchievementsWithBadgeData,

@@ -28,7 +28,7 @@ const initialPrivateAssetsState = {
   getPrivateAssetPackAudioArchiveUrl: async id => null,
 };
 
-const PrivateAssetsAuthorizationContext = React.createContext<PrivateAssetsState>(
+const PrivateAssetsAuthorizationContext: React.Context<PrivateAssetsState> = React.createContext<PrivateAssetsState>(
   initialPrivateAssetsState
 );
 

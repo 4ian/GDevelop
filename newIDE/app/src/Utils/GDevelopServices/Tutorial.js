@@ -63,7 +63,7 @@ export const canAccessTutorial = (
   return false;
 };
 
-export const client = axios.create({
+export const client: Axios = axios.create({
   baseURL: GDevelopAssetApi.baseUrl,
 });
 

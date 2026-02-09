@@ -27,7 +27,9 @@ type Props = {|
 
 export type TwoStatesButtonInterface = {| focusLeftButton: () => void |};
 
-const TwoStatesButton = React.forwardRef<Props, TwoStatesButtonInterface>(
+const TwoStatesButton: component(
+  ...{ ...Props, +ref?: React.RefSetter<TwoStatesButtonInterface> }
+) = React.forwardRef<Props, TwoStatesButtonInterface>(
   ({ leftButton, rightButton, onChange, value, disabled }, ref) => {
     const leftButtonRef = React.useRef<?Button>(null);
 

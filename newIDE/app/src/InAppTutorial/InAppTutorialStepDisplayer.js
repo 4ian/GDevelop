@@ -159,7 +159,7 @@ function InAppTutorialStepDisplayer({
   endTutorial,
   progress,
   goToNextStep,
-}: Props) {
+}: Props): React.Node {
   const [
     elementToHighlight,
     setElementToHighlight,

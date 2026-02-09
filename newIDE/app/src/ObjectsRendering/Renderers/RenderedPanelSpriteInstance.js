@@ -466,14 +466,14 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     this.updatePosition();
   }
 
-  getDefaultWidth() {
+  getDefaultWidth(): any {
     const panelSprite = gd.asPanelSpriteConfiguration(
       this._associatedObjectConfiguration
     );
     return panelSprite.getWidth();
   }
 
-  getDefaultHeight() {
+  getDefaultHeight(): any {
     const panelSprite = gd.asPanelSpriteConfiguration(
       this._associatedObjectConfiguration
     );
@@ -487,7 +487,7 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ) {
+  ): any {
     const panelSprite = gd.asPanelSpriteConfiguration(objectConfiguration);
 
     return ResourcesLoader.getResourceFullUrl(

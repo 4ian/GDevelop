@@ -36,7 +36,7 @@ type Props = {|
   iconStyle?: any,
 |};
 
-const VariablesListToolbar = React.memo<Props>((props: Props) => {
+const VariablesListToolbar: component(...Props) = React.memo<Props>((props: Props) => {
   const buttons = [
     {
       key: 'copy',

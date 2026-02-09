@@ -54,7 +54,7 @@ export default class RenderedTiledSpriteInstance extends RenderedInstance {
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ) {
+  ): any {
     const tiledSprite = gd.asTiledSpriteConfiguration(objectConfiguration);
 
     return ResourcesLoader.getResourceFullUrl(
@@ -95,14 +95,14 @@ export default class RenderedTiledSpriteInstance extends RenderedInstance {
     this._pixiObject.alpha = alphaForDisplay;
   }
 
-  getDefaultWidth() {
+  getDefaultWidth(): any {
     const tiledSprite = gd.asTiledSpriteConfiguration(
       this._associatedObjectConfiguration
     );
     return tiledSprite.getWidth();
   }
 
-  getDefaultHeight() {
+  getDefaultHeight(): any {
     const tiledSprite = gd.asTiledSpriteConfiguration(
       this._associatedObjectConfiguration
     );

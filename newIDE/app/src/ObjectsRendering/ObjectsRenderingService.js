@@ -56,7 +56,7 @@ const ObjectsRenderingService = {
   getThumbnail: function(
     project: gdProject,
     objectConfiguration: gdObjectConfiguration
-  ) {
+  ): any {
     const objectType = objectConfiguration.getType();
     if (this.renderers.hasOwnProperty(objectType))
       return this.renderers[objectType].getThumbnail(
@@ -202,7 +202,7 @@ const ObjectsRenderingService = {
 
     this.renderers3D[objectType] = renderer;
   },
-  renderersCacheClearingMethods: [],
+  renderersCacheClearingMethods: [] as Array<empty>,
   registerClearCache: function(clearCache: (project: gdProject) => void) {
     this.renderersCacheClearingMethods.push(clearCache);
   },

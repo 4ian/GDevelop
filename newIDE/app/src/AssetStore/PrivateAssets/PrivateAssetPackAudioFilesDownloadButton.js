@@ -9,11 +9,13 @@ import Window from '../../Utils/Window';
 import { Column } from '../../UI/Grid';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
-const PrivateAssetPackAudioFilesDownloadButton = ({
-  assetPack,
-}: {|
-  assetPack: PrivateAssetPack,
-|}) => {
+const PrivateAssetPackAudioFilesDownloadButton = (
+  {
+    assetPack
+  }: {|
+    assetPack: PrivateAssetPack,
+  |},
+): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const { getPrivateAssetPackAudioArchiveUrl } = React.useContext(
     PrivateAssetsAuthorizationContext

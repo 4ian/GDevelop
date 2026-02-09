@@ -50,7 +50,7 @@ const getConditionWidthRatio = (eventsSheetWidth: number) => {
  * next to each other on a big screen (with proper sizing for the conditions column),
  * and stacked on a small one.
  */
-const ConditionsActionsColumns = (props: Props) => {
+const ConditionsActionsColumns = (props: Props): React.MixedElement => {
   const isMobile = props.windowSize === 'small';
   if (isMobile) {
     return (

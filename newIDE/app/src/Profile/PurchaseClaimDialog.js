@@ -49,10 +49,12 @@ type Props = {|
   onClose: () => void,
 |};
 
-const PurchaseClaimDialog = ({
-  claimedProductOptions: { productListingData, purchaseId, claimableToken },
-  onClose,
-}: Props) => {
+const PurchaseClaimDialog = (
+  {
+    claimedProductOptions: {productListingData, purchaseId, claimableToken},
+    onClose
+  }: Props,
+): React.Node => {
   const {
     getAuthorizationHeader,
     profile,

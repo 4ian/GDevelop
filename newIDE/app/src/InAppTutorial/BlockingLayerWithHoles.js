@@ -10,7 +10,7 @@ type Props = {|
   elements: Array<HTMLElement>,
 |};
 
-const BlockingLayerWithHoles = ({ elements }: Props) => {
+const BlockingLayerWithHoles = ({elements}: Props): null | React.MixedElement => {
   const [holes, setHoles] = React.useState([]);
 
   const updateHoles = React.useCallback(

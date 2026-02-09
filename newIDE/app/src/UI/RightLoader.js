@@ -6,13 +6,15 @@ const styles = {
   progress: { marginLeft: 8, verticalAlign: 'middle' },
 };
 
-const RightLoader = ({
-  children,
-  isLoading,
-}: {
-  children: React.Node,
-  isLoading: ?boolean,
-}) => (
+const RightLoader = (
+  {
+    children,
+    isLoading
+  }: {
+    children: React.Node,
+    isLoading: ?boolean,
+  },
+): React.MixedElement => (
   <span>
     {children}
     {isLoading && <CircularProgress size={20} style={styles.progress} />}

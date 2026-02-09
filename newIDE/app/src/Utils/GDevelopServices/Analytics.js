@@ -49,7 +49,7 @@ export type GameMetrics = {
   },
 };
 
-export const client = axios.create({
+export const client: Axios = axios.create({
   baseURL: GDevelopAnalyticsApi.baseUrl,
 });
 

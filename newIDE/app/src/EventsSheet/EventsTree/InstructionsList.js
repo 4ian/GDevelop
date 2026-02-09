@@ -104,7 +104,7 @@ export default function InstructionsList({
   objectsContainer,
   projectScopedContainersAccessor,
   idPrefix,
-}: Props) {
+}: Props): React.Node {
   const [canPaste, setCanPaste] = React.useState(false);
 
   const addNewInstruction = React.useCallback(

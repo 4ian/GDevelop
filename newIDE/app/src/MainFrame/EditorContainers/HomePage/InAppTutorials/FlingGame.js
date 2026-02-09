@@ -56,7 +56,7 @@ type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
 |};
 
-const FlingGame = ({ selectInAppTutorial }: Props) => {
+const FlingGame = ({selectInAppTutorial}: Props): React.Node => {
   const {
     inAppTutorialShortHeaders,
     inAppTutorialsFetchingError,

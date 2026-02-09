@@ -64,9 +64,9 @@ type State = {|
  */
 export default class Debugger extends React.Component<Props, State> {
   state = {
-    debuggerServerState: this.props.previewDebuggerServer.getServerState(),
+    debuggerServerState: this.props.previewDebuggerServer.getServerState() as "started" | "stopped",
     debuggerServerError: null,
-    debuggerIds: this.props.previewDebuggerServer.getExistingDebuggerIds(),
+    debuggerIds: this.props.previewDebuggerServer.getExistingDebuggerIds() as Array<DebuggerId>,
     unregisterDebuggerServerCallbacks: null,
     debuggerGameData: {},
     profilerOutputs: {},
@@ -299,7 +299,7 @@ export default class Debugger extends React.Component<Props, State> {
     previewDebuggerServer.sendMessage(id, { command: 'refresh' });
   };
 
-  _edit = (id: DebuggerId, path: Array<string>, newValue: any) => {
+  _edit = (id: DebuggerId, path: Array<string>, newValue: any): any => {
     const { previewDebuggerServer } = this.props;
     previewDebuggerServer.sendMessage(id, {
       command: 'set',
@@ -311,7 +311,7 @@ export default class Debugger extends React.Component<Props, State> {
     return true;
   };
 
-  _call = (id: DebuggerId, path: Array<string>, args: Array<any>) => {
+  _call = (id: DebuggerId, path: Array<string>, args: Array<any>): any => {
     const { previewDebuggerServer } = this.props;
     previewDebuggerServer.sendMessage(id, {
       command: 'call',
@@ -333,7 +333,7 @@ export default class Debugger extends React.Component<Props, State> {
     previewDebuggerServer.sendMessage(id, { command: 'profiler.stop' });
   };
 
-  _hasSelectedDebugger = () => {
+  _hasSelectedDebugger = (): any => {
     const { selectedId, debuggerIds } = this.state;
     if (debuggerIds.indexOf(selectedId) === -1) return false;
 
@@ -343,7 +343,7 @@ export default class Debugger extends React.Component<Props, State> {
     return true;
   };
 
-  render() {
+  render(): any {
     const {
       debuggerServerError,
       debuggerServerState,

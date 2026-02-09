@@ -26,9 +26,14 @@ const emptyForm = {
 
 type Props = {| authenticatedUser: AuthenticatedUser |};
 
-const useEducationForm = ({
-  authenticatedUser: { authenticated, profile, getAuthorizationHeader },
-}: Props) => {
+const useEducationForm = ({authenticatedUser: {authenticated, profile, getAuthorizationHeader}}: Props): {
+  educationForm: EducationForm,
+  educationFormError: ?React.Node,
+  educationFormStatus: EducationFormStatus,
+  onChangeEducationForm: (newEducationForm: EducationForm) => void,
+  onResetEducationForm: () => void,
+  onSendEducationForm: () => Promise<void>,
+} => {
   const [educationForm, setEducationForm] = React.useState<EducationForm>({
     ...emptyForm,
     email: profile ? profile.email : '',

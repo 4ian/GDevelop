@@ -32,7 +32,7 @@ export default function QuickCustomizationPropertiesVisibilityDialog({
   onClose,
   propertyNames,
   propertiesQuickCustomizationVisibilities,
-}: Props) {
+}: Props): React.Node {
   const forceUpdate = useForceUpdate();
 
   return (

@@ -37,19 +37,21 @@ type OnlineGameLinkProps = {|
 
 const timeForExport = 5; // seconds.
 
-const OnlineGameLink = ({
-  build,
-  game,
-  project,
-  onSaveProject,
-  isSavingProject,
-  errored,
-  exportStep,
-  onRefreshGame,
-  onGameUpdated,
-  automaticallyPublishNewBuild,
-  shouldShowShareDialog,
-}: OnlineGameLinkProps) => {
+const OnlineGameLink = (
+  {
+    build,
+    game,
+    project,
+    onSaveProject,
+    isSavingProject,
+    errored,
+    exportStep,
+    onRefreshGame,
+    onGameUpdated,
+    automaticallyPublishNewBuild,
+    shouldShowShareDialog
+  }: OnlineGameLinkProps,
+): React.Node => {
   const [isShareDialogOpen, setIsShareDialogOpen] = React.useState<boolean>(
     false
   );

@@ -278,7 +278,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
     return this._goToSearchResults(+1);
   };
 
-  render() {
+  render(): any {
     return this.props.children({
       eventsSearchResultEvents: this._resultEvents,
       searchFocusOffset: this.state.searchFocusOffset,

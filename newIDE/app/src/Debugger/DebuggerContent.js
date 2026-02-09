@@ -73,20 +73,20 @@ const initialMosaicEditorNodes = {
 export default class DebuggerContent extends React.Component<Props, State> {
   state = {
     selectedInspector: null,
-    selectedInspectorFullPath: [],
+    selectedInspectorFullPath: [] as Array<empty>,
     rawMode: false,
   };
 
   _editors: ?EditorMosaicInterface = null;
 
-  isProfilerShown = () => {
+  isProfilerShown = (): any => {
     return (
       !!this._editors &&
       this._editors.getOpenedEditorNames().includes('profiler')
     );
   };
 
-  isConsoleShown = () => {
+  isConsoleShown = (): any => {
     return (
       !!this._editors &&
       this._editors.getOpenedEditorNames().includes('console')
@@ -101,7 +101,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
     if (this._editors) this._editors.toggleEditor('console', 'bottom');
   };
 
-  render() {
+  render(): any {
     const {
       gameData,
       onRefresh,

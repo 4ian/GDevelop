@@ -45,7 +45,7 @@ export const initialLeaderboardState = {
     goToPreviousPage: null,
     goToFirstPage: null,
   },
-  createLeaderboard: async () => null,
+  createLeaderboard: async (): Promise<null> => null,
   listLeaderboards: async () => {},
   selectLeaderboard: () => {},
   setDisplayOnlyBestEntry: () => {},
@@ -56,7 +56,7 @@ export const initialLeaderboardState = {
   fetchLeaderboardEntries: async () => {},
 };
 
-const LeaderboardContext = React.createContext<LeaderboardState>(
+const LeaderboardContext: React.Context<LeaderboardState> = React.createContext<LeaderboardState>(
   initialLeaderboardState
 );
 

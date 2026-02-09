@@ -273,22 +273,24 @@ type Props = {|
   animationName: string, // This is used for the default name of images created with Piskel.
 |};
 
-const SpritesList = ({
-  animations,
-  direction,
-  project,
-  resourcesLoader,
-  resourceManagementProps,
-  editDirectionWith,
-  onReplaceByDirection,
-  onSpriteAdded,
-  onSpriteUpdated,
-  onFirstSpriteUpdated,
-  addAnimations,
-  onChangeName,
-  objectName,
-  animationName,
-}: Props) => {
+const SpritesList = (
+  {
+    animations,
+    direction,
+    project,
+    resourcesLoader,
+    resourceManagementProps,
+    editDirectionWith,
+    onReplaceByDirection,
+    onSpriteAdded,
+    onSpriteUpdated,
+    onFirstSpriteUpdated,
+    addAnimations,
+    onChangeName,
+    objectName,
+    animationName
+  }: Props,
+): React.Node => {
   // It's important to save the selected sprites in a ref, so that
   // we can update the selection when a context menu is opened without relying on the state.
   // Otherwise, the selection would be updated after the context menu is opened.

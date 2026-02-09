@@ -55,7 +55,7 @@ type ResourceStoreState = {|
   |},
 |};
 
-export const ResourceStoreContext = React.createContext<ResourceStoreState>({
+export const ResourceStoreContext: React.Context<ResourceStoreState> = React.createContext<ResourceStoreState>({
   filters: null,
   authors: null,
   licenses: null,
@@ -87,9 +87,7 @@ const getResourceSearchTerms = (resource: ResourceV2 | Resource) => {
   return resource.name + '\n' + resource.tags.join(', ');
 };
 
-export const ResourceStoreStateProvider = ({
-  children,
-}: ResourceStoreStateProviderProps) => {
+export const ResourceStoreStateProvider = ({children}: ResourceStoreStateProviderProps): React.MixedElement => {
   const [svgResourcesByUrl, setSvgResourcesByUrl] = React.useState<?{
     [string]: Resource,
   }>(null);

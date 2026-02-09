@@ -34,7 +34,7 @@ import LocalLoginProvider from './LoginProvider/LocalLoginProvider';
 
 const gd: libGDevelop = global.gd;
 
-export const create = (authentication: Authentication) => {
+export const create = (authentication: Authentication): React.Node => {
   Window.setUpContextMenu();
   const loginProvider = new LocalLoginProvider(authentication.auth);
   authentication.setLoginProvider(loginProvider);

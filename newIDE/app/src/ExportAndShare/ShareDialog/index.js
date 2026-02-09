@@ -311,7 +311,7 @@ const ShareDialog = ({
   );
 };
 
-const ShareDialogWithErrorBoundary = (props: Props) => (
+const ShareDialogWithErrorBoundary = (props: Props): React.Node => (
   <ErrorBoundary
     componentTitle={<Trans>Share dialog</Trans>}
     scope="export-and-share"

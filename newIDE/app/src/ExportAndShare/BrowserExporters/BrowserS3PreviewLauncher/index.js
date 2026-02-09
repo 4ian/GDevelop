@@ -31,7 +31,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
   PreviewLauncherProps,
   State
 > {
-  canDoNetworkPreview = () => false;
+  canDoNetworkPreview = (): any => false;
 
   state = {
     error: null,
@@ -282,11 +282,11 @@ export default class BrowserS3PreviewLauncher extends React.Component<
     }
   };
 
-  getPreviewDebuggerServer() {
+  getPreviewDebuggerServer(): any {
     return browserPreviewDebuggerServer;
   }
 
-  render() {
+  render(): any {
     const { error } = this.state;
 
     if (error) {

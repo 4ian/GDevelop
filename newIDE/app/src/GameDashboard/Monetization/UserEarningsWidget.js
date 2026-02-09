@@ -38,7 +38,7 @@ type Props = {|
   size: DashboardWidgetSize,
 |};
 
-const UserEarningsWidget = ({ size }: Props) => {
+const UserEarningsWidget = ({size}: Props): React.Node => {
   const {
     userEarningsBalance,
     onRefreshEarningsBalance,

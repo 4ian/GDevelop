@@ -265,7 +265,7 @@ export type RedemptionCode = {|
 
 export const EDUCATION_PLAN_MIN_SEATS = 5;
 export const EDUCATION_PLAN_MAX_SEATS = 300;
-export const apiClient = axios.create({
+export const apiClient: Axios = axios.create({
   baseURL: GDevelopUsageApi.baseUrl,
 });
 
@@ -537,7 +537,7 @@ export const isSubscriptionComingFromTeam = (
   return !!subscription && subscription.pricingSystemId === 'TEAM_MEMBER';
 };
 
-export const hasValidSubscriptionPlan = (subscription: ?Subscription) => {
+export const hasValidSubscriptionPlan = (subscription: ?Subscription): boolean => {
   const hasValidSubscription =
     !!subscription &&
     !!subscription.planId &&
@@ -692,7 +692,7 @@ export const validateCoupon = async (
   return response.data;
 };
 
-export const canBenefitFromDiscordRole = (subscription: ?Subscription) => {
+export const canBenefitFromDiscordRole = (subscription: ?Subscription): false | true | boolean => {
   return (
     !!subscription &&
     ['gdevelop_education', 'gdevelop_startup', 'gdevelop_gold'].includes(
@@ -702,7 +702,7 @@ export const canBenefitFromDiscordRole = (subscription: ?Subscription) => {
   );
 };
 
-export const canUpgradeSubscription = (subscription: ?Subscription) => {
+export const canUpgradeSubscription = (subscription: ?Subscription): false | true | boolean => {
   return (
     !!subscription &&
     !['gdevelop_education', 'gdevelop_startup'].includes(subscription.planId) &&
@@ -710,12 +710,12 @@ export const canUpgradeSubscription = (subscription: ?Subscription) => {
   );
 };
 
-export const canUseClassroomFeature = (limits: ?Limits) =>
+export const canUseClassroomFeature = (limits: ?Limits): ?boolean =>
   limits &&
   limits.capabilities.classrooms &&
   limits.capabilities.classrooms.showClassroomTab;
 
-export const shouldHideClassroomTab = (limits: ?Limits) =>
+export const shouldHideClassroomTab = (limits: ?Limits): boolean =>
   !limits ||
   !limits.capabilities.classrooms ||
   limits.capabilities.classrooms.showClassroomTab

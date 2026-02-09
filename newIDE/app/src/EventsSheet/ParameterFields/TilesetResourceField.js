@@ -18,17 +18,20 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(ref, () => ({
-      focus,
-    }));
-
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        focus,
+      }),
+    );
+    
     if (!props.resourceManagementProps || !props.project) {
       console.error(
-        'Missing project or resourceManagementProps for TilesetResourceField'
+        'Missing project or resourceManagementProps for TilesetResourceField',
       );
       return null;
     }
-
+    
     return (
       <ResourceSelector
         margin={props.isInline ? 'none' : 'dense'}
@@ -47,5 +50,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         ref={field}
       />
     );
-  }
+  },
+) as component(
+  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
 );

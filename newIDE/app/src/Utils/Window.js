@@ -180,19 +180,19 @@ export default class Window {
     }
   }
 
-  static onFocus(cb: () => void) {
+  static onFocus(cb: () => void): any {
     if (!remote) return;
 
     return remote.getCurrentWindow().on('focus', cb);
   }
 
-  static onBlur(cb: () => void) {
+  static onBlur(cb: () => void): any {
     if (!remote) return;
 
     return remote.getCurrentWindow().on('blur', cb);
   }
 
-  static onClose(cb: () => void) {
+  static onClose(cb: () => void): any {
     if (!remote) return;
 
     return remote.getCurrentWindow().on('close', cb);
@@ -300,7 +300,7 @@ export default class Window {
   static showConfirmDialog(
     message: string,
     type?: 'none' | 'info' | 'error' | 'question' | 'warning'
-  ) {
+  ): any {
     if (!dialog || !electron) {
       // eslint-disable-next-line
       return confirm(message);
@@ -378,7 +378,7 @@ export default class Window {
     }
   }
 
-  static hasMainMenu() {
+  static hasMainMenu(): any {
     return !!electron;
   }
 

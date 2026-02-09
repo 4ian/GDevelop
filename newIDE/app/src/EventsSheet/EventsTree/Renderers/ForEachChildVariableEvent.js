@@ -29,7 +29,7 @@ const gd: libGDevelop = global.gd;
 export const getVariableSourceOrSceneIcon = (
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   variableName: string
-) => {
+): any => {
   const variablesContainerSourceType = getVariableSourceFromIdentifier(
     variableName,
     projectScopedContainersAccessor.get()
@@ -177,7 +177,7 @@ export default class ForEachChildVariableEvent extends React.Component<
     });
   };
 
-  render() {
+  render(): any {
     const forEachChildVariableEvent = gd.asForEachChildVariableEvent(
       this.props.event
     );

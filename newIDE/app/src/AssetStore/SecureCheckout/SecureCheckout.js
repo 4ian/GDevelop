@@ -8,13 +8,15 @@ import ShieldChecked from '../../UI/CustomSvgIcons/ShieldChecked';
 import ThumbsUp from '../../UI/CustomSvgIcons/ThumbsUp';
 import { Spacer } from '../../UI/Grid';
 
-const SecureCheckout = ({
-  includeCancelInformation,
-  noMargin,
-}: {|
-  includeCancelInformation?: boolean,
-  noMargin?: boolean,
-|}) => {
+const SecureCheckout = (
+  {
+    includeCancelInformation,
+    noMargin
+  }: {|
+    includeCancelInformation?: boolean,
+    noMargin?: boolean,
+  |},
+): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <LineStackLayout

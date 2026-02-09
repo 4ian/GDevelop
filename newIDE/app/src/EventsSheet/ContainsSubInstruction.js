@@ -4,7 +4,7 @@ const gd: libGDevelop = global.gd;
 export const containsSubInstructions = (
   instruction: gdInstruction,
   instructionsList: gdInstructionsList
-) => {
+): boolean => {
   const subInstructionsList = instruction.getSubInstructions();
   if (gd.compare(subInstructionsList, instructionsList)) return true;
 

@@ -34,13 +34,15 @@ export type GameRegistrationProps = {|
 
 export type GameAvailabilityError = 'not-found' | 'not-owned' | 'unexpected';
 
-export const GameRegistration = ({
-  project,
-  suggestAdditionalActions,
-  hideLoader,
-  onGameRegistered,
-  customRegistrationMessage,
-}: GameRegistrationProps) => {
+export const GameRegistration = (
+  {
+    project,
+    suggestAdditionalActions,
+    hideLoader,
+    onGameRegistered,
+    customRegistrationMessage
+  }: GameRegistrationProps,
+): React.Node => {
   const {
     onOpenLoginDialog,
     onOpenCreateAccountDialog,

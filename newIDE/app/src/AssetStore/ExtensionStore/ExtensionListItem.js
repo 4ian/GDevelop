@@ -35,14 +35,16 @@ type Props = {|
   onHeightComputed: number => void,
 |};
 
-export const ExtensionListItem = ({
-  id,
-  project,
-  extensionShortHeader,
-  matches,
-  onChoose,
-  onHeightComputed,
-}: Props) => {
+export const ExtensionListItem = (
+  {
+    id,
+    project,
+    extensionShortHeader,
+    matches,
+    onChoose,
+    onHeightComputed
+  }: Props,
+): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(

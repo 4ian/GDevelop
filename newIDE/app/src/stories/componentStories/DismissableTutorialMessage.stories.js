@@ -44,11 +44,13 @@ type Props = {|
   tutorialId: string,
 |};
 
-const WrappedDismissableTutorialMessage = ({
-  tutorials = defaultTutorials,
-  preferences = initialPreferences,
-  tutorialId,
-}: Props) => (
+const WrappedDismissableTutorialMessage = (
+  {
+    tutorials = defaultTutorials,
+    preferences = initialPreferences,
+    tutorialId
+  }: Props,
+): React.Node => (
   <PreferencesContext.Provider value={preferences}>
     <TutorialContext.Provider
       value={{
@@ -68,15 +70,15 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const NoTutorialsLoaded = () => (
+export const NoTutorialsLoaded = (): React.Node => (
   <WrappedDismissableTutorialMessage tutorials={null} tutorialId="tutorial-1" />
 );
 
-export const NoTutorialsFound = () => (
+export const NoTutorialsFound = (): React.Node => (
   <WrappedDismissableTutorialMessage tutorials={[]} tutorialId="tutorial-1" />
 );
 
-export const HiddenTutorial = () => (
+export const HiddenTutorial = (): React.Node => (
   <WrappedDismissableTutorialMessage
     tutorialId="tutorial-1"
     preferences={{
@@ -89,14 +91,14 @@ export const HiddenTutorial = () => (
   />
 );
 
-export const TutorialNotInList = () => (
+export const TutorialNotInList = (): React.Node => (
   <WrappedDismissableTutorialMessage tutorialId="tutorial-3" />
 );
 
-export const DefaultVideo = () => (
+export const DefaultVideo = (): React.Node => (
   <WrappedDismissableTutorialMessage tutorialId="tutorial-1" />
 );
 
-export const DefaultText = () => (
+export const DefaultText = (): React.Node => (
   <WrappedDismissableTutorialMessage tutorialId="tutorial-2" />
 );

@@ -27,7 +27,7 @@ const getIconStyle = ({ isMobile }: {| isMobile: boolean |}) => {
   };
 };
 
-export const ExplanationHeader = () => {
+export const ExplanationHeader = (): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const iconStyle = getIconStyle({ isMobile });
   return (
@@ -57,13 +57,15 @@ type HTML5ExportFlowProps = {|
   exportPipelineName: string,
 |};
 
-export const ExportFlow = ({
-  disabled,
-  launchExport,
-  isExporting,
-  exportPipelineName,
-  exportStep,
-}: HTML5ExportFlowProps) =>
+export const ExportFlow = (
+  {
+    disabled,
+    launchExport,
+    isExporting,
+    exportPipelineName,
+    exportStep
+  }: HTML5ExportFlowProps,
+): React.Node | null =>
   exportStep !== 'done' ? (
     <Line justifyContent="center">
       <RaisedButton
@@ -82,11 +84,13 @@ export const ExportFlow = ({
     </Line>
   ) : null;
 
-export const DoneFooter = ({
-  renderGameButton,
-}: {|
-  renderGameButton: () => React.Node,
-|}) => {
+export const DoneFooter = (
+  {
+    renderGameButton
+  }: {|
+    renderGameButton: () => React.Node,
+  |},
+): React.Node => {
   const openLearnMore = () => {
     Window.openExternalURL(
       getHelpLink(
@@ -134,7 +138,7 @@ export const DoneFooter = ({
 
 export const html5Exporter = {
   key: 'webexport',
-  tabName: <Trans>Web</Trans>,
-  name: <Trans>HTML5</Trans>,
+  tabName: <Trans>Web</Trans> as React.Node,
+  name: <Trans>HTML5</Trans> as React.Node,
   helpPage: '/publishing/html5_game_in_a_local_folder',
 };

@@ -62,7 +62,7 @@ export const sharedFuseConfiguration = {
 /**
  * This helper allows creating the search query for a search within a simple array of strings.
  */
-export const getFuseSearchQueryForSimpleArray = (searchText: string) => {
+export const getFuseSearchQueryForSimpleArray = (searchText: string): string => {
   const tokenisedSearchQuery = searchText.trim().split(' ');
   return `'${tokenisedSearchQuery.join(" '")}`;
 };
@@ -76,7 +76,7 @@ export const getFuseSearchQueryForSimpleArray = (searchText: string) => {
 export const getFuseSearchQueryForMultipleKeys = (
   searchText: string,
   keys: Array<string>
-) => {
+): { $or: Array<{ $or: Array<any> }> } => {
   const tokenisedSearchQuery = searchText.trim().split(' ');
   const searchQuery: {
     $or: Fuse.Expression[],
@@ -162,7 +162,7 @@ const getFirstExactMatchPosition = (
   };
 };
 
-export const nullifySingleCharacterMatches = <T>(result: SearchResult<T>) => {
+export const nullifySingleCharacterMatches = <T>(result: SearchResult<T>): any => {
   const matchesWithAtLeastOneSignificantIndex = result.matches
     .map(match => {
       const newIndices = match.indices
@@ -194,14 +194,17 @@ export const augmentSearchResult = <T>(
   };
 };
 
-export const tuneMatches = <T>(result: SearchResult<T>, searchText: string) =>
+export const tuneMatches = <T>(result: SearchResult<T>, searchText: string): any =>
   result.matches.map<SearchMatch>(match => ({
     key: match.key,
     value: match.value,
     indices: tuneMatchIndices(match, searchText),
   }));
 
-export const sortResultsUsingExactMatches = (orderedKeys: string[]) => {
+export const sortResultsUsingExactMatches = (orderedKeys: Array<string>): (<T>(
+  resultA: AugmentedSearchResult<T>,
+  resultB: AugmentedSearchResult<T>
+) => any) => {
   return <T>(
     resultA: AugmentedSearchResult<T>,
     resultB: AugmentedSearchResult<T>

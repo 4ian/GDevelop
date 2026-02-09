@@ -126,12 +126,10 @@ export default class ExportLauncher extends Component<Props, State> {
     doneFooterOpen: false,
     errored: false,
     shouldBumpVersionNumber: true,
-    exportState: this.props.exportPipeline.getInitialExportState(
-      this.props.project
-    ),
+    exportState: this.props.exportPipeline.getInitialExportState(this.props.project) as any,
   };
   _candidateBumpedVersionNumber = '';
-  buildsWatcher = new BuildsWatcher();
+  buildsWatcher = new BuildsWatcher() as BuildsWatcher;
   launchWholeExport: ({|
     payWithCredits?: boolean,
   |}) => Promise<void>;
@@ -184,7 +182,7 @@ export default class ExportLauncher extends Component<Props, State> {
   _updateStepProgress = (
     stepCurrentProgress: number,
     stepMaxProgress: number
-  ) =>
+  ): any =>
     this.setState({
       stepCurrentProgress,
       stepMaxProgress,
@@ -385,7 +383,7 @@ export default class ExportLauncher extends Component<Props, State> {
     }));
   };
 
-  render() {
+  render(): any {
     const {
       exportStep,
       compressionOutput,

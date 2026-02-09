@@ -138,7 +138,7 @@ export class CodeEditor extends React.Component<Props, State> {
     event.stopPropagation();
   };
 
-  render() {
+  render(): any {
     const { MonacoEditor, error } = this.state;
     if (error) {
       return (

@@ -58,7 +58,7 @@ export default class InstancesRenderer {
   temporaryRectangle: Rectangle;
   instanceMeasurer: InstanceMeasurer;
 
-  _basicProfilingCounters = makeBasicProfilingCounters();
+  _basicProfilingCounters = makeBasicProfilingCounters() as BasicProfilingCounters;
 
   constructor({
     project,
@@ -179,11 +179,11 @@ export default class InstancesRenderer {
     };
   }
 
-  getPixiContainer() {
+  getPixiContainer(): any {
     return this.pixiContainer;
   }
 
-  getInstanceMeasurer() {
+  getInstanceMeasurer(): any {
     return this.instanceMeasurer;
   }
 
@@ -375,7 +375,7 @@ export default class InstancesRenderer {
     }
   }
 
-  getRendererOfInstance(layerName: string, instance: gdInitialInstance) {
+  getRendererOfInstance(layerName: string, instance: gdInitialInstance): any {
     if (!this.layersRenderers.hasOwnProperty(layerName)) {
       return null;
     }

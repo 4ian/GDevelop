@@ -87,7 +87,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 
 const electron = optionalRequire('electron');
 
-export const getProjectManagerItemId = (identifier: string) =>
+export const getProjectManagerItemId = (identifier: string): string =>
   `project-manager-tab-${identifier}`;
 
 const gameSettingsRootFolderId = getProjectManagerItemId('game-settings');
@@ -95,12 +95,12 @@ const gamePropertiesItemId = getProjectManagerItemId('game-properties');
 const gameDashboardItemId = 'manage';
 const globalVariablesItemId = getProjectManagerItemId('global-variables');
 const gameResourcesItemId = getProjectManagerItemId('game-resources');
-export const scenesRootFolderId = getProjectManagerItemId('scenes');
-export const extensionsRootFolderId = getProjectManagerItemId('extensions');
-export const externalEventsRootFolderId = getProjectManagerItemId(
+export const scenesRootFolderId: string = getProjectManagerItemId('scenes');
+export const extensionsRootFolderId: string = getProjectManagerItemId('extensions');
+export const externalEventsRootFolderId: string = getProjectManagerItemId(
   'external-events'
 );
-export const externalLayoutsRootFolderId = getProjectManagerItemId(
+export const externalLayoutsRootFolderId: string = getProjectManagerItemId(
   'external-layout'
 );
 
@@ -1546,7 +1546,9 @@ const MemoizedProjectManager = React.memo<Props, ProjectManagerInterface>(
   arePropsEqual
 );
 
-const ProjectManagerWithErrorBoundary = React.forwardRef<
+const ProjectManagerWithErrorBoundary: component(
+  ...{ ...Props, +ref?: React.RefSetter<ProjectManagerInterface> }
+) = React.forwardRef<
   Props,
   ProjectManagerInterface
 >((props, outerRef) => {

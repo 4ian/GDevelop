@@ -1,7 +1,7 @@
 // @flow
 import ViewPosition from './ViewPosition';
 
-export const shouldBeHandledByPinch = (event: ?TouchEvent) => {
+export const shouldBeHandledByPinch = (event: ?TouchEvent): boolean => {
   if (!event) return false;
 
   const { targetTouches } = event;

@@ -1,3 +1,3 @@
 // @flow
 
-export const emailRegex = /^(.+)@(.+)$/;
+export const emailRegex: RegExp = /^(.+)@(.+)$/;

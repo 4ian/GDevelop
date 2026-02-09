@@ -28,11 +28,13 @@ type Props = {|
   onStoreProductOpened: () => void,
 |};
 
-const PrivateGameTemplateOwnedInformationPage = ({
-  privateGameTemplateListingData,
-  purchaseUsageType,
-  onStoreProductOpened,
-}: Props) => {
+const PrivateGameTemplateOwnedInformationPage = (
+  {
+    privateGameTemplateListingData,
+    purchaseUsageType,
+    onStoreProductOpened
+  }: Props,
+): React.Node => {
   const shouldUseOrSimulateAppStoreProduct = shouldUseAppStoreProduct();
   const { navigateToRoute } = React.useContext(RouterContext);
 

@@ -32,17 +32,19 @@ type Props = {|
   disabled?: boolean,
 |};
 
-const ColorField = ({
-  fullWidth,
-  disableAlpha,
-  id,
-  floatingLabelText,
-  helperMarkdownText,
-  onChange,
-  color,
-  alpha,
-  disabled,
-}: Props) => {
+const ColorField = (
+  {
+    fullWidth,
+    disableAlpha,
+    id,
+    floatingLabelText,
+    helperMarkdownText,
+    onChange,
+    color,
+    alpha,
+    disabled
+  }: Props,
+): React.MixedElement => {
   const [colorValue, setColorValue] = React.useState<string>(color);
   // alpha can be equal to 0, so we have to check if it is not undefined
   const [alphaValue, setAlphaValue] = React.useState<number>(

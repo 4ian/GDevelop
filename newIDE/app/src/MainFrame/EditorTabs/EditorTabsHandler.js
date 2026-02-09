@@ -223,7 +223,11 @@ export const isStartPageTabPresent = (state: EditorTabsState): boolean => {
 export const closeTabsExceptIf = (
   state: EditorTabsState,
   keepPredicate: (editorTab: EditorTab) => boolean
-) => {
+): {
+  panes: {
+    [paneIdentifier: string]: { currentTab: number, editors: Array<EditorTab> },
+  },
+} => {
   let newState = { ...state };
   for (const paneIdentifier in state.panes) {
     const pane = state.panes[paneIdentifier];
@@ -297,7 +301,11 @@ export const getCurrentTabForPane = (
 export const closeProjectTabs = (
   state: EditorTabsState,
   project: ?gdProject
-) => {
+): {
+  panes: {
+    [paneIdentifier: string]: { currentTab: number, editors: Array<EditorTab> },
+  },
+} => {
   return closeTabsExceptIf(state, editorTab => {
     const editorProject =
       editorTab.editorRef && editorTab.editorRef.getProject();
@@ -350,7 +358,11 @@ export const notifyPreviewOrExportWillStart = (state: EditorTabsState) => {
   }
 };
 
-export const closeLayoutTabs = (state: EditorTabsState, layout: gdLayout) => {
+export const closeLayoutTabs = (state: EditorTabsState, layout: gdLayout): {
+  panes: {
+    [paneIdentifier: string]: { currentTab: number, editors: Array<EditorTab> },
+  },
+} => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
 
@@ -371,7 +383,11 @@ export const closeLayoutTabs = (state: EditorTabsState, layout: gdLayout) => {
 export const closeExternalLayoutTabs = (
   state: EditorTabsState,
   externalLayout: gdExternalLayout
-) => {
+): {
+  panes: {
+    [paneIdentifier: string]: { currentTab: number, editors: Array<EditorTab> },
+  },
+} => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
 
@@ -389,7 +405,11 @@ export const closeExternalLayoutTabs = (
 export const closeExternalEventsTabs = (
   state: EditorTabsState,
   externalEvents: gdExternalEvents
-) => {
+): {
+  panes: {
+    [paneIdentifier: string]: { currentTab: number, editors: Array<EditorTab> },
+  },
+} => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
     if (editor instanceof ExternalEventsEditorContainer) {
@@ -406,7 +426,11 @@ export const closeExternalEventsTabs = (
 export const closeEventsFunctionsExtensionTabs = (
   state: EditorTabsState,
   eventsFunctionsExtensionName: string
-) => {
+): {
+  panes: {
+    [paneIdentifier: string]: { currentTab: number, editors: Array<EditorTab> },
+  },
+} => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
     if (
@@ -427,7 +451,11 @@ export const closeCustomObjectTab = (
   state: EditorTabsState,
   eventsFunctionsExtensionName: string,
   eventsBasedObjectName: string
-) => {
+): {
+  panes: {
+    [paneIdentifier: string]: { currentTab: number, editors: Array<EditorTab> },
+  },
+} => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
     if (editor instanceof CustomObjectEditorContainer) {
@@ -448,7 +476,11 @@ export const closeEventsBasedObjectVariantTab = (
   eventsFunctionsExtensionName: string,
   eventsBasedObjectName: string,
   eventsBasedObjectVariantName: string
-) => {
+): {
+  panes: {
+    [paneIdentifier: string]: { currentTab: number, editors: Array<EditorTab> },
+  },
+} => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
     if (editor instanceof CustomObjectEditorContainer) {

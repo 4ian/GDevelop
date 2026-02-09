@@ -34,7 +34,7 @@ export const renderInstructionOrExpressionTree = <
   initiallyOpenedPath,
   getGroupIconSrc,
   parentGroupIconSrc,
-}: Props<T>): Array<React$Element<any> | null> => {
+}: Props<T>): Array<React.Element<any> | null> => {
   const [initiallyOpenedKey, ...restOfInitiallyOpenedPath] =
     initiallyOpenedPath || [];
 

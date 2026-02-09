@@ -23,14 +23,16 @@ type Props = {|
   closeAutomaticallyAfterSuccess?: boolean,
 |};
 
-const CreditsUsageDialog = ({
-  onClose,
-  title,
-  message,
-  onConfirm,
-  successMessage,
-  closeAutomaticallyAfterSuccess,
-}: Props) => {
+const CreditsUsageDialog = (
+  {
+    onClose,
+    title,
+    message,
+    onConfirm,
+    successMessage,
+    closeAutomaticallyAfterSuccess
+  }: Props,
+): React.Node => {
   const [isPurchasing, setIsPurchasing] = React.useState(false);
   const [isPurchaseSuccessful, setIsPurchaseSuccessful] = React.useState(false);
   const { showAlert } = useAlertDialog();

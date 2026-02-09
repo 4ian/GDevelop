@@ -16,13 +16,7 @@ type Props = {|
   isSavingProject: boolean,
 |};
 
-const QuitInAppTutorialDialog = ({
-  onSaveProject,
-  canEndTutorial,
-  endTutorial,
-  onClose,
-  isSavingProject,
-}: Props) => {
+const QuitInAppTutorialDialog = ({onSaveProject, canEndTutorial, endTutorial, onClose, isSavingProject}: Props): React.Node => {
   const [hasUserInteracted, setHasUserInteracted] = React.useState<boolean>(
     false
   );

@@ -37,6 +37,6 @@ export const uploadObjects = async (
   );
 };
 
-export const getBaseUrl = () => {
+export const getBaseUrl = (): string => {
   return GDevelopGamePreviews.baseUrl;
 };

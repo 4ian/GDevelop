@@ -66,7 +66,9 @@ export type SemiControlledTextFieldInterface = {|
  * is typing. This is useful if the parent component can do modifications on the value:
  * the user won't be interrupted or have the value changed until he blurs the field.
  */
-const SemiControlledTextField = React.forwardRef<
+const SemiControlledTextField: component(
+  ...{ ...Props, +ref?: React.RefSetter<SemiControlledTextFieldInterface> }
+) = React.forwardRef<
   Props,
   SemiControlledTextFieldInterface
 >((props, ref) => {

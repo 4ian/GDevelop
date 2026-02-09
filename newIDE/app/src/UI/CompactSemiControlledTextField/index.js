@@ -20,13 +20,7 @@ type Props = {|
   errorText?: React.Node,
 |};
 
-const CompactSemiControlledTextField = ({
-  value,
-  onChange,
-  errorText,
-  commitOnBlur,
-  ...otherProps
-}: Props) => {
+const CompactSemiControlledTextField = ({value, onChange, errorText, commitOnBlur, ...otherProps}: Props): React.MixedElement => {
   const [focused, setFocused] = React.useState<boolean>(false);
   const [text, setText] = React.useState<string>('');
 

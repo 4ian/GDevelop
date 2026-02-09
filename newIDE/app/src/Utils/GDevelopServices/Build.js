@@ -93,7 +93,7 @@ export type SigningCredential =
   | AppleCertificateSigningCredential
   | AppleAuthKeySigningCredential;
 
-export const client = axios.create({
+export const client: Axios = axios.create({
   baseURL: GDevelopBuildApi.baseUrl,
 });
 

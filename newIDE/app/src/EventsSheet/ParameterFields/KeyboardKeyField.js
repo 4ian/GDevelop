@@ -50,124 +50,114 @@ const getStringContent = (expression: string): string => {
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function KeyboardKeyField(props, ref) {
-    const field = React.useRef<?(
-      | GenericExpressionField
-      | SemiControlledAutoCompleteInterface
-    )>(null);
-
+    const field = React.useRef<
+      ?(GenericExpressionField | SemiControlledAutoCompleteInterface),
+    >(null);
+    
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(ref, () => ({
-      focus,
-    }));
-
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        focus,
+      }),
+    );
+    
     // If the current value is not in the list, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(
-      !!props.value && !isValidLiteralKeyboardKey(props.value)
+      !!props.value && !isValidLiteralKeyboardKey(props.value),
     );
-
+    
     const switchFieldType = () => {
       setIsExpressionField(!isExpressionField);
     };
-
+    
     const onChangeSelectValue = (value: string) => {
       props.onChange(valueRegex.test(value) ? `"${value}"` : value);
     };
-
+    
     const onChangeTextValue = (value: string) => {
       props.onChange(value);
     };
-
+    
     const fieldLabel = props.parameterMetadata
       ? props.parameterMetadata.getDescription()
       : undefined;
-
+    
     return (
       <TextFieldWithButtonLayout
-        renderTextField={() =>
-          !isExpressionField ? (
-            <SemiControlledAutoComplete
-              ref={field}
-              id={
-                props.parameterIndex !== undefined
-                  ? `parameter-${props.parameterIndex}-key-field`
-                  : undefined
-              }
-              value={getStringContent(props.value)}
-              onChange={onChangeSelectValue}
-              margin={props.isInline ? 'none' : 'dense'}
-              fullWidth
-              floatingLabelText={fieldLabel}
-              helperMarkdownText={
-                props.parameterMetadata
-                  ? props.parameterMetadata.getLongDescription()
-                  : undefined
-              }
-              dataSource={keyNames.map(keyName => ({
+        renderTextField={() => !isExpressionField
+          ? <SemiControlledAutoComplete
+            ref={field}
+            id={props.parameterIndex !== undefined
+              ? `parameter-${props.parameterIndex}-key-field`
+              : undefined}
+            value={getStringContent(props.value)}
+            onChange={onChangeSelectValue}
+            margin={props.isInline ? 'none' : 'dense'}
+            fullWidth
+            floatingLabelText={fieldLabel}
+            helperMarkdownText={props.parameterMetadata
+              ? props.parameterMetadata.getLongDescription()
+              : undefined}
+            dataSource={keyNames.map(
+              keyName => ({
                 text: keyName,
                 value: keyName,
-              }))}
-              openOnFocus={!props.isInline}
-              onRequestClose={props.onRequestClose}
-              onApply={props.onApply}
-              errorText={
-                !props.value ? (
-                  <Trans>You must select a key.</Trans>
-                ) : !isValidLiteralKeyboardKey(props.value) ? (
-                  <Trans>
-                    You must select a valid key. "{props.value}" is not valid.
-                  </Trans>
-                ) : (
-                  undefined
-                )
-              }
-            />
-          ) : (
-            <GenericExpressionField
-              ref={field}
-              id={
-                props.parameterIndex !== undefined
-                  ? `parameter-${props.parameterIndex}-key-field`
-                  : undefined
-              }
-              expressionType="string"
-              {...props}
-              onChange={onChangeTextValue}
-            />
-          )
-        }
-        renderButton={style =>
-          isExpressionField ? (
-            <FlatButton
-              id="switch-expression-select"
-              leftIcon={<TypeCursorSelect />}
-              style={style}
-              primary
-              label={<Trans>Select</Trans>}
-              onClick={switchFieldType}
-            />
-          ) : (
-            <RaisedButton
-              id="switch-expression-select"
-              icon={<Functions />}
-              style={style}
-              primary
-              label={<Trans>Use an expression</Trans>}
-              onClick={switchFieldType}
-            />
-          )
-        }
+              }),
+            )}
+            openOnFocus={!props.isInline}
+            onRequestClose={props.onRequestClose}
+            onApply={props.onApply}
+            errorText={!props.value
+              ? <Trans>You must select a key.</Trans>
+              : !isValidLiteralKeyboardKey(props.value)
+                ? <Trans>
+                  You must select a valid key. "{props.value}" is not valid.
+                </Trans>
+                : undefined}
+          />
+          : <GenericExpressionField
+            ref={field}
+            id={props.parameterIndex !== undefined
+              ? `parameter-${props.parameterIndex}-key-field`
+              : undefined}
+            expressionType="string"
+            {...props}
+            onChange={onChangeTextValue}
+          />}
+        renderButton={style => isExpressionField
+          ? <FlatButton
+            id="switch-expression-select"
+            leftIcon={<TypeCursorSelect />}
+            style={style}
+            primary
+            label={<Trans>Select</Trans>}
+            onClick={switchFieldType}
+          />
+          : <RaisedButton
+            id="switch-expression-select"
+            icon={<Functions />}
+            style={style}
+            primary
+            label={<Trans>Use an expression</Trans>}
+            onClick={switchFieldType}
+          />}
       />
     );
-  }
+  },
+) as component(
+  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
 );
 
-export const renderInlineKeyboardKey = ({
-  value,
-  expressionIsValid,
-  InvalidParameterValue,
-}: ParameterInlineRendererProps) => {
+export const renderInlineKeyboardKey = (
+  {
+    value,
+    expressionIsValid,
+    InvalidParameterValue
+  }: ParameterInlineRendererProps,
+): string | React.MixedElement => {
   if (!value) {
     return (
       <InvalidParameterValue isEmpty>

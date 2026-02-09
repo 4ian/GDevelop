@@ -20,20 +20,22 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       instruction,
       expressionMetadata,
       expression,
-      parameterIndex,
+      parameterIndex
     } = props;
-    const { layout } = scope;
-
-    const objectName =
-      getLastObjectParameterValue({
+    const {layout} = scope;
+    
+    const objectName = getLastObjectParameterValue(
+      {
         instructionMetadata,
         instruction,
         expressionMetadata,
         expression,
         parameterIndex,
-      }) || '';
-
-    const autocompletionIdentifierNames: ExpressionAutocompletion[] = React.useMemo(
+      },
+    ) ||
+      '';
+    
+    const autocompletionIdentifierNames: Array<ExpressionAutocompletion> = React.useMemo(
       () => {
         if (!parameterIndex) {
           return [];
@@ -41,29 +43,28 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         const parameterMetadata = instructionMetadata
           ? instructionMetadata.getParameter(parameterIndex)
           : expressionMetadata
-          ? expressionMetadata.getParameter(parameterIndex)
-          : null;
+            ? expressionMetadata.getParameter(parameterIndex)
+            : null;
         const identifierName = parameterMetadata
           ? parameterMetadata.getExtraInfo()
           : '';
-
-        const allIdentifierExpressions =
-          project && layout
-            ? gd.EventsIdentifiersFinder.findAllIdentifierExpressions(
-                project.getCurrentPlatform(),
-                project,
-                layout,
-                identifierName,
-                objectName
-              )
-                .toNewVectorString()
-                .toJSArray()
-            : [];
-
-        return allIdentifierExpressions.map(expression => ({
-          kind: 'FullExpression',
-          completion: expression,
-        }));
+        
+        const allIdentifierExpressions = project && layout
+          ? gd.EventsIdentifiersFinder.findAllIdentifierExpressions(
+            project.getCurrentPlatform(),
+            project,
+            layout,
+            identifierName,
+            objectName,
+          ).toNewVectorString().toJSArray()
+          : [];
+        
+        return allIdentifierExpressions.map(
+          expression => ({
+            kind: 'FullExpression',
+            completion: expression,
+          }),
+        );
       },
       [
         project,
@@ -73,38 +74,42 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         parameterIndex,
         // Users can change the objectName with other fields.
         objectName,
-      ]
+      ],
     );
-
+    
     const field = React.useRef<?GenericExpressionField>(null);
-
+    
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(ref, () => ({
-      focus,
-    }));
-
-    React.useEffect(() => {
-      focus();
-    }, []);
-
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        focus,
+      }),
+    );
+    
+    React.useEffect(
+      () => {
+        focus();
+      },
+      [],
+    );
+    
     return (
       <GenericExpressionField
         expressionType="string"
-        onGetAdditionalAutocompletions={expression =>
-          autocompletionIdentifierNames.filter(
-            ({ completion }) => completion.indexOf(expression) === 0
-          )
-        }
-        id={
-          props.parameterIndex !== undefined
-            ? `parameter-${props.parameterIndex}-identifier`
-            : undefined
-        }
+        onGetAdditionalAutocompletions={expression => autocompletionIdentifierNames.filter(
+          ({completion}) => completion.indexOf(expression) === 0,
+        )}
+        id={props.parameterIndex !== undefined
+          ? `parameter-${props.parameterIndex}-identifier`
+          : undefined}
         ref={field}
         {...props}
       />
     );
-  }
+  },
+) as component(
+  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
 );

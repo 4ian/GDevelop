@@ -29,7 +29,7 @@ import { showErrorBox } from '../../UI/Messages/MessageBox';
 
 type Props = {| children: React.Node |};
 
-const TeamProvider = ({ children }: Props) => {
+const TeamProvider = ({children}: Props): React.Node => {
   const {
     limits,
     profile,

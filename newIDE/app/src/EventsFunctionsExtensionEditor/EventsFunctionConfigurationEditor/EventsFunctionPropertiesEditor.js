@@ -50,7 +50,7 @@ export const getSentenceErrorText = (
   eventsBasedBehavior: ?gdEventsBasedBehavior,
   eventsBasedObject: ?gdEventsBasedObject,
   eventsFunction: gdEventsFunction
-) => {
+): any | string | void => {
   const sentence = eventsFunction.getSentence();
   if (!sentence)
     return i18n._(
@@ -150,19 +150,21 @@ const getDescriptionHintText = (
   return t`Example: Make the object flash for 5 seconds.`;
 };
 
-export const EventsFunctionPropertiesEditor = ({
-  project,
-  eventsFunctionsExtension,
-  eventsFunction,
-  freezeEventsFunctionType,
-  onConfigurationUpdated,
-  helpPagePath,
-  renderConfigurationHeader,
-  eventsBasedBehavior,
-  eventsBasedObject,
-  getFunctionGroupNames,
-  eventsFunctionsContainer,
-}: Props) => {
+export const EventsFunctionPropertiesEditor = (
+  {
+    project,
+    eventsFunctionsExtension,
+    eventsFunction,
+    freezeEventsFunctionType,
+    onConfigurationUpdated,
+    helpPagePath,
+    renderConfigurationHeader,
+    eventsBasedBehavior,
+    eventsBasedObject,
+    getFunctionGroupNames,
+    eventsFunctionsContainer
+  }: Props,
+): React.Node => {
   const forceUpdate = useForceUpdate();
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
   const { isMobile } = useResponsiveWindowSize();

@@ -162,11 +162,13 @@ const MultipleChoiceWithClosableTagsFilter = ({
   );
 };
 
-export const ResourceStoreFilterPanel = ({
-  resourceKind,
-}: {
-  resourceKind: 'audio' | 'font',
-}) => {
+export const ResourceStoreFilterPanel = (
+  {
+    resourceKind
+  }: {
+    resourceKind: 'audio' | 'font',
+  },
+): React.Node => {
   const {
     audioFiltersState,
     fontFiltersState,

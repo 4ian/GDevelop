@@ -47,7 +47,7 @@ const styles = {
   },
 };
 
-export default class LinkEvent extends React.Component<EventRendererProps, *> {
+export default class LinkEvent extends React.Component<EventRendererProps, any> {
   _externalEventsAutoComplete: ?ExternalEventsAutoComplete = null;
 
   state = {
@@ -150,7 +150,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
     );
   };
 
-  render() {
+  render(): any {
     const linkEvent = gd.asLinkEvent(this.props.event);
     const target = linkEvent.getTarget();
 

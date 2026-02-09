@@ -19,12 +19,14 @@ type AvatarWithStatusAndTooltipProps = {|
   hideStatus?: boolean,
 |};
 
-const AvatarWithStatusAndTooltip = ({
-  avatarUrl,
-  status,
-  tooltipMessage,
-  hideStatus,
-}: AvatarWithStatusAndTooltipProps) =>
+const AvatarWithStatusAndTooltip = (
+  {
+    avatarUrl,
+    status,
+    tooltipMessage,
+    hideStatus
+  }: AvatarWithStatusAndTooltipProps,
+): React.Node =>
   !!avatarUrl ? (
     tooltipMessage ? (
       <DotBadge overlap="circle" color={status} invisible={hideStatus}>

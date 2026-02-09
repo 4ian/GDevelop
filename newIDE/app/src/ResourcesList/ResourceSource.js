@@ -38,79 +38,79 @@ export const resourcesKindSupportedByResourceStore = ['audio', 'font'];
 export const allResourceKindsAndMetadata = [
   {
     kind: 'audio',
-    displayName: t`Audio`,
+    displayName: t`Audio` as any,
     fileExtensions: ['aac', 'wav', 'mp3', 'ogg'],
-    createNewResource: () => new gd.AudioResource(),
+    createNewResource: (): gdAudioResource => new gd.AudioResource(),
   },
   {
     kind: 'image',
-    displayName: t`Image`,
+    displayName: t`Image` as any,
     fileExtensions: ['png', 'jpg', 'jpeg', 'webp'],
-    createNewResource: () => new gd.ImageResource(),
+    createNewResource: (): gdImageResource => new gd.ImageResource(),
   },
   {
     kind: 'font',
-    displayName: t`Font`,
+    displayName: t`Font` as any,
     fileExtensions: ['ttf', 'otf'],
-    createNewResource: () => new gd.FontResource(),
+    createNewResource: (): gdFontResource => new gd.FontResource(),
   },
   {
     kind: 'video',
-    displayName: t`Video`,
+    displayName: t`Video` as any,
     fileExtensions: ['mp4', 'webm'],
-    createNewResource: () => new gd.VideoResource(),
+    createNewResource: (): gdVideoResource => new gd.VideoResource(),
   },
   {
     kind: 'json',
-    displayName: t`Json`,
+    displayName: t`Json` as any,
     fileExtensions: ['json'],
-    createNewResource: () => {
+    createNewResource: (): gdJsonResource => {
       return new gd.JsonResource();
     },
   },
   {
     kind: 'tilemap',
-    displayName: t`Tile Map`,
+    displayName: t`Tile Map` as any,
     fileExtensions: ['json', 'ldtk', 'tmj'],
-    createNewResource: () => new gd.TilemapResource(),
+    createNewResource: (): gdTilemapResource => new gd.TilemapResource(),
   },
   {
     kind: 'tileset',
-    displayName: t`Tile Set`,
+    displayName: t`Tile Set` as any,
     fileExtensions: ['json', 'tsj'],
-    createNewResource: () => new gd.TilesetResource(),
+    createNewResource: (): gdTilesetResource => new gd.TilesetResource(),
   },
   {
     kind: 'bitmapFont',
-    displayName: t`Bitmap Font`,
+    displayName: t`Bitmap Font` as any,
     fileExtensions: ['fnt', 'xml'],
-    createNewResource: () => new gd.BitmapFontResource(),
+    createNewResource: (): gdBitmapFontResource => new gd.BitmapFontResource(),
   },
   {
     kind: 'model3D',
-    displayName: t`3D model`,
+    displayName: t`3D model` as any,
     fileExtensions: ['glb'],
-    createNewResource: () => new gd.Model3DResource(),
+    createNewResource: (): gdModel3DResource => new gd.Model3DResource(),
   },
   {
     kind: 'atlas',
-    displayName: t`Atlas`,
+    displayName: t`Atlas` as any,
     fileExtensions: ['atlas'],
-    createNewResource: () => new gd.AtlasResource(),
+    createNewResource: (): gdAtlasResource => new gd.AtlasResource(),
   },
   {
     kind: 'spine',
-    displayName: t`Spine Json`,
+    displayName: t`Spine Json` as any,
     fileExtensions: ['json'],
-    createNewResource: () => {
+    createNewResource: (): gdSpineResource => {
       return new gd.SpineResource();
     },
   },
   {
     kind: 'javascript',
-    displayName: t`JavaScript file`,
+    displayName: t`JavaScript file` as any,
     fileExtensions: ['js'],
-    createNewResource: () => {
+    createNewResource: (): gdJavaScriptResource => {
       return new gd.JavaScriptResource();
     },
   },

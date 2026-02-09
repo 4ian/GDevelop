@@ -8,7 +8,7 @@ export default class UnknownEvent extends React.Component<
   EventRendererProps,
   *
 > {
-  render() {
+  render(): any {
     return (
       <p
         className={classNames({

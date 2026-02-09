@@ -448,12 +448,7 @@ export const getTileSet = (object: gdObject): TileSet => {
   return { rowCount, columnCount, tileSize, atlasImage };
 };
 
-export const isTileSetBadlyConfigured = ({
-  rowCount,
-  columnCount,
-  tileSize,
-  atlasImage,
-}: TileSet) => {
+export const isTileSetBadlyConfigured = ({rowCount, columnCount, tileSize, atlasImage}: TileSet): boolean => {
   return (
     !Number.isInteger(columnCount) ||
     columnCount <= 0 ||

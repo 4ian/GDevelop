@@ -34,12 +34,7 @@ type Props = {|
   fetchGameFeaturings: () => Promise<void>,
 |};
 
-const MarketingPlanSingleDisplay = ({
-  game,
-  marketingPlan,
-  gameFeaturings,
-  fetchGameFeaturings,
-}: Props) => {
+const MarketingPlanSingleDisplay = ({game, marketingPlan, gameFeaturings, fetchGameFeaturings}: Props): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const [

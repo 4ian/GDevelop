@@ -50,16 +50,18 @@ type Props = {|
   ) => CourseChapterCompletion | null,
 |};
 
-const CoursesPage = ({
-  onBack,
-  courses,
-  onSelectCourse,
-  onSelectBundle,
-  previewedCourse,
-  getCourseChapters,
-  getCourseChapterCompletion,
-  getCourseCompletion,
-}: Props) => {
+const CoursesPage = (
+  {
+    onBack,
+    courses,
+    onSelectCourse,
+    onSelectBundle,
+    previewedCourse,
+    getCourseChapters,
+    getCourseChapterCompletion,
+    getCourseCompletion
+  }: Props,
+): React.Node => {
   const { listedCourses } = React.useContext(CourseStoreContext);
   const { windowSize, isLandscape } = useResponsiveWindowSize();
   const numberOfItemsOnOneRow = getColumnsFromWindowSize(

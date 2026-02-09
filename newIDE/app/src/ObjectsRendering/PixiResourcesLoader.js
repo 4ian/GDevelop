@@ -461,7 +461,7 @@ export default class PixiResourcesLoader {
    * should listen to PIXI.Texture `update` event, and refresh your object
    * if this event is triggered.
    */
-  static getPIXITexture(project: gdProject, resourceName: string) {
+  static getPIXITexture(project: gdProject, resourceName: string): any {
     if (loadedTextures[resourceName]) {
       // TODO: we never consider textures as not valid anymore. When we
       // update the IDE to unload textures, we should handle loading them again
@@ -846,7 +846,7 @@ export default class PixiResourcesLoader {
    * should listen to PIXI.Texture `update` event, and refresh your object
    * if this event is triggered.
    */
-  static getPIXIVideoTexture(project: gdProject, resourceName: string) {
+  static getPIXIVideoTexture(project: gdProject, resourceName: string): any {
     if (loadedTextures[resourceName]) {
       // TODO: we never consider textures as not valid anymore. When we
       // update the IDE to unload textures, we should handle loading them again
@@ -950,7 +950,7 @@ export default class PixiResourcesLoader {
    * The font won't be loaded.
    * @returns The font-family to be used to render a text with the font.
    */
-  static getFontFamily(project: gdProject, resourceName: string) {
+  static getFontFamily(project: gdProject, resourceName: string): any {
     if (loadedFontFamilies[resourceName]) {
       return loadedFontFamilies[resourceName];
     }
@@ -1007,11 +1007,11 @@ export default class PixiResourcesLoader {
       });
   }
 
-  static getInvalidPIXITexture() {
+  static getInvalidPIXITexture(): any {
     return invalidTexture;
   }
 
-  static getLoadingPIXITexture() {
+  static getLoadingPIXITexture(): any {
     return loadingTexture;
   }
 

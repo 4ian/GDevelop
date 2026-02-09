@@ -22,14 +22,14 @@ export const CLOUD_PROJECT_NAME_MAX_LENGTH = 60;
 export const CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH = 50;
 export const PROJECT_RESOURCE_MAX_SIZE_IN_BYTES = 15 * 1000 * 1000;
 
-export const projectResourcesClient = axios.create({
+export const projectResourcesClient: Axios = axios.create({
   baseURL: GDevelopProjectResourcesStorage.baseUrl,
   // On web/desktop, "credentials" are necessary to use the cookie previously
   // returned by the server.
   withCredentials: !isNativeMobileApp(),
 });
 
-export const apiClient = axios.create({
+export const apiClient: Axios = axios.create({
   baseURL: GDevelopProjectApi.baseUrl,
 });
 
@@ -56,7 +56,7 @@ export const cleanGDevelopResourceJwtToken = () => {
   gdResourceJwt = null;
 };
 
-export const addGDevelopResourceJwtTokenToUrl = (url: string) => {
+export const addGDevelopResourceJwtTokenToUrl = (url: string): string => {
   if (!gdResourceJwt) return url;
 
   const separator = url.indexOf('?') === -1 ? '?' : '&';
@@ -265,7 +265,7 @@ export const clearCloudProjectCredentials = async (): Promise<void> => {
 export const getCloudProjectFileMetadataIdentifier = (
   storageProviderInternalName: string,
   fileMetadata: ?FileMetadata
-) => {
+): null | string => {
   if (
     !fileMetadata ||
     !(storageProviderInternalName === CloudStorageProvider.internalName)

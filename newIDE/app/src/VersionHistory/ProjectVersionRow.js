@@ -436,21 +436,23 @@ type DayGroupRowProps = {|
   getAnonymousAvatar: () => {| src: string, alt: string |},
 |};
 
-export const DayGroupRow = ({
-  day,
-  authenticatedUserId,
-  versions,
-  isOpenedInitially,
-  editedVersionId,
-  latestVersion,
-  loadingVersionId,
-  onRenameVersion,
-  onCancelRenaming,
-  onContextMenu,
-  openedVersionStatus,
-  usersPublicProfileByIds,
-  getAnonymousAvatar,
-}: DayGroupRowProps) => {
+export const DayGroupRow = (
+  {
+    day,
+    authenticatedUserId,
+    versions,
+    isOpenedInitially,
+    editedVersionId,
+    latestVersion,
+    loadingVersionId,
+    onRenameVersion,
+    onCancelRenaming,
+    onContextMenu,
+    openedVersionStatus,
+    usersPublicProfileByIds,
+    getAnonymousAvatar
+  }: DayGroupRowProps,
+): React.Node => {
   const [isOpen, setIsOpen] = React.useState<boolean>(isOpenedInitially);
   const displayYear = new Date(day).getFullYear() !== thisYear;
   const namedVersions = React.useMemo(

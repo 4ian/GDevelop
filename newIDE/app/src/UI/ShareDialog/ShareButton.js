@@ -9,7 +9,7 @@ type Props = {|
   url: string,
 |};
 
-const ShareButton = ({ url }: Props) => {
+const ShareButton = ({url}: Props): React.Node => {
   const onShare = async () => {
     if (!url || !navigator.share) return;
 

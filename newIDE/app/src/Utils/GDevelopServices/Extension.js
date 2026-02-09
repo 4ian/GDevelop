@@ -200,10 +200,10 @@ const transformTagsAsStringToTagsAsArray = <
   };
 };
 
-export const client = axios.create({
+export const client: Axios = axios.create({
   baseURL: GDevelopAssetApi.baseUrl,
 });
-export const cdnClient = axios.create();
+export const cdnClient: Axios = axios.create();
 
 export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
   const response = await client.get(`/extension`, {

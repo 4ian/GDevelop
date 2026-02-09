@@ -27,7 +27,7 @@ type ExampleStoreState = {|
   filtersState: FiltersState,
 |};
 
-export const ExampleStoreContext = React.createContext<ExampleStoreState>({
+export const ExampleStoreContext: React.Context<ExampleStoreState> = React.createContext<ExampleStoreState>({
   exampleFilters: null,
   exampleShortHeadersSearchResults: null,
   fetchExamplesAndFilters: () => {},
@@ -48,9 +48,7 @@ type ExampleStoreStateProviderProps = {|
   children: React.Node,
 |};
 
-export const ExampleStoreStateProvider = ({
-  children,
-}: ExampleStoreStateProviderProps) => {
+export const ExampleStoreStateProvider = ({children}: ExampleStoreStateProviderProps): React.MixedElement => {
   const [
     exampleShortHeadersById,
     setExampleShortHeadersById,

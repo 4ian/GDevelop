@@ -177,9 +177,7 @@ export const quicklyAnalyzeVariableName = (
   return VariableNameQuickAnalyzeResults.OK;
 };
 
-export const getVariableSourceIcon = (
-  variableSourceType: VariablesContainer_SourceType
-) => {
+export const getVariableSourceIcon = (variableSourceType: VariablesContainer_SourceType): any => {
   switch (variableSourceType) {
     case gd.VariablesContainer.Global:
     case gd.VariablesContainer.ExtensionGlobal:
@@ -200,7 +198,7 @@ export const getVariableSourceIcon = (
   }
 };
 
-export const getVariableTypeIcon = (variableType: Variable_Type) => {
+export const getVariableTypeIcon = (variableType: Variable_Type): any => {
   switch (variableType) {
     case gd.Variable.Number:
       return VariableNumberIcon;
@@ -236,13 +234,13 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       id,
       onInstructionTypeChanged,
       isObjectVariable,
-      getVariableSourceFromIdentifier,
+      getVariableSourceFromIdentifier
     } = props;
-
+    
     const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
     const [
       autocompletionVariableNames,
-      setAutocompletionVariableNames,
+      setAutocompletionVariableNames
     ] = React.useState<DataSource>([]);
     /**
      * Can be called to set up or force updating the variables list.
@@ -250,21 +248,19 @@ export default React.forwardRef<Props, VariableFieldInterface>(
     const updateAutocompletions = React.useCallback(
       () => {
         setAutocompletionVariableNames(
-          enumerateVariables()
-            .map(variable =>
-              variable.isValidName
-                ? variable
-                : // Hide invalid variable names - they would not
-                  // be parsed correctly anyway.
-                  null
-            )
-            .filter(Boolean)
-            .map(variable => ({
+          enumerateVariables().map(
+            variable => variable.isValidName
+              ? variable
+              : // Hide invalid variable names - they would not
+              // be parsed correctly anyway.
+              null,
+          ).filter(Boolean).map(
+            variable => ({
               text: variable.name,
               value: variable.name,
               renderIcon: () => {
                 const VariableSourceIcon = getVariableSourceIcon(
-                  variable.source
+                  variable.source,
                 );
                 const VariableTypeIcon = getVariableTypeIcon(variable.type);
                 return (
@@ -274,27 +270,31 @@ export default React.forwardRef<Props, VariableFieldInterface>(
                   </LineStackLayout>
                 );
               },
-            }))
+            }),
+          ),
         );
       },
-      [enumerateVariables]
+      [enumerateVariables],
     );
-
+    
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(ref, () => ({
-      focus,
-      updateAutocompletions,
-    }));
-
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        focus,
+        updateAutocompletions,
+      }),
+    );
+    
     React.useEffect(
       () => {
         updateAutocompletions();
       },
-      [updateAutocompletions]
+      [updateAutocompletions],
     );
-
+    
     const openVariableEditor = React.useCallback(
       () => {
         if (!onOpenDialog) {
@@ -305,203 +305,172 @@ export default React.forwardRef<Props, VariableFieldInterface>(
         const fieldCurrentValue = field.current
           ? field.current.getInputValue()
           : value;
-        const isRootVariableDeclared =
-          projectScopedContainersAccessor &&
-          projectScopedContainersAccessor
-            .get()
-            .getVariablesContainersList()
-            .has(getRootVariableName(fieldCurrentValue));
-
+        const isRootVariableDeclared = projectScopedContainersAccessor &&
+          projectScopedContainersAccessor.get().getVariablesContainersList().has(
+            getRootVariableName(fieldCurrentValue),
+          );
+        
         onChange(fieldCurrentValue);
-        onOpenDialog({
-          variableName: fieldCurrentValue,
-          shouldCreate: !isRootVariableDeclared,
-        });
+        onOpenDialog(
+          {
+            variableName: fieldCurrentValue,
+            shouldCreate: !isRootVariableDeclared,
+          },
+        );
       },
-      [onChange, onOpenDialog, projectScopedContainersAccessor, value]
+      [onChange, onOpenDialog, projectScopedContainersAccessor, value],
     );
-
+    
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
-
+    
     const quicklyAnalysisResult = quicklyAnalyzeVariableName(
       value,
       variablesContainers,
       getVariableSourceFromIdentifier,
       projectScopedContainersAccessor,
-      isObjectVariable
+      isObjectVariable,
     );
-
-    const errorText =
-      quicklyAnalysisResult === VariableNameQuickAnalyzeResults.WRONG_QUOTE ? (
-        <Trans>
-          It seems you entered a name with a quote. Variable names should not be
-          quoted.
+    
+    const errorText = quicklyAnalysisResult === VariableNameQuickAnalyzeResults.WRONG_QUOTE
+      ? <Trans>
+        It seems you entered a name with a quote. Variable names should not be quoted.
+      </Trans>
+      : quicklyAnalysisResult === VariableNameQuickAnalyzeResults.WRONG_SPACE
+        ? <Trans>
+          The variable name contains a space - this is not recommended. Prefer to use underscores or uppercase letters to separate words.
         </Trans>
-      ) : quicklyAnalysisResult ===
-        VariableNameQuickAnalyzeResults.WRONG_SPACE ? (
-        <Trans>
-          The variable name contains a space - this is not recommended. Prefer
-          to use underscores or uppercase letters to separate words.
-        </Trans>
-      ) : quicklyAnalysisResult ===
-        VariableNameQuickAnalyzeResults.WRONG_EXPRESSION ? (
-        <Trans>
-          The variable name looks like you're building an expression or a
-          formula. You can only use this for structure or arrays. For example:
-          Score[3].
-        </Trans>
-      ) : forceDeclaration &&
-        quicklyAnalysisResult ===
-          VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE ? (
-        <Trans>
-          This variable does not exist.{' '}
-          <Link onClick={openVariableEditor} href="#">
-            Click to add it.
-          </Link>
-        </Trans>
-      ) : forceDeclaration &&
-        quicklyAnalysisResult ===
-          VariableNameQuickAnalyzeResults.NAME_COLLISION_WITH_OBJECT ? (
-        <Trans>
-          This variable has the same name as an object. Consider renaming one or
-          the other.
-        </Trans>
-      ) : forceDeclaration &&
-        quicklyAnalysisResult ===
-          VariableNameQuickAnalyzeResults.PARAMETER_WITH_CHILD ? (
-        <Trans>Parameters can't have children.</Trans>
-      ) : forceDeclaration &&
-        quicklyAnalysisResult ===
-          VariableNameQuickAnalyzeResults.PROPERTY_WITH_CHILD ? (
-        <Trans>Properties can't have children.</Trans>
-      ) : null;
-    const warningTranslatableText =
-      !forceDeclaration &&
-      quicklyAnalysisResult ===
-        VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE
-        ? t`This variable is not declared. It's recommended to use the *variables editor* to add it.`
-        : !forceDeclaration &&
-          quicklyAnalysisResult ===
-            VariableNameQuickAnalyzeResults.NAME_COLLISION_WITH_OBJECT
+        : quicklyAnalysisResult === VariableNameQuickAnalyzeResults.WRONG_EXPRESSION
+          ? <Trans>
+            The variable name looks like you're building an expression or a formula. You can only use this for structure or arrays. For example: Score[3].
+          </Trans>
+          : forceDeclaration &&
+            quicklyAnalysisResult === VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE
+            ? <Trans>
+              This variable does not exist.{' '}
+              <Link onClick={openVariableEditor} href="#">
+                Click to add it.
+              </Link>
+            </Trans>
+            : forceDeclaration &&
+              quicklyAnalysisResult === VariableNameQuickAnalyzeResults.NAME_COLLISION_WITH_OBJECT
+              ? <Trans>
+                This variable has the same name as an object. Consider renaming one or the other.
+              </Trans>
+              : forceDeclaration &&
+                quicklyAnalysisResult === VariableNameQuickAnalyzeResults.PARAMETER_WITH_CHILD
+                ? <Trans>Parameters can't have children.</Trans>
+                : forceDeclaration &&
+                  quicklyAnalysisResult === VariableNameQuickAnalyzeResults.PROPERTY_WITH_CHILD
+                  ? <Trans>Properties can't have children.</Trans>
+                  : null;
+    const warningTranslatableText = !forceDeclaration &&
+      quicklyAnalysisResult === VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE
+      ? t`This variable is not declared. It's recommended to use the *variables editor* to add it.`
+      : !forceDeclaration &&
+        quicklyAnalysisResult === VariableNameQuickAnalyzeResults.NAME_COLLISION_WITH_OBJECT
         ? t`This variable has the same name as an object. Consider renaming one or the other.`
         : null;
-
-    const isSwitchableInstruction =
-      instruction &&
+    
+    const isSwitchableInstruction = instruction &&
       gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
-        instruction.getType()
+        instruction.getType(),
       );
-    const variableType =
-      project && instruction && isSwitchableInstruction
-        ? gd.VariableInstructionSwitcher.getVariableTypeFromParameters(
-            project.getCurrentPlatform(),
-            projectScopedContainersAccessor.get(),
-            instruction
-          )
-        : null;
-    const needManualTypeSwitcher =
-      isSwitchableInstruction &&
+    const variableType = project && instruction && isSwitchableInstruction
+      ? gd.VariableInstructionSwitcher.getVariableTypeFromParameters(
+        project.getCurrentPlatform(),
+        projectScopedContainersAccessor.get(),
+        instruction,
+      )
+      : null;
+    const needManualTypeSwitcher = isSwitchableInstruction &&
       variableType !== gd.Variable.Number &&
       variableType !== gd.Variable.String &&
       variableType !== gd.Variable.Boolean &&
       !errorText &&
       value;
-
+    
     return (
       <I18n>
-        {({ i18n }) => (
-          <ColumnStackLayout noMargin expand>
-            <TextFieldWithButtonLayout
-              renderTextField={() => (
-                <SemiControlledAutoComplete
-                  margin={isInline ? 'none' : 'dense'}
-                  floatingLabelText={description}
-                  helperMarkdownText={
-                    warningTranslatableText
-                      ? i18n._(warningTranslatableText)
-                      : parameterMetadata
-                      ? parameterMetadata.getLongDescription()
-                      : undefined
+        {({i18n}) => <ColumnStackLayout noMargin expand>
+          <TextFieldWithButtonLayout
+            renderTextField={() => <SemiControlledAutoComplete
+              margin={isInline ? 'none' : 'dense'}
+              floatingLabelText={description}
+              helperMarkdownText={warningTranslatableText
+                ? i18n._(warningTranslatableText)
+                : parameterMetadata
+                  ? parameterMetadata.getLongDescription()
+                  : undefined}
+              errorText={errorText}
+              fullWidth
+              value={value}
+              onChange={onChange}
+              onRequestClose={onRequestClose}
+              onApply={onApply}
+              dataSource={[
+                ...autocompletionVariableNames,
+                onOpenDialog
+                  ? {
+                    translatableValue: t`Add or edit variables...`,
+                    text: '',
+                    value: '',
+                    renderIcon: () => <Add />,
+                    onClick: openVariableEditor,
                   }
-                  errorText={errorText}
-                  fullWidth
-                  value={value}
-                  onChange={onChange}
-                  onRequestClose={onRequestClose}
-                  onApply={onApply}
-                  dataSource={[
-                    ...autocompletionVariableNames,
-                    onOpenDialog
-                      ? {
-                          translatableValue: t`Add or edit variables...`,
-                          text: '',
-                          value: '',
-                          renderIcon: () => <Add />,
-                          onClick: openVariableEditor,
-                        }
-                      : null,
-                  ].filter(Boolean)}
-                  openOnFocus={!isInline}
-                  ref={field}
-                  id={id}
-                />
-              )}
-              renderButton={style =>
-                !isInline ? (
-                  <RaisedButton
-                    icon={<ShareExternal />}
-                    disabled={!onOpenDialog}
-                    primary
-                    style={style}
-                    onClick={() => {
-                      if (onOpenDialog) {
-                        onOpenDialog({
-                          variableName: value,
-                          shouldCreate: false,
-                        });
-                      }
-                    }}
-                  />
-                ) : null
-              }
-            />
-            {!isInline &&
-              needManualTypeSwitcher &&
-              instruction &&
-              onInstructionTypeChanged && (
-                <SelectField
-                  floatingLabelText={<Trans>Use as...</Trans>}
-                  value={(() => {
-                    const type = gd.VariableInstructionSwitcher.getSwitchableInstructionVariableType(
-                      instruction.getType()
+                  : null,
+              ].filter(Boolean)}
+              openOnFocus={!isInline}
+              ref={field}
+              id={id}
+            />}
+            renderButton={style => !isInline
+              ? <RaisedButton
+                icon={<ShareExternal />}
+                disabled={!onOpenDialog}
+                primary
+                style={style}
+                onClick={() => {
+                  if (onOpenDialog) {
+                    onOpenDialog(
+                      {
+                        variableName: value,
+                        shouldCreate: false,
+                      },
                     );
-                    return type === gd.Variable.Unknown
-                      ? gd.Variable.Number
-                      : type;
-                  })()}
-                  onChange={(e, i, value: any) => {
-                    gd.VariableInstructionSwitcher.switchVariableInstructionType(
-                      instruction,
-                      value
-                    );
-                    onInstructionTypeChanged();
-                  }}
-                >
-                  <SelectOption value={gd.Variable.Number} label={t`Number`} />
-                  <SelectOption value={gd.Variable.String} label={t`Text`} />
-                  <SelectOption
-                    value={gd.Variable.Boolean}
-                    label={t`Boolean`}
-                  />
-                </SelectField>
-              )}
-          </ColumnStackLayout>
-        )}
+                  }
+                }}
+              />
+              : null}
+          />
+          {!isInline && needManualTypeSwitcher && instruction &&
+            onInstructionTypeChanged &&
+            <SelectField
+              floatingLabelText={<Trans>Use as...</Trans>}
+              value={(() => {
+                const type = gd.VariableInstructionSwitcher.getSwitchableInstructionVariableType(
+                  instruction.getType(),
+                );
+                return type === gd.Variable.Unknown ? gd.Variable.Number : type;
+              })()}
+              onChange={(e, i, value: any) => {
+                gd.VariableInstructionSwitcher.switchVariableInstructionType(
+                  instruction,
+                  value,
+                );
+                onInstructionTypeChanged();
+              }}>
+              <SelectOption value={gd.Variable.Number} label={t`Number`} />
+              <SelectOption value={gd.Variable.String} label={t`Text`} />
+              <SelectOption value={gd.Variable.Boolean} label={t`Boolean`} />
+            </SelectField>}
+        </ColumnStackLayout>}
       </I18n>
     );
-  }
+  },
+) as component(
+  ...{ ...Props, +ref?: React.RefSetter<VariableFieldInterface> }
 );
 
 export const renderVariableWithIcon = (
@@ -518,7 +487,7 @@ export const renderVariableWithIcon = (
     variableName: string,
     projectScopedContainers: gdProjectScopedContainers
   ) => VariablesContainer_SourceType
-) => {
+): React.MixedElement => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }

@@ -135,12 +135,7 @@ type Props = {|
   onOpenAbout: () => void,
 |};
 
-export const HomePageMenu = ({
-  setActiveTab,
-  activeTab,
-  onOpenPreferences,
-  onOpenAbout,
-}: Props) => {
+export const HomePageMenu = ({setActiveTab, activeTab, onOpenPreferences, onOpenAbout}: Props): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { limits } = React.useContext(AuthenticatedUserContext);
   const [

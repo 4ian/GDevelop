@@ -46,7 +46,7 @@ type Props = {|
   onOpenSceneVariables: () => void,
 |};
 
-const Toolbar = React.memo<Props>(function Toolbar({
+const Toolbar: component(...Props) = React.memo<Props>(function Toolbar({
   onAddStandardEvent,
   onAddSubEvent,
   canAddSubEvent,

@@ -209,11 +209,7 @@ const noHotReloadSteps = {
   reasons: [],
 };
 
-export const EmbeddedGameFrame = ({
-  previewDebuggerServer,
-  onLaunchPreviewForInGameEdition,
-  enabled,
-}: Props) => {
+export const EmbeddedGameFrame = ({previewDebuggerServer, onLaunchPreviewForInGameEdition, enabled}: Props): React.MixedElement => {
   const [
     previewIndexHtmlLocation,
     setPreviewIndexHtmlLocation,

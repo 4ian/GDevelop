@@ -27,7 +27,7 @@ type Props = {|
   labelColor?: 'primary' | 'secondary',
 |};
 
-export const CompactToggleField = (props: Props) => {
+export const CompactToggleField = (props: Props): React.MixedElement => {
   const title = props.hideTooltip
     ? null
     : !props.markdownDescription

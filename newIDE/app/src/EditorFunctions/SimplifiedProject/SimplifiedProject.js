@@ -76,7 +76,15 @@ export type SimplifiedProjectOptions = {|
   scopeToScene?: string,
 |};
 
-export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
+export const makeSimplifiedProjectBuilder = (gd: libGDevelop): {
+  getProjectSpecificExtensionsSummary: (
+    project: gdProject
+  ) => ProjectSpecificExtensionsSummary,
+  getSimplifiedProject: (
+    project: gdProject,
+    options: SimplifiedProjectOptions
+  ) => SimplifiedProject,
+} => {
   const getVariableType = (variable: gdVariable) => {
     const type = variable.getType();
     return type === gd.Variable.String

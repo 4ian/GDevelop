@@ -12,12 +12,7 @@ type Props = {
   justifyContent?: 'center',
 };
 
-const FixedWidthFlexContainer = ({
-  children,
-  width,
-  alignItems,
-  justifyContent,
-}: Props) => (
+const FixedWidthFlexContainer = ({children, width, alignItems, justifyContent}: Props): React.MixedElement => (
   <div style={{ ...style, width, alignItems, justifyContent }}>{children}</div>
 );
 

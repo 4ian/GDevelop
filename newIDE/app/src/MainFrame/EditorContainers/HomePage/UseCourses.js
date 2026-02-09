@@ -88,7 +88,7 @@ const noCourseChapters: {
   [courseId: string]: CourseChapter[],
 } = {};
 
-const useCourses = () => {
+const useCourses = (): any => {
   const {
     userStatus,
     userId,

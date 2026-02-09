@@ -35,7 +35,7 @@ type Props = {|
   hideControls?: boolean,
 |};
 
-const CollisionMasksPreview = (props: Props) => {
+const CollisionMasksPreview = (props: Props): React.MixedElement => {
   const svgRef = React.useRef<React.ElementRef<'svg'> | null>(null);
   const [
     draggedVertex,

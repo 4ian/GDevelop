@@ -18,17 +18,19 @@ type Props = {|
   isListLocked: boolean,
 |};
 
-const GlobalAndSceneVariablesDialog = ({
-  projectScopedContainersAccessor,
-  open,
-  onCancel,
-  onApply,
-  hotReloadPreviewButtonProps,
-  isGlobalTabInitiallyOpen,
-  initiallySelectedVariableName,
-  shouldCreateInitiallySelectedVariable,
-  isListLocked,
-}: Props) => {
+const GlobalAndSceneVariablesDialog = (
+  {
+    projectScopedContainersAccessor,
+    open,
+    onCancel,
+    onApply,
+    hotReloadPreviewButtonProps,
+    isGlobalTabInitiallyOpen,
+    initiallySelectedVariableName,
+    shouldCreateInitiallySelectedVariable,
+    isListLocked
+  }: Props,
+): React.Node => {
   const {
     project,
     layout,

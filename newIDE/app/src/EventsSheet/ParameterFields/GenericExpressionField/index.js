@@ -183,10 +183,10 @@ export default class ExpressionField extends React.Component<Props, State> {
     parametersDialogOpen: false,
     selectedExpressionInfo: null,
 
-    validatedValue: this.props.value,
+    validatedValue: this.props.value as string,
     errorText: null,
-    errorHighlights: [],
-    autocompletions: getAutocompletionsInitialState(),
+    errorHighlights: [] as Array<empty>,
+    autocompletions: getAutocompletionsInitialState() as AutocompletionsState,
   };
 
   componentDidMount() {
@@ -419,11 +419,14 @@ export default class ExpressionField extends React.Component<Props, State> {
     );
   };
 
-  _enqueueValidation = debounce(() => {
+  _enqueueValidation = debounce(
+  () => {
     this._doValidation();
-  }, 250);
+  },
+  250,
+) as any;
 
-  _doValidation = () => {
+  _doValidation = (): any => {
     const {
       project,
       projectScopedContainersAccessor,
@@ -511,7 +514,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     }));
   };
 
-  render() {
+  render(): any {
     const {
       value,
       expressionType,

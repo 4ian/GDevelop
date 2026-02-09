@@ -62,16 +62,18 @@ type Props = {|
   getDisplayedValueFromValue?: string => string,
 |};
 
-const CompactSemiControlledNumberField = ({
-  value,
-  onChange,
-  placeholder,
-  canBeUnlimitedUsingMinus1,
-  commitOnBlur,
-  getValueFromDisplayedValue,
-  getDisplayedValueFromValue,
-  ...otherProps
-}: Props) => {
+const CompactSemiControlledNumberField = (
+  {
+    value,
+    onChange,
+    placeholder,
+    canBeUnlimitedUsingMinus1,
+    commitOnBlur,
+    getValueFromDisplayedValue,
+    getDisplayedValueFromValue,
+    ...otherProps
+  }: Props,
+): React.MixedElement => {
   const textFieldRef = React.useRef<?CompactTextFieldInterface>(null);
   const cancelEditionRef = React.useRef<boolean>(false);
   const [focused, setFocused] = React.useState<boolean>(false);

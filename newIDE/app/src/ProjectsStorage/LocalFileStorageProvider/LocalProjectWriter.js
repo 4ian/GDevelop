@@ -227,13 +227,21 @@ export const onSaveProject = async (
   };
 };
 
-export const generateOnChooseSaveProjectAsLocation = ({
-  setDialog,
-  closeDialog,
-}: {
-  setDialog: (() => React.Node) => void,
-  closeDialog: () => void,
-}) => async ({
+export const generateOnChooseSaveProjectAsLocation = (
+  {
+    setDialog,
+    closeDialog
+  }: {
+    setDialog: (() => React.Node) => void,
+    closeDialog: () => void,
+  },
+): ((
+  {
+    displayOptionToGenerateNewProjectUuid: boolean,
+    fileMetadata: ?FileMetadata,
+    project: gdProject,
+  }
+) => Promise<{ saveAsLocation: ?SaveAsLocation, saveAsOptions: ?SaveAsOptions }>) => async ({
   project,
   fileMetadata,
   displayOptionToGenerateNewProjectUuid,
@@ -399,17 +407,19 @@ export const getProjectLocation = ({
   };
 };
 
-export const renderNewProjectSaveAsLocationChooser = ({
-  projectName,
-  saveAsLocation,
-  setSaveAsLocation,
-  newProjectsDefaultFolder,
-}: {|
-  projectName: string,
-  saveAsLocation: ?SaveAsLocation,
-  setSaveAsLocation: (?SaveAsLocation) => void,
-  newProjectsDefaultFolder?: string,
-|}) => {
+export const renderNewProjectSaveAsLocationChooser = (
+  {
+    projectName,
+    saveAsLocation,
+    setSaveAsLocation,
+    newProjectsDefaultFolder
+  }: {|
+    projectName: string,
+    saveAsLocation: ?SaveAsLocation,
+    setSaveAsLocation: (?SaveAsLocation) => void,
+    newProjectsDefaultFolder?: string,
+  |},
+): React.Node => {
   const projectLocation = getProjectLocation({
     projectName,
     saveAsLocation,
@@ -456,7 +466,7 @@ export const canFileMetadataBeSafelySaved = async (
     showAlert: ShowAlertFunction,
     showConfirmation: ShowConfirmFunction,
   |}
-) => {
+): Promise<boolean> => {
   const path = fileMetadata.fileIdentifier;
   if (isTryingToSaveInForbiddenPath(path)) {
     await actions.showAlert({
@@ -475,7 +485,7 @@ export const canFileMetadataBeSafelySavedAs = async (
     showAlert: ShowAlertFunction,
     showConfirmation: ShowConfirmFunction,
   |}
-) => {
+): Promise<boolean> => {
   const path = fileMetadata.fileIdentifier;
   if (isTryingToSaveInForbiddenPath(path)) {
     await actions.showAlert({

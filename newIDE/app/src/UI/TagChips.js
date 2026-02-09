@@ -24,7 +24,7 @@ type Props = {|
   onRemove: string => void,
 |};
 
-const TagChips = ({ tags, tagsWithLabel, onRemove }: Props) => {
+const TagChips = ({tags, tagsWithLabel, onRemove}: Props): null | React.MixedElement => {
   const [focusedTag, setFocusedTag] = React.useState<?string>(null);
   const tagsRefs = React.useRef([]);
 

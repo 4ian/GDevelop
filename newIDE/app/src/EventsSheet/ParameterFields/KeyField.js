@@ -20,57 +20,57 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(ref, () => ({
-      focus,
-    }));
-
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        focus,
+      }),
+    );
+    
     const {
       value,
       onChange,
       isInline,
       parameterMetadata,
       onRequestClose,
-      onApply,
+      onApply
     } = props;
-
+    
     return (
       <SemiControlledAutoComplete
         margin={props.isInline ? 'none' : 'dense'}
-        floatingLabelText={
-          parameterMetadata ? parameterMetadata.getDescription() : undefined
-        }
-        helperMarkdownText={
-          parameterMetadata ? parameterMetadata.getLongDescription() : undefined
-        }
+        floatingLabelText={parameterMetadata
+          ? parameterMetadata.getDescription()
+          : undefined}
+        helperMarkdownText={parameterMetadata
+          ? parameterMetadata.getLongDescription()
+          : undefined}
         fullWidth
         value={value}
         onChange={onChange}
-        dataSource={keyNames.map(keyName => ({
-          text: keyName,
-          value: keyName,
-        }))}
+        dataSource={keyNames.map(
+          keyName => ({
+            text: keyName,
+            value: keyName,
+          }),
+        )}
         openOnFocus={!isInline}
         onRequestClose={onRequestClose}
         onApply={onApply}
         ref={field}
-        errorText={
-          !value ? (
-            <Trans>You must select a key.</Trans>
-          ) : !isKeyValid(value) ? (
-            <Trans>You must select a valid key. "{value}" is not valid.</Trans>
-          ) : (
-            undefined
-          )
-        }
+        errorText={!value
+          ? <Trans>You must select a key.</Trans>
+          : !isKeyValid(value)
+            ? <Trans>You must select a valid key. "{value}" is not valid.</Trans>
+            : undefined}
       />
     );
-  }
+  },
+) as component(
+  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
 );
 
-export const renderInlineKey = ({
-  value,
-  InvalidParameterValue,
-}: ParameterInlineRendererProps) => {
+export const renderInlineKey = ({value, InvalidParameterValue}: ParameterInlineRendererProps): string | React.MixedElement => {
   if (!value) {
     return (
       <InvalidParameterValue isEmpty>

@@ -83,12 +83,7 @@ type Props = {|
   showCalloutTip?: boolean,
 |};
 
-const CreditsPackagesDialog = ({
-  onClose,
-  suggestedPackage,
-  missingCredits,
-  showCalloutTip,
-}: Props) => {
+const CreditsPackagesDialog = ({onClose, suggestedPackage, missingCredits, showCalloutTip}: Props): React.Node => {
   const {
     error,
     fetchCreditsPackages,

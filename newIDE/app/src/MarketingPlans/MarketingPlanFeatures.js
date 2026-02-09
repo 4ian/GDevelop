@@ -52,14 +52,16 @@ type Props = {|
   hideBorder?: boolean,
 |};
 
-const MarketingPlanFeatures = ({
-  marketingPlan,
-  gameFeaturings,
-  requirementsErrors,
-  onPurchase,
-  isPlanActive,
-  hideBorder,
-}: Props) => {
+const MarketingPlanFeatures = (
+  {
+    marketingPlan,
+    gameFeaturings,
+    requirementsErrors,
+    onPurchase,
+    isPlanActive,
+    hideBorder
+  }: Props,
+): React.Node => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const {

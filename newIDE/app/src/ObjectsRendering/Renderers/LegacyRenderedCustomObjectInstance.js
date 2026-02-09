@@ -202,7 +202,7 @@ export default class LegacyRenderedCustomObjectInstance
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ) {
+  ): any {
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       objectConfiguration
     );
@@ -324,19 +324,19 @@ export default class LegacyRenderedCustomObjectInstance
     }
   }
 
-  getDefaultWidth() {
+  getDefaultWidth(): any {
     return this.childrenRenderedInstances.length > 0
       ? this.childrenRenderedInstances[0].getDefaultWidth()
       : 48;
   }
 
-  getDefaultHeight() {
+  getDefaultHeight(): any {
     return this.childrenRenderedInstances.length > 0
       ? this.childrenRenderedInstances[0].getDefaultHeight()
       : 48;
   }
 
-  getDefaultDepth() {
+  getDefaultDepth(): any {
     const firstInstance = this.childrenRenderedInstances[0];
     return firstInstance && firstInstance instanceof Rendered3DInstance
       ? firstInstance.getDefaultDepth()
@@ -385,15 +385,15 @@ export default class LegacyRenderedCustomObjectInstance
     return this._proportionalOriginZ * this.getDepth();
   }
 
-  getCenterX() {
+  getCenterX(): any {
     return this.getWidth() / 2;
   }
 
-  getCenterY() {
+  getCenterY(): any {
     return this.getHeight() / 2;
   }
 
-  getCenterZ() {
+  getCenterZ(): any {
     return this.getDepth() / 2;
   }
 }

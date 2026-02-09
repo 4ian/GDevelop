@@ -43,7 +43,7 @@ export default class RenderedInstance {
   /**
    * Convert an angle from degrees to radians.
    */
-  static toRad(angleInDegrees: number) {
+  static toRad(angleInDegrees: number): any {
     return (angleInDegrees / 180) * Math.PI;
   }
 

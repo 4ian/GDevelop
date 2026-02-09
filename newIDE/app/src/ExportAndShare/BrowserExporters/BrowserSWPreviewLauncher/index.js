@@ -78,6 +78,7 @@ export default class BrowserSWPreviewLauncher extends React.Component<
 > {
   canDoNetworkPreview = (): any => false;
 
+  // $FlowFixMe[missing-local-annot]
   state = {
     error: null,
   };

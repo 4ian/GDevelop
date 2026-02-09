@@ -115,6 +115,7 @@ export function createAndMapEmbeddedResources(
         theEmbeddedResource.setName(resourceName);
         theEmbeddedResource.setFile(resourceName);
 
+        // $FlowFixMe[prop-missing]
         mapping[relPath] = resourceName;
 
         // embedded resources can have mappings too

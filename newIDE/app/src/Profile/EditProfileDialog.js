@@ -123,6 +123,7 @@ const CommunityLinkWithFollow = <UpdateResponse: { +code: string }>({
   prefix: string,
   translatableHintText?: string,
   icon: React.Node,
+// $FlowFixMe[missing-local-annot]
 }) => {
   const { showAlert } = useAlertDialog();
 
@@ -372,6 +373,7 @@ const EditProfileDialog = (
       donateLink,
       discordUsername,
       githubUsername,
+      // $FlowFixMe[incompatible-type]
       communityLinks: updatedCommunityLinks,
     });
   };
@@ -455,7 +457,9 @@ const EditProfileDialog = (
       {({ i18n }) => (
         <Dialog
           title={<Trans>Edit your GDevelop profile</Trans>}
+          // $FlowFixMe[incompatible-type]
           actions={actions}
+          // $FlowFixMe[incompatible-type]
           secondaryActions={secondaryActions}
           maxWidth="sm"
           cannotBeDismissed={actionInProgress}
@@ -543,6 +547,7 @@ const EditProfileDialog = (
                     value={twitterUsername}
                     onChange={setTwitterUsername}
                     onUpdateFollow={() =>
+                      // $FlowFixMe[incompatible-type]
                       onUpdateTwitterFollow(updatedCommunityLinks)
                     }
                     getMessageFromUpdate={
@@ -564,6 +569,7 @@ const EditProfileDialog = (
                     value={youtubeUsername}
                     onChange={setYoutubeUsername}
                     onUpdateFollow={() =>
+                      // $FlowFixMe[incompatible-type]
                       onUpdateYoutubeSubscription(updatedCommunityLinks)
                     }
                     getMessageFromUpdate={
@@ -585,6 +591,7 @@ const EditProfileDialog = (
                     value={tiktokUsername}
                     onChange={setTiktokUsername}
                     onUpdateFollow={() =>
+                      // $FlowFixMe[incompatible-type]
                       onUpdateTiktokFollow(updatedCommunityLinks)
                     }
                     getMessageFromUpdate={

@@ -74,6 +74,7 @@ const useEditorFunctionCallResultsStorage = (): EditorFunctionCallResultsStorage
       setEditorFunctionCallResultsPerRequest(
         editorFunctionCallResultsPerRequest => ({
           ...editorFunctionCallResultsPerRequest,
+          // $FlowFixMe[incompatible-type]
           [aiRequestId]: null,
         })
       );
@@ -155,6 +156,7 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
         if (!history) return;
         const aiRequestsById = history.aiRequests.reduce(
           (accumulator, aiRequest) => {
+            // $FlowFixMe[prop-missing]
             accumulator[aiRequest.id] = aiRequest;
             return accumulator;
           },
@@ -339,7 +341,8 @@ export const useAiRequestHistory = (
       // information about the request date, not the date of each user message.
       Object.values(aiRequests)
         .sort(
-          // $FlowFixMe - Object.values() loses the type of aiRequests.
+          // $FlowFixMe[incompatible-type]
+          // $FlowFixMe[incompatible-type] - Object.values() loses the type of aiRequests.
           (a: AiRequest, b: AiRequest) => {
             return (
               new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
@@ -347,14 +350,17 @@ export const useAiRequestHistory = (
           }
         )
         .forEach(
-          // $FlowFixMe - Object.values() loses the type of aiRequests.
+          // $FlowFixMe[incompatible-type]
+          // $FlowFixMe[incompatible-type] - Object.values() loses the type of aiRequests.
           (request: AiRequest) => {
             const userMessages = request.output
               .filter(
                 message => message.type === 'message' && message.role === 'user'
               )
               .map(
-                // $FlowFixMe - We filtered the type above.
+                // $FlowFixMe[incompatible-type]
+                // $FlowFixMe[incompatible-type] - We filtered the type above.
+                // $FlowFixMe[cannot-resolve-name]
                 (message: AiRequestUserMessage) => {
                   const userRequest = message.content.find(
                     item => item.type === 'user_request'

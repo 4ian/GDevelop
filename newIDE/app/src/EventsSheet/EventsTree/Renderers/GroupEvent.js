@@ -36,6 +36,7 @@ const styles = {
 };
 
 export default class GroupEvent extends React.Component<EventRendererProps, any> {
+  // $FlowFixMe[missing-local-annot]
   state = {
     editing: false,
     editingPreviousValue: null,
@@ -100,6 +101,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, any>
         }`}
       >
         {this.state.editing ? (
+          // $FlowFixMe[incompatible-type]
           <TextField
             margin="none"
             ref={textField => (this._textField = textField)}

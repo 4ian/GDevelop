@@ -23,22 +23,26 @@ export const setupAuthenticationWebSocket = (
 ): ?WebSocket => {
   webSocket = new WebSocket(GDevelopAuthorizationWebSocketApi.baseUrl);
   const timeoutId = setTimeout(onTimeout, 10000);
+  // $FlowFixMe[incompatible-use]
   webSocket.onopen = () => {
     console.info('WebSocket - Open.');
     if (webSocket) {
       webSocket.send(JSON.stringify({ action: 'getConnectionId' }));
     }
   };
+  // $FlowFixMe[incompatible-use]
   webSocket.onclose = () => {
     console.info('WebSocket - Closed.');
     clearTimeout(timeoutId);
   };
+  // $FlowFixMe[incompatible-use]
   webSocket.onerror = event => {
     console.error('WebSocket - Error:', event);
     clearTimeout(timeoutId);
     onError(event);
   };
 
+  // $FlowFixMe[incompatible-use]
   webSocket.onmessage = event => {
     if (event.data) {
       if (typeof event.data !== 'string') {

@@ -69,6 +69,7 @@ const sortMembersByNameOrEmail = (a: User, b: User) => {
   return (a.username || a.email).localeCompare(b.username || b.email);
 };
 
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const DropTarget = makeDropTarget('team-groups');
 
 type Props = {|

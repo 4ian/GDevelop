@@ -2,7 +2,9 @@
 import optionalRequire from './Utils/OptionalRequire';
 import { isNativeMobileApp } from './Utils/Platform';
 
+// $FlowFixMe[cannot-resolve-name]
 const PUBLIC_URL: string = process.env.PUBLIC_URL || '';
+// $FlowFixMe[cannot-resolve-name]
 const isDev = process.env.NODE_ENV !== 'production';
 
 const electron = optionalRequire('electron');

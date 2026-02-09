@@ -84,6 +84,7 @@ export const getVariableContextFromNodeId = (
   let currentVariable = null;
   let currentVariableName = null;
   let lineage = [];
+  // $FlowFixMe[invalid-declaration]
   let name = null;
   let depth = -1;
 
@@ -103,6 +104,7 @@ export const getVariableContextFromNodeId = (
         if (index >= parentVariable.getChildrenCount()) {
           return { variable: null, lineage, depth, name };
         }
+        // $FlowFixMe[definition-cycle]
         currentVariable = parentVariable.getAtIndex(index);
       } else {
         if (!parentVariable.hasChild(currentVariableName)) {
@@ -140,6 +142,7 @@ export const getVariablePathFromNodeId = (
     variablesContainer
   );
   const variablePath = variableContext.lineage.map(variable => variable.name);
+  // $FlowFixMe[incompatible-type]
   variablePath.push(variableContext.name);
   return variablePath.join('.');
 };

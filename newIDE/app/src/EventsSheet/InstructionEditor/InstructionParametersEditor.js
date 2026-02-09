@@ -10,11 +10,6 @@ import { mapFor } from '../../Utils/MapFor';
 import EmptyMessage from '../../UI/EmptyMessage';
 import ParameterRenderingService from '../ParameterRenderingService';
 import HelpButton from '../../UI/HelpButton';
-import HelpIcon from '../../UI/HelpIcon';
-import {
-  isRelativePathToDocumentationRoot,
-  isDocumentationAbsoluteUrl,
-} from '../../Utils/HelpLink';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
@@ -300,8 +295,8 @@ const InstructionParametersEditor: component(
       <I18n>
         {({ i18n }) => (
           <ScrollView autoHideScrollbar id={id}>
-            <ColumnStackLayout expand>
-              <Line alignItems="flex-start" noMargin>
+            <Column expand>
+              <Line alignItems="flex-start">
                 <img
                   src={iconFilename}
                   alt=""
@@ -313,14 +308,10 @@ const InstructionParametersEditor: component(
                   }}
                 />
                 <Column expand>
-                  <Line noMargin alignItems="flex-start">
-                    <Text style={styles.description} noMargin>
-                      {instructionMetadata.getDescription()}
-                    </Text>
-                    {helpPage && isDocumentationAbsoluteUrl(helpPage) && (
-                      <HelpIcon size="small" helpPagePath={helpPage} />
-                    )}
-                  </Line>
+                  // $FlowFixMe[incompatible-type]
+                  <Text style={styles.description}>
+                    {instructionMetadata.getDescription()}
+                  </Text>
                 </Column>
               </Line>
               {instructionExtraInformation && (
@@ -432,6 +423,7 @@ const InstructionParametersEditor: component(
                     label={<Trans>Invert condition</Trans>}
                     labelPosition="right"
                     toggled={instruction.isInverted()}
+                    // $FlowFixMe[incompatible-type]
                     style={styles.invertToggle}
                     onToggle={(e, enabled) => {
                       instruction.setInverted(enabled);
@@ -449,6 +441,7 @@ const InstructionParametersEditor: component(
                     }
                     labelPosition="right"
                     toggled={instruction.isAwaited()}
+                    // $FlowFixMe[incompatible-type]
                     style={styles.invertToggle}
                     onToggle={(e, enabled) => {
                       instruction.setAwaited(enabled);
@@ -476,22 +469,20 @@ const InstructionParametersEditor: component(
                 )}
               </div>
               <Line>
-                {!noHelpButton &&
-                  helpPage &&
-                  isRelativePathToDocumentationRoot(helpPage) && (
-                    <HelpButton
-                      helpPagePath={helpPage}
-                      label={
-                        isCondition ? (
-                          <Trans>Help for this condition</Trans>
-                        ) : (
-                          <Trans>Help for this action</Trans>
-                        )
-                      }
-                    />
-                  )}
+                {!noHelpButton && helpPage && (
+                  <HelpButton
+                    helpPagePath={instructionMetadata.getHelpPath()}
+                    label={
+                      isCondition ? (
+                        <Trans>Help for this condition</Trans>
+                      ) : (
+                        <Trans>Help for this action</Trans>
+                      )
+                    }
+                  />
+                )}
               </Line>
-            </ColumnStackLayout>
+            </Column>
           </ScrollView>
         )}
       </I18n>

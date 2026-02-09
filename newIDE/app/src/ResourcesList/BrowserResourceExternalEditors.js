@@ -87,7 +87,9 @@ const openAndWaitForExternalEditorWindow = async ({
         console.info(
           `Received data from external editor "${externalEditorName}."`
         );
-        // $FlowFixMe - assuming the typing is good.
+        // $FlowFixMe[incompatible-type]
+        // $FlowFixMe[incompatible-type] - assuming the typing is good.
+        // $FlowFixMe[incompatible-type]
         externalEditorOutput = payload;
       } else if (event.data.id === 'close') {
         externalEditorWindow.close();
@@ -185,6 +187,7 @@ export const downloadAndPrepareExternalEditorBase64Resources = async ({
 
   const downloadedBlobs: Array<
     ItemResult<ResourceToDownload>
+  // $FlowFixMe[incompatible-type]
   > = await downloadUrlsToBlobs({
     urlContainers: urlsToDownload,
     onProgress: (count, total) => {},
@@ -382,6 +385,7 @@ const editors: Array<ResourceExternalEditor> = [
       }
 
       const externalEditorWindow = immediatelyOpenLoadingWindowForExternalEditor();
+      // $FlowFixMe[incompatible-type]
       return await editWithBrowserExternalEditor({
         options,
         externalEditorWindow,

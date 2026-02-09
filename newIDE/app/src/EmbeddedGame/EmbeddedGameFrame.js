@@ -178,10 +178,12 @@ const logSwitchingInfo = ({
   console.info(
     eventsBasedObjectType
       ? `Switching in-game edition preview for variant "${eventsBasedObjectVariantName ||
+          // $FlowFixMe[constant-condition]
           ''}" of "${eventsBasedObjectType || ''}". Reason(s): ${reasons.join(
           ', '
         )}.`
       : externalLayoutName
+      // $FlowFixMe[constant-condition]
       ? `Switching in-game edition previews to external layout "${externalLayoutName ||
           ''}" (scene: "${sceneName || ''}". Reason(s): ${reasons.join(', ')}).`
       : `Switching in-game edition previews to scene "${sceneName ||
@@ -219,6 +221,7 @@ export const EmbeddedGameFrame = ({previewDebuggerServer, onLaunchPreviewForInGa
     setIsPointerEventsPrevented,
   ] = React.useState(false);
   const iframeRef = React.useRef<HTMLIFrameElement | null>(null);
+  // $FlowFixMe[incompatible-type]
   const hotReloadSteps = React.useRef<HotReloadSteps>(noHotReloadSteps);
   const lastPreviewContainer = React.useRef<PreviewInGameEditorTarget | null>(
     null
@@ -339,9 +342,11 @@ export const EmbeddedGameFrame = ({previewDebuggerServer, onLaunchPreviewForInGa
           console.info(
             eventsBasedObjectType
               ? `Launching in-game edition preview for variant "${eventsBasedObjectVariantName ||
+                  // $FlowFixMe[constant-condition]
                   ''}" of "${eventsBasedObjectType ||
                   ''}". Reason(s): ${reasons.join(', ')}.`
               : externalLayoutName
+              // $FlowFixMe[constant-condition]
               ? `Launching in-game edition preview for external layout "${externalLayoutName ||
                   ''}" (scene: "${sceneName || ''}"). Reason(s): ${reasons.join(
                   ', '
@@ -349,6 +354,7 @@ export const EmbeddedGameFrame = ({previewDebuggerServer, onLaunchPreviewForInGa
               : `Launching in-game edition preview for scene "${sceneName ||
                   ''}". Reason(s): ${reasons.join(', ')}.`
           );
+          // $FlowFixMe[incompatible-type]
           hotReloadSteps.current = noHotReloadSteps;
           isPreviewOngoing.current = true;
 

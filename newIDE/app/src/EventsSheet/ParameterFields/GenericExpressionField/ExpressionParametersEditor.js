@@ -55,6 +55,7 @@ const ExpressionParametersEditor = (
   const parametersCount = expressionMetadata.getParametersCount();
   const expression = {
     getParametersCount: () => parametersCount,
+    // $FlowFixMe[missing-local-annot]
     getParameter: index => {
       return parameterValues[index] || '';
     },

@@ -57,6 +57,7 @@ type BuildProperties = {
 type Props = {|
   comment: Comment,
   buildProperties?: BuildProperties,
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   onCommentUpdated: (comment: Comment) => void,
 |};
@@ -313,6 +314,7 @@ const FeedbackCard = ({comment, buildProperties, authenticatedUser, onCommentUpd
                 </ResponsiveLineStackLayout>
               )}
               <LargeSpacer />
+              // $FlowFixMe[incompatible-type]
               <Text style={styles.textComment} allowSelection>
                 {comment.text}
               </Text>

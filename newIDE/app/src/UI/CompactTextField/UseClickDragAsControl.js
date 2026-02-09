@@ -24,6 +24,7 @@ const useClickDragAsControl = ({onChange, onGetInitialValue}: Props): {
       if (
         target instanceof Element &&
         // requestPointerLock does not exist no mobile devices.
+        // $FlowFixMe[method-unbinding]
         target.requestPointerLock
       ) {
         target.requestPointerLock();

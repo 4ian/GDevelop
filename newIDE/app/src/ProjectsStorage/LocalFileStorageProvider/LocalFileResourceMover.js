@@ -32,6 +32,7 @@ type Options = {|
   project: gdProject,
   fileMetadata: FileMetadata,
   onProgress: (number, number) => void,
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
 |};
 
@@ -57,6 +58,7 @@ const downloadBlobToLocalFile = async (
 ): Promise<void> => {
   if (!ipcRenderer) throw new Error('Not supported');
 
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(blobUrl, {
     responseType: 'arraybuffer',
   });

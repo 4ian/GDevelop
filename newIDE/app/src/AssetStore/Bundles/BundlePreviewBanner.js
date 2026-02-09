@@ -406,6 +406,7 @@ const BundlePreviewBanner = ({onDisplayBundle, i18n, category}: Props): React.No
         return null; // Don't display course tiles on mobile, they take too much space.
       }
       if (!productListingDatasIncludedInBundle) {
+        // $FlowFixMe[underconstrained-implicit-instantiation]
         return new Array(numberOfTilesToDisplay).fill(0).map((_, index) => (
           <React.Fragment key={`skeleton-${index}`}>
             {index > 0 &&
@@ -433,9 +434,10 @@ const BundlePreviewBanner = ({onDisplayBundle, i18n, category}: Props): React.No
         productListingData => productListingData.productType === 'COURSE'
       );
 
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       return new Array(numberOfTilesToDisplay).fill(0).map((_, index) => {
         const courseListingData: ?CourseListingData =
-          // $FlowFixMe
+          // $FlowFixMe[incompatible-type]
           coursesIncludedInBundle[index];
         if (!courseListingData) {
           return <div style={{ flex: 1 }} key={`empty-tile-${index}`} />;

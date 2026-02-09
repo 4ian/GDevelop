@@ -50,8 +50,11 @@ export const enumerateObjectsInFolder = (
   folder: gdObjectFolderOrObject
 ): gdObject[] => {
   if (!folder.isFolder()) return [];
+  // $FlowFixMe[missing-empty-array-annot]
   const result = [];
+  // $FlowFixMe[incompatible-type]
   recursivelyEnumerateObjectsInFolder(folder, result);
+  // $FlowFixMe[incompatible-type]
   return result;
 };
 
@@ -59,8 +62,11 @@ export const enumerateFoldersInFolder = (
   folder: gdObjectFolderOrObject
 ): {| path: string, folder: gdObjectFolderOrObject |}[] => {
   if (!folder.isFolder()) return [];
+  // $FlowFixMe[missing-empty-array-annot]
   const result = [];
+  // $FlowFixMe[incompatible-type]
   recursivelyEnumerateFoldersInFolder(folder, '', result);
+  // $FlowFixMe[incompatible-type]
   return result;
 };
 
@@ -68,8 +74,11 @@ export const enumerateFoldersInContainer = (
   container: gdObjectsContainer
 ): {| path: string, folder: gdObjectFolderOrObject |}[] => {
   const rootFolder = container.getRootFolder();
+  // $FlowFixMe[missing-empty-array-annot]
   const result = [];
+  // $FlowFixMe[incompatible-type]
   recursivelyEnumerateFoldersInFolder(rootFolder, '', result);
+  // $FlowFixMe[incompatible-type]
   return result;
 };
 

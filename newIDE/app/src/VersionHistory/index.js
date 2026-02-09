@@ -50,7 +50,9 @@ const groupVersionsByDay = (
   const versionsGroupedByDay = {};
   versions.forEach(version => {
     const dayDate = new Date(version.createdAt.slice(0, 10)).getTime();
+    // $FlowFixMe[invalid-computed-prop]
     if (!versionsGroupedByDay[dayDate]) {
+      // $FlowFixMe[invalid-computed-prop]
       versionsGroupedByDay[dayDate] = [version];
     } else {
       versionsGroupedByDay[dayDate].push(version);
@@ -295,6 +297,7 @@ const VersionHistory: component(...Props) = React.memo<Props>(
         </I18n>
         <ContextMenu
           ref={contextMenuRef}
+          // $FlowFixMe[incompatible-type]
           buildMenuTemplate={buildVersionMenuTemplate}
         />
       </>

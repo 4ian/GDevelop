@@ -142,6 +142,7 @@ const ResourceSelector: component(
         if (value === resourceName) {
           return;
         }
+        // $FlowFixMe[constant-condition]
         if (onChange) {
           onChange(value);
         }
@@ -209,12 +210,15 @@ const ResourceSelector: component(
           );
 
           mapVector(
+            // $FlowFixMe[incompatible-exact]
             resourcesContainer.getAllResourceNames(),
             (resourceName, index) => {
               if (
+                // $FlowFixMe[incompatible-type]
                 resourcesContainer.getResource(resourceName).getKind() ===
                 resourceKind
               ) {
+                // $FlowFixMe[incompatible-type]
                 allResourcesNames.add(resourceName);
               }
             }
@@ -222,12 +226,15 @@ const ResourceSelector: component(
 
           if (fallbackResourceKind) {
             mapVector(
+              // $FlowFixMe[incompatible-exact]
               resourcesContainer.getAllResourceNames(),
               (resourceName, index) => {
                 if (
+                  // $FlowFixMe[incompatible-type]
                   resourcesContainer.getResource(resourceName).getKind() ===
                   fallbackResourceKind
                 ) {
+                  // $FlowFixMe[incompatible-type]
                   allResourcesNames.add(resourceName);
                 }
               }
@@ -483,6 +490,7 @@ const ResourceSelector: component(
                   helperMarkdownText={props.helperMarkdownText}
                   hintText={props.hintText}
                   openOnFocus
+                  // $FlowFixMe[incompatible-type]
                   dataSource={autoCompleteData}
                   value={resourceName}
                   onChange={onChangeResourceName}

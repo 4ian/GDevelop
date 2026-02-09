@@ -18,6 +18,7 @@ type Props = {|
 |};
 
 export const getBackgroundColor = (
+  // $FlowFixMe[value-as-type]
   gdevelopTheme: GDevelopTheme,
   backgroundColor: 'light' | 'medium' | 'dark'
 ): any =>

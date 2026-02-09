@@ -37,6 +37,7 @@ export const Default = (): React.Node => (
   <AuthenticatedUserContext.Provider
     value={fakeAuthenticatedUserWithNoSubscription}
   >
+    // $FlowFixMe[incompatible-type]
     <PreferencesContext.Provider value={initialPreferences}>
       <TutorialContext.Provider
         value={{
@@ -86,6 +87,7 @@ export const Default = (): React.Node => (
 
 export const NotAuthenticated = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
+    // $FlowFixMe[incompatible-type]
     <PreferencesContext.Provider value={initialPreferences}>
       <TutorialContext.Provider
         value={{
@@ -137,6 +139,7 @@ export const EducationSubscriber = (): React.Node => (
   <AuthenticatedUserContext.Provider
     value={fakeAuthenticatedUserWithEducationPlan}
   >
+    // $FlowFixMe[incompatible-type]
     <PreferencesContext.Provider value={initialPreferences}>
       <TutorialContext.Provider
         value={{
@@ -188,6 +191,7 @@ export const EducationTeacher = (): React.Node => (
   <AuthenticatedUserContext.Provider
     value={fakeAuthenticatedTeacherFromEducationPlan}
   >
+    // $FlowFixMe[incompatible-type]
     <PreferencesContext.Provider value={initialPreferences}>
       <TutorialContext.Provider
         value={{
@@ -236,6 +240,7 @@ export const EducationTeacher = (): React.Node => (
 );
 
 export const LoadingTutorials = (): React.Node => (
+  // $FlowFixMe[incompatible-type]
   <PreferencesContext.Provider value={initialPreferences}>
     <TutorialContext.Provider
       value={{
@@ -280,6 +285,7 @@ export const LoadingTutorials = (): React.Node => (
 );
 
 export const LoadingCourses = (): React.Node => (
+  // $FlowFixMe[incompatible-type]
   <PreferencesContext.Provider value={initialPreferences}>
     <TutorialContext.Provider
       value={{

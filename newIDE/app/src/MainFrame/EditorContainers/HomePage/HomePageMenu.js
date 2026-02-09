@@ -118,6 +118,7 @@ export const getTabsToDisplay = ({
     );
   const displayTeachTab =
     !shouldHideClassroomTab(limits) && !isNativeMobileApp();
+  // $FlowFixMe[incompatible-type]
   const tabs: HomeTab[] = [
     'learn',
     'create',

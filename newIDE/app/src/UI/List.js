@@ -88,6 +88,7 @@ type ListItemProps = {|
   disableAutoTranslate?: boolean,
   selected?: boolean,
   autoGenerateNestedIndicator?: boolean, // TODO: Rename?
+  // $FlowFixMe[prop-missing]
   renderNestedItems?: () => Array<React.Element<any> | null>,
   isGreyed?: boolean,
   open?: boolean,
@@ -247,7 +248,9 @@ export const ListItem: component(
           disabled={props.disabled}
           selected={props.selected}
           style={{
-            // $FlowFixMe - Flow is not happy about two spreads.
+            // $FlowFixMe[incompatible-type]
+            // $FlowFixMe[incompatible-type] - Flow is not happy about two spreads.
+            // $FlowFixMe[exponential-spread]
             ...noPaddingStyle,
             ...props.style,
           }}
@@ -303,7 +306,9 @@ export const ListItem: component(
             onClick={onClickItem}
             disabled={props.disabled}
             style={{
-              // $FlowFixMe - Flow is not happy about two spreads.
+              // $FlowFixMe[incompatible-type]
+              // $FlowFixMe[incompatible-type] - Flow is not happy about two spreads.
+              // $FlowFixMe[exponential-spread]
               ...noPaddingStyle,
               ...props.style,
             }}
@@ -384,6 +389,7 @@ type ListProps = {|
 export const List = (props: ListProps): React.Node => {
   let listStyle = { ...props.style };
   if (props.useGap) {
+    // $FlowFixMe[incompatible-type]
     listStyle = { ...listStyle, ...styles.listWithGap };
   }
   return (

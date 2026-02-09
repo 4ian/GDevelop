@@ -54,6 +54,7 @@ export default React.forwardRef<Props, LeaderboardIdPropertyFieldInterface>(
       !leaderboards || !!props.value && !isCurrentValueInLeaderboardList,
     );
     
+    // $FlowFixMe[missing-local-annot]
     const onChangeSelectValue = (event, value) => {
       props.onChange(event.target.value);
     };

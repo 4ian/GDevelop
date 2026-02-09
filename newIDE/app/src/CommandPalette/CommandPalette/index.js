@@ -52,6 +52,7 @@ type PaletteMode = 'closed' | 'command' | 'option';
 
 const CommandPalette: component(
   '(Reason.OrdinaryName "ref")'?: React.RefSetter<CommandPaletteInterface>,
+// $FlowFixMe[incompatible-type]
 ) = React.forwardRef<{||}, CommandPaletteInterface>(
   (props, ref) => {
     const classes = useStyles();
@@ -113,6 +114,7 @@ const CommandPalette: component(
       setMode('closed');
     };
 
+    // $FlowFixMe[missing-local-annot]
     const openPalette = React.useCallback((open? = true) => {
       if (open) setMode('command');
       else setMode('closed');
@@ -123,6 +125,7 @@ const CommandPalette: component(
      * manager and launches command accordingly
      */
     const launchCommand = React.useCallback(
+      // $FlowFixMe[missing-local-annot]
       commandName => {
         const command = commandManager.getNamedCommand(commandName);
         if (!command) return;
@@ -218,11 +221,13 @@ const CommandPalette: component(
 
 export const CommandPaletteWithAlgoliaSearch: component(
   '(Reason.OrdinaryName "ref")'?: React.RefSetter<CommandPaletteInterface>,
+// $FlowFixMe[incompatible-type]
 ) = React.forwardRef<
   {},
   CommandPaletteInterface
 >((props, ref) => (
   <InstantSearch searchClient={searchClient} indexName={indexName}>
+    // $FlowFixMe[incompatible-type]
     <CommandPalette ref={ref} />
   </InstantSearch>
 ));

@@ -54,6 +54,7 @@ export const fetchRelativeResourcesToFullUrls = async ({project, fileMetadata, o
       try {
         const resourceFullUrl = new URL(resource.getFile(), projectBaseUrl)
           .href;
+        // $FlowFixMe[underconstrained-implicit-instantiation]
         await axios.get(resourceFullUrl, {
           timeout: 3000,
         });

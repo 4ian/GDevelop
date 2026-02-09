@@ -59,6 +59,7 @@ export const CustomObjectPackResults = (
     }),
     [packTag]
   );
+  // $FlowFixMe[missing-empty-array-annot]
   const filters = React.useMemo(() => [], []);
   const selectedAssetPackSearchResults = useSearchItem(
     '',
@@ -115,7 +116,9 @@ const TitleListItem = ({ value, onHeightComputed }: TitleListItemProps) => {
 
 const getObjectType = (
   objectShortHeader: ObjectShortHeader | ObjectCategory
-  //$FlowFixMe
+  // $FlowFixMe[incompatible-type]
+  //$FlowFixMe[incompatible-type]
+// $FlowFixMe[incompatible-type]
 ): string => objectShortHeader.type || objectShortHeader.categoryId;
 
 type Props = {|
@@ -172,6 +175,7 @@ export default function NewObjectFromScratch({
               eventsBasedObject
             );
           }
+          // $FlowFixMe[incompatible-type]
           return {
             type: object.type,
             fullName: object.fullName,
@@ -225,7 +229,9 @@ export default function NewObjectFromScratch({
       if (!searchResults) return [];
       const extensionMatches = searchResults.find(result => {
         const resultItem: ObjectShortHeader =
-          //$FlowFixMe Categories will never match since they have no type.
+          // $FlowFixMe[incompatible-type]
+          //$FlowFixMe[incompatible-type] Categories will never match since they have no type.
+          // $FlowFixMe[incompatible-type]
           result.item;
         return resultItem.type === extensionShortHeader.type;
       });
@@ -302,6 +308,7 @@ export default function NewObjectFromScratch({
             filteredSearchResults.map(({ item }) => item)
           }
           getSearchItemUniqueId={getObjectType}
+          // $FlowFixMe[missing-local-annot]
           renderSearchItem={(objectShortHeaderOrCategory, onHeightComputed) => {
             if (objectShortHeaderOrCategory.categoryId) {
               return (
@@ -312,7 +319,8 @@ export default function NewObjectFromScratch({
               );
             }
             const objectShortHeader: ObjectShortHeader =
-              //$FlowFixMe It can't be a category at this point
+              // $FlowFixMe[incompatible-type]
+              //$FlowFixMe[incompatible-type] It can't be a category at this point
               objectShortHeaderOrCategory;
             return (
               <ObjectListItem

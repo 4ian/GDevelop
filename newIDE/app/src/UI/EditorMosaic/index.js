@@ -62,9 +62,9 @@ export const mosaicContainsNode = (
   return (
     !!mosaic &&
     (mosaic === node ||
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
       ((!!mosaic.first && mosaicContainsNode(mosaic.first, node)) ||
-        // $FlowFixMe
+        // $FlowFixMe[incompatible-type]
         (!!mosaic.second && mosaicContainsNode(mosaic.second, node))))
   );
 };
@@ -262,6 +262,7 @@ const shallowClone = (node: EditorMosaicNode): EditorMosaicNode => {
 
 const defaultToolbarControls = [<CloseButton key="close" />];
 
+// $FlowFixMe[missing-local-annot]
 const renderMosaicWindowPreview = props => (
   <div className="mosaic-preview">
     <div className="mosaic-window-toolbar">
@@ -367,6 +368,7 @@ const EditorMosaic: component(
       [editors, hidableMosaicNode, centralNodeId]
     );
 
+    // $FlowFixMe[incompatible-type]
     React.useImperativeHandle(ref, () => ({
       getOpenedEditorNames: (): Array<string> => {
         return mosaicNode ? getVisibleLeaves(mosaicNode) : [];
@@ -454,6 +456,7 @@ const EditorMosaic: component(
     );
 
     const onChange = React.useCallback(
+      // $FlowFixMe[missing-local-annot]
       nodes => {
         if (!isResizing.current) {
           if (onDragOrResizedStarted) {

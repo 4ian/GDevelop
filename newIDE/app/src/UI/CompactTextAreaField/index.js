@@ -89,6 +89,7 @@ export const CompactTextAreaField = (
                 },
               }}
             >
+              // $FlowFixMe[incompatible-type]
               <Text noMargin style={styles.label}>
                 {label}
               </Text>
@@ -102,6 +103,7 @@ export const CompactTextAreaField = (
             <textarea
               id={idToUse.current}
               disabled={disabled}
+              // $FlowFixMe[invalid-compare]
               value={value === null ? '' : value}
               onChange={e => onChange(e.currentTarget.value)}
               placeholder={i18n._(placeholder)}

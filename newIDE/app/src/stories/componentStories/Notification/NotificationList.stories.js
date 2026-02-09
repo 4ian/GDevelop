@@ -76,6 +76,7 @@ const notifications: Notification[] = [
     },
   },
   // $FlowIgnore - Unknown notification on purpose.
+  // $FlowFixMe[incompatible-type]
   {
     id: 'notification-id-33',
     userId,

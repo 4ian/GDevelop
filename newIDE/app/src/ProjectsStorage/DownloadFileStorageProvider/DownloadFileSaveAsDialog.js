@@ -95,6 +95,7 @@ export const downloadResourcesAsBlobs = async ({project, onAddBlobFile, onProgre
             }
           } else {
             // Local resource: unsupported.
+            // $FlowFixMe[incompatible-type]
             result.erroredResources.push({
               resourceName: resource.getName(),
               error: new Error(
@@ -113,6 +114,7 @@ export const downloadResourcesAsBlobs = async ({project, onAddBlobFile, onProgre
   // Download all the project resources as blob (much like what is done during an export).
   const downloadedBlobsAndResources: Array<
     ItemResult<ResourceToFetch>
+  // $FlowFixMe[incompatible-type]
   > = await downloadUrlsToBlobs({
     urlContainers: resourcesToFetchAndUpload,
     onProgress: (count, total) => {
@@ -125,6 +127,7 @@ export const downloadResourcesAsBlobs = async ({project, onAddBlobFile, onProgre
   downloadedBlobsAndResources.forEach(({ item, error, blob }) => {
     const { resource, filename } = item;
     if (error || !blob) {
+      // $FlowFixMe[incompatible-type]
       result.erroredResources.push({
         resourceName: resource.getName(),
         error: error || new Error('Unknown error during download.'),
@@ -165,6 +168,7 @@ export default function DownloadFileSaveAsDialog({ project, onDone }: Props): Re
     {
       onDoProcess: React.useCallback(
         (options, onProgress) =>
+          // $FlowFixMe[incompatible-type]
           downloadResourcesAsBlobs({ ...options, onProgress }),
         []
       ),

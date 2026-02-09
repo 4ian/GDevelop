@@ -125,6 +125,7 @@ const CoursesPage = (
                         </GridListTile>
                       );
                     })
+                  // $FlowFixMe[underconstrained-implicit-instantiation]
                   : new Array(6).fill(0).map((_, index) => (
                       <GridListTile key={`skeleton-course-${index}`}>
                         <CourseCard

@@ -49,6 +49,7 @@ export const cleanUpGameSlug = (gameSlug: string): string => {
     .slice(0, GAME_SLUG_MAX_LENGTH);
   if (slug.length < GAME_SLUG_MIN_LENGTH) {
     slug = slug.concat(
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       new Array(GAME_SLUG_MIN_LENGTH - slug.length).fill('-').join('')
     );
   }
@@ -407,6 +408,8 @@ export function PublicGameProperties({
               }
               onChange={(event, values) => {
                 setCategories(
+                  // $FlowFixMe[constant-condition]
+                  // $FlowFixMe[missing-local-annot]
                   values ? values.map(category => category.value) : []
                 );
                 setCategoryInput('');

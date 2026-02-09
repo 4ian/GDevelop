@@ -23,6 +23,7 @@ type LastModificationInfoProps = {|
   file: FileMetadataAndStorageProviderName,
   lastModifiedInfo?: LastModifiedInfo | null, // If null, the project has been modified last by the current user.
   storageProvider: ?StorageProvider,
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   currentFileMetadata: ?FileMetadata,
   textColor?: 'primary' | 'secondary',
@@ -38,6 +39,7 @@ const LastModificationInfo = (
     authenticatedUser,
     currentFileMetadata,
     textColor = 'primary',
+    // $FlowFixMe[incompatible-type]
     textSize = 'body',
     textPrefix
   }: LastModificationInfoProps,

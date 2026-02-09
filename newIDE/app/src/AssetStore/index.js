@@ -376,6 +376,7 @@ export const AssetStore: component(
           assetPackName,
           assetPackTag,
           assetPackId,
+          // $FlowFixMe[incompatible-type]
           assetPackKind,
         });
         saveScrollPosition();

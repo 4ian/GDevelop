@@ -181,6 +181,7 @@ export const useProcessFunctionCalls = (
       } = await processEditorFunctionCalls({
         project,
         editorCallbacks,
+        // $FlowFixMe[incompatible-type]
         toolOptions: selectedAiRequest.toolOptions || null,
         i18n,
         functionCalls: functionCalls.map(functionCall => ({
@@ -620,7 +621,8 @@ export const useAiRequestState = (
                 message.messageId === lastMessageId &&
                 message.role !== 'user'
               ) {
-                // $FlowFixMe - Flow is not able to understand this is the right type.
+                // $FlowFixMe[incompatible-type]
+                // $FlowFixMe[incompatible-type] - Flow is not able to understand this is the right type.
                 return {
                   ...message,
                   projectVersionIdAfterMessage,
@@ -630,7 +632,9 @@ export const useAiRequestState = (
                 message.messageId === lastMessageId &&
                 message.role === 'user'
               ) {
-                // $FlowFixMe - Flow is not able to understand this is the right type.
+                // $FlowFixMe[incompatible-type]
+                // $FlowFixMe[incompatible-type] - Flow is not able to understand this is the right type.
+                // $FlowFixMe[incompatible-type]
                 return {
                   ...message,
                   projectVersionIdBeforeMessage,

@@ -164,6 +164,7 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
     const [editorToolbar, setEditorToolbar] = React.useState<?React.Node>(null);
     
     React.useImperativeHandle(
+      // $FlowFixMe[incompatible-type]
       ref,
       () => ({
         setEditorToolbar,

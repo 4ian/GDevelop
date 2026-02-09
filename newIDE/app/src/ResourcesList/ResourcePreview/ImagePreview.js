@@ -335,7 +335,9 @@ const ImagePreview = (
       if (
         event.target &&
         (event.target instanceof HTMLElement ||
-          // $FlowFixMe - Flow does not know about SVGElement
+          // $FlowFixMe[incompatible-type]
+          // $FlowFixMe[incompatible-type] - Flow does not know about SVGElement
+          // $FlowFixMe[cannot-resolve-name]
           event.target instanceof SVGElement) &&
         event.target.dataset &&
         'draggable' in event.target.dataset

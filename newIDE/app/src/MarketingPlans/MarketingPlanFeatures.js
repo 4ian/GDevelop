@@ -145,6 +145,7 @@ const MarketingPlanFeatures = (
                             color: gdevelopTheme.message.error,
                           }}
                         />
+                        // $FlowFixMe[incompatible-type]
                         <Text style={styles.bulletPointText}>{error}</Text>
                       </Line>
                     </Column>
@@ -162,6 +163,7 @@ const MarketingPlanFeatures = (
                               : {}),
                           }}
                         />
+                        // $FlowFixMe[incompatible-type]
                         <Text style={styles.bulletPointText}>
                           {selectMessageByLocale(i18n, bulletPointByLocale)}
                         </Text>

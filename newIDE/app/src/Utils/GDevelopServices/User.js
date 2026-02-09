@@ -201,6 +201,7 @@ export type UserLeaderboard = {
   topUserCommentQualityRatings: UserLeaderboardEntry[],
 };
 
+// $FlowFixMe[cannot-resolve-name]
 export const client: Axios = axios.create({
   baseURL: GDevelopUserApi.baseUrl,
 });

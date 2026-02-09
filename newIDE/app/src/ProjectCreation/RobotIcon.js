@@ -4,6 +4,7 @@ import RobotFace from '../UI/CustomSvgIcons/RobotFace';
 import { makeStyles } from '@material-ui/core';
 import RobotFaceSad from '../UI/CustomSvgIcons/RobotFaceSad';
 
+// $FlowFixMe[missing-local-annot]
 const useClasses = (rotating, size) =>
   makeStyles(theme => ({
     container: {

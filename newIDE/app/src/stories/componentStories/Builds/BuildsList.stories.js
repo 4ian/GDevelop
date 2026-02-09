@@ -36,6 +36,7 @@ const buildArray = [
 
 export const DefaultBuildsList = (): React.Node => (
   <BuildsList
+    // $FlowFixMe[incompatible-type]
     builds={buildArray}
     authenticatedUser={fakeSilverAuthenticatedUser}
     error={null}

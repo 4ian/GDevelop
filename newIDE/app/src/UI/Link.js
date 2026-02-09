@@ -14,6 +14,7 @@ type Props = {|
 |};
 
 const useLinkStyles = (
+  // $FlowFixMe[value-as-type]
   theme: GDevelopTheme,
   color: 'primary' | 'secondary' | 'inherit',
   disabled: boolean

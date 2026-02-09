@@ -103,6 +103,7 @@ export type TreeItemProps = {|
   forceUpdateList: () => void,
   unsavedChanges?: ?UnsavedChanges,
   preferences: Preferences,
+  // $FlowFixMe[value-as-type]
   gdevelopTheme: GDevelopTheme,
   project: gdProject,
   editName: (itemId: string) => void,
@@ -175,6 +176,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
 
   onClick(): void {}
 
+  // $FlowFixMe[missing-local-annot]
   buildMenuTemplate(i18n: I18nType, index: number) {
     return this.buildMenuTemplateFunction(i18n, index);
   }
@@ -588,12 +590,14 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         if (!project || !layerTreeViewItemProps) {
           return [];
         }
+        // $FlowFixMe[incompatible-type]
         return [
           {
             isRoot: false,
             content: new LabelTreeViewItemContent(
               layersRootFolderId,
               '',
+              // $FlowFixMe[incompatible-type]
               [
                 gameEditorMode === 'embedded-game'
                   ? {
@@ -623,6 +627,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                 },
               ].filter(Boolean),
               () =>
+                // $FlowFixMe[incompatible-type]
                 [
                   gameEditorMode === 'embedded-game'
                     ? {
@@ -759,6 +764,8 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
             >
               <AutoSizer style={styles.autoSizer} disableWidth>
                 {({ height }) => (
+                  // $FlowFixMe[incompatible-type]
+                  // $FlowFixMe[incompatible-exact]
                   <TreeView
                     key={listKey}
                     ref={treeViewRef}

@@ -151,9 +151,12 @@ export default class InstancesEditor extends Component<Props, State> {
   lastContextMenuY = 0;
   lastCursorX: number | null = null;
   lastCursorY: number | null = null;
+  // $FlowFixMe[missing-local-annot]
   fpsLimiter = new FpsLimiter({ maxFps: 60, idleFps: 10 }) as FpsLimiter;
   canvasArea: ?HTMLDivElement;
+  // $FlowFixMe[value-as-type]
   pixiRenderer: PIXI.Renderer;
+  // $FlowFixMe[value-as-type]
   threeRenderer: THREE.WebGLRenderer | null = null;
   keyboardShortcuts: KeyboardShortcuts;
   pinchHandler: PinchHandler;
@@ -171,8 +174,11 @@ export default class InstancesEditor extends Component<Props, State> {
   windowMask: WindowMask;
   statusBar: StatusBar;
   profilerBar: ProfilerBar;
+  // $FlowFixMe[value-as-type]
   uiPixiContainer: PIXI.Container;
+  // $FlowFixMe[value-as-type]
   backgroundPixiContainer: PIXI.Container;
+  // $FlowFixMe[value-as-type]
   backgroundArea: PIXI.Container;
   instancesRenderer: InstancesRenderer;
   viewPosition: ViewPosition;
@@ -186,6 +192,7 @@ export default class InstancesEditor extends Component<Props, State> {
   hasCursorMovedSinceItIsDown = false;
   _showObjectInstancesIn3D: boolean = false;
 
+  // $FlowFixMe[missing-local-annot]
   state = {
     renderingError: null,
   };
@@ -352,6 +359,7 @@ export default class InstancesEditor extends Component<Props, State> {
     );
     this.backgroundArea.addEventListener(
       'rightclick',
+      // $FlowFixMe[value-as-type]
       (interactionEvent: PIXI.InteractionEvent) => {
         const {
           data: { originalEvent: event },
@@ -833,10 +841,11 @@ export default class InstancesEditor extends Component<Props, State> {
     if (
       object.getType() === 'TileMap::SimpleTileMap' &&
       renderedInstance &&
-      // $FlowFixMe - We are confident the renderedInstance is an instance of RenderedSimpleTileMapInstance.
+      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-type] - We are confident the renderedInstance is an instance of RenderedSimpleTileMapInstance.
       !!renderedInstance.getEditableTileMap
     ) {
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
       const editableTileMap = renderedInstance.getEditableTileMap();
       if (!editableTileMap) {
         console.error(
@@ -848,7 +857,7 @@ export default class InstancesEditor extends Component<Props, State> {
       const tileMapToSceneTransformation = new AffineTransformation();
       const scales = updateSceneToTileMapTransformation(
         selectedInstance,
-        // $FlowFixMe
+        // $FlowFixMe[incompatible-type]
         renderedInstance,
         sceneToTileMapTransformation,
         tileMapToSceneTransformation
@@ -1104,6 +1113,7 @@ export default class InstancesEditor extends Component<Props, State> {
     const layersLocks = {};
     for (let i = 0; i < layersContainer.getLayersCount(); i++) {
       const layer = layersContainer.getLayerAt(i);
+      // $FlowFixMe[prop-missing]
       layersLocks[layersContainer.getLayerAt(i).getName()] =
         !layer.getVisibility() || layer.isLocked();
     }
@@ -1399,6 +1409,7 @@ export default class InstancesEditor extends Component<Props, State> {
 
   // Debounce function to avoid storing history for each pixel move when user
   // keeps pressing an arrow key.
+  // $FlowFixMe[missing-local-annot]
   onInstancesMovedDebounced = debounce(
   this.props.onInstancesMoved,
   50,
@@ -1468,10 +1479,14 @@ export default class InstancesEditor extends Component<Props, State> {
     const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
     let contentAABB: Rectangle | null = null;
     const getInstanceRectangle = new gd.InitialInstanceJSFunctor();
-    // $FlowFixMe - invoke is not writable
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type] - invoke is not writable
+    // $FlowFixMe[cannot-write]
     getInstanceRectangle.invoke = instancePtr => {
-      // $FlowFixMe - wrapPointer is not exposed
+      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
       const instance: gdInitialInstance = gd.wrapPointer(
+        // $FlowFixMe[incompatible-type]
         instancePtr,
         gd.InitialInstance
       );
@@ -1486,7 +1501,9 @@ export default class InstancesEditor extends Component<Props, State> {
         );
       }
     };
-    // $FlowFixMe - JSFunctor is incompatible with Functor
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type] - JSFunctor is incompatible with Functor
+    // $FlowFixMe[incompatible-type]
     initialInstances.iterateOverInstances(getInstanceRectangle);
     getInstanceRectangle.delete();
     return contentAABB;

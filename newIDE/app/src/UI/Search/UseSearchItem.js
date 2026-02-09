@@ -172,6 +172,7 @@ export const filterSearchItems = <SearchItem: SearchableItem>(
           searchItem.tags.some(tag => chosenFilters.has(tag))) ||
         (searchItem.categories &&
           // $FlowIgnore - Flow seems unable to consider `categories` type.
+          // $FlowFixMe[incompatible-use]
           searchItem.categories.some(category => chosenFilters.has(category)))
       );
     });

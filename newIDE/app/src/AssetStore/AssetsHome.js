@@ -241,7 +241,9 @@ export const AssetsHome: component(
     const categoryTiles = React.useMemo(
       () =>
         Object.entries(shopCategories).map(
-          // $FlowExpectedError - Object.entries does not infer well the type of the value.
+          // $FlowFixMe[incompatible-type]
+          // $FlowFixMe[incompatible-type] - Object.entries does not infer well the type of the value.
+          // $FlowFixMe[incompatible-use]
           ([id, { title, imageSource, imageAlt }]) =>
             onlyShowAssets && id === 'game-template' ? null : (
               <CategoryTile
@@ -263,6 +265,7 @@ export const AssetsHome: component(
     );
 
     const openedShopCategoryTitle = openedShopCategory
+      // $FlowFixMe[invalid-computed-prop]
       ? shopCategories[openedShopCategory].title
       : null;
 

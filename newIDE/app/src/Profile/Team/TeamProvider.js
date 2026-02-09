@@ -131,6 +131,7 @@ const TeamProvider = ({children}: Props): React.Node => {
   );
 
   const onCreateMembers = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     async quantity => {
       if (!team || !adminUserId) return;
       try {
@@ -285,6 +286,7 @@ const TeamProvider = ({children}: Props): React.Node => {
 
   const onListUserProjects = React.useCallback(
     async (user: User) => {
+      // $FlowFixMe[missing-empty-array-annot]
       if (!adminUserId) return [];
       return listOtherUserCloudProjects(
         getAuthorizationHeader,

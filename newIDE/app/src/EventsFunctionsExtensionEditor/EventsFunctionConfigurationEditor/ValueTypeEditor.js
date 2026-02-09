@@ -26,6 +26,7 @@ type Props = {|
 
 const getExtraInfoArray = (type: gdValueTypeMetadata) => {
   const extraInfoJson = type.getExtraInfo();
+  // $FlowFixMe[missing-empty-array-annot]
   let array = [];
   try {
     if (extraInfoJson !== '') array = JSON.parse(extraInfoJson);

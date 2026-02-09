@@ -38,6 +38,7 @@ export default class RenderedTextInstance extends RenderedInstance {
     project: gdProject,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
+    // $FlowFixMe[value-as-type]
     pixiContainer: PIXI.Container,
     pixiResourcesLoader: Class<PixiResourcesLoader>,
     getPropertyOverridings: (() => Map<string, string>) | null

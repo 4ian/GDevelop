@@ -13,6 +13,7 @@ import {
 } from '../Utils/Serializer';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import {
+  // $FlowFixMe[import-type-as-value]
   TreeViewItemContent,
   type TreeItemProps,
   extensionObjectsRootFolderId,

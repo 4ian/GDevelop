@@ -78,6 +78,7 @@ const BottomToolbar: component(...Props) = React.memo<Props>((props: Props) => {
             const { icon, buttonId } = editors[editorId];
             const isSelected = props.selectedEditorId === editorId;
             return (
+              // $FlowFixMe[incompatible-type]
               <IconButton
                 color="default"
                 key={editorId}

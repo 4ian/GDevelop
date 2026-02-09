@@ -92,6 +92,7 @@ const getAutocompletionsForExpressions = (
   isExact: boolean,
   completionType: string
 ): Array<ExpressionAutocompletion> => {
+  // $FlowFixMe[incompatible-type]
   return expressionMetadatas
     .filter(
       enumeratedExpressionMetadata =>
@@ -179,9 +180,11 @@ const getAutocompletionsForObjectExpressions = function(
   const behaviorNames = projectScopedContainers
     .getObjectsContainersList()
     .getBehaviorsOfObject(objectName, true);
+  // $FlowFixMe[incompatible-exact]
   mapVector(behaviorNames, behaviorName => {
     const behaviorType = projectScopedContainers
       .getObjectsContainersList()
+      // $FlowFixMe[incompatible-type]
       .getTypeOfBehaviorInObjectOrGroup(objectName, behaviorName, true);
     if (!behaviorType) {
       return;
@@ -204,10 +207,12 @@ const getAutocompletionsForObjectExpressions = function(
     );
     behaviorExpressionAutocompletions.forEach(autocompletion => {
       autocompletion.completion =
+        // $FlowFixMe[unsafe-addition]
         behaviorName +
         gd.PlatformExtension.getNamespaceSeparator() +
         autocompletion.completion;
     });
+    // $FlowFixMe[method-unbinding]
     autocompletions.push.apply(
       autocompletions,
       behaviorExpressionAutocompletions
@@ -447,29 +452,36 @@ export const getAutocompletionsFromDescriptions = (
   const { gd } = expressionAutocompletionContext;
 
   return flatten(
+    // $FlowFixMe[incompatible-exact]
     mapVector(expressionCompletionDescriptions, completionDescription => {
+      // $FlowFixMe[incompatible-use]
       const completionKind = completionDescription.getCompletionKind();
 
       if (
         completionKind ===
         gd.ExpressionCompletionDescription.ExpressionWithPrefix
       ) {
+        // $FlowFixMe[incompatible-use]
         const objectName: string = completionDescription.getObjectName();
+        // $FlowFixMe[incompatible-use]
         const behaviorName: string = completionDescription.getBehaviorName();
 
         if (behaviorName) {
           return getAutocompletionsForBehaviorExpressions(
             expressionAutocompletionContext,
+            // $FlowFixMe[incompatible-type]
             completionDescription
           );
         } else if (objectName) {
           return getAutocompletionsForObjectExpressions(
             expressionAutocompletionContext,
+            // $FlowFixMe[incompatible-type]
             completionDescription
           );
         } else {
           return getAutocompletionsForFreeExpressions(
             expressionAutocompletionContext,
+            // $FlowFixMe[incompatible-type]
             completionDescription,
             i18n
           );
@@ -478,13 +490,19 @@ export const getAutocompletionsFromDescriptions = (
         return [
           {
             kind: 'Object',
+            // $FlowFixMe[incompatible-use]
             completion: completionDescription.getCompletion(),
+            // $FlowFixMe[incompatible-use]
             replacementStartPosition: completionDescription.getReplacementStartPosition(),
+            // $FlowFixMe[incompatible-use]
             replacementEndPosition: completionDescription.getReplacementEndPosition(),
+            // $FlowFixMe[incompatible-use]
             objectConfiguration: completionDescription.hasObjectConfiguration()
+              // $FlowFixMe[incompatible-use]
               ? completionDescription.getObjectConfiguration()
               : null,
             addDot: !gd.ParameterMetadata.isObject(
+              // $FlowFixMe[incompatible-use]
               completionDescription.getType()
             ),
           },
@@ -494,6 +512,7 @@ export const getAutocompletionsFromDescriptions = (
       ) {
         return getAutocompletionsForBehavior(
           expressionAutocompletionContext,
+          // $FlowFixMe[incompatible-type]
           completionDescription
         );
       } else if (
@@ -501,6 +520,7 @@ export const getAutocompletionsFromDescriptions = (
       ) {
         return getAutocompletionsForText(
           expressionAutocompletionContext,
+          // $FlowFixMe[incompatible-type]
           completionDescription
         );
       } else if (
@@ -509,10 +529,15 @@ export const getAutocompletionsFromDescriptions = (
         return [
           {
             kind: 'Variable',
+            // $FlowFixMe[incompatible-use]
             completion: completionDescription.getCompletion(),
+            // $FlowFixMe[incompatible-use]
             replacementStartPosition: completionDescription.getReplacementStartPosition(),
+            // $FlowFixMe[incompatible-use]
             replacementEndPosition: completionDescription.getReplacementEndPosition(),
+            // $FlowFixMe[incompatible-use]
             variableType: completionDescription.getVariableType(),
+            // $FlowFixMe[incompatible-use]
             variableScope: completionDescription.getVariableScope(),
           },
         ];
@@ -522,9 +547,13 @@ export const getAutocompletionsFromDescriptions = (
         return [
           {
             kind: 'Property',
+            // $FlowFixMe[incompatible-use]
             completion: completionDescription.getCompletion(),
+            // $FlowFixMe[incompatible-use]
             replacementStartPosition: completionDescription.getReplacementStartPosition(),
+            // $FlowFixMe[incompatible-use]
             replacementEndPosition: completionDescription.getReplacementEndPosition(),
+            // $FlowFixMe[incompatible-use]
             propertyType: completionDescription.getType(),
           },
         ];
@@ -534,9 +563,13 @@ export const getAutocompletionsFromDescriptions = (
         return [
           {
             kind: 'Parameter',
+            // $FlowFixMe[incompatible-use]
             completion: completionDescription.getCompletion(),
+            // $FlowFixMe[incompatible-use]
             replacementStartPosition: completionDescription.getReplacementStartPosition(),
+            // $FlowFixMe[incompatible-use]
             replacementEndPosition: completionDescription.getReplacementEndPosition(),
+            // $FlowFixMe[incompatible-use]
             parameterType: completionDescription.getType(),
           },
         ];

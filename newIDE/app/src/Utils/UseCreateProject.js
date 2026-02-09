@@ -202,6 +202,7 @@ const useCreateProject = (
             await registerGame(
               authenticatedUser.getAuthorizationHeader,
               authenticatedUser.profile.id,
+              // $FlowFixMe[incompatible-type]
               getDefaultRegisterGameProperties({
                 projectId: currentProject.getProjectUuid(),
                 projectName: currentProject.getName(),

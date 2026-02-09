@@ -147,7 +147,9 @@ const errorHandler = (
   );
   sendErrorMessage(
     'Error caught by error boundary',
-    // $FlowFixMe - Flow does not infer string type possibilities from interpolation.
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type] - Flow does not infer string type possibilities from interpolation.
+    // $FlowFixMe[incompatible-type]
     `error-boundary_${scope}`,
     {
       error,

@@ -83,6 +83,7 @@ const QuickObjectPropertiesEditor = ({
           instances={[objectConfiguration]}
           onInstancesModified={onObjectUpdated}
           resourceManagementProps={resourceManagementProps}
+          // $FlowFixMe[incompatible-type]
           onRefreshAllFields={forceRecomputeSchema}
         />
       </Column>
@@ -127,6 +128,7 @@ export const QuickTitleTweaker = ({project, resourceManagementProps}: Props): Re
       // the arguments will be mismatched. To workaround this, always cast the object to
       // a base gdObject to ensure C++ methods are called.
       const objectConfigurationAsGd = gd.castObject(
+        // $FlowFixMe[incompatible-exact]
         objectConfiguration,
         gd.ObjectConfiguration
       );

@@ -42,6 +42,7 @@ const mergeSubscriptionPlansWithPrices = (
       if (subscriptionPlan.id === 'free') {
         return {
           ...subscriptionPlan,
+          // $FlowFixMe[missing-empty-array-annot]
           pricingSystems: [],
         };
       }
@@ -227,6 +228,7 @@ export const SubscriptionProvider = ({children, simulateMobileApp}: Subscription
   };
 
   const openSubscriptionDialog = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     ({ analyticsMetadata: metadata, couponCode: coupon }) => {
       if (isNativeMobileApp() || simulateMobileApp) {
         if (hasValidSubscriptionPlan(authenticatedUser.subscription)) {

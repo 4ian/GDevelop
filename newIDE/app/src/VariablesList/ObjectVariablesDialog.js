@@ -66,6 +66,7 @@ const ObjectVariablesDialog = (
       onCancel={onCancel}
       onApply={onApply}
       title={<Trans>{objectName} variables</Trans>}
+      // $FlowFixMe[incompatible-type]
       tabs={tabs}
       initiallySelectedVariableName={initiallySelectedVariableName}
       shouldCreateInitiallySelectedVariable={

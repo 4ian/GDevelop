@@ -79,11 +79,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       );
       if (group) {
         const effectsNamesByObject: Array<Array<string>> = mapVector(
+          // $FlowFixMe[incompatible-exact]
           group.getAllObjectsNames(),
           objectName => {
             const object = getObjectByName(
               globalObjectsContainer,
               objectsContainer,
+              // $FlowFixMe[incompatible-type]
               objectName,
             );
             if (!object) {
@@ -115,6 +117,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       setIsExpressionField(!isExpressionField);
     };
     
+    // $FlowFixMe[missing-local-annot]
     const onChangeSelectValue = (event, value) => {
       props.onChange(event.target.value);
     };

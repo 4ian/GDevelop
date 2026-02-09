@@ -118,10 +118,12 @@ export const allResourceKindsAndMetadata = [
 
 const constructors = {};
 for (const { kind, createNewResource } of allResourceKindsAndMetadata) {
+  // $FlowFixMe[prop-missing]
   constructors[kind] = createNewResource;
 }
 
 export function createNewResource(kind: string): ?gdResource {
+  // $FlowFixMe[invalid-computed-prop]
   return constructors[kind] ? constructors[kind]() : null;
 }
 

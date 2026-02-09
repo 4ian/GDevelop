@@ -79,12 +79,15 @@ const MeasuresTable = (props: Props): React.Node => {
   };
 
   const isSectionCollapsed = (path: string) => {
+    // $FlowFixMe[invalid-computed-prop]
     return collapsedPaths[path];
   };
 
   const toggleSection = (path: string) => {
+    // $FlowFixMe[incompatible-type]
     setCollapsedPaths({
       ...collapsedPaths,
+      // $FlowFixMe[invalid-computed-prop]
       [path]: !collapsedPaths[path],
     });
   };

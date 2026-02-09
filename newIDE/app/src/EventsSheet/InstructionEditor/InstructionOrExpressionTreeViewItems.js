@@ -25,6 +25,7 @@ export interface TreeViewItem {
   getChildren(): ?Array<TreeViewItem>;
 }
 
+// $FlowFixMe[incompatible-type]
 export class LeafTreeViewItem implements TreeViewItem {
   content: TreeViewItemContent;
   displayAsPrimaryButton: boolean;
@@ -58,15 +59,20 @@ export const createFreeInstructionTreeViewItem = ({
       // between instruction (leaf nodes) and group (nodes). We use
       // the "type" properties, but this will fail if a group is called "type"
       // (hence the flow errors, which are valid warnings)
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
       if (typeof subInstructionOrGroup.type === 'string') {
-        // $FlowFixMe - see above
+        // $FlowFixMe[incompatible-type]
+        // $FlowFixMe[incompatible-type] - see above
+        // $FlowFixMe[incompatible-type]
+        // $FlowFixMe[incompatible-indexer]
         const instructionMetadata: EnumeratedInstructionMetadata = subInstructionOrGroup;
         return new LeafTreeViewItem(
           new InstructionTreeViewItemContent(instructionMetadata)
         );
       }
-      // $FlowFixMe - see above
+      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-type] - see above
+      // $FlowFixMe[incompatible-type]
       const groupOfInstructionInformation: InstructionOrExpressionTreeNode = subInstructionOrGroup;
       const parentGroupIconSrc =
         freeInstructionProps.getGroupIconSrc(categoryName) ||
@@ -96,6 +102,7 @@ export const createFreeInstructionTreeViewItem = ({
   );
 };
 
+// $FlowFixMe[incompatible-type]
 export class InstructionCategoryTreeViewItem implements TreeViewItem {
   content: TreeViewItemContent;
   children: TreeViewItem[];
@@ -110,6 +117,7 @@ export class InstructionCategoryTreeViewItem implements TreeViewItem {
     return this.children;
   }
 }
+// $FlowFixMe[incompatible-type]
 export class InstructionGroupTreeViewItem implements TreeViewItem {
   content: TreeViewItemContent;
   children: TreeViewItem[];

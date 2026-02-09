@@ -95,6 +95,7 @@ const TextBasedCourseChapterView: component(
                 <ColumnStackLayout noMargin>
                   {courseChapter.templates.map(template => (
                     <Line noMargin alignItems="center" key={template.id}>
+                      // $FlowFixMe[invalid-computed-prop]
                       <Text noMargin>{rankLabel[chapterIndex + 1]}</Text>
                       &nbsp;
                       <Text noMargin>

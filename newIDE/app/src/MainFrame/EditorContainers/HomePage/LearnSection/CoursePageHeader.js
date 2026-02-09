@@ -208,6 +208,7 @@ const CoursePageHeader = (
                           </div>
                         )}
                     </ResponsiveLineStackLayout>
+                    // $FlowFixMe[incompatible-type]
                     <Text size="title" noMargin style={styles.title}>
                       {selectMessageByLocale(i18n, course.titleByLocale)}
                     </Text>

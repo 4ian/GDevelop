@@ -576,6 +576,7 @@ export const LeaderboardAdmin = ({onLoading, project, leaderboardIdToSelectAtOpe
       avatar: <Tag />,
       text: isEditingName ? (
         <Line alignItems="center" expand noMargin>
+          // $FlowFixMe[incompatible-type]
           <TextField
             id="edit-name-field"
             ref={newNameTextFieldRef}
@@ -845,7 +846,7 @@ export const LeaderboardAdmin = ({onLoading, project, leaderboardIdToSelectAtOpe
           value={currentLeaderboard.playerUnicityDisplayChoice}
           onChange={(e, i, value) => {
             onUpdateLeaderboard(i18n, {
-              // $FlowFixMe
+              // $FlowFixMe[incompatible-type]
               playerUnicityDisplayChoice: value,
             });
           }}

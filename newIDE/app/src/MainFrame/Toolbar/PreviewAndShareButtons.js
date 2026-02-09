@@ -201,6 +201,7 @@ const PreviewAndShareButtons: component(...PreviewAndShareButtonsProps) = React.
           }
           id="toolbar-preview-button"
           splitMenuButtonId="toolbar-preview-split-menu-button"
+          // $FlowFixMe[incompatible-type]
           buildMenuTemplate={previewBuildMenuTemplate}
         />
         <ResponsiveRaisedButton

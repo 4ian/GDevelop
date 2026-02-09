@@ -95,10 +95,12 @@ class TileMapPaintingPreview {
     | null;
   toCanvasCoordinates: (x: number, y: number) => [number, number];
   viewPosition: ViewPosition;
+  // $FlowFixMe[value-as-type]
   cache: Map<string, PIXI.Texture>;
   sceneToTileMapTransformation: AffineTransformation;
   tileMapToSceneTransformation: AffineTransformation;
 
+  // $FlowFixMe[value-as-type]
   preview: PIXI.Container;
 
   constructor({
@@ -125,6 +127,7 @@ class TileMapPaintingPreview {
     this.tileMapToSceneTransformation = new AffineTransformation();
   }
 
+  // $FlowFixMe[value-as-type]
   getPixiObject(): PIXI.Container {
     return this.preview;
   }
@@ -137,6 +140,7 @@ class TileMapPaintingPreview {
     tileSet: TileSet,
     x: number,
     y: number,
+  // $FlowFixMe[value-as-type]
   }): ?PIXI.Texture {
     const { atlasImage, tileSize } = tileSet;
     if (!atlasImage) return;
@@ -184,6 +188,7 @@ class TileMapPaintingPreview {
     flipHorizontally: boolean,
     flipVertically: boolean,
     angle: number,
+    // $FlowFixMe[value-as-type]
     texture: PIXI.Texture,
   |}): any {
     const sprite = new PIXI.TilingSprite(texture);
@@ -222,11 +227,14 @@ class TileMapPaintingPreview {
     tileSet: TileSet,
     isBadlyConfigured: boolean,
     tileMapTileSelection: TileMapTileSelection,
+  // $FlowFixMe[value-as-type]
   }): ?PIXI.Container {
     const renderedInstance = this.getRendererOfInstance(instance);
     if (
       !renderedInstance ||
-      // $FlowFixMe - TODO: Replace this check with a `instanceof RenderedSimpleTileMapInstance`
+      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-type] - TODO: Replace this check with a `instanceof RenderedSimpleTileMapInstance`
+      // $FlowFixMe[prop-missing]
       !renderedInstance.getEditableTileMap
     ) {
       console.error(
@@ -237,7 +245,8 @@ class TileMapPaintingPreview {
 
     const scales = updateSceneToTileMapTransformation(
       instance,
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-exact]
       renderedInstance,
       this.sceneToTileMapTransformation,
       this.tileMapToSceneTransformation

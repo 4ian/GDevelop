@@ -38,6 +38,7 @@ const styles = {
   },
 };
 
+// $FlowFixMe[missing-local-annot]
 const stopPropagation = e => e.stopPropagation();
 
 /**
@@ -46,8 +47,11 @@ const stopPropagation = e => e.stopPropagation();
  */
 export const SimpleTextField: component(...SimpleTextFieldProps) = React.memo<
   SimpleTextFieldProps,
+  // $FlowFixMe[incompatible-type]
   SimpleTextFieldInterface
 >(
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-exact]
   React.forwardRef<SimpleTextFieldProps, SimpleTextFieldInterface>(
     (props, ref) => {
       const inputRef = React.useRef<?HTMLInputElement>(null);

@@ -53,6 +53,7 @@ export const downloadUrlFilesToBlobFiles = async ({
 |}): Promise<Array<BlobFileDescriptor>> => {
   const downloadedBlobs: Array<
     ItemResult<UrlFileDescriptor>
+  // $FlowFixMe[incompatible-type]
   > = await downloadUrlsToBlobs({
     urlContainers: urlFiles.filter(({ url }) => url.indexOf('.h') === -1), // Should be useless now, still keep it by safety.
     onProgress,
@@ -79,7 +80,9 @@ export const downloadUrlFilesToBlobFiles = async ({
 
   return downloadedBlobs.map(({ item, blob }) => {
     return {
-      // $FlowFixMe - any non existing blob is discarded before.
+      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-type] - any non existing blob is discarded before.
+      // $FlowFixMe[incompatible-type]
       blob,
       filePath: item.filePath,
     };
@@ -110,6 +113,7 @@ export const archiveFiles = async ({
 
   return new Promise((resolve, reject) => {
     zipJs.createWriter(
+      // $FlowFixMe[invalid-constructor]
       new zipJs.BlobWriter('application/zip'),
       function(zipWriter) {
         eachCallback(
@@ -120,6 +124,7 @@ export const archiveFiles = async ({
 
             zipWriter.add(
               relativeFilePath,
+              // $FlowFixMe[invalid-constructor]
               new zipJs.BlobReader(blob),
               () => {
                 zippedFilesCount++;
@@ -140,6 +145,7 @@ export const archiveFiles = async ({
 
                 zipWriter.add(
                   relativeFilePath,
+                  // $FlowFixMe[invalid-constructor]
                   new zipJs.TextReader(text),
                   () => {
                     zippedFilesCount++;

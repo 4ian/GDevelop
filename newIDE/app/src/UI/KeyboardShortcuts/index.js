@@ -243,7 +243,8 @@ export default class KeyboardShortcuts {
     if (this._isActive && !this._isActive()) return;
 
     const textEditorSelectors = 'textarea, input, [contenteditable="true"]';
-    // $FlowFixMe
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[prop-missing]
     if (evt.target && evt.target.closest(textEditorSelectors)) {
       return; // Something else is currently being edited.
     }

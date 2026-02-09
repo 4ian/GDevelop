@@ -218,6 +218,7 @@ const SwipeableDrawerEditorsDisplay: component(
     [drawerOpeningState]
   );
 
+  // $FlowFixMe[incompatible-type]
   React.useImperativeHandle(ref, () => {
     const { current: editor } = editorRef;
 

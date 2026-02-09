@@ -19,6 +19,7 @@ import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import CreateAccountForm from './CreateAccountForm';
 
+// $FlowFixMe[missing-local-annot]
 const getStyles = ({ isMobile }) => {
   return {
     formContainer: {

@@ -39,6 +39,7 @@ export type AutoCompleteOption =
       value: string, // The value to show on screen and to be selected
       translatableValue?: MessageDescriptor,
       onClick?: () => void | Promise<void>, // If defined, will be called when the item is clicked. onChange/onChoose won't be called.
+      // $FlowFixMe[prop-missing]
       renderIcon?: ?() => React.Element<typeof ListIcon | typeof SvgIcon>,
       disabled?: boolean, // If true, the item is disabled and cannot be selected.
     |};
@@ -390,6 +391,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
                   },
                 }}
                 {...otherStylingProps}
+                // $FlowFixMe[incompatible-type]
                 {...computeTextFieldStyleProps(props)}
                 style={props.textFieldStyle}
                 label={props.floatingLabelText}

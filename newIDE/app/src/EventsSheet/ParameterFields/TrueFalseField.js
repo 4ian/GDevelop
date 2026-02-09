@@ -47,6 +47,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     return (
       <Column noMargin>
         <Line alignItems="center" justifyContent="space-between">
+          // $FlowFixMe[incompatible-type]
           <Text style={styles.description} displayInlineAsSpan>
             {description}
           </Text>

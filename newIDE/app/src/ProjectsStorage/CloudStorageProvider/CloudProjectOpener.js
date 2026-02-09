@@ -34,6 +34,7 @@ class CloudProjectReadingError extends Error {
   }
 }
 
+// $FlowFixMe[value-as-type]
 export const generateOnOpen = (authenticatedUser: AuthenticatedUser): ((
   fileMetadata: FileMetadata,
   onProgress?: (progress: number, message: MessageDescriptor) => void
@@ -107,6 +108,7 @@ export const generateOnOpen = (authenticatedUser: AuthenticatedUser): ((
   }
 };
 
+// $FlowFixMe[value-as-type]
 export const generateOnEnsureCanAccessResources = (authenticatedUser: AuthenticatedUser): ((
   project: gdProject,
   fileMetadata: FileMetadata,
@@ -120,6 +122,7 @@ export const generateOnEnsureCanAccessResources = (authenticatedUser: Authentica
   await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
 };
 
+// $FlowFixMe[value-as-type]
 export const generateGetAutoSaveCreationDate = (authenticatedUser: AuthenticatedUser): 
   | ((
     fileMetadata: FileMetadata,
@@ -158,6 +161,7 @@ export const generateGetAutoSaveCreationDate = (authenticatedUser: Authenticated
       }
     : undefined;
 
+// $FlowFixMe[value-as-type]
 export const generateOnGetAutoSave = (authenticatedUser: AuthenticatedUser): ((fileMetadata: FileMetadata) => Promise<FileMetadata>) | void =>
   ProjectCache.isAvailable()
     ? async (fileMetadata: FileMetadata): Promise<FileMetadata> => {

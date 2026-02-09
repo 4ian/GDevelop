@@ -25,6 +25,7 @@ const LeftLoader = (
         // when rotating: the scrollbar appears and disappears each time the diagonal
         // of the square box containing the round SVG is vertical.
         size={18}
+        // $FlowFixMe[incompatible-type]
         style={styles.progress}
         variant={
           // Avoid animating the loader when it's not loading.

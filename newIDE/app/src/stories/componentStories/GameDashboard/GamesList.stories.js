@@ -28,14 +28,19 @@ export default {
 };
 
 export const NoGamesOrProjects = (): React.Node => {
+  // $FlowFixMe[missing-empty-array-annot]
   const projectFiles = [];
 
+  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
+    // $FlowFixMe[incompatible-type]
     values: {
       ...initialPreferences.values,
+      // $FlowFixMe[incompatible-type]
       recentProjectFiles: projectFiles,
     },
+    // $FlowFixMe[incompatible-type]
     getRecentProjectFiles: () => projectFiles,
   };
 
@@ -85,12 +90,16 @@ export const WithOnlyGames = (): React.Node => {
     },
   ];
 
+  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
+    // $FlowFixMe[incompatible-type]
     values: {
       ...initialPreferences.values,
+      // $FlowFixMe[incompatible-type]
       recentProjectFiles: projectFiles,
     },
+    // $FlowFixMe[incompatible-type]
     getRecentProjectFiles: () => projectFiles,
   };
 
@@ -135,8 +144,10 @@ export const WithOnlyProjects = (): React.Node => {
     fakeFileMetadataAndStorageProviderNameForLocalProject,
   ];
 
+  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
+    // $FlowFixMe[incompatible-type]
     values: {
       ...initialPreferences.values,
       recentProjectFiles: projectFiles,
@@ -192,12 +203,16 @@ export const WithGamesAndProjects = (): React.Node => {
     },
   ];
 
+  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
+    // $FlowFixMe[incompatible-type]
     values: {
       ...initialPreferences.values,
+      // $FlowFixMe[incompatible-type]
       recentProjectFiles: projectFiles,
     },
+    // $FlowFixMe[incompatible-type]
     getRecentProjectFiles: () => projectFiles,
   };
 

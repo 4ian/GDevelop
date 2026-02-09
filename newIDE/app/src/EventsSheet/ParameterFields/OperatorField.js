@@ -23,6 +23,7 @@ const operatorLabels = {
 };
 
 const mapTypeToOperators: { [string]: Array<string> } = {
+  // $FlowFixMe[incompatible-type]
   unknown: Object.keys(operatorLabels),
   number: ['=', '+', '-', '*', '/'],
   string: ['=', '+'],
@@ -82,6 +83,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           operator => <SelectOption
             key={operator}
             value={operator}
+            // $FlowFixMe[invalid-computed-prop]
             label={operatorLabels[operator]}
           />,
         )}

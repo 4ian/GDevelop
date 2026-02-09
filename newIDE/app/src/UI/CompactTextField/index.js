@@ -96,12 +96,14 @@ const CompactTextField: component(
     });
 
     const onBlurInput = React.useCallback(
+      // $FlowFixMe[missing-local-annot]
       event => {
         if (onBlur) onBlur(event);
       },
       [onBlur]
     );
     const onFocusInput = React.useCallback(
+      // $FlowFixMe[missing-local-annot]
       event => {
         if (onFocus) onFocus(event);
       },

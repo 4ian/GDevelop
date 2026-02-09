@@ -61,6 +61,7 @@ const QuickBehaviorPropertiesEditor = ({
         instances={[behavior]}
         onInstancesModified={onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
+        // $FlowFixMe[incompatible-type]
         onRefreshAllFields={forceRecomputeSchema}
       />
     </Column>

@@ -89,6 +89,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     return this.props.isActive || nextProps.isActive;
   }
 
+  // $FlowFixMe[unsupported-syntax]
   componentDidUpdate(prevProps: *) {
     // Ensure that the editor will trigger the
     // reload/regeneration of extensions when the user

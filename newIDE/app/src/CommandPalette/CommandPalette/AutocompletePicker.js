@@ -131,11 +131,13 @@ const AutocompletePicker = (props: Props<NamedCommand | GoToWikiCommand> | Props
   const shortcutMap = useShortcutMap();
   const classes = useStyles();
 
+  // $FlowFixMe[missing-local-annot]
   const handleClose = (_, reason) => {
     if (reason === 'select-option' || reason === 'toggleInput') return;
     props.onClose();
   };
 
+  // $FlowFixMe[missing-local-annot]
   const handleSelect = (_, item) => {
     props.onSelect(item);
   };

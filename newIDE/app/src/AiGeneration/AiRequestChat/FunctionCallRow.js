@@ -136,6 +136,7 @@ export const FunctionCallRow: component(...Props) = React.memo<Props>(function F
 
       text = result.text;
       details = result.details;
+      // $FlowFixMe[incompatible-type]
       hasDetailsToShow = result.hasDetailsToShow;
     } catch (error) {
       console.error('Error rendering function call:', error);
@@ -178,6 +179,7 @@ export const FunctionCallRow: component(...Props) = React.memo<Props>(function F
         <Text
           size="body-small"
           color="secondary"
+          // $FlowFixMe[incompatible-type]
           style={styles.functionCallText}
         >
           {text || <Trans>Working...</Trans>}

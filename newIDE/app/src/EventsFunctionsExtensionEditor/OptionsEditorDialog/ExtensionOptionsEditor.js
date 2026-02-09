@@ -28,6 +28,7 @@ import { ResourceStoreContext } from '../../AssetStore/ResourceStore/ResourceSto
 
 const downloadSvgAsBase64 = async (url: string): Promise<string> => {
   try {
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     const response = await axios.get(url, { responseType: 'arraybuffer' });
 
     const image = btoa(

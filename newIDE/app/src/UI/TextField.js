@@ -192,6 +192,7 @@ const TextField: component(
   ...{ ...Props, +ref?: React.RefSetter<TextFieldInterface> }
 ) = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
+  // $FlowFixMe[value-as-type]
   const muiTextFieldRef = React.useRef<?MUITextField>(null);
   const [isPasswordVisible, setIsPasswordVisible] = React.useState<boolean>(
     false
@@ -247,6 +248,7 @@ const TextField: component(
     return null;
   };
 
+  // $FlowFixMe[incompatible-type]
   React.useImperativeHandle(ref, () => ({
     focus,
     blur,
@@ -321,6 +323,7 @@ const TextField: component(
           rows={props.rows}
           rowsMax={props.rowsMax}
           // Styling:
+          // $FlowFixMe[incompatible-type]
           {...computeTextFieldStyleProps(props)}
           fullWidth={props.fullWidth}
           InputProps={{

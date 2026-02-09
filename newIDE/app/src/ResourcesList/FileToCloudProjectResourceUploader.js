@@ -65,6 +65,7 @@ const getAcceptedExtensions = (
 };
 
 const getAcceptedMimeTypes = (resourceKind: ResourceKind): string[] => {
+  // $FlowFixMe[incompatible-type]
   return resourceKindToInputAcceptedMimes[resourceKind] || [];
 };
 

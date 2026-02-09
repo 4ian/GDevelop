@@ -78,6 +78,7 @@ function ItemRow<Item>({
   );
 
   const label = editingName ? (
+    // $FlowFixMe[incompatible-type]
     <TextField
       id="rename-item-field"
       margin="none"
@@ -158,6 +159,7 @@ function ItemRow<Item>({
       }
       buildMenuTemplate={buildMenuTemplate}
       onClick={() => {
+        // $FlowFixMe[constant-condition]
         if (!onItemSelected) return;
         if (editingName) return;
 

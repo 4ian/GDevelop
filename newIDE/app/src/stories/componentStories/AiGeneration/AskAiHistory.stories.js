@@ -73,6 +73,7 @@ const fakeOutputWithDifferentUserRequest = [
 ];
 
 // Factory function to create AI request objects with different properties
+// $FlowFixMe[missing-local-annot]
 const createFakeAiRequest = ({
   id,
   status = 'ready',
@@ -165,6 +166,7 @@ export const Empty = (): React.Node => (
 export const SingleAiRequest = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
+      // $FlowFixMe[incompatible-type]
       'request-1': createFakeAiRequest({
         id: 'request-1',
         createdAt: '2024-03-15T10:30:00Z',
@@ -181,16 +183,19 @@ export const SingleAiRequest = (): React.Node => (
 export const MultipleAiRequests = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
+      // $FlowFixMe[incompatible-type]
       'request-1': createFakeAiRequest({
         id: 'request-1',
         createdAt: '2024-03-15T14:30:00Z',
         output: fakeOutputWithAiResponses,
       }),
+      // $FlowFixMe[incompatible-type]
       'request-2': createFakeAiRequest({
         id: 'request-2',
         createdAt: '2024-03-14T09:45:00Z',
         output: fakeOutputWithDifferentUserRequest,
       }),
+      // $FlowFixMe[incompatible-type]
       'request-3': createFakeAiRequest({
         id: 'request-3',
         createdAt: '2024-03-10T16:20:00Z',
@@ -206,11 +211,13 @@ export const MultipleAiRequests = (): React.Node => (
 export const WithSelectedRequest = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
+      // $FlowFixMe[incompatible-type]
       'request-1': createFakeAiRequest({
         id: 'request-1',
         createdAt: '2024-03-15T14:30:00Z',
         output: fakeOutputWithAiResponses,
       }),
+      // $FlowFixMe[incompatible-type]
       'request-2': createFakeAiRequest({
         id: 'request-2',
         createdAt: '2024-03-14T09:45:00Z',
@@ -227,11 +234,13 @@ export const WithSelectedRequest = (): React.Node => (
 export const WithWorkingRequest = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
+      // $FlowFixMe[incompatible-type]
       'request-1': createFakeAiRequest({
         id: 'request-1',
         status: 'working',
         createdAt: '2024-03-15T14:30:00Z',
       }),
+      // $FlowFixMe[incompatible-type]
       'request-2': createFakeAiRequest({
         id: 'request-2',
         createdAt: '2024-03-14T09:45:00Z',
@@ -248,12 +257,14 @@ export const WithWorkingRequest = (): React.Node => (
 export const WithErroredRequest = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
+      // $FlowFixMe[incompatible-type]
       'request-1': createFakeAiRequest({
         id: 'request-1',
         status: 'error',
         createdAt: '2024-03-15T14:30:00Z',
         error: { code: 'internal-error', message: 'Some error happened' },
       }),
+      // $FlowFixMe[incompatible-type]
       'request-2': createFakeAiRequest({
         id: 'request-2',
         createdAt: '2024-03-14T09:45:00Z',
@@ -270,10 +281,12 @@ export const WithErroredRequest = (): React.Node => (
 export const RefreshingRequests = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
+      // $FlowFixMe[incompatible-type]
       'request-1': createFakeAiRequest({
         id: 'request-1',
         createdAt: '2024-03-15T14:30:00Z',
       }),
+      // $FlowFixMe[incompatible-type]
       'request-2': createFakeAiRequest({
         id: 'request-2',
         createdAt: '2024-03-14T09:45:00Z',

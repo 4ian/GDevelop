@@ -22,6 +22,7 @@ const styles = {
 };
 type Props = {|
   builds: ?Array<Build>,
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   error: ?Error,
   loadBuilds: () => void,
@@ -134,7 +135,9 @@ const BuildsList = (
             floatingLabelText={<Trans>Show</Trans>}
             value={buildFilter}
             onChange={(e, i, value) => {
-              // $FlowFixMe - We are confident that the selected option's value is of type BuildFilter.
+              // $FlowFixMe[incompatible-type]
+              // $FlowFixMe[incompatible-type] - We are confident that the selected option's value is of type BuildFilter.
+              // $FlowFixMe[incompatible-type]
               setBuildFilter(value);
             }}
           >

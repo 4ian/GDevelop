@@ -83,8 +83,10 @@ export const WithCommunityExtensions = (): React.Node => {
     showExperimentalExtensions,
     setShowExperimentalExtensions,
   ] = React.useState(true);
+  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
+    // $FlowFixMe[incompatible-type]
     values: { ...initialPreferences.values, showExperimentalExtensions },
     setShowExperimentalExtensions,
   };

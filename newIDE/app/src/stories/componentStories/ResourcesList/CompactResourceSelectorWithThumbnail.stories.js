@@ -59,6 +59,7 @@ export const Default = (): React.Node => {
                 createDisplayName: 'Create with Super Image Editor 2',
                 editDisplayName: 'Edit with Super Image Editor 2',
                 kind: 'image',
+                // $FlowFixMe[missing-local-annot]
                 edit: async options => {
                   console.log(
                     'Open the image editor with these options:',

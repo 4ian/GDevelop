@@ -218,6 +218,7 @@ export const AssetStoreNavigatorStateProvider = (props: AssetStoreNavigatorState
         });
       },
       openSearchResultPage: () => {
+        // $FlowFixMe[incompatible-type]
         setHistory(previousHistory => {
           const currentPage =
             previousHistory.previousPages[
@@ -249,6 +250,7 @@ export const AssetStoreNavigatorStateProvider = (props: AssetStoreNavigatorState
         });
       },
       openTagPage: (tag: string) => {
+        // $FlowFixMe[incompatible-type]
         setHistory(previousHistory => ({
           ...previousHistory,
           previousPages: [
@@ -266,6 +268,7 @@ export const AssetStoreNavigatorStateProvider = (props: AssetStoreNavigatorState
                   node: { name: tag, allChildrenTags: [], children: [] },
                   parentNodes: [],
                 },
+                // $FlowFixMe[underconstrained-implicit-instantiation]
                 chosenFilters: new Set(),
                 addFilter: () => {},
                 removeFilter: () => {},
@@ -277,6 +280,7 @@ export const AssetStoreNavigatorStateProvider = (props: AssetStoreNavigatorState
         }));
       },
       openShopCategoryPage: (category: string) => {
+        // $FlowFixMe[incompatible-type]
         setHistory(previousHistory => ({
           ...previousHistory,
           previousPages: [
@@ -304,6 +308,7 @@ export const AssetStoreNavigatorStateProvider = (props: AssetStoreNavigatorState
         storeSearchText: boolean,
         clearSearchText: boolean,
       |}) => {
+        // $FlowFixMe[incompatible-type]
         setHistory(previousHistory => {
           const currentPage =
             previousHistory.previousPages[
@@ -343,6 +348,7 @@ export const AssetStoreNavigatorStateProvider = (props: AssetStoreNavigatorState
                     },
                     parentNodes: [],
                   },
+                  // $FlowFixMe[underconstrained-implicit-instantiation]
                   chosenFilters: new Set(),
                   addFilter: () => {},
                   removeFilter: () => {},
@@ -364,6 +370,7 @@ export const AssetStoreNavigatorStateProvider = (props: AssetStoreNavigatorState
         storeSearchText: boolean,
         clearSearchText: boolean,
       |}) => {
+        // $FlowFixMe[incompatible-type]
         setHistory(previousHistory => {
           const currentPage =
             previousHistory.previousPages[
@@ -410,6 +417,7 @@ export const AssetStoreNavigatorStateProvider = (props: AssetStoreNavigatorState
         storeSearchText: boolean,
         clearSearchText: boolean,
       |}) => {
+        // $FlowFixMe[incompatible-type]
         setHistory(previousHistory => {
           const currentPage =
             previousHistory.previousPages[
@@ -456,6 +464,7 @@ export const AssetStoreNavigatorStateProvider = (props: AssetStoreNavigatorState
         storeSearchText: boolean,
         clearSearchText: boolean,
       |}) => {
+        // $FlowFixMe[incompatible-type]
         setHistory(previousHistory => {
           const currentPage =
             previousHistory.previousPages[
@@ -502,6 +511,7 @@ export const AssetStoreNavigatorStateProvider = (props: AssetStoreNavigatorState
         storeSearchText: boolean,
         clearSearchText: boolean,
       |}) => {
+        // $FlowFixMe[incompatible-type]
         setHistory(previousHistory => {
           const currentPage =
             previousHistory.previousPages[
@@ -595,6 +605,7 @@ export const AssetStoreNavigatorStateProvider = (props: AssetStoreNavigatorState
   );
 
   return (
+    // $FlowFixMe[incompatible-type]
     <AssetStoreNavigatorContext.Provider value={state}>
       {props.children}
     </AssetStoreNavigatorContext.Provider>

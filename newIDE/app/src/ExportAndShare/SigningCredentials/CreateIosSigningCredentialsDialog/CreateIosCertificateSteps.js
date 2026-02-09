@@ -48,6 +48,7 @@ const styles = {
 };
 
 type Props = {
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
 };
 
@@ -141,6 +142,7 @@ export const CreateIosCertificateSteps = ({authenticatedUser}: Props): React.Nod
           authenticatedUser.getAuthorizationHeader,
           userId,
           {
+            // $FlowFixMe[incompatible-type]
             certificateAsBase64,
           }
         );
@@ -194,6 +196,7 @@ export const CreateIosCertificateSteps = ({authenticatedUser}: Props): React.Nod
           authenticatedUser.getAuthorizationHeader,
           userId,
           {
+            // $FlowFixMe[incompatible-type]
             mobileProvisionAsBase64,
           }
         );

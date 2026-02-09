@@ -106,6 +106,7 @@ const gameServiceMock = new MockAdapter(gameApiAxiosClient, {
 
 const sessionDurations = [60, 180, 300, 600, 900];
 
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const fakeGameMetrics = new Array(7).fill(0).map((_, index) => {
   const date = new Date(Date.now() - (7 - index) * 24 * 3600 * 1000)
     .toISOString()
@@ -299,6 +300,7 @@ export const Default = (
       return [504, null];
     });
 
+  // $FlowFixMe[value-as-type]
   const authenticatedUser: AuthenticatedUser = {
     ...fakeSilverAuthenticatedUser,
     userEarningsBalance: userEarningsBalanceToDisplay,

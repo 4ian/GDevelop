@@ -40,12 +40,15 @@ const AchievementList = ({badges, achievements}: Props): React.Node => {
   React.useEffect(
     () => {
       const badgeByAchievementId = badges.reduce((acc, badge) => {
+        // $FlowFixMe[prop-missing]
         acc[badge.achievementId] = badge;
         return acc;
       }, {});
 
       const achievementsWithBadgeData = achievements.reduce(
+        // $FlowFixMe[missing-local-annot]
         (acc, achievement) => {
+          // $FlowFixMe[invalid-computed-prop]
           const badge = badgeByAchievementId[achievement.id];
           const hasBadge = !!badge;
           acc.push({
@@ -88,7 +91,9 @@ const AchievementList = ({badges, achievements}: Props): React.Node => {
                       size="sub-title"
                       style={
                         achievementWithBadgeData.unlockedAt
+                          // $FlowFixMe[incompatible-type]
                           ? styles.unlockedAchievement
+                          // $FlowFixMe[incompatible-type]
                           : styles.lockedAchievement
                       }
                     >
@@ -102,7 +107,9 @@ const AchievementList = ({badges, achievements}: Props): React.Node => {
                     noMargin
                     style={
                       achievementWithBadgeData.unlockedAt
+                        // $FlowFixMe[incompatible-type]
                         ? styles.unlockedAchievement
+                        // $FlowFixMe[incompatible-type]
                         : styles.lockedAchievement
                     }
                     size="body2"

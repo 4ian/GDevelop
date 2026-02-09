@@ -82,10 +82,12 @@ export const TitleAndSubtitle = (
       {i18n._(text)}
     </Text>
     {multi ? (
+      // $FlowFixMe[incompatible-type]
       <Text style={styles.subTitle} align={textAlign} noMargin>
         {i18n._(t`You can select more than one.`)}
       </Text>
     ) : isOnlyOneFreeAnswerPossible(answers) ? (
+      // $FlowFixMe[incompatible-type]
       <Text style={styles.subTitle} align={textAlign} noMargin>
         {i18n._(
           t`The more descriptive you are, the better we can match the content we’ll recommend.`

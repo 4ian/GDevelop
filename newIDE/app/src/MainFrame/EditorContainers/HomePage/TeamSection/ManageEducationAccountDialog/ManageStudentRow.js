@@ -202,6 +202,7 @@ const ManageStudentRow = ({member, isSelected, isArchived, onSelect, onChangePas
           }
           emptyErrorText={<Trans>Password cannot be empty</Trans>}
           onCancel={() => setIsEditingPassword(false)}
+          // $FlowFixMe[incompatible-type]
           style={styles.passwordTextField}
         />
       </div>
@@ -266,12 +267,15 @@ const ManageStudentRow = ({member, isSelected, isArchived, onSelect, onChangePas
   if (isMobile) {
     return (
       <>
+        // $FlowFixMe[constant-condition]
         <Grid item xs={4} style={isMobile ? styles.mobileCell : styles.cell}>
           {usernameCell}
         </Grid>
+        // $FlowFixMe[constant-condition]
         <Grid item xs={4} style={isMobile ? styles.mobileCell : styles.cell}>
           {emailCell}
         </Grid>
+        // $FlowFixMe[constant-condition]
         <Grid item xs={4} style={isMobile ? styles.mobileCell : styles.cell}>
           {passwordCell}
         </Grid>
@@ -282,12 +286,14 @@ const ManageStudentRow = ({member, isSelected, isArchived, onSelect, onChangePas
 
   return (
     <>
+      // $FlowFixMe[constant-condition]
       <Grid item xs={9} style={isMobile ? styles.mobileCell : styles.cell}>
         <LineStackLayout noMargin alignItems="center">
           {usernameCell}
           {emailCell}
         </LineStackLayout>
       </Grid>
+      // $FlowFixMe[constant-condition]
       <Grid item xs={3} style={isMobile ? styles.mobileCell : styles.cell}>
         {passwordCell}
       </Grid>

@@ -176,6 +176,7 @@ export const AssetFolderTile = (
         >
           <Line alignItems="center">
             <FolderIcon style={styles.folderIcon} />
+            // $FlowFixMe[incompatible-type]
             <Text noMargin style={styles.folderTitle} size="sub-title">
               {capitalize(tag)}
             </Text>

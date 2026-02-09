@@ -162,6 +162,7 @@ export const optimizeTilesGridCoordinates = ({
       patchIndices.forEach(index => tileMapTilePatches.splice(index, 1));
     }
   }
+  // $FlowFixMe[incompatible-type]
   return newTileMapTilePatches;
 };
 

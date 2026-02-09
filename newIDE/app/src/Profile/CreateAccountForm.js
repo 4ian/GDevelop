@@ -32,6 +32,7 @@ import BackgroundText from '../UI/BackgroundText';
 import { MarkdownText } from '../UI/MarkdownText';
 import ResponsiveDelimiter from './ResponsiveDelimiter';
 
+// $FlowFixMe[missing-local-annot]
 const getStyles = ({ verticalDesign }) => ({
   logInContainer: {
     width: '100%',

@@ -151,6 +151,7 @@ const ScenePropertiesDialog = (
     .map(behaviorName => {
       const behaviorSharedData = layout.getBehaviorSharedData(behaviorName);
 
+      // $FlowFixMe[incompatible-exact]
       if (isNullPtr(gd, behaviorSharedData)) return null;
 
       const behaviorTypeName = behaviorSharedData.getTypeName();
@@ -177,6 +178,7 @@ const ScenePropertiesDialog = (
       });
       const tutorialIds = getBehaviorTutorialIds(behaviorTypeName);
       // TODO Make this a functional component to use PreferencesContext
+      // $FlowFixMe[missing-empty-array-annot]
       const enabledTutorialIds = [];
       const iconUrl = behaviorMetadata.getIconFilename();
 
@@ -257,6 +259,7 @@ const ScenePropertiesDialog = (
   return (
     <Dialog
       title={<Trans>{layout.getName()} properties</Trans>}
+      // $FlowFixMe[incompatible-type]
       actions={actions}
       secondaryActions={[
         <RaisedButton
@@ -357,6 +360,7 @@ const ScenePropertiesDialog = (
             primary
             fullWidth
             onClick={() => {
+              // $FlowFixMe[constant-condition]
               if (onOpenMoreSettings) onOpenMoreSettings();
               onClose();
             }}

@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+// $FlowFixMe[import-type-as-value]
 import { I18n as I18nType } from '@lingui/core';
 import { Trans } from '@lingui/macro';
 import { type Game } from '../../Utils/GDevelopServices/Game';

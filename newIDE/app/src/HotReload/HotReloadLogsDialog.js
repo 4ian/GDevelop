@@ -16,6 +16,7 @@ type Props = {|
   isForEditor?: boolean,
 |};
 
+// $FlowFixMe[missing-local-annot]
 const shouldDisplayDialogForLogs = logs =>
   logs.filter(log => log.kind === 'error' || log.kind === 'fatal').length > 0;
 

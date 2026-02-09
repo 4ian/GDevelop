@@ -90,11 +90,13 @@ const TextBasedCourseChapterTaskItem = ({task, isComplete, onComplete}: Props): 
               <Checkbox
                 checked={isComplete}
                 onCheck={() => onComplete(!isComplete)}
+                // $FlowFixMe[incompatible-type]
                 style={styles.checkbox}
               />
             </div>
             <ColumnStackLayout expand noMargin noOverflowParent>
               <TextBasedCourseChapterItems items={task.items} />
+              // $FlowFixMe[constant-condition]
               {isOpen && task.answer && (
                 <Accordion kind="answer" noMargin>
                   <AccordionHeader>

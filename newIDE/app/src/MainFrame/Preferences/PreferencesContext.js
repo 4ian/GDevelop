@@ -237,6 +237,7 @@ export type PreferencesValues = {|
 /**
  * Partial PreferencesValues that can be overridden per-project via preferences block in gdevelop-settings.yaml.
  */
+// $FlowFixMe[deprecated-utility]
 export type ProjectSpecificPreferencesValues = $Shape<PreferencesValues>;
 
 /**
@@ -445,6 +446,8 @@ export const initialPreferences = {
     name: EditorMosaicName,
     node: ?EditorMosaicNode
   ) => {},
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
   getRecentProjectFiles: options => [],
   insertRecentProjectFile: () => {},
   removeRecentProjectFile: () => {},
@@ -484,6 +487,8 @@ export const initialPreferences = {
   setWatchProjectFolderFilesForLocalProjects: () => {},
   setNewFeaturesAcknowledgements: () => {},
   setDisplaySaveReminder: () => {},
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
   getEditorStateForProject: projectId => {},
   setEditorStateForProject: (projectId: any, editorState: any) => {},
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => {},
@@ -498,6 +503,7 @@ export const initialPreferences = {
   setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
 };
 
+// $FlowFixMe[incompatible-type]
 const PreferencesContext: React.Context<Preferences> = React.createContext<Preferences>(initialPreferences);
 
 export default PreferencesContext;

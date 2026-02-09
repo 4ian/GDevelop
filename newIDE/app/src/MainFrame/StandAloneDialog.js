@@ -41,6 +41,7 @@ const StandaloneDialog = ({ onClose }: Props) => {
 
       let bundleListingData: ?BundleListingData = null;
       // Open the information page of a the bundle.
+      // $FlowFixMe[constant-condition]
       if (bundleCategory) {
         bundleListingData = getBundleListingDataFromCategory({
           bundleListingDatas,

@@ -33,6 +33,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
 > {
   canDoNetworkPreview = (): any => false;
 
+  // $FlowFixMe[missing-local-annot]
   state = {
     error: null,
   };

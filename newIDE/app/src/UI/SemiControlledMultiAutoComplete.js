@@ -85,6 +85,7 @@ const SemiControlledMultiAutoComplete: component(
   SemiControlledMultiAutoCompleteInterface
 >((props, ref) => {
   const chipStyles = useChipStyles();
+  // $FlowFixMe[value-as-type]
   const inputRef = React.useRef<?TextField>(null);
 
   React.useImperativeHandle(ref, () => ({

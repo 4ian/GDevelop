@@ -108,6 +108,7 @@ const CompactSemiControlledNumberField = (
         const isNewValueAsFloatValidOrStartsWithSign =
           newValueAsValidFloat !== null &&
           (!containsMathCharacters ||
+            // $FlowFixMe[constant-condition]
             (containsMathCharacters && isValueWithLeadingSign));
         let updateTemporaryValueWithCalculatedValue = false;
         let newValueAfterCalculation: number | null = null;

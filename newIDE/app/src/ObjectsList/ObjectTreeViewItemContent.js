@@ -10,6 +10,7 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+// $FlowFixMe[import-type-as-value]
 import { TreeViewItemContent } from '.';
 import { canSwapAssetOfObject } from '../AssetStore/AssetSwapper';
 import { getInstanceCountInLayoutForObject } from '../Utils/Layout';

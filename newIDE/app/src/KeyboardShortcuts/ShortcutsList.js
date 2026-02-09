@@ -45,7 +45,9 @@ const sortCommandsIntoAreasAndGetReverseMap = (
     .forEach(name => {
       // Sort commands by area
       const areaName = commandsList[name].area;
+      // $FlowFixMe[prop-missing]
       if (!areaWiseCommands[areaName]) areaWiseCommands[areaName] = [];
+      // $FlowFixMe[prop-missing]
       areaWiseCommands[areaName].push(name);
 
       // Add to shortcut-command mapping
@@ -122,6 +124,7 @@ const ShortcutsList = (props: Props): React.Node => {
             <Text size="block-title">
               {props.i18n._(commandAreas[areaName])}
             </Text>
+            // $FlowFixMe[missing-local-annot]
             {areaWiseCommands[areaName].map(commandName => {
               // Get default and user-set shortcuts
               const userShortcut = props.userShortcutMap[commandName];

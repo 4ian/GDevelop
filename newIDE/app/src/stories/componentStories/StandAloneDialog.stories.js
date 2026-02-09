@@ -68,6 +68,7 @@ const allPrivateAssetPackListingData = [
 
 const allPrivateGameTemplateListingData = [fakePrivateGameTemplateListingData];
 
+// $FlowFixMe[missing-empty-array-annot]
 const mockCourses = [];
 
 const StandAloneDialogStory = ({
@@ -79,6 +80,7 @@ const StandAloneDialogStory = ({
   errorMessage,
 }: {
   bundleCategory: string,
+  // $FlowFixMe[value-as-type]
   authenticatedUser?: AuthenticatedUser,
   receivedBundles?: Array<Bundle>,
   delayResponse?: number,

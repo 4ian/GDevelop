@@ -78,6 +78,7 @@ function ConfirmDialog(props: Props): React.Node {
             }
             title={i18n._(props.title)}
             open={props.open}
+            // $FlowFixMe[incompatible-type]
             actions={dialogActions}
             maxWidth={props.maxWidth || 'xs'}
             fullscreen="never-even-on-mobile"

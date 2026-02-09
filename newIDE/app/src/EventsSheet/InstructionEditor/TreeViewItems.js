@@ -210,6 +210,7 @@ export class GroupTreeViewItem implements TreeViewItem {
   getChildren(searchText: string): ?Array<TreeViewItem> {
     if (!searchText) return null;
     const allObjectNames = this.group.getAllObjectsNames();
+    // $FlowFixMe[incompatible-type]
     return allObjectNames
       .toJSArray()
       .map(objectName => {
@@ -233,6 +234,7 @@ export class GroupTreeViewItem implements TreeViewItem {
   }
 }
 
+// $FlowFixMe[incompatible-type]
 export class RootTreeViewItem implements TreeViewItem {
   content: TreeViewItemContent;
   children: TreeViewItem[];
@@ -357,6 +359,7 @@ export class LabelTreeViewItemContent implements TreeViewItemContent {
   }
 }
 
+// $FlowFixMe[incompatible-type]
 export class ObjectFolderTreeViewItem implements TreeViewItem {
   isRoot: boolean;
   global: boolean;

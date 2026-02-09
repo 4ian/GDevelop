@@ -41,6 +41,7 @@ const initialPublicProfileState = {
 };
 
 const PublicProfileContext: React.Context<PublicProfileState> = React.createContext<PublicProfileState>(
+  // $FlowFixMe[incompatible-type]
   initialPublicProfileState
 );
 

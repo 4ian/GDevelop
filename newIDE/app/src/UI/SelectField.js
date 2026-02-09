@@ -11,8 +11,10 @@ import { makeStyles } from '@material-ui/core';
 import ChevronArrowBottom from './CustomSvgIcons/ChevronArrowBottom';
 
 const INVALID_VALUE = '';
+// $FlowFixMe[missing-local-annot]
 const stopPropagation = event => event.stopPropagation();
 
+// $FlowFixMe[missing-local-annot]
 const useSelectStyles = textAlign =>
   makeStyles({
     root: {
@@ -88,8 +90,11 @@ const SelectField: component(
     // Dig into children props to see if the current value is valid or not.
     let hasValidValue = true;
     const childrenValues = React.Children.map(props.children, child => {
+      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[prop-missing]
       if (child === null || !child.props) return null;
 
+      // $FlowFixMe[incompatible-use]
       return child.props.value;
     });
     if (!childrenValues) {
@@ -116,6 +121,7 @@ const SelectField: component(
             id={props.id}
             select
             color="secondary"
+            // $FlowFixMe[incompatible-type]
             {...computeTextFieldStyleProps(props)}
             disabled={props.disabled}
             fullWidth={props.fullWidth}

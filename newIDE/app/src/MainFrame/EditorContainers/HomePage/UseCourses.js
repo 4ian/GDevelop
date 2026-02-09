@@ -525,6 +525,7 @@ const useCourses = (): any => {
         }
 
         if (userId) {
+          // $FlowFixMe[constant-condition]
           const userIdOrEmpty: string = userId || '';
           // we empty the chapters fetched for the user to ensure they are re-fetched
           // and up-to-date (notably in case subscription changed or purchase count changed).

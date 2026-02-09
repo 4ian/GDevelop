@@ -67,11 +67,14 @@ function ListIcon(props: Props) {
 
   let filter = undefined;
   if (brightness != null && Number.isFinite(brightness)) {
+    // $FlowFixMe[incompatible-type]
     filter = `grayscale(1) invert(1) brightness(${brightness})`;
   } else if (shouldInvertGrayScale) {
+    // $FlowFixMe[incompatible-type]
     filter = 'grayscale(1) invert(1)';
   } else if (isGDevelopIcon && !isBlackIcon) {
     filter = disabled
+      // $FlowFixMe[incompatible-type]
       ? 'grayscale(100%)'
       : gdevelopTheme.gdevelopIconsCSSFilter;
   }

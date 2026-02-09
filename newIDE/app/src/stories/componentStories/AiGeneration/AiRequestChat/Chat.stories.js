@@ -135,6 +135,7 @@ const fakeAiRequest: AiRequest = {
   status: 'ready',
   userId: 'fake-user-id',
   gameProjectJson: 'FAKE DATA',
+  // $FlowFixMe[incompatible-type]
   output: fakeOutputWithUserRequestOnly,
   error: null,
 };
@@ -158,11 +159,13 @@ const fakeOutputWithAiResponses = [
 ];
 const aiRequestWithAiResponses: AiRequest = {
   ...fakeAiRequest,
+  // $FlowFixMe[incompatible-type]
   output: fakeOutputWithAiResponses,
 };
 
 const fakeOutputWithMoreAiResponses = [
   ...fakeOutputWithUserRequestOnly,
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   ...new Array(7)
     .fill([
       {
@@ -195,11 +198,13 @@ const fakeOutputWithMoreAiResponses = [
 ];
 const aiRequestWithMoreAiResponses: AiRequest = {
   ...fakeAiRequest,
+  // $FlowFixMe[incompatible-type]
   output: fakeOutputWithMoreAiResponses,
 };
 
 const fakeOutputWithEvenMoreAiResponses = [
   ...fakeOutputWithUserRequestOnly,
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   ...new Array(15)
     .fill([
       {
@@ -232,6 +237,7 @@ const fakeOutputWithEvenMoreAiResponses = [
 ];
 const aiRequestWithEvenMoreAiResponses: AiRequest = {
   ...fakeAiRequest,
+  // $FlowFixMe[incompatible-type]
   output: fakeOutputWithEvenMoreAiResponses,
 };
 
@@ -250,8 +256,10 @@ const WrappedChatComponent = (allProps: any) => {
     <FixedHeightFlexContainer height={800}>
       <FixedWidthFlexContainer width={600}>
         <PreferencesContext.Provider
+          // $FlowFixMe[incompatible-type]
           value={{
             ...initialPreferences,
+            // $FlowFixMe[incompatible-type]
             values: {
               ...initialPreferences.values,
               automaticallyUseCreditsForAiRequests: automaticallyUseCredits,

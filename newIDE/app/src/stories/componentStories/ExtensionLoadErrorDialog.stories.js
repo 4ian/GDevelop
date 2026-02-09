@@ -24,6 +24,7 @@ export const WithSingleExtensionError = (): React.Node => {
 
   return (
     <ExtensionLoadErrorDialog
+      // $FlowFixMe[incompatible-type]
       erroredExtensionLoadingResults={erroredExtensionLoadingResults}
       genericError={null}
       onClose={action('On close')}
@@ -61,6 +62,7 @@ export const WithMultipleExtensionErrors = (): React.Node => {
 
   return (
     <ExtensionLoadErrorDialog
+      // $FlowFixMe[incompatible-type]
       erroredExtensionLoadingResults={erroredExtensionLoadingResults}
       genericError={null}
       onClose={action('On close')}
@@ -69,6 +71,7 @@ export const WithMultipleExtensionErrors = (): React.Node => {
 };
 
 export const WithGenericError = (): React.Node => {
+  // $FlowFixMe[missing-empty-array-annot]
   const erroredExtensionLoadingResults = [];
   const genericError = new Error(
     'Some extension modules could not be loaded. Please check the console for more details.'
@@ -76,6 +79,7 @@ export const WithGenericError = (): React.Node => {
 
   return (
     <ExtensionLoadErrorDialog
+      // $FlowFixMe[incompatible-type]
       erroredExtensionLoadingResults={erroredExtensionLoadingResults}
       genericError={genericError}
       onClose={action('On close')}
@@ -100,6 +104,7 @@ export const WithBothExtensionAndGenericErrors = (): React.Node => {
 
   return (
     <ExtensionLoadErrorDialog
+      // $FlowFixMe[incompatible-type]
       erroredExtensionLoadingResults={erroredExtensionLoadingResults}
       genericError={genericError}
       onClose={action('On close')}

@@ -6,6 +6,7 @@ import * as React from 'react';
 import Clipboard from '../../Utils/Clipboard';
 import { SafeExtractor } from '../../Utils/SafeExtractor';
 import {
+  // $FlowFixMe[import-type-as-value]
   TreeViewItemContent,
   type TreeItemProps,
   propertiesRootFolderId,

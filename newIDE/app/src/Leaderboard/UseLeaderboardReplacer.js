@@ -210,6 +210,7 @@ export const replaceLeaderboardsInProject = async (
     leaderboardsToReplace,
     setProgress
   }: {|
+    // $FlowFixMe[value-as-type]
     authenticatedUser: AuthenticatedUser,
     project: gdProject,
     sourceGameId: string,
@@ -240,6 +241,7 @@ export const replaceLeaderboardsInProject = async (
     await registerGame(
       getAuthorizationHeader,
       profile.id,
+      // $FlowFixMe[incompatible-type]
       getDefaultRegisterGameProperties({
         projectId: project.getProjectUuid(),
         projectName: project.getName(),
@@ -257,6 +259,7 @@ export const replaceLeaderboardsInProject = async (
   setProgress(progressStep);
 
   const duplicateLeaderboardAndStepProgress = async (
+    // $FlowFixMe[value-as-type]
     authenticatedUser: AuthenticatedUser,
     leaderboardId: string
   ): Promise<?ErroredLeaderboard> => {
@@ -269,6 +272,7 @@ export const replaceLeaderboardsInProject = async (
           sourceLeaderboardId: leaderboardId,
         }
       );
+      // $FlowFixMe[prop-missing]
       replacedLeaderboardsMap[leaderboardId] = duplicatedLeaderboard.id;
       setProgress(previousProgress => previousProgress + progressStep);
       return null;
@@ -348,6 +352,7 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
     null
   );
 
+  // $FlowFixMe[recursive-definition]
   const ensureLeaderboardsAreReplaced = React.useCallback(
     async () => {
       if (!leaderboardsToReplace || !project || !sourceGameId) {

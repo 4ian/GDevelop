@@ -8,6 +8,7 @@ import ObjectsRenderingService from '../ObjectsRenderingService';
 import {
   getLayoutedRenderedInstance,
   LayoutedInstance,
+  // $FlowFixMe[import-type-as-value]
   LayoutedParent,
 } from './CustomObjectLayoutingModel';
 import { mapVector } from '../../Utils/MapFor';
@@ -76,7 +77,9 @@ const getPropertyMappingRules = (
   if (!properties.has('_PropertyMapping')) {
     return [];
   }
+  // $FlowFixMe[incompatible-exact]
   return mapVector(properties.get('_PropertyMapping').getChoices(), choice => {
+    // $FlowFixMe[incompatible-use]
     const mapping = choice.getValue().split('=');
     if (mapping.length < 2) {
       return null;
@@ -103,7 +106,9 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   /** Functor used to render an instance */
   instancesRenderer: gdInitialInstanceJSFunctor;
 
+  // $FlowFixMe[missing-local-annot]
   layoutedInstances = new Map<number, LayoutedInstance>() as Map<number, LayoutedInstance>;
+  // $FlowFixMe[missing-local-annot]
   renderedInstances = new Map<number, RenderedInstance | Rendered3DInstance>() as Map<
   number,
   RenderedInstance | Rendered3DInstance,
@@ -114,7 +119,9 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     project: gdProject,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
+    // $FlowFixMe[value-as-type]
     pixiContainer: PIXI.Container,
+    // $FlowFixMe[value-as-type]
     threeGroup: THREE.Group,
     pixiResourcesLoader: Class<PixiResourcesLoader>,
     getPropertyOverridings: (() => Map<string, string>) | null = null
@@ -156,10 +163,14 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
 
     // Functor used to render an instance
     this.instancesRenderer = new gd.InitialInstanceJSFunctor();
-    // $FlowFixMe - invoke is not writable
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type] - invoke is not writable
+    // $FlowFixMe[cannot-write]
     this.instancesRenderer.invoke = instancePtr => {
-      // $FlowFixMe - wrapPointer is not exposed
+      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
       const instance: gdInitialInstance = gd.wrapPointer(
+        // $FlowFixMe[incompatible-type]
         instancePtr,
         gd.InitialInstance
       );
@@ -174,6 +185,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
 
       if (!renderedInstance) return;
 
+      // $FlowFixMe[value-as-type]
       const pixiObject: PIXI.DisplayObject | null = renderedInstance.getPixiObject();
       if (pixiObject) {
         if (renderedInstance.isRenderedIn3D()) {
@@ -191,6 +203,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
           pixiObject.visible = isVisible;
           pixiObject.eventMode = 'auto';
         }
+        // $FlowFixMe[constant-condition]
         if (isVisible) renderedInstance.update();
 
         if (renderedInstance instanceof Rendered3DInstance) {
@@ -295,7 +308,8 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         : new RenderedUnknownInstance(
             this._project,
             instance,
-            // $FlowFixMe It's not actually used.
+            // $FlowFixMe[incompatible-type]
+            // $FlowFixMe[incompatible-type] It's not actually used.
             null,
             this._pixiObject,
             PixiResourcesLoader
@@ -479,7 +493,9 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       const layer = layers.getLayerAt(layerIndex);
       if (layer.getVisibility()) {
         variant.getInitialInstances().iterateOverInstancesWithZOrdering(
-          // $FlowFixMe - gd.castObject is not supporting typings.
+          // $FlowFixMe[incompatible-type]
+          // $FlowFixMe[incompatible-type] - gd.castObject is not supporting typings.
+          // $FlowFixMe[incompatible-type]
           this.instancesRenderer,
           layer.getName()
         );

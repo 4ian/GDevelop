@@ -98,6 +98,7 @@ export const UsersAutocomplete = ({userIds, onChange, floatingLabelText, helperT
           userIds
         );
         setUsers(
+          // $FlowFixMe[incompatible-type]
           userIds
             .map(userId => {
               const userPublicProfile: UserPublicProfile =
@@ -146,11 +147,13 @@ export const UsersAutocomplete = ({userIds, onChange, floatingLabelText, helperT
       helperText={helperText}
       value={users}
       onChange={(event, values) => {
+        // $FlowFixMe[constant-condition]
         if (!values) return;
         // change users in state
         setUsers(values);
         // call top onChange on user ids
         onChange(
+          // $FlowFixMe[missing-local-annot]
           values.map(option => ({
             username: option.text,
             userId: option.value,
@@ -163,6 +166,7 @@ export const UsersAutocomplete = ({userIds, onChange, floatingLabelText, helperT
         setUserInput(value);
       }}
       ref={autocompleteRef}
+      // $FlowFixMe[incompatible-type]
       dataSource={completionOwnUserProfile.concat(
         completionUserPublicProfiles
           .map((userPublicProfile: UserPublicProfile) => {

@@ -93,6 +93,7 @@ let previewOrigin = null;
  * from popup windows in the browser.
  */
 class BrowserPreviewDebuggerServer {
+  // $FlowFixMe[missing-local-annot]
   async startServer({ origin }) {
     if (debuggerServerState === 'started') return;
     debuggerServerState = 'started';
@@ -166,18 +167,23 @@ class BrowserPreviewDebuggerServer {
     });
     return promise;
   }
+  // $FlowFixMe[missing-local-annot]
   getServerState() {
     return debuggerServerState;
   }
+  // $FlowFixMe[missing-local-annot]
   getExistingDebuggerIds() {
     return getExistingDebuggerIds();
   }
+  // $FlowFixMe[missing-local-annot]
   getExistingEmbeddedGameFrameDebuggerIds() {
     return getExistingEmbeddedGameFrameDebuggerIds();
   }
+  // $FlowFixMe[missing-local-annot]
   getExistingPreviewDebuggerIds() {
     return getExistingPreviewDebuggerIds();
   }
+  // $FlowFixMe[missing-local-annot]
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks) {
     callbacksList.push(callbacks);
 

@@ -73,6 +73,7 @@ export function serializeToObjectAsset(
     serializedElement,
     usedResourceNamesVector
   );
+  // $FlowFixMe[method-unbinding]
   usedResourceNames.push.apply(
     usedResourceNames,
     usedResourceNamesVector.toJSArray()

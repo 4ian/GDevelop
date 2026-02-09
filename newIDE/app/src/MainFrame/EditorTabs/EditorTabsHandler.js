@@ -651,8 +651,10 @@ export const getOpenedAskAiEditor = (
   const editorTabOpened = getEditorTabOpenedWithKey(state, 'ask-ai');
   if (!editorTabOpened) return null;
 
+  // $FlowFixMe[incompatible-type]
   return {
-    // $FlowFixMe - the key ensures that the editor is an AskAiEditorInterface.
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type] - the key ensures that the editor is an AskAiEditorInterface.
     askAiEditor: editorTabOpened.editorTab.editorRef,
     editorTab: editorTabOpened.editorTab,
     paneIdentifier: editorTabOpened.paneIdentifier,
@@ -661,11 +663,14 @@ export const getOpenedAskAiEditor = (
 };
 
 export const getAllEditorTabs = (state: EditorTabsState): Array<EditorTab> => {
+  // $FlowFixMe[missing-empty-array-annot]
   const allEditors = [];
   for (const paneIdentifier in state.panes) {
     const pane = state.panes[paneIdentifier];
+    // $FlowFixMe[incompatible-type]
     allEditors.push(...pane.editors);
   }
+  // $FlowFixMe[incompatible-type]
   return allEditors;
 };
 

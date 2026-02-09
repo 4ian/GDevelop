@@ -76,6 +76,7 @@ const useStylesForIconButton = ({
   selected,
   disableHover,
 }: {|
+  // $FlowFixMe[value-as-type]
   theme: GDevelopTheme,
   selected?: boolean,
   disableHover?: boolean,

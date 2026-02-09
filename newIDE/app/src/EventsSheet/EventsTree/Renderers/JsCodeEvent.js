@@ -71,6 +71,7 @@ export default class JsCodeEvent extends React.Component<
   State
 > {
   _objectField: ?ParameterFieldInterface = null;
+  // $FlowFixMe[missing-local-annot]
   state = {
     editingObject: false,
     editingPreviousValue: null,
@@ -140,7 +141,7 @@ export default class JsCodeEvent extends React.Component<
     const { anchorEl } = this.state;
 
     // Put back the focus after closing the inline popover.
-    // $FlowFixMe
+    // $FlowFixMe[incompatible-type]
     if (anchorEl) anchorEl.focus();
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
     const { editingPreviousValue } = this.state;

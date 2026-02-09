@@ -184,6 +184,7 @@ const VideoBasedCourseChapterView: component(
               <Paper background="medium" style={styles.sideBar}>
                 <ColumnStackLayout noMargin>
                   <Line noMargin>
+                    // $FlowFixMe[invalid-computed-prop]
                     <Text noMargin>{rankLabel[chapterIndex + 1]}</Text>
                     &nbsp;
                     <Text noMargin>

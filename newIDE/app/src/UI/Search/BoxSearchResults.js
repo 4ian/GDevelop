@@ -37,7 +37,9 @@ export type BoxSearchResultsInterface = {|
 export const BoxSearchResults: component(
   ...{ ...Props<any>, +ref?: React.RefSetter<BoxSearchResultsInterface> }
 ) = React.forwardRef<
-  // $FlowFixMe The generic type can't pass through.
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-type] The generic type can't pass through.
+  // $FlowFixMe[cannot-resolve-name]
   Props<SearchItem>,
   BoxSearchResultsInterface
 >(
@@ -51,9 +53,12 @@ export const BoxSearchResults: component(
       baseSize,
       noResultPlaceholder,
       noScroll,
+    // $FlowFixMe[cannot-resolve-name]
     }: Props<SearchItem>,
+    // $FlowFixMe[missing-local-annot]
     ref
   ) => {
+    // $FlowFixMe[value-as-type]
     const grid = React.useRef<?Grid>(null);
     React.useImperativeHandle(ref, () => ({
       /**
@@ -125,6 +130,7 @@ export const BoxSearchResults: component(
               const gridHeight = noScroll ? rowHeight * rowCount : height;
               const gridWidth = width;
 
+              // $FlowFixMe[missing-local-annot]
               function cellRenderer({ columnIndex, key, rowIndex, style }) {
                 const indexInList = rowIndex * columnCount + columnIndex;
                 const searchItem =

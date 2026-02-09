@@ -378,12 +378,14 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
 
         if (message.type === 'message' && message.role === 'user') {
           flushFunctionCallGroup();
+          // $FlowFixMe[incompatible-type]
           items.push({
             type: 'user_message',
             messageIndex,
             message,
           });
         } else if (message.type === 'message' && message.role === 'assistant') {
+          // $FlowFixMe[missing-empty-array-annot]
           let pendingFunctionCallItems = [];
 
           message.content.forEach((messageContent, messageContentIndex) => {
@@ -413,6 +415,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
                 currentFunctionCallItems = [];
               }
 
+              // $FlowFixMe[incompatible-type]
               items.push({
                 type: 'message_content',
                 messageIndex,
@@ -443,6 +446,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
             isSavingProjectForThisMessage)
         ) {
           flushFunctionCallGroup();
+          // $FlowFixMe[incompatible-type]
           items.push({
             type: 'save',
             messageIndex: messageIndex,
@@ -475,6 +479,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
             flushFunctionCallGroup();
           }
 
+          // $FlowFixMe[incompatible-type]
           items.push({
             type: 'suggestions',
             messageIndex: messageIndex,
@@ -508,7 +513,9 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
       const forkSaveIndex = renderItems.findIndex(
         item =>
           item.type === 'save' &&
+          // $FlowFixMe[prop-missing]
           item.message &&
+          // $FlowFixMe[invalid-compare]
           item.message.messageId === forkingState.messageId
       );
 
@@ -550,14 +557,18 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
       {filteredRenderItems
         .flatMap((item, itemIndex) => {
           if (item.type === 'user_message') {
+            // $FlowFixMe[prop-missing]
             const { messageIndex, message } = item;
 
             const currentVersionOpened = fileMetadata
               ? fileMetadata.version
               : null;
+            // $FlowFixMe[incompatible-use]
             const hasVersionToRestore = !!message.projectVersionIdBeforeMessage;
 
             const previousMessage =
+              // $FlowFixMe[invalid-compare]
+              // $FlowFixMe[unsafe-arithmetic]
               messageIndex > 0 ? aiRequest.output[messageIndex - 1] : null;
             const previousMessageHasSameVersionId =
               previousMessage &&
@@ -565,13 +576,16 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
               ((previousMessage.type === 'message' &&
                 previousMessage.role === 'user' &&
                 previousMessage.projectVersionIdBeforeMessage ===
+                  // $FlowFixMe[incompatible-use]
                   message.projectVersionIdBeforeMessage) ||
                 (previousMessage.type === 'function_call_output' &&
                   previousMessage.projectVersionIdAfterMessage ===
+                    // $FlowFixMe[incompatible-use]
                     message.projectVersionIdBeforeMessage) ||
                 (previousMessage.type === 'message' &&
                   previousMessage.role === 'assistant' &&
                   previousMessage.projectVersionIdAfterMessage ===
+                    // $FlowFixMe[incompatible-use]
                     message.projectVersionIdBeforeMessage));
 
             const shouldShowRestore =
@@ -584,6 +598,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
               disabled ||
               (!currentVersionOpened ||
                 // Disable if the version before the message is the current opened version and there is no unsaved changes.
+                // $FlowFixMe[incompatible-use]
                 (message.projectVersionIdBeforeMessage ===
                   currentVersionOpened &&
                   !hasUnsavedChanges));
@@ -597,6 +612,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
                       ? {
                           onRestore: () => {
                             onRestoreVersion({
+                              // $FlowFixMe[incompatible-type]
                               message,
                               aiRequest,
                             });
@@ -607,6 +623,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
                   }
                 >
                   <ChatMarkdownText
+                    // $FlowFixMe[incompatible-use]
                     source={message.content
                       .map(messageContent => messageContent.text)
                       .join('\n')}
@@ -649,18 +666,28 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
 
           if (item.type === 'message_content') {
             const {
+              // $FlowFixMe[prop-missing]
               messageIndex,
+              // $FlowFixMe[prop-missing]
               messageContentIndex,
+              // $FlowFixMe[prop-missing]
               messageContent,
+              // $FlowFixMe[prop-missing]
               isLastMessage,
+              // $FlowFixMe[prop-missing]
               functionCallItems,
             } = item;
+            // $FlowFixMe[incompatible-type]
             const key = `messageIndex${messageIndex}-${messageContentIndex}`;
 
+            // $FlowFixMe[incompatible-use]
             if (messageContent.type === 'output_text') {
+              // $FlowFixMe[incompatible-type]
               const feedbackKey = `${messageIndex}-${messageContentIndex}`;
+              // $FlowFixMe[invalid-computed-prop]
               const currentFeedback = messageFeedbacks[feedbackKey];
 
+              // $FlowFixMe[incompatible-use]
               const trimmedText = messageContent.text.trim();
               if (!trimmedText) {
                 return null;
@@ -672,6 +699,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
                     role="assistant"
                     feedbackButtons={
                       <div className={classes.feedbackButtonsContainer}>
+                        // $FlowFixMe[constant-condition]
                         {isLastMessage && shouldDisplayFeedbackBanner && (
                           <Text size="body-small" color="secondary" noMargin>
                             <Trans>Did it work?</Trans>
@@ -687,6 +715,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
                             tooltip={t`Copy`}
                             onClick={() => {
                               navigator.clipboard.writeText(
+                                // $FlowFixMe[incompatible-use]
                                 messageContent.text
                               );
                             }}
@@ -697,12 +726,14 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
                             size="small"
                             tooltip={t`This was helpful`}
                             onClick={() => {
+                              // $FlowFixMe[incompatible-type]
                               setMessageFeedbacks({
                                 ...messageFeedbacks,
                                 [feedbackKey]: 'like',
                               });
                               onSendFeedback(
                                 aiRequest.id,
+                                // $FlowFixMe[incompatible-type]
                                 messageIndex,
                                 'like'
                               );
@@ -721,10 +752,12 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
                             size="small"
                             tooltip={t`This needs improvement`}
                             onClick={() => {
+                              // $FlowFixMe[incompatible-type]
                               setMessageFeedbacks({
                                 ...messageFeedbacks,
                                 [feedbackKey]: 'dislike',
                               });
+                              // $FlowFixMe[incompatible-type]
                               setDislikeFeedbackDialogOpenedFor({
                                 aiRequestId: aiRequest.id,
                                 messageIndex,
@@ -745,9 +778,11 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
                     }
                   >
                     <Column noMargin>
+                      // $FlowFixMe[constant-condition]
                       {functionCallItems && functionCallItems.length > 0 && (
                         <FunctionCallsGroup>
                           {functionCallItems.map(
+                            // $FlowFixMe[missing-local-annot]
                             ({
                               key: functionCallKey,
                               messageContent: functionCallMessageContent,
@@ -782,6 +817,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
               return [
                 <Line key={key} justifyContent="flex-start">
                   <ChatBubble role="assistant">
+                    // $FlowFixMe[incompatible-use]
                     <ChatMarkdownText source={messageContent.summary.text} />
                   </ChatBubble>
                 </Line>,
@@ -792,15 +828,18 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
           }
 
           if (item.type === 'save') {
+            // $FlowFixMe[prop-missing]
             const { messageIndex, message, isRestored, isSaving } = item;
             const isForking =
               forkingState &&
               forkingState.aiRequestId === aiRequest.id &&
+              // $FlowFixMe[incompatible-use]
               forkingState.messageId === message.messageId;
             const currentVersionOpened = fileMetadata
               ? fileMetadata.version
               : null;
             const messageVersionIdToRestore =
+              // $FlowFixMe[incompatible-use]
               message.projectVersionIdAfterMessage;
             const hasVersionToRestore =
               (!!messageVersionIdToRestore &&
@@ -809,6 +848,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
               hasUnsavedChanges;
 
             return [
+              // $FlowFixMe[incompatible-type]
               <Line key={`save-${messageIndex}`} justifyContent="flex-start">
                 <ColumnStackLayout noMargin>
                   {isForking ? (
@@ -818,6 +858,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
                         <Trans>Restoring...</Trans>
                       </Text>
                     </LineStackLayout>
+                  // $FlowFixMe[constant-condition]
                   ) : isSaving ? (
                     <LineStackLayout noMargin alignItems="center">
                       <Floppy fontSize="small" />
@@ -839,6 +880,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
                             <Link
                               onClick={() => {
                                 onRestoreVersion({
+                                  // $FlowFixMe[incompatible-type]
                                   message,
                                   aiRequest,
                                 });
@@ -854,6 +896,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
                       </Text>
                     </LineStackLayout>
                   )}
+                  // $FlowFixMe[constant-condition]
                   {isRestored && !isForking && forkedFromAiRequestId && (
                     <LineStackLayout
                       noMargin
@@ -886,9 +929,13 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
 
           if (item.type === 'suggestions') {
             const {
+              // $FlowFixMe[prop-missing]
               messageIndex,
+              // $FlowFixMe[prop-missing]
               message,
+              // $FlowFixMe[prop-missing]
               onlyShowExplanationMessage,
+              // $FlowFixMe[prop-missing]
               functionCallItems,
             } = item;
             return [
@@ -896,7 +943,9 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
                 aiRequest,
                 onUserRequestTextChange,
                 disabled,
+                // $FlowFixMe[incompatible-type]
                 message,
+                // $FlowFixMe[incompatible-type]
                 messageIndex,
                 onlyShowExplanationMessage,
                 functionCallItems,
@@ -907,6 +956,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
             ];
           }
 
+          // $FlowFixMe[missing-empty-array-annot]
           return [];
         })
         .filter(Boolean)}
@@ -938,6 +988,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
       ) : shouldBeWorkingIfNotPaused ? (
         <Line justifyContent="flex-start">
           <div className={classes.thinkingText}>
+            // $FlowFixMe[constant-condition]
             {onPause && aiRequest.mode === 'agent' && (
               <IconButton
                 onClick={() => onPause(!isPaused)}
@@ -1109,6 +1160,7 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
         </Line>
       )}
 
+      // $FlowFixMe[constant-condition]
       {dislikeFeedbackDialogOpenedFor && (
         <DislikeFeedbackDialog
           mode={aiRequest.mode || 'chat'}

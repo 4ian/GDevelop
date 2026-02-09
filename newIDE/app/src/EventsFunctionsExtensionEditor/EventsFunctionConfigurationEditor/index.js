@@ -74,6 +74,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
   Props,
   State
 > {
+  // $FlowFixMe[missing-local-annot]
   state = {
     currentTab: 'config',
   };

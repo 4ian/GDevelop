@@ -61,7 +61,10 @@ export const GdGamesFrame = ({loadErrorMessage, path, onMessageReceived, support
             loadState.current = 'loaded';
             forceUpdate();
           } else {
-            // $FlowFixMe - Trust gd.games to send the right data shapes.
+            // $FlowFixMe[incompatible-type]
+            // $FlowFixMe[incompatible-type] - Trust gd.games to send the right data shapes.
+            // $FlowFixMe[incompatible-type]
+            // $FlowFixMe[incompatible-indexer]
             onMessageReceived(event.data);
           }
         }

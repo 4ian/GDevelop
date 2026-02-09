@@ -41,6 +41,7 @@ export const CompactToggleField = (props: Props): React.MixedElement => {
   const label = (
     <Text
       noMargin
+      // $FlowFixMe[incompatible-type]
       style={styles.label}
       color={props.labelColor === 'primary' ? 'primary' : 'secondary'}
     >

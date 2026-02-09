@@ -13,7 +13,9 @@ import {
 import { EXAMPLES_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 
 const defaultSearchText = '';
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const excludedTiers = new Set(); // No tiers for examples.
+// $FlowFixMe[missing-empty-array-annot]
 const firstExampleIds = [];
 
 type ExampleStoreState = {|
@@ -95,6 +97,7 @@ export const ExampleStoreStateProvider = ({children}: ExampleStoreStateProviderP
 
           const exampleShortHeadersById = {};
           fetchedExampleShortHeaders.forEach(exampleShortHeader => {
+            // $FlowFixMe[prop-missing]
             exampleShortHeadersById[exampleShortHeader.id] = exampleShortHeader;
           });
           setExampleShortHeadersById(exampleShortHeadersById);
@@ -135,6 +138,7 @@ export const ExampleStoreStateProvider = ({children}: ExampleStoreStateProviderP
     chosenCategory,
     chosenFilters,
     excludedTiers,
+    // $FlowFixMe[incompatible-type]
     defaultFirstSearchItemIds: firstExampleIds,
     shuffleResults: false,
   });
@@ -162,6 +166,7 @@ export const ExampleStoreStateProvider = ({children}: ExampleStoreStateProviderP
   );
 
   return (
+    // $FlowFixMe[incompatible-type]
     <ExampleStoreContext.Provider value={exampleStoreState}>
       {children}
     </ExampleStoreContext.Provider>

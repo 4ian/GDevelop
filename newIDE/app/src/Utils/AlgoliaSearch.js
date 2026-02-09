@@ -22,7 +22,9 @@ export const searchClient = {
         results: [{ hits: [] }],
       });
     }
-    // $FlowFixMe - The declaration is not clear.
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type] - The declaration is not clear.
+    // $FlowFixMe[prop-missing]
     return algoliaClient.search(requests);
   },
 };
@@ -50,6 +52,7 @@ export const getHierarchyAsArray = (
   hierarchy: AlgoliaSearchHitHierarchy
 ): Array<string> =>
   Object.entries(hierarchy)
+    // $FlowFixMe[missing-local-annot]
     .reduce((acc, [level, content]) => {
       if (content) {
         acc.push([Number(level.replace('lvl', '')), content]);

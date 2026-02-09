@@ -264,6 +264,7 @@ const EventContainer = (props: EventsContainerProps) => {
   );
 };
 
+// $FlowFixMe[missing-local-annot]
 const SortableTree = ({ className, ...otherProps }) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
@@ -378,6 +379,7 @@ export type EventsTreeInterface = {|
 
 export type { SortableTreeNode };
 
+// $FlowFixMe[missing-local-annot]
 const getNodeKey = ({ treeIndex }) => treeIndex;
 
 /**
@@ -510,6 +512,7 @@ const EventsTree: component(
         // an event was actually dropped. It is also already called in `_onDrop` to update
         // the event list and compute history. So if draggedNode is null, we want to avoid
         // recomputing the event list.
+        // $FlowFixMe[constant-condition]
         if (draggedNode) {
           setDraggedNode(null);
           _restoreFoldedNodes();
@@ -539,7 +542,8 @@ const EventsTree: component(
           if (!_hoverTimerId.current && !node.expanded) {
             if (!isNodeTemporaryUnfolded) {
               _hoverTimerId.current = window.setTimeout(() => {
-                // $FlowFixMe - Per the condition above, we are confident that node.event is not null.
+                // $FlowFixMe[incompatible-type]
+                // $FlowFixMe[incompatible-type] - Per the condition above, we are confident that node.event is not null.
                 event.setFolded(false);
                 temporaryUnfoldedNodes.current.push(node);
                 forceEventsUpdate();
@@ -599,9 +603,11 @@ const EventsTree: component(
     const { onEventMoved } = props;
     const _onDrop = React.useCallback(
       (
+        // $FlowFixMe[value-as-type]
         moveFunction: MoveFunctionArguments => void,
         currentNode: SortableTreeNode
       ) => {
+        // $FlowFixMe[constant-condition]
         if (!draggedNode) return;
 
         moveFunction({
@@ -625,11 +631,14 @@ const EventsTree: component(
       if (!event) return null;
 
       const isDragged =
+        // $FlowFixMe[constant-condition]
         !!draggedNode &&
+        // $FlowFixMe[invalid-compare]
         (isDescendant(draggedNode, node) || node.key === draggedNode.key);
       return (
         <DragSourceAndDropTarget
           beginDrag={() => {
+            // $FlowFixMe[incompatible-type]
             setDraggedNode(node);
             return node;
           }}
@@ -766,6 +775,7 @@ const EventsTree: component(
                     props.highlightedAiGeneratedEventIds
                   }
                 />
+                // $FlowFixMe[constant-condition]
                 {draggedNode && (
                   <DropContainer
                     node={node}
@@ -844,8 +854,10 @@ const EventsTree: component(
           }
         }
 
+        // $FlowFixMe[missing-empty-array-annot]
         const childrenTreeData = [];
         buildEventsTreeData(
+          // $FlowFixMe[incompatible-type]
           childrenTreeData,
           projectScopedContainersAccessor,
           event.getSubEvents(),
@@ -877,6 +889,7 @@ const EventsTree: component(
       });
 
       // Add the bottom buttons if we're at the root
+      // $FlowFixMe[incompatible-type]
       const extraNodes: Array<SortableTreeNode> = [
         depth === 0
           ? {
@@ -1005,6 +1018,7 @@ const EventsTree: component(
         .filter(Boolean);
     };
 
+    // $FlowFixMe[incompatible-type]
     React.useImperativeHandle(ref, () => ({
       forceEventsUpdate,
       foldAll,
@@ -1040,6 +1054,7 @@ const EventsTree: component(
         if (!event) return false;
 
         return searchResults.some(highlightedEvent =>
+          // $FlowFixMe[incompatible-exact]
           gd.compare(highlightedEvent, event)
         );
       },
@@ -1094,12 +1109,14 @@ const EventsTree: component(
             <AutoScroll
               DnDComponent={DropTarget}
               direction="top"
+              // $FlowFixMe[constant-condition]
               activateTargets={!!draggedNode && !isScrolledTop}
               onHover={_scrollUp}
             />
             <AutoScroll
               DnDComponent={DropTarget}
               direction="bottom"
+              // $FlowFixMe[constant-condition]
               activateTargets={!!draggedNode && !isScrolledBottom}
               onHover={_scrollDown}
             />

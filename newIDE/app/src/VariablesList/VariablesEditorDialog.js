@@ -111,6 +111,8 @@ const VariablesEditorDialog = (
     shouldCreateVariable.current = false;
     const tabIndex = Math.max(
       0,
+      // $FlowFixMe[incompatible-exact]
+      // $FlowFixMe[missing-local-annot]
       tabs.indexOf(({ id }) => id === initiallyOpenTabId)
     );
     const { variablesContainer, inheritedVariablesContainer } = tabs[tabIndex];

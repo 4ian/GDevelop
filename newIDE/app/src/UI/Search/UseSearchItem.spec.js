@@ -28,6 +28,7 @@ describe('UseSearchItem', () => {
 
 describe('partialQuickSort', () => {
   test('Sort an empty search result', () => {
+    // $FlowFixMe[missing-empty-array-annot]
     const elements = [];
     partialQuickSort(elements, a => a, 1, 0);
     expect(elements).toStrictEqual([]);
@@ -39,13 +40,17 @@ describe('partialQuickSort', () => {
   });
   [0.4, 0.6, 1].forEach(pertinence => {
     test(`Sort search results with same pertinence: ${pertinence}`, () => {
+      // $FlowFixMe[missing-empty-array-annot]
       const elements = [];
       elements.length = 8;
+      // $FlowFixMe[incompatible-type]
       elements.fill(pertinence);
       partialQuickSort(elements, a => a, pertinence, pertinence);
 
+      // $FlowFixMe[missing-empty-array-annot]
       const expectedElements = [];
       expectedElements.length = 8;
+      // $FlowFixMe[incompatible-type]
       expectedElements.fill(pertinence);
       expect(elements).toStrictEqual(expectedElements);
     });

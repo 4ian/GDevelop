@@ -206,6 +206,7 @@ const ResourcePropertiesEditor: component(
               : renderResourcesProperties()}
             {resources.length > 0 &&
               resources.some(
+                // $FlowFixMe[invalid-compare]
                 resource => resource.getKind() === 'javascript'
               ) && (
                 <AlertMessage kind="info">

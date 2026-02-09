@@ -41,6 +41,7 @@ const mockedEntries = Array(8)
   }))
   .sort((a, b) => a.score - b.score);
 const leaderboardsByIds = mockedLeaderboards.reduce((acc, leaderboard) => {
+  // $FlowFixMe[prop-missing]
   acc[leaderboard.id] = leaderboard;
   return acc;
 }, {});
@@ -49,15 +50,18 @@ const MockLeaderboardProvider = ({ children }: {| children: React.Node |}) => {
   const [
     currentLeaderboard,
     setCurrentLeaderboard,
+  // $FlowFixMe[incompatible-type]
   ] = React.useState<Leaderboard>(mockedLeaderboards[3]);
   return (
     <LeaderboardContext.Provider
       value={{
+        // $FlowFixMe[incompatible-type]
         leaderboards: mockedLeaderboards,
         currentLeaderboard,
         displayOnlyBestEntry:
           currentLeaderboard.playerUnicityDisplayChoice === 'PREFER_UNIQUE',
         browsing: {
+          // $FlowFixMe[incompatible-type]
           entries: mockedEntries,
           goToNextPage: null,
           goToPreviousPage: null,
@@ -67,6 +71,7 @@ const MockLeaderboardProvider = ({ children }: {| children: React.Node |}) => {
         createLeaderboard: () => action('createLeaderboard'),
         listLeaderboards: action('listLeaderboards'),
         selectLeaderboard: leaderboardId => {
+          // $FlowFixMe[invalid-computed-prop]
           setCurrentLeaderboard(leaderboardsByIds[leaderboardId]);
         },
         updateLeaderboard: () => action('updateLeaderboard'),

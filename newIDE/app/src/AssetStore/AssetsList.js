@@ -330,6 +330,7 @@ const AssetsList: component(
     const { openedAssetPack, selectedFolders } = React.useMemo(
       () => {
         if (!currentPage) {
+          // $FlowFixMe[missing-empty-array-annot]
           return { openedAssetPack: null, selectedFolders: [] };
         }
         return {
@@ -450,6 +451,7 @@ const AssetsList: component(
     const folderTiles = React.useMemo(
       () => {
         // Don't show folders if we are searching.
+        // $FlowFixMe[missing-empty-array-annot]
         if (!folderTags.length || !onFolderSelection) return [];
         return folderTags.map(folderTag => (
           <AssetFolderTile
@@ -489,6 +491,7 @@ const AssetsList: component(
         // Loading
         if (!assetShortHeaders) return null;
         // Don't show assets if filtering on asset packs.)
+        // $FlowFixMe[missing-empty-array-annot]
         if (hasAssetPackFiltersApplied && !openedAssetPack) return [];
         const assetSize = getAssetSize(windowSize);
 

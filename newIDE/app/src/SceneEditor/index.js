@@ -994,7 +994,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.instancesSelection.clearSelection();
     this.setState(
       {
-        history: undo(this.state.history, this.props.initialInstances),
+        history: undo(
+          this.state.history,
+          this.props.initialInstances,
+          this.props.project
+        ),
       },
       () => {
         // /!\ Force the instances editor to destroy and mount again the
@@ -1013,7 +1017,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.instancesSelection.clearSelection();
     this.setState(
       {
-        history: redo(this.state.history, this.props.initialInstances),
+        history: redo(
+          this.state.history,
+          this.props.initialInstances,
+          this.props.project
+        ),
       },
       () => {
         // /!\ Force the instances editor to destroy and mount again the

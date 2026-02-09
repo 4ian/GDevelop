@@ -11,7 +11,7 @@ import os
 import re
 from collections import defaultdict
 
-APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+APP_DIR = os.environ.get('APP_DIR', os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def get_flow_errors():

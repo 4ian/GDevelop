@@ -208,7 +208,7 @@ type Props = {|
   isPaused?: boolean,
   isForAnotherProject?: boolean,
   shouldDisplayFeedbackBanner?: boolean,
-  onPause: (pause: boolean) => void,
+  onPause?: (pause: boolean) => void,
   onScrollToBottom: () => void,
   hasStartedRequestButCannotContinue: boolean,
   onSwitchedToGDevelopCredits: () => void,
@@ -938,7 +938,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(functi
       ) : shouldBeWorkingIfNotPaused ? (
         <Line justifyContent="flex-start">
           <div className={classes.thinkingText}>
-            // $FlowFixMe[constant-condition]
+            {/* $FlowFixMe[constant-condition] */}
             {onPause && aiRequest.mode === 'agent' && (
               <IconButton
                 onClick={() => onPause(!isPaused)}

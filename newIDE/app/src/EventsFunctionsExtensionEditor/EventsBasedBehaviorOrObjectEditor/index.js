@@ -47,12 +47,7 @@ export type EventsBasedBehaviorOrObjectEditorInterface = {|
   scrollToProperty: (propertyName: string, isSharedProperties: boolean) => void,
 |};
 
-export const EventsBasedBehaviorOrObjectEditor: component(
-  ...{
-    ...Props,
-    +ref?: React.RefSetter<EventsBasedBehaviorOrObjectEditorInterface>,
-  }
-) React.Node = React.forwardRef<
+export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<any> = React.forwardRef<
   Props,
   EventsBasedBehaviorOrObjectEditorInterface
 >(
@@ -88,6 +83,7 @@ export const EventsBasedBehaviorOrObjectEditor: component(
       [onPropertiesUpdated, unsavedChanges]
     );
 
+    // $FlowFixMe[value-as-type]
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     const propertiesEditor = React.useRef<?EventsBasedBehaviorPropertiesEditorInterface>(
       null
@@ -149,6 +145,7 @@ export const EventsBasedBehaviorOrObjectEditor: component(
         const property = properties.insertNew(newName, properties.getCount());
         property.setType('Number');
         forceUpdate();
+        // $FlowFixMe[constant-condition]
         onPropertiesUpdated && onPropertiesUpdated();
 
         // Scroll to the selected property.

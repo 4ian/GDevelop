@@ -3,6 +3,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
+// $FlowFixMe[import-type-as-value]
 import { TreeViewItemContent } from '.';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import ColorPicker from '../UI/ColorField/ColorPicker';

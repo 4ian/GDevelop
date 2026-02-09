@@ -457,7 +457,9 @@ const EditProfileDialog = (
       {({ i18n }) => (
         <Dialog
           title={<Trans>Edit your GDevelop profile</Trans>}
+          // $FlowFixMe[incompatible-type]
           actions={actions}
+          // $FlowFixMe[incompatible-type]
           secondaryActions={secondaryActions}
           maxWidth="sm"
           cannotBeDismissed={actionInProgress}

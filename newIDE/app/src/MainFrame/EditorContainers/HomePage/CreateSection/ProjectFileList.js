@@ -170,7 +170,7 @@ const ProjectFileList = ({
     ];
     if (file.storageProviderName === 'Cloud') {
       actions.push(
-        // $FlowFixMe[incompatible-type]
+        {/* $FlowFixMe[incompatible-type] */}
         { type: 'separator' },
         {
           label: i18n._(t`Delete`),
@@ -185,7 +185,7 @@ const ProjectFileList = ({
             // $FlowFixMe[incompatible-type]
             click: () => locateProjectFile(file),
           },
-          // $FlowFixMe[incompatible-type]
+          {/* $FlowFixMe[incompatible-type] */}
           { type: 'separator' },
           {
             label: i18n._(t`Remove from list`),
@@ -195,7 +195,7 @@ const ProjectFileList = ({
       );
     } else {
       actions.push(
-        // $FlowFixMe[incompatible-type]
+        {/* $FlowFixMe[incompatible-type] */}
         { type: 'separator' },
         {
           label: i18n._(t`Remove from list`),

@@ -134,11 +134,11 @@ const CollisionMasksPreview = (props: Props): React.MixedElement => {
     | null => {
     if (!svgRef.current) return null;
 
-    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
+    // $FlowFixMe[incompatible-type] Flow doesn't have SVG typings yet (@facebook/flow#4551)
     const pointOnScreen = svgRef.current.createSVGPoint();
     pointOnScreen.x = event.clientX;
     pointOnScreen.y = event.clientY;
-    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
+    // $FlowFixMe[incompatible-type] Flow doesn't have SVG typings yet (@facebook/flow#4551)
     // $FlowFixMe[incompatible-use]
     const screenToSvgMatrix = svgRef.current.getScreenCTM().inverse();
     const pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
@@ -313,7 +313,7 @@ const CollisionMasksPreview = (props: Props): React.MixedElement => {
   const renderPolygons = () => {
     return (
       <React.Fragment>
-        // $FlowFixMe[incompatible-exact]
+        {/* $FlowFixMe[incompatible-exact] */}
         {mapVector(polygons, (polygon, i) => {
           // $FlowFixMe[incompatible-use]
           const vertices = polygon.getVertices();

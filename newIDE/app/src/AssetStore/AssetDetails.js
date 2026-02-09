@@ -97,9 +97,7 @@ export type AssetDetailsInterface = {|
   scrollToPosition: (y: number) => void,
 |};
 
-export const AssetDetails: component(
-  ...{ ...Props, +ref?: React.RefSetter<AssetDetailsInterface> }
-) React.Node = React.forwardRef<Props, AssetDetailsInterface>(
+export const AssetDetails: React.ComponentType<any> = React.forwardRef<Props, AssetDetailsInterface>(
   (
     {
       onTagSelection,
@@ -133,6 +131,7 @@ export const AssetDetails: component(
     >([]);
     const { openUserPublicProfile } = React.useContext(PublicProfileContext);
 
+    // $FlowFixMe[value-as-type]
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
       /**
@@ -352,6 +351,7 @@ export const AssetDetails: component(
                           ({ name }) => name
                         )}
                         getImageResourceSource={(resourceName: string) => {
+                          // $FlowFixMe[invalid-computed-prop]
                           const resource = assetResources[resourceName];
                           return resource ? resource.file : '';
                         }}

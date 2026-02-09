@@ -71,6 +71,7 @@ export default class EventsContextAnalyzerDialog extends React.Component<
     return (
       <Dialog
         title={<Trans>Events analysis</Trans>}
+        // $FlowFixMe[incompatible-type]
         actions={actions}
         open
         onRequestClose={onClose}

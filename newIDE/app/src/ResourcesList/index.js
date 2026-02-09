@@ -77,9 +77,9 @@ type Props = {|
   getResourceActionsSpecificToStorageProvider?: ?ResourcesActionsMenuBuilder,
 |};
 
-// $FlowFixMe[incompatible-type][invalid-render]
+// $FlowFixMe[invalid-render]
 const ResourcesList: component(...Props) renders ResourcesListInterface = React.memo<Props, ResourcesListInterface>(
-  // $FlowFixMe[incompatible-exact][incompatible-type]
+  // $FlowFixMe[incompatible-type]
   React.forwardRef<Props, ResourcesListInterface>(
     (
       {
@@ -333,7 +333,7 @@ const ResourcesList: component(...Props) renders ResourcesListInterface = React.
               )}
             </AutoSizer>
           </div>
-          // $FlowFixMe[constant-condition]
+          {/* $FlowFixMe[constant-condition] */}
           {!!infoBarContent && (
             <InfoBar
               duration={7000}

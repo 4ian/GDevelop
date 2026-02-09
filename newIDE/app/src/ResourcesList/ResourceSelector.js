@@ -66,9 +66,7 @@ type Props = {|
 
 export type ResourceSelectorInterface = {| focus: FieldFocusFunction |};
 
-const ResourceSelector: component(
-  ...{ ...Props, +ref?: React.RefSetter<ResourceSelectorInterface> }
-) React.Node = React.forwardRef<Props, ResourceSelectorInterface>(
+const ResourceSelector: React.ComponentType<any> = React.forwardRef<Props, ResourceSelectorInterface>(
   (props, ref) => {
     const {
       project,
@@ -83,6 +81,7 @@ const ResourceSelector: component(
       disabled,
     } = props;
     const forceUpdate = useForceUpdate();
+    // $FlowFixMe[value-as-type]
     const autoCompleteRef = React.useRef<?SemiControlledAutoCompleteInterface>(
       null
     );
@@ -95,6 +94,7 @@ const ResourceSelector: component(
       setAutoCompleteInputValue,
     ] = React.useState<string>(props.initialResourceName);
     const { showConfirmation } = useAlertDialog();
+    // $FlowFixMe[cannot-resolve-name]
     const abortControllerRef = React.useRef<?AbortController>(null);
     const allResourcesNamesRef = React.useRef<Array<string>>([]);
     const [notFoundError, setNotFoundError] = React.useState<boolean>(false);
@@ -142,6 +142,7 @@ const ResourceSelector: component(
         if (value === resourceName) {
           return;
         }
+        // $FlowFixMe[constant-condition]
         if (onChange) {
           onChange(value);
         }
@@ -209,12 +210,15 @@ const ResourceSelector: component(
           );
 
           mapVector(
+            // $FlowFixMe[incompatible-exact]
             resourcesContainer.getAllResourceNames(),
             (resourceName, index) => {
               if (
+                // $FlowFixMe[incompatible-type]
                 resourcesContainer.getResource(resourceName).getKind() ===
                 resourceKind
               ) {
+                // $FlowFixMe[incompatible-type]
                 allResourcesNames.add(resourceName);
               }
             }
@@ -222,12 +226,15 @@ const ResourceSelector: component(
 
           if (fallbackResourceKind) {
             mapVector(
+              // $FlowFixMe[incompatible-exact]
               resourcesContainer.getAllResourceNames(),
               (resourceName, index) => {
                 if (
+                  // $FlowFixMe[incompatible-type]
                   resourcesContainer.getResource(resourceName).getKind() ===
                   fallbackResourceKind
                 ) {
+                  // $FlowFixMe[incompatible-type]
                   allResourcesNames.add(resourceName);
                 }
               }
@@ -330,6 +337,7 @@ const ResourceSelector: component(
     );
 
     const getResourceSourceItems = React.useCallback(
+      // $FlowFixMe[value-as-type]
       (): DataSource => {
         return [
           ...resourceSources.map(source => ({
@@ -352,6 +360,7 @@ const ResourceSelector: component(
         i18n: I18nType,
         resourceExternalEditor: ResourceExternalEditor
       ) => {
+        // $FlowFixMe[cannot-resolve-name]
         abortControllerRef.current = new AbortController();
         const { signal } = abortControllerRef.current;
         const resourcesManager = project.getResourcesManager();
@@ -454,6 +463,7 @@ const ResourceSelector: component(
       text: resourceName,
       value: resourceName,
     }));
+    // $FlowFixMe[value-as-type]
     const placeholderSearchItem: AutoCompleteOption = {
       text: '',
       value: '',

@@ -11,8 +11,10 @@ import { makeStyles } from '@material-ui/core';
 import ChevronArrowBottom from './CustomSvgIcons/ChevronArrowBottom';
 
 const INVALID_VALUE = '';
+// $FlowFixMe[missing-local-annot]
 const stopPropagation = event => event.stopPropagation();
 
+// $FlowFixMe[missing-local-annot]
 const useSelectStyles = textAlign =>
   makeStyles({
     root: {
@@ -43,6 +45,7 @@ type Props = {|
   children: React.Node,
   disabled?: boolean,
   stopPropagationOnClick?: boolean,
+  // $FlowFixMe[cannot-resolve-name]
   onFocus?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
 
   id?: ?string,
@@ -68,10 +71,9 @@ type Props = {|
  * A select field based on Material-UI select field.
  * To be used with `SelectOption`.
  */
-const SelectField: component(
-  ...{ ...Props, +ref?: React.RefSetter<SelectFieldInterface> }
-) React.Node = React.forwardRef<Props, SelectFieldInterface>(
+const SelectField: React.ComponentType<any> = React.forwardRef<Props, SelectFieldInterface>(
   (props, ref) => {
+    // $FlowFixMe[cannot-resolve-name]
     const inputRef = React.useRef<?HTMLInputElement>(null);
 
     const focus: FieldFocusFunction = options => {
@@ -88,8 +90,10 @@ const SelectField: component(
     // Dig into children props to see if the current value is valid or not.
     let hasValidValue = true;
     const childrenValues = React.Children.map(props.children, child => {
+      // $FlowFixMe[incompatible-type][prop-missing]
       if (child === null || !child.props) return null;
 
+      // $FlowFixMe[incompatible-use]
       return child.props.value;
     });
     if (!childrenValues) {
@@ -116,6 +120,7 @@ const SelectField: component(
             id={props.id}
             select
             color="secondary"
+            {/* $FlowFixMe[incompatible-type] */}
             {...computeTextFieldStyleProps(props)}
             disabled={props.disabled}
             fullWidth={props.fullWidth}

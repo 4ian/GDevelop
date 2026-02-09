@@ -28,7 +28,7 @@ const getOrCreateBackgroundSerializerWorker = (): Worker => {
     return serializerWorker;
   }
 
-  // $FlowExpectedError - worker-loader types aren't recognized by Flow
+  // $FlowFixMe[incompatible-type] - worker-loader types aren't recognized by Flow
   // $FlowFixMe[invalid-constructor]
   serializerWorker = new BackgroundSerializerWorker();
 

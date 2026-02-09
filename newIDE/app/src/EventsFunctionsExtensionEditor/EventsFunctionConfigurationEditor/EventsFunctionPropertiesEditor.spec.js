@@ -2,8 +2,8 @@
 import { getSentenceErrorText } from './EventsFunctionPropertiesEditor';
 const gd: libGDevelop = global.gd;
 
-// $FlowExpectedError
-// $FlowFixMe[cannot-resolve-name][missing-local-annot]
+// $FlowFixMe[incompatible-type]
+// $FlowFixMe[missing-local-annot]
 const makeFakeI18n = (fakeI18n): I18nType => ({
   ...fakeI18n,
   _: message => message.id,

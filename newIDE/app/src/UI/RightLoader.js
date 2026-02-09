@@ -17,7 +17,7 @@ const RightLoader = (
 ): React.MixedElement => (
   <span>
     {children}
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     {isLoading && <CircularProgress size={20} style={styles.progress} />}
   </span>
 );

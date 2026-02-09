@@ -90,16 +90,12 @@ export type InstanceOrObjectPropertiesEditorInterface = {|
   getEditorTitle: () => React.Node,
 |};
 
-export const InstanceOrObjectPropertiesEditorContainer: component(
-  ...{
-    ...Props,
-    +ref?: React.RefSetter<InstanceOrObjectPropertiesEditorInterface>,
-  }
-) React.Node = React.forwardRef<
+export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<any> = React.forwardRef<
   Props,
   InstanceOrObjectPropertiesEditorInterface
 >((props, ref) => {
   const forceUpdate = useForceUpdate();
+  // $FlowFixMe[incompatible-type]
   React.useImperativeHandle(ref, () => ({
     forceUpdate,
     getEditorTitle: () =>

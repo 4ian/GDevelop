@@ -22,7 +22,7 @@ export const searchClient = {
         results: [{ hits: [] }],
       });
     }
-    // $FlowFixMe[incompatible-type][prop-missing] - The declaration is not clear.
+    // $FlowFixMe[prop-missing] - The declaration is not clear.
     return algoliaClient.search(requests);
   },
 };

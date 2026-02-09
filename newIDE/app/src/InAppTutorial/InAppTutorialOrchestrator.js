@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+// $FlowFixMe[import-type-as-value]
 import { I18n as I18nType } from '@lingui/core';
 import { useDebounce } from '../Utils/UseDebounce';
 import { useInterval } from '../Utils/UseInterval';
@@ -136,6 +137,7 @@ const interpolateExpectedEditor = (
         data
       );
     }
+    // $FlowFixMe[incompatible-type]
     scene = sceneName;
   }
   return {
@@ -303,6 +305,7 @@ const isDomBasedTriggerComplete = ({
   if (!trigger) return false;
   if (
     trigger.presenceOfElement &&
+    // $FlowFixMe[cannot-resolve-name]
     document.querySelector(
       interpolateElementId({
         elementId: trigger.presenceOfElement,
@@ -314,6 +317,7 @@ const isDomBasedTriggerComplete = ({
     return true;
   } else if (
     trigger.absenceOfElement &&
+    // $FlowFixMe[cannot-resolve-name]
     !document.querySelector(
       interpolateElementId({
         elementId: trigger.absenceOfElement,
@@ -325,6 +329,7 @@ const isDomBasedTriggerComplete = ({
     return true;
   } else if (
     trigger.editorIsActive &&
+    // $FlowFixMe[cannot-resolve-name]
     document.querySelector(
       interpolateEditorTabActiveTrigger({
         trigger: trigger.editorIsActive,
@@ -337,6 +342,7 @@ const isDomBasedTriggerComplete = ({
   return false;
 };
 
+// $FlowFixMe[cannot-resolve-name]
 const getInputValue = (element: HTMLElement): any => {
   if (isMuiCheckbox(element)) {
     return getMuiCheckboxValue(element);
@@ -414,6 +420,7 @@ const useGiveTrivialBadgeWhenTutorialIsFinished = ({
   displayEndDialog,
   tutorial,
 }: {
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   displayEndDialog: boolean,
   tutorial: InAppTutorial,
@@ -485,9 +492,7 @@ export type InAppTutorialOrchestratorInterface = {|
   getPreviewMessage: () => {| message: string, position: string |} | null,
 |};
 
-const InAppTutorialOrchestrator: component(
-  ...{ ...Props, +ref?: React.RefSetter<InAppTutorialOrchestratorInterface> }
-) React.Node = React.forwardRef<
+const InAppTutorialOrchestrator: React.ComponentType<any> = React.forwardRef<
   Props,
   InAppTutorialOrchestratorInterface
 >(
@@ -554,6 +559,7 @@ const InAppTutorialOrchestrator: component(
       sceneObjectCountToWatch,
       setSceneObjectCountToWatch,
     ] = React.useState<boolean>(false);
+    // $FlowFixMe[cannot-resolve-name]
     const domObserverRef = React.useRef<?MutationObserver>(null);
     const [
       shouldWatchProjectChanges,
@@ -597,10 +603,12 @@ const InAppTutorialOrchestrator: component(
             tutorial.editorSwitches.hasOwnProperty(tutorial.flow[index].id)
           ) {
             newExpectedEditor =
+              // $FlowFixMe[incompatible-type]
               tutorial.editorSwitches[tutorial.flow[index].id];
             break;
           }
         }
+        // $FlowFixMe[incompatible-type]
         setExpectedEditor(newExpectedEditor);
       },
       [tutorial, changeStep, startStepIndex]
@@ -864,8 +872,10 @@ const InAppTutorialOrchestrator: component(
     // Set up mutation observer to be able to detect any change in the dom.
     React.useEffect(
       () => {
+        // $FlowFixMe[cannot-resolve-name]
         const appContainer = document.querySelector('body'); // We could have only watch the React root node but Material UI created dialog out of this node.
         if (!appContainer) return;
+        // $FlowFixMe[cannot-resolve-name]
         const observer = new MutationObserver(handleDomMutation);
         observer.observe(appContainer, {
           childList: true,
@@ -933,6 +943,7 @@ const InAppTutorialOrchestrator: component(
         if (
           nextStepTrigger &&
           nextStepTrigger.valueEquals !== undefined &&
+          // $FlowFixMe[invalid-compare]
           nextStepTrigger.valueEquals !== null
         ) {
           if (!elementToHighlightId) return;
@@ -940,6 +951,7 @@ const InAppTutorialOrchestrator: component(
           setElementWithValueToWatchIfEquals(elementToHighlightId);
         } else if (nextStepTrigger && nextStepTrigger.valueHasChanged) {
           if (!elementToHighlightId) return;
+          // $FlowFixMe[cannot-resolve-name]
           const elementToWatch = document.querySelector(elementToHighlightId);
 
           if (elementToWatch) {
@@ -986,6 +998,7 @@ const InAppTutorialOrchestrator: component(
     const watchInputChanges = React.useCallback(
       () => {
         if (!elementWithValueToWatchIfChanged) return;
+        // $FlowFixMe[cannot-resolve-name]
         const elementToWatch = document.querySelector(
           elementWithValueToWatchIfChanged
         );
@@ -1004,6 +1017,7 @@ const InAppTutorialOrchestrator: component(
     const watchInputEquals = React.useCallback(
       () => {
         if (!elementWithValueToWatchIfEquals) return;
+        // $FlowFixMe[cannot-resolve-name]
         const elementToWatch = document.querySelector(
           elementWithValueToWatchIfEquals
         );

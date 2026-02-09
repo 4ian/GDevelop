@@ -368,7 +368,7 @@ const PlanSmallCard = (
                       <Text noMargin color="primary">
                         <Trans>Redeemed</Trans>
                       </Text>
-                      // $FlowFixMe[constant-condition]
+                      {/* $FlowFixMe[constant-condition] */}
                       {!!redemptionCodeExpirationDate && (
                         <Tooltip
                           title={

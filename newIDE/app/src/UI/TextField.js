@@ -62,9 +62,13 @@ type Props = {|
   }) => void,
 
   // Advanced DOM events, for exceptional usage:
+  // $FlowFixMe[cannot-resolve-name]
   onClick?: (event: SyntheticPointerEvent<HTMLInputElement>) => void,
+  // $FlowFixMe[cannot-resolve-name]
   onKeyPress?: (event: SyntheticKeyboardEvent<>) => void,
+  // $FlowFixMe[cannot-resolve-name]
   onKeyUp?: (event: SyntheticKeyboardEvent<>) => void,
+  // $FlowFixMe[cannot-resolve-name]
   onKeyDown?: (event: SyntheticKeyboardEvent<>) => void,
   stopContextMenuPropagation?: boolean,
 
@@ -180,6 +184,7 @@ export const computeTextFieldStyleProps = (
 export type TextFieldInterface = {|
   focus: FieldFocusFunction,
   blur: () => void,
+  // $FlowFixMe[cannot-resolve-name]
   getInputNode: () => ?HTMLInputElement,
   getFieldWidth: () => ?number,
   getCaretPosition: () => ?number,
@@ -188,10 +193,10 @@ export type TextFieldInterface = {|
 /**
  * A text field based on Material-UI text field.
  */
-const TextField: component(
-  ...{ ...Props, +ref?: React.RefSetter<TextFieldInterface> }
-) React.Node = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
+const TextField: React.ComponentType<any> = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
+  // $FlowFixMe[cannot-resolve-name]
   const inputRef = React.useRef<?HTMLInputElement>(null);
+  // $FlowFixMe[value-as-type]
   const muiTextFieldRef = React.useRef<?MUITextField>(null);
   const [isPasswordVisible, setIsPasswordVisible] = React.useState<boolean>(
     false
@@ -225,6 +230,7 @@ const TextField: component(
     }
   };
 
+  // $FlowFixMe[cannot-resolve-name]
   const getInputNode = (): ?HTMLInputElement => {
     if (inputRef.current) {
       return inputRef.current;
@@ -321,6 +327,7 @@ const TextField: component(
           rows={props.rows}
           rowsMax={props.rowsMax}
           // Styling:
+          {/* $FlowFixMe[incompatible-type] */}
           {...computeTextFieldStyleProps(props)}
           fullWidth={props.fullWidth}
           InputProps={{

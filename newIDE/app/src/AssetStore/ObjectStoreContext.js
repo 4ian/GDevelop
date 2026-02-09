@@ -573,7 +573,7 @@ export const ObjectStoreStateProvider = ({children, i18n, defaultSearchText}: Ob
   );
 
   return (
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     <ObjectStoreContext.Provider value={objectStoreState}>
       {children}
     </ObjectStoreContext.Provider>

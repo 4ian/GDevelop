@@ -18,7 +18,7 @@ const enumerateExpressionMetadataMap = (
   expressions: gdMapStringExpressionMetadata,
   scope: InstructionOrExpressionScope
 ): Array<EnumeratedExpressionMetadata> => {
-  // $FlowFixMe[incompatible-exact][incompatible-type]
+  // $FlowFixMe[incompatible-type]
   return mapVector(expressions.keys(), expressionType => {
     // $FlowFixMe[incompatible-type]
     const exprMetadata = expressions.get(expressionType);

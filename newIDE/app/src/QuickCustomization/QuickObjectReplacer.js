@@ -91,7 +91,7 @@ export const QuickObjectReplacer = (
           </ColumnStackLayout>
         );
       })}
-      // $FlowFixMe[constant-condition]
+      {/* $FlowFixMe[constant-condition] */}
       {selectedObjectToSwap && (
         <AssetSwappingDialog
           project={project}

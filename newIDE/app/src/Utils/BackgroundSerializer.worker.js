@@ -84,7 +84,7 @@ const unserializeBinarySnapshotToJson = (
 // eslint-disable-next-line no-restricted-globals
 // $FlowFixMe[cannot-resolve-name]
 self.onmessage = async (event /*: MessageEvent */) => {
-  // $FlowExpectedError
+  // $FlowFixMe[incompatible-type]
   const { type, binary, requestId, versionWithHash } = event.data || {};
 
   const startTime = Date.now();

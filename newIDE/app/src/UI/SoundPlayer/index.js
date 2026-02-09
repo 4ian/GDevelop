@@ -61,9 +61,7 @@ export type SoundPlayerInterface = {|
   playPause: (forcePlay: boolean) => void,
 |};
 
-const SoundPlayer: component(
-  ...{ ...Props, +ref?: React.RefSetter<SoundPlayerInterface> }
-) React.Node = React.forwardRef<Props, SoundPlayerInterface>(
+const SoundPlayer: React.ComponentType<any> = React.forwardRef<Props, SoundPlayerInterface>(
   (
     {
       soundSrc,
@@ -79,6 +77,7 @@ const SoundPlayer: component(
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const shouldPlayAfterLoading = React.useRef<boolean>(false);
     const { isMobile } = useResponsiveWindowSize();
+    // $FlowFixMe[cannot-resolve-name]
     const mobileAudioRef = React.useRef<?Audio>(null);
     const waveSurferRef = React.useRef<?any>(null);
     const [duration, setDuration] = React.useState<?number>(null);
@@ -86,6 +85,7 @@ const SoundPlayer: component(
     const [isPlaying, setIsPlaying] = React.useState(false);
 
     const onWaveSurferReady = React.useCallback(
+      // $FlowFixMe[missing-local-annot]
       ws => {
         waveSurferRef.current = ws;
         setDuration(Math.ceil(ws.getDuration()));
@@ -163,6 +163,7 @@ const SoundPlayer: component(
       setIsPlaying(false);
     }, []);
 
+    // $FlowFixMe[incompatible-type]
     React.useImperativeHandle(ref, () => ({
       playPause: onPlayPause,
     }));
@@ -188,6 +189,7 @@ const SoundPlayer: component(
             if (mobileAudioRef.current) {
               mobileAudioRef.current.pause();
             }
+            // $FlowFixMe[cannot-resolve-name]
             const audio = new Audio(soundSrc);
             audio.addEventListener('timeupdate', onTimeupdate);
             audio.addEventListener('ended', onFinishPlaying);

@@ -148,7 +148,7 @@ export const PropertyResourceSelector = (
     <ResourceSelector
       project={project}
       projectScopedContainersAccessor={projectScopedContainersAccessor}
-      // $FlowExpectedError
+      // $FlowFixMe[incompatible-type]
       resourceKind={extraInfos.size() > 0 ? extraInfos.at(0) : ''}
       floatingLabelText={label}
       resourceManagementProps={resourceManagementProps}

@@ -163,7 +163,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       'MIT'
     );
     const fakeBehavior = new gd.BehaviorJsImplementation();
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
     // $FlowFixMe[cannot-write]
     fakeBehavior.updateProperty = function(
       behaviorContent,
@@ -181,7 +181,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
     // $FlowFixMe[cannot-write]
     fakeBehavior.getProperties = function(behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
@@ -200,7 +200,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
 
       return behaviorProperties;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
     // $FlowFixMe[cannot-write]
     fakeBehavior.initializeContent = function(behaviorContent) {
       behaviorContent.setStringAttribute('property1', 'Initial value 1');
@@ -250,7 +250,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       'MIT'
     );
     const fakeBehavior = new gd.BehaviorJsImplementation();
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
     // $FlowFixMe[cannot-write]
     fakeBehavior.updateProperty = function(
       behaviorContent,
@@ -259,13 +259,13 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     ) {
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
     // $FlowFixMe[cannot-write]
     fakeBehavior.getProperties = function(behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
       return behaviorProperties;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+    // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
     // $FlowFixMe[cannot-write]
     fakeBehavior.initializeContent = function(behaviorContent) {};
 
@@ -297,13 +297,13 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     );
     const fakeObject = new gd.ObjectJsImplementation();
 
-    // $FlowExpectedError
+    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[cannot-write]
     fakeObject.updateProperty = function(propertyName, newValue) {
       return false;
     };
-    // $FlowExpectedError
-    // $FlowFixMe[cannot-write][missing-this-annot]
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[missing-this-annot]
     fakeObject.getProperties = function() {
       const objectProperties = new gd.MapStringPropertyDescriptor();
       const objectContent = this.content;
@@ -316,13 +316,13 @@ export const makeTestExtensions = (gd: libGDevelop) => {
 
       return objectProperties;
     };
-    // $FlowExpectedError
+    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[prop-missing]
     fakeObject.content = {
       text: 'Some text.',
     };
 
-    // $FlowExpectedError
+    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[cannot-write]
     fakeObject.updateInitialInstanceProperty = function(
       instance,
@@ -331,7 +331,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     ) {
       return false;
     };
-    // $FlowExpectedError
+    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[cannot-write]
     fakeObject.getInitialInstanceProperties = function(instance) {
       var instanceProperties = new gd.MapStringPropertyDescriptor();
@@ -375,13 +375,13 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       .addInstructionOrExpressionGroupMetadata('3D')
       .setIcon('res/conditions/3d_box.svg');
     const Cube3DObject = new gd.ObjectJsImplementation();
-    // $FlowExpectedError
+    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[cannot-write]
     Cube3DObject.getProperties = function(objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
       return objectProperties;
     };
-    // $FlowExpectedError
+    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[cannot-write]
     Cube3DObject.getInitialInstanceProperties = function(
       content,
@@ -422,17 +422,17 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       .setIcon('JsPlatform/Extensions/text_input.svg');
 
     const textInputObject = new gd.ObjectJsImplementation();
-    // $FlowExpectedError
+    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[cannot-write]
     textInputObject.getProperties = function() {
       const objectProperties = new gd.MapStringPropertyDescriptor();
       return objectProperties;
     };
-    // $FlowExpectedError
+    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[prop-missing]
     textInputObject.content = {};
 
-    // $FlowExpectedError
+    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[cannot-write]
     textInputObject.getInitialInstanceProperties = function(
       instance,
@@ -456,7 +456,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       return instanceProperties;
     };
 
-    // $FlowExpectedError
+    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[cannot-write]
     textInputObject.updateInitialInstanceProperty = function(
       instance,

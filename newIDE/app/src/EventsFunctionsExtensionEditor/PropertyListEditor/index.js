@@ -139,6 +139,7 @@ class LeafTreeViewItem implements TreeViewItem {
   }
 }
 
+// $FlowFixMe[incompatible-type]
 class PlaceHolderTreeViewItem implements TreeViewItem {
   isPlaceholder = true;
   content: TreeViewItemContent;
@@ -182,6 +183,7 @@ const createTreeViewItem = ({
   }
 };
 
+// $FlowFixMe[incompatible-type]
 class PropertyFolderTreeViewItem implements TreeViewItem {
   isRoot: boolean;
   isPlaceholder = false;
@@ -248,6 +250,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     this.id = id;
     this.label = label;
     this.buildMenuTemplateFunction = (i18n: I18nType, index: number) =>
+      // $FlowFixMe[incompatible-type]
       [
         rightButton
           ? {
@@ -288,6 +291,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
 
   onClick(): void {}
 
+  // $FlowFixMe[missing-local-annot]
   buildMenuTemplate(i18n: I18nType, index: number) {
     return this.buildMenuTemplateFunction(i18n, index);
   }
@@ -384,6 +388,7 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
     this.onClickCallback();
   }
 
+  // $FlowFixMe[missing-local-annot]
   buildMenuTemplate(i18n: I18nType, index: number) {
     return this.buildMenuTemplateFunction(i18n, index);
   }
@@ -965,6 +970,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
           !propertiesTreeViewItemProps ||
           !propertyFolderTreeViewItemProps
           ? []
+          // $FlowFixMe[incompatible-type]
           : [
               new LeafTreeViewItem(
                 new ActionTreeViewItemContent(
@@ -1332,6 +1338,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
                 >
                   <AutoSizer style={styles.autoSizer} disableWidth>
                     {({ height }) => (
+                      {/* $FlowFixMe[incompatible-type] */}
                       <TreeView
                         key={listKey}
                         ref={treeViewRef}
@@ -1383,9 +1390,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
   }
 );
 
-const PropertyListEditorWithErrorBoundary: component(
-  ...{ ...Props, +ref?: React.RefSetter<PropertyListEditorInterface> }
-) React.Node = React.forwardRef<
+const PropertyListEditorWithErrorBoundary: React.ComponentType<any> = React.forwardRef<
   Props,
   PropertyListEditorInterface
 >((props, ref) => (

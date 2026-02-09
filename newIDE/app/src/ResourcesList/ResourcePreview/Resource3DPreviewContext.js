@@ -69,7 +69,7 @@ class Resource3DPreviewWorkerManager {
   fallbackImagePath: string = 'JsPlatform/Extensions/3d_model.svg';
 
   constructor() {
-    // $FlowExpectedError - worker-loader types aren't recognized by Flow
+    // $FlowFixMe[incompatible-type] - worker-loader types aren't recognized by Flow
     // $FlowFixMe[invalid-constructor]
     this.worker = new Resource3DPreviewWorker();
     this.setupMessageHandlers();
@@ -79,14 +79,14 @@ class Resource3DPreviewWorkerManager {
   setupMessageHandlers() {
     // $FlowFixMe[cannot-resolve-name]
     this.worker.onmessage = (event: MessageEvent) => {
-      // $FlowExpectedError
+      // $FlowFixMe[incompatible-type]
       const workerOutMessageData = (event.data: WorkerOutMessage);
       const type = workerOutMessageData.type;
 
       switch (type) {
         case MESSAGE_TYPES.INIT:
           const { success } =
-            // $FlowExpectedError
+            // $FlowFixMe[incompatible-type]
             // $FlowFixMe[incompatible-type]
             (workerOutMessageData: WorkerOutInitMessage);
           this.isInitialized = success;
@@ -94,7 +94,7 @@ class Resource3DPreviewWorkerManager {
 
         case MESSAGE_TYPES.RENDER_COMPLETE:
           const { resourceUrl, screenshot } =
-            // $FlowExpectedError
+            // $FlowFixMe[incompatible-type]
             // $FlowFixMe[incompatible-type]
             (workerOutMessageData: WorkerOutRenderCompleteMessage);
           const pendingPromise = this.pendingPromises.get(resourceUrl);
@@ -106,7 +106,7 @@ class Resource3DPreviewWorkerManager {
 
         case MESSAGE_TYPES.RENDER_ERROR:
           const { resourceUrl: errorResourceUrl, error } =
-            // $FlowExpectedError
+            // $FlowFixMe[incompatible-type]
             // $FlowFixMe[incompatible-type]
             (workerOutMessageData: WorkerOutRenderErrorMessage);
           console.error('Worker error rendering 3D model:', error);

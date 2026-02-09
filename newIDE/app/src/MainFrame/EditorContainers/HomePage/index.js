@@ -740,7 +740,7 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
 );
 
 export const renderHomePageContainer = (props: RenderEditorContainerPropsWithRef): React.MixedElement => (
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   <HomePage
     ref={props.ref}
     project={props.project}

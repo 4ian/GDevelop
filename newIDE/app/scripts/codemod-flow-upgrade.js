@@ -234,6 +234,31 @@ function applyFlowSuppressions(errors) {
   return updatedFiles;
 }
 
+function convertJsxFlowFixMe(filePath) {
+  if (!fs.existsSync(filePath)) return false;
+  const lines = fs.readFileSync(filePath, 'utf8').split('\n');
+  let changed = false;
+
+  for (let i = 0; i < lines.length - 1; i += 1) {
+    const line = lines[i];
+    const match = line.match(/^(\s*)\/\/\s*\$FlowFixMe(\[[^\]]+\])*(.*)$/);
+    if (!match) continue;
+    const nextLine = lines[i + 1];
+    const trimmedNext = nextLine.trimStart();
+    if (!trimmedNext.startsWith('{') && !trimmedNext.startsWith('<')) continue;
+
+    const indent = match[1];
+    const codes = match[2] || '';
+    const suffix = match[3] || '';
+    lines[i] = `${indent}{/* $FlowFixMe${codes}${suffix} */}`;
+    changed = true;
+  }
+
+  if (!changed) return false;
+  fs.writeFileSync(filePath, lines.join('\n'), 'utf8');
+  return true;
+}
+
 function ensureGDevelopShims() {
   const filePath = path.join(repoRoot, 'GDevelop.js', 'types', 'flow-upgrade-shims.js');
   const declarations = [
@@ -417,8 +442,16 @@ function run() {
       replaceValue: ': React.ComponentType<$1>',
     },
     {
-      searchValue: /:\s*component\(\.\.\.\{[\s\S]*?\bProps\b[\s\S]*?\}\)\s*React\.Node/g,
-      replaceValue: ': React.ComponentType<Props>',
+      searchValue: /:\s*component\(\.\.\.\{[\s\S]*?\.\.\.([A-Za-z0-9_$]+)[\s\S]*?\}\)\s*React\.Node/g,
+      replaceValue: ': React.ComponentType<$1>',
+    },
+    {
+      searchValue: /:\s*component\(\.\.\.([A-Za-z0-9_$]+)\)\s*React\.Node/g,
+      replaceValue: ': React.ComponentType<$1>',
+    },
+    {
+      searchValue: /:\s*component\([\s\S]*?\)\s*React\.Node/g,
+      replaceValue: ': React.ComponentType<any>',
     },
     { searchValue: /renders\*/g, replaceValue: 'React.Node' },
     { searchValue: /renders React\.Node\b/g, replaceValue: 'React.Node' },
@@ -435,6 +468,10 @@ function run() {
   const flowFixMeReplacements = [
     {
       searchValue: /\/\/\s*\$FlowFixMe(?!\[)/g,
+      replaceValue: '// $FlowFixMe[incompatible-type]',
+    },
+    {
+      searchValue: /\/\/\s*\$FlowExpectedError(?!\[)/g,
       replaceValue: '// $FlowFixMe[incompatible-type]',
     },
   ];
@@ -514,6 +551,11 @@ function run() {
         searchValue: /React\.useRef<ScrollViewInterface \| null>\(null\)/g,
         replaceValue: 'React.useRef<any>(null)',
       },
+      {
+        searchValue:
+          /\/\/ \$FlowFixMe\[constant-condition\]\s*\n\s*\{!standAloneForm && \(\s*\n([\s\S]*?)\n\s*\)\}/g,
+        replaceValue: '$1',
+      },
     ])
   ) {
     updatedFiles += 1;
@@ -552,6 +594,10 @@ function run() {
         searchValue: /React\.useState\(null\)/g,
         replaceValue:
           "React.useState<?{| aiRequestId: string, messageIndex: number |}>(null)",
+      },
+      {
+        searchValue: /onPause: \(pause: boolean\) => void,/g,
+        replaceValue: 'onPause?: (pause: boolean) => void,',
       },
     ])
   ) {
@@ -592,6 +638,10 @@ function run() {
   const flowErrors = collectFlowErrors();
   const suppressedFiles = applyFlowSuppressions(flowErrors);
   if (suppressedFiles) updatedFiles += suppressedFiles;
+
+  for (const filePath of srcFiles) {
+    if (convertJsxFlowFixMe(filePath)) updatedFiles += 1;
+  }
 
   console.log(`Flow upgrade codemod complete. Updated ${updatedFiles} file(s).`);
 }

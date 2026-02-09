@@ -2,7 +2,7 @@
 import { type Achievement } from '../../Utils/GDevelopServices/Badge';
 
 export const fakeAchievements: Array<Achievement> = [
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: 'First event',
     nameByLocale: { en: 'First event' },
@@ -18,7 +18,7 @@ export const fakeAchievements: Array<Achievement> = [
     publicDescription: 'First event in a scene',
     publicDescriptionByLocale: { en: 'First event in a scene' },
   },
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: 'First behavior',
     nameByLocale: { en: 'First behavior' },
@@ -36,7 +36,7 @@ export const fakeAchievements: Array<Achievement> = [
     publicDescription: 'First behavior added to an object',
     publicDescriptionByLocale: { en: 'First behavior added to an object' },
   },
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: 'First preview',
     nameByLocale: { en: 'First preview' },
@@ -53,7 +53,7 @@ export const fakeAchievements: Array<Achievement> = [
     publicDescription: 'First preview of a game',
     publicDescriptionByLocale: { en: 'First preview of a game' },
   },
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: 'First web export',
     nameByLocale: { en: 'First web export' },
@@ -71,7 +71,7 @@ export const fakeAchievements: Array<Achievement> = [
     publicDescription: 'First online export',
     publicDescriptionByLocale: { en: 'First online export' },
   },
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: 'First effect',
     nameByLocale: { en: 'First effect' },
@@ -89,7 +89,7 @@ export const fakeAchievements: Array<Achievement> = [
     publicDescription: 'First effect added to an object',
     publicDescriptionByLocale: { en: 'First effect added to an object' },
   },
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: 'First debug',
     nameByLocale: { en: 'First debug' },
@@ -107,7 +107,7 @@ export const fakeAchievements: Array<Achievement> = [
     publicDescription: 'First use of the debugger',
     publicDescriptionByLocale: { en: 'First use of the debugger' },
   },
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: 'First extension',
     nameByLocale: { en: 'First extension' },
@@ -125,7 +125,7 @@ export const fakeAchievements: Array<Achievement> = [
     publicDescription: 'First extension installed in a project',
     publicDescriptionByLocale: { en: 'First extension installed in a project' },
   },
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: 'Insert a coin',
     nameByLocale: { en: 'Insert a coin' },
@@ -144,7 +144,7 @@ export const fakeAchievements: Array<Achievement> = [
     publicDescription: '{user} got 10 plays on a game',
     publicDescriptionByLocale: { en: '{user} got 10 plays on a game' },
   },
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: 'Into Space',
     nameByLocale: { en: 'Into Space' },
@@ -163,7 +163,7 @@ export const fakeAchievements: Array<Achievement> = [
     publicDescription: '{user} got 100 plays on a game',
     publicDescriptionByLocale: { en: '{user} got 100 plays on a game' },
   },
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: 'Millenium Falcon',
     nameByLocale: { en: 'Millenium Falcon' },
@@ -183,7 +183,7 @@ export const fakeAchievements: Array<Achievement> = [
     publicDescription: '{user} got 1000 plays on a game',
     publicDescriptionByLocale: { en: '{user} got 1000 plays on a game' },
   },
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: "It's over 9000!",
     nameByLocale: { en: "It's over 9000!" },
@@ -203,7 +203,7 @@ export const fakeAchievements: Array<Achievement> = [
     publicDescription: '{user} got 10,000 plays on a game',
     publicDescriptionByLocale: { en: '{user} got 10,000 plays on a game' },
   },
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: 'Fits in your house?',
     nameByLocale: { en: 'Fits in your house?' },
@@ -223,7 +223,7 @@ export const fakeAchievements: Array<Achievement> = [
     publicDescription: '{user} got 50,000 plays on a game',
     publicDescriptionByLocale: { en: '{user} got 50,000 plays on a game' },
   },
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: 'Fits in your yard?',
     nameByLocale: { en: 'Fits in your yard?' },
@@ -245,7 +245,7 @@ export const fakeAchievements: Array<Achievement> = [
       en: '{user} got 100,000 plays on all their games',
     },
   },
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: 'Solid Snake',
     nameByLocale: { en: 'Solid Snake' },
@@ -266,7 +266,7 @@ export const fakeAchievements: Array<Achievement> = [
       en: '{user} got 10 plays on two different games',
     },
   },
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: 'Eevee',
     nameByLocale: { en: 'Eevee' },
@@ -288,7 +288,7 @@ export const fakeAchievements: Array<Achievement> = [
       en: '{user} got 100 plays on three different games',
     },
   },
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: 'Open-source love',
     nameByLocale: { en: 'Open-source love' },
@@ -307,7 +307,7 @@ export const fakeAchievements: Array<Achievement> = [
       en: "{user} starred GDevelop's source code on GitHub",
     },
   },
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: 'Marketer',
     nameByLocale: { en: 'Marketer' },
@@ -325,7 +325,7 @@ export const fakeAchievements: Array<Achievement> = [
       en: '{user} represented GDevelop in a major event',
     },
   },
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: 'Tiktok fan',
     nameByLocale: { en: 'Tiktok fan' },
@@ -343,7 +343,7 @@ export const fakeAchievements: Array<Achievement> = [
       en: "{user} subscribed to GDevelop's account on TikTok",
     },
   },
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: 'X follower',
     nameByLocale: { en: 'X follower' },
@@ -361,7 +361,7 @@ export const fakeAchievements: Array<Achievement> = [
       en: "{user} follows GDevelop's account on X/Twitter",
     },
   },
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   {
     name: 'GDevelop Master course graduate',
     nameByLocale: {

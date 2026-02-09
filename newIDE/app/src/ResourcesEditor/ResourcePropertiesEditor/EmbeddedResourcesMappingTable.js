@@ -51,11 +51,11 @@ export const EmbeddedResourcesMappingTable = ({resources}: Props): null | React.
 
             return (
               <TableRow key={embeddedFilePath}>
-                // $FlowFixMe[incompatible-type]
+                {/* $FlowFixMe[incompatible-type] */}
                 <TableRowColumn style={styles.tableCell}>
                   {embeddedFilePath}
                 </TableRowColumn>
-                // $FlowFixMe[incompatible-type]
+                {/* $FlowFixMe[incompatible-type] */}
                 <TableRowColumn style={styles.tableCell}>
                   {associatedResourceName}
                 </TableRowColumn>

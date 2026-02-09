@@ -70,7 +70,7 @@ type Props = {|
 // $FlowFixMe[cannot-resolve-name]
 const VideoBasedCourseChapterView: React.ComponentType<Props> = React.forwardRef<Props, HTMLDivElement>(
   (
-    // $FlowFixMe[missing-local-annot]
+    {/* $FlowFixMe[missing-local-annot] */}
     {
       chapterIndex,
       course,
@@ -95,7 +95,7 @@ const VideoBasedCourseChapterView: React.ComponentType<Props> = React.forwardRef
 
     return (
       <ColumnStackLayout expand noMargin>
-        // $FlowFixMe[incompatible-type]
+        {/* $FlowFixMe[incompatible-type] */}
         <CourseChapterTitle
           course={course}
           chapterIndex={chapterIndex}

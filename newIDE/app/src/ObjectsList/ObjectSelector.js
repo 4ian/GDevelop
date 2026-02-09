@@ -73,6 +73,7 @@ const getObjectsAndGroupsDataSource = ({
   allowedObjectType: ?string,
   requiredCapabilitiesBehaviorTypes?: Array<string>,
   excludedObjectOrGroupNames: ?Array<string>,
+// $FlowFixMe[value-as-type]
 |}): DataSource => {
   const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
     objectsContainersList,
@@ -164,10 +165,9 @@ const getMissingBehaviors = ({
 
 export type ObjectSelectorInterface = {| focus: FieldFocusFunction |};
 
-const ObjectSelector: component(
-  ...{ ...Props, +ref?: React.RefSetter<ObjectSelectorInterface> }
-) React.Node = React.forwardRef<Props, ObjectSelectorInterface>(
+const ObjectSelector: React.ComponentType<any> = React.forwardRef<Props, ObjectSelectorInterface>(
   (props, ref) => {
+    // $FlowFixMe[value-as-type]
     const fieldRef = React.useRef<?SemiControlledAutoCompleteInterface>(null);
 
     const focus: FieldFocusFunction = options => {

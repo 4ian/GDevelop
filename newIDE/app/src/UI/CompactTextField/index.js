@@ -52,17 +52,15 @@ export type CompactTextFieldProps = {|
   useLeftIconAsNumberControl?: boolean,
   renderEndAdornmentOnHover?: (className: string) => React.Node,
   onClickEndAdornment?: () => void,
+  // $FlowFixMe[cannot-resolve-name]
   onKeyDown?: KeyboardEvent => void,
+  // $FlowFixMe[cannot-resolve-name]
   onKeyUp?: KeyboardEvent => void,
+  // $FlowFixMe[cannot-resolve-name]
   onWheel?: WheelEvent => void,
 |};
 
-const CompactTextField: component(
-  ...{
-    ...CompactTextFieldProps,
-    +ref?: React.RefSetter<CompactTextFieldInterface>,
-  }
-) React.Node = React.forwardRef<
+const CompactTextField: React.ComponentType<any> = React.forwardRef<
   CompactTextFieldProps,
   CompactTextFieldInterface
 >(
@@ -89,6 +87,7 @@ const CompactTextField: component(
     ref
   ) => {
     const idToUse = React.useRef<string>(id || makeTimestampedId());
+    // $FlowFixMe[cannot-resolve-name]
     const inputRef = React.useRef<?HTMLInputElement>(null);
     const controlProps = useClickDragAsControl({
       onChange: (value: number) => onChange(value.toString(), 'iconControl'),
@@ -96,12 +95,14 @@ const CompactTextField: component(
     });
 
     const onBlurInput = React.useCallback(
+      // $FlowFixMe[missing-local-annot]
       event => {
         if (onBlur) onBlur(event);
       },
       [onBlur]
     );
     const onFocusInput = React.useCallback(
+      // $FlowFixMe[missing-local-annot]
       event => {
         if (onFocus) onFocus(event);
       },
@@ -118,9 +119,11 @@ const CompactTextField: component(
     }));
 
     const onWheelIfFocused = React.useCallback(
+      // $FlowFixMe[cannot-resolve-name]
       (event: WheelEvent) => {
         if (
           inputRef.current &&
+          // $FlowFixMe[cannot-resolve-name]
           inputRef.current === document.activeElement &&
           onWheel
         ) {

@@ -3,7 +3,7 @@ import { mapFor, mapVector } from '../../../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
-// $FlowFixMe[definition-cycle][recursive-definition]
+// $FlowFixMe[recursive-definition]
 const renderInstructionsAsText = ({
   instructionsList,
   padding,
@@ -307,9 +307,9 @@ export const renderNonTranslatedEventsAsText = (
 ): string | "Error while rendering events as text." => {
   // Temporarily override the getTranslation function to return the original
   // string, so that events are always rendered in English.
-  // $FlowFixMe[incompatible-type][prop-missing]
+  // $FlowFixMe[prop-missing]
   const previousGetTranslation = gd.getTranslation;
-  // $FlowFixMe[incompatible-type][prop-missing]
+  // $FlowFixMe[prop-missing]
   gd.getTranslation = (str: string) => str;
 
   let text = '';
@@ -323,7 +323,7 @@ export const renderNonTranslatedEventsAsText = (
     console.error('Error while rendering events as text:', error);
     text = 'Error while rendering events as text.';
   } finally {
-    // $FlowFixMe[incompatible-type][prop-missing]
+    // $FlowFixMe[prop-missing]
     gd.getTranslation = previousGetTranslation;
   }
 

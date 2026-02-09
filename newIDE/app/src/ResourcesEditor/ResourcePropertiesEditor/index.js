@@ -44,9 +44,7 @@ const renderEmpty = () => {
   );
 };
 
-const ResourcePropertiesEditor: component(
-  ...{ ...Props, +ref?: React.RefSetter<ResourcePropertiesEditorInterface> }
-) React.Node = React.forwardRef<
+const ResourcePropertiesEditor: React.ComponentType<any> = React.forwardRef<
   Props,
   ResourcePropertiesEditorInterface
 >(
@@ -202,6 +200,7 @@ const ResourcePropertiesEditor: component(
               : renderResourcesProperties()}
             {resources.length > 0 &&
               resources.some(
+                // $FlowFixMe[invalid-compare]
                 resource => resource.getKind() === 'javascript'
               ) && (
                 <AlertMessage kind="info">

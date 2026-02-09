@@ -59,7 +59,7 @@ const ConditionsActionsColumns = (props: Props): React.MixedElement => {
           style: {},
           className: `${conditionsContainer} ${smallWidthContainer}`,
         })}
-        // $FlowFixMe[incompatible-type]
+        {/* $FlowFixMe[incompatible-type] */}
         {props.renderActionsList({
           style: {},
           className: `${actionsContainer} ${smallWidthContainer}`,

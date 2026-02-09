@@ -25,7 +25,7 @@ const fakeLeaderboard: Leaderboard = {
 };
 
 export const Default = (): React.Node => (
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   <LeaderboardOptionsDialog
     open
     onClose={() => action('onClose')()}
@@ -38,7 +38,7 @@ export const Default = (): React.Node => (
 
 export const WithProSubscription = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeStartupAuthenticatedUser}>
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     <LeaderboardOptionsDialog
       open
       onClose={() => action('onClose')()}

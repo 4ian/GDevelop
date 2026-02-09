@@ -395,7 +395,7 @@ export const buildMainMenuDeclarativeTemplate = ({
       ],
     });
 
-    // $FlowFixMe[incompatible-type][incompatible-use] - submenu is guaranteed to exist.
+    // $FlowFixMe[incompatible-use] - submenu is guaranteed to exist.
     editTemplate.submenu.push(
       { type: 'separator' },
       {
@@ -404,7 +404,7 @@ export const buildMainMenuDeclarativeTemplate = ({
       }
     );
 
-    // $FlowFixMe[incompatible-type][prop-missing] - submenu is guaranteed to exist.
+    // $FlowFixMe[prop-missing] - submenu is guaranteed to exist.
     windowTemplate.submenu = [
       { role: 'minimize' },
       { role: 'zoom' },

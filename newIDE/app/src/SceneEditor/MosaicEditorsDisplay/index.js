@@ -68,12 +68,7 @@ const defaultPanelConfigByEditor = {
 };
 
 // Forward ref to allow Scene editor to force update some editors
-const MosaicEditorsDisplay: component(
-  ...{
-    ...SceneEditorsDisplayProps,
-    +ref?: React.RefSetter<SceneEditorsDisplayInterface>,
-  }
-) React.Node = React.forwardRef<
+const MosaicEditorsDisplay: React.ComponentType<any> = React.forwardRef<
   SceneEditorsDisplayProps,
   SceneEditorsDisplayInterface
 >((props, ref) => {
@@ -153,6 +148,7 @@ const MosaicEditorsDisplay: component(
         ];
   }, []);
   const _onInstancesModified = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     instances => {
       if (onInstancesModified) onInstancesModified(instances);
       forceUpdateInstancesList();
@@ -162,6 +158,7 @@ const MosaicEditorsDisplay: component(
   const toggleEditorView = React.useCallback((editorId: EditorId) => {
     if (!editorMosaicRef.current) return;
     const config = defaultPanelConfigByEditor[editorId];
+    // $FlowFixMe[incompatible-type]
     editorMosaicRef.current.toggleEditor(editorId, config.position);
   }, []);
   const isEditorVisible = React.useCallback((editorId: EditorId) => {
@@ -199,6 +196,7 @@ const MosaicEditorsDisplay: component(
     [isEditorVisible, toggleEditorView, objectsListDoNowOrAfterRender]
   );
 
+  // $FlowFixMe[incompatible-type]
   React.useImperativeHandle(ref, () => {
     const { current: editor } = editorRef;
     return {

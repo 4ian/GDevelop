@@ -128,7 +128,7 @@ const EducationCurriculumLesson = (
 
   const title = (
     <LineStackLayout noMargin alignItems="center">
-      // $FlowFixMe[invalid-computed-prop]
+      {/* $FlowFixMe[invalid-computed-prop] */}
       <Chip size="small" color="secondary" label={rankLabel[index + 1]} />
       <Text size="block-title" noMargin>
         {selectMessageByLocale(i18n, tutorial.titleByLocale)}

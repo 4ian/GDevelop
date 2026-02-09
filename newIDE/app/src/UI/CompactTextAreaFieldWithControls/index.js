@@ -33,12 +33,7 @@ export type CompactTextAreaFieldWithControlsInterface = {|
   setCursorPosition: (position: number) => void,
 |};
 
-export const CompactTextAreaFieldWithControls: component(
-  ...{
-    ...CompactTextAreaFieldWithControlsProps,
-    +ref?: React.RefSetter<CompactTextAreaFieldWithControlsInterface>,
-  }
-) React.Node = React.forwardRef<
+export const CompactTextAreaFieldWithControls: React.ComponentType<any> = React.forwardRef<
   CompactTextAreaFieldWithControlsProps,
   CompactTextAreaFieldWithControlsInterface
 >(
@@ -62,6 +57,7 @@ export const CompactTextAreaFieldWithControls: component(
     ref
   ) => {
     const idToUse = React.useRef<string>(id || makeTimestampedId());
+    // $FlowFixMe[cannot-resolve-name]
     const textareaRef = React.useRef<?HTMLTextAreaElement>(null);
 
     const setCursorPosition = React.useCallback((position: number) => {
@@ -86,6 +82,7 @@ export const CompactTextAreaFieldWithControls: component(
         textarea.style.height = 'auto';
 
         // Calculate the height based on scrollHeight
+        // $FlowFixMe[cannot-resolve-name]
         const style = window.getComputedStyle(textarea);
         const lineHeight = parseInt(style.lineHeight);
         const paddingTop = parseInt(style.paddingTop);
@@ -112,6 +109,7 @@ export const CompactTextAreaFieldWithControls: component(
     );
 
     const handleKeyDown = React.useCallback(
+      // $FlowFixMe[cannot-resolve-name]
       (e: SyntheticKeyboardEvent<HTMLTextAreaElement>) => {
         // Handle submit first
         if (onSubmit && shouldSubmit(e)) {
@@ -194,6 +192,7 @@ export const CompactTextAreaFieldWithControls: component(
                 ref={textareaRef}
                 id={idToUse.current}
                 disabled={disabled}
+                // $FlowFixMe[invalid-compare]
                 value={value === null ? '' : value}
                 onChange={e => onChange(e.currentTarget.value)}
                 placeholder={i18n._(placeholder)}

@@ -76,7 +76,7 @@ type Props = {|
 // $FlowFixMe[cannot-resolve-name]
 const SectionContainer: React.ComponentType<Props> = React.forwardRef<Props, HTMLDivElement>(
   (
-    // $FlowFixMe[missing-local-annot]
+    {/* $FlowFixMe[missing-local-annot] */}
     {
       children,
       chipText,
@@ -136,7 +136,7 @@ const SectionContainer: React.ComponentType<Props> = React.forwardRef<Props, HTM
 
     return (
       <Column expand useFullHeight noMargin>
-        // $FlowFixMe[incompatible-type]
+        {/* $FlowFixMe[incompatible-type] */}
         <Paper style={paperStyle} square background="dark" ref={ref}>
           <div style={childrenContainerStyle}>
             {showUrgentAnnouncements && !shouldHideAnnouncements && (

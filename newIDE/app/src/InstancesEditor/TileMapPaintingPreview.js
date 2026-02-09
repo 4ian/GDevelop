@@ -232,7 +232,7 @@ class TileMapPaintingPreview {
     const renderedInstance = this.getRendererOfInstance(instance);
     if (
       !renderedInstance ||
-      // $FlowFixMe[incompatible-type][prop-missing] - TODO: Replace this check with a `instanceof RenderedSimpleTileMapInstance`
+      // $FlowFixMe[prop-missing] - TODO: Replace this check with a `instanceof RenderedSimpleTileMapInstance`
       !renderedInstance.getEditableTileMap
     ) {
       console.error(

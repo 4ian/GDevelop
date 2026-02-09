@@ -11,15 +11,11 @@ export type TreeViewRightPrimaryButtonProps = {|
   disabled?: boolean,
   icon?: React.Node,
   id?: ?string,
+  // $FlowFixMe[cannot-resolve-name]
   onClick: ?(MouseEvent) => void | Promise<void>,
 |};
 
-export const TreeViewRightPrimaryButton: component(
-  ...{
-    ...TreeViewRightPrimaryButtonProps,
-    +ref?: React.RefSetter<ButtonInterface>,
-  }
-) React.Node = React.forwardRef<
+export const TreeViewRightPrimaryButton: React.ComponentType<any> = React.forwardRef<
   TreeViewRightPrimaryButtonProps,
   ButtonInterface
 >(

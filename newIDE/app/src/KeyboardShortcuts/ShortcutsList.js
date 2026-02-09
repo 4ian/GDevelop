@@ -120,7 +120,7 @@ const ShortcutsList = (props: Props): React.Node => {
         {Object.keys(areaWiseCommands).map(areaName => (
           <React.Fragment key={areaName}>
             <Text size="block-title">
-              // $FlowFixMe[invalid-computed-prop]
+              {/* $FlowFixMe[invalid-computed-prop] */}
               {props.i18n._(commandAreas[areaName])}
             </Text>
             {areaWiseCommands[areaName].map(commandName => {

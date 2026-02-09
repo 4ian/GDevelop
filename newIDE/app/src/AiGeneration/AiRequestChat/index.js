@@ -1027,9 +1027,7 @@ export const AiRequestChat: React.AbstractComponent<Props, AiRequestChatInterfac
             alignItems="stretch"
             noMargin
           >
-            // $FlowFixMe[constant-condition]
-            {!standAloneForm && (
-              <CompactTextAreaFieldWithControls
+                          <CompactTextAreaFieldWithControls
                 maxLength={6000}
                 value={userRequestTextPerAiRequestId[aiRequestId] || ''}
                 disabled={isWorking || isForAnotherProject}
@@ -1069,7 +1067,6 @@ export const AiRequestChat: React.AbstractComponent<Props, AiRequestChatInterfac
                   </Column>
                 }
               />
-            )}
             <Line
               noMargin
               expand

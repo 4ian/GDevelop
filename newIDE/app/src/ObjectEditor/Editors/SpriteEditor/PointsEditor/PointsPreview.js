@@ -86,11 +86,11 @@ const PointsPreview = (props: Props): React.MixedElement => {
     | null => {
     if (!svgRef.current) return null;
 
-    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
+    // $FlowFixMe[incompatible-type] Flow doesn't have SVG typings yet (@facebook/flow#4551)
     const pointOnScreen = svgRef.current.createSVGPoint();
     pointOnScreen.x = event.clientX;
     pointOnScreen.y = event.clientY;
-    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
+    // $FlowFixMe[incompatible-type] Flow doesn't have SVG typings yet (@facebook/flow#4551)
     // $FlowFixMe[incompatible-use]
     const screenToSvgMatrix = svgRef.current.getScreenCTM().inverse();
     const pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
@@ -300,7 +300,7 @@ const PointsPreview = (props: Props): React.MixedElement => {
 
   const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();
   const backgroundPointNames = [
-    // $FlowFixMe[incompatible-exact][incompatible-use]
+    // $FlowFixMe[incompatible-use]
     ...mapVector(nonDefaultPoints, (point, i) => point.getName()),
     'Origin',
     'Center',

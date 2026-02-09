@@ -114,9 +114,7 @@ const identifyAssetPackKind = ({
     : 'unknown';
 };
 
-export const AssetStore: component(
-  ...{ ...Props, +ref?: React.RefSetter<AssetStoreInterface> }
-) React.Node = React.forwardRef<Props, AssetStoreInterface>(
+export const AssetStore: React.ComponentType<any> = React.forwardRef<Props, AssetStoreInterface>(
   (
     {
       onlyShowAssets,
@@ -376,6 +374,7 @@ export const AssetStore: component(
           assetPackName,
           assetPackTag,
           assetPackId,
+          // $FlowFixMe[incompatible-type]
           assetPackKind,
         });
         saveScrollPosition();

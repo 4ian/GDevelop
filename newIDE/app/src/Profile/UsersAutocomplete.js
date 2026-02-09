@@ -100,6 +100,7 @@ export const UsersAutocomplete = ({userIds, onChange, floatingLabelText, helperT
           userIds
         );
         setUsers(
+          // $FlowFixMe[incompatible-type]
           userIds
             .map(userId => {
               const userPublicProfile: UserPublicProfile =

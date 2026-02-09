@@ -48,7 +48,7 @@ const ensureGDevelopGamesMonetizationReady = async () => {
       const module = await retryIfFailed(
         { times: 2 },
         async () =>
-          // $FlowExpectedError - Remote script cannot be found.
+          // $FlowFixMe[incompatible-type] - Remote script cannot be found.
           // $FlowFixMe[cannot-resolve-module]
           (await import(/* webpackIgnore: true */ 'https://resources.gdevelop.io/a/ggm-web.js'))
             .default

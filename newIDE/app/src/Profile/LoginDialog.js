@@ -123,6 +123,7 @@ const LoginDialog = (
     <Dialog
       title={null} // This dialog has a custom design to be more welcoming, the title is set in the content.
       id="login-dialog"
+      // $FlowFixMe[incompatible-type]
       actions={actions}
       // $FlowFixMe[incompatible-type]
       secondaryActions={secondaryActions}

@@ -160,7 +160,7 @@ export default class LocalPreviewLauncher extends React.Component<
     options: PreviewOptions
   ): void => {
     this.setState(
-      // $FlowFixMe[incompatible-type]
+      {/* $FlowFixMe[incompatible-type] */}
       {
         previewBrowserWindowOptions: {
           width: project.getGameResolutionWidth(),

@@ -1455,7 +1455,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       project={testProject.project}
       expressionAutocompletions={makeFakeExpressionAutocompletions()}
       remainingCount={3}
-      // $FlowExpectedError
+      // $FlowFixMe[incompatible-type]
       anchorEl={getFakePopperJsAnchorElement()}
       onChoose={action('chosen')}
       selectedCompletionIndex={0}
@@ -1469,7 +1469,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       project={testProject.project}
       expressionAutocompletions={makeFakeExpressionAutocompletions()}
       remainingCount={3}
-      // $FlowExpectedError
+      // $FlowFixMe[incompatible-type]
       anchorEl={getFakePopperJsAnchorElement()}
       onChoose={action('chosen')}
       selectedCompletionIndex={6}
@@ -1484,7 +1484,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       // $FlowFixMe[incompatible-type]
       expressionAutocompletions={makeFakeExactExpressionAutocompletion()}
       remainingCount={0}
-      // $FlowExpectedError
+      // $FlowFixMe[incompatible-type]
       anchorEl={getFakePopperJsAnchorElement()}
       onChoose={action('chosen')}
       selectedCompletionIndex={0}
@@ -1498,7 +1498,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       project={testProject.project}
       expressionAutocompletions={[]}
       remainingCount={0}
-      // $FlowExpectedError
+      // $FlowFixMe[incompatible-type]
       anchorEl={getFakePopperJsAnchorElement()}
       onChoose={action('chosen')}
       selectedCompletionIndex={0}
@@ -2287,7 +2287,7 @@ storiesOf('BrowserPreviewErrorDialog', module)
   .add('networking error', () => (
     <BrowserPreviewErrorDialog
       error={
-        // $FlowFixMe[incompatible-type] - mocking an Error with "code field"
+        {/* $FlowFixMe[incompatible-type] - mocking an Error with "code field" */}
         {
           code: 'NetworkingError',
           message: "Oops, you're offline",

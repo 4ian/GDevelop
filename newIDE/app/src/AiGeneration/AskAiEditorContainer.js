@@ -1312,7 +1312,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
 export const renderAskAiEditorContainer = (props: RenderEditorContainerPropsWithRef): React.Node => (
   <I18n>
     {({ i18n }) => (
-      // $FlowFixMe[incompatible-type]
+      {/* $FlowFixMe[incompatible-type] */}
       <AskAiEditor
         ref={props.ref}
         i18n={i18n}

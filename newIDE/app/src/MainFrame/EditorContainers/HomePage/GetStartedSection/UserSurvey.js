@@ -80,7 +80,7 @@ const NavigationStep = ({ stepIndex }: {| stepIndex: number |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <Line justifyContent="center">
-      // $FlowFixMe[underconstrained-implicit-instantiation]
+      {/* $FlowFixMe[underconstrained-implicit-instantiation] */}
       {new Array(STEP_MAX_COUNT).fill(0).map((_, index) => {
         return (
           <div
@@ -193,7 +193,7 @@ const DesktopDisplay = ({
     <SectionContainer flexBody>
       <ColumnStackLayout noMargin>
         {questionsPropsToRender.map((props, index) => (
-          // $FlowFixMe[incompatible-type]
+          {/* $FlowFixMe[incompatible-type] */}
           <UserSurveyQuestion
             {...props}
             ref={

@@ -287,7 +287,7 @@ export const BundleStoreStateProvider = ({children}: BundleStoreStateProviderPro
   );
 
   return (
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     <BundleStoreContext.Provider value={BundleStoreState}>
       {children}
     </BundleStoreContext.Provider>

@@ -6,6 +6,7 @@ import SortableEventsTree, {
   getNodeAtPath,
   type SortableTreeNode,
 } from './SortableEventsTree';
+// $FlowFixMe[missing-export]
 import { type ConnectDragSource } from 'react-dnd';
 import { mapFor } from '../../Utils/MapFor';
 import { isEventSelected } from '../SelectionHandler';
@@ -112,6 +113,7 @@ type EventsContainerProps = {|
   onInstructionDoubleClick: InstructionContext => void,
   onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
   onAddInstructionContextMenu: (
+    // $FlowFixMe[cannot-resolve-name]
     HTMLButtonElement,
     InstructionsListContext
   ) => void,
@@ -157,6 +159,7 @@ const EventContainer = (props: EventsContainerProps) => {
     highlightedAiGeneratedEventIds,
   } = props;
   const forceUpdate = useForceUpdate();
+  // $FlowFixMe[cannot-resolve-name]
   const containerRef = React.useRef<?HTMLDivElement>(null);
 
   // At EACH rendering, update the cache with the current height of the event.
@@ -180,6 +183,7 @@ const EventContainer = (props: EventsContainerProps) => {
   );
 
   const _onEventContextMenu = React.useCallback(
+    // $FlowFixMe[cannot-resolve-name]
     (domEvent: MouseEvent) => {
       domEvent.preventDefault();
       onEventContextMenu(domEvent.clientX, domEvent.clientY);
@@ -264,6 +268,7 @@ const EventContainer = (props: EventsContainerProps) => {
   );
 };
 
+// $FlowFixMe[missing-local-annot]
 const SortableTree = ({ className, ...otherProps }) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
@@ -316,6 +321,7 @@ type EventsTreeProps = {|
   ) => void,
   onAddInstructionContextMenu: (
     eventContext: EventContext,
+    // $FlowFixMe[cannot-resolve-name]
     HTMLButtonElement,
     InstructionsListContext
   ) => void,
@@ -378,15 +384,14 @@ export type EventsTreeInterface = {|
 
 export type { SortableTreeNode };
 
+// $FlowFixMe[missing-local-annot]
 const getNodeKey = ({ treeIndex }) => treeIndex;
 
 /**
  * Display a tree of event. Builtin on react-sortable-tree so that event
  * can be drag'n'dropped and events rows are virtualized.
  */
-const EventsTree: component(
-  ...{ ...EventsTreeProps, +ref?: React.RefSetter<EventsTreeInterface> }
-) React.Node = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
+const EventsTree: React.ComponentType<any> = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
   (props, ref) => {
     const forceUpdate = useForceUpdate();
 
@@ -510,6 +515,7 @@ const EventsTree: component(
         // an event was actually dropped. It is also already called in `_onDrop` to update
         // the event list and compute history. So if draggedNode is null, we want to avoid
         // recomputing the event list.
+        // $FlowFixMe[constant-condition]
         if (draggedNode) {
           setDraggedNode(null);
           _restoreFoldedNodes();
@@ -538,6 +544,7 @@ const EventsTree: component(
         if (isOverLazy) {
           if (!_hoverTimerId.current && !node.expanded) {
             if (!isNodeTemporaryUnfolded) {
+              // $FlowFixMe[cannot-resolve-name]
               _hoverTimerId.current = window.setTimeout(() => {
                 // $FlowFixMe[incompatible-type] - Per the condition above, we are confident that node.event is not null.
                 event.setFolded(false);
@@ -547,6 +554,7 @@ const EventsTree: component(
             }
           }
         } else {
+          // $FlowFixMe[cannot-resolve-name]
           if (_hoverTimerId.current) window.clearTimeout(_hoverTimerId.current);
           _hoverTimerId.current = null;
         }
@@ -599,9 +607,11 @@ const EventsTree: component(
     const { onEventMoved } = props;
     const _onDrop = React.useCallback(
       (
+        // $FlowFixMe[value-as-type]
         moveFunction: MoveFunctionArguments => void,
         currentNode: SortableTreeNode
       ) => {
+        // $FlowFixMe[constant-condition]
         if (!draggedNode) return;
 
         moveFunction({
@@ -625,11 +635,14 @@ const EventsTree: component(
       if (!event) return null;
 
       const isDragged =
+        // $FlowFixMe[constant-condition]
         !!draggedNode &&
+        // $FlowFixMe[invalid-compare]
         (isDescendant(draggedNode, node) || node.key === draggedNode.key);
       return (
         <DragSourceAndDropTarget
           beginDrag={() => {
+            // $FlowFixMe[incompatible-type]
             setDraggedNode(node);
             return node;
           }}
@@ -766,6 +779,7 @@ const EventsTree: component(
                     props.highlightedAiGeneratedEventIds
                   }
                 />
+                {/* $FlowFixMe[constant-condition] */}
                 {draggedNode && (
                   <DropContainer
                     node={node}
@@ -877,6 +891,7 @@ const EventsTree: component(
       });
 
       // Add the bottom buttons if we're at the root
+      // $FlowFixMe[incompatible-type]
       const extraNodes: Array<SortableTreeNode> = [
         depth === 0
           ? {
@@ -1005,6 +1020,7 @@ const EventsTree: component(
         .filter(Boolean);
     };
 
+    // $FlowFixMe[incompatible-type]
     React.useImperativeHandle(ref, () => ({
       forceEventsUpdate,
       foldAll,
@@ -1040,6 +1056,7 @@ const EventsTree: component(
         if (!event) return false;
 
         return searchResults.some(highlightedEvent =>
+          // $FlowFixMe[incompatible-exact]
           gd.compare(highlightedEvent, event)
         );
       },
@@ -1094,12 +1111,14 @@ const EventsTree: component(
             <AutoScroll
               DnDComponent={DropTarget}
               direction="top"
+              // $FlowFixMe[constant-condition]
               activateTargets={!!draggedNode && !isScrolledTop}
               onHover={_scrollUp}
             />
             <AutoScroll
               DnDComponent={DropTarget}
               direction="bottom"
+              // $FlowFixMe[constant-condition]
               activateTargets={!!draggedNode && !isScrolledBottom}
               onHover={_scrollDown}
             />

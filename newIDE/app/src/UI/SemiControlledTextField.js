@@ -22,9 +22,13 @@ type Props = {|
   type?: 'text' | 'number',
 
   // Some TextField props that can be reused:
+  // $FlowFixMe[cannot-resolve-name]
   onClick?: (event: SyntheticPointerEvent<HTMLInputElement>) => void,
+  // $FlowFixMe[cannot-resolve-name]
   onKeyPress?: (event: SyntheticKeyboardEvent<HTMLInputElement>) => void,
+  // $FlowFixMe[cannot-resolve-name]
   onKeyUp?: (event: SyntheticKeyboardEvent<HTMLInputElement>) => void,
+  // $FlowFixMe[cannot-resolve-name]
   onKeyDown?: (event: SyntheticKeyboardEvent<HTMLInputElement>) => void,
   margin?: 'none' | 'dense',
   disabled?: boolean,
@@ -55,6 +59,7 @@ export type SemiControlledTextFieldInterface = {|
   focus: FieldFocusFunction,
   forceSetValue: (text: string) => void,
   forceSetSelection: (start: number, end: number) => void,
+  // $FlowFixMe[cannot-resolve-name]
   getInputNode: () => ?HTMLInputElement,
   getFieldWidth: () => ?number,
   getCaretPosition: () => ?number,
@@ -66,9 +71,7 @@ export type SemiControlledTextFieldInterface = {|
  * is typing. This is useful if the parent component can do modifications on the value:
  * the user won't be interrupted or have the value changed until he blurs the field.
  */
-const SemiControlledTextField: component(
-  ...{ ...Props, +ref?: React.RefSetter<SemiControlledTextFieldInterface> }
-) React.Node = React.forwardRef<
+const SemiControlledTextField: React.ComponentType<any> = React.forwardRef<
   Props,
   SemiControlledTextFieldInterface
 >((props, ref) => {
@@ -92,6 +95,7 @@ const SemiControlledTextField: component(
     if (textFieldRef.current) textFieldRef.current.focus(options);
   };
 
+  // $FlowFixMe[cannot-resolve-name]
   const getInputNode = (): ?HTMLInputElement => {
     if (textFieldRef.current) return textFieldRef.current.getInputNode();
   };
@@ -124,7 +128,7 @@ const SemiControlledTextField: component(
   } = props;
 
   return (
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     <TextField
       {...otherProps}
       type={type || 'text'}

@@ -75,16 +75,12 @@ export type SemiControlledMultiAutoCompleteInterface = {|
   focusInput: () => void,
 |};
 
-const SemiControlledMultiAutoComplete: component(
-  ...{
-    ...Props,
-    +ref?: React.RefSetter<SemiControlledMultiAutoCompleteInterface>,
-  }
-) React.Node = React.forwardRef<
+const SemiControlledMultiAutoComplete: React.ComponentType<any> = React.forwardRef<
   Props,
   SemiControlledMultiAutoCompleteInterface
 >((props, ref) => {
   const chipStyles = useChipStyles();
+  // $FlowFixMe[value-as-type]
   const inputRef = React.useRef<?TextField>(null);
 
   React.useImperativeHandle(ref, () => ({

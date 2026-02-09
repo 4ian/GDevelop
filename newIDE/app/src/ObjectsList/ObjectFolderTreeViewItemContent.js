@@ -5,6 +5,7 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import Clipboard from '../Utils/Clipboard';
 import { SafeExtractor } from '../Utils/SafeExtractor';
+// $FlowFixMe[import-type-as-value]
 import { TreeViewItemContent } from '.';
 import {
   enumerateFoldersInContainer,

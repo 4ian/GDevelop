@@ -112,7 +112,7 @@ export const ProductLicenseStoreStateProvider = ({children}: ProductLicenseStore
   );
 
   return (
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     <ProductLicenseStoreContext.Provider value={ProductLicenseStoreState}>
       {children}
     </ProductLicenseStoreContext.Provider>

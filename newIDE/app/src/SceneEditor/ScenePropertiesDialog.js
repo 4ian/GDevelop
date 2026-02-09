@@ -254,6 +254,7 @@ const ScenePropertiesDialog = (
   return (
     <Dialog
       title={<Trans>{layout.getName()} properties</Trans>}
+      // $FlowFixMe[incompatible-type]
       actions={actions}
       secondaryActions={[
         <RaisedButton

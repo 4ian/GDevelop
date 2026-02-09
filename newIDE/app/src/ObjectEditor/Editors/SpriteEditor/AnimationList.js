@@ -55,6 +55,7 @@ const removeExtensionFromFileName = (fileName: string) => {
   return dotIndex < 0 ? fileName : fileName.substring(0, dotIndex);
 };
 
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget(
   'sprite-animations-list'
 );
@@ -112,13 +113,12 @@ type AnimationListProps = {|
   unsavedChanges?: UnsavedChanges,
   animations: gdSpriteAnimationList,
   isAnimationListLocked?: boolean,
+  // $FlowFixMe[value-as-type]
   scrollView: { current: ?ScrollViewInterface },
   onCreateMatchingSpriteCollisionMask: () => Promise<void>,
 |};
 
-const AnimationList: component(
-  ...{ ...AnimationListProps, +ref?: React.RefSetter<AnimationListInterface> }
-) React.Node = React.forwardRef<
+const AnimationList: React.ComponentType<any> = React.forwardRef<
   AnimationListProps,
   AnimationListInterface
 >(
@@ -143,11 +143,13 @@ const AnimationList: component(
     const [externalEditorOpened, setExternalEditorOpened] = React.useState(
       false
     );
+    // $FlowFixMe[cannot-resolve-name]
     const abortControllerRef = React.useRef<?AbortController>(null);
     const forceUpdate = useForceUpdate();
     const { isMobile } = useResponsiveWindowSize();
     const { showConfirmation } = useAlertDialog();
     const animationsCount = animations.getAnimationsCount();
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     const animationsIndices = new Array(animationsCount)
       .fill(0)
       .map((_, index) => index);
@@ -415,6 +417,7 @@ const AnimationList: component(
     );
 
     const replaceDirection = React.useCallback(
+      // $FlowFixMe[missing-local-annot]
       (animationId, directionId, newDirection) => {
         animations
           .getAnimation(animationId)
@@ -513,6 +516,7 @@ const AnimationList: component(
         animationIndex: number,
         directionIndex: number
       ) => {
+        // $FlowFixMe[cannot-resolve-name]
         abortControllerRef.current = new AbortController();
         const { signal } = abortControllerRef.current;
         const resourceNames = mapFor(0, direction.getSpritesCount(), i => {

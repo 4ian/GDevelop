@@ -175,6 +175,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
 
   onClick(): void {}
 
+  // $FlowFixMe[missing-local-annot]
   buildMenuTemplate(i18n: I18nType, index: number) {
     return this.buildMenuTemplateFunction(i18n, index);
   }
@@ -588,12 +589,14 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         if (!project || !layerTreeViewItemProps) {
           return [];
         }
+        // $FlowFixMe[incompatible-type]
         return [
           {
             isRoot: false,
             content: new LabelTreeViewItemContent(
               layersRootFolderId,
               '',
+              // $FlowFixMe[incompatible-type]
               [
                 gameEditorMode === 'embedded-game'
                   ? {
@@ -623,6 +626,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                 },
               ].filter(Boolean),
               () =>
+                // $FlowFixMe[incompatible-type]
                 [
                   gameEditorMode === 'embedded-game'
                     ? {
@@ -759,6 +763,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
             >
               <AutoSizer style={styles.autoSizer} disableWidth>
                 {({ height }) => (
+                  {/* $FlowFixMe[incompatible-type] */}
                   <TreeView
                     key={listKey}
                     ref={treeViewRef}
@@ -805,9 +810,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
   }
 );
 
-const LayersListWithErrorBoundary: component(
-  ...{ ...Props, +ref?: React.RefSetter<LayersListInterface> }
-) React.Node = React.forwardRef<
+const LayersListWithErrorBoundary: React.ComponentType<any> = React.forwardRef<
   Props,
   LayersListInterface
 >((props, ref) => (

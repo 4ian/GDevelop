@@ -36,9 +36,7 @@ type Props = {|
   isNotShownDuringInAppTutorial?: boolean,
 |};
 
-const SubscriptionChecker: component(
-  ...{ ...Props, +ref?: React.RefSetter<SubscriptionCheckerInterface> }
-) React.Node = React.forwardRef<
+const SubscriptionChecker: React.ComponentType<any> = React.forwardRef<
   Props,
   SubscriptionCheckerInterface
 >(

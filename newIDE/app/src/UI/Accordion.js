@@ -147,9 +147,8 @@ type AccordionProps = {|
  * and accordion-specific actions.
  * Based on Material-UI Accordion.
  */
-export const Accordion: component(
-  ...{ ...AccordionProps, +ref?: React.RefSetter<any> }
-) React.Node = React.forwardRef<AccordionProps, MUIAccordion>(
+// $FlowFixMe[value-as-type]
+export const Accordion: React.ComponentType<any> = React.forwardRef<AccordionProps, MUIAccordion>(
   (props, ref) => {
     const { costlyBody, noMargin, kind, ...otherProps } = props;
     const gdevelopTheme = React.useContext(GDevelopThemeContext);

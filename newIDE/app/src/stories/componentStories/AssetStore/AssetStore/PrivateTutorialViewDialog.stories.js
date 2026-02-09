@@ -66,7 +66,7 @@ const PrivateTutorialViewDialogStory = ({
 };
 
 export const Unauthenticated = (): React.Node => (
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   <PrivateTutorialViewDialogStory
     tutorial={fakeEducationCurriculumPrivateTutorial}
     privatePdfTutorial={fakeEducationCurriculumPrivatePdfTutorial}
@@ -75,7 +75,7 @@ export const Unauthenticated = (): React.Node => (
 );
 
 export const WithAccess = (): React.Node => (
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   <PrivateTutorialViewDialogStory
     authenticatedUser={fakeAuthenticatedTeacherFromEducationPlan}
     tutorial={fakeEducationCurriculumPrivateTutorial}
@@ -86,7 +86,7 @@ export const WithAccess = (): React.Node => (
 );
 
 export const Errored = (): React.Node => (
-  // $FlowFixMe[incompatible-type]
+  {/* $FlowFixMe[incompatible-type] */}
   <PrivateTutorialViewDialogStory
     authenticatedUser={fakeAuthenticatedTeacherFromEducationPlan}
     tutorial={fakeEducationCurriculumPrivateTutorial}

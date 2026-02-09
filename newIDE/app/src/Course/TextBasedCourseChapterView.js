@@ -57,7 +57,7 @@ type Props = {|
 // $FlowFixMe[cannot-resolve-name]
 const TextBasedCourseChapterView: React.ComponentType<Props> = React.forwardRef<Props, HTMLDivElement>(
   (
-    // $FlowFixMe[missing-local-annot]
+    {/* $FlowFixMe[missing-local-annot] */}
     {
       chapterIndex,
       courseChapter,
@@ -73,7 +73,7 @@ const TextBasedCourseChapterView: React.ComponentType<Props> = React.forwardRef<
   ) => {
     return (
       <ColumnStackLayout expand noMargin>
-        // $FlowFixMe[incompatible-type]
+        {/* $FlowFixMe[incompatible-type] */}
         <CourseChapterTitle
           course={course}
           chapterIndex={chapterIndex}

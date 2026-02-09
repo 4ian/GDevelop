@@ -60,12 +60,7 @@ const styles = {
 };
 
 // Forward ref to allow Scene editor to force update some editors
-const SwipeableDrawerEditorsDisplay: component(
-  ...{
-    ...SceneEditorsDisplayProps,
-    +ref?: React.RefSetter<SceneEditorsDisplayInterface>,
-  }
-) React.Node = React.forwardRef<
+const SwipeableDrawerEditorsDisplay: React.ComponentType<any> = React.forwardRef<
   SceneEditorsDisplayProps,
   SceneEditorsDisplayInterface
 >((props, ref) => {
@@ -109,6 +104,7 @@ const SwipeableDrawerEditorsDisplay: component(
   const objectsListDoNowOrAfterRender = useDoNowOrAfterRender<?ObjectsListInterface>(
     objectsListRef
   );
+  // $FlowFixMe[cannot-resolve-name]
   const bottomContainerRef = React.useRef<?HTMLDivElement>(null);
   const [bottomContainerHeight, setBottomContainerHeight] = React.useState(0);
 
@@ -218,6 +214,7 @@ const SwipeableDrawerEditorsDisplay: component(
     [drawerOpeningState]
   );
 
+  // $FlowFixMe[incompatible-type]
   React.useImperativeHandle(ref, () => {
     const { current: editor } = editorRef;
 

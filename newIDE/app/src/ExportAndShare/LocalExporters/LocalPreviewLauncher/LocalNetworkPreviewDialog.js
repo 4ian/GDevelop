@@ -80,7 +80,7 @@ const LocalNetworkPreviewDialog = ({url, open, error, onExport, onClose, onRunPr
             </Text>
           </Line>
           <ShareLink url={urlWithProtocol} />
-          // $FlowFixMe[constant-condition]
+          {/* $FlowFixMe[constant-condition] */}
           {urlWithProtocol && (
             <>
               <Line>

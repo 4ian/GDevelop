@@ -120,7 +120,7 @@ class ProjectCache {
 
   _initializeDatabase(): any {
     if (!this.databasePromise) {
-      // $FlowFixMe[cannot-resolve-name][missing-local-annot]
+      // $FlowFixMe[missing-local-annot]
       this.databasePromise = new Promise<IDBDatabase>((resolve, reject) => {
         ProjectCache._removeDatabaseIfCorrupt().then(
           () => {

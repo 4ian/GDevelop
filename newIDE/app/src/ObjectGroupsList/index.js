@@ -472,6 +472,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     const renderGroupMenuTemplate = React.useCallback(
       (i18n: I18nType) => (item: TreeViewItem, index: number) =>
         item.isRoot || item.isPlaceholder
+          // $FlowFixMe[missing-empty-array-annot]
           ? []
           : [
               {
@@ -660,6 +661,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                 <div style={{ flex: 1 }}>
                   <AutoSizer style={{ width: '100%' }} disableWidth>
                     {({ height }) => (
+                      {/* $FlowFixMe[incompatible-type] */}
                       <TreeView
                         key={listKey}
                         ref={treeViewRef}
@@ -690,6 +692,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                         reactDndType={groupWithContextReactDndType}
                         initiallyOpenedNodeIds={initiallyOpenedNodeIds}
                         shouldSelectUponContextMenuOpening
+                        // $FlowFixMe[incompatible-type]
                         getItemRightButton={getRightButton(i18n)}
                       />
                     )}
@@ -714,14 +717,14 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.globalObjectGroups === nextProps.globalObjectGroups &&
   prevProps.objectGroups === nextProps.objectGroups;
 
+// $FlowFixMe[incompatible-type]
 const MemoizedObjectGroupsList = React.memo<Props, ObjectGroupsListInterface>(
+  // $FlowFixMe[incompatible-exact][incompatible-type]
   ObjectGroupsList,
   arePropsEqual
 );
 
-const ObjectGroupsListWithErrorBoundary: component(
-  ...{ ...Props, +ref?: React.RefSetter<ObjectGroupsListInterface> }
-) React.Node = React.forwardRef<
+const ObjectGroupsListWithErrorBoundary: React.ComponentType<any> = React.forwardRef<
   Props,
   ObjectGroupsListInterface
 >((props, ref) => (
@@ -729,6 +732,7 @@ const ObjectGroupsListWithErrorBoundary: component(
     componentTitle={<Trans>Object groups list</Trans>}
     scope="scene-editor-object-groups-list"
   >
+    {/* $FlowFixMe[incompatible-type] */}
     <MemoizedObjectGroupsList ref={ref} {...props} />
   </ErrorBoundary>
 ));

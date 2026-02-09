@@ -181,6 +181,7 @@ type PageBreakNavigationProps = {|
   pageBreakIndex: number,
   setPageBreakIndex: number => void,
   assetShortHeaders: Array<AssetShortHeader>,
+  // $FlowFixMe[value-as-type]
   scrollView: ?ScrollViewInterface,
 |};
 
@@ -263,9 +264,7 @@ type Props = {|
   hideDetails?: boolean,
 |};
 
-const AssetsList: component(
-  ...{ ...Props, +ref?: React.RefSetter<AssetsListInterface> }
-) React.Node = React.forwardRef<Props, AssetsListInterface>(
+const AssetsList: React.ComponentType<any> = React.forwardRef<Props, AssetsListInterface>(
   (
     {
       assetShortHeaders,
@@ -330,6 +329,7 @@ const AssetsList: component(
     const { openedAssetPack, selectedFolders } = React.useMemo(
       () => {
         if (!currentPage) {
+          // $FlowFixMe[missing-empty-array-annot]
           return { openedAssetPack: null, selectedFolders: [] };
         }
         return {
@@ -340,6 +340,7 @@ const AssetsList: component(
       [currentPage]
     );
     const { windowSize, isLandscape } = useResponsiveWindowSize();
+    // $FlowFixMe[value-as-type]
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
       getScrollPosition: () => {
@@ -450,6 +451,7 @@ const AssetsList: component(
     const folderTiles = React.useMemo(
       () => {
         // Don't show folders if we are searching.
+        // $FlowFixMe[missing-empty-array-annot]
         if (!folderTags.length || !onFolderSelection) return [];
         return folderTags.map(folderTag => (
           <AssetFolderTile
@@ -489,6 +491,7 @@ const AssetsList: component(
         // Loading
         if (!assetShortHeaders) return null;
         // Don't show assets if filtering on asset packs.)
+        // $FlowFixMe[missing-empty-array-annot]
         if (hasAssetPackFiltersApplied && !openedAssetPack) return [];
         const assetSize = getAssetSize(windowSize);
 

@@ -189,9 +189,7 @@ type Props = {|
   onOpenProfile?: () => void,
 |};
 
-export const AssetsHome: component(
-  ...{ ...Props, +ref?: React.RefSetter<AssetsHomeInterface> }
-) React.Node = React.forwardRef<Props, AssetsHomeInterface>(
+export const AssetsHome: React.ComponentType<any> = React.forwardRef<Props, AssetsHomeInterface>(
   (
     {
       publicAssetPacks: { starterPacks },
@@ -219,6 +217,7 @@ export const AssetsHome: component(
       achievements,
     } = React.useContext(AuthenticatedUserContext);
 
+    // $FlowFixMe[value-as-type]
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
       /**
@@ -241,7 +240,7 @@ export const AssetsHome: component(
     const categoryTiles = React.useMemo(
       () =>
         Object.entries(shopCategories).map(
-          // $FlowExpectedError - Object.entries does not infer well the type of the value.
+          // $FlowFixMe[incompatible-type][incompatible-use] - Object.entries does not infer well the type of the value.
           ([id, { title, imageSource, imageAlt }]) =>
             onlyShowAssets && id === 'game-template' ? null : (
               <CategoryTile
@@ -263,6 +262,7 @@ export const AssetsHome: component(
     );
 
     const openedShopCategoryTitle = openedShopCategory
+      // $FlowFixMe[invalid-computed-prop]
       ? shopCategories[openedShopCategory].title
       : null;
 

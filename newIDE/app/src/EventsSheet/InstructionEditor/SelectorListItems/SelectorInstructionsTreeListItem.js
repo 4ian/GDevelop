@@ -46,7 +46,7 @@ export const renderInstructionOrExpressionTree = <
       // between instruction (leaf nodes) and group (nodes). We use
       // the "type" properties, but this will fail if a group is called "type"
       // (hence the flow errors, which are valid warnings)
-      // $FlowFixMe[incompatible-type][invalid-computed-prop][prop-missing]
+      // $FlowFixMe[invalid-computed-prop][prop-missing]
       const instructionOrGroup = instructionTreeNode[key];
       if (!instructionOrGroup) return null;
 

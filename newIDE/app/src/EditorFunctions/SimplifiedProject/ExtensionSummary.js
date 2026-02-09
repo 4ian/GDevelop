@@ -207,7 +207,7 @@ const getPropertiesSummary = ({
   if (propertiesContainer)
     // $FlowFixMe[incompatible-exact]
     return mapVector(propertiesContainer, namedProperty => {
-      // $FlowFixMe[incompatible-type][incompatible-use]
+      // $FlowFixMe[incompatible-use]
       return getPropertySummary(namedProperty.getName(), namedProperty);
     });
 

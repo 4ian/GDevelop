@@ -32,9 +32,8 @@ type ChipInterface = {|
   focus: () => void,
 |};
 
-const Chip: component(
-  ...{ ...Props, +ref?: React.RefSetter<ChipInterface> }
-) React.Node = React.forwardRef<Props, ChipInterface>((props, ref) => {
+const Chip: React.ComponentType<any> = React.forwardRef<Props, ChipInterface>((props, ref) => {
+  // $FlowFixMe[cannot-resolve-name]
   const chipRef = React.useRef<?HTMLDivElement>(null);
   const muiTheme = useTheme();
   const focus = () => {

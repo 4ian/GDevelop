@@ -50,9 +50,7 @@ export type CommandPaletteInterface = {|
 
 type PaletteMode = 'closed' | 'command' | 'option';
 
-const CommandPalette: component(
-  '(Reason.OrdinaryName "ref")'?: React.RefSetter<CommandPaletteInterface>,
-) React.Node = React.forwardRef<{||}, CommandPaletteInterface>(
+const CommandPalette: React.ComponentType<any> = React.forwardRef<{||}, CommandPaletteInterface>(
   (props, ref) => {
     const classes = useStyles();
     const paperClasses = useStylesForPaper();
@@ -113,6 +111,7 @@ const CommandPalette: component(
       setMode('closed');
     };
 
+    // $FlowFixMe[missing-local-annot]
     const openPalette = React.useCallback((open? = true) => {
       if (open) setMode('command');
       else setMode('closed');
@@ -123,6 +122,7 @@ const CommandPalette: component(
      * manager and launches command accordingly
      */
     const launchCommand = React.useCallback(
+      // $FlowFixMe[missing-local-annot]
       commandName => {
         const command = commandManager.getNamedCommand(commandName);
         if (!command) return;
@@ -216,9 +216,7 @@ const CommandPalette: component(
   }
 );
 
-export const CommandPaletteWithAlgoliaSearch: component(
-  '(Reason.OrdinaryName "ref")'?: React.RefSetter<CommandPaletteInterface>,
-) React.Node = React.forwardRef<
+export const CommandPaletteWithAlgoliaSearch: React.ComponentType<any> = React.forwardRef<
   {},
   CommandPaletteInterface
 >((props, ref) => (

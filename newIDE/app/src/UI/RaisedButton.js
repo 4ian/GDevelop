@@ -31,15 +31,14 @@ export type RaisedButtonPropsWithoutOnClick = {|
 
 export type RaisedButtonProps = {|
   ...RaisedButtonPropsWithoutOnClick,
+  // $FlowFixMe[cannot-resolve-name]
   onClick: ?(MouseEvent) => void | Promise<void>,
 |};
 
 /**
  * A raised button based on Material-UI button.
  */
-const RaisedButton: component(
-  ...{ ...RaisedButtonProps, +ref?: React.RefSetter<ButtonInterface> }
-) React.Node = React.forwardRef<RaisedButtonProps, ButtonInterface>(
+const RaisedButton: React.ComponentType<any> = React.forwardRef<RaisedButtonProps, ButtonInterface>(
   (
     {
       label,

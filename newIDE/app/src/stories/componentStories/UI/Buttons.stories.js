@@ -420,17 +420,20 @@ export const Default = (): React.Node => (
       />
       <RaisedButtonWithMenu
         label="Button with menu"
+        // $FlowFixMe[incompatible-type]
         buildMenuTemplate={buildFakeMenuTemplate}
       />
       <RaisedButtonWithMenu
         label="... and with icon"
         icon={<Edit />}
+        // $FlowFixMe[incompatible-type]
         buildMenuTemplate={buildFakeMenuTemplate}
       />
       <RaisedButtonWithMenu
         label="... and disabled"
         icon={<Edit />}
         disabled
+        // $FlowFixMe[incompatible-type]
         buildMenuTemplate={buildFakeMenuTemplate}
       />
     </LineStackLayout>

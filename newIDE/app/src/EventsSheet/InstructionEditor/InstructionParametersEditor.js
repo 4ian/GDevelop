@@ -111,9 +111,7 @@ const isParameterVisible = (
   return true;
 };
 
-const InstructionParametersEditor: component(
-  ...{ ...Props, +ref?: React.RefSetter<InstructionParametersEditorInterface> }
-) React.Node = React.forwardRef<
+const InstructionParametersEditor: React.ComponentType<any> = React.forwardRef<
   Props,
   InstructionParametersEditorInterface
 >(
@@ -422,6 +420,7 @@ const InstructionParametersEditor: component(
                     label={<Trans>Invert condition</Trans>}
                     labelPosition="right"
                     toggled={instruction.isInverted()}
+                    // $FlowFixMe[incompatible-type]
                     style={styles.invertToggle}
                     onToggle={(e, enabled) => {
                       instruction.setInverted(enabled);
@@ -439,6 +438,7 @@ const InstructionParametersEditor: component(
                     }
                     labelPosition="right"
                     toggled={instruction.isAwaited()}
+                    // $FlowFixMe[incompatible-type]
                     style={styles.invertToggle}
                     onToggle={(e, enabled) => {
                       instruction.setAwaited(enabled);

@@ -161,6 +161,7 @@ const CloudProjectRecoveryDialog = ({cloudProjectId, onClose, onOpenPreviousVers
           maxWidth="sm"
           onRequestClose={onClose}
           onApply={onApply}
+          // $FlowFixMe[incompatible-type]
           actions={actions}
           title={
             lastSaneVersion && !isLoading ? (

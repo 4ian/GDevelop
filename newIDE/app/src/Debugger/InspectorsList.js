@@ -73,6 +73,7 @@ export default class InspectorsList extends React.Component<Props, void> {
 
   render(): any {
     return this.props.gameData ? (
+      {/* $FlowFixMe[incompatible-type] */}
       <List style={styles.list}>
         {this._renderInspectorList(
           this.props.gameData,

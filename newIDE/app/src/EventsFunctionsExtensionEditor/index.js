@@ -1845,6 +1845,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       mosaicContainsNode(
                         getDefaultEditorMosaicNode(
                           'events-functions-extension-editor'
+                        // $FlowFixMe[incompatible-type]
                         ) || getInitialMosaicEditorNodes(),
                         'functions-list'
                       )

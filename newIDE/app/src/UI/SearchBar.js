@@ -60,9 +60,7 @@ const noop = () => {};
  *
  * Customized to add optional menu button and chips corresponding to tags.
  */
-const SearchBar: component(
-  ...{ ...Props, +ref?: React.RefSetter<SearchBarInterface> }
-) React.Node = React.forwardRef<Props, SearchBarInterface>(
+const SearchBar: React.ComponentType<any> = React.forwardRef<Props, SearchBarInterface>(
   (
     {
       id,
@@ -182,6 +180,7 @@ const SearchBar: component(
       if (!isMobile) focus();
     };
 
+    // $FlowFixMe[cannot-resolve-name]
     const handleKeyPressed = (event: SyntheticKeyboardEvent<>) => {
       if (shouldValidate(event)) {
         onRequestSearch(value);

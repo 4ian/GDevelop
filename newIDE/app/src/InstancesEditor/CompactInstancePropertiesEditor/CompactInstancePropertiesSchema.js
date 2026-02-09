@@ -735,7 +735,7 @@ export const reorderInstanceSchemaForCustomProperties = (
   const [animationField] = newSchema.splice(animationFieldIndex, 1);
 
   const firstFields: Schema = [
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     {
       name: 'Animation',
       type: 'row',

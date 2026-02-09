@@ -23,7 +23,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
     },
   },
   headers: [
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     {
       tier: 'reviewed',
       authorIds: ['IWykYNRvhCZBN3vEgKEbBPOR3Oc2'],
@@ -47,7 +47,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       // $FlowFixMe[incompatible-type]
       type: null,
     },
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     {
       tier: 'reviewed',
       authorIds: ['wWP8BSlAW0UP4NeaHa2LcmmDzmH2'],
@@ -83,7 +83,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     {
       tier: 'reviewed',
       authorIds: [
@@ -131,7 +131,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     {
       tier: 'reviewed',
       authorIds: ['wWP8BSlAW0UP4NeaHa2LcmmDzmH2'],
@@ -155,7 +155,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       // $FlowFixMe[incompatible-type]
       type: null,
     },
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     {
       tier: 'reviewed',
       authorIds: ['2OwwM8ToR9dx9RJ2sAKTcrLmCB92'],
@@ -190,7 +190,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     {
       tier: 'reviewed',
       authorIds: ['2OwwM8ToR9dx9RJ2sAKTcrLmCB92'],
@@ -225,7 +225,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     {
       tier: 'reviewed',
       authorIds: [
@@ -274,7 +274,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     {
       tier: 'reviewed',
       authorIds: ['IWykYNRvhCZBN3vEgKEbBPOR3Oc2'],
@@ -309,7 +309,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     {
       tier: 'reviewed',
       authorIds: ['IWykYNRvhCZBN3vEgKEbBPOR3Oc2'],
@@ -345,7 +345,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     {
       tier: 'reviewed',
       authorIds: [
@@ -396,7 +396,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     {
       tier: 'reviewed',
       authorIds: [
@@ -446,7 +446,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     {
       tier: 'reviewed',
       authorIds: [
@@ -495,7 +495,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     {
       tier: 'reviewed',
       authorIds: [],
@@ -520,7 +520,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       type: null,
       authors: [],
     },
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     {
       tier: 'experimental',
       authorIds: [
@@ -569,7 +569,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     {
       tier: 'experimental',
       authorIds: [
@@ -618,7 +618,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     {
       tier: 'experimental',
       authorIds: [
@@ -667,7 +667,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
+    {/* $FlowFixMe[incompatible-type] */}
     {
       tier: 'experimental',
       authorIds: [

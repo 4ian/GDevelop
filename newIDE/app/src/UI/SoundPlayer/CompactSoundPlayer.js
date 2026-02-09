@@ -30,7 +30,7 @@ const CompactSoundPlayer = ({
     if (!audio) return;
 
     audio.pause();
-    abortControllerRef.current?.abort();
+    if (abortControllerRef.current) abortControllerRef.current.abort();
 
     audio.src = '';
     audioRef.current = null;

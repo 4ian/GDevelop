@@ -9,7 +9,7 @@ class UrlsCache {
 
   // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  _getProjectCache(project: gdProject) {
+  _getProjectCache(project: gdProject): any {
     const cache = this.projectCache[project.ptr];
     if (!cache) {
       return (this.projectCache[project.ptr] = {});

@@ -8,7 +8,9 @@ import * as PIXI from 'pixi.js-legacy';
  * Create a renderer for an type of object displayed as an icon
  */
 // $FlowFixMe[cannot-resolve-name]
-export default function makeRenderer(iconPath: string): typeof RenderedIconInstance {
+export default function makeRenderer(
+  iconPath: string
+): typeof RenderedIconInstance {
   class RenderedIconInstance extends RenderedInstance {
     constructor(
       project: gdProject,
@@ -49,7 +51,7 @@ export default function makeRenderer(iconPath: string): typeof RenderedIconInsta
       project: gdProject,
       resourcesLoader: Class<ResourcesLoader>,
       objectConfiguration: gdObjectConfiguration
-    // $FlowFixMe[missing-local-annot]
+      // $FlowFixMe[missing-local-annot]
     ) {
       return iconPath;
     }

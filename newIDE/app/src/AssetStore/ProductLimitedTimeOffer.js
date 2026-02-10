@@ -21,7 +21,11 @@ type Props = {|
   alignCenter?: boolean,
 |};
 
-const ProductLimitedTimeOffer = ({visibleUntil, hideMinutesAndSeconds, alignCenter}: Props): null | React.MixedElement => {
+const ProductLimitedTimeOffer = ({
+  visibleUntil,
+  hideMinutesAndSeconds,
+  alignCenter,
+}: Props): null | React.MixedElement => {
   const [timeLeft, setTimeLeft] = React.useState<{|
     days: number,
     hours: number,

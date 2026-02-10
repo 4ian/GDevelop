@@ -79,7 +79,10 @@ type Props = {|
 
 // $FlowFixMe[prop-missing]
 // $FlowFixMe[incompatible-type]
-const ResourcesList: React.AbstractComponent<Props, ResourcesListInterface> = React.memo<Props, ResourcesListInterface>(
+const ResourcesList: React.AbstractComponent<
+  Props,
+  ResourcesListInterface
+> = React.memo<Props, ResourcesListInterface>(
   // $FlowFixMe[incompatible-type]
   // $FlowFixMe[incompatible-exact]
   React.forwardRef<Props, ResourcesListInterface>(

@@ -21,19 +21,17 @@ const gd: libGDevelop = global.gd;
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function AnyVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
-    const [editorOpen, setEditorOpen] = React.useState<
-      VariableDialogOpeningProps | null,
-    >(null);
+    const [
+      editorOpen,
+      setEditorOpen,
+    ] = React.useState<VariableDialogOpeningProps | null>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(
-      ref,
-      () => ({
-        focus,
-      }),
-    );
-    
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
+
     const {
       project,
       scope,
@@ -41,34 +39,40 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       onInstructionTypeChanged,
       projectScopedContainersAccessor,
       onChange,
-      value
+      value,
     } = props;
-    const {layout} = scope;
-    
+    const { layout } = scope;
+
     const enumerateGlobalAndSceneVariables = React.useCallback(
-      () => enumerateVariablesOfContainersList(
-        projectScopedContainersAccessor.get().getVariablesContainersList(),
-      ),
-      [projectScopedContainersAccessor],
+      () =>
+        enumerateVariablesOfContainersList(
+          projectScopedContainersAccessor.get().getVariablesContainersList()
+        ),
+      [projectScopedContainersAccessor]
     );
-    
+
     const variablesContainers = React.useMemo(
       () => {
-        const variablesContainersList = projectScopedContainersAccessor.get().getVariablesContainersList();
+        const variablesContainersList = projectScopedContainersAccessor
+          .get()
+          .getVariablesContainersList();
         return mapFor(
           0,
           variablesContainersList.getVariablesContainersCount(),
           i => {
             return variablesContainersList.getVariablesContainer(i);
-          },
+          }
         ).filter(
-          variableContainer => variableContainer.getSourceType() !== gd.VariablesContainer.Parameters &&
-            variableContainer.getSourceType() !== gd.VariablesContainer.Properties,
+          variableContainer =>
+            variableContainer.getSourceType() !==
+              gd.VariablesContainer.Parameters &&
+            variableContainer.getSourceType() !==
+              gd.VariablesContainer.Properties
         );
       },
-      [projectScopedContainersAccessor],
+      [projectScopedContainersAccessor]
     );
-    
+
     const onVariableEditorApply = React.useCallback(
       (selectedVariableName: string | null) => {
         if (selectedVariableName && selectedVariableName.startsWith(value)) {
@@ -80,13 +84,16 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         if (onInstructionTypeChanged) onInstructionTypeChanged();
         if (field.current) field.current.updateAutocompletions();
       },
-      [onChange, onInstructionTypeChanged, value],
+      [onChange, onInstructionTypeChanged, value]
     );
-    
-    const isGlobal = !!(layout && project &&
+
+    const isGlobal = !!(
+      layout &&
+      project &&
       !layout.getVariables().has(getRootVariableName(props.value)) &&
-      project.getVariables().has(getRootVariableName(props.value)));
-    
+      project.getVariables().has(getRootVariableName(props.value))
+    );
+
     return (
       <React.Fragment>
         <VariableField
@@ -108,13 +115,15 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           objectsContainer={props.objectsContainer}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
           scope={scope}
-          id={props.parameterIndex !== undefined
-            ? `parameter-${props.parameterIndex}-scene-variable-field`
-            : undefined}
+          id={
+            props.parameterIndex !== undefined
+              ? `parameter-${props.parameterIndex}-scene-variable-field`
+              : undefined
+          }
           onInstructionTypeChanged={onInstructionTypeChanged}
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
         />
-        {editorOpen &&
+        {editorOpen && (
           <GlobalAndSceneVariablesDialog
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             open
@@ -125,12 +134,16 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
             hotReloadPreviewButtonProps={null}
             isListLocked={false}
-          />}
+          />
+        )}
       </React.Fragment>
     );
-  },
-// $FlowFixMe[prop-missing]
-): React.AbstractComponent<{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }, React.RefSetter<ParameterFieldInterface>>);
+  }
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);
 
 export const getVariableSourceFromIdentifier = (
   variableName: string,
@@ -145,5 +158,7 @@ export const getVariableSourceFromIdentifier = (
     : gd.VariablesContainer.Unknown;
 };
 
-export const renderInlineAnyVariable = (props: ParameterInlineRendererProps): any =>
+export const renderInlineAnyVariable = (
+  props: ParameterInlineRendererProps
+): any =>
   renderVariableWithIcon(props, 'variable', getVariableSourceFromIdentifier);

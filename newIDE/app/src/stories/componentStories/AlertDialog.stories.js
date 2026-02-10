@@ -33,7 +33,7 @@ export const Default = (): React.Node => {
     // $FlowFixMe[invalid-compare]
     if (answer === 0) {
       action('Yes')();
-    // $FlowFixMe[invalid-compare]
+      // $FlowFixMe[invalid-compare]
     } else if (answer === 1) {
       action('No')();
     } else {

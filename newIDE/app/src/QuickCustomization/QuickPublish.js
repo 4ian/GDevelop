@@ -49,22 +49,20 @@ type Props = {|
   onLaunchPreview: () => Promise<void>,
 |};
 
-export const QuickPublish = (
-  {
-    project,
-    gameAndBuildsManager,
-    setIsNavigationDisabled,
-    onlineWebExporter,
-    onSaveProject,
-    isSavingProject,
-    isRequiredToSaveAsNewCloudProject,
-    onClose,
-    onContinueQuickCustomization,
-    gameScreenshotUrls,
-    onScreenshotsClaimed,
-    onLaunchPreview
-  }: Props,
-): React.Node => {
+export const QuickPublish = ({
+  project,
+  gameAndBuildsManager,
+  setIsNavigationDisabled,
+  onlineWebExporter,
+  onSaveProject,
+  isSavingProject,
+  isRequiredToSaveAsNewCloudProject,
+  onClose,
+  onContinueQuickCustomization,
+  gameScreenshotUrls,
+  onScreenshotsClaimed,
+  onLaunchPreview,
+}: Props): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
     profile,
@@ -142,11 +140,11 @@ export const QuickPublish = (
 
         setBuildOrGameUrl(
           game
-            // $FlowFixMe[incompatible-type]
-            ? getGameUrl(game)
+            ? // $FlowFixMe[incompatible-type]
+              getGameUrl(game)
             : build
-            // $FlowFixMe[incompatible-type]
-            ? getBuildArtifactUrl(build, 's3Key')
+            ? // $FlowFixMe[incompatible-type]
+              getBuildArtifactUrl(build, 's3Key')
             : ''
         );
         setExportState('succeeded');

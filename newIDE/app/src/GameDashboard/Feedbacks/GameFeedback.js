@@ -124,7 +124,7 @@ const getDisplayedFeedbacks = (
   return filteredFeedbacksByBuildAndUnprocessed;
 };
 
-const GameFeedback = ({i18n, authenticatedUser, game}: Props): React.Node => {
+const GameFeedback = ({ i18n, authenticatedUser, game }: Props): React.Node => {
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const [showProcessed, setShowProcessed] = React.useState(false);

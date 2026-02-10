@@ -49,7 +49,11 @@ type SlideshowArrowProps = {|
   classes: Object,
 |};
 
-const SlideshowArrow = ({onClick, position, classes}: SlideshowArrowProps): React.MixedElement => {
+const SlideshowArrow = ({
+  onClick,
+  position,
+  classes,
+}: SlideshowArrowProps): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (

@@ -13,10 +13,14 @@ export const getCurrentElements = (
   animationIndex: number,
   directionIndex: number,
   spriteIndex: number
-): 
+):
   | { animation: null, direction: null, sprite: null }
   | { animation: gdAnimation, direction: null, sprite: null }
-  | { animation: gdAnimation, direction: gdDirection, sprite: gdSprite | null } => {
+  | {
+      animation: gdAnimation,
+      direction: gdDirection,
+      sprite: gdSprite | null,
+    } => {
   const hasValidAnimation = animationIndex < animations.getAnimationsCount();
   const animation = hasValidAnimation
     ? animations.getAnimation(animationIndex)
@@ -51,7 +55,9 @@ export const getCurrentElements = (
   };
 };
 
-export const getTotalSpritesCount = (animations: gdSpriteAnimationList): number => {
+export const getTotalSpritesCount = (
+  animations: gdSpriteAnimationList
+): number => {
   let totalSpritesCount = 0;
   for (
     let animationIndex = 0;
@@ -75,7 +81,9 @@ export const getTotalSpritesCount = (animations: gdSpriteAnimationList): number 
 /**
  * Return all the point names
  */
-export const getAllPointNames = (animations: gdSpriteAnimationList): Array<any> => {
+export const getAllPointNames = (
+  animations: gdSpriteAnimationList
+): Array<any> => {
   // $FlowFixMe[underconstrained-implicit-instantiation]
   const allPointNames = new Set();
   for (
@@ -151,7 +159,10 @@ export const copyAnimationsSpritePoints = (
   });
 };
 
-export const isSamePoint = (point1: gdPoint, point2: gdPoint): false | boolean => {
+export const isSamePoint = (
+  point1: gdPoint,
+  point2: gdPoint
+): false | boolean => {
   return (
     point1.getX() === point2.getX() &&
     point1.getY() === point2.getY() &&
@@ -159,7 +170,10 @@ export const isSamePoint = (point1: gdPoint, point2: gdPoint): false | boolean =
   );
 };
 
-export const haveSamePoints = (sprite1: gdSprite, sprite2: gdSprite): any | boolean => {
+export const haveSamePoints = (
+  sprite1: gdSprite,
+  sprite2: gdSprite
+): any | boolean => {
   if (!isSamePoint(sprite1.getCenter(), sprite2.getCenter())) return false;
   if (!isSamePoint(sprite1.getOrigin(), sprite2.getOrigin())) return false;
   if (sprite1.isDefaultCenterPoint() !== sprite2.isDefaultCenterPoint())
@@ -255,7 +269,10 @@ export const copyAnimationsSpriteCollisionMasks = (
   });
 };
 
-export const isSamePolygon = (polygon1: gdPolygon2d, polygon2: gdPolygon2d): any | boolean => {
+export const isSamePolygon = (
+  polygon1: gdPolygon2d,
+  polygon2: gdPolygon2d
+): any | boolean => {
   const polygon1Vertices = polygon1.getVertices();
   const polygon2Vertices = polygon2.getVertices();
 
@@ -339,7 +356,9 @@ export const allObjectSpritesHaveSameCollisionMaskAs = (
   );
 };
 
-export const isFirstSpriteUsingFullImageCollisionMask = (animations: gdSpriteAnimationList): boolean => {
+export const isFirstSpriteUsingFullImageCollisionMask = (
+  animations: gdSpriteAnimationList
+): boolean => {
   const firstSprite = getCurrentElements(animations, 0, 0, 0).sprite;
   return firstSprite ? firstSprite.isFullImageCollisionMask() : false;
 };

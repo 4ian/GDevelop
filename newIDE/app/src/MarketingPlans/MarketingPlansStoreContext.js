@@ -24,7 +24,9 @@ type MarketingPlansStoreStateProviderProps = {|
   children: React.Node,
 |};
 
-export const MarketingPlansStoreStateProvider = ({children}: MarketingPlansStoreStateProviderProps): React.MixedElement => {
+export const MarketingPlansStoreStateProvider = ({
+  children,
+}: MarketingPlansStoreStateProviderProps): React.MixedElement => {
   const [error, setError] = React.useState<?Error>(null);
   const [
     marketingPlans,

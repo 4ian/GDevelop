@@ -180,23 +180,21 @@ const initialMemberships: Array<TeamMembership> = [
   },
 ];
 
-export const MockTeamProvider = (
-  {
-    children,
-    loading,
-    noGroups,
-    noMembers,
-    noActiveMembers,
-    teamSize
-  }: {|
-    children: React.Node,
-    loading: boolean,
-    noGroups?: boolean,
-    noMembers?: boolean,
-    noActiveMembers?: boolean,
-    teamSize?: number,
-  |},
-): React.Node => {
+export const MockTeamProvider = ({
+  children,
+  loading,
+  noGroups,
+  noMembers,
+  noActiveMembers,
+  teamSize,
+}: {|
+  children: React.Node,
+  loading: boolean,
+  noGroups?: boolean,
+  noMembers?: boolean,
+  noActiveMembers?: boolean,
+  teamSize?: number,
+|}): React.Node => {
   const team = { ...initialTeam, seats: teamSize || initialTeam.seats };
   const [nameChangeTryCount, setNameChangeTryCount] = React.useState<number>(0);
   const [userChangeTryCount, setUserChangeTryCount] = React.useState<number>(0);

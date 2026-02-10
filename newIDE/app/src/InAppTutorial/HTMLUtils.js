@@ -53,7 +53,9 @@ export const isContainedInReactRootNode = (element: HTMLElement): boolean => {
   return reactRootNode.contains(element);
 };
 
-export const getDisplayZIndexForHighlighter = (element: HTMLElement): number | string => {
+export const getDisplayZIndexForHighlighter = (
+  element: HTMLElement
+): number | string => {
   // If the element is the tutorial avatar, it should be above everything else,
   // to avoid modals or drawers to be displayed above it.
   if (element.id === 'in-app-tutorial-avatar') return aboveMaterialUiMaxZIndex;

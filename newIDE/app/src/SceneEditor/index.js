@@ -978,12 +978,12 @@ export default class SceneEditor extends React.Component<Props, State> {
    */
   // $FlowFixMe[missing-local-annot]
   _onInstancesEditorSettingsMutated = (debounce(
-  (instancesEditorSettings: InstancesEditorSettings) => {
-    this.setInstancesEditorSettings(instancesEditorSettings);
-  },
-  1000,
-  { leading: false, trailing: true },
-): any);
+    (instancesEditorSettings: InstancesEditorSettings) => {
+      this.setInstancesEditorSettings(instancesEditorSettings);
+    },
+    1000,
+    { leading: false, trailing: true }
+  ): any);
 
   undo = () => {
     // /!\ Drop the selection to avoid keeping any references to deleted instances.
@@ -1295,12 +1295,9 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   // $FlowFixMe[missing-local-annot]
-  _exportDataOnly = (debounce(
-  () => {
+  _exportDataOnly = (debounce(() => {
     this.props.hotReloadPreviewButtonProps.launchProjectDataOnlyPreview();
-  },
-  250,
-): any);
+  }, 250): any);
 
   _onInstancesModified = (instances: Array<gdInitialInstance>) => {
     this._sendUpdatedInstances(instances);

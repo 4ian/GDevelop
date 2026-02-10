@@ -43,20 +43,18 @@ type Props = {|
   platform: gdPlatform,
 |};
 
-export const BehaviorListItem = (
-  {
-    id,
-    objectType,
-    objectBehaviorsTypes,
-    isChildObject,
-    behaviorShortHeader,
-    matches,
-    onChoose,
-    onShowDetails,
-    onHeightComputed,
-    platform
-  }: Props,
-): React.Node => {
+export const BehaviorListItem = ({
+  id,
+  objectType,
+  objectBehaviorsTypes,
+  isChildObject,
+  behaviorShortHeader,
+  matches,
+  onChoose,
+  onShowDetails,
+  onHeightComputed,
+  platform,
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const alreadyAdded = objectBehaviorsTypes.includes(behaviorShortHeader.type);

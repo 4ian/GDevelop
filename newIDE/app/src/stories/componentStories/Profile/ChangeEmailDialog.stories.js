@@ -20,7 +20,9 @@ const defaultProps = {
   onChangeEmail: action('onChangeEmail'),
   error: null,
 };
-export const Default = (): React.Node => <ChangeEmailDialog {...defaultProps} />;
+export const Default = (): React.Node => (
+  <ChangeEmailDialog {...defaultProps} />
+);
 
 export const ErrorFromBackend = (): React.Node => (
   <ChangeEmailDialog

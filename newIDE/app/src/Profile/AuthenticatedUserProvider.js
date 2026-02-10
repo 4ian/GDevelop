@@ -146,9 +146,11 @@ export default class AuthenticatedUserProvider extends React.Component<
   //   their cloud projects;
   // - Second one comes from the homepage fetching the cloud projects regularly.
   // $FlowFixMe[missing-local-annot]
-  _cloudProjectListingDeduplicator = (new RequestDeduplicator<Array<CloudProjectWithUserAccessInfo>>(
-  listUserCloudProjects,
-): RequestDeduplicator<Array<CloudProjectWithUserAccessInfo>>);
+  _cloudProjectListingDeduplicator = (new RequestDeduplicator<
+    Array<CloudProjectWithUserAccessInfo>
+  >(listUserCloudProjects): RequestDeduplicator<
+    Array<CloudProjectWithUserAccessInfo>
+  >);
 
   async componentDidMount() {
     // Wait for Firebase to complete its initial auth check before doing anything.
@@ -360,7 +362,7 @@ export default class AuthenticatedUserProvider extends React.Component<
        */
       resetState?: boolean,
     }
-  // $FlowFixMe[missing-local-annot]
+    // $FlowFixMe[missing-local-annot]
   ) => {
     const { authentication } = this.props;
 
@@ -1296,7 +1298,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   _doEdit = async (
     payload: EditUserChanges,
     preferences: PreferencesValues
-  // $FlowFixMe[missing-local-annot]
+    // $FlowFixMe[missing-local-annot]
   ) => {
     const { authentication } = this.props;
     if (!authentication) return;

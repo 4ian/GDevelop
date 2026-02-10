@@ -55,29 +55,31 @@ type ResourceStoreState = {|
   |},
 |};
 
-export const ResourceStoreContext: React.Context<ResourceStoreState> = React.createContext<ResourceStoreState>({
-  filters: null,
-  authors: null,
-  licenses: null,
-  searchResults: null,
-  fetchResourcesAndFilters: () => {},
-  error: null,
-  searchText: '',
-  setSearchText: () => {},
-  clearAllFilters: () => {},
-  setSearchResourceKind: () => {},
-  getAuthorsDisplayLinks: () => null,
-  audioFiltersState: {
-    durationFilter: new DurationResourceStoreSearchFilter(),
-    setDurationFilter: DurationResourceStoreSearchFilter => {},
-    audioTypeFilter: new AudioTypeResourceStoreSearchFilter(),
-    setAudioTypeFilter: AudioTypeResourceStoreSearchFilter => {},
-  },
-  fontFiltersState: {
-    alphabetSupportFilter: new AlphabetSupportResourceStoreSearchFilter(),
-    setAlphabetSupportFilter: () => {},
-  },
-});
+export const ResourceStoreContext: React.Context<ResourceStoreState> = React.createContext<ResourceStoreState>(
+  {
+    filters: null,
+    authors: null,
+    licenses: null,
+    searchResults: null,
+    fetchResourcesAndFilters: () => {},
+    error: null,
+    searchText: '',
+    setSearchText: () => {},
+    clearAllFilters: () => {},
+    setSearchResourceKind: () => {},
+    getAuthorsDisplayLinks: () => null,
+    audioFiltersState: {
+      durationFilter: new DurationResourceStoreSearchFilter(),
+      setDurationFilter: DurationResourceStoreSearchFilter => {},
+      audioTypeFilter: new AudioTypeResourceStoreSearchFilter(),
+      setAudioTypeFilter: AudioTypeResourceStoreSearchFilter => {},
+    },
+    fontFiltersState: {
+      alphabetSupportFilter: new AlphabetSupportResourceStoreSearchFilter(),
+      setAlphabetSupportFilter: () => {},
+    },
+  }
+);
 
 type ResourceStoreStateProviderProps = {|
   children: React.Node,
@@ -87,7 +89,9 @@ const getResourceSearchTerms = (resource: ResourceV2 | Resource) => {
   return resource.name + '\n' + resource.tags.join(', ');
 };
 
-export const ResourceStoreStateProvider = ({children}: ResourceStoreStateProviderProps): React.MixedElement => {
+export const ResourceStoreStateProvider = ({
+  children,
+}: ResourceStoreStateProviderProps): React.MixedElement => {
   const [svgResourcesByUrl, setSvgResourcesByUrl] = React.useState<?{
     [string]: Resource,
   }>(null);

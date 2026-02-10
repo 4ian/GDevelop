@@ -52,25 +52,23 @@ type Props = {|
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
-const useNewProjectDialog = (
-  {
-    project,
-    fileMetadata,
-    resourceManagementProps,
-    isProjectOpening,
-    newProjectSetupDialogOpen,
-    setNewProjectSetupDialogOpen,
-    createEmptyProject,
-    createProjectFromExample,
-    createProjectFromPrivateGameTemplate,
-    closeAskAi,
-    storageProviders,
-    storageProvider,
-    onOpenLayout,
-    onWillInstallExtension,
-    onExtensionInstalled
-  }: Props,
-): any => {
+const useNewProjectDialog = ({
+  project,
+  fileMetadata,
+  resourceManagementProps,
+  isProjectOpening,
+  newProjectSetupDialogOpen,
+  setNewProjectSetupDialogOpen,
+  createEmptyProject,
+  createProjectFromExample,
+  createProjectFromPrivateGameTemplate,
+  closeAskAi,
+  storageProviders,
+  storageProvider,
+  onOpenLayout,
+  onWillInstallExtension,
+  onExtensionInstalled,
+}: Props): any => {
   const [isFetchingExample, setIsFetchingExample] = React.useState(false);
   const [
     selectedPrivateGameTemplateListingData,

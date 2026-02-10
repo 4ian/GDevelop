@@ -34,24 +34,22 @@ type Props = {|
   isObjectListLocked: boolean,
 |};
 
-const ObjectGroupEditorDialog = (
-  {
-    project,
-    projectScopedContainersAccessor,
-    group,
-    onApply,
-    onCancel,
-    onObjectGroupAdded,
-    globalObjectsContainer,
-    objectsContainer,
-    initialInstances,
-    bypassedObjectGroupsContainer,
-    initialTab,
-    onComputeAllVariableNames,
-    isVariableListLocked,
-    isObjectListLocked
-  }: Props,
-): React.Node => {
+const ObjectGroupEditorDialog = ({
+  project,
+  projectScopedContainersAccessor,
+  group,
+  onApply,
+  onCancel,
+  onObjectGroupAdded,
+  globalObjectsContainer,
+  objectsContainer,
+  initialInstances,
+  bypassedObjectGroupsContainer,
+  initialTab,
+  onComputeAllVariableNames,
+  isVariableListLocked,
+  isObjectListLocked,
+}: Props): React.Node => {
   const [
     editedObjectGroup,
     setEditedObjectGroup,

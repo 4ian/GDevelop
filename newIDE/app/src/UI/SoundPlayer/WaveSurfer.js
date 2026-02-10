@@ -48,7 +48,7 @@ function useWavesurferInstance(
   containerRef: {| current: HTMLDivElement | null |},
   // $FlowFixMe[value-as-type]
   options: WaveSurferOptions
-// $FlowFixMe[value-as-type]
+  // $FlowFixMe[value-as-type]
 ): WaveSurfer | null {
   // $FlowFixMe[value-as-type]
   const [wavesurfer, setWavesurfer] = React.useState<WaveSurfer | null>(null);
@@ -258,7 +258,10 @@ export default WavesurferPlayer;
  *
  * @public
  */
-export function useWavesurfer({ container, ...options }: Props): {
+export function useWavesurfer({
+  container,
+  ...options
+}: Props): {
   currentTime: number,
   isPlaying: boolean,
   isReady: boolean,

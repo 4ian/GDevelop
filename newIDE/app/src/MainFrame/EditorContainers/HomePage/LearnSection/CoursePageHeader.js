@@ -96,17 +96,15 @@ type Props = {|
   simulateAppStoreProduct?: boolean,
 |};
 
-const CoursePageHeader = (
-  {
-    course,
-    courseChapters,
-    onBuyCourseWithCredits,
-    onBuyCourse,
-    purchasingCourseListingData,
-    setPurchasingCourseListingData,
-    simulateAppStoreProduct
-  }: Props,
-): React.Node => {
+const CoursePageHeader = ({
+  course,
+  courseChapters,
+  onBuyCourseWithCredits,
+  onBuyCourse,
+  purchasingCourseListingData,
+  setPurchasingCourseListingData,
+  simulateAppStoreProduct,
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { listedCourses } = React.useContext(CourseStoreContext);
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();

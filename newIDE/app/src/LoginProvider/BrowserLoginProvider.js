@@ -35,7 +35,7 @@ class BrowserLoginProvider
   }: {|
     email: string,
     password: string,
-  // $FlowFixMe[missing-local-annot]
+    // $FlowFixMe[missing-local-annot]
   |}) {
     try {
       await signInWithEmailAndPassword(this.auth, email, password);

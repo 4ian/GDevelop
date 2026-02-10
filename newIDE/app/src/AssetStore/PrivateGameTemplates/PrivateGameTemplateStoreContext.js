@@ -95,7 +95,9 @@ type PrivateGameTemplateStoreStateProviderProps = {|
   children: React.Node,
 |};
 
-export const PrivateGameTemplateStoreStateProvider = ({children}: PrivateGameTemplateStoreStateProviderProps): React.MixedElement => {
+export const PrivateGameTemplateStoreStateProvider = ({
+  children,
+}: PrivateGameTemplateStoreStateProviderProps): React.MixedElement => {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const {
     searchText: shopSearchText,
@@ -278,8 +280,8 @@ export const PrivateGameTemplateStoreStateProvider = ({children}: PrivateGameTem
               `Multiple private game templates with the same id: ${id}`
             );
           }
+          // $FlowFixMe[prop-missing]
           privateGameTemplateListingDatasById[
-            // $FlowFixMe[prop-missing]
             id
           ] = privateGameTemplateListingData;
         }

@@ -13,7 +13,11 @@ type Props = {|
   onOpenHistory: () => void,
 |};
 
-export const Toolbar = ({onStartNewChat, canStartNewChat, onOpenHistory}: Props): React.Node => {
+export const Toolbar = ({
+  onStartNewChat,
+  canStartNewChat,
+  onOpenHistory,
+}: Props): React.Node => {
   return (
     <>
       <ToolbarGroup firstChild>

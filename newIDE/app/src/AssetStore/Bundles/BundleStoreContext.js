@@ -64,7 +64,9 @@ type BundleStoreStateProviderProps = {|
   children: React.Node,
 |};
 
-export const BundleStoreStateProvider = ({children}: BundleStoreStateProviderProps): React.MixedElement => {
+export const BundleStoreStateProvider = ({
+  children,
+}: BundleStoreStateProviderProps): React.MixedElement => {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const {
     searchText: shopSearchText,

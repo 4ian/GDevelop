@@ -15,7 +15,9 @@ let firstLoad = true;
  * initialization (https://github.com/algolia/react-instantsearch/issues/1111).
  */
 export const searchClient = {
-  async search(requests: any): Promise<any> | Promise<{ results: Array<{ hits: Array<empty> }> }> {
+  async search(
+    requests: any
+  ): Promise<any> | Promise<{ results: Array<{ hits: Array<empty> }> }> {
     if (firstLoad === true) {
       firstLoad = false;
       return Promise.resolve({

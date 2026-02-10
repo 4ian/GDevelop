@@ -163,7 +163,9 @@ type Props = {|
   children: React.Node,
 |};
 
-export const Resource3DPreviewProvider = ({children}: Props): React.MixedElement => {
+export const Resource3DPreviewProvider = ({
+  children,
+}: Props): React.MixedElement => {
   const [currentResource, setCurrentResource] = React.useState<?string>(null);
   const queueRef = React.useRef<
     Array<{ url: string, resolve: (dataUrl: ?string) => void }>

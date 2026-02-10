@@ -65,7 +65,9 @@ type State = {|
 export default class Debugger extends React.Component<Props, State> {
   // $FlowFixMe[missing-local-annot]
   state = {
-    debuggerServerState: (this.props.previewDebuggerServer.getServerState(): "started" | "stopped"),
+    debuggerServerState: (this.props.previewDebuggerServer.getServerState():
+      | 'started'
+      | 'stopped'),
     debuggerServerError: null,
     debuggerIds: (this.props.previewDebuggerServer.getExistingDebuggerIds(): Array<DebuggerId>),
     unregisterDebuggerServerCallbacks: null,

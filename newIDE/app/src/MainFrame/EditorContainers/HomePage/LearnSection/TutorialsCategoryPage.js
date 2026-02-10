@@ -45,19 +45,17 @@ type EducationCurriculumProps = {|
   renderInterstitialCallout?: (key: string) => React.Node,
 |};
 
-export const EducationCurriculum = (
-  {
-    i18n,
-    limits,
-    tutorials,
-    onSelectTutorial,
-    onSelectCourse,
-    onOpenTemplateFromTutorial,
-    isLocked,
-    onClickSubscribe,
-    renderInterstitialCallout
-  }: EducationCurriculumProps,
-): React.MixedElement => {
+export const EducationCurriculum = ({
+  i18n,
+  limits,
+  tutorials,
+  onSelectTutorial,
+  onSelectCourse,
+  onOpenTemplateFromTutorial,
+  isLocked,
+  onClickSubscribe,
+  renderInterstitialCallout,
+}: EducationCurriculumProps): React.MixedElement => {
   const listItems: React.Node[] = React.useMemo(
     () => {
       const items = [];
@@ -151,7 +149,12 @@ type Props = {|
   onSelectCourse: (courseListingData: CourseListingData) => void,
 |};
 
-const TutorialsCategoryPage = ({category, onBack, onOpenTemplateFromTutorial, onSelectCourse}: Props): React.Node => {
+const TutorialsCategoryPage = ({
+  category,
+  onBack,
+  onOpenTemplateFromTutorial,
+  onSelectCourse,
+}: Props): React.Node => {
   const { listedCourses } = React.useContext(CourseStoreContext);
   const { limits } = React.useContext(AuthenticatedUserContext);
   const { tutorials } = React.useContext(TutorialContext);

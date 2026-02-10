@@ -28,7 +28,9 @@ const emptyForm = {
 // $FlowFixMe[value-as-type]
 type Props = {| authenticatedUser: AuthenticatedUser |};
 
-const useEducationForm = ({authenticatedUser: {authenticated, profile, getAuthorizationHeader}}: Props): {
+const useEducationForm = ({
+  authenticatedUser: { authenticated, profile, getAuthorizationHeader },
+}: Props): {
   educationForm: EducationForm,
   educationFormError: ?React.Node,
   educationFormStatus: EducationFormStatus,

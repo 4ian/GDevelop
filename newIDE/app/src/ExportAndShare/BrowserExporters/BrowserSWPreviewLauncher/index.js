@@ -88,7 +88,9 @@ export default class BrowserSWPreviewLauncher extends React.Component<
     browserPreviewDebuggerServer.closeAllConnections();
   };
 
-  immediatelyPreparePreviewWindows = (options: PreparePreviewWindowsOptions): any => {
+  immediatelyPreparePreviewWindows = (
+    options: PreparePreviewWindowsOptions
+  ): any => {
     const debuggerIds = options.isForInGameEdition
       ? this.getPreviewDebuggerServer().getExistingEmbeddedGameFrameDebuggerIds()
       : this.getPreviewDebuggerServer().getExistingPreviewDebuggerIds();

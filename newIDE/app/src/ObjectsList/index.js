@@ -614,8 +614,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           ? 'New' +
             (project.getEventsBasedObject(objectType).getDefaultName() ||
               project.getEventsBasedObject(objectType).getName())
-          // $FlowFixMe[invalid-computed-prop]
-          : objectTypeToDefaultName[objectType] || 'NewObject';
+          : // $FlowFixMe[invalid-computed-prop]
+            objectTypeToDefaultName[objectType] || 'NewObject';
         const name = newNameGenerator(
           defaultName,
           name =>
@@ -1691,10 +1691,10 @@ const MemoizedObjectsList = React.memo<Props, ObjectsListInterface>(
 );
 
 // $FlowFixMe[prop-missing]
-const ObjectsListWithErrorBoundary: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<ObjectsListInterface> }, React.RefSetter<ObjectsListInterface>> = React.forwardRef<
-  Props,
-  ObjectsListInterface
->((props, ref) => (
+const ObjectsListWithErrorBoundary: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<ObjectsListInterface> },
+  React.RefSetter<ObjectsListInterface>
+> = React.forwardRef<Props, ObjectsListInterface>((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Objects list</Trans>}
     scope="scene-editor-objects-list"

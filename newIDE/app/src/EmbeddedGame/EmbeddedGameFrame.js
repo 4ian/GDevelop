@@ -183,8 +183,8 @@ const logSwitchingInfo = ({
           ', '
         )}.`
       : externalLayoutName
-      // $FlowFixMe[constant-condition]
-      ? `Switching in-game edition previews to external layout "${externalLayoutName ||
+      ? // $FlowFixMe[constant-condition]
+        `Switching in-game edition previews to external layout "${externalLayoutName ||
           ''}" (scene: "${sceneName || ''}". Reason(s): ${reasons.join(', ')}).`
       : `Switching in-game edition previews to scene "${sceneName ||
           ''}". Reason(s): ${reasons.join(', ')}.`
@@ -211,7 +211,11 @@ const noHotReloadSteps = {
   reasons: [],
 };
 
-export const EmbeddedGameFrame = ({previewDebuggerServer, onLaunchPreviewForInGameEdition, enabled}: Props): React.MixedElement => {
+export const EmbeddedGameFrame = ({
+  previewDebuggerServer,
+  onLaunchPreviewForInGameEdition,
+  enabled,
+}: Props): React.MixedElement => {
   const [
     previewIndexHtmlLocation,
     setPreviewIndexHtmlLocation,
@@ -346,8 +350,8 @@ export const EmbeddedGameFrame = ({previewDebuggerServer, onLaunchPreviewForInGa
                   ''}" of "${eventsBasedObjectType ||
                   ''}". Reason(s): ${reasons.join(', ')}.`
               : externalLayoutName
-              // $FlowFixMe[constant-condition]
-              ? `Launching in-game edition preview for external layout "${externalLayoutName ||
+              ? // $FlowFixMe[constant-condition]
+                `Launching in-game edition preview for external layout "${externalLayoutName ||
                   ''}" (scene: "${sceneName || ''}"). Reason(s): ${reasons.join(
                   ', '
                 )}.`

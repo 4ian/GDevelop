@@ -28,14 +28,12 @@ const changesBeforeShowingWarning = 1;
  * the object to this serialized state later, by calling the function
  * returned by the hook.
  */
-export const useSerializableObjectCancelableEditor = (
-  {
-    serializableObject,
-    useProjectToUnserialize,
-    onCancel,
-    resetThenClearPersistentUuid
-  }: Props,
-): {
+export const useSerializableObjectCancelableEditor = ({
+  serializableObject,
+  useProjectToUnserialize,
+  onCancel,
+  resetThenClearPersistentUuid,
+}: Props): {
   getOriginalContentSerializedElement: () => gdSerializerElement,
   hasUnsavedChanges: () => boolean,
   notifyOfChange: () => void,
@@ -171,14 +169,12 @@ type SerializableObjectsCancelableEditorProps = {|
  * the object to this serialized state later, by calling the function
  * returned by the hook.
  */
-export const useSerializableObjectsCancelableEditor = (
-  {
-    serializableObjects,
-    useProjectToUnserialize,
-    onCancel,
-    resetThenClearPersistentUuid
-  }: SerializableObjectsCancelableEditorProps,
-): {
+export const useSerializableObjectsCancelableEditor = ({
+  serializableObjects,
+  useProjectToUnserialize,
+  onCancel,
+  resetThenClearPersistentUuid,
+}: SerializableObjectsCancelableEditorProps): {
   getOriginalContentSerializedElements: () => Map<string, gdSerializerElement>,
   hasUnsavedChanges: () => boolean,
   notifyOfChange: () => void,

@@ -69,26 +69,24 @@ type Props = {|
   onGoToLogin?: () => void,
 |};
 
-const CreateAccountForm = (
-  {
-    onCreateAccount,
-    onLoginWithProvider,
-    email,
-    onChangeEmail,
-    password,
-    onChangePassword,
-    username,
-    onChangeUsername,
-    optInNewsletterEmail,
-    onChangeOptInNewsletterEmail,
-    onChangeUsernameAvailability,
-    isValidatingUsername,
-    onChangeIsValidatingUsername,
-    createAccountInProgress,
-    error,
-    onGoToLogin
-  }: Props,
-): React.Node => {
+const CreateAccountForm = ({
+  onCreateAccount,
+  onLoginWithProvider,
+  email,
+  onChangeEmail,
+  password,
+  onChangePassword,
+  username,
+  onChangeUsername,
+  optInNewsletterEmail,
+  onChangeOptInNewsletterEmail,
+  onChangeUsernameAvailability,
+  isValidatingUsername,
+  onChangeIsValidatingUsername,
+  createAccountInProgress,
+  error,
+  onGoToLogin,
+}: Props): React.Node => {
   const accountsExistsWithOtherCredentials = error
     ? error.code === 'auth/account-exists-with-different-credential'
     : false;

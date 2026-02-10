@@ -123,7 +123,7 @@ const CommunityLinkWithFollow = <UpdateResponse: { +code: string }>({
   prefix: string,
   translatableHintText?: string,
   icon: React.Node,
-// $FlowFixMe[missing-local-annot]
+  // $FlowFixMe[missing-local-annot]
 }) => {
   const { showAlert } = useAlertDialog();
 
@@ -245,24 +245,22 @@ const CommunityLinkLine = ({
   );
 };
 
-const EditProfileDialog = (
-  {
-    profile,
-    subscription,
-    limits,
-    achievements,
-    badges,
-    onClose,
-    onEdit,
-    onUpdateGitHubStar,
-    onUpdateTiktokFollow,
-    onUpdateTwitterFollow,
-    onUpdateYoutubeSubscription,
-    onDelete,
-    actionInProgress,
-    error
-  }: EditProfileDialogProps,
-): React.Node => {
+const EditProfileDialog = ({
+  profile,
+  subscription,
+  limits,
+  achievements,
+  badges,
+  onClose,
+  onEdit,
+  onUpdateGitHubStar,
+  onUpdateTiktokFollow,
+  onUpdateTwitterFollow,
+  onUpdateYoutubeSubscription,
+  onDelete,
+  actionInProgress,
+  error,
+}: EditProfileDialogProps): React.Node => {
   const { showDeleteConfirmation, showAlert } = useAlertDialog();
 
   const communityLinks = profile.communityLinks || {};

@@ -11,17 +11,21 @@ type TutorialState = {|
   error: ?Error,
 |};
 
-export const TutorialContext: React.Context<TutorialState> = React.createContext<TutorialState>({
-  tutorials: null,
-  fetchTutorials: () => {},
-  error: null,
-});
+export const TutorialContext: React.Context<TutorialState> = React.createContext<TutorialState>(
+  {
+    tutorials: null,
+    fetchTutorials: () => {},
+    error: null,
+  }
+);
 
 type TutorialStateProviderProps = {|
   children: React.Node,
 |};
 
-export const TutorialStateProvider = ({children}: TutorialStateProviderProps): React.MixedElement => {
+export const TutorialStateProvider = ({
+  children,
+}: TutorialStateProviderProps): React.MixedElement => {
   const [tutorials, setTutorials] = React.useState<?(Tutorial[])>(null);
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);

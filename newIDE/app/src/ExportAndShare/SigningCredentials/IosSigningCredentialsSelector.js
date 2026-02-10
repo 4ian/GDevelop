@@ -249,15 +249,13 @@ type Props = {
   disabled?: boolean,
 };
 
-export const IosSigningCredentialsSelector = (
-  {
-    targets,
-    authenticatedUser,
-    buildSigningOptions,
-    onSelectBuildSigningOptions,
-    disabled
-  }: Props,
-): React.Node => {
+export const IosSigningCredentialsSelector = ({
+  targets,
+  authenticatedUser,
+  buildSigningOptions,
+  onSelectBuildSigningOptions,
+  disabled,
+}: Props): React.Node => {
   const {
     signingCredentials,
     error,

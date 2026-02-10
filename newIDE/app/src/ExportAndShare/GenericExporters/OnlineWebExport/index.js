@@ -18,7 +18,9 @@ type ExplanationHeaderProps = {|
   uiMode: 'minimal' | 'full',
 |};
 
-const ExplanationHeader = ({uiMode}: ExplanationHeaderProps): null | React.Node => {
+const ExplanationHeader = ({
+  uiMode,
+}: ExplanationHeaderProps): null | React.Node => {
   if (uiMode === 'minimal') return null;
 
   return (

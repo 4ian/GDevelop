@@ -21,7 +21,12 @@ type Props = {|
   rightButtonLabel?: React.Node,
 |};
 
-const HotMessage = ({title, message, onClickRightButton, rightButtonLabel}: Props): React.Node => {
+const HotMessage = ({
+  title,
+  message,
+  onClickRightButton,
+  rightButtonLabel,
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <Paper

@@ -57,15 +57,13 @@ type HTML5ExportFlowProps = {|
   exportPipelineName: string,
 |};
 
-export const ExportFlow = (
-  {
-    disabled,
-    launchExport,
-    isExporting,
-    exportPipelineName,
-    exportStep
-  }: HTML5ExportFlowProps,
-): React.Node | null =>
+export const ExportFlow = ({
+  disabled,
+  launchExport,
+  isExporting,
+  exportPipelineName,
+  exportStep,
+}: HTML5ExportFlowProps): React.Node | null =>
   exportStep !== 'done' ? (
     <Line justifyContent="center">
       <RaisedButton
@@ -84,13 +82,11 @@ export const ExportFlow = (
     </Line>
   ) : null;
 
-export const DoneFooter = (
-  {
-    renderGameButton
-  }: {|
-    renderGameButton: () => React.Node,
-  |},
-): React.Node => {
+export const DoneFooter = ({
+  renderGameButton,
+}: {|
+  renderGameButton: () => React.Node,
+|}): React.Node => {
   const openLearnMore = () => {
     Window.openExternalURL(
       getHelpLink(

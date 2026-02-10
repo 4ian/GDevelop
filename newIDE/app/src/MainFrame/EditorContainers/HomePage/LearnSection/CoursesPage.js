@@ -50,18 +50,16 @@ type Props = {|
   ) => CourseChapterCompletion | null,
 |};
 
-const CoursesPage = (
-  {
-    onBack,
-    courses,
-    onSelectCourse,
-    onSelectBundle,
-    previewedCourse,
-    getCourseChapters,
-    getCourseChapterCompletion,
-    getCourseCompletion
-  }: Props,
-): React.Node => {
+const CoursesPage = ({
+  onBack,
+  courses,
+  onSelectCourse,
+  onSelectBundle,
+  previewedCourse,
+  getCourseChapters,
+  getCourseChapterCompletion,
+  getCourseCompletion,
+}: Props): React.Node => {
   const { listedCourses } = React.useContext(CourseStoreContext);
   const { windowSize, isLandscape } = useResponsiveWindowSize();
   const numberOfItemsOnOneRow = getColumnsFromWindowSize(
@@ -125,8 +123,8 @@ const CoursesPage = (
                         </GridListTile>
                       );
                     })
-                  // $FlowFixMe[underconstrained-implicit-instantiation]
-                  : new Array(6).fill(0).map((_, index) => (
+                  : // $FlowFixMe[underconstrained-implicit-instantiation]
+                    new Array(6).fill(0).map((_, index) => (
                       <GridListTile key={`skeleton-course-${index}`}>
                         <CourseCard
                           course={null}

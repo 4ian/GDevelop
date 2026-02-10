@@ -24,7 +24,12 @@ type Props = {|
   onPointerLeave: () => void,
 |};
 
-const VerticeRow = ({verticeX, verticeY, parentVerticeId, ...props}: Props): React.Node => {
+const VerticeRow = ({
+  verticeX,
+  verticeY,
+  parentVerticeId,
+  ...props
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (

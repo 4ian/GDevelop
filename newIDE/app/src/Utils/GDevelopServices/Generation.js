@@ -287,8 +287,8 @@ export const getPartialAiRequest = async (
     aiRequestId: string,
     include: string,
   |}
-// $FlowFixMe[deprecated-utility]
-): Promise<$Shape<AiRequest>> => {
+): // $FlowFixMe[deprecated-utility]
+Promise<$Shape<AiRequest>> => {
   const authorizationHeader = await getAuthorizationHeader();
   // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(

@@ -60,17 +60,15 @@ type Props = {|
   widgetName: GameDashboardWidgetName,
 |};
 
-const DashboardWidget = (
-  {
-    title,
-    topRightAction,
-    widgetSize,
-    renderSubtitle,
-    children,
-    minHeight,
-    widgetName
-  }: Props,
-): React.Node => {
+const DashboardWidget = ({
+  title,
+  topRightAction,
+  widgetSize,
+  renderSubtitle,
+  children,
+  minHeight,
+  widgetName,
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   return (
     <Grid

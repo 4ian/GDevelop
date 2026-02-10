@@ -14,7 +14,12 @@ export type ExportState = {|
   targets: Array<TargetName>,
 |};
 
-export const SetupExportHeader = ({exportState, updateExportState, isExporting, build}: HeaderProps<ExportState>): null | React.Node => {
+export const SetupExportHeader = ({
+  exportState,
+  updateExportState,
+  isExporting,
+  build,
+}: HeaderProps<ExportState>): null | React.Node => {
   // Build is finished, hide options.
   if (!!build && build.status === 'complete') return null;
 
@@ -84,19 +89,17 @@ type OnlineElectronExportFlowProps = {|
   exportPipelineName: string,
 |};
 
-export const ExportFlow = (
-  {
-    disabled,
-    launchExport,
-    isExporting,
-    exportPipelineName,
-    exportStep,
-    build,
-    stepMaxProgress,
-    stepCurrentProgress,
-    errored
-  }: OnlineElectronExportFlowProps,
-): React.Node => {
+export const ExportFlow = ({
+  disabled,
+  launchExport,
+  isExporting,
+  exportPipelineName,
+  exportStep,
+  build,
+  stepMaxProgress,
+  stepCurrentProgress,
+  errored,
+}: OnlineElectronExportFlowProps): React.Node => {
   const isExportingOrbuildRunningOrFinished =
     isExporting || (!!build && build.status !== 'error');
 

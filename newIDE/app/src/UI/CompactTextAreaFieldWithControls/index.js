@@ -34,10 +34,13 @@ export type CompactTextAreaFieldWithControlsInterface = {|
 |};
 
 // $FlowFixMe[prop-missing]
-export const CompactTextAreaFieldWithControls: React.AbstractComponent<{
+export const CompactTextAreaFieldWithControls: React.AbstractComponent<
+  {
     ...CompactTextAreaFieldWithControlsProps,
     +ref?: React.RefSetter<CompactTextAreaFieldWithControlsInterface>,
-  }, React.RefSetter<CompactTextAreaFieldWithControlsInterface>> = React.forwardRef<
+  },
+  React.RefSetter<CompactTextAreaFieldWithControlsInterface>
+> = React.forwardRef<
   CompactTextAreaFieldWithControlsProps,
   CompactTextAreaFieldWithControlsInterface
 >(

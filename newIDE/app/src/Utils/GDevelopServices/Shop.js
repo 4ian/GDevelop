@@ -498,23 +498,21 @@ export const getPurchaseCheckoutUrl = ({
   return url.toString();
 };
 
-export const getStripeCheckoutUrl = (
-  {
-    userId,
-    userUuid,
-    productId,
-    priceName,
-    userEmail,
-    password
-  }: {|
-    userId?: string,
-    userUuid?: string,
-    productId: string,
-    priceName: string,
-    userEmail?: string,
-    password?: string,
-  |},
-): string => {
+export const getStripeCheckoutUrl = ({
+  userId,
+  userUuid,
+  productId,
+  priceName,
+  userEmail,
+  password,
+}: {|
+  userId?: string,
+  userUuid?: string,
+  productId: string,
+  priceName: string,
+  userEmail?: string,
+  password?: string,
+|}): string => {
   const url = new URL(
     `${GDevelopShopApi.baseUrl}/purchase/action/redirect-to-stripe-checkout`
   );

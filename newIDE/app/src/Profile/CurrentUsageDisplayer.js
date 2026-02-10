@@ -41,16 +41,14 @@ type Props = {|
   hidePurchaseWithCredits?: boolean,
 |};
 
-const CurrentUsageDisplayer = (
-  {
-    subscription,
-    quota,
-    usagePrice,
-    onChangeSubscription,
-    onStartBuildWithCredits,
-    hidePurchaseWithCredits
-  }: Props,
-): React.Node => {
+const CurrentUsageDisplayer = ({
+  subscription,
+  quota,
+  usagePrice,
+  onChangeSubscription,
+  onStartBuildWithCredits,
+  hidePurchaseWithCredits,
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { openCreditsPackageDialog, openCreditsUsageDialog } = React.useContext(
     CreditsPackageStoreContext

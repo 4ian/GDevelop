@@ -58,13 +58,13 @@ export type CompactTextFieldProps = {|
 |};
 
 // $FlowFixMe[prop-missing]
-const CompactTextField: React.AbstractComponent<{
+const CompactTextField: React.AbstractComponent<
+  {
     ...CompactTextFieldProps,
     +ref?: React.RefSetter<CompactTextFieldInterface>,
-  }, React.RefSetter<CompactTextFieldInterface>> = React.forwardRef<
-  CompactTextFieldProps,
-  CompactTextFieldInterface
->(
+  },
+  React.RefSetter<CompactTextFieldInterface>
+> = React.forwardRef<CompactTextFieldProps, CompactTextFieldInterface>(
   (
     {
       type,

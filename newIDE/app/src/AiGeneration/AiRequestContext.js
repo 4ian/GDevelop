@@ -472,7 +472,9 @@ type AiRequestProviderProps = {|
   children: React.Node,
 |};
 
-export const AiRequestProvider = ({children}: AiRequestProviderProps): React.MixedElement => {
+export const AiRequestProvider = ({
+  children,
+}: AiRequestProviderProps): React.MixedElement => {
   const editorFunctionCallResultsStorage = useEditorFunctionCallResultsStorage();
   const aiRequestStorage = useAiRequestsStorage();
   const aiRequestHistory = useAiRequestHistory(aiRequestStorage);

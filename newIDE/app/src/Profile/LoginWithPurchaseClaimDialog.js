@@ -57,18 +57,16 @@ type Props = {|
   claimedProductOptions: ClaimedProductOptions,
 |};
 
-const LoginWithPurchaseClaimDialog = (
-  {
-    onClose,
-    onGoToCreateAccount,
-    onLogin,
-    onLoginWithProvider,
-    onForgotPassword,
-    loginInProgress,
-    error,
-    claimedProductOptions: {productListingData: claimedProduct}
-  }: Props,
-): React.Node => {
+const LoginWithPurchaseClaimDialog = ({
+  onClose,
+  onGoToCreateAccount,
+  onLogin,
+  onLoginWithProvider,
+  onForgotPassword,
+  loginInProgress,
+  error,
+  claimedProductOptions: { productListingData: claimedProduct },
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');

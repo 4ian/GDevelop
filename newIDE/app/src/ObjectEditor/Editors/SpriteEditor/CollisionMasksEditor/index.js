@@ -64,15 +64,13 @@ type Props = {|
   onCreateMatchingSpriteCollisionMask: () => Promise<void>,
 |};
 
-const CollisionMasksEditor = (
-  {
-    animations,
-    resourcesLoader,
-    project,
-    onMasksUpdated,
-    onCreateMatchingSpriteCollisionMask
-  }: Props,
-): null | React.MixedElement => {
+const CollisionMasksEditor = ({
+  animations,
+  resourcesLoader,
+  project,
+  onMasksUpdated,
+  onCreateMatchingSpriteCollisionMask,
+}: Props): null | React.MixedElement => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);

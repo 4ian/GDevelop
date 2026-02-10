@@ -213,10 +213,10 @@ export type InstructionOrObjectSelectorInterface = {|
 |};
 
 // $FlowFixMe[prop-missing]
-const InstructionOrObjectSelector: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<InstructionOrObjectSelectorInterface> }, React.RefSetter<InstructionOrObjectSelectorInterface>> = React.forwardRef<
-  Props,
-  InstructionOrObjectSelectorInterface
->(
+const InstructionOrObjectSelector: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<InstructionOrObjectSelectorInterface> },
+  React.RefSetter<InstructionOrObjectSelectorInterface>
+> = React.forwardRef<Props, InstructionOrObjectSelectorInterface>(
   (
     {
       project,

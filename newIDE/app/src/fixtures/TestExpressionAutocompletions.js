@@ -44,16 +44,14 @@ const makeFakeEnumeratedExpressionMetadata = (
   isRelevantForCustomObjectEvents: true,
 });
 
-export const makeFakeExactExpressionAutocompletion = (): Array<
-  {
-    addParenthesis: boolean,
-    completion: string,
-    enumeratedExpressionMetadata: EnumeratedExpressionMetadata,
-    isExact: boolean,
-    kind: string,
-    shouldConvertToString: boolean,
-  },
-> => {
+export const makeFakeExactExpressionAutocompletion = (): Array<{
+  addParenthesis: boolean,
+  completion: string,
+  enumeratedExpressionMetadata: EnumeratedExpressionMetadata,
+  isExact: boolean,
+  kind: string,
+  shouldConvertToString: boolean,
+}> => {
   const gd: libGDevelop = global.gd;
   const expressionMetadata = new gd.ExpressionMetadata(
     'number',

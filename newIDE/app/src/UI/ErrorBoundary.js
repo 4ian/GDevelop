@@ -167,23 +167,21 @@ const errorHandler = (
   );
 };
 
-export const ErrorFallbackComponent = (
-  {
-    componentStack,
-    error,
-    componentTitle,
-    uniqueErrorId,
-    onClose,
-    showOnTop
-  }: {|
-    componentStack: string,
-    error: Error,
-    componentTitle: React.Node,
-    uniqueErrorId: string,
-    onClose?: () => void,
-    showOnTop?: boolean,
-  |},
-): React.Node => {
+export const ErrorFallbackComponent = ({
+  componentStack,
+  error,
+  componentTitle,
+  uniqueErrorId,
+  onClose,
+  showOnTop,
+}: {|
+  componentStack: string,
+  error: Error,
+  componentTitle: React.Node,
+  uniqueErrorId: string,
+  onClose?: () => void,
+  showOnTop?: boolean,
+|}): React.Node => {
   const isCriticalError = error.stack && error.stack.includes('.wasm');
   return (
     <PlaceholderMessage showOnTop={showOnTop} data={{ errorBoundary: 'true' }}>

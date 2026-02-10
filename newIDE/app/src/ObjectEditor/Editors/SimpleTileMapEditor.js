@@ -17,19 +17,17 @@ import { Column, Line } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
 import Text from '../../UI/Text';
 
-const SimpleTileMapEditor = (
-  {
-    objectConfiguration,
-    project,
-    layout,
-    object,
-    onObjectUpdated,
-    onSizeUpdated,
-    resourceManagementProps,
-    projectScopedContainersAccessor,
-    renderObjectNameField
-  }: EditorProps,
-): React.Node => {
+const SimpleTileMapEditor = ({
+  objectConfiguration,
+  project,
+  layout,
+  object,
+  onObjectUpdated,
+  onSizeUpdated,
+  resourceManagementProps,
+  projectScopedContainersAccessor,
+  renderObjectNameField,
+}: EditorProps): React.Node => {
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
   const forceUpdate = useForceUpdate();
   const objectProperties = objectConfiguration.getProperties();

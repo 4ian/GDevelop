@@ -74,16 +74,14 @@ type Props = {|
   project: gdProject,
 |};
 
-const ExtensionInstallDialog = (
-  {
-    extensionShortHeader,
-    isInstalling,
-    onClose,
-    onInstall,
-    onEdit,
-    project
-  }: Props,
-): React.Node => {
+const ExtensionInstallDialog = ({
+  extensionShortHeader,
+  isInstalling,
+  onClose,
+  onInstall,
+  onEdit,
+  project,
+}: Props): React.Node => {
   const isAlreadyInstalled: boolean = project.hasEventsFunctionsExtensionNamed(
     extensionShortHeader.name
   );

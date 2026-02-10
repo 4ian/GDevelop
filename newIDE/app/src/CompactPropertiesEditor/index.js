@@ -165,22 +165,20 @@ const getFieldLabel = ({
   return field.name;
 };
 
-const CompactPropertiesEditor = (
-  {
-    onInstancesModified,
-    onRefreshAllFields,
-    instances,
-    schema,
-    mode,
-    renderExtraDescriptionText,
-    unsavedChanges,
-    project,
-    resourceManagementProps,
-    preventWrap,
-    removeSpacers,
-    isHidden
-  }: Props,
-): null | React.Node => {
+const CompactPropertiesEditor = ({
+  onInstancesModified,
+  onRefreshAllFields,
+  instances,
+  schema,
+  mode,
+  renderExtraDescriptionText,
+  unsavedChanges,
+  project,
+  resourceManagementProps,
+  preventWrap,
+  removeSpacers,
+  isHidden,
+}: Props): null | React.Node => {
   const forceUpdate = useForceUpdate();
 
   const onFieldChanged = React.useCallback(

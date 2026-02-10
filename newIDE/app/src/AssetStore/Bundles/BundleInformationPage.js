@@ -91,22 +91,20 @@ type Props = {|
   onCloseAfterPurchaseDone?: () => void,
 |};
 
-const BundleInformationPage = (
-  {
-    bundleListingData,
-    onBack,
-    onAssetPackOpen,
-    onGameTemplateOpen,
-    onBundleOpen,
-    onCourseOpen,
-    courses,
-    getCourseCompletion,
-    noPadding,
-    noActions,
-    fastCheckout,
-    onCloseAfterPurchaseDone
-  }: Props,
-): React.Node => {
+const BundleInformationPage = ({
+  bundleListingData,
+  onBack,
+  onAssetPackOpen,
+  onGameTemplateOpen,
+  onBundleOpen,
+  onCourseOpen,
+  courses,
+  getCourseCompletion,
+  noPadding,
+  noActions,
+  fastCheckout,
+  onCloseAfterPurchaseDone,
+}: Props): React.Node => {
   const { windowSize, isLandscape, isMobile } = useResponsiveWindowSize();
   const { bundleListingDatas } = React.useContext(BundleStoreContext); // If archived, should use the one passed.
   const { privateGameTemplateListingDatas } = React.useContext(

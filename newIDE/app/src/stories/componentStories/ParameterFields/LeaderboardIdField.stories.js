@@ -50,7 +50,7 @@ const MockLeaderboardProvider = ({ children }: {| children: React.Node |}) => {
   const [
     currentLeaderboard,
     setCurrentLeaderboard,
-  // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type]
   ] = React.useState<Leaderboard>(mockedLeaderboards[3]);
   return (
     <LeaderboardContext.Provider

@@ -47,7 +47,11 @@ const useClasses = (rotating, size) =>
 
 type Props = {| rotating?: boolean, size?: number, sad?: boolean |};
 
-export default function RobotIcon({ rotating, size, sad }: Props): React.MixedElement {
+export default function RobotIcon({
+  rotating,
+  size,
+  sad,
+}: Props): React.MixedElement {
   const sizeOrDefaultSize = size || 34;
 
   const classes = useClasses(rotating, sizeOrDefaultSize);

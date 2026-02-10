@@ -35,15 +35,13 @@ const styles = {
   bulletIcon: { width: 20, height: 20, marginRight: 10 },
 };
 
-export const AppleAuthKeysList = (
-  {
-    signingCredentials,
-    authenticatedUser,
-    error,
-    onRefreshSigningCredentials,
-    onAddNew
-  }: Props,
-): React.Node => {
+export const AppleAuthKeysList = ({
+  signingCredentials,
+  authenticatedUser,
+  error,
+  onRefreshSigningCredentials,
+  onAddNew,
+}: Props): React.Node => {
   const appleAuthKeySigningCredentials = filterAppleAuthKeySigningCredentials(
     signingCredentials
   );

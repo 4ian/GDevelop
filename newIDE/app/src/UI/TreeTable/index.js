@@ -40,7 +40,9 @@ type TreeTableCellProps = {|
   children?: React.Node,
 |};
 
-export const TreeTableCell = (props: TreeTableCellProps): React.MixedElement => (
+export const TreeTableCell = (
+  props: TreeTableCellProps
+): React.MixedElement => (
   <div
     style={{
       ...styles.cell,

@@ -17,19 +17,17 @@ export const readJSONFile = async (filepath: string): Promise<Object> => {
   }
 };
 
-export const openFilePicker = (
-  {
-    title,
-    properties,
-    message,
-    filters
-  }: {|
-    title: string,
-    properties: Array<string>,
-    message: string,
-    filters: Array<{| name: string, extensions: Array<string> |}>,
-  |},
-): any | Promise<> => {
+export const openFilePicker = ({
+  title,
+  properties,
+  message,
+  filters,
+}: {|
+  title: string,
+  properties: Array<string>,
+  message: string,
+  filters: Array<{| name: string, extensions: Array<string> |}>,
+|}): any | Promise<> => {
   if (!dialog) return Promise.reject('Not supported');
   const browserWindow = remote.getCurrentWindow();
 
@@ -46,19 +44,17 @@ export const openFilePicker = (
     });
 };
 
-export const openFilesPicker = (
-  {
-    title,
-    properties,
-    message,
-    filters
-  }: {|
-    title: string,
-    properties: Array<string>,
-    message: string,
-    filters: Array<{| name: string, extensions: Array<string> |}>,
-  |},
-): any | Promise<> => {
+export const openFilesPicker = ({
+  title,
+  properties,
+  message,
+  filters,
+}: {|
+  title: string,
+  properties: Array<string>,
+  message: string,
+  filters: Array<{| name: string, extensions: Array<string> |}>,
+|}): any | Promise<> => {
   if (!dialog) return Promise.reject('Not supported');
   const browserWindow = remote.getCurrentWindow();
 

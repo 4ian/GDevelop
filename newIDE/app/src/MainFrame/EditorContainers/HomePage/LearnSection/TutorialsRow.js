@@ -38,15 +38,13 @@ type TutorialsRowProps = {|
   ) => number,
 |};
 
-export const TutorialsRow = (
-  {
-    limits,
-    category,
-    onSelectCategory,
-    onSelectTutorial,
-    getColumnsFromWindowSize
-  }: TutorialsRowProps,
-): React.Node => {
+export const TutorialsRow = ({
+  limits,
+  category,
+  onSelectCategory,
+  onSelectTutorial,
+  getColumnsFromWindowSize,
+}: TutorialsRowProps): React.Node => {
   const {
     tutorials,
     error: tutorialLoadingError,

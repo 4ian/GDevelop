@@ -53,7 +53,9 @@ const gd: libGDevelop = global.gd;
 
 const BEHAVIORS_CLIPBOARD_KIND = 'Behaviors';
 
-export const useBehaviorOverridingAlertDialog = (): ((existingBehaviorNames: Array<string>) => Promise<boolean>) => {
+export const useBehaviorOverridingAlertDialog = (): ((
+  existingBehaviorNames: Array<string>
+) => Promise<boolean>) => {
   const { showConfirmation } = useAlertDialog();
   return async (existingBehaviorNames: Array<string>): Promise<boolean> => {
     return await showConfirmation({

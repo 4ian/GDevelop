@@ -68,7 +68,10 @@ type Props = {|
 |};
 
 // $FlowFixMe[prop-missing]
-const VideoBasedCourseChapterView: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<HTMLDivElement> }, React.RefSetter<HTMLDivElement>> = React.forwardRef<Props, HTMLDivElement>(
+const VideoBasedCourseChapterView: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<HTMLDivElement> },
+  React.RefSetter<HTMLDivElement>
+> = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       chapterIndex,

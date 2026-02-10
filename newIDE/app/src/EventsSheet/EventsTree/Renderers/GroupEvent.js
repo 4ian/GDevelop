@@ -35,7 +35,10 @@ const styles = {
   },
 };
 
-export default class GroupEvent extends React.Component<EventRendererProps, any> {
+export default class GroupEvent extends React.Component<
+  EventRendererProps,
+  any
+> {
   // $FlowFixMe[missing-local-annot]
   state = {
     editing: false,

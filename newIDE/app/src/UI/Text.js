@@ -109,7 +109,10 @@ const getTextColorFromColor = (color: ?TextColor) => {
 // than a `<p>`/`<span>` or `<div>` as this will help maintain
 // consistency of text in the whole app.
 // $FlowFixMe[prop-missing]
-const Text: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<Interface> }, React.RefSetter<Interface>> = React.forwardRef<Props, Interface>(
+const Text: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<Interface> },
+  React.RefSetter<Interface>
+> = React.forwardRef<Props, Interface>(
   (
     {
       children,

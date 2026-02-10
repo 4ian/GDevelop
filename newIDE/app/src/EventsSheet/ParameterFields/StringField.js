@@ -13,23 +13,25 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(
-      ref,
-      () => ({
-        focus,
-      }),
-    );
-    
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
+
     return (
       <GenericExpressionField
         expressionType="string"
         ref={field}
         {...props}
-        id={props.parameterIndex !== undefined
-          ? `parameter-${props.parameterIndex}-string-field`
-          : undefined}
+        id={
+          props.parameterIndex !== undefined
+            ? `parameter-${props.parameterIndex}-string-field`
+            : undefined
+        }
       />
     );
-  },
-// $FlowFixMe[prop-missing]
-): React.AbstractComponent<{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }, React.RefSetter<ParameterFieldInterface>>);
+  }
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);

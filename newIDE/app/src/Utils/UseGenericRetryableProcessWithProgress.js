@@ -38,15 +38,13 @@ const styles = {
   },
 };
 
-export const GenericRetryableProcessWithProgressDialog = (
-  {
-    progress,
-    result,
-    onAbandon,
-    onRetry,
-    genericError
-  }: GenericRetryableProcessWithProgressProps,
-): React.Node => {
+export const GenericRetryableProcessWithProgressDialog = ({
+  progress,
+  result,
+  onAbandon,
+  onRetry,
+  genericError,
+}: GenericRetryableProcessWithProgressProps): React.Node => {
   const hasErrors =
     (result && result.erroredResources.length > 0) || !!genericError;
 

@@ -52,17 +52,15 @@ type Props = {|
   onDirectionUpdated?: () => void,
 |};
 
-const DirectionTools = (
-  {
-    animationName,
-    direction,
-    resourcesLoader,
-    project,
-    resourceExternalEditors,
-    onEditWith,
-    onDirectionUpdated
-  }: Props,
-): React.Node => {
+const DirectionTools = ({
+  animationName,
+  direction,
+  resourcesLoader,
+  project,
+  resourceExternalEditors,
+  onEditWith,
+  onDirectionUpdated,
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const [previewOpen, setPreviewOpen] = React.useState(false);
   const currentTimeBetweenFrames = direction.getTimeBetweenFrames();

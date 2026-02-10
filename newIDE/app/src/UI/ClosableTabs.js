@@ -83,7 +83,10 @@ type ClosableTabsProps = {|
   renderTabs: ({| containerWidth: number |}) => React.Node,
 |};
 
-export const ClosableTabs = ({hideLabels, renderTabs}: ClosableTabsProps): React.MixedElement => {
+export const ClosableTabs = ({
+  hideLabels,
+  renderTabs,
+}: ClosableTabsProps): React.MixedElement => {
   const forceUpdate = useForceUpdate();
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const tabItemContainerStyle = {

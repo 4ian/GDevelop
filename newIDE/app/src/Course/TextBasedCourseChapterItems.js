@@ -48,7 +48,11 @@ type Props = {|
         | TextBasedCourseChapterTableItemType
       >,
 |};
-const TextBasedCourseChapterItems = ({items, onCompleteTask, isTaskCompleted}: Props): React.Node => {
+const TextBasedCourseChapterItems = ({
+  items,
+  onCompleteTask,
+  isTaskCompleted,
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   // $FlowFixMe[incompatible-type] - map does not recognize time of items.

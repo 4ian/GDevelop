@@ -9,7 +9,9 @@ export const useSoftKeyboardBottomOffset = (props?: Props): number => {
 /**
  * Helper for avoiding the soft keyboard. See also `.avoid-soft-keyboard`.
  */
-export const getAvoidSoftKeyboardStyle = (softKeyboardBottomOffset: number): { transform: string, transition: string, willChange: string } => {
+export const getAvoidSoftKeyboardStyle = (
+  softKeyboardBottomOffset: number
+): { transform: string, transition: string, willChange: string } => {
   return {
     transform: `translateY(0px)`,
     transition: 'transform 0.2s linear',

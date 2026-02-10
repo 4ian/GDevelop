@@ -28,7 +28,9 @@ type ProductLicenseStoreStateProviderProps = {|
   children: React.Node,
 |};
 
-export const ProductLicenseStoreStateProvider = ({children}: ProductLicenseStoreStateProviderProps): React.MixedElement => {
+export const ProductLicenseStoreStateProvider = ({
+  children,
+}: ProductLicenseStoreStateProviderProps): React.MixedElement => {
   const [error, setError] = React.useState<?Error>(null);
   const [
     gameTemplateLicenses,

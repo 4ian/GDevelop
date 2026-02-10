@@ -47,7 +47,10 @@ const styles = {
   },
 };
 
-export default class LinkEvent extends React.Component<EventRendererProps, any> {
+export default class LinkEvent extends React.Component<
+  EventRendererProps,
+  any
+> {
   _externalEventsAutoComplete: ?ExternalEventsAutoComplete = null;
 
   // $FlowFixMe[missing-local-annot]

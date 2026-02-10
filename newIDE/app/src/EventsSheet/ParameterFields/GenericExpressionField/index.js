@@ -426,12 +426,9 @@ export default class ExpressionField extends React.Component<Props, State> {
   };
 
   // $FlowFixMe[missing-local-annot]
-  _enqueueValidation = (debounce(
-  () => {
+  _enqueueValidation = (debounce(() => {
     this._doValidation();
-  },
-  250,
-): any);
+  }, 250): any);
 
   _doValidation = (): any => {
     const {

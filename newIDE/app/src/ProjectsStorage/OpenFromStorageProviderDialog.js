@@ -27,7 +27,11 @@ const fakeLocalFileStorageProvider: StorageProvider = {
   createOperations: () => ({}),
 };
 
-const OpenFromStorageProviderDialog = ({onClose, storageProviders, onChooseProvider}: Props): React.Node => {
+const OpenFromStorageProviderDialog = ({
+  onClose,
+  storageProviders,
+  onChooseProvider,
+}: Props): React.Node => {
   const isCloudStorageProviderEnabled = storageProviders.some(
     provider => provider.internalName === 'Cloud'
   );

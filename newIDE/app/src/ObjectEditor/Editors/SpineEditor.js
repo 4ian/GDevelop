@@ -55,21 +55,19 @@ const styles = {
   },
 };
 
-const SpineEditor = (
-  {
-    objectConfiguration,
-    project,
-    layout,
-    eventsFunctionsExtension,
-    eventsBasedObject,
-    object,
-    onSizeUpdated,
-    onObjectUpdated,
-    resourceManagementProps,
-    projectScopedContainersAccessor,
-    renderObjectNameField
-  }: EditorProps,
-): React.Node => {
+const SpineEditor = ({
+  objectConfiguration,
+  project,
+  layout,
+  eventsFunctionsExtension,
+  eventsBasedObject,
+  object,
+  onSizeUpdated,
+  onObjectUpdated,
+  resourceManagementProps,
+  projectScopedContainersAccessor,
+  renderObjectNameField,
+}: EditorProps): React.Node => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
     justAddedAnimationName,

@@ -75,21 +75,19 @@ type Props = {|
 /**
  * Helper for Mainframe to create a new project.
  */
-const useCreateProject = (
-  {
-    beforeCreatingProject,
-    afterCreatingProject,
-    onSuccessOrError,
-    onError,
-    getStorageProviderOperations,
-    getStorageProvider,
-    loadFromProject,
-    openFromFileMetadata,
-    onProjectSaved,
-    ensureResourcesAreMoved,
-    onGameRegistered
-  }: Props,
-): any => {
+const useCreateProject = ({
+  beforeCreatingProject,
+  afterCreatingProject,
+  onSuccessOrError,
+  onError,
+  getStorageProviderOperations,
+  getStorageProvider,
+  loadFromProject,
+  openFromFileMetadata,
+  onProjectSaved,
+  ensureResourcesAreMoved,
+  onGameRegistered,
+}: Props): any => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const profile = authenticatedUser.profile;
   const unsavedChanges = React.useContext(UnsavedChangesContext);

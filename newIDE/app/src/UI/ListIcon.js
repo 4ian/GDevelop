@@ -74,8 +74,8 @@ function ListIcon(props: Props) {
     filter = 'grayscale(1) invert(1)';
   } else if (isGDevelopIcon && !isBlackIcon) {
     filter = disabled
-      // $FlowFixMe[incompatible-type]
-      ? 'grayscale(100%)'
+      ? // $FlowFixMe[incompatible-type]
+        'grayscale(100%)'
       : gdevelopTheme.gdevelopIconsCSSFilter;
   }
 

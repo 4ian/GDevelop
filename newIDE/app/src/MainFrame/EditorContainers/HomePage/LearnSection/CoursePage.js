@@ -120,24 +120,22 @@ type Props = {|
   onOpenAskAi: (?OpenAskAiOptions) => void,
 |};
 
-const CoursePage = (
-  {
-    course,
-    courseChapters,
-    onOpenTemplateFromCourseChapter,
-    onBack,
-    onCompleteTask,
-    isTaskCompleted,
-    getChapterCompletion,
-    getCourseCompletion,
-    onBuyCourseWithCredits,
-    onBuyCourse,
-    purchasingCourseListingData,
-    setPurchasingCourseListingData,
-    simulateAppStoreProduct,
-    onOpenAskAi
-  }: Props,
-): React.Node => {
+const CoursePage = ({
+  course,
+  courseChapters,
+  onOpenTemplateFromCourseChapter,
+  onBack,
+  onCompleteTask,
+  isTaskCompleted,
+  getChapterCompletion,
+  getCourseCompletion,
+  onBuyCourseWithCredits,
+  onBuyCourse,
+  purchasingCourseListingData,
+  setPurchasingCourseListingData,
+  simulateAppStoreProduct,
+  onOpenAskAi,
+}: Props): React.Node => {
   const { profile } = React.useContext(AuthenticatedUserContext);
   const userId = (profile && profile.id) || null;
   const {

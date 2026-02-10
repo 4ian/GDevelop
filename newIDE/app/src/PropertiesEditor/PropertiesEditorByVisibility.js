@@ -47,20 +47,18 @@ type Props = {|
   resourceManagementProps?: ?ResourceManagementProps,
 |};
 
-const PropertiesEditorByVisibility = (
-  {
-    onInstancesModified,
-    instances,
-    schema,
-    object,
-    renderExtraDescriptionText,
-    unsavedChanges,
-    project,
-    projectScopedContainersAccessor,
-    resourceManagementProps,
-    placeholder
-  }: Props,
-): ?(false | 0 | "" | React$Portal | React.Node) => {
+const PropertiesEditorByVisibility = ({
+  onInstancesModified,
+  instances,
+  schema,
+  object,
+  renderExtraDescriptionText,
+  unsavedChanges,
+  project,
+  projectScopedContainersAccessor,
+  resourceManagementProps,
+  placeholder,
+}: Props): ?(false | 0 | '' | React$Portal | React.Node) => {
   const [
     shouldShowDeprecatedProperties,
     setShouldShowDeprecatedProperties,

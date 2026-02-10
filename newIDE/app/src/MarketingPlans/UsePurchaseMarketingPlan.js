@@ -24,7 +24,11 @@ type Props = {|
   fetchGameFeaturings: () => Promise<void>,
 |};
 
-const usePurchaseMarketingPlan = ({game, activeGameFeaturings, fetchGameFeaturings}: Props): {
+const usePurchaseMarketingPlan = ({
+  game,
+  activeGameFeaturings,
+  fetchGameFeaturings,
+}: Props): {
   onPurchaseMarketingPlan: (
     i18n: I18nType,
     marketingPlan: MarketingPlan

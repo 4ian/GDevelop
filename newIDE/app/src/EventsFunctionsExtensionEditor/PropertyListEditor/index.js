@@ -462,7 +462,9 @@ const deleteItem = (item: TreeViewItem) => {
 const getTreeViewItemRightButton = (i18n: I18nType) => (item: TreeViewItem) =>
   item.content.getRightButton(i18n);
 
-export const usePropertyOverridingAlertDialog = (): ((existingPropertyNames: Array<string>) => Promise<boolean>) => {
+export const usePropertyOverridingAlertDialog = (): ((
+  existingPropertyNames: Array<string>
+) => Promise<boolean>) => {
   const { showConfirmation } = useAlertDialog();
   return async (existingPropertyNames: Array<string>): Promise<boolean> => {
     return await showConfirmation({
@@ -970,8 +972,8 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
           !propertiesTreeViewItemProps ||
           !propertyFolderTreeViewItemProps
           ? []
-          // $FlowFixMe[incompatible-type]
-          : [
+          : // $FlowFixMe[incompatible-type]
+            [
               new LeafTreeViewItem(
                 new ActionTreeViewItemContent(
                   configurationItemId,
@@ -1392,10 +1394,10 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
 );
 
 // $FlowFixMe[prop-missing]
-const PropertyListEditorWithErrorBoundary: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<PropertyListEditorInterface> }, React.RefSetter<PropertyListEditorInterface>> = React.forwardRef<
-  Props,
-  PropertyListEditorInterface
->((props, ref) => (
+const PropertyListEditorWithErrorBoundary: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<PropertyListEditorInterface> },
+  React.RefSetter<PropertyListEditorInterface>
+> = React.forwardRef<Props, PropertyListEditorInterface>((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Property list editor</Trans>}
     scope="property-list-editor"

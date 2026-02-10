@@ -26,15 +26,13 @@ type CordovaExportFlowProps = {|
   exportPipelineName: string,
 |};
 
-export const ExportFlow = (
-  {
-    disabled,
-    launchExport,
-    isExporting,
-    exportStep,
-    exportPipelineName
-  }: CordovaExportFlowProps,
-): React.Node | null =>
+export const ExportFlow = ({
+  disabled,
+  launchExport,
+  isExporting,
+  exportStep,
+  exportPipelineName,
+}: CordovaExportFlowProps): React.Node | null =>
   exportStep !== 'done' ? (
     <Line justifyContent="center">
       <RaisedButton
@@ -53,13 +51,11 @@ export const ExportFlow = (
     </Line>
   ) : null;
 
-export const DoneFooter = (
-  {
-    renderGameButton
-  }: {|
-    renderGameButton: () => React.Node,
-  |},
-): React.Node => {
+export const DoneFooter = ({
+  renderGameButton,
+}: {|
+  renderGameButton: () => React.Node,
+|}): React.Node => {
   const openLearnMore = () => {
     Window.openExternalURL(
       getHelpLink('/publishing/android_and_ios_with_cordova')

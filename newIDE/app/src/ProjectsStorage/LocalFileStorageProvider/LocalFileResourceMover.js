@@ -72,7 +72,14 @@ const downloadBlobToLocalFile = async (
 };
 
 // This mover can be used for both public URLs and Cloud project resources.
-export const moveUrlResourcesToLocalFiles = async ({project, fileMetadata, onProgress, authenticatedUser}: Options): Promise<{ erroredResources: Array<{ error: any, resourceName: string }> }> => {
+export const moveUrlResourcesToLocalFiles = async ({
+  project,
+  fileMetadata,
+  onProgress,
+  authenticatedUser,
+}: Options): Promise<{
+  erroredResources: Array<{ error: any, resourceName: string }>,
+}> => {
   if (!fs || !ipcRenderer) throw new Error('Unsupported');
 
   // Get all resources to download.

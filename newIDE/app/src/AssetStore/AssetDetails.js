@@ -98,7 +98,10 @@ export type AssetDetailsInterface = {|
 |};
 
 // $FlowFixMe[prop-missing]
-export const AssetDetails: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<AssetDetailsInterface> }, React.RefSetter<AssetDetailsInterface>> = React.forwardRef<Props, AssetDetailsInterface>(
+export const AssetDetails: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<AssetDetailsInterface> },
+  React.RefSetter<AssetDetailsInterface>
+> = React.forwardRef<Props, AssetDetailsInterface>(
   (
     {
       onTagSelection,

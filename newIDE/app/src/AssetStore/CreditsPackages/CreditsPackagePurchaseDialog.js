@@ -32,14 +32,12 @@ type Props = {|
   simulateAppStoreProduct?: boolean,
 |};
 
-const CreditsPackagePurchaseDialog = (
-  {
-    creditsPackageListingData,
-    onClose,
-    onCloseWhenPurchaseSuccessful,
-    simulateAppStoreProduct
-  }: Props,
-): React.Node => {
+const CreditsPackagePurchaseDialog = ({
+  creditsPackageListingData,
+  onClose,
+  onCloseWhenPurchaseSuccessful,
+  simulateAppStoreProduct,
+}: Props): React.Node => {
   const {
     profile,
     onOpenLoginDialog,

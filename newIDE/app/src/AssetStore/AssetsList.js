@@ -264,7 +264,10 @@ type Props = {|
 |};
 
 // $FlowFixMe[prop-missing]
-const AssetsList: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<AssetsListInterface> }, React.RefSetter<AssetsListInterface>> = React.forwardRef<Props, AssetsListInterface>(
+const AssetsList: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<AssetsListInterface> },
+  React.RefSetter<AssetsListInterface>
+> = React.forwardRef<Props, AssetsListInterface>(
   (
     {
       assetShortHeaders,

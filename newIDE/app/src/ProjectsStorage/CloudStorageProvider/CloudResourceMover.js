@@ -149,7 +149,7 @@ export const moveUrlResourcesToCloudProject = async ({
   // Download all the project resources as blob (much like what is done during an export).
   const downloadedBlobsAndResourcesToUpload: Array<
     ItemResult<ResourceToFetchAndUpload>
-  // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type]
   > = await downloadUrlsToBlobs({
     urlContainers: resourcesToFetchAndUpload,
     onProgress: (count, total) => {

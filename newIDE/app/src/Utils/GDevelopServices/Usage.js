@@ -538,7 +538,9 @@ export const isSubscriptionComingFromTeam = (
   return !!subscription && subscription.pricingSystemId === 'TEAM_MEMBER';
 };
 
-export const hasValidSubscriptionPlan = (subscription: ?Subscription): boolean => {
+export const hasValidSubscriptionPlan = (
+  subscription: ?Subscription
+): boolean => {
   const hasValidSubscription =
     !!subscription &&
     !!subscription.planId &&
@@ -693,7 +695,9 @@ export const validateCoupon = async (
   return response.data;
 };
 
-export const canBenefitFromDiscordRole = (subscription: ?Subscription): false | true | boolean => {
+export const canBenefitFromDiscordRole = (
+  subscription: ?Subscription
+): false | true | boolean => {
   return (
     !!subscription &&
     ['gdevelop_education', 'gdevelop_startup', 'gdevelop_gold'].includes(
@@ -704,7 +708,9 @@ export const canBenefitFromDiscordRole = (subscription: ?Subscription): false | 
   );
 };
 
-export const canUpgradeSubscription = (subscription: ?Subscription): false | true | boolean => {
+export const canUpgradeSubscription = (
+  subscription: ?Subscription
+): false | true | boolean => {
   return (
     !!subscription &&
     // $FlowFixMe[incompatible-type]

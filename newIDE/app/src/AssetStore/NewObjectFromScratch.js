@@ -38,14 +38,12 @@ type CustomObjectPackResultsProps = {|
   isAssetBeingInstalled: boolean,
 |};
 
-export const CustomObjectPackResults = (
-  {
-    packTag,
-    onAssetSelect,
-    onBack,
-    isAssetBeingInstalled
-  }: CustomObjectPackResultsProps,
-): React.Node => {
+export const CustomObjectPackResults = ({
+  packTag,
+  onAssetSelect,
+  onBack,
+  isAssetBeingInstalled,
+}: CustomObjectPackResultsProps): React.Node => {
   const { useSearchItem, error } = React.useContext(AssetStoreContext);
   // Memoizing the parameters of the search as it seems to trigger infinite rendering if not.
   const chosenCategory: ChosenCategory = React.useMemo(

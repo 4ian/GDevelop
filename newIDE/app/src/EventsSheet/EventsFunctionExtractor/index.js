@@ -233,6 +233,8 @@ export const canCreateEventsFunction = (
 /**
  * Return true if the function is considered to have more parameters than usual.
  */
-export const functionHasLotsOfParameters = (eventsFunction: gdEventsFunction): boolean => {
+export const functionHasLotsOfParameters = (
+  eventsFunction: gdEventsFunction
+): boolean => {
   return eventsFunction.getParameters().getParametersCount() > 7;
 };

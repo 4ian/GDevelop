@@ -15,13 +15,11 @@ const titleBarStyles = {
   rightSideArea: { alignSelf: 'stretch', flexShrink: 0 },
 };
 
-export const TitleBarLeftSafeMargins = (
-  {
-    backgroundColor
-  }: {|
-    backgroundColor?: string,
-  |},
-): null | React.MixedElement => {
+export const TitleBarLeftSafeMargins = ({
+  backgroundColor,
+}: {|
+  backgroundColor?: string,
+|}): null | React.MixedElement => {
   // An installed PWA can have window controls displayed as overlay. If supported,
   // we set up a listener to detect any change and force a refresh that will read
   // the latest size of the controls.
@@ -67,13 +65,11 @@ export const TitleBarLeftSafeMargins = (
   return null;
 };
 
-export const TitleBarRightSafeMargins = (
-  {
-    backgroundColor
-  }: {|
-    backgroundColor?: string,
-  |},
-): React.MixedElement => {
+export const TitleBarRightSafeMargins = ({
+  backgroundColor,
+}: {|
+  backgroundColor?: string,
+|}): React.MixedElement => {
   // An installed PWA can have window controls displayed as overlay. If supported,
   // we set up a listener to detect any change and force a refresh that will read
   // the latest size of the controls.

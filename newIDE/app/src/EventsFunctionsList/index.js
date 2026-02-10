@@ -1122,8 +1122,8 @@ const EventsFunctionsList = React.forwardRef<
                       i18n._(t`Start by adding a new object.`)
                     ),
                   ]
-                // $FlowFixMe[incompatible-type]
-                : objectTreeViewItems;
+                : // $FlowFixMe[incompatible-type]
+                  objectTreeViewItems;
             },
           },
           {
@@ -1145,8 +1145,8 @@ const EventsFunctionsList = React.forwardRef<
                       i18n._(t`Start by adding a new behavior.`)
                     ),
                   ]
-                // $FlowFixMe[incompatible-type]
-                : behaviorTreeViewItems;
+                : // $FlowFixMe[incompatible-type]
+                  behaviorTreeViewItems;
             },
           },
           {
@@ -1447,10 +1447,10 @@ const MemoizedObjectsList = React.memo<Props, EventsFunctionsListInterface>(
 );
 
 // $FlowFixMe[prop-missing]
-const EventsFunctionsListWithErrorBoundary: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<EventsFunctionsListInterface> }, React.RefSetter<EventsFunctionsListInterface>> = React.forwardRef<
-  Props,
-  EventsFunctionsListInterface
->((props, ref) => (
+const EventsFunctionsListWithErrorBoundary: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<EventsFunctionsListInterface> },
+  React.RefSetter<EventsFunctionsListInterface>
+> = React.forwardRef<Props, EventsFunctionsListInterface>((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Objects list</Trans>}
     scope="scene-editor-objects-list"

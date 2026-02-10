@@ -139,19 +139,17 @@ const convertJsObjectToVariable = (value: any, variable: gdVariable) => {
   }
 };
 
-export const applyVariableChange = (
-  {
-    variablePath,
-    forcedVariableType,
-    variablesContainer,
-    value
-  }: {|
-    variablePath: string,
-    forcedVariableType: string | null,
-    variablesContainer: gd.VariablesContainer,
-    value: string,
-  |},
-): {
+export const applyVariableChange = ({
+  variablePath,
+  forcedVariableType,
+  variablesContainer,
+  value,
+}: {|
+  variablePath: string,
+  forcedVariableType: string | null,
+  variablesContainer: gd.VariablesContainer,
+  value: string,
+|}): {
   addedNewVariable: boolean,
   variable: null | gdVariable,
   variableType: string,

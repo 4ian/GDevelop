@@ -66,20 +66,18 @@ type Props = {|
   onGoToCreateAccount?: () => void,
 |};
 
-const LoginForm = (
-  {
-    onLogin,
-    onLoginWithProvider,
-    email,
-    onChangeEmail,
-    password,
-    onChangePassword,
-    onForgotPassword,
-    loginInProgress,
-    error,
-    onGoToCreateAccount
-  }: Props,
-): React.Node => {
+const LoginForm = ({
+  onLogin,
+  onLoginWithProvider,
+  email,
+  onChangeEmail,
+  password,
+  onChangePassword,
+  onForgotPassword,
+  loginInProgress,
+  error,
+  onGoToCreateAccount,
+}: Props): React.Node => {
   const [
     isForgotPasswordDialogOpen,
     setIsForgotPasswordDialogOpen,

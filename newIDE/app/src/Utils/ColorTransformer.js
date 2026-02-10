@@ -68,7 +68,9 @@ export const rgbOrHexToHexNumber = (value: string): number => {
 /**
  * Convert a Hex number to a RGB color.
  */
-export const hexNumberToRGBColor = (hexNumber: number): { a: number, b: number, g: number, r: number } => {
+export const hexNumberToRGBColor = (
+  hexNumber: number
+): { a: number, b: number, g: number, r: number } => {
   return {
     r: (hexNumber >> 16) & 0xff,
     g: (hexNumber >> 8) & 0xff,
@@ -80,7 +82,9 @@ export const hexNumberToRGBColor = (hexNumber: number): { a: number, b: number, 
 /**
  * Convert a Hex string to a RGB color.
  */
-export const hexToRGBColor = (hex: string): { a: number, b: number, g: number, r: number } => {
+export const hexToRGBColor = (
+  hex: string
+): { a: number, b: number, g: number, r: number } => {
   const hexNumber = parseInt(hex.replace('#', ''), 16);
   return hexNumberToRGBColor(hexNumber);
 };

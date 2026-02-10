@@ -19,35 +19,33 @@ const gd: libGDevelop = global.gd;
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function GlobalVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
-    const [editorOpen, setEditorOpen] = React.useState<
-      VariableDialogOpeningProps | null,
-    >(null);
+    const [
+      editorOpen,
+      setEditorOpen,
+    ] = React.useState<VariableDialogOpeningProps | null>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(
-      ref,
-      () => ({
-        focus,
-      }),
-    );
-    
-    const {project, scope, projectScopedContainersAccessor} = props;
-    
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
+
+    const { project, scope, projectScopedContainersAccessor } = props;
+
     const variablesContainers = React.useMemo(
       () => {
         return project ? [project.getVariables()] : [];
       },
-      [project],
+      [project]
     );
-    
+
     const enumerateGlobaleVariables = React.useCallback(
       () => {
         return project ? enumerateVariables(project.getVariables()) : [];
       },
-      [project],
+      [project]
     );
-    
+
     return (
       <React.Fragment>
         <VariableField
@@ -68,7 +66,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           scope={scope}
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
         />
-        {editorOpen && project &&
+        {editorOpen && project && (
           <GlobalVariablesDialog
             project={project}
             open
@@ -76,7 +74,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             onApply={(selectedVariableName: string | null) => {
               if (
                 selectedVariableName &&
-                  selectedVariableName.startsWith(props.value)
+                selectedVariableName.startsWith(props.value)
               ) {
                 props.onChange(selectedVariableName);
               }
@@ -87,19 +85,25 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
             hotReloadPreviewButtonProps={null}
             isListLocked={false}
-          />}
+          />
+        )}
       </React.Fragment>
     );
-  },
-// $FlowFixMe[prop-missing]
-): React.AbstractComponent<{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }, React.RefSetter<ParameterFieldInterface>>);
+  }
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);
 
 const getVariableSourceFromIdentifier = (
   variableName: string,
   projectScopedContainers: gdProjectScopedContainers
 ): VariablesContainer_SourceType => gd.VariablesContainer.Global;
 
-export const renderInlineGlobalVariable = (props: ParameterInlineRendererProps): any =>
+export const renderInlineGlobalVariable = (
+  props: ParameterInlineRendererProps
+): any =>
   renderVariableWithIcon(
     props,
     'global variable',

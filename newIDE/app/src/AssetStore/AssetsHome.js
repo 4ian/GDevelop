@@ -75,17 +75,17 @@ export const gameTemplatesCategoryId = 'game-template';
 export const shopCategories: {
   background: { imageAlt: string, imageSource: string, title: React.Node },
   character: { imageAlt: string, imageSource: string, title: React.Node },
-  "full-game-pack": {
+  'full-game-pack': {
     imageAlt: string,
     imageSource: string,
     title: React.Node,
   },
-  "game-template": { imageAlt: string, imageSource: string, title: React.Node },
+  'game-template': { imageAlt: string, imageSource: string, title: React.Node },
   interface: { imageAlt: string, imageSource: string, title: React.Node },
   prefab: { imageAlt: string, imageSource: string, title: React.Node },
   props: { imageAlt: string, imageSource: string, title: React.Node },
   sounds: { imageAlt: string, imageSource: string, title: React.Node },
-  "visual-effect": { imageAlt: string, imageSource: string, title: React.Node },
+  'visual-effect': { imageAlt: string, imageSource: string, title: React.Node },
 } = {
   [gameTemplatesCategoryId]: {
     title: <Trans>Ready-made games</Trans>,
@@ -190,7 +190,10 @@ type Props = {|
 |};
 
 // $FlowFixMe[prop-missing]
-export const AssetsHome: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<AssetsHomeInterface> }, React.RefSetter<AssetsHomeInterface>> = React.forwardRef<Props, AssetsHomeInterface>(
+export const AssetsHome: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<AssetsHomeInterface> },
+  React.RefSetter<AssetsHomeInterface>
+> = React.forwardRef<Props, AssetsHomeInterface>(
   (
     {
       publicAssetPacks: { starterPacks },
@@ -263,8 +266,8 @@ export const AssetsHome: React.AbstractComponent<{ ...Props, +ref?: React.RefSet
     );
 
     const openedShopCategoryTitle = openedShopCategory
-      // $FlowFixMe[invalid-computed-prop]
-      ? shopCategories[openedShopCategory].title
+      ? // $FlowFixMe[invalid-computed-prop]
+        shopCategories[openedShopCategory].title
       : null;
 
     const publicPackTiles: Array<React.Node> = React.useMemo(

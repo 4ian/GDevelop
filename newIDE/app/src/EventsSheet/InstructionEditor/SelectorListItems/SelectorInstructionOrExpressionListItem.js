@@ -16,16 +16,14 @@ type Props = {|
   matches?: SearchMatch[],
 |};
 
-export const renderInstructionOrExpressionListItem = (
-  {
-    id,
-    instructionOrExpressionMetadata,
-    iconSize,
-    onClick,
-    selectedValue,
-    matches
-  }: Props,
-): React.Node => {
+export const renderInstructionOrExpressionListItem = ({
+  id,
+  instructionOrExpressionMetadata,
+  iconSize,
+  onClick,
+  selectedValue,
+  matches,
+}: Props): React.Node => {
   const getRenderedText = (field: 'displayedName' | 'fullGroupName') => {
     let text = instructionOrExpressionMetadata[field];
     if (matches && matches.length) {

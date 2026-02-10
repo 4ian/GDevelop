@@ -18,7 +18,9 @@ type PropsType = {|
 /**
  * The button that can be used in any dialog to open a Youtube tutorial.
  */
-const TutorialButton = (props: PropsType): 
+const TutorialButton = (
+  props: PropsType
+):
   | null
   | boolean
   | number

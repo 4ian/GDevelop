@@ -29,21 +29,23 @@ export const TUTORIAL_CATEGORY_TEXTS = {
   },
   'game-mechanic': {
     title: (<Trans>Specific game mechanics</Trans>: React.Node),
-    description: (
-      (<Trans>
-  Find how to implement the most common game mechanics and more
-</Trans>: React.Node)
-    ),
+    description: ((
+      <Trans>
+        Find how to implement the most common game mechanics and more
+      </Trans>
+    ): React.Node),
   },
   'official-beginner': {
     title: (<Trans>Beginner course</Trans>: React.Node),
-    description: (<Trans>Learn the fundamental principles of GDevelop</Trans>: React.Node),
+    description: ((
+      <Trans>Learn the fundamental principles of GDevelop</Trans>
+    ): React.Node),
   },
   'official-intermediate': {
     title: (<Trans>Intermediate course</Trans>: React.Node),
-    description: (
-      (<Trans>Learn all the game-building mechanics of GDevelop</Trans>: React.Node)
-    ),
+    description: ((
+      <Trans>Learn all the game-building mechanics of GDevelop</Trans>
+    ): React.Node),
   },
   'official-advanced': {
     title: (<Trans>Advanced course</Trans>: React.Node),
@@ -51,11 +53,12 @@ export const TUTORIAL_CATEGORY_TEXTS = {
   },
   'education-curriculum': {
     title: (<Trans>Education curriculum and resources</Trans>: React.Node),
-    description: (
-      (<Trans>
-  For teachers and educators having the GDevelop Education subscription. Ready to use resources for teaching.
-</Trans>: React.Node)
-    ),
+    description: ((
+      <Trans>
+        For teachers and educators having the GDevelop Education subscription.
+        Ready to use resources for teaching.
+      </Trans>
+    ): React.Node),
   },
   course: {
     title: (<Trans>Loading</Trans>: React.Node),

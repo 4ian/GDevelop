@@ -17,30 +17,28 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(
-      ref,
-      () => ({
-        focus,
-      }),
-    );
-    
-    const {parameterMetadata, value} = props;
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
+
+    const { parameterMetadata, value } = props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
-    
+
     return (
       <SelectField
         margin={props.isInline ? 'none' : 'dense'}
         fullWidth
         floatingLabelText={description}
-        helperMarkdownText={parameterMetadata
-          ? parameterMetadata.getLongDescription()
-          : undefined}
+        helperMarkdownText={
+          parameterMetadata ? parameterMetadata.getLongDescription() : undefined
+        }
         value={value}
         ref={field}
         onChange={(e, i, value) => props.onChange(value)}
-        translatableHintText={t`Choose a mouse button`}>
+        translatableHintText={t`Choose a mouse button`}
+      >
         <SelectOption value="Left" label={t`Left (primary)`} />
         <SelectOption value="Right" label={t`Right (secondary)`} />
         <SelectOption
@@ -57,11 +55,17 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         />
       </SelectField>
     );
-  },
-// $FlowFixMe[prop-missing]
-): React.AbstractComponent<{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }, React.RefSetter<ParameterFieldInterface>>);
+  }
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);
 
-export const renderInlineMouse = ({value, InvalidParameterValue}: ParameterInlineRendererProps): string | React.MixedElement => {
+export const renderInlineMouse = ({
+  value,
+  InvalidParameterValue,
+}: ParameterInlineRendererProps): string | React.MixedElement => {
   return value ? (
     value
   ) : (

@@ -74,7 +74,10 @@ type Props = {|
 |};
 
 // $FlowFixMe[prop-missing]
-const SectionContainer: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<HTMLDivElement> }, React.RefSetter<HTMLDivElement>> = React.forwardRef<Props, HTMLDivElement>(
+const SectionContainer: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<HTMLDivElement> },
+  React.RefSetter<HTMLDivElement>
+> = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       children,
@@ -201,15 +204,13 @@ const SectionContainer: React.AbstractComponent<{ ...Props, +ref?: React.RefSett
   }
 );
 
-export const SectionRow = (
-  {
-    children,
-    expand
-  }: {
-    children: React.Node,
-    expand?: boolean,
-  },
-): React.MixedElement => (
+export const SectionRow = ({
+  children,
+  expand,
+}: {
+  children: React.Node,
+  expand?: boolean,
+}): React.MixedElement => (
   <div
     style={{ ...styles.rowContainer, ...(expand ? { flex: 1 } : undefined) }}
   >

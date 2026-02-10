@@ -140,27 +140,29 @@ type ObjectStoreState = {|
   filtersState: FiltersState,
 |};
 
-export const ObjectStoreContext: React.Context<ObjectStoreState> = React.createContext<ObjectStoreState>({
-  filters: null,
-  searchResults: null,
-  fetchObjects: () => {},
-  error: null,
-  searchText: '',
-  setSearchText: () => {},
-  allCategories: [],
-  // '' means all categories.
-  chosenCategory: '',
-  setChosenCategory: () => {},
-  setInstalledObjectMetadataList: () => {},
-  translatedObjectShortHeadersByType: {},
-  filtersState: {
-    chosenFilters: new Set(),
-    addFilter: () => {},
-    removeFilter: () => {},
-    chosenCategory: null,
+export const ObjectStoreContext: React.Context<ObjectStoreState> = React.createContext<ObjectStoreState>(
+  {
+    filters: null,
+    searchResults: null,
+    fetchObjects: () => {},
+    error: null,
+    searchText: '',
+    setSearchText: () => {},
+    allCategories: [],
+    // '' means all categories.
+    chosenCategory: '',
     setChosenCategory: () => {},
-  },
-});
+    setInstalledObjectMetadataList: () => {},
+    translatedObjectShortHeadersByType: {},
+    filtersState: {
+      chosenFilters: new Set(),
+      addFilter: () => {},
+      removeFilter: () => {},
+      chosenCategory: null,
+      setChosenCategory: () => {},
+    },
+  }
+);
 
 type ObjectStoreStateProviderProps = {|
   children: React.Node,
@@ -168,7 +170,11 @@ type ObjectStoreStateProviderProps = {|
   defaultSearchText?: string,
 |};
 
-export const ObjectStoreStateProvider = ({children, i18n, defaultSearchText}: ObjectStoreStateProviderProps): React.MixedElement => {
+export const ObjectStoreStateProvider = ({
+  children,
+  i18n,
+  defaultSearchText,
+}: ObjectStoreStateProviderProps): React.MixedElement => {
   const [
     installedObjectMetadataList,
     setInstalledObjectMetadataList,

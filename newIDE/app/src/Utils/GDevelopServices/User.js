@@ -660,7 +660,9 @@ export const communityLinksConfig = {
     icon: (<GitHub style={{ width: 24, height: 24 }} />: React.Node),
     prefix: 'https://github.com/',
     maxLength: 39,
-    getMessageFromUpdate: (responseCode: string): null | { message: any, title: any } => {
+    getMessageFromUpdate: (
+      responseCode: string
+    ): null | { message: any, title: any } => {
       if (
         responseCode === 'github-star/badge-given' ||
         responseCode === 'github-star/badge-already-given'
@@ -691,7 +693,9 @@ export const communityLinksConfig = {
     icon: (<Twitter />: React.Node),
     prefix: 'https://twitter.com/',
     maxLength: 15,
-    getMessageFromUpdate: (responseCode: string): null | { message: any, title: any } => {
+    getMessageFromUpdate: (
+      responseCode: string
+    ): null | { message: any, title: any } => {
       if (
         responseCode === 'twitter-follow/badge-given' ||
         responseCode === 'twitter-follow/badge-already-given'
@@ -728,7 +732,9 @@ export const communityLinksConfig = {
     icon: (<YouTube />: React.Node),
     prefix: 'https://youtube.com/@',
     maxLength: 100,
-    getMessageFromUpdate: (responseCode: string): null | { message: any, title: any } => {
+    getMessageFromUpdate: (
+      responseCode: string
+    ): null | { message: any, title: any } => {
       if (
         responseCode === 'youtube-subscription/badge-given' ||
         responseCode === 'youtube-subscription/badge-already-given'
@@ -766,7 +772,9 @@ export const communityLinksConfig = {
         ? tiktokUsernameFormattingErrorMessage
         : undefined,
     maxLength: 30,
-    getMessageFromUpdate: (responseCode: string): null | { message: any, title: any } => {
+    getMessageFromUpdate: (
+      responseCode: string
+    ): null | { message: any, title: any } => {
       if (
         responseCode === 'tiktok-follow/badge-given' ||
         responseCode === 'tiktok-follow/badge-already-given'

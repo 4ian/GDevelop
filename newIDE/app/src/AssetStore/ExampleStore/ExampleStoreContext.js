@@ -29,28 +29,32 @@ type ExampleStoreState = {|
   filtersState: FiltersState,
 |};
 
-export const ExampleStoreContext: React.Context<ExampleStoreState> = React.createContext<ExampleStoreState>({
-  exampleFilters: null,
-  exampleShortHeadersSearchResults: null,
-  fetchExamplesAndFilters: () => {},
-  exampleShortHeaders: null,
-  error: null,
-  searchText: '',
-  setSearchText: () => {},
-  filtersState: {
-    chosenFilters: new Set(),
-    addFilter: () => {},
-    removeFilter: () => {},
-    chosenCategory: null,
-    setChosenCategory: () => {},
-  },
-});
+export const ExampleStoreContext: React.Context<ExampleStoreState> = React.createContext<ExampleStoreState>(
+  {
+    exampleFilters: null,
+    exampleShortHeadersSearchResults: null,
+    fetchExamplesAndFilters: () => {},
+    exampleShortHeaders: null,
+    error: null,
+    searchText: '',
+    setSearchText: () => {},
+    filtersState: {
+      chosenFilters: new Set(),
+      addFilter: () => {},
+      removeFilter: () => {},
+      chosenCategory: null,
+      setChosenCategory: () => {},
+    },
+  }
+);
 
 type ExampleStoreStateProviderProps = {|
   children: React.Node,
 |};
 
-export const ExampleStoreStateProvider = ({children}: ExampleStoreStateProviderProps): React.MixedElement => {
+export const ExampleStoreStateProvider = ({
+  children,
+}: ExampleStoreStateProviderProps): React.MixedElement => {
   const [
     exampleShortHeadersById,
     setExampleShortHeadersById,

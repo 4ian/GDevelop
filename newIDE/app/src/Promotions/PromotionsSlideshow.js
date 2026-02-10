@@ -23,7 +23,9 @@ type PromotionsSlideshowProps = {|
   type?: 'game' | 'asset-pack' | 'game-template',
 |};
 
-const PromotionsSlideshow = ({type}: PromotionsSlideshowProps): null | React.Node => {
+const PromotionsSlideshow = ({
+  type,
+}: PromotionsSlideshowProps): null | React.Node => {
   const { promotions, error } = React.useContext(AnnouncementsFeedContext);
   const { navigateToRoute } = React.useContext(RouterContext);
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();

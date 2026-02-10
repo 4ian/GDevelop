@@ -65,7 +65,12 @@ const projectHasItem = ({
   }
 };
 
-const useEditorTabsStateSaving = ({currentProjectId, editorTabs, getEditorOpeningOptions, setEditorTabs}: Props): {
+const useEditorTabsStateSaving = ({
+  currentProjectId,
+  editorTabs,
+  getEditorOpeningOptions,
+  setEditorTabs,
+}: Props): {
   hasAPreviousSaveForEditorTabsState: (project: gdProject) => boolean,
   openEditorTabsFromPersistedState: (project: gdProject) => number,
 } => {

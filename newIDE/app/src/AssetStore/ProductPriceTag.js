@@ -243,15 +243,13 @@ type ProductPriceTagProps = {|
   discountedPrice?: boolean,
 |};
 
-const ProductPriceTag = (
-  {
-    productListingData,
-    usageType,
-    withOverlay,
-    owned,
-    discountedPrice
-  }: ProductPriceTagProps,
-): React.Node => {
+const ProductPriceTag = ({
+  productListingData,
+  usageType,
+  withOverlay,
+  owned,
+  discountedPrice,
+}: ProductPriceTagProps): React.Node => {
   return (
     <I18n>
       {({ i18n }) => {

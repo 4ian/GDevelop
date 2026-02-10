@@ -15,15 +15,13 @@ import PreferencesContext from './Preferences/PreferencesContext';
 
 export const TIME_BETWEEN_PREVIEW_SCREENSHOTS = 1000 * 60 * 3; // 3 minutes
 
-const useCapturesManager = (
-  {
-    project,
-    gamesList
-  }: {
-    project: ?gdProject,
-    gamesList: GamesList,
-  },
-): {
+const useCapturesManager = ({
+  project,
+  gamesList,
+}: {
+  project: ?gdProject,
+  gamesList: GamesList,
+}): {
   createCaptureOptionsForPreview: (
     launchCaptureOptions: ?LaunchCaptureOptions
   ) => Promise<CaptureOptions>,

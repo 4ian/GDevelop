@@ -22,7 +22,9 @@ export const shouldValidate = (event: SupportedEvent): false | boolean => {
 /**
  * Check if the user asked to go to previous match.
  */
-export const shouldBrowsePrevious = (event: SupportedEvent): false | boolean => {
+export const shouldBrowsePrevious = (
+  event: SupportedEvent
+): false | boolean => {
   return event.shiftKey && event.key === 'Enter';
 };
 
@@ -54,7 +56,9 @@ export const shouldZoom = (event: SupportedEvent | WheelEvent): boolean => {
  * Note that in most case, this should be automatically handled by the browser
  * (or material-ui), and using this should not be needed.
  */
-export const shouldFocusNextField = (event: SupportedEvent): false | boolean => {
+export const shouldFocusNextField = (
+  event: SupportedEvent
+): false | boolean => {
   return event.key === 'Tab' && !event.shiftKey;
 };
 
@@ -63,6 +67,8 @@ export const shouldFocusNextField = (event: SupportedEvent): false | boolean => 
  * Note that in most case, this should be automatically handled by the browser
  * (or material-ui), and using this should not be needed.
  */
-export const shouldFocusPreviousField = (event: SupportedEvent): false | boolean => {
+export const shouldFocusPreviousField = (
+  event: SupportedEvent
+): false | boolean => {
   return event.key === 'Tab' && event.shiftKey;
 };

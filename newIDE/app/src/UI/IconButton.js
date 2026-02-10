@@ -99,7 +99,10 @@ const useStylesForIconButton = ({
  */
 
 // $FlowFixMe[prop-missing]
-const IconButton: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<{}> }, React.RefSetter<{}>> = React.forwardRef<Props, {||}>((props: Props, ref) => {
+const IconButton: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<{}> },
+  React.RefSetter<{}>
+> = React.forwardRef<Props, {||}>((props: Props, ref) => {
   const {
     selected,
     tooltip,

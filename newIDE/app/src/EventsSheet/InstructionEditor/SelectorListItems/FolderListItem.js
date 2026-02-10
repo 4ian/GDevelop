@@ -14,7 +14,11 @@ type Props = {|
   matchesCoordinates: number[][],
 |};
 
-export const renderFolderListItem = ({folderWithPath, iconSize, matchesCoordinates}: Props): React.Node => {
+export const renderFolderListItem = ({
+  folderWithPath,
+  iconSize,
+  matchesCoordinates,
+}: Props): React.Node => {
   const folderPath: string = folderWithPath.path;
   return (
     <ListItem

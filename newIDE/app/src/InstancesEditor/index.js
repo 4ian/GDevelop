@@ -1408,13 +1408,9 @@ export default class InstancesEditor extends Component<Props, State> {
   // Debounce function to avoid storing history for each pixel move when user
   // keeps pressing an arrow key.
   // $FlowFixMe[missing-local-annot]
-  onInstancesMovedDebounced = (debounce(
-  this.props.onInstancesMoved,
-  50,
-  {
+  onInstancesMovedDebounced = (debounce(this.props.onInstancesMoved, 50, {
     trailing: true,
-  },
-): any);
+  }): any);
 
   moveSelection = (x: number, y: number) => {
     this.fpsLimiter.notifyInteractionHappened();

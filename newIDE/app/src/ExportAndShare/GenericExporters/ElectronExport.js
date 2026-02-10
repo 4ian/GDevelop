@@ -27,15 +27,13 @@ type ElectronExportFlowProps = {|
   exportPipelineName: string,
 |};
 
-export const ExportFlow = (
-  {
-    disabled,
-    launchExport,
-    isExporting,
-    exportStep,
-    exportPipelineName
-  }: ElectronExportFlowProps,
-): React.Node | null =>
+export const ExportFlow = ({
+  disabled,
+  launchExport,
+  isExporting,
+  exportStep,
+  exportPipelineName,
+}: ElectronExportFlowProps): React.Node | null =>
   exportStep !== 'done' ? (
     <Line justifyContent="center">
       <RaisedButton
@@ -54,13 +52,11 @@ export const ExportFlow = (
     </Line>
   ) : null;
 
-export const DoneFooter = (
-  {
-    renderGameButton
-  }: {|
-    renderGameButton: () => React.Node,
-  |},
-): React.Node => {
+export const DoneFooter = ({
+  renderGameButton,
+}: {|
+  renderGameButton: () => React.Node,
+|}): React.Node => {
   const openLearnMore = () => {
     Window.openExternalURL(
       getHelpLink('/publishing/windows-macos-linux-with-electron')

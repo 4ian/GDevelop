@@ -40,7 +40,9 @@ export type OpenedDialogsCountCallback = ({
 }) => void;
 
 let openedDialogsCountCallbacks: OpenedDialogsCountCallback[] = [];
-export const registerOpenedDialogsCountCallback = (callback: OpenedDialogsCountCallback): (() => void) => {
+export const registerOpenedDialogsCountCallback = (
+  callback: OpenedDialogsCountCallback
+): (() => void) => {
   openedDialogsCountCallbacks.push(callback);
   callback({ openedDialogsCount }); // Ensure the callback is called with the current count.
 

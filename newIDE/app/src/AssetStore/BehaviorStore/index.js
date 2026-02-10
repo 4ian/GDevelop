@@ -75,19 +75,17 @@ type Props = {|
 const getBehaviorType = (behaviorShortHeader: BehaviorShortHeader) =>
   behaviorShortHeader.type;
 
-export const BehaviorStore = (
-  {
-    isInstalling,
-    project,
-    objectType,
-    objectBehaviorsTypes,
-    isChildObject,
-    installedBehaviorMetadataList,
-    deprecatedBehaviorMetadataList,
-    onInstall,
-    onChoose
-  }: Props,
-): React.Node => {
+export const BehaviorStore = ({
+  isInstalling,
+  project,
+  objectType,
+  objectBehaviorsTypes,
+  isChildObject,
+  installedBehaviorMetadataList,
+  deprecatedBehaviorMetadataList,
+  onInstall,
+  onChoose,
+}: Props): React.Node => {
   const preferences = React.useContext(PreferencesContext);
   const [
     selectedBehaviorShortHeader,

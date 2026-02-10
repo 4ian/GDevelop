@@ -453,4 +453,6 @@ export class ExternalLayoutEditorContainer extends React.Component<
   }
 }
 
-export const renderExternalLayoutEditorContainer = (props: RenderEditorContainerPropsWithRef): React.Node => <ExternalLayoutEditorContainer {...props} />;
+export const renderExternalLayoutEditorContainer = (
+  props: RenderEditorContainerPropsWithRef
+): React.Node => <ExternalLayoutEditorContainer {...props} />;

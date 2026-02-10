@@ -17,14 +17,15 @@ const remote = optionalRequire('@electron/remote');
 const shell = remote ? remote.shell : null;
 const app = remote ? remote.app : null;
 
-export const generateGetResourceActions = (
-  {
-    authenticatedUser
-  }: {
-    // $FlowFixMe[value-as-type]
-    authenticatedUser: AuthenticatedUser,
-  },
-): ((ResourcesActionsProps) => Array<{ click: () => Promise<void>, label: any }>) => ({
+export const generateGetResourceActions = ({
+  authenticatedUser,
+}: {
+  // $FlowFixMe[value-as-type]
+  authenticatedUser: AuthenticatedUser,
+}): (ResourcesActionsProps => Array<{
+  click: () => Promise<void>,
+  label: any,
+}>) => ({
   project,
   resource,
   i18n,

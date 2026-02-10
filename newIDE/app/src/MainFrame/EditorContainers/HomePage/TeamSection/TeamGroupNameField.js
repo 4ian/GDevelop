@@ -22,7 +22,12 @@ type Props = {|
   onDeleteGroup: (group: TeamGroup) => Promise<void>,
 |};
 
-const TeamGroupNameField = ({group, onFinishEditingGroupName, allowDelete, onDeleteGroup}: Props): React.Node => {
+const TeamGroupNameField = ({
+  group,
+  onFinishEditingGroupName,
+  allowDelete,
+  onDeleteGroup,
+}: Props): React.Node => {
   const [isDeleting, setIsDeleting] = React.useState<boolean>(false);
   const [isEditingName, setIsEditingName] = React.useState<boolean>(false);
 

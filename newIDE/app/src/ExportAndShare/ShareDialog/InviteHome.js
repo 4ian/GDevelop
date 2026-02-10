@@ -69,7 +69,7 @@ type Props = {|
   cloudProjectId: ?string,
 |};
 
-const InviteHome = ({cloudProjectId}: Props): React.Node | React.Node => {
+const InviteHome = ({ cloudProjectId }: Props): React.Node | React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile, limits } = authenticatedUser;
   const isOnline = useOnlineStatus();
@@ -368,8 +368,8 @@ const InviteHome = ({cloudProjectId}: Props): React.Node | React.Node => {
               collaborators.
             </Trans>
           </AlertMessage>
-        // $FlowFixMe[constant-condition]
-        ) : !projectUserAcls ? (
+        ) : // $FlowFixMe[constant-condition]
+        !projectUserAcls ? (
           <PlaceholderLoader />
         ) : (
           // $FlowFixMe[missing-local-annot]

@@ -114,21 +114,19 @@ const getUserFromState = (userState: string) => {
   }
 };
 
-export const Default = (
-  {
-    willCancelAtPeriodEndOrIsExpired,
-    loading,
-    simulateNativeMobileApp,
-    userState,
-    pricingSystem
-  }: {|
-    willCancelAtPeriodEndOrIsExpired: boolean,
-    loading: boolean,
-    simulateNativeMobileApp: boolean,
-    userState: string,
-    pricingSystem: string,
-  |},
-): React.Node => {
+export const Default = ({
+  willCancelAtPeriodEndOrIsExpired,
+  loading,
+  simulateNativeMobileApp,
+  userState,
+  pricingSystem,
+}: {|
+  willCancelAtPeriodEndOrIsExpired: boolean,
+  loading: boolean,
+  simulateNativeMobileApp: boolean,
+  userState: string,
+  pricingSystem: string,
+|}): React.Node => {
   const authenticatedUser = loading
     ? fakeAuthenticatedUserLoggingIn
     : getUserFromState(userState);

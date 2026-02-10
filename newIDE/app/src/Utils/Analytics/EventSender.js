@@ -84,8 +84,9 @@ const ensureGDevelopEditorAnalyticsReady = async () => {
   return gdevelopEditorAnalyticsPromise;
 };
 
-export const setCurrentlyRunningInAppTutorial = (tutorial: string | null): string | null =>
-  (currentlyRunningInAppTutorial = tutorial);
+export const setCurrentlyRunningInAppTutorial = (
+  tutorial: string | null
+): string | null => (currentlyRunningInAppTutorial = tutorial);
 
 const makeCanSendEvent = (options: {| minimumTimeBetweenEvents: number |}) => {
   const lastSentEventTimestamps = {};

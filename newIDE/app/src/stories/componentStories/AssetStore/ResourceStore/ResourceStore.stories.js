@@ -36,9 +36,13 @@ const ResourceStoreStory = ({ kind }: {| kind: 'audio' | 'font' | 'svg' |}) => {
   );
 };
 
-export const AudioResource = (): React.Node => <ResourceStoreStory kind="audio" />;
+export const AudioResource = (): React.Node => (
+  <ResourceStoreStory kind="audio" />
+);
 
-export const FontResource = (): React.Node => <ResourceStoreStory kind="font" />;
+export const FontResource = (): React.Node => (
+  <ResourceStoreStory kind="font" />
+);
 
 export const SvgResource = (): React.Node => <ResourceStoreStory kind="svg" />;
 

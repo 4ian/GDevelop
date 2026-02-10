@@ -151,7 +151,9 @@ const commitProjectVersion = async ({
 };
 
 // $FlowFixMe[value-as-type]
-export const generateOnSaveProject = (authenticatedUser: AuthenticatedUser): ((
+export const generateOnSaveProject = (
+  authenticatedUser: AuthenticatedUser
+): ((
   project: gdProject,
   fileMetadata: FileMetadata,
   options?: SaveProjectOptions,
@@ -240,7 +242,9 @@ export const generateOnSaveProject = (authenticatedUser: AuthenticatedUser): ((
 };
 
 // $FlowFixMe[value-as-type]
-export const generateOnChangeProjectProperty = (authenticatedUser: AuthenticatedUser): ((
+export const generateOnChangeProjectProperty = (
+  authenticatedUser: AuthenticatedUser
+): ((
   project: gdProject,
   fileMetadata: FileMetadata,
   properties: { gameId?: string, name?: string }
@@ -297,24 +301,23 @@ export const getWriteErrorMessage = (
   return t`An error occurred when saving the project, please verify your internet connection or try again later.`;
 };
 
-export const generateOnChooseSaveProjectAsLocation = (
-  {
-    authenticatedUser,
-    setDialog,
-    closeDialog
-  }: {|
-    // $FlowFixMe[value-as-type]
-    authenticatedUser: AuthenticatedUser,
-    setDialog: (() => React.Node) => void,
-    closeDialog: () => void,
-  |},
-): ((
-  {
-    displayOptionToGenerateNewProjectUuid: boolean,
-    fileMetadata: ?FileMetadata,
-    project: gdProject,
-  }
-) => Promise<{ saveAsLocation: ?SaveAsLocation, saveAsOptions: ?SaveAsOptions }>) => async ({
+export const generateOnChooseSaveProjectAsLocation = ({
+  authenticatedUser,
+  setDialog,
+  closeDialog,
+}: {|
+  // $FlowFixMe[value-as-type]
+  authenticatedUser: AuthenticatedUser,
+  setDialog: (() => React.Node) => void,
+  closeDialog: () => void,
+|}): (({
+  displayOptionToGenerateNewProjectUuid: boolean,
+  fileMetadata: ?FileMetadata,
+  project: gdProject,
+}) => Promise<{
+  saveAsLocation: ?SaveAsLocation,
+  saveAsOptions: ?SaveAsOptions,
+}>) => async ({
   project,
   fileMetadata,
   displayOptionToGenerateNewProjectUuid,
@@ -378,7 +381,7 @@ export const generateOnSaveProjectAs = (
     onMoveResources: ({ newFileMetadata: FileMetadata }) => Promise<void>,
     onStartSaving: () => void,
   }
-) => 
+) =>
   | Promise<{ fileMetadata: null, wasSaved: boolean }>
   | Promise<{ fileMetadata: FileMetadata, wasSaved: boolean }>) => async (
   project: gdProject,
@@ -467,19 +470,17 @@ export const getProjectLocation = ({
   };
 };
 
-export const renderNewProjectSaveAsLocationChooser = (
-  {
-    projectName,
-    saveAsLocation,
-    setSaveAsLocation,
-    newProjectsDefaultFolder
-  }: {|
-    projectName: string,
-    saveAsLocation: ?SaveAsLocation,
-    setSaveAsLocation: (?SaveAsLocation) => void,
-    newProjectsDefaultFolder?: string,
-  |},
-): null => {
+export const renderNewProjectSaveAsLocationChooser = ({
+  projectName,
+  saveAsLocation,
+  setSaveAsLocation,
+  newProjectsDefaultFolder,
+}: {|
+  projectName: string,
+  saveAsLocation: ?SaveAsLocation,
+  setSaveAsLocation: (?SaveAsLocation) => void,
+  newProjectsDefaultFolder?: string,
+|}): null => {
   if (!saveAsLocation || saveAsLocation.name !== projectName) {
     setSaveAsLocation(
       getProjectLocation({
@@ -493,7 +494,9 @@ export const renderNewProjectSaveAsLocationChooser = (
 };
 
 // $FlowFixMe[value-as-type]
-export const generateOnAutoSaveProject = (authenticatedUser: AuthenticatedUser): ((project: gdProject, fileMetadata: FileMetadata) => Promise<void>) | void =>
+export const generateOnAutoSaveProject = (
+  authenticatedUser: AuthenticatedUser
+): ((project: gdProject, fileMetadata: FileMetadata) => Promise<void>) | void =>
   ProjectCache.isAvailable()
     ? async (project: gdProject, fileMetadata: FileMetadata): Promise<void> => {
         const { profile } = authenticatedUser;

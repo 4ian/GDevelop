@@ -76,7 +76,9 @@ export type SimplifiedProjectOptions = {|
   scopeToScene?: string,
 |};
 
-export const makeSimplifiedProjectBuilder = (gd: libGDevelop): {
+export const makeSimplifiedProjectBuilder = (
+  gd: libGDevelop
+): {
   getProjectSpecificExtensionsSummary: (
     project: gdProject
   ) => ProjectSpecificExtensionsSummary,

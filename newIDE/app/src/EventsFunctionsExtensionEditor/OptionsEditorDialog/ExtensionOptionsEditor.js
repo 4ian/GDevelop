@@ -108,7 +108,11 @@ type Props = {|
   isLoading: boolean,
 |};
 
-export const ExtensionOptionsEditor = ({eventsFunctionsExtension, onLoadChange, isLoading}: Props): React.Node => {
+export const ExtensionOptionsEditor = ({
+  eventsFunctionsExtension,
+  onLoadChange,
+  isLoading,
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const [resourceStoreOpen, setResourceStoreOpen] = React.useState(false);
   const isMounted = useIsMounted();

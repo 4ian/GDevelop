@@ -112,7 +112,13 @@ type Props = {|
   isSelected?: boolean,
 |};
 
-export const ProjectResourceCard = ({project, resource, onChoose, size, isSelected}: Props): React.Node => {
+export const ProjectResourceCard = ({
+  project,
+  resource,
+  onChoose,
+  size,
+  isSelected,
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const resourceName = resource.getName();
 

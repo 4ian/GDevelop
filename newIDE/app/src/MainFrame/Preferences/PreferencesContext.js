@@ -358,12 +358,11 @@ export const initialPreferences = {
   values: {
     language: 'en',
     autoDownloadUpdates: true,
-    themeName:
-      ((typeof window !== 'undefined' &&
-  window.matchMedia('(prefers-color-scheme: dark)').matches
-  ? 'GDevelop default Dark'
-  : // TODO: Use the light theme back when it's adapted to the modern theme.
-  'GDevelop default Dark'): string),
+    themeName: ((typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'GDevelop default Dark'
+      : // TODO: Use the light theme back when it's adapted to the modern theme.
+        'GDevelop default Dark'): string),
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},
@@ -384,7 +383,9 @@ export const initialPreferences = {
     autoOpenMostRecentProject: true,
     hasProjectOpened: false,
     userShortcutMap: {},
-    newObjectDialogDefaultTab: ((electron ? 'new-object' : 'asset-store'): string),
+    newObjectDialogDefaultTab: ((electron
+      ? 'new-object'
+      : 'asset-store'): string),
     shareDialogDefaultTab: 'publish',
     isMenuBarHiddenInPreview: true,
     isAlwaysOnTopInPreview: false,
@@ -500,6 +501,8 @@ export const initialPreferences = {
 };
 
 // $FlowFixMe[incompatible-type]
-const PreferencesContext: React.Context<Preferences> = React.createContext<Preferences>(initialPreferences);
+const PreferencesContext: React.Context<Preferences> = React.createContext<Preferences>(
+  initialPreferences
+);
 
 export default PreferencesContext;

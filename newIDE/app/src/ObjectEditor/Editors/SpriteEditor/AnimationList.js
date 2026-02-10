@@ -118,10 +118,10 @@ type AnimationListProps = {|
 |};
 
 // $FlowFixMe[prop-missing]
-const AnimationList: React.AbstractComponent<{ ...AnimationListProps, +ref?: React.RefSetter<AnimationListInterface> }, React.RefSetter<AnimationListInterface>> = React.forwardRef<
-  AnimationListProps,
-  AnimationListInterface
->(
+const AnimationList: React.AbstractComponent<
+  { ...AnimationListProps, +ref?: React.RefSetter<AnimationListInterface> },
+  React.RefSetter<AnimationListInterface>
+> = React.forwardRef<AnimationListProps, AnimationListInterface>(
   (
     {
       animations,

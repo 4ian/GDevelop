@@ -59,17 +59,15 @@ const watermarkPlacementOptions = [
   { value: 'bottom-right', label: t`Bottom right corner` },
 ];
 
-export const LoadingScreenEditor = (
-  {
-    loadingScreen,
-    watermark,
-    onLoadingScreenUpdated,
-    onChangeSubscription,
-    project,
-    resourceManagementProps,
-    projectScopedContainersAccessor
-  }: Props,
-): React.Node => {
+export const LoadingScreenEditor = ({
+  loadingScreen,
+  watermark,
+  onLoadingScreenUpdated,
+  onChangeSubscription,
+  project,
+  resourceManagementProps,
+  projectScopedContainersAccessor,
+}: Props): React.Node => {
   const subscriptionChecker = React.useRef<?SubscriptionCheckerInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const forceUpdate = useForceUpdate();

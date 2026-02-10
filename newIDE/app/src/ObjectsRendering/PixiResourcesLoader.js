@@ -98,7 +98,7 @@ const getOrCreateGltfLoader = () => {
 const load3DModel = (
   project: gdProject,
   resourceName: string
-// $FlowFixMe[value-as-type]
+  // $FlowFixMe[value-as-type]
 ): Promise<THREE.THREE_ADDONS.GLTF> => {
   if (
     resourceName.length === 0 ||
@@ -545,7 +545,7 @@ export default class PixiResourcesLoader {
   static async getThreeTexture(
     project: gdProject,
     resourceName: string
-  // $FlowFixMe[value-as-type]
+    // $FlowFixMe[value-as-type]
   ): Promise<THREE.Texture> {
     const loadedOrLoadingPromise = loadedOrLoadingThreeTextures[resourceName];
     // $FlowFixMe[constant-condition]
@@ -607,8 +607,8 @@ export default class PixiResourcesLoader {
     }: {|
       useTransparentTexture: boolean,
     |}
-  // $FlowFixMe[value-as-type]
-  ): Promise<THREE.Material> {
+  ): // $FlowFixMe[value-as-type]
+  Promise<THREE.Material> {
     const cacheKey = `${resourceName}|transparent:${useTransparentTexture.toString()}`;
     const loadedOrLoadingPromise = loadedOrLoadingThreeMaterials[cacheKey];
     // $FlowFixMe[constant-condition]
@@ -639,7 +639,7 @@ export default class PixiResourcesLoader {
   static get3DModel(
     project: gdProject,
     resourceName: string
-  // $FlowFixMe[value-as-type]
+    // $FlowFixMe[value-as-type]
   ): Promise<THREE.THREE_ADDONS.GLTF> {
     const promise = loadedOrLoading3DModelPromises[resourceName];
     // $FlowFixMe[constant-condition]
@@ -1050,16 +1050,18 @@ export default class PixiResourcesLoader {
       );
     }
 
-    return axios
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      .get(fullUrl, {
-        withCredentials: checkIfCredentialsRequired(fullUrl),
-      })
-      .then(response => {
-        // $FlowFixMe[prop-missing]
-        loadedBitmapFonts[resourceName] = response;
-        return response.data;
-      });
+    return (
+      axios
+        // $FlowFixMe[underconstrained-implicit-instantiation]
+        .get(fullUrl, {
+          withCredentials: checkIfCredentialsRequired(fullUrl),
+        })
+        .then(response => {
+          // $FlowFixMe[prop-missing]
+          loadedBitmapFonts[resourceName] = response;
+          return response.data;
+        })
+    );
   }
 
   static getInvalidPIXITexture(): any {
@@ -1098,11 +1100,13 @@ export default class PixiResourcesLoader {
     const fullUrl = ResourcesLoader.getResourceFullUrl(project, resourceName, {
       isResourceForPixi: true,
     });
-    return axios
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      .get(fullUrl, {
-        withCredentials: checkIfCredentialsRequired(fullUrl),
-      })
-      .then(response => response.data);
+    return (
+      axios
+        // $FlowFixMe[underconstrained-implicit-instantiation]
+        .get(fullUrl, {
+          withCredentials: checkIfCredentialsRequired(fullUrl),
+        })
+        .then(response => response.data)
+    );
   }
 }

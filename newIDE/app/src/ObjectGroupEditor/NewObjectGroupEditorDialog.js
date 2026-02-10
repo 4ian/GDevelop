@@ -27,17 +27,15 @@ type Props = {|
   isGroupAlreadyAdded: boolean,
 |};
 
-const NewObjectGroupEditorDialog = (
-  {
-    project,
-    projectScopedContainersAccessor,
-    onApply,
-    onCancel,
-    globalObjectsContainer,
-    objectsContainer,
-    isGroupAlreadyAdded
-  }: Props,
-): React.Node => {
+const NewObjectGroupEditorDialog = ({
+  project,
+  projectScopedContainersAccessor,
+  onApply,
+  onCancel,
+  globalObjectsContainer,
+  objectsContainer,
+  isGroupAlreadyAdded,
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
 
   const [objectGroupName, setObjectGroupName] = React.useState<string>('');

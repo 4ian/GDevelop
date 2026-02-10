@@ -48,27 +48,29 @@ type BehaviorStoreState = {|
   filtersState: FiltersState,
 |};
 
-export const BehaviorStoreContext: React.Context<BehaviorStoreState> = React.createContext<BehaviorStoreState>({
-  filters: null,
-  searchResults: null,
-  fetchBehaviors: () => {},
-  error: null,
-  searchText: '',
-  setSearchText: () => {},
-  allCategories: [],
-  // '' means all categories.
-  chosenCategory: '',
-  setChosenCategory: () => {},
-  setInstalledBehaviorMetadataList: () => {},
-  translatedBehaviorShortHeadersByType: {},
-  filtersState: {
-    chosenFilters: new Set(),
-    addFilter: () => {},
-    removeFilter: () => {},
-    chosenCategory: null,
+export const BehaviorStoreContext: React.Context<BehaviorStoreState> = React.createContext<BehaviorStoreState>(
+  {
+    filters: null,
+    searchResults: null,
+    fetchBehaviors: () => {},
+    error: null,
+    searchText: '',
+    setSearchText: () => {},
+    allCategories: [],
+    // '' means all categories.
+    chosenCategory: '',
     setChosenCategory: () => {},
-  },
-});
+    setInstalledBehaviorMetadataList: () => {},
+    translatedBehaviorShortHeadersByType: {},
+    filtersState: {
+      chosenFilters: new Set(),
+      addFilter: () => {},
+      removeFilter: () => {},
+      chosenCategory: null,
+      setChosenCategory: () => {},
+    },
+  }
+);
 
 type BehaviorStoreStateProviderProps = {|
   children: React.Node,
@@ -76,7 +78,11 @@ type BehaviorStoreStateProviderProps = {|
   defaultSearchText?: string,
 |};
 
-export const BehaviorStoreStateProvider = ({children, i18n, defaultSearchText}: BehaviorStoreStateProviderProps): React.MixedElement => {
+export const BehaviorStoreStateProvider = ({
+  children,
+  i18n,
+  defaultSearchText,
+}: BehaviorStoreStateProviderProps): React.MixedElement => {
   const [
     installedBehaviorMetadataList,
     setInstalledBehaviorMetadataList,
@@ -276,7 +282,7 @@ export const BehaviorStoreStateProvider = ({children, i18n, defaultSearchText}: 
           : installedBehaviorMetadata;
         allTranslatedBehaviors[
           installedBehaviorMetadata.type
-        // $FlowFixMe[incompatible-type]
+          // $FlowFixMe[incompatible-type]
         ] = behaviorMetadata;
       }
       return allTranslatedBehaviors;

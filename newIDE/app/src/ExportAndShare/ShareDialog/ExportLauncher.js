@@ -130,7 +130,9 @@ export default class ExportLauncher extends Component<Props, State> {
     doneFooterOpen: false,
     errored: false,
     shouldBumpVersionNumber: true,
-    exportState: (this.props.exportPipeline.getInitialExportState(this.props.project): any),
+    exportState: (this.props.exportPipeline.getInitialExportState(
+      this.props.project
+    ): any),
   };
   _candidateBumpedVersionNumber = '';
   // $FlowFixMe[missing-local-annot]

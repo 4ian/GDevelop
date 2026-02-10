@@ -79,21 +79,19 @@ type Props = {|
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
 |};
 
-const MainPage = (
-  {
-    onSelectCategory,
-    selectInAppTutorial,
-    courses,
-    onSelectCourse,
-    onSelectBundle,
-    getCourseCompletion,
-    getCourseChapterCompletion,
-    onOpenAskAi,
-    onOpenNewProjectSetupDialog,
-    onSelectPrivateGameTemplateListingData,
-    onSelectExampleShortHeader
-  }: Props,
-): React.Node => {
+const MainPage = ({
+  onSelectCategory,
+  selectInAppTutorial,
+  courses,
+  onSelectCourse,
+  onSelectBundle,
+  getCourseCompletion,
+  getCourseChapterCompletion,
+  onOpenAskAi,
+  onOpenNewProjectSetupDialog,
+  onSelectPrivateGameTemplateListingData,
+  onSelectExampleShortHeader,
+}: Props): React.Node => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const {
     palette: { type: paletteType },
@@ -133,7 +131,7 @@ const MainPage = (
     description: React.Node,
     action: () => void,
     disabled?: boolean,
-  // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type]
   }[] = [
     {
       title: <Trans>Documentation</Trans>,
@@ -226,8 +224,8 @@ const MainPage = (
                           ),
                         };
                       })
-                    // $FlowFixMe[underconstrained-implicit-instantiation]
-                    : new Array(6).fill(0).map((_, index) => ({
+                    : // $FlowFixMe[underconstrained-implicit-instantiation]
+                      new Array(6).fill(0).map((_, index) => ({
                         renderItem: () => (
                           <GridListTile key={`skeleton-course-${index}`}>
                             <CourseCard

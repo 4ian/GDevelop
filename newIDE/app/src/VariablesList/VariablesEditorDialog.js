@@ -57,27 +57,25 @@ type Props = {|
   id?: string,
 |};
 
-const VariablesEditorDialog = (
-  {
-    onCancel,
-    onApply,
-    open,
-    onEditObjectVariables,
-    title,
-    project,
-    hotReloadPreviewButtonProps,
-    helpPagePath,
-    id,
-    tabs,
-    initiallyOpenTabId,
-    initiallySelectedVariableName,
-    shouldCreateInitiallySelectedVariable,
-    projectScopedContainersAccessor,
-    objectName,
-    initialInstances,
-    isListLocked
-  }: Props,
-): React.Node => {
+const VariablesEditorDialog = ({
+  onCancel,
+  onApply,
+  open,
+  onEditObjectVariables,
+  title,
+  project,
+  hotReloadPreviewButtonProps,
+  helpPagePath,
+  id,
+  tabs,
+  initiallyOpenTabId,
+  initiallySelectedVariableName,
+  shouldCreateInitiallySelectedVariable,
+  projectScopedContainersAccessor,
+  objectName,
+  initialInstances,
+  isListLocked,
+}: Props): React.Node => {
   const serializableObjects = React.useMemo(
     () =>
       new Map(

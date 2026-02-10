@@ -40,17 +40,15 @@ type Props = {|
   error: ?AuthError,
 |};
 
-const LoginDialog = (
-  {
-    onClose,
-    onGoToCreateAccount,
-    onLogin,
-    onLoginWithProvider,
-    onForgotPassword,
-    loginInProgress,
-    error
-  }: Props,
-): React.Node => {
+const LoginDialog = ({
+  onClose,
+  onGoToCreateAccount,
+  onLogin,
+  onLoginWithProvider,
+  onForgotPassword,
+  loginInProgress,
+  error,
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');

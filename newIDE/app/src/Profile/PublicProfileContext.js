@@ -51,7 +51,7 @@ type Props = {|
   children: React.Node,
 |};
 
-export const PublicProfileProvider = ({children}: Props): React.Node => {
+export const PublicProfileProvider = ({ children }: Props): React.Node => {
   const [
     visitedPublicProfileUserId,
     setVisitedPublicProfileUserId,

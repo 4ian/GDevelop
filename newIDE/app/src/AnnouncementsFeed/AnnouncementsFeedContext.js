@@ -34,7 +34,9 @@ type AnnouncementsFeedStateProviderProps = {|
   children: React.Node,
 |};
 
-export const AnnouncementsFeedStateProvider = ({children}: AnnouncementsFeedStateProviderProps): React.MixedElement => {
+export const AnnouncementsFeedStateProvider = ({
+  children,
+}: AnnouncementsFeedStateProviderProps): React.MixedElement => {
   const [announcements, setAnnouncements] = React.useState<?(Announcement[])>(
     null
   );

@@ -72,7 +72,10 @@ export const commonProps = {
   ],
   editorCallbacks: {
     onOpenLayout: (action('onOpenLayout'): any),
-    onCreateProject: async (): Promise<{ createdProject: null, exampleSlug: null }> => ({ exampleSlug: null, createdProject: null }),
+    onCreateProject: async (): Promise<{
+      createdProject: null,
+      exampleSlug: null,
+    }> => ({ exampleSlug: null, createdProject: null }),
   },
   project: null,
   quota: {
@@ -80,7 +83,7 @@ export const commonProps = {
     current: 100,
     max: 200,
     period: '7days',
-    resetsAt: ((Date.now(): number)) + 1000 * 60 * 60 * 24 * 2,
+    resetsAt: (Date.now(): number) + 1000 * 60 * 60 * 24 * 2,
   },
   onStartNewAiRequest: (action('onStartNewAiRequest'): any),
   onSendUserMessage: (action('onSendUserMessage'): any),

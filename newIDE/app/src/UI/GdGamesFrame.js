@@ -37,7 +37,12 @@ const styles = {
 const gdGamesHost = 'https://gd.games';
 // const gdGamesHost = 'http://localhost:4000';
 
-export const GdGamesFrame = ({loadErrorMessage, path, onMessageReceived, supportedMessageIds}: Props): React.Node => {
+export const GdGamesFrame = ({
+  loadErrorMessage,
+  path,
+  onMessageReceived,
+  supportedMessageIds,
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const paletteType = gdevelopTheme.palette.type;
 

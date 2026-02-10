@@ -63,8 +63,8 @@ const getEditObjectButton = ({
   disabled: 'onValuesDifferent',
   nonFieldType: 'button',
   getIcon: is3DInstance
-    // $FlowFixMe[missing-local-annot]
-    ? props => <Object3d {...props} />
+    ? // $FlowFixMe[missing-local-annot]
+      props => <Object3d {...props} />
     : props => <Object2d {...props} />,
   getValue: (instance: gdInitialInstance) => instance.getObjectName(),
   onClick: (instance: gdInitialInstance) =>

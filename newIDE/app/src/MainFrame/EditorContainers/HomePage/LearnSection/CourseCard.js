@@ -137,16 +137,14 @@ type Props = {|
   disabled?: boolean,
 |};
 
-const CourseCard = (
-  {
-    completion,
-    course,
-    courseListingData,
-    onClick,
-    discountedPrice,
-    disabled
-  }: Props,
-): React.Node => {
+const CourseCard = ({
+  completion,
+  course,
+  courseListingData,
+  onClick,
+  discountedPrice,
+  disabled,
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const specializationConfig = getSpecializationConfig(
     course ? course.specializationId : 'loading'

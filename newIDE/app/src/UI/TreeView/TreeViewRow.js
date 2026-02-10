@@ -586,4 +586,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
 
 // $FlowFixMe[incompatible-type] - memo does not support having a generic in the props.
 // $FlowFixMe[missing-type-arg]
-export default (React.memo<Props>(TreeViewRow, areEqual): React.ComponentType<any>);
+export default (React.memo<Props>(
+  TreeViewRow,
+  areEqual
+): React.ComponentType<any>);

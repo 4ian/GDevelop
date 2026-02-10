@@ -76,7 +76,7 @@ const renderLanguageSelectOption = localeMetadata => {
   );
 };
 
-const LanguageSelector = ({onLanguageChanged}: Props): React.Node => {
+const LanguageSelector = ({ onLanguageChanged }: Props): React.Node => {
   const { values, setLanguage } = useContext(PreferencesContext);
 
   return (

@@ -44,14 +44,12 @@ type Props = {|
   tutorialId: string,
 |};
 
-const WrappedDismissableTutorialMessage = (
-  {
-    tutorials = defaultTutorials,
-    // $FlowFixMe[incompatible-type]
-    preferences = initialPreferences,
-    tutorialId
-  }: Props,
-): React.Node => (
+const WrappedDismissableTutorialMessage = ({
+  tutorials = defaultTutorials,
+  // $FlowFixMe[incompatible-type]
+  preferences = initialPreferences,
+  tutorialId,
+}: Props): React.Node => (
   <PreferencesContext.Provider value={preferences}>
     <TutorialContext.Provider
       value={{

@@ -50,25 +50,23 @@ const getPartiallySavedRecentProjectFiles = (count: number) =>
     storageProviderName: 'test',
   }));
 
-const WrappedCreateSection = (
-  {
-    project,
-    recentProjectFiles,
-    // $FlowFixMe[incompatible-type]
-    tutorialProgress = undefined,
-    inAppTutorialsFetchingError = null,
-    user,
-    games = []
-  }: {|
-    project: ?gdProject,
-    recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
-    tutorialProgress?: InAppTutorialUserProgress,
-    inAppTutorialsFetchingError?: string | null,
-    // $FlowFixMe[value-as-type]
-    user: AuthenticatedUser,
-    games?: ?Array<Game>,
-  |},
-): React.Node => {
+const WrappedCreateSection = ({
+  project,
+  recentProjectFiles,
+  // $FlowFixMe[incompatible-type]
+  tutorialProgress = undefined,
+  inAppTutorialsFetchingError = null,
+  user,
+  games = [],
+}: {|
+  project: ?gdProject,
+  recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
+  tutorialProgress?: InAppTutorialUserProgress,
+  inAppTutorialsFetchingError?: string | null,
+  // $FlowFixMe[value-as-type]
+  user: AuthenticatedUser,
+  games?: ?Array<Game>,
+|}): React.Node => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   // Adapt height for storybook to see the bottom menu on mobile.
   const fixedHeight = isMobile ? (isLandscape ? 400 : 850) : 1080;

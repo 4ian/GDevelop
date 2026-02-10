@@ -35,7 +35,9 @@ class CloudProjectReadingError extends Error {
 }
 
 // $FlowFixMe[value-as-type]
-export const generateOnOpen = (authenticatedUser: AuthenticatedUser): ((
+export const generateOnOpen = (
+  authenticatedUser: AuthenticatedUser
+): ((
   fileMetadata: FileMetadata,
   onProgress?: (progress: number, message: MessageDescriptor) => void
 ) => Promise<{ content: any }>) => async (
@@ -109,7 +111,9 @@ export const generateOnOpen = (authenticatedUser: AuthenticatedUser): ((
 };
 
 // $FlowFixMe[value-as-type]
-export const generateOnEnsureCanAccessResources = (authenticatedUser: AuthenticatedUser): ((
+export const generateOnEnsureCanAccessResources = (
+  authenticatedUser: AuthenticatedUser
+): ((
   project: gdProject,
   fileMetadata: FileMetadata,
   onProgress?: (progress: number, message: MessageDescriptor) => void
@@ -123,11 +127,13 @@ export const generateOnEnsureCanAccessResources = (authenticatedUser: Authentica
 };
 
 // $FlowFixMe[value-as-type]
-export const generateGetAutoSaveCreationDate = (authenticatedUser: AuthenticatedUser): 
+export const generateGetAutoSaveCreationDate = (
+  authenticatedUser: AuthenticatedUser
+):
   | ((
-    fileMetadata: FileMetadata,
-    compareLastModified: boolean
-  ) => Promise<?number>)
+      fileMetadata: FileMetadata,
+      compareLastModified: boolean
+    ) => Promise<?number>)
   | void =>
   ProjectCache.isAvailable()
     ? async (
@@ -162,7 +168,9 @@ export const generateGetAutoSaveCreationDate = (authenticatedUser: Authenticated
     : undefined;
 
 // $FlowFixMe[value-as-type]
-export const generateOnGetAutoSave = (authenticatedUser: AuthenticatedUser): ((fileMetadata: FileMetadata) => Promise<FileMetadata>) | void =>
+export const generateOnGetAutoSave = (
+  authenticatedUser: AuthenticatedUser
+): ((fileMetadata: FileMetadata) => Promise<FileMetadata>) | void =>
   ProjectCache.isAvailable()
     ? async (fileMetadata: FileMetadata): Promise<FileMetadata> => {
         return {

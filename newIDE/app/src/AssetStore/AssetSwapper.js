@@ -105,7 +105,7 @@ const mergeAnimations = function<A: { name: string }>(
     objectsAnimation: A,
     assetAnimation: A
   ) => A
-// $FlowFixMe[missing-local-annot]
+  // $FlowFixMe[missing-local-annot]
 ) {
   const animations = [];
   // Ensure the object don't loose any animation.

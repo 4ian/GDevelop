@@ -107,12 +107,15 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   instancesRenderer: gdInitialInstanceJSFunctor;
 
   // $FlowFixMe[missing-local-annot]
-  layoutedInstances = (new Map<number, LayoutedInstance>(): Map<number, LayoutedInstance>);
+  layoutedInstances = (new Map<number, LayoutedInstance>(): Map<
+    number,
+    LayoutedInstance
+  >);
   // $FlowFixMe[missing-local-annot]
-  renderedInstances = (new Map<number, RenderedInstance | Rendered3DInstance>(): Map<
-  number,
-  RenderedInstance | Rendered3DInstance,
->);
+  renderedInstances = (new Map<
+    number,
+    RenderedInstance | Rendered3DInstance
+  >(): Map<number, RenderedInstance | Rendered3DInstance>);
   _propertyMappingRules: Array<PropertyMappingRule>;
 
   constructor(

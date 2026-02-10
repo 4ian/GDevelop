@@ -7,7 +7,9 @@ export type ObjectFolderOrObjectWithContext = {|
   global: boolean,
 |};
 
-export const getObjectFolderOrObjectUnifiedName = (objectFolderOrObject: gdObjectFolderOrObject): string =>
+export const getObjectFolderOrObjectUnifiedName = (
+  objectFolderOrObject: gdObjectFolderOrObject
+): string =>
   objectFolderOrObject.isFolder()
     ? objectFolderOrObject.getFolderName()
     : objectFolderOrObject.getObject().getName();

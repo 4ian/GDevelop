@@ -146,21 +146,19 @@ const getDescriptionHintText = (
   return t`Example: Make the object flash for 5 seconds.`;
 };
 
-export const EventsFunctionPropertiesEditor = (
-  {
-    project,
-    eventsFunctionsExtension,
-    eventsFunction,
-    freezeEventsFunctionType,
-    onConfigurationUpdated,
-    helpPagePath,
-    renderConfigurationHeader,
-    eventsBasedBehavior,
-    eventsBasedObject,
-    getFunctionGroupNames,
-    eventsFunctionsContainer
-  }: Props,
-): React.Node => {
+export const EventsFunctionPropertiesEditor = ({
+  project,
+  eventsFunctionsExtension,
+  eventsFunction,
+  freezeEventsFunctionType,
+  onConfigurationUpdated,
+  helpPagePath,
+  renderConfigurationHeader,
+  eventsBasedBehavior,
+  eventsBasedObject,
+  getFunctionGroupNames,
+  eventsFunctionsContainer,
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
   const { isMobile } = useResponsiveWindowSize();

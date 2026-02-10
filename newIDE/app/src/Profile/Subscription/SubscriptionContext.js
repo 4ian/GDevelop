@@ -109,21 +109,26 @@ type SubscriptionState = {|
   |}) => void,
 |};
 
-export const SubscriptionContext: React.Context<SubscriptionState> = React.createContext<SubscriptionState>({
-  getSubscriptionPlansWithPricingSystems: () => null,
-  getUserSubscriptionPlanEvenIfLegacy: () => null,
-  openSubscriptionDialog: () => {},
-  getCouponCode: () => null,
-  clearCouponCode: () => {},
-  openRedeemCodeDialog: () => {},
-});
+export const SubscriptionContext: React.Context<SubscriptionState> = React.createContext<SubscriptionState>(
+  {
+    getSubscriptionPlansWithPricingSystems: () => null,
+    getUserSubscriptionPlanEvenIfLegacy: () => null,
+    openSubscriptionDialog: () => {},
+    getCouponCode: () => null,
+    clearCouponCode: () => {},
+    openRedeemCodeDialog: () => {},
+  }
+);
 
 type SubscriptionProviderProps = {|
   children: React.Node,
   simulateMobileApp?: true,
 |};
 
-export const SubscriptionProvider = ({children, simulateMobileApp}: SubscriptionProviderProps): React.MixedElement => {
+export const SubscriptionProvider = ({
+  children,
+  simulateMobileApp,
+}: SubscriptionProviderProps): React.MixedElement => {
   const [
     analyticsMetadata,
     setAnalyticsMetadata,

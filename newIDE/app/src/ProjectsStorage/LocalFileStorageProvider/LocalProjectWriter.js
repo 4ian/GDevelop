@@ -228,21 +228,20 @@ export const onSaveProject = async (
   };
 };
 
-export const generateOnChooseSaveProjectAsLocation = (
-  {
-    setDialog,
-    closeDialog
-  }: {
-    setDialog: (() => React.Node) => void,
-    closeDialog: () => void,
-  },
-): ((
-  {
-    displayOptionToGenerateNewProjectUuid: boolean,
-    fileMetadata: ?FileMetadata,
-    project: gdProject,
-  }
-) => Promise<{ saveAsLocation: ?SaveAsLocation, saveAsOptions: ?SaveAsOptions }>) => async ({
+export const generateOnChooseSaveProjectAsLocation = ({
+  setDialog,
+  closeDialog,
+}: {
+  setDialog: (() => React.Node) => void,
+  closeDialog: () => void,
+}): (({
+  displayOptionToGenerateNewProjectUuid: boolean,
+  fileMetadata: ?FileMetadata,
+  project: gdProject,
+}) => Promise<{
+  saveAsLocation: ?SaveAsLocation,
+  saveAsOptions: ?SaveAsOptions,
+}>) => async ({
   project,
   fileMetadata,
   displayOptionToGenerateNewProjectUuid,
@@ -413,19 +412,17 @@ export const getProjectLocation = ({
   };
 };
 
-export const renderNewProjectSaveAsLocationChooser = (
-  {
-    projectName,
-    saveAsLocation,
-    setSaveAsLocation,
-    newProjectsDefaultFolder
-  }: {|
-    projectName: string,
-    saveAsLocation: ?SaveAsLocation,
-    setSaveAsLocation: (?SaveAsLocation) => void,
-    newProjectsDefaultFolder?: string,
-  |},
-): React.Node => {
+export const renderNewProjectSaveAsLocationChooser = ({
+  projectName,
+  saveAsLocation,
+  setSaveAsLocation,
+  newProjectsDefaultFolder,
+}: {|
+  projectName: string,
+  saveAsLocation: ?SaveAsLocation,
+  setSaveAsLocation: (?SaveAsLocation) => void,
+  newProjectsDefaultFolder?: string,
+|}): React.Node => {
   const projectLocation = getProjectLocation({
     projectName,
     saveAsLocation,

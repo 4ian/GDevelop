@@ -21,7 +21,12 @@ export type ExportState = {|
   signingDialogOpen: boolean,
 |};
 
-export const SetupExportHeader = ({exportState, updateExportState, isExporting, build}: HeaderProps<ExportState>): null | React.Node => {
+export const SetupExportHeader = ({
+  exportState,
+  updateExportState,
+  isExporting,
+  build,
+}: HeaderProps<ExportState>): null | React.Node => {
   // Build is finished, hide options.
   if (!!build && build.status === 'complete') return null;
 
@@ -163,19 +168,17 @@ type OnlineCordovaExportFlowProps = {|
   exportPipelineName: string,
 |};
 
-export const ExportFlow = (
-  {
-    disabled,
-    launchExport,
-    isExporting,
-    exportPipelineName,
-    exportStep,
-    build,
-    stepMaxProgress,
-    stepCurrentProgress,
-    errored
-  }: OnlineCordovaExportFlowProps,
-): React.Node => {
+export const ExportFlow = ({
+  disabled,
+  launchExport,
+  isExporting,
+  exportPipelineName,
+  exportStep,
+  build,
+  stepMaxProgress,
+  stepCurrentProgress,
+  errored,
+}: OnlineCordovaExportFlowProps): React.Node => {
   const isExportingOrbuildRunningOrFinished =
     isExporting || (!!build && build.status !== 'error');
 

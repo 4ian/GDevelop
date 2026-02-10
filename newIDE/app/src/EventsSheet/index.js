@@ -251,9 +251,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   // $FlowFixMe[missing-local-annot]
   _containerDivLastKnownSize = null;
   // $FlowFixMe[missing-local-annot]
-  _keyboardShortcuts = (new KeyboardShortcuts(
-  {
-    isActive: () => !this.state.inlineEditing &&
+  _keyboardShortcuts = (new KeyboardShortcuts({
+    isActive: () =>
+      !this.state.inlineEditing &&
       !this.state.editedInstruction.instruction &&
       !this.state.analyzedEventsContextResult &&
       !this.state.serializedEventsToExtract,
@@ -269,8 +269,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       onZoomIn: (event: KeyboardEvent) => this.onZoomEvent('IN')(event),
       onZoomOut: (event: KeyboardEvent) => this.onZoomEvent('OUT')(event),
     },
-  },
-): KeyboardShortcuts);
+  }): KeyboardShortcuts);
 
   eventContextMenu: ?ContextMenuInterface;
   resourceExternallyChangedCallbackId: ?string;
@@ -282,12 +281,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   // $FlowFixMe[missing-local-annot]
   state = {
-    eventsHistory: (getHistoryInitialState(
-  this.props.events,
-  {
-    historyMaxSize: 100,
-  },
-): HistoryState),
+    eventsHistory: (getHistoryInitialState(this.props.events, {
+      historyMaxSize: 100,
+    }): HistoryState),
 
     editedInstruction: {
       isCondition: true,
@@ -2388,4 +2384,9 @@ const EventsSheet = (props, ref) => {
 };
 
 // $FlowFixMe[prop-missing]
-export default (React.forwardRef<Props, EventsSheetInterface>(EventsSheet): React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<EventsSheetInterface> }, React.RefSetter<EventsSheetInterface>>);
+export default (React.forwardRef<Props, EventsSheetInterface>(
+  EventsSheet
+): React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<EventsSheetInterface> },
+  React.RefSetter<EventsSheetInterface>
+>);

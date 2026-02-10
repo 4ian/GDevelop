@@ -340,7 +340,9 @@ export const selectInstructionsList = (
   };
 };
 
-export const selectEventsAfterHistoryChange = (eventContexts: Array<EventContext>): {
+export const selectEventsAfterHistoryChange = (
+  eventContexts: Array<EventContext>
+): {
   selectedEvents: Array<empty>,
   selectedInstructions: Array<empty>,
   selectedInstructionsLists: Array<empty>,

@@ -234,8 +234,8 @@ export default function SubscriptionDialog({
               confirmButtonLabel: dialogTexts.confirmButtonLabel,
               dismissButtonLabel: dialogTexts.dismissButtonLabel,
             })
-          // $FlowFixMe[incompatible-type]
-          : await showConfirmation(dialogTexts);
+          : // $FlowFixMe[incompatible-type]
+            await showConfirmation(dialogTexts);
       if (!answer) return;
     }
 

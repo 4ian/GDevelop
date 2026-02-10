@@ -52,7 +52,9 @@ type CreditsPackageStoreStateProviderProps = {|
   children: React.Node,
 |};
 
-export const CreditsPackageStoreStateProvider = ({children}: CreditsPackageStoreStateProviderProps): React.MixedElement => {
+export const CreditsPackageStoreStateProvider = ({
+  children,
+}: CreditsPackageStoreStateProviderProps): React.MixedElement => {
   const [error, setError] = React.useState<?Error>(null);
   const [
     creditsPackageListingDatas,

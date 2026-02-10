@@ -30,14 +30,12 @@ type Props = {|
   simulateAppStoreProduct?: boolean,
 |};
 
-const PrivateGameTemplatePurchaseDialog = (
-  {
-    privateGameTemplateListingData,
-    usageType,
-    onClose,
-    simulateAppStoreProduct
-  }: Props,
-): React.Node => {
+const PrivateGameTemplatePurchaseDialog = ({
+  privateGameTemplateListingData,
+  usageType,
+  onClose,
+  simulateAppStoreProduct,
+}: Props): React.Node => {
   const {
     profile,
     onOpenLoginDialog,

@@ -126,18 +126,16 @@ type Props = {|
   authenticatedUser: AuthenticatedUser,
 |};
 
-export const BuildCard = (
-  {
-    build,
-    game,
-    onGameUpdated,
-    gameUpdating,
-    setGameUpdating,
-    onBuildUpdated,
-    onBuildDeleted,
-    authenticatedUser
-  }: Props,
-): React.Node => {
+export const BuildCard = ({
+  build,
+  game,
+  onGameUpdated,
+  gameUpdating,
+  setGameUpdating,
+  onBuildUpdated,
+  onBuildDeleted,
+  authenticatedUser,
+}: Props): React.Node => {
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const defaultBuildName = `${game.gameName
     .toLowerCase()

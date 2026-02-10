@@ -109,16 +109,14 @@ type Props = {|
  * Show an estimate of the progress of a build or the button
  * to download the artifacts.
  */
-const BuildProgressAndActions = (
-  {
-    build,
-    game,
-    onGameUpdated,
-    gameUpdating,
-    setGameUpdating,
-    onCopyToClipboard
-  }: Props,
-): React.Node => {
+const BuildProgressAndActions = ({
+  build,
+  game,
+  onGameUpdated,
+  gameUpdating,
+  setGameUpdating,
+  onCopyToClipboard,
+}: Props): React.Node => {
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );

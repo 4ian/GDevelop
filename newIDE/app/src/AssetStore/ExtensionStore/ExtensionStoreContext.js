@@ -38,27 +38,29 @@ type ExtensionStoreState = {|
   hasExtensionNamed: (extensionName: string) => boolean,
 |};
 
-export const ExtensionStoreContext: React.Context<ExtensionStoreState> = React.createContext<ExtensionStoreState>({
-  filters: null,
-  searchResults: null,
-  fetchExtensionsAndFilters: () => {},
-  error: null,
-  searchText: '',
-  setSearchText: () => {},
-  allCategories: [],
-  // '' means all categories.
-  chosenCategory: '',
-  setChosenCategory: () => {},
-  translatedExtensionShortHeadersByName: {},
-  filtersState: {
-    chosenFilters: new Set(),
-    addFilter: () => {},
-    removeFilter: () => {},
-    chosenCategory: null,
+export const ExtensionStoreContext: React.Context<ExtensionStoreState> = React.createContext<ExtensionStoreState>(
+  {
+    filters: null,
+    searchResults: null,
+    fetchExtensionsAndFilters: () => {},
+    error: null,
+    searchText: '',
+    setSearchText: () => {},
+    allCategories: [],
+    // '' means all categories.
+    chosenCategory: '',
     setChosenCategory: () => {},
-  },
-  hasExtensionNamed: () => false,
-});
+    translatedExtensionShortHeadersByName: {},
+    filtersState: {
+      chosenFilters: new Set(),
+      addFilter: () => {},
+      removeFilter: () => {},
+      chosenCategory: null,
+      setChosenCategory: () => {},
+    },
+    hasExtensionNamed: () => false,
+  }
+);
 
 type ExtensionStoreStateProviderProps = {|
   children: React.Node,
@@ -66,7 +68,11 @@ type ExtensionStoreStateProviderProps = {|
   defaultSearchText?: string,
 |};
 
-export const ExtensionStoreStateProvider = ({children, i18n, defaultSearchText}: ExtensionStoreStateProviderProps): React.MixedElement => {
+export const ExtensionStoreStateProvider = ({
+  children,
+  i18n,
+  defaultSearchText,
+}: ExtensionStoreStateProviderProps): React.MixedElement => {
   const [
     translatedExtensionShortHeadersByName,
     setTranslatedExtensionShortHeadersByName,

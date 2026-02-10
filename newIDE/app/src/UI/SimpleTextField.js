@@ -46,7 +46,10 @@ const stopPropagation = e => e.stopPropagation();
  * and faster to render (2 DOM elements, uncontrolled, pure CSS styling).
  */
 // $FlowFixMe[prop-missing]
-export const SimpleTextField: React.AbstractComponent<SimpleTextFieldProps, SimpleTextFieldInterface> = React.memo<
+export const SimpleTextField: React.AbstractComponent<
+  SimpleTextFieldProps,
+  SimpleTextFieldInterface
+> = React.memo<
   SimpleTextFieldProps,
   // $FlowFixMe[incompatible-type]
   SimpleTextFieldInterface

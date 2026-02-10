@@ -34,7 +34,9 @@ export function serializeToJSObject(
   }
 }
 
-export function serializeObjectWithCleanDefaultBehaviorFlags(object: gdObject): any {
+export function serializeObjectWithCleanDefaultBehaviorFlags(
+  object: gdObject
+): any {
   const serializedElement = new gd.SerializerElement();
   gd.BehaviorDefaultFlagClearer.serializeObjectWithCleanDefaultBehaviorFlags(
     object,

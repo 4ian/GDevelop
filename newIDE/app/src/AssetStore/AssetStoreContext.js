@@ -157,7 +157,9 @@ const getPrivateAssetPackListingDataSearchTerms = (
   privateAssetPack: PrivateAssetPackListingData
 ) => privateAssetPack.name + '\n' + privateAssetPack.description;
 
-export const AssetStoreStateProvider = ({children}: AssetStoreStateProviderProps): React.MixedElement => {
+export const AssetStoreStateProvider = ({
+  children,
+}: AssetStoreStateProviderProps): React.MixedElement => {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const { searchText } = shopNavigationState;
 

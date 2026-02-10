@@ -13,7 +13,7 @@ type Props = {|
   size?: number,
 |};
 
-const QrCode = ({url, size = 128}: Props): React.MixedElement => {
+const QrCode = ({ url, size = 128 }: Props): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const containerRef = React.useRef<?HTMLDivElement>(null);

@@ -28,7 +28,9 @@ const defaultProps = {
   claimedProductOptions,
 };
 
-export const Default = (): React.Node => <LoginWithPurchaseClaimDialog {...defaultProps} />;
+export const Default = (): React.Node => (
+  <LoginWithPurchaseClaimDialog {...defaultProps} />
+);
 
 export const WeakPasswordErrorFromBackend = (): React.Node => (
   <LoginWithPurchaseClaimDialog

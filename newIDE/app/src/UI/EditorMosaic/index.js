@@ -305,7 +305,10 @@ type Props = {|
  * Must be used inside a component wrapped in a DragDropContext.
  */
 // $FlowFixMe[prop-missing]
-const EditorMosaic: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<EditorMosaicInterface> }, React.RefSetter<EditorMosaicInterface>> = React.forwardRef<Props, EditorMosaicInterface>(
+const EditorMosaic: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<EditorMosaicInterface> },
+  React.RefSetter<EditorMosaicInterface>
+> = React.forwardRef<Props, EditorMosaicInterface>(
   (
     {
       initialNodes,

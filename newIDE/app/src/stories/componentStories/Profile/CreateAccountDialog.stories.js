@@ -18,7 +18,9 @@ const defaultProps = {
   createAccountInProgress: false,
   error: null,
 };
-export const Default = (): React.Node => <CreateAccountDialog {...defaultProps} />;
+export const Default = (): React.Node => (
+  <CreateAccountDialog {...defaultProps} />
+);
 
 export const PasswordErrorFromBackend = (): React.Node => (
   <CreateAccountDialog

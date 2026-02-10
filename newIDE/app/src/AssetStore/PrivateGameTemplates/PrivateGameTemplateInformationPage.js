@@ -139,17 +139,15 @@ type Props = {|
   simulateAppStoreProduct?: boolean,
 |};
 
-const PrivateGameTemplateInformationPage = (
-  {
-    privateGameTemplateListingData,
-    privateGameTemplateListingDatasFromSameCreator,
-    onGameTemplateOpen,
-    onAssetPackOpen,
-    onBundleOpen,
-    onCreateWithGameTemplate,
-    simulateAppStoreProduct
-  }: Props,
-): React.Node => {
+const PrivateGameTemplateInformationPage = ({
+  privateGameTemplateListingData,
+  privateGameTemplateListingDatasFromSameCreator,
+  onGameTemplateOpen,
+  onAssetPackOpen,
+  onBundleOpen,
+  onCreateWithGameTemplate,
+  simulateAppStoreProduct,
+}: Props): React.Node => {
   const { id, name, sellerId } = privateGameTemplateListingData;
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext

@@ -96,21 +96,19 @@ export const hasLight = (layout: ?gd.Layout): boolean => {
   return false;
 };
 
-const Model3DEditor = (
-  {
-    objectConfiguration,
-    project,
-    layout,
-    eventsFunctionsExtension,
-    eventsBasedObject,
-    object,
-    onSizeUpdated,
-    onObjectUpdated,
-    resourceManagementProps,
-    projectScopedContainersAccessor,
-    renderObjectNameField
-  }: EditorProps,
-): React.Node => {
+const Model3DEditor = ({
+  objectConfiguration,
+  project,
+  layout,
+  eventsFunctionsExtension,
+  eventsBasedObject,
+  object,
+  onSizeUpdated,
+  onObjectUpdated,
+  resourceManagementProps,
+  projectScopedContainersAccessor,
+  renderObjectNameField,
+}: EditorProps): React.Node => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
 
   const [

@@ -96,7 +96,9 @@ const gameDashboardItemId = 'manage';
 const globalVariablesItemId = getProjectManagerItemId('global-variables');
 const gameResourcesItemId = getProjectManagerItemId('game-resources');
 export const scenesRootFolderId: string = getProjectManagerItemId('scenes');
-export const extensionsRootFolderId: string = getProjectManagerItemId('extensions');
+export const extensionsRootFolderId: string = getProjectManagerItemId(
+  'extensions'
+);
 export const externalEventsRootFolderId: string = getProjectManagerItemId(
   'external-events'
 );
@@ -1312,7 +1314,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const [
       selectedMainMenuItemIndices,
       setSelectedMainMenuItemIndices,
-    // $FlowFixMe[missing-empty-array-annot]
+      // $FlowFixMe[missing-empty-array-annot]
     ] = React.useState([]);
     const isNavigatingInMainMenuItem = selectedMainMenuItemIndices.length > 0;
     const shouldHideMainMenu = isMacLike() && !!electron;
@@ -1562,10 +1564,10 @@ const MemoizedProjectManager = React.memo<Props, ProjectManagerInterface>(
 );
 
 // $FlowFixMe[prop-missing]
-const ProjectManagerWithErrorBoundary: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<ProjectManagerInterface> }, React.RefSetter<ProjectManagerInterface>> = React.forwardRef<
-  Props,
-  ProjectManagerInterface
->((props, outerRef) => {
+const ProjectManagerWithErrorBoundary: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<ProjectManagerInterface> },
+  React.RefSetter<ProjectManagerInterface>
+> = React.forwardRef<Props, ProjectManagerInterface>((props, outerRef) => {
   const projectManagerRef = React.useRef<?ProjectManagerInterface>(null);
   const shouldAutofocusInput = useShouldAutofocusInput();
 

@@ -190,7 +190,9 @@ export const splitPaths = (paths: Set<string>): ((path: string) => boolean) => {
 /**
  * A helper that can be used to get the name of items in array using an hardcoded property name.
  */
-export const getNameFromProperty = (propertyName: string): ((object: any) => string) => {
+export const getNameFromProperty = (
+  propertyName: string
+): ((object: any) => string) => {
   return (object: Object): string => {
     const property = object[propertyName];
     if (typeof property !== 'string') {
@@ -204,7 +206,9 @@ export const getNameFromProperty = (propertyName: string): ((object: any) => str
 /**
  * A helper that can be used to get the name of items in array using an hardcoded property name.
  */
-export const getSlugifiedUniqueNameFromProperty = (propertyName: string): ((object: any, currentReference: string) => string) => {
+export const getSlugifiedUniqueNameFromProperty = (
+  propertyName: string
+): ((object: any, currentReference: string) => string) => {
   const existingNamesForReference = {};
 
   return (object: Object, currentReference: string): string => {

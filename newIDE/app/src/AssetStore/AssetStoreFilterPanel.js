@@ -149,20 +149,18 @@ type RangeFilterProps = {|
   marks?: {| value: number, label: React.Node |}[],
 |};
 
-export const RangeFilter = (
-  {
-    filterKey,
-    title,
-    min,
-    max,
-    scale,
-    step,
-    range,
-    setRange,
-    valueLabelFormat,
-    marks
-  }: RangeFilterProps,
-): React.Node => {
+export const RangeFilter = ({
+  filterKey,
+  title,
+  min,
+  max,
+  scale,
+  step,
+  range,
+  setRange,
+  valueLabelFormat,
+  marks,
+}: RangeFilterProps): React.Node => {
   return (
     <Accordion key={filterKey} defaultExpanded>
       <AccordionHeader>
@@ -223,13 +221,11 @@ const ColorFilter = ({
   );
 };
 
-export const AssetStoreFilterPanel = (
-  {
-    assetSwappedObject
-  }: {
-    assetSwappedObject?: ?gdObject,
-  },
-): React.Node => {
+export const AssetStoreFilterPanel = ({
+  assetSwappedObject,
+}: {
+  assetSwappedObject?: ?gdObject,
+}): React.Node => {
   const {
     assetFiltersState,
     assetPackFiltersState,

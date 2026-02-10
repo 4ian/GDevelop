@@ -77,10 +77,10 @@ type Props = {|
  * To be used with `SelectOption`.
  */
 // $FlowFixMe[prop-missing]
-const SearchBarSelectField: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<SearchBarSelectFieldInterface> }, React.RefSetter<SearchBarSelectFieldInterface>> = React.forwardRef<
-  Props,
-  SearchBarSelectFieldInterface
->((props, ref) => {
+const SearchBarSelectField: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<SearchBarSelectFieldInterface> },
+  React.RefSetter<SearchBarSelectFieldInterface>
+> = React.forwardRef<Props, SearchBarSelectFieldInterface>((props, ref) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
   const focus = React.useCallback(
     () => {

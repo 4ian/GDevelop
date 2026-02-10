@@ -12,7 +12,9 @@ type Props = {|
   editorTabs: EditorTabsState,
 |};
 
-const useInAppTutorialOrchestrator = ({editorTabs}: Props): {
+const useInAppTutorialOrchestrator = ({
+  editorTabs,
+}: Props): {
   InAppTutorialOrchestrator: any,
   orchestratorProps: {
     currentEditor: EditorIdentifier | null,

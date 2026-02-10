@@ -23,7 +23,14 @@ type Props = {|
   error: ?any,
 |};
 
-const LocalNetworkPreviewDialog = ({url, open, error, onExport, onClose, onRunPreviewLocally}: Props): null | React.Node => {
+const LocalNetworkPreviewDialog = ({
+  url,
+  open,
+  error,
+  onExport,
+  onClose,
+  onRunPreviewLocally,
+}: Props): null | React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   if (!open) return null;
   const urlWithProtocol = url ? `http://${url}` : null;

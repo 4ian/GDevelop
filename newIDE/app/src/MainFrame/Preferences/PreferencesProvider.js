@@ -182,31 +182,47 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     // $FlowFixMe[method-unbinding]
     showAskAiStandAloneForm: (this._showAskAiStandAloneForm.bind(this): any),
     // $FlowFixMe[method-unbinding]
-    showAllAskAiStandAloneForms: (this._showAllAskAiStandAloneForms.bind(this): any),
+    showAllAskAiStandAloneForms: (this._showAllAskAiStandAloneForms.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
     verifyIfIsNewVersion: (this._verifyIfIsNewVersion.bind(this): any),
     // $FlowFixMe[method-unbinding]
-    setEventsSheetShowObjectThumbnails: (this._setEventsSheetShowObjectThumbnails.bind(this): any),
+    setEventsSheetShowObjectThumbnails: (this._setEventsSheetShowObjectThumbnails.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
     setAutosaveOnPreview: (this._setAutosaveOnPreview.bind(this): any),
     // $FlowFixMe[method-unbinding]
-    setUseGDJSDevelopmentWatcher: (this._setUseGDJSDevelopmentWatcher.bind(this): any),
+    setUseGDJSDevelopmentWatcher: (this._setUseGDJSDevelopmentWatcher.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setEventsSheetUseAssignmentOperators: (this._setEventsSheetUseAssignmentOperators.bind(this): any),
+    setEventsSheetUseAssignmentOperators: (this._setEventsSheetUseAssignmentOperators.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setEventsSheetIndentScale: (this._setEventsSheetIndentScale.bind(this): any),
+    setEventsSheetIndentScale: (this._setEventsSheetIndentScale.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
     setEventsSheetZoomLevel: (this._setEventsSheetZoomLevel.bind(this): any),
     // $FlowFixMe[method-unbinding]
-    setShowEffectParameterNames: (this._setShowEffectParameterNames.bind(this): any),
+    setShowEffectParameterNames: (this._setShowEffectParameterNames.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
     getLastUsedPath: (this._getLastUsedPath.bind(this): any),
     // $FlowFixMe[method-unbinding]
     setLastUsedPath: (this._setLastUsedPath.bind(this): any),
     // $FlowFixMe[method-unbinding]
-    getDefaultEditorMosaicNode: (this._getDefaultEditorMosaicNode.bind(this): any),
+    getDefaultEditorMosaicNode: (this._getDefaultEditorMosaicNode.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setDefaultEditorMosaicNode: (this._setDefaultEditorMosaicNode.bind(this): any),
+    setDefaultEditorMosaicNode: (this._setDefaultEditorMosaicNode.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
     getRecentProjectFiles: (this._getRecentProjectFiles.bind(this): any),
     // $FlowFixMe[method-unbinding]
@@ -214,11 +230,17 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     // $FlowFixMe[method-unbinding]
     removeRecentProjectFile: (this._removeRecentProjectFile.bind(this): any),
     // $FlowFixMe[method-unbinding]
-    getAutoOpenMostRecentProject: (this._getAutoOpenMostRecentProject.bind(this): any),
+    getAutoOpenMostRecentProject: (this._getAutoOpenMostRecentProject.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setAutoOpenMostRecentProject: (this._setAutoOpenMostRecentProject.bind(this): any),
+    setAutoOpenMostRecentProject: (this._setAutoOpenMostRecentProject.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    hadProjectOpenedDuringLastSession: (this._hadProjectOpenedDuringLastSession.bind(this): any),
+    hadProjectOpenedDuringLastSession: (this._hadProjectOpenedDuringLastSession.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
     setHasProjectOpened: (this._setHasProjectOpened.bind(this): any),
     // $FlowFixMe[method-unbinding]
@@ -226,63 +248,107 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     // $FlowFixMe[method-unbinding]
     resetShortcutsToDefault: (this._resetShortcutsToDefault.bind(this): any),
     // $FlowFixMe[method-unbinding]
-    getNewObjectDialogDefaultTab: (this._getNewObjectDialogDefaultTab.bind(this): any),
+    getNewObjectDialogDefaultTab: (this._getNewObjectDialogDefaultTab.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setNewObjectDialogDefaultTab: (this._setNewObjectDialogDefaultTab.bind(this): any),
+    setNewObjectDialogDefaultTab: (this._setNewObjectDialogDefaultTab.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
     getShareDialogDefaultTab: (this._getShareDialogDefaultTab.bind(this): any),
     // $FlowFixMe[method-unbinding]
     setShareDialogDefaultTab: (this._setShareDialogDefaultTab.bind(this): any),
     // $FlowFixMe[method-unbinding]
-    getIsMenuBarHiddenInPreview: (this._getIsMenuBarHiddenInPreview.bind(this): any),
+    getIsMenuBarHiddenInPreview: (this._getIsMenuBarHiddenInPreview.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setIsMenuBarHiddenInPreview: (this._setIsMenuBarHiddenInPreview.bind(this): any),
+    setIsMenuBarHiddenInPreview: (this._setIsMenuBarHiddenInPreview.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
     setBackdropClickBehavior: (this._setBackdropClickBehavior.bind(this): any),
     // $FlowFixMe[method-unbinding]
-    setResourcesImporationBehavior: (this._setResourcesImporationBehavior.bind(this): any),
+    setResourcesImporationBehavior: (this._setResourcesImporationBehavior.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    getIsAlwaysOnTopInPreview: (this._getIsAlwaysOnTopInPreview.bind(this): any),
+    getIsAlwaysOnTopInPreview: (this._getIsAlwaysOnTopInPreview.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setIsAlwaysOnTopInPreview: (this._setIsAlwaysOnTopInPreview.bind(this): any),
+    setIsAlwaysOnTopInPreview: (this._setIsAlwaysOnTopInPreview.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setEventsSheetCancelInlineParameter: (this._setEventsSheetCancelInlineParameter.bind(this): any),
+    setEventsSheetCancelInlineParameter: (this._setEventsSheetCancelInlineParameter.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setShowExperimentalExtensions: (this._setShowCommunityExtensions.bind(this): any),
+    setShowExperimentalExtensions: (this._setShowCommunityExtensions.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setShowCreateSectionByDefault: (this._setShowCreateSectionByDefault.bind(this): any),
+    setShowCreateSectionByDefault: (this._setShowCreateSectionByDefault.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setShowInAppTutorialDeveloperMode: (this._setShowInAppTutorialDeveloperMode.bind(this): any),
+    setShowInAppTutorialDeveloperMode: (this._setShowInAppTutorialDeveloperMode.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setOpenDiagnosticReportAutomatically: (this._setOpenDiagnosticReportAutomatically.bind(this): any),
+    setOpenDiagnosticReportAutomatically: (this._setOpenDiagnosticReportAutomatically.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    getOpenDiagnosticReportAutomatically: (this._getOpenDiagnosticReportAutomatically.bind(this): any),
+    getOpenDiagnosticReportAutomatically: (this._getOpenDiagnosticReportAutomatically.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setShowDeprecatedInstructionWarning: (this._setShowDeprecatedInstructionWarning.bind(this): any),
+    setShowDeprecatedInstructionWarning: (this._setShowDeprecatedInstructionWarning.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    getShowDeprecatedInstructionWarning: (this._getShowDeprecatedInstructionWarning.bind(this): any),
+    getShowDeprecatedInstructionWarning: (this._getShowDeprecatedInstructionWarning.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
     setUse3DEditor: (this._setUse3DEditor.bind(this): any),
     // $FlowFixMe[method-unbinding]
     getUse3DEditor: (this._getUse3DEditor.bind(this): any),
     // $FlowFixMe[method-unbinding]
-    setShowBasicProfilingCounters: (this._setShowBasicProfilingCounters.bind(this): any),
+    setShowBasicProfilingCounters: (this._setShowBasicProfilingCounters.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setDisableNpmScriptConfirmation: (this._setDisableNpmScriptConfirmation.bind(this): any),
+    setDisableNpmScriptConfirmation: (this._setDisableNpmScriptConfirmation.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
     saveTutorialProgress: (this._saveTutorialProgress.bind(this): any),
     // $FlowFixMe[method-unbinding]
     getTutorialProgress: (this._getTutorialProgress.bind(this): any),
     // $FlowFixMe[method-unbinding]
-    setNewProjectsDefaultFolder: (this._setNewProjectsDefaultFolder.bind(this): any),
+    setNewProjectsDefaultFolder: (this._setNewProjectsDefaultFolder.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setNewProjectsDefaultStorageProviderName: (this._setNewProjectsDefaultStorageProviderName.bind(this): any),
+    setNewProjectsDefaultStorageProviderName: (this._setNewProjectsDefaultStorageProviderName.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setUseShortcutToClosePreviewWindow: (this._setUseShortcutToClosePreviewWindow.bind(this): any),
+    setUseShortcutToClosePreviewWindow: (this._setUseShortcutToClosePreviewWindow.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setWatchProjectFolderFilesForLocalProjects: (this._setWatchProjectFolderFilesForLocalProjects.bind(this): any),
+    setWatchProjectFolderFilesForLocalProjects: (this._setWatchProjectFolderFilesForLocalProjects.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setNewFeaturesAcknowledgements: (this._setNewFeaturesAcknowledgements.bind(this): any),
+    setNewFeaturesAcknowledgements: (this._setNewFeaturesAcknowledgements.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
     setDisplaySaveReminder: (this._setDisplaySaveReminder.bind(this): any),
     // $FlowFixMe[method-unbinding]
@@ -290,21 +356,33 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     // $FlowFixMe[method-unbinding]
     setEditorStateForProject: (this._setEditorStateForProject.bind(this): any),
     // $FlowFixMe[method-unbinding]
-    setFetchPlayerTokenForPreviewAutomatically: (this._setFetchPlayerTokenForPreviewAutomatically.bind(this): any),
+    setFetchPlayerTokenForPreviewAutomatically: (this._setFetchPlayerTokenForPreviewAutomatically.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setPreviewCrashReportUploadLevel: (this._setPreviewCrashReportUploadLevel.bind(this): any),
+    setPreviewCrashReportUploadLevel: (this._setPreviewCrashReportUploadLevel.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
     setGamesDashboardOrderBy: (this._setGamesDashboardOrderBy.bind(this): any),
     // $FlowFixMe[method-unbinding]
-    setTakeScreenshotOnPreview: (this._setTakeScreenshotOnPreview.bind(this): any),
+    setTakeScreenshotOnPreview: (this._setTakeScreenshotOnPreview.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setShowAiAskButtonInTitleBar: (this._setShowAiAskButtonInTitleBar.bind(this): any),
+    setShowAiAskButtonInTitleBar: (this._setShowAiAskButtonInTitleBar.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
     setAiState: (this._setAiState.bind(this): any),
     // $FlowFixMe[method-unbinding]
-    setAutomaticallyUseCreditsForAiRequests: (this._setAutomaticallyUseCreditsForAiRequests.bind(this): any),
+    setAutomaticallyUseCreditsForAiRequests: (this._setAutomaticallyUseCreditsForAiRequests.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
-    setUseBackgroundSerializerForSaving: (this._setUseBackgroundSerializerForSaving.bind(this): any),
+    setUseBackgroundSerializerForSaving: (this._setUseBackgroundSerializerForSaving.bind(
+      this
+    ): any),
   };
 
   componentDidMount() {

@@ -114,7 +114,9 @@ export const isHomePage = (pageState: AssetStorePageState): false | boolean => {
   );
 };
 
-export const isSearchResultPage = (pageState: AssetStorePageState): false | true => {
+export const isSearchResultPage = (
+  pageState: AssetStorePageState
+): false | true => {
   return (
     !isHomePage(pageState) &&
     !pageState.openedAssetShortHeader &&
@@ -128,33 +130,37 @@ type AssetStorePageHistory = {|
   previousPages: Array<AssetStorePageState>,
 |};
 
-export const AssetStoreNavigatorContext: React.Context<NavigationState> = React.createContext<NavigationState>({
-  searchText: '',
-  setSearchText: () => {},
-  getCurrentPage: () => assetStoreHomePageState,
-  isRootPage: true,
-  backToPreviousPage: () => assetStoreHomePageState,
-  openHome: () => assetStoreHomePageState,
-  openAssetSwapping: () => assetStoreHomePageState,
-  clearHistory: () => {},
-  clearPreviousPageFromHistory: () => {},
-  openSearchResultPage: () => {},
-  openTagPage: string => {},
-  openShopCategoryPage: string => {},
-  openPackPage: () => {},
-  openPrivateAssetPackInformationPage: () => {},
-  openPrivateGameTemplateInformationPage: () => {},
-  openBundleInformationPage: () => {},
-  openAssetDetailPage: () => {},
-  navigateInsideFolder: string => {},
-  goBackToFolderIndex: number => {},
-});
+export const AssetStoreNavigatorContext: React.Context<NavigationState> = React.createContext<NavigationState>(
+  {
+    searchText: '',
+    setSearchText: () => {},
+    getCurrentPage: () => assetStoreHomePageState,
+    isRootPage: true,
+    backToPreviousPage: () => assetStoreHomePageState,
+    openHome: () => assetStoreHomePageState,
+    openAssetSwapping: () => assetStoreHomePageState,
+    clearHistory: () => {},
+    clearPreviousPageFromHistory: () => {},
+    openSearchResultPage: () => {},
+    openTagPage: string => {},
+    openShopCategoryPage: string => {},
+    openPackPage: () => {},
+    openPrivateAssetPackInformationPage: () => {},
+    openPrivateGameTemplateInformationPage: () => {},
+    openBundleInformationPage: () => {},
+    openAssetDetailPage: () => {},
+    navigateInsideFolder: string => {},
+    goBackToFolderIndex: number => {},
+  }
+);
 
 type AssetStoreNavigatorStateProviderProps = {|
   children: React.Node,
 |};
 
-export const AssetStoreNavigatorStateProvider = (props: AssetStoreNavigatorStateProviderProps): React.MixedElement => {
+export const AssetStoreNavigatorStateProvider = (
+  props: AssetStoreNavigatorStateProviderProps
+): React.MixedElement => {
   const [searchText, setSearchText] = React.useState<string>('');
   const [history, setHistory] = React.useState<AssetStorePageHistory>({
     previousPages: [assetStoreHomePageState],

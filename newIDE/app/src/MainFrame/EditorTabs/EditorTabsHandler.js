@@ -358,7 +358,10 @@ export const notifyPreviewOrExportWillStart = (state: EditorTabsState) => {
   }
 };
 
-export const closeLayoutTabs = (state: EditorTabsState, layout: gdLayout): {
+export const closeLayoutTabs = (
+  state: EditorTabsState,
+  layout: gdLayout
+): {
   panes: {
     [paneIdentifier: string]: { currentTab: number, editors: Array<EditorTab> },
   },

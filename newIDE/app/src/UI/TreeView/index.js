@@ -214,7 +214,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     shouldHideMenuIcon,
   }: Props<Item>,
   ref: TreeViewInterface<Item>
-// $FlowFixMe[missing-local-annot]
+  // $FlowFixMe[missing-local-annot]
 ) => {
   const selectedNodeIds = selectedItems.map(getItemId);
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>(

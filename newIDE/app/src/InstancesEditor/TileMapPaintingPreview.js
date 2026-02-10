@@ -140,7 +140,7 @@ class TileMapPaintingPreview {
     tileSet: TileSet,
     x: number,
     y: number,
-  // $FlowFixMe[value-as-type]
+    // $FlowFixMe[value-as-type]
   }): ?PIXI.Texture {
     const { atlasImage, tileSize } = tileSet;
     if (!atlasImage) return;
@@ -227,7 +227,7 @@ class TileMapPaintingPreview {
     tileSet: TileSet,
     isBadlyConfigured: boolean,
     tileMapTileSelection: TileMapTileSelection,
-  // $FlowFixMe[value-as-type]
+    // $FlowFixMe[value-as-type]
   }): ?PIXI.Container {
     const renderedInstance = this.getRendererOfInstance(instance);
     if (

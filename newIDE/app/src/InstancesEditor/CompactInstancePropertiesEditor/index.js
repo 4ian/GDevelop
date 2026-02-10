@@ -67,27 +67,25 @@ type Props = {|
   isVariableListLocked: boolean,
 |};
 
-export const CompactInstancePropertiesEditor = (
-  {
-    instances,
-    i18n,
-    project,
-    layout,
-    objectsContainer,
-    globalObjectsContainer,
-    layersContainer,
-    unsavedChanges,
-    historyHandler,
-    editObjectInPropertiesPanel,
-    onGetInstanceSize,
-    editInstanceVariables,
-    onInstancesModified,
-    projectScopedContainersAccessor,
-    tileMapTileSelection,
-    onSelectTileMapTile,
-    isVariableListLocked
-  }: Props,
-): null | React.Node => {
+export const CompactInstancePropertiesEditor = ({
+  instances,
+  i18n,
+  project,
+  layout,
+  objectsContainer,
+  globalObjectsContainer,
+  layersContainer,
+  unsavedChanges,
+  historyHandler,
+  editObjectInPropertiesPanel,
+  onGetInstanceSize,
+  editInstanceVariables,
+  onInstancesModified,
+  projectScopedContainersAccessor,
+  tileMapTileSelection,
+  onSelectTileMapTile,
+  isVariableListLocked,
+}: Props): null | React.Node => {
   const forceUpdate = useForceUpdate();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
 

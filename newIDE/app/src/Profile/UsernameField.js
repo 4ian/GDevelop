@@ -47,19 +47,17 @@ type Props = {|
   disabled?: boolean,
 |};
 
-export const UsernameField = (
-  {
-    initialUsername,
-    value,
-    onChange,
-    errorText,
-    allowEmpty,
-    onAvailabilityChecked,
-    onAvailabilityCheckLoading,
-    isValidatingUsername,
-    disabled
-  }: Props,
-): React.Node => {
+export const UsernameField = ({
+  initialUsername,
+  value,
+  onChange,
+  errorText,
+  allowEmpty,
+  onAvailabilityChecked,
+  onAvailabilityCheckLoading,
+  isValidatingUsername,
+  disabled,
+}: Props): React.Node => {
   const usernameFormattingError = isUsernameValid(value, {
     allowEmpty: !!allowEmpty,
   })

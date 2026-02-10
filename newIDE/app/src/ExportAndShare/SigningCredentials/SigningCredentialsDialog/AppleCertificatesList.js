@@ -42,15 +42,13 @@ const styles = {
   bulletIcon: { width: 20, height: 20, marginRight: 10 },
 };
 
-export const AppleCertificatesList = (
-  {
-    signingCredentials,
-    authenticatedUser,
-    error,
-    onRefreshSigningCredentials,
-    onAddNew
-  }: Props,
-): React.Node => {
+export const AppleCertificatesList = ({
+  signingCredentials,
+  authenticatedUser,
+  error,
+  onRefreshSigningCredentials,
+  onAddNew,
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { showConfirmation } = useAlertDialog();
 

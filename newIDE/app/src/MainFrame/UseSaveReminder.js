@@ -53,7 +53,11 @@ export const getUnsavedChangesAmount = (
   }
 };
 
-const useSaveReminder = ({onSave, project, isInQuickCustomization}: Props): (() => React.MixedElement) => {
+const useSaveReminder = ({
+  onSave,
+  project,
+  isInQuickCustomization,
+}: Props): (() => React.MixedElement) => {
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext

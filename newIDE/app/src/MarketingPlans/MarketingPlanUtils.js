@@ -18,7 +18,9 @@ const styles = {
   iconStyle: { width: 40, height: 40 },
 };
 
-export const getIconForMarketingPlan = (marketingPlan: MarketingPlan): null | React.Node => {
+export const getIconForMarketingPlan = (
+  marketingPlan: MarketingPlan
+): null | React.Node => {
   switch (marketingPlan.icon) {
     case 'speaker':
       return <Speaker style={styles.iconStyle} />;
@@ -93,19 +95,17 @@ export const getRequirementsErrors = (
   return requirementsErrors;
 };
 
-export const getActiveMessage = (
-  {
-    marketingPlan,
-    i18n,
-    hasErrors,
-    activeGameFeaturings
-  }: {|
-    marketingPlan: MarketingPlan,
-    i18n: I18nType,
-    hasErrors: boolean,
-    activeGameFeaturings: Array<GameFeaturing>,
-  |},
-): null | React.Node => {
+export const getActiveMessage = ({
+  marketingPlan,
+  i18n,
+  hasErrors,
+  activeGameFeaturings,
+}: {|
+  marketingPlan: MarketingPlan,
+  i18n: I18nType,
+  hasErrors: boolean,
+  activeGameFeaturings: Array<GameFeaturing>,
+|}): null | React.Node => {
   if (hasErrors) {
     return <Trans>Fix those issues to get the campaign up!</Trans>;
   }

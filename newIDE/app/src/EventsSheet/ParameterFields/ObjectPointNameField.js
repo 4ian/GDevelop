@@ -22,13 +22,10 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(
-      ref,
-      () => ({
-        focus,
-      }),
-    );
-    
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
+
     const getPointNames = (): Array<ExpressionAutocompletion> => {
       const {
         project,
@@ -39,47 +36,45 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         instruction,
         expressionMetadata,
         expression,
-        parameterIndex
+        parameterIndex,
       } = props;
-      
-      const objectOrGroupName = getLastObjectParameterValue(
-        {
-          instructionMetadata,
-          instruction,
-          expressionMetadata,
-          expression,
-          parameterIndex,
-        },
-      );
+
+      const objectOrGroupName = getLastObjectParameterValue({
+        instructionMetadata,
+        instruction,
+        expressionMetadata,
+        expression,
+        parameterIndex,
+      });
       if (!objectOrGroupName || !project) {
         return [];
       }
-      
+
       const object = getObjectByName(
         globalObjectsContainer,
         objectsContainer,
-        objectOrGroupName,
+        objectOrGroupName
       );
       if (object && object.getType() === 'Sprite') {
         const spriteConfiguration = gd.asSpriteConfiguration(
-          object.getConfiguration(),
+          object.getConfiguration()
         );
         const animations = spriteConfiguration.getAnimations();
-        
-        return getAllPointNames(animations).map(
-          pointName => pointName.length > 0 ? pointName : null,
-        ).filter(Boolean).sort().map(
-          pointName => ({
+
+        return getAllPointNames(animations)
+          .map(pointName => (pointName.length > 0 ? pointName : null))
+          .filter(Boolean)
+          .sort()
+          .map(pointName => ({
             kind: 'Text',
             completion: `"${pointName}"`,
-          }),
-        );
+          }));
       }
-      
+
       const group = getObjectGroupByName(
         project.getObjects(),
         scope.layout ? scope.layout.getObjects() : null,
-        objectOrGroupName,
+        objectOrGroupName
       );
       if (group) {
         // If the instruction targets a group, we check that every object of the
@@ -92,48 +87,53 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               project.getObjects(),
               scope.layout ? scope.layout.getObjects() : null,
               // $FlowFixMe[incompatible-type]
-              objectName,
+              objectName
             );
             if (!object || object.getType() !== 'Sprite') {
               return null;
             }
             const spriteConfiguration = gd.asSpriteConfiguration(
-              object.getConfiguration(),
+              object.getConfiguration()
             );
             const animations = spriteConfiguration.getAnimations();
-            
-            return getAllPointNames(animations).map(
-              pointName => pointName.length > 0 ? pointName : null,
-            ).filter(Boolean);
-          },
+
+            return getAllPointNames(animations)
+              .map(pointName => (pointName.length > 0 ? pointName : null))
+              .filter(Boolean);
+          }
         );
-        
+
         if (pointsNamesByObject.some(pointsNames => !pointsNames)) return [];
-        
+
         // Flow fears that pointsNamesByObject contains null values but this
         // possibility should be handled above.
         // $FlowFixMe[incompatible-call]
-        return intersection<string>(...pointsNamesByObject).sort().map(
-          pointName => ({
+        return intersection<string>(...pointsNamesByObject)
+          .sort()
+          .map(pointName => ({
             kind: 'Text',
             completion: `"${pointName}"`,
-          }),
-        );
+          }));
       }
-      
+
       return [];
     };
-    
+
     return (
       <GenericExpressionField
         expressionType="string"
-        onGetAdditionalAutocompletions={expression => getPointNames().filter(
-          ({completion}) => completion.indexOf(expression) === 0,
-        )}
+        onGetAdditionalAutocompletions={expression =>
+          getPointNames().filter(
+            ({ completion }) => completion.indexOf(expression) === 0
+          )
+        }
         ref={field}
         {...props}
       />
     );
-  },
-// $FlowFixMe[prop-missing]
-): React.AbstractComponent<{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }, React.RefSetter<ParameterFieldInterface>>);
+  }
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);

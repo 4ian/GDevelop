@@ -24,21 +24,19 @@ import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindow
 import { client as tutorialClient } from '../../../Utils/GDevelopServices/Tutorial';
 import { client as assetClient } from '../../../Utils/GDevelopServices/Asset';
 
-const WrappedHomePage = (
-  {
-    project,
-    // $FlowFixMe[incompatible-type]
-    tutorialProgress = undefined,
-    inAppTutorialsFetchingError = null,
-    user
-  }: {|
-    project: ?gdProject,
-    tutorialProgress?: InAppTutorialUserProgress,
-    inAppTutorialsFetchingError?: string | null,
-    // $FlowFixMe[value-as-type]
-    user: AuthenticatedUser,
-  |},
-): React.Node => {
+const WrappedHomePage = ({
+  project,
+  // $FlowFixMe[incompatible-type]
+  tutorialProgress = undefined,
+  inAppTutorialsFetchingError = null,
+  user,
+}: {|
+  project: ?gdProject,
+  tutorialProgress?: InAppTutorialUserProgress,
+  inAppTutorialsFetchingError?: string | null,
+  // $FlowFixMe[value-as-type]
+  user: AuthenticatedUser,
+|}): React.Node => {
   const assetApiMock = React.useMemo(() => {
     const mock = new MockAdapter(assetClient, {
       delayResponse: 250,

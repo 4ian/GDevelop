@@ -106,16 +106,14 @@ export const getPasswordErrorText = (error: ?AuthError): void | React.Node => {
   return undefined;
 };
 
-const CreateAccountDialog = (
-  {
-    onClose,
-    onGoToLogin,
-    onCreateAccount,
-    onLoginWithProvider,
-    createAccountInProgress,
-    error
-  }: Props,
-): React.Node => {
+const CreateAccountDialog = ({
+  onClose,
+  onGoToLogin,
+  onCreateAccount,
+  onLoginWithProvider,
+  createAccountInProgress,
+  error,
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const styles = getStyles({ isMobile });
   const [email, setEmail] = React.useState<string>('');

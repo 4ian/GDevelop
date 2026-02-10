@@ -57,6 +57,8 @@ export const initialTeamState = {
 };
 
 // $FlowFixMe[incompatible-type]
-const TeamContext: React.Context<TeamState> = React.createContext<TeamState>(initialTeamState);
+const TeamContext: React.Context<TeamState> = React.createContext<TeamState>(
+  initialTeamState
+);
 
 export default TeamContext;

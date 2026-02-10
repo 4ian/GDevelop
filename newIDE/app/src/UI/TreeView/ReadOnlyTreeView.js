@@ -166,7 +166,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     arrowKeyNavigationProps,
   }: Props<Item>,
   ref: ReadOnlyTreeViewInterface<Item>
-// $FlowFixMe[missing-local-annot]
+  // $FlowFixMe[missing-local-annot]
 ) => {
   const selectedNodeIds = selectedItems.map(getItemId);
   const [isRendered, setIsRendered] = React.useState<boolean>(false);
@@ -716,4 +716,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
 // $FlowFixMe[incompatible-type]
 // $FlowFixMe[prop-missing]
 // $FlowFixMe[incompatible-exact]
-export default (React.forwardRef(ReadOnlyTreeView): React.AbstractComponent<{ ...Props<any>, +ref?: React.RefSetter<any> }, React.RefSetter<any>>);
+export default (React.forwardRef(ReadOnlyTreeView): React.AbstractComponent<
+  { ...Props<any>, +ref?: React.RefSetter<any> },
+  React.RefSetter<any>
+>);

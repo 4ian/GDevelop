@@ -42,7 +42,13 @@ type Props = {|
   onOpenContextMenu: (event: ClientCoordinates, member: User) => void,
 |};
 
-const TeamMemberRow = ({isTemporary, member, onListUserProjects, onDrag, onOpenContextMenu}: Props): React.MixedElement => {
+const TeamMemberRow = ({
+  isTemporary,
+  member,
+  onListUserProjects,
+  onDrag,
+  onOpenContextMenu,
+}: Props): React.MixedElement => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const [emailCopySuccess, setEmailCopySuccess] = React.useState<boolean>(

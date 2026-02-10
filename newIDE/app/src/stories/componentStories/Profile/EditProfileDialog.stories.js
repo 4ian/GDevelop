@@ -83,7 +83,9 @@ const defaultProps: EditProfileDialogProps = {
   },
   limits: limitsForNoSubscriptionUser,
 };
-export const WithSubscription = (): React.Node => <EditProfileDialog {...defaultProps} />;
+export const WithSubscription = (): React.Node => (
+  <EditProfileDialog {...defaultProps} />
+);
 
 export const WithoutSubscription = (): React.Node => (
   <EditProfileDialog {...defaultProps} subscription={null} />

@@ -180,7 +180,11 @@ type Props = {|
   displayAsCarousel?: boolean,
 |};
 
-const GuidedLessons = ({selectInAppTutorial, lessonsIds, displayAsCarousel}: Props): React.Node => {
+const GuidedLessons = ({
+  selectInAppTutorial,
+  lessonsIds,
+  displayAsCarousel,
+}: Props): React.Node => {
   const isOnline = useOnlineStatus();
   const {
     inAppTutorialShortHeaders,

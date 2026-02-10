@@ -23,15 +23,13 @@ type Props = {|
 
 const notificationsPreviewCount = 5;
 
-const NotificationList = (
-  {
-    notifications,
-    onMarkAllAsRead,
-    canMarkAllAsRead,
-    onMarkNotificationAsSeen,
-    onCloseNotificationList
-  }: Props,
-): React.Node => {
+const NotificationList = ({
+  notifications,
+  onMarkAllAsRead,
+  canMarkAllAsRead,
+  onMarkNotificationAsSeen,
+  onCloseNotificationList,
+}: Props): React.Node => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [showAll, setShowAll] = React.useState<boolean>(false);
 

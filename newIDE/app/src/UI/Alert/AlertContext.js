@@ -77,6 +77,8 @@ const initialConfirmState = {
   showYesNoCancelDialog: ShowYesNoCancelDialogOptionsWithCallback => {},
 };
 
-const AlertContext: React.Context<ConfirmState> = React.createContext<ConfirmState>(initialConfirmState);
+const AlertContext: React.Context<ConfirmState> = React.createContext<ConfirmState>(
+  initialConfirmState
+);
 
 export default AlertContext;

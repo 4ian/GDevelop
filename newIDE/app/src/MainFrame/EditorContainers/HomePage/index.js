@@ -399,7 +399,7 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
               'bundle',
               'bundle-category',
             ]);
-          // $FlowFixMe[invalid-compare]
+            // $FlowFixMe[invalid-compare]
           } else if (requestedTab === 'manage') {
             const gameId = routeArguments['game-id'];
             if (gameId) {
@@ -739,7 +739,9 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
   (prevProps, nextProps) => prevProps.isActive || nextProps.isActive
 );
 
-export const renderHomePageContainer = (props: RenderEditorContainerPropsWithRef): React.MixedElement => (
+export const renderHomePageContainer = (
+  props: RenderEditorContainerPropsWithRef
+): React.MixedElement => (
   // $FlowFixMe[incompatible-type]
   <HomePage
     ref={props.ref}

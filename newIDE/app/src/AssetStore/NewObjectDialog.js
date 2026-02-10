@@ -49,7 +49,9 @@ const gd: libGDevelop = global.gd;
 
 const isDev = Window.isDev();
 
-export const useProjectNeedToBeSavedAlertDialog = (canInstallPrivateAsset: () => boolean): ((assetShortHeader: AssetShortHeader) => Promise<boolean>) => {
+export const useProjectNeedToBeSavedAlertDialog = (
+  canInstallPrivateAsset: () => boolean
+): ((assetShortHeader: AssetShortHeader) => Promise<boolean>) => {
   const { showAlert } = useAlertDialog();
   return async (assetShortHeader: AssetShortHeader): Promise<boolean> => {
     const isPrivate = isPrivateAsset(assetShortHeader);
@@ -67,7 +69,9 @@ export const useProjectNeedToBeSavedAlertDialog = (canInstallPrivateAsset: () =>
   };
 };
 
-export const useFetchAssets = (): ((assetShortHeaders: Array<AssetShortHeader>) => Promise<Array<Asset>>) => {
+export const useFetchAssets = (): ((
+  assetShortHeaders: Array<AssetShortHeader>
+) => Promise<Array<Asset>>) => {
   const { environment } = React.useContext(AssetStoreContext);
 
   const { fetchPrivateAsset } = React.useContext(
@@ -103,28 +107,24 @@ export const useFetchAssets = (): ((assetShortHeaders: Array<AssetShortHeader>) 
   };
 };
 
-export const useInstallAsset = (
-  {
-    project,
-    targetObjectFolderOrObjectWithContext,
-    resourceManagementProps,
-    onWillInstallExtension,
-    onExtensionInstalled
-  }: {|
-    project: ?gdProject,
-    targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
-    resourceManagementProps: ResourceManagementProps,
-    onWillInstallExtension: (extensionNames: Array<string>) => void,
-    onExtensionInstalled: (extensionNames: Array<string>) => void,
-  |},
-): ((
-  {
-    assetShortHeader: AssetShortHeader,
-    objectsContainer: gdObjectsContainer,
-    requestedObjectName?: string,
-    setIsAssetBeingInstalled: (boolean) => void,
-  }
-) => Promise<InstallAssetOutput | null>) => {
+export const useInstallAsset = ({
+  project,
+  targetObjectFolderOrObjectWithContext,
+  resourceManagementProps,
+  onWillInstallExtension,
+  onExtensionInstalled,
+}: {|
+  project: ?gdProject,
+  targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
+  resourceManagementProps: ResourceManagementProps,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
+|}): (({
+  assetShortHeader: AssetShortHeader,
+  objectsContainer: gdObjectsContainer,
+  requestedObjectName?: string,
+  setIsAssetBeingInstalled: boolean => void,
+}) => Promise<InstallAssetOutput | null>) => {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const { openedAssetPack } = shopNavigationState.getCurrentPage();
   const { installPrivateAsset } = React.useContext(

@@ -16,21 +16,27 @@ export type ElectronUpdateStatus = {
     | 'unknown',
 };
 
-export const getElectronUpdateNotificationTitle = (updateStatus: ElectronUpdateStatus): string => {
+export const getElectronUpdateNotificationTitle = (
+  updateStatus: ElectronUpdateStatus
+): string => {
   if (updateStatus.status === 'update-available')
     return 'A new update is available!';
 
   return '';
 };
 
-export const getElectronUpdateNotificationBody = (updateStatus: ElectronUpdateStatus): string => {
+export const getElectronUpdateNotificationBody = (
+  updateStatus: ElectronUpdateStatus
+): string => {
   if (updateStatus.status === 'update-available')
     return 'It will be downloaded and installed automatically (unless you deactivated this in preferences)';
 
   return '';
 };
 
-export const getElectronUpdateStatusLabel = (status: string): string | React.Node => {
+export const getElectronUpdateStatusLabel = (
+  status: string
+): string | React.Node => {
   if (status === 'checking-for-update')
     return <Trans>Checking for update...</Trans>;
   if (status === 'update-available')
@@ -99,7 +105,9 @@ export const useServiceWorkerUpdateStatus = (): ServiceWorkerUpdateStatus => {
   return serviceWorkerUpdateStatus;
 };
 
-export const getServiceWorkerStatusLabel = (status: ServiceWorkerUpdateStatus): React.Node => {
+export const getServiceWorkerStatusLabel = (
+  status: ServiceWorkerUpdateStatus
+): React.Node => {
   if (status === 'not-installed') {
     return <Trans>Not installed as an app. No updates available.</Trans>;
   } else if (status === 'installed') {

@@ -62,7 +62,9 @@ export const sharedFuseConfiguration = {
 /**
  * This helper allows creating the search query for a search within a simple array of strings.
  */
-export const getFuseSearchQueryForSimpleArray = (searchText: string): string => {
+export const getFuseSearchQueryForSimpleArray = (
+  searchText: string
+): string => {
   const tokenisedSearchQuery = searchText.trim().split(' ');
   return `'${tokenisedSearchQuery.join(" '")}`;
 };
@@ -164,7 +166,9 @@ const getFirstExactMatchPosition = (
   };
 };
 
-export const nullifySingleCharacterMatches = <T>(result: SearchResult<T>): any => {
+export const nullifySingleCharacterMatches = <T>(
+  result: SearchResult<T>
+): any => {
   const matchesWithAtLeastOneSignificantIndex = result.matches
     .map(match => {
       const newIndices = match.indices
@@ -196,7 +200,10 @@ export const augmentSearchResult = <T>(
   };
 };
 
-export const tuneMatches = <T>(result: SearchResult<T>, searchText: string): any =>
+export const tuneMatches = <T>(
+  result: SearchResult<T>,
+  searchText: string
+): any =>
   // $FlowFixMe[missing-type-arg]
   result.matches.map<SearchMatch>(match => ({
     key: match.key,
@@ -204,14 +211,16 @@ export const tuneMatches = <T>(result: SearchResult<T>, searchText: string): any
     indices: tuneMatchIndices(match, searchText),
   }));
 
-export const sortResultsUsingExactMatches = (orderedKeys: Array<string>): (<T>(
+export const sortResultsUsingExactMatches = (
+  orderedKeys: Array<string>
+): (<T>(
   resultA: AugmentedSearchResult<T>,
   resultB: AugmentedSearchResult<T>
 ) => any) => {
   return <T>(
     resultA: AugmentedSearchResult<T>,
     resultB: AugmentedSearchResult<T>
-  // $FlowFixMe[missing-local-annot]
+    // $FlowFixMe[missing-local-annot]
   ) => {
     // First give priority to result that have an exact match at start of word and not the other.
     const resultAExactMatchesAtStartOfWordCount = resultA.matches.filter(

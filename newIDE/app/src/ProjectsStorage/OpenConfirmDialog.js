@@ -13,7 +13,10 @@ type OpenConfirmDialogProps = {|
   onConfirm: () => void,
 |};
 
-export const OpenConfirmDialog = ({onClose, onConfirm}: OpenConfirmDialogProps): React.Node => {
+export const OpenConfirmDialog = ({
+  onClose,
+  onConfirm,
+}: OpenConfirmDialogProps): React.Node => {
   return (
     <Dialog
       title={<Trans>Confirm the opening</Trans>}

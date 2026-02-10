@@ -341,7 +341,10 @@ type Props = {|
   onStarted: () => void,
 |};
 
-const UserSurvey = ({onCompleted, onStarted}: Props): React.Node | React.MixedElement => {
+const UserSurvey = ({
+  onCompleted,
+  onStarted,
+}: Props): React.Node | React.MixedElement => {
   const persistedState = getRecentPersistedState();
   const [questionId, setQuestionId] = React.useState<string>(
     persistedState ? persistedState.questionId : firstQuestion

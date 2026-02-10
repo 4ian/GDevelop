@@ -17,20 +17,17 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(
-      ref,
-      () => ({
-        focus,
-      }),
-    );
-    
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
+
     if (!props.resourceManagementProps || !props.project) {
       console.error(
-        'Missing project or resourceManagementProps for BitmapFontResourceField',
+        'Missing project or resourceManagementProps for BitmapFontResourceField'
       );
       return null;
     }
-    
+
     return (
       <ResourceSelector
         margin={props.isInline ? 'none' : 'dense'}
@@ -42,12 +39,17 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         fullWidth
         initialResourceName={props.value}
         onChange={props.onChange}
-        floatingLabelText={<Trans>Choose the bitmap font file (.fnt, .xml) to use</Trans>}
+        floatingLabelText={
+          <Trans>Choose the bitmap font file (.fnt, .xml) to use</Trans>
+        }
         onRequestClose={props.onRequestClose}
         onApply={props.onApply}
         ref={field}
       />
     );
-  },
-// $FlowFixMe[prop-missing]
-): React.AbstractComponent<{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }, React.RefSetter<ParameterFieldInterface>>);
+  }
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);

@@ -48,13 +48,13 @@ export type EventsBasedBehaviorOrObjectEditorInterface = {|
 |};
 
 // $FlowFixMe[prop-missing]
-export const EventsBasedBehaviorOrObjectEditor: React.AbstractComponent<{
+export const EventsBasedBehaviorOrObjectEditor: React.AbstractComponent<
+  {
     ...Props,
     +ref?: React.RefSetter<EventsBasedBehaviorOrObjectEditorInterface>,
-  }, React.RefSetter<EventsBasedBehaviorOrObjectEditorInterface>> = React.forwardRef<
-  Props,
-  EventsBasedBehaviorOrObjectEditorInterface
->(
+  },
+  React.RefSetter<EventsBasedBehaviorOrObjectEditorInterface>
+> = React.forwardRef<Props, EventsBasedBehaviorOrObjectEditorInterface>(
   (
     {
       eventsBasedBehavior,

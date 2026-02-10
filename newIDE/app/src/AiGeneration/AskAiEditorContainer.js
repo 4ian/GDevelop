@@ -1309,7 +1309,9 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
   (prevProps, nextProps) => prevProps.isActive || nextProps.isActive
 );
 
-export const renderAskAiEditorContainer = (props: RenderEditorContainerPropsWithRef): React.Node => (
+export const renderAskAiEditorContainer = (
+  props: RenderEditorContainerPropsWithRef
+): React.Node => (
   <I18n>
     {({ i18n }) => (
       // $FlowFixMe[incompatible-type]

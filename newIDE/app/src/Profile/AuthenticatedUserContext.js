@@ -171,7 +171,8 @@ export const initialAuthenticatedUser = {
   onSendEmailVerification: async () => {},
   onOpenEmailVerificationDialog: () => {},
   onAcceptGameStatsEmail: async () => {},
-  getAuthorizationHeader: (): Promise<> => Promise.reject(new Error('Unimplemented')),
+  getAuthorizationHeader: (): Promise<> =>
+    Promise.reject(new Error('Unimplemented')),
   achievements: null,
 };
 

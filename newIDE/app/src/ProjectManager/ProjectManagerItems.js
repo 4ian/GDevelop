@@ -53,17 +53,15 @@ type ProjectStructureItemProps = {|
   open?: boolean,
 |};
 
-export const ProjectStructureItem = (
-  {
-    id,
-    error,
-    onRefresh,
-    autoGenerateNestedIndicator,
-    open,
-    primaryText,
-    renderNestedItems
-  }: ProjectStructureItemProps,
-): React.Node => {
+export const ProjectStructureItem = ({
+  id,
+  error,
+  onRefresh,
+  autoGenerateNestedIndicator,
+  open,
+  primaryText,
+  renderNestedItems,
+}: ProjectStructureItemProps): React.Node => {
   return (
     <ListItem
       id={id}
@@ -120,34 +118,32 @@ type ItemProps = {|
   |},
 |};
 
-export const Item = (
-  {
-    id,
-    data,
-    primaryText,
-    textEndAdornment,
-    editingName,
-    leftIcon,
-    onEdit,
-    onDelete,
-    addLabel,
-    onAdd,
-    onRename,
-    onEditName,
-    onCopy,
-    onCut,
-    onPaste,
-    onDuplicate,
-    canPaste,
-    canMoveUp,
-    onMoveUp,
-    canMoveDown,
-    onMoveDown,
-    buildExtraMenuTemplate,
-    isLastItem,
-    dragAndDropProps: {DragSourceAndDropTarget, onBeginDrag, onDrop}
-  }: ItemProps,
-): React.Node => {
+export const Item = ({
+  id,
+  data,
+  primaryText,
+  textEndAdornment,
+  editingName,
+  leftIcon,
+  onEdit,
+  onDelete,
+  addLabel,
+  onAdd,
+  onRename,
+  onEditName,
+  onCopy,
+  onCut,
+  onPaste,
+  onDuplicate,
+  canPaste,
+  canMoveUp,
+  onMoveUp,
+  canMoveDown,
+  onMoveDown,
+  buildExtraMenuTemplate,
+  isLastItem,
+  dragAndDropProps: { DragSourceAndDropTarget, onBeginDrag, onDrop },
+}: ItemProps): React.Node => {
   const textFieldRef = React.useRef<?TextFieldInterface>(null);
   const shouldDiscardChanges = React.useRef<boolean>(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -353,28 +349,26 @@ type EventFunctionExtensionItemProps = {|
   |},
 |};
 
-export const EventFunctionExtensionItem = (
-  {
-    eventsFunctionsExtension,
-    onEdit,
-    onRename,
-    onEditName,
-    isEditingName,
-    onDelete,
-    onAdd,
-    onCopy,
-    onCut,
-    onPaste,
-    onDuplicate,
-    canPaste,
-    canMoveUp,
-    onMoveUp,
-    canMoveDown,
-    onMoveDown,
-    isLastItem,
-    dragAndDropProps
-  }: EventFunctionExtensionItemProps,
-): React.Node => {
+export const EventFunctionExtensionItem = ({
+  eventsFunctionsExtension,
+  onEdit,
+  onRename,
+  onEditName,
+  isEditingName,
+  onDelete,
+  onAdd,
+  onCopy,
+  onCut,
+  onPaste,
+  onDuplicate,
+  canPaste,
+  canMoveUp,
+  onMoveUp,
+  canMoveDown,
+  onMoveDown,
+  isLastItem,
+  dragAndDropProps,
+}: EventFunctionExtensionItemProps): React.Node => {
   const name = eventsFunctionsExtension.getName();
   const iconUrl = eventsFunctionsExtension.getIconUrl();
 

@@ -251,7 +251,13 @@ type Props = {|
   showAllItems?: boolean,
 |};
 
-export const EarnCredits = ({achievements, badges, onOpenProfile, showRandomItem, showAllItems}: Props): React.MixedElement => {
+export const EarnCredits = ({
+  achievements,
+  badges,
+  onOpenProfile,
+  showRandomItem,
+  showAllItems,
+}: Props): React.MixedElement => {
   const { isMobile, windowSize } = useResponsiveWindowSize();
   const isExtraLargeScreen = windowSize === 'xlarge';
 

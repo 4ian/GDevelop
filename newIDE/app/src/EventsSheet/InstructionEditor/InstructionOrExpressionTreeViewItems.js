@@ -4,8 +4,10 @@ import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { type EnumeratedInstructionMetadata } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { type InstructionOrExpressionTreeNode } from '../../InstructionOrExpression/CreateTree';
 
-export const getInstructionGroupId = (groupName: string, parentId?: ?string): string =>
-  `${parentId ? `${parentId}-` : ''}instruction-group-${groupName}`;
+export const getInstructionGroupId = (
+  groupName: string,
+  parentId?: ?string
+): string => `${parentId ? `${parentId}-` : ''}instruction-group-${groupName}`;
 
 export interface TreeViewItemContent {
   applySearch: boolean;

@@ -61,16 +61,14 @@ type Props = {|
  * Wrap the children with Drag and Drop, Material UI theme and i18n React providers,
  * so that these modules can be used in the children.
  */
-const Providers = (
-  {
-    disableCheckForUpdates,
-    authentication,
-    children,
-    makeEventsFunctionCodeWriter,
-    eventsFunctionsExtensionWriter,
-    eventsFunctionsExtensionOpener
-  }: Props,
-): React.Node => {
+const Providers = ({
+  disableCheckForUpdates,
+  authentication,
+  children,
+  makeEventsFunctionCodeWriter,
+  eventsFunctionsExtensionWriter,
+  eventsFunctionsExtensionOpener,
+}: Props): React.Node => {
   return (
     <DragAndDropContextProvider>
       <UnsavedChangesContextProvider>

@@ -323,7 +323,7 @@ module.exports = [
     "languageCode": "uk_UA",
     "languageName": "Ukrainian",
     "languageNativeName": "Українська",
-    "translationRatio": 0.9904831625183016
+    "translationRatio": 0.9905877431499687
   },
   {
     "languageCode": "ur_PK",

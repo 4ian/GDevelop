@@ -27,8 +27,7 @@ type Props = {|
   timers: ?TimersHashtable,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const TimersInspector = (props: Props) => (
+const TimersInspector = (props: Props): React.Node => (
   <ReactJsonView
     collapsed={false}
     name={false}

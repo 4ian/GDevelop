@@ -2,16 +2,16 @@
 
 type Props = {| useCumulatedValue: boolean |};
 
-// $FlowFixMe[signature-verification-failure]
-export const useSoftKeyboardBottomOffset = (props?: Props) => {
+export const useSoftKeyboardBottomOffset = (props?: Props): number => {
   return 0;
 };
 
 /**
  * Helper for avoiding the soft keyboard. See also `.avoid-soft-keyboard`.
  */
-// $FlowFixMe[signature-verification-failure]
-export const getAvoidSoftKeyboardStyle = (softKeyboardBottomOffset: number) => {
+export const getAvoidSoftKeyboardStyle = (
+  softKeyboardBottomOffset: number
+): { transform: string, transition: string, willChange: string } => {
   return {
     transform: `translateY(0px)`,
     transition: 'transform 0.2s linear',

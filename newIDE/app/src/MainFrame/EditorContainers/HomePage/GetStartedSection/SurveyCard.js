@@ -15,8 +15,7 @@ type Props = {|
 export const SurveyCard = ({
   onStartSurvey,
   hasFilledSurveyAlready,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   return (
     <CalloutCard
       renderImage={style => (

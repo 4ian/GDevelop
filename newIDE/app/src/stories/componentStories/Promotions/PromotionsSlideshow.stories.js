@@ -17,8 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => {
+export const Default = (): React.Node => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -35,8 +34,7 @@ export const Default = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const ErrorLoadingPromotions = () => {
+export const ErrorLoadingPromotions = (): React.Node => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -53,8 +51,7 @@ export const ErrorLoadingPromotions = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const LoadingPromotions = () => {
+export const LoadingPromotions = (): React.Node => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -71,8 +68,7 @@ export const LoadingPromotions = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const OnlyGame = () => {
+export const OnlyGame = (): React.Node => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -89,8 +85,7 @@ export const OnlyGame = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const OnlyAssetPack = () => {
+export const OnlyAssetPack = (): React.Node => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{

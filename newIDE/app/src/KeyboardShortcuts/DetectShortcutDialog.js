@@ -20,8 +20,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const DetectShortcutDialog = (props: Props) => {
+const DetectShortcutDialog = (props: Props): React.Node => {
   const [shortcutString, setShortcutString] = React.useState('');
   const [isValid, setIsValid] = React.useState(false);
 

@@ -18,8 +18,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Layer = () => (
+export const Layer = (): React.Node => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (
@@ -42,8 +41,7 @@ export const Layer = () => (
   </DragAndDropContextProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const LightingLayer = () => (
+export const LightingLayer = (): React.Node => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (

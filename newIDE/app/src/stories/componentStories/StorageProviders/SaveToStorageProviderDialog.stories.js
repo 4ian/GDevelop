@@ -20,8 +20,7 @@ export default {
   component: SaveToStorageProviderDialog,
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const UserNotAuthenticated = () => (
+export const UserNotAuthenticated = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <SaveToStorageProviderDialog
       storageProviders={[
@@ -35,8 +34,7 @@ export const UserNotAuthenticated = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const UserAuthenticatedWithEnoughStorage = () => (
+export const UserAuthenticatedWithEnoughStorage = (): React.Node => (
   <AuthenticatedUserContext.Provider
     value={fakeAuthenticatedUserWithEmailVerified}
   >
@@ -52,8 +50,7 @@ export const UserAuthenticatedWithEnoughStorage = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const UserAuthenticatedWithNotEnoughStorage = () => (
+export const UserAuthenticatedWithNotEnoughStorage = (): React.Node => (
   <AuthenticatedUserContext.Provider
     value={{
       ...fakeAuthenticatedUserWithEmailVerified,

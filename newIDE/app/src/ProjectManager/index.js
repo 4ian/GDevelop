@@ -87,8 +87,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 
 const electron = optionalRequire('electron');
 
-// $FlowFixMe[signature-verification-failure]
-export const getProjectManagerItemId = (identifier: string) =>
+export const getProjectManagerItemId = (identifier: string): string =>
   `project-manager-tab-${identifier}`;
 
 const gameSettingsRootFolderId = getProjectManagerItemId('game-settings');
@@ -96,16 +95,14 @@ const gamePropertiesItemId = getProjectManagerItemId('game-properties');
 const gameDashboardItemId = 'manage';
 const globalVariablesItemId = getProjectManagerItemId('global-variables');
 const gameResourcesItemId = getProjectManagerItemId('game-resources');
-// $FlowFixMe[signature-verification-failure]
-export const scenesRootFolderId = getProjectManagerItemId('scenes');
-// $FlowFixMe[signature-verification-failure]
-export const extensionsRootFolderId = getProjectManagerItemId('extensions');
-// $FlowFixMe[signature-verification-failure]
-export const externalEventsRootFolderId = getProjectManagerItemId(
+export const scenesRootFolderId: string = getProjectManagerItemId('scenes');
+export const extensionsRootFolderId: string = getProjectManagerItemId(
+  'extensions'
+);
+export const externalEventsRootFolderId: string = getProjectManagerItemId(
   'external-events'
 );
-// $FlowFixMe[signature-verification-failure]
-export const externalLayoutsRootFolderId = getProjectManagerItemId(
+export const externalLayoutsRootFolderId: string = getProjectManagerItemId(
   'external-layout'
 );
 
@@ -161,7 +158,6 @@ export type TreeItemProps = {|
   forceUpdateList: () => void,
   unsavedChanges?: ?UnsavedChanges,
   preferences: Preferences,
-  // $FlowFixMe[value-as-type]
   gdevelopTheme: GDevelopTheme,
   project: gdProject,
   editName: (itemId: string) => void,
@@ -747,6 +743,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           onOpenEventsFunctionsExtension(name);
           return;
         }
+        // $FlowFixMe[incompatible-type]
         setOpenedExtensionShortHeader(extensionShortHeader);
         // $FlowFixMe[incompatible-type]
         setOpenedExtensionName(name);
@@ -1317,7 +1314,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const [
       selectedMainMenuItemIndices,
       setSelectedMainMenuItemIndices,
-    // $FlowFixMe[missing-empty-array-annot]
+      // $FlowFixMe[missing-empty-array-annot]
     ] = React.useState([]);
     const isNavigatingInMainMenuItem = selectedMainMenuItemIndices.length > 0;
     const shouldHideMainMenu = isMacLike() && !!electron;
@@ -1566,11 +1563,11 @@ const MemoizedProjectManager = React.memo<Props, ProjectManagerInterface>(
   arePropsEqual
 );
 
-// $FlowFixMe[signature-verification-failure]
-const ProjectManagerWithErrorBoundary = React.forwardRef<
-  Props,
-  ProjectManagerInterface
->((props, outerRef) => {
+// $FlowFixMe[prop-missing]
+const ProjectManagerWithErrorBoundary: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<ProjectManagerInterface> },
+  React.RefSetter<ProjectManagerInterface>
+> = React.forwardRef<Props, ProjectManagerInterface>((props, outerRef) => {
   const projectManagerRef = React.useRef<?ProjectManagerInterface>(null);
   const shouldAutofocusInput = useShouldAutofocusInput();
 

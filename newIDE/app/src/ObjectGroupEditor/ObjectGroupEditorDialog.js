@@ -49,8 +49,7 @@ const ObjectGroupEditorDialog = ({
   onComputeAllVariableNames,
   isVariableListLocked,
   isObjectListLocked,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [
     editedObjectGroup,
     setEditedObjectGroup,

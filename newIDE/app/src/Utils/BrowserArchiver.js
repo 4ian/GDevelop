@@ -53,7 +53,7 @@ export const downloadUrlFilesToBlobFiles = async ({
 |}): Promise<Array<BlobFileDescriptor>> => {
   const downloadedBlobs: Array<
     ItemResult<UrlFileDescriptor>
-  // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type]
   > = await downloadUrlsToBlobs({
     urlContainers: urlFiles.filter(({ url }) => url.indexOf('.h') === -1), // Should be useless now, still keep it by safety.
     onProgress,

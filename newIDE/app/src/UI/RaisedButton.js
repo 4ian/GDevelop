@@ -37,8 +37,11 @@ export type RaisedButtonProps = {|
 /**
  * A raised button based on Material-UI button.
  */
-// $FlowFixMe[signature-verification-failure]
-const RaisedButton = React.forwardRef<RaisedButtonProps, ButtonInterface>(
+// $FlowFixMe[prop-missing]
+const RaisedButton: React.AbstractComponent<
+  { ...RaisedButtonProps, +ref?: React.RefSetter<ButtonInterface> },
+  React.RefSetter<ButtonInterface>
+> = React.forwardRef<RaisedButtonProps, ButtonInterface>(
   (
     {
       label,

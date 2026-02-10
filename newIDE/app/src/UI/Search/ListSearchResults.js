@@ -41,9 +41,7 @@ export const ListSearchResults = <SearchItem>({
   renderSearchItem,
   error,
   onRetry,
-// $FlowFixMe[signature-verification-failure]
-// $FlowFixMe[missing-local-annot]
-}: Props<SearchItem>) => {
+}: Props<SearchItem>): any => {
   // $FlowFixMe[value-as-type]
   const grid = React.useRef<?Grid>(null);
 

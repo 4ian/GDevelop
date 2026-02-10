@@ -32,8 +32,10 @@ type Props = {|
   onSelectCode?: (code: string) => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const RedemptionCodesDialog = ({ onClose, onSelectCode }: Props) => {
+const RedemptionCodesDialog = ({
+  onClose,
+  onSelectCode,
+}: Props): null | React.Node => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );

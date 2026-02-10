@@ -48,8 +48,7 @@ export const filterEditableWithEventTextDialog = (
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-const EventTextDialog = (props: Props) => {
+const EventTextDialog = (props: Props): React.Node => {
   const { event, onClose } = props;
 
   const [textValue, setTextValue] = React.useState<string>('');

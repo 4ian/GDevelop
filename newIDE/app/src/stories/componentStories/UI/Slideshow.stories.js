@@ -39,8 +39,7 @@ const items = [
   },
 ];
 
-// $FlowFixMe[signature-verification-failure]
-export const Loading = () => {
+export const Loading = (): React.Node => {
   return (
     <Slideshow
       items={null}
@@ -50,8 +49,7 @@ export const Loading = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Loaded = () => {
+export const Loaded = (): React.Node => {
   return (
     <Slideshow
       items={items}
@@ -61,8 +59,7 @@ export const Loaded = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithOnly1Item = () => {
+export const WithOnly1Item = (): React.Node => {
   return (
     <Slideshow
       items={[items[0]]}

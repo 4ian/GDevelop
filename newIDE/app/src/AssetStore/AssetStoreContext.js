@@ -132,8 +132,7 @@ export const initialAssetStoreState: AssetStoreState = {
   getAssetShortHeaderFromId: (id: string) => null,
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const AssetStoreContext = React.createContext<AssetStoreState>(
+export const AssetStoreContext: React.Context<AssetStoreState> = React.createContext<AssetStoreState>(
   initialAssetStoreState
 );
 
@@ -160,8 +159,7 @@ const getPrivateAssetPackListingDataSearchTerms = (
 
 export const AssetStoreStateProvider = ({
   children,
-// $FlowFixMe[signature-verification-failure]
-}: AssetStoreStateProviderProps) => {
+}: AssetStoreStateProviderProps): React.MixedElement => {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const { searchText } = shopNavigationState;
 
@@ -336,6 +334,7 @@ export const AssetStoreStateProvider = ({
       }
       if (receivedAssetShortHeaders) {
         receivedAssetShortHeaders.forEach(assetShortHeader => {
+          // $FlowFixMe[prop-missing]
           assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
         });
       }

@@ -11,5 +11,6 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => <EmptyEditor renderObjectNameField={() => null} />;
+export const Default = (): React.Node => (
+  <EmptyEditor renderObjectNameField={() => null} />
+);

@@ -46,8 +46,7 @@ export const AssetCard = ({
   assetShortHeader,
   size,
   hideShortDescription,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.MixedElement => {
   const displayShortDescription =
     !hideShortDescription && !!assetShortHeader.shortDescription;
 

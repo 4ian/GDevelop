@@ -128,8 +128,7 @@ export const DebuggerConsole = ({
   logsManager,
 }: {
   logsManager: LogsManager,
-// $FlowFixMe[signature-verification-failure]
-}) => {
+}): React.Node => {
   const forceUpdate = useForceUpdate();
 
   const { logs, groups } = logsManager;

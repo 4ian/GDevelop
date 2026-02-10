@@ -41,9 +41,7 @@ export default class RenderedUnknownInstance extends RenderedInstance {
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  ) {
+  ): any {
     return 'res/unknown32.png';
   }
 

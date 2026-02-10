@@ -21,8 +21,11 @@ export const fetchRelativeResourcesToFullUrls = async ({
   project,
   fileMetadata,
   onProgress,
-// $FlowFixMe[signature-verification-failure]
-}: Options) => {
+}: Options):
+  | Promise<{ erroredResources: Array<empty> }>
+  | Promise<{
+      erroredResources: Array<{ error: any, resourceName: string }>,
+    }> => {
   const resourcesManager = project.getResourcesManager();
   const allResourceNames = resourcesManager.getAllResourceNames().toJSArray();
   const erroredResources = [];

@@ -46,8 +46,7 @@ const BundlePurchaseDialog = ({
   simulateAppStoreProduct,
   fastCheckout,
   onCloseAfterPurchaseDone,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const {
     profile,
     onOpenLoginDialog,

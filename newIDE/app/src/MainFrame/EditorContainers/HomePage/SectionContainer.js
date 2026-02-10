@@ -73,8 +73,11 @@ type Props = {|
   showUrgentAnnouncements?: boolean,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const SectionContainer = React.forwardRef<Props, HTMLDivElement>(
+// $FlowFixMe[prop-missing]
+const SectionContainer: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<HTMLDivElement> },
+  React.RefSetter<HTMLDivElement>
+> = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       children,
@@ -207,8 +210,7 @@ export const SectionRow = ({
 }: {
   children: React.Node,
   expand?: boolean,
-// $FlowFixMe[signature-verification-failure]
-}) => (
+}): React.MixedElement => (
   <div
     style={{ ...styles.rowContainer, ...(expand ? { flex: 1 } : undefined) }}
   >

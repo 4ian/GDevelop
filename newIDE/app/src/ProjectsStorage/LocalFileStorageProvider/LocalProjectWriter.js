@@ -234,8 +234,14 @@ export const generateOnChooseSaveProjectAsLocation = ({
 }: {
   setDialog: (() => React.Node) => void,
   closeDialog: () => void,
-// $FlowFixMe[signature-verification-failure]
-}) => async ({
+}): (({
+  displayOptionToGenerateNewProjectUuid: boolean,
+  fileMetadata: ?FileMetadata,
+  project: gdProject,
+}) => Promise<{
+  saveAsLocation: ?SaveAsLocation,
+  saveAsOptions: ?SaveAsOptions,
+}>) => async ({
   project,
   fileMetadata,
   displayOptionToGenerateNewProjectUuid,
@@ -416,8 +422,7 @@ export const renderNewProjectSaveAsLocationChooser = ({
   saveAsLocation: ?SaveAsLocation,
   setSaveAsLocation: (?SaveAsLocation) => void,
   newProjectsDefaultFolder?: string,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): React.Node => {
   const projectLocation = getProjectLocation({
     projectName,
     saveAsLocation,
@@ -464,8 +469,7 @@ export const canFileMetadataBeSafelySaved = async (
     showAlert: ShowAlertFunction,
     showConfirmation: ShowConfirmFunction,
   |}
-// $FlowFixMe[signature-verification-failure]
-) => {
+): Promise<boolean> => {
   const path = fileMetadata.fileIdentifier;
   if (isTryingToSaveInForbiddenPath(path)) {
     await actions.showAlert({
@@ -484,8 +488,7 @@ export const canFileMetadataBeSafelySavedAs = async (
     showAlert: ShowAlertFunction,
     showConfirmation: ShowConfirmFunction,
   |}
-// $FlowFixMe[signature-verification-failure]
-) => {
+): Promise<boolean> => {
   const path = fileMetadata.fileIdentifier;
   if (isTryingToSaveInForbiddenPath(path)) {
     await actions.showAlert({

@@ -93,8 +93,7 @@ const HomePageMenuBar = ({
   onOpenPreferences,
   onOpenAbout,
   onOpenHomePageMenuDrawer,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();
   const isMobileOrSmallScreen = isMobile || isMediumScreen;
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

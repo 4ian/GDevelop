@@ -55,8 +55,7 @@ export const EducationCurriculum = ({
   isLocked,
   onClickSubscribe,
   renderInterstitialCallout,
-// $FlowFixMe[signature-verification-failure]
-}: EducationCurriculumProps) => {
+}: EducationCurriculumProps): React.MixedElement => {
   const listItems: React.Node[] = React.useMemo(
     () => {
       const items = [];
@@ -155,8 +154,7 @@ const TutorialsCategoryPage = ({
   onBack,
   onOpenTemplateFromTutorial,
   onSelectCourse,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { listedCourses } = React.useContext(CourseStoreContext);
   const { limits } = React.useContext(AuthenticatedUserContext);
   const { tutorials } = React.useContext(TutorialContext);

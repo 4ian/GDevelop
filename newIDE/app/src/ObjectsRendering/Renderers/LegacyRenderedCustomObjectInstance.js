@@ -206,9 +206,7 @@ export default class LegacyRenderedCustomObjectInstance
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  ) {
+  ): any {
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       objectConfiguration
     );
@@ -330,25 +328,19 @@ export default class LegacyRenderedCustomObjectInstance
     }
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getDefaultWidth() {
+  getDefaultWidth(): any {
     return this.childrenRenderedInstances.length > 0
       ? this.childrenRenderedInstances[0].getDefaultWidth()
       : 48;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getDefaultHeight() {
+  getDefaultHeight(): any {
     return this.childrenRenderedInstances.length > 0
       ? this.childrenRenderedInstances[0].getDefaultHeight()
       : 48;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getDefaultDepth() {
+  getDefaultDepth(): any {
     const firstInstance = this.childrenRenderedInstances[0];
     return firstInstance && firstInstance instanceof Rendered3DInstance
       ? firstInstance.getDefaultDepth()
@@ -397,21 +389,15 @@ export default class LegacyRenderedCustomObjectInstance
     return this._proportionalOriginZ * this.getDepth();
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getCenterX() {
+  getCenterX(): any {
     return this.getWidth() / 2;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getCenterY() {
+  getCenterY(): any {
     return this.getHeight() / 2;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getCenterZ() {
+  getCenterZ(): any {
     return this.getDepth() / 2;
   }
 }

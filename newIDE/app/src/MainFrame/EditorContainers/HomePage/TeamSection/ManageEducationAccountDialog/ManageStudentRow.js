@@ -65,8 +65,7 @@ const ManageStudentRow = ({
   onSelect,
   onChangePassword,
   onEdit,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const [isEditingPassword, setIsEditingPassword] = React.useState<boolean>(
     false

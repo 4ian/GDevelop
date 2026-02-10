@@ -57,8 +57,7 @@ const ObjectsRenderingService = {
   getThumbnail: function(
     project: gdProject,
     objectConfiguration: gdObjectConfiguration
-  // $FlowFixMe[signature-verification-failure]
-  ) {
+  ): any {
     const objectType = objectConfiguration.getType();
     if (this.renderers.hasOwnProperty(objectType))
       return this.renderers[objectType].getThumbnail(
@@ -211,8 +210,7 @@ const ObjectsRenderingService = {
 
     this.renderers3D[objectType] = renderer;
   },
-  // $FlowFixMe[signature-verification-failure]
-  renderersCacheClearingMethods: [],
+  renderersCacheClearingMethods: ([]: Array<empty>),
   // $FlowFixMe[missing-this-annot]
   registerClearCache: function(clearCache: (project: gdProject) => void) {
     this.renderersCacheClearingMethods.push(clearCache);

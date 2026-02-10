@@ -26,8 +26,7 @@ export default {
   component: NewBehaviorDialog,
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const DefaultForSpriteObject = () => {
+export const DefaultForSpriteObject = (): React.Node => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -87,12 +86,12 @@ export const DefaultForSpriteObject = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithCommunityExtensions = () => {
+export const WithCommunityExtensions = (): React.Node => {
   const [
     showExperimentalExtensions,
     setShowExperimentalExtensions,
   ] = React.useState(true);
+  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
     // $FlowFixMe[incompatible-type]
@@ -163,8 +162,7 @@ export const WithCommunityExtensions = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithServerSideErrors = () => {
+export const WithServerSideErrors = (): React.Node => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,

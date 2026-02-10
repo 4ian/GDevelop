@@ -77,8 +77,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const ExtensionExporterDialog = (props: Props) => {
+const ExtensionExporterDialog = (props: Props): React.Node => {
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );

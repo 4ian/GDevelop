@@ -160,8 +160,7 @@ export const RangeFilter = ({
   setRange,
   valueLabelFormat,
   marks,
-// $FlowFixMe[signature-verification-failure]
-}: RangeFilterProps) => {
+}: RangeFilterProps): React.Node => {
   return (
     <Accordion key={filterKey} defaultExpanded>
       <AccordionHeader>
@@ -226,8 +225,7 @@ export const AssetStoreFilterPanel = ({
   assetSwappedObject,
 }: {
   assetSwappedObject?: ?gdObject,
-// $FlowFixMe[signature-verification-failure]
-}) => {
+}): React.Node => {
   const {
     assetFiltersState,
     assetPackFiltersState,

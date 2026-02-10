@@ -45,8 +45,7 @@ const VerticalTabButton = ({
   isActive,
   hideLabel,
   id,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   return (
     <Button
       variant={isActive ? 'contained' : 'text'}

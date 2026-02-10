@@ -15,8 +15,7 @@ const Form = ({
   name,
   children,
   fullWidth,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.MixedElement => {
   return (
     <form
       onSubmit={event => {

@@ -40,8 +40,7 @@ export const HomePageHeader = ({
   onOpenLanguageDialog,
   onSave,
   canSave,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const { profile } = React.useContext(AuthenticatedUserContext);
 

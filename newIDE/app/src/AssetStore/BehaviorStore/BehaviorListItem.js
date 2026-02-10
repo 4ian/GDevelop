@@ -54,8 +54,7 @@ export const BehaviorListItem = ({
   onShowDetails,
   onHeightComputed,
   platform,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const alreadyAdded = objectBehaviorsTypes.includes(behaviorShortHeader.type);

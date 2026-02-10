@@ -60,8 +60,7 @@ const DirectionTools = ({
   resourceExternalEditors,
   onEditWith,
   onDirectionUpdated,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const [previewOpen, setPreviewOpen] = React.useState(false);
   const currentTimeBetweenFrames = direction.getTimeBetweenFrames();

@@ -28,8 +28,7 @@ const GlobalAndSceneVariablesDialog = ({
   initiallySelectedVariableName,
   shouldCreateInitiallySelectedVariable,
   isListLocked,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const {
     project,
     layout,

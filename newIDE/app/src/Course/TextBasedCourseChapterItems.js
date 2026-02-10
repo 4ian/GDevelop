@@ -52,8 +52,7 @@ const TextBasedCourseChapterItems = ({
   items,
   onCompleteTask,
   isTaskCompleted,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   // $FlowFixMe[incompatible-type] - map does not recognize time of items.

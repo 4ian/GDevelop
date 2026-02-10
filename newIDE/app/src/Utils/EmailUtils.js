@@ -1,4 +1,3 @@
 // @flow
 
-// $FlowFixMe[signature-verification-failure]
-export const emailRegex = /^(.+)@(.+)$/;
+export const emailRegex: RegExp = /^(.+)@(.+)$/;

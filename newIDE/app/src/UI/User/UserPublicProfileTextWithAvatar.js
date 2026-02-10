@@ -19,8 +19,7 @@ export const UserPublicProfileTextWithAvatar = ({
   user,
   avatarSize,
   expand,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { openUserPublicProfile } = React.useContext(PublicProfileContext);
 
   return (

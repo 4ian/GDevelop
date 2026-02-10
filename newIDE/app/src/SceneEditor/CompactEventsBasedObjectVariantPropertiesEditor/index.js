@@ -42,8 +42,7 @@ export const CompactEventsBasedObjectVariantPropertiesEditor = ({
   eventsBasedObjectVariant,
   getContentAABB,
   onEventsBasedObjectChildrenEdited,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
 
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);

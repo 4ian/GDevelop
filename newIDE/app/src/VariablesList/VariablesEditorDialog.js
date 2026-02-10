@@ -75,8 +75,7 @@ const VariablesEditorDialog = ({
   objectName,
   initialInstances,
   isListLocked,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const serializableObjects = React.useMemo(
     () =>
       new Map(

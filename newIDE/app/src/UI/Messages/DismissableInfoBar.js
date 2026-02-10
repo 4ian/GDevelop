@@ -21,8 +21,7 @@ const DismissableInfoBar = ({
   show,
   touchScreenMessage,
   message,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): null | React.Node => {
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
   );

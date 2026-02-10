@@ -38,103 +38,79 @@ export const resourcesKindSupportedByResourceStore = ['audio', 'font'];
 export const allResourceKindsAndMetadata = [
   {
     kind: 'audio',
-    // $FlowFixMe[signature-verification-failure]
-    displayName: t`Audio`,
+    displayName: (t`Audio`: any),
     fileExtensions: ['aac', 'wav', 'mp3', 'ogg'],
-    // $FlowFixMe[signature-verification-failure]
-    createNewResource: () => new gd.AudioResource(),
+    createNewResource: (): gdAudioResource => new gd.AudioResource(),
   },
   {
     kind: 'image',
-    // $FlowFixMe[signature-verification-failure]
-    displayName: t`Image`,
+    displayName: (t`Image`: any),
     fileExtensions: ['png', 'jpg', 'jpeg', 'webp'],
-    // $FlowFixMe[signature-verification-failure]
-    createNewResource: () => new gd.ImageResource(),
+    createNewResource: (): gdImageResource => new gd.ImageResource(),
   },
   {
     kind: 'font',
-    // $FlowFixMe[signature-verification-failure]
-    displayName: t`Font`,
+    displayName: (t`Font`: any),
     fileExtensions: ['ttf', 'otf'],
-    // $FlowFixMe[signature-verification-failure]
-    createNewResource: () => new gd.FontResource(),
+    createNewResource: (): gdFontResource => new gd.FontResource(),
   },
   {
     kind: 'video',
-    // $FlowFixMe[signature-verification-failure]
-    displayName: t`Video`,
+    displayName: (t`Video`: any),
     fileExtensions: ['mp4', 'webm'],
-    // $FlowFixMe[signature-verification-failure]
-    createNewResource: () => new gd.VideoResource(),
+    createNewResource: (): gdVideoResource => new gd.VideoResource(),
   },
   {
     kind: 'json',
-    // $FlowFixMe[signature-verification-failure]
-    displayName: t`Json`,
+    displayName: (t`Json`: any),
     fileExtensions: ['json'],
-    // $FlowFixMe[signature-verification-failure]
-    createNewResource: () => {
+    createNewResource: (): gdJsonResource => {
       return new gd.JsonResource();
     },
   },
   {
     kind: 'tilemap',
-    // $FlowFixMe[signature-verification-failure]
-    displayName: t`Tile Map`,
+    displayName: (t`Tile Map`: any),
     fileExtensions: ['json', 'ldtk', 'tmj'],
-    // $FlowFixMe[signature-verification-failure]
-    createNewResource: () => new gd.TilemapResource(),
+    createNewResource: (): gdTilemapResource => new gd.TilemapResource(),
   },
   {
     kind: 'tileset',
-    // $FlowFixMe[signature-verification-failure]
-    displayName: t`Tile Set`,
+    displayName: (t`Tile Set`: any),
     fileExtensions: ['json', 'tsj'],
-    // $FlowFixMe[signature-verification-failure]
-    createNewResource: () => new gd.TilesetResource(),
+    createNewResource: (): gdTilesetResource => new gd.TilesetResource(),
   },
   {
     kind: 'bitmapFont',
-    // $FlowFixMe[signature-verification-failure]
-    displayName: t`Bitmap Font`,
+    displayName: (t`Bitmap Font`: any),
     fileExtensions: ['fnt', 'xml'],
-    // $FlowFixMe[signature-verification-failure]
-    createNewResource: () => new gd.BitmapFontResource(),
+    createNewResource: (): gdBitmapFontResource => new gd.BitmapFontResource(),
   },
   {
     kind: 'model3D',
-    // $FlowFixMe[signature-verification-failure]
-    displayName: t`3D model`,
+    displayName: (t`3D model`: any),
     fileExtensions: ['glb'],
-    // $FlowFixMe[signature-verification-failure]
-    createNewResource: () => new gd.Model3DResource(),
+    createNewResource: (): gdModel3DResource => new gd.Model3DResource(),
   },
   {
     kind: 'atlas',
-    // $FlowFixMe[signature-verification-failure]
-    displayName: t`Atlas`,
+    displayName: (t`Atlas`: any),
     fileExtensions: ['atlas'],
-    // $FlowFixMe[signature-verification-failure]
-    createNewResource: () => new gd.AtlasResource(),
+    createNewResource: (): gdAtlasResource => new gd.AtlasResource(),
   },
   {
     kind: 'spine',
-    // $FlowFixMe[signature-verification-failure]
-    displayName: t`Spine Json`,
+    displayName: (t`Spine Json`: any),
     fileExtensions: ['json'],
-    // $FlowFixMe[signature-verification-failure]
-    createNewResource: () => {
+    createNewResource: (): gdSpineResource => {
       return new gd.SpineResource();
     },
   },
   {
     kind: 'javascript',
-    // $FlowFixMe[signature-verification-failure]
-    displayName: t`JavaScript file`,
+    displayName: (t`JavaScript file`: any),
     fileExtensions: ['js'],
-    // $FlowFixMe[signature-verification-failure]
-    createNewResource: () => {
+    createNewResource: (): gdJavaScriptResource => {
       return new gd.JavaScriptResource();
     },
   },

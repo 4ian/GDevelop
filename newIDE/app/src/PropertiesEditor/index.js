@@ -178,8 +178,6 @@ const getFieldLabel = ({
   return field.name;
 };
 
-// $FlowFixMe[recursive-definition]
-// $FlowFixMe[definition-cycle]
 const PropertiesEditor = ({
   onInstancesModified,
   instances,
@@ -190,8 +188,7 @@ const PropertiesEditor = ({
   project,
   projectScopedContainersAccessor,
   resourceManagementProps,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
 
   const _onInstancesModified = React.useCallback(

@@ -40,8 +40,7 @@ const Card = ({
   isHighlighted,
   disabled,
   padding,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const cardContentStyle: {|

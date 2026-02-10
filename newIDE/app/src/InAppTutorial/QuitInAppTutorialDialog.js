@@ -22,8 +22,7 @@ const QuitInAppTutorialDialog = ({
   endTutorial,
   onClose,
   isSavingProject,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [hasUserInteracted, setHasUserInteracted] = React.useState<boolean>(
     false
   );

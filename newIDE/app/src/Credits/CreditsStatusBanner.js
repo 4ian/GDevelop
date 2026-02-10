@@ -27,8 +27,7 @@ const CreditsStatusBanner = ({
   displayPurchaseAction,
   actionButtonLabel,
   onActionButtonClick,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): null | React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { limits, onRefreshLimits } = React.useContext(
     AuthenticatedUserContext

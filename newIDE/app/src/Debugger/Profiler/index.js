@@ -25,9 +25,7 @@ type Props = {|
 |};
 
 export default class Profiler extends React.Component<Props, void> {
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const { onStart, onStop, profilerOutput, profilingInProgress } = this.props;
 
     return (

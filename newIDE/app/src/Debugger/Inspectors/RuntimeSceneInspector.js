@@ -108,9 +108,7 @@ export default class RuntimeSceneInspector extends React.Component<
     newObjectName: '',
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const { runtimeScene, onCall } = this.props;
     if (!runtimeScene) return null;
 

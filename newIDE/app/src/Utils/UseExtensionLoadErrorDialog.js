@@ -35,8 +35,7 @@ export const ExtensionLoadErrorDialog = ({
   erroredExtensionLoadingResults,
   genericError,
   onClose,
-// $FlowFixMe[signature-verification-failure]
-}: ExtensionLoadErrorDialogProps) => {
+}: ExtensionLoadErrorDialogProps): React.Node => {
   return (
     <Dialog
       title={

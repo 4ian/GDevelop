@@ -76,7 +76,6 @@ const useStylesForIconButton = ({
   selected,
   disableHover,
 }: {|
-  // $FlowFixMe[value-as-type]
   theme: GDevelopTheme,
   selected?: boolean,
   disableHover?: boolean,
@@ -99,8 +98,11 @@ const useStylesForIconButton = ({
  * Supports displaying a tooltip.
  */
 
-// $FlowFixMe[signature-verification-failure]
-const IconButton = React.forwardRef<Props, {||}>((props: Props, ref) => {
+// $FlowFixMe[prop-missing]
+const IconButton: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<{}> },
+  React.RefSetter<{}>
+> = React.forwardRef<Props, {||}>((props: Props, ref) => {
   const {
     selected,
     tooltip,

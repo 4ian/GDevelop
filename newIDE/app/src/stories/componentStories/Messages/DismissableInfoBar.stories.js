@@ -12,8 +12,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => {
+export const Default = (): React.Node => {
   return (
     <FixedHeightFlexContainer height={600}>
       <DismissableInfoBar

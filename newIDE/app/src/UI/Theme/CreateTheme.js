@@ -37,8 +37,7 @@ export function getMuiOverrides({
   snackbarBackgroundColor: string,
   snackbarBorderColor: string,
   textDefaultColor: string,
-// $FlowFixMe[signature-verification-failure]
-|}) {
+|}): any {
   return {
     MuiTypography: {
       h1: {
@@ -454,8 +453,7 @@ export function createGdevelopTheme({
   rootClassNameIdentifier: string,
   paletteType: string,
   gdevelopIconsCSSFilter: ?string,
-// $FlowFixMe[signature-verification-failure]
-}) {
+}): any {
   return {
     gdevelopTheme: {
       palette: {

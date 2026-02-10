@@ -17,9 +17,7 @@ type Props = {|
 |};
 
 export default class BehaviorSharedPropertiesEditor extends React.Component<Props> {
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const { behaviorSharedData } = this.props;
 
     const propertiesSchema = propertiesMapToSchema({

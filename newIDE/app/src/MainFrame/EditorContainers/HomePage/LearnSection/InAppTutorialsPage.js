@@ -16,8 +16,10 @@ type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const InAppTutorialsPage = ({ onBack, selectInAppTutorial }: Props) => {
+const InAppTutorialsPage = ({
+  onBack,
+  selectInAppTutorial,
+}: Props): React.Node => {
   const {
     values: { showInAppTutorialDeveloperMode },
   } = React.useContext(PreferencesContext);

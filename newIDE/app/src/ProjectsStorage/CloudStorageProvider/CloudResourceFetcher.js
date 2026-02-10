@@ -30,10 +30,10 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async ({
 }: {|
   project: gdProject,
   fileMetadata: FileMetadata,
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   onProgress: (number, number) => void,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): Promise<{ erroredResources: Array<empty> }> => {
   const result = {
     erroredResources: [],
   };
@@ -110,7 +110,7 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async ({
   // Download all the project resources as blob (much like what is done during an export).
   const downloadedBlobsAndResourcesToUpload: Array<
     ItemResult<ResourceToFetchAndUpload>
-  // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type]
   > = await downloadUrlsToBlobs({
     urlContainers: resourcesToFetchAndUpload,
     onProgress: (count, total) => {

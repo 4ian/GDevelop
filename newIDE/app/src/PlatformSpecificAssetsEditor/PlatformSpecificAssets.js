@@ -305,8 +305,7 @@ const PlatformSpecificAssets = ({
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-const PlatformSpecificAssetsWithErrorBoundary = (props: Props) => (
+const PlatformSpecificAssetsWithErrorBoundary = (props: Props): React.Node => (
   <ErrorBoundary
     componentTitle={<Trans>Project icons</Trans>}
     scope="project-icons"

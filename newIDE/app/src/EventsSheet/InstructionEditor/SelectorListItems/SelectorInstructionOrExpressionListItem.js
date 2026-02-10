@@ -23,8 +23,7 @@ export const renderInstructionOrExpressionListItem = ({
   onClick,
   selectedValue,
   matches,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const getRenderedText = (field: 'displayedName' | 'fullGroupName') => {
     let text = instructionOrExpressionMetadata[field];
     if (matches && matches.length) {

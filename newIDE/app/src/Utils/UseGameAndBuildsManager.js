@@ -31,8 +31,12 @@ export const getDefaultRegisterGameProperties = ({
   projectName: ?string,
   projectAuthor: ?string,
   savedStatus: SavedStatus,
-// $FlowFixMe[signature-verification-failure]
-|}) => ({
+|}): {
+  authorName: string,
+  gameId: string,
+  gameName: string,
+  savedStatus: SavedStatus,
+} => ({
   gameId: projectId,
   authorName: projectAuthor || 'Unspecified publisher',
   gameName: projectName || 'Untitled game',

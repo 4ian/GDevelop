@@ -42,8 +42,7 @@ export const EventsFunctionsExtensionsProvider = ({
   makeEventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [
     eventsFunctionsExtensionsError,
     setEventsFunctionsExtensionsError,

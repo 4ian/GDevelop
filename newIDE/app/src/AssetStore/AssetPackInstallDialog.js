@@ -69,8 +69,7 @@ const AssetPackInstallDialog = ({
   objectsContainer,
   resourceManagementProps,
   targetObjectFolderOrObjectWithContext,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const missingAssetShortHeaders = assetShortHeaders.filter(
     assetShortHeader => !addedAssetIds.has(assetShortHeader.id)
   );

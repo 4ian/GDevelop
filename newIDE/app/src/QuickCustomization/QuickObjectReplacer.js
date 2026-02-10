@@ -33,8 +33,7 @@ export const QuickObjectReplacer = ({
   resourceManagementProps,
   onWillInstallExtension,
   onExtensionInstalled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [selectedObjectToSwap, setSelectedObjectToSwap] = React.useState(null);
 
   return (

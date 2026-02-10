@@ -84,9 +84,7 @@ export default class GDI18nProvider extends React.Component<Props, State> {
     );
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     // Use language from the state, as it is synchronized with the catalogs,
     // while the language from props is the "target language", and sometime
     // can be a language for which the catalog is not loaded yet (which would

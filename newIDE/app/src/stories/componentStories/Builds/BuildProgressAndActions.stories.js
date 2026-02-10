@@ -20,63 +20,54 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Errored = () => (
+export const Errored = (): React.Node => (
   <BuildProgressAndActions build={erroredCordovaBuild} game={game1} />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const PendingElectronBuild = () => (
+export const PendingElectronBuild = (): React.Node => (
   <BuildProgressAndActions
     build={{ ...pendingElectronBuild, updatedAt: Date.now() }}
     game={game1}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const PendingCordovaBuild = () => (
+export const PendingCordovaBuild = (): React.Node => (
   <BuildProgressAndActions
     build={{ ...pendingCordovaBuild, updatedAt: Date.now() }}
     game={game1}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const SlowPendingCordovaBuild = () => (
+export const SlowPendingCordovaBuild = (): React.Node => (
   <BuildProgressAndActions
     build={{ ...pendingCordovaBuild, updatedAt: Date.now() - 1000 * 400 }}
     game={game1}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const TimedOutPendingCordovaBuild = () => (
+export const TimedOutPendingCordovaBuild = (): React.Node => (
   <BuildProgressAndActions
     build={{ ...pendingCordovaBuild, updatedAt: Date.now() - 1000 * 3600 * 24 }}
     game={game1}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const CompleteCordovaBuild = () => (
+export const CompleteCordovaBuild = (): React.Node => (
   <BuildProgressAndActions build={completeCordovaBuild} game={game1} />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const CompleteElectronBuild = () => (
+export const CompleteElectronBuild = (): React.Node => (
   <BuildProgressAndActions build={completeElectronBuild} game={game1} />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const CompleteUnpublishedWebBuild = () => (
+export const CompleteUnpublishedWebBuild = (): React.Node => (
   <BuildProgressAndActions
     build={completeWebBuild}
     game={{ ...game1, publicWebBuildId: 'other-build-id' }}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const CompletePublishedWebBuild = () => (
+export const CompletePublishedWebBuild = (): React.Node => (
   <BuildProgressAndActions
     build={completeWebBuild}
     game={{ ...game1, publicWebBuildId: completeWebBuild.id }}

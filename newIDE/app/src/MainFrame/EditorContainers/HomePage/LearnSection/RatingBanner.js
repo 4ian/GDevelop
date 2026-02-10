@@ -15,8 +15,10 @@ type Props = {|
   disabled: boolean,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const RatingBanner = ({ onClick, disabled }: Props) => {
+export const RatingBanner = ({
+  onClick,
+  disabled,
+}: Props): React.MixedElement => {
   return (
     <div className={classes.container}>
       <ResponsiveLineStackLayout

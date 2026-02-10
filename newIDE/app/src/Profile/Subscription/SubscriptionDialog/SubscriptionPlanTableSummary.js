@@ -49,8 +49,7 @@ const SubscriptionPlanTableSummary = ({
   displayedFeatures?: Array<string>,
   hideFullTableLink?: boolean,
   actionLabel?: React.Node,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
 

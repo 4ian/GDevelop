@@ -14,8 +14,7 @@ type Props = {|
   onApply: () => Promise<void> | void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const PasswordPromptDialog = (props: Props) => (
+const PasswordPromptDialog = (props: Props): React.Node => (
   <Dialog
     open
     maxWidth="xs"

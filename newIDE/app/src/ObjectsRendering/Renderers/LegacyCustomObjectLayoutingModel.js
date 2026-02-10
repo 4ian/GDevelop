@@ -431,47 +431,33 @@ export class ChildInstance {
     this._hasCustomDepth = false;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getX() {
+  getX(): any {
     return this.x;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getY() {
+  getY(): any {
     return this.y;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getZ() {
+  getZ(): any {
     return this.z;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getAngle() {
+  getAngle(): any {
     return 0;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getRotationX() {
+  getRotationX(): any {
     return 0;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getRotationY() {
+  getRotationY(): any {
     return 0;
   }
 
   setObjectName(name: string) {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getObjectName() {
+  getObjectName(): any {
     return '';
   }
 
@@ -487,65 +473,49 @@ export class ChildInstance {
 
   setRotationY(angle: number) {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  isLocked() {
+  isLocked(): any {
     return false;
   }
 
   setLocked(lock: boolean) {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  isSealed() {
+  isSealed(): any {
     return false;
   }
 
   setSealed(seal: boolean) {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getZOrder() {
+  getZOrder(): any {
     return 0;
   }
 
   setZOrder(zOrder: number) {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getOpacity() {
+  getOpacity(): any {
     return 255;
   }
 
   setOpacity(opacity: number) {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  isFlippedX() {
+  isFlippedX(): any {
     return false;
   }
 
   setFlippedX(flippedX: boolean) {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  isFlippedY() {
+  isFlippedY(): any {
     return false;
   }
 
   setFlippedY(flippedY: boolean) {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  isFlippedZ() {
+  isFlippedZ(): any {
     return false;
   }
 
   setFlippedZ(flippedY: boolean) {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getLayer() {
+  getLayer(): any {
     return '';
   }
 
@@ -555,15 +525,11 @@ export class ChildInstance {
     this._hasCustomSize = enable;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  hasCustomSize() {
+  hasCustomSize(): any {
     return this._hasCustomSize;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  hasCustomDepth() {
+  hasCustomDepth(): any {
     return this._hasCustomDepth;
   }
 
@@ -572,9 +538,7 @@ export class ChildInstance {
     this._hasCustomSize = true;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getCustomWidth() {
+  getCustomWidth(): any {
     return this._customWidth;
   }
 
@@ -583,9 +547,7 @@ export class ChildInstance {
     this._hasCustomSize = true;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getCustomHeight() {
+  getCustomHeight(): any {
     return this._customHeight;
   }
 
@@ -594,15 +556,11 @@ export class ChildInstance {
     this._hasCustomDepth = true;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getCustomDepth() {
+  getCustomDepth(): any {
     return this._customDepth;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  resetPersistentUuid() {
+  resetPersistentUuid(): any {
     return this;
   }
 
@@ -616,21 +574,15 @@ export class ChildInstance {
   getCustomProperties(
     globalObjectsContainer: gdObjectsContainer,
     objectsContainer: gdObjectsContainer
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  ) {
+  ): any {
     return null;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getRawDoubleProperty(name: string) {
+  getRawDoubleProperty(name: string): any {
     return 0;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getRawStringProperty(name: string) {
+  getRawStringProperty(name: string): any {
     return '';
   }
 
@@ -638,9 +590,7 @@ export class ChildInstance {
 
   setRawStringProperty(name: string, value: string) {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getVariables() {
+  getVariables(): any {
     return [];
   }
 

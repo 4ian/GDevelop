@@ -158,16 +158,18 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
   }
 );
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
+export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
   function MainframeToolbar(props: MainFrameToolbarProps, ref) {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const [editorToolbar, setEditorToolbar] = React.useState<?React.Node>(null);
 
-    // $FlowFixMe[incompatible-type]
-    React.useImperativeHandle(ref, () => ({
-      setEditorToolbar,
-    }));
+    React.useImperativeHandle(
+      // $FlowFixMe[incompatible-type]
+      ref,
+      () => ({
+        setEditorToolbar,
+      })
+    );
 
     const borderBottomColor = React.useMemo(
       () => {
@@ -220,4 +222,8 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
       </Toolbar>
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...MainFrameToolbarProps, +ref?: React.RefSetter<ToolbarInterface> },
+  React.RefSetter<ToolbarInterface>
+>);

@@ -330,8 +330,11 @@ export type AiRequestChatInterface = {|
   resetUserInput: (aiRequestId: string | null) => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
+// $FlowFixMe[prop-missing]
+export const AiRequestChat: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<AiRequestChatInterface> },
+  React.RefSetter<AiRequestChatInterface>
+> = React.forwardRef<Props, AiRequestChatInterface>(
   (
     {
       aiConfigurationPresetsWithAvailability,

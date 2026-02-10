@@ -601,9 +601,7 @@ export const PurchaseProductButtons = <
   onClickBuyWithCredits?: () => void | Promise<void>,
   customLabel?: React.Node,
   fullWidth?: boolean,
-// $FlowFixMe[signature-verification-failure]
-// $FlowFixMe[missing-local-annot]
-|}) => {
+|}): any => {
   const { authenticated } = React.useContext(AuthenticatedUserContext);
   const shouldUseOrSimulateAppStoreProduct =
     simulateAppStoreProduct || shouldUseAppStoreProduct();
@@ -705,9 +703,7 @@ export const OpenProductButton = <
   productListingData: T,
   onClick: () => void,
   label: React.Node,
-// $FlowFixMe[signature-verification-failure]
-// $FlowFixMe[missing-local-annot]
-|}) => {
+|}): any => {
   if (
     productListingData.productType === 'GAME_TEMPLATE' &&
     productListingData.includedListableProductIds

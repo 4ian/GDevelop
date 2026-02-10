@@ -26,8 +26,7 @@ const InfoBar = ({
   onActionClick,
   closable,
   duration = 3000,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const screenType = useScreenType();
 
   React.useEffect(

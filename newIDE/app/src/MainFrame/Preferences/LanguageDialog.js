@@ -14,8 +14,7 @@ type Props = {|
   onClose: (options: {| languageDidChange: boolean |}) => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const LanguageDialog = ({ open, onClose }: Props) => {
+const LanguageDialog = ({ open, onClose }: Props): null | React.Node => {
   const { values } = React.useContext(PreferencesContext);
 
   const [languageDidChange, setLanguageDidChange] = React.useState<boolean>(

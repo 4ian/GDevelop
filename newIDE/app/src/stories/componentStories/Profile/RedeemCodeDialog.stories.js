@@ -13,8 +13,7 @@ export default {
   component: RedeemCodeDialog,
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WorkingCode = () => {
+export const WorkingCode = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 100 });
   mock
     .onPost(`${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`)
@@ -32,8 +31,7 @@ export const WorkingCode = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const CodeDoesNotExist = () => {
+export const CodeDoesNotExist = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 100 });
   mock
     .onPost(`${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`)
@@ -51,8 +49,7 @@ export const CodeDoesNotExist = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const UnknownError = () => {
+export const UnknownError = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 100 });
   mock
     .onPost(`${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`)
@@ -70,8 +67,7 @@ export const UnknownError = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const CannotBeRedeemedAnymoreError = () => {
+export const CannotBeRedeemedAnymoreError = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 100 });
   mock
     .onPost(`${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`)
@@ -91,8 +87,7 @@ export const CannotBeRedeemedAnymoreError = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const AlreadyRedeemedByUser = () => {
+export const AlreadyRedeemedByUser = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 100 });
   mock
     .onPost(`${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`)

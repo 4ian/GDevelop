@@ -67,8 +67,7 @@ export default function BehaviorMethodSelectorDialog({
   eventsBasedBehavior,
   onChoose,
   onCancel,
-// $FlowFixMe[signature-verification-failure]
-}: Props) {
+}: Props): React.Node {
   const eventsFunctions = eventsBasedBehavior.getEventsFunctions();
   const [showAdvanced, setShowAdvanced] = React.useState(false);
 

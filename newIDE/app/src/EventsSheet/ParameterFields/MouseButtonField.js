@@ -56,8 +56,7 @@ const isInvalidLiteralMouseButton = (expression: string): boolean => {
       false;
 };
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function MouseButtonField(props, ref) {
     const field = React.useRef<?(
       | GenericExpressionField
@@ -160,14 +159,17 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);
 
 export const renderInlineMouseButton = ({
   value,
   expressionIsValid,
   InvalidParameterValue,
-// $FlowFixMe[signature-verification-failure]
-}: ParameterInlineRendererProps) => {
+}: ParameterInlineRendererProps): string | React.MixedElement => {
   if (!value) {
     return (
       <InvalidParameterValue isEmpty>

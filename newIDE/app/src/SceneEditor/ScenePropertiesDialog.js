@@ -57,8 +57,7 @@ const ScenePropertiesDialog = ({
   resourceManagementProps,
   projectScopedContainersAccessor,
   onBackgroundColorChanged,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [windowTitle, setWindowTitle] = React.useState<string>(
     layout.getWindowDefaultTitle()
   );

@@ -29,23 +29,24 @@ type ExampleStoreState = {|
   filtersState: FiltersState,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const ExampleStoreContext = React.createContext<ExampleStoreState>({
-  exampleFilters: null,
-  exampleShortHeadersSearchResults: null,
-  fetchExamplesAndFilters: () => {},
-  exampleShortHeaders: null,
-  error: null,
-  searchText: '',
-  setSearchText: () => {},
-  filtersState: {
-    chosenFilters: new Set(),
-    addFilter: () => {},
-    removeFilter: () => {},
-    chosenCategory: null,
-    setChosenCategory: () => {},
-  },
-});
+export const ExampleStoreContext: React.Context<ExampleStoreState> = React.createContext<ExampleStoreState>(
+  {
+    exampleFilters: null,
+    exampleShortHeadersSearchResults: null,
+    fetchExamplesAndFilters: () => {},
+    exampleShortHeaders: null,
+    error: null,
+    searchText: '',
+    setSearchText: () => {},
+    filtersState: {
+      chosenFilters: new Set(),
+      addFilter: () => {},
+      removeFilter: () => {},
+      chosenCategory: null,
+      setChosenCategory: () => {},
+    },
+  }
+);
 
 type ExampleStoreStateProviderProps = {|
   children: React.Node,
@@ -53,8 +54,7 @@ type ExampleStoreStateProviderProps = {|
 
 export const ExampleStoreStateProvider = ({
   children,
-// $FlowFixMe[signature-verification-failure]
-}: ExampleStoreStateProviderProps) => {
+}: ExampleStoreStateProviderProps): React.MixedElement => {
   const [
     exampleShortHeadersById,
     setExampleShortHeadersById,

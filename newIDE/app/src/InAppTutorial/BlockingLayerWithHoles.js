@@ -10,8 +10,9 @@ type Props = {|
   elements: Array<HTMLElement>,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const BlockingLayerWithHoles = ({ elements }: Props) => {
+const BlockingLayerWithHoles = ({
+  elements,
+}: Props): null | React.MixedElement => {
   // $FlowFixMe[missing-empty-array-annot]
   const [holes, setHoles] = React.useState([]);
 

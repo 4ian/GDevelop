@@ -72,8 +72,21 @@ const getShopItemsColumns = (
 
 export const gameTemplatesCategoryId = 'game-template';
 
-// $FlowFixMe[signature-verification-failure]
-export const shopCategories = {
+export const shopCategories: {
+  background: { imageAlt: string, imageSource: string, title: React.Node },
+  character: { imageAlt: string, imageSource: string, title: React.Node },
+  'full-game-pack': {
+    imageAlt: string,
+    imageSource: string,
+    title: React.Node,
+  },
+  'game-template': { imageAlt: string, imageSource: string, title: React.Node },
+  interface: { imageAlt: string, imageSource: string, title: React.Node },
+  prefab: { imageAlt: string, imageSource: string, title: React.Node },
+  props: { imageAlt: string, imageSource: string, title: React.Node },
+  sounds: { imageAlt: string, imageSource: string, title: React.Node },
+  'visual-effect': { imageAlt: string, imageSource: string, title: React.Node },
+} = {
   [gameTemplatesCategoryId]: {
     title: <Trans>Ready-made games</Trans>,
     imageAlt: 'Premium game templates category',
@@ -176,8 +189,11 @@ type Props = {|
   onOpenProfile?: () => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
+// $FlowFixMe[prop-missing]
+export const AssetsHome: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<AssetsHomeInterface> },
+  React.RefSetter<AssetsHomeInterface>
+> = React.forwardRef<Props, AssetsHomeInterface>(
   (
     {
       publicAssetPacks: { starterPacks },
@@ -250,8 +266,8 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
     );
 
     const openedShopCategoryTitle = openedShopCategory
-      // $FlowFixMe[invalid-computed-prop]
-      ? shopCategories[openedShopCategory].title
+      ? // $FlowFixMe[invalid-computed-prop]
+        shopCategories[openedShopCategory].title
       : null;
 
     const publicPackTiles: Array<React.Node> = React.useMemo(

@@ -40,8 +40,7 @@ const Wrapper = ({ children }: {| children: React.Node |}) => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const LayoutPublicAssetInstallSuccess = () => {
+export const LayoutPublicAssetInstallSuccess = (): React.Node => {
   const assetServiceMock = new MockAdapter(assetClient, {
     delayResponse: 250,
   });
@@ -80,8 +79,7 @@ export const LayoutPublicAssetInstallSuccess = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const LayoutPublicAssetInstallFailure = () => {
+export const LayoutPublicAssetInstallFailure = (): React.Node => {
   const assetServiceMock = new MockAdapter(assetClient, {
     delayResponse: 250,
   });
@@ -116,8 +114,7 @@ export const LayoutPublicAssetInstallFailure = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const LayoutPublicAssetAllAlreadyInstalled = () => (
+export const LayoutPublicAssetAllAlreadyInstalled = (): React.Node => (
   <Wrapper>
     <AssetPackInstallDialog
       assetPack={fakeAssetPacks.starterPacks[0]}
@@ -137,8 +134,7 @@ export const LayoutPublicAssetAllAlreadyInstalled = () => (
   </Wrapper>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const LayoutPublicAssetSomeAlreadyInstalled = () => {
+export const LayoutPublicAssetSomeAlreadyInstalled = (): React.Node => {
   const assetServiceMock = new MockAdapter(assetClient, {
     delayResponse: 250,
   });
@@ -185,8 +181,7 @@ export const LayoutPublicAssetSomeAlreadyInstalled = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const LayoutPrivateAssetInstallSuccess = () => {
+export const LayoutPrivateAssetInstallSuccess = (): React.Node => {
   return (
     <PrivateAssetsAuthorizationContext.Provider
       value={{
@@ -224,8 +219,7 @@ export const LayoutPrivateAssetInstallSuccess = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const LayoutPrivateAssetInstallFailure = () => {
+export const LayoutPrivateAssetInstallFailure = (): React.Node => {
   return (
     <PrivateAssetsAuthorizationContext.Provider
       value={{
@@ -263,8 +257,7 @@ export const LayoutPrivateAssetInstallFailure = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const LayoutPrivateAssetButCantInstall = () => (
+export const LayoutPrivateAssetButCantInstall = (): React.Node => (
   <Wrapper>
     <AssetPackInstallDialog
       assetPack={fakeAssetPacks.starterPacks[0]}
@@ -281,8 +274,7 @@ export const LayoutPrivateAssetButCantInstall = () => (
   </Wrapper>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const LayoutPrivateAssetButInstallingTooMany = () => (
+export const LayoutPrivateAssetButInstallingTooMany = (): React.Node => (
   <Wrapper>
     <AssetPackInstallDialog
       assetPack={fakeAssetPacks.starterPacks[0]}
@@ -305,8 +297,7 @@ export const LayoutPrivateAssetButInstallingTooMany = () => (
   </Wrapper>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const NoObjectsContainerPublicAssetInstallSuccess = () => {
+export const NoObjectsContainerPublicAssetInstallSuccess = (): React.Node => {
   const assetServiceMock = new MockAdapter(assetClient, {
     delayResponse: 250,
   });
@@ -353,8 +344,7 @@ export const NoObjectsContainerPublicAssetInstallSuccess = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const NoObjectsContainerPrivateAssetButCantInstall = () => (
+export const NoObjectsContainerPrivateAssetButCantInstall = (): React.Node => (
   <Wrapper>
     <AssetPackInstallDialog
       assetPack={fakeAssetPacks.starterPacks[0]}

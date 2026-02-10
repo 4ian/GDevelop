@@ -67,11 +67,10 @@ export const getAllRequiredBehaviorTypes = (
   platform: gdPlatform,
   functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
   parameterIndex: number
-// $FlowFixMe[signature-verification-failure]
-) => getRequiredBehaviorTypes(platform, functionMetadata, parameterIndex, null);
+): Array<string> =>
+  getRequiredBehaviorTypes(platform, functionMetadata, parameterIndex, null);
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectField(props: ParameterFieldProps, ref) {
     const { currentlyRunningInAppTutorial } = React.useContext(
       InAppTutorialContext
@@ -199,7 +198,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);
 
 export const renderInlineObjectWithThumbnail = ({
   value,
@@ -208,8 +211,7 @@ export const renderInlineObjectWithThumbnail = ({
   expressionIsValid,
   InvalidParameterValue,
   MissingParameterValue,
-// $FlowFixMe[signature-verification-failure]
-}: ParameterInlineRendererProps) => {
+}: ParameterInlineRendererProps): React.MixedElement => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }

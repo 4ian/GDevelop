@@ -11,6 +11,7 @@ import useForceUpdate from '../../Utils/UseForceUpdate';
 import { type Game } from '../../Utils/GDevelopServices/Game';
 
 type Props = {|
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   game: Game,
   open: boolean,
@@ -24,8 +25,7 @@ const BuildsDialog = ({
   open,
   onClose,
   onGameUpdated,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): null | React.Node => {
   const forceUpdate = useForceUpdate();
   if (!open) return null;
 

@@ -38,9 +38,7 @@ export default class ExpressionSelector extends Component<Props, {||}> {
     this.props.i18n
   );
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const { expressionType, scope, i18n, ...otherProps } = this.props;
     return (
       <InstructionOrExpressionSelector

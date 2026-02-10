@@ -27,8 +27,7 @@ export const ChildObjectPropertiesEditor = ({
   customObjectConfiguration,
   childObject,
   onEditObject,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   // Don't use a memo for this because metadata from custom objects are built
   // from event-based object when extensions are refreshed after an extension
   // installation.
@@ -90,6 +89,7 @@ export const ChildObjectPropertiesEditor = ({
         onInstancesModified={() => {
           // TODO: undo/redo?
         }}
+        // $FlowFixMe[incompatible-type]
         onRefreshAllFields={forceRecomputeSchema}
         placeholder={<Trans>This object has no properties.</Trans>}
         customizeBasicSchema={schema =>

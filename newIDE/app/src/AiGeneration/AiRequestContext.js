@@ -464,8 +464,7 @@ export const initialAiRequestContextState: AiRequestContextState = {
   },
   getAiSettings: () => null,
 };
-// $FlowFixMe[signature-verification-failure]
-export const AiRequestContext = React.createContext<AiRequestContextState>(
+export const AiRequestContext: React.Context<AiRequestContextState> = React.createContext<AiRequestContextState>(
   initialAiRequestContextState
 );
 
@@ -473,8 +472,9 @@ type AiRequestProviderProps = {|
   children: React.Node,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const AiRequestProvider = ({ children }: AiRequestProviderProps) => {
+export const AiRequestProvider = ({
+  children,
+}: AiRequestProviderProps): React.MixedElement => {
   const editorFunctionCallResultsStorage = useEditorFunctionCallResultsStorage();
   const aiRequestStorage = useAiRequestsStorage();
   const aiRequestHistory = useAiRequestHistory(aiRequestStorage);

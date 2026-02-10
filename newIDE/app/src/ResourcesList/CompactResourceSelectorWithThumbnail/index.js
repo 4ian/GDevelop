@@ -50,8 +50,7 @@ export const CompactResourceSelectorWithThumbnail = ({
   defaultNewResourceName,
   onChange,
   id,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const resourcesLoader = ResourcesLoader;
   const forceUpdate = useForceUpdate();
   const displayThumbnail = resourcesKindsWithThumbnail.includes(resourceKind);

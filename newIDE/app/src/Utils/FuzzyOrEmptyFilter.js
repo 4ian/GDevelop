@@ -16,7 +16,9 @@ const fuzzyFilter = (searchText: string, key: string) => {
 /**
  * A fuzzy filter that still return true if the key is empty.
  */
-// $FlowFixMe[signature-verification-failure]
-export const fuzzyOrEmptyFilter = (searchText: string, key: string) => {
+export const fuzzyOrEmptyFilter = (
+  searchText: string,
+  key: string
+): boolean => {
   return !key || fuzzyFilter(searchText, key);
 };

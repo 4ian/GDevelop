@@ -55,8 +55,7 @@ export const ExtensionDependenciesEditor = ({
   eventsFunctionsExtension,
   project,
   resourceManagementProps,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const deps = eventsFunctionsExtension.getAllDependencies();
   const forceUpdate = useForceUpdate();
 

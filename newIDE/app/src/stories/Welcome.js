@@ -4,8 +4,7 @@ import { Column } from '../UI/Grid';
 import Text from '../UI/Text';
 import AlertMessage from '../UI/AlertMessage';
 
-// $FlowFixMe[signature-verification-failure]
-export default function Welcome() {
+export default function Welcome(): React.Node {
   return (
     <Column>
       <Text size="title">Welcome to GDevelop Storybook</Text>

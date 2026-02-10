@@ -66,8 +66,7 @@ const PointsEditor = ({
   project,
   onPointsUpdated,
   onRenamedPoint,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): null | React.MixedElement => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);

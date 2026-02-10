@@ -57,8 +57,7 @@ const useSaveReminder = ({
   onSave,
   project,
   isInQuickCustomization,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): (() => React.MixedElement) => {
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext

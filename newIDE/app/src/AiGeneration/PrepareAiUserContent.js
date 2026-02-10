@@ -102,8 +102,14 @@ export const prepareAiUserContent = async ({
   simplifiedProjectJson: string | null,
   projectSpecificExtensionsSummaryJson: string | null,
   eventsJson?: string | null,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): Promise<{
+  eventsJson: null | string,
+  eventsJsonUserRelativeKey: null | string,
+  gameProjectJson: null | string,
+  gameProjectJsonUserRelativeKey: null | string,
+  projectSpecificExtensionsSummaryJson: null | string,
+  projectSpecificExtensionsSummaryJsonUserRelativeKey: null | string,
+}> => {
   // Hash the contents, if provided, to then upload it only once (as long as the hash stays
   // the same, no need to re-upload it for a while).
   // If the content is not provided, no hash is computed because there is no content to upload.

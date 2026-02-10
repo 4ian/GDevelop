@@ -16,8 +16,7 @@ import { Trans, t } from '@lingui/macro';
 import RaisedButton from '../../UI/RaisedButton';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ExternalLayoutNameField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?(
       | GenericExpressionField
@@ -134,4 +133,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);

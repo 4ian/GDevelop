@@ -17,8 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const RelationalOperatorFieldString = () => (
+export const RelationalOperatorFieldString = (): React.Node => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (
@@ -38,8 +37,7 @@ export const RelationalOperatorFieldString = () => (
     )}
   />
 );
-// $FlowFixMe[signature-verification-failure]
-export const RelationalOperatorFieldNumber = () => (
+export const RelationalOperatorFieldNumber = (): React.Node => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (
@@ -59,8 +57,7 @@ export const RelationalOperatorFieldNumber = () => (
     )}
   />
 );
-// $FlowFixMe[signature-verification-failure]
-export const RelationalOperatorFieldColor = () => (
+export const RelationalOperatorFieldColor = (): React.Node => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (
@@ -78,8 +75,7 @@ export const RelationalOperatorFieldColor = () => (
     )}
   />
 );
-// $FlowFixMe[signature-verification-failure]
-export const RelationalOperatorFieldUnknownType = () => (
+export const RelationalOperatorFieldUnknownType = (): React.Node => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (

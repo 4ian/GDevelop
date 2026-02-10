@@ -246,6 +246,7 @@ const ShareDialog = ({
       minHeight={'lg'}
       title={<Trans>Share</Trans>}
       actions={mainActions}
+      // $FlowFixMe[incompatible-type]
       secondaryActions={secondaryActions}
       onRequestClose={onClose}
       open
@@ -311,8 +312,7 @@ const ShareDialog = ({
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-const ShareDialogWithErrorBoundary = (props: Props) => (
+const ShareDialogWithErrorBoundary = (props: Props): React.Node => (
   <ErrorBoundary
     componentTitle={<Trans>Share dialog</Trans>}
     scope="export-and-share"

@@ -31,8 +31,7 @@ const initialPrivateAssetsState = {
   getPrivateAssetPackAudioArchiveUrl: async id => null,
 };
 
-// $FlowFixMe[signature-verification-failure]
-const PrivateAssetsAuthorizationContext = React.createContext<PrivateAssetsState>(
+const PrivateAssetsAuthorizationContext: React.Context<PrivateAssetsState> = React.createContext<PrivateAssetsState>(
   // $FlowFixMe[incompatible-type]
   initialPrivateAssetsState
 );

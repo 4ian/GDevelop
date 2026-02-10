@@ -71,8 +71,7 @@ const CompactSemiControlledNumberField = ({
   getValueFromDisplayedValue,
   getDisplayedValueFromValue,
   ...otherProps
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.MixedElement => {
   const textFieldRef = React.useRef<?CompactTextFieldInterface>(null);
   const cancelEditionRef = React.useRef<boolean>(false);
   const [focused, setFocused] = React.useState<boolean>(false);

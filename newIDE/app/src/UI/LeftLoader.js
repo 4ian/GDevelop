@@ -15,8 +15,7 @@ const LeftLoader = ({
   children: React.Node,
   isLoading: ?boolean,
   reserveSpace?: boolean,
-// $FlowFixMe[signature-verification-failure]
-}) => (
+}): React.MixedElement => (
   <span style={styles.container}>
     {(isLoading || reserveSpace) && (
       <CircularProgress

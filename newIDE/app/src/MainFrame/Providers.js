@@ -68,8 +68,7 @@ const Providers = ({
   makeEventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   return (
     <DragAndDropContextProvider>
       <UnsavedChangesContextProvider>

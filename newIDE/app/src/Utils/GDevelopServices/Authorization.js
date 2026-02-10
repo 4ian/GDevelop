@@ -16,8 +16,7 @@ export const setupAuthenticationWebSocket = ({
   |}) => Promise<void>,
   onError: Error => void,
   onTimeout: () => void,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): ?WebSocket => {
   webSocket = new WebSocket(GDevelopAuthorizationWebSocketApi.baseUrl);
   const timeoutId = setTimeout(onTimeout, 10000);
   // $FlowFixMe[incompatible-use]

@@ -498,8 +498,8 @@ export const getAutocompletionsFromDescriptions = (
             replacementEndPosition: completionDescription.getReplacementEndPosition(),
             // $FlowFixMe[incompatible-use]
             objectConfiguration: completionDescription.hasObjectConfiguration()
-              // $FlowFixMe[incompatible-use]
-              ? completionDescription.getObjectConfiguration()
+              ? // $FlowFixMe[incompatible-use]
+                completionDescription.getObjectConfiguration()
               : null,
             addDot: !gd.ParameterMetadata.isObject(
               // $FlowFixMe[incompatible-use]

@@ -35,8 +35,7 @@ const NewObjectGroupEditorDialog = ({
   globalObjectsContainer,
   objectsContainer,
   isGroupAlreadyAdded,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
 
   const [objectGroupName, setObjectGroupName] = React.useState<string>('');

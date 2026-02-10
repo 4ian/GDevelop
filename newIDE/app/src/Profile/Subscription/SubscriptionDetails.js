@@ -104,8 +104,7 @@ const SubscriptionDetails = ({
   isManageSubscriptionLoading,
   onManageSubscription,
   simulateNativeMobileApp,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const {
     openSubscriptionDialog,
     getUserSubscriptionPlanEvenIfLegacy,

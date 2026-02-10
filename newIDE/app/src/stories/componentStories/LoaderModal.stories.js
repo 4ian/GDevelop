@@ -10,13 +10,11 @@ export default {
   component: LoaderModal,
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => <LoaderModal showImmediately />;
+export const Default = (): React.Node => <LoaderModal showImmediately />;
 
 const STEP_COUNT = 4;
 
-// $FlowFixMe[signature-verification-failure]
-export const WithProgress = () => {
+export const WithProgress = (): React.Node => {
   const [step, setStep] = React.useState<number>(0);
   useTimeout(() => {
     if (step < STEP_COUNT) setStep(step + 1);

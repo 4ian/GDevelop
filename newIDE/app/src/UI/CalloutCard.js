@@ -35,8 +35,10 @@ type Props = {|
   renderImage: (style: {| width: number, height: number |}) => React.Node,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const CalloutCard = ({ children, renderImage }: Props) => {
+export const CalloutCard = ({
+  children,
+  renderImage,
+}: Props): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { windowSize } = useResponsiveWindowSize();
 

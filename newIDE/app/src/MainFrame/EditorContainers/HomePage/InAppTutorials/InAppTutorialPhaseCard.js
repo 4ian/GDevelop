@@ -87,8 +87,7 @@ const InAppTutorialPhaseCard = ({
   onClick,
   renderImage,
   loading,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const shouldTextBeDisabled = loading || disabled || locked;
   const { isMobile } = useResponsiveWindowSize();

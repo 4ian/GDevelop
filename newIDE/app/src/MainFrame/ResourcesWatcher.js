@@ -13,8 +13,7 @@ const getNewId = () => {
 
 export const registerOnResourceExternallyChangedCallback = (
   callback: Function
-// $FlowFixMe[signature-verification-failure]
-) => {
+): string => {
   const id = getNewId().toString();
   callbacks[id] = callback;
   return id;

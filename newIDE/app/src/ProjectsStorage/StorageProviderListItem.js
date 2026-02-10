@@ -35,8 +35,7 @@ const StorageProviderListItem = ({
   storageProvider,
   onChooseProvider,
   disabled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const classesForListItem = useListItemStyles();

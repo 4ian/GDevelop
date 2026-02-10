@@ -20,8 +20,7 @@ const NewVariantDialog = ({
   onApply,
   onCancel,
   isDuplicationBeforeEdition,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [variantName, setVariantName] = React.useState<string>(initialName);
 
   const apply = React.useCallback(

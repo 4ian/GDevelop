@@ -44,8 +44,7 @@ const ObjectGroupsListWithObjectGroupEditor = ({
   onGroupsUpdated,
   canSetAsGlobalGroup,
   unsavedChanges,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [editedGroup, setEditedGroup] = React.useState<gdObjectGroup | null>(
     null
   );

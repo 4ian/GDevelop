@@ -24,8 +24,7 @@ const AvatarWithStatusAndTooltip = ({
   status,
   tooltipMessage,
   hideStatus,
-// $FlowFixMe[signature-verification-failure]
-}: AvatarWithStatusAndTooltipProps) =>
+}: AvatarWithStatusAndTooltipProps): React.Node =>
   !!avatarUrl ? (
     tooltipMessage ? (
       <DotBadge overlap="circle" color={status} invisible={hideStatus}>

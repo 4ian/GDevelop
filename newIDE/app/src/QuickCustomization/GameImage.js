@@ -52,8 +52,7 @@ const GameImage = ({
   previewScreenshotUrls,
   onLaunchPreview,
   disabled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
 
   const gameThumbnailUrl = React.useMemo(

@@ -566,7 +566,7 @@ class MockedParent implements LayoutedParent<MockedChildRenderedInstance> {
       defaultHeight?: number,
       heightAfterUpdate?: number,
     |}
-  // $FlowFixMe[missing-local-annot]
+    // $FlowFixMe[missing-local-annot]
   ) {
     const childInstance = new ChildInstance();
     const childRenderedInstance = new MockedChildRenderedInstance(

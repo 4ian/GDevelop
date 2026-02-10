@@ -91,8 +91,7 @@ const unswappableObjectTypes = [
   'TileMap::SimpleTileMap',
   'Video::VideoObject',
 ];
-// $FlowFixMe[signature-verification-failure]
-export const canSwapAssetOfObject = (object: gdObject) =>
+export const canSwapAssetOfObject = (object: gdObject): boolean =>
   !unswappableObjectTypes.includes(object.getType());
 
 const mergeAnimations = function<A: { name: string }>(
@@ -106,7 +105,7 @@ const mergeAnimations = function<A: { name: string }>(
     objectsAnimation: A,
     assetAnimation: A
   ) => A
-// $FlowFixMe[missing-local-annot]
+  // $FlowFixMe[missing-local-annot]
 ) {
   const animations = [];
   // Ensure the object don't loose any animation.

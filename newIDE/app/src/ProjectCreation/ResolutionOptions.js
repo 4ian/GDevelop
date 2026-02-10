@@ -209,8 +209,7 @@ const ResolutionOptions = ({
   customHeight: ?number,
   onCustomWidthChange: (?number) => void,
   onCustomHeightChange: (?number) => void,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): React.MixedElement => {
   return (
     <div style={styles.optionsContainer}>
       {Object.keys(resolutionOptions).map((key, index) => {

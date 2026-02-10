@@ -35,7 +35,10 @@ const styles = {
   },
 };
 
-export default class GroupEvent extends React.Component<EventRendererProps, any> {
+export default class GroupEvent extends React.Component<
+  EventRendererProps,
+  any
+> {
   // $FlowFixMe[missing-local-annot]
   state = {
     editing: false,
@@ -70,9 +73,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, any>
     }
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     var groupEvent = gd.asGroupEvent(this.props.event);
 
     const r = groupEvent.getBackgroundColorR(),

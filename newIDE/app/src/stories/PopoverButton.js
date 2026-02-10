@@ -7,8 +7,7 @@ type Props = {|
   children: (childrenProps: ChildrenProps) => React.Node,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export function PopoverButton({ children }: Props) {
+export function PopoverButton({ children }: Props): React.Node {
   const [buttonElement, setButtonElement] = React.useState(
     (null: ?HTMLElement)
   );

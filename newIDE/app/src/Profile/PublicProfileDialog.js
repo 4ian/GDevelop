@@ -33,8 +33,7 @@ const PublicProfileDialog = ({
   onGameTemplateOpen,
   onGameOpen,
   onExampleOpen,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const callbacks = React.useMemo(
     () => ({
       openAssetPack: onAssetPackOpen

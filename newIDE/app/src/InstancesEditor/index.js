@@ -151,9 +151,8 @@ export default class InstancesEditor extends Component<Props, State> {
   lastContextMenuY = 0;
   lastCursorX: number | null = null;
   lastCursorY: number | null = null;
-  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  fpsLimiter = new FpsLimiter({ maxFps: 60, idleFps: 10 });
+  fpsLimiter = (new FpsLimiter({ maxFps: 60, idleFps: 10 }): FpsLimiter);
   canvasArea: ?HTMLDivElement;
   // $FlowFixMe[value-as-type]
   pixiRenderer: PIXI.Renderer;
@@ -757,9 +756,7 @@ export default class InstancesEditor extends Component<Props, State> {
     );
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getTileMapTileSelection = () => {
+  getTileMapTileSelection = (): any => {
     return this.props.tileMapTileSelection;
   };
 
@@ -770,13 +767,9 @@ export default class InstancesEditor extends Component<Props, State> {
     return { color: isLocked ? 0xbc5753 : 0x6868e8, alpha: 1 };
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  shouldDisplayClickableHandles = () => !this.props.tileMapTileSelection;
+  shouldDisplayClickableHandles = (): any => !this.props.tileMapTileSelection;
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getZoomFactor = () => {
+  getZoomFactor = (): any => {
     return this.props.instancesEditorSettings.zoomFactor;
   };
 
@@ -1059,9 +1052,7 @@ export default class InstancesEditor extends Component<Props, State> {
     }
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getRendererOfInstance = (instance: gdInitialInstance) => {
+  getRendererOfInstance = (instance: gdInitialInstance): any => {
     return this.instancesRenderer.getRendererOfInstance(
       instance.getLayer(),
       instance
@@ -1116,9 +1107,7 @@ export default class InstancesEditor extends Component<Props, State> {
     }
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _getLayersLocks = () => {
+  _getLayersLocks = (): any => {
     const { layersContainer } = this.props;
     const layersLocks = {};
     for (let i = 0; i < layersContainer.getLayersCount(); i++) {
@@ -1419,11 +1408,10 @@ export default class InstancesEditor extends Component<Props, State> {
 
   // Debounce function to avoid storing history for each pixel move when user
   // keeps pressing an arrow key.
-  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  onInstancesMovedDebounced = debounce(this.props.onInstancesMoved, 50, {
+  onInstancesMovedDebounced = (debounce(this.props.onInstancesMoved, 50, {
     trailing: true,
-  });
+  }): any);
 
   moveSelection = (x: number, y: number) => {
     this.fpsLimiter.notifyInteractionHappened();
@@ -1474,9 +1462,7 @@ export default class InstancesEditor extends Component<Props, State> {
     }
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getBoundingClientRect() {
+  getBoundingClientRect(): any {
     if (!this.canvasArea) return { left: 0, top: 0, right: 0, bottom: 0 };
     return this.canvasArea.getBoundingClientRect();
   }
@@ -1571,9 +1557,7 @@ export default class InstancesEditor extends Component<Props, State> {
     if (offset) this.scrollBy(offset[0], offset[1]);
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getLastContextMenuSceneCoordinates = () => {
+  getLastContextMenuSceneCoordinates = (): any => {
     return this.viewPosition.toSceneCoordinates(
       this.lastContextMenuX,
       this.lastContextMenuY
@@ -1588,9 +1572,7 @@ export default class InstancesEditor extends Component<Props, State> {
     );
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getCoordinatesToRenderTileMapPreview = () => {
+  getCoordinatesToRenderTileMapPreview = (): any => {
     const clickInterceptorPointerPathCoordinates = this.clickInterceptor.getPointerPathCoordinates();
     if (clickInterceptorPointerPathCoordinates) {
       return clickInterceptorPointerPathCoordinates;
@@ -1686,9 +1668,7 @@ export default class InstancesEditor extends Component<Props, State> {
       .getUnrotatedInstanceSize(initialInstance);
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     if (!this.props.project) return null;
 
     if (this.state.renderingError) {

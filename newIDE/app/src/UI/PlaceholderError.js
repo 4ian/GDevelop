@@ -11,8 +11,7 @@ type Props = {|
   onRetry?: () => void | Promise<void>,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const PlaceholderError = ({ onRetry, children }: Props) => {
+const PlaceholderError = ({ onRetry, children }: Props): React.Node => {
   return (
     <Column expand alignItems="center" justifyContent="center">
       <Line noMargin>

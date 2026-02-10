@@ -34,8 +34,7 @@ const ResourceThumbnail = ({
   onSelect,
   onContextMenu,
   size,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): null | React.Node => {
   switch (resourceKind) {
     case 'image':
       return (

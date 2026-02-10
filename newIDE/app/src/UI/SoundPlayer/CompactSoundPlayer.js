@@ -17,8 +17,7 @@ const CompactSoundPlayer = ({
   soundSrc,
   onSoundLoaded,
   onSoundError,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): null | React.Node => {
   const audioRef = React.useRef<?HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -89,7 +88,7 @@ const CompactSoundPlayer = ({
         }
       });
     },
-    [soundSrc, onSoundLoaded, onSoundError, isMountedRef]
+    [soundSrc, onSoundLoaded, onSoundError]
   );
 
   const onPlayPause = React.useCallback(

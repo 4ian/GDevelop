@@ -19,8 +19,7 @@ const columnsPadding = 4;
 export const SelectColumns = ({
   columnsRenderer,
   getColumns,
-// $FlowFixMe[signature-verification-failure]
-}: Props<string>) => {
+}: Props<string>): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const columns = getColumns();
   return (

@@ -23,9 +23,7 @@ export default class Rectangle {
     this.zMax = zMax;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  static fromDOMRect(domRect: DOMRect | ClientRect) {
+  static fromDOMRect(domRect: DOMRect | ClientRect): any {
     return new this(domRect.left, domRect.top, domRect.right, domRect.bottom);
   }
 
@@ -82,39 +80,27 @@ export default class Rectangle {
     this.zMax = rectangle.zMax;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  width() {
+  width(): any {
     return this.right - this.left;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  height() {
+  height(): any {
     return this.bottom - this.top;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  depth() {
+  depth(): any {
     return this.zMax - this.zMin;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  centerX() {
+  centerX(): any {
     return (this.left + this.right) / 2;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  centerY() {
+  centerY(): any {
     return (this.top + this.bottom) / 2;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  centerZ() {
+  centerZ(): any {
     return (this.zMin + this.zMax) / 2;
   }
 
@@ -143,9 +129,7 @@ export default class Rectangle {
     return this.left <= x && this.right > x && this.bottom > y && this.top <= y;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  toCSSPosition() {
+  toCSSPosition(): any {
     return {
       top: this.top,
       left: this.left,
@@ -154,9 +138,7 @@ export default class Rectangle {
     };
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  toString() {
+  toString(): any {
     return (
       '[' +
       this.left +

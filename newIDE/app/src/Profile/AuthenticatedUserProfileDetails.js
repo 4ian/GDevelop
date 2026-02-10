@@ -12,6 +12,7 @@ import RaisedButton from '../UI/RaisedButton';
 type Props = {|
   onOpenEditProfileDialog: () => void,
   onOpenChangeEmailDialog: () => void,
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
 |};
 
@@ -19,8 +20,7 @@ const AuthenticatedUserProfileDetails = ({
   onOpenEditProfileDialog,
   onOpenChangeEmailDialog,
   authenticatedUser,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const profile = authenticatedUser.profile;
   const firebaseUser = authenticatedUser.firebaseUser;
   const openEmailVerificationDialog = React.useCallback(

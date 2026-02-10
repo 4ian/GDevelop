@@ -112,8 +112,7 @@ export const ExtensionOptionsEditor = ({
   eventsFunctionsExtension,
   onLoadChange,
   isLoading,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const [resourceStoreOpen, setResourceStoreOpen] = React.useState(false);
   const isMounted = useIsMounted();

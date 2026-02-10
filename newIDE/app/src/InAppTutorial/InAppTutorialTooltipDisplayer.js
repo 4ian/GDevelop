@@ -310,8 +310,7 @@ const InAppTutorialTooltipDisplayer = ({
   goToNextStep,
   fillAutomatically,
   isBlockingLayerDisplayed,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const {
     palette: { type: paletteType },

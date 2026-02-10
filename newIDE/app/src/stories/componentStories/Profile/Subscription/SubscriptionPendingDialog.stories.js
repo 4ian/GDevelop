@@ -17,8 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const DefaultNoSubscription = () => (
+export const DefaultNoSubscription = (): React.Node => (
   <SubscriptionPendingDialog
     authenticatedUser={fakeAuthenticatedUserWithNoSubscription}
     onClose={action('on close')}
@@ -26,8 +25,7 @@ export const DefaultNoSubscription = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const AuthenticatedUserWithSubscriptionAndDiscordUsernameAlreadyFilled = () => (
+export const AuthenticatedUserWithSubscriptionAndDiscordUsernameAlreadyFilled = (): React.Node => (
   <SubscriptionPendingDialog
     authenticatedUser={fakeSilverAuthenticatedUser}
     onClose={action('on close')}
@@ -40,8 +38,7 @@ const fakeProfileWithoutDiscordUsername = {
   discordUsername: '',
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const AuthenticatedUserWithSilverSubscriptionButWithoutDiscordUsername = () => (
+export const AuthenticatedUserWithSilverSubscriptionButWithoutDiscordUsername = (): React.Node => (
   <SubscriptionPendingDialog
     authenticatedUser={{
       ...fakeSilverAuthenticatedUser,
@@ -53,8 +50,7 @@ export const AuthenticatedUserWithSilverSubscriptionButWithoutDiscordUsername = 
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const AuthenticatedUserWithStartupSubscriptionButWithoutDiscordUsername = () => (
+export const AuthenticatedUserWithStartupSubscriptionButWithoutDiscordUsername = (): React.Node => (
   <SubscriptionPendingDialog
     authenticatedUser={{
       ...fakeStartupAuthenticatedUser,

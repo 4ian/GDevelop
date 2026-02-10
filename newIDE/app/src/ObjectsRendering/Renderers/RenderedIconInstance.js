@@ -7,8 +7,10 @@ import * as PIXI from 'pixi.js-legacy';
 /**
  * Create a renderer for an type of object displayed as an icon
  */
-// $FlowFixMe[signature-verification-failure]
-export default function makeRenderer(iconPath: string) {
+// $FlowFixMe[cannot-resolve-name]
+export default function makeRenderer(
+  iconPath: string
+): typeof RenderedIconInstance {
   class RenderedIconInstance extends RenderedInstance {
     constructor(
       project: gdProject,
@@ -49,7 +51,7 @@ export default function makeRenderer(iconPath: string) {
       project: gdProject,
       resourcesLoader: Class<ResourcesLoader>,
       objectConfiguration: gdObjectConfiguration
-    // $FlowFixMe[missing-local-annot]
+      // $FlowFixMe[missing-local-annot]
     ) {
       return iconPath;
     }

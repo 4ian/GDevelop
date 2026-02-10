@@ -68,8 +68,7 @@ const useNewProjectDialog = ({
   onOpenLayout,
   onWillInstallExtension,
   onExtensionInstalled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): any => {
   const [isFetchingExample, setIsFetchingExample] = React.useState(false);
   const [
     selectedPrivateGameTemplateListingData,

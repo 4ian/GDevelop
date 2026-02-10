@@ -24,8 +24,7 @@ const useHomePageSwitch = ({
 }: {|
   openHomePage: () => void,
   closeDialogs: () => void,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): { navigateToRoute: any } => {
   const {
     navigateToRoute,
     removeRouteArguments,
@@ -38,6 +37,7 @@ const useHomePageSwitch = ({
       const initialDialog = routeArguments['initial-dialog'];
       if (!initialDialog) return;
 
+      // $FlowFixMe[incompatible-type]
       if (homePageRoutes.includes(initialDialog)) {
         closeDialogs();
         openHomePage();

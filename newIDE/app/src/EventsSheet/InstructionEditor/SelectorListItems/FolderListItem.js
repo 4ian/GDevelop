@@ -18,8 +18,7 @@ export const renderFolderListItem = ({
   folderWithPath,
   iconSize,
   matchesCoordinates,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const folderPath: string = folderWithPath.path;
   return (
     <ListItem

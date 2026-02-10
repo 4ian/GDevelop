@@ -45,8 +45,7 @@ const GameHeader = ({
   onEditGame,
   gameUrl,
   onPublishOnGdGames,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   useOnResize(useForceUpdate());
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

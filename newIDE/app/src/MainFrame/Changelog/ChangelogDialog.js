@@ -15,8 +15,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const ChangelogDialog = ({ open, onClose }: Props) => {
+const ChangelogDialog = ({ open, onClose }: Props): null | React.Node => {
   const forceUpdate = useForceUpdate();
   if (!open) {
     // Don't render anything, to avoid in particular sending useless requests.

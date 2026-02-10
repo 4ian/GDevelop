@@ -676,8 +676,7 @@ export type InstructionFilteringOptions = {|
 
 export const getObjectParameterIndex = (
   instructionMetadata: gdInstructionMetadata
-// $FlowFixMe[signature-verification-failure]
-) => {
+): number => {
   const parametersCount = instructionMetadata.getParametersCount();
   if (parametersCount >= 1) {
     const firstParameterType = instructionMetadata.getParameter(0).getType();

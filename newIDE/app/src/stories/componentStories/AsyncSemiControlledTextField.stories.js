@@ -20,8 +20,7 @@ export const Default = (args: {|
   endAdornment?: React.Node,
   helperMarkdownText?: string,
   required?: boolean,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): React.Node => {
   const [value, setValue] = React.useState('Hello world');
   const [isEditing, setIsEditing] = React.useState<boolean>(false);
 
@@ -67,8 +66,7 @@ export const NoMargin = (args: {|
   endAdornment?: React.Node,
   helperMarkdownText?: string,
   required?: boolean,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): React.Node => {
   const [value, setValue] = React.useState('Hello world');
   const [isEditing, setIsEditing] = React.useState<boolean>(false);
 

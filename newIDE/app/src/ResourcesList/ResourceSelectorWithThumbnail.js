@@ -45,8 +45,7 @@ const ResourceSelectorWithThumbnail = ({
   fallbackResourceKind,
   id,
   disabled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const itemsAlignment = isMobile ? 'center' : 'flex-end';
   const displayThumbnail = resourcesKindsWithThumbnail.includes(resourceKind);

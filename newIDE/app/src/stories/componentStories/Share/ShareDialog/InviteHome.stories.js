@@ -49,8 +49,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const NotLoggedInOrOffline = () => {
+export const NotLoggedInOrOffline = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <InviteHome cloudProjectId="owned-project-id" />
@@ -58,8 +57,7 @@ export const NotLoggedInOrOffline = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const ProjectNotSaved = () => {
+export const ProjectNotSaved = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider value={fakeStartupAuthenticatedUser}>
       <InviteHome cloudProjectId={null} />
@@ -67,8 +65,7 @@ export const ProjectNotSaved = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const NoStartupSubscription = () => {
+export const NoStartupSubscription = (): React.Node => {
   const projectApiMock = React.useMemo(() => {
     const mock = new MockAdapter(projectApiClient, {
       delayResponse: 500,
@@ -102,8 +99,7 @@ export const NoStartupSubscription = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const NotOwnerOfProject = () => {
+export const NotOwnerOfProject = (): React.Node => {
   const projectApiMock = React.useMemo(() => {
     const mock = new MockAdapter(projectApiClient, {
       delayResponse: 500,
@@ -137,8 +133,7 @@ export const NotOwnerOfProject = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Errored = () => {
+export const Errored = (): React.Node => {
   const projectApiMock = React.useMemo(() => {
     const mock = new MockAdapter(projectApiClient, {
       delayResponse: 500,
@@ -172,8 +167,7 @@ export const Errored = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithCollaborators = () => {
+export const WithCollaborators = (): React.Node => {
   const projectApiMock = React.useMemo(() => {
     const mock = new MockAdapter(projectApiClient, {
       delayResponse: 500,

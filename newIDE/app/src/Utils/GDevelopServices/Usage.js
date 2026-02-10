@@ -265,8 +265,8 @@ export type RedemptionCode = {|
 
 export const EDUCATION_PLAN_MIN_SEATS = 5;
 export const EDUCATION_PLAN_MAX_SEATS = 300;
-// $FlowFixMe[signature-verification-failure]
-export const apiClient = axios.create({
+// $FlowFixMe[cannot-resolve-name]
+export const apiClient: Axios = axios.create({
   baseURL: GDevelopUsageApi.baseUrl,
 });
 
@@ -292,7 +292,6 @@ export const listSubscriptionPlans = async (options: {|
   if (options.userId && options.getAuthorizationHeader) {
     const authorizationHeader = await options.getAuthorizationHeader();
 
-    // $FlowFixMe[underconstrained-implicit-instantiation]
     const response = await apiClient.get('/subscription-plan', {
       params: {
         includeLegacy: options.includeLegacy ? 'true' : 'false',
@@ -308,7 +307,6 @@ export const listSubscriptionPlans = async (options: {|
     });
   }
   return ensureIsArray({
-    // $FlowFixMe[underconstrained-implicit-instantiation]
     data: (await apiClient.get('/subscription-plan', {
       params: { includeLegacy: options.includeLegacy ? 'true' : 'false' },
     })).data,
@@ -320,7 +318,6 @@ export const getSubscriptionPlanPricingSystem = async (
   pricingSystemId: string
 ): Promise<?SubscriptionPlanPricingSystem> => {
   try {
-    // $FlowFixMe[underconstrained-implicit-instantiation]
     const response = await apiClient.get(
       `/subscription-plan-pricing-system/${pricingSystemId}`
     );
@@ -356,7 +353,6 @@ export const listSubscriptionPlanPricingSystems = async (options: {|
   if (options.userId && options.getAuthorizationHeader) {
     params.userId = options.userId;
     const authorizationHeader = await options.getAuthorizationHeader();
-    // $FlowFixMe[underconstrained-implicit-instantiation]
     const response = await apiClient.get('/subscription-plan-pricing-system', {
       params,
       headers: {
@@ -370,7 +366,6 @@ export const listSubscriptionPlanPricingSystems = async (options: {|
   }
 
   return ensureIsArray({
-    // $FlowFixMe[underconstrained-implicit-instantiation]
     data: (await apiClient.get('/subscription-plan-pricing-system', {
       params,
     })).data,
@@ -384,7 +379,6 @@ export const getUserUsages = async (
 ): Promise<Usages> => {
   const authorizationHeader = await getAuthorizationHeader();
 
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.get('/usage', {
     params: {
       userId,
@@ -405,7 +399,6 @@ export const getUserEarningsBalance = async (
 ): Promise<UserEarningsBalance> => {
   const authorizationHeader = await getAuthorizationHeader();
 
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.get(`/user-earnings-balance`, {
     params: {
       userId,
@@ -433,7 +426,6 @@ export const cashOutUserEarnings = async (
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
 
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   await apiClient.post(
     `/user-earnings-balance/action/cash-out`,
     {
@@ -462,7 +454,6 @@ export const getUserLimits = async (
     params.platform = 'mobile';
   }
 
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.get('/limits', {
     params,
     headers: {
@@ -482,7 +473,6 @@ export const getUserSubscription = async (
 ): Promise<Subscription> => {
   const authorizationHeader = await getAuthorizationHeader();
 
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.get('/subscription-v2', {
     params: {
       userId,
@@ -506,7 +496,6 @@ export const changeUserSubscription = async (
 ): Promise<Subscription> => {
   const authorizationHeader = await getAuthorizationHeader();
 
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.post(
     '/subscription-v2',
     {
@@ -549,8 +538,9 @@ export const isSubscriptionComingFromTeam = (
   return !!subscription && subscription.pricingSystemId === 'TEAM_MEMBER';
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const hasValidSubscriptionPlan = (subscription: ?Subscription) => {
+export const hasValidSubscriptionPlan = (
+  subscription: ?Subscription
+): boolean => {
   const hasValidSubscription =
     !!subscription &&
     !!subscription.planId &&
@@ -574,7 +564,6 @@ export const getSignedUrl = async (params: {|
 |}): Promise<{
   signedUrl: string,
 }> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.post('/upload-options/signed-url', params);
   return ensureIsObjectWithPropertyOfType({
     data: response.data,
@@ -593,7 +582,6 @@ export const getSignedUrls = async (params: {|
 |}): Promise<{
   signedUrls: Array<string>,
 }> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.post('/upload-options/signed-url', params);
   return ensureIsObjectWithPropertyOfType({
     data: response.data,
@@ -609,7 +597,6 @@ export const getRedirectToSubscriptionPortalUrl = async (
 ): Promise<string> => {
   const authorizationHeader = await getAuthorizationHeader();
 
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.post(
     '/subscription-v2/action/redirect-to-portal',
     {},
@@ -664,7 +651,6 @@ export const redeemCode = async (
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
 
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   await apiClient.post(
     '/redemption-code/action/redeem-code',
     {
@@ -699,7 +685,6 @@ export type CouponValidationApiResponse = {
 export const validateCoupon = async (
   couponCode: string
 ): Promise<CouponValidationApiResponse> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.post(
     '/subscription-v2/action/validate-coupon',
     {
@@ -710,8 +695,9 @@ export const validateCoupon = async (
   return response.data;
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const canBenefitFromDiscordRole = (subscription: ?Subscription) => {
+export const canBenefitFromDiscordRole = (
+  subscription: ?Subscription
+): false | true | boolean => {
   return (
     !!subscription &&
     ['gdevelop_education', 'gdevelop_startup', 'gdevelop_gold'].includes(
@@ -722,8 +708,9 @@ export const canBenefitFromDiscordRole = (subscription: ?Subscription) => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const canUpgradeSubscription = (subscription: ?Subscription) => {
+export const canUpgradeSubscription = (
+  subscription: ?Subscription
+): false | true | boolean => {
   return (
     !!subscription &&
     // $FlowFixMe[incompatible-type]
@@ -732,14 +719,12 @@ export const canUpgradeSubscription = (subscription: ?Subscription) => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const canUseClassroomFeature = (limits: ?Limits) =>
+export const canUseClassroomFeature = (limits: ?Limits): ?boolean =>
   limits &&
   limits.capabilities.classrooms &&
   limits.capabilities.classrooms.showClassroomTab;
 
-// $FlowFixMe[signature-verification-failure]
-export const shouldHideClassroomTab = (limits: ?Limits) =>
+export const shouldHideClassroomTab = (limits: ?Limits): boolean =>
   !limits ||
   !limits.capabilities.classrooms ||
   limits.capabilities.classrooms.showClassroomTab
@@ -815,7 +800,6 @@ export const getRedemptionCodes = async (
 ): Promise<Array<RedemptionCode>> => {
   const authorizationHeader = await getAuthorizationHeader();
 
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.get('/redemption-code', {
     params: {
       userId,

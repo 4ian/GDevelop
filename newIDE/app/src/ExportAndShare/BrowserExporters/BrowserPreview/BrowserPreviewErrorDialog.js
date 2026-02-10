@@ -13,9 +13,7 @@ type Props = {|
 |};
 
 export default class BrowserPreviewErrorDialog extends Component<Props> {
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const { error, onClose } = this.props;
 
     return (

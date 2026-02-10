@@ -71,8 +71,7 @@ const AnimationPreview = ({
   fixedWidth,
   isAssetPrivate,
   hideAnimationLoader,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
 
   const fps = Number.parseFloat((1 / timeBetweenFrames).toFixed(4));

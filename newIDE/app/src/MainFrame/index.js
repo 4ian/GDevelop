@@ -355,7 +355,7 @@ export type Props = {|
   renderPreviewLauncher?: (
     props: PreviewLauncherProps,
     ref: (previewLauncher: ?PreviewLauncherInterface) => void
-  // $FlowFixMe[prop-missing]
+    // $FlowFixMe[prop-missing]
   ) => React.Element<PreviewLauncherComponent>,
   onEditObject?: gdObject => void,
   storageProviders: Array<StorageProvider>,
@@ -380,8 +380,7 @@ export type Props = {|
   i18n: I18n,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const MainFrame = (props: Props) => {
+const MainFrame = (props: Props): React.MixedElement => {
   const [state, setState]: [
     State,
     ((State => State) | State) => Promise<State>,
@@ -1046,8 +1045,8 @@ const MainFrame = (props: Props) => {
   const loadFromProject = React.useCallback(
     async (project: gdProject, fileMetadata: ?FileMetadata): Promise<State> => {
       let updatedFileMetadata: ?FileMetadata = fileMetadata
-        // $FlowFixMe[incompatible-type]
-        ? updateFileMetadataWithOpenedProject(fileMetadata, project)
+        ? // $FlowFixMe[incompatible-type]
+          updateFileMetadataWithOpenedProject(fileMetadata, project)
         : null;
 
       if (updatedFileMetadata) {
@@ -2597,12 +2596,12 @@ const MainFrame = (props: Props) => {
       });
 
       const tabsWithSceneEditor = openSceneEditor
-        // $FlowFixMe[incompatible-type]
-        ? openEditorTab(editorTabs, sceneEditorOptions)
+        ? // $FlowFixMe[incompatible-type]
+          openEditorTab(editorTabs, sceneEditorOptions)
         : editorTabs;
       return openEventsEditor
-        // $FlowFixMe[incompatible-type]
-        ? openEditorTab(tabsWithSceneEditor, eventsEditorOptions)
+        ? // $FlowFixMe[incompatible-type]
+          openEditorTab(tabsWithSceneEditor, eventsEditorOptions)
         : tabsWithSceneEditor;
     },
     [getEditorOpeningOptions]

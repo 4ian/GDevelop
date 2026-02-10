@@ -11,7 +11,6 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <AssetCard size={128} assetShortHeader={fakeAssetShortHeader1} />
 );

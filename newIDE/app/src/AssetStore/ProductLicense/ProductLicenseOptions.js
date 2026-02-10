@@ -179,8 +179,7 @@ const ProductLicenseOptions = ({
   product,
   ownedLicense,
   disabled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const {
     gameTemplateLicenses,
     assetPackLicenses,
@@ -255,8 +254,7 @@ export const OwnedProductLicense = ({
 }: {|
   ownedLicense: ?string,
   productType: 'game-template' | 'asset-pack',
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): null | React.Node => {
   const { gameTemplateLicenses, assetPackLicenses, error } = React.useContext(
     ProductLicenseStoreContext
   );

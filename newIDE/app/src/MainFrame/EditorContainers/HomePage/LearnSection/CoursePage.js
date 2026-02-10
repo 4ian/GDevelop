@@ -135,8 +135,7 @@ const CoursePage = ({
   setPurchasingCourseListingData,
   simulateAppStoreProduct,
   onOpenAskAi,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { profile } = React.useContext(AuthenticatedUserContext);
   const userId = (profile && profile.id) || null;
   const {

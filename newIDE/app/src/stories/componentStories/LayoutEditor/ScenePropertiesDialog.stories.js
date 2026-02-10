@@ -13,8 +13,7 @@ export default {
   component: ScenePropertiesDialog,
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <ScenePropertiesDialog
     open
     project={testProject.project}
@@ -30,8 +29,7 @@ export const Default = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const MoreSettings = () => (
+export const MoreSettings = (): React.Node => (
   <ScenePropertiesDialog
     open
     project={testProject.project}

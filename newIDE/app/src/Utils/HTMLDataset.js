@@ -4,8 +4,7 @@ import { toKebabCase } from './StringHelpers';
 
 export type HTMLDataset = {| [key: string]: ?string |};
 
-// $FlowFixMe[signature-verification-failure]
-export const dataObjectToProps = (object: ?HTMLDataset) =>
+export const dataObjectToProps = (object: ?HTMLDataset): void | {} =>
   object
     ? Object.entries(object).reduce((acc, [key, value]) => {
         if (value) {

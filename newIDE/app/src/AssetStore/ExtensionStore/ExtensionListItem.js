@@ -42,8 +42,7 @@ export const ExtensionListItem = ({
   matches,
   onChoose,
   onHeightComputed,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(

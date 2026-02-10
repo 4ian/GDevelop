@@ -24,8 +24,7 @@ type Props = {|
   field: React.Node,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const CompactPropertiesEditorRowField = (props: Props) => {
+const CompactPropertiesEditorRowField = (props: Props): React.Node => {
   const title = !props.markdownDescription
     ? props.label
     : [

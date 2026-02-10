@@ -28,8 +28,7 @@ export const renderGroupObjectsListItem = ({
   matchesCoordinates,
   id,
   data,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const groupName: string = groupWithContext.group.getName();
   return (
     <ListItem

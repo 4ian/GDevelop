@@ -22,8 +22,7 @@ const AuthorizedAssetImage = ({
   onError,
   onLoad,
   hideLoader,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [authorizedUrl, setAuthorizedUrl] = React.useState(null);
   const [isImageLoaded, setIsImageLoaded] = React.useState(false);
   const { authorizationToken, updateAuthorizationToken } = React.useContext(

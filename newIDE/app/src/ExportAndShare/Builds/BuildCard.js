@@ -122,6 +122,7 @@ type Props = {|
   setGameUpdating: boolean => void,
   onBuildUpdated: Build => void,
   onBuildDeleted: Build => void,
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
 |};
 
@@ -134,8 +135,7 @@ export const BuildCard = ({
   onBuildUpdated,
   onBuildDeleted,
   authenticatedUser,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const defaultBuildName = `${game.gameName
     .toLowerCase()

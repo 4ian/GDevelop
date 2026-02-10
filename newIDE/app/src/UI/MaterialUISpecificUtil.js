@@ -22,8 +22,7 @@ export const shouldPreventRenderingInstanceEditors = (): boolean => {
 export const isElementADialog = (
   element: Element,
   options?: { isVisible: true }
-// $FlowFixMe[signature-verification-failure]
-) => {
+): true | boolean => {
   const isDialog =
     element.tagName === 'DIV' &&
     element.getAttribute('role') === 'presentation';

@@ -67,8 +67,7 @@ export const LoadingScreenEditor = ({
   project,
   resourceManagementProps,
   projectScopedContainersAccessor,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const subscriptionChecker = React.useRef<?SubscriptionCheckerInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const forceUpdate = useForceUpdate();

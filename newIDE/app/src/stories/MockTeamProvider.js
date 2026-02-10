@@ -26,8 +26,7 @@ export const emptySubscriptionPlanMockData = [
     url: `${GDevelopUsageApi.baseUrl}/subscription-plan?includeLegacy=true`,
     method: 'GET',
     status: 200,
-    // $FlowFixMe[signature-verification-failure]
-    response: [],
+    response: ([]: Array<empty>),
     delay: 0,
   },
   {
@@ -36,8 +35,7 @@ export const emptySubscriptionPlanMockData = [
     }/subscription-plan-pricing-system?includeLegacy=true`,
     method: 'GET',
     status: 200,
-    // $FlowFixMe[signature-verification-failure]
-    response: [],
+    response: ([]: Array<empty>),
     delay: 0,
   },
 ];
@@ -196,8 +194,7 @@ export const MockTeamProvider = ({
   noMembers?: boolean,
   noActiveMembers?: boolean,
   teamSize?: number,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): React.Node => {
   const team = { ...initialTeam, seats: teamSize || initialTeam.seats };
   const [nameChangeTryCount, setNameChangeTryCount] = React.useState<number>(0);
   const [userChangeTryCount, setUserChangeTryCount] = React.useState<number>(0);

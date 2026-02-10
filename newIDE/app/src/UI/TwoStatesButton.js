@@ -27,8 +27,11 @@ type Props = {|
 
 export type TwoStatesButtonInterface = {| focusLeftButton: () => void |};
 
-// $FlowFixMe[signature-verification-failure]
-const TwoStatesButton = React.forwardRef<Props, TwoStatesButtonInterface>(
+// $FlowFixMe[prop-missing]
+const TwoStatesButton: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<TwoStatesButtonInterface> },
+  React.RefSetter<TwoStatesButtonInterface>
+> = React.forwardRef<Props, TwoStatesButtonInterface>(
   ({ leftButton, rightButton, onChange, value, disabled }, ref) => {
     // $FlowFixMe[value-as-type]
     const leftButtonRef = React.useRef<?Button>(null);

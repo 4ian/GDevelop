@@ -47,8 +47,7 @@ export const ObjectListItem = ({
   onShowDetails,
   onHeightComputed,
   platform,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const isEngineCompatible = isCompatibleWithGDevelopVersion(

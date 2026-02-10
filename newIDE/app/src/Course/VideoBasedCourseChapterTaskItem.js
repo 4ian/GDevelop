@@ -30,8 +30,7 @@ const VideoBasedCourseChapterTaskItem = ({
   isOpen,
   isComplete,
   onComplete,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [isOpenIndividually, setIsOpenIndividually] = React.useState<boolean>(
     isOpen
   );

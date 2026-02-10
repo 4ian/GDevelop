@@ -15,8 +15,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <GetSubscriptionCard
       placementId="builds"
@@ -33,8 +32,7 @@ export const Default = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const CustomLabel = () => (
+export const CustomLabel = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <GetSubscriptionCard
       placementId="builds"
@@ -52,8 +50,7 @@ export const CustomLabel = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ButtonHidden = () => (
+export const ButtonHidden = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <GetSubscriptionCard
       placementId="builds"
@@ -71,8 +68,7 @@ export const ButtonHidden = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const PayWithCreditsOptions = () => (
+export const PayWithCreditsOptions = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <GetSubscriptionCard
       placementId="builds"
@@ -93,8 +89,7 @@ export const PayWithCreditsOptions = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ForceColumnLayout = () => (
+export const ForceColumnLayout = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <GetSubscriptionCard
       placementId="builds"

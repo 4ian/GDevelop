@@ -98,8 +98,7 @@ export const AskAiStandAloneForm = ({
   dismissableIdentifier,
   onWillInstallExtension,
   onExtensionInstalled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): null | React.Node => {
   const onCreateProject = React.useCallback(
     async ({
       name,

@@ -179,8 +179,7 @@ const PrivateAssetPackInformationPage = ({
   onGameTemplateOpen,
   onBundleOpen,
   simulateAppStoreProduct,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const { id, name, sellerId } = privateAssetPackListingData;
   const { privateAssetPackListingDatas } = React.useContext(AssetStoreContext);

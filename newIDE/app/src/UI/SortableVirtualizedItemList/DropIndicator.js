@@ -16,8 +16,10 @@ const styles = {
 
 type Props = {| canDrop: boolean, zIndex?: 1 |};
 
-// $FlowFixMe[signature-verification-failure]
-export default function DropIndicator({ canDrop, zIndex }: Props) {
+export default function DropIndicator({
+  canDrop,
+  zIndex,
+}: Props): React.MixedElement {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <div

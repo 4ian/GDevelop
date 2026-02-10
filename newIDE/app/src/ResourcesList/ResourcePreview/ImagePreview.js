@@ -135,8 +135,7 @@ const ImagePreview = ({
   isImagePrivate,
   onImageLoaded,
   hideLoader,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [errored, setErrored] = React.useState<boolean>(false);
   const [imageWidth, setImageWidth] = React.useState<?number>(null);
   const [imageHeight, setImageHeight] = React.useState<?number>(null);

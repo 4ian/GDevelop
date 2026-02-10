@@ -85,8 +85,7 @@ export const CompactInstancePropertiesEditor = ({
   tileMapTileSelection,
   onSelectTileMapTile,
   isVariableListLocked,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): null | React.Node => {
   const forceUpdate = useForceUpdate();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
 

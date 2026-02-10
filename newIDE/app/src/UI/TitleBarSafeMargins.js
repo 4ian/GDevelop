@@ -19,8 +19,7 @@ export const TitleBarLeftSafeMargins = ({
   backgroundColor,
 }: {|
   backgroundColor?: string,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): null | React.MixedElement => {
   // An installed PWA can have window controls displayed as overlay. If supported,
   // we set up a listener to detect any change and force a refresh that will read
   // the latest size of the controls.
@@ -70,8 +69,7 @@ export const TitleBarRightSafeMargins = ({
   backgroundColor,
 }: {|
   backgroundColor?: string,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): React.MixedElement => {
   // An installed PWA can have window controls displayed as overlay. If supported,
   // we set up a listener to detect any change and force a refresh that will read
   // the latest size of the controls.

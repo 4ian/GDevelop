@@ -104,8 +104,7 @@ const CoursePageHeader = ({
   purchasingCourseListingData,
   setPurchasingCourseListingData,
   simulateAppStoreProduct,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { listedCourses } = React.useContext(CourseStoreContext);
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();

@@ -454,8 +454,7 @@ export const isTileSetBadlyConfigured = ({
   columnCount,
   tileSize,
   atlasImage,
-// $FlowFixMe[signature-verification-failure]
-}: TileSet) => {
+}: TileSet): boolean => {
   return (
     !Number.isInteger(columnCount) ||
     columnCount <= 0 ||

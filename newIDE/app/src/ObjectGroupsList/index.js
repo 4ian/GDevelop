@@ -472,8 +472,8 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     const renderGroupMenuTemplate = React.useCallback(
       (i18n: I18nType) => (item: TreeViewItem, index: number) =>
         item.isRoot || item.isPlaceholder
-          // $FlowFixMe[missing-empty-array-annot]
-          ? []
+          ? // $FlowFixMe[missing-empty-array-annot]
+            []
           : [
               {
                 label: i18n._(t`Duplicate`),
@@ -725,11 +725,11 @@ const MemoizedObjectGroupsList = React.memo<Props, ObjectGroupsListInterface>(
   arePropsEqual
 );
 
-// $FlowFixMe[signature-verification-failure]
-const ObjectGroupsListWithErrorBoundary = React.forwardRef<
-  Props,
-  ObjectGroupsListInterface
->((props, ref) => (
+// $FlowFixMe[prop-missing]
+const ObjectGroupsListWithErrorBoundary: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<ObjectGroupsListInterface> },
+  React.RefSetter<ObjectGroupsListInterface>
+> = React.forwardRef<Props, ObjectGroupsListInterface>((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Object groups list</Trans>}
     scope="scene-editor-object-groups-list"

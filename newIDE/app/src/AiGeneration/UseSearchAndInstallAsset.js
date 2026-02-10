@@ -23,8 +23,7 @@ export const useSearchAndInstallAsset = ({
   resourceManagementProps: ResourceManagementProps,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): any => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );

@@ -62,8 +62,7 @@ const LayerEditorDialog = ({
   hotReloadPreviewButtonProps,
   resourceManagementProps,
   projectScopedContainersAccessor,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const {
     onCancelChanges,

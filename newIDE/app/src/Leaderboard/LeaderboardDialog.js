@@ -19,8 +19,7 @@ const LeaderboardDialog = ({
   open,
   project,
   leaderboardId,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [isLoading, setIsLoading] = React.useState(false);
   return (
     <Dialog

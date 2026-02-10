@@ -104,8 +104,7 @@ const BundleInformationPage = ({
   noActions,
   fastCheckout,
   onCloseAfterPurchaseDone,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { windowSize, isLandscape, isMobile } = useResponsiveWindowSize();
   const { bundleListingDatas } = React.useContext(BundleStoreContext); // If archived, should use the one passed.
   const { privateGameTemplateListingDatas } = React.useContext(
@@ -141,7 +140,6 @@ const BundleInformationPage = ({
 
       if (!productListingDatasInBundle) return null;
       // $FlowIgnore - Flow doesn't understand that we have filtered the products to only include courses.
-      // $FlowFixMe[incompatible-type]
       const courseListingDatasInBundle: CourseListingData[] = productListingDatasInBundle.filter(
         productListingData => productListingData.productType === 'COURSE'
       );

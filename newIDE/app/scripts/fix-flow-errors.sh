@@ -5,9 +5,9 @@ set -e
 # This script is idempotent - it can be run multiple times safely.
 # It fixes Flow type errors after upgrading from Flow 0.131 to 0.299.
 #
-# NOTE: We intentionally do NOT run "flow codemod annotate-exports" because
-# it introduces component() syntax and as-casts that Babel cannot parse.
-# Instead, all errors are suppressed with $FlowFixMe[code] comments.
+# NOTE: We DO run "flow codemod annotate-exports", then normalize the
+# generated modern syntax (component()/renders/as-casts) back to
+# Babel-compatible Flow syntax.
 #
 # Usage: cd newIDE/app && bash scripts/fix-flow-errors.sh
 
@@ -107,10 +107,49 @@ find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
 echo "  Done."
 
 ###############################################################################
-# STEP 4: Fix specific known issues
+# STEP 4: Run annotate-exports and normalize syntax
 ###############################################################################
 echo ""
-echo "--- Step 4: Fixing specific known issues ---"
+echo "--- Step 4: Running Flow codemod annotate-exports ---"
+
+npx flow stop 2>/dev/null || true
+
+for i in $(seq 1 5); do
+  echo "  Codemod iteration $i..."
+  set +e
+  CODEMOD_OUTPUT=$(npx flow codemod annotate-exports --write --default-any src 2>&1)
+  CODEMOD_EXIT=$?
+  set -e
+
+  echo "$CODEMOD_OUTPUT" | grep -E \
+    "Files changed:|Number of annotations added:|Number of sig\. ver\. errors:|Number of annotations required:" || true
+
+  if [ $CODEMOD_EXIT -ne 0 ]; then
+    echo "  WARNING: annotate-exports exited with status $CODEMOD_EXIT"
+    break
+  fi
+
+  FILES_CHANGED=$(echo "$CODEMOD_OUTPUT" | sed -n 's/.*Files changed:[[:space:]]*\([0-9][0-9]*\).*/\1/p' | head -n 1)
+  if [ -z "$FILES_CHANGED" ]; then
+    echo "  WARNING: Could not parse codemod output."
+    break
+  fi
+
+  if [ "$FILES_CHANGED" -eq 0 ]; then
+    echo "  Codemod converged."
+    break
+  fi
+done
+
+echo "  Normalizing codemod syntax to Babel-compatible Flow..."
+python3 "$SCRIPT_DIR/fix-codemod-syntax.py"
+echo "  Done."
+
+###############################################################################
+# STEP 5: Fix specific known issues
+###############################################################################
+echo ""
+echo "--- Step 5: Fixing specific known issues ---"
 
 # Fix GDevelop.js type files (if they exist and don't have FlowFixMe)
 GD_TYPES="$APP_DIR/../../GDevelop.js/types"
@@ -168,44 +207,92 @@ with open('$THEME_FILE', 'w') as f:
   echo "  Fixed Theme/index.js"
 fi
 
+# Fix known annotate-exports gaps (remaining signature-verification failures).
+python3 << 'PYEOF'
+import os
+import re
+
+app_dir = os.environ.get('APP_DIR', os.getcwd())
+replacements = [
+    (
+        os.path.join(app_dir, 'src/EventsSheet/index.js'),
+        r'onResourceExternallyChanged = resourceInfo => \{',
+        'onResourceExternallyChanged = (resourceInfo: any) => {',
+    ),
+    (
+        os.path.join(app_dir, 'src/Leaderboard/LeaderboardContext.js'),
+        r'deleteLeaderboardEntry: async entryId => \{\},',
+        'deleteLeaderboardEntry: async (entryId: any) => {},',
+    ),
+]
+
+fixed = 0
+for filepath, pattern, replacement in replacements:
+    if not os.path.isfile(filepath):
+        continue
+    with open(filepath) as f:
+        content = f.read()
+    updated = re.sub(pattern, replacement, content)
+    if updated != content:
+        with open(filepath, 'w') as f:
+            f.write(updated)
+        fixed += 1
+
+print(f"  Fixed {fixed} known annotate-exports signature gaps")
+PYEOF
+
 echo "  Done."
 
 ###############################################################################
-# STEP 5: Add $FlowFixMe for all remaining errors (iterative)
+# STEP 6: Add $FlowFixMe for all remaining errors (iterative)
 ###############################################################################
 echo ""
-echo "--- Step 5: Adding \$FlowFixMe for all errors (iterative) ---"
+echo "--- Step 6: Adding \$FlowFixMe for all errors (iterative) ---"
 
 npx flow stop 2>/dev/null || true
 
-for i in $(seq 1 10); do
+PREV_ERROR_COUNT=""
+for i in $(seq 1 15); do
   echo "  Iteration $i..."
 
   # Add FlowFixMe comments for errors
-  python3 "$SCRIPT_DIR/add-flow-fixme.py" 2>&1 | grep -E "Added|Found|No" || true
+  FLOWFIXME_OUTPUT=$(python3 "$SCRIPT_DIR/add-flow-fixme.py" 2>&1 || true)
+  echo "$FLOWFIXME_OUTPUT" | grep -E "Added|Found|No" || true
 
   # Convert // FlowFixMe in JSX context to {/* FlowFixMe */}
-  python3 "$SCRIPT_DIR/convert-jsx-flowfixme.py" 2>&1 | grep -E "Converted" || true
+  JSX_CONVERT_OUTPUT=$(python3 "$SCRIPT_DIR/convert-jsx-flowfixme.py" 2>&1 || true)
+  echo "$JSX_CONVERT_OUTPUT" | grep -E "Converted|Reverted" || true
 
   npx flow stop 2>/dev/null || true
 
   # Check remaining errors
+  set +e
   ERROR_OUTPUT=$(npx flow 2>&1)
+  FLOW_EXIT=$?
+  set -e
   if echo "$ERROR_OUTPUT" | grep -q "No errors"; then
     echo "  No more errors!"
     break
   fi
 
   ERROR_COUNT=$(echo "$ERROR_OUTPUT" | grep "Found" | grep -o '[0-9]*' | head -1)
-  echo "  Remaining errors: ${ERROR_COUNT:-unknown}"
+  echo "  Remaining errors: ${ERROR_COUNT:-unknown} (flow exit: $FLOW_EXIT)"
+
+  if echo "$FLOWFIXME_OUTPUT" | grep -q "Added 0 \$FlowFixMe comments" && \
+     [ -n "$ERROR_COUNT" ] && [ "$ERROR_COUNT" = "$PREV_ERROR_COUNT" ]; then
+    echo "  No automatic progress in this iteration; stopping early."
+    break
+  fi
+
+  PREV_ERROR_COUNT="$ERROR_COUNT"
   npx flow stop 2>/dev/null || true
 done
 
 ###############################################################################
-# STEP 6: Fix eslint-disable-next-line ordering with $FlowFixMe
+# STEP 7: Fix eslint-disable-next-line ordering with $FlowFixMe
 ###############################################################################
 echo ""
-echo "--- Step 6: Fixing eslint/FlowFixMe comment ordering ---"
+echo "--- Step 7: Fixing eslint/FlowFixMe comment ordering ---"
 
 # When $FlowFixMe is inserted between eslint-disable-next-line and the code,
 # eslint-disable no longer applies (it targets the FlowFixMe comment instead).

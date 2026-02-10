@@ -46,8 +46,7 @@ const ShareOnlineGameDialog = ({
   onClose,
   isBuildPublished,
   loadingText,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState<boolean>(
     false

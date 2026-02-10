@@ -93,7 +93,7 @@ export const downloadAndPrepareExternalEditorBase64Resources = async ({
 
   const downloadedBlobs: Array<
     ItemResult<ResourceToDownload>
-  // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type]
   > = await downloadUrlsToBlobs({
     urlContainers: urlsToDownload,
     onProgress: (count, total) => {},

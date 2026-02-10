@@ -25,8 +25,7 @@ const UserLine = ({
   level: ?Level,
   onDelete?: () => Promise<void> | void,
   disabled?: boolean,
-// $FlowFixMe[signature-verification-failure]
-|}) => (
+|}): React.Node => (
   <I18n>
     {({ i18n }) => (
       <Line justifyContent="space-between">

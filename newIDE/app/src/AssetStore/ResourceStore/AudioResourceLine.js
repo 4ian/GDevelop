@@ -31,8 +31,7 @@ const AudioResourceLine = ({
   onClickLine,
   isPlaying,
   isSelected,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { getAuthorsDisplayLinks } = React.useContext(ResourceStoreContext);

@@ -107,8 +107,7 @@ const EducationCurriculumLesson = ({
   onOpenTemplateFromTutorial,
   isLocked,
   onClickSubscribe,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.MixedElement => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const [isImageLoaded, setIsImageLoaded] = React.useState<boolean>(false);
   const isLessonLocked =

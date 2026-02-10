@@ -46,8 +46,7 @@ const ExpressionParametersEditorDialog = ({
   projectScopedContainersAccessor,
   expressionMetadata,
   parameterRenderingService,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [parameterValues, setParameterValues] = React.useState<Array<string>>(
     Array(expressionMetadata.getParametersCount()).fill('')
   );

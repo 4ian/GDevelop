@@ -26,8 +26,7 @@ const CompactToggleButtons = ({
   noSeparator,
   buttons,
   expand,
-// $FlowFixMe[signature-verification-failure]
-}: CompactToggleButtonsProps) => {
+}: CompactToggleButtonsProps): React.MixedElement => {
   return (
     <div
       id={id}

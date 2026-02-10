@@ -40,8 +40,7 @@ const initialPublicProfileState = {
   configureNewProjectActions: () => {},
 };
 
-// $FlowFixMe[signature-verification-failure]
-const PublicProfileContext = React.createContext<PublicProfileState>(
+const PublicProfileContext: React.Context<PublicProfileState> = React.createContext<PublicProfileState>(
   // $FlowFixMe[incompatible-type]
   initialPublicProfileState
 );
@@ -52,8 +51,7 @@ type Props = {|
   children: React.Node,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const PublicProfileProvider = ({ children }: Props) => {
+export const PublicProfileProvider = ({ children }: Props): React.Node => {
   const [
     visitedPublicProfileUserId,
     setVisitedPublicProfileUserId,

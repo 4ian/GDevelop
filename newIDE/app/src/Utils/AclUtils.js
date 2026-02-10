@@ -3,8 +3,7 @@
 import { t } from '@lingui/macro';
 import { type Level } from './GDevelopServices/Project';
 
-// $FlowFixMe[signature-verification-failure]
-export const getTranslatableLevel = (level: Level) => {
+export const getTranslatableLevel = (level: Level): any => {
   switch (level) {
     case 'owner':
       return t`Owner`;

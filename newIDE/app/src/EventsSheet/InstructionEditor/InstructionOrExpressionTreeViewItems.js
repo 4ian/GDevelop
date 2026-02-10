@@ -4,9 +4,10 @@ import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { type EnumeratedInstructionMetadata } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { type InstructionOrExpressionTreeNode } from '../../InstructionOrExpression/CreateTree';
 
-// $FlowFixMe[signature-verification-failure]
-export const getInstructionGroupId = (groupName: string, parentId?: ?string) =>
-  `${parentId ? `${parentId}-` : ''}instruction-group-${groupName}`;
+export const getInstructionGroupId = (
+  groupName: string,
+  parentId?: ?string
+): string => `${parentId ? `${parentId}-` : ''}instruction-group-${groupName}`;
 
 export interface TreeViewItemContent {
   applySearch: boolean;
@@ -142,36 +143,26 @@ export class InstructionGroupTreeViewItemContent
     this.props = props;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getName() {
+  getName(): any {
     return this.name;
   }
   getDescription(): string | null {
     return null;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getId() {
+  getId(): any {
     return getInstructionGroupId(this.name, this.props.parentId);
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getHtmlId() {
+  getHtmlId(): any {
     return null;
   }
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getDataSet() {
+  getDataSet(): any {
     return {
       group: this.name,
     };
   }
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getThumbnail() {
+  getThumbnail(): any {
     return !this.props.parentId
       ? 'NONE'
       : this.props.getGroupIconSrc(this.name) || this.props.parentGroupIconSrc;
@@ -184,36 +175,26 @@ export class InstructionTreeViewItemContent implements TreeViewItemContent {
   constructor(instructionMetadata: EnumeratedInstructionMetadata) {
     this.instructionMetadata = instructionMetadata;
   }
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getInstructionMetadata() {
+  getInstructionMetadata(): any {
     return this.instructionMetadata;
   }
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getName() {
+  getName(): any {
     return this.instructionMetadata.displayedName;
   }
   getDescription(): string | null {
     return null;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getId() {
+  getId(): any {
     return `instruction-item-${this.instructionMetadata.type.replace(
       /:/g,
       '-'
     )}`;
   }
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getHtmlId() {
+  getHtmlId(): any {
     return this.getId();
   }
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getDataSet() {
+  getDataSet(): any {
     return {
       instructionType: this.instructionMetadata.type.replace(/:/g, '-'),
       object: this.instructionMetadata.scope.objectMetadata
@@ -224,9 +205,7 @@ export class InstructionTreeViewItemContent implements TreeViewItemContent {
         : undefined,
     };
   }
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getThumbnail() {
+  getThumbnail(): any {
     return this.instructionMetadata.iconFilename;
   }
 }
@@ -241,33 +220,23 @@ export class MoreResultsTreeViewItemContent implements TreeViewItemContent {
     this.onClick = onClick;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getName() {
+  getName(): any {
     return this.name;
   }
   getDescription(): string | null {
     return null;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getId() {
+  getId(): any {
     return `more-instructions`;
   }
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getHtmlId() {
+  getHtmlId(): any {
     return null;
   }
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getDataSet() {
+  getDataSet(): any {
     return {};
   }
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getThumbnail() {
+  getThumbnail(): any {
     return null;
   }
 }

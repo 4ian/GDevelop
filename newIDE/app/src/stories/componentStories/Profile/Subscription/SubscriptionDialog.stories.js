@@ -138,8 +138,7 @@ export const Default = ({
   pricingSystem: string,
   recommendedPlanId: string,
   excludePlanId: string,
-// $FlowFixMe[signature-verification-failure]
-}) => {
+}): React.Node => {
   const Component = () => {
     const {
       getSubscriptionPlansWithPricingSystems,
@@ -257,6 +256,7 @@ export const Default = ({
 
   return (
     <AlertProvider>
+      {/* $FlowFixMe[incompatible-type] */}
       <AuthenticatedUserContext.Provider value={authenticatedUser}>
         <SubscriptionProvider>
           <Component />

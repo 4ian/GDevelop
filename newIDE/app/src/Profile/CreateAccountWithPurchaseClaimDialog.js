@@ -65,8 +65,7 @@ const CreateAccountWithPurchaseClaimDialog = ({
   createAccountInProgress,
   error,
   claimedProductOptions: { productListingData: claimedProduct },
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const styles = getStyles({ isMobile });
   const [email, setEmail] = React.useState<string>('');

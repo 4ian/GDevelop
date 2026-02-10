@@ -16,9 +16,8 @@ export default class WindowBorder {
   layout: gdLayout | null;
   eventsBasedObjectVariant: gdEventsBasedObjectVariant | null;
   toCanvasCoordinates: (x: number, y: number) => [number, number];
-  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  pixiRectangle = new PIXI.Graphics();
+  pixiRectangle = (new PIXI.Graphics(): any);
   windowRectangle: Rectangle = new Rectangle();
 
   constructor({
@@ -35,9 +34,7 @@ export default class WindowBorder {
     this.pixiRectangle.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getPixiObject() {
+  getPixiObject(): any {
     return this.pixiRectangle;
   }
 

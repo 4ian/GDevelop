@@ -21,8 +21,7 @@ export const AiConfigurationPresetSelector = ({
   aiConfigurationPresetsWithAvailability,
   aiRequestMode,
   disabled,
-// $FlowFixMe[signature-verification-failure]
-}: AiConfigurationPresetSelectorProps) => {
+}: AiConfigurationPresetSelectorProps): React.Node => {
   const filteredAiConfigurationPresets = aiConfigurationPresetsWithAvailability.filter(
     preset => preset.mode === aiRequestMode
   );

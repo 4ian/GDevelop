@@ -31,8 +31,7 @@ const ChangeEmailDialog = ({
   firebaseUser,
   changeEmailInProgress,
   error,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [email, setEmail] = React.useState(firebaseUser.email);
   const [isEmailValid, setIsEmailValid] = React.useState<boolean>(true);
 

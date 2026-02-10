@@ -35,8 +35,7 @@ export const AssetPreviewImage = ({
   assetShortHeader,
   maxSize,
   loading,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const previewImageUrl = assetShortHeader.previewImageUrls[0];
   const isPrivate = isPrivateAsset(assetShortHeader);
   const [isLoaded, setIsLoaded] = React.useState(false);

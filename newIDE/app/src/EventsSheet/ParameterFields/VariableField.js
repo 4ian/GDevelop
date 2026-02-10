@@ -189,8 +189,7 @@ export const quicklyAnalyzeVariableName = (
 
 export const getVariableSourceIcon = (
   variableSourceType: VariablesContainer_SourceType
-// $FlowFixMe[signature-verification-failure]
-) => {
+): any => {
   switch (variableSourceType) {
     case gd.VariablesContainer.Global:
     case gd.VariablesContainer.ExtensionGlobal:
@@ -211,8 +210,7 @@ export const getVariableSourceIcon = (
   }
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const getVariableTypeIcon = (variableType: Variable_Type) => {
+export const getVariableTypeIcon = (variableType: Variable_Type): any => {
   switch (variableType) {
     case gd.Variable.Number:
       return VariableNumberIcon;
@@ -229,8 +227,7 @@ export const getVariableTypeIcon = (variableType: Variable_Type) => {
   }
 };
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<Props, VariableFieldInterface>(
+export default (React.forwardRef<Props, VariableFieldInterface>(
   function VariableField(props: Props, ref) {
     const {
       project,
@@ -515,7 +512,11 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       </I18n>
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<VariableFieldInterface> },
+  React.RefSetter<VariableFieldInterface>
+>);
 
 export const renderVariableWithIcon = (
   {
@@ -531,8 +532,7 @@ export const renderVariableWithIcon = (
     variableName: string,
     projectScopedContainers: gdProjectScopedContainers
   ) => VariablesContainer_SourceType
-// $FlowFixMe[signature-verification-failure]
-) => {
+): React.MixedElement => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }

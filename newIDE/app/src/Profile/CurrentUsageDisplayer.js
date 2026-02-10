@@ -48,8 +48,7 @@ const CurrentUsageDisplayer = ({
   onChangeSubscription,
   onStartBuildWithCredits,
   hidePurchaseWithCredits,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { openCreditsPackageDialog, openCreditsUsageDialog } = React.useContext(
     CreditsPackageStoreContext

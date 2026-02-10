@@ -50,8 +50,7 @@ export const QuickCustomizationDialog = ({
   onScreenshotsClaimed,
   onWillInstallExtension,
   onExtensionInstalled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { triggerUnsavedChanges } = React.useContext(UnsavedChangesContext);
   const gameAndBuildsManager = useGameAndBuildsManager({
     project,

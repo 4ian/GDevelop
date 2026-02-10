@@ -27,8 +27,7 @@ const TeamGroupNameField = ({
   onFinishEditingGroupName,
   allowDelete,
   onDeleteGroup,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [isDeleting, setIsDeleting] = React.useState<boolean>(false);
   const [isEditingName, setIsEditingName] = React.useState<boolean>(false);
 

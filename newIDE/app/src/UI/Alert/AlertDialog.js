@@ -17,8 +17,7 @@ type Props = {|
   dismissButtonLabel?: MessageDescriptor,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-function AlertDialog(props: Props) {
+function AlertDialog(props: Props): React.Node {
   return (
     <I18n>
       {({ i18n }) => (

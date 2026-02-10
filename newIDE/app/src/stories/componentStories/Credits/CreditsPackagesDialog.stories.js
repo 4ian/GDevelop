@@ -93,8 +93,7 @@ const creditsPackageListingDatas: CreditsPackageListingData[] = [
   },
 ];
 
-// $FlowFixMe[signature-verification-failure]
-export const Loading = () => {
+export const Loading = (): React.Node => {
   return (
     <CreditsPackageStoreContext.Provider
       value={{
@@ -115,8 +114,7 @@ export const Loading = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Loaded = () => {
+export const Loaded = (): React.Node => {
   return (
     <CreditsPackageStoreContext.Provider
       value={{
@@ -137,8 +135,7 @@ export const Loaded = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithSuggestedPackageAndMissingCredits = () => {
+export const WithSuggestedPackageAndMissingCredits = (): React.Node => {
   return (
     <CreditsPackageStoreContext.Provider
       value={{

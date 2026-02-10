@@ -5,7 +5,7 @@ import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extensio
 export const fakeExtensionsRegistry: ExtensionsRegistry & {
   // The service gives CSV but it's converted on the fly to an array.
   headers: Array<ExtensionShortHeader & { tags: any }>,
-// $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-type]
 } = {
   version: '0.0.1',
   views: {

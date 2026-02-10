@@ -205,8 +205,7 @@ export type AskAiEditorInterface = {|
 
 const noop = () => {};
 
-// $FlowFixMe[signature-verification-failure]
-export const AskAiEditor = React.memo<Props>(
+export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
   React.forwardRef<Props, AskAiEditorInterface>(
     (
       {
@@ -1312,8 +1311,7 @@ export const AskAiEditor = React.memo<Props>(
 
 export const renderAskAiEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-// $FlowFixMe[signature-verification-failure]
-) => (
+): React.Node => (
   <I18n>
     {({ i18n }) => (
       // $FlowFixMe[incompatible-type]

@@ -47,8 +47,7 @@ export const GameAnalyticsPanel = ({
   recommendedMarketingPlan,
   gameFeaturings,
   fetchGameFeaturings,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );

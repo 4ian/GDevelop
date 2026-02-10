@@ -57,11 +57,14 @@ export type CompactTextFieldProps = {|
   onWheel?: WheelEvent => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const CompactTextField = React.forwardRef<
-  CompactTextFieldProps,
-  CompactTextFieldInterface
->(
+// $FlowFixMe[prop-missing]
+const CompactTextField: React.AbstractComponent<
+  {
+    ...CompactTextFieldProps,
+    +ref?: React.RefSetter<CompactTextFieldInterface>,
+  },
+  React.RefSetter<CompactTextFieldInterface>
+> = React.forwardRef<CompactTextFieldProps, CompactTextFieldInterface>(
   (
     {
       type,

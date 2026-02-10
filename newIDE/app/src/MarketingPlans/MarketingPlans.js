@@ -27,8 +27,7 @@ type Props = {|
   game?: Game,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const MarketingPlans = ({ game }: Props) => {
+const MarketingPlans = ({ game }: Props): React.Node => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );

@@ -25,8 +25,7 @@ export default {
   component: CloudProjectRecoveryDialog,
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => {
+export const Default = (): React.Node => {
   const projectId = 'fb4d878a-1935-4916-b681-f9235475d354';
   const versions: Array<ExpandedCloudProjectVersion> = [
     {
@@ -96,8 +95,7 @@ export const Default = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const NoFallbackVersion = () => {
+export const NoFallbackVersion = (): React.Node => {
   const projectId = 'fb4d878a-1935-4916-b681-f9235475d354';
   const versions: Array<ExpandedCloudProjectVersion> = [
     {
@@ -177,8 +175,7 @@ export const NoFallbackVersion = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Errored = () => {
+export const Errored = (): React.Node => {
   const projectId = 'projectId';
 
   const assetServiceMock = new MockAdapter(projectApiAxiosClient, {

@@ -104,8 +104,7 @@ function LeaderboardAppearanceDialog({
   onClose,
   onSave,
   leaderboardCustomizationSettings,
-// $FlowFixMe[signature-verification-failure]
-}: Props) {
+}: Props): React.Node {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { canUseTheme, canUseCustomCss } = canUserCustomizeLeaderboardTheme(
@@ -229,8 +228,8 @@ function LeaderboardAppearanceDialog({
               suffix,
               precision,
             }
-          // $FlowFixMe[invalid-computed-prop]
-          : { type: scoreType, ...unitSelectOptions[timeUnits] },
+          : // $FlowFixMe[invalid-computed-prop]
+            { type: scoreType, ...unitSelectOptions[timeUnits] },
       theme: canUseTheme
         ? {
             backgroundColor: rgbStringToHexString(backgroundColor),

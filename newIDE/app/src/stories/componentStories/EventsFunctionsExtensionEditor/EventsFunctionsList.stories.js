@@ -17,8 +17,7 @@ export default {
   decorators: [alertDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={500}>
       <EventsFunctionsListWithErrorBoundary

@@ -68,8 +68,7 @@ const DashboardWidget = ({
   children,
   minHeight,
   widgetName,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   return (
     <Grid

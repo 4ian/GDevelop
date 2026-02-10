@@ -10,8 +10,7 @@ import { enumerateParametersUsableInExpressions } from './EnumerateFunctionParam
 import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function FunctionParameterNameField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SelectFieldInterface>(null);
     const focus: FieldFocusFunction = options => {
@@ -88,4 +87,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </SelectField>
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);

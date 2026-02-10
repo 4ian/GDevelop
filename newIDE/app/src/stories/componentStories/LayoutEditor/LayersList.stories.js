@@ -17,8 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => {
+export const Default = (): React.Node => {
   const [chosenLayer, setChosenLayer] = React.useState<string>('');
   const [selectLayer, setSelectLayer] = React.useState<gdLayer | null>(null);
   return (
@@ -54,8 +53,7 @@ export const Default = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const SmallWidthAndHeight = () => {
+export const SmallWidthAndHeight = (): React.Node => {
   const [chosenLayer, setChosenLayer] = React.useState<string>('');
   const [selectLayer, setSelectLayer] = React.useState<gdLayer | null>(null);
 

@@ -429,10 +429,10 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
       startDate.toLocaleDateString(
         undefined,
         endDate.getMonth() === startDate.getMonth()
-          // $FlowFixMe[incompatible-type]
-          ? noMonthDateFormatOptions
-          // $FlowFixMe[incompatible-type]
-          : dateFormatOptions
+          ? // $FlowFixMe[incompatible-type]
+            noMonthDateFormatOptions
+          : // $FlowFixMe[incompatible-type]
+            dateFormatOptions
       ) +
       '-' +
       formattedDate

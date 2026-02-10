@@ -48,9 +48,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     return this.props.project;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     if (!this.props.isActive && nextProps.isActive) {
       this._setPreviewedLayout();
     }
@@ -271,9 +269,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     );
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const { project, isActive } = this.props;
     if (!project) return null;
 
@@ -376,5 +372,4 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
 
 export const renderCustomObjectEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-// $FlowFixMe[signature-verification-failure]
-) => <CustomObjectEditorContainer {...props} />;
+): React.Node => <CustomObjectEditorContainer {...props} />;

@@ -12,8 +12,9 @@ import TutorialMessage from './TutorialMessage';
  * Useful to use when you need to know if the component is null before rendering,
  * to avoid spacing issues when the component is hidden.
  */
-// $FlowFixMe[signature-verification-failure]
-const useDismissableTutorialMessage = (tutorialId: string) => {
+const useDismissableTutorialMessage = (
+  tutorialId: string
+): { DismissableTutorialMessage: null | React.MixedElement } => {
   const preferences = React.useContext(PreferencesContext);
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext

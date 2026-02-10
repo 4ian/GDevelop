@@ -160,7 +160,7 @@ class InstancesList extends Component<Props, State> {
     rowData: { instance },
   }: {
     rowData: RenderedRowInfo,
-  // $FlowFixMe[missing-local-annot]
+    // $FlowFixMe[missing-local-annot]
   }) => {
     return (
       <IconButton
@@ -363,11 +363,11 @@ class InstancesList extends Component<Props, State> {
   }
 }
 
-// $FlowFixMe[signature-verification-failure]
-const InstancesListWithErrorBoundary = React.forwardRef<
-  Props,
-  InstancesListInterface
->((props, ref) => {
+// $FlowFixMe[prop-missing]
+const InstancesListWithErrorBoundary: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<InstancesListInterface> },
+  React.RefSetter<InstancesListInterface>
+> = React.forwardRef<Props, InstancesListInterface>((props, ref) => {
   const forceUpdate = useForceUpdate();
   React.useImperativeHandle(ref, () => ({
     forceUpdate,

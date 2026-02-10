@@ -9,8 +9,7 @@ type Props = {|
   showOnTop?: boolean,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const PlaceholderMessage = (props: Props) => {
+const PlaceholderMessage = (props: Props): React.MixedElement => {
   return (
     <div
       {...dataObjectToProps(props.data)}

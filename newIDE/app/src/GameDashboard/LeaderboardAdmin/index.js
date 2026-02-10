@@ -190,8 +190,7 @@ export const LeaderboardAdmin = ({
   onLoading,
   project,
   leaderboardIdToSelectAtOpening,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const isOnline = useOnlineStatus();
   const { isMobile } = useResponsiveWindowSize();
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
@@ -1140,8 +1139,7 @@ type ContainerProps = {| ...Props, gameId: string |};
 const LeaderboardAdminContainer = ({
   gameId,
   ...otherProps
-// $FlowFixMe[signature-verification-failure]
-}: ContainerProps) => (
+}: ContainerProps): React.Node => (
   <LeaderboardProvider gameId={gameId}>
     <LeaderboardAdmin {...otherProps} />
   </LeaderboardProvider>

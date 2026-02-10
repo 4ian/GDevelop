@@ -12,8 +12,7 @@ const RightLoader = ({
 }: {
   children: React.Node,
   isLoading: ?boolean,
-// $FlowFixMe[signature-verification-failure]
-}) => (
+}): React.MixedElement => (
   <span>
     {children}
     {/* $FlowFixMe[incompatible-type] */}

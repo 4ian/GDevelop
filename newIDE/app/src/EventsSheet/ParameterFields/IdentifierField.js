@@ -11,8 +11,7 @@ import { getLastObjectParameterValue } from './ParameterMetadataTools';
 
 const gd: libGDevelop = global.gd;
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function IdentifierField(props, ref) {
     const {
       project,
@@ -34,7 +33,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         parameterIndex,
       }) || '';
 
-    const autocompletionIdentifierNames: ExpressionAutocompletion[] = React.useMemo(
+    const autocompletionIdentifierNames: Array<ExpressionAutocompletion> = React.useMemo(
       () => {
         if (!parameterIndex) {
           return [];
@@ -108,4 +107,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);

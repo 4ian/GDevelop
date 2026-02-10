@@ -59,8 +59,7 @@ const CoursesPage = ({
   getCourseChapters,
   getCourseChapterCompletion,
   getCourseCompletion,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { listedCourses } = React.useContext(CourseStoreContext);
   const { windowSize, isLandscape } = useResponsiveWindowSize();
   const numberOfItemsOnOneRow = getColumnsFromWindowSize(
@@ -124,8 +123,8 @@ const CoursesPage = ({
                         </GridListTile>
                       );
                     })
-                  // $FlowFixMe[underconstrained-implicit-instantiation]
-                  : new Array(6).fill(0).map((_, index) => (
+                  : // $FlowFixMe[underconstrained-implicit-instantiation]
+                    new Array(6).fill(0).map((_, index) => (
                       <GridListTile key={`skeleton-course-${index}`}>
                         <CourseCard
                           course={null}

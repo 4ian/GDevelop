@@ -32,8 +32,7 @@ const PrivateGameTemplateOwnedInformationPage = ({
   privateGameTemplateListingData,
   purchaseUsageType,
   onStoreProductOpened,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const shouldUseOrSimulateAppStoreProduct = shouldUseAppStoreProduct();
   const { navigateToRoute } = React.useContext(RouterContext);
 

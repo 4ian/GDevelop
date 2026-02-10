@@ -39,8 +39,7 @@ const MarketingPlanSingleDisplay = ({
   marketingPlan,
   gameFeaturings,
   fetchGameFeaturings,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const [

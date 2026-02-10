@@ -26,8 +26,7 @@ const LocalVariablesDialog = ({
   initiallySelectedVariableName,
   shouldCreateInitiallySelectedVariable,
   isListLocked,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const tabs = React.useMemo(
     () => [
       {

@@ -119,7 +119,6 @@ export type TreeItemProps = {|
   forceUpdateList: () => void,
   unsavedChanges?: ?UnsavedChanges,
   preferences: Preferences,
-  // $FlowFixMe[value-as-type]
   gdevelopTheme: GDevelopTheme,
   editName: (itemId: string) => void,
   scrollToItem: (itemId: string) => void,
@@ -463,8 +462,9 @@ const deleteItem = (item: TreeViewItem) => {
 const getTreeViewItemRightButton = (i18n: I18nType) => (item: TreeViewItem) =>
   item.content.getRightButton(i18n);
 
-// $FlowFixMe[signature-verification-failure]
-export const usePropertyOverridingAlertDialog = () => {
+export const usePropertyOverridingAlertDialog = (): ((
+  existingPropertyNames: Array<string>
+) => Promise<boolean>) => {
   const { showConfirmation } = useAlertDialog();
   return async (existingPropertyNames: Array<string>): Promise<boolean> => {
     return await showConfirmation({
@@ -972,8 +972,8 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
           !propertiesTreeViewItemProps ||
           !propertyFolderTreeViewItemProps
           ? []
-          // $FlowFixMe[incompatible-type]
-          : [
+          : // $FlowFixMe[incompatible-type]
+            [
               new LeafTreeViewItem(
                 new ActionTreeViewItemContent(
                   configurationItemId,
@@ -1393,11 +1393,11 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
   }
 );
 
-// $FlowFixMe[signature-verification-failure]
-const PropertyListEditorWithErrorBoundary = React.forwardRef<
-  Props,
-  PropertyListEditorInterface
->((props, ref) => (
+// $FlowFixMe[prop-missing]
+const PropertyListEditorWithErrorBoundary: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<PropertyListEditorInterface> },
+  React.RefSetter<PropertyListEditorInterface>
+> = React.forwardRef<Props, PropertyListEditorInterface>((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Property list editor</Trans>}
     scope="property-list-editor"

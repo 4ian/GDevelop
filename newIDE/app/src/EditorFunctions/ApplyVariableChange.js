@@ -149,8 +149,11 @@ export const applyVariableChange = ({
   forcedVariableType: string | null,
   variablesContainer: gd.VariablesContainer,
   value: string,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): {
+  addedNewVariable: boolean,
+  variable: null | gdVariable,
+  variableType: string,
+} => {
   const pathSegments = parseVariablePath(variablePath);
 
   if (pathSegments.length === 0) {

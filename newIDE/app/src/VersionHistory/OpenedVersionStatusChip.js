@@ -50,8 +50,7 @@ const OpenedVersionStatusChip = ({
   openedVersionStatus,
   onQuit,
   disableQuitting,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): null | React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const classes = useStylesCloseIconButton();
   if (!openedVersionStatus) return null;

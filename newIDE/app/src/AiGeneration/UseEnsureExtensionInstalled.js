@@ -22,8 +22,7 @@ export const useEnsureExtensionInstalled = ({
 }: {|
   project: ?gdProject,
   i18n: I18nType,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): any => {
   const {
     translatedExtensionShortHeadersByName: extensionShortHeadersByName,
   } = React.useContext(ExtensionStoreContext);

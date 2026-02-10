@@ -59,8 +59,7 @@ const ColorPicker = ({
   disableAlpha,
   disabled,
   size,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const swatchRef = React.useRef<?HTMLDivElement>(null);
   const [displayColorPicker, setDisplayColorPicker] = React.useState(false);
 

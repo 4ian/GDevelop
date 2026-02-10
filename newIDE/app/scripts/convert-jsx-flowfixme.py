@@ -13,6 +13,75 @@ from collections import defaultdict
 APP_DIR = os.environ.get('APP_DIR', os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
+def looks_like_jsx_context(lines, code_idx):
+    """
+    Heuristic to detect if a line is inside JSX where // comments are invalid.
+    """
+    if code_idx < 0 or code_idx >= len(lines):
+        return False
+
+    for idx in range(code_idx, min(len(lines), code_idx + 4)):
+        stripped = lines[idx].lstrip()
+        if not stripped:
+            continue
+        if stripped.startswith('//') or stripped.startswith('/*') or stripped.startswith('*'):
+            continue
+
+        if (
+            stripped.startswith('<')
+            or stripped.startswith('</')
+            or stripped.startswith('<>')
+            or stripped.startswith('{<')
+            or stripped.startswith('(<')
+        ):
+            return True
+
+        # JSX expression containers can start with "{" and contain JSX on
+        # following lines:
+        # {
+        #   condition && (
+        #     <Component />
+        #   )
+        # }
+        if stripped.startswith('{'):
+            for look_ahead in range(idx + 1, min(len(lines), idx + 5)):
+                next_stripped = lines[look_ahead].lstrip()
+                if not next_stripped:
+                    continue
+                if (
+                    next_stripped.startswith('<')
+                    or next_stripped.startswith('</')
+                    or next_stripped.startswith('<>')
+                ):
+                    return True
+                if (
+                    next_stripped.startswith('//')
+                    or next_stripped.startswith('/*')
+                    or next_stripped.startswith('*')
+                ):
+                    continue
+                break
+
+        # Common pattern:
+        # {
+        #   condition && (
+        #     <Component />
+        #   )
+        # }
+        if stripped.startswith('(') and idx + 1 < len(lines):
+            next_stripped = lines[idx + 1].lstrip()
+            if (
+                next_stripped.startswith('<')
+                or next_stripped.startswith('</')
+                or next_stripped.startswith('<>')
+            ):
+                return True
+
+        return False
+
+    return False
+
+
 def get_flow_errors():
     """Run flow and get errors as JSON."""
     result = subprocess.run(
@@ -65,6 +134,7 @@ def main():
     
     # Convert the failing comments to JSX format
     fixes_count = 0
+    reverted_count = 0
     for filepath, fixme_indices in file_fixes.items():
         with open(filepath) as f:
             lines = f.readlines()
@@ -85,12 +155,33 @@ def main():
                     lines[idx] = f'{indent}{{/* {fixme} */}}\n'
                 modified = True
                 fixes_count += 1
+
+        # If a JSX-style FlowFixMe ended up outside JSX (can happen with noisy
+        # parse errors), restore it back to normal // comment syntax.
+        for idx, line in enumerate(lines):
+            m = re.match(r'^(\s*)\{/\*\s*(\$FlowFixMe\[[^\]]+\])(?:\s+(.*?))?\s*\*/\}\s*$', line.rstrip())
+            if not m:
+                continue
+            if looks_like_jsx_context(lines, idx + 1):
+                continue
+
+            indent = m.group(1)
+            fixme = m.group(2)
+            rest = (m.group(3) or '').strip()
+            if rest:
+                lines[idx] = f'{indent}// {fixme} {rest}\n'
+            else:
+                lines[idx] = f'{indent}// {fixme}\n'
+            modified = True
+            reverted_count += 1
         
         if modified:
             with open(filepath, 'w') as f:
                 f.writelines(lines)
     
     print(f"Converted {fixes_count} FlowFixMe comments to JSX format")
+    if reverted_count:
+        print(f"Reverted {reverted_count} non-JSX FlowFixMe comments back to // syntax")
 
 
 if __name__ == '__main__':

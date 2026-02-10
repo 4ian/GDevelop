@@ -8,6 +8,14 @@ import RaisedButton from '../UI/RaisedButton';
 import Text from '../UI/Text';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { getAllThemes } from './Theme';
+import optionalRequire from '../Utils/OptionalRequire';
+
+const electron = optionalRequire('electron');
+const ipcRenderer = electron ? electron.ipcRenderer : null;
+
+const notifyMonacoFocusChanged = (isFocused: boolean) => {
+  if (ipcRenderer) ipcRenderer.send('monaco-focus-changed', { isFocused });
+};
 
 export type State = {|
   MonacoEditor: ?any,
@@ -58,10 +66,16 @@ export class CodeEditor extends React.Component<Props, State> {
   };
 
   setUpSaveOnEditorBlur = (editor: any) => {
-    editor.onDidBlurEditorText(this.props.onBlur);
+    editor.onDidBlurEditorText(() => {
+      notifyMonacoFocusChanged(false);
+      this.props.onBlur();
+    });
   };
   setUpEditorFocus = (editor: any) => {
-    editor.onDidFocusEditorText(this.props.onFocus);
+    editor.onDidFocusEditorText(() => {
+      notifyMonacoFocusChanged(true);
+      this.props.onFocus();
+    });
   };
 
   setupEditorCompletions = (editor: any, monaco: any) => {

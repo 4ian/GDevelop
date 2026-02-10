@@ -49,12 +49,12 @@ const { setupWatcher, disableWatcher } = require('./LocalFilesystemWatcher');
 const isMac = process.platform === 'darwin';
 
 /**
- * Ensures paste operations work in all web content (notably Monaco editor)
- * by intercepting Cmd/Ctrl+V before Electron's menu accelerators consume the
- * event, and explicitly calling webContents.paste().
+ * Ensures paste operations work in Monaco editor by intercepting Cmd/Ctrl+V
+ * only when Monaco is focused, and injecting clipboard text via insertText()
+ * instead of the unreliable webContents.paste().
  * See https://github.com/microsoft/monaco-editor/issues/4855
  *
- * This may be fixed in future monaco-editor versions, starting from 0.56.0 when it's released.
+ * For all other inputs, native Chromium paste is left alone.
  */
 const setupPasteHandler = window => {
   window.webContents.on('before-input-event', (event, input) => {
@@ -62,12 +62,27 @@ const setupPasteHandler = window => {
     const hasShift = input.shift === true;
     const hasAlt = input.alt === true;
     const isV = input.code === 'KeyV' || input.key === 'v';
+
     const shouldPaste =
       input.type === 'keyDown' && isCmdOrCtrl && !hasShift && !hasAlt && isV;
 
-    if (shouldPaste) {
-      window.webContents.paste();
-      event.preventDefault();
+    if (!shouldPaste) return;
+
+    // Only intercept when Monaco is focused in this webContents.
+    const isMonacoFocused = !!monacoFocusedByWebContentsId.get(
+      window.webContents.id
+    );
+    if (!isMonacoFocused) {
+      // Let Chromium handle paste normally for all other inputs.
+      return;
+    }
+
+    // Avoid webContents.paste() which is unreliable on some Electron versions;
+    // inject clipboard text directly instead.
+    const text = electron.clipboard.readText();
+    if (text) {
+      window.webContents.insertText(text);
+      event.preventDefault(); // prevent duplicate paste (native + injected)
     }
   });
 };
@@ -90,6 +105,10 @@ autoUpdater.autoDownload = false;
 let mainWindows = new Set();
 let mainWindow = null; // Primary window reference for backwards compatibility
 let windowCounter = 0; // Counter for creating unique session partitions
+
+// Track which webContents currently have Monaco editor focused,
+// so the paste handler only intervenes when Monaco needs it.
+const monacoFocusedByWebContentsId = new Map();
 
 // Parse arguments (knowing that in dev, we run electron with an argument,
 // so have to ignore one more).
@@ -216,8 +235,9 @@ function createNewWindow(windowArgs = args) {
   const newWindow = new BrowserWindow(options);
   if (!isIntegrated) newWindow.maximize();
 
-  // Capture window ID and whether this is the primary window before it can be destroyed
+  // Capture window/webContents IDs and whether this is the primary window before it can be destroyed
   const windowId = newWindow.id;
+  const webContentsId = newWindow.webContents.id;
   const isPrimaryWindow = windowNumber === 0;
   log.info(
     `Created window with Electron ID: ${windowId}, window number: ${windowNumber}, isPrimary: ${isPrimaryWindow}`
@@ -267,6 +287,7 @@ function createNewWindow(windowArgs = args) {
   newWindow.on('closed', function() {
     // Remove from tracked windows
     mainWindows.delete(newWindow);
+    monacoFocusedByWebContentsId.delete(webContentsId);
 
     // If this was the primary window, set a new primary
     if (isPrimaryWindow) {
@@ -348,6 +369,10 @@ app.on('ready', function() {
         mainMenuTemplate
       )
     );
+  });
+
+  ipcMain.on('monaco-focus-changed', (event, { isFocused }) => {
+    monacoFocusedByWebContentsId.set(event.sender.id, !!isFocused);
   });
 
   ipcMain.handle('preview-open', async (event, options) => {

@@ -14,8 +14,7 @@ const SerializedObjectDisplay = ({
   children: React.Node,
   object: any,
   methodName?: string,
-// $FlowFixMe[signature-verification-failure]
-}) => {
+}): React.MixedElement => {
   const forceUpdate = useForceUpdate();
 
   return (

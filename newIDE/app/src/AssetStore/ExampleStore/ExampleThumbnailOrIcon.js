@@ -24,8 +24,9 @@ type Props = {|
   exampleShortHeader: ExampleShortHeader,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const ExampleThumbnailOrIcon = ({ exampleShortHeader }: Props) => {
+export const ExampleThumbnailOrIcon = ({
+  exampleShortHeader,
+}: Props): React.MixedElement => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const iconUrl = exampleShortHeader.previewImageUrls[0];
   const aspectRatio = iconUrl.endsWith('square-icon.png') ? '1 / 1' : '16 / 9';

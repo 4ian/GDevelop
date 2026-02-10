@@ -69,8 +69,8 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
         leaderboard => leaderboard.primary
       );
       const currentLeaderboardUpdated = state.currentLeaderboard
-        // $FlowFixMe[invalid-computed-prop]
-        ? leaderboardsByIds[state.currentLeaderboard.id]
+        ? // $FlowFixMe[invalid-computed-prop]
+          leaderboardsByIds[state.currentLeaderboard.id]
         : undefined;
       const fallBackLeaderboard =
         currentLeaderboardUpdated || state.currentLeaderboard;
@@ -184,8 +184,7 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
   }
 };
 
-// $FlowFixMe[signature-verification-failure]
-const LeaderboardProvider = ({ gameId, children }: Props) => {
+const LeaderboardProvider = ({ gameId, children }: Props): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   // Ensure that only one request for leaderboards list is sent at the same time.
   const isListingLeaderboards = React.useRef(false);

@@ -74,25 +74,20 @@ export default class DebuggerContent extends React.Component<Props, State> {
   // $FlowFixMe[missing-local-annot]
   state = {
     selectedInspector: null,
-    // $FlowFixMe[signature-verification-failure]
-    selectedInspectorFullPath: [],
+    selectedInspectorFullPath: ([]: Array<empty>),
     rawMode: false,
   };
 
   _editors: ?EditorMosaicInterface = null;
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  isProfilerShown = () => {
+  isProfilerShown = (): any => {
     return (
       !!this._editors &&
       this._editors.getOpenedEditorNames().includes('profiler')
     );
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  isConsoleShown = () => {
+  isConsoleShown = (): any => {
     return (
       !!this._editors &&
       this._editors.getOpenedEditorNames().includes('console')
@@ -107,9 +102,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
     if (this._editors) this._editors.toggleEditor('console', 'bottom');
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const {
       gameData,
       onRefresh,

@@ -142,8 +142,7 @@ const StartInAppTutorialDialog = ({
   isProjectOpened,
   startTutorial,
   isProjectOpening,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): null | React.Node => {
   const { getInAppTutorialShortHeader } = React.useContext(
     InAppTutorialContext
   );

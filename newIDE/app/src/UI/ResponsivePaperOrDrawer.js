@@ -34,8 +34,7 @@ export const ResponsivePaperOrDrawer = ({
   open: boolean,
   onClose: () => void,
   children: React.Node,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): null | React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   if (!isMobile) {
     if (!open) return null;

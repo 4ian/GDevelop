@@ -21,8 +21,7 @@ type Props = {|
   feedbacks: Array<Comment>,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const FeedbackAverageCard = ({ feedbacks }: Props) => {
+const FeedbackAverageCard = ({ feedbacks }: Props): null | React.Node => {
   if (feedbacks.length === 0) return null;
 
   const ratings = feedbacks.map(feedback => feedback.ratings).filter(Boolean);

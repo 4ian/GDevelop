@@ -27,37 +27,32 @@ const defaultProps = {
   claimedProductOptions,
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <CreateAccountWithPurchaseClaimDialog {...defaultProps} />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const PasswordErrorFromBackend = () => (
+export const PasswordErrorFromBackend = (): React.Node => (
   <CreateAccountWithPurchaseClaimDialog
     {...defaultProps}
     error={{ code: 'auth/weak-password' }}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const EmailErrorFromBackend = () => (
+export const EmailErrorFromBackend = (): React.Node => (
   <CreateAccountWithPurchaseClaimDialog
     {...defaultProps}
     error={{ code: 'auth/invalid-email' }}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const AccountExists = () => (
+export const AccountExists = (): React.Node => (
   <CreateAccountWithPurchaseClaimDialog
     {...defaultProps}
     error={{ code: 'auth/account-exists-with-different-credential' }}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Submitting = () => (
+export const Submitting = (): React.Node => (
   <CreateAccountWithPurchaseClaimDialog
     {...defaultProps}
     createAccountInProgress

@@ -56,8 +56,7 @@ const Wrapper = ({ children }: {| children: React.Node |}) => {
   return <>{children}</>;
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Export = () => {
+export const Export = (): React.Node => {
   return (
     <Wrapper>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -77,8 +76,7 @@ export const Export = () => {
     </Wrapper>
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const SavingProject = () => {
+export const SavingProject = (): React.Node => {
   return (
     <Wrapper>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -98,8 +96,7 @@ export const SavingProject = () => {
     </Wrapper>
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const ResourcesDownload = () => {
+export const ResourcesDownload = (): React.Node => {
   return (
     <Wrapper>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -119,8 +116,7 @@ export const ResourcesDownload = () => {
     </Wrapper>
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const Compress = () => {
+export const Compress = (): React.Node => {
   return (
     <Wrapper>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -140,8 +136,7 @@ export const Compress = () => {
     </Wrapper>
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const Upload = () => {
+export const Upload = (): React.Node => {
   return (
     <Wrapper>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -161,8 +156,7 @@ export const Upload = () => {
     </Wrapper>
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const WaitingForBuild = () => {
+export const WaitingForBuild = (): React.Node => {
   return (
     <Wrapper>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -182,8 +176,7 @@ export const WaitingForBuild = () => {
     </Wrapper>
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const Build = () => {
+export const Build = (): React.Node => {
   return (
     <Wrapper>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -203,8 +196,7 @@ export const Build = () => {
     </Wrapper>
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const DoneWithPublicBuild = () => {
+export const DoneWithPublicBuild = (): React.Node => {
   return (
     <Wrapper>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -224,8 +216,7 @@ export const DoneWithPublicBuild = () => {
     </Wrapper>
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const DoneWithPrivateBuild = () => {
+export const DoneWithPrivateBuild = (): React.Node => {
   return (
     <Wrapper>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>

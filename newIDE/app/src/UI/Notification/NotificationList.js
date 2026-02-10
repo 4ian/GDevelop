@@ -29,8 +29,7 @@ const NotificationList = ({
   canMarkAllAsRead,
   onMarkNotificationAsSeen,
   onCloseNotificationList,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [showAll, setShowAll] = React.useState<boolean>(false);
 

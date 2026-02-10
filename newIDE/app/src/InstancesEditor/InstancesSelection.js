@@ -7,9 +7,7 @@ const gd: libGDevelop = global.gd;
 export default class InstancesSelection {
   selection: Array<gdInitialInstance> = [];
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  hasSelectedInstances() {
+  hasSelectedInstances(): any {
     return !!this.getSelectedInstances().length;
   }
 
@@ -17,9 +15,7 @@ export default class InstancesSelection {
     return this.selection;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  isInstanceSelected(instance: gdInitialInstance) {
+  isInstanceSelected(instance: gdInitialInstance): any {
     for (var i = 0; i < this.selection.length; i++) {
       // $FlowFixMe[incompatible-exact]
       if (gd.compare(this.selection[i], instance)) return true;

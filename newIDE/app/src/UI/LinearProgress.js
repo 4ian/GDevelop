@@ -3,11 +3,9 @@ import * as React from 'react';
 
 import MuiLinearProgress from '@material-ui/core/LinearProgress';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
-// $FlowFixMe[untyped-type-import]
 import type { GDevelopTheme } from './Theme';
 import { makeStyles } from '@material-ui/core/styles';
 
-// $FlowFixMe[value-as-type]
 const useStyles = (color?: 'success', gdevelopTheme: GDevelopTheme) =>
   makeStyles({
     colorSecondary: {
@@ -28,8 +26,7 @@ type Props = {|
   style?: {| height?: number, borderRadius?: number, width?: number |},
 |};
 
-// $FlowFixMe[signature-verification-failure]
-function LinearProgress(props: Props) {
+function LinearProgress(props: Props): React.Node {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const classes = useStyles(props.color, gdevelopTheme);
 

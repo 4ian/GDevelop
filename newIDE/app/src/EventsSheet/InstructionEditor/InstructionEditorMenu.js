@@ -81,8 +81,7 @@ const InstructionEditorMenu = ({
   onPasteInstructions,
   onExtensionInstalled,
   i18n,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const [
     instructionEditorState,

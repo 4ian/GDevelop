@@ -45,8 +45,7 @@ const LocalFilePicker = ({
   defaultPath,
   fullWidth,
   filters,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.MixedElement => {
   const onChooseFolder = async () => {
     if (!dialog || !electron) return;
 

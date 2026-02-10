@@ -9,8 +9,10 @@ type Props = {|
   text: string,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const TextBasedCourseChapterCalloutBlock = ({ text, kind }: Props) => {
+const TextBasedCourseChapterCalloutBlock = ({
+  text,
+  kind,
+}: Props): React.Node => {
   return (
     <AlertMessage kind={kind}>
       <MarkdownText allowParagraphs source={text} />

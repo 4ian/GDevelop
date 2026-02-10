@@ -30,8 +30,7 @@ const CloudProjectRecoveryDialog = ({
   cloudProjectId,
   onClose,
   onOpenPreviousVersion,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile } = authenticatedUser;
   const [

@@ -42,8 +42,7 @@ export const GdGamesFrame = ({
   path,
   onMessageReceived,
   supportedMessageIds,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const paletteType = gdevelopTheme.palette.type;
 

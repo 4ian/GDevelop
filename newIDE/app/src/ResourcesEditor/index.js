@@ -242,9 +242,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     this.refreshResourcesList();
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const {
       project,
       onRenameResource,

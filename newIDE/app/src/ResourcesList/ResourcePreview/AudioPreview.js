@@ -9,8 +9,10 @@ type Props = {|
   audioResourceSource: string,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const AudioPreview = ({ resourceName, audioResourceSource }: Props) => {
+const AudioPreview = ({
+  resourceName,
+  audioResourceSource,
+}: Props): React.Node => {
   const [hasError, setHasError] = React.useState(false);
 
   const onSoundLoaded = React.useCallback(() => {

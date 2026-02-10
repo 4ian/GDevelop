@@ -4,8 +4,7 @@ import SvgIcon from '@material-ui/core/SvgIcon';
 
 type Props = {};
 
-// $FlowFixMe[signature-verification-failure]
-export default React.memo<Props>(props => (
+export default (React.memo<Props>(props => (
   <SvgIcon {...props} viewBox="0 0 17 7">
     <path
       fill="none"
@@ -24,4 +23,4 @@ export default React.memo<Props>(props => (
       strokeLinejoin="round"
     />
   </SvgIcon>
-));
+)): React.ComponentType<Props>);

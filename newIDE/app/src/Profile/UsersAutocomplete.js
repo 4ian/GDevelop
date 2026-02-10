@@ -34,8 +34,7 @@ export const UsersAutocomplete = ({
   floatingLabelText,
   helperText,
   disabled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const [users, setUsers] = React.useState<Array<AutocompleteOption>>([]);
   const [userInput, setUserInput] = useState('');

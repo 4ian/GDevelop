@@ -23,8 +23,7 @@ export const UserPublicProfileChip = ({
   user,
   isClickable = false,
   variant,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { openUserPublicProfile } = React.useContext(PublicProfileContext);
 
   return (

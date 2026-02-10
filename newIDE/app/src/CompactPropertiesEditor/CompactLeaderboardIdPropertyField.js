@@ -33,8 +33,7 @@ const CompactLeaderboardIdPropertyField = ({
   value: string,
   onChange: (newValue: string) => void,
   id?: string,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): React.Node => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
 
   const isOnline = useOnlineStatus();

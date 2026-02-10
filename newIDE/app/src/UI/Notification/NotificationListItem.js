@@ -209,8 +209,7 @@ const NotificationListItem = ({
   notification,
   onCloseNotificationList,
   onMarkNotificationAsSeen,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): null | React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { addRouteArguments } = React.useContext(RouterContext);
   const onClickNotification = getNotificationClickCallback({

@@ -14,8 +14,7 @@ export default {
   component: ObjectMethodSelectorDialog,
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <I18n>
     {({ i18n }) => (
       <ObjectMethodSelectorDialog

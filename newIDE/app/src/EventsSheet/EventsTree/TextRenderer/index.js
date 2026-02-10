@@ -304,8 +304,7 @@ export const renderNonTranslatedEventsAsText = ({
   eventsList,
 }: {
   eventsList: gdEventsList,
-// $FlowFixMe[signature-verification-failure]
-}) => {
+}): string | 'Error while rendering events as text.' => {
   // Temporarily override the getTranslation function to return the original
   // string, so that events are always rendered in English.
   // $FlowFixMe[incompatible-type]

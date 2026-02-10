@@ -166,8 +166,7 @@ export const ResourceStoreFilterPanel = ({
   resourceKind,
 }: {
   resourceKind: 'audio' | 'font',
-// $FlowFixMe[signature-verification-failure]
-}) => {
+}): React.Node => {
   const {
     audioFiltersState,
     fontFiltersState,
@@ -244,6 +243,7 @@ export const ResourceStoreFilterPanel = ({
           values={fontFiltersState.alphabetSupportFilter.alphabets.map(
             alphabet => ({
               value: alphabet,
+              // $FlowFixMe[invalid-computed-prop]
               label: languageNames[alphabet].languageNativeName,
             })
           )}

@@ -102,8 +102,17 @@ export const useProcessFunctionCalls = ({
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   isReadyToProcessFunctionCalls: boolean,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): {
+  isAutoProcessingFunctionCalls: (aiRequestId: string) => boolean,
+  onProcessFunctionCalls: (
+    functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
+    options: ?{ ignore?: boolean }
+  ) => Promise<void>,
+  setAutoProcessFunctionCalls: (
+    aiRequestId: string,
+    shouldAutoProcess: boolean
+  ) => void,
+} => {
   const { ensureExtensionInstalled } = useEnsureExtensionInstalled({
     project,
     i18n,
@@ -289,8 +298,13 @@ export const useAiRequestState = ({
       createdProject?: gdProject,
     |}
   ) => Promise<?FileMetadata>,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): {
+  isFetchingSuggestions: boolean,
+  savingProjectForMessageId: ?string,
+  selectedAiRequest: any,
+  selectedAiRequestId: any,
+  setAiState: any,
+} => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile, getAuthorizationHeader } = authenticatedUser;
   const {

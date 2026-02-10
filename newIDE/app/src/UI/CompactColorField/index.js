@@ -30,8 +30,7 @@ export const CompactColorField = ({
   disabled,
   errored,
   placeholder,
-// $FlowFixMe[signature-verification-failure]
-}: CompactColorFieldProps) => {
+}: CompactColorFieldProps): React.MixedElement => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
   const [colorValue, setColorValue] = React.useState<string>(color);
   // alpha can be equal to 0, so we have to check if it is not undefined

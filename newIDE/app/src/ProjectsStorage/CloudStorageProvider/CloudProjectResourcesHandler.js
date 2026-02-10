@@ -20,9 +20,12 @@ const app = remote ? remote.app : null;
 export const generateGetResourceActions = ({
   authenticatedUser,
 }: {
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
-// $FlowFixMe[signature-verification-failure]
-}) => ({
+}): (ResourcesActionsProps => Array<{
+  click: () => Promise<void>,
+  label: any,
+}>) => ({
   project,
   resource,
   i18n,

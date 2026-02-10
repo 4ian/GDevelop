@@ -146,8 +146,7 @@ export const PanesContainer = ({
   renderPane,
   hasEditorsInLeftPane,
   hasEditorsInRightPane,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.MixedElement => {
   const { isMobile } = useResponsiveWindowSize();
   const forceUpdate = useForceUpdate();
   const debouncedForceUpdate = useDebounce(forceUpdate, 200);

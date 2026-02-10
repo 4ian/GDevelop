@@ -15,8 +15,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const DefaultStringNoScope = () => (
+export const DefaultStringNoScope = (): React.Node => (
   <FixedHeightFlexContainer height={400}>
     <I18n>
       {({ i18n }) => (
@@ -33,8 +32,7 @@ export const DefaultStringNoScope = () => (
   </FixedHeightFlexContainer>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const DefaultNumberNoScope = () => (
+export const DefaultNumberNoScope = (): React.Node => (
   <FixedHeightFlexContainer height={400}>
     <I18n>
       {({ i18n }) => (

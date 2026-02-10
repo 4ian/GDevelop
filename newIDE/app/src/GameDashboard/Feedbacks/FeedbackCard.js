@@ -57,12 +57,14 @@ type BuildProperties = {
 type Props = {|
   comment: Comment,
   buildProperties?: BuildProperties,
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   onCommentUpdated: (comment: Comment) => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const getRatings = (ratings: ?GameRatings) => {
+export const getRatings = (
+  ratings: ?GameRatings
+): ?Array<{ key: string, label: React.Node, value: number }> => {
   if (!ratings) return null;
   if (ratings.version === 1) {
     return [
@@ -91,8 +93,7 @@ const FeedbackCard = ({
   buildProperties,
   authenticatedUser,
   onCommentUpdated,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const ratings = getRatings(comment.ratings);
   const theme = React.useContext(GDevelopThemeContext);

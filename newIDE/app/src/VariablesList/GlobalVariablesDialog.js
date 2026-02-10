@@ -26,8 +26,7 @@ const GlobalVariablesDialog = ({
   initiallySelectedVariableName,
   shouldCreateInitiallySelectedVariable,
   isListLocked,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const onComputeAllVariableNames = React.useCallback(
     () =>
       EventsRootVariablesFinder.findAllGlobalVariables(

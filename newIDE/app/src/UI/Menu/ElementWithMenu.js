@@ -40,9 +40,7 @@ export default class ElementWithMenu extends React.Component<Props, State> {
     }
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const {
       element,
       buildMenuTemplate,

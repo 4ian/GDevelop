@@ -39,8 +39,7 @@ const ObjectGroupEditor = ({
   onObjectAdded,
   onObjectRemoved,
   isObjectListLocked,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [objectName, setObjectName] = React.useState<string>('');
 
   const addObject = React.useCallback(

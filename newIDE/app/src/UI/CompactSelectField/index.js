@@ -29,8 +29,7 @@ const CompactSelectField = ({
   renderOptionIcon,
   leftIconTooltip,
   rounded,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.MixedElement => {
   return (
     <div
       className={classNames({

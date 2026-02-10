@@ -18,8 +18,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <I18n>
     {({ i18n }) => (
       <AutocompletePicker
@@ -57,8 +56,7 @@ export const Default = () => (
   </I18n>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const SelectingOption = () => (
+export const SelectingOption = (): React.Node => (
   <I18n>
     {({ i18n }) => (
       <AutocompletePicker

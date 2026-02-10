@@ -69,8 +69,7 @@ type Props = {|
   cloudProjectId: ?string,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const InviteHome = ({ cloudProjectId }: Props) => {
+const InviteHome = ({ cloudProjectId }: Props): React.Node | React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile, limits } = authenticatedUser;
   const isOnline = useOnlineStatus();
@@ -369,8 +368,8 @@ const InviteHome = ({ cloudProjectId }: Props) => {
               collaborators.
             </Trans>
           </AlertMessage>
-        // $FlowFixMe[constant-condition]
-        ) : !projectUserAcls ? (
+        ) : // $FlowFixMe[constant-condition]
+        !projectUserAcls ? (
           <PlaceholderLoader />
         ) : (
           // $FlowFixMe[missing-local-annot]

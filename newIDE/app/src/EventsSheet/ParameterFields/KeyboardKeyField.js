@@ -48,8 +48,7 @@ const getStringContent = (expression: string): string => {
   return matches && matches[1] !== undefined ? matches[1] : expression;
 };
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function KeyboardKeyField(props, ref) {
     const field = React.useRef<?(
       | GenericExpressionField
@@ -162,14 +161,17 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);
 
 export const renderInlineKeyboardKey = ({
   value,
   expressionIsValid,
   InvalidParameterValue,
-// $FlowFixMe[signature-verification-failure]
-}: ParameterInlineRendererProps) => {
+}: ParameterInlineRendererProps): string | React.MixedElement => {
   if (!value) {
     return (
       <InvalidParameterValue isEmpty>

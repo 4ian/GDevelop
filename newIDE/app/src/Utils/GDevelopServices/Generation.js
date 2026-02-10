@@ -241,8 +241,8 @@ export type ResourceSearch = {
   }> | null,
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const apiClient = axios.create({
+// $FlowFixMe[cannot-resolve-name]
+export const apiClient: Axios = axios.create({
   baseURL: GDevelopGenerationApi.baseUrl,
 });
 
@@ -287,8 +287,8 @@ export const getPartialAiRequest = async (
     aiRequestId: string,
     include: string,
   |}
-// $FlowFixMe[deprecated-utility]
-): Promise<$Shape<AiRequest>> => {
+): // $FlowFixMe[deprecated-utility]
+Promise<$Shape<AiRequest>> => {
   const authorizationHeader = await getAuthorizationHeader();
   // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(
@@ -327,14 +327,12 @@ export const getAiRequests = async (
   const uri = forceUri || '/ai-request';
 
   // $FlowFixMe[incompatible-type]
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.get(uri, {
     headers: {
       Authorization: authorizationHeader,
     },
     params: forceUri ? { userId } : { userId, perPage: 10 },
   });
-  // $FlowFixMe[incompatible-use]
   const nextPageUri = response.headers.link
     ? extractNextPageUriFromLinkHeader(response.headers.link)
     : null;
@@ -387,7 +385,6 @@ export const createAiRequest = async (
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.post(
     '/ai-request',
     {
@@ -458,7 +455,6 @@ export const addMessageToAiRequest = async (
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.post(
     `/ai-request/${aiRequestId}/action/add-message`,
     {
@@ -510,7 +506,6 @@ export const updateAiRequestMessage = async (
   |}
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   await apiClient.patch(
     `/ai-request/${aiRequestId}/message/${aiRequestMessageId}`,
     {
@@ -547,7 +542,6 @@ export const sendAiRequestFeedback = async (
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.post(
     `/ai-request/${aiRequestId}/action/set-feedback`,
     {
@@ -594,7 +588,6 @@ export const getAiRequestSuggestions = async (
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.post(
     `/ai-request/${aiRequestId}/action/get-suggestions`,
     {
@@ -666,7 +659,6 @@ export const createAiGeneratedEvent = async (
   |}
 ): Promise<CreateAiGeneratedEventResult> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.post(
     `/ai-generated-event`,
     {
@@ -733,7 +725,6 @@ export const getAiGeneratedEvent = async (
   |}
 ): Promise<AiGeneratedEvent> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.get(
     `/ai-generated-event/${aiGeneratedEventId}`,
     {
@@ -769,7 +760,6 @@ export const createAssetSearch = async (
   |}
 ): Promise<AssetSearch> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.post(
     `/asset-search`,
     {
@@ -808,7 +798,6 @@ export const createResourceSearch = async (
   |}
 ): Promise<ResourceSearch> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.post(
     `/resource-search`,
     {
@@ -856,7 +845,6 @@ export const createAiUserContentPresignedUrls = async (
   |}
 ): Promise<AiUserContentPresignedUrlsResult> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.post(
     `/ai-user-content/action/create-presigned-urls`,
     {
@@ -908,7 +896,6 @@ export const forkAiRequest = async (
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.post(
     `/ai-request/${aiRequestId}/action/fork`,
     {

@@ -124,8 +124,7 @@ const GameDashboard = ({
   onBack,
   disabled,
   initialWidgetToScrollTo,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const grid = React.useRef<?HTMLDivElement>(null);
   const { isMobile } = useResponsiveWindowSize();
   const [widgetToScrollTo, setWidgetToScrollTo] = React.useState<?string>(

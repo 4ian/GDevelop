@@ -16,8 +16,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import Functions from '@material-ui/icons/Functions';
 import TypeCursorSelect from '../../UI/CustomSvgIcons/TypeCursorSelect';
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectAnimationNameField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?(
       | GenericExpressionField
@@ -165,4 +164,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);

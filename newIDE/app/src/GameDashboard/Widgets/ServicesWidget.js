@@ -32,8 +32,7 @@ const ServicesWidget = ({
   onSeeAllLeaderboards,
   onSeeLobbyConfiguration,
   displayUnlockMoreLeaderboardsCallout,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
   return (

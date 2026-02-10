@@ -27,8 +27,7 @@ export const PropertyField = ({
   objectConfiguration,
   propertyName,
   onChange,
-// $FlowFixMe[signature-verification-failure]
-}: PropertyFieldProps) => {
+}: PropertyFieldProps): React.Node => {
   const forceUpdate = useForceUpdate();
   const properties = objectConfiguration.getProperties();
 
@@ -83,8 +82,7 @@ export const PropertyField = ({
 export const PropertyCheckbox = ({
   objectConfiguration,
   propertyName,
-// $FlowFixMe[signature-verification-failure]
-}: PropertyFieldProps) => {
+}: PropertyFieldProps): React.Node => {
   const forceUpdate = useForceUpdate();
   const properties = objectConfiguration.getProperties();
 
@@ -131,8 +129,7 @@ export const PropertyResourceSelector = ({
   projectScopedContainersAccessor,
   resourceManagementProps,
   onChange,
-// $FlowFixMe[signature-verification-failure]
-}: PropertyResourceSelectorProps) => {
+}: PropertyResourceSelectorProps): React.Node => {
   const forceUpdate = useForceUpdate();
   const { current: resourcesLoader } = React.useRef(ResourcesLoader);
   const properties = objectConfiguration.getProperties();

@@ -26,8 +26,7 @@ const HotMessage = ({
   message,
   onClickRightButton,
   rightButtonLabel,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <Paper

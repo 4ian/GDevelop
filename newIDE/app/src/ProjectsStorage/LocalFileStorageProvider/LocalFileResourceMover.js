@@ -32,6 +32,7 @@ type Options = {|
   project: gdProject,
   fileMetadata: FileMetadata,
   onProgress: (number, number) => void,
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
 |};
 
@@ -76,8 +77,9 @@ export const moveUrlResourcesToLocalFiles = async ({
   fileMetadata,
   onProgress,
   authenticatedUser,
-// $FlowFixMe[signature-verification-failure]
-}: Options) => {
+}: Options): Promise<{
+  erroredResources: Array<{ error: any, resourceName: string }>,
+}> => {
   if (!fs || !ipcRenderer) throw new Error('Unsupported');
 
   // Get all resources to download.

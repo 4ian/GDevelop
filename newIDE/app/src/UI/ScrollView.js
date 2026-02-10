@@ -35,8 +35,7 @@ export type ScrollViewInterface = {|
   scrollToBottom: (options?: ScrollBehaviorOptions) => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<Props, ScrollViewInterface>(
+export default (React.forwardRef<Props, ScrollViewInterface>(
   ({ id, data, children, autoHideScrollbar, style, onScroll }: Props, ref) => {
     const scrollView = React.useRef((null: ?HTMLDivElement));
     React.useImperativeHandle(ref, () => ({
@@ -136,4 +135,8 @@ export default React.forwardRef<Props, ScrollViewInterface>(
       </div>
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<ScrollViewInterface> },
+  React.RefSetter<ScrollViewInterface>
+>);

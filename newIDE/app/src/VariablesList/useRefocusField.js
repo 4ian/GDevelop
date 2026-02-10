@@ -12,8 +12,7 @@ const useRefocusField = (fieldRefs: {|
       +focus: (?{| caretPosition: ?('end' | number) |}) => void,
     |},
   |},
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): ((options: FocusOptions) => void) => {
   const fieldToFocus = React.useRef<FocusOptions | null>(null);
 
   const setFieldToFocus = React.useCallback((options: FocusOptions) => {

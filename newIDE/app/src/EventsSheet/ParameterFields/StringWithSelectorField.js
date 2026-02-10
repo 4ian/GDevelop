@@ -17,8 +17,7 @@ import FlatButton from '../../UI/FlatButton';
 import TypeCursorSelect from '../../UI/CustomSvgIcons/TypeCursorSelect';
 import { getParameterChoiceValues } from './ParameterMetadataTools';
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function StringWithSelectorField(props: ParameterFieldProps, ref) {
     const {
       value,
@@ -148,4 +147,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);

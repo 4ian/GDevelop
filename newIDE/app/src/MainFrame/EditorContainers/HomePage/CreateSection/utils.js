@@ -31,8 +31,11 @@ export type LastModifiedInfoByProjectId = {|
   [projectId: string]: LastModifiedInfo,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const getProjectLineHeight = ({ isMobile }: {| isMobile: boolean |}) => {
+export const getProjectLineHeight = ({
+  isMobile,
+}: {|
+  isMobile: boolean,
+|}): number => {
   const lineHeight = isMobile ? 52 : 36;
 
   return lineHeight - 2 * marginsSize;
@@ -99,8 +102,9 @@ export const getStorageProviderByInternalName = (
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const useProjectsListFor = (gameId: string | null) => {
+export const useProjectsListFor = (
+  gameId: string | null
+): Array<FileMetadataAndStorageProviderName> => {
   const { getRecentProjectFiles } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
@@ -226,7 +230,6 @@ export const getExampleAndTemplateTiles = ({
   ) => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
   i18n: I18nType,
-  // $FlowFixMe[value-as-type]
   gdevelopTheme: GDevelopTheme,
   numberOfItemsExclusivelyInCarousel?: number,
   numberOfItemsInCarousel?: number,

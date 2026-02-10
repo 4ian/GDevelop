@@ -17,8 +17,7 @@ import Functions from '@material-ui/icons/Functions';
 import FlatButton from '../../UI/FlatButton';
 import TypeCursorSelect from '../../UI/CustomSvgIcons/TypeCursorSelect';
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function LayerField(props, ref) {
     const field = React.useRef<?(
       | GenericExpressionField
@@ -154,4 +153,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);

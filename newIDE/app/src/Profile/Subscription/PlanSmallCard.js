@@ -27,8 +27,7 @@ import GDevelopGLogo from '../../UI/CustomSvgIcons/GDevelopGLogo';
 export const formatPriceWithCurrency = (
   amountInCents: number,
   currency: string
-// $FlowFixMe[signature-verification-failure]
-) => {
+): string => {
   if (currency === 'USD') {
     return `$${amountInCents / 100}`;
   }
@@ -298,8 +297,7 @@ const PlanSmallCard = ({
   isPending,
   hidePrice = false,
   background,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { isMobile } = useResponsiveWindowSize();
 

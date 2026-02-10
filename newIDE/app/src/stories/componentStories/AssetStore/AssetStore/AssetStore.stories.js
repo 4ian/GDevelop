@@ -37,8 +37,7 @@ const Wrapper = ({ children }: {| children: React.Node |}) => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => {
+export const Default = (): React.Node => {
   return (
     <Wrapper>
       <AssetStore onOpenProfile={action('onOpenProfile')} displayPromotions />
@@ -46,8 +45,7 @@ export const Default = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithoutPromotions = () => {
+export const WithoutPromotions = (): React.Node => {
   return (
     <Wrapper>
       <AssetStore
@@ -58,8 +56,7 @@ export const WithoutPromotions = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const LoadingError = () => {
+export const LoadingError = (): React.Node => {
   const assetCdnMock = React.useMemo(() => {
     const mock = new MockAdapter(cdnClient, {
       delayResponse: 250,

@@ -15,8 +15,7 @@ import BackgroundText from '../../UI/BackgroundText';
 import { focusButton } from '../../UI/Button';
 import Text from '../../UI/Text';
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ForceMultiplierField(props: ParameterFieldProps, ref) {
     const button = React.useRef<?ButtonInterface>(null);
     const focus: FieldFocusFunction = options => {
@@ -89,12 +88,15 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </Column>
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);
 
 export const renderInlineForceMultiplier = ({
   value,
-// $FlowFixMe[signature-verification-failure]
-}: ParameterInlineRendererProps) => {
+}: ParameterInlineRendererProps): string | React.Node => {
   if (value === '1') return <Trans>{`a permanent`}</Trans>;
   else if (value === '0' || value === '') return <Trans>{`an instant`}</Trans>;
 

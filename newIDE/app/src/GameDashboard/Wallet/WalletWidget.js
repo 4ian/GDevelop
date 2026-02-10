@@ -23,8 +23,7 @@ const WalletWidget = ({
   size,
   showOneItem,
   showAllItems,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const {
     profile,
     limits,

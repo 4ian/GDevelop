@@ -160,9 +160,10 @@ const SubscriptionPlanPricingSummary = ({
   period: 'year' | 'month',
   setPeriod: ('year' | 'month') => void,
   onlyShowDiscountedPrice?: boolean,
-  pricingSystemDiscounts?: { [pricingSystemId: string]: PricingSystemDiscount },
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+  pricingSystemDiscounts?: {
+    [pricingSystemId: string]: PricingSystemDiscount,
+  },
+|}): null | React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const selectedPricingSystem = subscriptionPlanWithPricingSystems.pricingSystems.find(
     pricingSystem => pricingSystem.period === period

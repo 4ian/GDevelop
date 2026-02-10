@@ -82,8 +82,7 @@ const ResponsiveMediaGallery = ({
   mediaItems,
   altTextTemplate,
   horizontalOuterMarginToEatOnMobile,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node | React.MixedElement => {
   const [selectedMediaIndex, setSelectedMediaIndex] = React.useState<number>(0);
   const { isMobile } = useResponsiveWindowSize();
 

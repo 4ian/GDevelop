@@ -45,8 +45,7 @@ const LeaderboardEntriesTable = ({
   isLoading,
   erroredEntry,
   navigation,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   if (!entries) return <PlaceholderLoader />;
 
   return (

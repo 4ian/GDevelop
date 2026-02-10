@@ -61,8 +61,7 @@ export const ProjectStructureItem = ({
   open,
   primaryText,
   renderNestedItems,
-// $FlowFixMe[signature-verification-failure]
-}: ProjectStructureItemProps) => {
+}: ProjectStructureItemProps): React.Node => {
   return (
     <ListItem
       id={id}
@@ -144,8 +143,7 @@ export const Item = ({
   buildExtraMenuTemplate,
   isLastItem,
   dragAndDropProps: { DragSourceAndDropTarget, onBeginDrag, onDrop },
-// $FlowFixMe[signature-verification-failure]
-}: ItemProps) => {
+}: ItemProps): React.Node => {
   const textFieldRef = React.useRef<?TextFieldInterface>(null);
   const shouldDiscardChanges = React.useRef<boolean>(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -370,8 +368,7 @@ export const EventFunctionExtensionItem = ({
   onMoveDown,
   isLastItem,
   dragAndDropProps,
-// $FlowFixMe[signature-verification-failure]
-}: EventFunctionExtensionItemProps) => {
+}: EventFunctionExtensionItemProps): React.Node => {
   const name = eventsFunctionsExtension.getName();
   const iconUrl = eventsFunctionsExtension.getIconUrl();
 

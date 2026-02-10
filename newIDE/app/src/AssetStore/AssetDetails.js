@@ -97,8 +97,11 @@ export type AssetDetailsInterface = {|
   scrollToPosition: (y: number) => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
+// $FlowFixMe[prop-missing]
+export const AssetDetails: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<AssetDetailsInterface> },
+  React.RefSetter<AssetDetailsInterface>
+> = React.forwardRef<Props, AssetDetailsInterface>(
   (
     {
       onTagSelection,

@@ -25,8 +25,7 @@ const ProductLimitedTimeOffer = ({
   visibleUntil,
   hideMinutesAndSeconds,
   alignCenter,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): null | React.MixedElement => {
   const [timeLeft, setTimeLeft] = React.useState<{|
     days: number,
     hours: number,

@@ -76,8 +76,7 @@ const DropTargetBox = ({ name }: {| name: string |}) => (
   </DropTarget>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export default (props: Props) => (
+export default (props: Props): React.MixedElement => (
   <div>
     <DragSourceAndDropTargetBox name="box1" />
     <DragSourceAndDropTargetBox name="box2, cant-drop-here" />

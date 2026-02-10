@@ -12,8 +12,7 @@ export default {
   component: OpenFromStorageProviderDialogComponent,
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const OpenFromStorageProviderDialog = () => (
+export const OpenFromStorageProviderDialog = (): React.Node => (
   <OpenFromStorageProviderDialogComponent
     storageProviders={[LocalFileStorageProvider]}
     onChooseProvider={action('onChooseProvider')}

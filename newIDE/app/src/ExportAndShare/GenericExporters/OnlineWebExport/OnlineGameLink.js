@@ -49,8 +49,7 @@ const OnlineGameLink = ({
   onGameUpdated,
   automaticallyPublishNewBuild,
   shouldShowShareDialog,
-// $FlowFixMe[signature-verification-failure]
-}: OnlineGameLinkProps) => {
+}: OnlineGameLinkProps): null | React.Node => {
   const [isShareDialogOpen, setIsShareDialogOpen] = React.useState<boolean>(
     false
   );

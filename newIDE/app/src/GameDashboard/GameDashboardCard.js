@@ -60,12 +60,17 @@ const remote = optionalRequire('@electron/remote');
 const shell = remote ? remote.shell : null;
 const path = optionalRequire('path');
 
-// $FlowFixMe[signature-verification-failure]
-export const getThumbnailWidth = ({ isMobile }: {| isMobile: boolean |}) =>
+export const getThumbnailWidth = ({
+  isMobile,
+}: {|
+  isMobile: boolean,
+|}): void | number =>
   isMobile ? undefined : Math.min(245, Math.max(130, window.innerWidth / 4));
 
-// $FlowFixMe[signature-verification-failure]
-export const getProjectDisplayDate = (i18n: I18nType, date: number) =>
+export const getProjectDisplayDate = (
+  i18n: I18nType,
+  date: number
+): React.Node =>
   getRelativeOrAbsoluteDisplayDate({
     i18n,
     dateAsNumber: date,
@@ -74,8 +79,10 @@ export const getProjectDisplayDate = (i18n: I18nType, date: number) =>
     relativeLimit: 'currentWeek',
     sameWeekFormat: 'thisWeek',
   });
-// $FlowFixMe[signature-verification-failure]
-export const getDetailedProjectDisplayDate = (i18n: I18nType, date: number) =>
+export const getDetailedProjectDisplayDate = (
+  i18n: I18nType,
+  date: number
+): any =>
   i18n.date(date, {
     dateStyle: 'short',
     timeStyle: 'short',
@@ -202,8 +209,7 @@ const GameDashboardCard = ({
   onRefreshGames,
   onDeleteCloudProject,
   onRegisterProject,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   useOnResize(useForceUpdate());
   const projectsList = React.useMemo(() => dashboardItem.projectFiles || [], [
     dashboardItem.projectFiles,
@@ -505,8 +511,8 @@ const GameDashboardCard = ({
                 ? () =>
                     // $FlowFixMe[incompatible-type]
                     onOpenGameManager({ game, widgetToScrollTo: 'projects' })
-                // $FlowFixMe[incompatible-type]
-                : undefined,
+                : // $FlowFixMe[incompatible-type]
+                  undefined,
             });
           }
 

@@ -52,8 +52,7 @@ export const UseCommandHook = (props: {|
   name: CommandName,
   enabled: boolean,
   command: SimpleCommand,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): null => {
   useCommand(props.name, props.enabled, props.command);
   return null;
 };
@@ -66,8 +65,7 @@ export const UseCommandWithOptionsHook = (props: {|
   name: CommandName,
   enabled: boolean,
   command: CommandWithOptions,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): null => {
   useCommandWithOptions(props.name, props.enabled, props.command);
   return null;
 };

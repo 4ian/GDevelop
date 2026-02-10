@@ -62,8 +62,7 @@ export const QuickPublish = ({
   gameScreenshotUrls,
   onScreenshotsClaimed,
   onLaunchPreview,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
     profile,
@@ -141,10 +140,11 @@ export const QuickPublish = ({
 
         setBuildOrGameUrl(
           game
-            ? getGameUrl(game)
+            ? // $FlowFixMe[incompatible-type]
+              getGameUrl(game)
             : build
-            // $FlowFixMe[incompatible-type]
-            ? getBuildArtifactUrl(build, 's3Key')
+            ? // $FlowFixMe[incompatible-type]
+              getBuildArtifactUrl(build, 's3Key')
             : ''
         );
         setExportState('succeeded');

@@ -67,17 +67,13 @@ export default class CommandManager implements CommandManagerInterface {
     delete this._commands[commandName];
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getNamedCommand = (commandName: CommandName) => {
+  getNamedCommand = (commandName: CommandName): any => {
     const command = this._commands[commandName];
     if (command) return { name: commandName, ...(command: Command) };
     return null;
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getAllNamedCommands = () => {
+  getAllNamedCommands = (): any => {
     // $FlowFixMe[missing-type-arg]
     return Object.keys(this._commands).map<NamedCommand>(commandName => {
       const command = this._commands[commandName];

@@ -29,8 +29,7 @@ export type LeaderboardIdPropertyFieldInterface = {|
   focus: FieldFocusFunction,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<Props, LeaderboardIdPropertyFieldInterface>(
+export default (React.forwardRef<Props, LeaderboardIdPropertyFieldInterface>(
   function LeaderboardIdPropertyField(props, ref) {
     const isOnline = useOnlineStatus();
     const leaderboards = useFetchLeaderboards();
@@ -172,4 +171,8 @@ export default React.forwardRef<Props, LeaderboardIdPropertyFieldInterface>(
       </I18n>
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<LeaderboardIdPropertyFieldInterface> },
+  React.RefSetter<LeaderboardIdPropertyFieldInterface>
+>);

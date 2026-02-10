@@ -160,8 +160,7 @@ export const Default = ({
   userBalance: 'None' | 'Some',
   leaderboards: 'None' | 'Some' | 'Too many',
   exports: 'None' | 'Some ongoing' | 'All complete',
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): React.Node => {
   const [game, setGame] = React.useState<Game>(game1);
   const [tab, setTab] = React.useState<GameDetailsTab>('details');
   const [renderCount, setRenderCount] = React.useState<number>(0);
@@ -299,6 +298,7 @@ export const Default = ({
       return [504, null];
     });
 
+  // $FlowFixMe[value-as-type]
   const authenticatedUser: AuthenticatedUser = {
     ...fakeSilverAuthenticatedUser,
     userEarningsBalance: userEarningsBalanceToDisplay,

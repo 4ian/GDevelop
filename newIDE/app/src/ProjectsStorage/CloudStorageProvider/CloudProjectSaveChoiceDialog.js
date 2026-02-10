@@ -21,8 +21,7 @@ const CloudProjectRecoveryDialog = ({
   isLoading,
   onSaveAsDuplicate,
   onSaveAsMainVersion,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const actions = [
     <FlatButton
       disabled={isLoading}

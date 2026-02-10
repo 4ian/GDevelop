@@ -170,8 +170,7 @@ export const renderQuickCustomization = ({
   onScreenshotsClaimed,
   onWillInstallExtension,
   onExtensionInstalled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): { content: React.Node, showPreview: boolean, title: React.Node } => {
   return {
     title: quickCustomizationState.step.title,
     content: (

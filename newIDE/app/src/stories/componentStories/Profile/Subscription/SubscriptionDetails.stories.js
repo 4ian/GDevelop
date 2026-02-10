@@ -126,8 +126,7 @@ export const Default = ({
   simulateNativeMobileApp: boolean,
   userState: string,
   pricingSystem: string,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): React.Node => {
   const authenticatedUser = loading
     ? fakeAuthenticatedUserLoggingIn
     : getUserFromState(userState);
@@ -212,6 +211,7 @@ export const Default = ({
 
   return (
     <AlertProvider>
+      {/* $FlowFixMe[incompatible-type] */}
       <AuthenticatedUserContext.Provider value={authenticatedUser}>
         <SubscriptionProvider>
           <SubscriptionDetails

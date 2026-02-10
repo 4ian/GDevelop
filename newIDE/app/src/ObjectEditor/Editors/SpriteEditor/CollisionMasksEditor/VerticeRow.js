@@ -29,8 +29,7 @@ const VerticeRow = ({
   verticeY,
   parentVerticeId,
   ...props
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (

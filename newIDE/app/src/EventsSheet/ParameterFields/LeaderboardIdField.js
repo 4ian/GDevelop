@@ -31,8 +31,7 @@ const getInlineParameterDisplayValue = (
   return leaderboard ? leaderboard.name : value;
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const useFetchLeaderboards = () => {
+export const useFetchLeaderboards = (): any => {
   const { leaderboards, listLeaderboards } = React.useContext(
     LeaderboardContext
   );
@@ -59,8 +58,7 @@ export const useFetchLeaderboards = () => {
   return leaderboards;
 };
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function LeaderboardIdField(props, ref) {
     const isOnline = useOnlineStatus();
     const leaderboards = useFetchLeaderboards();
@@ -213,7 +211,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </I18n>
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);
 
 const InlineLeaderboardIdField = ({
   value,
@@ -243,5 +245,4 @@ const InlineLeaderboardIdField = ({
 
 export const renderInlineLeaderboardIdField = (
   props: ParameterInlineRendererProps
-// $FlowFixMe[signature-verification-failure]
-) => <InlineLeaderboardIdField {...props} />;
+): React.MixedElement => <InlineLeaderboardIdField {...props} />;

@@ -160,8 +160,7 @@ const ImageTileGrid = ({
   isLoading,
   getColumnsFromWindowSize,
   getLimitFromWindowSize,
-// $FlowFixMe[signature-verification-failure]
-}: ImageTileGridProps) => {
+}: ImageTileGridProps): React.Node => {
   const { windowSize, isLandscape } = useResponsiveWindowSize();
   const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', isLandscape);
   const limit = getLimitFromWindowSize
@@ -199,8 +198,8 @@ const ImageTileGrid = ({
         spacing={SPACING * 2}
       >
         {isLoading
-          // $FlowFixMe[underconstrained-implicit-instantiation]
-          ? new Array(columns).fill(0).map((_, index) => (
+          ? // $FlowFixMe[underconstrained-implicit-instantiation]
+            new Array(columns).fill(0).map((_, index) => (
               // Display tiles but with skeletons while the data is loading.
               <GridListTile key={index}>
                 <Skeleton

@@ -26,8 +26,7 @@ const OnlineWebExportFlow = ({
   exportPipelineName,
   isExporting,
   uiMode,
-// $FlowFixMe[signature-verification-failure]
-}: OnlineWebExportFlowProps) => {
+}: OnlineWebExportFlowProps): React.Node => {
   const {
     game,
     gameBuilds,

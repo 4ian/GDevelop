@@ -61,8 +61,11 @@ export type SoundPlayerInterface = {|
   playPause: (forcePlay: boolean) => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
+// $FlowFixMe[prop-missing]
+const SoundPlayer: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<SoundPlayerInterface> },
+  React.RefSetter<SoundPlayerInterface>
+> = React.forwardRef<Props, SoundPlayerInterface>(
   (
     {
       soundSrc,

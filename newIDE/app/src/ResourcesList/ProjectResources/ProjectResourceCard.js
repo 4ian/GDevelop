@@ -118,8 +118,7 @@ export const ProjectResourceCard = ({
   onChoose,
   size,
   isSelected,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const resourceName = resource.getName();
 

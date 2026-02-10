@@ -13,8 +13,7 @@ type Props = {|
   steps: Array<BreadcrumbStep>,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const Breadcrumbs = ({ steps }: Props) => {
+const Breadcrumbs = ({ steps }: Props): React.Node => {
   return (
     <MuiBreadcrumbs separator=">" aria-label="breadcrumb">
       {steps.map((step, index) =>

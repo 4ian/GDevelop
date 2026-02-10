@@ -65,8 +65,7 @@ const LoaderModal = ({
   message,
   showImmediately,
   showAfterDelay,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const delayedShow = useDelayedBoolean(!!showAfterDelay, 150);
   const isInfinite = progress === null || progress === undefined;
 

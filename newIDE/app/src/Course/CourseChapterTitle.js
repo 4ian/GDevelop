@@ -30,8 +30,11 @@ type Props = {|
   getChapterCompletion: (chapterId: string) => CourseChapterCompletion | null,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const CourseChapterTitle = React.forwardRef<Props, HTMLDivElement>(
+// $FlowFixMe[prop-missing]
+const CourseChapterTitle: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<HTMLDivElement> },
+  React.RefSetter<HTMLDivElement>
+> = React.forwardRef<Props, HTMLDivElement>(
   ({ course, chapterIndex, courseChapter, getChapterCompletion }, ref) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const { isMobile, isLandscape } = useResponsiveWindowSize();

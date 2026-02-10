@@ -30,8 +30,7 @@ const LocalNetworkPreviewDialog = ({
   onExport,
   onClose,
   onRunPreviewLocally,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): null | React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   if (!open) return null;
   const urlWithProtocol = url ? `http://${url}` : null;

@@ -56,8 +56,7 @@ export const initialBundleStoreState: BundleStoreState = {
   },
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const BundleStoreContext = React.createContext<BundleStoreState>(
+export const BundleStoreContext: React.Context<BundleStoreState> = React.createContext<BundleStoreState>(
   initialBundleStoreState
 );
 
@@ -67,8 +66,7 @@ type BundleStoreStateProviderProps = {|
 
 export const BundleStoreStateProvider = ({
   children,
-// $FlowFixMe[signature-verification-failure]
-}: BundleStoreStateProviderProps) => {
+}: BundleStoreStateProviderProps): React.MixedElement => {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const {
     searchText: shopSearchText,

@@ -82,21 +82,15 @@ export default class Rendered3DInstance {
     //Nothing to do.
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getPixiObject() {
+  getPixiObject(): any {
     return this._pixiObject;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getThreeObject() {
+  getThreeObject(): any {
     return this._threeObject;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getInstance() {
+  getInstance(): any {
     return this._instance;
   }
 
@@ -112,39 +106,27 @@ export default class Rendered3DInstance {
     if (this._threeObject !== null) this._threeGroup.remove(this._threeObject);
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getOriginX() {
+  getOriginX(): any {
     return 0;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getOriginY() {
+  getOriginY(): any {
     return 0;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getOriginZ() {
+  getOriginZ(): any {
     return 0;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getCenterX() {
+  getCenterX(): any {
     return this.getWidth() / 2;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getCenterY() {
+  getCenterY(): any {
     return this.getHeight() / 2;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getCenterZ() {
+  getCenterZ(): any {
     return this.getDepth() / 2;
   }
 
@@ -182,27 +164,21 @@ export default class Rendered3DInstance {
   /**
    * Return the width of the instance when the instance doesn't have a custom size.
    */
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getDefaultWidth() {
+  getDefaultWidth(): any {
     return 32;
   }
 
   /**
    * Return the height of the instance when the instance doesn't have a custom size.
    */
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getDefaultHeight() {
+  getDefaultHeight(): any {
     return 32;
   }
 
   /**
    * Return the depth of the instance when the instance doesn't have a custom size.
    */
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getDefaultDepth() {
+  getDefaultDepth(): any {
     return 32;
   }
 

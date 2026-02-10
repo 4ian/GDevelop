@@ -77,8 +77,7 @@ export const CardWidget = ({
   disabled,
   useDefaultDisabledStyle,
   noBorder,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node | React.MixedElement => {
   const classes = useStylesForWidget({
     useDefaultDisabledStyle,
     noBorder,

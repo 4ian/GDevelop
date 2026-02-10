@@ -232,8 +232,7 @@ export function DropContainer({
   indentScale,
   draggedNodeHeight,
   getNodeAtPath,
-// $FlowFixMe[signature-verification-failure]
-}: DropContainerProps) {
+}: DropContainerProps): React.MixedElement {
   const isDraggedNodeSibling = isSibling(node, draggedNode);
   const isDraggedNodeJustBelow = isJustBelow(node, draggedNode);
   // We want to allow dropping below if the event has no children OR if the only
@@ -344,8 +343,7 @@ export function AutoScroll({
   DnDComponent: DropTargetComponent<SortableTreeNode>,
   activateTargets: boolean,
   onHover: () => void,
-// $FlowFixMe[signature-verification-failure]
-|}) {
+|}): React.MixedElement {
   const delayActivationTimer = React.useRef<?TimeoutID>(null);
   const [show, setShow] = React.useState(false);
 

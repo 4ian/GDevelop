@@ -38,7 +38,6 @@ export const uploadObjects = async (
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const getBaseUrl = () => {
+export const getBaseUrl = (): string => {
   return GDevelopGamePreviews.baseUrl;
 };

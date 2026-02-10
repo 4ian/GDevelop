@@ -35,8 +35,7 @@ const PrivateGameTemplatePurchaseDialog = ({
   usageType,
   onClose,
   simulateAppStoreProduct,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const {
     profile,
     onOpenLoginDialog,

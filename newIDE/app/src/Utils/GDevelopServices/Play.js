@@ -109,8 +109,8 @@ export type LobbyConfiguration = {|
 export const shortenUuidForDisplay = (uuid: string): string =>
   `${uuid.split('-')[0]}-...`;
 
-// $FlowFixMe[signature-verification-failure]
-export const client = axios.create({
+// $FlowFixMe[cannot-resolve-name]
+export const client: Axios = axios.create({
   baseURL: GDevelopPlayApi.baseUrl,
 });
 
@@ -120,7 +120,6 @@ export const listGameActiveLeaderboards = async (
   gameId: string
 ): Promise<?Array<Leaderboard>> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/game/${gameId}/leaderboard`, {
     headers: { Authorization: authorizationHeader },
     params: { userId, deleted: 'false' },
@@ -163,7 +162,6 @@ export const listLeaderboardEntries = async (
   const uri =
     options.forceUri || `/game/${gameId}/leaderboard/${leaderboardId}/entry`;
   // $FlowFixMe[incompatible-type]
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(uri, {
     params: options.forceUri
       ? null
@@ -172,7 +170,6 @@ export const listLeaderboardEntries = async (
           perPage: options.pageSize,
         },
   });
-  // $FlowFixMe[incompatible-use]
   const nextPageUri = response.headers.link
     ? extractNextPageUriFromLinkHeader(response.headers.link)
     : null;
@@ -186,6 +183,7 @@ export const listLeaderboardEntries = async (
 };
 
 export const createLeaderboard = async (
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   { name, sort }: {| name: string, sort: LeaderboardSortOption |}
@@ -195,7 +193,6 @@ export const createLeaderboard = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.post(
     `/game/${gameId}/leaderboard`,
     {
@@ -220,6 +217,7 @@ type LeaderboardDuplicationPayload = {|
 |};
 
 export const duplicateLeaderboard = async (
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   payload: LeaderboardDuplicationPayload
@@ -229,7 +227,6 @@ export const duplicateLeaderboard = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.post(
     `/game/${gameId}/leaderboard/action/copy`,
     payload,
@@ -246,6 +243,7 @@ export const duplicateLeaderboard = async (
 };
 
 export const updateLeaderboard = async (
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   leaderboardId: string,
@@ -256,7 +254,6 @@ export const updateLeaderboard = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.patch(
     `/game/${gameId}/leaderboard/${leaderboardId}`,
     payload,
@@ -273,6 +270,7 @@ export const updateLeaderboard = async (
 };
 
 export const resetLeaderboard = async (
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   leaderboardId: string
@@ -282,7 +280,6 @@ export const resetLeaderboard = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.put(
     `/game/${gameId}/leaderboard/${leaderboardId}/reset`,
     {},
@@ -299,6 +296,7 @@ export const resetLeaderboard = async (
 };
 
 export const deleteLeaderboard = async (
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   leaderboardId: string
@@ -308,7 +306,6 @@ export const deleteLeaderboard = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.delete(
     `/game/${gameId}/leaderboard/${leaderboardId}`,
     {
@@ -324,6 +321,7 @@ export const deleteLeaderboard = async (
 };
 
 export const deleteLeaderboardEntry = async (
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   leaderboardId: string,
@@ -334,7 +332,6 @@ export const deleteLeaderboardEntry = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.delete(
     `/game/${gameId}/leaderboard/${leaderboardId}/entry/${entryId}`,
     {
@@ -429,8 +426,7 @@ export const updateComment = async (
     processed?: boolean,
     qualityRating?: string,
   |}
-// $FlowFixMe[signature-verification-failure]
-) => {
+): Promise<any> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
       client.patch(
@@ -454,6 +450,7 @@ export const updateComment = async (
 };
 
 export const canUserCustomizeLeaderboardTheme = (
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser
 ): {|
   canUseTheme: boolean,
@@ -522,7 +519,6 @@ export const getLobbyConfiguration = async (
   |}
 ): Promise<LobbyConfiguration> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/game/${gameId}/lobby-configuration`, {
     params: { userId },
     headers: {
@@ -553,7 +549,6 @@ export const updateLobbyConfiguration = async (
   |}
 ): Promise<LobbyConfiguration> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.patch(
     `/game/${gameId}/lobby-configuration`,
     { maxPlayers, minPlayers, canJoinAfterStart },
@@ -584,7 +579,6 @@ export const duplicateLobbyConfiguration = async ({
   sourceGameId: string,
 |}): Promise<LobbyConfiguration> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.post(
     `/game/${gameId}/lobby-configuration/action/copy`,
     { sourceGameId },
@@ -611,7 +605,6 @@ export const getPlayerToken = async ({
   gameId: string,
 }): Promise<string> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.post(
     `/game/${gameId}/player-token`,
     {},

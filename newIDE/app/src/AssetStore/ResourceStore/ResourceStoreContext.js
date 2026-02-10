@@ -55,30 +55,31 @@ type ResourceStoreState = {|
   |},
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const ResourceStoreContext = React.createContext<ResourceStoreState>({
-  filters: null,
-  authors: null,
-  licenses: null,
-  searchResults: null,
-  fetchResourcesAndFilters: () => {},
-  error: null,
-  searchText: '',
-  setSearchText: () => {},
-  clearAllFilters: () => {},
-  setSearchResourceKind: () => {},
-  getAuthorsDisplayLinks: () => null,
-  audioFiltersState: {
-    durationFilter: new DurationResourceStoreSearchFilter(),
-    setDurationFilter: DurationResourceStoreSearchFilter => {},
-    audioTypeFilter: new AudioTypeResourceStoreSearchFilter(),
-    setAudioTypeFilter: AudioTypeResourceStoreSearchFilter => {},
-  },
-  fontFiltersState: {
-    alphabetSupportFilter: new AlphabetSupportResourceStoreSearchFilter(),
-    setAlphabetSupportFilter: () => {},
-  },
-});
+export const ResourceStoreContext: React.Context<ResourceStoreState> = React.createContext<ResourceStoreState>(
+  {
+    filters: null,
+    authors: null,
+    licenses: null,
+    searchResults: null,
+    fetchResourcesAndFilters: () => {},
+    error: null,
+    searchText: '',
+    setSearchText: () => {},
+    clearAllFilters: () => {},
+    setSearchResourceKind: () => {},
+    getAuthorsDisplayLinks: () => null,
+    audioFiltersState: {
+      durationFilter: new DurationResourceStoreSearchFilter(),
+      setDurationFilter: DurationResourceStoreSearchFilter => {},
+      audioTypeFilter: new AudioTypeResourceStoreSearchFilter(),
+      setAudioTypeFilter: AudioTypeResourceStoreSearchFilter => {},
+    },
+    fontFiltersState: {
+      alphabetSupportFilter: new AlphabetSupportResourceStoreSearchFilter(),
+      setAlphabetSupportFilter: () => {},
+    },
+  }
+);
 
 type ResourceStoreStateProviderProps = {|
   children: React.Node,
@@ -90,8 +91,7 @@ const getResourceSearchTerms = (resource: ResourceV2 | Resource) => {
 
 export const ResourceStoreStateProvider = ({
   children,
-// $FlowFixMe[signature-verification-failure]
-}: ResourceStoreStateProviderProps) => {
+}: ResourceStoreStateProviderProps): React.MixedElement => {
   const [svgResourcesByUrl, setSvgResourcesByUrl] = React.useState<?{
     [string]: Resource,
   }>(null);

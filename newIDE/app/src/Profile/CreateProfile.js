@@ -27,8 +27,7 @@ const CreateProfile = ({
   onOpenLoginDialog,
   onOpenCreateAccountDialog,
   justifyContent,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => (
+}: Props): React.Node => (
   <Column alignItems="center">
     <div style={styles.container}>
       <ColumnStackLayout>

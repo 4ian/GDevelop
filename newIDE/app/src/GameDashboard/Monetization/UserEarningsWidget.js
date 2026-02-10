@@ -38,8 +38,7 @@ type Props = {|
   size: DashboardWidgetSize,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const UserEarningsWidget = ({ size }: Props) => {
+const UserEarningsWidget = ({ size }: Props): React.Node => {
   const {
     userEarningsBalance,
     onRefreshEarningsBalance,

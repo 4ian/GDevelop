@@ -219,8 +219,7 @@ export type HomePageEditorInterface = {|
   ) => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const HomePage = React.memo<Props>(
+export const HomePage: React.ComponentType<Props> = React.memo<Props>(
   React.forwardRef<Props, HomePageEditorInterface>(
     (
       {
@@ -400,7 +399,7 @@ export const HomePage = React.memo<Props>(
               'bundle',
               'bundle-category',
             ]);
-          // $FlowFixMe[invalid-compare]
+            // $FlowFixMe[invalid-compare]
           } else if (requestedTab === 'manage') {
             const gameId = routeArguments['game-id'];
             if (gameId) {
@@ -409,6 +408,7 @@ export const HomePage = React.memo<Props>(
                 if (routeArguments['games-dashboard-tab']) {
                   setGameDetailsCurrentTab(
                     // $FlowIgnore - We are confident the argument is one of the possible tab.
+                    // $FlowFixMe[incompatible-type]
                     routeArguments['games-dashboard-tab']
                   );
                   removeRouteArguments(['games-dashboard-tab']);
@@ -741,8 +741,7 @@ export const HomePage = React.memo<Props>(
 
 export const renderHomePageContainer = (
   props: RenderEditorContainerPropsWithRef
-// $FlowFixMe[signature-verification-failure]
-) => (
+): React.MixedElement => (
   // $FlowFixMe[incompatible-type]
   <HomePage
     ref={props.ref}

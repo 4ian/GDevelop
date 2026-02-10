@@ -48,8 +48,11 @@ export type SelectionState = {|
   selectedEvents: Array<EventContext>,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const getInitialSelection = () => {
+export const getInitialSelection = (): {
+  selectedEvents: Array<empty>,
+  selectedInstructions: Array<empty>,
+  selectedInstructionsLists: Array<empty>,
+} => {
   return {
     selectedInstructions: [],
     selectedEvents: [],
@@ -339,8 +342,11 @@ export const selectInstructionsList = (
 
 export const selectEventsAfterHistoryChange = (
   eventContexts: Array<EventContext>
-// $FlowFixMe[signature-verification-failure]
-) => {
+): {
+  selectedEvents: Array<empty>,
+  selectedInstructions: Array<empty>,
+  selectedInstructionsLists: Array<empty>,
+} => {
   let newSelection = getInitialSelection();
 
   eventContexts.forEach(eventContext => {

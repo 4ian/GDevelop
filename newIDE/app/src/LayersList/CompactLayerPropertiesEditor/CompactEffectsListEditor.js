@@ -216,8 +216,7 @@ export const CompactEffectsListEditor = ({
   onEffectAdded,
   layerRenderingType,
   target,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const [isEffectsFolded, setEffectsFolded] = React.useState(false);
 

@@ -27,8 +27,7 @@ type Props = {|
   closeProject: () => Promise<void>,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const ProjectsWidget = (props: Props) => {
+const ProjectsWidget = (props: Props): React.Node => {
   return (
     <DashboardWidget
       widgetSize={'full'}

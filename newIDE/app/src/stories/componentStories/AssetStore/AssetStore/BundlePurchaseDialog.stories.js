@@ -22,8 +22,7 @@ export default {
   },
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const NotLoggedIn = () => {
+export const NotLoggedIn = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <BundlePurchaseDialog
@@ -35,8 +34,7 @@ export const NotLoggedIn = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const LoggedIn = () => {
+export const LoggedIn = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <BundlePurchaseDialog
@@ -48,8 +46,7 @@ export const LoggedIn = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const FastCheckout = () => {
+export const FastCheckout = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <BundlePurchaseDialog

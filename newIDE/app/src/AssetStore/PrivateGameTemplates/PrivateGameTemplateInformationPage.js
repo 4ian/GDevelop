@@ -147,8 +147,7 @@ const PrivateGameTemplateInformationPage = ({
   onBundleOpen,
   onCreateWithGameTemplate,
   simulateAppStoreProduct,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { id, name, sellerId } = privateGameTemplateListingData;
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext

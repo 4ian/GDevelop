@@ -16,8 +16,7 @@ const NotificationDot = ({
 }: {
   size?: number,
   color: 'notification' | 'warning',
-// $FlowFixMe[signature-verification-failure]
-}) => {
+}): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <span

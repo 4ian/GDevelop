@@ -16,8 +16,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => {
+export const Default = (): React.Node => {
   const [infoBarOpen, setInfoBarOpen] = React.useState<boolean>(false);
   const [
     infoBarWithActionOpen,

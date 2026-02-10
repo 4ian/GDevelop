@@ -87,8 +87,7 @@ export const initialPrivateGameTemplateStoreState: PrivateGameTemplateStoreState
   },
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const PrivateGameTemplateStoreContext = React.createContext<PrivateGameTemplateStoreState>(
+export const PrivateGameTemplateStoreContext: React.Context<PrivateGameTemplateStoreState> = React.createContext<PrivateGameTemplateStoreState>(
   initialPrivateGameTemplateStoreState
 );
 
@@ -98,8 +97,7 @@ type PrivateGameTemplateStoreStateProviderProps = {|
 
 export const PrivateGameTemplateStoreStateProvider = ({
   children,
-// $FlowFixMe[signature-verification-failure]
-}: PrivateGameTemplateStoreStateProviderProps) => {
+}: PrivateGameTemplateStoreStateProviderProps): React.MixedElement => {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const {
     searchText: shopSearchText,
@@ -282,8 +280,8 @@ export const PrivateGameTemplateStoreStateProvider = ({
               `Multiple private game templates with the same id: ${id}`
             );
           }
+          // $FlowFixMe[prop-missing]
           privateGameTemplateListingDatasById[
-            // $FlowFixMe[prop-missing]
             id
           ] = privateGameTemplateListingData;
         }

@@ -67,8 +67,7 @@ const SpineEditor = ({
   resourceManagementProps,
   projectScopedContainersAccessor,
   renderObjectNameField,
-// $FlowFixMe[signature-verification-failure]
-}: EditorProps) => {
+}: EditorProps): React.Node => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
     justAddedAnimationName,

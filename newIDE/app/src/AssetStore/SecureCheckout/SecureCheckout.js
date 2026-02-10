@@ -14,8 +14,7 @@ const SecureCheckout = ({
 }: {|
   includeCancelInformation?: boolean,
   noMargin?: boolean,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <LineStackLayout

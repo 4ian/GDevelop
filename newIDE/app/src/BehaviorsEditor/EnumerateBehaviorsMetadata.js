@@ -77,8 +77,7 @@ export const filterEnumeratedBehaviorMetadata = (
 
 export const isBehaviorDefaultCapability = (
   behaviorMetadata: gdBehaviorMetadata
-// $FlowFixMe[signature-verification-failure]
-) => {
+): boolean => {
   return (
     behaviorMetadata.getName().includes('Capability') ||
     behaviorMetadata.getName() === 'Scene3D::Base3DBehavior'

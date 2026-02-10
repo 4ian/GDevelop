@@ -71,8 +71,7 @@ const getAcceptedMimeTypes = (resourceKind: ResourceKind): string[] => {
 
 export const getInputAcceptedMimesAndExtensions = (
   resourceKind: ResourceKind
-// $FlowFixMe[signature-verification-failure]
-) => {
+): string => {
   const acceptedExtensions = getAcceptedExtensions(resourceKind);
   const acceptedMimes = getAcceptedMimeTypes(resourceKind);
 
@@ -86,8 +85,7 @@ export const FileToCloudProjectResourceUploader = ({
   onChooseResources,
   createNewResource,
   automaticallyOpenInput,
-// $FlowFixMe[signature-verification-failure]
-}: FileToCloudProjectResourceUploaderProps) => {
+}: FileToCloudProjectResourceUploaderProps): React.Node => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
   const hasAutomaticallyOpenedInput = React.useRef(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

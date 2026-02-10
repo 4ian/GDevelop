@@ -36,8 +36,7 @@ const SaveToStorageProviderDialog = ({
   onClose,
   storageProviders,
   onChooseProvider,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const { profile, cloudProjects } = authenticatedUser;

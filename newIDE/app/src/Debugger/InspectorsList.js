@@ -36,7 +36,7 @@ export default class InspectorsList extends React.Component<Props, void> {
     gameData: GameData,
     getInspectorDescriptions: InspectorDescriptionsGetter,
     path: Array<string>
-  // $FlowFixMe[prop-missing]
+    // $FlowFixMe[prop-missing]
   ): Array<React.Element<any> | null> {
     return getInspectorDescriptions(gameData).map(inspectorDescription => {
       if (!inspectorDescription) return null;
@@ -70,9 +70,7 @@ export default class InspectorsList extends React.Component<Props, void> {
     });
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     return this.props.gameData ? (
       // $FlowFixMe[incompatible-type]
       <List style={styles.list}>

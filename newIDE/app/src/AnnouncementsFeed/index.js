@@ -53,8 +53,7 @@ export const AnnouncementsFeed = ({
   canClose,
   addMargins,
   hideLoader,
-// $FlowFixMe[signature-verification-failure]
-}: AnnouncementsFeedProps) => {
+}: AnnouncementsFeedProps): null | React.Node => {
   const {
     announcements,
     error,

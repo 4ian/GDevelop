@@ -41,8 +41,7 @@ export const NewResourceDialog = ({
   resourceSources,
   onClose,
   onChooseResources,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): null | React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const { searchResults } = React.useContext(ResourceStoreContext);
   const storageProvider = React.useMemo(() => getStorageProvider(), [

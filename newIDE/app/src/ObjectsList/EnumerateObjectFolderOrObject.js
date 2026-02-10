@@ -9,8 +9,7 @@ export type ObjectFolderOrObjectWithContext = {|
 
 export const getObjectFolderOrObjectUnifiedName = (
   objectFolderOrObject: gdObjectFolderOrObject
-// $FlowFixMe[signature-verification-failure]
-) =>
+): string =>
   objectFolderOrObject.isFolder()
     ? objectFolderOrObject.getFolderName()
     : objectFolderOrObject.getObject().getName();

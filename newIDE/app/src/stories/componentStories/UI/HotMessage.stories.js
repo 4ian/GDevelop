@@ -10,12 +10,11 @@ import { ColumnStackLayout } from '../../../UI/Layout';
 export default {
   title: 'UI Building Blocks/HotMessage',
   component: HotMessage,
-  // $FlowFixMe[signature-verification-failure]
-  decorators: [getPaperDecorator('medium')],
+  // $FlowFixMe[cannot-resolve-name]
+  decorators: [(getPaperDecorator('medium'): StoryDecorator)],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <ColumnStackLayout>
     <HotMessage
       title="Get 2 months free!"

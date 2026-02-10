@@ -548,17 +548,16 @@ export const getSummaryLines = ({
   bundleListingData,
   productListingDatasIncludedInBundle,
 }: {|
-  redemptionCodesIncludedInBundle: IncludedRedemptionCode[],
+  redemptionCodesIncludedInBundle: Array<IncludedRedemptionCode>,
   bundleListingData: BundleListingData,
-  productListingDatasIncludedInBundle: (
+  productListingDatasIncludedInBundle: Array<
     | PrivateAssetPackListingData
     | PrivateGameTemplateListingData
     | BundleListingData
     | CreditsPackageListingData
     | CourseListingData
-  )[],
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+  >,
+|}): { desktopLines: Array<React.Node>, mobileLines: Array<React.Node> } => {
   const includedListableProducts =
     bundleListingData.includedListableProducts || [];
   const summaryLineItems = [];
@@ -724,7 +723,9 @@ export const getSummaryLines = ({
   }
 
   return {
+    // $FlowFixMe[incompatible-type]
     mobileLines,
+    // $FlowFixMe[incompatible-type]
     desktopLines,
   };
 };

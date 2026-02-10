@@ -27,8 +27,7 @@ const SimpleTileMapEditor = ({
   resourceManagementProps,
   projectScopedContainersAccessor,
   renderObjectNameField,
-// $FlowFixMe[signature-verification-failure]
-}: EditorProps) => {
+}: EditorProps): React.Node => {
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
   const forceUpdate = useForceUpdate();
   const objectProperties = objectConfiguration.getProperties();

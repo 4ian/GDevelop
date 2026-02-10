@@ -71,10 +71,11 @@ export const commonProps = {
     },
   ],
   editorCallbacks: {
-    // $FlowFixMe[signature-verification-failure]
-    onOpenLayout: action('onOpenLayout'),
-    // $FlowFixMe[signature-verification-failure]
-    onCreateProject: async () => ({ exampleSlug: null, createdProject: null }),
+    onOpenLayout: (action('onOpenLayout'): any),
+    onCreateProject: async (): Promise<{
+      createdProject: null,
+      exampleSlug: null,
+    }> => ({ exampleSlug: null, createdProject: null }),
   },
   project: null,
   quota: {
@@ -82,13 +83,10 @@ export const commonProps = {
     current: 100,
     max: 200,
     period: '7days',
-    // $FlowFixMe[signature-verification-failure]
-    resetsAt: Date.now() + 1000 * 60 * 60 * 24 * 2,
+    resetsAt: (Date.now(): number) + 1000 * 60 * 60 * 24 * 2,
   },
-  // $FlowFixMe[signature-verification-failure]
-  onStartNewAiRequest: action('onStartNewAiRequest'),
-  // $FlowFixMe[signature-verification-failure]
-  onSendUserMessage: action('onSendUserMessage'),
+  onStartNewAiRequest: (action('onStartNewAiRequest'): any),
+  onSendUserMessage: (action('onSendUserMessage'): any),
   isSending: false,
   price: {
     priceInCredits: 3,
@@ -111,8 +109,7 @@ export const commonProps = {
   availableCredits: 400,
   onSendFeedback: async () => {},
   hasOpenedProject: false,
-  // $FlowFixMe[signature-verification-failure]
-  editorFunctionCallResults: [],
+  editorFunctionCallResults: ([]: Array<empty>),
   increaseQuotaOffering: 'subscribe',
   onProcessFunctionCalls: async () => {},
   setAutoProcessFunctionCalls: () => {},
@@ -138,8 +135,10 @@ const WrappedChatComponent = (allProps: any) => {
     <FixedHeightFlexContainer height={800}>
       <FixedWidthFlexContainer width={600}>
         <PreferencesContext.Provider
+          // $FlowFixMe[incompatible-type]
           value={{
             ...initialPreferences,
+            // $FlowFixMe[incompatible-type]
             values: {
               ...initialPreferences.values,
               automaticallyUseCreditsForAiRequests: automaticallyUseCredits,
@@ -283,8 +282,7 @@ const fakeOutputWithFunctionCallWithSameCallId = [
   },
 ];
 
-// $FlowFixMe[signature-verification-failure]
-export const ReadyAiRequestWithFunctionCallWithoutAutoProcess = () => (
+export const ReadyAiRequestWithFunctionCallWithoutAutoProcess = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -300,8 +298,7 @@ export const ReadyAiRequestWithFunctionCallWithoutAutoProcess = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ReadyAiRequestWithWorkingFunctionCall = () => (
+export const ReadyAiRequestWithWorkingFunctionCall = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -323,8 +320,7 @@ export const ReadyAiRequestWithWorkingFunctionCall = () => (
     isAutoProcessingFunctionCalls={true}
   />
 );
-// $FlowFixMe[signature-verification-failure]
-export const ReadyAiRequestWithFinishedFunctionCallAndLaunchingRequest = () => (
+export const ReadyAiRequestWithFinishedFunctionCallAndLaunchingRequest = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -352,8 +348,7 @@ export const ReadyAiRequestWithFinishedFunctionCallAndLaunchingRequest = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WorkingAiRequestWithFinishedFunctionCall = () => (
+export const WorkingAiRequestWithFinishedFunctionCall = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -380,8 +375,7 @@ export const WorkingAiRequestWithFinishedFunctionCall = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ReadyAiRequestWithIgnoredFunctionCall = () => (
+export const ReadyAiRequestWithIgnoredFunctionCall = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -404,8 +398,7 @@ export const ReadyAiRequestWithIgnoredFunctionCall = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ReadyAiRequestWithFailedFunctionCall = () => (
+export const ReadyAiRequestWithFailedFunctionCall = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -432,8 +425,7 @@ export const ReadyAiRequestWithFailedFunctionCall = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ReadyAiRequestWithFunctionCallAndOutput = () => (
+export const ReadyAiRequestWithFunctionCallAndOutput = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -450,8 +442,7 @@ export const ReadyAiRequestWithFunctionCallAndOutput = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ReadyAiRequestWithFunctionCallWithSameCallId = () => (
+export const ReadyAiRequestWithFunctionCallWithSameCallId = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -478,49 +469,42 @@ export const ReadyAiRequestWithFunctionCallWithSameCallId = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ReadyAiRequestWithFailedAndIgnoredFunctionCallOutputs = () => (
+export const ReadyAiRequestWithFailedAndIgnoredFunctionCallOutputs = (): React.Node => (
   <WrappedChatComponent
     aiRequest={agentAiRequestWithFailedAndIgnoredFunctionCallOutputs}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const LongReadyAiRequest = () => (
+export const LongReadyAiRequest = (): React.Node => (
   <WrappedChatComponent
     aiRequest={agentAiRequest}
     isAutoProcessingFunctionCalls={true}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const LongReadyAiRequestForAnotherProject = () => (
+export const LongReadyAiRequestForAnotherProject = (): React.Node => (
   <WrappedChatComponent
     aiRequest={{ ...agentAiRequest, gameId: 'another-project-uuid' }}
     isAutoProcessingFunctionCalls={true}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const LongReadyAiRequestWithFunctionCallToDo = () => (
+export const LongReadyAiRequestWithFunctionCallToDo = (): React.Node => (
   <WrappedChatComponent aiRequest={agentAiRequestWithFunctionCallToDo} />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const LaunchingFollowupAiRequest = () => (
+export const LaunchingFollowupAiRequest = (): React.Node => (
   <WrappedChatComponent aiRequest={agentAiRequest} isSending={true} />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ErrorLaunchingFollowupAiRequest = () => (
+export const ErrorLaunchingFollowupAiRequest = (): React.Node => (
   <WrappedChatComponent
     aiRequest={agentAiRequest}
     lastSendError={new Error('fake error while sending request')}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const QuotaLimitsReachedAndAutomaticallyUsingCredits = () => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCredits = (): React.Node => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -554,8 +538,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCredits = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftNoSubscription = () => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): React.Node => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -589,8 +572,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftNoSubscrip
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = () => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): React.Node => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -624,8 +606,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilver
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = () => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): React.Node => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -659,8 +640,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartu
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = () => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = (): React.Node => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -694,8 +674,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubscription = () => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): React.Node => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -729,8 +708,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubsc
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = () => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): React.Node => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -764,8 +742,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSil
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = () => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): React.Node => {
   const quota = {
     limitReached: true,
     current: 100,

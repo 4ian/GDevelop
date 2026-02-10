@@ -18,8 +18,7 @@ const BehaviorPropertiesEditor = ({
   onBehaviorUpdated,
   resourceManagementProps,
   projectScopedContainersAccessor,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
     gd.JsPlatform.get(),
     behavior.getTypeName()

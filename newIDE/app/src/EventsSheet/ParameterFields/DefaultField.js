@@ -10,8 +10,7 @@ import {
 } from './ParameterFieldCommons';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function DefaultField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SemiControlledTextFieldInterface>(null);
     const focus: FieldFocusFunction = options => {
@@ -41,7 +40,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);
 
 export const renderInlineDefaultField = ({
   value,
@@ -49,8 +52,7 @@ export const renderInlineDefaultField = ({
   parameterMetadata,
   InvalidParameterValue,
   MissingParameterValue,
-// $FlowFixMe[signature-verification-failure]
-}: ParameterInlineRendererProps) => {
+}: ParameterInlineRendererProps): string | React.MixedElement => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }

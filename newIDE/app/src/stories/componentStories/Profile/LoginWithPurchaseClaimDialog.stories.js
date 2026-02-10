@@ -28,11 +28,11 @@ const defaultProps = {
   claimedProductOptions,
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => <LoginWithPurchaseClaimDialog {...defaultProps} />;
+export const Default = (): React.Node => (
+  <LoginWithPurchaseClaimDialog {...defaultProps} />
+);
 
-// $FlowFixMe[signature-verification-failure]
-export const WeakPasswordErrorFromBackend = () => (
+export const WeakPasswordErrorFromBackend = (): React.Node => (
   <LoginWithPurchaseClaimDialog
     {...defaultProps}
     error={{
@@ -41,8 +41,7 @@ export const WeakPasswordErrorFromBackend = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const InvalidEmailErrorFromBackend = () => (
+export const InvalidEmailErrorFromBackend = (): React.Node => (
   <LoginWithPurchaseClaimDialog
     {...defaultProps}
     error={{
@@ -51,8 +50,7 @@ export const InvalidEmailErrorFromBackend = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const AccountExistsWithDifferentCredentialErrorFromBackend = () => (
+export const AccountExistsWithDifferentCredentialErrorFromBackend = (): React.Node => (
   <LoginWithPurchaseClaimDialog
     {...defaultProps}
     error={{
@@ -61,7 +59,6 @@ export const AccountExistsWithDifferentCredentialErrorFromBackend = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Submitting = () => (
+export const Submitting = (): React.Node => (
   <LoginWithPurchaseClaimDialog {...defaultProps} loginInProgress />
 );

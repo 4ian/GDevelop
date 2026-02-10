@@ -35,8 +35,7 @@ export const openExampleInWebApp = (exampleShortHeader: ExampleShortHeader) => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-const ExampleInformationPage = ({ exampleShortHeader }: Props) => {
+const ExampleInformationPage = ({ exampleShortHeader }: Props): React.Node => {
   const isCompatible = isCompatibleWithGDevelopVersion(
     getIDEVersion(),
     exampleShortHeader.gdevelopVersion

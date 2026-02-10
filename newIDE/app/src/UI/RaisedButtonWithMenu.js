@@ -21,8 +21,7 @@ const shouldNeverBeCalled = () => {
 /**
  * A raised button based on Material-UI button, that has a menu displayed when clicked.
  */
-// $FlowFixMe[signature-verification-failure]
-const RaisedButtonWithMenu = (props: Props) => {
+const RaisedButtonWithMenu = (props: Props): React.Node => {
   const { buildMenuTemplate, ...otherProps } = props;
 
   return (

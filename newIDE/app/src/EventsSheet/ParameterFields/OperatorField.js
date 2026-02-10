@@ -31,8 +31,7 @@ const mapTypeToOperators: { [string]: Array<string> } = {
   boolean: ['True', 'False', 'Toggle'],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function OperatorField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SelectFieldInterface>(null);
     const focus: FieldFocusFunction = options => {
@@ -91,15 +90,18 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </SelectField>
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);
 
 export const renderInlineOperator = ({
   value,
   InvalidParameterValue,
   useAssignmentOperators,
   parameterMetadata,
-// $FlowFixMe[signature-verification-failure]
-}: ParameterInlineRendererProps) => {
+}: ParameterInlineRendererProps): string | React.MixedElement | React.Node => {
   const comparedValueType = parameterMetadata
     ? parameterMetadata.getExtraInfo()
     : 'unknown';

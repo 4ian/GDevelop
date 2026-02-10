@@ -107,8 +107,7 @@ const HighlightingTooltip = ({
   onClose,
   placement,
   closeWithBackdropClick,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): null | React.Node => {
   const classes = useClasses();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { currentlyRunningInAppTutorial } = React.useContext(

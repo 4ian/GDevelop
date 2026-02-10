@@ -23,8 +23,7 @@ export const useSearchAndInstallResource = ({
 }: {|
   project: ?gdProject,
   resourceManagementProps: ResourceManagementProps,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): any => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );

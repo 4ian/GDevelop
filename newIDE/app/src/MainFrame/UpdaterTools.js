@@ -18,8 +18,7 @@ export type ElectronUpdateStatus = {
 
 export const getElectronUpdateNotificationTitle = (
   updateStatus: ElectronUpdateStatus
-// $FlowFixMe[signature-verification-failure]
-) => {
+): string => {
   if (updateStatus.status === 'update-available')
     return 'A new update is available!';
 
@@ -28,16 +27,16 @@ export const getElectronUpdateNotificationTitle = (
 
 export const getElectronUpdateNotificationBody = (
   updateStatus: ElectronUpdateStatus
-// $FlowFixMe[signature-verification-failure]
-) => {
+): string => {
   if (updateStatus.status === 'update-available')
     return 'It will be downloaded and installed automatically (unless you deactivated this in preferences)';
 
   return '';
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const getElectronUpdateStatusLabel = (status: string) => {
+export const getElectronUpdateStatusLabel = (
+  status: string
+): string | React.Node => {
   if (status === 'checking-for-update')
     return <Trans>Checking for update...</Trans>;
   if (status === 'update-available')
@@ -56,15 +55,13 @@ export const getElectronUpdateStatusLabel = (status: string) => {
   return '';
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const getElectronUpdateButtonLabel = (status: string) => {
+export const getElectronUpdateButtonLabel = (status: string): React.Node => {
   if (status === 'update-available')
     return <Trans>Update GDevelop to latest version</Trans>;
   return <Trans>Check again for new updates</Trans>;
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const canDownloadElectronUpdate = (status: string) => {
+export const canDownloadElectronUpdate = (status: string): boolean => {
   return status === 'update-available';
 };
 
@@ -75,8 +72,7 @@ type ServiceWorkerUpdateStatus =
   | 'update-installing'
   | 'update-ready';
 
-// $FlowFixMe[signature-verification-failure]
-export const useServiceWorkerUpdateStatus = () => {
+export const useServiceWorkerUpdateStatus = (): ServiceWorkerUpdateStatus => {
   const [
     serviceWorkerUpdateStatus,
     setServiceWorkerUpdateStatus,
@@ -111,8 +107,7 @@ export const useServiceWorkerUpdateStatus = () => {
 
 export const getServiceWorkerStatusLabel = (
   status: ServiceWorkerUpdateStatus
-// $FlowFixMe[signature-verification-failure]
-) => {
+): React.Node => {
   if (status === 'not-installed') {
     return <Trans>Not installed as an app. No updates available.</Trans>;
   } else if (status === 'installed') {

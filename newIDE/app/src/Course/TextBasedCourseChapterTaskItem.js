@@ -45,8 +45,7 @@ const TextBasedCourseChapterTaskItem = ({
   task,
   isComplete,
   onComplete,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

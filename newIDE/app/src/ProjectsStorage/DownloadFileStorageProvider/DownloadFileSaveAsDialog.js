@@ -64,8 +64,9 @@ export const downloadResourcesAsBlobs = async ({
   project,
   onAddBlobFile,
   onProgress,
-// $FlowFixMe[signature-verification-failure]
-}: DownloadResourcesAsBlobsOptions) => {
+}: DownloadResourcesAsBlobsOptions): Promise<{
+  erroredResources: Array<empty>,
+}> => {
   const result = {
     erroredResources: [],
   };
@@ -119,7 +120,7 @@ export const downloadResourcesAsBlobs = async ({
   // Download all the project resources as blob (much like what is done during an export).
   const downloadedBlobsAndResources: Array<
     ItemResult<ResourceToFetch>
-  // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-type]
   > = await downloadUrlsToBlobs({
     urlContainers: resourcesToFetchAndUpload,
     onProgress: (count, total) => {
@@ -164,8 +165,10 @@ type Props = {|
   onDone: () => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export default function DownloadFileSaveAsDialog({ project, onDone }: Props) {
+export default function DownloadFileSaveAsDialog({
+  project,
+  onDone,
+}: Props): React.Node {
   const [zippedProjectBlob, setZippedProjectBlob] = React.useState<?Blob>(null);
   const {
     ensureProcessIsDone,

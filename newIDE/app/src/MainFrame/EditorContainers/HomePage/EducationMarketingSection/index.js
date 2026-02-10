@@ -85,8 +85,7 @@ const EducationMarketingSection = ({
   onSendForm,
   formStatus,
   onLogin,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const { limits } = React.useContext(AuthenticatedUserContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

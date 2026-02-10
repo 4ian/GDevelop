@@ -162,8 +162,11 @@ type Props = {|
 export const computeTextFieldStyleProps = (props: {
   margin?: 'none' | 'dense',
   floatingLabelText?: React.Node,
-// $FlowFixMe[signature-verification-failure]
-}) => {
+}): {
+  hiddenLabel: false | true | boolean,
+  margin: string,
+  variant: string,
+} => {
   return {
     // Use "filled" variant by default, unless `margin` is "none" (see 1. and 2.)
     variant: props.margin === 'none' ? 'standard' : 'filled',
@@ -187,8 +190,11 @@ export type TextFieldInterface = {|
 /**
  * A text field based on Material-UI text field.
  */
-// $FlowFixMe[signature-verification-failure]
-const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
+// $FlowFixMe[prop-missing]
+const TextField: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<TextFieldInterface> },
+  React.RefSetter<TextFieldInterface>
+> = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
   // $FlowFixMe[value-as-type]
   const muiTextFieldRef = React.useRef<?MUITextField>(null);

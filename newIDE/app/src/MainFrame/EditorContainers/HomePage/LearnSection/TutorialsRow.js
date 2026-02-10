@@ -44,8 +44,7 @@ export const TutorialsRow = ({
   onSelectCategory,
   onSelectTutorial,
   getColumnsFromWindowSize,
-// $FlowFixMe[signature-verification-failure]
-}: TutorialsRowProps) => {
+}: TutorialsRowProps): React.Node => {
   const {
     tutorials,
     error: tutorialLoadingError,

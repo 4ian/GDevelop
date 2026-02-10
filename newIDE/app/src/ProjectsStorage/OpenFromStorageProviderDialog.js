@@ -31,8 +31,7 @@ const OpenFromStorageProviderDialog = ({
   onClose,
   storageProviders,
   onChooseProvider,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const isCloudStorageProviderEnabled = storageProviders.some(
     provider => provider.internalName === 'Cloud'
   );

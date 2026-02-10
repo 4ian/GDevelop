@@ -88,8 +88,7 @@ const BuildStepsProgress = ({
   errored,
   hasBuildStep,
   showSeeAllMyBuildsExplanation,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const getActiveStep = React.useCallback(
     () =>

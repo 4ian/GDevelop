@@ -26,16 +26,13 @@ type State = {|
 export default class ObjectTypeSelector extends React.Component<Props, State> {
   // $FlowFixMe[missing-local-annot]
   state = {
-    // $FlowFixMe[signature-verification-failure]
-    objectMetadata: enumerateObjectTypes(
+    objectMetadata: (enumerateObjectTypes(
       this.props.project,
       this.props.eventsFunctionsExtension
-    ),
+    ): Array<EnumeratedObjectMetadata>),
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const {
       disabled,
       value,

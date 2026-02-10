@@ -86,8 +86,7 @@ const CreateAccountForm = ({
   createAccountInProgress,
   error,
   onGoToLogin,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const accountsExistsWithOtherCredentials = error
     ? error.code === 'auth/account-exists-with-different-credential'
     : false;

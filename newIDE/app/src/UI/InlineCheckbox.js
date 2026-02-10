@@ -51,8 +51,7 @@ const InlineCheckbox = ({
   checkedIcon,
   tooltipOrHelperText,
   paddingSize,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const labelClasses = useLabelStyles();
   const formGroupClasses = useFormGroupStyles();
   const smallPaddingClasses = useSmallPaddingCheckboxStyles();

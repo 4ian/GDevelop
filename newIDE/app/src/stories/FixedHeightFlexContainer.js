@@ -17,8 +17,7 @@ const FixedHeightFlexContainer = ({
   height,
   alignItems,
   justifyContent,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => (
+}: Props): React.MixedElement => (
   <div style={{ ...style, height, alignItems, justifyContent }}>{children}</div>
 );
 

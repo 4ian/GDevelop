@@ -80,8 +80,7 @@ const ElectronMainMenu = ({
   props: BuildMainMenuProps,
   callbacks: MainMenuCallbacks,
   extraCallbacks: MainMenuExtraCallbacks,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): null => {
   const {
     i18n,
     project,

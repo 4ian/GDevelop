@@ -3,8 +3,7 @@
 
 // $FlowFixMe[incompatible-type] - Mock worker for tests
 // $FlowFixMe[underconstrained-implicit-instantiation]
-// $FlowFixMe[signature-verification-failure]
-const MockWorker = jest.fn().mockImplementation(() => {
+const MockWorker: JestMockFn<any, any> = jest.fn().mockImplementation(() => {
   return {
     postMessage: jest.fn(),
     onmessage: null,

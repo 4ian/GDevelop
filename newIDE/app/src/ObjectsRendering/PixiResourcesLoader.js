@@ -98,7 +98,7 @@ const getOrCreateGltfLoader = () => {
 const load3DModel = (
   project: gdProject,
   resourceName: string
-// $FlowFixMe[value-as-type]
+  // $FlowFixMe[value-as-type]
 ): Promise<THREE.THREE_ADDONS.GLTF> => {
   if (
     resourceName.length === 0 ||
@@ -486,9 +486,7 @@ export default class PixiResourcesLoader {
    * should listen to PIXI.Texture `update` event, and refresh your object
    * if this event is triggered.
    */
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  static getPIXITexture(project: gdProject, resourceName: string) {
+  static getPIXITexture(project: gdProject, resourceName: string): any {
     // $FlowFixMe[invalid-computed-prop]
     if (loadedTextures[resourceName]) {
       // TODO: we never consider textures as not valid anymore. When we
@@ -547,7 +545,7 @@ export default class PixiResourcesLoader {
   static async getThreeTexture(
     project: gdProject,
     resourceName: string
-  // $FlowFixMe[value-as-type]
+    // $FlowFixMe[value-as-type]
   ): Promise<THREE.Texture> {
     const loadedOrLoadingPromise = loadedOrLoadingThreeTextures[resourceName];
     // $FlowFixMe[constant-condition]
@@ -609,8 +607,8 @@ export default class PixiResourcesLoader {
     }: {|
       useTransparentTexture: boolean,
     |}
-  // $FlowFixMe[value-as-type]
-  ): Promise<THREE.Material> {
+  ): // $FlowFixMe[value-as-type]
+  Promise<THREE.Material> {
     const cacheKey = `${resourceName}|transparent:${useTransparentTexture.toString()}`;
     const loadedOrLoadingPromise = loadedOrLoadingThreeMaterials[cacheKey];
     // $FlowFixMe[constant-condition]
@@ -641,7 +639,7 @@ export default class PixiResourcesLoader {
   static get3DModel(
     project: gdProject,
     resourceName: string
-  // $FlowFixMe[value-as-type]
+    // $FlowFixMe[value-as-type]
   ): Promise<THREE.THREE_ADDONS.GLTF> {
     const promise = loadedOrLoading3DModelPromises[resourceName];
     // $FlowFixMe[constant-condition]
@@ -889,9 +887,7 @@ export default class PixiResourcesLoader {
    * should listen to PIXI.Texture `update` event, and refresh your object
    * if this event is triggered.
    */
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  static getPIXIVideoTexture(project: gdProject, resourceName: string) {
+  static getPIXIVideoTexture(project: gdProject, resourceName: string): any {
     // $FlowFixMe[invalid-computed-prop]
     if (loadedTextures[resourceName]) {
       // TODO: we never consider textures as not valid anymore. When we
@@ -1004,9 +1000,7 @@ export default class PixiResourcesLoader {
    * The font won't be loaded.
    * @returns The font-family to be used to render a text with the font.
    */
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  static getFontFamily(project: gdProject, resourceName: string) {
+  static getFontFamily(project: gdProject, resourceName: string): any {
     // $FlowFixMe[invalid-computed-prop]
     if (loadedFontFamilies[resourceName]) {
       return loadedFontFamilies[resourceName];
@@ -1056,27 +1050,25 @@ export default class PixiResourcesLoader {
       );
     }
 
-    return axios
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      .get(fullUrl, {
-        withCredentials: checkIfCredentialsRequired(fullUrl),
-      })
-      .then(response => {
-        // $FlowFixMe[prop-missing]
-        loadedBitmapFonts[resourceName] = response;
-        return response.data;
-      });
+    return (
+      axios
+        // $FlowFixMe[underconstrained-implicit-instantiation]
+        .get(fullUrl, {
+          withCredentials: checkIfCredentialsRequired(fullUrl),
+        })
+        .then(response => {
+          // $FlowFixMe[prop-missing]
+          loadedBitmapFonts[resourceName] = response;
+          return response.data;
+        })
+    );
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  static getInvalidPIXITexture() {
+  static getInvalidPIXITexture(): any {
     return invalidTexture;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  static getLoadingPIXITexture() {
+  static getLoadingPIXITexture(): any {
     return loadingTexture;
   }
 
@@ -1108,11 +1100,13 @@ export default class PixiResourcesLoader {
     const fullUrl = ResourcesLoader.getResourceFullUrl(project, resourceName, {
       isResourceForPixi: true,
     });
-    return axios
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      .get(fullUrl, {
-        withCredentials: checkIfCredentialsRequired(fullUrl),
-      })
-      .then(response => response.data);
+    return (
+      axios
+        // $FlowFixMe[underconstrained-implicit-instantiation]
+        .get(fullUrl, {
+          withCredentials: checkIfCredentialsRequired(fullUrl),
+        })
+        .then(response => response.data)
+    );
   }
 }

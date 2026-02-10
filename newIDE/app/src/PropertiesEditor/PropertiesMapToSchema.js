@@ -85,8 +85,8 @@ const createField = (
         ? (instance: gdInitialInstance) => {
             return getValue(instance) === defaultValueNumber
               ? null
-              // $FlowFixMe[missing-local-annot]
-              : className => <Restore className={className} />;
+              : // $FlowFixMe[missing-local-annot]
+                className => <Restore className={className} />;
           }
         : undefined;
     const setValue = (instance: Instance, newValue: number) => {
@@ -98,6 +98,7 @@ const createField = (
             setValue(instance, defaultValueNumber);
           }
         : undefined;
+    // $FlowFixMe[incompatible-type]
     return {
       name,
       valueType,
@@ -156,8 +157,8 @@ const createField = (
         choice.getValue() +
         // $FlowFixMe[incompatible-use]
         (choice.getLabel() && choice.getLabel() !== choice.getValue()
-          // $FlowFixMe[incompatible-use]
-          ? ` — ${choice.getLabel()}`
+          ? // $FlowFixMe[incompatible-use]
+            ` — ${choice.getLabel()}`
           : ''),
     }));
     // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.

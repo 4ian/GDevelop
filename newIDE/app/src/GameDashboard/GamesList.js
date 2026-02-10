@@ -294,8 +294,7 @@ const GamesList = ({
   setCurrentPage,
   searchText,
   setSearchText,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { cloudProjects, profile, onCloudProjectsChanged } = React.useContext(
     AuthenticatedUserContext
   );
@@ -324,6 +323,7 @@ const GamesList = ({
         .map(file => ({ projectFiles: [file] }));
       const allItems = [...projectFilesWithGame, ...projectFilesWithoutGame];
 
+      // $FlowFixMe[incompatible-type]
       return allItems.filter(
         item =>
           // Filter out draft games which don't have a project file linked to it (local or cloud)

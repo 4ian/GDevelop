@@ -64,8 +64,9 @@ const styles = {
   },
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const useParameterOverridingAlertDialog = () => {
+export const useParameterOverridingAlertDialog = (): ((
+  existingParameterNames: Array<string>
+) => Promise<boolean>) => {
   const { showConfirmation } = useAlertDialog();
   return async (existingParameterNames: Array<string>): Promise<boolean> => {
     return await showConfirmation({
@@ -156,8 +157,7 @@ export const EventsFunctionParametersEditor = ({
   onFunctionParameterWillBeRenamed,
   children,
   onFunctionParameterTypeChanged,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
     justAddedParameterName,

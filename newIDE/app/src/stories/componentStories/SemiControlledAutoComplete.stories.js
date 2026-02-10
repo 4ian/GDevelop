@@ -17,8 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const DefaultWithText = () => (
+export const DefaultWithText = (): React.Node => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -37,8 +36,7 @@ export const DefaultWithText = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithError = () => (
+export const WithError = (): React.Node => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -58,8 +56,7 @@ export const WithError = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithTranslatableElementsAndSeparator = () => (
+export const WithTranslatableElementsAndSeparator = (): React.Node => (
   <ValueStateHolder
     initialValue={''}
     render={(value, onChange) => (
@@ -90,8 +87,7 @@ export const WithTranslatableElementsAndSeparator = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithOnClickForSomeElements = () => (
+export const WithOnClickForSomeElements = (): React.Node => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -126,8 +122,7 @@ export const WithOnClickForSomeElements = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithOnClickLongTextsAndRenderIcon = () => (
+export const WithOnClickLongTextsAndRenderIcon = (): React.Node => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -178,8 +173,7 @@ export const WithOnClickLongTextsAndRenderIcon = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const InDialog = () => (
+export const InDialog = (): React.Node => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -214,8 +208,7 @@ export const InDialog = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithReducedMarginInMiniToolbar = () => (
+export const WithReducedMarginInMiniToolbar = (): React.Node => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -238,8 +231,7 @@ export const WithReducedMarginInMiniToolbar = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithMarkdownHelperText = () => (
+export const WithMarkdownHelperText = (): React.Node => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -259,8 +251,7 @@ export const WithMarkdownHelperText = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithFloatingLabel = () => (
+export const WithFloatingLabel = (): React.Node => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -281,8 +272,7 @@ export const WithFloatingLabel = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithInputValueListener = () => {
+export const WithInputValueListener = (): React.Node => {
   const [value, setValue] = React.useState('Choice 6');
   const [inputValue, setInputValue] = React.useState('Choice 6');
 

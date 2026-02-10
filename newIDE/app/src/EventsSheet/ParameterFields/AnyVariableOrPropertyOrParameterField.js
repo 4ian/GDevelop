@@ -18,8 +18,7 @@ import { mapFor } from '../../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function AnyVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
     const [
@@ -134,7 +133,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </React.Fragment>
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);
 
 export const getVariableSourceFromIdentifier = (
   variableName: string,
@@ -153,5 +156,5 @@ export const getVariableSourceFromIdentifier = (
 
 export const renderInlineAnyVariableOrPropertyOrParameter = (
   props: ParameterInlineRendererProps
-// $FlowFixMe[signature-verification-failure]
-) => renderVariableWithIcon(props, 'variable', getVariableSourceFromIdentifier);
+): any =>
+  renderVariableWithIcon(props, 'variable', getVariableSourceFromIdentifier);

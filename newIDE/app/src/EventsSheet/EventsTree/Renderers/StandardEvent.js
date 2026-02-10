@@ -24,9 +24,7 @@ export default class StandardEvent extends React.Component<
   // $FlowFixMe[unsupported-syntax]
   *
 > {
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     var standardEvent = gd.asStandardEvent(this.props.event);
 
     return (

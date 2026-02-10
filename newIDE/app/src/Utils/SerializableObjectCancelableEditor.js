@@ -33,8 +33,12 @@ export const useSerializableObjectCancelableEditor = ({
   useProjectToUnserialize,
   onCancel,
   resetThenClearPersistentUuid,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): {
+  getOriginalContentSerializedElement: () => gdSerializerElement,
+  hasUnsavedChanges: () => boolean,
+  notifyOfChange: () => void,
+  onCancelChanges: () => Promise<void>,
+} => {
   const serializedElementRef = React.useRef<gdSerializerElement | null>(null);
   const numberOfChangesRef = React.useRef(0);
   const { showConfirmation } = useAlertDialog();
@@ -170,8 +174,12 @@ export const useSerializableObjectsCancelableEditor = ({
   useProjectToUnserialize,
   onCancel,
   resetThenClearPersistentUuid,
-// $FlowFixMe[signature-verification-failure]
-}: SerializableObjectsCancelableEditorProps) => {
+}: SerializableObjectsCancelableEditorProps): {
+  getOriginalContentSerializedElements: () => Map<string, gdSerializerElement>,
+  hasUnsavedChanges: () => boolean,
+  notifyOfChange: () => void,
+  onCancelChanges: () => Promise<void>,
+} => {
   const serializedElementsRef = React.useRef<Map<string, gdSerializerElement>>(
     new Map()
   );

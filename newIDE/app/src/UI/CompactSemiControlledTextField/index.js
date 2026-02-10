@@ -26,8 +26,7 @@ const CompactSemiControlledTextField = ({
   errorText,
   commitOnBlur,
   ...otherProps
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.MixedElement => {
   const [focused, setFocused] = React.useState<boolean>(false);
   const [text, setText] = React.useState<string>('');
 

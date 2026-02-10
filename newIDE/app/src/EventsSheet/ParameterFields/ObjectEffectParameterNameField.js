@@ -26,8 +26,7 @@ import Functions from '@material-ui/icons/Functions';
 
 const gd: libGDevelop = global.gd;
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectEffectParameterNameField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?GenericExpressionField | SelectFieldInterface>(
       null
@@ -251,4 +250,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);

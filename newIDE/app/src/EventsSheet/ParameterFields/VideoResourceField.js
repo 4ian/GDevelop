@@ -12,8 +12,7 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function VideoResourceField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?ResourceSelectorInterface>(null);
     const focus: FieldFocusFunction = options => {
@@ -48,4 +47,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);

@@ -61,8 +61,7 @@ export const GameThumbnail = ({
   background = 'light',
   fullWidthOnMobile,
   width,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext

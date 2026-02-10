@@ -160,8 +160,7 @@ export const ResourceCard = ({
   onChoose,
   size,
   isSelected,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): null | React.MixedElement | React.Node => {
   const resourceKind = resource.type;
   const theme = React.useContext(GDevelopThemeContext);
 
@@ -184,10 +183,10 @@ export const ResourceCard = ({
           size={size}
           imageStyle={
             theme.palette.type === 'light'
-              // $FlowFixMe[incompatible-type]
-              ? styles.previewIconLightTheme
-              // $FlowFixMe[incompatible-type]
-              : styles.previewIconDarkTheme
+              ? // $FlowFixMe[incompatible-type]
+                styles.previewIconLightTheme
+              : // $FlowFixMe[incompatible-type]
+                styles.previewIconDarkTheme
           }
         />
       );

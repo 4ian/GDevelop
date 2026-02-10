@@ -201,15 +201,14 @@ const transformTagsAsStringToTagsAsArray = <
   };
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const client = axios.create({
+// $FlowFixMe[cannot-resolve-name]
+export const client: Axios = axios.create({
   baseURL: GDevelopAssetApi.baseUrl,
 });
-// $FlowFixMe[signature-verification-failure]
-export const cdnClient = axios.create();
+// $FlowFixMe[cannot-resolve-name]
+export const cdnClient: Axios = axios.create();
 
 export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/extension`, {
     params: {
       // Could be changed according to the editor environment, but keep
@@ -221,7 +220,6 @@ export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
 
   const extensionsRegistry: ExtensionsRegistry = await retryIfFailed(
     { times: 2 },
-    // $FlowFixMe[underconstrained-implicit-instantiation]
     async () => (await cdnClient.get(databaseUrl)).data
   );
 
@@ -249,7 +247,6 @@ export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
 };
 
 export const getBehaviorsRegistry = async (): Promise<BehaviorsRegistry> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/behavior`, {
     params: {
       // Could be changed according to the editor environment, but keep
@@ -261,7 +258,6 @@ export const getBehaviorsRegistry = async (): Promise<BehaviorsRegistry> => {
 
   const behaviorsRegistry: BehaviorsRegistry = await retryIfFailed(
     { times: 2 },
-    // $FlowFixMe[underconstrained-implicit-instantiation]
     async () => (await cdnClient.get(databaseUrl)).data
   );
 
@@ -290,7 +286,6 @@ const adaptBehaviorHeader = (
 };
 
 export const getObjectsRegistry = async (): Promise<ObjectsRegistry> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/object`, {
     params: {
       // Could be changed according to the editor environment, but keep
@@ -302,7 +297,6 @@ export const getObjectsRegistry = async (): Promise<ObjectsRegistry> => {
 
   const objectsRegistry: ObjectsRegistry = await retryIfFailed(
     { times: 2 },
-    // $FlowFixMe[underconstrained-implicit-instantiation]
     async () => (await cdnClient.get(databaseUrl)).data
   );
 
@@ -334,7 +328,6 @@ export const getExtensionHeader = (
     | BehaviorShortHeader
     | ObjectShortHeader
 ): Promise<ExtensionHeader> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   return cdnClient.get(extensionShortHeader.headerUrl).then(response => {
     const data: ExtensionHeaderWithTagsAsString = response.data;
     const transformedData: ExtensionHeader = transformTagsAsStringToTagsAsArray(
@@ -351,7 +344,6 @@ export const getExtensionHeader = (
 export const getExtension = (
   extensionHeader: ExtensionShortHeader | BehaviorShortHeader
 ): Promise<SerializedExtension> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   return cdnClient.get(extensionHeader.url).then(response => {
     const data: SerializedExtensionWithTagsAsString = response.data;
     // $FlowFixMe[incompatible-type]
@@ -366,7 +358,6 @@ export const getExtension = (
 export const getUserExtensionShortHeaders = async (
   authorId: string
 ): Promise<Array<ExtensionShortHeader>> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/extension-short-header`, {
     params: {
       authorId,

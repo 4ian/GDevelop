@@ -10,6 +10,7 @@ import { Tabs } from '../../../UI/Tabs';
 import { CreateAuthKeySteps } from './CreateAuthKeySteps';
 
 type Props = {
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   onClose: () => void,
   initialTab: string,
@@ -19,8 +20,7 @@ export const CreateIosSigningCredentialsDialog = ({
   onClose,
   initialTab,
   authenticatedUser,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [currentTab, setCurrentTab] = React.useState<string>(initialTab);
 
   return (

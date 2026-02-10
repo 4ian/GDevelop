@@ -34,8 +34,8 @@ export const renderInstructionOrExpressionTree = <
   initiallyOpenedPath,
   getGroupIconSrc,
   parentGroupIconSrc,
-// $FlowFixMe[prop-missing]
-}: Props<T>): Array<React.Element<any> | null> => {
+}: // $FlowFixMe[prop-missing]
+Props<T>): Array<React.Element<any> | null> => {
   const [initiallyOpenedKey, ...restOfInitiallyOpenedPath] =
     initiallyOpenedPath || [];
 

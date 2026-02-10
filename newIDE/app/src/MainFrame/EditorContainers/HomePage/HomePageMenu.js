@@ -141,8 +141,7 @@ export const HomePageMenu = ({
   activeTab,
   onOpenPreferences,
   onOpenAbout,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { limits } = React.useContext(AuthenticatedUserContext);
   const [

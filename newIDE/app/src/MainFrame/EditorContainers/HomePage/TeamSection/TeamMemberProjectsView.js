@@ -63,8 +63,7 @@ const TeamMemberProjectsView = ({
   projects,
   onRefreshProjects,
   isLoadingProjects,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const skeletonLineHeight = getProjectLineHeight({ isMobile });
   const contextMenu = React.useRef<?ContextMenuInterface>(null);

@@ -136,8 +136,7 @@ type TopLevelWindowSizeProviderProps = {|
  */
 export const TopLevelWindowSizeProvider = ({
   children,
-// $FlowFixMe[signature-verification-failure]
-}: TopLevelWindowSizeProviderProps) => {
+}: TopLevelWindowSizeProviderProps): React.MixedElement => {
   return (
     <WindowSizeContext.Provider value={null}>
       {children}
@@ -160,8 +159,7 @@ export const SpecificDimensionsWindowSizeProvider = ({
   children,
   innerWidth,
   innerHeight,
-// $FlowFixMe[signature-verification-failure]
-}: SpecificDimensionsWindowSizeProviderProps) => {
+}: SpecificDimensionsWindowSizeProviderProps): React.MixedElement => {
   const windowSize = React.useMemo(
     () => {
       if (innerWidth === null || innerHeight === null) {
@@ -196,8 +194,8 @@ type ResponsiveWindowMeasurerProps = {|
  */
 export const ResponsiveWindowMeasurer = ({
   children,
-// $FlowFixMe[signature-verification-failure]
-}: ResponsiveWindowMeasurerProps) => children(useResponsiveWindowSize());
+}: ResponsiveWindowMeasurerProps): React.Node =>
+  children(useResponsiveWindowSize());
 
 /**
  * Return the size of the window.

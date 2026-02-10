@@ -216,6 +216,7 @@ const PrivateAssetPackInformationPageStory = ({
   errorMessage,
 }: {
   privateAssetPackListingData: PrivateAssetPackListingData,
+  // $FlowFixMe[value-as-type]
   authenticatedUser?: AuthenticatedUser,
   receivedAssetPacks?: Array<PrivateAssetPack>,
   delayResponse?: number,
@@ -312,22 +313,19 @@ const PrivateAssetPackInformationPageStory = ({
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPack1ListingData}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ForABundle = () => (
+export const ForABundle = (): React.Node => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPackBundleListingData}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ForAlreadyPurchasedAssetPack = () => (
+export const ForAlreadyPurchasedAssetPack = (): React.Node => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPack1ListingData}
     receivedAssetPacks={[
@@ -346,16 +344,14 @@ export const ForAlreadyPurchasedAssetPack = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Loading = () => (
+export const Loading = (): React.Node => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPack1ListingData}
     delayResponse={10000}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithRedeemableAssetPackWithoutSubscription = () => (
+export const WithRedeemableAssetPackWithoutSubscription = (): React.Node => (
   <PrivateAssetPackInformationPageStory
     authenticatedUser={defaultAuthenticatedUserWithNoSubscription}
     privateAssetPackListingData={{
@@ -372,8 +368,7 @@ export const WithRedeemableAssetPackWithoutSubscription = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithRedeemableAssetPackWithSilverSubscription = () => (
+export const WithRedeemableAssetPackWithSilverSubscription = (): React.Node => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={{
       ...privateAssetPack1ListingData,
@@ -389,8 +384,7 @@ export const WithRedeemableAssetPackWithSilverSubscription = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithRedeemableAssetPackWithGoldSubscription = () => (
+export const WithRedeemableAssetPackWithGoldSubscription = (): React.Node => (
   <PrivateAssetPackInformationPageStory
     authenticatedUser={fakeGoldAuthenticatedUser}
     privateAssetPackListingData={{
@@ -407,8 +401,7 @@ export const WithRedeemableAssetPackWithGoldSubscription = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithRedeemableAssetPackWithEducationSubscription = () => (
+export const WithRedeemableAssetPackWithEducationSubscription = (): React.Node => (
   <PrivateAssetPackInformationPageStory
     authenticatedUser={fakeAuthenticatedUserWithEducationPlan}
     privateAssetPackListingData={{
@@ -425,16 +418,14 @@ export const WithRedeemableAssetPackWithEducationSubscription = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const With404 = () => (
+export const With404 = (): React.Node => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPack1ListingData}
     errorCode={404}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithUnknownError = () => (
+export const WithUnknownError = (): React.Node => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPack1ListingData}
     errorCode={500}

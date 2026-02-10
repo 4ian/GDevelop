@@ -25,8 +25,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => {
+export const Default = (): React.Node => {
   const extensionCdnMock = React.useMemo(() => {
     const mock = new MockAdapter(cdnClient, {
       delayResponse: 250,
@@ -64,8 +63,7 @@ export const Default = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const BeingInstalled = () => {
+export const BeingInstalled = (): React.Node => {
   const extensionCdnMock = React.useMemo(() => {
     const mock = new MockAdapter(cdnClient, {
       delayResponse: 250,
@@ -103,8 +101,7 @@ export const BeingInstalled = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const IncompatibleGdevelopVersion = () => {
+export const IncompatibleGdevelopVersion = (): React.Node => {
   const extensionCdnMock = React.useMemo(() => {
     const mock = new MockAdapter(cdnClient, {
       delayResponse: 250,
@@ -142,8 +139,7 @@ export const IncompatibleGdevelopVersion = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const AlreadyInstalled = () => {
+export const AlreadyInstalled = (): React.Node => {
   const extensionCdnMock = React.useMemo(() => {
     const mock = new MockAdapter(cdnClient, {
       delayResponse: 250,
@@ -181,8 +177,7 @@ export const AlreadyInstalled = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Outdated = () => {
+export const Outdated = (): React.Node => {
   const extensionCdnMock = React.useMemo(() => {
     const mock = new MockAdapter(cdnClient, {
       delayResponse: 250,
@@ -220,8 +215,7 @@ export const Outdated = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const AlreadyInstalledCommunityExtension = () => {
+export const AlreadyInstalledCommunityExtension = (): React.Node => {
   const extensionCdnMock = React.useMemo(() => {
     const mock = new MockAdapter(cdnClient, {
       delayResponse: 250,
@@ -259,8 +253,7 @@ export const AlreadyInstalledCommunityExtension = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithServerSideError = () => {
+export const WithServerSideError = (): React.Node => {
   const extensionCdnMock = React.useMemo(() => {
     const mock = new MockAdapter(cdnClient, {
       delayResponse: 250,
@@ -298,8 +291,7 @@ export const WithServerSideError = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const CommunityExtension = () => {
+export const CommunityExtension = (): React.Node => {
   const extensionCdnMock = React.useMemo(() => {
     const mock = new MockAdapter(cdnClient, {
       delayResponse: 250,

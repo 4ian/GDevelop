@@ -15,8 +15,7 @@ type ProductLicenseStoreState = {|
   error: ?Error,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const ProductLicenseStoreContext = React.createContext<ProductLicenseStoreState>(
+export const ProductLicenseStoreContext: React.Context<ProductLicenseStoreState> = React.createContext<ProductLicenseStoreState>(
   {
     fetchProductLicenses: () => {},
     assetPackLicenses: null,
@@ -31,8 +30,7 @@ type ProductLicenseStoreStateProviderProps = {|
 
 export const ProductLicenseStoreStateProvider = ({
   children,
-// $FlowFixMe[signature-verification-failure]
-}: ProductLicenseStoreStateProviderProps) => {
+}: ProductLicenseStoreStateProviderProps): React.MixedElement => {
   const [error, setError] = React.useState<?Error>(null);
   const [
     gameTemplateLicenses,

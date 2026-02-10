@@ -1,4 +1,5 @@
 /* eslint-env worker */
+/* eslint-disable no-undef */
 // @flow
 
 let modulePromise /*: ?Promise<libGDevelop>*/ = null;
@@ -14,18 +15,17 @@ const getLibGDevelop = (versionWithHash /*: string */) => {
     try {
       const url = `/libGD.js?cache-buster=${versionWithHash}`;
       // Load libGD.js in the worker context.
-      // eslint-disable-next-line no-undef
       importScripts(url);
 
       // $FlowFixMe[incompatible-type]
       // $FlowFixMe[cannot-resolve-name]
-      if (typeof initializeGDevelopJs !== 'function') { // eslint-disable-line no-undef
+      if (typeof initializeGDevelopJs !== 'function') {
         reject(new Error('Missing initializeGDevelopJs in worker'));
         return;
       }
 
       // $FlowFixMe[cannot-resolve-name]
-      initializeGDevelopJs({ // eslint-disable-line no-undef
+      initializeGDevelopJs({
         // Override the resolved URL for the .wasm file,
         // to ensure a new version is fetched when the version changes.
         locateFile: (path /*: string */, prefix /*: string */) => {

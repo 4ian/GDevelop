@@ -43,8 +43,7 @@ export type EditorNavigatorInterface = {|
 // Flow types might have to be changed/removed if upgrading Flow
 // (see example at https://github.com/wgao19/flow-notes/blob/master/react/react-memo.md)
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<Props, EditorNavigatorInterface>(
+export default (React.forwardRef<Props, EditorNavigatorInterface>(
   (
     { initialEditorName, editors, transitions, onEditorChanged }: Props,
     ref
@@ -124,4 +123,8 @@ export default React.forwardRef<Props, EditorNavigatorInterface>(
       </Column>
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<EditorNavigatorInterface> },
+  React.RefSetter<EditorNavigatorInterface>
+>);

@@ -68,8 +68,7 @@ const SubscriptionPlan = ({
   couponErrorMessage: ?string,
   isValidatingCoupon: boolean,
   onClearCoupon: () => void,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { windowSize } = useResponsiveWindowSize();
   const isLargeScreen = windowSize === 'large' || windowSize === 'xlarge';

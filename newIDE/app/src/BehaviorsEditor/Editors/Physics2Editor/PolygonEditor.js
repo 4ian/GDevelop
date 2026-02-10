@@ -36,8 +36,7 @@ const PolygonEditor = ({
   onChangeVertexY,
   onAdd,
   onRemove,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const isPolygonConvex = (vertices: Array<Vertex>) => {
     // Get edges

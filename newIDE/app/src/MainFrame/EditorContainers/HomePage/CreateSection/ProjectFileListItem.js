@@ -81,8 +81,7 @@ export const ProjectFileListItem = ({
   disabled,
   isLoading,
   onOpenContextMenu,
-// $FlowFixMe[signature-verification-failure]
-}: ProjectFileListItemProps) => {
+}: ProjectFileListItemProps): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const storageProvider = getStorageProviderByInternalName(

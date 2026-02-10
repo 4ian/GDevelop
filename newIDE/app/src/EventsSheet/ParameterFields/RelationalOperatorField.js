@@ -39,8 +39,7 @@ const defaultOperators: { [string]: string } = {
   color: '=',
 };
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function RelationalOperatorField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SelectFieldInterface>(null);
     const focus: FieldFocusFunction = options => {
@@ -92,14 +91,23 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </SelectField>
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);
 
 export const renderInlineRelationalOperator = ({
   value,
   InvalidParameterValue,
   parameterMetadata,
-// $FlowFixMe[signature-verification-failure]
-}: ParameterInlineRendererProps) => {
+}: ParameterInlineRendererProps):
+  | '<'
+  | '='
+  | '>'
+  | string
+  | React.MixedElement
+  | React.Node => {
   const comparedValueType = parameterMetadata
     ? parameterMetadata.getExtraInfo()
     : 'unknown';

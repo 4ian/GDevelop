@@ -46,8 +46,7 @@ const DotBadge = ({
   invisible,
   overlap,
   color = 'secondary',
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const classes = useStyles(color);
   const colorForBadge =
     color === 'success' || color === 'neutral' ? undefined : color;

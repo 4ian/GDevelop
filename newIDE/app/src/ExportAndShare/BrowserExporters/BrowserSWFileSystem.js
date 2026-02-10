@@ -69,9 +69,8 @@ export default class BrowserSWFileSystem {
 
   // Store a set of all external URLs copied so that we can simulate
   // readDir result.
-  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  _allCopiedExternalUrls = new Set<string>();
+  _allCopiedExternalUrls = (new Set<string>(): Set<string>);
 
   constructor({ filesContent, rootUrl }: ConstructorArgs) {
     this.rootUrl = rootUrl;
@@ -136,9 +135,7 @@ export default class BrowserSWFileSystem {
     // Assume required directories always exist in a virtual file system.
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  dirExists = (path: string) => {
+  dirExists = (path: string): any => {
     // Assume required directories always exist.
     return true;
   };
@@ -157,29 +154,21 @@ export default class BrowserSWFileSystem {
     );
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getTempDir = () => {
+  getTempDir = (): any => {
     return '/virtual-unused-tmp-dir';
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  fileNameFrom = (fullpath: string) => {
+  fileNameFrom = (fullpath: string): any => {
     if (isURL(fullpath)) return fullpath;
     return path.basename(fullpath);
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  dirNameFrom = (fullpath: string) => {
+  dirNameFrom = (fullpath: string): any => {
     if (isURL(fullpath)) return '';
     return path.dirname(fullpath);
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  makeAbsolute = (filename: string, baseDirectory: string) => {
+  makeAbsolute = (filename: string, baseDirectory: string): any => {
     if (isURL(filename)) return filename;
 
     if (!this.isAbsolute(baseDirectory))
@@ -192,16 +181,12 @@ export default class BrowserSWFileSystem {
     return path.resolve(baseDirectory, path.normalize(filename));
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  makeRelative = (filename: string, baseDirectory: string) => {
+  makeRelative = (filename: string, baseDirectory: string): any => {
     if (isURL(filename)) return filename;
     return path.relative(baseDirectory, path.normalize(filename));
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  isAbsolute = (fullpath: string) => {
+  isAbsolute = (fullpath: string): any => {
     if (isURL(fullpath)) return true;
     if (fullpath.length === 0) return true;
     return (
@@ -210,9 +195,7 @@ export default class BrowserSWFileSystem {
     );
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  copyFile = (source: string, dest: string) => {
+  copyFile = (source: string, dest: string): any => {
     // URLs are not copied, just tracked.
     if (isURL(source)) {
       this._allCopiedExternalUrls.add(source);
@@ -228,9 +211,7 @@ export default class BrowserSWFileSystem {
     return true;
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  writeToFile = (fullPath: string, contents: string) => {
+  writeToFile = (fullPath: string, contents: string): any => {
     // Remove the base URL to get the relative path
     const relativePath = fullPath.replace(this.rootUrl, '');
     const contentType = getContentType(fullPath);
@@ -245,9 +226,7 @@ export default class BrowserSWFileSystem {
     return true;
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  readFile = (file: string) => {
+  readFile = (file: string): any => {
     if (!!this._indexedFilesContent[file])
       return this._indexedFilesContent[file].text;
 
@@ -257,9 +236,7 @@ export default class BrowserSWFileSystem {
     return '';
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  readDir = (path: string, ext: string) => {
+  readDir = (path: string, ext: string): any => {
     ext = ext.toUpperCase();
     var output = new gd.VectorString();
 
@@ -275,9 +252,7 @@ export default class BrowserSWFileSystem {
     return output;
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  fileExists = (filename: string) => {
+  fileExists = (filename: string): any => {
     if (isURL(filename)) return true;
 
     // Assume all files asked for exist.

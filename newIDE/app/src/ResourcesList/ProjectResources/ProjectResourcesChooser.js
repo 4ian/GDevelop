@@ -69,8 +69,7 @@ const ProjectResourcesChooser = ({
   onResourcesSelected,
   resourceKind,
   multiSelection,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [searchText, setSearchText] = React.useState<string>('');
 
   const searchResults = React.useMemo(

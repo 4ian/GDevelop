@@ -417,6 +417,7 @@ const useGiveTrivialBadgeWhenTutorialIsFinished = ({
   displayEndDialog,
   tutorial,
 }: {
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   displayEndDialog: boolean,
   tutorial: InAppTutorial,
@@ -488,11 +489,11 @@ export type InAppTutorialOrchestratorInterface = {|
   getPreviewMessage: () => {| message: string, position: string |} | null,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const InAppTutorialOrchestrator = React.forwardRef<
-  Props,
-  InAppTutorialOrchestratorInterface
->(
+// $FlowFixMe[prop-missing]
+const InAppTutorialOrchestrator: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<InAppTutorialOrchestratorInterface> },
+  React.RefSetter<InAppTutorialOrchestratorInterface>
+> = React.forwardRef<Props, InAppTutorialOrchestratorInterface>(
   (
     {
       tutorial,

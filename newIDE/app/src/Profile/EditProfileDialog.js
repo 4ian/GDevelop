@@ -77,8 +77,7 @@ export type EditProfileDialogProps = {|
   error: ?AuthError,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const getUsernameErrorText = (error: ?AuthError) => {
+export const getUsernameErrorText = (error: ?AuthError): any | void => {
   if (!error) return undefined;
 
   if (error.code === 'auth/username-used')
@@ -124,7 +123,7 @@ const CommunityLinkWithFollow = <UpdateResponse: { +code: string }>({
   prefix: string,
   translatableHintText?: string,
   icon: React.Node,
-// $FlowFixMe[missing-local-annot]
+  // $FlowFixMe[missing-local-annot]
 }) => {
   const { showAlert } = useAlertDialog();
 
@@ -261,8 +260,7 @@ const EditProfileDialog = ({
   onDelete,
   actionInProgress,
   error,
-// $FlowFixMe[signature-verification-failure]
-}: EditProfileDialogProps) => {
+}: EditProfileDialogProps): React.Node => {
   const { showDeleteConfirmation, showAlert } = useAlertDialog();
 
   const communityLinks = profile.communityLinks || {};

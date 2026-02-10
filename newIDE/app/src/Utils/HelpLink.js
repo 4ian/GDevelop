@@ -1,12 +1,10 @@
 // @flow
 
-// $FlowFixMe[signature-verification-failure]
-export const isRelativePathToDocumentationRoot = (path: string) => {
+export const isRelativePathToDocumentationRoot = (path: string): boolean => {
   return path.startsWith('/');
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const isDocumentationAbsoluteUrl = (path: string) => {
+export const isDocumentationAbsoluteUrl = (path: string): boolean => {
   return path.startsWith('http://') || path.startsWith('https://');
 };
 

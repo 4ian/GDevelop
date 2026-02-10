@@ -357,8 +357,7 @@ const SortableEventsTree = ({
   searchFocusOffset,
   className,
   reactVirtualizedListProps,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.MixedElement => {
   // $FlowFixMe[value-as-type]
   const listRef = React.useRef<?VariableSizeList>(null);
   const outerRef = React.useRef<?HTMLDivElement>(null);

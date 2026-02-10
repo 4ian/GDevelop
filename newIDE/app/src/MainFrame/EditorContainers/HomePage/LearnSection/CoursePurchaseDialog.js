@@ -30,8 +30,7 @@ const CoursePurchaseDialog = ({
   course,
   courseListingData,
   onClose,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const {
     profile,
     onOpenLoginDialog,

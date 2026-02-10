@@ -88,8 +88,7 @@ const CreditsPackagesDialog = ({
   suggestedPackage,
   missingCredits,
   showCalloutTip,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const {
     error,
     fetchCreditsPackages,

@@ -273,8 +273,7 @@ export const CompactObjectPropertiesEditor = ({
   onExtensionInstalled,
   isVariableListLocked,
   isBehaviorListLocked,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const [isPropertiesFolded, setIsPropertiesFolded] = React.useState(false);
   const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(false);
@@ -584,6 +583,7 @@ export const CompactObjectPropertiesEditor = ({
                       onEditObject,
                     })
                   }
+                  // $FlowFixMe[incompatible-type]
                   onRefreshAllFields={forceRecomputeSchema}
                 />
                 {shouldDisplayVariant && (

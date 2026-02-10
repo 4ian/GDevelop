@@ -11,6 +11,7 @@ export default class BuildsWatcher {
   runningWatchers: { [string]: boolean } = {};
   nextWatcherId = 0;
   onBuildUpdated: ?(build: Build) => void;
+  // $FlowFixMe[value-as-type]
   authenticatedUser: ?AuthenticatedUser;
 
   start({
@@ -18,6 +19,7 @@ export default class BuildsWatcher {
     builds,
     onBuildUpdated,
   }: {
+    // $FlowFixMe[value-as-type]
     authenticatedUser: AuthenticatedUser,
     builds: Array<Build>,
     onBuildUpdated: (build: Build) => void,

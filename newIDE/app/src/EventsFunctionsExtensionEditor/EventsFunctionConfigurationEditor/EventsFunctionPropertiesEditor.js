@@ -46,8 +46,7 @@ export const getSentenceErrorText = (
   eventsBasedBehavior: ?gdEventsBasedBehavior,
   eventsBasedObject: ?gdEventsBasedObject,
   eventsFunction: gdEventsFunction
-// $FlowFixMe[signature-verification-failure]
-) => {
+): any | string | void => {
   const sentence = eventsFunction.getSentence();
   if (!sentence)
     return i18n._(
@@ -159,8 +158,7 @@ export const EventsFunctionPropertiesEditor = ({
   eventsBasedObject,
   getFunctionGroupNames,
   eventsFunctionsContainer,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
   const { isMobile } = useResponsiveWindowSize();

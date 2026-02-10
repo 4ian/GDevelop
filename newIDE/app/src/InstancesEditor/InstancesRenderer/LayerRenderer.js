@@ -98,9 +98,8 @@ export default class LayerRenderer {
 
   _showObjectInstancesIn3D: boolean;
 
-  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  _basicProfilingCounters = makeBasicProfilingCounters();
+  _basicProfilingCounters = (makeBasicProfilingCounters(): BasicProfilingCounters);
 
   constructor({
     project,
@@ -255,9 +254,7 @@ export default class LayerRenderer {
     }
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getPixiContainer() {
+  getPixiContainer(): any {
     return this.pixiContainer;
   }
 
@@ -283,9 +280,7 @@ export default class LayerRenderer {
     return this.renderedInstances[instance.ptr];
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getUnrotatedInstanceLeft = (instance: gdInitialInstance) => {
+  getUnrotatedInstanceLeft = (instance: gdInitialInstance): any => {
     return (
       instance.getX() -
       (this.renderedInstances[instance.ptr]
@@ -294,9 +289,7 @@ export default class LayerRenderer {
     );
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getUnrotatedInstanceTop = (instance: gdInitialInstance) => {
+  getUnrotatedInstanceTop = (instance: gdInitialInstance): any => {
     return (
       instance.getY() -
       (this.renderedInstances[instance.ptr]
@@ -305,9 +298,7 @@ export default class LayerRenderer {
     );
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getUnrotatedInstanceZMin = (instance: gdInitialInstance) => {
+  getUnrotatedInstanceZMin = (instance: gdInitialInstance): any => {
     return (
       instance.getZ() -
       // 3D objects Z position is always the "Z min":
@@ -318,9 +309,7 @@ export default class LayerRenderer {
     );
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getUnrotatedInstanceSize = (instance: gdInitialInstance) => {
+  getUnrotatedInstanceSize = (instance: gdInitialInstance): any => {
     const renderedInstance = this.getOrCreateRendererOfInstance(instance);
     const hasCustomSize = instance.hasCustomSize();
     const hasCustomDepth = instance.hasCustomDepth();
@@ -432,9 +421,7 @@ export default class LayerRenderer {
     return bounds;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getOrCreateRendererOfInstance = (instance: gdInitialInstance) => {
+  getOrCreateRendererOfInstance = (instance: gdInitialInstance): any => {
     var renderedInstance = this.renderedInstances[instance.ptr];
     if (renderedInstance === undefined) {
       //No renderer associated yet, the instance must have been just created!...
@@ -583,9 +570,7 @@ export default class LayerRenderer {
    * The approach is a naive bounding box testing but save rendering time on large
    * levels (though this could be improved with spatial partitioning).
    */
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _isInstanceVisible(instance: gdInitialInstance) {
+  _isInstanceVisible(instance: gdInitialInstance): any {
     const aabb = this.getInstanceAABB(instance, this._temporaryRectangle);
     if (
       aabb.left + aabb.width() < this.viewTopLeft[0] ||

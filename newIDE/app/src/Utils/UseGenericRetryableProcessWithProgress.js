@@ -44,8 +44,7 @@ export const GenericRetryableProcessWithProgressDialog = ({
   onAbandon,
   onRetry,
   genericError,
-// $FlowFixMe[signature-verification-failure]
-}: GenericRetryableProcessWithProgressProps) => {
+}: GenericRetryableProcessWithProgressProps): React.Node => {
   const hasErrors =
     (result && result.erroredResources.length > 0) || !!genericError;
 

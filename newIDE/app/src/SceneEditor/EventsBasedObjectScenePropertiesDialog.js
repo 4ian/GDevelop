@@ -29,8 +29,7 @@ const EventsBasedObjectScenePropertiesDialog = ({
   onClose,
   getContentAABB,
   onEventsBasedObjectChildrenEdited,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [areaMinX, setAreaMinX] = React.useState<number>(
     eventsBasedObjectVariant.getAreaMinX()
   );

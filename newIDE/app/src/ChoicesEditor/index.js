@@ -33,8 +33,7 @@ const ChoicesEditor = ({
   disabled,
   hideLabels,
   isNumber,
-// $FlowFixMe[signature-verification-failure]
-}: ChoicesEditorProps) => {
+}: ChoicesEditorProps): React.Node => {
   const updateChoices = () => setChoices(choices);
 
   return (

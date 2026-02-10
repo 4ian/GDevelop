@@ -70,8 +70,7 @@ export type ParameterFieldInterface = {|
 export const getParameterValueOrDefault = (
   value: string,
   parameterMetadata: ?gdParameterMetadata
-// $FlowFixMe[signature-verification-failure]
-) => {
+): string => {
   if (value) return value;
 
   const defaultValue =

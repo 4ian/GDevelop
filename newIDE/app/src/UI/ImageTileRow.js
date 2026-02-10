@@ -38,8 +38,7 @@ const ImageTileRow = ({
   getColumnsFromWindowSize,
   seeAllLabel,
   margin,
-// $FlowFixMe[signature-verification-failure]
-}: ImageTileRowProps) => {
+}: ImageTileRowProps): React.Node => {
   return (
     <>
       <LineStackLayout

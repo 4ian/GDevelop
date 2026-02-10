@@ -18,8 +18,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => {
+export const Default = (): React.Node => {
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
   const onContextMenu = (event: MouseEvent) => {
     event.preventDefault();

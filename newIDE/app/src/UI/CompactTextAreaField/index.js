@@ -48,8 +48,7 @@ export const CompactTextAreaField = ({
   rows,
   maxLength,
   onSubmit,
-// $FlowFixMe[signature-verification-failure]
-}: CompactTextAreaFieldProps) => {
+}: CompactTextAreaFieldProps): React.Node => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
 
   const title = !markdownDescription

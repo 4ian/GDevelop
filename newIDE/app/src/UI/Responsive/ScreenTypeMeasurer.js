@@ -46,8 +46,7 @@ type Props = {|
 /**
  * Wraps useScreenType in a component.
  */
-// $FlowFixMe[signature-verification-failure]
-export const ScreenTypeMeasurer = ({ children }: Props) =>
+export const ScreenTypeMeasurer = ({ children }: Props): React.Node =>
   children(useScreenType());
 
 /**

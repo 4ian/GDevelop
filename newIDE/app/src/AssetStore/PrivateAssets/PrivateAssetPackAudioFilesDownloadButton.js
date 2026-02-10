@@ -13,8 +13,7 @@ const PrivateAssetPackAudioFilesDownloadButton = ({
   assetPack,
 }: {|
   assetPack: PrivateAssetPack,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+|}): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const { getPrivateAssetPackAudioArchiveUrl } = React.useContext(
     PrivateAssetsAuthorizationContext

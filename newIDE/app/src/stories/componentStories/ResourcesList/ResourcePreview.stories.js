@@ -12,8 +12,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Image = () => (
+export const Image = (): React.Node => (
   <FixedHeightFlexContainer height={300}>
     <ResourcePreview
       project={testProject.project}
@@ -23,8 +22,7 @@ export const Image = () => (
   </FixedHeightFlexContainer>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const NotExisting = () => (
+export const NotExisting = (): React.Node => (
   <FixedHeightFlexContainer height={300}>
     <ResourcePreview
       project={testProject.project}
@@ -34,8 +32,7 @@ export const NotExisting = () => (
   </FixedHeightFlexContainer>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Audio = () => (
+export const Audio = (): React.Node => (
   <FixedHeightFlexContainer height={300}>
     <ResourcePreview
       project={testProject.project}

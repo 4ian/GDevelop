@@ -31,8 +31,7 @@ const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
   }
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <ImageTileRow
     items={itemsWithJustImage}
     title="Recommended templates"
@@ -43,8 +42,7 @@ export const Default = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Loading = () => (
+export const Loading = (): React.Node => (
   <ImageTileRow
     items={itemsWithJustImage}
     isLoading
@@ -56,8 +54,7 @@ export const Loading = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithDescription = () => (
+export const WithDescription = (): React.Node => (
   <ImageTileRow
     items={itemsWithJustImage}
     title="Recommended templates"
@@ -69,8 +66,7 @@ export const WithDescription = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithTitleAndDescription = () => (
+export const WithTitleAndDescription = (): React.Node => (
   <ImageTileRow
     items={itemsWithTitleAndDescription}
     title="Recommended templates"
@@ -81,8 +77,7 @@ export const WithTitleAndDescription = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithOverlay = () => (
+export const WithOverlay = (): React.Node => (
   <ImageTileRow
     items={itemsWithOverlay}
     title="Recommended templates"
@@ -93,8 +88,7 @@ export const WithOverlay = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithLocks = () => (
+export const WithLocks = (): React.Node => (
   <ImageTileRow
     items={itemsWithLocks}
     title="Recommended templates"
@@ -105,8 +99,7 @@ export const WithLocks = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithNoCroppingOnMobile = () => (
+export const WithNoCroppingOnMobile = (): React.Node => (
   <ImageTileRow
     items={itemsWithJustImage}
     title="Recommended templates"

@@ -17,8 +17,7 @@ export const Toolbar = ({
   onStartNewChat,
   canStartNewChat,
   onOpenHistory,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   return (
     <>
       <ToolbarGroup firstChild>

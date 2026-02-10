@@ -4,6 +4,7 @@
 # See also Semaphore CI for quick tests (not building GDevelop.js, so
 # faster but not always reliable).
 
+dist: noble # Ubuntu 24.04 LTS
 language: cpp
 sudo: false
 compiler:

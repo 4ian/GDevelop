@@ -67,8 +67,7 @@ const removeTrailingZeroes = (value: string) => {
   return value;
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const hasLight = (layout: ?gd.Layout) => {
+export const hasLight = (layout: ?gd.Layout): boolean => {
   if (!layout) {
     return true;
   }
@@ -109,8 +108,7 @@ const Model3DEditor = ({
   resourceManagementProps,
   projectScopedContainersAccessor,
   renderObjectNameField,
-// $FlowFixMe[signature-verification-failure]
-}: EditorProps) => {
+}: EditorProps): React.Node => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
 
   const [

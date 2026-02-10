@@ -30,8 +30,7 @@ export const ProjectManagerDrawer = ({
   children,
   projectManagerOpen,
   toggleProjectManager,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const softKeyboardBottomOffset = useSoftKeyboardBottomOffset();
 
   return (

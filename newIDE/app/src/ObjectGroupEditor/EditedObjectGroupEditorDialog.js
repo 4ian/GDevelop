@@ -47,8 +47,7 @@ const EditedObjectGroupEditorDialog = ({
   onComputeAllVariableNames,
   isVariableListLocked,
   isObjectListLocked,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const {
     onCancelChanges,

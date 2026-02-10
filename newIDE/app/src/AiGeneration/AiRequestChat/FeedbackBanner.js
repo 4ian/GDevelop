@@ -27,8 +27,7 @@ type Props = {
   ) => void,
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const FeedbackBanner = ({ onSendFeedback }: Props) => {
+export const FeedbackBanner = ({ onSendFeedback }: Props): React.Node => {
   const [currentFeedback, setCurrentFeedback] = React.useState<
     'like' | 'dislike' | null
   >(null);

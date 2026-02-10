@@ -20,11 +20,9 @@ const defaultProps = {
   error: null,
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => <LoginDialog {...defaultProps} />;
+export const Default = (): React.Node => <LoginDialog {...defaultProps} />;
 
-// $FlowFixMe[signature-verification-failure]
-export const WeakPasswordErrorFromBackend = () => (
+export const WeakPasswordErrorFromBackend = (): React.Node => (
   <LoginDialog
     {...defaultProps}
     error={{
@@ -33,8 +31,7 @@ export const WeakPasswordErrorFromBackend = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const InvalidEmailErrorFromBackend = () => (
+export const InvalidEmailErrorFromBackend = (): React.Node => (
   <LoginDialog
     {...defaultProps}
     error={{
@@ -43,8 +40,7 @@ export const InvalidEmailErrorFromBackend = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const AccountExistsWithDifferentCredentialErrorFromBackend = () => (
+export const AccountExistsWithDifferentCredentialErrorFromBackend = (): React.Node => (
   <LoginDialog
     {...defaultProps}
     error={{
@@ -53,7 +49,6 @@ export const AccountExistsWithDifferentCredentialErrorFromBackend = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Submitting = () => (
+export const Submitting = (): React.Node => (
   <LoginDialog {...defaultProps} loginInProgress />
 );

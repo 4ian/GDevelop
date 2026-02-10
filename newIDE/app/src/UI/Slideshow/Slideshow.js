@@ -97,8 +97,7 @@ const Slideshow = ({
   // The slideshow bases its width on the full window width, so if used in a
   // container, use this prop to calculate the width accurately.
   additionalMarginForWidthCalculation,
-// $FlowFixMe[signature-verification-failure]
-}: SlideshowProps) => {
+}: SlideshowProps): null | React.Node => {
   // Ensure the component is re-rendered when the window is resized.
   useOnResize(useForceUpdate());
   const windowInnerWidth = window.innerWidth;

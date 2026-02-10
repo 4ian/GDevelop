@@ -54,8 +54,7 @@ const InlineParameterEditor = ({
   parameterIndex,
   anchorEl,
   resourceManagementProps,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): null | React.Node => {
   const [
     parameterMetadata,
     setParameterMetadata,

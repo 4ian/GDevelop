@@ -8,8 +8,7 @@ import VariablesList from '../../VariablesList/VariablesList';
 import DragAndDropContextProvider from '../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList
@@ -31,8 +30,7 @@ export const Default = () => (
   </DragAndDropContextProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Compact = () => (
+export const Compact = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList
@@ -55,8 +53,7 @@ export const Compact = () => (
   </DragAndDropContextProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const InstanceWithObjectVariables = () => (
+export const InstanceWithObjectVariables = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList
@@ -80,8 +77,7 @@ export const InstanceWithObjectVariables = () => (
   </DragAndDropContextProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Locked = () => (
+export const Locked = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList
@@ -103,8 +99,7 @@ export const Locked = () => (
   </DragAndDropContextProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const LockedCompact = () => (
+export const LockedCompact = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList
@@ -127,8 +122,7 @@ export const LockedCompact = () => (
   </DragAndDropContextProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const LockedInstanceWithObjectVariables = () => (
+export const LockedInstanceWithObjectVariables = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList

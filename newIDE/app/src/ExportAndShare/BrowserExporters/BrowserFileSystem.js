@@ -89,22 +89,16 @@ export default class BrowserFileSystem {
       }));
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  mkDir = (path: string) => {
+  mkDir = (path: string): any => {
     // "Directories" are assumed to exist.
     return true;
   };
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  dirExists = (path: string) => {
+  dirExists = (path: string): any => {
     // TODO: To be changed to be EnsureDirExists.
     // "Directories" are assumed to exist.
     return true;
   };
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  clearDir = (path: string) => {
+  clearDir = (path: string): any => {
     // Clear the files to be written in the specified directory.
     const filePaths = Object.keys(this._textFiles);
     filePaths.forEach(filePath => {
@@ -115,24 +109,16 @@ export default class BrowserFileSystem {
 
     return true;
   };
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getTempDir = () => {
+  getTempDir = (): any => {
     return '/browser-file-system-tmp-dir';
   };
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  fileNameFrom = (fullpath: string) => {
+  fileNameFrom = (fullpath: string): any => {
     return pathPosix.basename(fullpath);
   };
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  dirNameFrom = (fullpath: string) => {
+  dirNameFrom = (fullpath: string): any => {
     return pathPosix.dirname(fullpath);
   };
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  makeAbsolute = (filePathOrURL: string, baseDirectoryOrURL: string) => {
+  makeAbsolute = (filePathOrURL: string, baseDirectoryOrURL: string): any => {
     // URLs are always absolute
     if (isURL(filePathOrURL)) return filePathOrURL;
 
@@ -148,9 +134,7 @@ export default class BrowserFileSystem {
       pathPosix.normalize(filePathOrURL)
     );
   };
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  makeRelative = (filePathOrURL: string, baseDirectoryOrURL: string) => {
+  makeRelative = (filePathOrURL: string, baseDirectoryOrURL: string): any => {
     if (isURL(filePathOrURL)) {
       // Cutting the start if the URL is relative to the base URL
       if (filePathOrURL.indexOf(baseDirectoryOrURL) === 0) {
@@ -170,9 +154,7 @@ export default class BrowserFileSystem {
       pathPosix.normalize(filePathOrURL)
     );
   };
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  isAbsolute = (fullpath: string) => {
+  isAbsolute = (fullpath: string): any => {
     // URLs are always absolute
     if (isURL(fullpath)) return true;
 
@@ -180,9 +162,7 @@ export default class BrowserFileSystem {
     return fullpath.length > 0 && fullpath.charAt(0) === '/';
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  copyFile = (source: string, dest: string) => {
+  copyFile = (source: string, dest: string): any => {
     // URLs are not copied, but marked as to be downloaded.
     if (isURL(source)) {
       if (isURL(dest)) {
@@ -222,9 +202,7 @@ export default class BrowserFileSystem {
     return false;
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  writeToFile = (filePath: string, content: string) => {
+  writeToFile = (filePath: string, content: string): any => {
     this._textFiles[pathPosix.normalize(filePath)] = content;
     return true;
   };
@@ -236,9 +214,7 @@ export default class BrowserFileSystem {
     return '';
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  readDir = (path: string, ext: string) => {
+  readDir = (path: string, ext: string): any => {
     ext = ext.toUpperCase();
     var output = new gd.VectorString();
 
@@ -257,9 +233,7 @@ export default class BrowserFileSystem {
     return output;
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  fileExists = (filePath: string) => {
+  fileExists = (filePath: string): any => {
     if (isURL(filePath)) return true;
 
     const normalizedFilePath = pathPosix.normalize(filePath);

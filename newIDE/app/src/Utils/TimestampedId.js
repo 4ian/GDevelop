@@ -1,5 +1,4 @@
 // @flow
 
-// $FlowFixMe[signature-verification-failure]
-export const makeTimestampedId = () =>
+export const makeTimestampedId = (): string =>
   '' + Date.now() + '-' + Math.floor(Math.random() * 1000000);

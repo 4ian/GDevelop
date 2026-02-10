@@ -59,8 +59,7 @@ const MarketingPlanFeatures = ({
   onPurchase,
   isPlanActive,
   hideBorder,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const {

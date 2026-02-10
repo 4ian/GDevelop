@@ -114,8 +114,11 @@ const identifyAssetPackKind = ({
     : 'unknown';
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
+// $FlowFixMe[prop-missing]
+export const AssetStore: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<AssetStoreInterface> },
+  React.RefSetter<AssetStoreInterface>
+> = React.forwardRef<Props, AssetStoreInterface>(
   (
     {
       onlyShowAssets,

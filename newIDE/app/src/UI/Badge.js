@@ -13,8 +13,7 @@ type Props = {|
   overlap?: 'circle',
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const Badge = ({ forcedColor, ...otherProps }: Props) => {
+const Badge = ({ forcedColor, ...otherProps }: Props): React.Node => {
   const stylesForBadge = React.useMemo(
     () =>
       forcedColor

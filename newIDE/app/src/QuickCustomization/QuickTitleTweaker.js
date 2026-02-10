@@ -79,6 +79,7 @@ const QuickObjectPropertiesEditor = ({
           instances={[objectConfiguration]}
           onInstancesModified={onObjectUpdated}
           resourceManagementProps={resourceManagementProps}
+          // $FlowFixMe[incompatible-type]
           onRefreshAllFields={forceRecomputeSchema}
         />
       </Column>
@@ -94,8 +95,7 @@ type Props = {|
 export const QuickTitleTweaker = ({
   project,
   resourceManagementProps,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const titleObject = React.useMemo(
     () => {
       for (let i = 0; i < project.getLayoutsCount(); i++) {

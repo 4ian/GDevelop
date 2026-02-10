@@ -28,8 +28,7 @@ export const EditStudentDialog = ({
   onClose,
   isSaving,
   error,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [changes, setChanges] = React.useState<EditUserChanges | null>(null);
 
   const [

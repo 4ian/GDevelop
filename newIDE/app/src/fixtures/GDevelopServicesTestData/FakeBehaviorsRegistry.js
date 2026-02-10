@@ -6,7 +6,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
   // The service gives CSV but it's converted on the fly to an array.
   // The type attribute is evaluated from extensionName and name.
   headers: Array<BehaviorShortHeader & { tags: any, type: any }>,
-// $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-type]
 } = {
   views: {
     default: {

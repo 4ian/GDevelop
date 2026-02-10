@@ -79,8 +79,7 @@ const BundlePageHeader = ({
   i18n,
   fastCheckout,
   onCloseAfterPurchaseDone,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
   );

@@ -14,7 +14,6 @@ type Props = {|
 |};
 
 const useLinkStyles = (
-  // $FlowFixMe[value-as-type]
   theme: GDevelopTheme,
   color: 'primary' | 'secondary' | 'inherit',
   disabled: boolean
@@ -40,8 +39,7 @@ const useLinkStyles = (
     },
   })();
 
-// $FlowFixMe[signature-verification-failure]
-const Link = (props: Props) => {
+const Link = (props: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const linkStyles = useLinkStyles(
     gdevelopTheme,

@@ -37,8 +37,7 @@ const ObjectInstanceVariablesDialog = ({
   projectScopedContainersAccessor,
   onEditObjectVariables,
   isListLocked,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const tabs = React.useMemo(
     () => {
       const objectName = objectInstance.getObjectName();
@@ -74,8 +73,8 @@ const ObjectInstanceVariablesDialog = ({
                   : [],
             },
           ]
-        // $FlowFixMe[incompatible-type]
-        : [];
+        : // $FlowFixMe[incompatible-type]
+          [];
     },
     [globalObjectsContainer, layout, objectInstance, objectsContainer, project]
   );

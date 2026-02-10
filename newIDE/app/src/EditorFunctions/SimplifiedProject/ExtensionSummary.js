@@ -329,8 +329,8 @@ export const buildExtensionSummary = ({
         fullName: objectMetadata.getFullName(),
         description: objectMetadata.getDescription(),
         properties: eventsBasedObject
-          // $FlowFixMe[incompatible-type]
-          ? getPropertiesSummary({
+          ? // $FlowFixMe[incompatible-type]
+            getPropertiesSummary({
               propertiesContainer: eventsBasedObject.getPropertyDescriptors(),
             })
           : undefined,

@@ -236,8 +236,7 @@ const TileSetVisualizer = ({
   interactive,
   onAtlasImageLoaded,
   onScrollY,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const atlasResourceName = objectConfiguration
     .getProperties()

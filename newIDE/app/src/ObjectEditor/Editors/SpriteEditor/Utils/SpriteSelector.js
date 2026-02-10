@@ -55,8 +55,7 @@ const SpriteSelector = ({
   setSameForAllAnimationsLabel,
   setSameForAllSpritesLabel,
   hideControlsForSprite,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const { animation, direction, sprite } = getCurrentElements(
     animations,
     animationIndex,

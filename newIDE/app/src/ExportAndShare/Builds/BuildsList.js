@@ -22,6 +22,7 @@ const styles = {
 };
 type Props = {|
   builds: ?Array<Build>,
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   error: ?Error,
   loadBuilds: () => void,
@@ -108,8 +109,7 @@ const BuildsList = ({
   onGameUpdated,
   onBuildUpdated,
   onBuildDeleted,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const [gameUpdating, setGameUpdating] = React.useState(false);
   const [buildFilter, setBuildFilter] = React.useState<BuildFilter>(
     'all-build'

@@ -35,8 +35,7 @@ const FeedbackWidget = ({
   game,
   onUpdateGame,
   gameUrl,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const unprocessedFeedbacks = feedbacks
     ? feedbacks.filter(comment => !comment.processedAt)
     : null;

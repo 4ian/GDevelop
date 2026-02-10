@@ -39,8 +39,7 @@ const ProjectManagerMainMenu = ({
   buildMainMenuProps,
   selectedMainMenuItemIndices,
   setSelectedMainMenuItemIndices,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const mainMenuItems = React.useMemo(
     () =>
       adaptFromDeclarativeTemplate(

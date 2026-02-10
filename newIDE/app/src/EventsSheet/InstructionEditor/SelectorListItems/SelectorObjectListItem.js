@@ -36,8 +36,7 @@ export const renderObjectListItem = ({
   data,
   withIndent,
   keyPrefix,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+}: Props): React.Node => {
   const objectName: string = objectWithContext.object.getName();
   return (
     <ListItem

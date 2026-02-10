@@ -24,8 +24,7 @@ import {
 import { textEllipsisStyle } from './TextEllipsis';
 import Paper from './Paper';
 
-// $FlowFixMe[signature-verification-failure]
-export const AutocompletePaperComponent = (props: any) => (
+export const AutocompletePaperComponent = (props: any): React.Node => (
   // Use light background so that it's in contrast with background that
   // is either dark or medium (in dialogs).
   <Paper {...props} background="light" />
@@ -254,8 +253,7 @@ const getDefaultStylingProps = (params: Object, props: Props): Object => {
 const getOptionLabel = (option: AutoCompleteOption, value: string): string =>
   option.value ? option.value : value;
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
+export default (React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
   function SemiControlledAutoComplete(props, ref) {
     const input = React.useRef((null: ?HTMLInputElement));
     const [inputValue, setInputValue] = useState((null: string | null));
@@ -407,4 +405,8 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
       </I18n>
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<SemiControlledAutoCompleteInterface> },
+  React.RefSetter<SemiControlledAutoCompleteInterface>
+>);

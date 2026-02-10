@@ -40,8 +40,7 @@ export const GameRegistration = ({
   hideLoader,
   onGameRegistered,
   customRegistrationMessage,
-// $FlowFixMe[signature-verification-failure]
-}: GameRegistrationProps) => {
+}: GameRegistrationProps): null | React.Node | React.Node => {
   const {
     onOpenLoginDialog,
     onOpenCreateAccountDialog,

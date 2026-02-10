@@ -1,4 +1,5 @@
 // @flow
 import makeRenderer from './RenderedIconInstance';
-// $FlowFixMe[signature-verification-failure]
-export default makeRenderer('CppPlatform/Extensions/primitivedrawingicon.png');
+export default (makeRenderer(
+  'CppPlatform/Extensions/primitivedrawingicon.png'
+): any);

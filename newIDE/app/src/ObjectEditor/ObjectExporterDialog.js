@@ -48,13 +48,14 @@ type DownloadResourcesAsBlobsOptions = {
   onProgress: (count: number, total: number) => void,
 };
 
-export const downloadResourcesAsBlobs = async ({
-  project,
-  resourceNames,
-  onAddBlobFile,
-  onProgress,
-// $FlowFixMe[signature-verification-failure]
-}: DownloadResourcesAsBlobsOptions) => {
+export const downloadResourcesAsBlobs = async (
+  {
+    project,
+    resourceNames,
+    onAddBlobFile,
+    onProgress
+  }: DownloadResourcesAsBlobsOptions,
+): Promise<{ erroredResources: Array<empty> }> => {
   const result = {
     erroredResources: [],
   };
@@ -220,8 +221,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const ObjectExporterDialog = ({ project, layout: scene, onClose }: Props) => {
+const ObjectExporterDialog = ({project, layout: scene, onClose}: Props): React.Node => {
   const [
     zippedSceneAssetsBlob,
     setZippedSceneAssetsBlob,

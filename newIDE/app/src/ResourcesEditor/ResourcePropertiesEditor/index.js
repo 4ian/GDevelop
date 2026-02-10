@@ -44,8 +44,8 @@ const renderEmpty = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-const ResourcePropertiesEditor = React.forwardRef<
+// $FlowFixMe[prop-missing]
+const ResourcePropertiesEditor: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<ResourcePropertiesEditorInterface> }, React.RefSetter<ResourcePropertiesEditorInterface>> = React.forwardRef<
   Props,
   ResourcePropertiesEditorInterface
 >(

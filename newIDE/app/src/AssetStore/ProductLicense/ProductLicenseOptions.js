@@ -173,14 +173,7 @@ type Props = {|
   disabled?: boolean,
 |};
 
-const ProductLicenseOptions = ({
-  value,
-  onChange,
-  product,
-  ownedLicense,
-  disabled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const ProductLicenseOptions = ({value, onChange, product, ownedLicense, disabled}: Props): React.Node => {
   const {
     gameTemplateLicenses,
     assetPackLicenses,
@@ -249,14 +242,15 @@ const ProductLicenseOptions = ({
   );
 };
 
-export const OwnedProductLicense = ({
-  ownedLicense,
-  productType,
-}: {|
-  ownedLicense: ?string,
-  productType: 'game-template' | 'asset-pack',
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+export const OwnedProductLicense = (
+  {
+    ownedLicense,
+    productType
+  }: {|
+    ownedLicense: ?string,
+    productType: 'game-template' | 'asset-pack',
+  |},
+): null | React.Node => {
   const { gameTemplateLicenses, assetPackLicenses, error } = React.useContext(
     ProductLicenseStoreContext
   );

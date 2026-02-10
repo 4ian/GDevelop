@@ -25,9 +25,7 @@ const useStyles = makeStyles(theme => {
   };
 });
 
-// $FlowFixMe[signature-verification-failure]
-// $FlowFixMe[missing-local-annot]
-const Slider = <T: number | [number, number]>(props: Props<T>) => {
+const Slider = <T: number | [number, number]>(props: Props<T>): any => {
   const classes = useStyles();
   return (
     <MuiSlider

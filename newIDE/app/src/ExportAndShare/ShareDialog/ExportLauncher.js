@@ -52,6 +52,7 @@ type Props = {|
   isSavingProject: boolean,
   gameAndBuildsManager: GameAndBuildsManager,
   onChangeSubscription: () => void,
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   exportPipeline: ExportPipeline<any, any, any, any, any>,
@@ -68,6 +69,7 @@ const getIncrementedVersionNumber = (project: gdProject) => {
 };
 
 const getBuildQuota = (
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   onlineBuildType: ?string
 ): ?Quota =>
@@ -76,6 +78,7 @@ const getBuildQuota = (
     : null;
 
 const getBuildCreditPrice = (
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   onlineBuildType: ?string
 ): ?UsagePrice =>
@@ -127,15 +130,11 @@ export default class ExportLauncher extends Component<Props, State> {
     doneFooterOpen: false,
     errored: false,
     shouldBumpVersionNumber: true,
-    // $FlowFixMe[signature-verification-failure]
-    exportState: this.props.exportPipeline.getInitialExportState(
-      this.props.project
-    ),
+    exportState: (this.props.exportPipeline.getInitialExportState(this.props.project): any),
   };
   _candidateBumpedVersionNumber = '';
-  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  buildsWatcher = new BuildsWatcher();
+  buildsWatcher = (new BuildsWatcher(): BuildsWatcher);
   launchWholeExport: ({|
     payWithCredits?: boolean,
   |}) => Promise<void>;
@@ -188,14 +187,13 @@ export default class ExportLauncher extends Component<Props, State> {
   _updateStepProgress = (
     stepCurrentProgress: number,
     stepMaxProgress: number
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  ) =>
+  ): any =>
     this.setState({
       stepCurrentProgress,
       stepMaxProgress,
     });
 
+  // $FlowFixMe[value-as-type]
   _startBuildWatch = (authenticatedUser: AuthenticatedUser) => {
     if (!this.state.build) return;
 
@@ -391,9 +389,7 @@ export default class ExportLauncher extends Component<Props, State> {
     }));
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const {
       exportStep,
       compressionOutput,
@@ -438,6 +434,7 @@ export default class ExportLauncher extends Component<Props, State> {
       ).length;
     };
 
+    // $FlowFixMe[value-as-type]
     const canLaunchBuild = (authenticatedUser: AuthenticatedUser) => {
       if (buildQuota) {
         const buildsRemaining = buildQuota

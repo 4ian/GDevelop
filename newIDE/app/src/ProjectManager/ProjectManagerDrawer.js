@@ -25,13 +25,7 @@ type Props = {|
   children: React.Node | null,
 |};
 
-export const ProjectManagerDrawer = ({
-  title,
-  children,
-  projectManagerOpen,
-  toggleProjectManager,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const ProjectManagerDrawer = ({title, children, projectManagerOpen, toggleProjectManager}: Props): React.Node => {
   const softKeyboardBottomOffset = useSoftKeyboardBottomOffset();
 
   return (

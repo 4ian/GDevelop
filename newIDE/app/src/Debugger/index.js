@@ -65,11 +65,9 @@ type State = {|
 export default class Debugger extends React.Component<Props, State> {
   // $FlowFixMe[missing-local-annot]
   state = {
-    // $FlowFixMe[signature-verification-failure]
-    debuggerServerState: this.props.previewDebuggerServer.getServerState(),
+    debuggerServerState: (this.props.previewDebuggerServer.getServerState(): "started" | "stopped"),
     debuggerServerError: null,
-    // $FlowFixMe[signature-verification-failure]
-    debuggerIds: this.props.previewDebuggerServer.getExistingDebuggerIds(),
+    debuggerIds: (this.props.previewDebuggerServer.getExistingDebuggerIds(): Array<DebuggerId>),
     unregisterDebuggerServerCallbacks: null,
     debuggerGameData: {},
     profilerOutputs: {},
@@ -302,9 +300,7 @@ export default class Debugger extends React.Component<Props, State> {
     previewDebuggerServer.sendMessage(id, { command: 'refresh' });
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _edit = (id: DebuggerId, path: Array<string>, newValue: any) => {
+  _edit = (id: DebuggerId, path: Array<string>, newValue: any): any => {
     const { previewDebuggerServer } = this.props;
     previewDebuggerServer.sendMessage(id, {
       command: 'set',
@@ -316,9 +312,7 @@ export default class Debugger extends React.Component<Props, State> {
     return true;
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _call = (id: DebuggerId, path: Array<string>, args: Array<any>) => {
+  _call = (id: DebuggerId, path: Array<string>, args: Array<any>): any => {
     const { previewDebuggerServer } = this.props;
     previewDebuggerServer.sendMessage(id, {
       command: 'call',
@@ -340,9 +334,7 @@ export default class Debugger extends React.Component<Props, State> {
     previewDebuggerServer.sendMessage(id, { command: 'profiler.stop' });
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _hasSelectedDebugger = () => {
+  _hasSelectedDebugger = (): any => {
     const { selectedId, debuggerIds } = this.state;
     if (debuggerIds.indexOf(selectedId) === -1) return false;
 
@@ -352,9 +344,7 @@ export default class Debugger extends React.Component<Props, State> {
     return true;
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const {
       debuggerServerError,
       debuggerServerState,

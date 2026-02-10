@@ -32,15 +32,16 @@ type Props = {|
   setSelectedMainMenuItemIndices: (Array<number>) => void,
 |};
 
-const ProjectManagerMainMenu = ({
-  project,
-  closeDrawer,
-  mainMenuCallbacks,
-  buildMainMenuProps,
-  selectedMainMenuItemIndices,
-  setSelectedMainMenuItemIndices,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const ProjectManagerMainMenu = (
+  {
+    project,
+    closeDrawer,
+    mainMenuCallbacks,
+    buildMainMenuProps,
+    selectedMainMenuItemIndices,
+    setSelectedMainMenuItemIndices
+  }: Props,
+): React.Node => {
   const mainMenuItems = React.useMemo(
     () =>
       adaptFromDeclarativeTemplate(

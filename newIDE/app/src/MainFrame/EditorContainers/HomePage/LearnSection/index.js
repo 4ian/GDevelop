@@ -334,8 +334,7 @@ const LearnSection = ({
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-const LearnSectionWithErrorBoundary = (props: Props) => (
+const LearnSectionWithErrorBoundary = (props: Props): React.Node => (
   <ErrorBoundary
     componentTitle={<Trans>Learn section</Trans>}
     scope="start-page-learn"

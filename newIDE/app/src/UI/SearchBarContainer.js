@@ -27,7 +27,6 @@ const usePaperStyles = ({
 }: {|
   nonEmpty: boolean,
   disabled: boolean,
-  // $FlowFixMe[value-as-type]
   theme: GDevelopTheme,
   focused: boolean,
 |}) =>
@@ -59,7 +58,6 @@ const getStyles = ({
 }: {|
   nonEmpty: boolean,
   disabled: boolean,
-  // $FlowFixMe[value-as-type]
   theme: GDevelopTheme,
   aspect?: 'integrated-search-bar',
   focused: boolean,
@@ -151,18 +149,19 @@ type Props = {|
   renderSubLine?: ?() => React.Node,
 |};
 
-const SearchBarContainer = ({
-  renderContent,
-  disabled,
-  isSearchBarEmpty,
-  isFocused,
-  helpPagePath,
-  aspect,
-  buildMenuTemplate,
-  onCancel,
-  renderSubLine,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const SearchBarContainer = (
+  {
+    renderContent,
+    disabled,
+    isSearchBarEmpty,
+    isFocused,
+    helpPagePath,
+    aspect,
+    buildMenuTemplate,
+    onCancel,
+    renderSubLine
+  }: Props,
+): React.Node => {
   const GDevelopTheme = React.useContext(GDevelopThemeContext);
 
   const styles = getStyles({

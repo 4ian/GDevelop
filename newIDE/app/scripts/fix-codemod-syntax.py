@@ -1,267 +1,367 @@
 #!/usr/bin/env python3
 """
-Fix syntax that the Flow codemod introduces but Babel can't parse:
-1. component() type syntax -> remove it, add $FlowFixMe
-2. as Type casts -> (expr: Type) old-style casts
-This script is idempotent.
+Normalize Flow codemod syntax to Babel-compatible Flow syntax.
+
+Flow 0.299 annotate-exports introduces syntax that older Babel/Flow tooling in this
+project cannot parse:
+  - component(...) type annotations
+  - renders type operator
+  - as-casts
+
+This script rewrites those constructs while preserving runtime behavior and as much
+type information as possible:
+  - component(...) -> React.ComponentType<Props> (or React.AbstractComponent when needed)
+  - renders T -> T (with renders any/mixed/empty/Fragment normalized to React.Node)
+  - expr as T -> (expr: T)
+
+The script is idempotent.
 """
 
+from __future__ import annotations
+
+import json
 import os
-import re
+import pathlib
+import subprocess
 import sys
+from typing import Any, Dict, List, Optional, Tuple
 
-APP_DIR = os.environ.get('APP_DIR', os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-SRC_DIR = os.path.join(APP_DIR, 'src')
+APP_DIR = os.environ.get(
+    "APP_DIR",
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+)
+SRC_DIR = pathlib.Path(APP_DIR) / "src"
+FLOW_BIN = pathlib.Path(APP_DIR) / "node_modules" / ".bin" / "flow"
+FLOW_AST_CMD = [str(FLOW_BIN), "ast"] if FLOW_BIN.exists() else ["npx", "flow", "ast"]
 
 
-def remove_component_annotations(filepath):
-    """
-    Remove : component(...) type annotations from variable declarations.
-    Replace 'expr as component(...)' casts with just 'expr'.
-    """
-    with open(filepath, 'r') as f:
-        content = f.read()
+def _extract_json(output: str) -> Optional[Dict[str, Any]]:
+    start = output.find("{")
+    if start == -1:
+        return None
+    try:
+        return json.loads(output[start:])
+    except json.JSONDecodeError:
+        return None
 
-    original = content
 
-    # --- 1. Fix "const X: component(...) = expr" declarations ---
-    # These span multiple lines. Strategy: find ": component(" and consume 
-    # everything until we find the balanced ") =" or ") =" pattern.
-    
-    result_chars = list(content)
-    # Work on the string directly
-    
-    # Find all occurrences of ": component(" that are type annotations
-    pattern = re.compile(r'((?:export\s+)?(?:const|let|var)\s+\w+)\s*:\s*component\(')
-    
-    new_content = content
-    offset = 0
-    
-    for m in pattern.finditer(content):
-        decl_prefix = m.group(1)
-        colon_start = m.start() + len(decl_prefix)
-        paren_start = m.end() - 1  # position of the (
-        
-        # Find balanced closing paren
-        depth = 1
-        pos = paren_start + 1
-        while pos < len(content) and depth > 0:
-            if content[pos] == '(':
-                depth += 1
-            elif content[pos] == ')':
-                depth -= 1
-            pos += 1
-        
-        if depth != 0:
-            continue
-        
-        # pos is now right after the closing )
-        # Find the = sign
-        eq_pos = pos
-        while eq_pos < len(content) and content[eq_pos] in ' \t\n\r':
-            eq_pos += 1
-        
-        if eq_pos < len(content) and content[eq_pos] == '=':
-            # Remove the ": component(...)" part (from colon_start to eq_pos)
-            # Replace with " "
-            to_remove = content[colon_start:eq_pos]
-            # In new_content, replace accounting for offset
-            actual_start = colon_start + offset
-            actual_end = eq_pos + offset
-            new_content = new_content[:actual_start] + ' ' + new_content[actual_end:]
-            offset += 1 - (eq_pos - colon_start)
-    
-    # --- 2. Fix "expr as component(...)" casts ---
-    # Pattern: ) as component(...)
-    # Replace with just )
-    while True:
-        m = re.search(r'\)\s*as\s+component\(', new_content)
-        if not m:
-            break
-        
-        # Find the balanced closing )
-        paren_start = m.end() - 1
-        depth = 1
-        pos = paren_start + 1
-        while pos < len(new_content) and depth > 0:
-            if new_content[pos] == '(':
-                depth += 1
-            elif new_content[pos] == ')':
-                depth -= 1
-            pos += 1
-        
-        if depth != 0:
-            break
-        
-        # Remove "as component(...)" and any trailing "React.Node" or type
-        end_pos = pos
-        # Check for trailing type like " React.Node" or " React$Node"
-        rest = new_content[end_pos:end_pos + 50].lstrip()
-        type_match = re.match(r'React\.Node\b|React\$Node\b', rest)
-        if type_match:
-            end_pos += (len(new_content[end_pos:]) - len(new_content[end_pos:].lstrip())) + type_match.end()
-        
-        # Replace: keep the ) before "as", remove the rest
-        new_content = new_content[:m.start() + 1] + new_content[end_pos:]
-    
-    if new_content != original:
-        # Add $FlowFixMe before lines that had component annotations removed
-        # We'll do this by checking which const/export lines lost their annotations
-        lines = new_content.split('\n')
-        final_lines = []
-        for i, line in enumerate(lines):
-            # Check if this is a declaration that previously had a component() annotation
-            # and now just has "const X =" pattern (the codemod would have added it)
-            if (re.match(r'\s*(?:export\s+)?(?:const|let|var)\s+\w+\s+=\s+React\.(memo|forwardRef)', line) and
-                (i == 0 or '$FlowFixMe' not in lines[i-1])):
-                indent = re.match(r'(\s*)', line).group(1)
-                final_lines.append(f'{indent}// $FlowFixMe[signature-verification-failure]')
-            final_lines.append(line)
-        new_content = '\n'.join(final_lines)
-        
-        with open(filepath, 'w') as f:
-            f.write(new_content)
+def _run_flow_ast(relative_path: str, content_text: str) -> Optional[Dict[str, Any]]:
+    result = subprocess.run(
+        FLOW_AST_CMD + ["--path", relative_path],
+        input=content_text.encode("utf-8"),
+        capture_output=True,
+        cwd=APP_DIR,
+    )
+    stdout = result.stdout.decode("utf-8", errors="replace")
+    stderr = result.stderr.decode("utf-8", errors="replace")
+    data = _extract_json(stdout)
+    if data is not None:
+        return data
+    # Flow may occasionally emit JSON to stderr on failure.
+    return _extract_json(stderr)
+
+
+def _walk(node: Any, visit, parent_type: Optional[str] = None) -> None:
+    if isinstance(node, dict):
+        node_type = node.get("type")
+        visit(node, parent_type)
+        for value in node.values():
+            _walk(value, visit, node_type)
+    elif isinstance(node, list):
+        for item in node:
+            _walk(item, visit, parent_type)
+
+
+def _node_text(content: bytes, node: Dict[str, Any]) -> str:
+    start, end = node["range"]
+    return content[start:end].decode("utf-8")
+
+
+def _is_render_node_like(type_text: str) -> bool:
+    normalized = "".join(type_text.split())
+    if normalized in {
+        "any",
+        "mixed",
+        "empty",
+        "void",
+        "null",
+        "Fragment",
+        "React.Node",
+        "React$Node",
+        "React.MixedElement",
+    }:
         return True
-    return False
+    return (
+        "React.Node" in normalized
+        or "React$Node" in normalized
+        or "React.MixedElement" in normalized
+    )
 
 
-def convert_as_casts(filepath):
-    """
-    Convert Flow 'as Type' casts to old-style '(expr: Type)' casts.
-    Only handles casts added by the codemod, not import aliases.
-    """
-    with open(filepath, 'r') as f:
-        lines = f.readlines()
+def _normalize_renders_target(type_text: str) -> str:
+    stripped = type_text.strip()
+    if stripped in {"any", "mixed", "empty", "Fragment"}:
+        return "React.Node"
+    return stripped
 
-    new_lines = []
-    modified = False
 
-    for line in lines:
-        stripped = line.strip()
-        
-        # Skip imports and comments
-        if (stripped.startswith('import ') or stripped.startswith('// ') or
-            stripped.startswith('/*') or stripped.startswith('*')):
-            new_lines.append(line)
+def _object_property_key_name(property_node: Dict[str, Any]) -> Optional[str]:
+    key = property_node.get("key")
+    if not isinstance(key, dict):
+        return None
+    key_type = key.get("type")
+    if key_type == "Identifier":
+        return key.get("name")
+    if key_type == "Literal":
+        return key.get("value")
+    return None
+
+
+def _extract_ref_type_from_component(
+    component_node: Dict[str, Any], content: bytes
+) -> Optional[str]:
+    # Form: component(ref: Type, ...Props)
+    for param in component_node.get("params", []):
+        if not isinstance(param, dict):
             continue
-        
-        if ' as ' not in line or re.match(r'\s*import\b', line):
-            new_lines.append(line)
+        if param.get("name") == "ref":
+            type_annotation = param.get("typeAnnotation")
+            if isinstance(type_annotation, dict) and "range" in type_annotation:
+                return _node_text(content, type_annotation).strip()
+
+    # Form: component(...{ ...Props, +ref?: Type })
+    rest = component_node.get("rest")
+    if not isinstance(rest, dict):
+        return None
+    rest_type = rest.get("typeAnnotation")
+    if not isinstance(rest_type, dict):
+        return None
+    if rest_type.get("type") != "ObjectTypeAnnotation":
+        return None
+    for prop in rest_type.get("properties", []):
+        if not isinstance(prop, dict):
             continue
-        
-        new_line = line
-        
-        # Pattern: EXPR as any, at end or before , or ;
-        # Convert: (EXPR: any),  or (EXPR: any);
-        # Be careful: must find the start of the expression
-        
-        # Strategy: replace from right to left to handle multiple casts
-        # Use a simple regex that finds " as TYPE" where TYPE is a known pattern
-        
-        # We handle each type of cast separately with targeted regexes
-        
-        # 1. "= EXPR as any," or "= EXPR as any;" or "= EXPR as any"
-        #    (simple assignment context)
-        
-        # Generic pattern: find " as TYPE" and wrap the preceding expression
-        # The "expression" before "as" can be:
-        #   - function call: fn() as Type
-        #   - new expression: new X() as Type  
-        #   - array literal: [] as Type
-        #   - variable: x as Type
-        #   - method call: this.x.y() as Type
-        #   - etc.
-        
-        # Simple approach: for each " as TYPE" occurrence, find the expression
-        # by looking backward for a delimiter: =, ,, (, [, {, :, ?, &&, ||, return
-        
-        # But this is complex. Let me use a different approach:
-        # Just use perl/sed-style replacements for the known patterns.
-        
-        # Actually, let me handle the common patterns:
-        
-        # Pattern: "[] as Array<...>" -> "([]: Array<...>)"
-        new_line = re.sub(
-            r'\[\]\s+as\s+(Array<[^>]+>)',
-            r'([]: \1)',
-            new_line
-        )
-        
-        # Pattern: "new Constructor(...) as Type" -> "(new Constructor(...): Type)"
-        # First handle: "new X() as X" (simple constructors)
-        new_line = re.sub(
-            r'(new\s+\w+(?:<[^>]*>)?\([^)]*\))\s+as\s+(\w+(?:<[^>]*>)?)',
-            r'(\1: \2)',
-            new_line
-        )
-        
-        # Pattern: "expr() as Type" (function call result cast)
-        # e.g. "getPreferences() as PreferencesValues"
-        # Find: identifier(...) as Type -> (identifier(...): Type)
-        new_line = re.sub(
-            r'(\w+(?:\.\w+)*(?:<[^>]*>)?\([^)]*\))\s+as\s+((?:any|empty|"[^"]*"(?:\s*\|\s*"[^"]*")*|[A-Z]\w*(?:<[^;{},]*?>)?))',
-            r'(\1: \2)',
-            new_line
-        )
-        
-        # Pattern: "this.prop.method(...) as Type"
-        # Already covered by the pattern above with \w+(?:\.\w+)*
-        
-        # Pattern: "React.createRef<T>() as Type"
-        # Already covered
-        
-        # Pattern: "[getPaperDecorator('medium') as StoryDecorator]"
-        # -> [(getPaperDecorator('medium'): StoryDecorator)]
-        new_line = re.sub(
-            r"(\w+\('[^']*'\))\s+as\s+(\w+)",
-            r'(\1: \2)',
-            new_line
-        )
-        
-        # Pattern: "t`...` as any" (tagged template literal)
-        new_line = re.sub(
-            r'(t`[^`]*`)\s+as\s+any\b',
-            r'(\1: any)',
-            new_line
-        )
-        
-        # Pattern: simple "EXPR as any" where EXPR is a simple expression
-        # Handle remaining "as any" patterns
-        new_line = re.sub(
-            r'(this\.\w+(?:\.\w+)*(?:\([^)]*\))?)\s+as\s+any\b',
-            r'(\1: any)',
-            new_line
-        )
-        new_line = re.sub(
-            r'(this\.props\.\w+(?:\.\w+)*(?:\([^)]*\))?)\s+as\s+any\b',
-            r'(\1: any)',
-            new_line
-        )
-        
-        if new_line != line:
-            modified = True
-        new_lines.append(new_line)
-
-    if modified:
-        with open(filepath, 'w') as f:
-            f.writelines(new_lines)
-    return modified
+        if prop.get("type") != "ObjectTypeProperty":
+            continue
+        if _object_property_key_name(prop) != "ref":
+            continue
+        value = prop.get("value")
+        if isinstance(value, dict) and "range" in value:
+            return _node_text(content, value).strip()
+    return None
 
 
-def main():
+def _component_to_legacy_type(
+    component_node: Dict[str, Any], content: bytes
+) -> str:
+    props_type = "any"
+    rest = component_node.get("rest")
+    if isinstance(rest, dict):
+        rest_type = rest.get("typeAnnotation")
+        if isinstance(rest_type, dict) and "range" in rest_type:
+            extracted_props = _node_text(content, rest_type).strip()
+            if extracted_props:
+                props_type = extracted_props
+
+    ref_type = _extract_ref_type_from_component(component_node, content)
+
+    renders_type = None
+    renders = component_node.get("rendersType")
+    if isinstance(renders, dict):
+        rendered = renders.get("typeAnnotation")
+        if isinstance(rendered, dict) and "range" in rendered:
+            renders_type = _node_text(content, rendered).strip()
+
+    if ref_type:
+        return f"React.AbstractComponent<{props_type}, {ref_type}>"
+
+    # In component syntax, non-React-node render targets are generally used for
+    # forwarded refs/interfaces. Preserve this with AbstractComponent.
+    if renders_type and not _is_render_node_like(renders_type):
+        return f"React.AbstractComponent<{props_type}, {renders_type}>"
+
+    return f"React.ComponentType<{props_type}>"
+
+
+def _apply_replacements(
+    content: bytes, replacements: List[Tuple[int, int, str]]
+) -> Tuple[bytes, int]:
+    valid: List[Tuple[int, int, bytes]] = []
+    for start, end, replacement in replacements:
+        if start >= end:
+            continue
+        replacement_bytes = replacement.encode("utf-8")
+        if content[start:end] == replacement_bytes:
+            continue
+        valid.append((start, end, replacement_bytes))
+
+    if not valid:
+        return content, 0
+
+    # Prefer outer nodes first when ranges overlap.
+    valid.sort(key=lambda item: (item[0], -(item[1] - item[0])))
+    non_overlapping: List[Tuple[int, int, bytes]] = []
+    current_end = -1
+    for start, end, replacement_bytes in valid:
+        if start < current_end:
+            continue
+        non_overlapping.append((start, end, replacement_bytes))
+        current_end = end
+
+    updated = bytearray(content)
+    for start, end, replacement_bytes in reversed(non_overlapping):
+        updated[start:end] = replacement_bytes
+
+    return bytes(updated), len(non_overlapping)
+
+
+def _collect_component_and_renders_replacements(
+    ast: Dict[str, Any], content: bytes
+) -> List[Tuple[int, int, str]]:
+    replacements: List[Tuple[int, int, str]] = []
+
+    def visit(node: Dict[str, Any], parent_type: Optional[str]) -> None:
+        node_type = node.get("type")
+        if node_type == "ComponentTypeAnnotation" and "range" in node:
+            start, end = node["range"]
+            replacements.append((start, end, _component_to_legacy_type(node, content)))
+            return
+
+        if (
+            node_type == "TypeOperator"
+            and node.get("operator") == "renders"
+            and parent_type != "ComponentTypeAnnotation"
+            and "range" in node
+        ):
+            type_annotation = node.get("typeAnnotation")
+            if isinstance(type_annotation, dict) and "range" in type_annotation:
+                rendered_type = _node_text(content, type_annotation)
+                replacements.append(
+                    (
+                        node["range"][0],
+                        node["range"][1],
+                        _normalize_renders_target(rendered_type),
+                    )
+                )
+
+    _walk(ast, visit)
+    return replacements
+
+
+def _collect_as_replacements(
+    ast: Dict[str, Any], content: bytes
+) -> List[Tuple[int, int, str]]:
+    replacements: List[Tuple[int, int, str]] = []
+
+    def visit(node: Dict[str, Any], _parent_type: Optional[str]) -> None:
+        if node.get("type") != "AsExpression":
+            return
+        if "range" not in node:
+            return
+        expression = node.get("expression")
+        type_annotation = node.get("typeAnnotation")
+        if not isinstance(expression, dict) or "range" not in expression:
+            return
+        if not isinstance(type_annotation, dict) or "range" not in type_annotation:
+            return
+
+        start, end = node["range"]
+        expr_start, expr_end = expression["range"]
+        type_start, _type_end = type_annotation["range"]
+        type_text = _node_text(content, type_annotation)
+
+        leading = content[start:expr_start].decode("utf-8")
+        expr_core = content[expr_start:expr_end].decode("utf-8")
+        between = content[expr_end:type_start].decode("utf-8")
+        as_index = between.rfind(" as ")
+        if as_index == -1:
+            return
+
+        between_before_as = between[:as_index]
+        trailing_comment = ""
+
+        line_comment_index = between_before_as.rfind("//")
+        block_comment_index = between_before_as.rfind("/*")
+        if line_comment_index != -1:
+            trailing_comment = between_before_as[line_comment_index:].strip()
+            between_before_as = between_before_as[:line_comment_index]
+        elif block_comment_index != -1 and "*/" in between_before_as[block_comment_index:]:
+            trailing_comment = between_before_as[block_comment_index:].strip()
+            between_before_as = between_before_as[:block_comment_index]
+
+        expression_text = f"{leading}{expr_core}{between_before_as}".rstrip()
+        replacement = f"({expression_text}: {type_text})"
+        if trailing_comment:
+            replacement = f"{replacement} {trailing_comment}"
+        replacements.append((start, end, replacement))
+
+    _walk(ast, visit)
+    return replacements
+
+
+def _process_file(path: pathlib.Path) -> Tuple[bool, int]:
+    original = path.read_bytes()
+
+    # Quick pre-filter to avoid expensive AST parsing on unrelated files.
+    if b"component(" not in original and b"renders " not in original and b" as " not in original:
+        return False, 0
+
+    try:
+        text = original.decode("utf-8")
+    except UnicodeDecodeError:
+        return False, 0
+
+    relative_path = os.path.relpath(path, APP_DIR)
+    ast = _run_flow_ast(relative_path, text)
+    if ast is None:
+        return False, 0
+
+    content = original
+    total_replacements = 0
+
+    # Pass 1: component(...) + renders.
+    pass1_replacements = _collect_component_and_renders_replacements(ast, content)
+    content, applied = _apply_replacements(content, pass1_replacements)
+    total_replacements += applied
+
+    # Pass 2: "as" casts. Run iteratively to handle nested casts.
+    for _ in range(10):
+        if b" as " not in content:
+            break
+        try:
+            content_text = content.decode("utf-8")
+        except UnicodeDecodeError:
+            break
+        as_ast = _run_flow_ast(relative_path, content_text)
+        if as_ast is None:
+            break
+        as_replacements = _collect_as_replacements(as_ast, content)
+        content, applied = _apply_replacements(content, as_replacements)
+        total_replacements += applied
+        if applied == 0:
+            break
+
+    if content != original:
+        path.write_bytes(content)
+        return True, total_replacements
+    return False, 0
+
+
+def main() -> int:
     files_modified = 0
-    for root, dirs, files in os.walk(SRC_DIR):
-        for fname in files:
-            if not fname.endswith('.js'):
-                continue
-            filepath = os.path.join(root, fname)
-            m1 = remove_component_annotations(filepath)
-            m2 = convert_as_casts(filepath)
-            if m1 or m2:
-                files_modified += 1
+    replacements_applied = 0
 
-    print(f"  Modified {files_modified} files")
+    for path in sorted(SRC_DIR.rglob("*.js")):
+        if not path.is_file():
+            continue
+        modified, replacements = _process_file(path)
+        if modified:
+            files_modified += 1
+            replacements_applied += replacements
+
+    print(f"  Modified {files_modified} files ({replacements_applied} replacements)")
+    return 0
 
 
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    sys.exit(main())

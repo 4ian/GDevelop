@@ -14,8 +14,7 @@ import { prepareAiUserContent } from './PrepareAiUserContent';
 
 const gd: libGDevelop = global.gd;
 
-// $FlowFixMe[signature-verification-failure]
-export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
+export const useGenerateEvents = ({project}: {| project: ?gdProject |}): any => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );

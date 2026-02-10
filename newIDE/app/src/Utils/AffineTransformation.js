@@ -122,9 +122,7 @@ export class AffineTransformation {
    * Copy a transformation.
    * @param other The transformation to copy.
    */
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  copyFrom(other: AffineTransformation) {
+  copyFrom(other: AffineTransformation): any {
     const matrix = this.matrix;
     const otherMatrix = other.matrix;
 
@@ -479,9 +477,7 @@ export class AffineTransformation {
   /**
    * Invert the matrix.
    */
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  invert() {
+  invert(): any {
     const matrix = this.matrix;
 
     const m0 = matrix[0];
@@ -503,9 +499,7 @@ export class AffineTransformation {
     return this;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  toString() {
+  toString(): any {
     const matrix = this.matrix;
     return `[[${matrix[0]} ${matrix[1]}] [${matrix[2]} ${matrix[3]}] [${
       matrix[4]

@@ -11,8 +11,7 @@ const style = {
 };
 
 // A Subheader to be displayed in a List.
-// $FlowFixMe[signature-verification-failure]
-const Subheader = ({ children }: Props) =>
+const Subheader = ({children}: Props): React.Node | null =>
   children ? (
     <Typography variant={'overline'} style={style}>
       {children}

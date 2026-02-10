@@ -67,8 +67,8 @@ type Props = {|
   onClickUnlock: () => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const VideoBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
+// $FlowFixMe[prop-missing]
+const VideoBasedCourseChapterView: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<HTMLDivElement> }, React.RefSetter<HTMLDivElement>> = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       chapterIndex,

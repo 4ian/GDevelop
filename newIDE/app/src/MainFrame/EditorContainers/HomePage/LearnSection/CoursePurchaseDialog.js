@@ -26,12 +26,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const CoursePurchaseDialog = ({
-  course,
-  courseListingData,
-  onClose,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const CoursePurchaseDialog = ({course, courseListingData, onClose}: Props): React.Node => {
   const {
     profile,
     onOpenLoginDialog,

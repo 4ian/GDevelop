@@ -341,8 +341,7 @@ type Props = {|
   onStarted: () => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const UserSurvey = ({ onCompleted, onStarted }: Props) => {
+const UserSurvey = ({onCompleted, onStarted}: Props): React.Node | React.MixedElement => {
   const persistedState = getRecentPersistedState();
   const [questionId, setQuestionId] = React.useState<string>(
     persistedState ? persistedState.questionId : firstQuestion

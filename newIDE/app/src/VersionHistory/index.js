@@ -89,8 +89,7 @@ type Props = {|
   isVisible: boolean,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const VersionHistory = React.memo<Props>(
+const VersionHistory: React.ComponentType<Props> = React.memo<Props>(
   ({
     projectId,
     authenticatedUserId,

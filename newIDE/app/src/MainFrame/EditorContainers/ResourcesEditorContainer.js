@@ -18,9 +18,7 @@ import {
 export class ResourcesEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?ResourcesEditor;
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     // We stop updates when the component is inactive.
     // If it's active, was active or becoming active again we let update propagate.
     // Especially important to note that when becoming inactive, a "last" update is allowed.
@@ -88,9 +86,7 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
       this.editor.refreshResourcesList();
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const { project } = this.props;
     if (!project) return null;
 
@@ -109,7 +105,4 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
   }
 }
 
-export const renderResourcesEditorContainer = (
-  props: RenderEditorContainerPropsWithRef
-// $FlowFixMe[signature-verification-failure]
-) => <ResourcesEditorContainer {...props} />;
+export const renderResourcesEditorContainer = (props: RenderEditorContainerPropsWithRef): React.Node => <ResourcesEditorContainer {...props} />;

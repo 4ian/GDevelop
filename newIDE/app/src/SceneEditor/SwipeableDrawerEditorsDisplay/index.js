@@ -60,8 +60,11 @@ const styles = {
 };
 
 // Forward ref to allow Scene editor to force update some editors
-// $FlowFixMe[signature-verification-failure]
-const SwipeableDrawerEditorsDisplay = React.forwardRef<
+// $FlowFixMe[prop-missing]
+const SwipeableDrawerEditorsDisplay: React.AbstractComponent<{
+    ...SceneEditorsDisplayProps,
+    +ref?: React.RefSetter<SceneEditorsDisplayInterface>,
+  }, React.RefSetter<SceneEditorsDisplayInterface>> = React.forwardRef<
   SceneEditorsDisplayProps,
   SceneEditorsDisplayInterface
 >((props, ref) => {

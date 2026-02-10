@@ -42,7 +42,6 @@ const percentFormatter = value => {
   return value.toFixed(2);
 };
 
-// $FlowFixMe[value-as-type]
 const getChartsStyleFromTheme = (gdevelopTheme: GDevelopTheme) => ({
   tooltipContent: {
     color: gdevelopTheme.chart.textColor,
@@ -100,13 +99,7 @@ type ChartProps = {|
   fontSize?: 'small' | 'medium',
 |};
 
-export const SessionsChart = ({
-  i18n,
-  chartData,
-  height,
-  fontSize,
-// $FlowFixMe[signature-verification-failure]
-}: ChartProps) => {
+export const SessionsChart = ({i18n, chartData, height, fontSize}: ChartProps): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
 
@@ -160,13 +153,7 @@ export const SessionsChart = ({
   );
 };
 
-export const BounceRateChart = ({
-  i18n,
-  chartData,
-  height,
-  fontSize,
-// $FlowFixMe[signature-verification-failure]
-}: ChartProps) => {
+export const BounceRateChart = ({i18n, chartData, height, fontSize}: ChartProps): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
 
@@ -211,13 +198,7 @@ export const BounceRateChart = ({
   );
 };
 
-export const MeanPlayTimeChart = ({
-  i18n,
-  chartData,
-  height,
-  fontSize,
-// $FlowFixMe[signature-verification-failure]
-}: ChartProps) => {
+export const MeanPlayTimeChart = ({i18n, chartData, height, fontSize}: ChartProps): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
 
@@ -262,13 +243,7 @@ export const MeanPlayTimeChart = ({
   );
 };
 
-export const PlayersRepartitionPerDurationChart = ({
-  i18n,
-  chartData,
-  height,
-  fontSize,
-// $FlowFixMe[signature-verification-failure]
-}: ChartProps) => {
+export const PlayersRepartitionPerDurationChart = ({i18n, chartData, height, fontSize}: ChartProps): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
   return (
@@ -317,13 +292,7 @@ export const PlayersRepartitionPerDurationChart = ({
   );
 };
 
-export const PlayersDurationPerDayChart = ({
-  i18n,
-  chartData,
-  height,
-  fontSize,
-// $FlowFixMe[signature-verification-failure]
-}: ChartProps) => {
+export const PlayersDurationPerDayChart = ({i18n, chartData, height, fontSize}: ChartProps): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
 

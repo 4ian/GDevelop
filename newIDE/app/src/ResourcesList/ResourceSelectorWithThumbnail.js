@@ -31,22 +31,23 @@ type Props = {|
   disabled?: boolean,
 |};
 
-const ResourceSelectorWithThumbnail = ({
-  project,
-  projectScopedContainersAccessor,
-  resourceManagementProps,
-  resourceKind,
-  resourceName,
-  defaultNewResourceName,
-  onChange,
-  floatingLabelText,
-  hintText,
-  helperMarkdownText,
-  fallbackResourceKind,
-  id,
-  disabled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const ResourceSelectorWithThumbnail = (
+  {
+    project,
+    projectScopedContainersAccessor,
+    resourceManagementProps,
+    resourceKind,
+    resourceName,
+    defaultNewResourceName,
+    onChange,
+    floatingLabelText,
+    hintText,
+    helperMarkdownText,
+    fallbackResourceKind,
+    id,
+    disabled
+  }: Props,
+): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const itemsAlignment = isMobile ? 'center' : 'flex-end';
   const displayThumbnail = resourcesKindsWithThumbnail.includes(resourceKind);

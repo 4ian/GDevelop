@@ -51,8 +51,7 @@ const dialogContent = {
   ],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const CheckpointDialog = () => {
+export const CheckpointDialog = (): React.Node => {
   return (
     <InAppTutorialDialog
       endTutorial={() => action('end tutorial')()}
@@ -62,8 +61,7 @@ export const CheckpointDialog = () => {
     />
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const EndDialog = () => {
+export const EndDialog = (): React.Node => {
   return (
     <InAppTutorialDialog
       isLastStep

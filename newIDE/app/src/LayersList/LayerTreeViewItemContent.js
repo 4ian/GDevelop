@@ -59,9 +59,7 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
     return this._isBaseLayer() ? i18n._(t`Base layer`) : this.layer.getName();
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _isBaseLayer() {
+  _isBaseLayer(): any {
     return !this.layer.getName();
   }
 
@@ -124,9 +122,7 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
     this.props.triggerOnLayersModified();
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getRightButton(i18n: I18nType) {
+  getRightButton(i18n: I18nType): any {
     return [
       {
         icon: this._isVisible() ? <VisibilityIcon /> : <VisibilityOffIcon />,
@@ -149,9 +145,7 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
     ];
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  buildMenuTemplate(i18n: I18nType, index: number) {
+  buildMenuTemplate(i18n: I18nType, index: number): any {
     return [
       {
         label: i18n._(t`Rename`),

@@ -1057,6 +1057,7 @@ export const limitsForNoSubscriptionUserWithCredits: Limits = {
   message: undefined,
 };
 
+// $FlowFixMe[value-as-type]
 export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
@@ -1186,18 +1187,21 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   achievements: fakeAchievements,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeSilverAuthenticatedUser: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   subscription: subscriptionForSilverUser,
   subscriptionPricingSystem: silverMonthlyPricingSystem,
   limits: limitsForSilverUser,
 };
+// $FlowFixMe[value-as-type]
 export const fakeSilverButCancelAtPeriodEndAuthenticatedUser: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   subscription: silverSubscriptionButCancelAtPeriodEnd,
   subscriptionPricingSystem: silverMonthlyPricingSystem,
   limits: limitsForSilverUser,
 };
+// $FlowFixMe[value-as-type]
 export const fakeSilverAuthenticatedUserWithCloudProjects: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   subscription: subscriptionForSilverUser,
@@ -1205,30 +1209,35 @@ export const fakeSilverAuthenticatedUserWithCloudProjects: AuthenticatedUser = {
   cloudProjects: tenCloudProjects,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeGoldAuthenticatedUser: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForGoldUser,
   subscriptionPricingSystem: goldMonthlyPricingSystem,
   limits: limitsForGoldUser,
 };
+// $FlowFixMe[value-as-type]
 export const fakeStartupAuthenticatedUser: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForStartupUser,
   subscriptionPricingSystem: startupMonthlyPricingSystem,
   limits: limitsForStartupUser,
 };
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithEducationPlan: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForEducationPlan,
   subscriptionPricingSystem: educationMonthlyPricingSystem,
   limits: limitsForTeacherUser,
 };
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedStudentFromEducationPlan: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForGoldUserFromEducationPlan,
   subscriptionPricingSystem: goldMonthlyPricingSystem,
   limits: limitsForStudentUser,
 };
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedTeacherFromEducationPlan: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForGoldUserFromEducationPlan,
@@ -1236,6 +1245,7 @@ export const fakeAuthenticatedTeacherFromEducationPlan: AuthenticatedUser = {
   limits: limitsForTeacherUser,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeGoldWithPurchaselyAuthenticatedUser: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: purchaselyGoldSubscription,
@@ -1243,18 +1253,21 @@ export const fakeGoldWithPurchaselyAuthenticatedUser: AuthenticatedUser = {
   limits: limitsForGoldUser,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: noSubscription,
   limits: limitsForNoSubscriptionUser,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithValidSilverRedemptionCode: AuthenticatedUser = {
   ...fakeAuthenticatedUserWithNoSubscription,
   subscription: silverSubscriptionWithRedemptionCode,
   limits: limitsForSilverUser,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithExpiredSilverRedemptionCode: AuthenticatedUser = {
   ...fakeAuthenticatedUserWithNoSubscription,
   subscription: silverSubscriptionWithExpiredRedemptionCode,
@@ -1275,6 +1288,7 @@ export const fakeAuthenticatedUserWithLegacyProSubscription = {
   limits: limitsForGoldUser,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   cloudProjects: tenCloudProjects,
@@ -1282,11 +1296,13 @@ export const fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects: Aut
   limits: limitsReached,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithEmailVerified: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   firebaseUser: indieVerifiedFirebaseUser,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserLoggingIn: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   authenticated: true,
@@ -1301,6 +1317,7 @@ export const fakeAuthenticatedUserLoggingIn: AuthenticatedUser = {
   limits: null,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithBadges: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   badges: [
@@ -1313,6 +1330,7 @@ export const fakeAuthenticatedUserWithBadges: AuthenticatedUser = {
   ],
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithGitHubStarBadge: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   badges: [
@@ -1325,12 +1343,14 @@ export const fakeAuthenticatedUserWithGitHubStarBadge: AuthenticatedUser = {
   ],
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithNoSubscriptionAndCredits: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: noSubscription,
   limits: limitsForNoSubscriptionUserWithCredits,
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeAuthenticatedUserWithQuestionsQuotaReached: AuthenticatedUser = {
   ...fakeAuthenticatedUserWithNoSubscription,
   limits: {
@@ -1345,6 +1365,7 @@ export const fakeAuthenticatedUserWithQuestionsQuotaReached: AuthenticatedUser =
   },
 };
 
+// $FlowFixMe[value-as-type]
 export const fakeNotAuthenticatedUser: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   authenticated: false,

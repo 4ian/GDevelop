@@ -66,6 +66,10 @@ def add_flowfixme_comments(errors):
             continue
 
         error_code = error_codes[0] if error_codes else 'incompatible-type'
+        # Never rely on signature-verification-failure suppressions, as this
+        # degrades typed exports/imports too much.
+        if error_code == 'signature-verification-failure':
+            error_code = 'incompatible-type'
         file_errors[source][line].add(error_code)
 
     files_modified = 0

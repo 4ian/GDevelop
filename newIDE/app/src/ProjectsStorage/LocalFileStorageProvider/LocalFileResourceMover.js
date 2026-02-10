@@ -32,6 +32,7 @@ type Options = {|
   project: gdProject,
   fileMetadata: FileMetadata,
   onProgress: (number, number) => void,
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
 |};
 
@@ -71,13 +72,7 @@ const downloadBlobToLocalFile = async (
 };
 
 // This mover can be used for both public URLs and Cloud project resources.
-export const moveUrlResourcesToLocalFiles = async ({
-  project,
-  fileMetadata,
-  onProgress,
-  authenticatedUser,
-// $FlowFixMe[signature-verification-failure]
-}: Options) => {
+export const moveUrlResourcesToLocalFiles = async ({project, fileMetadata, onProgress, authenticatedUser}: Options): Promise<{ erroredResources: Array<{ error: any, resourceName: string }> }> => {
   if (!fs || !ipcRenderer) throw new Error('Unsupported');
 
   // Get all resources to download.

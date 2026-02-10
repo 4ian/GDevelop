@@ -58,21 +58,22 @@ export const getObjectOrGroupVariablesContainers = (
   return variablesContainers;
 };
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
-    const [
-      editorOpen,
-      setEditorOpen,
-    ] = React.useState<VariableDialogOpeningProps | null>(null);
+    const [editorOpen, setEditorOpen] = React.useState<
+      VariableDialogOpeningProps | null,
+    >(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(ref, () => ({
-      focus,
-    }));
-
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        focus,
+      }),
+    );
+    
     const {
       project,
       globalObjectsContainer,
@@ -86,69 +87,65 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       parameterIndex,
       onInstructionTypeChanged,
       value,
-      onChange,
+      onChange
     } = props;
-
-    const objectName = getLastObjectParameterValue({
-      instructionMetadata,
-      instruction,
-      expressionMetadata,
-      expression,
-      parameterIndex,
-    });
+    
+    const objectName = getLastObjectParameterValue(
+      {
+        instructionMetadata,
+        instruction,
+        expressionMetadata,
+        expression,
+        parameterIndex,
+      },
+    );
     const objectGroup = objectName
       ? getObjectGroupByName(
-          globalObjectsContainer,
-          objectsContainer,
-          objectName
-        )
+        globalObjectsContainer,
+        objectsContainer,
+        objectName,
+      )
       : null;
-
+    
     const objectSourceType = React.useMemo(
-      () =>
-        objectName
-          ? projectScopedContainersAccessor
-              .get()
-              .getObjectsContainersList()
-              .getObjectsContainerSourceType(objectName)
-          : gd.ObjectsContainer.Unknown,
-      [objectName, projectScopedContainersAccessor]
+      () => objectName
+        ? projectScopedContainersAccessor.get().getObjectsContainersList().getObjectsContainerSourceType(
+          objectName,
+        )
+        : gd.ObjectsContainer.Unknown,
+      [objectName, projectScopedContainersAccessor],
     );
-    const canObjectDeclareVariable =
-      objectSourceType !== gd.ObjectsContainer.Function;
-
-    const { layout, eventsBasedObject } = scope;
-    const initialInstances =
-      (layout && layout.getInitialInstances()) ||
-      (eventsBasedObject && eventsBasedObject.getInitialInstances()) ||
+    const canObjectDeclareVariable = objectSourceType !== gd.ObjectsContainer.Function;
+    
+    const {layout, eventsBasedObject} = scope;
+    const initialInstances = layout && layout.getInitialInstances() ||
+      eventsBasedObject && eventsBasedObject.getInitialInstances() ||
       null;
     const variablesContainers = React.useMemo<Array<gdVariablesContainer>>(
-      () =>
-        objectName && canObjectDeclareVariable
-          ? getObjectOrGroupVariablesContainers(
-              globalObjectsContainer,
-              objectsContainer,
-              objectName
-            )
-          : [],
+      () => objectName && canObjectDeclareVariable
+        ? getObjectOrGroupVariablesContainers(
+          globalObjectsContainer,
+          objectsContainer,
+          objectName,
+        )
+        : [],
       [
         objectName,
         canObjectDeclareVariable,
         globalObjectsContainer,
         objectsContainer,
-      ]
+      ],
     );
-
+    
     const enumerateObjectVariables = React.useCallback(
-      () =>
-        variablesContainers.length > 0
-          ? variablesContainers
-              .map(variablesContainer => enumerateVariables(variablesContainer))
-              .reduce((a, b) => intersectionBy(a, b, 'name'))
-          : [],
-      [variablesContainers]
+      () => variablesContainers.length > 0
+        ? variablesContainers.map(
+          variablesContainer => enumerateVariables(variablesContainer),
+        ).reduce((a, b) => intersectionBy(a, b, 'name'))
+        : [],
+      [variablesContainers],
     );
-
+    
     const onVariableEditorApply = React.useCallback(
       (selectedVariableName: string | null) => {
         if (selectedVariableName && selectedVariableName.startsWith(value)) {
@@ -160,33 +157,32 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         if (onInstructionTypeChanged) onInstructionTypeChanged();
         if (field.current) field.current.updateAutocompletions();
       },
-      [onChange, onInstructionTypeChanged, value]
+      [onChange, onInstructionTypeChanged, value],
     );
-
+    
     const onComputeAllVariableNames = React.useCallback(
       () => {
         // $FlowFixMe[missing-empty-array-annot]
         if (!project || !layout || !objectName) return [];
-
+        
         return EventsRootVariablesFinder.findAllObjectVariables(
           project.getCurrentPlatform(),
           project,
-          layout, // TODO: Handle this for custom objects?
-          objectName
+          layout // TODO: Handle this for custom objects?
+          ,
+          objectName,
         );
       },
-      [layout, objectName, project]
+      [layout, objectName, project],
     );
-
+    
     return (
       <React.Fragment>
         <VariableField
-          forceDeclaration={
-            instruction &&
+          forceDeclaration={instruction &&
             gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
-              instruction.getType()
-            )
-          }
+              instruction.getType(),
+            )}
           project={project}
           instruction={instruction}
           isObjectVariable={true}
@@ -204,68 +200,57 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           objectsContainer={props.objectsContainer}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
           scope={scope}
-          id={
-            props.parameterIndex !== undefined
-              ? `parameter-${props.parameterIndex}-object-variable-field`
-              : undefined
-          }
+          id={props.parameterIndex !== undefined
+            ? `parameter-${props.parameterIndex}-object-variable-field`
+            : undefined}
           onInstructionTypeChanged={onInstructionTypeChanged}
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
         />
-        {editorOpen &&
-          project &&
-          !!variablesContainers.length &&
-          !objectGroup && (
-            <ObjectVariablesDialog
-              project={project}
-              projectScopedContainersAccessor={projectScopedContainersAccessor}
-              objectName={objectName}
-              initialInstances={initialInstances}
-              variablesContainer={variablesContainers[0]}
-              open
-              onCancel={() => setEditorOpen(null)}
-              onApply={onVariableEditorApply}
-              initiallySelectedVariableName={editorOpen.variableName}
-              shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
-              onComputeAllVariableNames={onComputeAllVariableNames}
-              hotReloadPreviewButtonProps={null}
-              isListLocked={false}
-            />
-          )}
-        {editorOpen &&
-          project &&
-          objectGroup &&
-          !!variablesContainers.length && (
-            <ObjectGroupVariablesDialog
-              project={project}
-              projectScopedContainersAccessor={projectScopedContainersAccessor}
-              globalObjectsContainer={globalObjectsContainer}
-              initialInstances={initialInstances}
-              objectsContainer={objectsContainer}
-              objectGroup={objectGroup}
-              onCancel={() => setEditorOpen(null)}
-              onApply={onVariableEditorApply}
-              open
-              initiallySelectedVariableName={editorOpen.variableName}
-              shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
-              onComputeAllVariableNames={onComputeAllVariableNames}
-              isListLocked={false}
-            />
-          )}
+        {editorOpen && project && !!variablesContainers.length &&
+          !objectGroup &&
+          <ObjectVariablesDialog
+            project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            objectName={objectName}
+            initialInstances={initialInstances}
+            variablesContainer={variablesContainers[0]}
+            open
+            onCancel={() => setEditorOpen(null)}
+            onApply={onVariableEditorApply}
+            initiallySelectedVariableName={editorOpen.variableName}
+            shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+            onComputeAllVariableNames={onComputeAllVariableNames}
+            hotReloadPreviewButtonProps={null}
+            isListLocked={false}
+          />}
+        {editorOpen && project && objectGroup && !!variablesContainers.length &&
+          <ObjectGroupVariablesDialog
+            project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            globalObjectsContainer={globalObjectsContainer}
+            initialInstances={initialInstances}
+            objectsContainer={objectsContainer}
+            objectGroup={objectGroup}
+            onCancel={() => setEditorOpen(null)}
+            onApply={onVariableEditorApply}
+            open
+            initiallySelectedVariableName={editorOpen.variableName}
+            shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+            onComputeAllVariableNames={onComputeAllVariableNames}
+            isListLocked={false}
+          />}
       </React.Fragment>
     );
-  }
-);
+  },
+// $FlowFixMe[prop-missing]
+): React.AbstractComponent<{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }, React.RefSetter<ParameterFieldInterface>>);
 
 const getVariableSourceFromIdentifier = (
   identifier: string,
   projectScopedContainers: gdProjectScopedContainers
 ): VariablesContainer_SourceType => gd.VariablesContainer.Object;
 
-export const renderInlineObjectVariable = (
-  props: ParameterInlineRendererProps
-// $FlowFixMe[signature-verification-failure]
-) =>
+export const renderInlineObjectVariable = (props: ParameterInlineRendererProps): any =>
   renderVariableWithIcon(
     props,
     'object variable',

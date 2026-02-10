@@ -73,8 +73,7 @@ type Props = {|
   onReset: () => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const ShortcutsList = (props: Props) => {
+const ShortcutsList = (props: Props): React.Node => {
   const [
     editedShortcut,
     setEditedShortcut,

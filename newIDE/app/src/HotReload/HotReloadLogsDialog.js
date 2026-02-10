@@ -25,8 +25,7 @@ export default function HotReloadLogsDialog({
   onClose,
   onLaunchNewPreview,
   logs,
-// $FlowFixMe[signature-verification-failure]
-}: Props) {
+}: Props): null | React.Node {
   if (!shouldDisplayDialogForLogs(logs)) {
     return null;
   }

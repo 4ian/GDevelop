@@ -188,13 +188,10 @@ export default class ExpressionField extends React.Component<Props, State> {
     parametersDialogOpen: false,
     selectedExpressionInfo: null,
 
-    // $FlowFixMe[signature-verification-failure]
-    validatedValue: this.props.value,
+    validatedValue: (this.props.value: string),
     errorText: null,
-    // $FlowFixMe[signature-verification-failure]
-    errorHighlights: [],
-    // $FlowFixMe[signature-verification-failure]
-    autocompletions: getAutocompletionsInitialState(),
+    errorHighlights: ([]: Array<empty>),
+    autocompletions: (getAutocompletionsInitialState(): AutocompletionsState),
   };
 
   componentDidMount() {
@@ -428,15 +425,15 @@ export default class ExpressionField extends React.Component<Props, State> {
     );
   };
 
-  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  _enqueueValidation = debounce(() => {
+  _enqueueValidation = (debounce(
+  () => {
     this._doValidation();
-  }, 250);
+  },
+  250,
+): any);
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _doValidation = () => {
+  _doValidation = (): any => {
     const {
       project,
       projectScopedContainersAccessor,
@@ -524,9 +521,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     }));
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const {
       value,
       expressionType,

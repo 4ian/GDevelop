@@ -45,8 +45,7 @@ type Props = {|
   onOpenProfile: () => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const UserChip = ({ onOpenProfile }: Props) => {
+const UserChip = ({onOpenProfile}: Props): React.MixedElement | React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
     profile,

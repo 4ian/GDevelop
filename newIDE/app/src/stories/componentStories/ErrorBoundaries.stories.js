@@ -71,8 +71,7 @@ TypeError: Cannot read properties of undefined (reading 'toString') at a.getProp
 `;
 fakeErrorWithCriticalStack.stack = fakeCriticalErrorStack;
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <ErrorFallbackComponent
     componentStack={fakeComponentStack}
     error={fakeError}
@@ -81,8 +80,7 @@ export const Default = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Critical = () => (
+export const Critical = (): React.Node => (
   <ErrorFallbackComponent
     componentStack={fakeComponentStack}
     error={fakeErrorWithCriticalStack}

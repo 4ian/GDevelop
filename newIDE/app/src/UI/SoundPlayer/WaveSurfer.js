@@ -218,8 +218,7 @@ function useWavesurferEvents(wavesurfer: WaveSurfer | null, events: any) {
  * @see https://wavesurfer.xyz/docs/modules/wavesurfer
  * @public
  */
-// $FlowFixMe[signature-verification-failure]
-const WavesurferPlayer = React.memo<Props>(
+const WavesurferPlayer: React.ComponentType<Props> = React.memo<Props>(
   // $FlowFixMe[prop-missing]
   (props: Props): React.Element<any> => {
     const containerRef = React.useRef<HTMLDivElement | null>(null);
@@ -259,8 +258,12 @@ export default WavesurferPlayer;
  *
  * @public
  */
-// $FlowFixMe[signature-verification-failure]
-export function useWavesurfer({ container, ...options }: Props) {
+export function useWavesurfer({ container, ...options }: Props): {
+  currentTime: number,
+  isPlaying: boolean,
+  isReady: boolean,
+  wavesurfer: any | null,
+} {
   const wavesurfer = useWavesurferInstance(container, options);
   const state = useWavesurferState(wavesurfer);
   return React.useMemo(() => ({ ...state, wavesurfer }), [state, wavesurfer]);

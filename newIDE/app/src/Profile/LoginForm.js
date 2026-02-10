@@ -46,8 +46,7 @@ const getStyles = ({ verticalDesign }) => ({
   },
 });
 
-export const accountsAlreadyExistsWithDifferentProviderCopy = (
-  // $FlowFixMe[signature-verification-failure]
+export const accountsAlreadyExistsWithDifferentProviderCopy: React.Node = (
   <Trans>
     You already have an account for this email address with a different provider
     (Google, Apple or GitHub). Please try with one of those.
@@ -67,19 +66,20 @@ type Props = {|
   onGoToCreateAccount?: () => void,
 |};
 
-const LoginForm = ({
-  onLogin,
-  onLoginWithProvider,
-  email,
-  onChangeEmail,
-  password,
-  onChangePassword,
-  onForgotPassword,
-  loginInProgress,
-  error,
-  onGoToCreateAccount,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const LoginForm = (
+  {
+    onLogin,
+    onLoginWithProvider,
+    email,
+    onChangeEmail,
+    password,
+    onChangePassword,
+    onForgotPassword,
+    loginInProgress,
+    error,
+    onGoToCreateAccount
+  }: Props,
+): React.Node => {
   const [
     isForgotPasswordDialogOpen,
     setIsForgotPasswordDialogOpen,

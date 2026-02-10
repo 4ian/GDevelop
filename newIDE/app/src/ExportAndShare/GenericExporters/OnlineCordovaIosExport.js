@@ -21,15 +21,16 @@ export type ExportState = {|
   signing: BuildSigningOptions | null,
 |};
 
-export const SetupExportHeader = ({
-  exportState,
-  authenticatedUser,
-  updateExportState,
-  isExporting,
-  build,
-  quota,
-// $FlowFixMe[signature-verification-failure]
-}: HeaderProps<ExportState>) => {
+export const SetupExportHeader = (
+  {
+    exportState,
+    authenticatedUser,
+    updateExportState,
+    isExporting,
+    build,
+    quota
+  }: HeaderProps<ExportState>,
+): null | React.Node => {
   // Build is finished, hide options.
   if (!!build && build.status === 'complete') return null;
 
@@ -94,18 +95,19 @@ type OnlineCordovaIosExportFlowProps = {|
   exportPipelineName: string,
 |};
 
-export const ExportFlow = ({
-  disabled,
-  launchExport,
-  isExporting,
-  exportPipelineName,
-  exportStep,
-  build,
-  stepMaxProgress,
-  stepCurrentProgress,
-  errored,
-// $FlowFixMe[signature-verification-failure]
-}: OnlineCordovaIosExportFlowProps) => {
+export const ExportFlow = (
+  {
+    disabled,
+    launchExport,
+    isExporting,
+    exportPipelineName,
+    exportStep,
+    build,
+    stepMaxProgress,
+    stepCurrentProgress,
+    errored
+  }: OnlineCordovaIosExportFlowProps,
+): React.Node => {
   const isExportingOrbuildRunningOrFinished =
     isExporting || (!!build && build.status !== 'error');
 
@@ -140,9 +142,7 @@ export const ExportFlow = ({
 
 export const onlineCordovaIosExporter = {
   key: 'onlinecordovaiosexport',
-  // $FlowFixMe[signature-verification-failure]
-  tabName: <Trans>iOS</Trans>,
-  // $FlowFixMe[signature-verification-failure]
-  name: <Trans>iOS</Trans>,
+  tabName: (<Trans>iOS</Trans>: React.Node),
+  name: (<Trans>iOS</Trans>: React.Node),
   helpPage: '/publishing/ios',
 };

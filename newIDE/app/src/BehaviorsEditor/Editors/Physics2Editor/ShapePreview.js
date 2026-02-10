@@ -25,8 +25,7 @@ type State = {|
   draggedIndex: number,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const ShapePreview = (props: Props) => {
+const ShapePreview = (props: Props): React.MixedElement => {
   const { forcedCursor, deactivateControls } = props;
 
   const svgRef = React.useRef<React.ElementRef<'svg'> | null>(null);

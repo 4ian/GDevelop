@@ -9,8 +9,7 @@ type Props = {|
   url: string,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const ShareButton = ({ url }: Props) => {
+const ShareButton = ({url}: Props): null | React.Node => {
   const onShare = async () => {
     if (!url || !navigator.share) return;
 

@@ -22,13 +22,7 @@ type Props = {|
   justifyContent?: 'center',
 |};
 
-const CreateProfile = ({
-  message,
-  onOpenLoginDialog,
-  onOpenCreateAccountDialog,
-  justifyContent,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => (
+const CreateProfile = ({message, onOpenLoginDialog, onOpenCreateAccountDialog, justifyContent}: Props): React.Node => (
   <Column alignItems="center">
     <div style={styles.container}>
       <ColumnStackLayout>

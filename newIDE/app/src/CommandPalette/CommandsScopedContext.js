@@ -75,8 +75,7 @@ type Props = {|
   active: boolean,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const CommandsContextScopedProvider = (props: Props) => {
+const CommandsContextScopedProvider = (props: Props): React.Node => {
   const centralManager = React.useContext(CommandsContext);
   const scopedManager = useValueWithInit(
     () => new ScopedCommandManager(centralManager)

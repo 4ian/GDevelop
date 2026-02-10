@@ -34,16 +34,16 @@ const ESTIMATED_ROW_HEIGHT = 90;
 const OVERSCAN_CELLS_COUNT = 25;
 
 /** A virtualized list of search results, caching the searched item heights. */
-export const ListSearchResults = <SearchItem>({
-  disableAutoTranslate,
-  searchItems,
-  getSearchItemUniqueId,
-  renderSearchItem,
-  error,
-  onRetry,
-// $FlowFixMe[signature-verification-failure]
-// $FlowFixMe[missing-local-annot]
-}: Props<SearchItem>) => {
+export const ListSearchResults = <SearchItem>(
+  {
+    disableAutoTranslate,
+    searchItems,
+    getSearchItemUniqueId,
+    renderSearchItem,
+    error,
+    onRetry
+  }: Props<SearchItem>,
+): any => {
   // $FlowFixMe[value-as-type]
   const grid = React.useRef<?Grid>(null);
 

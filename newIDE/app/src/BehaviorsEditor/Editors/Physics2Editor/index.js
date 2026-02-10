@@ -31,14 +31,15 @@ import { mapVector } from '../../../Utils/MapFor';
 
 type Props = BehaviorEditorProps;
 
-export const NumericProperty = (props: {|
-  id?: string,
-  properties: gdMapStringPropertyDescriptor,
-  propertyName: string,
-  step: number,
-  onUpdate: (newValue: string) => void,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+export const NumericProperty = (
+  props: {|
+    id?: string,
+    properties: gdMapStringPropertyDescriptor,
+    propertyName: string,
+    step: number,
+    onUpdate: (newValue: string) => void,
+  |},
+): React.Node => {
   const { properties, propertyName, step, onUpdate, id } = props;
   const property = properties.get(propertyName);
 
@@ -57,19 +58,21 @@ export const NumericProperty = (props: {|
   );
 };
 
-export const ChoiceProperty = (props: {|
-  id?: string,
-  properties: gdMapStringPropertyDescriptor,
-  propertyName: string,
-  value?: string,
-  onUpdate: (
-    event: {| target: {| value: string |} |},
-    index: number,
-    text: string // Note that even for number values, a string is returned
-  ) => void,
-  disabled?: boolean,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+export const ChoiceProperty = (
+  props: {|
+    id?: string,
+    properties: gdMapStringPropertyDescriptor,
+    propertyName: string,
+    value?: string,
+    onUpdate: (
+      event: {| target: {| value: string |} |},
+      index: number,
+      text: string // Note that even for number values, a string is returned
+      
+    ) => void,
+    disabled?: boolean,
+  |},
+): React.Node => {
   const { properties, propertyName, onUpdate, id, value, disabled } = props;
   const property = properties.get(propertyName);
 
@@ -98,8 +101,7 @@ export const ChoiceProperty = (props: {|
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const UnitAdornment = (props: {| property: gdPropertyDescriptor |}) => {
+export const UnitAdornment = (props: {| property: gdPropertyDescriptor |}): React.Node => {
   const { property } = props;
   const measurementUnit = property.getMeasurementUnit();
   if (measurementUnit.isUndefined() && property.getDescription()) {
@@ -166,8 +168,7 @@ const enableBit = (bitsValue: number, pos: number, enable: boolean) => {
   return bitsValue;
 };
 
-// $FlowFixMe[signature-verification-failure]
-const Physics2Editor = (props: Props) => {
+const Physics2Editor = (props: Props): React.Node => {
   const { current: resourcesLoader } = React.useRef(ResourcesLoader);
   const [image, setImage] = React.useState('');
   const { behavior, onBehaviorUpdated } = props;

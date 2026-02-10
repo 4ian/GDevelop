@@ -5,7 +5,6 @@ import { dropIndicator, cantDropIndicator } from './ClassNames';
 /**
  * A Drop indicator line for the events sheet
  */
-// $FlowFixMe[signature-verification-failure]
-export default function DropIndicator({ canDrop }: {| canDrop: boolean |}) {
+export default function DropIndicator({ canDrop }: {| canDrop: boolean |}): React.MixedElement {
   return <div className={canDrop ? dropIndicator : cantDropIndicator} />;
 }

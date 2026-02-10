@@ -133,8 +133,8 @@ const useStylesForGreyedListItem = makeStyles(theme => {
  *
  * Also used outside of a List by virtualized lists.
  */
-// $FlowFixMe[signature-verification-failure]
-export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
+// $FlowFixMe[prop-missing]
+export const ListItem: React.AbstractComponent<{ ...ListItemProps, +ref?: React.RefSetter<ListItemRefType> }, React.RefSetter<ListItemRefType>> = React.forwardRef<ListItemProps, ListItemRefType>(
   (props: ListItemProps, ref) => {
     const [isOpen, setIsOpen] = React.useState(!!props.initiallyOpen);
     const elementWithMenu = React.useRef<?ElementWithMenu>(null);
@@ -383,8 +383,7 @@ type ListProps = {|
 /**
  * List based on Material-UI List.
  */
-// $FlowFixMe[signature-verification-failure]
-export const List = (props: ListProps) => {
+export const List = (props: ListProps): React.Node => {
   let listStyle = { ...props.style };
   if (props.useGap) {
     // $FlowFixMe[incompatible-type]

@@ -1,8 +1,7 @@
 // @flow
 import ViewPosition from './ViewPosition';
 
-// $FlowFixMe[signature-verification-failure]
-export const shouldBeHandledByPinch = (event: ?TouchEvent) => {
+export const shouldBeHandledByPinch = (event: ?TouchEvent): boolean => {
   if (!event) return false;
 
   const { targetTouches } = event;

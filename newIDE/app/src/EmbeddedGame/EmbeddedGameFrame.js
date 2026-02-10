@@ -211,12 +211,7 @@ const noHotReloadSteps = {
   reasons: [],
 };
 
-export const EmbeddedGameFrame = ({
-  previewDebuggerServer,
-  onLaunchPreviewForInGameEdition,
-  enabled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const EmbeddedGameFrame = ({previewDebuggerServer, onLaunchPreviewForInGameEdition, enabled}: Props): React.MixedElement => {
   const [
     previewIndexHtmlLocation,
     setPreviewIndexHtmlLocation,

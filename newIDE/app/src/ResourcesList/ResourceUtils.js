@@ -34,8 +34,7 @@ export const createOrUpdateResource = (
 export const getLocalResourceFullPath = (
   project: gdProject,
   resourceName: string
-// $FlowFixMe[signature-verification-failure]
-) => {
+): any => {
   let resourcePath = ResourcesLoader.getResourceFullUrl(
     project,
     resourceName,
@@ -55,8 +54,7 @@ export const getLocalResourceFullPath = (
 export const isPathInProjectFolder = (
   project: gdProject,
   resourcePath: string
-// $FlowFixMe[signature-verification-failure]
-) => {
+): boolean => {
   const projectPath = path.dirname(project.getProjectFile());
   return resourcePath.includes(projectPath);
 };
@@ -122,8 +120,7 @@ export const copyAllToProjectFolder = (
 export const getResourceFilePathStatus = (
   project: gdProject,
   resourceName: string
-// $FlowFixMe[signature-verification-failure]
-) => {
+): string => {
   if (!project.getResourcesManager().hasResource(resourceName)) return '';
   if (!fs) return '';
 
@@ -242,8 +239,7 @@ export const updateResourceJsonMetadata = (
   resource.setMetadata(JSON.stringify(newMetadata));
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const isFetchableUrl = (url: string) => {
+export const isFetchableUrl = (url: string): boolean => {
   return (
     url.startsWith('http://') ||
     url.startsWith('https://') ||
@@ -251,8 +247,7 @@ export const isFetchableUrl = (url: string) => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const isURL = (filename: string) => {
+export const isURL = (filename: string): boolean => {
   return (
     filename.startsWith('http://') ||
     filename.startsWith('https://') ||
@@ -262,7 +257,6 @@ export const isURL = (filename: string) => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const isBlobURL = (filename: string) => {
+export const isBlobURL = (filename: string): boolean => {
   return filename.startsWith('blob:');
 };

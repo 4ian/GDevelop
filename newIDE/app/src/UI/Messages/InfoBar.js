@@ -17,17 +17,18 @@ type Props = {|
   onActionClick?: () => void | Promise<void>,
 |};
 
-const InfoBar = ({
-  visible,
-  touchScreenMessage,
-  message,
-  hide,
-  actionLabel,
-  onActionClick,
-  closable,
-  duration = 3000,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const InfoBar = (
+  {
+    visible,
+    touchScreenMessage,
+    message,
+    hide,
+    actionLabel,
+    onActionClick,
+    closable,
+    duration = 3000
+  }: Props,
+): React.Node => {
   const screenType = useScreenType();
 
   React.useEffect(

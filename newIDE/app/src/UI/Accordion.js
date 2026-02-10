@@ -50,8 +50,7 @@ type AccordionHeadProps = {|
  * The header of an accordion section.
  * Based on Material-UI AccordionSummary (but we could almost remove it).
  */
-// $FlowFixMe[signature-verification-failure]
-export const AccordionHeader = (props: AccordionHeadProps) => {
+export const AccordionHeader = (props: AccordionHeadProps): React.Node => {
   const classes = useStylesForExpandIcon();
 
   return (
@@ -92,8 +91,7 @@ type AccordionBodyProps = {|
  * The collapsible contents of an accordion section.
  * Based on Material-UI AccordionDetails.
  */
-// $FlowFixMe[signature-verification-failure]
-export const AccordionBody = (props: AccordionBodyProps) => {
+export const AccordionBody = (props: AccordionBodyProps): React.Node => {
   return (
     <MUIAccordionDetails
       style={{ ...(props.disableGutters && styles.bodyRoot), ...props.style }}
@@ -113,8 +111,7 @@ type AccordionActionsProps = {|
  * actions specific to the accordion contents.
  * Based on Material-UI AccordionActions.
  */
-// $FlowFixMe[signature-verification-failure]
-export const AccordionActions = (props: AccordionActionsProps) => {
+export const AccordionActions = (props: AccordionActionsProps): React.Node => {
   const accordionActions = props.secondaryActions ? (
     <React.Fragment>
       <div key="secondary-actions">{props.secondaryActions}</div>
@@ -151,8 +148,8 @@ type AccordionProps = {|
  * Based on Material-UI Accordion.
  */
 // $FlowFixMe[value-as-type]
-// $FlowFixMe[signature-verification-failure]
-export const Accordion = React.forwardRef<AccordionProps, MUIAccordion>(
+// $FlowFixMe[prop-missing]
+export const Accordion: React.AbstractComponent<{ ...AccordionProps, +ref?: React.RefSetter<any> }, React.RefSetter<any>> = React.forwardRef<AccordionProps, MUIAccordion>(
   (props, ref) => {
     const { costlyBody, noMargin, kind, ...otherProps } = props;
     const gdevelopTheme = React.useContext(GDevelopThemeContext);

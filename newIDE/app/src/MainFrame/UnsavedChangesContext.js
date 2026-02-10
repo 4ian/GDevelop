@@ -17,8 +17,7 @@ const initialState: UnsavedChanges = {
   getTimeOfFirstChangeSinceLastSave: () => null,
 };
 
-// $FlowFixMe[signature-verification-failure]
-const UnsavedChangesContext = React.createContext<UnsavedChanges>(initialState);
+const UnsavedChangesContext: React.Context<UnsavedChanges> = React.createContext<UnsavedChanges>(initialState);
 
 export default UnsavedChangesContext;
 
@@ -26,8 +25,7 @@ type Props = {|
   children?: React.Node,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const UnsavedChangesContextProvider = (props: Props) => {
+export const UnsavedChangesContextProvider = (props: Props): React.MixedElement => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState<boolean>(
     false
   );

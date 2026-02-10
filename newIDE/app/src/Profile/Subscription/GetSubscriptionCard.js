@@ -57,19 +57,20 @@ type Props = {|
   placementId: SubscriptionPlacementId,
 |};
 
-const GetSubscriptionCard = ({
-  children,
-  subscriptionDialogOpeningReason,
-  label,
-  hideButton,
-  payWithCreditsOptions,
-  onUpgrade,
-  forceColumnLayout,
-  recommendedPlanId,
-  canHide,
-  placementId,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const GetSubscriptionCard = (
+  {
+    children,
+    subscriptionDialogOpeningReason,
+    label,
+    hideButton,
+    payWithCreditsOptions,
+    onUpgrade,
+    forceColumnLayout,
+    recommendedPlanId,
+    canHide,
+    placementId
+  }: Props,
+): null | React.MixedElement => {
   const [isHidden, setIsHidden] = React.useState(false);
   const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
   const { isMobile } = useResponsiveWindowSize();

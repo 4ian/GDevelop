@@ -14,8 +14,7 @@ const gameName = 'Bark and sea';
 const thumbnailUrl =
   'https://games.gdevelop-app.com/game-14f30268-f976-4e84-8c09-2e391b1f3907/BarkAndSail2.png';
 
-// $FlowFixMe[signature-verification-failure]
-export const Published = () => {
+export const Published = (): React.Node => {
   const buildOrGameUrl = 'https://gd.games/alex_/bark-and-sea';
   return (
     <ShareOnlineGameDialog
@@ -29,8 +28,7 @@ export const Published = () => {
     />
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const PublishedWithThumbnail = () => {
+export const PublishedWithThumbnail = (): React.Node => {
   const buildOrGameUrl = 'https://gd.games/alex_/bark-and-sea';
   return (
     <ShareOnlineGameDialog
@@ -45,8 +43,7 @@ export const PublishedWithThumbnail = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Private = () => {
+export const Private = (): React.Node => {
   const buildOrGameUrl = `https://gd.games/instant-builds/${
     completeWebBuild.id
   }`;
@@ -63,8 +60,7 @@ export const Private = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Loading = () => {
+export const Loading = (): React.Node => {
   const buildOrGameUrl = 'https://gd.games/alex_/bark-and-sea';
   return (
     <ShareOnlineGameDialog

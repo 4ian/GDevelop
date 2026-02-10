@@ -31,12 +31,7 @@ const useListItemStyles = makeStyles(theme => {
   };
 });
 
-const StorageProviderListItem = ({
-  storageProvider,
-  onChooseProvider,
-  disabled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const StorageProviderListItem = ({storageProvider, onChooseProvider, disabled}: Props): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const classesForListItem = useListItemStyles();

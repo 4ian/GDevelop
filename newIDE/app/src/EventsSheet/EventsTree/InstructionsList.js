@@ -104,8 +104,7 @@ export default function InstructionsList({
   objectsContainer,
   projectScopedContainersAccessor,
   idPrefix,
-// $FlowFixMe[signature-verification-failure]
-}: Props) {
+}: Props): React.Node {
   const [canPaste, setCanPaste] = React.useState(false);
 
   const addNewInstruction = React.useCallback(

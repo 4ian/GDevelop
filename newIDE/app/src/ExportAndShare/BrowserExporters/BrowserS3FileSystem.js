@@ -46,9 +46,8 @@ export default class BrowserS3FileSystem {
 
   // Store a set of all external URLs copied so that we can simulate
   // readDir result.
-  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  _allCopiedExternalUrls = new Set<string>();
+  _allCopiedExternalUrls = (new Set<string>(): Set<string>);
 
   constructor({ filesContent, prefix, bucketBaseUrl }: ConstructorArgs) {
     this.prefix = prefix;
@@ -81,37 +80,27 @@ export default class BrowserS3FileSystem {
   mkDir = (path: string) => {
     // Assume required directories always exist.
   };
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  dirExists = (path: string) => {
+  dirExists = (path: string): any => {
     // Assume required directories always exist.
     return true;
   };
   clearDir = (path: string) => {
     // Assume path is cleared.
   };
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getTempDir = () => {
+  getTempDir = (): any => {
     return '/virtual-unused-tmp-dir';
   };
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  fileNameFrom = (fullpath: string) => {
+  fileNameFrom = (fullpath: string): any => {
     if (isURL(fullpath)) return fullpath;
 
     return path.basename(fullpath);
   };
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  dirNameFrom = (fullpath: string) => {
+  dirNameFrom = (fullpath: string): any => {
     if (isURL(fullpath)) return '';
 
     return path.dirname(fullpath);
   };
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  makeAbsolute = (filename: string, baseDirectory: string) => {
+  makeAbsolute = (filename: string, baseDirectory: string): any => {
     if (isURL(filename)) return filename;
 
     if (!this.isAbsolute(baseDirectory))
@@ -123,16 +112,12 @@ export default class BrowserS3FileSystem {
 
     return path.resolve(baseDirectory, path.normalize(filename));
   };
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  makeRelative = (filename: string, baseDirectory: string) => {
+  makeRelative = (filename: string, baseDirectory: string): any => {
     if (isURL(filename)) return filename;
 
     return path.relative(baseDirectory, path.normalize(filename));
   };
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  isAbsolute = (fullpath: string) => {
+  isAbsolute = (fullpath: string): any => {
     if (isURL(fullpath)) return true;
 
     if (fullpath.length === 0) return true;
@@ -141,9 +126,7 @@ export default class BrowserS3FileSystem {
       (fullpath.length > 1 && fullpath.charAt(1) === ':')
     );
   };
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  copyFile = (source: string, dest: string) => {
+  copyFile = (source: string, dest: string): any => {
     //URL are not copied.
     if (isURL(source)) {
       this._allCopiedExternalUrls.add(source);
@@ -153,9 +136,7 @@ export default class BrowserS3FileSystem {
     console.warn('Copy not done from', source, 'to', dest);
     return true;
   };
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  writeToFile = (fullPath: string, contents: string) => {
+  writeToFile = (fullPath: string, contents: string): any => {
     const key = fullPath.replace(this.bucketBaseUrl, '');
     const mime = {
       '.js': 'text/javascript',
@@ -173,9 +154,7 @@ export default class BrowserS3FileSystem {
     return true;
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  readFile = (file: string) => {
+  readFile = (file: string): any => {
     if (!!this._indexedFilesContent[file])
       return this._indexedFilesContent[file].text;
 
@@ -183,9 +162,7 @@ export default class BrowserS3FileSystem {
     return '';
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  readDir = (path: string, ext: string) => {
+  readDir = (path: string, ext: string): any => {
     ext = ext.toUpperCase();
     var output = new gd.VectorString();
 
@@ -201,9 +178,7 @@ export default class BrowserS3FileSystem {
     return output;
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  fileExists = (filename: string) => {
+  fileExists = (filename: string): any => {
     if (isURL(filename)) return true;
 
     // Assume all files asked for exists.

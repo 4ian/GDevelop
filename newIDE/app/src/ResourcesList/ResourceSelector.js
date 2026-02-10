@@ -66,8 +66,8 @@ type Props = {|
 
 export type ResourceSelectorInterface = {| focus: FieldFocusFunction |};
 
-// $FlowFixMe[signature-verification-failure]
-const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
+// $FlowFixMe[prop-missing]
+const ResourceSelector: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<ResourceSelectorInterface> }, React.RefSetter<ResourceSelectorInterface>> = React.forwardRef<Props, ResourceSelectorInterface>(
   (props, ref) => {
     const {
       project,

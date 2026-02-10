@@ -19,8 +19,7 @@ const gd: libGDevelop = global.gd;
  * A service returning editor components for each object type.
  */
 const ObjectsEditorService = {
-  // $FlowFixMe[signature-verification-failure]
-  getEditorConfiguration(project: gdProject, objectType: string) {
+  getEditorConfiguration(project: gdProject, objectType: string): any {
     // $FlowFixMe[object-this-reference]
     if (this.editorConfigurations[objectType]) {
       // $FlowFixMe[object-this-reference]
@@ -79,8 +78,7 @@ const ObjectsEditorService = {
   },
   getDefaultObjectJsImplementationPropertiesEditor(options: {
     helpPagePath: string,
-  // $FlowFixMe[signature-verification-failure]
-  }) {
+  }): any {
     return {
       component: ObjectPropertiesEditor,
       createNewObject: (
@@ -97,8 +95,7 @@ const ObjectsEditorService = {
       helpPagePath: options.helpPagePath,
     };
   },
-  // $FlowFixMe[signature-verification-failure]
-  getCustomObjectPropertiesEditor(options: { helpPagePath: string }) {
+  getCustomObjectPropertiesEditor(options: { helpPagePath: string }): any {
     return {
       component: CustomObjectPropertiesEditor,
       createNewObject: (

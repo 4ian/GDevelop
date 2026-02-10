@@ -75,8 +75,7 @@ const Template = ({ children }: {| children: React.Node |}) => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const NotAuthenticated = () => {
+export const NotAuthenticated = (): React.Node => {
   return (
     <Template>
       <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
@@ -99,8 +98,7 @@ export const NotAuthenticated = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const NotAuthenticatedWithScreenshot = () => {
+export const NotAuthenticatedWithScreenshot = (): React.Node => {
   return (
     <Template>
       <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
@@ -125,8 +123,7 @@ export const NotAuthenticatedWithScreenshot = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const AuthenticatedWithAvailableCloudProjectsRoom = () => {
+export const AuthenticatedWithAvailableCloudProjectsRoom = (): React.Node => {
   return (
     <Template>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -149,8 +146,7 @@ export const AuthenticatedWithAvailableCloudProjectsRoom = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const AuthenticatedWithTooManyCloudProjects = () => {
+export const AuthenticatedWithTooManyCloudProjects = (): React.Node => {
   return (
     <Template>
       <AuthenticatedUserContext.Provider
@@ -180,8 +176,7 @@ export const AuthenticatedWithTooManyCloudProjects = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const AuthenticatedWithCloudProjectsMaximumReachedButSavedAlready = () => {
+export const AuthenticatedWithCloudProjectsMaximumReachedButSavedAlready = (): React.Node => {
   return (
     <Template>
       <AuthenticatedUserContext.Provider
@@ -215,8 +210,7 @@ export const AuthenticatedWithCloudProjectsMaximumReachedButSavedAlready = () =>
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const AuthenticatedAndLoadingUserCloudProjects = () => {
+export const AuthenticatedAndLoadingUserCloudProjects = (): React.Node => {
   return (
     <Template>
       <AuthenticatedUserContext.Provider
@@ -244,8 +238,7 @@ export const AuthenticatedAndLoadingUserCloudProjects = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const AuthenticatedAndFails = () => {
+export const AuthenticatedAndFails = (): React.Node => {
   return (
     <Template>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -268,8 +261,7 @@ export const AuthenticatedAndFails = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const AuthenticatedExistingGame = () => {
+export const AuthenticatedExistingGame = (): React.Node => {
   return (
     <Template>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
@@ -292,8 +284,7 @@ export const AuthenticatedExistingGame = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const AuthenticatedNotOwnedGame = () => {
+export const AuthenticatedNotOwnedGame = (): React.Node => {
   return (
     <Template>
       <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>

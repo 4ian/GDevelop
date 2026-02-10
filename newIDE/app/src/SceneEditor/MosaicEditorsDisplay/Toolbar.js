@@ -61,8 +61,7 @@ type Props = {|
   onOpenSceneVariables: () => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const Toolbar = React.memo<Props>(function Toolbar(props) {
+const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(props) {
   return (
     <>
       <ToolbarCommands

@@ -382,9 +382,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _makeRenameEventsFunction = (i18n: I18nType) => (
+  _makeRenameEventsFunction = (i18n: I18nType): any => (
     eventsBasedBehavior: ?gdEventsBasedBehavior,
     eventsBasedObject: ?gdEventsBasedObject,
     eventsFunction: gdEventsFunction,
@@ -534,9 +532,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _makeMoveFreeEventsParameter = (i18n: I18nType) => (
+  _makeMoveFreeEventsParameter = (i18n: I18nType): any => (
     eventsFunction: gdEventsFunction,
     oldIndex: number,
     newIndex: number,
@@ -556,9 +552,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done(true);
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _makeMoveBehaviorEventsParameter = (i18n: I18nType) => (
+  _makeMoveBehaviorEventsParameter = (i18n: I18nType): any => (
     eventsBasedBehavior: gdEventsBasedBehavior,
     eventsFunction: gdEventsFunction,
     oldIndex: number,
@@ -580,9 +574,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done(true);
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _makeMoveObjectEventsParameter = (i18n: I18nType) => (
+  _makeMoveObjectEventsParameter = (i18n: I18nType): any => (
     eventsBasedObject: gdEventsBasedObject,
     eventsFunction: gdEventsFunction,
     oldIndex: number,
@@ -704,9 +696,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _makeRenameEventsBasedBehavior = (i18n: I18nType) => (
+  _makeRenameEventsBasedBehavior = (i18n: I18nType): any => (
     eventsBasedBehavior: gdEventsBasedBehavior,
     newName: string,
     done: boolean => void
@@ -738,9 +728,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done(true);
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _makeRenameEventsBasedObject = (i18n: I18nType) => (
+  _makeRenameEventsBasedObject = (i18n: I18nType): any => (
     eventsBasedObject: gdEventsBasedObject,
     newName: string,
     done: boolean => void
@@ -1363,9 +1351,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const { project, eventsFunctionsExtension } = this.props;
 
     const {
@@ -1852,6 +1838,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       mosaicContainsNode(
                         getDefaultEditorMosaicNode(
                           'events-functions-extension-editor'
+                        // $FlowFixMe[incompatible-type]
                         ) || getInitialMosaicEditorNodes(),
                         'functions-list'
                       )

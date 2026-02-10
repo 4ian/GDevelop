@@ -14,13 +14,7 @@ type Props = {|
   leaderboardId?: string,
 |};
 
-const LeaderboardDialog = ({
-  onClose,
-  open,
-  project,
-  leaderboardId,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const LeaderboardDialog = ({onClose, open, project, leaderboardId}: Props): React.Node => {
   const [isLoading, setIsLoading] = React.useState(false);
   return (
     <Dialog

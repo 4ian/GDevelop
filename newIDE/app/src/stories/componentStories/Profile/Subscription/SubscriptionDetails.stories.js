@@ -114,20 +114,21 @@ const getUserFromState = (userState: string) => {
   }
 };
 
-export const Default = ({
-  willCancelAtPeriodEndOrIsExpired,
-  loading,
-  simulateNativeMobileApp,
-  userState,
-  pricingSystem,
-}: {|
-  willCancelAtPeriodEndOrIsExpired: boolean,
-  loading: boolean,
-  simulateNativeMobileApp: boolean,
-  userState: string,
-  pricingSystem: string,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+export const Default = (
+  {
+    willCancelAtPeriodEndOrIsExpired,
+    loading,
+    simulateNativeMobileApp,
+    userState,
+    pricingSystem
+  }: {|
+    willCancelAtPeriodEndOrIsExpired: boolean,
+    loading: boolean,
+    simulateNativeMobileApp: boolean,
+    userState: string,
+    pricingSystem: string,
+  |},
+): React.Node => {
   const authenticatedUser = loading
     ? fakeAuthenticatedUserLoggingIn
     : getUserFromState(userState);
@@ -212,6 +213,7 @@ export const Default = ({
 
   return (
     <AlertProvider>
+      {/* $FlowFixMe[incompatible-type] */}
       <AuthenticatedUserContext.Provider value={authenticatedUser}>
         <SubscriptionProvider>
           <SubscriptionDetails

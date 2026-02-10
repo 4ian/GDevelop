@@ -31,8 +31,7 @@ const eventsTreeTutorials: Array<Tutorial> = [
   },
 ];
 
-// $FlowFixMe[signature-verification-failure]
-export const DefaultMediumScreenScopeInLayout = () => (
+export const DefaultMediumScreenScopeInLayout = (): React.Node => (
   <DragAndDropContextProvider>
     <div className="gd-events-sheet">
       <FixedHeightFlexContainer height={500}>
@@ -88,8 +87,7 @@ export const DefaultMediumScreenScopeInLayout = () => (
   </DragAndDropContextProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const DefaultSmallScreenScopeInLayout = () => (
+export const DefaultSmallScreenScopeInLayout = (): React.Node => (
   <DragAndDropContextProvider>
     <div className="gd-events-sheet">
       <FixedHeightFlexContainer height={500}>
@@ -145,8 +143,7 @@ export const DefaultSmallScreenScopeInLayout = () => (
   </DragAndDropContextProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const DefaultMediumScreenScopeNotInLayout = () => (
+export const DefaultMediumScreenScopeNotInLayout = (): React.Node => (
   <DragAndDropContextProvider>
     <div className="gd-events-sheet">
       <FixedHeightFlexContainer height={500}>
@@ -199,8 +196,7 @@ export const DefaultMediumScreenScopeNotInLayout = () => (
   </DragAndDropContextProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const EmptySmallScreenScopeInALayout = () => (
+export const EmptySmallScreenScopeInALayout = (): React.Node => (
   <DragAndDropContextProvider>
     <div className="gd-events-sheet">
       <FixedHeightFlexContainer height={500}>

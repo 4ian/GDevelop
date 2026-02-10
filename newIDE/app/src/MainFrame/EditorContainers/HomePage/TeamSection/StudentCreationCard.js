@@ -19,12 +19,7 @@ type Props = {|
   isCreatingMembers: boolean,
 |};
 
-const StudentCreationCard = ({
-  availableSeats,
-  onCreateStudentAccounts,
-  isCreatingMembers,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const StudentCreationCard = ({availableSeats, onCreateStudentAccounts, isCreatingMembers}: Props): React.Node => {
   const [quantity, setQuantity] = React.useState<string>(
     availableSeats.toString()
   );

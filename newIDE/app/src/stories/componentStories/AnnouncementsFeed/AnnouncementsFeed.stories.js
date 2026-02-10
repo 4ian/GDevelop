@@ -17,8 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => {
+export const Default = (): React.Node => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -35,8 +34,7 @@ export const Default = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithClosableItems = () => {
+export const WithClosableItems = (): React.Node => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -53,8 +51,7 @@ export const WithClosableItems = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const ErrorLoadingAnnouncements = () => {
+export const ErrorLoadingAnnouncements = (): React.Node => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -71,8 +68,7 @@ export const ErrorLoadingAnnouncements = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const LoadingAnnouncements = () => {
+export const LoadingAnnouncements = (): React.Node => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -89,8 +85,7 @@ export const LoadingAnnouncements = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const DefaultWithMargins = () => {
+export const DefaultWithMargins = (): React.Node => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -107,8 +102,7 @@ export const DefaultWithMargins = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const OnlyUrgent = () => {
+export const OnlyUrgent = (): React.Node => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{

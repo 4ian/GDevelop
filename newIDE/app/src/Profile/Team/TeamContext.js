@@ -43,13 +43,11 @@ export const initialTeamState = {
   memberships: null,
   onChangeGroupName: async () => {},
   onChangeUserGroup: async () => {},
-  // $FlowFixMe[signature-verification-failure]
-  onListUserProjects: async () => [],
+  onListUserProjects: async (): Promise<Array<empty>> => [],
   onDeleteGroup: async () => {},
   onCreateGroup: async () => {},
   onRefreshMembers: async () => {},
-  // $FlowFixMe[signature-verification-failure]
-  getAvailableSeats: () => null,
+  getAvailableSeats: (): null => null,
   onCreateMembers: async () => {},
   onActivateMembers: async () => {},
   onRefreshAdmins: async () => {},
@@ -58,8 +56,7 @@ export const initialTeamState = {
   onEditUser: async () => {},
 };
 
-// $FlowFixMe[signature-verification-failure]
 // $FlowFixMe[incompatible-type]
-const TeamContext = React.createContext<TeamState>(initialTeamState);
+const TeamContext: React.Context<TeamState> = React.createContext<TeamState>(initialTeamState);
 
 export default TeamContext;

@@ -12,8 +12,8 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 
-// $FlowFixMe[signature-verification-failure]
-const ImageResourceField = React.forwardRef<
+// $FlowFixMe[prop-missing]
+const ImageResourceField: React.AbstractComponent<{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }, React.RefSetter<ParameterFieldInterface>> = React.forwardRef<
   ParameterFieldProps,
   ParameterFieldInterface
 >((props, ref) => {

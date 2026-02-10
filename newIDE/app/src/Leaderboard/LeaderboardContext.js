@@ -45,22 +45,18 @@ export const initialLeaderboardState = {
     goToPreviousPage: null,
     goToFirstPage: null,
   },
-  // $FlowFixMe[signature-verification-failure]
-  createLeaderboard: async () => null,
+  createLeaderboard: async (): Promise<null> => null,
   listLeaderboards: async () => {},
   selectLeaderboard: () => {},
   setDisplayOnlyBestEntry: () => {},
   updateLeaderboard: async () => {},
   resetLeaderboard: async () => {},
   deleteLeaderboard: async () => {},
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  deleteLeaderboardEntry: async entryId => {},
+  deleteLeaderboardEntry: async (entryId: any) => {},
   fetchLeaderboardEntries: async () => {},
 };
 
-// $FlowFixMe[signature-verification-failure]
-const LeaderboardContext = React.createContext<LeaderboardState>(
+const LeaderboardContext: React.Context<LeaderboardState> = React.createContext<LeaderboardState>(
   // $FlowFixMe[incompatible-type]
   initialLeaderboardState
 );

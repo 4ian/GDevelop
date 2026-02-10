@@ -19,8 +19,7 @@ import Model3DResourceField from '../../../EventsSheet/ParameterFields/Model3DRe
 import AtlasResourceField from '../../../EventsSheet/ParameterFields/AtlasResourceField';
 import SpineResourceField from '../../../EventsSheet/ParameterFields/SpineResourceField';
 
-// $FlowFixMe[signature-verification-failure]
-export const AllResourceFields = () => (
+export const AllResourceFields = (): React.Node => (
   <Column expand>
     <Line expand>
       <ValueStateHolder

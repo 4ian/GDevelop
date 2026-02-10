@@ -242,20 +242,22 @@ const getDefaultOrValidBuildSigningOptionsFor = (
 
 type Props = {
   targets: Array<TargetName>,
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   buildSigningOptions: BuildSigningOptions | null,
   onSelectBuildSigningOptions: (BuildSigningOptions | null) => void,
   disabled?: boolean,
 };
 
-export const IosSigningCredentialsSelector = ({
-  targets,
-  authenticatedUser,
-  buildSigningOptions,
-  onSelectBuildSigningOptions,
-  disabled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const IosSigningCredentialsSelector = (
+  {
+    targets,
+    authenticatedUser,
+    buildSigningOptions,
+    onSelectBuildSigningOptions,
+    disabled
+  }: Props,
+): React.Node => {
   const {
     signingCredentials,
     error,

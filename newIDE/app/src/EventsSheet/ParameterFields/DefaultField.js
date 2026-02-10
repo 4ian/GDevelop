@@ -10,47 +10,51 @@ import {
 } from './ParameterFieldCommons';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function DefaultField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SemiControlledTextFieldInterface>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(ref, () => ({
-      focus,
-    }));
-
-    const { parameterMetadata } = props;
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        focus,
+      }),
+    );
+    
+    const {parameterMetadata} = props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
-
+    
     return (
       <SemiControlledTextField
         margin={props.isInline ? 'none' : 'dense'}
         commitOnBlur
         value={props.value}
         floatingLabelText={description}
-        helperMarkdownText={
-          parameterMetadata ? parameterMetadata.getLongDescription() : undefined
-        }
+        helperMarkdownText={parameterMetadata
+          ? parameterMetadata.getLongDescription()
+          : undefined}
         onChange={(text: string) => props.onChange(text)}
         ref={field}
         fullWidth
       />
     );
-  }
-);
+  },
+// $FlowFixMe[prop-missing]
+): React.AbstractComponent<{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }, React.RefSetter<ParameterFieldInterface>>);
 
-export const renderInlineDefaultField = ({
-  value,
-  expressionIsValid,
-  parameterMetadata,
-  InvalidParameterValue,
-  MissingParameterValue,
-// $FlowFixMe[signature-verification-failure]
-}: ParameterInlineRendererProps) => {
+export const renderInlineDefaultField = (
+  {
+    value,
+    expressionIsValid,
+    parameterMetadata,
+    InvalidParameterValue,
+    MissingParameterValue
+  }: ParameterInlineRendererProps,
+): string | React.MixedElement => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }

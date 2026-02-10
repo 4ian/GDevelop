@@ -84,8 +84,7 @@ const ensureGDevelopEditorAnalyticsReady = async () => {
   return gdevelopEditorAnalyticsPromise;
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const setCurrentlyRunningInAppTutorial = (tutorial: string | null) =>
+export const setCurrentlyRunningInAppTutorial = (tutorial: string | null): string | null =>
   (currentlyRunningInAppTutorial = tutorial);
 
 const makeCanSendEvent = (options: {| minimumTimeBetweenEvents: number |}) => {
@@ -183,6 +182,7 @@ export const installAnalyticsEvents = () => {
  * We can safely call it multiple times, as it will only send the user properties if they changed.
  */
 export const identifyUserForAnalytics = (
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser
 ) => {
   if (isDev) {

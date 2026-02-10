@@ -10,8 +10,7 @@ export type RGBColor = {|
 /**
  * Convert a RGB color to a RGB string.
  */
-// $FlowFixMe[signature-verification-failure]
-export const rgbColorToRGBString = (rgbColor: ?RGBColor) => {
+export const rgbColorToRGBString = (rgbColor: ?RGBColor): string => {
   if (!rgbColor) return '';
   return `${rgbColor.r};${rgbColor.g};${rgbColor.b}`;
 };
@@ -26,22 +25,19 @@ export const hexNumberToRGBArray = (
  * Convert a RGB color value to a Hex string.
  * @note No "#" or "0x" are added.
  */
-// $FlowFixMe[signature-verification-failure]
-export const rgbToHex = (r: number, g: number, b: number) =>
+export const rgbToHex = (r: number, g: number, b: number): string =>
   '' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 
 /**
  * Convert a RGB color to a Hex number.
  */
-// $FlowFixMe[signature-verification-failure]
-export const rgbToHexNumber = (r: number, g: number, b: number) =>
+export const rgbToHexNumber = (r: number, g: number, b: number): number =>
   (r << 16) + (g << 8) + b;
 
 /**
  * Convert a RGB string ("rr;gg;bb") to a Hex number.
  */
-// $FlowFixMe[signature-verification-failure]
-export const rgbStringToHexNumber = (rgbString: string) => {
+export const rgbStringToHexNumber = (rgbString: string): number => {
   const rgbColor = rgbStringAndAlphaToRGBColor(rgbString);
   if (!rgbColor) return 0;
   return rgbToHexNumber(rgbColor.r, rgbColor.g, rgbColor.b);
@@ -50,8 +46,7 @@ export const rgbStringToHexNumber = (rgbString: string) => {
 /**
  * Convert a RGB string ("rr;gg;bb") to a Hex string (#000000).
  */
-// $FlowFixMe[signature-verification-failure]
-export const rgbStringToHexString = (rgbString: string) => {
+export const rgbStringToHexString = (rgbString: string): string => {
   const rgbColor = rgbStringAndAlphaToRGBColor(rgbString);
   if (!rgbColor) return '#000000';
   return rgbColorToHex(rgbColor.r, rgbColor.g, rgbColor.b);
@@ -73,8 +68,7 @@ export const rgbOrHexToHexNumber = (value: string): number => {
 /**
  * Convert a Hex number to a RGB color.
  */
-// $FlowFixMe[signature-verification-failure]
-export const hexNumberToRGBColor = (hexNumber: number) => {
+export const hexNumberToRGBColor = (hexNumber: number): { a: number, b: number, g: number, r: number } => {
   return {
     r: (hexNumber >> 16) & 0xff,
     g: (hexNumber >> 8) & 0xff,
@@ -86,8 +80,7 @@ export const hexNumberToRGBColor = (hexNumber: number) => {
 /**
  * Convert a Hex string to a RGB color.
  */
-// $FlowFixMe[signature-verification-failure]
-export const hexToRGBColor = (hex: string) => {
+export const hexToRGBColor = (hex: string): { a: number, b: number, g: number, r: number } => {
   const hexNumber = parseInt(hex.replace('#', ''), 16);
   return hexNumberToRGBColor(hexNumber);
 };
@@ -104,8 +97,7 @@ export const rgbColorToHex = (r: number, g: number, b: number): string => {
 /**
  * Convert a Hex number to a RGB string.
  */
-// $FlowFixMe[signature-verification-failure]
-export const hexNumberToRGBString = (hex: number) => {
+export const hexNumberToRGBString = (hex: number): string => {
   const rgbColor = hexNumberToRGBColor(hex);
   // $FlowFixMe[incompatible-type]
   return rgbColorToRGBString(rgbColor);
@@ -235,7 +227,6 @@ export const rgbToHsl = (r: number, g: number, b: number): number[] => {
  * Return true if the specified color is mostly light (and so a dark text/shape
  * should be displayed on it for being readable).
  */
-// $FlowFixMe[signature-verification-failure]
-export const isLightRgbColor = (rgbColor: RGBColor) => {
+export const isLightRgbColor = (rgbColor: RGBColor): boolean => {
   return rgbColor.r * 0.299 + rgbColor.g * 0.587 + rgbColor.b * 0.114 > 186;
 };

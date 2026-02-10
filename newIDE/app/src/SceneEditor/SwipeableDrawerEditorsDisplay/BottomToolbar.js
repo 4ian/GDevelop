@@ -69,8 +69,7 @@ const editors = {
   },
 };
 
-// $FlowFixMe[signature-verification-failure]
-const BottomToolbar = React.memo<Props>((props: Props) => {
+const BottomToolbar: React.ComponentType<Props> = React.memo<Props>((props: Props) => {
   return (
     <Paper background="medium" square style={styles.container}>
       <Toolbar height={toolbarHeight} paddingBottom={toolbarPaddingBottom}>

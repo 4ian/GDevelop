@@ -63,14 +63,13 @@ export const canAccessTutorial = (
   return false;
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const client = axios.create({
+// $FlowFixMe[cannot-resolve-name]
+export const client: Axios = axios.create({
   baseURL: GDevelopAssetApi.baseUrl,
 });
 
 export const listAllTutorials = (): Promise<Array<Tutorial>> => {
   return client
-    // $FlowFixMe[underconstrained-implicit-instantiation]
     .get(`/tutorial`, {
       params: { include: 'upcoming' },
     })

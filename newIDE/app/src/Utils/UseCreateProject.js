@@ -75,20 +75,21 @@ type Props = {|
 /**
  * Helper for Mainframe to create a new project.
  */
-const useCreateProject = ({
-  beforeCreatingProject,
-  afterCreatingProject,
-  onSuccessOrError,
-  onError,
-  getStorageProviderOperations,
-  getStorageProvider,
-  loadFromProject,
-  openFromFileMetadata,
-  onProjectSaved,
-  ensureResourcesAreMoved,
-  onGameRegistered,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const useCreateProject = (
+  {
+    beforeCreatingProject,
+    afterCreatingProject,
+    onSuccessOrError,
+    onError,
+    getStorageProviderOperations,
+    getStorageProvider,
+    loadFromProject,
+    openFromFileMetadata,
+    onProjectSaved,
+    ensureResourcesAreMoved,
+    onGameRegistered
+  }: Props,
+): any => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const profile = authenticatedUser.profile;
   const unsavedChanges = React.useContext(UnsavedChangesContext);
@@ -175,6 +176,7 @@ const useCreateProject = ({
             await registerGame(
               authenticatedUser.getAuthorizationHeader,
               authenticatedUser.profile.id,
+              // $FlowFixMe[incompatible-type]
               getDefaultRegisterGameProperties({
                 projectId: currentProject.getProjectUuid(),
                 projectName: currentProject.getName(),

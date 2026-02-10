@@ -32,17 +32,18 @@ type Props = {|
   |}) => void,
 |};
 
-export const NewResourceDialog = ({
-  project,
-  fileMetadata,
-  getStorageProvider,
-  options,
-  i18n,
-  resourceSources,
-  onClose,
-  onChooseResources,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const NewResourceDialog = (
+  {
+    project,
+    fileMetadata,
+    getStorageProvider,
+    options,
+    i18n,
+    resourceSources,
+    onClose,
+    onChooseResources
+  }: Props,
+): null | React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const { searchResults } = React.useContext(ResourceStoreContext);
   const storageProvider = React.useMemo(() => getStorageProvider(), [

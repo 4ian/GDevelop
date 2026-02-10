@@ -106,12 +106,13 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   /** Functor used to render an instance */
   instancesRenderer: gdInitialInstanceJSFunctor;
 
-  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  layoutedInstances = new Map<number, LayoutedInstance>();
-  // $FlowFixMe[signature-verification-failure]
+  layoutedInstances = (new Map<number, LayoutedInstance>(): Map<number, LayoutedInstance>);
   // $FlowFixMe[missing-local-annot]
-  renderedInstances = new Map<number, RenderedInstance | Rendered3DInstance>();
+  renderedInstances = (new Map<number, RenderedInstance | Rendered3DInstance>(): Map<
+  number,
+  RenderedInstance | Rendered3DInstance,
+>);
   _propertyMappingRules: Array<PropertyMappingRule>;
 
   constructor(
@@ -380,9 +381,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  ) {
+  ): any {
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       objectConfiguration
     );
@@ -599,23 +598,17 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     }
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getDefaultWidth() {
+  getDefaultWidth(): any {
     const variant = this.getVariant();
     return variant ? variant.getAreaMaxX() - variant.getAreaMinX() : 48;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getDefaultHeight() {
+  getDefaultHeight(): any {
     const variant = this.getVariant();
     return variant ? variant.getAreaMaxY() - variant.getAreaMinY() : 48;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getDefaultDepth() {
+  getDefaultDepth(): any {
     const variant = this.getVariant();
     return variant ? variant.getAreaMaxZ() - variant.getAreaMinZ() : 48;
   }
@@ -646,21 +639,15 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     return (-variant.getAreaMinZ() / this.getDefaultDepth()) * this.getDepth();
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getCenterX() {
+  getCenterX(): any {
     return this.getWidth() / 2;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getCenterY() {
+  getCenterY(): any {
     return this.getHeight() / 2;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getCenterZ() {
+  getCenterZ(): any {
     return this.getDepth() / 2;
   }
 }

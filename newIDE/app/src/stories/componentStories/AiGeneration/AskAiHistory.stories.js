@@ -133,8 +133,7 @@ const AskAIHistoryContentStoryTemplate = ({
   </FixedHeightFlexContainer>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Loading = () => (
+export const Loading = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{}}
     isLoading={true}
@@ -144,8 +143,7 @@ export const Loading = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Errored = () => (
+export const Errored = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{}}
     isLoading={false}
@@ -155,8 +153,7 @@ export const Errored = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Empty = () => (
+export const Empty = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{}}
     isLoading={false}
@@ -166,8 +163,7 @@ export const Empty = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const SingleAiRequest = () => (
+export const SingleAiRequest = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
       // $FlowFixMe[incompatible-type]
@@ -184,8 +180,7 @@ export const SingleAiRequest = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const MultipleAiRequests = () => (
+export const MultipleAiRequests = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
       // $FlowFixMe[incompatible-type]
@@ -213,8 +208,7 @@ export const MultipleAiRequests = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithSelectedRequest = () => (
+export const WithSelectedRequest = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
       // $FlowFixMe[incompatible-type]
@@ -237,8 +231,7 @@ export const WithSelectedRequest = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithWorkingRequest = () => (
+export const WithWorkingRequest = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
       // $FlowFixMe[incompatible-type]
@@ -261,8 +254,7 @@ export const WithWorkingRequest = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithErroredRequest = () => (
+export const WithErroredRequest = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
       // $FlowFixMe[incompatible-type]
@@ -286,8 +278,7 @@ export const WithErroredRequest = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const RefreshingRequests = () => (
+export const RefreshingRequests = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
       // $FlowFixMe[incompatible-type]

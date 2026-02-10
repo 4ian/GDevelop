@@ -725,8 +725,8 @@ const MemoizedObjectGroupsList = React.memo<Props, ObjectGroupsListInterface>(
   arePropsEqual
 );
 
-// $FlowFixMe[signature-verification-failure]
-const ObjectGroupsListWithErrorBoundary = React.forwardRef<
+// $FlowFixMe[prop-missing]
+const ObjectGroupsListWithErrorBoundary: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<ObjectGroupsListInterface> }, React.RefSetter<ObjectGroupsListInterface>> = React.forwardRef<
   Props,
   ObjectGroupsListInterface
 >((props, ref) => (

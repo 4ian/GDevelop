@@ -24,16 +24,14 @@ export const isUsernameValid = (
   return !!username && /^[\w|-]+$/.test(username) && username.length < 31;
 };
 
-export const usernameFormatErrorMessage = (
-  // $FlowFixMe[signature-verification-failure]
+export const usernameFormatErrorMessage: React.Node = (
   <Trans>
     Please pick a short username with only alphanumeric characters as well as _
     and -
   </Trans>
 );
 
-export const usernameAvailabilityErrorMessage = (
-  // $FlowFixMe[signature-verification-failure]
+export const usernameAvailabilityErrorMessage: React.Node = (
   <Trans>This username is already used, please pick another one.</Trans>
 );
 
@@ -49,18 +47,19 @@ type Props = {|
   disabled?: boolean,
 |};
 
-export const UsernameField = ({
-  initialUsername,
-  value,
-  onChange,
-  errorText,
-  allowEmpty,
-  onAvailabilityChecked,
-  onAvailabilityCheckLoading,
-  isValidatingUsername,
-  disabled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const UsernameField = (
+  {
+    initialUsername,
+    value,
+    onChange,
+    errorText,
+    allowEmpty,
+    onAvailabilityChecked,
+    onAvailabilityCheckLoading,
+    isValidatingUsername,
+    disabled
+  }: Props,
+): React.Node => {
   const usernameFormattingError = isUsernameValid(value, {
     allowEmpty: !!allowEmpty,
   })

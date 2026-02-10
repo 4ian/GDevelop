@@ -54,8 +54,8 @@ type Props = {|
   onClickUnlock: () => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const TextBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
+// $FlowFixMe[prop-missing]
+const TextBasedCourseChapterView: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<HTMLDivElement> }, React.RefSetter<HTMLDivElement>> = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       chapterIndex,

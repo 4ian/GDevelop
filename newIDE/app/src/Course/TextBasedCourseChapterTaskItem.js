@@ -41,12 +41,7 @@ type Props = {|
   onComplete: boolean => void,
 |};
 
-const TextBasedCourseChapterTaskItem = ({
-  task,
-  isComplete,
-  onComplete,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const TextBasedCourseChapterTaskItem = ({task, isComplete, onComplete}: Props): React.Node => {
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

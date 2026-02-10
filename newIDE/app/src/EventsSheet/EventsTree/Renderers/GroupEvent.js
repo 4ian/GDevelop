@@ -70,9 +70,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, any>
     }
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     var groupEvent = gd.asGroupEvent(this.props.event);
 
     const r = groupEvent.getBackgroundColorR(),

@@ -149,9 +149,7 @@ export class EventsBasedBehaviorTreeViewItemContent
     this.props.editName(this.getId());
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  buildMenuTemplate(i18n: I18nType, index: number) {
+  buildMenuTemplate(i18n: I18nType, index: number): any {
     return [
       {
         label: i18n._(t`Add a function`),
@@ -373,9 +371,7 @@ export class EventsBasedBehaviorTreeViewItemContent
     this.props.forceUpdate();
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getRightButton(i18n: I18nType) {
+  getRightButton(i18n: I18nType): any {
     return {
       icon: <Add />,
       label: i18n._(t`Add a function`),

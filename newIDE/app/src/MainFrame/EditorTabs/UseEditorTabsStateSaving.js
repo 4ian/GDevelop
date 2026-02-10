@@ -65,13 +65,10 @@ const projectHasItem = ({
   }
 };
 
-const useEditorTabsStateSaving = ({
-  currentProjectId,
-  editorTabs,
-  getEditorOpeningOptions,
-  setEditorTabs,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const useEditorTabsStateSaving = ({currentProjectId, editorTabs, getEditorOpeningOptions, setEditorTabs}: Props): {
+  hasAPreviousSaveForEditorTabsState: (project: gdProject) => boolean,
+  openEditorTabsFromPersistedState: (project: gdProject) => number,
+} => {
   const {
     setEditorStateForProject,
     getEditorStateForProject,

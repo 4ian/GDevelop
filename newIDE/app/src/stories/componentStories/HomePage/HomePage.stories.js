@@ -24,19 +24,21 @@ import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindow
 import { client as tutorialClient } from '../../../Utils/GDevelopServices/Tutorial';
 import { client as assetClient } from '../../../Utils/GDevelopServices/Asset';
 
-const WrappedHomePage = ({
-  project,
-  // $FlowFixMe[incompatible-type]
-  tutorialProgress = undefined,
-  inAppTutorialsFetchingError = null,
-  user,
-}: {|
-  project: ?gdProject,
-  tutorialProgress?: InAppTutorialUserProgress,
-  inAppTutorialsFetchingError?: string | null,
-  user: AuthenticatedUser,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+const WrappedHomePage = (
+  {
+    project,
+    // $FlowFixMe[incompatible-type]
+    tutorialProgress = undefined,
+    inAppTutorialsFetchingError = null,
+    user
+  }: {|
+    project: ?gdProject,
+    tutorialProgress?: InAppTutorialUserProgress,
+    inAppTutorialsFetchingError?: string | null,
+    // $FlowFixMe[value-as-type]
+    user: AuthenticatedUser,
+  |},
+): React.Node => {
   const assetApiMock = React.useMemo(() => {
     const mock = new MockAdapter(assetClient, {
       delayResponse: 250,
@@ -62,6 +64,7 @@ const WrappedHomePage = ({
   return (
     <FixedHeightFlexContainer height={fixedHeight}>
       <PreferencesContext.Provider
+        // $FlowFixMe[incompatible-type]
         value={{
           ...initialPreferences,
           getTutorialProgress: () => tutorialProgress,
@@ -152,16 +155,14 @@ export default {
   decorators: [GDevelopJsInitializerDecorator, inAppTutorialDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Connected = () => (
+export const Connected = (): React.Node => (
   <WrappedHomePage
     project={testProject.project}
     user={fakeSilverAuthenticatedUser}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ConnectedWithInAppTutorialCompleted = () => (
+export const ConnectedWithInAppTutorialCompleted = (): React.Node => (
   <WrappedHomePage
     project={testProject.project}
     user={fakeSilverAuthenticatedUser}
@@ -177,8 +178,7 @@ export const ConnectedWithInAppTutorialCompleted = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const NetworkError = () => {
+export const NetworkError = (): React.Node => {
   const tutorialApiMock = React.useMemo(() => {
     const mock = new MockAdapter(tutorialClient, {
       delayResponse: 250,

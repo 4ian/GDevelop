@@ -380,8 +380,7 @@ export type Props = {|
   i18n: I18n,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const MainFrame = (props: Props) => {
+const MainFrame = (props: Props): React.MixedElement => {
   const [state, setState]: [
     State,
     ((State => State) | State) => Promise<State>,

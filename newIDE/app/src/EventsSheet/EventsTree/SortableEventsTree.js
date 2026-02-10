@@ -347,18 +347,19 @@ const TreeRow = ({
 
 // -- Main component --
 
-const SortableEventsTree = ({
-  treeData,
-  scaffoldBlockPxWidth,
-  onVisibilityToggle,
-  rowHeight,
-  searchMethod,
-  searchQuery,
-  searchFocusOffset,
-  className,
-  reactVirtualizedListProps,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const SortableEventsTree = (
+  {
+    treeData,
+    scaffoldBlockPxWidth,
+    onVisibilityToggle,
+    rowHeight,
+    searchMethod,
+    searchQuery,
+    searchFocusOffset,
+    className,
+    reactVirtualizedListProps
+  }: Props,
+): React.MixedElement => {
   // $FlowFixMe[value-as-type]
   const listRef = React.useRef<?VariableSizeList>(null);
   const outerRef = React.useRef<?HTMLDivElement>(null);

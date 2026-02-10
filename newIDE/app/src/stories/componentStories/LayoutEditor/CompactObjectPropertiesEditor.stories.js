@@ -19,8 +19,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Sprite2d = () => (
+export const Sprite2d = (): React.Node => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (
@@ -59,8 +58,7 @@ export const Sprite2d = () => (
   </DragAndDropContextProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Cube3d = () => (
+export const Cube3d = (): React.Node => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (
@@ -99,8 +97,7 @@ export const Cube3d = () => (
   </DragAndDropContextProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const TextInput = () => (
+export const TextInput = (): React.Node => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (
@@ -139,8 +136,7 @@ export const TextInput = () => (
   </DragAndDropContextProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const CustomObject = () => (
+export const CustomObject = (): React.Node => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (

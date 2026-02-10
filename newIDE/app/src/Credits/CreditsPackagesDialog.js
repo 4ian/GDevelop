@@ -83,13 +83,7 @@ type Props = {|
   showCalloutTip?: boolean,
 |};
 
-const CreditsPackagesDialog = ({
-  onClose,
-  suggestedPackage,
-  missingCredits,
-  showCalloutTip,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const CreditsPackagesDialog = ({onClose, suggestedPackage, missingCredits, showCalloutTip}: Props): React.Node => {
   const {
     error,
     fetchCreditsPackages,

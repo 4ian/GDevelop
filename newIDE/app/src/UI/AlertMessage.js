@@ -36,17 +36,18 @@ type Props = {|
  * Show an hint, warning or other message. If you want to allow the user
  * to permanently hide the hint/alert/message, see DismissableAlertMessage.
  */
-const AlertMessage = ({
-  kind,
-  children,
-  onHide,
-  hideButtonSize,
-  renderRightButton,
-  renderLeftIcon,
-  markdownImageOnly,
-  background = 'dark',
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const AlertMessage = (
+  {
+    kind,
+    children,
+    onHide,
+    hideButtonSize,
+    renderRightButton,
+    renderLeftIcon,
+    markdownImageOnly,
+    background = 'dark'
+  }: Props,
+): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const theme = useTheme();
   const paperStyle: {|

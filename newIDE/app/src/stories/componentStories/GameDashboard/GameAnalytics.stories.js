@@ -26,8 +26,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const ErrorLoadingAnalytics = () => {
+export const ErrorLoadingAnalytics = (): React.Node => {
   const mock = new MockAdapter(axios);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
@@ -45,8 +44,7 @@ export const ErrorLoadingAnalytics = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const MissingAnalytics = () => {
+export const MissingAnalytics = (): React.Node => {
   const mock = new MockAdapter(axios);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
@@ -64,8 +62,7 @@ export const MissingAnalytics = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithPartialAnalytics = () => {
+export const WithPartialAnalytics = (): React.Node => {
   const mock = new MockAdapter(axios);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
@@ -83,8 +80,7 @@ export const WithPartialAnalytics = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithAnalytics = () => {
+export const WithAnalytics = (): React.Node => {
   const mock = new MockAdapter(axios);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
@@ -102,8 +98,7 @@ export const WithAnalytics = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithAnalyticsWithMissingNewMetrics = () => {
+export const WithAnalyticsWithMissingNewMetrics = (): React.Node => {
   const mock = new MockAdapter(axios);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
@@ -121,8 +116,7 @@ export const WithAnalyticsWithMissingNewMetrics = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithAnalyticsOnlyFor19Days = () => {
+export const WithAnalyticsOnlyFor19Days = (): React.Node => {
   const mock = new MockAdapter(axios);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
@@ -140,8 +134,7 @@ export const WithAnalyticsOnlyFor19Days = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithAnalyticsWithHoles = () => {
+export const WithAnalyticsWithHoles = (): React.Node => {
   const mock = new MockAdapter(axios);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
@@ -159,8 +152,7 @@ export const WithAnalyticsWithHoles = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithAnalyticsOnlyFor1Day = () => {
+export const WithAnalyticsOnlyFor1Day = (): React.Node => {
   const mock = new MockAdapter(axios);
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
@@ -178,8 +170,7 @@ export const WithAnalyticsOnlyFor1Day = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithAnalyticsLongLoading = () => {
+export const WithAnalyticsLongLoading = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 2000 });
   mock
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)

@@ -12,8 +12,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Starting = () => (
+export const Starting = (): React.Node => (
   <GenericRetryableProcessWithProgressDialog
     progress={0}
     result={null}
@@ -23,8 +22,7 @@ export const Starting = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const InProgress = () => (
+export const InProgress = (): React.Node => (
   <GenericRetryableProcessWithProgressDialog
     progress={40}
     result={null}
@@ -34,8 +32,7 @@ export const InProgress = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithErrors = () => (
+export const WithErrors = (): React.Node => (
   <GenericRetryableProcessWithProgressDialog
     progress={100}
     result={{
@@ -56,8 +53,7 @@ export const WithErrors = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithGenericError = () => (
+export const WithGenericError = (): React.Node => (
   <GenericRetryableProcessWithProgressDialog
     progress={100}
     result={{

@@ -55,13 +55,14 @@ const textFieldWithButtonLayoutStyles = {
 /**
  * Position a button on the right of a TextField.
  */
-export const TextFieldWithButtonLayout = ({
-  margin,
-  noFloatingLabelText,
-  renderTextField,
-  renderButton,
-// $FlowFixMe[signature-verification-failure]
-}: TextFieldWithButtonLayoutProps) => {
+export const TextFieldWithButtonLayout = (
+  {
+    margin,
+    noFloatingLabelText,
+    renderTextField,
+    renderButton
+  }: TextFieldWithButtonLayoutProps,
+): React.Node => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   return (
     <ResponsiveLineStackLayout
@@ -103,18 +104,19 @@ type LineStackLayoutProps = {|
   neverShrink?: boolean,
 |};
 
-export const LineStackLayout = ({
-  id,
-  alignItems,
-  justifyContent,
-  expand,
-  noMargin,
-  children,
-  useLargeSpacer,
-  overflow,
-  neverShrink,
-// $FlowFixMe[signature-verification-failure]
-}: LineStackLayoutProps) => {
+export const LineStackLayout = (
+  {
+    id,
+    alignItems,
+    justifyContent,
+    expand,
+    noMargin,
+    children,
+    useLargeSpacer,
+    overflow,
+    neverShrink
+  }: LineStackLayoutProps,
+): React.Node => {
   let isFirstChild = true;
   return (
     <Line
@@ -160,20 +162,21 @@ type ResponsiveLineStackLayoutProps = {|
   children: React.Node,
 |};
 
-export const ResponsiveLineStackLayout = ({
-  id,
-  alignItems,
-  justifyContent,
-  expand,
-  noMargin,
-  noColumnMargin,
-  forceMobileLayout,
-  noOverflowParent,
-  noResponsiveLandscape,
-  useLargeSpacer,
-  children,
-// $FlowFixMe[signature-verification-failure]
-}: ResponsiveLineStackLayoutProps) => {
+export const ResponsiveLineStackLayout = (
+  {
+    id,
+    alignItems,
+    justifyContent,
+    expand,
+    noMargin,
+    noColumnMargin,
+    forceMobileLayout,
+    noOverflowParent,
+    noResponsiveLandscape,
+    useLargeSpacer,
+    children
+  }: ResponsiveLineStackLayoutProps,
+): React.Node => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const assumeMobileScreen = forceMobileLayout || isMobile;
   const shouldPreventSwitchingToColumn = noResponsiveLandscape && isLandscape;
@@ -216,18 +219,19 @@ type ColumnStackLayoutProps = {|
   useLargeSpacer?: boolean,
 |};
 
-export const ColumnStackLayout = ({
-  id,
-  alignItems,
-  justifyContent,
-  expand,
-  noMargin,
-  children,
-  noOverflowParent,
-  useFullHeight,
-  useLargeSpacer,
-// $FlowFixMe[signature-verification-failure]
-}: ColumnStackLayoutProps) => {
+export const ColumnStackLayout = (
+  {
+    id,
+    alignItems,
+    justifyContent,
+    expand,
+    noMargin,
+    children,
+    noOverflowParent,
+    useFullHeight,
+    useLargeSpacer
+  }: ColumnStackLayoutProps,
+): React.Node => {
   let isFirstChild = true;
   return (
     <Column

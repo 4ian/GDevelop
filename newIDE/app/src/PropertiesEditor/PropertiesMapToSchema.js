@@ -98,6 +98,7 @@ const createField = (
             setValue(instance, defaultValueNumber);
           }
         : undefined;
+    // $FlowFixMe[incompatible-type]
     return {
       name,
       valueType,

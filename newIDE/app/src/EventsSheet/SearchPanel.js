@@ -397,5 +397,5 @@ const SearchPanel = (
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<Props, SearchPanelInterface>(SearchPanel);
+// $FlowFixMe[prop-missing]
+export default (React.forwardRef<Props, SearchPanelInterface>(SearchPanel): React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<SearchPanelInterface> }, React.RefSetter<SearchPanelInterface>>);

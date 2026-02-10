@@ -41,13 +41,7 @@ type Props = {|
   hideShortDescription?: boolean,
 |};
 
-export const AssetCard = ({
-  id,
-  assetShortHeader,
-  size,
-  hideShortDescription,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const AssetCard = ({id, assetShortHeader, size, hideShortDescription}: Props): React.MixedElement => {
   const displayShortDescription =
     !hideShortDescription && !!assetShortHeader.shortDescription;
 

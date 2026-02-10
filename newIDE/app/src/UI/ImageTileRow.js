@@ -27,19 +27,20 @@ type ImageTileRowProps = {|
   margin?: 'dense',
 |};
 
-const ImageTileRow = ({
-  title,
-  description,
-  isLoading,
-  items,
-  onShowAll,
-  showAllIcon,
-  getLimitFromWindowSize,
-  getColumnsFromWindowSize,
-  seeAllLabel,
-  margin,
-// $FlowFixMe[signature-verification-failure]
-}: ImageTileRowProps) => {
+const ImageTileRow = (
+  {
+    title,
+    description,
+    isLoading,
+    items,
+    onShowAll,
+    showAllIcon,
+    getLimitFromWindowSize,
+    getColumnsFromWindowSize,
+    seeAllLabel,
+    margin
+  }: ImageTileRowProps,
+): React.Node => {
   return (
     <>
       <LineStackLayout

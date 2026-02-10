@@ -21,6 +21,7 @@ const fetchers: {
   [CloudStorageProvider.internalName]: moveUrlResourcesToCloudFilesIfPrivate,
   // The local file storage provider fetches the resources that are URLs
   // by downloading them locally.
+  // $FlowFixMe[incompatible-type]
   [LocalFileStorageProvider.internalName]: moveUrlResourcesToLocalFiles,
   // The URL storage consider relative resources to be relative to the project
   // URL. This allows to open local projects uploaded to GitHub for example.

@@ -9,9 +9,7 @@ export default class UnknownEvent extends React.Component<
   // $FlowFixMe[unsupported-syntax]
   *
 > {
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     return (
       <p
         className={classNames({

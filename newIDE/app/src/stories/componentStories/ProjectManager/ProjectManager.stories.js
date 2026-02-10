@@ -43,8 +43,7 @@ const mainMenuCallbacks = {
   setElectronUpdateStatus: () => action('setElectronUpdateStatus'),
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const NoProjectOpen = () => {
+export const NoProjectOpen = (): React.Node => {
   const shortcutMap = useShortcutMap();
   return (
     <I18n>
@@ -119,8 +118,7 @@ export const NoProjectOpen = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const ProjectOpen = () => {
+export const ProjectOpen = (): React.Node => {
   const shortcutMap = useShortcutMap();
   return (
     <I18n>

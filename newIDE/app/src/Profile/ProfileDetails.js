@@ -55,17 +55,13 @@ const CommunityLinksLines = ({
 );
 
 type Props = {|
+  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   onOpenChangeEmailDialog?: () => void,
   onOpenEditProfileDialog?: () => void,
 |};
 
-const ProfileDetails = ({
-  authenticatedUser,
-  onOpenChangeEmailDialog,
-  onOpenEditProfileDialog,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const ProfileDetails = ({authenticatedUser, onOpenChangeEmailDialog, onOpenEditProfileDialog}: Props): React.Node => {
   const {
     firebaseUser,
     achievements,

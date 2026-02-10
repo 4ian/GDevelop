@@ -76,8 +76,8 @@ type Props = {|
  * A select field based on Material-UI select field.
  * To be used with `SelectOption`.
  */
-// $FlowFixMe[signature-verification-failure]
-const SearchBarSelectField = React.forwardRef<
+// $FlowFixMe[prop-missing]
+const SearchBarSelectField: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<SearchBarSelectFieldInterface> }, React.RefSetter<SearchBarSelectFieldInterface>> = React.forwardRef<
   Props,
   SearchBarSelectFieldInterface
 >((props, ref) => {

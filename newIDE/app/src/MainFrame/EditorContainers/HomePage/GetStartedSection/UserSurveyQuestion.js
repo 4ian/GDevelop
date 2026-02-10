@@ -62,20 +62,21 @@ const useStylesForAnswer = (isSelected?: boolean) =>
     })
   )();
 
-export const TitleAndSubtitle = ({
-  i18n,
-  text,
-  multi,
-  answers,
-  textAlign,
-}: {
-  i18n: I18nType,
-  text: MessageDescriptor,
-  multi: ?boolean,
-  answers: AnswerData[],
-  textAlign: 'center' | 'left',
-// $FlowFixMe[signature-verification-failure]
-}) => (
+export const TitleAndSubtitle = (
+  {
+    i18n,
+    text,
+    multi,
+    answers,
+    textAlign
+  }: {
+    i18n: I18nType,
+    text: MessageDescriptor,
+    multi: ?boolean,
+    answers: Array<AnswerData>,
+    textAlign: 'center' | 'left',
+  },
+): React.Node => (
   <ColumnStackLayout noMargin>
     <Text size="block-title" align={textAlign} noMargin>
       {i18n._(text)}
@@ -356,8 +357,8 @@ type Props = {|
   onChangeUserInputValue?: string => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const UserSurveyQuestion = React.forwardRef<Props, HTMLDivElement>(
+// $FlowFixMe[prop-missing]
+const UserSurveyQuestion: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<HTMLDivElement> }, React.RefSetter<HTMLDivElement>> = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       questionData,

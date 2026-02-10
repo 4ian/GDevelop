@@ -80,6 +80,7 @@ const StandAloneDialogStory = ({
   errorMessage,
 }: {
   bundleCategory: string,
+  // $FlowFixMe[value-as-type]
   authenticatedUser?: AuthenticatedUser,
   receivedBundles?: Array<Bundle>,
   delayResponse?: number,
@@ -205,10 +206,8 @@ const StandAloneDialogStory = ({
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => <StandAloneDialogStory bundleCategory="starter" />;
+export const Default = (): React.Node => <StandAloneDialogStory bundleCategory="starter" />;
 
-// $FlowFixMe[signature-verification-failure]
-export const Loading = () => (
+export const Loading = (): React.Node => (
   <StandAloneDialogStory bundleCategory="starter" delayResponse={10000} />
 );

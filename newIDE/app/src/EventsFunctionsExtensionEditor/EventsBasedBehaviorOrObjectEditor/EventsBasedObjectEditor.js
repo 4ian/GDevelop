@@ -37,8 +37,7 @@ export default function EventsBasedObjectEditor({
   onOpenCustomObjectEditor,
   unsavedChanges,
   onEventsBasedObjectChildrenEdited,
-// $FlowFixMe[signature-verification-failure]
-}: Props) {
+}: Props): React.Node {
   const forceUpdate = useForceUpdate();
 
   const onChange = React.useCallback(

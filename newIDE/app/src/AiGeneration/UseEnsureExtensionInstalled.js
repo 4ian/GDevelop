@@ -16,14 +16,15 @@ export type EnsureExtensionInstalledOptions = {|
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
-export const useEnsureExtensionInstalled = ({
-  project,
-  i18n,
-}: {|
-  project: ?gdProject,
-  i18n: I18nType,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+export const useEnsureExtensionInstalled = (
+  {
+    project,
+    i18n
+  }: {|
+    project: ?gdProject,
+    i18n: I18nType,
+  |},
+): any => {
   const {
     translatedExtensionShortHeadersByName: extensionShortHeadersByName,
   } = React.useContext(ExtensionStoreContext);

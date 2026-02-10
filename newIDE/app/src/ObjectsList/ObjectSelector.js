@@ -111,10 +111,12 @@ const getObjectsAndGroupsDataSource = ({
       : [...objects, { type: 'separator' }, ...groups];
 
   return excludedObjectOrGroupNames
+    // $FlowFixMe[incompatible-type]
     ? fullList.filter(
         //$FlowFixMe[incompatible-type]
         ({ value }) => !excludedObjectOrGroupNames.includes(value)
       )
+    // $FlowFixMe[incompatible-type]
     : fullList;
 };
 
@@ -164,8 +166,8 @@ const getMissingBehaviors = ({
 
 export type ObjectSelectorInterface = {| focus: FieldFocusFunction |};
 
-// $FlowFixMe[signature-verification-failure]
-const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
+// $FlowFixMe[prop-missing]
+const ObjectSelector: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<ObjectSelectorInterface> }, React.RefSetter<ObjectSelectorInterface>> = React.forwardRef<Props, ObjectSelectorInterface>(
   (props, ref) => {
     const fieldRef = React.useRef<?SemiControlledAutoCompleteInterface>(null);
 

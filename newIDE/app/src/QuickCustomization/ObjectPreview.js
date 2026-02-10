@@ -50,8 +50,7 @@ const styles = {
   },
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const ObjectPreview = ({ project, object }: Props) => {
+export const ObjectPreview = ({project, object}: Props): React.MixedElement => {
   const size = 128;
   const { getAssetShortHeaderFromId } = React.useContext(AssetStoreContext);
   const assetStoreId = object.getAssetStoreId();

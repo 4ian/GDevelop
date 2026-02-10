@@ -50,12 +50,7 @@ const ResourceStoreChooser = ({
   );
 };
 
-export const UrlChooser = ({
-  options,
-  onChooseResources,
-  createNewResource,
-// $FlowFixMe[signature-verification-failure]
-}: ResourceStoreChooserProps) => {
+export const UrlChooser = ({options, onChooseResources, createNewResource}: ResourceStoreChooserProps): React.Node => {
   const [inputValue, setInputValue] = React.useState('');
   const [error, setError] = React.useState<?Error>(null);
   const [urlsErroredBooleanArray, setUrlsErroredBooleanArray] = React.useState<

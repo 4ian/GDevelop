@@ -43,8 +43,7 @@ type Props = {|
   size?: number,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const ImageThumbnail = (props: Props) => {
+const ImageThumbnail = (props: Props): React.MixedElement => {
   const { onContextMenu, resourcesLoader, resourceName, project } = props;
   const theme = React.useContext(GDevelopThemeContext);
   const [error, setError] = React.useState(false);

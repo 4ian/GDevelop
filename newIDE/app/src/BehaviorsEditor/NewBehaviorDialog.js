@@ -53,8 +53,7 @@ export default function NewBehaviorDialog({
   isChildObject,
   onWillInstallExtension,
   onExtensionInstalled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) {
+}: Props): null | React.Node {
   const [isInstalling, setIsInstalling] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {

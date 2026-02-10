@@ -139,18 +139,23 @@ const convertJsObjectToVariable = (value: any, variable: gdVariable) => {
   }
 };
 
-export const applyVariableChange = ({
-  variablePath,
-  forcedVariableType,
-  variablesContainer,
-  value,
-}: {|
-  variablePath: string,
-  forcedVariableType: string | null,
-  variablesContainer: gd.VariablesContainer,
-  value: string,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+export const applyVariableChange = (
+  {
+    variablePath,
+    forcedVariableType,
+    variablesContainer,
+    value
+  }: {|
+    variablePath: string,
+    forcedVariableType: string | null,
+    variablesContainer: gd.VariablesContainer,
+    value: string,
+  |},
+): {
+  addedNewVariable: boolean,
+  variable: null | gdVariable,
+  variableType: string,
+} => {
   const pathSegments = parseVariablePath(variablePath);
 
   if (pathSegments.length === 0) {

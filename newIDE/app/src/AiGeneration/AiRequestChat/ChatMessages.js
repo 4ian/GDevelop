@@ -223,8 +223,7 @@ type Props = {|
   |}) => Promise<void>,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const ChatMessages = React.memo<Props>(function ChatMessages({
+export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(function ChatMessages({
   aiRequest,
   onSendFeedback,
   editorFunctionCallResults,

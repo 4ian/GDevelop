@@ -250,31 +250,32 @@ type Props = {|
   isBehaviorListLocked: boolean,
 |};
 
-export const CompactObjectPropertiesEditor = ({
-  project,
-  resourceManagementProps,
-  layout,
-  eventsFunctionsExtension,
-  onUpdateBehaviorsSharedData,
-  objectsContainer,
-  globalObjectsContainer,
-  layersContainer,
-  projectScopedContainersAccessor,
-  unsavedChanges,
-  i18n,
-  historyHandler,
-  objects,
-  onEditObject,
-  onObjectsModified,
-  onEffectAdded,
-  onOpenEventBasedObjectVariantEditor,
-  onDeleteEventsBasedObjectVariant,
-  onWillInstallExtension,
-  onExtensionInstalled,
-  isVariableListLocked,
-  isBehaviorListLocked,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const CompactObjectPropertiesEditor = (
+  {
+    project,
+    resourceManagementProps,
+    layout,
+    eventsFunctionsExtension,
+    onUpdateBehaviorsSharedData,
+    objectsContainer,
+    globalObjectsContainer,
+    layersContainer,
+    projectScopedContainersAccessor,
+    unsavedChanges,
+    i18n,
+    historyHandler,
+    objects,
+    onEditObject,
+    onObjectsModified,
+    onEffectAdded,
+    onOpenEventBasedObjectVariantEditor,
+    onDeleteEventsBasedObjectVariant,
+    onWillInstallExtension,
+    onExtensionInstalled,
+    isVariableListLocked,
+    isBehaviorListLocked
+  }: Props,
+): React.Node => {
   const forceUpdate = useForceUpdate();
   const [isPropertiesFolded, setIsPropertiesFolded] = React.useState(false);
   const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(false);
@@ -584,6 +585,7 @@ export const CompactObjectPropertiesEditor = ({
                       onEditObject,
                     })
                   }
+                  // $FlowFixMe[incompatible-type]
                   onRefreshAllFields={forceRecomputeSchema}
                 />
                 {shouldDisplayVariant && (

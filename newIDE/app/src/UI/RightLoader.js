@@ -6,14 +6,15 @@ const styles = {
   progress: { marginLeft: 8, verticalAlign: 'middle' },
 };
 
-const RightLoader = ({
-  children,
-  isLoading,
-}: {
-  children: React.Node,
-  isLoading: ?boolean,
-// $FlowFixMe[signature-verification-failure]
-}) => (
+const RightLoader = (
+  {
+    children,
+    isLoading
+  }: {
+    children: React.Node,
+    isLoading: ?boolean,
+  },
+): React.MixedElement => (
   <span>
     {children}
     {/* $FlowFixMe[incompatible-type] */}

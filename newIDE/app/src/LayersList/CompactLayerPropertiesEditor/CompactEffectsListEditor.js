@@ -204,20 +204,21 @@ type Props = {|
   target: 'object' | 'layer',
 |};
 
-export const CompactEffectsListEditor = ({
-  project,
-  resourceManagementProps,
-  projectScopedContainersAccessor,
-  unsavedChanges,
-  i18n,
-  effectsContainer,
-  onEffectsUpdated,
-  onOpenFullEditor,
-  onEffectAdded,
-  layerRenderingType,
-  target,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const CompactEffectsListEditor = (
+  {
+    project,
+    resourceManagementProps,
+    projectScopedContainersAccessor,
+    unsavedChanges,
+    i18n,
+    effectsContainer,
+    onEffectsUpdated,
+    onOpenFullEditor,
+    onEffectAdded,
+    layerRenderingType,
+    target
+  }: Props,
+): React.Node => {
   const forceUpdate = useForceUpdate();
   const [isEffectsFolded, setEffectsFolded] = React.useState(false);
 

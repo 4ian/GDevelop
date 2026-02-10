@@ -9,12 +9,10 @@ const getOverflowAttributes = (element: Element) =>
   getStyleAttribute(element, 'overflow-y') +
   getStyleAttribute(element, 'overflow-x');
 
-// $FlowFixMe[recursive-definition]
 export const getElementAncestry = (
   element: Element,
   elementPath: Array<Element>
-// $FlowFixMe[signature-verification-failure]
-) => {
+): any | Array<Element> => {
   if (!element.parentElement) {
     return elementPath;
   }
@@ -49,15 +47,13 @@ export const getScrollParent = (element: Element): Element | null => {
   return document.scrollingElement || document.documentElement;
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const isContainedInReactRootNode = (element: HTMLElement) => {
+export const isContainedInReactRootNode = (element: HTMLElement): boolean => {
   const reactRootNode = document.querySelector('#root');
   if (!reactRootNode) return false;
   return reactRootNode.contains(element);
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const getDisplayZIndexForHighlighter = (element: HTMLElement) => {
+export const getDisplayZIndexForHighlighter = (element: HTMLElement): number | string => {
   // If the element is the tutorial avatar, it should be above everything else,
   // to avoid modals or drawers to be displayed above it.
   if (element.id === 'in-app-tutorial-avatar') return aboveMaterialUiMaxZIndex;

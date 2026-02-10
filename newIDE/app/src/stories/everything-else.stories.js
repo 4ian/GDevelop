@@ -1480,6 +1480,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
   .add('empty autocompletions (because exact expression)', () => (
     <ExpressionAutocompletionsDisplayer
       project={testProject.project}
+      // $FlowFixMe[incompatible-type]
       expressionAutocompletions={makeFakeExactExpressionAutocompletion()}
       remainingCount={0}
       // $FlowFixMe[incompatible-type]

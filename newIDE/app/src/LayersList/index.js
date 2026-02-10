@@ -103,7 +103,6 @@ export type TreeItemProps = {|
   forceUpdateList: () => void,
   unsavedChanges?: ?UnsavedChanges,
   preferences: Preferences,
-  // $FlowFixMe[value-as-type]
   gdevelopTheme: GDevelopTheme,
   project: gdProject,
   editName: (itemId: string) => void,
@@ -812,8 +811,8 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
   }
 );
 
-// $FlowFixMe[signature-verification-failure]
-const LayersListWithErrorBoundary = React.forwardRef<
+// $FlowFixMe[prop-missing]
+const LayersListWithErrorBoundary: React.AbstractComponent<{ ...Props, +ref?: React.RefSetter<LayersListInterface> }, React.RefSetter<LayersListInterface>> = React.forwardRef<
   Props,
   LayersListInterface
 >((props, ref) => (

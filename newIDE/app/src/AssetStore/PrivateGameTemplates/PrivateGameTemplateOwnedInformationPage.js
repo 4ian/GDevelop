@@ -28,12 +28,13 @@ type Props = {|
   onStoreProductOpened: () => void,
 |};
 
-const PrivateGameTemplateOwnedInformationPage = ({
-  privateGameTemplateListingData,
-  purchaseUsageType,
-  onStoreProductOpened,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const PrivateGameTemplateOwnedInformationPage = (
+  {
+    privateGameTemplateListingData,
+    purchaseUsageType,
+    onStoreProductOpened
+  }: Props,
+): React.Node => {
   const shouldUseOrSimulateAppStoreProduct = shouldUseAppStoreProduct();
   const { navigateToRoute } = React.useContext(RouterContext);
 

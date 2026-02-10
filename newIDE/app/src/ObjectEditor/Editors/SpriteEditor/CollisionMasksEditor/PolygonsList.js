@@ -216,8 +216,7 @@ type PolygonsListProps = {|
   spriteSize: [number, number],
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const PolygonsList = (props: PolygonsListProps) => {
+const PolygonsList = (props: PolygonsListProps): React.Node => {
   const {
     polygons,
     spriteSize,

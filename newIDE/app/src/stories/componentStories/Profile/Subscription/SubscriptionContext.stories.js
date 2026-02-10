@@ -40,8 +40,7 @@ const SubscriptionDialogTestOpener = ({ label }: {| label: string |}) => {
   return <Text>{label}</Text>;
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const NotAuthenticated = () => {
+export const NotAuthenticated = (): React.Node => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
@@ -54,8 +53,7 @@ export const NotAuthenticated = () => {
     </AlertProvider>
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const NoSubscriptionUser = () => {
+export const NoSubscriptionUser = (): React.Node => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider
@@ -70,8 +68,7 @@ export const NoSubscriptionUser = () => {
     </AlertProvider>
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const GoldSubscribedUser = () => {
+export const GoldSubscribedUser = (): React.Node => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={fakeGoldAuthenticatedUser}>
@@ -84,8 +81,7 @@ export const GoldSubscribedUser = () => {
     </AlertProvider>
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const GoldWithPurchaselySubscribedUser = () => {
+export const GoldWithPurchaselySubscribedUser = (): React.Node => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider
@@ -99,8 +95,7 @@ export const GoldWithPurchaselySubscribedUser = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const NotAuthenticatedOnMobile = () => {
+export const NotAuthenticatedOnMobile = (): React.Node => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
@@ -115,8 +110,7 @@ export const NotAuthenticatedOnMobile = () => {
     </AlertProvider>
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const NoSubscriptionUserOnMobile = () => {
+export const NoSubscriptionUserOnMobile = (): React.Node => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider
@@ -133,8 +127,7 @@ export const NoSubscriptionUserOnMobile = () => {
     </AlertProvider>
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const GoldSubscribedUserOnMobile = () => {
+export const GoldSubscribedUserOnMobile = (): React.Node => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={fakeGoldAuthenticatedUser}>
@@ -145,8 +138,7 @@ export const GoldSubscribedUserOnMobile = () => {
     </AlertProvider>
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const GoldWithPurchaselySubscribedUserOnMobile = () => {
+export const GoldWithPurchaselySubscribedUserOnMobile = (): React.Node => {
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider

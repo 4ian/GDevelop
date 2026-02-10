@@ -32,13 +32,14 @@ type Props = {|
   simulateAppStoreProduct?: boolean,
 |};
 
-const CreditsPackagePurchaseDialog = ({
-  creditsPackageListingData,
-  onClose,
-  onCloseWhenPurchaseSuccessful,
-  simulateAppStoreProduct,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const CreditsPackagePurchaseDialog = (
+  {
+    creditsPackageListingData,
+    onClose,
+    onCloseWhenPurchaseSuccessful,
+    simulateAppStoreProduct
+  }: Props,
+): React.Node => {
   const {
     profile,
     onOpenLoginDialog,
@@ -141,6 +142,7 @@ const CreditsPackagePurchaseDialog = ({
     () => {
       (async () => {
         if (limits && initialCreditsAmount === null) {
+          // $FlowFixMe[incompatible-type]
           setInitialCreditsAmount(limits.credits.userBalance.amount);
         }
       })();

@@ -14,8 +14,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const LayerWithInstances = () => {
+export const LayerWithInstances = (): React.Node => {
   const instance1 = new gd.InitialInstance();
   instance1.setObjectName('Object');
   instance1.setLayer('GUI');
@@ -56,8 +55,7 @@ export const LayerWithInstances = () => {
     />
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const LayerWithoutInstances = () => {
+export const LayerWithoutInstances = (): React.Node => {
   const project = new gd.Project();
   const layout = project.insertNewLayout('NewScene', 0);
   layout.insertNewLayer('GUI', 0);

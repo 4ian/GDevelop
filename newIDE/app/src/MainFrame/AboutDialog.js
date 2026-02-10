@@ -419,8 +419,7 @@ const AboutDialog = ({ onClose, updateStatus }: Props) => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-const AboutDialogWithErrorBoundary = (props: Props) => (
+const AboutDialogWithErrorBoundary = (props: Props): React.Node => (
   <ErrorBoundary
     componentTitle={<Trans>About dialog</Trans>}
     scope="about"

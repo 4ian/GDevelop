@@ -12,24 +12,26 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function VideoResourceField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?ResourceSelectorInterface>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(ref, () => ({
-      focus,
-    }));
-
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        focus,
+      }),
+    );
+    
     if (!props.resourceManagementProps || !props.project) {
       console.error(
-        'Missing project or resourceManagementProps for VideoResourceField'
+        'Missing project or resourceManagementProps for VideoResourceField',
       );
       return null;
     }
-
+    
     return (
       <ResourceSelector
         margin={props.isInline ? 'none' : 'dense'}
@@ -47,5 +49,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         ref={field}
       />
     );
-  }
-);
+  },
+// $FlowFixMe[prop-missing]
+): React.AbstractComponent<{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }, React.RefSetter<ParameterFieldInterface>>);

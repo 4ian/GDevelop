@@ -16,8 +16,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const IsReplacingLeaderboards = () => (
+export const IsReplacingLeaderboards = (): React.Node => (
   <LeaderboardReplacerProgressDialog
     progress={30}
     onAbandon={null}
@@ -28,8 +27,7 @@ export const IsReplacingLeaderboards = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithErrors = () => (
+export const WithErrors = (): React.Node => (
   <LeaderboardReplacerProgressDialog
     progress={100}
     onAbandon={action('onAbandon')}
@@ -40,8 +38,7 @@ export const WithErrors = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ReplacerPromptAuthenticatedUser = () => (
+export const ReplacerPromptAuthenticatedUser = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <ReplacePromptDialog
       leaderboardsToReplace={['leaderboard-to-replace']}
@@ -51,8 +48,7 @@ export const ReplacerPromptAuthenticatedUser = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ReplacerPromptNotAuthenticatedUser = () => (
+export const ReplacerPromptNotAuthenticatedUser = (): React.Node => (
   <AuthenticatedUserContext.Provider
     value={{ ...fakeSilverAuthenticatedUser, authenticated: false }}
   >

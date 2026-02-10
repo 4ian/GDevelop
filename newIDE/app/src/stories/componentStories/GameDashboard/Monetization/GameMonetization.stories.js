@@ -23,8 +23,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const AdsEnabled = () => {
+export const AdsEnabled = (): React.Node => {
   const game = gameWithDisplayAdsOnGamePageEnabled;
   const mock = new MockAdapter(axios, { delayResponse: 1000 });
   mock
@@ -43,8 +42,7 @@ export const AdsEnabled = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const AdsDisabled = () => {
+export const AdsDisabled = (): React.Node => {
   const game = gameWithDisplayAdsOnGamePageDisabled;
   const mock = new MockAdapter(axios, { delayResponse: 1000 });
   mock
@@ -63,8 +61,7 @@ export const AdsDisabled = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const ErrorWhenUpdatingGame = () => {
+export const ErrorWhenUpdatingGame = (): React.Node => {
   const game = gameWithDisplayAdsOnGamePageEnabled;
   const mock = new MockAdapter(axios, { delayResponse: 1000 });
   mock

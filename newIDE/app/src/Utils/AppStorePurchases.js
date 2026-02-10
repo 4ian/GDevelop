@@ -18,15 +18,13 @@ export type AppStoreProduct = {|
 /**
  * Check if the user has subscription bought on the app store.
  */
-// $FlowFixMe[signature-verification-failure]
-export const hasAppStoreUserSubscription = () => {
+export const hasAppStoreUserSubscription = (): boolean => {
   return false;
 };
 
 // Products:
 
-// $FlowFixMe[signature-verification-failure]
-export const shouldUseAppStoreProduct = () => false;
+export const shouldUseAppStoreProduct = (): boolean => false;
 
 export const getAppStoreProduct = (
   productId: string | null

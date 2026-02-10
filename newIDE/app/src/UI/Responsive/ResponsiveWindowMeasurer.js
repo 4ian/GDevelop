@@ -134,10 +134,7 @@ type TopLevelWindowSizeProviderProps = {|
  * "Reset" the dimensions to use the size of the window itself.
  * Typically: for dialogs.
  */
-export const TopLevelWindowSizeProvider = ({
-  children,
-// $FlowFixMe[signature-verification-failure]
-}: TopLevelWindowSizeProviderProps) => {
+export const TopLevelWindowSizeProvider = ({children}: TopLevelWindowSizeProviderProps): React.MixedElement => {
   return (
     <WindowSizeContext.Provider value={null}>
       {children}
@@ -156,12 +153,7 @@ type SpecificDimensionsWindowSizeProviderProps = {|
  * Useful when the component knows the dimensions in which its children are displayed.
  * Typically: a tab in an editor.
  */
-export const SpecificDimensionsWindowSizeProvider = ({
-  children,
-  innerWidth,
-  innerHeight,
-// $FlowFixMe[signature-verification-failure]
-}: SpecificDimensionsWindowSizeProviderProps) => {
+export const SpecificDimensionsWindowSizeProvider = ({children, innerWidth, innerHeight}: SpecificDimensionsWindowSizeProviderProps): React.MixedElement => {
   const windowSize = React.useMemo(
     () => {
       if (innerWidth === null || innerHeight === null) {
@@ -194,10 +186,7 @@ type ResponsiveWindowMeasurerProps = {|
 /**
  * Wraps useResponsiveWindowSize in a component.
  */
-export const ResponsiveWindowMeasurer = ({
-  children,
-// $FlowFixMe[signature-verification-failure]
-}: ResponsiveWindowMeasurerProps) => children(useResponsiveWindowSize());
+export const ResponsiveWindowMeasurer = ({children}: ResponsiveWindowMeasurerProps): React.Node => children(useResponsiveWindowSize());
 
 /**
  * Return the size of the window.

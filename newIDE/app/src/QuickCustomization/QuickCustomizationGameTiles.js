@@ -43,12 +43,13 @@ type Props = {|
   disabled?: boolean,
 |};
 
-export const QuickCustomizationGameTiles = ({
-  onSelectExampleShortHeader,
-  quickCustomizationRecommendation,
-  disabled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const QuickCustomizationGameTiles = (
+  {
+    onSelectExampleShortHeader,
+    quickCustomizationRecommendation,
+    disabled
+  }: Props,
+): React.Node => {
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
   const { windowSize, isLandscape } = useResponsiveWindowSize();
   const columnsCount = getColumnsCount(windowSize, isLandscape);

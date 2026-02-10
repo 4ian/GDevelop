@@ -38,8 +38,7 @@ export default function EventsBasedBehaviorEditor({
   eventsBasedBehavior,
   unsavedChanges,
   onConfigurationUpdated,
-// $FlowFixMe[signature-verification-failure]
-}: Props) {
+}: Props): React.Node {
   const forceUpdate = useForceUpdate();
 
   const onChange = React.useCallback(

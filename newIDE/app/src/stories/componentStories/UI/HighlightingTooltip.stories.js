@@ -17,8 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithThumbnailSetByHref = () => {
+export const WithThumbnailSetByHref = (): React.Node => {
   const [anchorEl, setAnchorEl] = React.useState<?HTMLDivElement>(null);
   return (
     <FixedHeightFlexContainer height={300}>
@@ -64,8 +63,7 @@ export const WithThumbnailSetByHref = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithThumbnailSetInContent = () => {
+export const WithThumbnailSetInContent = (): React.Node => {
   const [anchorEl, setAnchorEl] = React.useState<?HTMLDivElement>(null);
   return (
     <FixedHeightFlexContainer height={300}>

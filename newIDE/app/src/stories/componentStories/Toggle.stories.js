@@ -54,8 +54,7 @@ const Disabled = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const AllOptions = () => (
+export const AllOptions = (): React.Node => (
   <ColumnStackLayout>
     <WithLeftLabel />
     <WithRightLabel />

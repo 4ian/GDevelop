@@ -32,13 +32,7 @@ type Props = {|
 const getExtensionName = (extensionShortHeader: ExtensionShortHeader) =>
   extensionShortHeader.name;
 
-export const ExtensionStore = ({
-  isInstalling,
-  project,
-  onInstall,
-  showOnlyWithBehaviors,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const ExtensionStore = ({isInstalling, project, onInstall, showOnlyWithBehaviors}: Props): React.Node => {
   const preferences = React.useContext(PreferencesContext);
   const [
     selectedExtensionShortHeader,
@@ -136,6 +130,7 @@ export const ExtensionStore = ({
             filteredSearchResults.map(({ item }) => item)
           }
           getSearchItemUniqueId={getExtensionName}
+          // $FlowFixMe[missing-local-annot]
           renderSearchItem={(extensionShortHeader, onHeightComputed) => (
             <ExtensionListItem
               id={`extension-list-item-${extensionShortHeader.name}`}

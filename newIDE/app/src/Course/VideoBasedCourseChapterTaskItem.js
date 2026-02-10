@@ -25,13 +25,7 @@ type Props = {|
   onComplete: boolean => void,
 |};
 
-const VideoBasedCourseChapterTaskItem = ({
-  courseChapterTask,
-  isOpen,
-  isComplete,
-  onComplete,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const VideoBasedCourseChapterTaskItem = ({courseChapterTask, isOpen, isComplete, onComplete}: Props): React.Node => {
   const [isOpenIndividually, setIsOpenIndividually] = React.useState<boolean>(
     isOpen
   );

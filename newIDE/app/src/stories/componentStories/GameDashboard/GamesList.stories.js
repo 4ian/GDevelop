@@ -27,11 +27,11 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const NoGamesOrProjects = () => {
+export const NoGamesOrProjects = (): React.Node => {
   // $FlowFixMe[missing-empty-array-annot]
   const projectFiles = [];
 
+  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
     // $FlowFixMe[incompatible-type]
@@ -79,8 +79,7 @@ export const NoGamesOrProjects = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithOnlyGames = () => {
+export const WithOnlyGames = (): React.Node => {
   const projectFiles = [
     {
       ...fakeFileMetadataAndStorageProviderNameForLocalProject,
@@ -91,6 +90,7 @@ export const WithOnlyGames = () => {
     },
   ];
 
+  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
     // $FlowFixMe[incompatible-type]
@@ -138,13 +138,13 @@ export const WithOnlyGames = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithOnlyProjects = () => {
+export const WithOnlyProjects = (): React.Node => {
   const projectFiles = [
     fakeFileMetadataAndStorageProviderNameForCloudProject,
     fakeFileMetadataAndStorageProviderNameForLocalProject,
   ];
 
+  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
     // $FlowFixMe[incompatible-type]
@@ -190,8 +190,7 @@ export const WithOnlyProjects = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithGamesAndProjects = () => {
+export const WithGamesAndProjects = (): React.Node => {
   const projectFiles = [
     fakeFileMetadataAndStorageProviderNameForCloudProject,
     fakeFileMetadataAndStorageProviderNameForLocalProject,
@@ -204,6 +203,7 @@ export const WithGamesAndProjects = () => {
     },
   ];
 
+  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
     // $FlowFixMe[incompatible-type]

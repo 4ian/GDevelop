@@ -143,6 +143,15 @@ done
 
 echo "  Normalizing codemod syntax to Babel-compatible Flow..."
 python3 "$SCRIPT_DIR/fix-codemod-syntax.py"
+
+# Fix arrow-function inline object return types that prettier 1.15 can't parse.
+# The codemod may add return type annotations like:
+#   const foo = (): { prop: Type } => { ... }
+# Prettier 1.15 can't parse the `: { ... } =>` pattern.
+# Fix: extract the inline type into a named type alias, preserving typing.
+echo "  Fixing arrow-function return types for prettier compatibility..."
+python3 "$SCRIPT_DIR/fix-arrow-return-types.py"
+
 echo "  Done."
 
 ###############################################################################
@@ -226,12 +235,14 @@ if os.path.isfile(theme_file):
         print("  Theme/index.js already correct")
 PYEOF
 
-# Fix known annotate-exports gaps (remaining signature-verification failures).
+# Fix known annotate-exports gaps and formatting-displacement issues.
 python3 << 'PYEOF'
 import os
 import re
 
 app_dir = os.environ.get('APP_DIR', os.getcwd())
+
+# Regex-based replacements for signature-verification gaps
 replacements = [
     (
         os.path.join(app_dir, 'src/EventsSheet/index.js'),
@@ -257,7 +268,31 @@ for filepath, pattern, replacement in replacements:
             f.write(updated)
         fixed += 1
 
-print(f"  Fixed {fixed} known annotate-exports signature gaps")
+# Fix PrivateGameTemplateStoreContext: add type annotation to empty object
+# that prettier splits across lines (causing FlowFixMe displacement).
+pgts_file = os.path.join(app_dir,
+    'src/AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext.js')
+if os.path.isfile(pgts_file):
+    with open(pgts_file) as f:
+        content = f.read()
+    # Add type annotation to the untyped empty object
+    updated = content.replace(
+        'const privateGameTemplateListingDatasById = {};',
+        'const privateGameTemplateListingDatasById: {[string]: any} = {};')
+    # Remove any stacked FlowFixMe[prop-missing] that accumulated from previous runs
+    updated = re.sub(
+        r'(\s*// \$FlowFixMe\[prop-missing\]\n)+(\s*privateGameTemplateListingDatasById\[)',
+        r'\2', updated)
+    # Also remove FlowFixMe[invalid-computed-prop] for the typed object (no longer needed)
+    updated = re.sub(
+        r'\s*// \$FlowFixMe\[invalid-computed-prop\]\n(\s*if \(privateGameTemplateListingDatasById\[)',
+        r'\n\1', updated)
+    if updated != content:
+        with open(pgts_file, 'w') as f:
+            f.write(updated)
+        fixed += 1
+
+print(f"  Fixed {fixed} known annotate-exports signature gaps and type issues")
 PYEOF
 
 echo "  Done."
@@ -320,182 +355,65 @@ for i in $(seq 1 15); do
 done
 
 ###############################################################################
-# STEP 8: Run prettier formatting (post-FlowFixMe)
+# STEP 8: Post-FlowFixMe format + fix cycle
 ###############################################################################
 echo ""
-echo "--- Step 8: Running prettier formatting (post-FlowFixMe) ---"
+echo "--- Step 8: Post-FlowFixMe format and fix cycle ---"
 
-# Format again after FlowFixMe comments were added, to ensure consistent style.
-npm run format 2>&1 || true
-echo "  Done."
+# After adding FlowFixMe comments, formatting may introduce new errors
+# (e.g., FlowFixMe comments getting displaced from error lines).
+# Run format + flow check + FlowFixMe in a cycle until stable.
+for j in $(seq 1 3); do
+  echo "  Format-fix cycle iteration $j..."
 
-###############################################################################
-# STEP 9: Remove orphaned FlowFixMe and re-add displaced ones
-###############################################################################
-echo ""
-echo "--- Step 9: Cleaning up displaced FlowFixMe comments ---"
+  npm run format 2>&1 || true
 
-# After formatting, some FlowFixMe comments may have been displaced
-# (no longer directly above the error line). This step:
-# 1. Runs flow to find current errors
-# 2. Removes FlowFixMe comments that are not directly above an error
-# 3. Re-adds them at the correct positions
-python3 << 'PYEOF'
-import subprocess
-import json
-import os
-import re
-from collections import defaultdict
+  npx flow stop 2>/dev/null || true
+  set +e
+  CYCLE_CHECK=$(npx flow 2>&1)
+  set -e
 
-app_dir = os.environ.get('APP_DIR', os.getcwd())
+  if echo "$CYCLE_CHECK" | grep -q "No errors"; then
+    echo "  No errors after formatting - cycle complete!"
+    break
+  fi
 
-def get_flow_errors():
-    result = subprocess.run(
-        ['npx', 'flow', '--json', '--show-all-errors'],
-        capture_output=True, text=True, cwd=app_dir, timeout=300
-    )
-    output = result.stdout
-    idx = output.find('{"flowVersion"')
-    if idx == -1:
-        return []
-    try:
-        data = json.loads(output[idx:])
-        return data.get('errors', [])
-    except json.JSONDecodeError:
-        return []
+  CYCLE_ERRORS=$(echo "$CYCLE_CHECK" | grep "Found" | grep -o '[0-9]*' | head -1)
+  echo "  $CYCLE_ERRORS errors after formatting, adding FlowFixMe..."
 
-def get_src_error_lines(errors):
-    """Get error locations grouped by file."""
-    file_errors = defaultdict(lambda: defaultdict(set))
-    for error in errors:
-        messages = error.get('message', [])
-        error_codes = error.get('error_codes', [])
-        if not messages:
-            continue
-        primary = messages[0]
-        loc = primary.get('loc', {})
-        source = loc.get('source', '')
-        line = loc.get('start', {}).get('line', 0)
-        if not source or not line:
-            continue
-        if app_dir + '/src/' not in source:
-            continue
-        code = error_codes[0] if error_codes else 'incompatible-type'
-        if code == 'signature-verification-failure':
-            code = 'incompatible-type'
-        file_errors[source][line].add(code)
-    return file_errors
-
-# Run flow and get current errors
-print("  Getting current flow errors...")
-subprocess.run(['npx', 'flow', 'stop'], capture_output=True, cwd=app_dir)
-errors = get_flow_errors()
-file_errors = get_src_error_lines(errors)
-src_errors = sum(len(lines) for lines in file_errors.values())
-print(f"  Found {src_errors} error locations in src/ files")
-
-if src_errors == 0:
-    print("  No errors to fix - skipping cleanup.")
-else:
-    # For each file with errors, check if FlowFixMe comments are correctly placed
-    removed = 0
-    added = 0
-    for filepath, line_errors in sorted(file_errors.items()):
-        if not os.path.isfile(filepath):
-            continue
-        with open(filepath) as f:
-            lines = f.readlines()
-
-        # Build a set of error lines (1-indexed)
-        error_line_set = set(line_errors.keys())
-
-        # Phase 1: Remove FlowFixMe comments that are NOT directly above an error line
-        # A FlowFixMe on line N is "correct" if line N+1 has an error, or if line N+1
-        # also has a FlowFixMe that is itself correct (chain of FlowFixMe).
-        lines_to_remove = set()
-        for i, line in enumerate(lines):
-            line_num = i + 1  # 1-indexed
-            if '$FlowFixMe[' not in line:
-                continue
-            # Check if the NEXT non-FlowFixMe line has an error
-            j = i + 1
-            while j < len(lines) and '$FlowFixMe[' in lines[j]:
-                j += 1
-            next_code_line = j + 1  # 1-indexed
-            if next_code_line not in error_line_set:
-                # This FlowFixMe is not directly protecting an error line
-                # But don't remove it if a CLOSER error line exists nearby
-                # (within 1 line of the FlowFixMe itself)
-                if (line_num + 1) not in error_line_set:
-                    lines_to_remove.add(i)
-
-        if lines_to_remove:
-            new_lines = [l for i, l in enumerate(lines) if i not in lines_to_remove]
-            removed += len(lines_to_remove)
-            with open(filepath, 'w') as f:
-                f.writelines(new_lines)
-
-    print(f"  Removed {removed} orphaned FlowFixMe comments")
-
-    # Phase 2: Re-add FlowFixMe at correct positions using existing add-flow-fixme.py
-    subprocess.run(['npx', 'flow', 'stop'], capture_output=True, cwd=app_dir)
-
-    for iteration in range(3):
-        result = subprocess.run(
-            ['python3', os.path.join(app_dir, 'scripts', 'add-flow-fixme.py')],
-            capture_output=True, text=True, cwd=app_dir
-        )
-        print(f"  Re-add pass {iteration + 1}: {result.stdout.strip()}")
-
-        # Convert JSX FlowFixMe
-        subprocess.run(
-            ['python3', os.path.join(app_dir, 'scripts', 'convert-jsx-flowfixme.py')],
-            capture_output=True, text=True, cwd=app_dir
-        )
-
-        subprocess.run(['npx', 'flow', 'stop'], capture_output=True, cwd=app_dir)
-
-        # Check if errors remain
-        check = subprocess.run(
-            ['npx', 'flow'], capture_output=True, text=True, cwd=app_dir, timeout=300
-        )
-        if 'No errors' in check.stdout:
-            print("  No more errors after cleanup!")
-            break
-PYEOF
+  python3 "$SCRIPT_DIR/add-flow-fixme.py" 2>&1 || true
+  python3 "$SCRIPT_DIR/convert-jsx-flowfixme.py" 2>&1 || true
+done
 
 echo "  Done."
 
 ###############################################################################
-# STEP 10: Final format pass
+# STEP 9: Final format verification
 ###############################################################################
 echo ""
-echo "--- Step 10: Final prettier formatting ---"
+echo "--- Step 9: Final format verification ---"
 
 npm run format 2>&1 || true
 
-# After final format, do one last quick check and fix if needed
 npx flow stop 2>/dev/null || true
 set +e
 FINAL_CHECK=$(npx flow 2>&1)
-FINAL_EXIT=$?
 set -e
 
-if ! echo "$FINAL_CHECK" | grep -q "No errors"; then
-  echo "  Post-format errors detected, running final FlowFixMe pass..."
-  python3 "$SCRIPT_DIR/add-flow-fixme.py" 2>&1 || true
-  python3 "$SCRIPT_DIR/convert-jsx-flowfixme.py" 2>&1 || true
-  # Format one more time to normalize
-  npm run format 2>&1 || true
+if echo "$FINAL_CHECK" | grep -q "No errors"; then
+  echo "  All clean!"
+else
+  echo "  WARNING: Still have errors after all cycles:"
+  echo "$FINAL_CHECK" | grep "Found" || true
 fi
 
 echo "  Done."
 
 ###############################################################################
-# STEP 11: Fix eslint-disable-next-line ordering with $FlowFixMe
+# STEP 10: Fix eslint-disable-next-line ordering with $FlowFixMe
 ###############################################################################
 echo ""
-echo "--- Step 11: Fixing eslint/FlowFixMe comment ordering ---"
+echo "--- Step 10: Fixing eslint/FlowFixMe comment ordering ---"
 
 # When $FlowFixMe is inserted between eslint-disable-next-line and the code,
 # eslint-disable no longer applies (it targets the FlowFixMe comment instead).

@@ -82,6 +82,7 @@ type Props = {|
 const ResourcesList: React.AbstractComponent<
   Props,
   ResourcesListInterface
+  // $FlowFixMe[incompatible-type]
 > = React.memo<Props, ResourcesListInterface>(
   // $FlowFixMe[incompatible-type]
   // $FlowFixMe[incompatible-exact]

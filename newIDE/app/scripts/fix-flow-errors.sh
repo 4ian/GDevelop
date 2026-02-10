@@ -115,27 +115,44 @@ find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
 echo "  Done."
 
 ###############################################################################
-# STEP 4: Run flow codemod annotate-exports
+# STEP 4+5: Run flow codemod annotate-exports + fix syntax
 ###############################################################################
 echo ""
-echo "--- Step 4: Running flow codemod annotate-exports ---"
+echo "--- Step 4+5: Running flow codemod + syntax fixes ---"
 
 npx flow stop 2>/dev/null || true
 
-# Run the codemod to annotate exports (adds type annotations to module exports)
-npx flow codemod annotate-exports --write "$APP_DIR/src/" 2>&1 | grep -E "Files changed|annotations added|sig\. ver|skipped" || true
+# Check if the codemod has already been run by looking at error count
+SIG_ERRORS=$(npx flow --json 2>&1 | python3 -c "
+import sys, json
+data = sys.stdin.read()
+idx = data.find('{\"flowVersion\"')
+if idx < 0: print('9999'); sys.exit(0)
+j = json.loads(data[idx:])
+sig = sum(1 for e in j.get('errors', []) if 'signature-verification-failure' in e.get('error_codes', []))
+print(sig)
+" 2>/dev/null || echo "9999")
 
-npx flow stop 2>/dev/null || true
+echo "  Signature-verification-failure errors: $SIG_ERRORS"
 
-echo "  Done."
+if [ "$SIG_ERRORS" -gt "50" ]; then
+  echo "  Running flow codemod annotate-exports..."
+  npx flow stop 2>/dev/null || true
 
-###############################################################################
-# STEP 5: Fix codemod syntax (as Type, component(), renders)
-###############################################################################
-echo ""
-echo "--- Step 5: Fixing codemod syntax for Babel compatibility ---"
+  # Round 1: Main codemod run
+  npx flow codemod annotate-exports --write "$APP_DIR/src/" 2>&1 | grep -E "Files changed|annotations added|sig\. ver|skipped" || true
+  npx flow stop 2>/dev/null || true
+  python3 "$SCRIPT_DIR/fix-codemod-syntax.py"
 
-python3 "$SCRIPT_DIR/fix-codemod-syntax.py"
+  # Round 2: Catch additional annotations
+  echo "  Round 2 (catch-up)..."
+  npx flow codemod annotate-exports --write "$APP_DIR/src/" 2>&1 | grep -E "Files changed|annotations added|sig\. ver|skipped" || true
+  npx flow stop 2>/dev/null || true
+  python3 "$SCRIPT_DIR/fix-codemod-syntax.py"
+else
+  echo "  Codemod already applied (few signature-verification errors). Running syntax fix only..."
+  python3 "$SCRIPT_DIR/fix-codemod-syntax.py"
+fi
 
 echo "  Done."
 

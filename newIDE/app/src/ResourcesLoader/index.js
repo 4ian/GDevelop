@@ -7,8 +7,6 @@ const path = optionalRequire('path');
 class UrlsCache {
   projectCache: { [number]: { [string]: string } } = {};
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
   _getProjectCache(project: gdProject): any {
     const cache = this.projectCache[project.ptr];
     if (!cache) {

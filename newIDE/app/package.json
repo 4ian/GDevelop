@@ -27,7 +27,9 @@
     "flow-bin": "0.131.0",
     "flow-coverage-report": "^0.4.0",
     "folder-hash": "^3.0.0",
+    "husky": "^9.1.7",
     "iso-639-1": "^3.1.2",
+    "lint-staged": "^16.2.7",
     "minimist": "1.2.5",
     "patch-package": "^6.4.7",
     "prettier": "1.15.3",
@@ -137,7 +139,8 @@
     "reload-extensions": "node scripts/import-GDJS-Runtime.js --skip-clean",
     "build-theme-resources": "node scripts/build-theme-resources.js",
     "create-new-theme": "node scripts/create-new-theme.js",
-    "import-zipped-external-editors": "cd scripts && node import-zipped-editor.js piskel 5.5.228 b161dc74582e428a6d210cd1b74f052ca4aab301d0d522e0be87bdb4962d0fb7 && node import-zipped-editor.js jfxr 5.0.0-beta55 8ac12b557c2ddba958c6f0d3e0c5df8cf3369a65262dcb90cf5c8a7a7d20bdf6 && node import-zipped-editor.js yarn 5.0.134 ba8558cad00ec9b18cf3c6fd8647f8c1478ca67c894bca94a152a3740af209cc"
+    "import-zipped-external-editors": "cd scripts && node import-zipped-editor.js piskel 5.5.228 b161dc74582e428a6d210cd1b74f052ca4aab301d0d522e0be87bdb4962d0fb7 && node import-zipped-editor.js jfxr 5.0.0-beta55 8ac12b557c2ddba958c6f0d3e0c5df8cf3369a65262dcb90cf5c8a7a7d20bdf6 && node import-zipped-editor.js yarn 5.0.134 ba8558cad00ec9b18cf3c6fd8647f8c1478ca67c894bca94a152a3740af209cc",
+    "prepare": "cd ../.. && node newIDE/app/node_modules/husky/bin.js"
   },
   "eslintConfig": {
     "extends": "react-app",
@@ -193,6 +196,9 @@
       "html",
       "json"
     ]
+  },
+  "lint-staged": {
+    "src/!(locales)/**/*.js": "prettier --write"
   },
   "browserslist": [
     ">0.2%",

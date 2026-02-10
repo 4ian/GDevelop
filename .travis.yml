@@ -4,6 +4,7 @@
 # See also Semaphore CI for quick tests (not building GDevelop.js, so
 # faster but not always reliable).
 
+dist: noble # Ubuntu 24.04 LTS
 language: cpp
 sudo: false
 compiler:
@@ -22,10 +23,8 @@ addons:
       # Build dependencies:
       - cmake
       - p7zip-full
-      # Install newer libstdc++ for clang 18 compatibility (requires CXXABI_1.3.11+)
-      - g++-9
-
-before_install:
+      # Install libstdc++ dev for clang linking
+      - libstdc++-14-dev
 
 install:
   # Ensure we use a recent version of Node.js (and npm).

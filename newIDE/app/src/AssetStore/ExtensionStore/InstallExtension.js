@@ -423,7 +423,8 @@ export const installRequiredExtensions = async ({
   await addSerializedExtensionsToProject(
     eventsFunctionsExtensionsState,
     project,
-    installedExtensions
+    installedExtensions,
+    downloadedSerializedExtensions.map(extensions => extensions.name)
   );
   onExtensionInstalled(installedExtensionNames);
 
@@ -447,13 +448,11 @@ export const addSerializedExtensionsToProject = async (
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   project: gdProject,
   serializedExtensions: Array<SerializedExtension>,
-  fromExtensionStore: boolean = true
+  fromStoreExtensionNames: Array<string>
 ): Promise<void> => {
-  const extensionNames = serializedExtensions.map(serializedExtension => {
+  serializedExtensions.forEach(serializedExtension => {
     const { name } = serializedExtension;
     if (!name) throw new Error('Malformed extension (missing name).');
-
-    return name;
   });
 
   // Unserialize the extensions in the project. Let the project do it
@@ -465,21 +464,19 @@ export const addSerializedExtensionsToProject = async (
   serializedExtensionsElement.delete();
 
   // Keep track of extensions added from the extension store.
-  if (fromExtensionStore) {
-    extensionNames.forEach(extensionName => {
-      if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
-        return;
-      }
+  fromStoreExtensionNames.forEach(extensionName => {
+    if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
+      return;
+    }
 
-      const eventsFunctionsExtension = project.getEventsFunctionsExtension(
-        extensionName
-      );
-      eventsFunctionsExtension.setOrigin(
-        'gdevelop-extension-store',
-        extensionName
-      );
-    });
-  }
+    const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+      extensionName
+    );
+    eventsFunctionsExtension.setOrigin(
+      'gdevelop-extension-store',
+      extensionName
+    );
+  });
 
   return eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
     project

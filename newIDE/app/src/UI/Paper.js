@@ -18,19 +18,17 @@ type Props = {|
 |};
 
 export const getBackgroundColor = (
-  // $FlowFixMe[value-as-type]
   gdevelopTheme: GDevelopTheme,
   backgroundColor: 'light' | 'medium' | 'dark'
-// $FlowFixMe[signature-verification-failure]
-) =>
+): any =>
   backgroundColor === 'dark'
     ? gdevelopTheme.paper.backgroundColor.dark
     : backgroundColor === 'medium'
     ? gdevelopTheme.paper.backgroundColor.medium
     : gdevelopTheme.paper.backgroundColor.light;
 
-// $FlowFixMe[signature-verification-failure]
-const Paper = React.forwardRef<Props, HTMLDivElement>(
+// $FlowFixMe[prop-missing]
+const Paper: React.AbstractComponent<Props, HTMLDivElement> = React.forwardRef<Props, HTMLDivElement>(
   ({ id, children, background, elevation, variant, style, square }, ref) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const backgroundColor = getBackgroundColor(gdevelopTheme, background);

@@ -99,17 +99,18 @@ const emptyBuildMessage = {
   'all-build': <Trans>You don't have any builds for this game.</Trans>,
 };
 
-const BuildsList = ({
-  builds,
-  authenticatedUser,
-  error,
-  loadBuilds,
-  game,
-  onGameUpdated,
-  onBuildUpdated,
-  onBuildDeleted,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const BuildsList = (
+  {
+    builds,
+    authenticatedUser,
+    error,
+    loadBuilds,
+    game,
+    onGameUpdated,
+    onBuildUpdated,
+    onBuildDeleted
+  }: Props,
+): React.Node => {
   const [gameUpdating, setGameUpdating] = React.useState(false);
   const [buildFilter, setBuildFilter] = React.useState<BuildFilter>(
     'all-build'

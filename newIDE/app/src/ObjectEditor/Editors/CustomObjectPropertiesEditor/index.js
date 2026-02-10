@@ -71,8 +71,7 @@ const styles = {
   icon: { width: 16, height: 16 },
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const ChildrenOverridingDepreciationAlert = () => {
+export const ChildrenOverridingDepreciationAlert = (): React.Node => {
   return (
     <AlertMessage kind="warning">
       <MarkdownText
@@ -205,8 +204,7 @@ export const deleteVariant = (
 
 type Props = EditorProps;
 
-// $FlowFixMe[signature-verification-failure]
-const CustomObjectPropertiesEditor = (props: Props) => {
+const CustomObjectPropertiesEditor = (props: Props): React.Node => {
   const forceUpdate = useForceUpdate();
 
   const {
@@ -441,7 +439,11 @@ const CustomObjectPropertiesEditor = (props: Props) => {
         defaultValueProperties: customObjectEventsBasedObject
           ? customObjectEventsBasedObject.getPropertyDescriptors()
           : null,
-        getProperties: instance => instance.getProperties(),
+        getPropertyValue: (instance, name) =>
+          instance
+            .getProperties()
+            .get(name)
+            .getValue(),
         onUpdateProperty: (instance, name, value) => {
           instance.updateProperty(name, value);
         },

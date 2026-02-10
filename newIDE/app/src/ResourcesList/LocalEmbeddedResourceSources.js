@@ -40,8 +40,7 @@ type ParseEmbeddedFiles = (
 export async function copyAllEmbeddedResourcesToProjectFolder(
   project: gdProject,
   filesWithEmbeddedResources: Map<string, EmbeddedResources>
-// $FlowFixMe[signature-verification-failure]
-) {
+): Promise<void> | Promise<Array<Awaited<any>>> {
   if (!fs || !path) {
     return;
   }

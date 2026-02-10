@@ -83,8 +83,7 @@ const styles = {
   },
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const getIndentWidth = (windowSize: WindowSizeType) =>
+export const getIndentWidth = (windowSize: WindowSizeType): number =>
   windowSize === 'small' ? smallIndentWidth : defaultIndentWidth;
 const getEventContainerStyle = (windowSize: WindowSizeType) =>
   windowSize === 'small'
@@ -387,8 +386,8 @@ const getNodeKey = ({ treeIndex }) => treeIndex;
  * Display a tree of event. Builtin on react-sortable-tree so that event
  * can be drag'n'dropped and events rows are virtualized.
  */
-// $FlowFixMe[signature-verification-failure]
-const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
+// $FlowFixMe[prop-missing]
+const EventsTree: React.AbstractComponent<EventsTreeProps, EventsTreeInterface> = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
   (props, ref) => {
     const forceUpdate = useForceUpdate();
 

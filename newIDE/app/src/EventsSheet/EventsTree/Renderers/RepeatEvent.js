@@ -100,9 +100,7 @@ export default class RepeatEvent extends React.Component<
     });
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const repeatEvent = gd.asRepeatEvent(this.props.event);
     const expression = repeatEvent.getRepeatExpression();
     const expressionPlainString = expression.getPlainString();

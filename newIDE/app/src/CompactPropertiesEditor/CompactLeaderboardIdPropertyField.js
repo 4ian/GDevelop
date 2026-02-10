@@ -23,18 +23,19 @@ const styles = {
   },
 };
 
-const CompactLeaderboardIdPropertyField = ({
-  project,
-  value,
-  onChange,
-  id,
-}: {|
-  project: gdProject,
-  value: string,
-  onChange: (newValue: string) => void,
-  id?: string,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+const CompactLeaderboardIdPropertyField = (
+  {
+    project,
+    value,
+    onChange,
+    id
+  }: {|
+    project: gdProject,
+    value: string,
+    onChange: (newValue: string) => void,
+    id?: string,
+  |},
+): React.Node => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
 
   const isOnline = useOnlineStatus();

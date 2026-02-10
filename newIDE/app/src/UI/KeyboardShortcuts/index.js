@@ -90,51 +90,35 @@ export default class KeyboardShortcuts {
     this._shortcutCallbacks[key] = callback;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  shouldCloneInstances() {
+  shouldCloneInstances(): any {
     return this._isControlOrCmdPressed();
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  shouldMultiSelect() {
+  shouldMultiSelect(): any {
     return this._shiftPressed;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  shouldFollowAxis() {
+  shouldFollowAxis(): any {
     return this._shiftPressed;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  shouldStartRectangleSelectionInsteadOfSelecting() {
+  shouldStartRectangleSelectionInsteadOfSelecting(): any {
     return this._shiftPressed;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  shouldNotSnapToGrid() {
+  shouldNotSnapToGrid(): any {
     return this._altPressed;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  shouldResizeProportionally() {
+  shouldResizeProportionally(): any {
     return this._shiftPressed;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  shouldScrollHorizontally() {
+  shouldScrollHorizontally(): any {
     return this._altPressed;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  shouldMoveView() {
+  shouldMoveView(): any {
     return this._spacePressed || this._mouseMidButtonPressed;
   }
 
@@ -164,9 +148,7 @@ export default class KeyboardShortcuts {
     }
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  shouldZoom(evt: WheelEvent) {
+  shouldZoom(evt: WheelEvent): any {
     // Browsers trigger a wheel event with ctrlKey or metaKey to true when the user
     // does a pinch gesture on a trackpad. If this is the case, we zoom.
     // see https://dev.to/danburzo/pinch-me-i-m-zooming-gestures-in-the-dom-a0e
@@ -182,9 +164,7 @@ export default class KeyboardShortcuts {
     }
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  shouldIgnoreDoubleClick() {
+  shouldIgnoreDoubleClick(): any {
     return (
       this._metaPressed ||
       this._altPressed ||
@@ -202,9 +182,7 @@ export default class KeyboardShortcuts {
     this._setSpacePressed(false);
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _updateModifiersFromEvent = (evt: KeyboardEvent | DragEvent) => {
+  _updateModifiersFromEvent = (evt: KeyboardEvent | DragEvent): any => {
     const hasModifierChanged =
       this._metaPressed !== evt.metaKey ||
       this._altPressed !== evt.altKey ||
@@ -231,9 +209,7 @@ export default class KeyboardShortcuts {
     }
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _isControlOrCmdPressed = () => {
+  _isControlOrCmdPressed = (): any => {
     // On macOS, meta key (Apple/Command key) acts as Control key on Windows/Linux.
     return this._metaPressed || this._ctrlPressed;
   };

@@ -79,9 +79,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     currentTab: 'config',
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _getValidatedObjectOrGroupName = (newName: string) => {
+  _getValidatedObjectOrGroupName = (newName: string): any => {
     const { projectScopedContainersAccessor } = this.props;
     const objectsContainersList = projectScopedContainersAccessor
       .get()
@@ -135,16 +133,12 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     done(true);
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _chooseTab = (currentTab: TabNames) =>
+  _chooseTab = (currentTab: TabNames): any =>
     this.setState({
       currentTab,
     });
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const {
       project,
       projectScopedContainersAccessor,

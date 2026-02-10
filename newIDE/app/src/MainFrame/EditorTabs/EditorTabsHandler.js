@@ -220,11 +220,12 @@ export const isStartPageTabPresent = (state: EditorTabsState): boolean => {
   return hasEditorTabOpenedWithKey(state, 'start page');
 };
 
+type CloseTabsExceptIfReturn = { panes: { [paneIdentifier: string]: { currentTab: number, editors: Array<EditorTab> }, } };
+
 export const closeTabsExceptIf = (
   state: EditorTabsState,
   keepPredicate: (editorTab: EditorTab) => boolean
-// $FlowFixMe[signature-verification-failure]
-) => {
+): CloseTabsExceptIfReturn => {
   let newState = { ...state };
   for (const paneIdentifier in state.panes) {
     const pane = state.panes[paneIdentifier];
@@ -295,11 +296,12 @@ export const getCurrentTabForPane = (
   return pane.editors[pane.currentTab] || null;
 };
 
+type CloseProjectTabsReturn = { panes: { [paneIdentifier: string]: { currentTab: number, editors: Array<EditorTab> }, } };
+
 export const closeProjectTabs = (
   state: EditorTabsState,
   project: ?gdProject
-// $FlowFixMe[signature-verification-failure]
-) => {
+): CloseProjectTabsReturn => {
   return closeTabsExceptIf(state, editorTab => {
     const editorProject =
       editorTab.editorRef && editorTab.editorRef.getProject();
@@ -352,8 +354,9 @@ export const notifyPreviewOrExportWillStart = (state: EditorTabsState) => {
   }
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const closeLayoutTabs = (state: EditorTabsState, layout: gdLayout) => {
+type CloseLayoutTabsReturn = { panes: { [paneIdentifier: string]: { currentTab: number, editors: Array<EditorTab> }, } };
+
+export const closeLayoutTabs = (state: EditorTabsState, layout: gdLayout): CloseLayoutTabsReturn => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
 
@@ -371,11 +374,12 @@ export const closeLayoutTabs = (state: EditorTabsState, layout: gdLayout) => {
   });
 };
 
+type CloseExternalLayoutTabsReturn = { panes: { [paneIdentifier: string]: { currentTab: number, editors: Array<EditorTab> }, } };
+
 export const closeExternalLayoutTabs = (
   state: EditorTabsState,
   externalLayout: gdExternalLayout
-// $FlowFixMe[signature-verification-failure]
-) => {
+): CloseExternalLayoutTabsReturn => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
 
@@ -390,11 +394,12 @@ export const closeExternalLayoutTabs = (
   });
 };
 
+type CloseExternalEventsTabsReturn = { panes: { [paneIdentifier: string]: { currentTab: number, editors: Array<EditorTab> }, } };
+
 export const closeExternalEventsTabs = (
   state: EditorTabsState,
   externalEvents: gdExternalEvents
-// $FlowFixMe[signature-verification-failure]
-) => {
+): CloseExternalEventsTabsReturn => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
     if (editor instanceof ExternalEventsEditorContainer) {
@@ -408,11 +413,12 @@ export const closeExternalEventsTabs = (
   });
 };
 
+type CloseEventsFunctionsExtensionTabsReturn = { panes: { [paneIdentifier: string]: { currentTab: number, editors: Array<EditorTab> }, } };
+
 export const closeEventsFunctionsExtensionTabs = (
   state: EditorTabsState,
   eventsFunctionsExtensionName: string
-// $FlowFixMe[signature-verification-failure]
-) => {
+): CloseEventsFunctionsExtensionTabsReturn => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
     if (
@@ -429,12 +435,13 @@ export const closeEventsFunctionsExtensionTabs = (
   });
 };
 
+type CloseCustomObjectTabReturn = { panes: { [paneIdentifier: string]: { currentTab: number, editors: Array<EditorTab> }, } };
+
 export const closeCustomObjectTab = (
   state: EditorTabsState,
   eventsFunctionsExtensionName: string,
   eventsBasedObjectName: string
-// $FlowFixMe[signature-verification-failure]
-) => {
+): CloseCustomObjectTabReturn => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
     if (editor instanceof CustomObjectEditorContainer) {
@@ -450,13 +457,14 @@ export const closeCustomObjectTab = (
   });
 };
 
+type CloseEventsBasedObjectVariantTabReturn = { panes: { [paneIdentifier: string]: { currentTab: number, editors: Array<EditorTab> }, } };
+
 export const closeEventsBasedObjectVariantTab = (
   state: EditorTabsState,
   eventsFunctionsExtensionName: string,
   eventsBasedObjectName: string,
   eventsBasedObjectVariantName: string
-// $FlowFixMe[signature-verification-failure]
-) => {
+): CloseEventsBasedObjectVariantTabReturn => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
     if (editor instanceof CustomObjectEditorContainer) {

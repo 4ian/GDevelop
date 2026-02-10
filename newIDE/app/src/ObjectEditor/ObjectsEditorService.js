@@ -19,8 +19,7 @@ const gd: libGDevelop = global.gd;
  * A service returning editor components for each object type.
  */
 const ObjectsEditorService = {
-  // $FlowFixMe[signature-verification-failure]
-  getEditorConfiguration(project: gdProject, objectType: string) {
+  getEditorConfiguration(project: gdProject, objectType: string): any {
     // $FlowFixMe[object-this-reference]
     if (this.editorConfigurations[objectType]) {
       // $FlowFixMe[object-this-reference]

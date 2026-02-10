@@ -42,8 +42,7 @@ const initialResource3DPreviewState = {
   getResourcePreview: async (_resourceUrl: string) => null,
 };
 
-// $FlowFixMe[signature-verification-failure]
-const Resource3DPreviewContext = React.createContext<Resource3DPreviewState>(
+const Resource3DPreviewContext: React.Context<Resource3DPreviewState> = React.createContext<Resource3DPreviewState>(
   // $FlowFixMe[incompatible-type]
   initialResource3DPreviewState
 );
@@ -164,8 +163,7 @@ type Props = {|
   children: React.Node,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const Resource3DPreviewProvider = ({ children }: Props) => {
+export const Resource3DPreviewProvider = ({children}: Props): React.MixedElement => {
   const [currentResource, setCurrentResource] = React.useState<?string>(null);
   const queueRef = React.useRef<
     Array<{ url: string, resolve: (dataUrl: ?string) => void }>

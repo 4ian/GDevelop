@@ -52,24 +52,27 @@ type Props = {|
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
-const useNewProjectDialog = ({
-  project,
-  fileMetadata,
-  resourceManagementProps,
-  isProjectOpening,
-  newProjectSetupDialogOpen,
-  setNewProjectSetupDialogOpen,
-  createEmptyProject,
-  createProjectFromExample,
-  createProjectFromPrivateGameTemplate,
-  closeAskAi,
-  storageProviders,
-  storageProvider,
-  onOpenLayout,
-  onWillInstallExtension,
-  onExtensionInstalled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+type UseNewProjectDialogReturn = { closeNewProjectDialog: () => void, fetchAndOpenNewProjectSetupDialogForExample: ( exampleSlug: string ) => Promise<void>, onSelectExampleShortHeader: ( { exampleShortHeader: ?ExampleShortHeader, preventBackHome?: boolean } ) => void, onSelectPrivateGameTemplateListingData: ( { preventBackHome?: boolean, privateGameTemplateListingData: ?PrivateGameTemplateListingData, } ) => void, openNewProjectDialog: () => void, renderNewProjectDialog: () => React.Node, selectedExampleShortHeader: ?ExampleShortHeader, selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData };
+
+const useNewProjectDialog = (
+  {
+    project,
+    fileMetadata,
+    resourceManagementProps,
+    isProjectOpening,
+    newProjectSetupDialogOpen,
+    setNewProjectSetupDialogOpen,
+    createEmptyProject,
+    createProjectFromExample,
+    createProjectFromPrivateGameTemplate,
+    closeAskAi,
+    storageProviders,
+    storageProvider,
+    onOpenLayout,
+    onWillInstallExtension,
+    onExtensionInstalled
+  }: Props,
+): UseNewProjectDialogReturn => {
   const [isFetchingExample, setIsFetchingExample] = React.useState(false);
   const [
     selectedPrivateGameTemplateListingData,

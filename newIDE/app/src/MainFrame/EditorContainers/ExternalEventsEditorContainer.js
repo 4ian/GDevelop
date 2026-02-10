@@ -58,9 +58,7 @@ export class ExternalEventsEditorContainer extends React.Component<
     externalPropertiesDialogOpen: false,
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     // We stop updates when the component is inactive.
     // If it's active, was active or becoming active again we let update propagate.
     // Especially important to note that when becoming inactive, a "last" update is allowed.
@@ -201,9 +199,7 @@ export class ExternalEventsEditorContainer extends React.Component<
     );
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const { project, projectItemName } = this.props;
     const externalEvents = this.getExternalEvents();
     const layout = this.getLayout();
@@ -296,7 +292,4 @@ export class ExternalEventsEditorContainer extends React.Component<
   }
 }
 
-export const renderExternalEventsEditorContainer = (
-  props: RenderEditorContainerPropsWithRef
-// $FlowFixMe[signature-verification-failure]
-) => <ExternalEventsEditorContainer {...props} />;
+export const renderExternalEventsEditorContainer = (props: RenderEditorContainerPropsWithRef): React.Node => <ExternalEventsEditorContainer {...props} />;

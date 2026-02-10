@@ -297,8 +297,8 @@ type Props = {|
   ) => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
+// $FlowFixMe[prop-missing]
+const EditorTabsPane: React.AbstractComponent<Props, {||}> = React.forwardRef<Props, {||}>((props, ref) => {
   const {
     editorTabs,
     currentProject,

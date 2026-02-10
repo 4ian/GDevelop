@@ -24,12 +24,9 @@ type Props = {|
   fetchGameFeaturings: () => Promise<void>,
 |};
 
-const usePurchaseMarketingPlan = ({
-  game,
-  activeGameFeaturings,
-  fetchGameFeaturings,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+type UsePurchaseMarketingPlanReturn = { onPurchaseMarketingPlan: ( i18n: I18nType, marketingPlan: MarketingPlan ) => Promise<void> };
+
+const usePurchaseMarketingPlan = ({game, activeGameFeaturings, fetchGameFeaturings}: Props): UsePurchaseMarketingPlanReturn => {
   const { profile, getAuthorizationHeader, limits } = React.useContext(
     AuthenticatedUserContext
   );

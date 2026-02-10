@@ -11,8 +11,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WrongEditorInfo = () => {
+export const WrongEditorInfo = (): React.Node => {
   return (
     <>
       <div id="step-text">Test text</div>
@@ -28,8 +27,7 @@ export const WrongEditorInfo = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WrongEditorInfoWithSceneName = () => {
+export const WrongEditorInfoWithSceneName = (): React.Node => {
   return (
     <>
       <div id="step-text">Test text</div>
@@ -45,8 +43,7 @@ export const WrongEditorInfoWithSceneName = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const StandaloneTooltip = () => {
+export const StandaloneTooltip = (): React.Node => {
   return (
     <>
       <div id="step-text">Test text</div>

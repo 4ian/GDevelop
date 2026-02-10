@@ -148,10 +148,15 @@ const commitProjectVersion = async ({
   return newVersion;
 };
 
-export const generateOnSaveProject = (
-  authenticatedUser: AuthenticatedUser
-// $FlowFixMe[signature-verification-failure]
-) => async (
+export const generateOnSaveProject = (authenticatedUser: AuthenticatedUser): ((
+  project: gdProject,
+  fileMetadata: FileMetadata,
+  options?: SaveProjectOptions,
+  actions: {
+    showAlert: ShowAlertFunction,
+    showConfirmation: ShowConfirmFunction,
+  }
+) => Promise<{ fileMetadata: FileMetadata, wasSaved: boolean }>) => async (
   project: gdProject,
   fileMetadata: FileMetadata,
   options?: SaveProjectOptions,
@@ -231,10 +236,11 @@ export const generateOnSaveProject = (
   };
 };
 
-export const generateOnChangeProjectProperty = (
-  authenticatedUser: AuthenticatedUser
-// $FlowFixMe[signature-verification-failure]
-) => async (
+export const generateOnChangeProjectProperty = (authenticatedUser: AuthenticatedUser): ((
+  project: gdProject,
+  fileMetadata: FileMetadata,
+  properties: { gameId?: string, name?: string }
+) => Promise<null | { lastModifiedDate: number, version: string }>) => async (
   project: gdProject,
   fileMetadata: FileMetadata,
   properties: {| name?: string, gameId?: string |}
@@ -287,16 +293,23 @@ export const getWriteErrorMessage = (
   return t`An error occurred when saving the project, please verify your internet connection or try again later.`;
 };
 
-export const generateOnChooseSaveProjectAsLocation = ({
-  authenticatedUser,
-  setDialog,
-  closeDialog,
-}: {|
-  authenticatedUser: AuthenticatedUser,
-  setDialog: (() => React.Node) => void,
-  closeDialog: () => void,
-// $FlowFixMe[signature-verification-failure]
-|}) => async ({
+export const generateOnChooseSaveProjectAsLocation = (
+  {
+    authenticatedUser,
+    setDialog,
+    closeDialog
+  }: {|
+    authenticatedUser: AuthenticatedUser,
+    setDialog: (() => React.Node) => void,
+    closeDialog: () => void,
+  |},
+): ((
+  {
+    displayOptionToGenerateNewProjectUuid: boolean,
+    fileMetadata: ?FileMetadata,
+    project: gdProject,
+  }
+) => Promise<{ saveAsLocation: ?SaveAsLocation, saveAsOptions: ?SaveAsOptions }>) => async ({
   project,
   fileMetadata,
   displayOptionToGenerateNewProjectUuid,
@@ -352,8 +365,16 @@ export const generateOnSaveProjectAs = (
   authenticatedUser: AuthenticatedUser,
   setDialog: (() => React.Node) => void,
   closeDialog: () => void
-// $FlowFixMe[signature-verification-failure]
-) => async (
+): ((
+  project: gdProject,
+  saveAsLocation: ?SaveAsLocation,
+  options: {
+    onMoveResources: ({ newFileMetadata: FileMetadata }) => Promise<void>,
+    onStartSaving: () => void,
+  }
+) => 
+  | Promise<{ fileMetadata: null, wasSaved: boolean }>
+  | Promise<{ fileMetadata: FileMetadata, wasSaved: boolean }>) => async (
   project: gdProject,
   saveAsLocation: ?SaveAsLocation,
   options: {|
@@ -440,18 +461,19 @@ export const getProjectLocation = ({
   };
 };
 
-export const renderNewProjectSaveAsLocationChooser = ({
-  projectName,
-  saveAsLocation,
-  setSaveAsLocation,
-  newProjectsDefaultFolder,
-}: {|
-  projectName: string,
-  saveAsLocation: ?SaveAsLocation,
-  setSaveAsLocation: (?SaveAsLocation) => void,
-  newProjectsDefaultFolder?: string,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+export const renderNewProjectSaveAsLocationChooser = (
+  {
+    projectName,
+    saveAsLocation,
+    setSaveAsLocation,
+    newProjectsDefaultFolder
+  }: {|
+    projectName: string,
+    saveAsLocation: ?SaveAsLocation,
+    setSaveAsLocation: (?SaveAsLocation) => void,
+    newProjectsDefaultFolder?: string,
+  |},
+): null => {
   if (!saveAsLocation || saveAsLocation.name !== projectName) {
     setSaveAsLocation(
       getProjectLocation({
@@ -464,10 +486,7 @@ export const renderNewProjectSaveAsLocationChooser = ({
   return null;
 };
 
-export const generateOnAutoSaveProject = (
-  authenticatedUser: AuthenticatedUser
-// $FlowFixMe[signature-verification-failure]
-) =>
+export const generateOnAutoSaveProject = (authenticatedUser: AuthenticatedUser): ((project: gdProject, fileMetadata: FileMetadata) => Promise<void>) | void =>
   ProjectCache.isAvailable()
     ? async (project: gdProject, fileMetadata: FileMetadata): Promise<void> => {
         const { profile } = authenticatedUser;

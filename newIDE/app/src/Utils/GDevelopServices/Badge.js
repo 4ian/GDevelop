@@ -18,8 +18,7 @@ export const TRIVIAL_FIRST_WEB_EXPORT = 'trivial_first-web-export';
 export const TRIVIAL_FIRST_EXTENSION = 'trivial_first-extension';
 export const TRIVIAL_FIRST_EFFECT = 'trivial_first-effect';
 export const TRIVIAL_FIRST_DEBUG = 'trivial_first-debug';
-// $FlowFixMe[signature-verification-failure]
-export const getTutorialCompletedAchievementId = (tutorialId: string) =>
+export const getTutorialCompletedAchievementId = (tutorialId: string): string =>
   'trivial_in-app-tutorial-completed_' + tutorialId;
 
 export type Badge = {|
@@ -190,8 +189,7 @@ export const markBadgesAsSeen = async (
 export const compareAchievements = (
   a: AchievementWithBadgeData,
   b: AchievementWithBadgeData
-// $FlowFixMe[signature-verification-failure]
-) => {
+): any | number => {
   if (b.unlockedAt && a.unlockedAt) {
     // $FlowFixMe[unsafe-arithmetic]
     return b.unlockedAt - a.unlockedAt;

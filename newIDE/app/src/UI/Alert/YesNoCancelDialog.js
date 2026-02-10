@@ -21,8 +21,7 @@ type Props = {|
   cancelButtonLabel?: MessageDescriptor,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-function YesNoCancelDialog(props: Props) {
+function YesNoCancelDialog(props: Props): React.Node {
   return (
     <I18n>
       {({ i18n }) => (

@@ -304,8 +304,8 @@ type Props = {|
  * Can be used to create a mosaic of resizable editors.
  * Must be used inside a component wrapped in a DragDropContext.
  */
-// $FlowFixMe[signature-verification-failure]
-const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
+// $FlowFixMe[prop-missing]
+const EditorMosaic: React.AbstractComponent<Props, EditorMosaicInterface> = React.forwardRef<Props, EditorMosaicInterface>(
   (
     {
       initialNodes,

@@ -71,18 +71,20 @@ type ProjectFileListItemProps = {|
   ) => void,
 |};
 
-export const ProjectFileListItem = ({
-  file,
-  currentFileMetadata,
-  lastModifiedInfo, // If null, the project has been modified last by the current user.
-  storageProviders,
-  onOpenProject,
-  isWindowSizeMediumOrLarger,
-  disabled,
-  isLoading,
-  onOpenContextMenu,
-// $FlowFixMe[signature-verification-failure]
-}: ProjectFileListItemProps) => {
+export const ProjectFileListItem = (
+  {
+    file,
+    currentFileMetadata,
+    lastModifiedInfo // If null, the project has been modified last by the current user.
+    ,
+    storageProviders,
+    onOpenProject,
+    isWindowSizeMediumOrLarger,
+    disabled,
+    isLoading,
+    onOpenContextMenu
+  }: ProjectFileListItemProps,
+): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const storageProvider = getStorageProviderByInternalName(

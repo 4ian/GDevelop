@@ -9,17 +9,17 @@ export type Hint = {|
   identifier?: AlertMessageIdentifier,
 |};
 
-export const getDeprecatedBehaviorsInformation = (): {
-  [string]: {| warning: MessageDescriptor |},
-} => ({
+type GetDeprecatedBehaviorsInformationReturn = { [string]: {| warning: MessageDescriptor |} };
+
+export const getDeprecatedBehaviorsInformation = (): GetDeprecatedBehaviorsInformationReturn => ({
   'PhysicsBehavior::PhysicsBehavior': {
     warning: t`A new physics engine (Physics Engine 2.0) is now available. You should prefer using it for new game. For existing games, note that the two behaviors are not compatible, so you should only use one of them with your objects.`,
   },
 });
 
-export const getExtraObjectsInformation = (): {
-  [string]: Array<Hint>,
-} => ({
+type GetExtraObjectsInformationReturn = { [string]: Array<Hint> };
+
+export const getExtraObjectsInformation = (): GetExtraObjectsInformationReturn => ({
   'Video::VideoObject': [
     {
       kind: 'warning',

@@ -22,18 +22,20 @@ const styles = {
   },
 };
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function YesNoField(props: ParameterFieldProps, ref) {
     const button = React.useRef<?TwoStatesButtonInterface>(null);
     const focus: FieldFocusFunction = options => {
       if (button.current) button.current.focusLeftButton();
     };
-    React.useImperativeHandle(ref, () => ({
-      focus,
-    }));
-
-    const { parameterMetadata, value } = props;
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        focus,
+      }),
+    );
+    
+    const {parameterMetadata, value} = props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : null;
@@ -41,7 +43,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? parameterMetadata.getLongDescription()
       : null;
     const effectiveValue = getParameterValueOrDefault(value, parameterMetadata);
-
+    
     return (
       <Column noMargin>
         <Line alignItems="center" justifyContent="space-between">
@@ -64,21 +66,18 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             ref={button}
           />
         </Line>
-        {longDescription ? (
-          <FormHelperText variant="filled" margin="dense">
+        {longDescription
+          ? <FormHelperText variant="filled" margin="dense">
             <MarkdownText source={longDescription} />
           </FormHelperText>
-        ) : null}
+          : null}
       </Column>
     );
-  }
-);
+  },
+// $FlowFixMe[prop-missing]
+): React.AbstractComponent<ParameterFieldProps, ParameterFieldInterface>);
 
-export const renderInlineYesNo = ({
-  value,
-  parameterMetadata,
-// $FlowFixMe[signature-verification-failure]
-}: ParameterInlineRendererProps) => {
+export const renderInlineYesNo = ({value, parameterMetadata}: ParameterInlineRendererProps): React.Node => {
   if (getParameterValueOrDefault(value, parameterMetadata) === 'yes') {
     return <Trans>yes</Trans>;
   } else {

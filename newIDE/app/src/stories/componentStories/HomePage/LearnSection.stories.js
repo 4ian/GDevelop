@@ -33,11 +33,11 @@ export default {
   ],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <AuthenticatedUserContext.Provider
     value={fakeAuthenticatedUserWithNoSubscription}
   >
+    {/* $FlowFixMe[incompatible-type] */}
     <PreferencesContext.Provider value={initialPreferences}>
       <TutorialContext.Provider
         value={{
@@ -85,9 +85,9 @@ export const Default = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const NotAuthenticated = () => (
+export const NotAuthenticated = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
+    {/* $FlowFixMe[incompatible-type] */}
     <PreferencesContext.Provider value={initialPreferences}>
       <TutorialContext.Provider
         value={{
@@ -135,11 +135,11 @@ export const NotAuthenticated = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const EducationSubscriber = () => (
+export const EducationSubscriber = (): React.Node => (
   <AuthenticatedUserContext.Provider
     value={fakeAuthenticatedUserWithEducationPlan}
   >
+    {/* $FlowFixMe[incompatible-type] */}
     <PreferencesContext.Provider value={initialPreferences}>
       <TutorialContext.Provider
         value={{
@@ -187,11 +187,11 @@ export const EducationSubscriber = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const EducationTeacher = () => (
+export const EducationTeacher = (): React.Node => (
   <AuthenticatedUserContext.Provider
     value={fakeAuthenticatedTeacherFromEducationPlan}
   >
+    {/* $FlowFixMe[incompatible-type] */}
     <PreferencesContext.Provider value={initialPreferences}>
       <TutorialContext.Provider
         value={{
@@ -239,8 +239,8 @@ export const EducationTeacher = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const LoadingTutorials = () => (
+export const LoadingTutorials = (): React.Node => (
+  // $FlowFixMe[incompatible-type]
   <PreferencesContext.Provider value={initialPreferences}>
     <TutorialContext.Provider
       value={{
@@ -284,8 +284,8 @@ export const LoadingTutorials = () => (
   </PreferencesContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const LoadingCourses = () => (
+export const LoadingCourses = (): React.Node => (
+  // $FlowFixMe[incompatible-type]
   <PreferencesContext.Provider value={initialPreferences}>
     <TutorialContext.Provider
       value={{

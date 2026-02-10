@@ -18,8 +18,7 @@ type Props = {|
   codeSizeLevel: string,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const ExampleSizeChip = ({ codeSizeLevel }: Props) => {
+export const ExampleSizeChip = ({codeSizeLevel}: Props): React.Node => {
   return (
     <Chip
       icon={<SizeIcon />}

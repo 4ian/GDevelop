@@ -242,8 +242,7 @@ export default function ExpressionAutocompletionsDisplayer({
   onChoose,
   onScroll,
   parameterRenderingService,
-// $FlowFixMe[signature-verification-failure]
-}: Props) {
+}: Props): null | React.Node {
   const scrollView = React.useRef((null: ?ScrollViewInterface));
   const selectedAutocompletionElement = React.useRef(
     (null: ?React.Component<any, any>)

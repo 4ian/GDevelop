@@ -27,14 +27,7 @@ type ChoicesEditorProps = {|
   isNumber: boolean,
 |};
 
-const ChoicesEditor = ({
-  choices,
-  setChoices,
-  disabled,
-  hideLabels,
-  isNumber,
-// $FlowFixMe[signature-verification-failure]
-}: ChoicesEditorProps) => {
+const ChoicesEditor = ({choices, setChoices, disabled, hideLabels, isNumber}: ChoicesEditorProps): React.Node => {
   const updateChoices = () => setChoices(choices);
 
   return (

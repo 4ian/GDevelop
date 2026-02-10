@@ -11,8 +11,7 @@ type Props = {|
  * Use useDismissableTutorialMessage if you need to know if the tutorial can't be found
  * or was previously hidden before rendering.
  */
-// $FlowFixMe[signature-verification-failure]
-const DismissableTutorialMessage = ({ tutorialId }: Props) => {
+const DismissableTutorialMessage = ({tutorialId}: Props): any => {
   const {
     DismissableTutorialMessage: ReturnedDismissableTutorialMessage,
   } = useDismissableTutorialMessage(tutorialId);

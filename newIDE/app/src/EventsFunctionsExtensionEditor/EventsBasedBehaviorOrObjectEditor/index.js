@@ -47,8 +47,8 @@ export type EventsBasedBehaviorOrObjectEditorInterface = {|
   scrollToProperty: (propertyName: string, isSharedProperties: boolean) => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const EventsBasedBehaviorOrObjectEditor = React.forwardRef<
+// $FlowFixMe[prop-missing]
+export const EventsBasedBehaviorOrObjectEditor: React.AbstractComponent<any, mixed> = React.forwardRef<
   Props,
   EventsBasedBehaviorOrObjectEditorInterface
 >(

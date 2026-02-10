@@ -15,8 +15,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const EmailAlreadySentNoButton = () => (
+export const EmailAlreadySentNoButton = (): React.Node => (
   <EmailVerificationDialog
     onClose={action('onClose')}
     authenticatedUser={fakeSilverAuthenticatedUser}
@@ -26,8 +25,7 @@ export const EmailAlreadySentNoButton = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const EmailAlreadySentWithButton = () => (
+export const EmailAlreadySentWithButton = (): React.Node => (
   <EmailVerificationDialog
     onClose={action('onClose')}
     authenticatedUser={fakeSilverAuthenticatedUser}
@@ -37,8 +35,7 @@ export const EmailAlreadySentWithButton = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const SendEmailOnOpeningNoButton = () => (
+export const SendEmailOnOpeningNoButton = (): React.Node => (
   <EmailVerificationDialog
     onClose={action('onClose')}
     authenticatedUser={fakeSilverAuthenticatedUser}
@@ -48,8 +45,7 @@ export const SendEmailOnOpeningNoButton = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const VerifiedUser = () => (
+export const VerifiedUser = (): React.Node => (
   <EmailVerificationDialog
     onClose={action('onClose')}
     authenticatedUser={fakeAuthenticatedUserWithEmailVerified}

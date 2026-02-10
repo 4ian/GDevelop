@@ -159,8 +159,7 @@ function InAppTutorialStepDisplayer({
   endTutorial,
   progress,
   goToNextStep,
-// $FlowFixMe[signature-verification-failure]
-}: Props) {
+}: Props): React.Node {
   const [
     elementToHighlight,
     setElementToHighlight,

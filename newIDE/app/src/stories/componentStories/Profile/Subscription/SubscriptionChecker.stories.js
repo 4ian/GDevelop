@@ -20,8 +20,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const NotAuthenticatedTryMode = () => {
+export const NotAuthenticatedTryMode = (): React.Node => {
   const checkerRef = React.useRef<?SubscriptionCheckerInterface>(null);
 
   const onClick = () => {
@@ -43,8 +42,7 @@ export const NotAuthenticatedTryMode = () => {
     </AuthenticatedUserContext.Provider>
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const NotAuthenticatedMandatoryMode = () => {
+export const NotAuthenticatedMandatoryMode = (): React.Node => {
   const checkerRef = React.useRef(null);
 
   const onClick = () => {
@@ -66,8 +64,7 @@ export const NotAuthenticatedMandatoryMode = () => {
     </AuthenticatedUserContext.Provider>
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const UserWithNoSubscription = () => {
+export const UserWithNoSubscription = (): React.Node => {
   const checkerRef = React.useRef(null);
 
   const onClick = () => {
@@ -91,8 +88,7 @@ export const UserWithNoSubscription = () => {
     </AuthenticatedUserContext.Provider>
   );
 };
-// $FlowFixMe[signature-verification-failure]
-export const UserWithGoldSubscription = () => {
+export const UserWithGoldSubscription = (): React.Node => {
   const checkerRef = React.useRef(null);
 
   const onClick = () => {

@@ -16,8 +16,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <ValueStateHolder
     initialValue={'MySpriteObject'}
     render={(value, onChange) => (
@@ -36,8 +35,7 @@ export const Default = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const NonExistingObject = () => (
+export const NonExistingObject = (): React.Node => (
   <ValueStateHolder
     initialValue={'ThisObjectDoesNotExist'}
     render={(value, onChange) => (
@@ -57,8 +55,7 @@ export const NonExistingObject = () => (
 );
 NonExistingObject.storyName = 'Error: non existing object';
 
-// $FlowFixMe[signature-verification-failure]
-export const WrongObjectType = () => {
+export const WrongObjectType = (): React.Node => {
   const instructionMetadata = gd.MetadataProvider.getConditionMetadata(
     gd.JsPlatform.get(),
     'AnimationEnded'
@@ -97,8 +94,7 @@ export const WrongObjectType = () => {
 };
 WrongObjectType.storyName = 'Error: wrong object type';
 
-// $FlowFixMe[signature-verification-failure]
-export const WithRequiredBehavior = () => {
+export const WithRequiredBehavior = (): React.Node => {
   const instructionMetadata = gd.MetadataProvider.getActionMetadata(
     gd.JsPlatform.get(),
     'EffectCapability::EffectBehavior::EnableEffect'

@@ -25,8 +25,7 @@ type Props = {| project: gdProject, callback: () => any |};
 /**
  * Hook used to synchronize different components displaying a project's resources.
  */
-// $FlowFixMe[signature-verification-failure]
-const useResourcesChangedWatcher = ({ project, callback }: Props) => {
+const useResourcesChangedWatcher = ({project, callback}: Props): { triggerResourcesHaveChanged: () => void } => {
   const registerOnResourcesChangedCallback = React.useCallback(
     (callback: () => any) => {
       const projectCallbacks = getOrCreateProjectCallbacks(project);

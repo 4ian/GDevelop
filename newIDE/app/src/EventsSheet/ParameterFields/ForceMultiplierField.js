@@ -15,19 +15,22 @@ import BackgroundText from '../../UI/BackgroundText';
 import { focusButton } from '../../UI/Button';
 import Text from '../../UI/Text';
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ForceMultiplierField(props: ParameterFieldProps, ref) {
     const button = React.useRef<?ButtonInterface>(null);
     const focus: FieldFocusFunction = options => {
       if (button.current) focusButton(button.current);
     };
-    React.useImperativeHandle(ref, () => ({
-      focus,
-    }));
-    const showDeprecatedNumericValue =
-      props.value !== '' && props.value !== '1' && props.value !== '0';
-
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        focus,
+      }),
+    );
+    const showDeprecatedNumericValue = props.value !== '' &&
+      props.value !== '1' &&
+      props.value !== '0';
+    
     return (
       <Column expand noMargin>
         <Line expand alignItems="center">
@@ -42,9 +45,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           <Column>
             <Text>
               <Trans>
-                The force will only push the object during the time of one
-                frame. Typically used in an event with no conditions or with
-                conditions that stay valid for a certain amount of time.
+                The force will only push the object during the time of one frame. Typically used in an event with no conditions or with conditions that stay valid for a certain amount of time.
               </Trans>
             </Text>
           </Column>
@@ -60,15 +61,12 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           <Column>
             <Text>
               <Trans>
-                The force will push the object forever, unless you use the
-                action "Stop the object". Typically used in an event with
-                conditions that are only true once, or with a "Trigger Once"
-                condition.
+                The force will push the object forever, unless you use the action "Stop the object". Typically used in an event with conditions that are only true once, or with a "Trigger Once" condition.
               </Trans>
             </Text>
           </Column>
         </Line>
-        {showDeprecatedNumericValue && (
+        {showDeprecatedNumericValue &&
           <React.Fragment>
             <BackgroundText>
               <Trans>or</Trans>
@@ -80,21 +78,17 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             </Line>
             <BackgroundText>
               <Trans>
-                The usage of a number or expression is deprecated. Please now
-                use only "Permanent" or "Instant" for configuring forces.
+                The usage of a number or expression is deprecated. Please now use only "Permanent" or "Instant" for configuring forces.
               </Trans>
             </BackgroundText>
-          </React.Fragment>
-        )}
+          </React.Fragment>}
       </Column>
     );
-  }
-);
+  },
+// $FlowFixMe[prop-missing]
+): React.AbstractComponent<ParameterFieldProps, ParameterFieldInterface>);
 
-export const renderInlineForceMultiplier = ({
-  value,
-// $FlowFixMe[signature-verification-failure]
-}: ParameterInlineRendererProps) => {
+export const renderInlineForceMultiplier = ({value}: ParameterInlineRendererProps): string | React.Node => {
   if (value === '1') return <Trans>{`a permanent`}</Trans>;
   else if (value === '0' || value === '') return <Trans>{`an instant`}</Trans>;
 

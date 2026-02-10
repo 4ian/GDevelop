@@ -390,8 +390,7 @@ const getKeyDisplayName = (code: string) => {
 /**
  * Parses shortcut string into array of platform-specific key strings
  */
-// $FlowFixMe[signature-verification-failure]
-export const getShortcutDisplayName = (shortcutString: ?string) => {
+export const getShortcutDisplayName = (shortcutString: ?string): string => {
   if (!shortcutString) return '';
 
   // $FlowFixMe[missing-type-arg]
@@ -422,8 +421,7 @@ const getElectronKeyString = (code: string) => {
 /**
  * Converts given shortcut string into an Electron accelerator string
  */
-// $FlowFixMe[signature-verification-failure]
-export const getElectronAccelerator = (shortcutString: string) => {
+export const getElectronAccelerator = (shortcutString: string): string => {
   // $FlowFixMe[missing-type-arg]
   return shortcutString
     .split('+')

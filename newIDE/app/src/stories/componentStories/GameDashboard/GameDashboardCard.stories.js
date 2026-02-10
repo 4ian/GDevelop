@@ -22,8 +22,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const UnpublishedGame = () => (
+export const UnpublishedGame = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       storageProviders={[CloudStorageProvider]}
@@ -48,8 +47,7 @@ export const UnpublishedGame = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const PublishedGame = () => (
+export const PublishedGame = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       storageProviders={[CloudStorageProvider]}
@@ -74,8 +72,7 @@ export const PublishedGame = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const CurrentlyOpenedGame = () => (
+export const CurrentlyOpenedGame = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       storageProviders={[CloudStorageProvider]}
@@ -100,8 +97,7 @@ export const CurrentlyOpenedGame = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const SavingGame = () => (
+export const SavingGame = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       storageProviders={[CloudStorageProvider]}
@@ -126,8 +122,7 @@ export const SavingGame = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const DisabledGame = () => (
+export const DisabledGame = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       storageProviders={[CloudStorageProvider]}
@@ -152,8 +147,7 @@ export const DisabledGame = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const LocalProject = () => (
+export const LocalProject = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       dashboardItem={{
@@ -178,8 +172,7 @@ export const LocalProject = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const OpenedLocalProject = () => (
+export const OpenedLocalProject = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       dashboardItem={{
@@ -204,8 +197,7 @@ export const OpenedLocalProject = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const DisabledLocalProject = () => (
+export const DisabledLocalProject = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       dashboardItem={{
@@ -230,8 +222,7 @@ export const DisabledLocalProject = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const CloudProject = () => (
+export const CloudProject = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       dashboardItem={{
@@ -256,8 +247,7 @@ export const CloudProject = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const OpenedCloudProject = () => (
+export const OpenedCloudProject = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       dashboardItem={{
@@ -282,8 +272,7 @@ export const OpenedCloudProject = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const DisabledCloudProject = () => (
+export const DisabledCloudProject = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       dashboardItem={{

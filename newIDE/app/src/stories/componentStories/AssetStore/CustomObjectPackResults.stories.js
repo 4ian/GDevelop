@@ -24,8 +24,7 @@ const Wrapper = ({ children }: {| children: React.Node |}) => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <Wrapper>
     <CustomObjectPackResults
       packTag="multitouch joysticks"
@@ -36,8 +35,7 @@ export const Default = () => (
   </Wrapper>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Installing = () => (
+export const Installing = (): React.Node => (
   <Wrapper>
     <CustomObjectPackResults
       packTag="multitouch joysticks"

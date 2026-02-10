@@ -35,15 +35,16 @@ type Props = {|
   onEventsBasedObjectChildrenEdited: () => void,
 |};
 
-export const CompactEventsBasedObjectVariantPropertiesEditor = ({
-  i18n,
-  unsavedChanges,
-  eventsBasedObject,
-  eventsBasedObjectVariant,
-  getContentAABB,
-  onEventsBasedObjectChildrenEdited,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const CompactEventsBasedObjectVariantPropertiesEditor = (
+  {
+    i18n,
+    unsavedChanges,
+    eventsBasedObject,
+    eventsBasedObjectVariant,
+    getContentAABB,
+    onEventsBasedObjectChildrenEdited
+  }: Props,
+): React.Node => {
   const forceUpdate = useForceUpdate();
 
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);

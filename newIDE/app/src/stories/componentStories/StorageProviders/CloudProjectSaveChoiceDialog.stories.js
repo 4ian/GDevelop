@@ -11,8 +11,7 @@ export default {
   component: CloudProjectSaveChoiceDialog,
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => {
+export const Default = (): React.Node => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   React.useEffect(

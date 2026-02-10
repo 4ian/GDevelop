@@ -19,8 +19,7 @@ type Props = {|
  * Show a link to a tutorial that can be permanently hidden. Hidden tutorials
  * will be stored in preferences.
  */
-// $FlowFixMe[signature-verification-failure]
-const TutorialMessage = ({ tutorial }: Props) => {
+const TutorialMessage = ({tutorial}: Props): React.Node => {
   const { showTutorialHint } = React.useContext(PreferencesContext);
   return (
     <I18n>

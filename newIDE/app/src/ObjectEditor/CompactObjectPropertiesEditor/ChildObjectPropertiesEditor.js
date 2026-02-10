@@ -20,15 +20,16 @@ type Props = {|
   onEditObject: () => void,
 |};
 
-export const ChildObjectPropertiesEditor = ({
-  project,
-  resourceManagementProps,
-  unsavedChanges,
-  customObjectConfiguration,
-  childObject,
-  onEditObject,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const ChildObjectPropertiesEditor = (
+  {
+    project,
+    resourceManagementProps,
+    unsavedChanges,
+    customObjectConfiguration,
+    childObject,
+    onEditObject
+  }: Props,
+): React.Node => {
   // Don't use a memo for this because metadata from custom objects are built
   // from event-based object when extensions are refreshed after an extension
   // installation.
@@ -61,8 +62,11 @@ export const ChildObjectPropertiesEditor = ({
       return propertiesMapToSchema({
         properties: childObjectConfigurationAsGd.getProperties(),
         defaultValueProperties: null,
-        getProperties: ({ object, objectConfiguration }) =>
-          objectConfiguration.getProperties(),
+        getPropertyValue: ({ object, objectConfiguration }, name) =>
+          objectConfiguration
+            .getProperties()
+            .get(name)
+            .getValue(),
         onUpdateProperty: ({ object, objectConfiguration }, name, value) =>
           objectConfiguration.updateProperty(name, value),
         visibility: 'All',
@@ -87,6 +91,7 @@ export const ChildObjectPropertiesEditor = ({
         onInstancesModified={() => {
           // TODO: undo/redo?
         }}
+        // $FlowFixMe[incompatible-type]
         onRefreshAllFields={forceRecomputeSchema}
         placeholder={<Trans>This object has no properties.</Trans>}
         customizeBasicSchema={schema =>

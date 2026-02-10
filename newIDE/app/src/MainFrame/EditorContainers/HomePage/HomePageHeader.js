@@ -33,15 +33,16 @@ type Props = {|
   canSave: boolean,
 |};
 
-export const HomePageHeader = ({
-  hasProject,
-  onOpenVersionHistory,
-  onOpenProfile,
-  onOpenLanguageDialog,
-  onSave,
-  canSave,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const HomePageHeader = (
+  {
+    hasProject,
+    onOpenVersionHistory,
+    onOpenProfile,
+    onOpenLanguageDialog,
+    onSave,
+    canSave
+  }: Props,
+): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const { profile } = React.useContext(AuthenticatedUserContext);
 

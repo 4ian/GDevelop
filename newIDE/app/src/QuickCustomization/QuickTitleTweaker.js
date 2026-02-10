@@ -58,7 +58,11 @@ const QuickObjectPropertiesEditor = ({
       const schema = propertiesMapToSchema({
         properties,
         defaultValueProperties: null,
-        getProperties: object => object.getProperties(),
+        getPropertyValue: (object, name) =>
+          object
+            .getProperties()
+            .get(name)
+            .getValue(),
         onUpdateProperty: (object, name, value) =>
           object.updateProperty(name, value),
         object,
@@ -79,6 +83,7 @@ const QuickObjectPropertiesEditor = ({
           instances={[objectConfiguration]}
           onInstancesModified={onObjectUpdated}
           resourceManagementProps={resourceManagementProps}
+          // $FlowFixMe[incompatible-type]
           onRefreshAllFields={forceRecomputeSchema}
         />
       </Column>
@@ -91,11 +96,7 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
 |};
 
-export const QuickTitleTweaker = ({
-  project,
-  resourceManagementProps,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const QuickTitleTweaker = ({project, resourceManagementProps}: Props): React.Node => {
   const titleObject = React.useMemo(
     () => {
       for (let i = 0; i < project.getLayoutsCount(); i++) {

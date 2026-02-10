@@ -29,8 +29,7 @@ const gd: libGDevelop = global.gd;
 export const getVariableSourceOrSceneIcon = (
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   variableName: string
-// $FlowFixMe[signature-verification-failure]
-) => {
+): any => {
   const variablesContainerSourceType = getVariableSourceFromIdentifier(
     variableName,
     projectScopedContainersAccessor.get()
@@ -179,9 +178,7 @@ export default class ForEachChildVariableEvent extends React.Component<
     });
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const forEachChildVariableEvent = gd.asForEachChildVariableEvent(
       this.props.event
     );

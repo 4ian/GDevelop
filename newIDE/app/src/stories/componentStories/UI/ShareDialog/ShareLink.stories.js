@@ -10,7 +10,6 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const DefaultShareLink = () => (
+export const DefaultShareLink = (): React.Node => (
   <ShareLink url={'https://gd.games/username/game-slug'} />
 );

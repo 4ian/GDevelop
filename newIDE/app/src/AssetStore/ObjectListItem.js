@@ -39,16 +39,17 @@ type Props = {|
   platform: gdPlatform,
 |};
 
-export const ObjectListItem = ({
-  id,
-  objectShortHeader,
-  matches,
-  onChoose,
-  onShowDetails,
-  onHeightComputed,
-  platform,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const ObjectListItem = (
+  {
+    id,
+    objectShortHeader,
+    matches,
+    onChoose,
+    onShowDetails,
+    onHeightComputed,
+    platform
+  }: Props,
+): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const isEngineCompatible = isCompatibleWithGDevelopVersion(

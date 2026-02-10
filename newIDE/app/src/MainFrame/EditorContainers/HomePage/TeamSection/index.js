@@ -573,8 +573,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
   }
 );
 
-// $FlowFixMe[signature-verification-failure]
-const TeamSectionWithErrorBoundary = (props: Props) => (
+const TeamSectionWithErrorBoundary = (props: Props): React.Node => (
   <ErrorBoundary
     componentTitle={<Trans>Team section</Trans>}
     scope="start-page-team"

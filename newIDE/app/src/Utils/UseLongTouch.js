@@ -38,6 +38,8 @@ const contextLocks: { [string]: true } = {};
  * A long press is characterized by starting a touch and staying pressed, without
  * moving too far from the initial position (to avoid being confused with a drag/scroll).
  */
+type UseLongTouchReturn = { onTouchEnd: () => void, onTouchMove: (event: TouchEvent) => void, onTouchStart: (event: TouchEvent) => void };
+
 export const useLongTouch = (
   callback: (e: ClientCoordinates) => void,
   options?: {
@@ -49,8 +51,7 @@ export const useLongTouch = (
     delay?: number,
     doNotCancelOnScroll?: boolean,
   }
-// $FlowFixMe[signature-verification-failure]
-) => {
+): UseLongTouchReturn => {
   const timeout = React.useRef<?TimeoutID>(null);
   const context = options && options.context ? options.context : null;
   const delay = options && options.delay ? options.delay : defaultDelay;

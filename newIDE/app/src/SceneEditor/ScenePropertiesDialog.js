@@ -46,19 +46,20 @@ type Props = {|
   onBackgroundColorChanged: () => void,
 |};
 
-const ScenePropertiesDialog = ({
-  open,
-  layout,
-  project,
-  onApply,
-  onClose,
-  onOpenMoreSettings,
-  onEditVariables,
-  resourceManagementProps,
-  projectScopedContainersAccessor,
-  onBackgroundColorChanged,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const ScenePropertiesDialog = (
+  {
+    open,
+    layout,
+    project,
+    onApply,
+    onClose,
+    onOpenMoreSettings,
+    onEditVariables,
+    resourceManagementProps,
+    projectScopedContainersAccessor,
+    onBackgroundColorChanged
+  }: Props,
+): React.Node => {
   const [windowTitle, setWindowTitle] = React.useState<string>(
     layout.getWindowDefaultTitle()
   );
@@ -166,7 +167,11 @@ const ScenePropertiesDialog = ({
         defaultValueProperties: behaviorMetadata
           ? behaviorMetadata.getSharedProperties()
           : null,
-        getProperties: sharedDataContent => behaviorSharedData.getProperties(),
+        getPropertyValue: (sharedDataContent, name) =>
+          behaviorSharedData
+            .getProperties()
+            .get(name)
+            .getValue(),
         onUpdateProperty: (sharedDataContent, name, value) => {
           behaviorSharedData.updateProperty(name, value);
         },

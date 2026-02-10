@@ -26,16 +26,17 @@ const drawerModalProps = {
 /**
  * Display a Paper element, for medium/large screens, or a Drawer on small screens.
  */
-export const ResponsivePaperOrDrawer = ({
-  open,
-  onClose,
-  children,
-}: {|
-  open: boolean,
-  onClose: () => void,
-  children: React.Node,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+export const ResponsivePaperOrDrawer = (
+  {
+    open,
+    onClose,
+    children
+  }: {|
+    open: boolean,
+    onClose: () => void,
+    children: React.Node,
+  |},
+): null | React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   if (!isMobile) {
     if (!open) return null;

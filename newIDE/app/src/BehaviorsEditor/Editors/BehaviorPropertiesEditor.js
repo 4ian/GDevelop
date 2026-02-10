@@ -11,15 +11,16 @@ const gd: libGDevelop = global.gd;
 
 type Props = BehaviorEditorProps;
 
-const BehaviorPropertiesEditor = ({
-  project,
-  behavior,
-  object,
-  onBehaviorUpdated,
-  resourceManagementProps,
-  projectScopedContainersAccessor,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const BehaviorPropertiesEditor = (
+  {
+    project,
+    behavior,
+    object,
+    onBehaviorUpdated,
+    resourceManagementProps,
+    projectScopedContainersAccessor
+  }: Props,
+): React.Node => {
   const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
     gd.JsPlatform.get(),
     behavior.getTypeName()
@@ -30,7 +31,11 @@ const BehaviorPropertiesEditor = ({
       propertiesMapToSchema({
         properties: behavior.getProperties(),
         defaultValueProperties: behaviorMetadata.getProperties(),
-        getProperties: instance => instance.getProperties(),
+        getPropertyValue: (instance, name) =>
+          instance
+            .getProperties()
+            .get(name)
+            .getValue(),
         onUpdateProperty: (instance, name, value) => {
           instance.updateProperty(name, value);
         },

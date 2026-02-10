@@ -75,8 +75,8 @@ export type SemiControlledMultiAutoCompleteInterface = {|
   focusInput: () => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const SemiControlledMultiAutoComplete = React.forwardRef<
+// $FlowFixMe[prop-missing]
+const SemiControlledMultiAutoComplete: React.AbstractComponent<any, mixed> = React.forwardRef<
   Props,
   SemiControlledMultiAutoCompleteInterface
 >((props, ref) => {

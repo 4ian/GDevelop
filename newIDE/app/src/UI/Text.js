@@ -108,8 +108,8 @@ const getTextColorFromColor = (color: ?TextColor) => {
 // A Text to be displayed in the app. Prefer using this
 // than a `<p>`/`<span>` or `<div>` as this will help maintain
 // consistency of text in the whole app.
-// $FlowFixMe[signature-verification-failure]
-const Text = React.forwardRef<Props, Interface>(
+// $FlowFixMe[prop-missing]
+const Text: React.AbstractComponent<Props, Interface> = React.forwardRef<Props, Interface>(
   (
     {
       children,

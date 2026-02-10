@@ -83,16 +83,13 @@ const defaultProps: EditProfileDialogProps = {
   },
   limits: limitsForNoSubscriptionUser,
 };
-// $FlowFixMe[signature-verification-failure]
-export const WithSubscription = () => <EditProfileDialog {...defaultProps} />;
+export const WithSubscription = (): React.Node => <EditProfileDialog {...defaultProps} />;
 
-// $FlowFixMe[signature-verification-failure]
-export const WithoutSubscription = () => (
+export const WithoutSubscription = (): React.Node => (
   <EditProfileDialog {...defaultProps} subscription={null} />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithoutGithubUsernameAndNoGithubStarBadge = () => (
+export const WithoutGithubUsernameAndNoGithubStarBadge = (): React.Node => (
   <EditProfileDialog
     {...defaultProps}
     badges={[]}
@@ -101,8 +98,7 @@ export const WithoutGithubUsernameAndNoGithubStarBadge = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithGithubUsernameButNoGithubStarBadge = () => (
+export const WithGithubUsernameButNoGithubStarBadge = (): React.Node => (
   <EditProfileDialog
     {...defaultProps}
     subscription={null}
@@ -113,8 +109,7 @@ export const WithGithubUsernameButNoGithubStarBadge = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithGithubUsernameButErrorWhenGivingGithubStarBadge = () => (
+export const WithGithubUsernameButErrorWhenGivingGithubStarBadge = (): React.Node => (
   <EditProfileDialog
     {...defaultProps}
     subscription={null}
@@ -125,8 +120,7 @@ export const WithGithubUsernameButErrorWhenGivingGithubStarBadge = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithGithubUsernameButUserNotFoundWhenGivingGithubStarBadge = () => (
+export const WithGithubUsernameButUserNotFoundWhenGivingGithubStarBadge = (): React.Node => (
   <EditProfileDialog
     {...defaultProps}
     subscription={null}
@@ -137,8 +131,7 @@ export const WithGithubUsernameButUserNotFoundWhenGivingGithubStarBadge = () => 
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithNoTiktokBadge = () => (
+export const WithNoTiktokBadge = (): React.Node => (
   <EditProfileDialog
     {...defaultProps}
     subscription={null}
@@ -149,8 +142,7 @@ export const WithNoTiktokBadge = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithErrorWhenGivingTiktokBadge = () => (
+export const WithErrorWhenGivingTiktokBadge = (): React.Node => (
   <EditProfileDialog
     {...defaultProps}
     subscription={null}
@@ -161,8 +153,7 @@ export const WithErrorWhenGivingTiktokBadge = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithUserNotFoundWhenGivingTiktokBadge = () => (
+export const WithUserNotFoundWhenGivingTiktokBadge = (): React.Node => (
   <EditProfileDialog
     {...defaultProps}
     subscription={null}
@@ -173,16 +164,13 @@ export const WithUserNotFoundWhenGivingTiktokBadge = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ErrorFromBackend = () => (
+export const ErrorFromBackend = (): React.Node => (
   <EditProfileDialog {...defaultProps} error={{ code: 'auth/username-used' }} />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Submitting = () => (
+export const Submitting = (): React.Node => (
   <EditProfileDialog {...defaultProps} actionInProgress />
 );
-// $FlowFixMe[signature-verification-failure]
-export const WithStudentUser = () => (
+export const WithStudentUser = (): React.Node => (
   <EditProfileDialog {...defaultProps} limits={limitsForStudentUser} />
 );

@@ -39,15 +39,16 @@ type Props = {|
   onCloseAfterPurchaseDone?: () => void,
 |};
 
-const BundlePurchaseDialog = ({
-  bundleListingData,
-  usageType,
-  onClose,
-  simulateAppStoreProduct,
-  fastCheckout,
-  onCloseAfterPurchaseDone,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const BundlePurchaseDialog = (
+  {
+    bundleListingData,
+    usageType,
+    onClose,
+    simulateAppStoreProduct,
+    fastCheckout,
+    onCloseAfterPurchaseDone
+  }: Props,
+): React.Node => {
   const {
     profile,
     onOpenLoginDialog,

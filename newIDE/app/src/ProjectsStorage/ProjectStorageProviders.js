@@ -72,8 +72,7 @@ const computeDefaultConfiguration = (
   return candidates[0];
 };
 
-// $FlowFixMe[signature-verification-failure]
-const ProjectStorageProviders = (props: Props) => {
+const ProjectStorageProviders = (props: Props): React.Node => {
   const storageProviderOperations = React.useRef<?StorageProviderOperations>(
     null
   );

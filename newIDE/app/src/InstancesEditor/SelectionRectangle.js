@@ -75,9 +75,7 @@ export default class SelectionRectangle {
     };
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  hasStartedSelectionRectangle() {
+  hasStartedSelectionRectangle(): any {
     return this.selectionRectangleStart;
   }
 
@@ -93,9 +91,7 @@ export default class SelectionRectangle {
     this.selectionRectangleEnd = { x: lastX, y: lastY };
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  endSelectionRectangle = () => {
+  endSelectionRectangle = (): any => {
     if (!this.selectionRectangleStart || !this.selectionRectangleEnd) return [];
 
     this._instancesInSelectionRectangle.length = 0;
@@ -119,9 +115,7 @@ export default class SelectionRectangle {
     return this._instancesInSelectionRectangle;
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getPixiObject() {
+  getPixiObject(): any {
     return this.pixiRectangle;
   }
 

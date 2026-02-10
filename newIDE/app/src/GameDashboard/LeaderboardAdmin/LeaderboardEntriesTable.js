@@ -38,15 +38,16 @@ type Props = {|
   |},
 |};
 
-const LeaderboardEntriesTable = ({
-  entries,
-  customizationSettings,
-  onDeleteEntry,
-  isLoading,
-  erroredEntry,
-  navigation,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const LeaderboardEntriesTable = (
+  {
+    entries,
+    customizationSettings,
+    onDeleteEntry,
+    isLoading,
+    erroredEntry,
+    navigation
+  }: Props,
+): React.Node => {
   if (!entries) return <PlaceholderLoader />;
 
   return (

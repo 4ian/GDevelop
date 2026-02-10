@@ -55,11 +55,13 @@ const MockLeaderboardProvider = ({ children }: {| children: React.Node |}) => {
   return (
     <LeaderboardContext.Provider
       value={{
+        // $FlowFixMe[incompatible-type]
         leaderboards: mockedLeaderboards,
         currentLeaderboard,
         displayOnlyBestEntry:
           currentLeaderboard.playerUnicityDisplayChoice === 'PREFER_UNIQUE',
         browsing: {
+          // $FlowFixMe[incompatible-type]
           entries: mockedEntries,
           goToNextPage: null,
           goToPreviousPage: null,
@@ -69,6 +71,7 @@ const MockLeaderboardProvider = ({ children }: {| children: React.Node |}) => {
         createLeaderboard: () => action('createLeaderboard'),
         listLeaderboards: action('listLeaderboards'),
         selectLeaderboard: leaderboardId => {
+          // $FlowFixMe[invalid-computed-prop]
           setCurrentLeaderboard(leaderboardsByIds[leaderboardId]);
         },
         updateLeaderboard: () => action('updateLeaderboard'),
@@ -83,8 +86,7 @@ const MockLeaderboardProvider = ({ children }: {| children: React.Node |}) => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <MockLeaderboardProvider>
     <ValueStateHolder
       initialValue={''}
@@ -108,8 +110,7 @@ export const Default = () => (
   </MockLeaderboardProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const InitialValidLeaderboard = () => (
+export const InitialValidLeaderboard = (): React.Node => (
   <MockLeaderboardProvider>
     <ValueStateHolder
       initialValue={'"489165zad49-a8ad6-4a984-dcz8da-hjqn983qh2"'}
@@ -133,8 +134,7 @@ export const InitialValidLeaderboard = () => (
   </MockLeaderboardProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const InitialInvalidLeaderboard = () => (
+export const InitialInvalidLeaderboard = (): React.Node => (
   <MockLeaderboardProvider>
     <ValueStateHolder
       initialValue={'5032ff25-6cd7-4adb-978d-8d2e532b16cf'}

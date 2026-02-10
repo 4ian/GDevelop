@@ -130,8 +130,8 @@ type Props = {|
 /**
  * Display a markdown text for a AI chat bubble.
  */
-// $FlowFixMe[signature-verification-failure]
-export const ChatMarkdownText = React.memo<Props>((props: Props) => {
+// $FlowFixMe[prop-missing]
+export const ChatMarkdownText: React.AbstractComponent<Props, mixed> = React.memo<Props>((props: Props) => {
   const { getConceptMetadataFromHref } = useGetConceptMetadata();
   const renderChatLink = React.useMemo(
     () => makeRenderChatLink({ getConceptMetadataFromHref }),

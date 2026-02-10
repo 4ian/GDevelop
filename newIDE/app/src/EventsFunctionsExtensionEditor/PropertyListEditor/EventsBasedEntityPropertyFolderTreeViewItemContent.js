@@ -161,9 +161,7 @@ export class EventsBasedEntityPropertyFolderTreeViewItemContent
 
   edit(): void {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _getPasteLabel(i18n: I18nType) {
+  _getPasteLabel(i18n: I18nType): any {
     let translation = t`Paste`;
     if (Clipboard.has(PROPERTIES_CLIPBOARD_KIND)) {
       const clipboardContent = Clipboard.get(PROPERTIES_CLIPBOARD_KIND);
@@ -174,9 +172,7 @@ export class EventsBasedEntityPropertyFolderTreeViewItemContent
     return i18n._(translation);
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  buildMenuTemplate(i18n: I18nType, index: number) {
+  buildMenuTemplate(i18n: I18nType, index: number): any {
     const {
       properties,
       isSharedProperties,
@@ -348,9 +344,7 @@ export class EventsBasedEntityPropertyFolderTreeViewItemContent
     this.props.onPropertiesUpdated();
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getRightButton(i18n: I18nType) {
+  getRightButton(i18n: I18nType): any {
     return null;
   }
 }

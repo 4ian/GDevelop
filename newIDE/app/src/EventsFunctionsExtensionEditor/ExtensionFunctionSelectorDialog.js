@@ -62,8 +62,7 @@ export default function ExtensionFunctionSelectorDialog({
   eventsFunctionsContainer,
   onChoose,
   onCancel,
-// $FlowFixMe[signature-verification-failure]
-}: Props) {
+}: Props): React.Node {
   const [showAdvanced, setShowAdvanced] = React.useState(false);
 
   return (

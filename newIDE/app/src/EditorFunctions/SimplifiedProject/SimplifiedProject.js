@@ -76,8 +76,9 @@ export type SimplifiedProjectOptions = {|
   scopeToScene?: string,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
+type MakeSimplifiedProjectBuilderReturn = { getProjectSpecificExtensionsSummary: ( project: gdProject ) => ProjectSpecificExtensionsSummary, getSimplifiedProject: ( project: gdProject, options: SimplifiedProjectOptions ) => SimplifiedProject };
+
+export const makeSimplifiedProjectBuilder = (gd: libGDevelop): MakeSimplifiedProjectBuilderReturn => {
   const getVariableType = (variable: gdVariable) => {
     const type = variable.getType();
     return type === gd.Variable.String

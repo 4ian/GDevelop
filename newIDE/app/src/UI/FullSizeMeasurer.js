@@ -14,8 +14,7 @@ type Props = {|
  * Take a component and pass the maximum size that the component can take
  * as width and height props.
  */
-// $FlowFixMe[signature-verification-failure]
-export const FullSizeMeasurer = ({ children }: Props) => (
+export const FullSizeMeasurer = ({children}: Props): React.Node => (
   <Measure bounds>
     {({ contentRect, measureRef }) => (
       <div style={styles.flexContainer} ref={measureRef}>

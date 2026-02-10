@@ -7,8 +7,9 @@ type Props = {|
   onGetInitialValue: () => number,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const useClickDragAsControl = ({ onChange, onGetInitialValue }: Props) => {
+type UseClickDragAsControlReturn = { onMouseDown: (e: MouseEvent) => void, onMouseMove: (e: MouseEvent) => void, onMouseUp: () => void };
+
+const useClickDragAsControl = ({onChange, onGetInitialValue}: Props): UseClickDragAsControlReturn => {
   const clickDragOrigin = React.useRef<?{|
     initialValue: number,
     accumulatedValue: number,

@@ -16,8 +16,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const ImageNotSelected = () => (
+export const ImageNotSelected = (): React.Node => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
@@ -31,8 +30,7 @@ export const ImageNotSelected = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ImageSelected = () => (
+export const ImageSelected = (): React.Node => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
@@ -46,8 +44,7 @@ export const ImageSelected = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ImageWithMultipleExternalEditors = () => (
+export const ImageWithMultipleExternalEditors = (): React.Node => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
@@ -84,8 +81,7 @@ export const ImageWithMultipleExternalEditors = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const NotExisting = () => (
+export const NotExisting = (): React.Node => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
@@ -99,8 +95,7 @@ export const NotExisting = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ImageNoMargin = () => (
+export const ImageNoMargin = (): React.Node => (
   <ResourceSelector
     margin="none"
     resourceKind="image"
@@ -115,8 +110,7 @@ export const ImageNoMargin = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ImageWithThumbnail = () => (
+export const ImageWithThumbnail = (): React.Node => (
   <ResourceSelectorWithThumbnail
     resourceKind="image"
     project={testProject.project}
@@ -129,8 +123,7 @@ export const ImageWithThumbnail = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Audio = () => (
+export const Audio = (): React.Node => (
   <ResourceSelector
     resourceKind="audio"
     project={testProject.project}
@@ -144,8 +137,7 @@ export const Audio = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const FontWithResetButton = () => (
+export const FontWithResetButton = (): React.Node => (
   <ResourceSelector
     canBeReset
     resourceKind="font"
@@ -160,8 +152,7 @@ export const FontWithResetButton = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const FontNoMarginWithResetButton = () => (
+export const FontNoMarginWithResetButton = (): React.Node => (
   <ResourceSelector
     canBeReset
     margin="none"

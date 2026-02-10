@@ -49,8 +49,8 @@ type Props = {|
   editorCallbacks: EditorCallbacks,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
+// $FlowFixMe[prop-missing]
+export const FunctionCallRow: React.AbstractComponent<Props, mixed> = React.memo<Props>(function FunctionCallRow({
   project,
   functionCall,
   editorFunctionCallResult,

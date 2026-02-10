@@ -60,8 +60,8 @@ const noop = () => {};
  *
  * Customized to add optional menu button and chips corresponding to tags.
  */
-// $FlowFixMe[signature-verification-failure]
-const SearchBar = React.forwardRef<Props, SearchBarInterface>(
+// $FlowFixMe[prop-missing]
+const SearchBar: React.AbstractComponent<Props, SearchBarInterface> = React.forwardRef<Props, SearchBarInterface>(
   (
     {
       id,

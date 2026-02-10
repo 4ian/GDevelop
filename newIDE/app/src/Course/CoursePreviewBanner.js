@@ -26,7 +26,6 @@ import type {
 import RaisedButton from '../UI/RaisedButton';
 import { rankLabel } from '../Utils/Ordinal';
 import CheckCircle from '../UI/CustomSvgIcons/CheckCircle';
-// $FlowFixMe[untyped-type-import]
 import type { GDevelopTheme } from '../UI/Theme';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Lock from '../UI/CustomSvgIcons/Lock';
@@ -86,7 +85,6 @@ const ChapterTile = ({
   chapter: CourseChapter,
   isComplete: boolean,
   chapterIndex: number,
-  // $FlowFixMe[value-as-type]
   gdevelopTheme: GDevelopTheme,
 |}) => {
   return (
@@ -156,14 +154,15 @@ type Props = {|
   onDisplayCourse: () => void,
 |};
 
-const CoursePreviewBanner = ({
-  course,
-  getCourseChapters,
-  getCourseCompletion,
-  getCourseChapterCompletion,
-  onDisplayCourse,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const CoursePreviewBanner = (
+  {
+    course,
+    getCourseChapters,
+    getCourseCompletion,
+    getCourseChapterCompletion,
+    onDisplayCourse
+  }: Props,
+): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { achievements, badges } = React.useContext(AuthenticatedUserContext);
   const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();

@@ -21,8 +21,7 @@ const styles = {
   },
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const ExplanationHeader = () => {
+export const ExplanationHeader = (): React.Node => {
   return (
     <Column noMargin>
       <Line>
@@ -46,13 +45,14 @@ type FacebookInstantGamesExportFlowProps = {|
   exportPipelineName: string,
 |};
 
-export const ExportFlow = ({
-  disabled,
-  launchExport,
-  isExporting,
-  exportPipelineName,
-// $FlowFixMe[signature-verification-failure]
-}: FacebookInstantGamesExportFlowProps) => (
+export const ExportFlow = (
+  {
+    disabled,
+    launchExport,
+    isExporting,
+    exportPipelineName
+  }: FacebookInstantGamesExportFlowProps,
+): React.Node => (
   <Line justifyContent="center">
     <RaisedButton
       label={
@@ -70,12 +70,13 @@ export const ExportFlow = ({
   </Line>
 );
 
-export const DoneFooter = ({
-  renderGameButton,
-}: {|
-  renderGameButton: () => React.Node,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+export const DoneFooter = (
+  {
+    renderGameButton
+  }: {|
+    renderGameButton: () => React.Node,
+  |},
+): React.Node => {
   const openLearnMore = () => {
     Window.openExternalURL(
       getHelpLink('/publishing/publishing-to-facebook-instant-games')
@@ -111,9 +112,7 @@ export const DoneFooter = ({
 
 export const facebookInstantGamesExporter = {
   key: 'facebookinstantgamesexport',
-  // $FlowFixMe[signature-verification-failure]
-  tabName: <Trans>Instant Games</Trans>,
-  // $FlowFixMe[signature-verification-failure]
-  name: <Trans>Facebook Instant Games</Trans>,
+  tabName: (<Trans>Instant Games</Trans>: React.Node),
+  name: (<Trans>Facebook Instant Games</Trans>: React.Node),
   helpPage: '/publishing/publishing-to-facebook-instant-games',
 };

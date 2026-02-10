@@ -11,10 +11,7 @@ export type ActiveEmbeddedGameFrameHoleCountCallback = ({
 }) => void;
 
 let activeEmbeddedGameFrameHoleCallbacks: ActiveEmbeddedGameFrameHoleCountCallback[] = [];
-export const registerActiveEmbeddedGameFrameHoleCountCallback = (
-  callback: ActiveEmbeddedGameFrameHoleCountCallback
-// $FlowFixMe[signature-verification-failure]
-) => {
+export const registerActiveEmbeddedGameFrameHoleCountCallback = (callback: ActiveEmbeddedGameFrameHoleCountCallback): (() => void) => {
   activeEmbeddedGameFrameHoleCallbacks.push(callback);
   callback({ activeEmbeddedGameFrameHoleCount }); // Ensure the callback is called with the current count.
 
@@ -52,8 +49,7 @@ type Props = {|
   marginBottom?: number,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const EmbeddedGameFrameHole = (props: Props) => {
+export const EmbeddedGameFrameHole = (props: Props): React.MixedElement => {
   React.useEffect(
     () => {
       if (props.isActive) {

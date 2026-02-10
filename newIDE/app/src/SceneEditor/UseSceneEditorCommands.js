@@ -17,8 +17,7 @@ type Props = {|
   onEditLayer: (layer: gdLayer) => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const UseSceneEditorCommands = (props: Props) => {
+const UseSceneEditorCommands = (props: Props): null => {
   const {
     project,
     layersContainer,

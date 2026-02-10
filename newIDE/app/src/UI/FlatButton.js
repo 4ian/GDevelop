@@ -35,8 +35,8 @@ export type FlatButtonProps = {|
 /**
  * A "outlined" button based on Material-UI button.
  */
-// $FlowFixMe[signature-verification-failure]
-const FlatButton = React.forwardRef<FlatButtonProps, ButtonInterface>(
+// $FlowFixMe[prop-missing]
+const FlatButton: React.AbstractComponent<FlatButtonProps, ButtonInterface> = React.forwardRef<FlatButtonProps, ButtonInterface>(
   (
     {
       label,

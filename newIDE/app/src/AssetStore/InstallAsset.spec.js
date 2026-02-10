@@ -895,6 +895,7 @@ describe('InstallAsset', () => {
     it('adds an extension with origin set if it comes from the store', () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
+      // $FlowFixMe[incompatible-type]
       addSerializedExtensionsToProject(
         mockEventsFunctionsExtensionsState,
         project,
@@ -923,6 +924,7 @@ describe('InstallAsset', () => {
         mockEventsFunctionsExtensionsState,
         project,
         [serializedExtension],
+        // $FlowFixMe[incompatible-type]
         false
       );
 

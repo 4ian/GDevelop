@@ -31,8 +31,7 @@ const styles = {
   unlockedAchievement: {},
 };
 
-// $FlowFixMe[signature-verification-failure]
-const AchievementList = ({ badges, achievements }: Props) => {
+const AchievementList = ({badges, achievements}: Props): React.Node => {
   const [
     achievementsWithBadgeData,
     setAchievementsWithBadgeData,

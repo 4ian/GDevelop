@@ -14,8 +14,9 @@ import { prepareAiUserContent } from './PrepareAiUserContent';
 
 const gd: libGDevelop = global.gd;
 
-// $FlowFixMe[signature-verification-failure]
-export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
+type UseGenerateEventsReturn = { generateEvents: ( { eventsDescription: string, existingEventsAsText: string, existingEventsJson: string | null, extensionNamesList: string, objectsList: string, placementHint: string, relatedAiRequestId: string, sceneName: string, } ) => Promise<EventsGenerationResult> };
+
+export const useGenerateEvents = ({project}: {| project: ?gdProject |}): UseGenerateEventsReturn => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );

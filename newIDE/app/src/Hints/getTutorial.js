@@ -9,8 +9,7 @@ const getTutorial = (
   preferences: Preferences,
   tutorials: ?Array<Tutorial>,
   tutorialId: string
-// $FlowFixMe[signature-verification-failure]
-) => {
+): null | Tutorial => {
   if (!tutorials) return null; // Loading or errored, do not display the tutorial.
 
   const { values } = preferences;

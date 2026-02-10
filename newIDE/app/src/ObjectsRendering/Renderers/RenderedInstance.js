@@ -46,9 +46,7 @@ export default class RenderedInstance {
   /**
    * Convert an angle from degrees to radians.
    */
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  static toRad(angleInDegrees: number) {
+  static toRad(angleInDegrees: number): any {
     return (angleInDegrees / 180) * Math.PI;
   }
 

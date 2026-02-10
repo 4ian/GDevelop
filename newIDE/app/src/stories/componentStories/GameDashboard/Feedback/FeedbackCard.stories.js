@@ -21,8 +21,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <FeedbackCard
     comment={commentUnprocessed}
     authenticatedUser={fakeSilverAuthenticatedUser}
@@ -30,8 +29,7 @@ export const Default = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithoutText = () => (
+export const WithoutText = (): React.Node => (
   <FeedbackCard
     comment={commentWithNoTextUnprocessed}
     authenticatedUser={fakeSilverAuthenticatedUser}
@@ -39,8 +37,7 @@ export const WithoutText = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Processed = () => (
+export const Processed = (): React.Node => (
   <FeedbackCard
     comment={commentProcessed}
     authenticatedUser={fakeSilverAuthenticatedUser}
@@ -48,8 +45,7 @@ export const Processed = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithContact = () => (
+export const WithContact = (): React.Node => (
   <FeedbackCard
     comment={{
       ...commentUnprocessed,
@@ -60,8 +56,7 @@ export const WithContact = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithNamedBuild = () => (
+export const WithNamedBuild = (): React.Node => (
   <FeedbackCard
     comment={commentUnprocessed}
     buildProperties={{
@@ -74,8 +69,7 @@ export const WithNamedBuild = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithAuthenticatedPlayer = () => (
+export const WithAuthenticatedPlayer = (): React.Node => (
   <FeedbackCard
     comment={{
       ...commentUnprocessed,
@@ -86,8 +80,7 @@ export const WithAuthenticatedPlayer = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithAuthenticatedPlayerAndContact = () => (
+export const WithAuthenticatedPlayerAndContact = (): React.Node => (
   <FeedbackCard
     comment={{
       ...commentUnprocessed,
@@ -99,8 +92,7 @@ export const WithAuthenticatedPlayerAndContact = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const FeedbackCardWithUnnamedBuild = () => (
+export const FeedbackCardWithUnnamedBuild = (): React.Node => (
   <FeedbackCard
     comment={commentUnprocessed}
     buildProperties={{ id: 'build-id', isDeleted: false }}
@@ -109,8 +101,7 @@ export const FeedbackCardWithUnnamedBuild = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const FeedbackCardWithDeletedBuild = () => (
+export const FeedbackCardWithDeletedBuild = (): React.Node => (
   <FeedbackCard
     comment={commentUnprocessed}
     buildProperties={{ id: 'build-id', isDeleted: true }}

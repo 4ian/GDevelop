@@ -33,8 +33,8 @@ export type PreviewAndShareButtonsProps = {|
   isSharingEnabled: boolean,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
+// $FlowFixMe[prop-missing]
+const PreviewAndShareButtons: React.AbstractComponent<PreviewAndShareButtonsProps, mixed> = React.memo<PreviewAndShareButtonsProps>(
   function PreviewAndShareButtons({
     onPreviewWithoutHotReload,
     onNetworkPreview,

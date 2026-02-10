@@ -14,8 +14,7 @@ import { hasValidSubscriptionPlan } from '../../Utils/GDevelopServices/Usage';
 export const checkIfHasTooManyLeaderboards = (
   authenticatedUser: AuthenticatedUser,
   leaderboards: ?Array<Leaderboard>
-// $FlowFixMe[signature-verification-failure]
-) => {
+): ?(false | boolean) => {
   if (!authenticatedUser.authenticated) return false;
 
   const { limits } = authenticatedUser;
@@ -33,8 +32,7 @@ export const checkIfHasTooManyLeaderboards = (
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-const MaxLeaderboardCountAlertMessage = () => {
+const MaxLeaderboardCountAlertMessage = (): null | React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { limits, subscription } = authenticatedUser;
   if (!limits) return null;

@@ -17,8 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => {
+export const Default = (): React.Node => {
   const usageApiMock = React.useMemo(() => {
     const mock = new MockAdapter(usageClient, {
       delayResponse: 250,
@@ -55,8 +54,7 @@ export const Default = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithNoGroupsYet = () => {
+export const WithNoGroupsYet = (): React.Node => {
   const usageApiMock = React.useMemo(() => {
     const mock = new MockAdapter(usageClient, {
       delayResponse: 250,
@@ -93,8 +91,7 @@ export const WithNoGroupsYet = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithNoStudentsYet = () => {
+export const WithNoStudentsYet = (): React.Node => {
   const usageApiMock = React.useMemo(() => {
     const mock = new MockAdapter(usageClient, {
       delayResponse: 250,
@@ -131,8 +128,7 @@ export const WithNoStudentsYet = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithArchivedStudentsOnly = () => {
+export const WithArchivedStudentsOnly = (): React.Node => {
   const usageApiMock = React.useMemo(() => {
     const mock = new MockAdapter(usageClient, {
       delayResponse: 250,
@@ -169,8 +165,7 @@ export const WithArchivedStudentsOnly = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Loading = () => {
+export const Loading = (): React.Node => {
   const usageApiMock = React.useMemo(() => {
     const mock = new MockAdapter(usageClient, {
       delayResponse: 250,

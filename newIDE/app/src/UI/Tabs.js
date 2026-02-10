@@ -79,9 +79,7 @@ export function Tabs<TabName>({
   onChange,
   options,
   variant,
-// $FlowFixMe[signature-verification-failure]
-// $FlowFixMe[missing-local-annot]
-}: TabsProps<TabName>) {
+}: TabsProps<TabName>): any {
   const { windowSize } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 

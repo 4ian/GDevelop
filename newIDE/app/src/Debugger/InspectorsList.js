@@ -70,9 +70,7 @@ export default class InspectorsList extends React.Component<Props, void> {
     });
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     return this.props.gameData ? (
       // $FlowFixMe[incompatible-type]
       <List style={styles.list}>

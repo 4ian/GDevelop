@@ -10,8 +10,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithGameTemplates = () => (
+export const WithGameTemplates = (): React.Node => (
   <PublicProfileDialog
     userId={'IRIhkkTTl2UHhfjrLTTH5GYwkYu1'}
     onClose={action('onClose')}
@@ -20,8 +19,7 @@ export const WithGameTemplates = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithAssetPacks = () => (
+export const WithAssetPacks = (): React.Node => (
   <PublicProfileDialog
     userId={'30NWiFZ3GWNGb1Rs0PzBTHx7jsT2'}
     onClose={action('onClose')}
@@ -30,8 +28,7 @@ export const WithAssetPacks = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithGames = () => (
+export const WithGames = (): React.Node => (
   <PublicProfileDialog
     userId={'9MGDlUQAh8QUilno4JPycekjRCJ3'}
     onClose={action('onClose')}

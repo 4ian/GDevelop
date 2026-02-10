@@ -18,8 +18,7 @@ const gd: libGDevelop = global.gd;
 
 type Props = EditorProps;
 
-// $FlowFixMe[signature-verification-failure]
-const ObjectPropertiesEditor = (props: Props) => {
+const ObjectPropertiesEditor = (props: Props): React.Node => {
   const {
     objectConfiguration,
     project,
@@ -44,7 +43,11 @@ const ObjectPropertiesEditor = (props: Props) => {
   const propertiesSchema = propertiesMapToSchema({
     properties,
     defaultValueProperties: null,
-    getProperties: object => object.getProperties(),
+    getPropertyValue: (object, name) =>
+      object
+        .getProperties()
+        .get(name)
+        .getValue(),
     onUpdateProperty: (object, name, value) =>
       object.updateProperty(name, value),
   });

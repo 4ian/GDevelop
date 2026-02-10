@@ -25,8 +25,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => {
+export const Default = (): React.Node => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -79,12 +78,12 @@ export const Default = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithCommunityExtensions = () => {
+export const WithCommunityExtensions = (): React.Node => {
   const [
     showExperimentalExtensions,
     setShowExperimentalExtensions,
   ] = React.useState(true);
+  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
     // $FlowFixMe[incompatible-type]
@@ -146,8 +145,7 @@ export const WithCommunityExtensions = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithServerSideErrors = () => {
+export const WithServerSideErrors = (): React.Node => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -185,8 +183,7 @@ export const WithServerSideErrors = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const ShowingAnAlreadyInstalledExtension = () => {
+export const ShowingAnAlreadyInstalledExtension = (): React.Node => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -242,8 +239,7 @@ export const ShowingAnAlreadyInstalledExtension = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const ExtensionBeingInstalled = () => {
+export const ExtensionBeingInstalled = (): React.Node => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -296,8 +292,7 @@ export const ExtensionBeingInstalled = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const OnlyWithBehaviors = () => {
+export const OnlyWithBehaviors = (): React.Node => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,

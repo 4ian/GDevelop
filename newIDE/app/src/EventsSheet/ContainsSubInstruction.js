@@ -1,12 +1,10 @@
 // @flow
 const gd: libGDevelop = global.gd;
 
-// $FlowFixMe[recursive-definition]
 export const containsSubInstructions = (
   instruction: gdInstruction,
   instructionsList: gdInstructionsList
-// $FlowFixMe[signature-verification-failure]
-) => {
+): boolean => {
   const subInstructionsList = instruction.getSubInstructions();
   // $FlowFixMe[incompatible-exact]
   if (gd.compare(subInstructionsList, instructionsList)) return true;

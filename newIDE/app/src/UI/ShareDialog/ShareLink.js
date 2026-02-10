@@ -30,8 +30,7 @@ type Props = {|
   withOpenButton?: boolean,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const ShareLink = ({ url, withOpenButton }: Props) => {
+const ShareLink = ({url, withOpenButton}: Props): React.Node => {
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState(false);
   const onCopyLinkToClipboard = () => {
     if (!url) return;

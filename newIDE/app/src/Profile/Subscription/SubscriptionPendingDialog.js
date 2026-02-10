@@ -30,8 +30,7 @@ export default function SubscriptionPendingDialog({
   authenticatedUser,
   onSuccess,
   immediatelyShowSuccessMessage,
-// $FlowFixMe[signature-verification-failure]
-}: Props) {
+}: Props): React.Node {
   const userPlanIdAtOpening = React.useRef<?string>(
     !!authenticatedUser.subscription
       ? authenticatedUser.subscription.planId

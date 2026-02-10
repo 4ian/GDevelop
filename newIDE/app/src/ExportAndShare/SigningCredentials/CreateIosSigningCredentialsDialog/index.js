@@ -15,12 +15,7 @@ type Props = {
   initialTab: string,
 };
 
-export const CreateIosSigningCredentialsDialog = ({
-  onClose,
-  initialTab,
-  authenticatedUser,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const CreateIosSigningCredentialsDialog = ({onClose, initialTab, authenticatedUser}: Props): React.Node => {
   const [currentTab, setCurrentTab] = React.useState<string>(initialTab);
 
   return (

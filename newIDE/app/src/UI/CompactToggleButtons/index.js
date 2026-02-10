@@ -21,13 +21,7 @@ export type CompactToggleButtonsProps = {|
   expand?: boolean,
 |};
 
-const CompactToggleButtons = ({
-  id,
-  noSeparator,
-  buttons,
-  expand,
-// $FlowFixMe[signature-verification-failure]
-}: CompactToggleButtonsProps) => {
+const CompactToggleButtons = ({id, noSeparator, buttons, expand}: CompactToggleButtonsProps): React.MixedElement => {
   return (
     <div
       id={id}

@@ -29,9 +29,7 @@ export default class InstancesRotator {
     this._instanceMeasurer = instanceMeasurer;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _getNewAngle(proportional: boolean, initialAngle: number) {
+  _getNewAngle(proportional: boolean, initialAngle: number): any {
     // The grabbable handle for rotation is on top.
     // Initially, totalDelta = (0 , selectionAABB.height() / 2)
     // (see the affectation of totalDeltaY in the rotateBy method).
@@ -44,9 +42,7 @@ export default class InstancesRotator {
     return proportional ? Math.round(angle / 15) * 15 : angle;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _getOrCreateInstanceAABB(instance: gdInitialInstance) {
+  _getOrCreateInstanceAABB(instance: gdInitialInstance): any {
     const initialAABB = this._instanceAABBs[instance.ptr];
     if (initialAABB) return initialAABB;
 
@@ -55,9 +51,7 @@ export default class InstancesRotator {
     ] = this._instanceMeasurer.getInstanceAABB(instance, new Rectangle()));
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _getOrCreateInstanceOriginPosition(instance: gdInitialInstance) {
+  _getOrCreateInstanceOriginPosition(instance: gdInitialInstance): any {
     const initialPosition = this._instancePositions[instance.ptr];
     if (initialPosition) return initialPosition;
 
@@ -67,9 +61,7 @@ export default class InstancesRotator {
     });
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _getOrCreateInstanceAngle(instance: gdInitialInstance) {
+  _getOrCreateInstanceAngle(instance: gdInitialInstance): any {
     const initialAngle = this._instanceAngles[instance.ptr];
     if (initialAngle !== undefined) return initialAngle;
 

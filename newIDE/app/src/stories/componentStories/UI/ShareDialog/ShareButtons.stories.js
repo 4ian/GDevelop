@@ -10,7 +10,6 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const DefaultSocialShareButtons = () => (
+export const DefaultSocialShareButtons = (): React.Node => (
   <SocialShareButtons url={'https://gd.games/username/game-slug'} />
 );

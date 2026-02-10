@@ -13,8 +13,7 @@ type Props = {
 };
 
 /* Display a rating between 1 and 10. */
-// $FlowFixMe[signature-verification-failure]
-const Rating = ({ value, label }: Props) => {
+const Rating = ({value, label}: Props): React.Node => {
   return (
     <Column expand noMargin>
       <Line justifyContent="space-between">

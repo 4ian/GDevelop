@@ -31,8 +31,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const PrivateTutorialViewDialog = ({ tutorial, onClose }: Props) => {
+export const PrivateTutorialViewDialog = ({tutorial, onClose}: Props): React.Node => {
   const { limits, getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );

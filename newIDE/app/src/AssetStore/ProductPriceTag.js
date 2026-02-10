@@ -189,8 +189,7 @@ type ProductPriceOrOwnedProps = {|
   discountedPrice?: boolean,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const OwnedLabel = () => {
+export const OwnedLabel = (): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <LineStackLayout noMargin alignItems="center">
@@ -244,14 +243,15 @@ type ProductPriceTagProps = {|
   discountedPrice?: boolean,
 |};
 
-const ProductPriceTag = ({
-  productListingData,
-  usageType,
-  withOverlay,
-  owned,
-  discountedPrice,
-// $FlowFixMe[signature-verification-failure]
-}: ProductPriceTagProps) => {
+const ProductPriceTag = (
+  {
+    productListingData,
+    usageType,
+    withOverlay,
+    owned,
+    discountedPrice
+  }: ProductPriceTagProps,
+): React.Node => {
   return (
     <I18n>
       {({ i18n }) => {

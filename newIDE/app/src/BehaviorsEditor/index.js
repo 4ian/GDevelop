@@ -53,8 +53,7 @@ const gd: libGDevelop = global.gd;
 
 const BEHAVIORS_CLIPBOARD_KIND = 'Behaviors';
 
-// $FlowFixMe[signature-verification-failure]
-export const useBehaviorOverridingAlertDialog = () => {
+export const useBehaviorOverridingAlertDialog = (): ((existingBehaviorNames: Array<string>) => Promise<boolean>) => {
   const { showConfirmation } = useAlertDialog();
   return async (existingBehaviorNames: Array<string>): Promise<boolean> => {
     return await showConfirmation({
@@ -396,6 +395,7 @@ export const useManageObjectBehaviors = ({
       // Renaming a behavior is something that is really rare anyway! :)
 
       if (object.hasBehaviorNamed(newName)) return;
+      // TODO Add a refactor operation to update the behavior name in overridings of object instances
       object.renameBehavior(behavior.getName(), newName);
       onUpdate();
       if (onBehaviorsUpdated) onBehaviorsUpdated();
@@ -420,6 +420,7 @@ export const useManageObjectBehaviors = ({
       const answer = Window.showConfirmDialog(message);
 
       if (answer) {
+        // TODO Add a refactor operation to remove the behavior overridings in object instances
         object.removeBehavior(behaviorName);
         dependentBehaviors.forEach(name => object.removeBehavior(name));
         if (onSizeUpdated) onSizeUpdated();
@@ -647,8 +648,7 @@ type Props = {|
   isListLocked: boolean,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const BehaviorsEditor = (props: Props) => {
+const BehaviorsEditor = (props: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const justAddedBehaviorAccordionElement = React.useRef<?BehaviorConfigurationEditorInterface>(

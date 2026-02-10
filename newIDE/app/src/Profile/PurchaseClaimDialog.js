@@ -49,11 +49,12 @@ type Props = {|
   onClose: () => void,
 |};
 
-const PurchaseClaimDialog = ({
-  claimedProductOptions: { productListingData, purchaseId, claimableToken },
-  onClose,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const PurchaseClaimDialog = (
+  {
+    claimedProductOptions: {productListingData, purchaseId, claimableToken},
+    onClose
+  }: Props,
+): null | React.Node => {
   const {
     getAuthorizationHeader,
     profile,

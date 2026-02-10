@@ -49,21 +49,22 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
-const LayerEditorDialog = ({
-  initialTab,
-  project,
-  layout,
-  eventsFunctionsExtension,
-  eventsBasedObject,
-  layer,
-  initialInstances,
-  onCancel,
-  onApply,
-  hotReloadPreviewButtonProps,
-  resourceManagementProps,
-  projectScopedContainersAccessor,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const LayerEditorDialog = (
+  {
+    initialTab,
+    project,
+    layout,
+    eventsFunctionsExtension,
+    eventsBasedObject,
+    layer,
+    initialInstances,
+    onCancel,
+    onApply,
+    hotReloadPreviewButtonProps,
+    resourceManagementProps,
+    projectScopedContainersAccessor
+  }: Props,
+): React.Node => {
   const forceUpdate = useForceUpdate();
   const {
     onCancelChanges,
@@ -331,7 +332,7 @@ const LayerEditorDialog = ({
             tooltipOrHelperText={
               <Trans>
                 This setting changes the visibility of the entire layer. Objects
-                on the layer will not be treated as "hidden" for event
+                on the layer will not be (treated: "hidden" for event)
                 conditions or actions.
               </Trans>
             }

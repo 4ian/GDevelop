@@ -80,11 +80,7 @@ type AskAiHistoryContentProps = {|
   selectedAiRequestId: string | null,
 |};
 
-export const AskAiHistoryContent = ({
-  onSelectAiRequest,
-  selectedAiRequestId,
-// $FlowFixMe[signature-verification-failure]
-}: AskAiHistoryContentProps) => {
+export const AskAiHistoryContent = ({onSelectAiRequest, selectedAiRequestId}: AskAiHistoryContentProps): React.Node => {
   const {
     aiRequestStorage: {
       aiRequests,
@@ -202,13 +198,7 @@ export const AskAiHistoryContent = ({
   );
 };
 
-export const AskAiHistory = ({
-  open,
-  onClose,
-  onSelectAiRequest,
-  selectedAiRequestId,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const AskAiHistory = ({open, onClose, onSelectAiRequest, selectedAiRequestId}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
 
   const handleSelectAiRequest = (aiRequest: AiRequest) => {

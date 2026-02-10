@@ -30,13 +30,14 @@ type Props = {|
   simulateAppStoreProduct?: boolean,
 |};
 
-const PrivateAssetPackPurchaseDialog = ({
-  privateAssetPackListingData,
-  usageType,
-  onClose,
-  simulateAppStoreProduct,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const PrivateAssetPackPurchaseDialog = (
+  {
+    privateAssetPackListingData,
+    usageType,
+    onClose,
+    simulateAppStoreProduct
+  }: Props,
+): React.Node => {
   const {
     profile,
     onOpenLoginDialog,

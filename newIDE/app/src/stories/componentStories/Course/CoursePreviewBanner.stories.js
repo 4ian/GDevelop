@@ -18,8 +18,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const CompletedCourse = () => {
+export const CompletedCourse = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider
       value={{

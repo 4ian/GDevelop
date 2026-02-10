@@ -149,7 +149,6 @@ export const getFieldValue = ({
     return mixedValueFallback;
   }
   let value = getValue(instances[0]);
-  // $FlowFixMe[invalid-compare]
   if (value === null) {
     value = defaultValue;
   }
@@ -178,20 +177,19 @@ const getFieldLabel = ({
   return field.name;
 };
 
-// $FlowFixMe[recursive-definition]
-// $FlowFixMe[definition-cycle]
-const PropertiesEditor = ({
-  onInstancesModified,
-  instances,
-  schema,
-  mode,
-  renderExtraDescriptionText,
-  unsavedChanges,
-  project,
-  projectScopedContainersAccessor,
-  resourceManagementProps,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const PropertiesEditor = (
+  {
+    onInstancesModified,
+    instances,
+    schema,
+    mode,
+    renderExtraDescriptionText,
+    unsavedChanges,
+    project,
+    projectScopedContainersAccessor,
+    resourceManagementProps
+  }: Props,
+): React.Node => {
   const forceUpdate = useForceUpdate();
 
   const _onInstancesModified = React.useCallback(
@@ -406,12 +404,11 @@ const PropertiesEditor = ({
         />
       ));
 
-      // $FlowFixMe[invalid-compare]
       if (field.valueType === 'number') {
         const { setValue } = field;
         return (
           <SelectField
-            value={getFieldValue({ instances, field })}
+            value={'' + getFieldValue({ instances, field })}
             key={field.name}
             id={field.name}
             floatingLabelText={getFieldLabel({ instances, field })}
@@ -421,7 +418,7 @@ const PropertiesEditor = ({
               _onInstancesModified(instances);
             }}
             style={styles.field}
-            disabled={field.disabled}
+            disabled={getDisabled({ instances, field })}
           >
             {children}
           </SelectField>

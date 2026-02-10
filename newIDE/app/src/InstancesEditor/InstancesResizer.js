@@ -36,12 +36,10 @@ export const resizeGrabbingRelativePositions = {
   Right: [1, 0.5],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const canMoveOnX = (location: ResizeGrabbingLocation) =>
+export const canMoveOnX = (location: ResizeGrabbingLocation): false | boolean =>
   location !== 'Top' && location !== 'Bottom';
 
-// $FlowFixMe[signature-verification-failure]
-export const canMoveOnY = (location: ResizeGrabbingLocation) =>
+export const canMoveOnY = (location: ResizeGrabbingLocation): false | boolean =>
   location !== 'Left' && location !== 'Right';
 
 const areAnyInstancesNotStraight = (instances: gdInitialInstance[]) => {
@@ -85,9 +83,7 @@ export default class InstancesResizer {
     this.instancesEditorSettings = instancesEditorSettings;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _getOrCreateInstanceAABB(instance: gdInitialInstance) {
+  _getOrCreateInstanceAABB(instance: gdInitialInstance): any {
     const initialInstanceAABB = this._instanceAABBs[instance.ptr];
     if (initialInstanceAABB) return initialInstanceAABB;
 
@@ -96,9 +92,7 @@ export default class InstancesResizer {
     ] = this.instanceMeasurer.getInstanceAABB(instance, new Rectangle()));
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _getOrCreateUnrotatedInstanceAABB(instance: gdInitialInstance) {
+  _getOrCreateUnrotatedInstanceAABB(instance: gdInitialInstance): any {
     const initialUnrotatedInstanceAABB = this._unrotatedInstanceAABBs[
       instance.ptr
     ];
@@ -112,9 +106,7 @@ export default class InstancesResizer {
     ));
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _getOrCreateInstanceOriginPosition(instance: gdInitialInstance) {
+  _getOrCreateInstanceOriginPosition(instance: gdInitialInstance): any {
     const initialPosition = this._instancePositions[instance.ptr];
     if (initialPosition) return initialPosition;
 

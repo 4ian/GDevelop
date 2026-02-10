@@ -212,8 +212,8 @@ export type InstructionOrObjectSelectorInterface = {|
   reEnumerateInstructions: (i18n: I18nType) => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const InstructionOrObjectSelector = React.forwardRef<
+// $FlowFixMe[prop-missing]
+const InstructionOrObjectSelector: React.AbstractComponent<any, mixed> = React.forwardRef<
   Props,
   InstructionOrObjectSelectorInterface
 >(

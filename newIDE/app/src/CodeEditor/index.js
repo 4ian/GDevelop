@@ -140,9 +140,7 @@ export class CodeEditor extends React.Component<Props, State> {
     event.stopPropagation();
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const { MonacoEditor, error } = this.state;
     if (error) {
       return (

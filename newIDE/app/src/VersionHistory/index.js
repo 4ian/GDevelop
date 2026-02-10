@@ -89,8 +89,8 @@ type Props = {|
   isVisible: boolean,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const VersionHistory = React.memo<Props>(
+// $FlowFixMe[prop-missing]
+const VersionHistory: React.AbstractComponent<Props, mixed> = React.memo<Props>(
   ({
     projectId,
     authenticatedUserId,

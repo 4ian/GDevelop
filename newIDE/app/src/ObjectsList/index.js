@@ -1690,8 +1690,8 @@ const MemoizedObjectsList = React.memo<Props, ObjectsListInterface>(
   arePropsEqual
 );
 
-// $FlowFixMe[signature-verification-failure]
-const ObjectsListWithErrorBoundary = React.forwardRef<
+// $FlowFixMe[prop-missing]
+const ObjectsListWithErrorBoundary: React.AbstractComponent<any, mixed> = React.forwardRef<
   Props,
   ObjectsListInterface
 >((props, ref) => (

@@ -34,8 +34,8 @@ export type BoxSearchResultsInterface = {|
   scrollToPosition: (y: number) => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const BoxSearchResults = React.forwardRef<
+// $FlowFixMe[prop-missing]
+export const BoxSearchResults: React.AbstractComponent<any, mixed> = React.forwardRef<
   // $FlowFixMe[incompatible-type] The generic type can't pass through.
   // $FlowFixMe[cannot-resolve-name]
   Props<SearchItem>,

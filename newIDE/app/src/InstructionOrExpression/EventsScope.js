@@ -164,9 +164,7 @@ export class ProjectScopedContainersAccessor {
     return projectScopedContainers;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  makeNewProjectScopedContainersWithLocalVariables(event: gdBaseEvent) {
+  makeNewProjectScopedContainersWithLocalVariables(event: gdBaseEvent): any {
     return new ProjectScopedContainersAccessor(
       this._scope,
       this._parameterObjectsContainer,

@@ -50,19 +50,20 @@ type Props = {|
   width?: number,
 |};
 
-export const GameThumbnail = ({
-  disabled,
-  canUpdateThumbnail,
-  thumbnailUrl,
-  gameName,
-  gameId,
-  onGameUpdated,
-  onUpdatingGame,
-  background = 'light',
-  fullWidthOnMobile,
-  width,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const GameThumbnail = (
+  {
+    disabled,
+    canUpdateThumbnail,
+    thumbnailUrl,
+    gameName,
+    gameId,
+    onGameUpdated,
+    onUpdatingGame,
+    background = 'light',
+    fullWidthOnMobile,
+    width
+  }: Props,
+): React.Node => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext

@@ -56,8 +56,7 @@ const privateAssetPackListingData: PrivateAssetPackListingData = {
   stripeProductId: 'stripeProductId',
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const NotLoggedIn = () => {
+export const NotLoggedIn = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <PrivateAssetPackPurchaseDialog
@@ -69,8 +68,7 @@ export const NotLoggedIn = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const LoggedIn = () => {
+export const LoggedIn = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <PrivateAssetPackPurchaseDialog

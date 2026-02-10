@@ -65,9 +65,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     }
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _renderItemRow(item: Item, index: number, isMobile: boolean) {
+  _renderItemRow(item: Item, index: number, isMobile: boolean): any {
     const {
       selectedItems,
       getItemThumbnail,
@@ -112,9 +110,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     );
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const {
       height,
       width,

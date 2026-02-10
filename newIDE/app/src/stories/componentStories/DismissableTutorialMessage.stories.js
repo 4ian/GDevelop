@@ -44,13 +44,14 @@ type Props = {|
   tutorialId: string,
 |};
 
-const WrappedDismissableTutorialMessage = ({
-  tutorials = defaultTutorials,
-  // $FlowFixMe[incompatible-type]
-  preferences = initialPreferences,
-  tutorialId,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => (
+const WrappedDismissableTutorialMessage = (
+  {
+    tutorials = defaultTutorials,
+    // $FlowFixMe[incompatible-type]
+    preferences = initialPreferences,
+    tutorialId
+  }: Props,
+): React.Node => (
   <PreferencesContext.Provider value={preferences}>
     <TutorialContext.Provider
       value={{
@@ -70,20 +71,18 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const NoTutorialsLoaded = () => (
+export const NoTutorialsLoaded = (): React.Node => (
   <WrappedDismissableTutorialMessage tutorials={null} tutorialId="tutorial-1" />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const NoTutorialsFound = () => (
+export const NoTutorialsFound = (): React.Node => (
   <WrappedDismissableTutorialMessage tutorials={[]} tutorialId="tutorial-1" />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const HiddenTutorial = () => (
+export const HiddenTutorial = (): React.Node => (
   <WrappedDismissableTutorialMessage
     tutorialId="tutorial-1"
+    // $FlowFixMe[incompatible-type]
     preferences={{
       ...initialPreferences,
       // $FlowFixMe[incompatible-type]
@@ -95,17 +94,14 @@ export const HiddenTutorial = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const TutorialNotInList = () => (
+export const TutorialNotInList = (): React.Node => (
   <WrappedDismissableTutorialMessage tutorialId="tutorial-3" />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const DefaultVideo = () => (
+export const DefaultVideo = (): React.Node => (
   <WrappedDismissableTutorialMessage tutorialId="tutorial-1" />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const DefaultText = () => (
+export const DefaultText = (): React.Node => (
   <WrappedDismissableTutorialMessage tutorialId="tutorial-2" />
 );

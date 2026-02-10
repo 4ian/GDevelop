@@ -190,9 +190,7 @@ class TileMapPaintingPreview {
     angle: number,
     // $FlowFixMe[value-as-type]
     texture: PIXI.Texture,
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  |}) {
+  |}): any {
     const sprite = new PIXI.TilingSprite(texture);
     const workingPoint = [0, 0];
 

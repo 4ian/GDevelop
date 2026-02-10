@@ -23,8 +23,8 @@ const styles = {
   },
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Toolbar = React.memo<ToolbarProps>(
+// $FlowFixMe[prop-missing]
+export const Toolbar: React.AbstractComponent<ToolbarProps, mixed> = React.memo<ToolbarProps>(
   ({
     children,
     borderBottomColor,
@@ -80,8 +80,8 @@ type ToolbarGroupProps = {|
   spaceOut?: boolean,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const ToolbarGroup = React.memo<ToolbarGroupProps>(
+// $FlowFixMe[prop-missing]
+export const ToolbarGroup: React.AbstractComponent<ToolbarGroupProps, mixed> = React.memo<ToolbarGroupProps>(
   (props: ToolbarGroupProps) => (
     <span style={toolbarGroupStyle(props)}>{props.children}</span>
   )

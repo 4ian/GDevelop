@@ -155,13 +155,7 @@ type Props = {|
   isSelected?: boolean,
 |};
 
-export const ResourceCard = ({
-  resource,
-  onChoose,
-  size,
-  isSelected,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const ResourceCard = ({resource, onChoose, size, isSelected}: Props): null | React.MixedElement | React.Node => {
   const resourceKind = resource.type;
   const theme = React.useContext(GDevelopThemeContext);
 

@@ -39,10 +39,19 @@ export type ObjectAnchor = {
 };
 
 const getPropertyValue = (
+  name: string,
   properties: gdMapStringPropertyDescriptor,
-  name: string
+  behaviorOverriding: gdBehavior | null
 ): CustomObjectConfiguration_EdgeAnchor =>
-  properties.has(name)
+  // $FlowFixMe[prop-missing]
+  behaviorOverriding && behaviorOverriding.hasPropertyValue(name)
+    ? gd.CustomObjectConfiguration.getEdgeAnchorFromString(
+        behaviorOverriding
+          .getProperties()
+          .get(name)
+          .getValue()
+      )
+    : properties.has(name)
     ? gd.CustomObjectConfiguration.getEdgeAnchorFromString(
         properties.get(name).getValue()
       )
@@ -64,7 +73,8 @@ const getDefaultAnchor = () => ({
  */
 export const getObjectAnchor = (
   eventBasedObjectVariant: gdEventsBasedObjectVariant,
-  objectName: string
+  objectName: string,
+  initialInstance: gdInitialInstance
 ): ObjectAnchor => {
   const objects = eventBasedObjectVariant.getObjects();
   if (!objects.hasObjectNamed(objectName)) {
@@ -77,10 +87,33 @@ export const getObjectAnchor = (
     return getDefaultAnchor();
   }
   const properties = childObject.getBehavior('Anchor').getProperties();
-  const leftEdgeAnchor = getPropertyValue(properties, 'leftEdgeAnchor');
-  const topEdgeAnchor = getPropertyValue(properties, 'topEdgeAnchor');
-  const rightEdgeAnchor = getPropertyValue(properties, 'rightEdgeAnchor');
-  const bottomEdgeAnchor = getPropertyValue(properties, 'bottomEdgeAnchor');
+  // $FlowFixMe[prop-missing]
+  const behaviorOverriding = initialInstance.hasBehaviorOverridingNamed(
+    'Anchor'
+  )
+    // $FlowFixMe[prop-missing]
+    ? initialInstance.getBehaviorOverriding('Anchor')
+    : null;
+  const leftEdgeAnchor = getPropertyValue(
+    'leftEdgeAnchor',
+    properties,
+    behaviorOverriding
+  );
+  const topEdgeAnchor = getPropertyValue(
+    'topEdgeAnchor',
+    properties,
+    behaviorOverriding
+  );
+  const rightEdgeAnchor = getPropertyValue(
+    'rightEdgeAnchor',
+    properties,
+    behaviorOverriding
+  );
+  const bottomEdgeAnchor = getPropertyValue(
+    'bottomEdgeAnchor',
+    properties,
+    behaviorOverriding
+  );
   return { leftEdgeAnchor, topEdgeAnchor, rightEdgeAnchor, bottomEdgeAnchor };
 };
 
@@ -112,45 +145,31 @@ export class LayoutedInstance {
     this._customDepth = instance.getCustomWidth();
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getX() {
+  getX(): any {
     return this.x;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getY() {
+  getY(): any {
     return this.y;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getZ() {
+  getZ(): any {
     return this.z;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getAngle() {
-    return 0;
+  getAngle(): any {
+    return this.instance.getAngle();
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getRotationX() {
-    return 0;
+  getRotationX(): any {
+    return this.instance.getRotationX();
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getRotationY() {
-    return 0;
+  getRotationY(): any {
+    return this.instance.getRotationY();
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getObjectName() {
+  getObjectName(): any {
     return this.instance.getObjectName();
   }
 
@@ -166,66 +185,50 @@ export class LayoutedInstance {
 
   setRotationY(angle: number) {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  isLocked() {
+  isLocked(): any {
     return false;
   }
 
   setLocked(lock: boolean) {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  isSealed() {
+  isSealed(): any {
     return false;
   }
 
   setSealed(seal: boolean) {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getZOrder() {
-    return 0;
+  getZOrder(): any {
+    return this.instance.getZOrder();
   }
 
   setZOrder(zOrder: number) {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getOpacity() {
+  getOpacity(): any {
     return this.instance.getOpacity();
   }
 
   setOpacity(opacity: number) {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  isFlippedX() {
+  isFlippedX(): any {
     return this.instance.isFlippedX();
   }
 
   setFlippedX(flippedX: boolean) {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  isFlippedY() {
+  isFlippedY(): any {
     return this.instance.isFlippedY();
   }
 
   setFlippedY(flippedY: boolean) {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  isFlippedZ() {
+  isFlippedZ(): any {
     return this.instance.isFlippedZ();
   }
 
   setFlippedZ(flippedY: boolean) {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getLayer() {
-    return '';
+  getLayer(): any {
+    return this.instance.getLayer();
   }
 
   setLayer(layer: string) {}
@@ -234,15 +237,11 @@ export class LayoutedInstance {
     this._hasCustomSize = enable;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  hasCustomSize() {
+  hasCustomSize(): any {
     return this._hasCustomSize;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  hasCustomDepth() {
+  hasCustomDepth(): any {
     return this._hasCustomDepth;
   }
 
@@ -251,9 +250,7 @@ export class LayoutedInstance {
     this._hasCustomSize = true;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getCustomWidth() {
+  getCustomWidth(): any {
     return this._customWidth;
   }
 
@@ -262,9 +259,7 @@ export class LayoutedInstance {
     this._hasCustomSize = true;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getCustomHeight() {
+  getCustomHeight(): any {
     return this._customHeight;
   }
 
@@ -273,15 +268,11 @@ export class LayoutedInstance {
     this._hasCustomDepth = true;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getCustomDepth() {
+  getCustomDepth(): any {
     return this._customDepth;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  resetPersistentUuid() {
+  resetPersistentUuid(): any {
     return this;
   }
 
@@ -295,24 +286,18 @@ export class LayoutedInstance {
   getCustomProperties(
     globalObjectsContainer: gdObjectsContainer,
     objectsContainer: gdObjectsContainer
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  ) {
+  ): any {
     return this.instance.getCustomProperties(
       globalObjectsContainer,
       objectsContainer
     );
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getRawDoubleProperty(name: string) {
+  getRawDoubleProperty(name: string): any {
     return this.instance.getRawDoubleProperty(name);
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getRawStringProperty(name: string) {
+  getRawStringProperty(name: string): any {
     return this.instance.getRawStringProperty(name);
   }
 
@@ -320,10 +305,18 @@ export class LayoutedInstance {
 
   setRawStringProperty(name: string, value: string) {}
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getVariables() {
+  getVariables(): any {
     return [];
+  }
+
+  hasBehaviorOverridingNamed(name: string): boolean {
+    // $FlowFixMe[prop-missing]
+    return this.instance.hasBehaviorOverridingNamed(name);
+  }
+
+  getBehaviorOverriding(name: string): gdBehavior {
+    // $FlowFixMe[prop-missing]
+    return this.instance.getBehaviorOverriding(name);
   }
 
   serializeTo(element: gdSerializerElement) {}
@@ -389,7 +382,8 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
 
   const objectAnchor = getObjectAnchor(
     eventBasedObjectVariant,
-    layoutedInstance.getObjectName()
+    layoutedInstance.getObjectName(),
+    initialInstance
   );
   const leftEdgeAnchor = objectAnchor
     ? objectAnchor.leftEdgeAnchor

@@ -78,12 +78,7 @@ type Props = {|
   horizontalOuterMarginToEatOnMobile?: number,
 |};
 
-const ResponsiveMediaGallery = ({
-  mediaItems,
-  altTextTemplate,
-  horizontalOuterMarginToEatOnMobile,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const ResponsiveMediaGallery = ({mediaItems, altTextTemplate, horizontalOuterMarginToEatOnMobile}: Props): any | React.MixedElement => {
   const [selectedMediaIndex, setSelectedMediaIndex] = React.useState<number>(0);
   const { isMobile } = useResponsiveWindowSize();
 

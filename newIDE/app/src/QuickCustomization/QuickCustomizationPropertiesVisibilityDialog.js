@@ -32,8 +32,7 @@ export default function QuickCustomizationPropertiesVisibilityDialog({
   onClose,
   propertyNames,
   propertiesQuickCustomizationVisibilities,
-// $FlowFixMe[signature-verification-failure]
-}: Props) {
+}: Props): React.Node {
   const forceUpdate = useForceUpdate();
 
   return (

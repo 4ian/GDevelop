@@ -30,14 +30,7 @@ type Props = {|
   onRemove: (index: number) => void,
 |};
 
-const PolygonEditor = ({
-  vertices,
-  onChangeVertexX,
-  onChangeVertexY,
-  onAdd,
-  onRemove,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const PolygonEditor = ({vertices, onChangeVertexX, onChangeVertexY, onAdd, onRemove}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const isPolygonConvex = (vertices: Array<Vertex>) => {
     // Get edges

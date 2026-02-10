@@ -62,8 +62,7 @@ export const sharedFuseConfiguration = {
 /**
  * This helper allows creating the search query for a search within a simple array of strings.
  */
-// $FlowFixMe[signature-verification-failure]
-export const getFuseSearchQueryForSimpleArray = (searchText: string) => {
+export const getFuseSearchQueryForSimpleArray = (searchText: string): string => {
   const tokenisedSearchQuery = searchText.trim().split(' ');
   return `'${tokenisedSearchQuery.join(" '")}`;
 };
@@ -77,8 +76,7 @@ export const getFuseSearchQueryForSimpleArray = (searchText: string) => {
 export const getFuseSearchQueryForMultipleKeys = (
   searchText: string,
   keys: Array<string>
-// $FlowFixMe[signature-verification-failure]
-) => {
+): { $or: Array<{ $or: Array<any> }> } => {
   const tokenisedSearchQuery = searchText.trim().split(' ');
   const searchQuery: {
     // $FlowFixMe[value-as-type]
@@ -166,9 +164,7 @@ const getFirstExactMatchPosition = (
   };
 };
 
-// $FlowFixMe[signature-verification-failure]
-// $FlowFixMe[missing-local-annot]
-export const nullifySingleCharacterMatches = <T>(result: SearchResult<T>) => {
+export const nullifySingleCharacterMatches = <T>(result: SearchResult<T>): any => {
   const matchesWithAtLeastOneSignificantIndex = result.matches
     .map(match => {
       const newIndices = match.indices
@@ -200,9 +196,7 @@ export const augmentSearchResult = <T>(
   };
 };
 
-// $FlowFixMe[signature-verification-failure]
-// $FlowFixMe[missing-local-annot]
-export const tuneMatches = <T>(result: SearchResult<T>, searchText: string) =>
+export const tuneMatches = <T>(result: SearchResult<T>, searchText: string): any =>
   // $FlowFixMe[missing-type-arg]
   result.matches.map<SearchMatch>(match => ({
     key: match.key,
@@ -210,8 +204,10 @@ export const tuneMatches = <T>(result: SearchResult<T>, searchText: string) =>
     indices: tuneMatchIndices(match, searchText),
   }));
 
-// $FlowFixMe[signature-verification-failure]
-export const sortResultsUsingExactMatches = (orderedKeys: string[]) => {
+export const sortResultsUsingExactMatches = (orderedKeys: Array<string>): (<T>(
+  resultA: AugmentedSearchResult<T>,
+  resultB: AugmentedSearchResult<T>
+) => any) => {
   return <T>(
     resultA: AugmentedSearchResult<T>,
     resultB: AugmentedSearchResult<T>

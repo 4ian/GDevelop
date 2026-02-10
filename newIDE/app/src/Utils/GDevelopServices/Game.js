@@ -185,13 +185,12 @@ export type GameLeaderboard = {
   topGameCommentQualityRatings: GameLeaderboardEntry[],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const client = axios.create({
+// $FlowFixMe[cannot-resolve-name]
+export const client: Axios = axios.create({
   baseURL: GDevelopGameApi.baseUrl,
 });
 
-// $FlowFixMe[signature-verification-failure]
-export const getCategoryName = (category: string, i18n: I18nType) => {
+export const getCategoryName = (category: string, i18n: I18nType): any => {
   switch (category) {
     case 'action':
       return i18n._(t`Action`);
@@ -232,8 +231,7 @@ export const getCategoryName = (category: string, i18n: I18nType) => {
   }
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const getGameUrl = (game: ?Game) => {
+export const getGameUrl = (game: ?Game): any | null => {
   if (!game) return null;
   const slug = game.cachedCurrentSlug;
   return slug
@@ -241,8 +239,7 @@ export const getGameUrl = (game: ?Game) => {
     : GDevelopGamesPlatform.getGameUrl(game.id);
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const getPublicGameUrl = (publicGame: ?PublicGame) => {
+export const getPublicGameUrl = (publicGame: ?PublicGame): any | null => {
   if (!publicGame) return null;
 
   return publicGame.gameSlug && publicGame.userSlug
@@ -262,7 +259,6 @@ export const getAclsFromUserIds = (
   }));
 
 export const listAllShowcasedGames = async (): Promise<AllShowcasedGames> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get('/showcased-game');
   const { gamesShowcaseUrl, filtersUrl } = response.data;
   if (!gamesShowcaseUrl || !filtersUrl) {
@@ -314,7 +310,6 @@ export const registerGame = async (
 ): Promise<Game> => {
   const authorizationHeader = await getAuthorizationHeader();
 
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.post(
     `/game/${gameId}`,
     {
@@ -364,7 +359,6 @@ export const updateGame = async (
   }: GameUpdatePayload
 ): Promise<Game> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.patch(
     `/game/${gameId}`,
     {
@@ -412,7 +406,6 @@ export const setGameUserAcls = async (
   |}
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.post(
     '/game/action/set-acls',
     {
@@ -440,7 +433,6 @@ export const setGameSlug = async (
   gameSlug: string
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.post(
     '/game/action/set-slug',
     {
@@ -467,7 +459,6 @@ export const getGame = async (
   gameId: string
 ): Promise<Game> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/game/${gameId}`, {
     params: {
       userId,
@@ -490,7 +481,6 @@ export const deleteGame = async (
   gameId: string
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   await client.delete(`/game/${gameId}`, {
     params: {
       userId,
@@ -507,7 +497,6 @@ export const getGames = async (
 ): Promise<Array<Game>> => {
   const authorizationHeader = await getAuthorizationHeader();
 
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get('/game', {
     params: {
       userId,
@@ -524,7 +513,6 @@ export const getGames = async (
 };
 
 export const getPublicGame = async (gameId: string): Promise<PublicGame> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/public-game/${gameId}`);
   return ensureObjectHasProperty({
     data: response.data,
@@ -534,7 +522,6 @@ export const getPublicGame = async (gameId: string): Promise<PublicGame> => {
 };
 
 export const getGameCategories = async (): Promise<GameCategory[]> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get('/game-category');
   return ensureIsArray({
     data: response.data,
@@ -551,7 +538,6 @@ export const buyGameFeaturing = async (
   }: {| gameId: string, userId: string, usageType: GameUsageType |}
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   await client.post(
     '/game/action/buy-with-credits',
     {},
@@ -573,7 +559,6 @@ export const listGameFeaturings = async (
   { gameId, userId }: {| gameId: string, userId: string |}
 ): Promise<GameFeaturing[]> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get('/game-featuring', {
     params: {
       userId,
@@ -591,7 +576,6 @@ export const listGameFeaturings = async (
 };
 
 export const listMarketingPlans = async (): Promise<MarketingPlan[]> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get('/marketing-plan');
   return ensureIsArray({
     data: response.data,
@@ -605,7 +589,6 @@ export const getRecommendedMarketingPlan = async (
 ): Promise<MarketingPlan> => {
   const authorizationHeader = await getAuthorizationHeader();
 
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get('/marketing-plan', {
     headers: {
       Authorization: authorizationHeader,
@@ -625,7 +608,6 @@ export const getRecommendedMarketingPlan = async (
 export const getGameCommentQualityRatingsLeaderboards = async (): Promise<
   Array<GameLeaderboard>
 > => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(
     '/game-comment-quality-ratings-leaderboard?leaderboardRegionName=global'
   );
@@ -650,7 +632,6 @@ export const createGameResourceSignedUrls = async ({
     publicUrl: string,
   |}>,
 |}> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.post(`/resource-signed-url`, {
     uploadType,
     files,

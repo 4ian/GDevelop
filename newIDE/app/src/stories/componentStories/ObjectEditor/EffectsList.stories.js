@@ -10,8 +10,7 @@ import fakeResourceManagementProps from '../../FakeResourceManagement';
 import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
 
-// $FlowFixMe[signature-verification-failure]
-export const withSomeEffectsForAMixedLayer = () => (
+export const withSomeEffectsForAMixedLayer = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
@@ -31,8 +30,7 @@ export const withSomeEffectsForAMixedLayer = () => (
   </DragAndDropContextProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const withSomeEffectsForA2DLayer = () => (
+export const withSomeEffectsForA2DLayer = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
@@ -55,8 +53,7 @@ export const withSomeEffectsForA2DLayer = () => (
 // TODO Add a story with 2 effects of the same type that should be unique.
 // Note that this can't be done until the list of unique effect is hardcoded.
 
-// $FlowFixMe[signature-verification-failure]
-export const withSomeEffectsForA3DLayer = () => (
+export const withSomeEffectsForA3DLayer = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
@@ -76,8 +73,7 @@ export const withSomeEffectsForA3DLayer = () => (
   </DragAndDropContextProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const withSomeEffectsForAnObject = () => (
+export const withSomeEffectsForAnObject = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
@@ -97,8 +93,7 @@ export const withSomeEffectsForAnObject = () => (
   </DragAndDropContextProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const withAnEffectWithoutEffectTypeForALayer = () => (
+export const withAnEffectWithoutEffectTypeForALayer = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
@@ -118,8 +113,7 @@ export const withAnEffectWithoutEffectTypeForALayer = () => (
   </DragAndDropContextProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const withoutEffectsForAMixedLayer = () => (
+export const withoutEffectsForAMixedLayer = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
@@ -139,8 +133,7 @@ export const withoutEffectsForAMixedLayer = () => (
   </DragAndDropContextProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const withoutEffectsForA2DLayer = () => (
+export const withoutEffectsForA2DLayer = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
@@ -170,8 +163,7 @@ export const withoutEffectsForA2DLayer = () => (
   </DragAndDropContextProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const withoutEffectsForA3DLayer = () => (
+export const withoutEffectsForA3DLayer = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
@@ -201,8 +193,7 @@ export const withoutEffectsForA3DLayer = () => (
   </DragAndDropContextProvider>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const withoutEffectsForAnObject = () => (
+export const withoutEffectsForAnObject = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList

@@ -40,8 +40,7 @@ type Props = {|
   error: ?AuthError,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const getEmailErrorText = (error: ?AuthError) => {
+export const getEmailErrorText = (error: ?AuthError): void | React.Node => {
   if (!error) return undefined;
 
   if (error.code === 'auth/invalid-email')
@@ -78,8 +77,7 @@ export const getEmailErrorText = (error: ?AuthError) => {
   return undefined;
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const getPasswordErrorText = (error: ?AuthError) => {
+export const getPasswordErrorText = (error: ?AuthError): void | React.Node => {
   if (!error) return undefined;
 
   if (error.code === 'auth/too-many-requests')
@@ -108,15 +106,16 @@ export const getPasswordErrorText = (error: ?AuthError) => {
   return undefined;
 };
 
-const CreateAccountDialog = ({
-  onClose,
-  onGoToLogin,
-  onCreateAccount,
-  onLoginWithProvider,
-  createAccountInProgress,
-  error,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const CreateAccountDialog = (
+  {
+    onClose,
+    onGoToLogin,
+    onCreateAccount,
+    onLoginWithProvider,
+    createAccountInProgress,
+    error
+  }: Props,
+): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const styles = getStyles({ isMobile });
   const [email, setEmail] = React.useState<string>('');

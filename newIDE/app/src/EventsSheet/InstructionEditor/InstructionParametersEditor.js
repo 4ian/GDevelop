@@ -111,8 +111,8 @@ const isParameterVisible = (
   return true;
 };
 
-// $FlowFixMe[signature-verification-failure]
-const InstructionParametersEditor = React.forwardRef<
+// $FlowFixMe[prop-missing]
+const InstructionParametersEditor: React.AbstractComponent<any, mixed> = React.forwardRef<
   Props,
   InstructionParametersEditorInterface
 >(

@@ -167,22 +167,23 @@ const errorHandler = (
   );
 };
 
-export const ErrorFallbackComponent = ({
-  componentStack,
-  error,
-  componentTitle,
-  uniqueErrorId,
-  onClose,
-  showOnTop,
-}: {|
-  componentStack: string,
-  error: Error,
-  componentTitle: React.Node,
-  uniqueErrorId: string,
-  onClose?: () => void,
-  showOnTop?: boolean,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+export const ErrorFallbackComponent = (
+  {
+    componentStack,
+    error,
+    componentTitle,
+    uniqueErrorId,
+    onClose,
+    showOnTop
+  }: {|
+    componentStack: string,
+    error: Error,
+    componentTitle: React.Node,
+    uniqueErrorId: string,
+    onClose?: () => void,
+    showOnTop?: boolean,
+  |},
+): React.Node => {
   const isCriticalError = error.stack && error.stack.includes('.wasm');
   return (
     <PlaceholderMessage showOnTop={showOnTop} data={{ errorBoundary: 'true' }}>
@@ -245,8 +246,7 @@ type Props = {|
   showOnTop?: boolean,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const ErrorBoundary = (props: Props) => {
+const ErrorBoundary = (props: Props): React.Node => {
   const uniqueErrorIdRef = React.useRef(generateUUID());
   return (
     <ReactErrorBoundary

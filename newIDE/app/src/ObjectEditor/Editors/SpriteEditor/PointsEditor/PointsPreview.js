@@ -45,8 +45,7 @@ type State = {|
   draggedPointKind: ?PointKind,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const PointsPreview = (props: Props) => {
+const PointsPreview = (props: Props): React.MixedElement => {
   const svgRef = React.useRef<React.ElementRef<'svg'> | null>(null);
   const [state, setState] = React.useState<State>({
     draggedPoint: null,

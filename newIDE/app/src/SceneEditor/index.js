@@ -444,9 +444,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._sendSelectedInstances();
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getInstancesEditorSettings() {
+  getInstancesEditorSettings(): any {
     return this.state.instancesEditorSettings;
   }
 
@@ -573,7 +571,12 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const justAddedInstances = changes.addedInstances.map(addedInstance => {
       const instance: gdInitialInstance = this.props.initialInstances.insertNewInitialInstance();
-      unserializeFromJSObject(instance, addedInstance);
+      unserializeFromJSObject(
+        instance,
+        addedInstance,
+        'unserializeFrom',
+        this.props.project
+      );
       return instance;
     });
     if (justAddedInstances.length) {
@@ -978,15 +981,14 @@ export default class SceneEditor extends React.Component<Props, State> {
    * bottleneck. We let the mutations be done and trigger an update only when the user
    * is done.
    */
-  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  _onInstancesEditorSettingsMutated = debounce(
-    (instancesEditorSettings: InstancesEditorSettings) => {
-      this.setInstancesEditorSettings(instancesEditorSettings);
-    },
-    1000,
-    { leading: false, trailing: true }
-  );
+  _onInstancesEditorSettingsMutated = (debounce(
+  (instancesEditorSettings: InstancesEditorSettings) => {
+    this.setInstancesEditorSettings(instancesEditorSettings);
+  },
+  1000,
+  { leading: false, trailing: true },
+): any);
 
   undo = () => {
     // /!\ Drop the selection to avoid keeping any references to deleted instances.
@@ -994,7 +996,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.instancesSelection.clearSelection();
     this.setState(
       {
-        history: undo(this.state.history, this.props.initialInstances),
+        history: undo(
+          this.state.history,
+          this.props.initialInstances,
+          this.props.project
+        ),
       },
       () => {
         // /!\ Force the instances editor to destroy and mount again the
@@ -1013,7 +1019,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.instancesSelection.clearSelection();
     this.setState(
       {
-        history: redo(this.state.history, this.props.initialInstances),
+        history: redo(
+          this.state.history,
+          this.props.initialInstances,
+          this.props.project
+        ),
       },
       () => {
         // /!\ Force the instances editor to destroy and mount again the
@@ -1297,11 +1307,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._sendUpdatedInstances(instances);
   };
 
-  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  _exportDataOnly = debounce(() => {
+  _exportDataOnly = (debounce(
+  () => {
     this.props.hotReloadPreviewButtonProps.launchProjectDataOnlyPreview();
-  }, 250);
+  },
+  250,
+): any);
 
   _onInstancesModified = (instances: Array<gdInitialInstance>) => {
     this._sendUpdatedInstances(instances);
@@ -1706,9 +1718,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     newName: string,
     global: boolean,
     i18n: I18nType
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  ) => {
+  ): any => {
     const { project, layout, projectScopedContainersAccessor } = this.props;
 
     const projectScopedContainers = projectScopedContainersAccessor.get();
@@ -2071,9 +2081,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getContextMenuZoomItems = (i18n: I18nType) => {
+  getContextMenuZoomItems = (i18n: I18nType): any => {
     return [
       {
         label: i18n._(t`Zoom in`),
@@ -2104,9 +2112,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     ];
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getContextMenuLayoutItems = (i18n: I18nType) => {
+  getContextMenuLayoutItems = (i18n: I18nType): any => {
     const { layout } = this.props;
 
     return [
@@ -2121,9 +2127,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     ].filter(Boolean);
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  getContextMenuInstancesWiseItems = (i18n: I18nType) => {
+  getContextMenuInstancesWiseItems = (i18n: I18nType): any => {
     const hasSelectedInstances = this.instancesSelection.hasSelectedInstances();
     return [
       {
@@ -2267,9 +2271,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  isInstanceOf3DObject = (instance: gdInitialInstance) => {
+  isInstanceOf3DObject = (instance: gdInitialInstance): any => {
     const { project, globalObjectsContainer, objectsContainer } = this.props;
 
     const object = getObjectByName(
@@ -2286,9 +2288,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  buildContextMenu = (i18n: I18nType, options: any) => {
+  buildContextMenu = (i18n: I18nType, options: any): any => {
     if (
       options.ignoreSelectedObjectsForContextMenu ||
       !this.instancesSelection.hasSelectedInstances()
@@ -2438,6 +2438,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       .map(instance => serializeToJSObject(instance));
 
     const newInstances = addSerializedInstances({
+      project: this.props.project,
       instancesContainer: this.props.initialInstances,
       copyReferential: [-2 * MOVEMENT_BIG_DELTA, -2 * MOVEMENT_BIG_DELTA],
       serializedInstances: serializedSelection,
@@ -2474,6 +2475,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (x === null || y === null || instancesContent === null) return;
 
     const newInstances = addSerializedInstances({
+      project: this.props.project,
       instancesContainer: this.props.initialInstances,
       copyReferential: [x, y],
       serializedInstances: instancesContent,
@@ -2539,7 +2541,12 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     for (const serializedInstance of serializedSelection) {
       const instance = new gd.InitialInstance();
-      unserializeFromJSObject(instance, serializedInstance);
+      unserializeFromJSObject(
+        instance,
+        serializedInstance,
+        'unserializeFrom',
+        project
+      );
       newExternalLayout
         .getInitialInstances()
         .insertInitialInstance(instance)
@@ -2713,9 +2720,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const {
       project,
       projectScopedContainersAccessor,

@@ -90,8 +90,8 @@ export type InstanceOrObjectPropertiesEditorInterface = {|
   getEditorTitle: () => React.Node,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
+// $FlowFixMe[prop-missing]
+export const InstanceOrObjectPropertiesEditorContainer: React.AbstractComponent<any, mixed> = React.forwardRef<
   Props,
   InstanceOrObjectPropertiesEditorInterface
 >((props, ref) => {
@@ -177,8 +177,10 @@ export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
           layersContainer={layersContainer}
           project={project}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
+          resourceManagementProps={resourceManagementProps}
           unsavedChanges={unsavedChanges}
           i18n={i18n}
+          canOverrideBehaviorProperties={!!eventsFunctionsExtension}
         />
       ) : !!objects.length && lastSelectionType === 'object' ? (
         <CompactObjectPropertiesEditor

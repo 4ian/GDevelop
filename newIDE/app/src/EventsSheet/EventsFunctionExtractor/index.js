@@ -164,16 +164,14 @@ export const createNewInstructionForEventsFunction = (
 /**
  * Validate that a function name is valid.
  */
-// $FlowFixMe[signature-verification-failure]
-export const validateEventsFunctionName = (functionName: string) => {
+export const validateEventsFunctionName = (functionName: string): boolean => {
   return gd.Project.isNameSafe(functionName);
 };
 
 /**
  * Validate that an events functions extension name is valid.
  */
-// $FlowFixMe[signature-verification-failure]
-export const validateExtensionName = (extensionName: string) => {
+export const validateExtensionName = (extensionName: string): boolean => {
   return gd.Project.isNameSafe(extensionName);
 };
 
@@ -183,8 +181,7 @@ export const validateExtensionName = (extensionName: string) => {
 export const validateExtensionNameUniqueness = (
   project: gdProject,
   extensionName: string
-// $FlowFixMe[signature-verification-failure]
-) => {
+): boolean => {
   return !project.hasEventsFunctionsExtensionNamed(extensionName);
 };
 
@@ -195,8 +192,7 @@ export const validateEventsFunctionNameUniqueness = (
   project: gdProject,
   extensionName: string,
   eventsFunction: gdEventsFunction
-// $FlowFixMe[signature-verification-failure]
-) => {
+): boolean => {
   if (project.hasEventsFunctionsExtensionNamed(extensionName)) {
     const eventsFunctionsExtension = project.getEventsFunctionsExtension(
       extensionName
@@ -218,8 +214,7 @@ export const canCreateEventsFunction = (
   project: gdProject,
   extensionName: string,
   eventsFunction: gdEventsFunction
-// $FlowFixMe[signature-verification-failure]
-) => {
+): false | boolean => {
   return (
     extensionName !== '' &&
     validateExtensionName(extensionName) &&
@@ -238,9 +233,6 @@ export const canCreateEventsFunction = (
 /**
  * Return true if the function is considered to have more parameters than usual.
  */
-export const functionHasLotsOfParameters = (
-  eventsFunction: gdEventsFunction
-// $FlowFixMe[signature-verification-failure]
-) => {
+export const functionHasLotsOfParameters = (eventsFunction: gdEventsFunction): boolean => {
   return eventsFunction.getParameters().getParametersCount() > 7;
 };

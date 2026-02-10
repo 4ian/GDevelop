@@ -8,8 +8,9 @@ import {
   type ShowYesNoCancelDialogOptions,
 } from './AlertContext';
 
-// $FlowFixMe[signature-verification-failure]
-const useAlertDialog = () => {
+type UseAlertDialogReturn = { showAlert: (options: ShowAlertDialogOptions) => Promise<void>, showConfirmation: (options: ShowConfirmDialogOptions) => Promise<boolean>, showDeleteConfirmation: ( options: ShowConfirmDeleteDialogOptions ) => Promise<boolean>, showYesNoCancel: (options: ShowYesNoCancelDialogOptions) => Promise<boolean> };
+
+const useAlertDialog = (): UseAlertDialogReturn => {
   const {
     showAlertDialog,
     showConfirmDialog,

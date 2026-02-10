@@ -68,8 +68,8 @@ const defaultPanelConfigByEditor = {
 };
 
 // Forward ref to allow Scene editor to force update some editors
-// $FlowFixMe[signature-verification-failure]
-const MosaicEditorsDisplay = React.forwardRef<
+// $FlowFixMe[prop-missing]
+const MosaicEditorsDisplay: React.AbstractComponent<any, mixed> = React.forwardRef<
   SceneEditorsDisplayProps,
   SceneEditorsDisplayInterface
 >((props, ref) => {

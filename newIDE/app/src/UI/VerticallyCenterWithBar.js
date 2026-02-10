@@ -23,8 +23,7 @@ type Props = {|
   children: React.Node,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const VerticallyCenterWithBar = (props: Props) => {
+const VerticallyCenterWithBar = (props: Props): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (

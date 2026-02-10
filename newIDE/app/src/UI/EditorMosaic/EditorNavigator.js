@@ -43,28 +43,27 @@ export type EditorNavigatorInterface = {|
 // Flow types might have to be changed/removed if upgrading Flow
 // (see example at https://github.com/wgao19/flow-notes/blob/master/react/react-memo.md)
 
-// $FlowFixMe[signature-verification-failure]
-export default React.forwardRef<Props, EditorNavigatorInterface>(
-  (
-    { initialEditorName, editors, transitions, onEditorChanged }: Props,
-    ref
-  ) => {
+export default (React.forwardRef<Props, EditorNavigatorInterface>(
+  ({initialEditorName, editors, transitions, onEditorChanged}: Props, ref) => {
     const [currentEditorName, setCurrentEditorName] = React.useState(
-      initialEditorName
+      initialEditorName,
     );
     const softKeyboardBottomOffset = useSoftKeyboardBottomOffset();
-    React.useImperativeHandle(ref, () => ({
-      openEditor: editorName => {
-        setCurrentEditorName(editorName);
-      },
-    }));
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        openEditor: editorName => {
+          setCurrentEditorName(editorName);
+        },
+      }),
+    );
     React.useEffect(
       () => {
         onEditorChanged(currentEditorName);
       },
-      [currentEditorName, onEditorChanged]
+      [currentEditorName, onEditorChanged],
     );
-
+    
     const transition = transitions[currentEditorName];
     let buttonLineJustifyContent = 'space-between';
     if (transition) {
@@ -75,28 +74,27 @@ export default React.forwardRef<Props, EditorNavigatorInterface>(
         buttonLineJustifyContent = 'flex-end';
       }
     }
-
+    
     const editor = editors[currentEditorName];
-    const renderedEditorWithKeyboardAvoidanceDiv = editor ? (
-      <div
+    const renderedEditorWithKeyboardAvoidanceDiv = editor
+      ? <div
         style={{
           ...styles.avoidSoftKeyboardContainer,
-          ...(editor.noSoftKeyboardAvoidance
+          ...editor.noSoftKeyboardAvoidance
             ? null
-            : getAvoidSoftKeyboardStyle(softKeyboardBottomOffset)),
-        }}
-      >
+            : getAvoidSoftKeyboardStyle(softKeyboardBottomOffset),
+        }}>
         {editor.renderEditor()}
       </div>
-    ) : null;
-
+      : null;
+    
     return (
       <Column noMargin expand noOverflowParent>
-        {transition && (
+        {transition &&
           <Background maxWidth noExpand noFullHeight>
             <Column>
               <Line justifyContent={buttonLineJustifyContent}>
-                {transition.previousEditor && (
+                {transition.previousEditor &&
                   <FlatButton
                     label={<Trans>Back</Trans>}
                     onClick={() => {
@@ -104,9 +102,8 @@ export default React.forwardRef<Props, EditorNavigatorInterface>(
                         setCurrentEditorName(transition.previousEditor);
                     }}
                     leftIcon={<ChevronArrowLeft />}
-                  />
-                )}
-                {transition.nextLabel && transition.nextEditor && (
+                  />}
+                {transition.nextLabel && transition.nextEditor &&
                   <FlatButton
                     label={transition.nextLabel}
                     onClick={() => {
@@ -114,14 +111,13 @@ export default React.forwardRef<Props, EditorNavigatorInterface>(
                         setCurrentEditorName(transition.nextEditor);
                     }}
                     leftIcon={transition.nextIcon}
-                  />
-                )}
+                  />}
               </Line>
             </Column>
-          </Background>
-        )}
+          </Background>}
         {renderedEditorWithKeyboardAvoidanceDiv}
       </Column>
     );
-  }
-);
+  },
+// $FlowFixMe[prop-missing]
+): React.AbstractComponent<Props, EditorNavigatorInterface>);

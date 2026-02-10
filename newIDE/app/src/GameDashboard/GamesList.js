@@ -270,32 +270,33 @@ type Props = {|
   setSearchText: (searchText: string) => void,
 |};
 
-const GamesList = ({
-  project,
-  currentFileMetadata,
-  games,
-  onRefreshGames,
-  onOpenGameManager,
-  onOpenProject,
-  onUnregisterGame,
-  onRegisterProject,
-  onDeleteCloudProject,
-  disabled,
-  storageProviders,
-  canOpen,
-  onOpenNewProjectSetupDialog,
-  onChooseProject,
-  closeProject,
-  askToCloseProject,
-  onSaveProject,
-  canSaveProject,
-  // Make the page controlled, so that it can be saved when navigating to a game.
-  currentPage,
-  setCurrentPage,
-  searchText,
-  setSearchText,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const GamesList = (
+  {
+    project,
+    currentFileMetadata,
+    games,
+    onRefreshGames,
+    onOpenGameManager,
+    onOpenProject,
+    onUnregisterGame,
+    onRegisterProject,
+    onDeleteCloudProject,
+    disabled,
+    storageProviders,
+    canOpen,
+    onOpenNewProjectSetupDialog,
+    onChooseProject,
+    closeProject,
+    askToCloseProject,
+    onSaveProject,
+    canSaveProject,
+    // Make the page controlled, so that it can be saved when navigating to a game.
+    currentPage,
+    setCurrentPage,
+    searchText,
+    setSearchText
+  }: Props,
+): React.Node => {
   const { cloudProjects, profile, onCloudProjectsChanged } = React.useContext(
     AuthenticatedUserContext
   );
@@ -324,6 +325,7 @@ const GamesList = ({
         .map(file => ({ projectFiles: [file] }));
       const allItems = [...projectFilesWithGame, ...projectFilesWithoutGame];
 
+      // $FlowFixMe[incompatible-type]
       return allItems.filter(
         item =>
           // Filter out draft games which don't have a project file linked to it (local or cloud)

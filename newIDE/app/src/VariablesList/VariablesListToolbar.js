@@ -36,8 +36,8 @@ type Props = {|
   iconStyle?: any,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const VariablesListToolbar = React.memo<Props>((props: Props) => {
+// $FlowFixMe[prop-missing]
+const VariablesListToolbar: React.AbstractComponent<Props, mixed> = React.memo<Props>((props: Props) => {
   const buttons = [
     {
       key: 'copy',

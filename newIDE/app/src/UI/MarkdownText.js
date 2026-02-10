@@ -65,7 +65,6 @@ const makeMarkdownCustomComponents = (
     );
   },
   // $FlowFixMe[missing-local-annot]
-  // $FlowFixMe[missing-local-annot]
   img: ({ node, ...props }) => <img style={{ display: 'flex' }} {...props} />, // eslint-disable-line jsx-a11y/alt-text
   // $FlowFixMe[missing-local-annot]
   code: ({ node, ...props }) => (
@@ -96,8 +95,7 @@ type Props = {|
 /**
  * Display a markdown text
  */
-// $FlowFixMe[signature-verification-failure]
-export const MarkdownText = (props: Props) => {
+export const MarkdownText = (props: Props): React.MixedElement => {
   const markdownCustomComponents = React.useMemo(
     () =>
       makeMarkdownCustomComponents(

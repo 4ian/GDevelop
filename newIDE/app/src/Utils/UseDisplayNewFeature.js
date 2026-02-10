@@ -18,8 +18,9 @@ const ONE_DAY = 24 * 3600 * 1000;
 
 type Feature = string;
 
-// $FlowFixMe[signature-verification-failure]
-const useDisplayNewFeature = () => {
+type UseDisplayNewFeatureReturn = { acknowledgeNewFeature: ({ featureId: Feature }) => void, shouldDisplayNewFeatureHighlighting: ({ featureId: Feature }) => boolean };
+
+const useDisplayNewFeature = (): UseDisplayNewFeatureReturn => {
   const {
     values: { newFeaturesAcknowledgements },
     setNewFeaturesAcknowledgements,
@@ -66,6 +67,7 @@ const useDisplayNewFeature = () => {
         ...newFeaturesAcknowledgements,
         [featureId]: {
           ...acknowledgments,
+          // $FlowFixMe[invalid-tuple-arity]
           dates: [...acknowledgments.dates, Date.now()],
         },
       });

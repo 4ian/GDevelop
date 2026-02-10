@@ -49,9 +49,7 @@ const styles = {
 };
 
 export default class TextEditor extends React.Component<EditorProps, void> {
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const {
       objectConfiguration,
       project,

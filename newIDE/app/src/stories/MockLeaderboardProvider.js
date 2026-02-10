@@ -43,8 +43,7 @@ const leaderboardsByIds = mockedLeaderboards.reduce((acc, leaderboard) => {
   return acc;
 }, {});
 
-// $FlowFixMe[signature-verification-failure]
-const MockLeaderboardProvider = ({ children }: {| children: React.Node |}) => {
+const MockLeaderboardProvider = ({children}: {| children: React.Node |}): React.Node => {
   const [
     currentLeaderboard,
     setCurrentLeaderboard,
@@ -68,6 +67,7 @@ const MockLeaderboardProvider = ({ children }: {| children: React.Node |}) => {
         },
         listLeaderboards: action('listLeaderboards'),
         selectLeaderboard: leaderboardId => {
+          // $FlowFixMe[invalid-computed-prop]
           setCurrentLeaderboard(leaderboardsByIds[leaderboardId]);
         },
         updateLeaderboard: () => {

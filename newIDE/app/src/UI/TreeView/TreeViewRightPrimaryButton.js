@@ -14,8 +14,8 @@ export type TreeViewRightPrimaryButtonProps = {|
   onClick: ?(MouseEvent) => void | Promise<void>,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const TreeViewRightPrimaryButton = React.forwardRef<
+// $FlowFixMe[prop-missing]
+export const TreeViewRightPrimaryButton: React.AbstractComponent<any, mixed> = React.forwardRef<
   TreeViewRightPrimaryButtonProps,
   ButtonInterface
 >(

@@ -382,6 +382,8 @@ const generateFreeFunction = (
   }
 };
 
+type GenerateFreeFunctionMetadataReturn = { functionFile: string, functionMetadata: gdAbstractFunctionMetadata };
+
 const generateFreeFunctionMetadata = (
   project: gdProject,
   extension: gdPlatformExtension,
@@ -390,10 +392,7 @@ const generateFreeFunctionMetadata = (
   options: Options,
   codeGenerationContext: CodeGenerationContext,
   metadataDeclarationHelper: gdMetadataDeclarationHelper
-): {
-  functionFile: string,
-  functionMetadata: gdAbstractFunctionMetadata,
-} => {
+): GenerateFreeFunctionMetadataReturn => {
   const instructionOrExpression = metadataDeclarationHelper.generateFreeFunctionMetadata(
     project,
     extension,
@@ -660,10 +659,7 @@ export const unloadProjectEventsFunctionsExtension = (
  * Given metadata about an instruction or an expression, tells if this was created
  * from an event function.
  */
-export const isAnEventFunctionMetadata = (
-  instructionOrExpression: gdInstructionMetadata | gdExpressionMetadata
-// $FlowFixMe[signature-verification-failure]
-) => {
+export const isAnEventFunctionMetadata = (instructionOrExpression: gdInstructionMetadata | gdExpressionMetadata): boolean => {
   const parametersCount = instructionOrExpression.getParametersCount();
   if (parametersCount <= 0) return false;
 
@@ -677,8 +673,9 @@ export const isAnEventFunctionMetadata = (
  * Get back the name a function from its type.
  * See also getFreeEventsFunctionType for the reverse operation.
  */
-// $FlowFixMe[signature-verification-failure]
-export const getFunctionNameFromType = (type: string) => {
+export const getFunctionNameFromType = (type: string): 
+  | { behaviorName: string, extensionName: string, name: string }
+  | { behaviorName: string | void, extensionName: string, name: string } => {
   const parts = type.split('::');
   if (!parts.length)
     return {
@@ -701,8 +698,7 @@ export const getFunctionNameFromType = (type: string) => {
 export const getFreeEventsFunctionType = (
   extensionName: string,
   eventsFunction: gdEventsFunction
-// $FlowFixMe[signature-verification-failure]
-) => {
+): string => {
   return extensionName + '::' + eventsFunction.getName();
 };
 

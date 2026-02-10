@@ -19,8 +19,7 @@ function NpmScriptConfirmDialog({
   scriptNames,
   onConfirm,
   onDismiss,
-// $FlowFixMe[signature-verification-failure]
-}: Props) {
+}: Props): React.Node {
   const [dontShowAgain, setDontShowAgain] = React.useState(false);
 
   const handleConfirm = React.useCallback(

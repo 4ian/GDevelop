@@ -44,8 +44,8 @@ const renderEmpty = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-const ResourcePropertiesEditor = React.forwardRef<
+// $FlowFixMe[prop-missing]
+const ResourcePropertiesEditor: React.AbstractComponent<any, mixed> = React.forwardRef<
   Props,
   ResourcePropertiesEditorInterface
 >(
@@ -158,7 +158,11 @@ const ResourcePropertiesEditor = React.forwardRef<
         const resourceSchema = propertiesMapToSchema({
           properties,
           defaultValueProperties: null,
-          getProperties: resource => resource.getProperties(),
+          getPropertyValue: (resource, name) =>
+            resource
+              .getProperties()
+              .get(name)
+              .getValue(),
           onUpdateProperty: (resource, name, value) => {
             resource.updateProperty(name, value);
             forceUpdate();

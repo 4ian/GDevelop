@@ -22,8 +22,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
     <DragAndDropContextProvider>
       <SpriteEditor
@@ -45,8 +44,7 @@ export const Default = () => (
   </SerializedObjectDisplay>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const AnimationLocked = () => (
+export const AnimationLocked = (): React.Node => (
   <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
     <DragAndDropContextProvider>
       <SpriteEditor
@@ -69,8 +67,7 @@ export const AnimationLocked = () => (
   </SerializedObjectDisplay>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Empty = () => (
+export const Empty = (): React.Node => (
   <SerializedObjectDisplay object={testProject.emptySpriteObjectConfiguration}>
     <DragAndDropContextProvider>
       <SpriteEditor
@@ -92,8 +89,7 @@ export const Empty = () => (
   </SerializedObjectDisplay>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Points = () => (
+export const Points = (): React.Node => (
   <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>
@@ -108,8 +104,7 @@ export const Points = () => (
   </SerializedObjectDisplay>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const CollisionMasks = () => (
+export const CollisionMasks = (): React.Node => (
   <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>

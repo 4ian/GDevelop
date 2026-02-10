@@ -248,14 +248,15 @@ type Props = {
   disabled?: boolean,
 };
 
-export const IosSigningCredentialsSelector = ({
-  targets,
-  authenticatedUser,
-  buildSigningOptions,
-  onSelectBuildSigningOptions,
-  disabled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const IosSigningCredentialsSelector = (
+  {
+    targets,
+    authenticatedUser,
+    buildSigningOptions,
+    onSelectBuildSigningOptions,
+    disabled
+  }: Props,
+): React.Node => {
   const {
     signingCredentials,
     error,

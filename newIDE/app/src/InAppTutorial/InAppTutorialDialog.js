@@ -30,8 +30,7 @@ function InAppTutorialDialog({
   endTutorial,
   goToNextStep,
   isLastStep,
-// $FlowFixMe[signature-verification-failure]
-}: Props) {
+}: Props): React.Node {
   const onApply = () => {
     if (isLastStep) {
       endTutorial({ reason: 'completed' });

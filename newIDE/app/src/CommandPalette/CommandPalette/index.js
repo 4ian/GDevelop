@@ -50,8 +50,8 @@ export type CommandPaletteInterface = {|
 
 type PaletteMode = 'closed' | 'command' | 'option';
 
-// $FlowFixMe[signature-verification-failure]
-const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
+// $FlowFixMe[prop-missing]
+const CommandPalette: React.AbstractComponent<any, mixed> = React.forwardRef<{||}, CommandPaletteInterface>(
   (props, ref) => {
     const classes = useStyles();
     const paperClasses = useStylesForPaper();
@@ -217,8 +217,8 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
   }
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const CommandPaletteWithAlgoliaSearch = React.forwardRef<
+// $FlowFixMe[prop-missing]
+export const CommandPaletteWithAlgoliaSearch: React.AbstractComponent<any, mixed> = React.forwardRef<
   {},
   CommandPaletteInterface
 >((props, ref) => (

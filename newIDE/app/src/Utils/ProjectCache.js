@@ -11,9 +11,7 @@ type ProjectCacheKey = {| userId: string, cloudProjectId: string |};
 class ProjectCache {
   databasePromise: Promise<IDBDatabase> | null;
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  static isAvailable() {
+  static isAvailable(): any {
     return (
       typeof window !== 'undefined' &&
       'indexedDB' in window &&
@@ -24,9 +22,7 @@ class ProjectCache {
     );
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  static async burst() {
+  static async burst(): any {
     if (!ProjectCache.isAvailable()) return;
     const databases = await window.indexedDB.databases();
     if (
@@ -112,9 +108,7 @@ class ProjectCache {
     });
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  _initializeDatabase() {
+  _initializeDatabase(): any {
     if (!this.databasePromise) {
       this.databasePromise = new Promise<IDBDatabase>((resolve, reject) => {
         ProjectCache._removeDatabaseIfCorrupt().then(
@@ -157,9 +151,7 @@ class ProjectCache {
     return this.databasePromise;
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  async _getEntry(cacheKey: ProjectCacheKey) {
+  async _getEntry(cacheKey: ProjectCacheKey): any {
     const database = await this._initializeDatabase();
     return new Promise((resolve, reject) => {
       try {

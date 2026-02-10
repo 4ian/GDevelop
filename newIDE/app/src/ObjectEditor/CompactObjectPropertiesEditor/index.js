@@ -89,28 +89,30 @@ const objectVariablesHelpLink = getHelpLink(
   '/all-features/variables/object-variables'
 );
 
-type TitleBarButton = {|
+export type TitleBarButton = {|
   id: string,
   icon: any,
   label?: MessageDescriptor,
   onClick?: () => void,
 |};
 
-const CollapsibleSubPanel = ({
-  renderContent,
-  isFolded,
-  toggleFolded,
-  title,
-  titleIcon,
-  titleBarButtons,
-}: {|
-  renderContent: () => React.Node,
-  isFolded: boolean,
-  toggleFolded: () => void,
-  titleIcon?: ?React.Node,
-  title: string,
-  titleBarButtons?: Array<TitleBarButton>,
-|}) => (
+export const CollapsibleSubPanel = (
+  {
+    renderContent,
+    isFolded,
+    toggleFolded,
+    title,
+    titleIcon,
+    titleBarButtons
+  }: {|
+    renderContent: () => React.Node,
+    isFolded: boolean,
+    toggleFolded: () => void,
+    titleIcon?: ?React.Node,
+    title: string,
+    titleBarButtons?: Array<TitleBarButton>,
+  |},
+): React.Node => (
   <Paper background="medium">
     <Line expand>
       <ColumnStackLayout noMargin expand noOverflowParent>
@@ -157,25 +159,27 @@ const CollapsibleSubPanel = ({
   </Paper>
 );
 
-const TopLevelCollapsibleSection = ({
-  title,
-  isFolded,
-  toggleFolded,
-  renderContent,
-  renderContentAsHiddenWhenFolded,
-  noContentMargin,
-  onOpenFullEditor,
-  onAdd,
-}: {|
-  title: React.Node,
-  isFolded: boolean,
-  toggleFolded: () => void,
-  renderContent: () => React.Node,
-  renderContentAsHiddenWhenFolded?: boolean,
-  noContentMargin?: boolean,
-  onOpenFullEditor: () => void,
-  onAdd?: (() => void) | null,
-|}) => (
+export const TopLevelCollapsibleSection = (
+  {
+    title,
+    isFolded,
+    toggleFolded,
+    renderContent,
+    renderContentAsHiddenWhenFolded,
+    noContentMargin,
+    onOpenFullEditor,
+    onAdd
+  }: {|
+    title: React.Node,
+    isFolded: boolean,
+    toggleFolded: () => void,
+    renderContent: () => React.Node,
+    renderContentAsHiddenWhenFolded?: boolean,
+    noContentMargin?: boolean,
+    onOpenFullEditor?: () => void,
+    onAdd?: (() => void) | null,
+  |},
+): React.Node => (
   <>
     <Separator />
     <Column noOverflowParent>
@@ -193,9 +197,11 @@ const TopLevelCollapsibleSection = ({
           </Text>
         </LineStackLayout>
         <Line alignItems="center" noMargin>
-          <IconButton size="small" onClick={onOpenFullEditor}>
-            <ShareExternal style={styles.icon} />
-          </IconButton>
+          {onOpenFullEditor && (
+            <IconButton size="small" onClick={onOpenFullEditor}>
+              <ShareExternal style={styles.icon} />
+            </IconButton>
+          )}
           {onAdd && (
             <IconButton size="small" onClick={onAdd}>
               <Add style={styles.icon} />
@@ -250,31 +256,32 @@ type Props = {|
   isBehaviorListLocked: boolean,
 |};
 
-export const CompactObjectPropertiesEditor = ({
-  project,
-  resourceManagementProps,
-  layout,
-  eventsFunctionsExtension,
-  onUpdateBehaviorsSharedData,
-  objectsContainer,
-  globalObjectsContainer,
-  layersContainer,
-  projectScopedContainersAccessor,
-  unsavedChanges,
-  i18n,
-  historyHandler,
-  objects,
-  onEditObject,
-  onObjectsModified,
-  onEffectAdded,
-  onOpenEventBasedObjectVariantEditor,
-  onDeleteEventsBasedObjectVariant,
-  onWillInstallExtension,
-  onExtensionInstalled,
-  isVariableListLocked,
-  isBehaviorListLocked,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const CompactObjectPropertiesEditor = (
+  {
+    project,
+    resourceManagementProps,
+    layout,
+    eventsFunctionsExtension,
+    onUpdateBehaviorsSharedData,
+    objectsContainer,
+    globalObjectsContainer,
+    layersContainer,
+    projectScopedContainersAccessor,
+    unsavedChanges,
+    i18n,
+    historyHandler,
+    objects,
+    onEditObject,
+    onObjectsModified,
+    onEffectAdded,
+    onOpenEventBasedObjectVariantEditor,
+    onDeleteEventsBasedObjectVariant,
+    onWillInstallExtension,
+    onExtensionInstalled,
+    isVariableListLocked,
+    isBehaviorListLocked
+  }: Props,
+): React.Node => {
   const forceUpdate = useForceUpdate();
   const [isPropertiesFolded, setIsPropertiesFolded] = React.useState(false);
   const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(false);
@@ -494,8 +501,11 @@ export const CompactObjectPropertiesEditor = ({
           ? customObjectEventsBasedObject.getPropertyDescriptors()
           : // We can't access default values for built-in objects.
             null,
-        getProperties: ({ objectConfiguration }) =>
-          objectConfiguration.getProperties(),
+        getPropertyValue: ({ objectConfiguration }, name) =>
+          objectConfiguration
+            .getProperties()
+            .get(name)
+            .getValue(),
         onUpdateProperty: ({ objectConfiguration }, name, value) => {
           objectConfiguration.updateProperty(name, value);
           onObjectsModified([object]);
@@ -584,6 +594,7 @@ export const CompactObjectPropertiesEditor = ({
                       onEditObject,
                     })
                   }
+                  // $FlowFixMe[incompatible-type]
                   onRefreshAllFields={forceRecomputeSchema}
                 />
                 {shouldDisplayVariant && (
@@ -751,6 +762,8 @@ export const CompactObjectPropertiesEditor = ({
                           project={project}
                           behaviorMetadata={behaviorMetadata}
                           behavior={behavior}
+                          behaviorOverriding={null}
+                          initialInstance={null}
                           object={object}
                           onBehaviorUpdated={() => {}}
                           resourceManagementProps={resourceManagementProps}

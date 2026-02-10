@@ -84,8 +84,7 @@ const styles = {
   },
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const useEffectOverridingAlertDialog = () => {
+export const useEffectOverridingAlertDialog = (): ((existingEffectNames: Array<string>) => Promise<boolean>) => {
   const { showConfirmation } = useAlertDialog();
   return async (existingEffectNames: Array<string>): Promise<boolean> => {
     return await showConfirmation({
@@ -364,8 +363,7 @@ export const getEnumeratedEffectMetadata = (
 export const getEffects2DCount = (
   platform: gdPlatform,
   effectsContainer: gdEffectsContainer
-// $FlowFixMe[signature-verification-failure]
-) => {
+): number => {
   const effectCount = effectsContainer.getEffectsCount();
   let effect2DCount = 0;
   for (let i = 0; i < effectCount; i++) {
@@ -384,8 +382,7 @@ export const getEffects2DCount = (
 export const getEffects3DCount = (
   platform: gdPlatform,
   effectsContainer: gdEffectsContainer
-// $FlowFixMe[signature-verification-failure]
-) => {
+): number => {
   const effectCount = effectsContainer.getEffectsCount();
   let effect3DCount = 0;
   for (let i = 0; i < effectCount; i++) {
@@ -781,8 +778,7 @@ type Props = {|
  *
  * All available effects are fetched from the project's platform.
  */
-// $FlowFixMe[signature-verification-failure]
-export default function EffectsList(props: Props) {
+export default function EffectsList(props: Props): React.Node {
   const {
     effectsContainer,
     onEffectsUpdated,

@@ -109,8 +109,7 @@ type SubscriptionState = {|
   |}) => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export const SubscriptionContext = React.createContext<SubscriptionState>({
+export const SubscriptionContext: React.Context<SubscriptionState> = React.createContext<SubscriptionState>({
   getSubscriptionPlansWithPricingSystems: () => null,
   getUserSubscriptionPlanEvenIfLegacy: () => null,
   openSubscriptionDialog: () => {},
@@ -124,11 +123,7 @@ type SubscriptionProviderProps = {|
   simulateMobileApp?: true,
 |};
 
-export const SubscriptionProvider = ({
-  children,
-  simulateMobileApp,
-// $FlowFixMe[signature-verification-failure]
-}: SubscriptionProviderProps) => {
+export const SubscriptionProvider = ({children, simulateMobileApp}: SubscriptionProviderProps): React.MixedElement => {
   const [
     analyticsMetadata,
     setAnalyticsMetadata,

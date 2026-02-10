@@ -24,8 +24,7 @@ const fakeLeaderboard: Leaderboard = {
   visibility: 'PUBLIC',
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   // $FlowFixMe[incompatible-type]
   <LeaderboardOptionsDialog
     open
@@ -37,8 +36,7 @@ export const Default = () => (
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithProSubscription = () => (
+export const WithProSubscription = (): React.Node => (
   <AuthenticatedUserContext.Provider value={fakeStartupAuthenticatedUser}>
     {/* $FlowFixMe[incompatible-type] */}
     <LeaderboardOptionsDialog

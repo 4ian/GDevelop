@@ -20,18 +20,15 @@ const defaultProps = {
   onChangeEmail: action('onChangeEmail'),
   error: null,
 };
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => <ChangeEmailDialog {...defaultProps} />;
+export const Default = (): React.Node => <ChangeEmailDialog {...defaultProps} />;
 
-// $FlowFixMe[signature-verification-failure]
-export const ErrorFromBackend = () => (
+export const ErrorFromBackend = (): React.Node => (
   <ChangeEmailDialog
     {...defaultProps}
     error={{ code: 'auth/requires-recent-login' }}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Submitting = () => (
+export const Submitting = (): React.Node => (
   <ChangeEmailDialog {...defaultProps} changeEmailInProgress />
 );

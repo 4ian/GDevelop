@@ -46,14 +46,7 @@ type Props = {|
   disabled?: boolean,
 |};
 
-const GameImage = ({
-  project,
-  game,
-  previewScreenshotUrls,
-  onLaunchPreview,
-  disabled,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const GameImage = ({project, game, previewScreenshotUrls, onLaunchPreview, disabled}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
 
   const gameThumbnailUrl = React.useMemo(

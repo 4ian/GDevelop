@@ -15,8 +15,7 @@ type Props = {|
   disabled: boolean,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const BooleanField = ({ value, onChange, disabled }: Props) => {
+const BooleanField = ({value, onChange, disabled}: Props): React.Node => {
   return (
     <Line>
       <Column noMargin>

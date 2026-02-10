@@ -10,8 +10,7 @@ type Props = {|
   project: gdProject,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-function ExtensionsProperties(props: Props) {
+function ExtensionsProperties(props: Props): any | null {
   const { project } = props;
   const allExtensions = project.getCurrentPlatform().getAllPlatformExtensions();
   const propertyList = [];
@@ -24,10 +23,12 @@ function ExtensionsProperties(props: Props) {
     const propertiesSchema = propertiesMapToSchema({
       properties,
       defaultValueProperties: null,
-      getProperties: instance =>
+      getPropertyValue: (instance, name) =>
         project
           .getExtensionProperties()
-          .getAllExtensionProperties(extension.getName(), project),
+          .getAllExtensionProperties(extension.getName(), project)
+          .get(name)
+          .getValue(),
       onUpdateProperty: (instance, propertyName, newValue) => {
         if (
           project

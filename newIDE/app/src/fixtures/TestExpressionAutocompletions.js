@@ -44,8 +44,16 @@ const makeFakeEnumeratedExpressionMetadata = (
   isRelevantForCustomObjectEvents: true,
 });
 
-// $FlowFixMe[signature-verification-failure]
-export const makeFakeExactExpressionAutocompletion = () => {
+export const makeFakeExactExpressionAutocompletion = (): Array<
+  {
+    addParenthesis: boolean,
+    completion: string,
+    enumeratedExpressionMetadata: EnumeratedExpressionMetadata,
+    isExact: boolean,
+    kind: string,
+    shouldConvertToString: boolean,
+  },
+> => {
   const gd: libGDevelop = global.gd;
   const expressionMetadata = new gd.ExpressionMetadata(
     'number',
@@ -183,8 +191,9 @@ export const makeFakeExpressionAutocompletions = (): Array<ExpressionAutocomplet
   ];
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const getFakePopperJsAnchorElement = () => ({
+type GetFakePopperJsAnchorElementReturn = { clientHeight: number, clientWidth: number, getBoundingClientRect: () => { bottom: number, height: number, left: number, right: number, top: number, width: number, x: number, y: number, } };
+
+export const getFakePopperJsAnchorElement = (): GetFakePopperJsAnchorElementReturn => ({
   clientWidth: 100,
   clientHeight: 100,
   getBoundingClientRect: () => ({

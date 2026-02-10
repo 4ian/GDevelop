@@ -17,8 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Errored = () => {
+export const Errored = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 500 });
   mock
     .onGet(`${GDevelopUsageApi.baseUrl}/user-earnings-balance`)
@@ -36,8 +35,7 @@ export const Errored = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const NoEarnings = () => {
+export const NoEarnings = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 500 });
   mock
     .onGet(`${GDevelopUsageApi.baseUrl}/user-earnings-balance`)
@@ -65,8 +63,7 @@ export const NoEarnings = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const LittleEarnings = () => {
+export const LittleEarnings = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 500 });
   mock
     .onGet(`${GDevelopUsageApi.baseUrl}/user-earnings-balance`)
@@ -94,8 +91,7 @@ export const LittleEarnings = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const SomeEarnings = () => {
+export const SomeEarnings = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 500 });
   mock
     .onGet(`${GDevelopUsageApi.baseUrl}/user-earnings-balance`)
@@ -123,8 +119,7 @@ export const SomeEarnings = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const ALotOfEarnings = () => {
+export const ALotOfEarnings = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 500 });
   mock
     .onGet(`${GDevelopUsageApi.baseUrl}/user-earnings-balance`)

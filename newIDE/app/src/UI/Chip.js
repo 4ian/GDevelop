@@ -32,8 +32,8 @@ type ChipInterface = {|
   focus: () => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const Chip = React.forwardRef<Props, ChipInterface>((props, ref) => {
+// $FlowFixMe[prop-missing]
+const Chip: React.AbstractComponent<Props, ChipInterface> = React.forwardRef<Props, ChipInterface>((props, ref) => {
   const chipRef = React.useRef<?HTMLDivElement>(null);
   const muiTheme = useTheme();
   const focus = () => {

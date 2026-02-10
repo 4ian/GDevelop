@@ -60,12 +60,7 @@ type DownloadResourcesAsBlobsOptions = {
   onProgress: (count: number, total: number) => void,
 };
 
-export const downloadResourcesAsBlobs = async ({
-  project,
-  onAddBlobFile,
-  onProgress,
-// $FlowFixMe[signature-verification-failure]
-}: DownloadResourcesAsBlobsOptions) => {
+export const downloadResourcesAsBlobs = async ({project, onAddBlobFile, onProgress}: DownloadResourcesAsBlobsOptions): Promise<{ erroredResources: Array<empty> }> => {
   const result = {
     erroredResources: [],
   };
@@ -164,8 +159,7 @@ type Props = {|
   onDone: () => void,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-export default function DownloadFileSaveAsDialog({ project, onDone }: Props) {
+export default function DownloadFileSaveAsDialog({ project, onDone }: Props): React.Node {
   const [zippedProjectBlob, setZippedProjectBlob] = React.useState<?Blob>(null);
   const {
     ensureProcessIsDone,

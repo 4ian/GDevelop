@@ -110,6 +110,6 @@ function ListIcon(props: Props) {
   );
 }
 
-// $FlowFixMe[signature-verification-failure]
-const ListIconMemo = React.memo<Props>(ListIcon);
+// $FlowFixMe[prop-missing]
+const ListIconMemo: React.AbstractComponent<Props, mixed> = React.memo<Props>(ListIcon);
 export default ListIconMemo;

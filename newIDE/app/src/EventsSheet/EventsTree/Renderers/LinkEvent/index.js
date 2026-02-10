@@ -151,9 +151,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, any> 
     );
   };
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const linkEvent = gd.asLinkEvent(this.props.event);
     const target = linkEvent.getTarget();
 

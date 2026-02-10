@@ -52,9 +52,7 @@ class BrowserLoginProvider
   }: {|
     provider: IdentityProvider,
     signal?: AbortSignal,
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  |}) {
+  |}): any {
     if (signal && signal.aborted) {
       return Promise.reject(
         new Error('Login or Signup with provider already aborted.')

@@ -196,39 +196,34 @@ const BundleInformationPageStory = ({
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <BundleInformationPageStory
     bundleListingDataToDisplay={fakeBundleListingData}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const ForAlreadyPurchasedBundle = () => (
+export const ForAlreadyPurchasedBundle = (): React.Node => (
   <BundleInformationPageStory
     bundleListingDataToDisplay={fakeBundleListingData}
     receivedBundles={[fakeBundle]}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Loading = () => (
+export const Loading = (): React.Node => (
   <BundleInformationPageStory
     bundleListingDataToDisplay={fakeBundleListingData}
     delayResponse={10000}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const With404 = () => (
+export const With404 = (): React.Node => (
   <BundleInformationPageStory
     bundleListingDataToDisplay={fakeBundleListingData}
     errorCode={404}
   />
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithUnknownError = () => (
+export const WithUnknownError = (): React.Node => (
   <BundleInformationPageStory
     bundleListingDataToDisplay={fakeBundleListingData}
     errorCode={500}

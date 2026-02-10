@@ -2,8 +2,7 @@
 import optionalRequire from './OptionalRequire';
 const os = optionalRequire('os');
 
-// $FlowFixMe[signature-verification-failure]
-export const getUID = () => {
+export const getUID = (): any | string => {
   try {
     return os.userInfo().uid;
   } catch (e) {

@@ -488,8 +488,8 @@ export type InAppTutorialOrchestratorInterface = {|
   getPreviewMessage: () => {| message: string, position: string |} | null,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const InAppTutorialOrchestrator = React.forwardRef<
+// $FlowFixMe[prop-missing]
+const InAppTutorialOrchestrator: React.AbstractComponent<any, mixed> = React.forwardRef<
   Props,
   InAppTutorialOrchestratorInterface
 >(

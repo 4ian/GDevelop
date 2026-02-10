@@ -120,7 +120,6 @@ export type TreeItemProps = {|
   unsavedChanges?: ?UnsavedChanges,
   forceUpdateEditor: () => void,
   preferences: Preferences,
-  // $FlowFixMe[value-as-type]
   gdevelopTheme: GDevelopTheme,
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
@@ -1447,8 +1446,8 @@ const MemoizedObjectsList = React.memo<Props, EventsFunctionsListInterface>(
   arePropsEqual
 );
 
-// $FlowFixMe[signature-verification-failure]
-const EventsFunctionsListWithErrorBoundary = React.forwardRef<
+// $FlowFixMe[prop-missing]
+const EventsFunctionsListWithErrorBoundary: React.AbstractComponent<any, mixed> = React.forwardRef<
   Props,
   EventsFunctionsListInterface
 >((props, ref) => (

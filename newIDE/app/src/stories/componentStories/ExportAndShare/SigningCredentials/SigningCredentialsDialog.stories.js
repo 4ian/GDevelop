@@ -19,8 +19,7 @@ export default {
   decorators: [alertDecorator, paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Loading = () => {
+export const Loading = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <SigningCredentialsDialog
@@ -34,8 +33,7 @@ export const Loading = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Errored = () => {
+export const Errored = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <SigningCredentialsDialog
@@ -49,8 +47,7 @@ export const Errored = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Empty = () => {
+export const Empty = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <SigningCredentialsDialog
@@ -64,8 +61,7 @@ export const Empty = () => {
   );
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const WithSigningCredentials = () => {
+export const WithSigningCredentials = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <SigningCredentialsDialog

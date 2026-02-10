@@ -28,13 +28,16 @@ const changesBeforeShowingWarning = 1;
  * the object to this serialized state later, by calling the function
  * returned by the hook.
  */
-export const useSerializableObjectCancelableEditor = ({
-  serializableObject,
-  useProjectToUnserialize,
-  onCancel,
-  resetThenClearPersistentUuid,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+type UseSerializableObjectCancelableEditorReturn = { getOriginalContentSerializedElement: () => gdSerializerElement, hasUnsavedChanges: () => boolean, notifyOfChange: () => void, onCancelChanges: () => Promise<void> };
+
+export const useSerializableObjectCancelableEditor = (
+  {
+    serializableObject,
+    useProjectToUnserialize,
+    onCancel,
+    resetThenClearPersistentUuid
+  }: Props,
+): UseSerializableObjectCancelableEditorReturn => {
   const serializedElementRef = React.useRef<gdSerializerElement | null>(null);
   const numberOfChangesRef = React.useRef(0);
   const { showConfirmation } = useAlertDialog();
@@ -165,13 +168,16 @@ type SerializableObjectsCancelableEditorProps = {|
  * the object to this serialized state later, by calling the function
  * returned by the hook.
  */
-export const useSerializableObjectsCancelableEditor = ({
-  serializableObjects,
-  useProjectToUnserialize,
-  onCancel,
-  resetThenClearPersistentUuid,
-// $FlowFixMe[signature-verification-failure]
-}: SerializableObjectsCancelableEditorProps) => {
+type UseSerializableObjectsCancelableEditorReturn = { getOriginalContentSerializedElements: () => Map<string, gdSerializerElement>, hasUnsavedChanges: () => boolean, notifyOfChange: () => void, onCancelChanges: () => Promise<void> };
+
+export const useSerializableObjectsCancelableEditor = (
+  {
+    serializableObjects,
+    useProjectToUnserialize,
+    onCancel,
+    resetThenClearPersistentUuid
+  }: SerializableObjectsCancelableEditorProps,
+): UseSerializableObjectsCancelableEditorReturn => {
   const serializedElementsRef = React.useRef<Map<string, gdSerializerElement>>(
     new Map()
   );

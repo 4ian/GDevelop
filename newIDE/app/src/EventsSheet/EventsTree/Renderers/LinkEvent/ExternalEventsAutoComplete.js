@@ -63,9 +63,7 @@ export default class ExternalEventsAutoComplete extends React.Component<
     if (this._field) this._field.focus();
   }
 
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const {
       value,
       onChange,

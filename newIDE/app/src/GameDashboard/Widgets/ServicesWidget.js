@@ -27,13 +27,14 @@ type Props = {|
   displayUnlockMoreLeaderboardsCallout: boolean,
 |};
 
-const ServicesWidget = ({
-  leaderboards,
-  onSeeAllLeaderboards,
-  onSeeLobbyConfiguration,
-  displayUnlockMoreLeaderboardsCallout,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const ServicesWidget = (
+  {
+    leaderboards,
+    onSeeAllLeaderboards,
+    onSeeLobbyConfiguration,
+    displayUnlockMoreLeaderboardsCallout
+  }: Props,
+): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
   return (

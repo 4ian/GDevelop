@@ -13,12 +13,7 @@ type Props = {|
   onOpenHistory: () => void,
 |};
 
-export const Toolbar = ({
-  onStartNewChat,
-  canStartNewChat,
-  onOpenHistory,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const Toolbar = ({onStartNewChat, canStartNewChat, onOpenHistory}: Props): React.Node => {
   return (
     <>
       <ToolbarGroup firstChild>

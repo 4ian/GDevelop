@@ -2,10 +2,7 @@
 
 import { mapFor } from '../../Utils/MapFor';
 
-export const getPropertyFolderOrPropertyUnifiedName = (
-  propertyFolderOrProperty: gdPropertyFolderOrProperty
-// $FlowFixMe[signature-verification-failure]
-) =>
+export const getPropertyFolderOrPropertyUnifiedName = (propertyFolderOrProperty: gdPropertyFolderOrProperty): string =>
   propertyFolderOrProperty.isFolder()
     ? propertyFolderOrProperty.getFolderName()
     : propertyFolderOrProperty.getProperty().getName();

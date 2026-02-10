@@ -363,8 +363,8 @@ class InstancesList extends Component<Props, State> {
   }
 }
 
-// $FlowFixMe[signature-verification-failure]
-const InstancesListWithErrorBoundary = React.forwardRef<
+// $FlowFixMe[prop-missing]
+const InstancesListWithErrorBoundary: React.AbstractComponent<any, mixed> = React.forwardRef<
   Props,
   InstancesListInterface
 >((props, ref) => {

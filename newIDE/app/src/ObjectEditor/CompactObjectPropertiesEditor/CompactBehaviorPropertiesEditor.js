@@ -54,24 +54,29 @@ export const getSchemaWithOpenFullEditorButton = ({
   return schema;
 };
 
-export const CompactBehaviorPropertiesEditor = ({
-  project,
-  behaviorMetadata,
-  behavior,
-  object,
-  onOpenFullEditor,
-  onBehaviorUpdated,
-  resourceManagementProps,
-}: {|
-  project: gdProject,
-  behaviorMetadata: gdBehaviorMetadata,
-  behavior: gdBehavior,
-  object: gdObject,
-  onOpenFullEditor: () => void,
-  onBehaviorUpdated: () => void,
-  resourceManagementProps: ResourceManagementProps,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+export const CompactBehaviorPropertiesEditor = (
+  {
+    project,
+    behaviorMetadata,
+    behavior,
+    object,
+    behaviorOverriding,
+    initialInstance,
+    onOpenFullEditor,
+    onBehaviorUpdated,
+    resourceManagementProps
+  }: {|
+    project: gdProject,
+    behaviorMetadata: gdBehaviorMetadata,
+    behavior: gdBehavior,
+    object: gdObject,
+    behaviorOverriding: gdBehavior | null,
+    initialInstance: gdInitialInstance | null,
+    onOpenFullEditor?: () => void,
+    onBehaviorUpdated: () => void,
+    resourceManagementProps: ResourceManagementProps,
+  |},
+): React.Node => {
   const fullEditorLabel = behaviorMetadata.getOpenFullEditorLabel();
 
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
@@ -81,10 +86,73 @@ export const CompactBehaviorPropertiesEditor = ({
       if (schemaRecomputeTrigger) {
         // schemaRecomputeTrigger allows to invalidate the schema when required.
       }
+      if (initialInstance) {
+        const behaviorProperties = behavior.getProperties();
+        return propertiesMapToSchema({
+          properties: behaviorProperties,
+          defaultValueProperties: behaviorProperties,
+          getPropertyValue: (instance, propertyName) => {
+            const behaviorName = behavior.getName();
+            if (
+              // $FlowFixMe[prop-missing]
+              initialInstance.hasBehaviorOverridingNamed(behaviorName) &&
+              initialInstance
+                // $FlowFixMe[prop-missing]
+                .getBehaviorOverriding(behaviorName)
+                .hasPropertyValue(propertyName)
+            ) {
+              // $FlowFixMe[prop-missing]
+              const behaviorOverriding = initialInstance.getBehaviorOverriding(
+                behaviorName
+              );
+              return behaviorOverriding
+                .getProperties()
+                .get(propertyName)
+                .getValue();
+            }
+            return behavior
+              .getProperties()
+              .get(propertyName)
+              .getValue();
+          },
+          onUpdateProperty: (instance, name, value) => {
+            const behaviorName = behavior.getName();
+            // $FlowFixMe[prop-missing]
+            const behaviorOverriding = initialInstance.hasBehaviorOverridingNamed(
+              behaviorName
+            )
+              // $FlowFixMe[prop-missing]
+              ? initialInstance.getBehaviorOverriding(behaviorName)
+              // $FlowFixMe[prop-missing]
+              : initialInstance.addNewBehaviorOverriding(
+                  project,
+                  behavior.getTypeName(),
+                  behaviorName
+                );
+            const behaviorProperties = behavior.getProperties();
+            const inheritedValue = behaviorProperties.has(name)
+              ? behaviorProperties.get(name).getValue()
+              : null;
+            if (inheritedValue === value) {
+              behaviorOverriding.removeProperty(name);
+            } else {
+              behaviorOverriding.updateProperty(name, value);
+            }
+          },
+          object,
+          visibility: 'All',
+          showcaseNonDefaultValues: true,
+        });
+      }
+      const behaviorMetadataProperties = behaviorMetadata.getProperties();
       return propertiesMapToSchema({
-        properties: behavior.getProperties(),
-        defaultValueProperties: behaviorMetadata.getProperties(),
-        getProperties: instance => instance.getProperties(),
+        properties: behaviorMetadataProperties,
+        defaultValueProperties: behaviorMetadataProperties,
+        getPropertyValue: (instance, name) =>
+          instance
+            .getProperties()
+            .get(name)
+            .getValue(),
         onUpdateProperty: (instance, name, value) => {
           instance.updateProperty(name, value);
         },
@@ -92,7 +160,14 @@ export const CompactBehaviorPropertiesEditor = ({
         visibility: 'All',
       });
     },
-    [schemaRecomputeTrigger, behavior, behaviorMetadata, object]
+    [
+      schemaRecomputeTrigger,
+      initialInstance,
+      behavior,
+      behaviorMetadata,
+      object,
+      project,
+    ]
   );
 
   return (
@@ -105,14 +180,18 @@ export const CompactBehaviorPropertiesEditor = ({
         onInstancesModified={onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
         placeholder={<Trans>Nothing to configure for this behavior.</Trans>}
-        customizeBasicSchema={schema =>
-          getSchemaWithOpenFullEditorButton({
-            schema,
-            fullEditorLabel,
-            behavior,
-            onOpenFullEditor,
-          })
+        customizeBasicSchema={
+          onOpenFullEditor
+            ? schema =>
+                getSchemaWithOpenFullEditorButton({
+                  schema,
+                  fullEditorLabel,
+                  behavior,
+                  onOpenFullEditor,
+                })
+            : null
         }
+        // $FlowFixMe[incompatible-type]
         onRefreshAllFields={forceRecomputeSchema}
       />
     </ColumnStackLayout>

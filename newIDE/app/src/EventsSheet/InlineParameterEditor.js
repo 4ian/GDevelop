@@ -39,23 +39,24 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
 |};
 
-const InlineParameterEditor = ({
-  project,
-  scope,
-  globalObjectsContainer,
-  objectsContainer,
-  projectScopedContainersAccessor,
-  open,
-  onRequestClose,
-  onApply,
-  onChange,
-  instruction,
-  isCondition,
-  parameterIndex,
-  anchorEl,
-  resourceManagementProps,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const InlineParameterEditor = (
+  {
+    project,
+    scope,
+    globalObjectsContainer,
+    objectsContainer,
+    projectScopedContainersAccessor,
+    open,
+    onRequestClose,
+    onApply,
+    onChange,
+    instruction,
+    isCondition,
+    parameterIndex,
+    anchorEl,
+    resourceManagementProps
+  }: Props,
+): null | React.Node => {
   const [
     parameterMetadata,
     setParameterMetadata,

@@ -13,16 +13,14 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <AuthenticatedUserProfileDetails
     authenticatedUser={fakeSilverAuthenticatedUser}
     onOpenEditProfileDialog={action('onOpenEditProfileDialog')}
     onOpenChangeEmailDialog={action('onOpenChangeEmailDialog')}
   />
 );
-// $FlowFixMe[signature-verification-failure]
-export const Loading = () => (
+export const Loading = (): React.Node => (
   <AuthenticatedUserProfileDetails
     authenticatedUser={fakeAuthenticatedUserLoggingIn}
     onOpenEditProfileDialog={action('onOpenEditProfileDialog')}

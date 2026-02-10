@@ -34,14 +34,15 @@ export type GameRegistrationProps = {|
 
 export type GameAvailabilityError = 'not-found' | 'not-owned' | 'unexpected';
 
-export const GameRegistration = ({
-  project,
-  suggestAdditionalActions,
-  hideLoader,
-  onGameRegistered,
-  customRegistrationMessage,
-// $FlowFixMe[signature-verification-failure]
-}: GameRegistrationProps) => {
+export const GameRegistration = (
+  {
+    project,
+    suggestAdditionalActions,
+    hideLoader,
+    onGameRegistered,
+    customRegistrationMessage
+  }: GameRegistrationProps,
+): null | React.Node | React.Node => {
   const {
     onOpenLoginDialog,
     onOpenCreateAccountDialog,

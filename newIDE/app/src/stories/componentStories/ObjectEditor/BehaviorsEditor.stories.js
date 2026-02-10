@@ -17,8 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-// $FlowFixMe[signature-verification-failure]
-export const Default = () => (
+export const Default = (): React.Node => (
   <SerializedObjectDisplay object={testProject.spriteObjectWithBehaviors}>
     <BehaviorsEditor
       project={testProject.project}
@@ -39,8 +38,7 @@ export const Default = () => (
   </SerializedObjectDisplay>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const WithoutAnyBehaviors = () => (
+export const WithoutAnyBehaviors = (): React.Node => (
   <SerializedObjectDisplay object={testProject.spriteObjectWithoutBehaviors}>
     <BehaviorsEditor
       project={testProject.project}
@@ -61,8 +59,7 @@ export const WithoutAnyBehaviors = () => (
   </SerializedObjectDisplay>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const Locked = () => (
+export const Locked = (): React.Node => (
   <SerializedObjectDisplay object={testProject.spriteObjectWithBehaviors}>
     <BehaviorsEditor
       project={testProject.project}
@@ -83,8 +80,7 @@ export const Locked = () => (
   </SerializedObjectDisplay>
 );
 
-// $FlowFixMe[signature-verification-failure]
-export const LockedWithoutAnyBehaviors = () => (
+export const LockedWithoutAnyBehaviors = (): React.Node => (
   <SerializedObjectDisplay object={testProject.spriteObjectWithoutBehaviors}>
     <BehaviorsEditor
       project={testProject.project}

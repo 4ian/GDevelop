@@ -37,6 +37,7 @@ class MockLogsManager extends LogsManager {
       internal: false,
     },
   ];
+  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
   groups = new Set<string>(['Grouped error', 'Regular group']);
   on() {}
@@ -44,5 +45,4 @@ class MockLogsManager extends LogsManager {
   addLog() {}
 }
 
-// $FlowFixMe[signature-verification-failure]
-export default new MockLogsManager();
+export default (new MockLogsManager(): MockLogsManager);

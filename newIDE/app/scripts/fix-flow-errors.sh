@@ -5,9 +5,11 @@ set -e
 # This script is idempotent - it can be run multiple times safely.
 # It fixes Flow type errors after upgrading from Flow 0.131 to 0.299.
 #
-# NOTE: We intentionally do NOT run "flow codemod annotate-exports" because
-# it introduces component() syntax and as-casts that Babel cannot parse.
-# Instead, all errors are suppressed with $FlowFixMe[code] comments.
+# Strategy:
+# 1. Fix deprecated syntax ($PropertyType, %checks, React$, etc.)
+# 2. Run flow codemod annotate-exports to add type annotations
+# 3. Fix new syntax that Babel can't parse (as Type -> (: Type), component(), renders)
+# 4. Add $FlowFixMe for remaining errors
 #
 # Usage: cd newIDE/app && bash scripts/fix-flow-errors.sh
 
@@ -87,11 +89,17 @@ find "$APP_DIR/src" -name "*.js" -type f -exec sed -i \
   -e 's/\bReact\$AbstractComponent\b/React.AbstractComponent/g' \
   {} +
 
-# Fix $PropertyType -> indexed access type
-find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e "
-  s/\\\$PropertyType<([^,]+),\s*'([^']+)'>/\$1['\$2']/g;
-  s/\\\$PropertyType<([^,]+),\s*\"([^\"]+)\">/\$1[\"\$2\"]/g;
-" {} +
+# Fix $PropertyType -> indexed access type (using Python to avoid shell escaping issues)
+python3 -c "
+import os, re, glob
+for f in glob.glob(os.path.join(os.environ['APP_DIR'], 'src/**/*.js'), recursive=True):
+    if not os.path.isfile(f): continue
+    with open(f) as fh: c = fh.read()
+    c2 = re.sub(r\"\\\$PropertyType<([^,]+),\s*'([^']+)'>\", r\"\\1['\\2']\", c)
+    c2 = re.sub(r'\\\$PropertyType<([^,]+),\s*\"([^\"]+)\">', r'\\1[\"\\2\"]', c2)
+    if c2 != c:
+        with open(f, 'w') as fh: fh.write(c2)
+"
 
 # Fix $FlowExpectedError -> $FlowFixMe[incompatible-type]
 find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
@@ -107,10 +115,35 @@ find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
 echo "  Done."
 
 ###############################################################################
-# STEP 4: Fix specific known issues
+# STEP 4: Run flow codemod annotate-exports
 ###############################################################################
 echo ""
-echo "--- Step 4: Fixing specific known issues ---"
+echo "--- Step 4: Running flow codemod annotate-exports ---"
+
+npx flow stop 2>/dev/null || true
+
+# Run the codemod to annotate exports (adds type annotations to module exports)
+npx flow codemod annotate-exports --write "$APP_DIR/src/" 2>&1 | grep -E "Files changed|annotations added|sig\. ver|skipped" || true
+
+npx flow stop 2>/dev/null || true
+
+echo "  Done."
+
+###############################################################################
+# STEP 5: Fix codemod syntax (as Type, component(), renders)
+###############################################################################
+echo ""
+echo "--- Step 5: Fixing codemod syntax for Babel compatibility ---"
+
+python3 "$SCRIPT_DIR/fix-codemod-syntax.py"
+
+echo "  Done."
+
+###############################################################################
+# STEP 6: Fix specific known issues
+###############################################################################
+echo ""
+echo "--- Step 6: Fixing specific known issues ---"
 
 # Fix GDevelop.js type files (if they exist and don't have FlowFixMe)
 GD_TYPES="$APP_DIR/../../GDevelop.js/types"
@@ -151,30 +184,13 @@ print("  Fixed GDevelop.js types")
 PYEOF
 fi
 
-# Fix Theme/index.js - $PropertyType replacement may leave empty type
-THEME_FILE="$APP_DIR/src/UI/Theme/index.js"
-if grep -q 'export type GDevelopTheme = ;' "$THEME_FILE" 2>/dev/null; then
-  sed -i "s/export type GDevelopTheme = ;/export type GDevelopTheme = Theme['gdevelopTheme'];/" "$THEME_FILE"
-  # Remove any stray {/* $FlowFixMe */} on the line above
-  python3 -c "
-with open('$THEME_FILE') as f:
-    content = f.read()
-import re
-content = re.sub(r'\{\\/\\* \\\$FlowFixMe\[incompatible-type\] \\*\\/\}\n(export type GDevelopTheme)', r'\1', content)
-content = re.sub(r'\{/\* \\\$FlowFixMe\[incompatible-type\] \*/\}\n(export type GDevelopTheme)', r'\1', content)
-with open('$THEME_FILE', 'w') as f:
-    f.write(content)
-"
-  echo "  Fixed Theme/index.js"
-fi
-
 echo "  Done."
 
 ###############################################################################
-# STEP 5: Add $FlowFixMe for all remaining errors (iterative)
+# STEP 7: Add $FlowFixMe for all remaining errors (iterative)
 ###############################################################################
 echo ""
-echo "--- Step 5: Adding \$FlowFixMe for all errors (iterative) ---"
+echo "--- Step 7: Adding \$FlowFixMe for all errors (iterative) ---"
 
 npx flow stop 2>/dev/null || true
 
@@ -202,10 +218,10 @@ for i in $(seq 1 10); do
 done
 
 ###############################################################################
-# STEP 6: Fix eslint-disable-next-line ordering with $FlowFixMe
+# STEP 8: Fix eslint-disable-next-line ordering with $FlowFixMe
 ###############################################################################
 echo ""
-echo "--- Step 6: Fixing eslint/FlowFixMe comment ordering ---"
+echo "--- Step 8: Fixing eslint/FlowFixMe comment ordering ---"
 
 # When $FlowFixMe is inserted between eslint-disable-next-line and the code,
 # eslint-disable no longer applies (it targets the FlowFixMe comment instead).

@@ -126,20 +126,21 @@ const getUserFromState = (userState: string) => {
   }
 };
 
-export const Default = ({
-  userState,
-  cancelAtPeriodEnd,
-  pricingSystem,
-  recommendedPlanId,
-  excludePlanId,
-}: {
-  userState: string,
-  cancelAtPeriodEnd: boolean,
-  pricingSystem: string,
-  recommendedPlanId: string,
-  excludePlanId: string,
-// $FlowFixMe[signature-verification-failure]
-}) => {
+export const Default = (
+  {
+    userState,
+    cancelAtPeriodEnd,
+    pricingSystem,
+    recommendedPlanId,
+    excludePlanId
+  }: {
+    userState: string,
+    cancelAtPeriodEnd: boolean,
+    pricingSystem: string,
+    recommendedPlanId: string,
+    excludePlanId: string,
+  },
+): React.Node => {
   const Component = () => {
     const {
       getSubscriptionPlansWithPricingSystems,
@@ -257,6 +258,7 @@ export const Default = ({
 
   return (
     <AlertProvider>
+      {/* $FlowFixMe[incompatible-type] */}
       <AuthenticatedUserContext.Provider value={authenticatedUser}>
         <SubscriptionProvider>
           <Component />

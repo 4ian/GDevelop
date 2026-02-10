@@ -45,8 +45,7 @@ export const initialLeaderboardState = {
     goToPreviousPage: null,
     goToFirstPage: null,
   },
-  // $FlowFixMe[signature-verification-failure]
-  createLeaderboard: async () => null,
+  createLeaderboard: async (): Promise<null> => null,
   listLeaderboards: async () => {},
   selectLeaderboard: () => {},
   setDisplayOnlyBestEntry: () => {},
@@ -59,8 +58,7 @@ export const initialLeaderboardState = {
   fetchLeaderboardEntries: async () => {},
 };
 
-// $FlowFixMe[signature-verification-failure]
-const LeaderboardContext = React.createContext<LeaderboardState>(
+const LeaderboardContext: React.Context<LeaderboardState> = React.createContext<LeaderboardState>(
   // $FlowFixMe[incompatible-type]
   initialLeaderboardState
 );

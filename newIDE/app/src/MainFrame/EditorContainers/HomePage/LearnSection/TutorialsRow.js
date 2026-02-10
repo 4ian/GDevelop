@@ -38,14 +38,15 @@ type TutorialsRowProps = {|
   ) => number,
 |};
 
-export const TutorialsRow = ({
-  limits,
-  category,
-  onSelectCategory,
-  onSelectTutorial,
-  getColumnsFromWindowSize,
-// $FlowFixMe[signature-verification-failure]
-}: TutorialsRowProps) => {
+export const TutorialsRow = (
+  {
+    limits,
+    category,
+    onSelectCategory,
+    onSelectTutorial,
+    getColumnsFromWindowSize
+  }: TutorialsRowProps,
+): React.Node => {
   const {
     tutorials,
     error: tutorialLoadingError,

@@ -142,8 +142,7 @@ const hasBadge = (badges: ?Array<Badge>, achievementId: string) =>
 export const hasMissingBadges = (
   badges: ?Array<Badge>,
   achievements: ?Array<Achievement>
-// $FlowFixMe[signature-verification-failure]
-) =>
+): boolean =>
   // Not connected
   !badges ||
   !achievements ||
@@ -252,14 +251,7 @@ type Props = {|
   showAllItems?: boolean,
 |};
 
-export const EarnCredits = ({
-  achievements,
-  badges,
-  onOpenProfile,
-  showRandomItem,
-  showAllItems,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const EarnCredits = ({achievements, badges, onOpenProfile, showRandomItem, showAllItems}: Props): React.MixedElement => {
   const { isMobile, windowSize } = useResponsiveWindowSize();
   const isExtraLargeScreen = windowSize === 'xlarge';
 

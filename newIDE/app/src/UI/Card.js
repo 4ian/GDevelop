@@ -32,16 +32,17 @@ type Props = {|
   padding?: number,
 |};
 
-const Card = ({
-  children,
-  header,
-  background,
-  cardCornerAction,
-  isHighlighted,
-  disabled,
-  padding,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const Card = (
+  {
+    children,
+    header,
+    background,
+    cardCornerAction,
+    isHighlighted,
+    disabled,
+    padding
+  }: Props,
+): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const cardContentStyle: {|

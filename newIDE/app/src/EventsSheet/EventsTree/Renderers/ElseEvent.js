@@ -24,9 +24,7 @@ const styles = {
 };
 
 export default class ElseEvent extends React.Component<EventRendererProps, any> {
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     const elseEvent = gd.asElseEvent(this.props.event);
     const { isValidElseEvent } = this.props;
 

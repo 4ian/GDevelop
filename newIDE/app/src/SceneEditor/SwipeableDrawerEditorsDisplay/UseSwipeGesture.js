@@ -12,8 +12,9 @@ const minMovement = 30; // px
 const minSpeed = 200; // px/s
 const absoluteMaxDelta = 30; // px
 
-// $FlowFixMe[signature-verification-failure]
-const useSwipeGesture = ({ containerRef, onSwipeDown, onSwipeUp }: Props) => {
+type UseSwipeGestureReturn = { onTouchEnd: (event: TouchEvent) => void, onTouchMove: (event: TouchEvent) => void, onTouchStart: (event: TouchEvent) => void };
+
+const useSwipeGesture = ({containerRef, onSwipeDown, onSwipeUp}: Props): UseSwipeGestureReturn => {
   const startTimeRef = React.useRef<?number>(null);
   const startYRef = React.useRef<?number>(null);
 

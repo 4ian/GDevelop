@@ -26,12 +26,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const CloudProjectRecoveryDialog = ({
-  cloudProjectId,
-  onClose,
-  onOpenPreviousVersion,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+const CloudProjectRecoveryDialog = ({cloudProjectId, onClose, onOpenPreviousVersion}: Props): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile } = authenticatedUser;
   const [

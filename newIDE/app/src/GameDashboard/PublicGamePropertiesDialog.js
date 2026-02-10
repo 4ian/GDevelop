@@ -48,8 +48,7 @@ export const applyPublicPropertiesToProject = (
   project: gdProject,
   i18n: I18nType,
   newProperties: PublicProjectProperties
-// $FlowFixMe[signature-verification-failure]
-) => {
+): boolean => {
   const {
     name,
     authorIds,
@@ -93,18 +92,19 @@ type Props = {|
   onUnregisterGame: () => Promise<void>,
 |};
 
-export const PublicGamePropertiesDialog = ({
-  publicGame,
-  onClose,
-  onApply,
-  isLoading,
-  i18n,
-  onUpdatingGame,
-  onGameUpdated,
-  canBePublishedOnGdGames,
-  onUnregisterGame,
-// $FlowFixMe[signature-verification-failure]
-}: Props) => {
+export const PublicGamePropertiesDialog = (
+  {
+    publicGame,
+    onClose,
+    onApply,
+    isLoading,
+    i18n,
+    onUpdatingGame,
+    onGameUpdated,
+    canBePublishedOnGdGames,
+    onUnregisterGame
+  }: Props,
+): React.Node => {
   const { profile } = React.useContext(AuthenticatedUserContext);
 
   const publicGameAuthorIds = publicGame.authors.map(author => author.id);

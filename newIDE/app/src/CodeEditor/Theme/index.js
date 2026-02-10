@@ -43,5 +43,4 @@ const themes: Array<CodeEditorTheme> = [
   RosePine,
 ];
 
-// $FlowFixMe[signature-verification-failure]
-export const getAllThemes = () => themes;
+export const getAllThemes = (): Array<CodeEditorTheme> => themes;

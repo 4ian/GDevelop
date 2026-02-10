@@ -53,57 +53,60 @@ const gd: libGDevelop = global.gd;
 export const AI_AGENT_TOOLS_VERSION = 'v8';
 export const AI_CHAT_TOOLS_VERSION = 'v8';
 
-export const useProcessFunctionCalls = ({
-  i18n,
-  project,
-  resourceManagementProps,
-  editorCallbacks,
-  selectedAiRequest,
-  onSendEditorFunctionCallResults,
-  getEditorFunctionCallResults,
-  addEditorFunctionCallResults,
-  onSceneEventsModifiedOutsideEditor,
-  onInstancesModifiedOutsideEditor,
-  onObjectsModifiedOutsideEditor,
-  onObjectGroupsModifiedOutsideEditor,
-  onWillInstallExtension,
-  onExtensionInstalled,
-  isReadyToProcessFunctionCalls,
-}: {|
-  i18n: I18nType,
-  project: ?gdProject,
-  resourceManagementProps: ResourceManagementProps,
-  editorCallbacks: EditorCallbacks,
-  selectedAiRequest: ?AiRequest,
-  onSendEditorFunctionCallResults: (
-    editorFunctionCallResults: Array<EditorFunctionCallResult>,
-    options: {|
-      createdSceneNames?: Array<string>,
-      createdProject?: ?gdProject,
-    |}
-  ) => Promise<void>,
-  getEditorFunctionCallResults: string => Array<EditorFunctionCallResult> | null,
-  addEditorFunctionCallResults: (
-    string,
-    Array<EditorFunctionCallResult>
-  ) => Array<EditorFunctionCallResult>,
-  onSceneEventsModifiedOutsideEditor: (
-    changes: SceneEventsOutsideEditorChanges
-  ) => void,
-  onInstancesModifiedOutsideEditor: (
-    changes: InstancesOutsideEditorChanges
-  ) => void,
-  onObjectsModifiedOutsideEditor: (
-    changes: ObjectsOutsideEditorChanges
-  ) => void,
-  onObjectGroupsModifiedOutsideEditor: (
-    changes: ObjectGroupsOutsideEditorChanges
-  ) => void,
-  onWillInstallExtension: (extensionNames: Array<string>) => void,
-  onExtensionInstalled: (extensionNames: Array<string>) => void,
-  isReadyToProcessFunctionCalls: boolean,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+export const useProcessFunctionCalls = (
+  {
+    i18n,
+    project,
+    resourceManagementProps,
+    editorCallbacks,
+    selectedAiRequest,
+    onSendEditorFunctionCallResults,
+    getEditorFunctionCallResults,
+    addEditorFunctionCallResults,
+    onSceneEventsModifiedOutsideEditor,
+    onInstancesModifiedOutsideEditor,
+    onObjectsModifiedOutsideEditor,
+    onObjectGroupsModifiedOutsideEditor,
+    onWillInstallExtension,
+    onExtensionInstalled,
+    isReadyToProcessFunctionCalls
+  }: {|
+    i18n: I18nType,
+    project: ?gdProject,
+    resourceManagementProps: ResourceManagementProps,
+    editorCallbacks: EditorCallbacks,
+    selectedAiRequest: ?AiRequest,
+    onSendEditorFunctionCallResults: (
+      editorFunctionCallResults: Array<EditorFunctionCallResult>,
+      options: {|
+        createdSceneNames?: Array<string>,
+        createdProject?: ?gdProject,
+      |}
+    ) => Promise<void>,
+    getEditorFunctionCallResults: (
+      string
+    ) => Array<EditorFunctionCallResult> | null,
+    addEditorFunctionCallResults: (
+      string,
+      Array<EditorFunctionCallResult>
+    ) => Array<EditorFunctionCallResult>,
+    onSceneEventsModifiedOutsideEditor: (
+      changes: SceneEventsOutsideEditorChanges
+    ) => void,
+    onInstancesModifiedOutsideEditor: (
+      changes: InstancesOutsideEditorChanges
+    ) => void,
+    onObjectsModifiedOutsideEditor: (
+      changes: ObjectsOutsideEditorChanges
+    ) => void,
+    onObjectGroupsModifiedOutsideEditor: (
+      changes: ObjectGroupsOutsideEditorChanges
+    ) => void,
+    onWillInstallExtension: (extensionNames: Array<string>) => void,
+    onExtensionInstalled: (extensionNames: Array<string>) => void,
+    isReadyToProcessFunctionCalls: boolean,
+  |},
+): { isAutoProcessingFunctionCalls: (aiRequestId: string) => boolean, onProcessFunctionCalls: ( functionCalls: Array<AiRequestMessageAssistantFunctionCall>, options: ?{ ignore?: boolean } ) => Promise<void>, setAutoProcessFunctionCalls: ( aiRequestId: string, shouldAutoProcess: boolean ) => void } => {
   const { ensureExtensionInstalled } = useEnsureExtensionInstalled({
     project,
     i18n,
@@ -269,28 +272,31 @@ export const useProcessFunctionCalls = ({
   };
 };
 
-export const useAiRequestState = ({
-  project,
-  fileMetadata,
-  storageProviderName,
-  onSave,
-  onSaveProjectAsWithStorageProvider,
-}: {|
-  project: ?gdProject,
-  fileMetadata?: ?FileMetadata,
-  storageProviderName?: ?string,
-  onSave?: (options?: {|
-    skipNewVersionWarning: boolean,
-  |}) => Promise<?FileMetadata>,
-  onSaveProjectAsWithStorageProvider?: (
-    options: ?{|
-      requestedStorageProvider?: StorageProvider,
-      forcedSavedAsLocation?: SaveAsLocation,
-      createdProject?: gdProject,
-    |}
-  ) => Promise<?FileMetadata>,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+export const useAiRequestState = (
+  {
+    project,
+    fileMetadata,
+    storageProviderName,
+    onSave,
+    onSaveProjectAsWithStorageProvider
+  }: {|
+    project: ?gdProject,
+    fileMetadata?: ?FileMetadata,
+    storageProviderName?: ?string,
+    onSave?: (
+      options?: {|
+        skipNewVersionWarning: boolean,
+      |}
+    ) => Promise<?FileMetadata>,
+    onSaveProjectAsWithStorageProvider?: (
+      options: ?{|
+        requestedStorageProvider?: StorageProvider,
+        forcedSavedAsLocation?: SaveAsLocation,
+        createdProject?: gdProject,
+      |}
+    ) => Promise<?FileMetadata>,
+  |},
+): { isFetchingSuggestions: boolean, savingProjectForMessageId: ?string, selectedAiRequest: any, selectedAiRequestId: any, setAiState: any } => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile, getAuthorizationHeader } = authenticatedUser;
   const {

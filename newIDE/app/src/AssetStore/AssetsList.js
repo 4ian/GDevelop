@@ -263,8 +263,8 @@ type Props = {|
   hideDetails?: boolean,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const AssetsList = React.forwardRef<Props, AssetsListInterface>(
+// $FlowFixMe[prop-missing]
+const AssetsList: React.AbstractComponent<Props, AssetsListInterface> = React.forwardRef<Props, AssetsListInterface>(
   (
     {
       assetShortHeaders,

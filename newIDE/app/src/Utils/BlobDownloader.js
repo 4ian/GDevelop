@@ -107,9 +107,7 @@ export const convertBlobToFiles = <
 >(
   itemResults: Array<ItemResult<Item>>,
   onError: (resourceName: string, error: Error) => void
-// $FlowFixMe[signature-verification-failure]
-// $FlowFixMe[missing-local-annot]
-) =>
+): any =>
   itemResults
     .map(({ item, blob, error }) => {
       if (error || !blob) {

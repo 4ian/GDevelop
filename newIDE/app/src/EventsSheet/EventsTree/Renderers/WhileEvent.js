@@ -28,9 +28,7 @@ const styles = {
 };
 
 export default class WhileEvent extends React.Component<EventRendererProps, any> {
-  // $FlowFixMe[signature-verification-failure]
-  // $FlowFixMe[missing-local-annot]
-  render() {
+  render(): any {
     var whileEvent = gd.asWhileEvent(this.props.event);
 
     return (

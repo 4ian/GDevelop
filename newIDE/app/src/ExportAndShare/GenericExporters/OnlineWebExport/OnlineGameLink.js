@@ -37,20 +37,21 @@ type OnlineGameLinkProps = {|
 
 const timeForExport = 5; // seconds.
 
-const OnlineGameLink = ({
-  build,
-  game,
-  project,
-  onSaveProject,
-  isSavingProject,
-  errored,
-  exportStep,
-  onRefreshGame,
-  onGameUpdated,
-  automaticallyPublishNewBuild,
-  shouldShowShareDialog,
-// $FlowFixMe[signature-verification-failure]
-}: OnlineGameLinkProps) => {
+const OnlineGameLink = (
+  {
+    build,
+    game,
+    project,
+    onSaveProject,
+    isSavingProject,
+    errored,
+    exportStep,
+    onRefreshGame,
+    onGameUpdated,
+    automaticallyPublishNewBuild,
+    shouldShowShareDialog
+  }: OnlineGameLinkProps,
+): null | React.Node => {
   const [isShareDialogOpen, setIsShareDialogOpen] = React.useState<boolean>(
     false
   );

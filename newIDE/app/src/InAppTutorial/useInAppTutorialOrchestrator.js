@@ -12,8 +12,9 @@ type Props = {|
   editorTabs: EditorTabsState,
 |};
 
-// $FlowFixMe[signature-verification-failure]
-const useInAppTutorialOrchestrator = ({ editorTabs }: Props) => {
+type UseInAppTutorialOrchestratorReturn = { InAppTutorialOrchestrator: any, orchestratorProps: { currentEditor: EditorIdentifier | null, currentSceneName: string | null, } };
+
+const useInAppTutorialOrchestrator = ({editorTabs}: Props): UseInAppTutorialOrchestratorReturn => {
   const [
     currentEditor,
     setCurrentEditor,

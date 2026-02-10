@@ -13,18 +13,21 @@ import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { useInstallAsset } from '../AssetStore/NewObjectDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 
-export const useSearchAndInstallAsset = ({
-  project,
-  resourceManagementProps,
-  onWillInstallExtension,
-  onExtensionInstalled,
-}: {|
-  project: ?gdProject,
-  resourceManagementProps: ResourceManagementProps,
-  onWillInstallExtension: (extensionNames: Array<string>) => void,
-  onExtensionInstalled: (extensionNames: Array<string>) => void,
-// $FlowFixMe[signature-verification-failure]
-|}) => {
+type UseSearchAndInstallAssetReturn = { searchAndInstallAsset: ( AssetSearchAndInstallOptions ) => Promise<AssetSearchAndInstallResult> };
+
+export const useSearchAndInstallAsset = (
+  {
+    project,
+    resourceManagementProps,
+    onWillInstallExtension,
+    onExtensionInstalled
+  }: {|
+    project: ?gdProject,
+    resourceManagementProps: ResourceManagementProps,
+    onWillInstallExtension: (extensionNames: Array<string>) => void,
+    onExtensionInstalled: (extensionNames: Array<string>) => void,
+  |},
+): UseSearchAndInstallAssetReturn => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );

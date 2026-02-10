@@ -171,7 +171,9 @@ type Props = {|
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 
   // Project save
-  onSave: () => Promise<void>,
+  onSave: (options?: {|
+    skipNewVersionWarning: boolean,
+  |}) => Promise<?FileMetadata>,
   canSave: boolean,
 
   resourceManagementProps: ResourceManagementProps,

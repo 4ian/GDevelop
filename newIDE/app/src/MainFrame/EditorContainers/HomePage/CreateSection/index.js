@@ -122,7 +122,7 @@ type Props = {|
   setCurrentTab: GameDetailsTab => void,
   onOpenNewProjectSetupDialog: () => void,
   onChooseProject: () => void,
-  onSaveProject: () => Promise<void>,
+  onSaveProject: () => Promise<?FileMetadata>,
   canSaveProject: boolean,
 |};
 

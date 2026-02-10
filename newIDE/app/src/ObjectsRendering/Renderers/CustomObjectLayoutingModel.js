@@ -39,10 +39,18 @@ export type ObjectAnchor = {
 };
 
 const getPropertyValue = (
+  name: string,
   properties: gdMapStringPropertyDescriptor,
-  name: string
+  behaviorOverriding: gdBehavior | null
 ): CustomObjectConfiguration_EdgeAnchor =>
-  properties.has(name)
+  behaviorOverriding && behaviorOverriding.hasPropertyValue(name)
+    ? gd.CustomObjectConfiguration.getEdgeAnchorFromString(
+        behaviorOverriding
+          .getProperties()
+          .get(name)
+          .getValue()
+      )
+    : properties.has(name)
     ? gd.CustomObjectConfiguration.getEdgeAnchorFromString(
         properties.get(name).getValue()
       )
@@ -64,7 +72,8 @@ const getDefaultAnchor = () => ({
  */
 export const getObjectAnchor = (
   eventBasedObjectVariant: gdEventsBasedObjectVariant,
-  objectName: string
+  objectName: string,
+  initialInstance: gdInitialInstance
 ): ObjectAnchor => {
   const objects = eventBasedObjectVariant.getObjects();
   if (!objects.hasObjectNamed(objectName)) {
@@ -75,10 +84,31 @@ export const getObjectAnchor = (
     return getDefaultAnchor();
   }
   const properties = childObject.getBehavior('Anchor').getProperties();
-  const leftEdgeAnchor = getPropertyValue(properties, 'leftEdgeAnchor');
-  const topEdgeAnchor = getPropertyValue(properties, 'topEdgeAnchor');
-  const rightEdgeAnchor = getPropertyValue(properties, 'rightEdgeAnchor');
-  const bottomEdgeAnchor = getPropertyValue(properties, 'bottomEdgeAnchor');
+  const behaviorOverriding = initialInstance.hasBehaviorOverridingNamed(
+    'Anchor'
+  )
+    ? initialInstance.getBehaviorOverriding('Anchor')
+    : null;
+  const leftEdgeAnchor = getPropertyValue(
+    'leftEdgeAnchor',
+    properties,
+    behaviorOverriding
+  );
+  const topEdgeAnchor = getPropertyValue(
+    'topEdgeAnchor',
+    properties,
+    behaviorOverriding
+  );
+  const rightEdgeAnchor = getPropertyValue(
+    'rightEdgeAnchor',
+    properties,
+    behaviorOverriding
+  );
+  const bottomEdgeAnchor = getPropertyValue(
+    'bottomEdgeAnchor',
+    properties,
+    behaviorOverriding
+  );
   return { leftEdgeAnchor, topEdgeAnchor, rightEdgeAnchor, bottomEdgeAnchor };
 };
 
@@ -123,15 +153,15 @@ export class LayoutedInstance {
   }
 
   getAngle() {
-    return 0;
+    return this.instance.getAngle();
   }
 
   getRotationX() {
-    return 0;
+    return this.instance.getRotationX();
   }
 
   getRotationY() {
-    return 0;
+    return this.instance.getRotationY();
   }
 
   getObjectName() {
@@ -163,7 +193,7 @@ export class LayoutedInstance {
   setSealed(seal: boolean) {}
 
   getZOrder() {
-    return 0;
+    return this.instance.getZOrder();
   }
 
   setZOrder(zOrder: number) {}
@@ -193,7 +223,7 @@ export class LayoutedInstance {
   setFlippedZ(flippedY: boolean) {}
 
   getLayer() {
-    return '';
+    return this.instance.getLayer();
   }
 
   setLayer(layer: string) {}
@@ -252,15 +282,18 @@ export class LayoutedInstance {
     globalObjectsContainer: gdObjectsContainer,
     objectsContainer: gdObjectsContainer
   ) {
-    return null;
+    return this.instance.getCustomProperties(
+      globalObjectsContainer,
+      objectsContainer
+    );
   }
 
   getRawDoubleProperty(name: string) {
-    return 0;
+    return this.instance.getRawDoubleProperty(name);
   }
 
   getRawStringProperty(name: string) {
-    return '';
+    return this.instance.getRawStringProperty(name);
   }
 
   setRawDoubleProperty(name: string, value: number) {}
@@ -269,6 +302,14 @@ export class LayoutedInstance {
 
   getVariables() {
     return [];
+  }
+
+  hasBehaviorOverridingNamed(name: string): boolean {
+    return this.instance.hasBehaviorOverridingNamed(name);
+  }
+
+  getBehaviorOverriding(name: string): gdBehavior {
+    return this.instance.getBehaviorOverriding(name);
   }
 
   serializeTo(element: gdSerializerElement) {}
@@ -334,7 +375,8 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
 
   const objectAnchor = getObjectAnchor(
     eventBasedObjectVariant,
-    layoutedInstance.getObjectName()
+    layoutedInstance.getObjectName(),
+    initialInstance
   );
   const leftEdgeAnchor = objectAnchor
     ? objectAnchor.leftEdgeAnchor

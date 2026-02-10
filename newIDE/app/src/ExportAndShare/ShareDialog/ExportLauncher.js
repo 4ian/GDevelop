@@ -9,6 +9,7 @@ import { Column, Line } from '../../UI/Grid';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import CreateProfile from '../../Profile/CreateProfile';
 import CurrentUsageDisplayer from '../../Profile/CurrentUsageDisplayer';
+import { type FileMetadata } from '../../ProjectsStorage';
 import {
   displayProjectErrorsBox,
   getProjectPropertiesErrors,
@@ -47,7 +48,7 @@ type State = {|
 type Props = {|
   i18n: I18nType,
   project: gdProject,
-  onSaveProject: () => Promise<void>,
+  onSaveProject: () => Promise<?FileMetadata>,
   isSavingProject: boolean,
   gameAndBuildsManager: GameAndBuildsManager,
   onChangeSubscription: () => void,

@@ -7,6 +7,7 @@ import {
   type ExtensionShortHeader,
   type ExtensionHeader,
   type BehaviorShortHeader,
+  type ObjectShortHeader,
   getExtensionHeader,
 } from '../../Utils/GDevelopServices/Extension';
 import {
@@ -62,7 +63,10 @@ const getTransformedDescription = (extensionHeader: ExtensionHeader) => {
 };
 
 type Props = {|
-  extensionShortHeader: ExtensionShortHeader | BehaviorShortHeader,
+  extensionShortHeader:
+    | ExtensionShortHeader
+    | BehaviorShortHeader
+    | ObjectShortHeader,
   isInstalling: boolean,
   onClose: () => void,
   onInstall?: () => Promise<void>,

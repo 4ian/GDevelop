@@ -15,6 +15,8 @@ import {
   ensureIsArray,
   ensureIsNullOrObjectHasProperty,
 } from '../DataValidator';
+import { type FileMetadata } from '../../ProjectsStorage';
+import CloudStorageProvider from '../../ProjectsStorage/CloudStorageProvider';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 60;
 export const CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH = 50;
@@ -260,6 +262,27 @@ export const clearCloudProjectCredentials = async (): Promise<void> => {
   }
 };
 
+export const getCloudProjectFileMetadataIdentifier = (
+  storageProviderInternalName: string,
+  fileMetadata: ?FileMetadata
+) => {
+  if (
+    !fileMetadata ||
+    !(storageProviderInternalName === CloudStorageProvider.internalName)
+  )
+    return null;
+  if (fileMetadata.fileIdentifier.startsWith('http')) {
+    // When creating a cloud project from an example, there might be a moment where
+    // the used Storage Provider is the cloud one but the file identifier is the url
+    // to the example such as `https://ressources.gdevelop-app.com/...`.
+    // A cloud project identifier is a uuid at the moment, so it does not contain the
+    // 3 letters h t and p so there should be no risk af having a cloud project
+    // uuid starting with http.
+    return null;
+  }
+  return fileMetadata.fileIdentifier;
+};
+
 export const createCloudProject = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectCreationPayload: {| name: string, gameId: string |}
@@ -298,12 +321,14 @@ export const createCloudProject = async (
 export const commitVersion = async ({
   authenticatedUser,
   cloudProjectId,
+  presignedUrl,
   zippedProject,
   previousVersion,
   restoredFromVersionId,
 }: {
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
+  presignedUrl: string,
   zippedProject: Blob,
   previousVersion?: ?string,
   restoredFromVersionId?: ?string,
@@ -313,12 +338,7 @@ export const commitVersion = async ({
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  // Get a presigned url to upload a new version (the URL will contain the new version id).
-  const presignedUrl = await getPresignedUrlForVersionUpload(
-    authenticatedUser,
-    cloudProjectId
-  );
-  if (!presignedUrl) return;
+
   const newVersion = getVersionIdFromPath(presignedUrl);
   // Upload zipped project.
   await refetchCredentialsForProjectAndRetryIfUnauthorized(
@@ -552,7 +572,7 @@ export const deleteCloudProject = async (
   });
 };
 
-const getPresignedUrlForVersionUpload = async (
+export const getPresignedUrlForVersionUpload = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
 ): Promise<?string> => {
@@ -818,4 +838,29 @@ export const listVersionsOfProject = async (
     }),
     nextPageUri,
   };
+};
+
+export const getCloudProjectVersion = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    cloudProjectId,
+    versionId,
+  }: {| userId: string, cloudProjectId: string, versionId: string |}
+): Promise<?ExpandedCloudProjectVersion> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.get(
+    `/project/${cloudProjectId}/version/${versionId}`,
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: { userId },
+    }
+  );
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/project/{id}/version/{id} of Project API',
+  });
 };

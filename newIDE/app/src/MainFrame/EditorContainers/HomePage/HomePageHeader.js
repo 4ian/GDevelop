@@ -19,6 +19,7 @@ import Mobile from '../../../UI/CustomSvgIcons/Mobile';
 import Desktop from '../../../UI/CustomSvgIcons/Desktop';
 import HistoryIcon from '../../../UI/CustomSvgIcons/History';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+import { type FileMetadata } from '../../../ProjectsStorage';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -26,7 +27,9 @@ type Props = {|
   onOpenVersionHistory: () => void,
   onOpenProfile: () => void,
   onOpenLanguageDialog: () => void,
-  onSave: () => Promise<void>,
+  onSave: (options?: {|
+    skipNewVersionWarning: boolean,
+  |}) => Promise<?FileMetadata>,
   canSave: boolean,
 |};
 

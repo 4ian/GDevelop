@@ -50,6 +50,13 @@ export type SaveAsLocation = {|
   // a new location where to save a project to.
 |};
 
+export type SaveProjectOptions = {|
+  previousVersion?: string,
+  restoredFromVersionId?: string,
+  useBackgroundSerializer?: boolean,
+  skipNewVersionWarning?: boolean,
+|};
+
 export type SaveAsOptions = {|
   generateNewProjectUuid?: boolean,
   setProjectNameFromLocation?: boolean,
@@ -106,7 +113,11 @@ export type StorageProviderOperations = {|
   onSaveProject?: (
     project: gdProject,
     fileMetadata: FileMetadata,
-    options?: {| previousVersion?: string, restoredFromVersionId?: string |}
+    options?: SaveProjectOptions,
+    actions: {|
+      showAlert: ShowAlertFunction,
+      showConfirmation: ShowConfirmFunction,
+    |}
   ) => Promise<{|
     wasSaved: boolean,
     fileMetadata: FileMetadata,
@@ -133,13 +144,6 @@ export type StorageProviderOperations = {|
     /** This is the location where the project was saved, or null if not persisted. */
     fileMetadata: ?FileMetadata,
   |}>,
-  canFileMetadataBeSafelySaved?: (
-    fileMetadata: FileMetadata,
-    actions: {|
-      showAlert: ShowAlertFunction,
-      showConfirmation: ShowConfirmFunction,
-    |}
-  ) => Promise<boolean>,
   canFileMetadataBeSafelySavedAs?: (
     fileMetadata: FileMetadata,
     actions: {|

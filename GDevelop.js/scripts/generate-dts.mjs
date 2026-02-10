@@ -12,6 +12,7 @@ const bindingsFile = readFileSync(
 /** @type {Record<string, {returnType: string, inputType?: string}>} */
 const castFunctions = {
   StandardEvent: { inputType: 'Event', returnType: 'StandardEvent' },
+  ElseEvent: { inputType: 'Event', returnType: 'ElseEvent' },
   RepeatEvent: { inputType: 'Event', returnType: 'RepeatEvent' },
   WhileEvent: { inputType: 'Event', returnType: 'WhileEvent' },
   ForEachEvent: { inputType: 'Event', returnType: 'ForEachEvent' },
@@ -452,6 +453,10 @@ export function compare<T extends EmscriptenObject>(object1: T, object2: T): boo
  * The alias {@link EmscriptenObject.delete} is recommended instead, for readability.
  */
 export function destroy(object: EmscriptenObject): void;
+
+export function _malloc(size: number): number;
+export function _free(ptr: number): void;
+export const HEAPU8: Uint8Array;
 
 export as namespace gd;
 

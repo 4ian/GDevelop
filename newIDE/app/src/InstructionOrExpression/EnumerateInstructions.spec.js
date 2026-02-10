@@ -58,12 +58,12 @@ describe('EnumerateInstructions', () => {
       })
     );
     expect(
-      instructions.find(instruction => instruction.type === 'SourisSurObjet')
+      instructions.find(instruction => instruction.type === 'IsCursorOnObject')
     ).toEqual(
       expect.objectContaining({
         displayedName: 'The cursor/touch is on an object',
         fullGroupName: 'General ❯ Objects ❯ Mouse and touch',
-        type: 'SourisSurObjet',
+        type: 'IsCursorOnObject',
       })
     );
   });
@@ -129,11 +129,15 @@ describe('EnumerateInstructions', () => {
     expect(createInstruction).not.toBeUndefined();
     expect(getObjectParameterIndex(createInstruction.metadata)).toBe(1);
 
-    const pickRandom = actions.filter(({ type }) => type === 'AjoutHasard')[0];
+    const pickRandom = actions.filter(
+      ({ type }) => type === 'PickRandomInstance'
+    )[0];
     expect(pickRandom).not.toBeUndefined();
     expect(getObjectParameterIndex(pickRandom.metadata)).toBe(1);
 
-    const pickAll = actions.filter(({ type }) => type === 'AjoutObjConcern')[0];
+    const pickAll = actions.filter(
+      ({ type }) => type === 'PickAllInstances'
+    )[0];
     expect(pickAll).not.toBeUndefined();
     expect(getObjectParameterIndex(pickAll.metadata)).toBe(1);
 
@@ -173,7 +177,7 @@ describe('EnumerateInstructions', () => {
         }),
         expect.objectContaining({
           displayedName: 'The cursor/touch is on an object',
-          type: 'SourisSurObjet',
+          type: 'IsCursorOnObject',
         }),
       ])
     );

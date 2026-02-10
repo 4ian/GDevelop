@@ -390,10 +390,7 @@ namespace gdjs {
       super(instanceContainer, behaviorData, owner);
     }
 
-    updateFromBehaviorData(
-      oldBehaviorData: BehaviorData,
-      newBehaviorData: BehaviorData
-    ): boolean {
+    override applyBehaviorOverriding(behaviorData: BehaviorData): boolean {
       // Nothing to update.
       return true;
     }

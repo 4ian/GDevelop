@@ -299,6 +299,7 @@ export const WithObjectsList = () => (
                   getThumbnail={() => 'res/unknown32.png'}
                   project={testProject.project}
                   layout={testProject.testLayout}
+                  eventsFunctionsExtension={null}
                   eventsBasedObject={null}
                   projectScopedContainersAccessor={
                     testProject.testSceneProjectScopedContainersAccessor

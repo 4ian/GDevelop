@@ -2,7 +2,10 @@
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import { type ElectronUpdateStatus } from './UpdaterTools';
-import { type FileMetadataAndStorageProviderName } from '../ProjectsStorage';
+import {
+  type FileMetadata,
+  type FileMetadataAndStorageProviderName,
+} from '../ProjectsStorage';
 import { type ShortcutMap } from '../KeyboardShortcuts/DefaultShortcuts';
 import {
   type MenuDeclarativeItemTemplate,
@@ -31,7 +34,7 @@ export type MainMenuCallbacks = {|
   onOpenRecentFile: (
     fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
   ) => Promise<void>,
-  onSaveProject: () => Promise<void>,
+  onSaveProject: () => Promise<?FileMetadata>,
   onSaveProjectAs: () => void,
   onShowVersionHistory: () => void,
   onCloseProject: () => Promise<boolean>,

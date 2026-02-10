@@ -26,6 +26,7 @@ export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
       extensionNamesList,
       objectsList,
       existingEventsAsText,
+      existingEventsJson,
       placementHint,
       relatedAiRequestId,
     }: {|
@@ -34,6 +35,7 @@ export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
       extensionNamesList: string,
       objectsList: string,
       existingEventsAsText: string,
+      existingEventsJson: string | null,
       placementHint: string,
       relatedAiRequestId: string,
     |}): Promise<EventsGenerationResult> => {
@@ -53,12 +55,22 @@ export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
         userId: profile.id,
         simplifiedProjectJson,
         projectSpecificExtensionsSummaryJson,
+        eventsJson: existingEventsJson,
       });
 
       const createResult = await retryIfFailed({ times: 2 }, () =>
         createAiGeneratedEvent(getAuthorizationHeader, {
           userId: profile.id,
-          ...preparedAiUserContent,
+          gameProjectJsonUserRelativeKey:
+            preparedAiUserContent.gameProjectJsonUserRelativeKey,
+          gameProjectJson: preparedAiUserContent.gameProjectJson,
+          projectSpecificExtensionsSummaryJsonUserRelativeKey:
+            preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
+          projectSpecificExtensionsSummaryJson:
+            preparedAiUserContent.projectSpecificExtensionsSummaryJson,
+          existingEventsJsonUserRelativeKey:
+            preparedAiUserContent.eventsJsonUserRelativeKey,
+          existingEventsJson: preparedAiUserContent.eventsJson,
           sceneName,
           eventsDescription,
           extensionNamesList,

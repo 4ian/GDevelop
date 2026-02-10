@@ -114,6 +114,26 @@ export const getFunctionCallsToProcess = ({
   return functionCallsToProcess;
 };
 
+export const getFunctionCallNameByCallId = ({
+  aiRequest,
+  callId,
+}: {|
+  aiRequest: AiRequest,
+  callId: string,
+|}): string | null => {
+  for (let i = 0; i < aiRequest.output.length; i++) {
+    const message = aiRequest.output[i];
+    if (message.type === 'message' && message.role === 'assistant') {
+      for (const content of message.content) {
+        if (content.type === 'function_call' && content.call_id === callId) {
+          return content.name;
+        }
+      }
+    }
+  }
+  return null;
+};
+
 export const getFunctionCallOutputsFromEditorFunctionCallResults = (
   editorFunctionCallResults: Array<EditorFunctionCallResult> | null
 ): {|

@@ -6,8 +6,8 @@ import GenericIconPreview from './GenericIconPreview';
 import FontDownload from '@material-ui/icons/FontDownload';
 import File from '../../UI/CustomSvgIcons/File';
 import Video from '../../UI/CustomSvgIcons/Video';
-import Music from '../../UI/CustomSvgIcons/Music';
 import Model3DPreview from './Model3DPreview';
+import AudioPreview from './AudioPreview';
 
 type Props = {|
   project: gdProject,
@@ -42,7 +42,16 @@ const ResourcePreview = (props: Props) => {
         />
       );
     case 'audio':
-      return <GenericIconPreview renderIcon={props => <Music {...props} />} />;
+      return (
+        <AudioPreview
+          resourceName={resourceName}
+          audioResourceSource={props.resourcesLoader.getResourceFullUrl(
+            project,
+            resourceName,
+            {}
+          )}
+        />
+      );
     case 'model3D':
       return (
         <Model3DPreview

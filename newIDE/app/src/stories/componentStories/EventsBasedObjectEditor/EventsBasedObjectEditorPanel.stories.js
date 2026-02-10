@@ -6,17 +6,17 @@ import { action } from '@storybook/addon-actions';
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
-import EventsBasedObjectEditorPanel from '../../../EventsBasedObjectEditor/EventsBasedObjectEditorPanel';
+import { EventsBasedBehaviorOrObjectEditor } from '../../../EventsFunctionsExtensionEditor/EventsBasedBehaviorOrObjectEditor';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 
 export default {
   title: 'EventsBasedObjectEditor/EventsBasedObjectEditorDialog',
-  component: EventsBasedObjectEditorPanel,
+  component: EventsBasedBehaviorOrObjectEditor,
 };
 
 export const Default = () => (
   <DragAndDropContextProvider>
-    <EventsBasedObjectEditorPanel
+    <EventsBasedBehaviorOrObjectEditor
       project={testProject.project}
       projectScopedContainersAccessor={
         testProject.emptySceneProjectScopedContainersAccessor
@@ -30,6 +30,9 @@ export const Default = () => (
       onEventsBasedObjectChildrenEdited={action(
         'onEventsBasedObjectChildrenEdited'
       )}
+      onFocusProperty={action('onFocusProperty')}
+      onPropertiesUpdated={action('onPropertiesUpdated')}
+      onRenameSharedProperty={action('onRenameSharedProperty')}
     />
   </DragAndDropContextProvider>
 );

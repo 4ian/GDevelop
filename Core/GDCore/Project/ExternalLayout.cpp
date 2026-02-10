@@ -12,9 +12,10 @@
 
 namespace gd {
 
-void ExternalLayout::UnserializeFrom(const SerializerElement& element) {
+void ExternalLayout::UnserializeFrom(gd::Project &project,
+                                     const SerializerElement &element) {
   name = element.GetStringAttribute("name", "", "Name");
-  instances.UnserializeFrom(element.GetChild("instances", 0, "Instances"));
+  instances.UnserializeFrom(project, element.GetChild("instances", 0, "Instances"));
   editorSettings.UnserializeFrom(element.GetChild("editionSettings"));
   associatedLayout = element.GetStringAttribute("associatedLayout");
 }

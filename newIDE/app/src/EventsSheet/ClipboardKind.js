@@ -56,12 +56,43 @@ export const hasClipboardActions = () => {
   return actionsCount > 0;
 };
 
+const addAllSubEvents = (
+  event: gdBaseEvent,
+  events: Set<gdBaseEvent>
+): void => {
+  const subEvents = event.getSubEvents();
+  for (let i = 0; i < subEvents.getEventsCount(); i++) {
+    const subEvent = subEvents.getEventAt(i);
+    events.add(subEvent);
+    addAllSubEvents(subEvent, events);
+  }
+};
+
+const excludeEventsChildren = (
+  events: Array<gdBaseEvent>
+): Array<gdBaseEvent> => {
+  const filteredEvents: Array<gdBaseEvent> = [];
+  const allChildren = new Set<gdBaseEvent>();
+  // Children may come first because the selection is ordered by selection time.
+  for (const event of events) {
+    if (!allChildren.has(event)) {
+      addAllSubEvents(event, allChildren);
+    }
+  }
+  for (const event of events) {
+    if (!allChildren.has(event)) {
+      filteredEvents.push(event);
+    }
+  }
+  return filteredEvents;
+};
+
 export const copySelectionToClipboard = (selection: SelectionState) => {
   const eventsList = new gd.EventsList();
   const actionsList = new gd.InstructionsList();
   const conditionsList = new gd.InstructionsList();
 
-  getSelectedEvents(selection).forEach(event =>
+  excludeEventsChildren(getSelectedEvents(selection)).forEach(event =>
     eventsList.insertEvent(event, eventsList.getEventsCount())
   );
   getSelectedInstructionsContexts(selection).forEach(instructionContext => {

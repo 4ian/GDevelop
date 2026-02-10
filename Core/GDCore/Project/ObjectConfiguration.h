@@ -99,6 +99,17 @@ class GD_CORE_API ObjectConfiguration {
   virtual bool UpdateProperty(const gd::String& name, const gd::String& value) {
     return false;
   };
+
+  /**
+   * \brief Called when the IDE wants to rename a custom property of the object
+   * configuration.
+   *
+   * \return false if properties can't be renamed
+   */
+  virtual bool RenameProperty(const gd::String &oldName,
+                              const gd::String &newName) {
+    return false;
+  };
   ///@}
 
   /** \name Drawing and editing initial instances

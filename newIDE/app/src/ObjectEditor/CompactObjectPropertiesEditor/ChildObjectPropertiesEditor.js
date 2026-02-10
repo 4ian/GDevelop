@@ -59,8 +59,11 @@ export const ChildObjectPropertiesEditor = ({
       return propertiesMapToSchema({
         properties: childObjectConfigurationAsGd.getProperties(),
         defaultValueProperties: null,
-        getProperties: ({ object, objectConfiguration }) =>
-          objectConfiguration.getProperties(),
+        getPropertyValue: ({ object, objectConfiguration }, name) =>
+          objectConfiguration
+            .getProperties()
+            .get(name)
+            .getValue(),
         onUpdateProperty: ({ object, objectConfiguration }, name, value) =>
           objectConfiguration.updateProperty(name, value),
         visibility: 'All',

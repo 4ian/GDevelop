@@ -155,6 +155,11 @@ export class VectorObjectFolderOrObject extends EmscriptenObject {
   at(index: number): ObjectFolderOrObject;
 }
 
+export class VectorPropertyFolderOrProperty extends EmscriptenObject {
+  size(): number;
+  at(index: number): PropertyFolderOrProperty;
+}
+
 export class VectorScreenshot extends EmscriptenObject {
   size(): number;
   at(index: number): Screenshot;
@@ -687,7 +692,9 @@ export class Behavior extends EmscriptenObject {
   getTypeName(): string;
   getProperties(): MapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
+  removeProperty(name: string): void;
   initializeContent(): void;
+  hasPropertyValue(name: string): boolean;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
   isFolded(): boolean;
@@ -861,7 +868,7 @@ export class ExternalLayout extends EmscriptenObject {
   getInitialInstances(): InitialInstancesContainer;
   getAssociatedEditorSettings(): EditorSettings;
   serializeTo(element: SerializerElement): void;
-  unserializeFrom(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class Effect extends EmscriptenObject {
@@ -1228,8 +1235,15 @@ export class InitialInstance extends EmscriptenObject {
   setRawDoubleProperty(name: string, value: number): void;
   setRawStringProperty(name: string, value: string): void;
   getVariables(): VariablesContainer;
+  hasAnyOverriddenProperty(obj: gdObject): boolean;
+  hasAnyOverriddenPropertyForBehavior(behavior: Behavior): boolean;
+  hasBehaviorOverridingNamed(name: string): boolean;
+  addNewBehaviorOverriding(project: Project, type: string, name: string): Behavior;
+  getBehaviorOverriding(name: string): Behavior;
+  removeBehaviorOverriding(name: string): void;
+  renameBehaviorOverriding(oldName: string, name: string): boolean;
   serializeTo(element: SerializerElement): void;
-  unserializeFrom(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class InitialInstancesContainer extends EmscriptenObject {
@@ -1250,7 +1264,7 @@ export class InitialInstancesContainer extends EmscriptenObject {
   insertNewInitialInstance(): InitialInstance;
   insertInitialInstance(inst: InitialInstance): InitialInstance;
   serializeTo(element: SerializerElement): void;
-  unserializeFrom(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class HighestZOrderFinder extends EmscriptenObject {
@@ -1323,6 +1337,13 @@ export class Serializer extends EmscriptenObject {
   static fromJSON(json: string): SerializerElement;
   static fromJSObject(object: Object): gdSerializerElement;
   static toJSObject(element: gdSerializerElement): any;
+}
+
+export class BinarySerializer extends EmscriptenObject {
+  static createBinarySnapshot(element: SerializerElement): number;
+  static getLastBinarySnapshotSize(): number;
+  static freeBinarySnapshot(bufferPtr: number): void;
+  static deserializeBinarySnapshot(bufferPtr: number, size: number): SerializerElement;
 }
 
 export class ObjectAssetSerializer extends EmscriptenObject {
@@ -1610,8 +1631,10 @@ export class ObjectMetadata extends EmscriptenObject {
   getDescription(): string;
   getIconFilename(): string;
   getHelpPath(): string;
-  getCategoryFullName(): string;
-  setCategoryFullName(categoryFullName: string): ObjectMetadata;
+  getCategory(): string;
+  getAssetStoreTag(): string;
+  setCategory(categoryFullName: string): ObjectMetadata;
+  setAssetStoreTag(assetStoreTag: string): ObjectMetadata;
   addInGameEditorResource(): InGameEditorResourceMetadata;
   addScopedCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
   addScopedAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
@@ -1852,6 +1875,12 @@ export class BaseEvent extends EmscriptenObject {
 }
 
 export class StandardEvent extends BaseEvent {
+  constructor();
+  getConditions(): InstructionsList;
+  getActions(): InstructionsList;
+}
+
+export class ElseEvent extends BaseEvent {
   constructor();
   getConditions(): InstructionsList;
   getActions(): InstructionsList;
@@ -2355,7 +2384,9 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   setDescription(description: string): EventsBasedObject;
   setPrivate(isPrivate: boolean): EventsBasedObject;
   setDefaultName(defaultName: string): EventsBasedObject;
+  setAssetStoreTag(assetStoreTag: string): EventsBasedObject;
   getDefaultName(): string;
+  getAssetStoreTag(): string;
   markAsRenderedIn3D(isRenderedIn3D: boolean): EventsBasedObject;
   isRenderedIn3D(): boolean;
   markAsAnimatable(isAnimatable: boolean): EventsBasedObject;
@@ -2443,6 +2474,28 @@ export class EventsBasedObjectsList extends EmscriptenObject {
   at(index: number): EventsBasedObject;
 }
 
+export class PropertyFolderOrProperty extends EmscriptenObject {
+  constructor();
+  isFolder(): boolean;
+  isRootFolder(): boolean;
+  getProperty(): NamedPropertyDescriptor;
+  getFolderName(): string;
+  setFolderName(name: string): void;
+  hasPropertyNamed(name: string): boolean;
+  getPropertyNamed(name: string): PropertyFolderOrProperty;
+  getChildrenCount(): number;
+  getChildAt(pos: number): PropertyFolderOrProperty;
+  getPropertyChild(name: string): PropertyFolderOrProperty;
+  getOrCreateChildFolder(name: string): PropertyFolderOrProperty;
+  getChildPosition(child: PropertyFolderOrProperty): number;
+  getParent(): PropertyFolderOrProperty;
+  insertNewFolder(name: string, newPosition: number): PropertyFolderOrProperty;
+  movePropertyFolderOrPropertyToAnotherFolder(propertyFolderOrProperty: PropertyFolderOrProperty, newParentFolder: PropertyFolderOrProperty, newPosition: number): void;
+  moveChild(oldIndex: number, newIndex: number): void;
+  removeFolderChild(childToRemove: PropertyFolderOrProperty): void;
+  isADescendantOf(otherPropertyFolderOrProperty: PropertyFolderOrProperty): boolean;
+}
+
 export class PropertiesContainer extends EmscriptenObject {
   constructor(owner: EventsFunctionsContainer_FunctionOwner);
   insertNew(name: string, pos: number): NamedPropertyDescriptor;
@@ -2456,6 +2509,10 @@ export class PropertiesContainer extends EmscriptenObject {
   getPosition(item: NamedPropertyDescriptor): number;
   size(): number;
   at(index: number): NamedPropertyDescriptor;
+  insertNewPropertyInFolder(name: string, folder: PropertyFolderOrProperty, pos: number): NamedPropertyDescriptor;
+  getRootFolder(): PropertyFolderOrProperty;
+  getAllPropertyFolderOrProperty(): VectorPropertyFolderOrProperty;
+  addMissingPropertiesInRootFolder(): void;
 }
 
 export class EventsFunctionsExtension extends EmscriptenObject {
@@ -3131,6 +3188,8 @@ export function moveVector2fInVector(oldIndex: number, newIndex: number): void;
 
 export function asStandardEvent(object: Event): StandardEvent;
 
+export function asElseEvent(object: Event): ElseEvent;
+
 export function asRepeatEvent(object: Event): RepeatEvent;
 
 export function asWhileEvent(object: Event): WhileEvent;
@@ -3237,6 +3296,10 @@ export function compare<T extends EmscriptenObject>(object1: T, object2: T): boo
  * The alias {@link EmscriptenObject.delete} is recommended instead, for readability.
  */
 export function destroy(object: EmscriptenObject): void;
+
+export function _malloc(size: number): number;
+export function _free(ptr: number): void;
+export const HEAPU8: Uint8Array;
 
 export as namespace gd;
 

@@ -12,11 +12,15 @@ import {
   type EventsGenerationOptions,
   type AssetSearchAndInstallOptions,
   type AssetSearchAndInstallResult,
+  type ResourceSearchAndInstallOptions,
+  type ResourceSearchAndInstallResult,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
+  type ToolOptions,
 } from '.';
+import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 
 export type EditorFunctionCallResult =
@@ -40,6 +44,7 @@ export type ProcessEditorFunctionCallsOptions = {|
   functionCalls: Array<EditorFunctionCall>,
   i18n: I18nType,
   editorCallbacks: EditorCallbacks,
+  toolOptions: ToolOptions | null,
   ignore: boolean,
   generateEvents: (
     options: EventsGenerationOptions
@@ -64,6 +69,9 @@ export type ProcessEditorFunctionCallsOptions = {|
   searchAndInstallAsset: (
     options: AssetSearchAndInstallOptions
   ) => Promise<AssetSearchAndInstallResult>,
+  searchAndInstallResources: (
+    options: ResourceSearchAndInstallOptions
+  ) => Promise<ResourceSearchAndInstallResult>,
 |};
 
 export const processEditorFunctionCalls = async ({
@@ -71,6 +79,7 @@ export const processEditorFunctionCalls = async ({
   project,
   i18n,
   editorCallbacks,
+  toolOptions,
   generateEvents,
   onSceneEventsModifiedOutsideEditor,
   onInstancesModifiedOutsideEditor,
@@ -81,6 +90,7 @@ export const processEditorFunctionCalls = async ({
   onWillInstallExtension,
   onExtensionInstalled,
   searchAndInstallAsset,
+  searchAndInstallResources,
 }: ProcessEditorFunctionCallsOptions): Promise<{|
   results: Array<EditorFunctionCallResult>,
   createdSceneNames: Array<string>,
@@ -172,6 +182,7 @@ export const processEditorFunctionCalls = async ({
       const argumentsWithoutProject = {
         args,
         i18n,
+        toolOptions,
         editorCallbacks,
         generateEvents,
         onSceneEventsModifiedOutsideEditor,
@@ -182,6 +193,8 @@ export const processEditorFunctionCalls = async ({
         onWillInstallExtension,
         onExtensionInstalled,
         searchAndInstallAsset,
+        searchAndInstallResources,
+        PixiResourcesLoader,
       };
 
       // Execute the function

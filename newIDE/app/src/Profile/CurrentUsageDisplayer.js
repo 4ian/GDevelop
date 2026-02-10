@@ -172,7 +172,7 @@ const CurrentUsageDisplayer = ({
                   }
             }
             hideButton={cannotUpgradeSubscription}
-            recommendedPlanIdIfNoSubscription="gdevelop_silver"
+            recommendedPlanId="gdevelop_silver"
             placementId="builds"
           >
             <Line>
@@ -219,7 +219,7 @@ const CurrentUsageDisplayer = ({
                   onPayWithCredits: onPurchaseBuildWithCredits,
                 }
           }
-          recommendedPlanIdIfNoSubscription="gdevelop_silver"
+          recommendedPlanId="gdevelop_silver"
           placementId="builds"
         >
           <Line>

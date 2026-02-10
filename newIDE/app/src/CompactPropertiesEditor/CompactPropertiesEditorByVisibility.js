@@ -84,6 +84,11 @@ export const isAnyPropertyModified = (
   instances: Instances
 ): boolean => {
   for (const field of schema) {
+    if (field.children) {
+      if (isAnyPropertyModified(field.children, instances)) {
+        return true;
+      }
+    }
     if (
       !field.getValue ||
       !field.setValue ||
@@ -157,7 +162,7 @@ export const CompactPropertiesEditorByVisibility = ({
   instances: Instances,
   preventWrap?: boolean,
   removeSpacers?: boolean,
-  customizeBasicSchema?: Schema => Schema,
+  customizeBasicSchema?: (Schema => Schema) | null,
   placeholder: React.Node,
   onRefreshAllFields: () => void,
 

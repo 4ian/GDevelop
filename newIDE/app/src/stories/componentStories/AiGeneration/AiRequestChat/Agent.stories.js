@@ -32,7 +32,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-const commonProps = {
+export const commonProps = {
   aiConfigurationPresetsWithAvailability: [
     {
       id: 'default',
@@ -113,6 +113,8 @@ const commonProps = {
   isAutoProcessingFunctionCalls: false,
   onStartOrOpenChat: () => {},
   aiRequestMode: 'agent',
+  saveProject: async () => {},
+  onRestore: async () => {},
 };
 
 const WrappedChatComponent = (allProps: any) => {

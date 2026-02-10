@@ -395,6 +395,7 @@ export const useManageObjectBehaviors = ({
       // Renaming a behavior is something that is really rare anyway! :)
 
       if (object.hasBehaviorNamed(newName)) return;
+      // TODO Add a refactor operation to update the behavior name in overridings of object instances
       object.renameBehavior(behavior.getName(), newName);
       onUpdate();
       if (onBehaviorsUpdated) onBehaviorsUpdated();
@@ -419,6 +420,7 @@ export const useManageObjectBehaviors = ({
       const answer = Window.showConfirmDialog(message);
 
       if (answer) {
+        // TODO Add a refactor operation to remove the behavior overridings in object instances
         object.removeBehavior(behaviorName);
         dependentBehaviors.forEach(name => object.removeBehavior(name));
         if (onSizeUpdated) onSizeUpdated();

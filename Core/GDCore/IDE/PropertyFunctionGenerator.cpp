@@ -244,7 +244,8 @@ bool PropertyFunctionGenerator::CanGenerateGetterAndSetter(
 
 gd::String PropertyFunctionGenerator::GetStringifiedExtraInfo(
     const gd::PropertyDescriptor &property) {
-  if (property.GetType() == "Choice") {
+  if (property.GetType() == "Choice" ||
+      property.GetType() == "NumberWithChoices") {
     gd::String arrayString;
     arrayString += "[";
     bool isFirst = true;

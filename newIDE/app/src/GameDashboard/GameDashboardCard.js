@@ -170,7 +170,7 @@ type Props = {|
   canSaveProject: boolean,
   askToCloseProject: () => Promise<boolean>,
   closeProject: () => Promise<void>,
-  onSaveProject: () => Promise<void>,
+  onSaveProject: () => Promise<?FileMetadata>,
   lastModifiedInfoByProjectId: LastModifiedInfoByProjectId,
   currentFileMetadata: ?FileMetadata,
   onRefreshGames: () => Promise<void>,
@@ -644,7 +644,9 @@ const GameDashboardCard = ({
               primary
               fullWidth={fullWidth}
               label={openProjectLabel}
-              onClick={mainAction}
+              onClick={() => {
+                mainAction();
+              }}
               disabled={disabled || (isCurrentProjectOpened && !canSaveProject)}
             />
           ) : (
@@ -652,7 +654,9 @@ const GameDashboardCard = ({
               primary
               fullWidth={fullWidth}
               label={openProjectLabel}
-              onClick={mainAction}
+              onClick={() => {
+                mainAction();
+              }}
               buildMenuTemplate={i18n => buildOpenProjectContextMenu(i18n)}
               disabled={disabled || (isCurrentProjectOpened && !canSaveProject)}
             />

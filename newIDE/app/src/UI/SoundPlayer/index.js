@@ -52,6 +52,7 @@ type Props = {|
   title: string | null,
   subtitle: React.Node,
   onSoundLoaded: () => void,
+  onSoundError?: () => void,
   onSkipForward?: () => void,
   onSkipBack?: () => void,
 |};
@@ -62,7 +63,15 @@ export type SoundPlayerInterface = {|
 
 const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
   (
-    { soundSrc, onSoundLoaded, onSkipBack, onSkipForward, title, subtitle },
+    {
+      soundSrc,
+      onSoundLoaded,
+      onSoundError,
+      onSkipBack,
+      onSkipForward,
+      title,
+      subtitle,
+    },
     ref
   ) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -118,6 +127,13 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
     const onLoad = React.useCallback(() => {
       setIsPlaying(false);
     }, []);
+
+    const onError = React.useCallback(
+      () => {
+        if (onSoundError) onSoundError();
+      },
+      [onSoundError]
+    );
 
     React.useEffect(
       () => {
@@ -175,6 +191,7 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
             audio.addEventListener('ended', onFinishPlaying);
             audio.addEventListener('loadstart', onLoad);
             audio.addEventListener('loadedmetadata', onAudioReady);
+            audio.addEventListener('error', onError);
             mobileAudioRef.current = audio;
           }
           waveSurferRef.current = null;
@@ -183,7 +200,15 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
         }
         onLoad();
       },
-      [isMobile, soundSrc, onTimeupdate, onFinishPlaying, onLoad, onAudioReady]
+      [
+        isMobile,
+        soundSrc,
+        onTimeupdate,
+        onFinishPlaying,
+        onLoad,
+        onAudioReady,
+        onError,
+      ]
     );
 
     return (
@@ -250,6 +275,7 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
                     onTimeupdate={onTimeupdate}
                     onLoad={onLoad}
                     onFinish={onFinishPlaying}
+                    onError={onError}
                   />
                 </div>
               )}

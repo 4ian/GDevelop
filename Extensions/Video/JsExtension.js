@@ -109,7 +109,7 @@ module.exports = {
       )
       .setIncludeFile('Extensions/Video/videoruntimeobject.js')
       .addIncludeFile('Extensions/Video/videoruntimeobject-pixi-renderer.js')
-      .setCategoryFullName(_('User interface'))
+      .setCategory('User interface')
       .addDefaultBehavior('EffectCapability::EffectBehavior')
       .addDefaultBehavior('OpacityCapability::OpacityBehavior');
 

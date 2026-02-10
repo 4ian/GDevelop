@@ -54,4 +54,5 @@ export type EventRendererProps = {
   eventsSheetHeight: number,
 
   idPrefix: string,
+  isValidElseEvent?: boolean,
 };

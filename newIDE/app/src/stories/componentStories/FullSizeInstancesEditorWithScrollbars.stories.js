@@ -27,6 +27,7 @@ const instancesEditorSettings: InstancesEditorSettings = {
   zoomFactor: 1,
   windowMask: false,
   selectedLayer: '',
+  gameEditorMode: 'instances-editor',
 };
 
 export default {

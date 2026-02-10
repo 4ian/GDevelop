@@ -25,6 +25,8 @@ export type InstancesEditorSettings = {|
 
   /** The name of the layer selected to place instances on. */
   selectedLayer: string,
+
+  gameEditorMode: 'embedded-game' | 'instances-editor',
 |};
 
 export const getRecommendedInitialZoomFactor = (
@@ -62,6 +64,7 @@ export const prepareInstancesEditorSettings = (
     ),
     windowMask: object.windowMask || false,
     selectedLayer: object.selectedLayer || '',
+    gameEditorMode: object.gameEditorMode || 'instances-editor',
   };
 };
 

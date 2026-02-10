@@ -11,6 +11,7 @@ import { getIDEVersion } from '../../Version';
 import {
   type PreferencesValues,
   type EditorMosaicName,
+  type ProjectSpecificPreferencesValues,
 } from './PreferencesContext';
 import type {
   ResourceKind,
@@ -94,6 +95,7 @@ const getPreferences = (): PreferencesValues => {
 export default class PreferencesProvider extends React.Component<Props, State> {
   state = {
     values: getPreferences(),
+    setMultipleValues: this._setMultipleValues.bind(this),
     setLanguage: this._setLanguage.bind(this),
     setThemeName: this._setThemeName.bind(this),
     setCodeEditorThemeName: this._setCodeEditorThemeName.bind(this),
@@ -180,6 +182,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setShowBasicProfilingCounters: this._setShowBasicProfilingCounters.bind(
       this
     ),
+    setDisableNpmScriptConfirmation: this._setDisableNpmScriptConfirmation.bind(
+      this
+    ),
     saveTutorialProgress: this._saveTutorialProgress.bind(this),
     getTutorialProgress: this._getTutorialProgress.bind(this),
     setNewProjectsDefaultFolder: this._setNewProjectsDefaultFolder.bind(this),
@@ -211,13 +216,25 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setAutomaticallyUseCreditsForAiRequests: this._setAutomaticallyUseCreditsForAiRequests.bind(
       this
     ),
-    setHasSeenInGameEditorWarning: this._setHasSeenInGameEditorWarning.bind(
+    setUseBackgroundSerializerForSaving: this._setUseBackgroundSerializerForSaving.bind(
       this
     ),
   };
 
   componentDidMount() {
     setTimeout(() => this._checkUpdates(), CHECK_APP_UPDATES_TIMEOUT);
+  }
+
+  _setMultipleValues(updates: ProjectSpecificPreferencesValues) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          ...updates,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
   }
 
   _setLanguage(language: string) {
@@ -556,6 +573,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           showBasicProfilingCounters,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setDisableNpmScriptConfirmation(disableNpmScriptConfirmation: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          disableNpmScriptConfirmation,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)
@@ -1022,13 +1051,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setHasSeenInGameEditorWarning(newValue: boolean) {
+  _setUseBackgroundSerializerForSaving(newValue: boolean) {
     this.setState(
       state => ({
-        values: {
-          ...state.values,
-          hasSeenInGameEditorWarning: newValue,
-        },
+        values: { ...state.values, useBackgroundSerializerForSaving: newValue },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

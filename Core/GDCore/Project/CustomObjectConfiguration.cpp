@@ -131,6 +131,20 @@ bool CustomObjectConfiguration::UpdateProperty(const gd::String& propertyName,
         newValue);
 }
 
+bool CustomObjectConfiguration::RenameProperty(const gd::String& oldName, const gd::String& newName) {
+    if (!project->HasEventsBasedObject(GetType())) {
+      return false;
+    }
+    const auto &eventsBasedObject = project->GetEventsBasedObject(GetType());
+    const auto &properties = eventsBasedObject.GetPropertyDescriptors();
+
+    return gd::CustomConfigurationHelper::RenameProperty(
+        properties,
+        objectContent,
+        oldName,
+        newName);
+};
+
 std::map<gd::String, gd::PropertyDescriptor>
 CustomObjectConfiguration::GetInitialInstanceProperties(
     const gd::InitialInstance &initialInstance) {
@@ -300,13 +314,13 @@ SpriteAnimationList& CustomObjectConfiguration::GetAnimations() {
 
 const gd::CustomObjectConfiguration::EdgeAnchor
 CustomObjectConfiguration::GetEdgeAnchorFromString(const gd::String &value) {
-  return (value == _("Window left") || value == _("Window top"))
+  return (value == "WindowLeft" || value == "WindowTop")
              ? gd::CustomObjectConfiguration::EdgeAnchor::MinEdge
-         : (value == _("Window right") || value == _("Window bottom"))
+         : (value == "WindowRight" || value == "WindowBottom")
              ? gd::CustomObjectConfiguration::EdgeAnchor::MaxEdge
-         : value == _("Proportional")
+         : value == "Proportional"
              ? gd::CustomObjectConfiguration::EdgeAnchor::Proportional
-         : value == _("Window center")
+         : value == "WindowCenter"
              ? gd::CustomObjectConfiguration::EdgeAnchor::Center
              : gd::CustomObjectConfiguration::EdgeAnchor::NoAnchor;
 }

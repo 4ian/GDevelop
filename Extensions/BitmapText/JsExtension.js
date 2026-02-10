@@ -36,6 +36,30 @@ module.exports = {
     const bitmapTextObject = new gd.ObjectJsImplementation();
     bitmapTextObject.updateProperty = function (propertyName, newValue) {
       const objectContent = this.content;
+      if (propertyName === 'align') {
+        const normalizedValue = newValue.toLowerCase();
+        if (
+          normalizedValue === 'left' ||
+          normalizedValue === 'center' ||
+          normalizedValue === 'right'
+        ) {
+          objectContent.align = normalizedValue;
+          return true;
+        }
+        return false;
+      }
+      if (propertyName === 'verticalTextAlignment') {
+        const normalizedValue = newValue.toLowerCase();
+        if (
+          normalizedValue === 'top' ||
+          normalizedValue === 'center' ||
+          normalizedValue === 'bottom'
+        ) {
+          objectContent.verticalTextAlignment = normalizedValue;
+          return true;
+        }
+        return false;
+      }
       if (propertyName in objectContent) {
         if (typeof objectContent[propertyName] === 'boolean')
           objectContent[propertyName] = newValue === '1';
@@ -140,9 +164,7 @@ module.exports = {
       .addObject(
         'BitmapTextObject',
         _('Bitmap Text'),
-        _(
-          'Displays a text using a "Bitmap Font" (an image representing characters). This is more performant than a traditional Text object and it allows for complete control on the characters aesthetic.'
-        ),
+        _('Image-based text.'),
         'JsPlatform/Extensions/bitmapfont32.png',
         bitmapTextObject
       )
@@ -150,7 +172,8 @@ module.exports = {
       .addIncludeFile(
         'Extensions/BitmapText/bitmaptextruntimeobject-pixi-renderer.js'
       )
-      .setCategoryFullName(_('Text'))
+      .setCategory('Text')
+      .setAssetStoreTag('bitmap texts')
       .addDefaultBehavior('TextContainerCapability::TextContainerBehavior')
       .addDefaultBehavior('EffectCapability::EffectBehavior')
       .addDefaultBehavior('OpacityCapability::OpacityBehavior')

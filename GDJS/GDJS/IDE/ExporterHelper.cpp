@@ -312,7 +312,6 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
                       runtimeGameOptions, options.isInGameEdition,
                       inGameEditorResources);
-    includesFiles.push_back(codeOutputDir + "/data.js");
 
     previousTime = LogTimeSpent("Project data export", previousTime);
   }
@@ -321,6 +320,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   }
 
   if (options.shouldReloadLibraries || options.shouldClearExportFolder) {
+    includesFiles.push_back(codeOutputDir + "/data.js");
     // Copy all the dependencies and their source maps
     ExportIncludesAndLibs(includesFiles, options.exportPath, true);
     ExportIncludesAndLibs(resourcesFiles, options.exportPath, true);

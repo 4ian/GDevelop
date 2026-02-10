@@ -69,7 +69,7 @@ export type Exporter = {|
 
 export type ShareDialogWithoutExportsProps = {|
   project: ?gdProject,
-  onSaveProject: () => Promise<void>,
+  onSaveProject: () => Promise<?FileMetadata>,
   isSavingProject: boolean,
   onClose: () => void,
   onChangeSubscription: () => void,

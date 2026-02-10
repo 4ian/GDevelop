@@ -4,16 +4,20 @@ import { type ChosenCategory } from './FiltersChooser';
 import {
   type ExtensionShortHeader,
   type BehaviorShortHeader,
+  type ObjectShortHeader,
 } from '../../Utils/GDevelopServices/Extension';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import shuffle from 'lodash/shuffle';
 import Fuse from 'fuse.js';
+import { type ObjectCategory } from '../../AssetStore/ObjectStoreContext';
 
 type SearchableItem =
   | ExtensionShortHeader
   | ExampleShortHeader
   | BehaviorShortHeader
+  | ObjectShortHeader
+  | ObjectCategory
   | PrivateGameTemplateListingData;
 
 export type SearchMatch = {|
@@ -316,7 +320,8 @@ export const filterSearchResults = <SearchItem: SearchableItem>(
   chosenItemCategory: ?string,
   chosenCategory: ?ChosenCategory,
   chosenFilters: Set<string>,
-  excludedTiers: Set<string>
+  excludedTiers: Set<string>,
+  isSearchTextEmpty: boolean = false
 ): ?Array<SearchResult<SearchItem>> => {
   if (!searchResults) return null;
 
@@ -374,6 +379,11 @@ export const filterSearchResults = <SearchItem: SearchableItem>(
           ));
 
       return passTier && passChosenFilters;
+    })
+    .filter(({ item }) => {
+      //$FlowFixMe Only categories are excluded.
+      const category: ObjectCategory = item;
+      return (isSearchTextEmpty && !chosenItemCategory) || !category.categoryId;
     });
 
   const totalTime = performance.now() - startTime;
@@ -487,7 +497,8 @@ export const useSearchStructuredItem = <SearchItem: SearchableItem>(
             chosenItemCategory,
             chosenCategory,
             chosenFilters,
-            excludedTiers
+            excludedTiers,
+            true /*isSearchTextEmpty*/
           )
         );
       } else {

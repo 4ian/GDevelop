@@ -5,110 +5,174 @@ import { action } from '@storybook/addon-actions';
 import paperDecorator from '../../../PaperDecorator';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import {
-  fakeAuthenticatedUserLoggingIn,
-  fakeSilverAuthenticatedUser,
   fakeAuthenticatedUserWithNoSubscription,
   fakeNotAuthenticatedUser,
-  fakeAuthenticatedUserWithLegacyIndieSubscription,
+  fakeSilverAuthenticatedUser,
   fakeGoldAuthenticatedUser,
-  fakeAuthenticatedUserWithLegacyProSubscription,
-  fakeAuthenticatedUserWithEducationPlan,
   fakeStartupAuthenticatedUser,
+  fakeAuthenticatedUserWithEducationPlan,
+  fakeAuthenticatedUserWithLegacyIndieSubscription,
+  fakeAuthenticatedUserWithLegacyProSubscription,
+  silverYearlyPricingSystem,
+  silverMonthlyPricingSystem,
+  silverYearlyPricingSystemOld,
+  silverMonthlyPricingSystemOld,
+  goldYearlyPricingSystem,
+  goldYearlyPricingSystemOld,
+  goldMonthlyPricingSystem,
+  goldMonthlyPricingSystemOld,
+  startupYearlyPricingSystem,
+  startupYearlyPricingSystemOld,
+  startupMonthlyPricingSystem,
+  startupMonthlyPricingSystemOld,
+  educationYearlyPricingSystem,
+  educationMonthlyPricingSystem,
+  indieMonthlyPricingSystem,
+  proMonthlyPricingSystem,
+  fakeGoldWithPurchaselyAuthenticatedUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import SubscriptionDialog from '../../../../Profile/Subscription/SubscriptionDialog';
 import AlertProvider from '../../../../UI/Alert/AlertProvider';
-import LoaderModal from '../../../../UI/LoaderModal';
 import {
   SubscriptionContext,
   SubscriptionProvider,
 } from '../../../../Profile/Subscription/SubscriptionContext';
+import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 
 export default {
   title: 'Subscription/SubscriptionDialog',
   component: SubscriptionDialog,
   decorators: [paperDecorator],
   argTypes: {
-    authenticated: {
-      options: ['no', 'loading', 'yes'],
-      control: { type: 'radio' },
-    },
-    willCancelAtPeriodEndOrIsExpired: {
-      control: { type: 'boolean' },
-    },
-    filter: {
-      options: ['none', 'individual', 'team', 'education'],
-      control: { type: 'radio' },
-    },
-    userSubscriptionId: {
+    userState: {
+      control: 'radio',
       options: [
-        'none',
-        'gdevelop_silver',
-        'gdevelop_gold',
-        'gdevelop_startup',
-        'gdevelop_education',
-        'gdevelop_indie',
-        'gdevelop_pro',
+        'Not Authenticated',
+        'No Subscription',
+        'Mobile subscription',
+        'Silver Subscription',
+        'Gold Subscription',
+        'Startup Subscription',
+        'Education Subscription',
+        'Indie Subscription (Legacy)',
+        'Pro Subscription (Legacy)',
       ],
-      control: { type: 'radio' },
+    },
+    cancelAtPeriodEnd: {
+      control: 'boolean',
     },
     pricingSystem: {
+      control: 'radio',
       options: [
         'monthly',
+        'monthly (inactive)',
         'yearly',
+        'yearly (inactive)',
         'redeemed',
         'team member',
         'manually added',
       ],
-      control: { type: 'radio' },
+    },
+    recommendedPlanId: {
+      control: 'radio',
+      options: [
+        'None',
+        'gdevelop_silver',
+        'gdevelop_gold',
+        'gdevelop_startup',
+        'gdevelop_education',
+      ],
+    },
+    excludePlanId: {
+      control: 'radio',
+      options: ['None', 'gdevelop_silver', 'gdevelop_gold', 'gdevelop_startup'],
+    },
+    availableSubscriptionPlansWithPrices: {
+      table: { disable: true },
+    },
+    userSubscriptionPlanEvenIfLegacy: {
+      table: { disable: true },
+    },
+    onClose: {
+      table: { disable: true },
+    },
+    onOpenPendingDialog: {
+      table: { disable: true },
     },
   },
 };
 
+const getUserFromState = (userState: string) => {
+  switch (userState) {
+    case 'Not Authenticated':
+      return fakeNotAuthenticatedUser;
+    case 'Mobile subscription':
+      return fakeGoldWithPurchaselyAuthenticatedUser;
+    case 'Silver Subscription':
+      return fakeSilverAuthenticatedUser;
+    case 'Gold Subscription':
+      return fakeGoldAuthenticatedUser;
+    case 'Startup Subscription':
+      return fakeStartupAuthenticatedUser;
+    case 'Education Subscription':
+      return fakeAuthenticatedUserWithEducationPlan;
+    case 'Indie Subscription (Legacy)':
+      return fakeAuthenticatedUserWithLegacyIndieSubscription;
+    case 'Pro Subscription (Legacy)':
+      return fakeAuthenticatedUserWithLegacyProSubscription;
+    case 'No Subscription':
+    default:
+      return fakeAuthenticatedUserWithNoSubscription;
+  }
+};
+
 export const Default = ({
-  authenticated,
-  willCancelAtPeriodEndOrIsExpired,
-  filter,
-  userSubscriptionId,
+  userState,
+  cancelAtPeriodEnd,
   pricingSystem,
-}: {|
-  authenticated?: 'no' | 'loading' | 'yes',
-  willCancelAtPeriodEndOrIsExpired?: boolean,
-  filter?: 'none' | 'individual' | 'team' | 'education',
-  userSubscriptionId?:
-    | 'none'
-    | 'gdevelop_silver'
-    | 'gdevelop_gold'
-    | 'gdevelop_startup'
-    | 'gdevelop_education'
-    | 'gdevelop_indie'
-    | 'gdevelop_pro',
-  pricingSystem?:
-    | 'monthly'
-    | 'yearly'
-    | 'redeemed'
-    | 'team member'
-    | 'manually added',
-|}) => {
-  const authenticatedUser =
-    authenticated === 'no'
-      ? fakeNotAuthenticatedUser
-      : authenticated === 'loading'
-      ? fakeAuthenticatedUserLoggingIn
-      : userSubscriptionId === 'none'
-      ? fakeAuthenticatedUserWithNoSubscription
-      : userSubscriptionId === 'gdevelop_silver'
-      ? fakeSilverAuthenticatedUser
-      : userSubscriptionId === 'gdevelop_gold'
-      ? fakeGoldAuthenticatedUser
-      : userSubscriptionId === 'gdevelop_startup'
-      ? fakeStartupAuthenticatedUser
-      : userSubscriptionId === 'gdevelop_education'
-      ? fakeAuthenticatedUserWithEducationPlan
-      : userSubscriptionId === 'gdevelop_indie'
-      ? fakeAuthenticatedUserWithLegacyIndieSubscription
-      : userSubscriptionId === 'gdevelop_pro'
-      ? fakeAuthenticatedUserWithLegacyProSubscription
-      : fakeNotAuthenticatedUser;
+  recommendedPlanId,
+  excludePlanId,
+}: {
+  userState: string,
+  cancelAtPeriodEnd: boolean,
+  pricingSystem: string,
+  recommendedPlanId: string,
+  excludePlanId: string,
+}) => {
+  const Component = () => {
+    const {
+      getSubscriptionPlansWithPricingSystems,
+      getUserSubscriptionPlanEvenIfLegacy,
+    } = React.useContext(SubscriptionContext);
+    const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
+    const userSubscriptionPlanEvenIfLegacy = getUserSubscriptionPlanEvenIfLegacy();
+
+    if (!subscriptionPlansWithPricingSystems) {
+      return <PlaceholderLoader />;
+    }
+
+    const filteredPlans =
+      excludePlanId === 'None'
+        ? subscriptionPlansWithPricingSystems
+        : subscriptionPlansWithPricingSystems.filter(
+            plan => plan.id !== excludePlanId
+          );
+
+    const recommendedPlanIdFinal =
+      recommendedPlanId === 'None' ? null : recommendedPlanId;
+
+    return (
+      <SubscriptionDialog
+        availableSubscriptionPlansWithPrices={filteredPlans}
+        userSubscriptionPlanEvenIfLegacy={userSubscriptionPlanEvenIfLegacy}
+        onClose={() => action('on close')()}
+        recommendedPlanId={recommendedPlanIdFinal}
+        onOpenPendingDialog={() => action('on open pending dialog')()}
+      />
+    );
+  };
+
+  const authenticatedUser = getUserFromState(userState);
 
   if (authenticatedUser.subscription) {
     if (pricingSystem === 'redeemed') {
@@ -116,85 +180,76 @@ export const Default = ({
       authenticatedUser.subscription.redemptionCode = 'test-123-code';
       // $FlowIgnore
       authenticatedUser.subscription.redemptionCodeValidUntil =
-        Date.now() +
-        (!!willCancelAtPeriodEndOrIsExpired ? -1 : 1) * 7 * 24 * 3600 * 1000;
+        Date.now() + (cancelAtPeriodEnd ? -1 : 1) * 7 * 24 * 3600 * 1000;
+      // $FlowIgnore
+      authenticatedUser.subscriptionPricingSystem = null;
     } else if (pricingSystem === 'team member') {
       authenticatedUser.subscription.pricingSystemId = 'TEAM_MEMBER';
+      // $FlowIgnore
+      authenticatedUser.subscriptionPricingSystem = null;
     } else if (pricingSystem === 'manually added') {
       authenticatedUser.subscription.pricingSystemId = 'MANUALLY_ADDED';
+      // $FlowIgnore
+      authenticatedUser.subscriptionPricingSystem = null;
     } else {
-      authenticatedUser.subscription.cancelAtPeriodEnd = !!willCancelAtPeriodEndOrIsExpired;
-      if (userSubscriptionId === 'gdevelop_silver') {
-        if (pricingSystem === 'yearly') {
-          authenticatedUser.subscription.pricingSystemId =
-            'silver_1year_3599EUR';
-        } else {
-          authenticatedUser.subscription.pricingSystemId =
-            'silver_1month_499EUR';
-        }
-      } else if (userSubscriptionId === 'gdevelop_gold') {
-        if (pricingSystem === 'yearly') {
-          authenticatedUser.subscription.pricingSystemId = 'gold_1year_7199EUR';
-        } else {
-          authenticatedUser.subscription.pricingSystemId = 'gold_1month_999EUR';
-        }
-      } else if (userSubscriptionId === 'gdevelop_startup') {
-        if (pricingSystem === 'yearly') {
-          authenticatedUser.subscription.pricingSystemId =
-            'startup_1year_30900EUR';
-        } else {
-          authenticatedUser.subscription.pricingSystemId =
-            'startup_1month_3000EUR';
-        }
-      } else if (userSubscriptionId === 'gdevelop_education') {
-        if (pricingSystem === 'yearly') {
-          authenticatedUser.subscription.pricingSystemId =
-            'education_1year_2999EUR';
-        } else {
-          authenticatedUser.subscription.pricingSystemId =
-            'education_1month_299EUR';
-        }
-      } else if (userSubscriptionId === 'gdevelop_indie') {
-        authenticatedUser.subscription.pricingSystemId = 'indie_1month';
-      } else if (userSubscriptionId === 'gdevelop_pro') {
-        authenticatedUser.subscription.pricingSystemId = 'pro_1month';
+      authenticatedUser.subscription.cancelAtPeriodEnd = cancelAtPeriodEnd;
+      if (userState === 'Silver Subscription') {
+        // $FlowIgnore
+        authenticatedUser.subscriptionPricingSystem =
+          pricingSystem === 'yearly'
+            ? silverYearlyPricingSystem
+            : pricingSystem === 'yearly (inactive)'
+            ? silverYearlyPricingSystemOld
+            : pricingSystem === 'monthly'
+            ? silverMonthlyPricingSystem
+            : silverMonthlyPricingSystemOld;
+        authenticatedUser.subscription.pricingSystemId =
+          authenticatedUser.subscriptionPricingSystem.id;
+      } else if (userState === 'Gold Subscription') {
+        // $FlowIgnore
+        authenticatedUser.subscriptionPricingSystem =
+          pricingSystem === 'yearly'
+            ? goldYearlyPricingSystem
+            : pricingSystem === 'yearly (inactive)'
+            ? goldYearlyPricingSystemOld
+            : pricingSystem === 'monthly'
+            ? goldMonthlyPricingSystem
+            : goldMonthlyPricingSystemOld;
+        authenticatedUser.subscription.pricingSystemId =
+          authenticatedUser.subscriptionPricingSystem.id;
+      } else if (userState === 'Startup Subscription') {
+        authenticatedUser.subscriptionPricingSystem =
+          pricingSystem === 'yearly'
+            ? startupYearlyPricingSystem
+            : pricingSystem === 'yearly (inactive)'
+            ? startupYearlyPricingSystemOld
+            : pricingSystem === 'monthly'
+            ? startupMonthlyPricingSystem
+            : startupMonthlyPricingSystemOld;
+        authenticatedUser.subscription.pricingSystemId =
+          authenticatedUser.subscriptionPricingSystem.id;
+      } else if (userState === 'Education Subscription') {
+        authenticatedUser.subscriptionPricingSystem =
+          pricingSystem === 'yearly'
+            ? educationYearlyPricingSystem
+            : pricingSystem === 'yearly (inactive)'
+            ? educationYearlyPricingSystem
+            : pricingSystem === 'monthly'
+            ? educationMonthlyPricingSystem
+            : educationMonthlyPricingSystem;
+        authenticatedUser.subscription.pricingSystemId =
+          authenticatedUser.subscriptionPricingSystem.id;
+      } else if (userState === 'Indie Subscription (Legacy)') {
+        authenticatedUser.subscriptionPricingSystem = indieMonthlyPricingSystem;
+        authenticatedUser.subscription.pricingSystemId =
+          authenticatedUser.subscriptionPricingSystem.id;
+      } else if (userState === 'Pro Subscription (Legacy)') {
+        authenticatedUser.subscriptionPricingSystem = proMonthlyPricingSystem;
+        authenticatedUser.subscription.pricingSystemId =
+          authenticatedUser.subscriptionPricingSystem.id;
       }
     }
   }
-
-  const Component = () => {
-    const { subscription: userSubscription } = authenticatedUser;
-    const {
-      getSubscriptionPlansWithPricingSystemsIncludingLegacy,
-    } = React.useContext(SubscriptionContext);
-    const subscriptionPlansWithPricingSystemsIncludingLegacy = getSubscriptionPlansWithPricingSystemsIncludingLegacy();
-
-    const userLegacySubscriptionPlanWithPricingSystem =
-      (userSubscription &&
-        subscriptionPlansWithPricingSystemsIncludingLegacy &&
-        subscriptionPlansWithPricingSystemsIncludingLegacy.find(
-          planWithPricingSystem =>
-            planWithPricingSystem.id === userSubscription.planId &&
-            planWithPricingSystem.isLegacy
-        )) ||
-      null;
-
-    return subscriptionPlansWithPricingSystemsIncludingLegacy ? (
-      <SubscriptionDialog
-        availableSubscriptionPlansWithPrices={
-          subscriptionPlansWithPricingSystemsIncludingLegacy
-        }
-        userLegacySubscriptionPlanWithPricingSystem={
-          userLegacySubscriptionPlanWithPricingSystem
-        }
-        onClose={() => action('on close')()}
-        filter={filter === 'none' ? undefined : filter}
-        onOpenPendingDialog={() => action('on open pending dialog')()}
-      />
-    ) : (
-      <LoaderModal showImmediately />
-    );
-  };
 
   return (
     <AlertProvider>
@@ -205,4 +260,12 @@ export const Default = ({
       </AuthenticatedUserContext.Provider>
     </AlertProvider>
   );
+};
+
+Default.args = {
+  userState: 'No Subscription',
+  cancelAtPeriodEnd: false,
+  pricingSystem: 'monthly',
+  recommendedPlanId: 'gdevelop_silver',
+  excludePlanId: 'None',
 };

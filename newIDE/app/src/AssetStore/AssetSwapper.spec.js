@@ -1,20 +1,8 @@
 // @flow
 import { swapAsset } from './AssetSwapper';
+import { PixiResourcesLoaderMock } from '../fixtures/TestPixiResourcesLoader';
 
 const gd: libGDevelop = global.gd;
-
-const PixiResourcesLoaderMock = {
-  getPIXITexture: (project: gdProject, resourceName: string) => {
-    switch (resourceName) {
-      case 'Frame100x240':
-        return { valid: true, width: 100, height: 240 };
-      case 'Frame50x120':
-        return { valid: true, width: 50, height: 120 };
-      default:
-        return { valid: false, width: 0, height: 0 };
-    }
-  },
-};
 
 describe('swapAsset (Sprite)', () => {
   const makeNewTestProject = (): {|

@@ -381,6 +381,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       globalObjectsContainer={globalObjectsContainer}
                       objectsContainer={objectsContainer}
                       layout={layout}
+                      eventsFunctionsExtension={eventsFunctionsExtension}
                       eventsBasedObject={eventsBasedObject}
                       initialInstances={initialInstances}
                       onSelectAllInstancesOfObjectInLayout={
@@ -482,6 +483,16 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       onEditLayerEffects={props.editLayerEffects}
                       onEditLayer={props.editLayer}
                       onLayersModified={props.onLayersModified}
+                      eventsBasedObject={props.eventsBasedObject}
+                      eventsBasedObjectVariant={props.eventsBasedObjectVariant}
+                      getContentAABB={
+                        editorRef.current
+                          ? editorRef.current.getContentAABB
+                          : () => null
+                      }
+                      onEventsBasedObjectChildrenEdited={
+                        props.onEventsBasedObjectChildrenEdited
+                      }
                     />
                   )}
                 </I18n>
@@ -542,6 +553,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                   eventsBasedObject={eventsBasedObject}
                   chosenLayer={chosenLayer}
                   onChooseLayer={props.onChooseLayer}
+                  selectedLayer={selectedLayer}
                   onSelectLayer={props.onSelectLayer}
                   onEditLayerEffects={props.editLayerEffects}
                   onLayersModified={props.onLayersModified}

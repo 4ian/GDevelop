@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
-import { getIndentWidth, type SortableTreeNode } from '.';
+import { type SortableTreeNode } from './SortableEventsTree';
+import { getIndentWidth } from '.';
 import {
   moveNodeAbove,
   moveNodeBelow,

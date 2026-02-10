@@ -359,6 +359,16 @@ export default class SceneEditor extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    // Sync the saved gameEditorMode from instancesEditorSettings to MainFrame.
+    if (
+      this.props.isActive &&
+      this.state.instancesEditorSettings.gameEditorMode
+    ) {
+      this.props.setGameEditorMode(
+        this.state.instancesEditorSettings.gameEditorMode
+      );
+    }
+
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
     );
@@ -561,7 +571,12 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const justAddedInstances = changes.addedInstances.map(addedInstance => {
       const instance: gdInitialInstance = this.props.initialInstances.insertNewInitialInstance();
-      unserializeFromJSObject(instance, addedInstance);
+      unserializeFromJSObject(
+        instance,
+        addedInstance,
+        'unserializeFrom',
+        this.props.project
+      );
       return instance;
     });
     if (justAddedInstances.length) {
@@ -655,8 +670,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (editorDisplay.getName() === 'mosaic') {
       this.props.setToolbar(
         <MosaicEditorsDisplayToolbar
-          gameEditorMode={this.props.gameEditorMode}
-          setGameEditorMode={this.props.setGameEditorMode}
+          gameEditorMode={this.state.instancesEditorSettings.gameEditorMode}
+          setGameEditorMode={this.setGameEditorMode}
           selectedInstancesCount={
             this.instancesSelection.getSelectedInstances().length
           }
@@ -735,6 +750,14 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.openSceneProperties(false);
     }
     if (!this.props.isActive && nextProps.isActive) {
+      // Sync the saved gameEditorMode from instancesEditorSettings to mainframe
+      // when the editor becomes active again
+      if (this.state.instancesEditorSettings.gameEditorMode) {
+        this.props.setGameEditorMode(
+          this.state.instancesEditorSettings.gameEditorMode
+        );
+      }
+
       // When the scene is refocused, the selections are cleaned
       // to avoid cases where we hold references to instances or objects
       // deleted by something outside of the scene (for example,
@@ -790,6 +813,16 @@ export default class SceneEditor extends React.Component<Props, State> {
       grid: !this.state.instancesEditorSettings.grid,
       snap: !this.state.instancesEditorSettings.grid,
     });
+  };
+
+  setGameEditorMode = (newMode: 'instances-editor' | 'embedded-game') => {
+    this.setInstancesEditorSettings({
+      ...this.state.instancesEditorSettings,
+      gameEditorMode: newMode,
+    });
+
+    // Call the setGameEditorMode from mainframe so it can make some global changes. (ex: hot reload)
+    this.props.setGameEditorMode(newMode);
   };
 
   openSetupGrid = (open: boolean = true) => {
@@ -887,6 +920,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       selectedObjectFolderOrObjectsWithContext: [
         objectFolderOrObjectWithContext,
       ],
+      selectedLayer: null,
       lastSelectionType: 'object',
     });
     if (this.editorDisplay)
@@ -960,7 +994,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.instancesSelection.clearSelection();
     this.setState(
       {
-        history: undo(this.state.history, this.props.initialInstances),
+        history: undo(
+          this.state.history,
+          this.props.initialInstances,
+          this.props.project
+        ),
       },
       () => {
         // /!\ Force the instances editor to destroy and mount again the
@@ -979,7 +1017,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.instancesSelection.clearSelection();
     this.setState(
       {
-        history: redo(this.state.history, this.props.initialInstances),
+        history: redo(
+          this.state.history,
+          this.props.initialInstances,
+          this.props.project
+        ),
       },
       () => {
         // /!\ Force the instances editor to destroy and mount again the
@@ -1024,6 +1066,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       {
         lastSelectionType: 'object',
         selectedObjectFolderOrObjectsWithContext,
+        selectedLayer: null,
       },
       () => {
         // We update the toolbar because we need to update the objects selected
@@ -1159,6 +1202,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         {
           lastSelectionType: 'instance',
           selectedObjectFolderOrObjectsWithContext: [],
+          selectedLayer: null,
         },
         this.updateToolbar
       );
@@ -1184,6 +1228,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               global: true,
             },
           ],
+          selectedLayer: null,
         },
         this.updateToolbar
       );
@@ -1199,6 +1244,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               global: false,
             },
           ],
+          selectedLayer: null,
         },
         this.updateToolbar
       );
@@ -2383,6 +2429,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       .map(instance => serializeToJSObject(instance));
 
     const newInstances = addSerializedInstances({
+      project: this.props.project,
       instancesContainer: this.props.initialInstances,
       copyReferential: [-2 * MOVEMENT_BIG_DELTA, -2 * MOVEMENT_BIG_DELTA],
       serializedInstances: serializedSelection,
@@ -2419,6 +2466,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (x === null || y === null || instancesContent === null) return;
 
     const newInstances = addSerializedInstances({
+      project: this.props.project,
       instancesContainer: this.props.initialInstances,
       copyReferential: [x, y],
       serializedInstances: instancesContent,
@@ -2484,7 +2532,12 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     for (const serializedInstance of serializedSelection) {
       const instance = new gd.InitialInstance();
-      unserializeFromJSObject(instance, serializedInstance);
+      unserializeFromJSObject(
+        instance,
+        serializedInstance,
+        'unserializeFrom',
+        project
+      );
       newExternalLayout
         .getInitialInstances()
         .insertInitialInstance(instance)
@@ -2859,6 +2912,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onWillInstallExtension={this.props.onWillInstallExtension}
                 onExtensionInstalled={this.props.onExtensionInstalled}
                 editorViewPosition2D={this.editorViewPosition2D}
+                onEventsBasedObjectChildrenEdited={
+                  this.props.onEventsBasedObjectChildrenEdited
+                }
               />
               <I18n>
                 {({ i18n }) => (

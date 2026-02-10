@@ -52,9 +52,10 @@ namespace gdjs {
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
-      lightObjectData: LightObjectData
+      lightObjectData: LightObjectData,
+      instanceData?: InstanceData
     ) {
-      super(runtimeScene, lightObjectData);
+      super(runtimeScene, lightObjectData, instanceData);
       this._radius =
         lightObjectData.content.radius > 0 ? lightObjectData.content.radius : 1;
       this._color = gdjs.rgbOrHexToRGBColor(lightObjectData.content.color);

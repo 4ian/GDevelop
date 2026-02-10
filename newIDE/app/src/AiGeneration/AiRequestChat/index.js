@@ -6,6 +6,7 @@ import Text from '../../UI/Text';
 import { Trans, t } from '@lingui/macro';
 import {
   type AiRequest,
+  type AiRequestMessage,
   type AiRequestMessageAssistantFunctionCall,
 } from '../../Utils/GDevelopServices/Generation';
 import RaisedButton from '../../UI/RaisedButton';
@@ -43,6 +44,7 @@ import {
 import { AiConfigurationPresetSelector } from './AiConfigurationPresetSelector';
 import { AiRequestContext } from '../AiRequestContext';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import { useStickyVisibility } from './UseStickyVisibility';
 import CircledInfo from '../../UI/CustomSvgIcons/CircledInfo';
 import Coin from '../../Credits/Icons/Coin';
 import FlatButton from '../../UI/FlatButton';
@@ -53,6 +55,7 @@ import Paper from '../../UI/Paper';
 import SelectOption from '../../UI/SelectOption';
 import CompactSelectField from '../../UI/CompactSelectField';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import { type FileMetadata } from '../../ProjectsStorage';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 15;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 20;
@@ -265,6 +268,7 @@ const questionsOnExistingProject = [
 
 type Props = {|
   project: ?gdProject,
+  fileMetadata: ?FileMetadata,
   i18n: I18nType,
   aiRequest: AiRequest | null,
 
@@ -311,6 +315,14 @@ type Props = {|
   availableCredits: number,
 
   standAloneForm?: boolean,
+
+  isFetchingSuggestions: boolean,
+  savingProjectForMessageId: ?string,
+  forkingState: ?{| aiRequestId: string, messageId: string |},
+  onRestore: ({|
+    message: AiRequestMessage,
+    aiRequest: AiRequest,
+  |}) => Promise<void>,
 |};
 
 export type AiRequestChatInterface = {|
@@ -322,6 +334,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     {
       aiConfigurationPresetsWithAvailability,
       project,
+      fileMetadata,
       aiRequest,
       isSending,
       onStartNewAiRequest,
@@ -341,6 +354,10 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
       i18n,
       editorCallbacks,
       standAloneForm,
+      isFetchingSuggestions,
+      savingProjectForMessageId,
+      forkingState,
+      onRestore,
     }: Props,
     ref
   ) => {
@@ -552,10 +569,13 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const isForAnotherProject =
       !!requiredGameId &&
       (!project || requiredGameId !== project.getProjectUuid());
+    const isForking =
+      forkingState && aiRequest && forkingState.aiRequestId === aiRequest.id;
     const shouldDisableButton =
       (hasStartedRequestButCannotContinue &&
         !hasSwitchedToGDevelopCreditsMidChat) ||
       isWorking ||
+      isForking ||
       !userRequestTextPerAiRequestId[aiRequestId];
     const shouldReplaceFormWithCreditsOrSubscriptionPrompt =
       // Cannot continue because either no AI credits or has not
@@ -642,6 +662,30 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
         selectedMode,
       ]
     );
+
+    // Calculate feedback banner visibility for sticky behavior
+    // (must be before conditional returns to follow React hooks rules)
+    const allFunctionCallsToProcess =
+      aiRequest && editorFunctionCallResults
+        ? getFunctionCallsToProcess({
+            aiRequest,
+            editorFunctionCallResults,
+          })
+        : [];
+    const isPausedAndHasFunctionCallsToProcess =
+      !isAutoProcessingFunctionCalls && allFunctionCallsToProcess.length > 0;
+    const shouldDisplayFeedbackBannerNow =
+      !hasWorkingFunctionCalls &&
+      !isPausedAndHasFunctionCallsToProcess &&
+      !isSending &&
+      !!aiRequest &&
+      aiRequest.status === 'ready' &&
+      aiRequest.mode === 'agent';
+    const shouldDisplayFeedbackBanner = useStickyVisibility({
+      shouldShow: shouldDisplayFeedbackBannerNow,
+      showDelayMs: 1000,
+      hideDelayMs: 300,
+    });
 
     if (!aiRequest || standAloneForm) {
       return (
@@ -893,19 +937,6 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
     const userMessagesCount = aiRequest.output.filter(
       message => message.type === 'message' && message.role === 'user'
     ).length;
-    const allFunctionCallsToProcess = getFunctionCallsToProcess({
-      aiRequest,
-      editorFunctionCallResults,
-    });
-    const isPausedAndHasFunctionCallsToProcess =
-      !isAutoProcessingFunctionCalls && allFunctionCallsToProcess.length > 0;
-
-    const shouldDisplayFeedbackBanner =
-      !hasWorkingFunctionCalls &&
-      !isPausedAndHasFunctionCallsToProcess &&
-      !isSending &&
-      aiRequest.status === 'ready' &&
-      aiRequest.mode === 'agent';
 
     const isForAnotherProjectText = isForAnotherProject ? (
       <Text size="body-small" color="secondary" align="center">
@@ -943,6 +974,7 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             editorFunctionCallResults={editorFunctionCallResults}
             editorCallbacks={editorCallbacks}
             project={project}
+            fileMetadata={fileMetadata}
             onProcessFunctionCalls={onProcessFunctionCalls}
             onUserRequestTextChange={onUserRequestTextChange}
             isPaused={isPaused}
@@ -957,6 +989,11 @@ export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
             onSwitchedToGDevelopCredits={() =>
               setHasSwitchedToGDevelopCreditsMidChat(true)
             }
+            onStartOrOpenChat={onStartOrOpenChat}
+            isFetchingSuggestions={isFetchingSuggestions}
+            savingProjectForMessageId={savingProjectForMessageId}
+            forkingState={forkingState}
+            onRestore={onRestore}
           />
           <Spacer />
           <ColumnStackLayout noMargin>

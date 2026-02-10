@@ -37,6 +37,9 @@ protected:
   bool UpdateProperty(gd::SerializerElement &behaviorContent,
                       const gd::String &name, const gd::String &value) override;
   void InitializeContent(gd::SerializerElement &behaviorContent) override;
+  bool RenameProperty(gd::SerializerElement &behaviorContent,
+                              const gd::String &oldName,
+                              const gd::String &newName) override;
 
 private:
   const Project &project; ///< The project is used to get the

@@ -58,3 +58,17 @@ bool CustomBehavior::UpdateProperty(gd::SerializerElement &behaviorContent,
       propertyName,
       newValue);
 }
+
+bool CustomBehavior::RenameProperty(gd::SerializerElement &behaviorContent,
+                                    const gd::String &oldName,
+                                    const gd::String &newName) {
+  if (!project.HasEventsBasedBehavior(GetTypeName())) {
+    return false;
+  }
+  const auto &eventsBasedBehavior =
+      project.GetEventsBasedBehavior(GetTypeName());
+  const auto &properties = eventsBasedBehavior.GetPropertyDescriptors();
+
+  return gd::CustomConfigurationHelper::RenameProperty(
+      properties, behaviorContent, oldName, newName);
+}

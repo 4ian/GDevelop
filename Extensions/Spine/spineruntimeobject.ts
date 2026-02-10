@@ -68,9 +68,10 @@ namespace gdjs {
      */
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: SpineObjectData
+      objectData: SpineObjectData,
+      instanceData?: InstanceData
     ) {
-      super(instanceContainer, objectData);
+      super(instanceContainer, objectData, instanceData);
 
       this._animations = objectData.content.animations;
       this._originalScale = objectData.content.scale;
@@ -532,6 +533,72 @@ namespace gdjs {
     getPointAttachmentY(attachmentName: string, slotName?: string): number {
       return this._renderer.getPointAttachmentPosition(attachmentName, slotName)
         .y;
+    }
+
+    getPointAttachmentScaleXWorld(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentScale(
+        attachmentName,
+        slotName,
+        true
+      ).x;
+    }
+
+    getPointAttachmentScaleXLocal(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentScale(
+        attachmentName,
+        slotName,
+        false
+      ).x;
+    }
+
+    getPointAttachmentScaleYWorld(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentScale(
+        attachmentName,
+        slotName,
+        true
+      ).y;
+    }
+
+    getPointAttachmentScaleYLocal(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentScale(
+        attachmentName,
+        slotName,
+        false
+      ).y;
+    }
+
+    getPointAttachmentRotationWorld(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentRotation(
+        attachmentName,
+        slotName,
+        true
+      );
+    }
+
+    getPointAttachmentRotationLocal(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentRotation(
+        attachmentName,
+        slotName,
+        false
+      );
     }
 
     getAnimationDuration(): number {

@@ -26,9 +26,7 @@ const SaveAsOptionsDialog = (props: Props) => {
   const [
     generateNewProjectUuid,
     setGenerateNewProjectUuid,
-  ] = React.useState<boolean>(
-    props.displayOptionToGenerateNewProjectUuid ? false : true
-  );
+  ] = React.useState<boolean>(false);
   const [error, setError] = React.useState<?string>(null);
 
   const onSave = (i18n: I18nType) => {

@@ -37,8 +37,16 @@ const defineTileMap = function (extension, _, gd) {
       return true;
     }
     if (propertyName === 'displayMode') {
-      objectContent.displayMode = newValue;
-      return true;
+      const normalizedValue = newValue.toLowerCase();
+      if (
+        normalizedValue === 'visible' ||
+        normalizedValue === 'all' ||
+        normalizedValue === 'index'
+      ) {
+        objectContent.displayMode = normalizedValue;
+        return true;
+      }
+      return false;
     }
     if (propertyName === 'layerIndex') {
       objectContent.layerIndex = parseFloat(newValue);
@@ -172,13 +180,11 @@ const defineTileMap = function (extension, _, gd) {
     .addObject(
       'TileMap',
       _('External Tilemap (Tiled/LDtk)'),
-      _(
-        'Displays a tiled-based map, made with the Tiled editor (https://www.mapeditor.org/) or the LDtk editor (https://ldtk.io/).'
-      ),
+      _('Tilemap imported from external editors like LDtk or Tiled.'),
       'JsPlatform/Extensions/tile_map.svg',
       objectTileMap
     )
-    .setCategoryFullName(_('Advanced'))
+    .setCategory('Advanced')
     .addDefaultBehavior('ResizableCapability::ResizableBehavior')
     .addDefaultBehavior('ScalableCapability::ScalableBehavior')
     .addDefaultBehavior('OpacityCapability::OpacityBehavior')
@@ -720,13 +726,11 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addObject(
       'SimpleTileMap',
       _('Tile map'),
-      _(
-        'Displays a tile-based map. Recommended for most games that need to use static tiles.'
-      ),
+      _('Grid-based map built from reusable tiles.'),
       'JsPlatform/Extensions/tile_map.svg',
       objectSimpleTileMap
     )
-    .setCategoryFullName(_('General'))
+    .setCategory('General')
     .setOpenFullEditorLabel(_('Edit tileset and collisions'))
     .addDefaultBehavior('ResizableCapability::ResizableBehavior')
     .addDefaultBehavior('ScalableCapability::ScalableBehavior')
@@ -1275,7 +1279,7 @@ const defineCollisionMask = function (extension, _, gd) {
       'JsPlatform/Extensions/tile_map_collision_mask32.svg',
       collisionMaskObject
     )
-    .setCategoryFullName(_('Advanced'))
+    .setCategory('Advanced')
     .addDefaultBehavior('ResizableCapability::ResizableBehavior')
     .addDefaultBehavior('ScalableCapability::ScalableBehavior')
     .setIncludeFile('Extensions/TileMap/tilemapcollisionmaskruntimeobject.js')
@@ -1800,7 +1804,11 @@ module.exports = {
                     this._editableTileMap,
                     textureCache,
                     displayMode,
-                    layerIndex
+                    layerIndex,
+                    0,
+                    this._editableTileMap.getDimensionX(),
+                    0,
+                    this._editableTileMap.getDimensionY()
                   );
                 }
               );
@@ -1876,7 +1884,11 @@ module.exports = {
               this._editableTileMap,
               textureCache,
               displayMode,
-              layerIndex
+              layerIndex,
+              0,
+              this._editableTileMap.getDimensionX(),
+              0,
+              this._editableTileMap.getDimensionY()
             );
           }
         );
@@ -2255,7 +2267,11 @@ module.exports = {
                       this._editableTileMap,
                       textureCache,
                       'all', // No notion of visibility on simple tile maps.
-                      0 // Only one layer is used on simple tile maps.
+                      0, // Only one layer is used on simple tile maps.
+                      0,
+                      this._editableTileMap.getDimensionX(),
+                      0,
+                      this._editableTileMap.getDimensionY()
                     );
                   }
                 );
@@ -2320,7 +2336,11 @@ module.exports = {
               this._editableTileMap,
               textureCache,
               'all',
-              0
+              0,
+              0,
+              this._editableTileMap.getDimensionX(),
+              0,
+              this._editableTileMap.getDimensionY()
             );
           }
         );

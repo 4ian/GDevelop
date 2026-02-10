@@ -18,6 +18,7 @@ import ProjectManager from '../ProjectManager';
 import LoaderModal from '../UI/LoaderModal';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
+import PurchaseClaimDialog from '../Profile/PurchaseClaimDialog';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import EditorTabsPane, {
@@ -109,6 +110,7 @@ import {
   type SaveAsOptions,
   type FileMetadataAndStorageProviderName,
   type ResourcesActionsMenuBuilder,
+  type SaveProjectOptions,
 } from '../ProjectsStorage';
 import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStorageProviderDialog';
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
@@ -203,6 +205,12 @@ import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizati
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
+import {
+  readProjectSettings,
+  getProjectDirectory,
+} from '../Utils/ProjectSettingsReader';
+import { type ToolbarButtonConfig } from './CustomToolbarButton';
+import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
 import {
   EmbeddedGameFrame,
   setEditorHotReloadNeeded,
@@ -315,6 +323,7 @@ export type State = {|
   openFromStorageProviderDialogOpen: boolean,
   saveToStorageProviderDialogOpen: boolean,
   gdjsDevelopmentWatcherEnabled: boolean,
+  toolbarButtons: Array<ToolbarButtonConfig>,
 |};
 
 const initialPreviewState: PreviewState = {
@@ -392,6 +401,7 @@ const MainFrame = (props: Props) => {
       openFromStorageProviderDialogOpen: false,
       saveToStorageProviderDialogOpen: false,
       gdjsDevelopmentWatcherEnabled: false,
+      toolbarButtons: [],
     }: State)
   );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
@@ -1053,6 +1063,7 @@ const MainFrame = (props: Props) => {
         currentProject: null,
         currentFileMetadata: null,
         editorTabs: closeProjectTabs(state.editorTabs, currentProject),
+        toolbarButtons: [],
       }));
 
       // Delete the project from memory. All references to it have been dropped previously
@@ -1155,6 +1166,25 @@ const MainFrame = (props: Props) => {
           authenticatedUser,
         }));
 
+        // Read and apply project settings from gdevelop-settings.yaml if it exists
+        try {
+          const rawSettings = await readProjectSettings(
+            updatedFileMetadata.fileIdentifier
+          );
+          if (rawSettings) {
+            applyProjectPreferences(rawSettings.preferences, preferences);
+            setState(currentState => ({
+              ...currentState,
+              toolbarButtons: rawSettings.toolbarButtons || [],
+            }));
+          }
+        } catch (error) {
+          console.warn(
+            '[MainFrame] Failed to read project settings:',
+            error.message
+          );
+        }
+
         setIsProjectClosedSoAvoidReloadingExtensions(false);
       }
 
@@ -1199,7 +1229,10 @@ const MainFrame = (props: Props) => {
   const openFromFileMetadata = React.useCallback(
     async (
       fileMetadata: FileMetadata,
-      options?: {| openingMessage?: ?MessageDescriptor |}
+      options?: {|
+        openingMessage?: ?MessageDescriptor,
+        ignoreAutoSave?: boolean,
+      |}
     ): Promise<?State> => {
       const storageProviderOperations = getStorageProviderOperations();
 
@@ -1220,7 +1253,11 @@ const MainFrame = (props: Props) => {
       }
 
       const checkForAutosave = async (): Promise<FileMetadata> => {
-        if (!getAutoSaveCreationDate || !onGetAutoSave) {
+        if (
+          !getAutoSaveCreationDate ||
+          !onGetAutoSave ||
+          (options && options.ignoreAutoSave)
+        ) {
           return fileMetadata;
         }
 
@@ -1245,7 +1282,11 @@ const MainFrame = (props: Props) => {
       };
 
       const checkForAutosaveAfterFailure = async (): Promise<?FileMetadata> => {
-        if (!getAutoSaveCreationDate || !onGetAutoSave) {
+        if (
+          !getAutoSaveCreationDate ||
+          !onGetAutoSave ||
+          (options && options.ignoreAutoSave)
+        ) {
           return null;
         }
 
@@ -3555,6 +3596,7 @@ const MainFrame = (props: Props) => {
       options: ?{|
         openAllScenes?: boolean,
         ignoreUnsavedChanges?: boolean,
+        ignoreAutoSave?: boolean,
         openingMessage?: ?MessageDescriptor,
       |}
     ): Promise<void> => {
@@ -3579,6 +3621,7 @@ const MainFrame = (props: Props) => {
       getStorageProviderOperations(storageProvider);
       await openFromFileMetadata(fileMetadata, {
         openingMessage: (options && options.openingMessage) || null,
+        ignoreAutoSave: (options && options.ignoreAutoSave) || false,
       })
         .then(state => {
           if (state) {
@@ -3653,11 +3696,13 @@ const MainFrame = (props: Props) => {
       fileMetadata,
       versionId,
       ignoreUnsavedChanges,
+      ignoreAutoSave,
       openingMessage,
     }: {|
       fileMetadata: FileMetadata,
       versionId: string,
       ignoreUnsavedChanges: boolean,
+      ignoreAutoSave: boolean,
       openingMessage: MessageDescriptor,
     |}): Promise<void> => {
       return openFromFileMetadataWithStorageProvider(
@@ -3668,7 +3713,7 @@ const MainFrame = (props: Props) => {
             version: versionId,
           },
         },
-        { ignoreUnsavedChanges, openingMessage }
+        { ignoreUnsavedChanges, ignoreAutoSave, openingMessage }
       );
     },
     [openFromFileMetadataWithStorageProvider]
@@ -3679,6 +3724,8 @@ const MainFrame = (props: Props) => {
     openVersionHistoryPanel,
     checkedOutVersionStatus,
     onQuitVersionHistory,
+    onCheckoutVersion,
+    getOrLoadProjectVersion,
   } = useVersionHistory({
     getStorageProvider,
     isSavingProject,
@@ -3703,9 +3750,16 @@ const MainFrame = (props: Props) => {
       options: ?{|
         requestedStorageProvider?: StorageProvider,
         forcedSavedAsLocation?: SaveAsLocation,
+        createdProject?: gdProject,
       |}
-    ) => {
-      if (!currentProject) return;
+    ): Promise<?FileMetadata> => {
+      // In some cases (ex: when a project is created by the AI), the project in
+      // the mainframe state is not updated yet, so we use the provided one.
+      const upToDateProject =
+        options && options.createdProject
+          ? options.createdProject
+          : currentProject;
+      if (!upToDateProject) return;
       // Prevent saving if there are errors in the extension modules, as
       // this can lead to corrupted projects.
       if (hasExtensionLoadErrors) return;
@@ -3760,7 +3814,7 @@ const MainFrame = (props: Props) => {
             saveAsLocation,
             saveAsOptions,
           } = await onChooseSaveProjectAsLocation({
-            project: currentProject,
+            project: upToDateProject,
             fileMetadata: currentFileMetadata,
             displayOptionToGenerateNewProjectUuid:
               // No need to display the option if current file metadata doesn't have
@@ -3797,8 +3851,8 @@ const MainFrame = (props: Props) => {
 
         let originalProjectUuid = null;
         if (newSaveAsOptions && newSaveAsOptions.generateNewProjectUuid) {
-          originalProjectUuid = currentProject.getProjectUuid();
-          currentProject.resetProjectUuid();
+          originalProjectUuid = upToDateProject.getProjectUuid();
+          upToDateProject.resetProjectUuid();
         }
         let originalProjectName = null;
         const newProjectName =
@@ -3806,12 +3860,12 @@ const MainFrame = (props: Props) => {
             ? newSaveAsLocation.name
             : null;
         if (newProjectName) {
-          originalProjectName = currentProject.getName();
-          currentProject.setName(newProjectName);
+          originalProjectName = upToDateProject.getName();
+          upToDateProject.setName(newProjectName);
         }
 
         const { wasSaved, fileMetadata } = await onSaveProjectAs(
-          currentProject,
+          upToDateProject,
           newSaveAsLocation,
           {
             onStartSaving: () =>
@@ -3819,7 +3873,7 @@ const MainFrame = (props: Props) => {
             onMoveResources: async ({ newFileMetadata }) => {
               if (currentFileMetadata)
                 await ensureResourcesAreMoved({
-                  project: currentProject,
+                  project: upToDateProject,
                   newFileMetadata,
                   newStorageProvider,
                   newStorageProviderOperations,
@@ -3834,9 +3888,9 @@ const MainFrame = (props: Props) => {
 
         if (!wasSaved) {
           _replaceSnackMessage(i18n._(t`An error occurred. Please try again.`));
-          if (originalProjectName) currentProject.setName(originalProjectName);
+          if (originalProjectName) upToDateProject.setName(originalProjectName);
           if (originalProjectUuid)
-            currentProject.setProjectUuid(originalProjectUuid);
+            upToDateProject.setProjectUuid(originalProjectUuid);
           return;
         }
 
@@ -3884,7 +3938,7 @@ const MainFrame = (props: Props) => {
         // Ensure resources are re-loaded from their new location.
         ResourcesLoader.burstAllUrlsCache();
 
-        if (isCurrentProjectFresh(currentProjectRef, currentProject)) {
+        if (isCurrentProjectFresh(currentProjectRef, upToDateProject)) {
           // We do not want to change the current file metadata if the
           // project has changed since the beginning of the save, which
           // can happen if another project was loaded in the meantime.
@@ -3893,6 +3947,8 @@ const MainFrame = (props: Props) => {
             currentFileMetadata: fileMetadata,
           }));
         }
+
+        return fileMetadata;
       } catch (rawError) {
         _closeSnackMessage();
         const errorMessage = getWriteErrorMessage
@@ -3972,8 +4028,14 @@ const MainFrame = (props: Props) => {
     ]
   );
 
+  // const saveWithBackgroundSerializer =
+  //   preferences.values.useBackgroundSerializerForSaving;
+  // Hardcode to false for now as libGD.js is not loaded properly by the worker in production (file:// protocol).
+  const saveWithBackgroundSerializer = false;
   const saveProject = React.useCallback(
-    async () => {
+    async (options?: {|
+      skipNewVersionWarning: boolean,
+    |}): Promise<?FileMetadata> => {
       if (!currentProject) return;
       // Prevent saving if there are errors in the extension modules, as
       // this can lead to corrupted projects.
@@ -3991,10 +4053,7 @@ const MainFrame = (props: Props) => {
       }
 
       const storageProviderOperations = getStorageProviderOperations();
-      const {
-        onSaveProject,
-        canFileMetadataBeSafelySaved,
-      } = storageProviderOperations;
+      const { onSaveProject } = storageProviderOperations;
       if (!onSaveProject) {
         return saveProjectAs();
       }
@@ -4014,15 +4073,6 @@ const MainFrame = (props: Props) => {
           message: t`You're trying to save changes made to a previous version of your project. If you continue, it will be used as the new latest version.`,
         });
         if (!shouldRestoreCheckedOutVersion) return;
-      } else if (canFileMetadataBeSafelySaved) {
-        const canProjectBeSafelySaved = await canFileMetadataBeSafelySaved(
-          currentFileMetadata,
-          {
-            showAlert,
-            showConfirmation,
-          }
-        );
-        if (!canProjectBeSafelySaved) return;
       }
 
       _showSnackMessage(i18n._(t`Saving...`), null);
@@ -4036,9 +4086,16 @@ const MainFrame = (props: Props) => {
         // store their values in variables now.
         const storageProviderInternalName = getStorageProvider().internalName;
 
-        const saveOptions = {};
+        const saveOptions: SaveProjectOptions = {
+          useBackgroundSerializer: saveWithBackgroundSerializer,
+          skipNewVersionWarning:
+            !!checkedOutVersionStatus ||
+            (options && options.skipNewVersionWarning),
+        };
         if (cloudProjectRecoveryOpenedVersionId) {
           saveOptions.previousVersion = cloudProjectRecoveryOpenedVersionId;
+        } else {
+          saveOptions.previousVersion = currentFileMetadata.version;
         }
         if (checkedOutVersionStatus) {
           saveOptions.restoredFromVersionId =
@@ -4047,7 +4104,11 @@ const MainFrame = (props: Props) => {
         const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,
           currentFileMetadata,
-          saveOptions
+          saveOptions,
+          {
+            showAlert,
+            showConfirmation,
+          }
         );
 
         if (wasSaved) {
@@ -4096,6 +4157,10 @@ const MainFrame = (props: Props) => {
 
           sealUnsavedChanges();
           _replaceSnackMessage(i18n._(t`Project properly saved`));
+
+          // Return the new file metadata, to allow further operations,
+          // without having to wait for the state to be updated.
+          return fileMetadata;
         }
       } catch (error) {
         const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
@@ -4115,6 +4180,7 @@ const MainFrame = (props: Props) => {
       }
     },
     [
+      saveWithBackgroundSerializer,
       isSavingProject,
       currentProject,
       currentProjectRef,
@@ -4245,6 +4311,7 @@ const MainFrame = (props: Props) => {
         fileMetadata: cloudProjectFileMetadataToRecover,
         versionId,
         ignoreUnsavedChanges: false,
+        ignoreAutoSave: true,
         openingMessage: t`Recovering older version...`,
       });
       setCloudProjectFileMetadataToRecover(null);
@@ -4797,6 +4864,9 @@ const MainFrame = (props: Props) => {
     toggleProjectManager: toggleProjectManager,
     setEditorTabs: setEditorTabs,
     saveProject: saveProject,
+    saveProjectAsWithStorageProvider: saveProjectAsWithStorageProvider,
+    onCheckoutVersion: onCheckoutVersion,
+    getOrLoadProjectVersion: getOrLoadProjectVersion,
     openShareDialog: openShareDialog,
     launchDebuggerAndPreview: launchDebuggerAndPreview,
     launchNewPreview: launchNewPreview,
@@ -4868,6 +4938,10 @@ const MainFrame = (props: Props) => {
     triggerHotReloadInGameEditorIfNeeded,
     onRestartInGameEditor,
     showRestartInGameEditorAfterErrorButton,
+    toolbarButtons: state.toolbarButtons,
+    projectPath: currentFileMetadata
+      ? getProjectDirectory(currentFileMetadata.fileIdentifier)
+      : null,
   };
 
   const hasEditorsInLeftPane = hasEditorsInPane(state.editorTabs, 'left');
@@ -5062,6 +5136,15 @@ const MainFrame = (props: Props) => {
           onClose={() => {
             openProfileDialog(false);
           }}
+        />
+      )}
+      {authenticatedUser.claimedProductOptions && (
+        // PurchaseClaimDialog is dependent on SubscriptionContext,
+        // which is defined after the AuthenticatedUserProvider in Providers.js.
+        // So it cannot be rendered inside the AuthenticatedUserProvider.
+        <PurchaseClaimDialog
+          claimedProductOptions={authenticatedUser.claimedProductOptions}
+          onClose={authenticatedUser.onClosePurchaseClaimDialog}
         />
       )}
       {renderNewProjectDialog()}

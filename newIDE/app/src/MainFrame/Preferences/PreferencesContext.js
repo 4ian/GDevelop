@@ -231,14 +231,21 @@ export type PreferencesValues = {|
   showAiAskButtonInTitleBar: boolean,
   aiState: {| aiRequestId: string | null |},
   automaticallyUseCreditsForAiRequests: boolean,
-  hasSeenInGameEditorWarning: boolean,
+  useBackgroundSerializerForSaving: boolean,
+  disableNpmScriptConfirmation: boolean,
 |};
+
+/**
+ * Partial PreferencesValues that can be overridden per-project via preferences block in gdevelop-settings.yaml.
+ */
+export type ProjectSpecificPreferencesValues = $Shape<PreferencesValues>;
 
 /**
  * Type containing all the preferences of GDevelop and their setters.
  */
 export type Preferences = {|
   values: PreferencesValues,
+  setMultipleValues: (updates: ProjectSpecificPreferencesValues) => void,
   setLanguage: (language: string) => void,
   setThemeName: (themeName: string) => void,
   setCodeEditorThemeName: (codeEditorThemeName: string) => void,
@@ -310,6 +317,7 @@ export type Preferences = {|
   setUse3DEditor: (enabled: boolean) => void,
   getUse3DEditor: () => boolean,
   setShowBasicProfilingCounters: (enabled: boolean) => void,
+  setDisableNpmScriptConfirmation: (enabled: boolean) => void,
   setNewProjectsDefaultStorageProviderName: (name: string) => void,
   saveTutorialProgress: ({|
     tutorialId: string,
@@ -345,7 +353,7 @@ export type Preferences = {|
     aiRequestId: string | null,
   |}) => void,
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => void,
-  setHasSeenInGameEditorWarning: (enabled: boolean) => void,
+  setUseBackgroundSerializerForSaving: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -408,8 +416,10 @@ export const initialPreferences = {
     showAiAskButtonInTitleBar: true,
     aiState: { aiRequestId: null },
     automaticallyUseCreditsForAiRequests: false,
-    hasSeenInGameEditorWarning: false,
+    useBackgroundSerializerForSaving: false,
+    disableNpmScriptConfirmation: false,
   },
+  setMultipleValues: () => {},
   setLanguage: () => {},
   setThemeName: () => {},
   setCodeEditorThemeName: () => {},
@@ -471,6 +481,7 @@ export const initialPreferences = {
   setUse3DEditor: (enabled: boolean) => {},
   getUse3DEditor: () => false,
   setShowBasicProfilingCounters: (enabled: boolean) => {},
+  setDisableNpmScriptConfirmation: (enabled: boolean) => {},
   saveTutorialProgress: () => {},
   getTutorialProgress: () => {},
   setNewProjectsDefaultFolder: () => {},
@@ -490,7 +501,7 @@ export const initialPreferences = {
   setShowAiAskButtonInTitleBar: (enabled: boolean) => {},
   setAiState: ({ aiRequestId }: {| aiRequestId: string | null |}) => {},
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => {},
-  setHasSeenInGameEditorWarning: (enabled: boolean) => {},
+  setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

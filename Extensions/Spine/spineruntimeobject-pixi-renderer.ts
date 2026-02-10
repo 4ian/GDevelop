@@ -12,6 +12,13 @@ namespace gdjs {
     computeWorldRotation(bone: pixi_spine.IBone): number;
   }
 
+  interface IExtendedBone extends pixi_spine.IBone {
+    scaleX: number;
+    scaleY: number;
+    rotation: number;
+    parent: IExtendedBone | null;
+  }
+
   const isPointAttachment = (
     attachment: pixi_spine.IAttachment
   ): attachment is IPointAttachment =>
@@ -219,21 +226,13 @@ namespace gdjs {
           this._rendererObject.y
         );
       }
-      const slot = this._rendererObject.skeleton.findSlot(slotName);
-      if (!slot) {
-        throw new Error(
-          `Unable to find ${slotName} slot name for ${attachmentName} point attachment.`
+
+      const { slot, attachment } =
+        SpineRuntimeObjectPixiRenderer.getSlotAndAttachmentFromRenderObject(
+          attachmentName,
+          slotName,
+          this._rendererObject
         );
-      }
-      const attachment = this._rendererObject.skeleton.getAttachmentByName(
-        slotName,
-        attachmentName
-      );
-      if (!isPointAttachment(attachment)) {
-        throw new Error(
-          `Unable to find ${attachmentName} point attachment with ${slotName} slot name.`
-        );
-      }
 
       return new PIXI.Matrix()
         .rotate(this._rendererObject.rotation)
@@ -242,6 +241,84 @@ namespace gdjs {
         .apply(
           attachment.computeWorldPosition(slot.bone, new pixi_spine.Vector2())
         );
+    }
+
+    getPointAttachmentRotation(
+      attachmentName: string,
+      slotName?: string,
+      isWorld?: boolean
+    ): number {
+      if (!slotName) {
+        slotName = attachmentName;
+      }
+      if (!isSpine(this._rendererObject)) {
+        return this._object.angle;
+      }
+
+      const { slot, attachment } =
+        SpineRuntimeObjectPixiRenderer.getSlotAndAttachmentFromRenderObject(
+          attachmentName,
+          slotName,
+          this._rendererObject
+        );
+
+      const bone = slot.bone as IExtendedBone;
+
+      if (isWorld) {
+        return (
+          gdjs.toDegrees(this._rendererObject.rotation) +
+          attachment.computeWorldRotation(slot.bone)
+        );
+      }
+
+      return bone.rotation;
+    }
+
+    getPointAttachmentScale(
+      attachmentName: string,
+      slotName?: string,
+      isWorld?: boolean
+    ): pixi_spine.Vector2 {
+      if (!slotName) {
+        slotName = attachmentName;
+      }
+      if (!isSpine(this._rendererObject)) {
+        return new pixi_spine.Vector2(
+          this._rendererObject.scale.x,
+          this._rendererObject.scale.y
+        );
+      }
+
+      const { slot } =
+        SpineRuntimeObjectPixiRenderer.getSlotAndAttachmentFromRenderObject(
+          attachmentName,
+          slotName,
+          this._rendererObject
+        );
+
+      let scaleX = 1;
+      let scaleY = 1;
+
+      const bone = slot.bone as IExtendedBone;
+
+      scaleX = bone.scaleX;
+      scaleY = bone.scaleY;
+
+      if (isWorld) {
+        let parent = bone.parent;
+        while (parent) {
+          if (parent) {
+            scaleX *= parent.scaleX;
+            scaleY *= parent.scaleY;
+          }
+          parent = parent.parent;
+        }
+
+        scaleX = scaleX * this._rendererObject.scale.x;
+        scaleY = scaleY * this._rendererObject.scale.y;
+      }
+
+      return new pixi_spine.Vector2(scaleX, scaleY);
     }
 
     private constructRendererObject(): pixi_spine.Spine | PIXI.Container {
@@ -258,6 +335,29 @@ namespace gdjs {
       return new pixi_spine.Spine(
         spineManager.getSpine(this._object.spineResourceName)!
       );
+    }
+
+    private static getSlotAndAttachmentFromRenderObject(
+      attachmentName: string,
+      slotName: string,
+      renderObject: pixi_spine.Spine
+    ): { slot: pixi_spine.ISlot; attachment: IPointAttachment } {
+      const slot = renderObject.skeleton.findSlot(slotName);
+      if (!slot) {
+        throw new Error(
+          `Unable to find ${slotName} slot name for ${attachmentName} point attachment.`
+        );
+      }
+      const attachment = renderObject.skeleton.getAttachmentByName(
+        slotName,
+        attachmentName
+      );
+      if (!isPointAttachment(attachment)) {
+        throw new Error(
+          `Unable to find ${attachmentName} point attachment with ${slotName} slot name.`
+        );
+      }
+      return { slot, attachment };
     }
   }
   /**

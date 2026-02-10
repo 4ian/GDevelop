@@ -32,7 +32,6 @@ import {
   type Schema,
   type ValueField,
   type ActionButton,
-  type SectionTitle,
   type Title,
   type ResourceField,
   type LeaderboardIdField,
@@ -42,6 +41,7 @@ import {
   type ToggleButtons,
   type Field,
 } from '../PropertiesEditor/PropertiesEditorSchema';
+import { getFieldValue, hasMixedValues } from '../PropertiesEditor';
 
 type Props = {|
   onInstancesModified?: Instances => void,
@@ -124,44 +124,6 @@ const getDisabled = ({
   field: ValueField,
 |}): boolean => (field.disabled ? field.disabled(instances) : false);
 
-/**
- * Get the value for the given field across all instances.
- * If one of the instances doesn't share the same value, returns the default value.
- * If there is no instances, returns the default value.
- * If the field does not have a `getValue` method, returns `null`.
- */
-const getFieldValue = ({
-  instances,
-  field,
-  defaultValue,
-}: {|
-  instances: Instances,
-  field: ValueField | ActionButton | SectionTitle | Title,
-  defaultValue?: any,
-|}): any => {
-  if (!instances[0]) {
-    console.warn(
-      'getFieldValue was called with an empty list of instances (or containing undefined). This is a bug that should be fixed.'
-    );
-    return defaultValue;
-  }
-
-  const { getValue } = field;
-  if (!getValue) return null;
-
-  let value = getValue(instances[0]);
-  if (typeof defaultValue !== 'undefined') {
-    for (var i = 1; i < instances.length; ++i) {
-      if (value !== getValue(instances[i])) {
-        value = defaultValue;
-        break;
-      }
-    }
-  }
-
-  return value;
-};
-
 const getFieldEndAdornmentIcon = ({
   instances,
   field,
@@ -182,6 +144,23 @@ const getFieldEndAdornmentIcon = ({
     if (getEndAdornmentIcon) return getEndAdornmentIcon;
   }
   return null;
+};
+
+const isFieldHighlighted = ({
+  instances,
+  field,
+}: {|
+  instances: Instances,
+  field: ValueField,
+|}): any => {
+  if (!instances[0]) {
+    console.warn(
+      'isFieldHighlighted was called with an empty list of instances (or containing undefined). This is a bug that should be fixed.'
+    );
+    return false;
+  }
+
+  return field.isHighlighted ? field.isHighlighted(instances[0]) : false;
 };
 
 const getFieldLabel = ({
@@ -285,6 +264,9 @@ const CompactPropertiesEditor = ({
             }}
             disabled={getDisabled({ instances, field })}
             fullWidth
+            labelColor={
+              isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
+            }
           />
         );
       } else if (field.valueType === 'number') {
@@ -344,6 +326,11 @@ const CompactPropertiesEditor = ({
                   {...otherCommonProps}
                 />
               }
+              labelColor={
+                isFieldHighlighted({ instances, field })
+                  ? 'primary'
+                  : 'secondary'
+              }
             />
           );
         }
@@ -369,6 +356,9 @@ const CompactPropertiesEditor = ({
                   });
                 }}
               />
+            }
+            labelColor={
+              isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
             }
           />
         );
@@ -410,6 +400,9 @@ const CompactPropertiesEditor = ({
             value={getFieldValue({ instances, field })}
             label={getFieldLabel({ instances, field })}
             markdownDescription={getFieldDescription(field)}
+            labelColor={
+              isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
+            }
           />
         );
       } else {
@@ -426,7 +419,7 @@ const CompactPropertiesEditor = ({
           value: getFieldValue({
             instances,
             field,
-            defaultValue: '(Multiple values)',
+            mixedValueFallback: '(Multiple values)',
           }),
           onChange: newValue => {
             instances.forEach(i => setValue(i, newValue || ''));
@@ -464,12 +457,17 @@ const CompactPropertiesEditor = ({
               label={getFieldLabel({ instances, field })}
               markdownDescription={getFieldDescription(field)}
               field={<CompactSemiControlledTextField {...otherCommonProps} />}
+              labelColor={
+                isFieldHighlighted({ instances, field })
+                  ? 'primary'
+                  : 'secondary'
+              }
             />
           );
         }
       }
     },
-    [instances, onFieldChanged, getFieldDescription]
+    [instances, getFieldDescription, onFieldChanged]
   );
 
   const renderSelectField = React.useCallback(
@@ -495,7 +493,7 @@ const CompactPropertiesEditor = ({
         compactSelectField = (
           <CompactSelectField
             key={field.name}
-            value={getFieldValue({ instances, field })}
+            value={'' + getFieldValue({ instances, field })}
             id={field.name}
             onChange={(newValue: string) => {
               instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
@@ -504,7 +502,7 @@ const CompactPropertiesEditor = ({
                 hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
               });
             }}
-            disabled={field.disabled}
+            disabled={getDisabled({ instances, field })}
           >
             {children}
           </CompactSelectField>
@@ -517,7 +515,7 @@ const CompactPropertiesEditor = ({
             value={getFieldValue({
               instances,
               field,
-              defaultValue: '(Multiple values)',
+              mixedValueFallback: '(Multiple values)',
             })}
             id={field.name}
             onChange={(newValue: string) => {
@@ -545,23 +543,23 @@ const CompactPropertiesEditor = ({
           label={getFieldLabel({ instances, field })}
           markdownDescription={getFieldDescription(field)}
           field={compactSelectField}
+          labelColor={
+            isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
+          }
         />
       );
     },
-    [instances, onFieldChanged, getFieldDescription]
+    [instances, getFieldDescription, onFieldChanged]
   );
 
   const renderButton = React.useCallback(
     (field: ActionButton) => {
       let disabled = false;
       if (field.disabled === 'onValuesDifferent') {
-        const DIFFERENT_VALUES = 'DIFFERENT_VALUES';
-        disabled =
-          getFieldValue({
-            instances,
-            field,
-            defaultValue: DIFFERENT_VALUES,
-          }) === DIFFERENT_VALUES;
+        disabled = hasMixedValues({
+          instances,
+          field,
+        });
       }
       return (
         <FlatButton
@@ -649,7 +647,7 @@ const CompactPropertiesEditor = ({
             resourceName={getFieldValue({
               instances,
               field,
-              defaultValue: '(Multiple values)',
+              mixedValueFallback: '(Multiple values)',
             })}
             onChange={newValue => {
               instances.forEach(i => setValue(i, newValue));
@@ -659,6 +657,9 @@ const CompactPropertiesEditor = ({
               });
             }}
           />
+        }
+        labelColor={
+          isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
         }
       />
     );
@@ -682,7 +683,7 @@ const CompactPropertiesEditor = ({
             value={getFieldValue({
               instances,
               field,
-              defaultValue: '(Multiple values)',
+              mixedValueFallback: '(Multiple values)',
             })}
             onChange={newValue => {
               instances.forEach(i => setValue(i, newValue));
@@ -692,6 +693,9 @@ const CompactPropertiesEditor = ({
               });
             }}
           />
+        }
+        labelColor={
+          isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
         }
       />
     );
@@ -747,7 +751,7 @@ const CompactPropertiesEditor = ({
         let selectedInstancesValue = getFieldValue({
           instances,
           field,
-          defaultValue: field.defaultValue || 'Multiple Values',
+          mixedValueFallback: field.defaultValue || 'Multiple Values',
         });
         if (!!selectedInstancesValue) additionalText = selectedInstancesValue;
       }

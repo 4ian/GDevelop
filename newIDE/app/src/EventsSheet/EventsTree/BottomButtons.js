@@ -7,7 +7,7 @@ import { Line, Column } from '../../UI/Grid';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import { enumerateEventsMetadata } from '../EnumerateEventsMetadata';
 import { type DropTargetComponent } from '../../UI/DragAndDrop/DropTarget';
-import { type SortableTreeNode } from '.';
+import { type SortableTreeNode } from './SortableEventsTree';
 import { moveEventToEventsList } from './helpers';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { useScreenType } from '../../UI/Responsive/ScreenTypeMeasurer';

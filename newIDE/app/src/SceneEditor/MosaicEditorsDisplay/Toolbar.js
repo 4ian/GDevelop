@@ -29,8 +29,6 @@ import {
 import CompactToggleButtons from '../../UI/CompactToggleButtons';
 import Grid2d from '../../UI/CustomSvgIcons/Grid2d';
 import Grid3d from '../../UI/CustomSvgIcons/Grid3d';
-import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
-import { InGameEditorWarningDialog } from './InGameEditorWarningDialog';
 
 type Props = {|
   gameEditorMode: 'embedded-game' | 'instances-editor',
@@ -64,11 +62,6 @@ type Props = {|
 |};
 
 const Toolbar = React.memo<Props>(function Toolbar(props) {
-  const { values, setHasSeenInGameEditorWarning } = React.useContext(
-    PreferencesContext
-  );
-  const [showWarningDialog, setShowWarningDialog] = React.useState(false);
-
   return (
     <>
       <ToolbarCommands
@@ -109,9 +102,6 @@ const Toolbar = React.memo<Props>(function Toolbar(props) {
               tooltip: <Trans>3D, real-time editor (new)</Trans>,
               label: '3D',
               onClick: () => {
-                if (!values.hasSeenInGameEditorWarning) {
-                  setShowWarningDialog(true);
-                }
                 props.setGameEditorMode('embedded-game');
               },
               isActive: props.gameEditorMode === 'embedded-game',
@@ -282,14 +272,6 @@ const Toolbar = React.memo<Props>(function Toolbar(props) {
           </IconButton>
         )}
       </ToolbarGroup>
-      {showWarningDialog && (
-        <InGameEditorWarningDialog
-          onClose={() => {
-            setShowWarningDialog(false);
-            setHasSeenInGameEditorWarning(true);
-          }}
-        />
-      )}
     </>
   );
 });

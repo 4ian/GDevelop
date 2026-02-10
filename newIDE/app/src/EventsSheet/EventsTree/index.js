@@ -1,11 +1,11 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import {
-  SortableTreeWithoutDndContext,
+import SortableEventsTree, {
   getFlatDataFromTree,
   getNodeAtPath,
-} from 'react-sortable-tree';
+  type SortableTreeNode,
+} from './SortableEventsTree';
 import { type ConnectDragSource } from 'react-dnd';
 import { mapFor } from '../../Utils/MapFor';
 import { isEventSelected } from '../SelectionHandler';
@@ -34,8 +34,8 @@ import { type ScreenType } from '../../UI/Responsive/ScreenTypeMeasurer';
 import { type WindowSizeType } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
 // Import default style of react-sortable-tree and the override made for EventsSheet.
-import 'react-sortable-tree/style.css';
 import './style.css';
+import './SortableEventsTree.css';
 import BottomButtons from './BottomButtons';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
@@ -136,6 +136,7 @@ type EventsContainerProps = {|
 
   idPrefix: string,
   highlightedAiGeneratedEventIds: Set<string>,
+  isValidElseEvent: boolean,
 |};
 
 /**
@@ -254,6 +255,7 @@ const EventContainer = (props: EventsContainerProps) => {
               eventsSheetHeight={props.eventsSheetHeight}
               windowSize={props.windowSize}
               idPrefix={props.idPrefix}
+              isValidElseEvent={props.isValidElseEvent}
             />
           </div>
         </div>
@@ -265,7 +267,7 @@ const EventContainer = (props: EventsContainerProps) => {
 const SortableTree = ({ className, ...otherProps }) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
-    <SortableTreeWithoutDndContext
+    <SortableEventsTree
       className={`${eventsTree} ${
         gdevelopTheme.palette.type === 'light' ? 'light-theme' : 'dark-theme'
       } ${className}`}
@@ -273,8 +275,6 @@ const SortableTree = ({ className, ...otherProps }) => {
     />
   );
 };
-
-const noop = () => {};
 
 type EventsTreeProps = {|
   events: gdEventsList,
@@ -376,30 +376,7 @@ export type EventsTreeInterface = {|
   unfoldForEvent: (event: gdBaseEvent) => void,
 |};
 
-// A node displayed by the SortableTree. Almost always represents an
-// event, except for the buttons at the bottom of the sheet and the tutorial.
-export type SortableTreeNode = {|
-  // Necessary attributes for react-sortable-tree.
-  title: (node: {| node: SortableTreeNode |}) => React.Node,
-  children: Array<any>,
-  expanded: boolean,
-
-  eventsList: gdEventsList,
-  event: ?gdBaseEvent,
-  depth: number,
-  disabled: boolean,
-  indexInList: number,
-  rowIndex: number,
-  nodePath: Array<number>,
-  relativeNodePath: Array<number>,
-  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
-  // Key is event pointer or an identification string.
-  key: number | string,
-
-  // In case of nodes without event (buttons at the bottom of the sheet),
-  // use a fixed height.
-  fixedHeight?: ?number,
-|};
+export type { SortableTreeNode };
 
 const getNodeKey = ({ treeIndex }) => treeIndex;
 
@@ -447,8 +424,8 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
      */
     const onHeightsChanged = React.useCallback(
       (cb: ?() => void) => {
-        if (_list.current && _list.current.wrappedInstance.current) {
-          _list.current.wrappedInstance.current.recomputeRowHeights();
+        if (_list.current) {
+          _list.current.recomputeRowHeights();
         }
         forceUpdate();
 
@@ -470,8 +447,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
     const scrollToRow = React.useCallback((row: number) => {
       if (row === -1) return;
       if (!_list.current) return;
-      if (!_list.current.wrappedInstance.current) return;
-      _list.current.wrappedInstance.current.scrollToRow(row);
+      _list.current.scrollToRow(row);
     }, []);
 
     /**
@@ -643,7 +619,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
     );
 
     const _renderEvent = ({ node }: {| node: SortableTreeNode |}) => {
-      const { event, depth, disabled } = node;
+      const { event, depth, disabled, isValidElseEvent } = node;
       if (!event) return null;
 
       const isDragged =
@@ -783,6 +759,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
                   connectDragSource={connectDragSource}
                   windowSize={props.windowSize}
                   idPrefix={`event-${node.relativeNodePath.join('-')}`}
+                  isValidElseEvent={isValidElseEvent}
                   highlightedAiGeneratedEventIds={
                     props.highlightedAiGeneratedEventIds
                   }
@@ -799,13 +776,18 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
                     activateTargets={!isDragged && !!draggedNode}
                     windowSize={props.windowSize}
                     indentScale={props.indentScale}
-                    getNodeAtPath={path =>
-                      getNodeAtPath({
+                    getNodeAtPath={path => {
+                      const result = getNodeAtPath({
                         path,
                         treeData: treeDataRoot.current,
                         getNodeKey,
-                      }).node
-                    }
+                      });
+                      if (!result)
+                        throw new Error(
+                          'Could not find node at path in events tree.'
+                        );
+                      return result.node;
+                    }}
                   />
                 )}
               </div>
@@ -846,6 +828,20 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
 
         eventPtrToRowIndex.current['' + event.ptr] = absoluteIndex;
 
+        let isValidElseEvent = false;
+        if (event.getType() === 'BuiltinCommonInstructions::Else') {
+          for (let j = i - 1; j >= 0; j--) {
+            const previousEvent = eventsList.getEventAt(j);
+            if (!previousEvent.isDisabled() && previousEvent.isExecutable()) {
+              const previousEventType = previousEvent.getType();
+              isValidElseEvent =
+                previousEventType === 'BuiltinCommonInstructions::Standard' ||
+                previousEventType === 'BuiltinCommonInstructions::Else';
+              break;
+            }
+          }
+        }
+
         const childrenTreeData = [];
         buildEventsTreeData(
           childrenTreeData,
@@ -869,7 +865,8 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
           expanded: !event.isFolded(),
           disabled,
           depth,
-          key: event.ptr, //TODO: useless?
+          key: event.ptr,
+          isValidElseEvent,
           children: childrenTreeData,
           nodePath: currentAbsolutePath,
           relativeNodePath: currentRelativePath,
@@ -901,6 +898,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
               rowIndex: flattenedList.length,
               projectScopedContainersAccessor: parentProjectScopedContainersAccessor,
               key: 'bottom-buttons',
+              isValidElseEvent: false,
               // Unused, but still provided to make typing happy:
               expanded: false,
               nodePath: [flattenedList.length + 0],
@@ -924,6 +922,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
               rowIndex: flattenedList.length + 1,
               projectScopedContainersAccessor: parentProjectScopedContainersAccessor,
               key: 'eventstree-tutorial-node',
+              isValidElseEvent: false,
               // Unused, but still provided to make typing happy:
               expanded: false,
               nodePath: [flattenedList.length + 1],
@@ -960,6 +959,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
               rowIndex: flattenedList.length + 2,
               projectScopedContainersAccessor: parentProjectScopedContainersAccessor,
               key: 'empty-state',
+              isValidElseEvent: false,
               // Unused, but still provided to make typing happy:
               expanded: false,
               nodePath: [flattenedList.length + 2],
@@ -975,9 +975,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
       rowIndexes: Array<number>
     ): Array<EventContext> => {
       // We use flatDataTree instead of treeDataRoot because we need the events contexts too.
-      const flatDataTree: Array<{
-        node: SortableTreeNode,
-      }> = getFlatDataFromTree({
+      const flatDataTree = getFlatDataFromTree({
         treeData: treeDataRoot.current,
         getNodeKey,
         ignoreCollapsed: true,
@@ -1039,7 +1037,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
         const { event } = node;
         if (!event) return false;
 
-        return searchResults.find(highlightedEvent =>
+        return searchResults.some(highlightedEvent =>
           gd.compare(highlightedEvent, event)
         );
       },
@@ -1068,8 +1066,8 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
     React.useLayoutEffect(() => {
       // Recompute the row heights of the tree at each render, because there
       // is no guarantee that events heights have not changed (resizing, change in event...).
-      if (_list.current && _list.current.wrappedInstance.current) {
-        _list.current.wrappedInstance.current.recomputeRowHeights();
+      if (_list.current) {
+        _list.current.recomputeRowHeights();
       }
     });
 
@@ -1113,9 +1111,7 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
           scaffoldBlockPxWidth={
             getIndentWidth(props.windowSize) * props.indentScale
           }
-          onChange={noop}
           onVisibilityToggle={_onVisibilityToggle}
-          canDrag={false}
           rowHeight={_getRowHeight}
           searchMethod={_isNodeHighlighted}
           searchQuery={props.searchResults}
@@ -1134,10 +1130,6 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
             },
             scrollToAlignment: 'center',
           }}
-          // Disable slideRegionSize on touchscreen because of a bug that makes scrolling
-          // uncontrollable on touchscreens. Ternary operator does not update slideRegionSize
-          // well.
-          slideRegionSize={-10}
         />
       </div>
     );

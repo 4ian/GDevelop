@@ -21,6 +21,7 @@ import {
   type Limits,
   type Usages,
   type Subscription,
+  type SubscriptionPlanPricingSystem,
   type UserEarningsBalance,
 } from '../Utils/GDevelopServices/Usage';
 import {
@@ -56,6 +57,7 @@ export type AuthenticatedUser = {|
   authenticationError: ?AuthError,
   usages: ?Usages,
   subscription: ?Subscription,
+  subscriptionPricingSystem: ?SubscriptionPlanPricingSystem,
   onLogin: (form: LoginForm) => Promise<void>,
   onLoginWithProvider: (provider: IdentityProvider) => Promise<void>,
   onCancelLoginOrSignUp: () => void,
@@ -82,6 +84,8 @@ export type AuthenticatedUser = {|
   onOpenPurchaseClaimDialog: (
     claimedProductOptions: ClaimedProductOptions
   ) => void,
+  claimedProductOptions: ?ClaimedProductOptions,
+  onClosePurchaseClaimDialog: () => void,
   onBadgesChanged: () => Promise<void>,
   onCloudProjectsChanged: () => Promise<void>,
   onRefreshUserProfile: () => Promise<void>,
@@ -128,6 +132,7 @@ export const initialAuthenticatedUser = {
   bundlePurchases: null,
   recommendations: null,
   subscription: null,
+  subscriptionPricingSystem: null,
   usages: null,
   userEarningsBalance: null,
   limits: null,
@@ -147,6 +152,8 @@ export const initialAuthenticatedUser = {
   onOpenCreateAccountDialog: () => {},
   onOpenCreateAccountWithPurchaseClaimDialog: () => {},
   onOpenPurchaseClaimDialog: () => {},
+  claimedProductOptions: null,
+  onClosePurchaseClaimDialog: () => {},
   onBadgesChanged: async () => {},
   onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {},
@@ -182,6 +189,7 @@ export const authenticatedUserLoggedOutAttributes = {
   receivedGameTemplates: [], // Initialize to empty array to indicate that the loading is done.
   receivedBundles: [], // Initialize to empty array to indicate that the loading is done.
   subscription: null,
+  subscriptionPricingSystem: null,
   userEarningsBalance: null,
   usages: null,
   limits: null,

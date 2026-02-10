@@ -2,7 +2,12 @@
 declare class libGDevelop {
   getPointer(gdEmscriptenObject): number;
   castObject<T>(gdEmscriptenObject, Class<T>): T;
+  wrapPointer<T>(ptr: number, objectClass: Class<T>): T;
   compare(gdEmscriptenObject, gdEmscriptenObject): boolean;
+
+  _malloc(size: number): number;
+  _free(ptr: number): void;
+  HEAPU8: Uint8Array;
 
   getTypeOfObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): string;
   getTypeOfBehavior(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): string;
@@ -15,6 +20,7 @@ declare class libGDevelop {
   swapInVectorParameterMetadata(gdVectorParameterMetadata, oldIndex: number, newIndex: number): void;
 
   asStandardEvent(gdBaseEvent): gdStandardEvent;
+  asElseEvent(gdBaseEvent): gdStandardEvent;
   asRepeatEvent(gdBaseEvent): gdRepeatEvent;
   asWhileEvent(gdBaseEvent): gdWhileEvent;
   asForEachEvent(gdBaseEvent): gdForEachEvent;
@@ -47,6 +53,7 @@ declare class libGDevelop {
   VectorInt: Class<gdVectorInt>;
   VectorVariable: Class<gdVectorVariable>;
   VectorObjectFolderOrObject: Class<gdVectorObjectFolderOrObject>;
+  VectorPropertyFolderOrProperty: Class<gdVectorPropertyFolderOrProperty>;
   VectorScreenshot: Class<gdVectorScreenshot>;
   MapStringString: Class<gdMapStringString>;
   MapStringBoolean: Class<gdMapStringBoolean>;
@@ -141,6 +148,7 @@ declare class libGDevelop {
   SerializerElement: Class<gdSerializerElement>;
   SharedPtrSerializerElement: Class<gdSharedPtrSerializerElement>;
   Serializer: Class<gdSerializer>;
+  BinarySerializer: Class<gdBinarySerializer>;
   ObjectAssetSerializer: Class<gdObjectAssetSerializer>;
   InstructionsList: Class<gdInstructionsList>;
   Instruction: Class<gdInstruction>;
@@ -173,6 +181,7 @@ declare class libGDevelop {
   EventsList: Class<gdEventsList>;
   BaseEvent: Class<gdBaseEvent>;
   StandardEvent: Class<gdStandardEvent>;
+  ElseEvent: Class<gdElseEvent>;
   RepeatEvent: Class<gdRepeatEvent>;
   WhileEvent: Class<gdWhileEvent>;
   ForEachEvent: Class<gdForEachEvent>;
@@ -235,6 +244,7 @@ declare class libGDevelop {
   EventsBasedObjectVariant: Class<gdEventsBasedObjectVariant>;
   EventsBasedObjectVariantsContainer: Class<gdEventsBasedObjectVariantsContainer>;
   EventsBasedObjectsList: Class<gdEventsBasedObjectsList>;
+  PropertyFolderOrProperty: Class<gdPropertyFolderOrProperty>;
   PropertiesContainer: Class<gdPropertiesContainer>;
   EventsFunctionsExtension: Class<gdEventsFunctionsExtension>;
   AbstractFileSystem: Class<gdAbstractFileSystem>;

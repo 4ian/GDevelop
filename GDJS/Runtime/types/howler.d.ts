@@ -209,7 +209,7 @@ declare interface HowlOptions extends HowlListeners {
 
 declare class Howl {
   constructor(options: HowlOptions);
-
+  _soundById(id: number | null): this | null;
   play(id?: number | '__default'): number; // .play() is not chainable; the other methods are
   pause(id?: number): this;
   stop(id?: number): this;

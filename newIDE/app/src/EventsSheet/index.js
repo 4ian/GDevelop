@@ -17,7 +17,10 @@ import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
 import { type ShortcutMap } from '../KeyboardShortcuts/DefaultShortcuts';
 import InlineParameterEditor from './InlineParameterEditor';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
-import { serializeToJSObject } from '../Utils/Serializer';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 import {
   type HistoryState,
   type RevertableActionType,
@@ -919,6 +922,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         this.props.shortcutMap['TOGGLE_EVENT_DISABLED'] || 'KeyD'
       ),
     },
+    {
+      label: i18n._(t`Remove the Else`),
+      click: () =>
+        this._replaceSelectedEventType('BuiltinCommonInstructions::Standard'),
+      visible: this._selectionIsElseEvent(),
+    },
     { type: 'separator' },
     {
       label: i18n._(t`Add`),
@@ -975,6 +984,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       label: i18n._(t`Replace`),
       submenu: [
         {
+          label: i18n._(t`Make it a Else for the previous event`),
+          click: () =>
+            this._replaceSelectedEventType('BuiltinCommonInstructions::Else'),
+          enabled: this._selectionIsStandardEvent(),
+        },
+        { type: 'separator' },
+        {
           label: i18n._(t`Extract Events to a Function`),
           click: () => this.extractEventsToFunction(),
         },
@@ -985,6 +1001,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             this.props.shortcutMap['MOVE_EVENTS_IN_NEW_GROUP']
           ),
         },
+        { type: 'separator' },
         {
           label: i18n._(t`Analyze Objects Used in this Event`),
           click: this._openEventsContextAnalyzer,
@@ -1033,6 +1050,61 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       ],
     },
   ];
+
+  _selectionIsStandardEvent = () => {
+    const eventContext = getLastSelectedEventContext(this.state.selection);
+    return (
+      !!eventContext &&
+      eventContext.event.getType() === 'BuiltinCommonInstructions::Standard'
+    );
+  };
+
+  _selectionIsElseEvent = () => {
+    const eventContext = getLastSelectedEventContext(this.state.selection);
+    return (
+      !!eventContext &&
+      eventContext.event.getType() === 'BuiltinCommonInstructions::Else'
+    );
+  };
+
+  _replaceSelectedEventType = (eventType: string) => {
+    const eventContext = getLastSelectedEventContext(this.state.selection);
+    if (!eventContext) return;
+
+    const { project } = this.props;
+    const { event, eventsList, indexInList } = eventContext;
+    const positionsBeforeAction = this._getChangedEventRows([event]);
+    const serializedEvent = serializeToJSObject(event);
+    const newEvent = eventsList.insertNewEvent(project, eventType, indexInList);
+
+    unserializeFromJSObject(
+      newEvent,
+      serializedEvent,
+      'unserializeFrom',
+      project
+    );
+    eventsList.removeEventAt(indexInList + 1);
+
+    if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+
+    this.setState(
+      {
+        selection: selectEvent(
+          clearSelection(),
+          { ...eventContext, event: newEvent, indexInList },
+          false
+        ),
+      },
+      () => {
+        this.updateToolbar();
+        const positionsAfterAction = this._getChangedEventRows([newEvent]);
+        this._saveChangesToHistory('EDIT', {
+          positionsBeforeAction,
+          positionAfterAction: positionsAfterAction,
+        });
+      }
+    );
+  };
 
   openEventContextMenu = (x: number, y: number, eventContext: EventContext) => {
     const multiSelect = this._keyboardShortcuts.shouldMultiSelect();

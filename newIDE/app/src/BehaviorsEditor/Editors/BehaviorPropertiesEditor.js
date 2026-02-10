@@ -29,7 +29,11 @@ const BehaviorPropertiesEditor = ({
       propertiesMapToSchema({
         properties: behavior.getProperties(),
         defaultValueProperties: behaviorMetadata.getProperties(),
-        getProperties: instance => instance.getProperties(),
+        getPropertyValue: (instance, name) =>
+          instance
+            .getProperties()
+            .get(name)
+            .getValue(),
         onUpdateProperty: (instance, name, value) => {
           instance.updateProperty(name, value);
         },

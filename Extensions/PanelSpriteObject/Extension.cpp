@@ -38,7 +38,7 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
                 "from "
                 "the full image."),
               "CppPlatform/Extensions/PanelSpriteIcon.png")
-          .SetCategoryFullName(_("General"))
+          .SetCategory("General")
           .AddDefaultBehavior("EffectCapability::EffectBehavior")
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("OpacityCapability::OpacityBehavior");

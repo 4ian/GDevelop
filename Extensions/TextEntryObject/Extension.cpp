@@ -29,7 +29,7 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
                                       "Invisible object used to get the text "
                                         "entered with the keyboard.",
                                       "CppPlatform/Extensions/textentry.png")
-          .SetCategoryFullName("User interface")
+          .SetCategory("User interface")
           .SetHidden(); // Deprecated
 
   obj.AddAction("String",

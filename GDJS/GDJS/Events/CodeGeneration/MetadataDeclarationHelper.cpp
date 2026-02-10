@@ -134,7 +134,8 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
           // several categories, we can assume it"s not scoped correctly.
           // Note: EventsFunctionsExtension should be used instead of
           // PlatformExtension but this line will be removed soon.
-          .SetCategoryFullName(extension.GetCategory())
+          .SetCategory(extension.GetCategory())
+          .SetAssetStoreTag(eventsBasedObject.GetAssetStoreTag())
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("FlippableCapability::FlippableBehavior");
   if (!eventsBasedObject.IsInnerAreaFollowingParentSize()) {
@@ -1013,7 +1014,8 @@ MetadataDeclarationHelper::DeclareObjectInstructionMetadata(
 
 gd::String MetadataDeclarationHelper::GetStringifiedExtraInfo(
     const gd::PropertyDescriptor &property) {
-  if (property.GetType() != "Choice") {
+  if (property.GetType() != "Choice" &&
+      property.GetType() != "NumberWithChoices") {
     return "";
   }
   SerializerElement element;

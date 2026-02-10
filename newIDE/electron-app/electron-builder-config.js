@@ -4,11 +4,12 @@
  */
 const config = {
   appId: 'com.gdevelop-app.ide',
+  directories: {
+    app: 'app',
+    buildResources: 'build',
+    output: 'dist',
+  },
   extraResources: [
-    {
-      from: '../app/resources/in-app-tutorials',
-      to: 'in-app-tutorials',
-    },
     {
       from: '../app/resources/GDJS',
       to: 'GDJS',
@@ -42,6 +43,8 @@ const config = {
       target: 'default',
       arch: ['universal'],
     },
+    mergeASARs: false,
+    x64ArchFiles: 'Contents/Resources/app.asar.unpacked/node_modules/steamworks.js/dist/osx/steamworksjs.darwin-*.node',
   },
   win: {
     executableName: 'GDevelop',
@@ -81,8 +84,11 @@ if (
   process.env.GD_SIGNTOOL_SUBJECT_NAME &&
   process.env.GD_SIGNTOOL_THUMBPRINT
 ) {
-  config.win.certificateSubjectName = process.env.GD_SIGNTOOL_SUBJECT_NAME;
-  config.win.certificateSha1 = process.env.GD_SIGNTOOL_THUMBPRINT;
+  config.win.signtoolOptions = {};
+  config.win.signtoolOptions.certificateSubjectName =
+    process.env.GD_SIGNTOOL_SUBJECT_NAME;
+  config.win.signtoolOptions.certificateSha1 =
+    process.env.GD_SIGNTOOL_THUMBPRINT;
 
   // electron-builder default signtool.exe is not sufficient for some reason.
   if (!process.env.SIGNTOOL_PATH) {
@@ -97,8 +103,11 @@ if (
   }
 
   // Seems required, see https://github.com/electron-userland/electron-builder/issues/6158#issuecomment-1587045539.
-  config.win.signingHashAlgorithms = ['sha256'];
-  console.log('ℹ️ Set Windows build signing options:', config.win);
+  config.win.signtoolOptions.signingHashAlgorithms = ['sha256'];
+  console.log(
+    'ℹ️ Set Windows build signing options:',
+    config.win.signtoolOptions
+  );
 } else {
   console.log('ℹ️ No Windows build signing options set.');
 }

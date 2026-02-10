@@ -349,7 +349,7 @@ function LeaderboardAppearanceDialog({
             {!canUseTheme ? (
               <GetSubscriptionCard
                 subscriptionDialogOpeningReason="Leaderboard customization"
-                recommendedPlanIdIfNoSubscription="gdevelop_silver"
+                recommendedPlanId="gdevelop_silver"
                 placementId="leaderboards-customization"
               >
                 <Line>
@@ -406,7 +406,7 @@ function LeaderboardAppearanceDialog({
             {!canUseCustomCss ? (
               <GetSubscriptionCard
                 subscriptionDialogOpeningReason="Leaderboard customization"
-                recommendedPlanIdIfNoSubscription="gdevelop_startup"
+                recommendedPlanId="gdevelop_startup"
                 placementId="leaderboards-customization"
               >
                 <Line>

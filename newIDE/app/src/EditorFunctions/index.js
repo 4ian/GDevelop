@@ -5,6 +5,7 @@ import { mapFor, mapVector } from '../Utils/MapFor';
 import { SafeExtractor } from '../Utils/SafeExtractor';
 import {
   serializeToJSObject,
+  serializeToJSON,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
@@ -35,9 +36,9 @@ import {
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
-import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import { swapAsset } from '../AssetStore/AssetSwapper';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
+import { getObjectFolderOrObjectWithContextFromObjectName } from '../SceneEditor/ObjectFolderOrObjectsSelection';
 
 const gd: libGDevelop = global.gd;
 
@@ -62,6 +63,28 @@ export type EditorFunctionCallResult =
       status: 'ignored',
       call_id: string,
     |};
+
+export type ResourceSearchAndInstallOptions = {|
+  resources: Array<{
+    resourceName: string,
+    resourceKind: string,
+  }>,
+|};
+
+export type SingleResourceSearchAndInstallResult = {|
+  resourceName: string,
+  resourceKind: string,
+  status:
+    | 'resource-installed'
+    | 'nothing-found'
+    | 'resource-already-exists'
+    | 'error',
+  error?: string,
+|};
+
+export type ResourceSearchAndInstallResult = {|
+  results: Array<SingleResourceSearchAndInstallResult>,
+|};
 
 export type EditorFunctionGenericOutput = {|
   success: boolean,
@@ -93,6 +116,9 @@ export type EditorFunctionGenericOutput = {|
   instancesOnlyForObjectsNamed?: string, // Must be combined with `instancesForSceneNamed`.
   propertiesLayersEffectsForSceneNamed?: string,
   objectPropertiesDeduplicationKey?: string,
+
+  // Used when new resources are added by a function call:
+  newlyAddedResources?: Array<SingleResourceSearchAndInstallResult>,
 |};
 
 export type EventsGenerationResult =
@@ -111,6 +137,7 @@ export type EventsGenerationOptions = {|
   extensionNamesList: string,
   objectsList: string,
   existingEventsAsText: string,
+  existingEventsJson: string | null,
   placementHint: string,
 |};
 
@@ -170,16 +197,23 @@ export type ObjectGroupsOutsideEditorChanges = {|
   scene: gdLayout,
 |};
 
+export type ToolOptions = {
+  includeEventsJson?: boolean,
+};
+
 type RenderForEditorOptions = {|
   project: ?gdProject,
   args: any,
   editorCallbacks: EditorCallbacks,
   shouldShowDetails: boolean,
+  editorFunctionCallResultOutput: any,
 |};
 
 type LaunchFunctionOptionsWithoutProject = {|
+  PixiResourcesLoader: any,
   args: any,
   editorCallbacks: EditorCallbacks,
+  toolOptions: ToolOptions | null,
   i18n: I18nType,
   generateEvents: (
     options: EventsGenerationOptions
@@ -204,9 +238,12 @@ type LaunchFunctionOptionsWithoutProject = {|
   searchAndInstallAsset: (
     options: AssetSearchAndInstallOptions
   ) => Promise<AssetSearchAndInstallResult>,
+  searchAndInstallResources: (
+    options: ResourceSearchAndInstallOptions
+  ) => Promise<ResourceSearchAndInstallResult>,
 |};
 
-type LaunchFunctionOptionsWithProject = {|
+export type LaunchFunctionOptionsWithProject = {|
   ...LaunchFunctionOptionsWithoutProject,
   project: gdProject,
 |};
@@ -295,6 +332,7 @@ const makeMultipleChangesOutput = (
     message: [
       'Successfully done some changes but some issues were found - see the warnings.',
       ...changes,
+      'Warnings:',
       ...warnings,
     ].join('\n'),
   };
@@ -337,10 +375,14 @@ const findPropertyByName = ({
       foundPropertyName: null,
     };
 
+  const normalizeName = name => name.toLowerCase().replace(/\s|_|-/g, '');
+  const normalizedName = normalizeName(name);
+
   const propertyNames = properties.keys().toJSArray();
   const foundPropertyName =
     propertyNames.find(
-      propertyName => propertyName.toLowerCase() === name.toLowerCase()
+      propertyName =>
+        normalizeName(propertyName.toLowerCase()) === normalizedName
     ) || null;
   const foundProperty = foundPropertyName
     ? properties.get(foundPropertyName)
@@ -365,6 +407,112 @@ const sanitizePropertyNewValue = (
       : '0';
   }
   return newValue;
+};
+
+export const getPropertyValue = ({
+  properties,
+  propertyName,
+}: {|
+  properties: gdMapStringPropertyDescriptor | null,
+  propertyName: string,
+|}): string | null => {
+  if (!properties) return null;
+
+  const { foundProperty } = findPropertyByName({
+    properties,
+    name: propertyName,
+  });
+
+  if (!foundProperty) return null;
+
+  return foundProperty.getValue();
+};
+
+const capitalizeFirstLetter = (str: string) => {
+  if (!str) return str;
+  return str[0].toUpperCase() + str.slice(1);
+};
+
+const verifyPropertyChange = ({
+  propertyNameWithLocation,
+  newProperties,
+  propertyName,
+  requestedNewValue,
+}: {|
+  propertyNameWithLocation: string,
+  newProperties: gdMapStringPropertyDescriptor,
+  propertyName: string,
+  requestedNewValue: string,
+|}): {|
+  propertyWarnings: Array<string>,
+  propertyChanges: Array<string>,
+|} => {
+  const { foundProperty } = findPropertyByName({
+    properties: newProperties,
+    name: propertyName,
+  });
+
+  if (!foundProperty) {
+    return {
+      propertyWarnings: [],
+      propertyChanges: [
+        `Changed property "${propertyName}" but it was then not found in the new properties - double check if necessary the value of all properties.`,
+      ],
+    };
+  }
+
+  const propertyWarnings = [];
+  const propertyChanges = [];
+
+  const actualNewValue = foundProperty.getValue();
+
+  if (foundProperty.getType().toLowerCase() === 'boolean') {
+    // Like in sanitizePropertyNewValue, we need to handle the boolean values in an usual "0" or "1" format.
+    const requestedNewValueAsBooleanString =
+      requestedNewValue === '1'
+        ? 'true'
+        : requestedNewValue === '0'
+        ? 'false'
+        : requestedNewValue;
+    if (requestedNewValueAsBooleanString !== actualNewValue) {
+      propertyWarnings.push(
+        capitalizeFirstLetter(
+          `${propertyNameWithLocation} was changed - but the new value (${actualNewValue}) is different from the requested value (${requestedNewValueAsBooleanString}).`
+        )
+      );
+    }
+  } else {
+    if (
+      actualNewValue.toLowerCase().trim() !==
+      requestedNewValue.toLowerCase().trim()
+    ) {
+      if (foundProperty.getType().toLowerCase() === 'number') {
+        const sizeLikeRegex = /^\s*([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?)\s*([,;xX*×])\s*([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?)\s*(?:\2\s*([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?)\s*)?$/;
+        if (sizeLikeRegex.test(requestedNewValue)) {
+          propertyWarnings.push(
+            capitalizeFirstLetter(
+              `${propertyNameWithLocation} was changed to ${actualNewValue} - but the original requested value (${requestedNewValue}) looks like a size with multiple dimensions. This is not supported, only a number is allowed here.`
+            )
+          );
+        }
+      } else {
+        propertyWarnings.push(
+          capitalizeFirstLetter(
+            `${propertyNameWithLocation} was changed - but the new value (${actualNewValue}) is different from the requested value (${requestedNewValue}).`
+          )
+        );
+      }
+    }
+  }
+
+  propertyChanges.push(
+    `Changed ${propertyNameWithLocation} to "${actualNewValue}".`
+  );
+
+  return {
+    propertyWarnings,
+    propertyChanges,
+  };
 };
 
 const makeShortTextForNamedProperty = (
@@ -507,10 +655,11 @@ const createOrReplaceObject: EditorFunction = {
     onObjectsModifiedOutsideEditor,
     onWillInstallExtension,
     onExtensionInstalled,
+    PixiResourcesLoader,
   }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_type = extractRequiredString(args, 'object_type');
-    const object_name = extractRequiredString(args, 'object_name');
+    const targetObjectName = extractRequiredString(args, 'object_name');
     const target_object_scope = SafeExtractor.extractStringProperty(
       args,
       'target_object_scope'
@@ -522,6 +671,10 @@ const createOrReplaceObject: EditorFunction = {
     const duplicatedObjectName = SafeExtractor.extractStringProperty(
       args,
       'duplicated_object_name'
+    );
+    const duplicatedObjectScene = SafeExtractor.extractStringProperty(
+      args,
+      'duplicated_object_scene'
     );
     const description = SafeExtractor.extractStringProperty(
       args,
@@ -566,32 +719,42 @@ const createOrReplaceObject: EditorFunction = {
       return propertiesText;
     };
 
+    // Check if target object already exists.
+    let existingTargetObject: gdObject | null = null;
+    let isTargetObjectGlobal = false;
+
+    if (layoutObjects.hasObjectNamed(targetObjectName)) {
+      existingTargetObject = layoutObjects.getObject(targetObjectName);
+    } else if (globalObjects.hasObjectNamed(targetObjectName)) {
+      existingTargetObject = globalObjects.getObject(targetObjectName);
+      isTargetObjectGlobal = true;
+    }
+
+    let existingObjectShouldBeMoved = false;
+    if (existingTargetObject) {
+      if (target_object_scope === 'global' && !isTargetObjectGlobal) {
+        existingObjectShouldBeMoved = true;
+      } else if (target_object_scope === 'scene' && isTargetObjectGlobal) {
+        existingObjectShouldBeMoved = true;
+      }
+    }
+
     const createNewObject = async () => {
       const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
         project,
         object_type
       );
 
-      // Check if object already exists.
-      let existingObject: gdObject | null = null;
-      let isGlobalObject = false;
-
-      if (layoutObjects.hasObjectNamed(object_name)) {
-        existingObject = layoutObjects.getObject(object_name);
-      } else if (globalObjects.hasObjectNamed(object_name)) {
-        existingObject = globalObjects.getObject(object_name);
-        isGlobalObject = true;
-      }
-      if (existingObject) {
-        if (existingObject.getType() !== object_type) {
-          if (isGlobalObject) {
+      if (existingTargetObject) {
+        if (existingTargetObject.getType() !== object_type) {
+          if (isTargetObjectGlobal) {
             return makeGenericFailure(
-              `Object with name "${object_name}" already exists globally but with a different type ("${object_type}").`
+              `Object with name "${targetObjectName}" already exists globally but with a different type ("${object_type}").`
             );
           }
 
           return makeGenericFailure(
-            `Object with name "${object_name}" already exists in scene "${scene_name}" but with a different type ("${object_type}").`
+            `Object with name "${targetObjectName}" already exists in scene "${scene_name}" but with a different type ("${object_type}").`
           );
         }
 
@@ -602,7 +765,7 @@ const createOrReplaceObject: EditorFunction = {
           isNewObjectTypeUsed: false, // No object was actually added.
         });
         return makeGenericSuccess(
-          `Object with name "${object_name}" already exists, no need to re-create it.`
+          `Object with name "${targetObjectName}" already exists, no need to re-create it.`
         );
       }
 
@@ -614,7 +777,7 @@ const createOrReplaceObject: EditorFunction = {
         const { status, message, createdObjects } = await searchAndInstallAsset(
           {
             objectsContainer: targetObjectsContainer,
-            objectName: object_name,
+            objectName: targetObjectName,
             objectType: object_type,
             searchTerms: search_terms || '',
             description: description || '',
@@ -627,6 +790,14 @@ const createOrReplaceObject: EditorFunction = {
             `Unable to search and install object (${message}).`
           );
         } else if (status === 'asset-installed') {
+          // Update behaviors shared data for the scene where the object was created.
+          // Assets from the store can come with behaviors that have shared data.
+          if (target_object_scope === 'global') {
+            gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
+          } else {
+            layout.updateBehaviorsSharedData(project);
+          }
+
           // /!\ Tell the editor that some objects have potentially been modified (and even removed).
           // This will force the objects panel to refresh.
           onObjectsModifiedOutsideEditor({
@@ -698,7 +869,7 @@ const createOrReplaceObject: EditorFunction = {
       const object = targetObjectsContainer.insertNewObject(
         project,
         object_type,
-        object_name,
+        targetObjectName,
         targetObjectsContainer.getObjectsCount()
       );
       // /!\ Tell the editor that some objects have potentially been modified (and even removed).
@@ -710,29 +881,19 @@ const createOrReplaceObject: EditorFunction = {
 
       return makeGenericSuccess(
         [
-          `Created a new object (from scratch) called "${object_name}" of type "${object_type}" in scene "${scene_name}".`,
+          `Created a new object (from scratch) called "${targetObjectName}" of type "${object_type}" in scene "${scene_name}".`,
           getPropertiesText(object),
         ].join(' ')
       );
     };
 
     const replaceExistingObject = async () => {
-      let isGlobalObject = false;
-      let existingObject: gdObject | null = null;
-
-      if (layoutObjects.hasObjectNamed(object_name)) {
-        existingObject = layoutObjects.getObject(object_name);
-      } else if (globalObjects.hasObjectNamed(object_name)) {
-        existingObject = globalObjects.getObject(object_name);
-        isGlobalObject = true;
-      }
-
-      if (!existingObject) {
+      if (!existingTargetObject) {
         // No existing object to replace, create a new one.
         return createNewObject();
       }
 
-      const objectsContainerWhereObjectWasFound = isGlobalObject
+      const objectsContainerWhereObjectWasFound = isTargetObjectGlobal
         ? globalObjects
         : layoutObjects;
       const targetObjectsContainer =
@@ -743,7 +904,7 @@ const createOrReplaceObject: EditorFunction = {
       // First try to search and install an object from the asset store.
       try {
         const replacementObjectName = newNameGenerator(
-          object_name + 'Replacement',
+          targetObjectName + 'Replacement',
           name => targetObjectsContainer.hasObjectNamed(name)
         );
         const {
@@ -773,15 +934,13 @@ const createOrReplaceObject: EditorFunction = {
           swapAsset(
             project,
             PixiResourcesLoader,
-            existingObject,
+            existingTargetObject,
             createdObjects[0],
             assetShortHeader
           );
 
           for (const createdObject of createdObjects) {
-            objectsContainerWhereObjectWasFound.removeObject(
-              createdObject.getName()
-            );
+            targetObjectsContainer.removeObject(createdObject.getName());
           }
 
           // /!\ Tell the editor that some objects have potentially been modified (and even removed).
@@ -791,7 +950,7 @@ const createOrReplaceObject: EditorFunction = {
             isNewObjectTypeUsed: false, // The object type was not changed.
           });
           return makeGenericSuccess(
-            `Replaced object "${existingObject.getName()}" by an object from the asset store fitting the search.`
+            `Replaced object "${existingTargetObject.getName()}" by an object from the asset store fitting the search, with the same type ("${existingTargetObject.getType()}").`
           );
         } else {
           // No asset found.
@@ -805,39 +964,53 @@ const createOrReplaceObject: EditorFunction = {
       }
 
       return makeGenericFailure(
-        `Could not find an object in the asset store to replace "${object_name}" in scene "${scene_name}". Instead, inspect properties of the object and modify it until it matches what you want it to be.`
+        `Could not find an object in the asset store to replace "${targetObjectName}" in scene "${scene_name}". Instead, inspect properties of the object and modify it until it matches what you want it to be.`
       );
     };
 
-    const duplicateExistingObject = (duplicatedObjectName: string) => {
-      let isGlobalObject = false;
-      let existingObject: gdObject | null = null;
+    const duplicateExistingObject = (
+      duplicatedObjectName: string,
+      duplicatedObjectSceneName: string | null
+    ) => {
+      if (
+        duplicatedObjectSceneName &&
+        !project.hasLayoutNamed(duplicatedObjectSceneName)
+      ) {
+        return makeGenericFailure(
+          `Scene not found: "${duplicatedObjectSceneName}". Nothing was duplicated.`
+        );
+      }
 
-      if (layoutObjects.hasObjectNamed(duplicatedObjectName)) {
-        existingObject = layoutObjects.getObject(duplicatedObjectName);
+      const duplicatedObjectScene = duplicatedObjectSceneName
+        ? project.getLayout(duplicatedObjectSceneName)
+        : layout;
+      const duplicatedObjectSceneObjects = duplicatedObjectScene.getObjects();
+
+      let isDuplicatedObjectGlobal = false;
+      let duplicatedObject: gdObject | null = null;
+      if (duplicatedObjectSceneObjects.hasObjectNamed(duplicatedObjectName)) {
+        duplicatedObject = duplicatedObjectSceneObjects.getObject(
+          duplicatedObjectName
+        );
       } else if (globalObjects.hasObjectNamed(duplicatedObjectName)) {
-        existingObject = globalObjects.getObject(duplicatedObjectName);
-        isGlobalObject = true;
+        duplicatedObject = globalObjects.getObject(duplicatedObjectName);
+        isDuplicatedObjectGlobal = true;
       }
 
-      if (!existingObject) {
-        // No existing object to duplicate, create a new one.
-        return createNewObject();
+      if (!duplicatedObject) {
+        return makeGenericFailure(
+          `Object not found: "${duplicatedObjectName}" in scene "${duplicatedObjectScene.getName()}" or as a global object. Nothing was duplicated.`
+        );
       }
 
-      const objectsContainerWhereObjectWasFound = isGlobalObject
-        ? globalObjects
-        : layoutObjects;
       const targetObjectsContainer =
-        target_object_scope === 'global'
-          ? globalObjects
-          : objectsContainerWhereObjectWasFound;
+        target_object_scope === 'global' ? globalObjects : layoutObjects;
 
-      const serializedObject = serializeToJSObject(existingObject);
+      const serializedObject = serializeToJSObject(duplicatedObject);
       const newObject = targetObjectsContainer.insertNewObject(
         project,
-        existingObject.getType(),
-        object_name,
+        duplicatedObject.getType(),
+        targetObjectName,
         targetObjectsContainer.getObjectsCount()
       );
       unserializeFromJSObject(
@@ -846,7 +1019,14 @@ const createOrReplaceObject: EditorFunction = {
         'unserializeFrom',
         project
       );
-      newObject.setName(object_name); // Unserialization has overwritten the name.
+      newObject.setName(targetObjectName); // Unserialization has overwritten the name.
+
+      // Update behaviors shared data for the scene where the object was duplicated.
+      if (target_object_scope === 'global') {
+        gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
+      } else {
+        layout.updateBehaviorsSharedData(project);
+      }
 
       // /!\ Tell the editor that some objects have potentially been modified (and even removed).
       // This will force the objects panel to refresh.
@@ -854,15 +1034,77 @@ const createOrReplaceObject: EditorFunction = {
         scene: layout,
         isNewObjectTypeUsed: false, // The object type can't be new because it is duplicated.
       });
+
+      const fromText = isDuplicatedObjectGlobal
+        ? 'the global objects'
+        : `scene "${duplicatedObjectScene.getName()}"`;
+      const toText =
+        target_object_scope === 'global'
+          ? 'the global objects'
+          : `scene "${scene_name}"`;
       return makeGenericSuccess(
-        `Duplicated object "${duplicatedObjectName}" as "${newObject.getName()}". The new object "${newObject.getName()}" has the same type, behaviors, properties and effects as the one it was duplicated from.`
+        `Duplicated object "${duplicatedObjectName}" (from ${fromText}) as "${newObject.getName()}" (to ${toText}). The new object "${newObject.getName()}" has the same type, behaviors, properties and effects as the one it was duplicated from.`
       );
     };
 
-    if (shouldReplaceExistingObject) {
+    const moveExistingObject = () => {
+      const existingTargetObjectFolderOrObject = getObjectFolderOrObjectWithContextFromObjectName(
+        globalObjects,
+        layoutObjects,
+        existingTargetObject ? existingTargetObject.getName() : ''
+      );
+      if (!existingTargetObjectFolderOrObject || !existingTargetObject) {
+        throw new Error(
+          "Internal error: can't locate the existing object to be moved."
+        );
+      }
+
+      if (target_object_scope === 'global' && !isTargetObjectGlobal) {
+        if (globalObjects.hasObjectNamed(existingTargetObject.getName())) {
+          return makeGenericFailure(
+            `Object "${existingTargetObject.getName()}" already exists in the global objects. Nothing was changed.`
+          );
+        }
+
+        layoutObjects.moveObjectFolderOrObjectToAnotherContainerInFolder(
+          existingTargetObjectFolderOrObject.objectFolderOrObject,
+          globalObjects,
+          globalObjects.getRootFolder(),
+          0
+        );
+
+        gd.WholeProjectRefactorer.updateBehaviorsSharedData(project);
+
+        // /!\ Tell the editor that some objects have potentially been modified (and even removed).
+        // This will force the objects panel to refresh.
+        onObjectsModifiedOutsideEditor({
+          scene: layout,
+          isNewObjectTypeUsed: false, // The object type was not changed.
+        });
+
+        return makeGenericSuccess(
+          `Moved object "${existingTargetObject.getName()}" to the global objects. Its type, behaviors, properties and effects are unchanged.`
+        );
+      } else if (target_object_scope === 'scene' && isTargetObjectGlobal) {
+        return makeGenericFailure(
+          `Object "${existingTargetObject.getName()}" is a global object. Global objects can't be moved, so it cannot be moved to the scene "${scene_name}".`
+        );
+      }
+
+      return makeGenericFailure(
+        `Unrecognized move requested - the object "${existingTargetObject.getName()}" was not changed and nothing was done.`
+      );
+    };
+
+    if (existingObjectShouldBeMoved) {
+      return moveExistingObject();
+    } else if (shouldReplaceExistingObject) {
       return replaceExistingObject();
     } else if (duplicatedObjectName) {
-      return duplicateExistingObject(duplicatedObjectName);
+      return duplicateExistingObject(
+        duplicatedObjectName,
+        duplicatedObjectScene
+      );
     } else {
       return createNewObject();
     }
@@ -1219,17 +1461,47 @@ const changeObjectProperty: EditorFunction = {
         name: propertyName,
       });
 
-      if (!foundPropertyName) {
+      if (!foundPropertyName || !foundProperty) {
         warnings.push(
           `Property not found: ${propertyName} on object ${object_name}.`
         );
         return;
       }
 
+      const sanitizedNewValue = sanitizePropertyNewValue(
+        foundProperty,
+        newValue
+      );
+
+      if (foundProperty.getType() === 'resource') {
+        if (!project.getResourcesManager().hasResource(sanitizedNewValue)) {
+          warnings.push(
+            `Could not change property "${foundPropertyName}" of object "${object_name}" to "${newValue}" because the resource "${sanitizedNewValue}" does not exist in the project. New resources can't be added just by setting a new name that does not exist. Instead, use \`create_or_replace_object\` to replace the assets of an existing object by new one(s) that will be searched and imported from the asset store (this will keep the object properties, behaviors, events, etc. unchanged).`
+          );
+          return;
+        }
+        const resource = project
+          .getResourcesManager()
+          .getResource(sanitizedNewValue);
+
+        // Check the new resource is of the expected kind.
+        const extraInfos = foundProperty.getExtraInfo().toJSArray();
+        const expectedResourceKind = (extraInfos[0] || '').toLowerCase();
+        if (
+          expectedResourceKind &&
+          resource.getKind().toLowerCase() !== expectedResourceKind
+        ) {
+          warnings.push(
+            `Could not change property "${foundPropertyName}" of object "${object_name}" to "${newValue}" because the resource "${sanitizedNewValue}" exists in project but has type "${resource.getKind()}", which is not the expected type "${expectedResourceKind}".`
+          );
+          return;
+        }
+      }
+
       if (
         !objectConfiguration.updateProperty(
           foundPropertyName,
-          sanitizePropertyNewValue(foundProperty, newValue)
+          sanitizedNewValue
         )
       ) {
         warnings.push(
@@ -1238,9 +1510,14 @@ const changeObjectProperty: EditorFunction = {
         return;
       }
 
-      changes.push(
-        `Changed property "${foundPropertyName}" of object "${object_name}" to "${newValue}".`
-      );
+      const { propertyWarnings, propertyChanges } = verifyPropertyChange({
+        propertyNameWithLocation: `property "${foundPropertyName}" of object "${object_name}"`,
+        newProperties: objectConfiguration.getProperties(),
+        propertyName: foundPropertyName,
+        requestedNewValue: sanitizedNewValue,
+      });
+      warnings.push(...propertyWarnings);
+      changes.push(...propertyChanges);
     });
 
     return makeMultipleChangesOutput(changes, warnings);
@@ -1406,6 +1683,15 @@ const addBehavior: EditorFunction = {
 
       return makeGenericFailure(
         `Behavior "${behaviorName}" of type "${behavior_type}" is a default capability and cannot be added to object "${object_name}".`
+      );
+    }
+
+    if (
+      behaviorMetadata.getObjectType() &&
+      behaviorMetadata.getObjectType() !== object.getType()
+    ) {
+      return makeGenericFailure(
+        `Behavior "${behaviorName}" of type "${behavior_type}" cannot be added to object "${object_name}" because the object is not of type "${behaviorMetadata.getObjectType()}".`
       );
     }
 
@@ -1850,21 +2136,25 @@ const changeBehaviorProperty: EditorFunction = {
 
       if (behaviorPropertySearch.foundPropertyName) {
         const { foundPropertyName, foundProperty } = behaviorPropertySearch;
-        if (
-          !behavior.updateProperty(
-            foundPropertyName,
-            sanitizePropertyNewValue(foundProperty, newValue)
-          )
-        ) {
+        const sanitizedNewValue = sanitizePropertyNewValue(
+          foundProperty,
+          newValue
+        );
+        if (!behavior.updateProperty(foundPropertyName, sanitizedNewValue)) {
           warnings.push(
             `Could not change property "${foundPropertyName}" of behavior "${behavior_name}". The value might be invalid, of the wrong type or not allowed.`
           );
           return;
         }
 
-        changes.push(
-          `Changed property "${foundPropertyName}" of behavior "${behavior_name}" to "${newValue}".`
-        );
+        const { propertyWarnings, propertyChanges } = verifyPropertyChange({
+          propertyNameWithLocation: `property "${foundPropertyName}" of behavior "${behavior_name}"`,
+          newProperties: behavior.getProperties(),
+          propertyName: foundPropertyName,
+          requestedNewValue: sanitizedNewValue,
+        });
+        warnings.push(...propertyWarnings);
+        changes.push(...propertyChanges);
       } else if (
         behaviorSharedData &&
         behaviorSharedDataPropertySearch.foundPropertyName
@@ -1873,10 +2163,14 @@ const changeBehaviorProperty: EditorFunction = {
           foundPropertyName,
           foundProperty,
         } = behaviorSharedDataPropertySearch;
+        const sanitizedNewValue = sanitizePropertyNewValue(
+          foundProperty,
+          newValue
+        );
         if (
           !behaviorSharedData.updateProperty(
             foundPropertyName,
-            sanitizePropertyNewValue(foundProperty, newValue)
+            sanitizedNewValue
           )
         ) {
           warnings.push(
@@ -1885,9 +2179,14 @@ const changeBehaviorProperty: EditorFunction = {
           return;
         }
 
-        changes.push(
-          `Changed property "${foundPropertyName}" of behavior "${behavior_name}" (shared between all objects having this behavior) to "${newValue}".`
-        );
+        const { propertyWarnings, propertyChanges } = verifyPropertyChange({
+          propertyNameWithLocation: `property "${foundPropertyName}" of behavior "${behavior_name}" (shared between all objects having this behavior)`,
+          newProperties: behavior.getProperties(),
+          propertyName: foundPropertyName,
+          requestedNewValue: sanitizedNewValue,
+        });
+        warnings.push(...propertyWarnings);
+        changes.push(...propertyChanges);
       } else {
         warnings.push(
           `Property "${propertyName}" not found on behavior "${behavior_name}" of object "${object_name}".`
@@ -3108,7 +3407,12 @@ const readSceneEvents: EditorFunction = {
  * Adds a new event to a scene's event sheet
  */
 const addSceneEvents: EditorFunction = {
-  renderForEditor: ({ args, shouldShowDetails, editorCallbacks }) => {
+  renderForEditor: ({
+    args,
+    shouldShowDetails,
+    editorCallbacks,
+    editorFunctionCallResultOutput,
+  }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const eventsDescription = extractRequiredString(args, 'events_description');
     const objectsListArgument = SafeExtractor.extractStringProperty(
@@ -3237,11 +3541,13 @@ const addSceneEvents: EditorFunction = {
   launchFunction: async ({
     project,
     args,
+    toolOptions,
     generateEvents,
     onSceneEventsModifiedOutsideEditor,
     ensureExtensionInstalled,
     onWillInstallExtension,
     onExtensionInstalled,
+    searchAndInstallResources,
   }) => {
     const sceneName = extractRequiredString(args, 'scene_name');
     const eventsDescription = extractRequiredString(args, 'events_description');
@@ -3266,6 +3572,10 @@ const addSceneEvents: EditorFunction = {
     const existingEventsAsText = renderNonTranslatedEventsAsText({
       eventsList: currentSceneEvents,
     });
+    const existingEventsJson =
+      toolOptions && toolOptions.includeEventsJson
+        ? serializeToJSON(currentSceneEvents)
+        : null;
 
     try {
       const eventsGenerationResult: EventsGenerationResult = await generateEvents(
@@ -3275,6 +3585,7 @@ const addSceneEvents: EditorFunction = {
           extensionNamesList,
           objectsList,
           existingEventsAsText,
+          existingEventsJson,
           placementHint,
         }
       );
@@ -3406,6 +3717,16 @@ const addSceneEvents: EditorFunction = {
           newOrChangedAiGeneratedEventIds: new Set([aiGeneratedEvent.id]),
         });
 
+        // Search and install missing resources if any
+        const allMissingResources = changes.flatMap(
+          change => change.missingResources || []
+        );
+        const {
+          results: newlyAddedResources,
+        } = await searchAndInstallResources({
+          resources: allMissingResources,
+        });
+
         const resultMessage =
           aiGeneratedEvent.resultMessage ||
           'Properly modified or added new event(s).';
@@ -3413,6 +3734,7 @@ const addSceneEvents: EditorFunction = {
           success: true,
           message: resultMessage,
           aiGeneratedEventId: aiGeneratedEvent.id,
+          newlyAddedResources,
         };
       } catch (error) {
         console.error(

@@ -318,6 +318,16 @@ const MosaicEditorsDisplay = React.forwardRef<
               onEditLayerEffects={props.editLayerEffects}
               onEditLayer={props.editLayer}
               onLayersModified={props.onLayersModified}
+              eventsBasedObject={props.eventsBasedObject}
+              eventsBasedObjectVariant={props.eventsBasedObjectVariant}
+              getContentAABB={
+                editorRef.current
+                  ? editorRef.current.getContentAABB
+                  : () => null
+              }
+              onEventsBasedObjectChildrenEdited={
+                props.onEventsBasedObjectChildrenEdited
+              }
             />
           )}
         </I18n>
@@ -334,6 +344,7 @@ const MosaicEditorsDisplay = React.forwardRef<
           eventsBasedObject={eventsBasedObject}
           chosenLayer={chosenLayer}
           onChooseLayer={props.onChooseLayer}
+          selectedLayer={selectedLayer}
           onSelectLayer={props.onSelectLayer}
           onEditLayerEffects={props.editLayerEffects}
           onEditLayer={props.editLayer}
@@ -436,6 +447,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               )}
               project={project}
               layout={layout}
+              eventsFunctionsExtension={eventsFunctionsExtension}
               eventsBasedObject={eventsBasedObject}
               projectScopedContainersAccessor={projectScopedContainersAccessor}
               globalObjectsContainer={globalObjectsContainer}

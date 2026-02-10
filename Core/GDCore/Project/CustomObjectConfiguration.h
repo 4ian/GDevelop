@@ -57,6 +57,7 @@ public:
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
   bool UpdateProperty(const gd::String& name, const gd::String& value) override;
+  bool RenameProperty(const gd::String& oldName, const gd::String& newName) override;
 
   std::map<gd::String, gd::PropertyDescriptor> GetInitialInstanceProperties(
       const gd::InitialInstance& instance) override;
@@ -65,6 +66,7 @@ public:
                                      const gd::String& value) override;
 
   void ExposeResources(gd::ArbitraryResourceWorker& worker) override;
+
 
   /**
    * \brief Get the name of the events-based object variant used by this custom object.

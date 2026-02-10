@@ -181,29 +181,29 @@ namespace gdjs {
     }
 
     //See b2Vec2 method
-    updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
-      if (oldBehaviorData.dynamic !== newBehaviorData.dynamic) {
-        if (newBehaviorData.dynamic) {
+    override applyBehaviorOverriding(behaviorData): boolean {
+      if (behaviorData.dynamic !== undefined) {
+        if (behaviorData.dynamic) {
           this.setDynamic();
         } else {
           this.setStatic();
         }
       }
-      if (oldBehaviorData.angularDamping !== newBehaviorData.angularDamping) {
-        this.setAngularDamping(newBehaviorData.angularDamping);
+      if (behaviorData.angularDamping !== undefined) {
+        this.setAngularDamping(behaviorData.angularDamping);
       }
-      if (oldBehaviorData.linearDamping !== newBehaviorData.linearDamping) {
-        this.setLinearDamping(newBehaviorData.linearDamping);
+      if (behaviorData.linearDamping !== undefined) {
+        this.setLinearDamping(behaviorData.linearDamping);
       }
-      if (oldBehaviorData.isBullet !== newBehaviorData.isBullet) {
-        if (newBehaviorData.isBullet) {
+      if (behaviorData.isBullet !== undefined) {
+        if (behaviorData.isBullet) {
           this.setAsBullet();
         } else {
           this.dontSetAsBullet();
         }
       }
-      if (oldBehaviorData.fixedRotation !== newBehaviorData.fixedRotation) {
-        if (newBehaviorData.fixedRotation) {
+      if (behaviorData.fixedRotation !== undefined) {
+        if (behaviorData.fixedRotation) {
           this.setFixedRotation();
         } else {
           this.setFreeRotation();
@@ -211,19 +211,16 @@ namespace gdjs {
       }
 
       // TODO: make these properties updatable.
-      if (oldBehaviorData.massDensity !== newBehaviorData.massDensity) {
+      if (behaviorData.massDensity !== undefined) {
         return false;
       }
-      if (oldBehaviorData.averageFriction !== newBehaviorData.averageFriction) {
+      if (behaviorData.averageFriction !== undefined) {
         return false;
       }
-      if (
-        oldBehaviorData.averageRestitution !==
-        newBehaviorData.averageRestitution
-      ) {
+      if (behaviorData.averageRestitution !== undefined) {
         return false;
       }
-      if (oldBehaviorData.shapeType !== newBehaviorData.shapeType) {
+      if (behaviorData.shapeType !== undefined) {
         return false;
       }
       return true;

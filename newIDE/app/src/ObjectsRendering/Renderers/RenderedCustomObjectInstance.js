@@ -556,8 +556,8 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         threeObject.position.y += this._instance.getY() + centerY - originY;
         threeObject.position.z += this._instance.getZ() + centerZ - originZ;
       }
-      this._pixiObject.pivot.x = centerX;
-      this._pixiObject.pivot.y = centerY;
+      this._pixiObject.pivot.x = centerX - originX;
+      this._pixiObject.pivot.y = centerY - originY;
       this._pixiObject.position.x = this._instance.getX() + centerX - originX;
       this._pixiObject.position.y = this._instance.getY() + centerY - originY;
 

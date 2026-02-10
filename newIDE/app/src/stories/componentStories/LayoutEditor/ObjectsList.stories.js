@@ -27,6 +27,7 @@ export const Default = () => (
         getThumbnail={() => 'res/unknown32.png'}
         project={testProject.project}
         layout={testProject.testLayout}
+        eventsFunctionsExtension={null}
         eventsBasedObject={null}
         projectScopedContainersAccessor={
           testProject.testSceneProjectScopedContainersAccessor
@@ -68,6 +69,7 @@ export const WithSerializedObjectView = () => (
           getThumbnail={() => 'res/unknown32.png'}
           project={testProject.project}
           layout={testProject.testLayout}
+          eventsFunctionsExtension={null}
           eventsBasedObject={null}
           projectScopedContainersAccessor={
             testProject.testSceneProjectScopedContainersAccessor
@@ -109,6 +111,7 @@ export const Locked = () => (
         getThumbnail={() => 'res/unknown32.png'}
         project={testProject.project}
         layout={testProject.testLayout}
+        eventsFunctionsExtension={null}
         eventsBasedObject={null}
         projectScopedContainersAccessor={
           testProject.testSceneProjectScopedContainersAccessor

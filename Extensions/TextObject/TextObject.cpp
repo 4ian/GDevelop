@@ -72,11 +72,28 @@ bool TextObject::UpdateProperty(const gd::String& propertyName,
     return true;
   }
   if (propertyName == "textAlignment") {
-    textAlignment = newValue;
+    if (newValue.LowerCase() == "left") {
+      textAlignment = "left";
+    } else if (newValue.LowerCase() == "center") {
+      textAlignment = "center";
+    } else if (newValue.LowerCase() == "right") {
+      textAlignment = "right";
+    } else {
+      return false;
+    }
+
     return true;
   }
   if (propertyName == "verticalTextAlignment") {
-    verticalTextAlignment = newValue;
+    if (newValue.LowerCase() == "top") {
+      verticalTextAlignment = "top";
+    } else if (newValue.LowerCase() == "center") {
+      verticalTextAlignment = "center";
+    } else if (newValue.LowerCase() == "bottom") {
+      verticalTextAlignment = "bottom";
+    } else {
+      return false;
+    }
     return true;
   }
   if (propertyName == "isOutlineEnabled") {

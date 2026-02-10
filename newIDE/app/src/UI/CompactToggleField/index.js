@@ -24,7 +24,7 @@ type Props = {|
   disabled?: boolean,
   fullWidth?: boolean,
   hideTooltip?: boolean,
-  labelColor?: 'primary',
+  labelColor?: 'primary' | 'secondary',
 |};
 
 export const CompactToggleField = (props: Props) => {

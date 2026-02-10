@@ -70,8 +70,11 @@ namespace gdjs {
       this._orderedLayers.length = 0;
     }
 
-    createObject(objectName: string): gdjs.RuntimeObject | null {
-      const result = super.createObject(objectName);
+    override createObject(
+      objectName: string,
+      instanceData?: InstanceData
+    ): gdjs.RuntimeObject | null {
+      const result = super.createObject(objectName, instanceData);
       this._customObject.onChildrenLocationChanged();
       return result;
     }
@@ -433,7 +436,7 @@ namespace gdjs {
      * in milliseconds, for objects on the layer.
      */
     getElapsedTime(): float {
-      return this._parent.getElapsedTime();
+      return this._customObject.getElapsedTime();
     }
   }
 }

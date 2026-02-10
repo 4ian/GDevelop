@@ -168,6 +168,7 @@ export default class LocalPreviewLauncher extends React.Component<
             // as we've not removed dependency on it and on "@electron/remote".
             nodeIntegration: true,
             contextIsolation: false,
+            backgroundThrottling: false,
           },
         },
         previewGamePath: gamePath,

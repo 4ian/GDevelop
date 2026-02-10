@@ -27,6 +27,7 @@ import { PrivateGameTemplateStoreStateProvider } from '../AssetStore/PrivateGame
 import { BundleStoreStateProvider } from '../AssetStore/Bundles/BundleStoreContext';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { BehaviorStoreStateProvider } from '../AssetStore/BehaviorStore/BehaviorStoreContext';
+import { ObjectStoreStateProvider } from '../AssetStore/ObjectStoreContext';
 import { TutorialStateProvider } from '../Tutorial/TutorialContext';
 import AlertProvider from '../UI/Alert/AlertProvider';
 import { AnnouncementsFeedStateProvider } from '../AnnouncementsFeed/AnnouncementsFeedContext';
@@ -120,21 +121,25 @@ const Providers = ({
                                                               <BehaviorStoreStateProvider
                                                                 i18n={i18n}
                                                               >
-                                                                <TutorialStateProvider>
-                                                                  <AnnouncementsFeedStateProvider>
-                                                                    <PrivateAssetsAuthorizationProvider>
-                                                                      <Resource3DPreviewProvider>
-                                                                        <AiRequestProvider>
-                                                                          {children(
-                                                                            {
-                                                                              i18n,
-                                                                            }
-                                                                          )}
-                                                                        </AiRequestProvider>
-                                                                      </Resource3DPreviewProvider>
-                                                                    </PrivateAssetsAuthorizationProvider>
-                                                                  </AnnouncementsFeedStateProvider>
-                                                                </TutorialStateProvider>
+                                                                <ObjectStoreStateProvider
+                                                                  i18n={i18n}
+                                                                >
+                                                                  <TutorialStateProvider>
+                                                                    <AnnouncementsFeedStateProvider>
+                                                                      <PrivateAssetsAuthorizationProvider>
+                                                                        <Resource3DPreviewProvider>
+                                                                          <AiRequestProvider>
+                                                                            {children(
+                                                                              {
+                                                                                i18n,
+                                                                              }
+                                                                            )}
+                                                                          </AiRequestProvider>
+                                                                        </Resource3DPreviewProvider>
+                                                                      </PrivateAssetsAuthorizationProvider>
+                                                                    </AnnouncementsFeedStateProvider>
+                                                                  </TutorialStateProvider>
+                                                                </ObjectStoreStateProvider>
                                                               </BehaviorStoreStateProvider>
                                                             </ExtensionStoreStateProvider>
                                                           </MarketingPlansStoreStateProvider>

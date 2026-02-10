@@ -255,7 +255,7 @@ function LeaderboardOptionsDialog({
             {!canDisableLoginInLeaderboard && (
               <GetSubscriptionCard
                 subscriptionDialogOpeningReason="Leaderboard customization"
-                recommendedPlanIdIfNoSubscription="gdevelop_startup"
+                recommendedPlanId="gdevelop_startup"
                 placementId="leaderboards-customization"
               >
                 <Line>

@@ -30,6 +30,7 @@ import { ExternalEditorOpenedDialog } from '../UI/ExternalEditorOpenedDialog';
 import Add from '../UI/CustomSvgIcons/Add';
 import Edit from '../UI/CustomSvgIcons/Edit';
 import Cross from '../UI/CustomSvgIcons/Cross';
+import CompactSoundPlayer from '../UI/SoundPlayer/CompactSoundPlayer';
 import useResourcesChangedWatcher from './UseResourcesChangedWatcher';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -505,6 +506,15 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
                 )}
               </LineStackLayout>
             </Column>
+            {props.resourceKind === 'audio' && resourceName && (
+              <CompactSoundPlayer
+                soundSrc={props.resourcesLoader.getResourceFullUrl(
+                  props.project,
+                  resourceName,
+                  {}
+                )}
+              />
+            )}
             <RaisedButton
               label={
                 resourceName ? (

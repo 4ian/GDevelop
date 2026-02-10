@@ -33,7 +33,8 @@ type RouteKey =
   | 'recommended-plan-id'
   | 'playable-game-id'
   | 'purchase-id'
-  | 'claimable-token';
+  | 'claimable-token'
+  | 'coupon-code';
 export type RouteArguments = { [RouteKey]: string };
 
 export type Router = {|

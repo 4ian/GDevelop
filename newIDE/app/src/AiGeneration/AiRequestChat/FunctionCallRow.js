@@ -25,6 +25,8 @@ import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 import Paper from '../../UI/Paper';
 import { Line, Column } from '../../UI/Grid';
+import { SafeExtractor } from '../../Utils/SafeExtractor';
+import CircledAdd from '../../UI/CustomSvgIcons/CircledAdd';
 
 const styles = {
   functionCallText: {
@@ -89,6 +91,26 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
     !!editorFunctionCallResult &&
     editorFunctionCallResult.status === 'working';
 
+  // Get the output from either the existing function call output or the current result
+  const editorFunctionCallResultOutput = existingParsedOutput
+    ? existingParsedOutput
+    : editorFunctionCallResult && editorFunctionCallResult.status === 'finished'
+    ? editorFunctionCallResult.output
+    : null;
+
+  const newlyAddedResources = SafeExtractor.extractArrayProperty(
+    editorFunctionCallResultOutput,
+    'newlyAddedResources'
+  );
+  const newlyAddedResourcesNames = newlyAddedResources
+    ? newlyAddedResources.map(addedResource => {
+        return SafeExtractor.extractStringProperty(
+          addedResource,
+          'resourceName'
+        );
+      })
+    : null;
+
   const editorFunction: EditorFunction | EditorFunctionWithoutProject | null =
     editorFunctions[functionCall.name] ||
     editorFunctionsWithoutProject[functionCall.name] ||
@@ -109,6 +131,7 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
         args: JSON.parse(functionCall.arguments),
         editorCallbacks,
         shouldShowDetails: showDetails,
+        editorFunctionCallResultOutput,
       });
 
       text = result.text;
@@ -160,6 +183,18 @@ export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
           {text || <Trans>Working...</Trans>}
         </Text>
       </LineStackLayout>
+      {newlyAddedResourcesNames && newlyAddedResourcesNames.length > 0 && (
+        <div className={classes.addedResourcesContainer}>
+          <LineStackLayout noMargin alignItems="center">
+            <CircledAdd fontSize="small" />
+            <Text noMargin size="body-small" color="secondary">
+              <Trans>
+                Resources added: {newlyAddedResourcesNames.join(', ')}
+              </Trans>
+            </Text>
+          </LineStackLayout>
+        </div>
+      )}
       {hasDetailsToShow && (
         <div
           className={classes.detailsButtonContainer}

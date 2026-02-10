@@ -40,9 +40,10 @@ import {
 } from '../ProjectsStorage';
 import UnsavedChangesContext from './UnsavedChangesContext';
 import { type OpenedVersionStatus } from '../VersionHistory';
-import { type StorageProvider } from '../ProjectsStorage';
+import { type StorageProvider, type SaveAsLocation } from '../ProjectsStorage';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
+import { type ExpandedCloudProjectVersion } from '../Utils/GDevelopServices/Project';
 import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
 import {
   type NewProjectSetup,
@@ -59,6 +60,7 @@ import DrawerTopBar from '../UI/DrawerTopBar';
 import { type FloatingPaneState } from './PanesContainer';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
+import { type ToolbarButtonConfig } from './CustomToolbarButton';
 
 const styles = {
   container: {
@@ -100,10 +102,26 @@ export type EditorTabsPaneCommonProps = {|
   gamesPlatformFrameTools: GamesPlatformFrameTools,
   gameEditorMode: 'embedded-game' | 'instances-editor',
   setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
+  toolbarButtons: Array<ToolbarButtonConfig>,
+  projectPath: ?string,
 
   // Callbacks from MainFrame
   toggleProjectManager: () => void,
-  saveProject: () => Promise<void>,
+  saveProject: () => Promise<?FileMetadata>,
+  saveProjectAsWithStorageProvider: (
+    options: ?{|
+      requestedStorageProvider?: StorageProvider,
+      forcedSavedAsLocation?: SaveAsLocation,
+      createdProject?: gdProject,
+    |}
+  ) => Promise<?FileMetadata>,
+  onCheckoutVersion: (
+    version: ExpandedCloudProjectVersion,
+    options?: {| dontSaveCheckedOutVersionStatus?: boolean |}
+  ) => Promise<boolean>,
+  getOrLoadProjectVersion: (
+    versionId: string
+  ) => Promise<?ExpandedCloudProjectVersion>,
   openShareDialog: (tab?: ShareTab) => void,
   launchDebuggerAndPreview: () => void,
   launchNewPreview: (?{ numberOfWindows: number }) => Promise<void>,
@@ -294,6 +312,9 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     gamesPlatformFrameTools,
     toggleProjectManager,
     saveProject,
+    saveProjectAsWithStorageProvider,
+    onCheckoutVersion,
+    getOrLoadProjectVersion,
     openShareDialog,
     launchDebuggerAndPreview,
     launchNewPreview,
@@ -373,6 +394,8 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
     setGameEditorMode,
     onRestartInGameEditor,
     showRestartInGameEditorAfterErrorButton,
+    toolbarButtons,
+    projectPath,
   } = props;
 
   const toolbarRef = React.useRef<?ToolbarInterface>(null);
@@ -610,6 +633,8 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
         checkedOutVersionStatus={checkedOutVersionStatus}
         onQuitVersionHistory={onQuitVersionHistory}
         canQuitVersionHistory={!isSavingProject}
+        toolbarButtons={toolbarButtons}
+        projectPath={projectPath}
       />
       <SpecificDimensionsWindowSizeProvider
         innerWidth={paneWidth}
@@ -673,7 +698,10 @@ const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
                       showRestartInGameEditorAfterErrorButton,
                       resourceManagementProps,
                       onSave: saveProject,
+                      onSaveProjectAsWithStorageProvider: saveProjectAsWithStorageProvider,
                       canSave,
+                      onCheckoutVersion,
+                      getOrLoadProjectVersion,
                       onCreateEventsFunction,
                       openInstructionOrExpression,
                       onOpenCustomObjectEditor: onOpenCustomObjectEditor,

@@ -7,6 +7,7 @@
   "scripts": {
     "test": "karma start --browsers ChromeHeadless --single-run",
     "test:watch": "karma start --browsers ChromeHeadless",
+    "test:chromeHeadlessNoSandbox": "karma start --browsers ChromeHeadlessNoSandbox --single-run",
     "test-benchmark": "karma start --browsers ChromeHeadless --single-run --enableBenchmarks",
     "test-benchmark:watch": "karma start --browsers ChromeHeadless --enableBenchmarks",
     "test:firefox": "karma start --browsers Firefox --single-run",

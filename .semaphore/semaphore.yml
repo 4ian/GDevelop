@@ -3,7 +3,7 @@ name: Fast tests (not building GDevelop.js - can have false negatives)
 agent:
   machine:
     type: e1-standard-2
-    os_image: ubuntu2004
+    os_image: ubuntu2404
 auto_cancel:
   running:
     when: "true"

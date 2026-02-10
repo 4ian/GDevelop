@@ -64,9 +64,9 @@ const makeMarkdownCustomComponents = (
       props.children
     );
   },
-  // eslint-disable-next-line jsx-a11y/alt-text
   // $FlowFixMe[missing-local-annot]
-  img: ({ node, ...props }) => <img style={{ display: 'flex' }} {...props} />,
+  // $FlowFixMe[missing-local-annot]
+  img: ({ node, ...props }) => <img style={{ display: 'flex' }} {...props} />, // eslint-disable-line jsx-a11y/alt-text
   // $FlowFixMe[missing-local-annot]
   code: ({ node, ...props }) => (
     <code

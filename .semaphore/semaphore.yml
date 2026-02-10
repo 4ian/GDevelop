@@ -233,5 +233,5 @@ blocks:
               fi
             - cd GDJS
             - npm run build
-            - sudo apt-get install -y libegl1-mesa libgl1-mesa-dri libgbm1 xvfb
+            - sudo apt-get install -y libegl1 libgl1-mesa-dri libgbm1 xvfb
             - xvfb-run --auto-servernum npm run test:chromeHeadlessNoSandbox

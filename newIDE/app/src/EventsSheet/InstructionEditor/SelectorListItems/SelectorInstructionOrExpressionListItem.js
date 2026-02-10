@@ -2,12 +2,10 @@
 import * as React from 'react';
 import { ListItem } from '../../../UI/List';
 import ListIcon from '../../../UI/ListIcon';
-import HelpIcon from '../../../UI/HelpIcon';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { getInstructionListItemValue, getInstructionListItemKey } from './Keys';
 import { type SearchMatch } from '../../../UI/Search/UseSearchStructuredItem';
 import HighlightedText from '../../../UI/Search/HighlightedText';
-import { isDocumentationAbsoluteUrl } from '../../../Utils/HelpLink';
 
 type Props = {|
   id?: string,
@@ -42,9 +40,6 @@ export const renderInstructionOrExpressionListItem = ({
     return text;
   };
 
-  const helpPath = instructionOrExpressionMetadata.metadata.getHelpPath();
-  const hasCustomHelpUrl = helpPath && isDocumentationAbsoluteUrl(helpPath);
-
   return (
     <ListItem
       id={id}
@@ -53,14 +48,7 @@ export const renderInstructionOrExpressionListItem = ({
         selectedValue ===
         getInstructionListItemValue(instructionOrExpressionMetadata.type)
       }
-      primaryText={
-        <span style={{ display: 'flex', alignItems: 'center' }}>
-          {getRenderedText('displayedName')}
-          {hasCustomHelpUrl && (
-            <HelpIcon size="small" helpPagePath={helpPath} />
-          )}
-        </span>
-      }
+      primaryText={getRenderedText('displayedName')}
       secondaryText={getRenderedText('fullGroupName')}
       leftIcon={
         <ListIcon

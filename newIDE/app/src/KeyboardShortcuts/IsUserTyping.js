@@ -3,7 +3,8 @@
 /**
  * Checks if the user is currently typing text
  */
-const isUserTyping = (): boolean => {
+// $FlowFixMe[signature-verification-failure]
+const isUserTyping = () => {
   const activeElement = document.activeElement;
   if (!activeElement) return false;
   // Check if focused element is part of a text entry HTML element

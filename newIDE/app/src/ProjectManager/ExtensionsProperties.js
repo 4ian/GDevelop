@@ -10,7 +10,8 @@ type Props = {|
   project: gdProject,
 |};
 
-function ExtensionsProperties(props: Props): React.Node | null {
+// $FlowFixMe[signature-verification-failure]
+function ExtensionsProperties(props: Props) {
   const { project } = props;
   const allExtensions = project.getCurrentPlatform().getAllPlatformExtensions();
   const propertyList = [];

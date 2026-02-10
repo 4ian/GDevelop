@@ -8,7 +8,8 @@ import VariablesList from '../../VariablesList/VariablesList';
 import DragAndDropContextProvider from '../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList
@@ -30,7 +31,8 @@ export const Default = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const Compact = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Compact = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList
@@ -53,7 +55,8 @@ export const Compact = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const InstanceWithObjectVariables = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const InstanceWithObjectVariables = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList
@@ -77,7 +80,8 @@ export const InstanceWithObjectVariables = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const Locked = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Locked = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList
@@ -99,7 +103,8 @@ export const Locked = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const LockedCompact = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const LockedCompact = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList
@@ -122,7 +127,8 @@ export const LockedCompact = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const LockedInstanceWithObjectVariables = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const LockedInstanceWithObjectVariables = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList

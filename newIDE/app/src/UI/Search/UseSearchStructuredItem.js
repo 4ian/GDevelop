@@ -62,7 +62,8 @@ export const sharedFuseConfiguration = {
 /**
  * This helper allows creating the search query for a search within a simple array of strings.
  */
-export const getFuseSearchQueryForSimpleArray = (searchText: string): string => {
+// $FlowFixMe[signature-verification-failure]
+export const getFuseSearchQueryForSimpleArray = (searchText: string) => {
   const tokenisedSearchQuery = searchText.trim().split(' ');
   return `'${tokenisedSearchQuery.join(" '")}`;
 };
@@ -76,7 +77,8 @@ export const getFuseSearchQueryForSimpleArray = (searchText: string): string => 
 export const getFuseSearchQueryForMultipleKeys = (
   searchText: string,
   keys: Array<string>
-): { $or: Array<{ $or: Array<any> }> } => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   const tokenisedSearchQuery = searchText.trim().split(' ');
   const searchQuery: {
     // $FlowFixMe[value-as-type]
@@ -164,7 +166,9 @@ const getFirstExactMatchPosition = (
   };
 };
 
-export const nullifySingleCharacterMatches = <T>(result: SearchResult<T>): any => {
+// $FlowFixMe[signature-verification-failure]
+// $FlowFixMe[missing-local-annot]
+export const nullifySingleCharacterMatches = <T>(result: SearchResult<T>) => {
   const matchesWithAtLeastOneSignificantIndex = result.matches
     .map(match => {
       const newIndices = match.indices
@@ -196,7 +200,9 @@ export const augmentSearchResult = <T>(
   };
 };
 
-export const tuneMatches = <T>(result: SearchResult<T>, searchText: string): any =>
+// $FlowFixMe[signature-verification-failure]
+// $FlowFixMe[missing-local-annot]
+export const tuneMatches = <T>(result: SearchResult<T>, searchText: string) =>
   // $FlowFixMe[missing-type-arg]
   result.matches.map<SearchMatch>(match => ({
     key: match.key,
@@ -204,10 +210,8 @@ export const tuneMatches = <T>(result: SearchResult<T>, searchText: string): any
     indices: tuneMatchIndices(match, searchText),
   }));
 
-export const sortResultsUsingExactMatches = (orderedKeys: Array<string>): (<T>(
-  resultA: AugmentedSearchResult<T>,
-  resultB: AugmentedSearchResult<T>
-) => any) => {
+// $FlowFixMe[signature-verification-failure]
+export const sortResultsUsingExactMatches = (orderedKeys: string[]) => {
   return <T>(
     resultA: AugmentedSearchResult<T>,
     resultB: AugmentedSearchResult<T>
@@ -388,9 +392,7 @@ export const filterSearchResults = <SearchItem: SearchableItem>(
       return passTier && passChosenFilters;
     })
     .filter(({ item }) => {
-      // $FlowFixMe[incompatible-type]
       //$FlowFixMe[incompatible-type] Only categories are excluded.
-      // $FlowFixMe[incompatible-type]
       const category: ObjectCategory = item;
       return (isSearchTextEmpty && !chosenItemCategory) || !category.categoryId;
     });

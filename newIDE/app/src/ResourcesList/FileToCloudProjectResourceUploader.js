@@ -69,23 +69,25 @@ const getAcceptedMimeTypes = (resourceKind: ResourceKind): string[] => {
   return resourceKindToInputAcceptedMimes[resourceKind] || [];
 };
 
-export const getInputAcceptedMimesAndExtensions = (resourceKind: ResourceKind): string => {
+export const getInputAcceptedMimesAndExtensions = (
+  resourceKind: ResourceKind
+// $FlowFixMe[signature-verification-failure]
+) => {
   const acceptedExtensions = getAcceptedExtensions(resourceKind);
   const acceptedMimes = getAcceptedMimeTypes(resourceKind);
 
   return [...acceptedMimes, ...acceptedExtensions].join(',');
 };
 
-export const FileToCloudProjectResourceUploader = (
-  {
-    options,
-    fileMetadata,
-    getStorageProvider,
-    onChooseResources,
-    createNewResource,
-    automaticallyOpenInput
-  }: FileToCloudProjectResourceUploaderProps,
-): React.Node => {
+export const FileToCloudProjectResourceUploader = ({
+  options,
+  fileMetadata,
+  getStorageProvider,
+  onChooseResources,
+  createNewResource,
+  automaticallyOpenInput,
+// $FlowFixMe[signature-verification-failure]
+}: FileToCloudProjectResourceUploaderProps) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
   const hasAutomaticallyOpenedInput = React.useRef(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

@@ -72,16 +72,15 @@ type Props = {|
   onCloseAfterPurchaseDone?: () => void,
 |};
 
-const BundlePageHeader = (
-  {
-    bundle,
-    bundleListingData,
-    simulateAppStoreProduct,
-    i18n,
-    fastCheckout,
-    onCloseAfterPurchaseDone
-  }: Props,
-): React.Node => {
+const BundlePageHeader = ({
+  bundle,
+  bundleListingData,
+  simulateAppStoreProduct,
+  i18n,
+  fastCheckout,
+  onCloseAfterPurchaseDone,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
   );
@@ -412,7 +411,6 @@ const BundlePageHeader = (
                 justifyContent="flex-start"
                 noMargin={isMobile}
               >
-                {/* $FlowFixMe[incompatible-type] */}
                 <Text size="title" noMargin style={styles.title}>
                   {selectMessageByLocale(i18n, bundle.nameByLocale)}
                 </Text>

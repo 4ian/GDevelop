@@ -397,6 +397,5 @@ const SearchPanel = (
   );
 };
 
-export default React.forwardRef<Props, SearchPanelInterface>(SearchPanel) as component(
-  ...{ ...Props, +ref?: React.RefSetter<SearchPanelInterface> }
-);
+// $FlowFixMe[signature-verification-failure]
+export default React.forwardRef<Props, SearchPanelInterface>(SearchPanel);

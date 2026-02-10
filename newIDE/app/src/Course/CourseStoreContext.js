@@ -20,13 +20,15 @@ export const initialCourseStoreState: CourseChapterStoreState = {
   listedCourseChapters: null,
 };
 
-const CourseStoreContext: React.Context<CourseChapterStoreState> = React.createContext<CourseChapterStoreState>(
+// $FlowFixMe[signature-verification-failure]
+const CourseStoreContext = React.createContext<CourseChapterStoreState>(
   initialCourseStoreState
 );
 
 type Props = {| children: React.Node |};
 
-export const CourseStoreStateProvider = (props: Props): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+export const CourseStoreStateProvider = (props: Props) => {
   const [listedCourses, setListedCourses] = React.useState<
     CourseListingData[] | null
   >(null);

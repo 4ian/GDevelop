@@ -30,7 +30,8 @@ const isCyrillic = (text: string) =>
   /[БГДЖЗИЙЛПФЦЧШЩЫЭЮЯбвгджзийклмнптфцчшщыэюя]/.test(text);
 const cyrillicToLatinMapping = require('./CyrillicToLatin.json');
 
-export const cleanUpGameSlug = (gameSlug: string): string => {
+// $FlowFixMe[signature-verification-failure]
+export const cleanUpGameSlug = (gameSlug: string) => {
   let latinGameSlug = gameSlug;
   if (isCyrillic(gameSlug)) {
     latinGameSlug = gameSlug
@@ -138,7 +139,8 @@ export function PublicGameProperties({
   onGameUpdated,
   onUpdatingGame,
   canBePublishedOnGdGames,
-}: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: Props) {
   const [categoryInput, setCategoryInput] = React.useState('');
   const { profile } = React.useContext(AuthenticatedUserContext);
 
@@ -408,8 +410,6 @@ export function PublicGameProperties({
               }
               onChange={(event, values) => {
                 setCategories(
-                  // $FlowFixMe[constant-condition]
-                  // $FlowFixMe[missing-local-annot]
                   values ? values.map(category => category.value) : []
                 );
                 setCategoryInput('');

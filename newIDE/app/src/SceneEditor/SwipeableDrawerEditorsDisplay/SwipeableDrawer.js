@@ -125,7 +125,8 @@ function useAnimationOpeningState(openingState: DrawerOpeningState) {
   return null;
 }
 
-const SwipeableDrawer = (props: Props): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+const SwipeableDrawer = (props: Props) => {
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const { openingState, setOpeningState } = props;
   const height =

@@ -87,7 +87,8 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 
 const electron = optionalRequire('electron');
 
-export const getProjectManagerItemId = (identifier: string): string =>
+// $FlowFixMe[signature-verification-failure]
+export const getProjectManagerItemId = (identifier: string) =>
   `project-manager-tab-${identifier}`;
 
 const gameSettingsRootFolderId = getProjectManagerItemId('game-settings');
@@ -95,12 +96,16 @@ const gamePropertiesItemId = getProjectManagerItemId('game-properties');
 const gameDashboardItemId = 'manage';
 const globalVariablesItemId = getProjectManagerItemId('global-variables');
 const gameResourcesItemId = getProjectManagerItemId('game-resources');
-export const scenesRootFolderId: string = getProjectManagerItemId('scenes');
-export const extensionsRootFolderId: string = getProjectManagerItemId('extensions');
-export const externalEventsRootFolderId: string = getProjectManagerItemId(
+// $FlowFixMe[signature-verification-failure]
+export const scenesRootFolderId = getProjectManagerItemId('scenes');
+// $FlowFixMe[signature-verification-failure]
+export const extensionsRootFolderId = getProjectManagerItemId('extensions');
+// $FlowFixMe[signature-verification-failure]
+export const externalEventsRootFolderId = getProjectManagerItemId(
   'external-events'
 );
-export const externalLayoutsRootFolderId: string = getProjectManagerItemId(
+// $FlowFixMe[signature-verification-failure]
+export const externalLayoutsRootFolderId = getProjectManagerItemId(
   'external-layout'
 );
 
@@ -742,7 +747,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           onOpenEventsFunctionsExtension(name);
           return;
         }
-        // $FlowFixMe[incompatible-type]
         setOpenedExtensionShortHeader(extensionShortHeader);
         // $FlowFixMe[incompatible-type]
         setOpenedExtensionName(name);
@@ -1562,9 +1566,8 @@ const MemoizedProjectManager = React.memo<Props, ProjectManagerInterface>(
   arePropsEqual
 );
 
-const ProjectManagerWithErrorBoundary: component(
-  ...{ ...Props, +ref?: React.RefSetter<ProjectManagerInterface> }
-) = React.forwardRef<
+// $FlowFixMe[signature-verification-failure]
+const ProjectManagerWithErrorBoundary = React.forwardRef<
   Props,
   ProjectManagerInterface
 >((props, outerRef) => {

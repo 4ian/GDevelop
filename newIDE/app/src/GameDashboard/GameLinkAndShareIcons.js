@@ -35,7 +35,8 @@ type Props = {|
   display: 'column' | 'line',
 |};
 
-const GameLinkAndShareIcons = ({url, display}: Props): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+const GameLinkAndShareIcons = ({ url, display }: Props) => {
   const Layout = display === 'column' ? ColumnContainer : LineContainer;
   return (
     <Layout>

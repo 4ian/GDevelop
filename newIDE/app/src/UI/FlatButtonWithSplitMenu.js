@@ -50,7 +50,8 @@ const styles = {
  * A flat button based on Material-UI button, that has a menu displayed
  * when the dropdown arrow is clicked.
  */
-const FlatButtonWithSplitMenu = (props: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const FlatButtonWithSplitMenu = (props: Props) => {
   const {
     id,
     splitMenuButtonId,

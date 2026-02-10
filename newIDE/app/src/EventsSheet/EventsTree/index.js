@@ -83,7 +83,8 @@ const styles = {
   },
 };
 
-export const getIndentWidth = (windowSize: WindowSizeType): number =>
+// $FlowFixMe[signature-verification-failure]
+export const getIndentWidth = (windowSize: WindowSizeType) =>
   windowSize === 'small' ? smallIndentWidth : defaultIndentWidth;
 const getEventContainerStyle = (windowSize: WindowSizeType) =>
   windowSize === 'small'
@@ -386,9 +387,8 @@ const getNodeKey = ({ treeIndex }) => treeIndex;
  * Display a tree of event. Builtin on react-sortable-tree so that event
  * can be drag'n'dropped and events rows are virtualized.
  */
-const EventsTree: component(
-  ...{ ...EventsTreeProps, +ref?: React.RefSetter<EventsTreeInterface> }
-) = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
+// $FlowFixMe[signature-verification-failure]
+const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
   (props, ref) => {
     const forceUpdate = useForceUpdate();
 
@@ -542,7 +542,6 @@ const EventsTree: component(
           if (!_hoverTimerId.current && !node.expanded) {
             if (!isNodeTemporaryUnfolded) {
               _hoverTimerId.current = window.setTimeout(() => {
-                // $FlowFixMe[incompatible-type]
                 // $FlowFixMe[incompatible-type] - Per the condition above, we are confident that node.event is not null.
                 event.setFolded(false);
                 temporaryUnfoldedNodes.current.push(node);

@@ -24,7 +24,8 @@ type Props = {|
   onRemove: string => void,
 |};
 
-const TagChips = ({tags, tagsWithLabel, onRemove}: Props): null | React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+const TagChips = ({ tags, tagsWithLabel, onRemove }: Props) => {
   const [focusedTag, setFocusedTag] = React.useState<?string>(null);
   // $FlowFixMe[missing-empty-array-annot]
   const tagsRefs = React.useRef([]);

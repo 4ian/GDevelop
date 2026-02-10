@@ -36,21 +36,20 @@ export type CompactTextAreaFieldProps = {|
   maxLength?: number,
 |};
 
-export const CompactTextAreaField = (
-  {
-    label,
-    markdownDescription,
-    value,
-    onChange,
-    id,
-    disabled,
-    errored,
-    placeholder,
-    rows,
-    maxLength,
-    onSubmit
-  }: CompactTextAreaFieldProps,
-): React.Node => {
+export const CompactTextAreaField = ({
+  label,
+  markdownDescription,
+  value,
+  onChange,
+  id,
+  disabled,
+  errored,
+  placeholder,
+  rows,
+  maxLength,
+  onSubmit,
+// $FlowFixMe[signature-verification-failure]
+}: CompactTextAreaFieldProps) => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
 
   const title = !markdownDescription
@@ -89,7 +88,6 @@ export const CompactTextAreaField = (
                 },
               }}
             >
-              {/* $FlowFixMe[incompatible-type] */}
               <Text noMargin style={styles.label}>
                 {label}
               </Text>

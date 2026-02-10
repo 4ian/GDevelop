@@ -158,34 +158,32 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
   }
 );
 
+// $FlowFixMe[signature-verification-failure]
 export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
   function MainframeToolbar(props: MainFrameToolbarProps, ref) {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const [editorToolbar, setEditorToolbar] = React.useState<?React.Node>(null);
-    
-    React.useImperativeHandle(
-      // $FlowFixMe[incompatible-type]
-      ref,
-      () => ({
-        setEditorToolbar,
-      }),
-    );
-    
+
+    // $FlowFixMe[incompatible-type]
+    React.useImperativeHandle(ref, () => ({
+      setEditorToolbar,
+    }));
+
     const borderBottomColor = React.useMemo(
       () => {
         if (!props.checkedOutVersionStatus) return null;
         return getStatusColor(
           gdevelopTheme,
-          props.checkedOutVersionStatus.status,
+          props.checkedOutVersionStatus.status
         );
       },
-      [props.checkedOutVersionStatus, gdevelopTheme],
+      [props.checkedOutVersionStatus, gdevelopTheme]
     );
-    
+
     return (
       <Toolbar borderBottomColor={borderBottomColor} hidden={props.hidden}>
-        {props.showProjectButtons
-          ? <>
+        {props.showProjectButtons ? (
+          <>
             <LeftButtonsToolbarGroup
               onSave={props.onSave}
               canSave={props.canSave}
@@ -203,7 +201,9 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
                 onOpenDebugger={props.onOpenDebugger}
                 onNetworkPreview={props.onNetworkPreview}
                 onHotReloadPreview={props.onHotReloadPreview}
-                onLaunchPreviewWithDiagnosticReport={props.onLaunchPreviewWithDiagnosticReport}
+                onLaunchPreviewWithDiagnosticReport={
+                  props.onLaunchPreviewWithDiagnosticReport
+                }
                 setPreviewOverride={props.setPreviewOverride}
                 canDoNetworkPreview={props.canDoNetworkPreview}
                 isPreviewEnabled={props.isPreviewEnabled}
@@ -215,11 +215,9 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
               <Spacer />
             </ToolbarGroup>
           </>
-          : null}
+        ) : null}
         {editorToolbar || <ToolbarGroup />}
       </Toolbar>
     );
-  },
-) as component(
-  ...{ ...MainFrameToolbarProps, +ref?: React.RefSetter<ToolbarInterface> }
+  }
 );

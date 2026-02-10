@@ -579,31 +579,31 @@ export const PurchaseProductButtons = <
     | PrivateGameTemplateListingData
     | CourseListingData
     | BundleListingData
->(
-  {
-    productListingData,
-    selectedUsageType,
-    onUsageTypeChange,
-    simulateAppStoreProduct,
-    i18n,
-    isAlreadyReceived,
-    onClickBuy,
-    onClickBuyWithCredits,
-    customLabel,
-    fullWidth
-  }: {|
-    productListingData: T,
-    selectedUsageType: string,
-    onUsageTypeChange: (usageType: string) => void,
-    simulateAppStoreProduct?: boolean,
-    i18n: I18nType,
-    isAlreadyReceived: boolean,
-    onClickBuy: () => void | Promise<void>,
-    onClickBuyWithCredits?: () => void | Promise<void>,
-    customLabel?: React.Node,
-    fullWidth?: boolean,
-  |},
-): any => {
+>({
+  productListingData,
+  selectedUsageType,
+  onUsageTypeChange,
+  simulateAppStoreProduct,
+  i18n,
+  isAlreadyReceived,
+  onClickBuy,
+  onClickBuyWithCredits,
+  customLabel,
+  fullWidth,
+}: {|
+  productListingData: T,
+  selectedUsageType: string,
+  onUsageTypeChange: (usageType: string) => void,
+  simulateAppStoreProduct?: boolean,
+  i18n: I18nType,
+  isAlreadyReceived: boolean,
+  onClickBuy: () => void | Promise<void>,
+  onClickBuyWithCredits?: () => void | Promise<void>,
+  customLabel?: React.Node,
+  fullWidth?: boolean,
+// $FlowFixMe[signature-verification-failure]
+// $FlowFixMe[missing-local-annot]
+|}) => {
   const { authenticated } = React.useContext(AuthenticatedUserContext);
   const shouldUseOrSimulateAppStoreProduct =
     simulateAppStoreProduct || shouldUseAppStoreProduct();
@@ -697,17 +697,17 @@ export const PurchaseProductButtons = <
 
 export const OpenProductButton = <
   T: PrivateAssetPackListingData | PrivateGameTemplateListingData
->(
-  {
-    productListingData,
-    onClick,
-    label
-  }: {|
-    productListingData: T,
-    onClick: () => void,
-    label: React.Node,
-  |},
-): any => {
+>({
+  productListingData,
+  onClick,
+  label,
+}: {|
+  productListingData: T,
+  onClick: () => void,
+  label: React.Node,
+// $FlowFixMe[signature-verification-failure]
+// $FlowFixMe[missing-local-annot]
+|}) => {
   if (
     productListingData.productType === 'GAME_TEMPLATE' &&
     productListingData.includedListableProductIds

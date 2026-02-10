@@ -15,8 +15,9 @@ export default class WindowMask {
   project: gdProject;
   instancesEditorSettings: InstancesEditorSettings;
   viewPosition: ViewPosition;
+  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  pixiRectangle = new PIXI.Graphics() as any;
+  pixiRectangle = new PIXI.Graphics();
   windowRectangle: Rectangle = new Rectangle();
 
   constructor({ project, viewPosition, instancesEditorSettings }: Props) {
@@ -31,7 +32,9 @@ export default class WindowMask {
     this.instancesEditorSettings = instancesEditorSettings;
   }
 
-  getPixiObject(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getPixiObject() {
     return this.pixiRectangle;
   }
 

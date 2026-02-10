@@ -6,17 +6,16 @@ import RaisedButton from '../UI/RaisedButton';
 import { serializeToJSObject } from '../Utils/Serializer';
 import useForceUpdate from '../Utils/UseForceUpdate';
 
-const SerializedObjectDisplay = (
-  {
-    children,
-    object,
-    methodName
-  }: {
-    children: React.Node,
-    object: any,
-    methodName?: string,
-  },
-): React.MixedElement => {
+const SerializedObjectDisplay = ({
+  children,
+  object,
+  methodName,
+}: {
+  children: React.Node,
+  object: any,
+  methodName?: string,
+// $FlowFixMe[signature-verification-failure]
+}) => {
   const forceUpdate = useForceUpdate();
 
   return (

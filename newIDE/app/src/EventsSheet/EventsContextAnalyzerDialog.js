@@ -58,7 +58,9 @@ export default class EventsContextAnalyzerDialog extends React.Component<
   Props,
   {}
 > {
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const { onClose, eventsContextResult } = this.props;
     const actions = [
       <FlatButton
@@ -72,7 +74,6 @@ export default class EventsContextAnalyzerDialog extends React.Component<
     return (
       <Dialog
         title={<Trans>Events analysis</Trans>}
-        // $FlowFixMe[incompatible-type]
         actions={actions}
         open
         onRequestClose={onClose}

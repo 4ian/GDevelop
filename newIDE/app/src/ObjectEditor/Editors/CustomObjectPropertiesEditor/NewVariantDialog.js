@@ -15,7 +15,13 @@ type Props = {|
   isDuplicationBeforeEdition?: boolean,
 |};
 
-const NewVariantDialog = ({initialName, onApply, onCancel, isDuplicationBeforeEdition}: Props): React.Node => {
+const NewVariantDialog = ({
+  initialName,
+  onApply,
+  onCancel,
+  isDuplicationBeforeEdition,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const [variantName, setVariantName] = React.useState<string>(initialName);
 
   const apply = React.useCallback(

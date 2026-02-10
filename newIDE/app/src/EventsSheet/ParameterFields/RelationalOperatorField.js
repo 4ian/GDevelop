@@ -39,71 +39,67 @@ const defaultOperators: { [string]: string } = {
   color: '=',
 };
 
+// $FlowFixMe[signature-verification-failure]
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function RelationalOperatorField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SelectFieldInterface>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(
-      ref,
-      () => ({
-        focus,
-      }),
-    );
-    
-    const {parameterMetadata} = props;
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
+
+    const { parameterMetadata } = props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
-    
+
     const comparedValueType = parameterMetadata
       ? parameterMetadata.getExtraInfo()
       : 'unknown';
-    const operators = mapTypeToOperators[comparedValueType] ||
-      mapTypeToOperators.unknown;
-    
+    const operators =
+      mapTypeToOperators[comparedValueType] || mapTypeToOperators.unknown;
+
     if (!props.value) {
       const defaultOperator = defaultOperators[comparedValueType];
       if (defaultOperator) {
         props.onChange(defaultOperator);
       }
     }
-    
+
     return (
       <SelectField
         margin={props.isInline ? 'none' : 'dense'}
         fullWidth
         floatingLabelText={description}
-        helperMarkdownText={parameterMetadata
-          ? parameterMetadata.getLongDescription()
-          : undefined}
+        helperMarkdownText={
+          parameterMetadata ? parameterMetadata.getLongDescription() : undefined
+        }
         value={props.value}
         onChange={(e, i, value: string) => props.onChange(value)}
         ref={field}
-        translatableHintText={t`Choose an operator`}>
-        {operators.map(
-          operator => <SelectOption
+        translatableHintText={t`Choose an operator`}
+      >
+        {operators.map(operator => (
+          <SelectOption
             key={operator}
             value={operator}
             // $FlowFixMe[invalid-computed-prop]
             label={operatorLabels[operator]}
-          />,
-        )}
+          />
+        ))}
       </SelectField>
     );
-  },
-) as component(
-  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
+  }
 );
 
-export const renderInlineRelationalOperator = (
-  {
-    value,
-    InvalidParameterValue,
-    parameterMetadata
-  }: ParameterInlineRendererProps,
-): "<" | "=" | ">" | string | React.MixedElement | React.Node => {
+export const renderInlineRelationalOperator = ({
+  value,
+  InvalidParameterValue,
+  parameterMetadata,
+// $FlowFixMe[signature-verification-failure]
+}: ParameterInlineRendererProps) => {
   const comparedValueType = parameterMetadata
     ? parameterMetadata.getExtraInfo()
     : 'unknown';

@@ -9,7 +9,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Info = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Info = () => (
   <TextBasedCourseChapterCalloutBlock
     kind="info"
     text={`**Notice**

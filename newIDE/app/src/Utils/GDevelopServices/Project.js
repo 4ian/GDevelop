@@ -22,16 +22,16 @@ export const CLOUD_PROJECT_NAME_MAX_LENGTH = 60;
 export const CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH = 50;
 export const PROJECT_RESOURCE_MAX_SIZE_IN_BYTES = 15 * 1000 * 1000;
 
-// $FlowFixMe[cannot-resolve-name]
-export const projectResourcesClient: Axios = axios.create({
+// $FlowFixMe[signature-verification-failure]
+export const projectResourcesClient = axios.create({
   baseURL: GDevelopProjectResourcesStorage.baseUrl,
   // On web/desktop, "credentials" are necessary to use the cookie previously
   // returned by the server.
   withCredentials: !isNativeMobileApp(),
 });
 
-// $FlowFixMe[cannot-resolve-name]
-export const apiClient: Axios = axios.create({
+// $FlowFixMe[signature-verification-failure]
+export const apiClient = axios.create({
   baseURL: GDevelopProjectApi.baseUrl,
 });
 
@@ -58,7 +58,8 @@ export const cleanGDevelopResourceJwtToken = () => {
   gdResourceJwt = null;
 };
 
-export const addGDevelopResourceJwtTokenToUrl = (url: string): string => {
+// $FlowFixMe[signature-verification-failure]
+export const addGDevelopResourceJwtTokenToUrl = (url: string) => {
   if (!gdResourceJwt) return url;
 
   const separator = url.indexOf('?') === -1 ? '?' : '&';
@@ -148,7 +149,6 @@ export type ProjectUserAclRequest = {|
 |};
 
 export const isCloudProjectVersionSane = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
   versionId: string
@@ -157,6 +157,7 @@ export const isCloudProjectVersionSane = async (
     authenticatedUser,
     cloudProjectId,
     () =>
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       projectResourcesClient.get(
         addGDevelopResourceJwtTokenToUrl(
           `/${cloudProjectId}/versions/${versionId}.zip`
@@ -174,7 +175,6 @@ export const isCloudProjectVersionSane = async (
 };
 
 const refetchCredentialsForProjectAndRetryIfUnauthorized = async <T>(
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
   apiCall: () => Promise<T>
@@ -209,7 +209,6 @@ const getVersionIdFromPath = (path: string): string => {
 };
 
 export const getLastVersionsOfProject = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
 ): Promise<?Array<ExpandedCloudProjectVersion>> => {
@@ -218,6 +217,7 @@ export const getLastVersionsOfProject = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.get(`/project/${cloudProjectId}/version`, {
     headers: {
       Authorization: authorizationHeader,
@@ -231,7 +231,6 @@ export const getLastVersionsOfProject = async (
 };
 
 export const getCredentialsForCloudProject = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
 ): Promise<boolean> => {
@@ -274,7 +273,8 @@ export const clearCloudProjectCredentials = async (): Promise<void> => {
 export const getCloudProjectFileMetadataIdentifier = (
   storageProviderInternalName: string,
   fileMetadata: ?FileMetadata
-): null | string => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   if (
     !fileMetadata ||
     !(storageProviderInternalName === CloudStorageProvider.internalName)
@@ -293,7 +293,6 @@ export const getCloudProjectFileMetadataIdentifier = (
 };
 
 export const createCloudProject = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   cloudProjectCreationPayload: {| name: string, gameId: string |}
 ): Promise<?CloudProject> => {
@@ -310,6 +309,7 @@ export const createCloudProject = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.post('/project', cleanedAttributes, {
     headers: { Authorization: authorizationHeader },
     params: { userId },
@@ -336,7 +336,6 @@ export const commitVersion = async ({
   previousVersion,
   restoredFromVersionId,
 }: {
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
   presignedUrl: string,
@@ -356,6 +355,7 @@ export const commitVersion = async ({
     authenticatedUser,
     cloudProjectId,
     () =>
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       projectResourcesClient.post(
         addGDevelopResourceJwtTokenToUrl(presignedUrl),
         zippedProject,
@@ -378,6 +378,7 @@ export const commitVersion = async ({
   // Inform backend a new version has been uploaded.
   try {
     // Backend only returns "OK".
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     await apiClient.post(`/project/${cloudProjectId}/action/commit`, body, {
       headers: {
         Authorization: authorizationHeader,
@@ -392,7 +393,6 @@ export const commitVersion = async ({
 };
 
 export const uploadProjectResourceFiles = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
   resourceFiles: File[],
@@ -418,6 +418,7 @@ export const uploadProjectResourceFiles = async (
           authenticatedUser,
           cloudProjectId,
           () =>
+            // $FlowFixMe[underconstrained-implicit-instantiation]
             projectResourcesClient.post(
               addGDevelopResourceJwtTokenToUrl(presignedUrl),
               resourceFile,
@@ -454,6 +455,7 @@ export const listUserCloudProjects = async (
   userId: string
 ): Promise<Array<CloudProjectWithUserAccessInfo>> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.get('project', {
     headers: { Authorization: authorizationHeader },
     params: { userId },
@@ -470,6 +472,7 @@ export const listOtherUserCloudProjects = async (
   otherUserId: string
 ): Promise<Array<CloudProjectWithUserAccessInfo>> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.get(`user/${otherUserId}/project`, {
     headers: { Authorization: authorizationHeader },
     params: { userId },
@@ -481,7 +484,6 @@ export const listOtherUserCloudProjects = async (
 };
 
 export const getCloudProject = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
 ): Promise<?CloudProjectWithUserAccessInfo> => {
@@ -490,6 +492,7 @@ export const getCloudProject = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.get(`/project/${cloudProjectId}`, {
     headers: {
       Authorization: authorizationHeader,
@@ -504,7 +507,6 @@ export const getCloudProject = async (
 };
 
 export const getOtherUserCloudProject = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
   otherUserId: string
@@ -514,6 +516,7 @@ export const getOtherUserCloudProject = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.get(
     `/user/${otherUserId}/project/${cloudProjectId}`,
     {
@@ -531,7 +534,6 @@ export const getOtherUserCloudProject = async (
 };
 
 export const updateCloudProject = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
   attributes: {| name?: string, gameId?: string |}
@@ -548,6 +550,7 @@ export const updateCloudProject = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.patch(
     `/project/${cloudProjectId}`,
     cleanedAttributes,
@@ -566,7 +569,6 @@ export const updateCloudProject = async (
 };
 
 export const deleteCloudProject = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
 ): Promise<?CloudProject> => {
@@ -575,6 +577,7 @@ export const deleteCloudProject = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.delete(`/project/${cloudProjectId}`, {
     headers: {
       Authorization: authorizationHeader,
@@ -589,7 +592,6 @@ export const deleteCloudProject = async (
 };
 
 export const getPresignedUrlForVersionUpload = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
 ): Promise<?string> => {
@@ -598,6 +600,7 @@ export const getPresignedUrlForVersionUpload = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.post(
     `/project/${cloudProjectId}/action/create-presigned-urls`,
     { resources: ['newProjectVersion'] },
@@ -613,7 +616,6 @@ export const getPresignedUrlForVersionUpload = async (
 };
 
 const getPresignedUrlForResourcesUpload = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
   resourceFiles: File[]
@@ -635,6 +637,7 @@ const getPresignedUrlForResourcesUpload = async (
     }))
   );
 
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.post(
     `/project/${cloudProjectId}/action/create-presigned-urls`,
     {
@@ -668,6 +671,7 @@ export const getProjectFileAsZipBlob = async (
     throw new Error('Opening of project without current version not handled');
   }
 
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await projectResourcesClient.get(
     addGDevelopResourceJwtTokenToUrl(
       `/${cloudProject.id}/versions/${versionId ||
@@ -718,7 +722,6 @@ export const extractProjectUuidFromProjectResourceUrl = (
 };
 
 export const createProjectUserAcl = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   { projectId, email, feature, level }: ProjectUserAclRequest
 ): Promise<?ProjectUserAclWithEmail> => {
@@ -727,6 +730,7 @@ export const createProjectUserAcl = async (
 
   const { uid: currentUserId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.post(
     `/project-user-acl`,
     { userId: currentUserId, projectId, feature, level, email },
@@ -745,7 +749,6 @@ export const createProjectUserAcl = async (
 };
 
 export const deleteProjectUserAcl = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   { projectId, userId, feature }: ProjectUserAcl
 ): Promise<void> => {
@@ -754,6 +757,7 @@ export const deleteProjectUserAcl = async (
 
   const { uid: currentUserId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.delete(`/project-user-acl`, {
     headers: {
       Authorization: authorizationHeader,
@@ -765,7 +769,6 @@ export const deleteProjectUserAcl = async (
 };
 
 export const listProjectUserAcls = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   { projectId }: {| projectId: string |}
 ): Promise<Array<ProjectUserAclWithEmail>> => {
@@ -774,6 +777,7 @@ export const listProjectUserAcls = async (
 
   const { uid: currentUserId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.get(`/project-user-acl`, {
     headers: {
       Authorization: authorizationHeader,
@@ -787,7 +791,6 @@ export const listProjectUserAcls = async (
 };
 
 export const updateCloudProjectVersion = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
   versionId: string,
@@ -806,6 +809,7 @@ export const updateCloudProjectVersion = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.patch(
     `/project/${cloudProjectId}/version/${versionId}`,
     cleanedAttributes,
@@ -843,6 +847,7 @@ export const listVersionsOfProject = async (
   const uri = options.forceUri || `/project/${cloudProjectId}/version`;
 
   // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.get(uri, {
     headers: {
       Authorization: authorizationHeader,
@@ -851,6 +856,7 @@ export const listVersionsOfProject = async (
       ? { userId }
       : { userId, goal: 'history', perPage: 15 },
   });
+  // $FlowFixMe[incompatible-use]
   const nextPageUri = response.headers.link
     ? extractNextPageUriFromLinkHeader(response.headers.link)
     : null;
@@ -872,6 +878,7 @@ export const getCloudProjectVersion = async (
   }: {| userId: string, cloudProjectId: string, versionId: string |}
 ): Promise<?ExpandedCloudProjectVersion> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await apiClient.get(
     `/project/${cloudProjectId}/version/${versionId}`,
     {

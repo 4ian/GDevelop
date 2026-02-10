@@ -17,7 +17,8 @@ type PropsType = {
 /**
  * The button that can be used in any dialog to open a help page
  */
-const HelpButton = (props: PropsType): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const HelpButton = (props: PropsType) => {
   const { isMobile } = useResponsiveWindowSize();
   if (!props.helpPagePath) return null;
   const helpLink = getHelpLink(props.helpPagePath, props.anchor);

@@ -71,11 +71,13 @@ const app = remote ? remote.app : null;
 export const getItemsColumns = (
   windowSize: WindowSizeType,
   isLandscape: boolean
-): number => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   return windowSize === 'small' && !isLandscape ? 2 : 4;
 };
 
-export const generateProjectName = (nameToAppend: ?string): string =>
+// $FlowFixMe[signature-verification-failure]
+export const generateProjectName = (nameToAppend: ?string) =>
   (nameToAppend ? `${generateName()} (${nameToAppend})` : generateName()).slice(
     0,
     CLOUD_PROJECT_NAME_MAX_LENGTH
@@ -615,7 +617,6 @@ const NewProjectSetupDialog = ({
           title={<Trans>Create a new game</Trans>}
           id="project-pre-creation-dialog"
           maxWidth="md"
-          // $FlowFixMe[incompatible-type]
           actions={[
             <FlatButton
               disabled={isLoading}

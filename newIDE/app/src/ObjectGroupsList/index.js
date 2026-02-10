@@ -567,7 +567,6 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
             children:
               globalObjectGroupsList.length > 0
                 ? globalObjectGroupsList
-                // $FlowFixMe[incompatible-type]
                 : // $FlowFixMe[incompatible-type]
                   [getGlobalGroupsEmptyPlaceholder(i18n)],
             isRoot: true,
@@ -578,7 +577,6 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
             children:
               objectGroupsList.length > 0
                 ? objectGroupsList
-                // $FlowFixMe[incompatible-type]
                 : // $FlowFixMe[incompatible-type]
                   [getSceneGroupsEmptyPlaceholder(i18n)],
             isRoot: true,
@@ -727,9 +725,8 @@ const MemoizedObjectGroupsList = React.memo<Props, ObjectGroupsListInterface>(
   arePropsEqual
 );
 
-const ObjectGroupsListWithErrorBoundary: component(
-  ...{ ...Props, +ref?: React.RefSetter<ObjectGroupsListInterface> }
-) = React.forwardRef<
+// $FlowFixMe[signature-verification-failure]
+const ObjectGroupsListWithErrorBoundary = React.forwardRef<
   Props,
   ObjectGroupsListInterface
 >((props, ref) => (

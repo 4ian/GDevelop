@@ -9,7 +9,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <TextBasedCourseChapterCodeBlock
     language="javascript"
     code={`// Example GDevelop JavaScript code
@@ -20,7 +21,8 @@ if (player.getX() < 100) {
   />
 );
 
-export const LongCode = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const LongCode = () => (
   <TextBasedCourseChapterCodeBlock
     language="javascript"
     code={`// Longer example to test scrolling and layout
@@ -33,7 +35,8 @@ for (let i = 0; i < 10; i++) {
   />
 );
 
-export const NonHighlightedCode = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const NonHighlightedCode = () => (
   <TextBasedCourseChapterCodeBlock
     language="python"
     code={`# Example Python code (no JS highlighting)

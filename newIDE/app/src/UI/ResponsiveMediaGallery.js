@@ -78,7 +78,12 @@ type Props = {|
   horizontalOuterMarginToEatOnMobile?: number,
 |};
 
-const ResponsiveMediaGallery = ({mediaItems, altTextTemplate, horizontalOuterMarginToEatOnMobile}: Props): React.Node | React.MixedElement => {
+const ResponsiveMediaGallery = ({
+  mediaItems,
+  altTextTemplate,
+  horizontalOuterMarginToEatOnMobile,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const [selectedMediaIndex, setSelectedMediaIndex] = React.useState<number>(0);
   const { isMobile } = useResponsiveWindowSize();
 
@@ -214,7 +219,6 @@ const ResponsiveMediaGallery = ({mediaItems, altTextTemplate, horizontalOuterMar
           )}
         </Measure>
         <Line justifyContent="center">
-          {/* $FlowFixMe[incompatible-type] */}
           <Text noMargin size="body2" style={styles.disabledText}>
             {currentlyViewedImageIndex + 1}/{mediaItems.length}
           </Text>

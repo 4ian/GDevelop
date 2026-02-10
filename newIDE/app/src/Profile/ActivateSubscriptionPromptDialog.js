@@ -17,7 +17,12 @@ type Props = {|
   onClose: () => void,
 |};
 
-const ActivateSubscriptionPromptDialog = ({bundleListingData, onActivateNow, onClose}: Props): React.Node => {
+const ActivateSubscriptionPromptDialog = ({
+  bundleListingData,
+  onActivateNow,
+  onClose,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   // Get the subscription plan info from the first redemption code
   const planId =
     bundleListingData.includedRedemptionCodes &&

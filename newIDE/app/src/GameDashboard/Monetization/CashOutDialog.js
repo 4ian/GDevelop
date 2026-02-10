@@ -25,7 +25,13 @@ type Props = {|
   type: 'credits' | 'cash',
 |};
 
-const CashOutDialog = ({onClose, userEarningsBalance, onSuccess, type}: Props): React.Node => {
+const CashOutDialog = ({
+  onClose,
+  userEarningsBalance,
+  onSuccess,
+  type,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const [isCashingOut, setIsCashingOut] = React.useState(false);
   const [isCashOutSuccesfull, setIsCashOutSuccessful] = React.useState(false);
   const { showAlert } = useAlertDialog();

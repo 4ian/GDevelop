@@ -242,22 +242,20 @@ const getDefaultOrValidBuildSigningOptionsFor = (
 
 type Props = {
   targets: Array<TargetName>,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   buildSigningOptions: BuildSigningOptions | null,
   onSelectBuildSigningOptions: (BuildSigningOptions | null) => void,
   disabled?: boolean,
 };
 
-export const IosSigningCredentialsSelector = (
-  {
-    targets,
-    authenticatedUser,
-    buildSigningOptions,
-    onSelectBuildSigningOptions,
-    disabled
-  }: Props,
-): React.Node => {
+export const IosSigningCredentialsSelector = ({
+  targets,
+  authenticatedUser,
+  buildSigningOptions,
+  onSelectBuildSigningOptions,
+  disabled,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const {
     signingCredentials,
     error,
@@ -362,7 +360,6 @@ export const IosSigningCredentialsSelector = (
         {appleCertificateSigningCredentials &&
         appleCertificateSigningCredentials.length > 0 ? (
           <FlatButton
-            // $FlowFixMe[incompatible-type]
             style={styles.button}
             label={<Trans>Add or edit</Trans>}
             onClick={() => setIsSigningCredentialsDialogOpen(true)}
@@ -371,7 +368,6 @@ export const IosSigningCredentialsSelector = (
         ) : (
           <RaisedButton
             primary
-            // $FlowFixMe[incompatible-type]
             style={styles.raisedButton}
             label={<Trans>Add new</Trans>}
             onClick={() => setIsSigningCredentialsDialogOpen(true)}

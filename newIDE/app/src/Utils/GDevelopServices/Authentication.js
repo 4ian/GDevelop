@@ -323,7 +323,9 @@ export default class Authentication {
   changeEmail = async (
     getAuthorizationHeader: () => Promise<string>,
     form: ChangeEmailForm
-  ): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  ) => {
     const { currentUser } = this.auth;
     if (!currentUser)
       throw new Error('Tried to change email while not authenticated.');
@@ -503,7 +505,9 @@ export default class Authentication {
   acceptGameStatsEmail = async (
     getAuthorizationHeader: () => Promise<string>,
     value: boolean
-  ): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  ) => {
     const { currentUser } = this.auth;
     if (!currentUser)
       throw new Error(

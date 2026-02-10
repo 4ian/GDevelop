@@ -14,7 +14,8 @@ type Props = {|
   noMargin?: boolean,
 |};
 
-export const AddListItem = (props: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const AddListItem = (props: Props) => {
   return (
     <Column expand noMargin={props.noMargin}>
       <Line>

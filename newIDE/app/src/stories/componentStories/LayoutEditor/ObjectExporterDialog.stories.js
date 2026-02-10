@@ -13,7 +13,8 @@ export default {
   component: ObjectExporterDialog,
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <ObjectExporterDialog
     project={testProject.project}
     layout={testProject.testLayout}

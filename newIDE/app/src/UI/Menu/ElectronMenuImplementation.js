@@ -15,7 +15,9 @@ export default class ElectronMenuImplementation
   menuTemplate: Array<MenuItemTemplate>;
   menu: any; // TODO: Is it necessary to store the menu in a class variable?
 
-  buildFromTemplate(template: Array<MenuItemTemplate>): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  buildFromTemplate(template: Array<MenuItemTemplate>) {
     this.menuTemplate = template;
     return undefined;
   }
@@ -39,7 +41,9 @@ export default class ElectronMenuImplementation
     });
   }
 
-  getMenuProps(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getMenuProps() {
     return {
       open: false,
     };

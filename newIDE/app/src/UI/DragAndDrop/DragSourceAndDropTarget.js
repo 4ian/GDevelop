@@ -128,8 +128,8 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
     sourceSpec,
     sourceCollect
   )(
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-variance]
+    // $FlowFixMe[incompatible-type]
     DropTarget(reactDndType, targetSpec, targetCollect)(
       // $FlowFixMe[missing-local-annot]
       ({

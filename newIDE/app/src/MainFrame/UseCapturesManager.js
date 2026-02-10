@@ -15,25 +15,14 @@ import PreferencesContext from './Preferences/PreferencesContext';
 
 export const TIME_BETWEEN_PREVIEW_SCREENSHOTS = 1000 * 60 * 3; // 3 minutes
 
-const useCapturesManager = (
-  {
-    project,
-    gamesList
-  }: {
-    project: ?gdProject,
-    gamesList: GamesList,
-  },
-): {
-  createCaptureOptionsForPreview: (
-    launchCaptureOptions: ?LaunchCaptureOptions
-  ) => Promise<CaptureOptions>,
-  getGameUnverifiedScreenshotUrls: (gameId: string) => Array<string>,
-  getHotReloadPreviewLaunchCaptureOptions: (
-    gameId: string
-  ) => LaunchCaptureOptions | void,
-  onCaptureFinished: (captureOptions: CaptureOptions) => Promise<void>,
-  onGameScreenshotsClaimed: () => void,
-} => {
+const useCapturesManager = ({
+  project,
+  gamesList,
+}: {
+  project: ?gdProject,
+  gamesList: GamesList,
+// $FlowFixMe[signature-verification-failure]
+}) => {
   const [
     unverifiedGameScreenshots,
     setUnverifiedGameScreenshots,

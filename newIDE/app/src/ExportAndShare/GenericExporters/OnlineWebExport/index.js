@@ -18,7 +18,8 @@ type ExplanationHeaderProps = {|
   uiMode: 'minimal' | 'full',
 |};
 
-const ExplanationHeader = ({uiMode}: ExplanationHeaderProps): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const ExplanationHeader = ({ uiMode }: ExplanationHeaderProps) => {
   if (uiMode === 'minimal') return null;
 
   return (
@@ -41,7 +42,8 @@ const ExplanationHeader = ({uiMode}: ExplanationHeaderProps): React.Node => {
 const onlineWebExporter = {
   key: 'onlinewebexport',
   tabName: 'Web',
-  name: <Trans>gd.games</Trans> as React.Node,
+  // $FlowFixMe[signature-verification-failure]
+  name: <Trans>gd.games</Trans>,
   helpPage: '/publishing/web',
 };
 

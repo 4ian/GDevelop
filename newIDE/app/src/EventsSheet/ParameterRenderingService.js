@@ -205,7 +205,8 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
 
 const ParameterRenderingService = {
   components,
-  getParameterComponent: (rawType: string): any => {
+  // $FlowFixMe[signature-verification-failure]
+  getParameterComponent: (rawType: string) => {
     const fieldType = gd.ParameterMetadata.isObject(rawType)
       ? 'object'
       : rawType;

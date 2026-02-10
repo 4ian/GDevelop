@@ -27,7 +27,9 @@ type TableProps = {|
  * See https://material-ui.com/components/tables/
  */
 export class Table extends React.Component<TableProps, {||}> {
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     return <MUITable size="small" {...this.props} />;
   }
 }
@@ -40,7 +42,9 @@ type TableBodyProps = {|
  * A TableBody based on Material-UI TableBody.
  */
 export class TableBody extends React.Component<TableBodyProps, {||}> {
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     return <MUITableBody {...this.props} />;
   }
 }
@@ -53,7 +57,9 @@ type TableHeaderProps = {|
  * A TableHeader based on Material-UI TableHead.
  */
 export class TableHeader extends React.Component<TableHeaderProps, {||}> {
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     return <MUITableHead {...this.props} />;
   }
 }
@@ -70,7 +76,9 @@ export class TableHeaderColumn extends React.Component<
   TableHeaderColumnProps,
   {||}
 > {
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     return <MUITableCell {...this.props} />;
   }
 }
@@ -89,7 +97,9 @@ type TableRowProps = {|
  * A TableRow based on Material-UI TableRow.
  */
 export class TableRow extends React.Component<TableRowProps, {||}> {
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     return <MUITableRow {...this.props} />;
   }
 }
@@ -103,7 +113,9 @@ type TableRowColumnProps = {|
  * A TableRowColumn based on Material-UI TableRowColumn.
  */
 export class TableRowColumn extends React.Component<TableRowColumnProps, {||}> {
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     return <MUITableCell {...this.props} />;
   }
 }

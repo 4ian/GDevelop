@@ -62,32 +62,29 @@ const useStylesForAnswer = (isSelected?: boolean) =>
     })
   )();
 
-export const TitleAndSubtitle = (
-  {
-    i18n,
-    text,
-    multi,
-    answers,
-    textAlign
-  }: {
-    i18n: I18nType,
-    text: MessageDescriptor,
-    multi: ?boolean,
-    answers: Array<AnswerData>,
-    textAlign: 'center' | 'left',
-  },
-): React.Node => (
+export const TitleAndSubtitle = ({
+  i18n,
+  text,
+  multi,
+  answers,
+  textAlign,
+}: {
+  i18n: I18nType,
+  text: MessageDescriptor,
+  multi: ?boolean,
+  answers: AnswerData[],
+  textAlign: 'center' | 'left',
+// $FlowFixMe[signature-verification-failure]
+}) => (
   <ColumnStackLayout noMargin>
     <Text size="block-title" align={textAlign} noMargin>
       {i18n._(text)}
     </Text>
     {multi ? (
-      // $FlowFixMe[incompatible-type]
       <Text style={styles.subTitle} align={textAlign} noMargin>
         {i18n._(t`You can select more than one.`)}
       </Text>
     ) : isOnlyOneFreeAnswerPossible(answers) ? (
-      // $FlowFixMe[incompatible-type]
       <Text style={styles.subTitle} align={textAlign} noMargin>
         {i18n._(
           t`The more descriptive you are, the better we can match the content we’ll recommend.`
@@ -359,9 +356,8 @@ type Props = {|
   onChangeUserInputValue?: string => void,
 |};
 
-const UserSurveyQuestion: component(
-  ...{ ...Props, +ref?: React.RefSetter<HTMLDivElement> }
-) = React.forwardRef<Props, HTMLDivElement>(
+// $FlowFixMe[signature-verification-failure]
+const UserSurveyQuestion = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       questionData,

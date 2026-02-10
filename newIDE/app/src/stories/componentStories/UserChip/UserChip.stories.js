@@ -18,8 +18,8 @@ import Text from '../../../UI/Text';
 export default {
   title: 'User chips/UserChip',
   component: UserChipComponent,
-  // $FlowFixMe[cannot-resolve-name]
-  decorators: [getPaperDecorator('medium') as StoryDecorator],
+  // $FlowFixMe[signature-verification-failure]
+  decorators: [getPaperDecorator('medium')],
 };
 
 const LoggedOut = () => {
@@ -56,7 +56,8 @@ const SignedInWithSubscription = () => {
   );
 };
 
-export const UserChips = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const UserChips = () => (
   <ColumnStackLayout>
     <Text>Logged Out</Text>
     <LoggedOut />

@@ -20,7 +20,8 @@ export default {
   decorators: [alertDecorator, paperDecorator],
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <DragAndDropContextProvider>
     <div style={{ height: 400 }}>
       <ObjectsList
@@ -61,7 +62,8 @@ export const Default = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const WithSerializedObjectView = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithSerializedObjectView = () => (
   <DragAndDropContextProvider>
     <SerializedObjectDisplay object={testProject.testLayout}>
       <div style={{ height: 250 }}>
@@ -104,7 +106,8 @@ export const WithSerializedObjectView = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const Locked = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Locked = () => (
   <DragAndDropContextProvider>
     <div style={{ height: 400 }}>
       <ObjectsList

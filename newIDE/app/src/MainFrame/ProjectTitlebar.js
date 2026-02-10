@@ -19,7 +19,8 @@ type Props = {|
  *
  * React.memo is used to avoid unnecessary update, as this is a top level component.
  */
-const ProjectTitlebar: component(...Props) = React.memo<Props>(
+// $FlowFixMe[signature-verification-failure]
+const ProjectTitlebar = React.memo<Props>(
   ({ fileMetadata, storageProvider, projectName, i18n }: Props) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const unsavedChanges = React.useContext(UnsavedChangesContext);

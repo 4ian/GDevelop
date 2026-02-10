@@ -57,7 +57,6 @@ const ensureGDevelopEditorAnalyticsReady = async () => {
       const module = await retryIfFailed(
         { times: 2 },
         async () =>
-          // $FlowFixMe[incompatible-type]
           // $FlowFixMe[incompatible-type] - Remote script cannot be found.
           // $FlowFixMe[cannot-resolve-module]
           (await import(/* webpackIgnore: true */ 'https://resources.gdevelop.io/a/gea.js'))
@@ -85,7 +84,8 @@ const ensureGDevelopEditorAnalyticsReady = async () => {
   return gdevelopEditorAnalyticsPromise;
 };
 
-export const setCurrentlyRunningInAppTutorial = (tutorial: string | null): string | null =>
+// $FlowFixMe[signature-verification-failure]
+export const setCurrentlyRunningInAppTutorial = (tutorial: string | null) =>
   (currentlyRunningInAppTutorial = tutorial);
 
 const makeCanSendEvent = (options: {| minimumTimeBetweenEvents: number |}) => {
@@ -183,7 +183,6 @@ export const installAnalyticsEvents = () => {
  * We can safely call it multiple times, as it will only send the user properties if they changed.
  */
 export const identifyUserForAnalytics = (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser
 ) => {
   if (isDev) {

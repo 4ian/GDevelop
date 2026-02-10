@@ -39,7 +39,14 @@ type TitleAndMessage = {|
   message: string,
 |};
 
-const LocalFolderPicker = ({type, value, onChange, defaultPath, fullWidth}: Props): React.Node => {
+const LocalFolderPicker = ({
+  type,
+  value,
+  onChange,
+  defaultPath,
+  fullWidth,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   // Use an internal state to avoid validating the value when the user
   // is typing in the text field. This allows typing a "/" without the
   // formatting kicking in.
@@ -96,7 +103,6 @@ const LocalFolderPicker = ({type, value, onChange, defaultPath, fullWidth}: Prop
               width: fullWidth ? '100%' : undefined,
             }}
           >
-            {/* $FlowFixMe[incompatible-type] */}
             <TextField
               margin="dense"
               style={styles.textField}
@@ -108,7 +114,6 @@ const LocalFolderPicker = ({type, value, onChange, defaultPath, fullWidth}: Prop
             />
             <FlatButton
               label={<Trans>Choose folder</Trans>}
-              // $FlowFixMe[incompatible-type]
               style={styles.button}
               onClick={() => onChooseFolder(titleAndMessage)}
             />

@@ -17,21 +17,25 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const MyCompleteProfileWithoutSubscription = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const MyCompleteProfileWithoutSubscription = () => (
   <ProfileDetails
     authenticatedUser={defaultAuthenticatedUserWithNoSubscription}
   />
 );
 
-export const MyCompleteProfileWithSilverSubscription = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const MyCompleteProfileWithSilverSubscription = () => (
   <ProfileDetails authenticatedUser={fakeSilverAuthenticatedUser} />
 );
 
-export const MyCompleteProfileWithProSubscription = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const MyCompleteProfileWithProSubscription = () => (
   <ProfileDetails authenticatedUser={fakeStartupAuthenticatedUser} />
 );
 
-export const MyProfileWithoutDiscordUsernameNorSubscription = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const MyProfileWithoutDiscordUsernameNorSubscription = () => (
   <ProfileDetails
     authenticatedUser={{
       ...defaultAuthenticatedUserWithNoSubscription,
@@ -40,7 +44,8 @@ export const MyProfileWithoutDiscordUsernameNorSubscription = (): React.Node => 
   />
 );
 
-export const MyProfileWithoutDiscordUsernameWithStartupSubscription = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const MyProfileWithoutDiscordUsernameWithStartupSubscription = () => (
   <ProfileDetails
     authenticatedUser={{
       ...fakeStartupAuthenticatedUser,
@@ -49,7 +54,8 @@ export const MyProfileWithoutDiscordUsernameWithStartupSubscription = (): React.
   />
 );
 
-export const Loading = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Loading = () => (
   <ProfileDetails
     authenticatedUser={{
       ...defaultAuthenticatedUserWithNoSubscription,

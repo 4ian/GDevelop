@@ -17,7 +17,8 @@ const electron = optionalRequire('electron');
 
 type Props = {| children: React.Node |};
 
-const InAppTutorialProvider = (props: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const InAppTutorialProvider = (props: Props) => {
   const [tutorial, setTutorial] = React.useState<InAppTutorial | null>(null);
   const [fetchingError, setFetchingError] = React.useState<string | null>(null);
   const [startStepIndex, setStartStepIndex] = React.useState<number>(0);
@@ -108,7 +109,6 @@ const InAppTutorialProvider = (props: Props): React.Node => {
         filters: [{ name: 'GDevelop 5 in-app tutorial', extensions: ['json'] }],
       });
       if (!filePath) return;
-      // $FlowFixMe[incompatible-type]
       const inAppTutorial = await readJSONFile(filePath);
       const errors = checkInAppTutorialFileJsonSchema(inAppTutorial);
       if (errors.length) {

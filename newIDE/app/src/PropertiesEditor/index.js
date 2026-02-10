@@ -178,19 +178,20 @@ const getFieldLabel = ({
   return field.name;
 };
 
-const PropertiesEditor = (
-  {
-    onInstancesModified,
-    instances,
-    schema,
-    mode,
-    renderExtraDescriptionText,
-    unsavedChanges,
-    project,
-    projectScopedContainersAccessor,
-    resourceManagementProps
-  }: Props,
-): React.Node => {
+// $FlowFixMe[recursive-definition]
+// $FlowFixMe[definition-cycle]
+const PropertiesEditor = ({
+  onInstancesModified,
+  instances,
+  schema,
+  mode,
+  renderExtraDescriptionText,
+  unsavedChanges,
+  project,
+  projectScopedContainersAccessor,
+  resourceManagementProps,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const forceUpdate = useForceUpdate();
 
   const _onInstancesModified = React.useCallback(
@@ -419,7 +420,6 @@ const PropertiesEditor = (
               instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
               _onInstancesModified(instances);
             }}
-            // $FlowFixMe[incompatible-type]
             style={styles.field}
             disabled={field.disabled}
           >
@@ -443,7 +443,6 @@ const PropertiesEditor = (
               instances.forEach(i => setValue(i, newValue || ''));
               _onInstancesModified(instances);
             }}
-            // $FlowFixMe[incompatible-type]
             style={styles.field}
             disabled={getDisabled({ instances, field })}
           >

@@ -22,9 +22,7 @@ const getAdaptedMessageAndRouteNavigationParams = (
       const urlParams = new URLSearchParams(
         groups.linkHref.replace(/.*\?/, '')
       );
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - Assume that the arguments are always valid.
-      // $FlowFixMe[incompatible-type]
       const route: ?Route = urlParams.get('initial-dialog');
       const otherParams = {};
       urlParams.forEach((value, key) => {

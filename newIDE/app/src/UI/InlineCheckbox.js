@@ -41,19 +41,18 @@ type Props = {|
  * A checkbox based on Material-UI Checkbox, but that can be displayed
  * without having it taking the full width of its container.
  */
-const InlineCheckbox = (
-  {
-    id,
-    onCheck,
-    disabled,
-    checked,
-    label,
-    uncheckedIcon,
-    checkedIcon,
-    tooltipOrHelperText,
-    paddingSize
-  }: Props,
-): React.Node => {
+const InlineCheckbox = ({
+  id,
+  onCheck,
+  disabled,
+  checked,
+  label,
+  uncheckedIcon,
+  checkedIcon,
+  tooltipOrHelperText,
+  paddingSize,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const labelClasses = useLabelStyles();
   const formGroupClasses = useFormGroupStyles();
   const smallPaddingClasses = useSmallPaddingCheckboxStyles();

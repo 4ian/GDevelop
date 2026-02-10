@@ -32,7 +32,8 @@ export type GroupWithContext = {|
 export type ObjectWithContextList = Array<ObjectWithContext>;
 export type GroupWithContextList = Array<GroupWithContext>;
 
-export const isSameGroupWithContext = (groupWithContext: ?GroupWithContext): ((other: ?GroupWithContext) => ?(false | boolean)) => (
+// $FlowFixMe[signature-verification-failure]
+export const isSameGroupWithContext = (groupWithContext: ?GroupWithContext) => (
   other: ?GroupWithContext
 ) => {
   return (
@@ -43,7 +44,10 @@ export const isSameGroupWithContext = (groupWithContext: ?GroupWithContext): ((o
   );
 };
 
-export const isSameObjectWithContext = (objectWithContext: ?ObjectWithContext): ((other: ?ObjectWithContext) => ?(false | boolean)) => (other: ?ObjectWithContext) => {
+export const isSameObjectWithContext = (
+  objectWithContext: ?ObjectWithContext
+// $FlowFixMe[signature-verification-failure]
+) => (other: ?ObjectWithContext) => {
   return (
     objectWithContext &&
     other &&
@@ -56,11 +60,8 @@ export const enumerateObjects = (
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   filters: ?{| type?: string, names?: Array<string> |}
-): {
-  allObjectsList: ObjectWithContextList,
-  containerObjectsList: ObjectWithContextList,
-  projectObjectsList: ObjectWithContextList,
-} => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   const typeFilter = (filters && filters.type) || null;
   const namesFilter = (filters && filters.names) || null;
   const filterObjectByType = typeFilter
@@ -225,12 +226,8 @@ export const enumerateObjectsAndGroups = (
   objectsContainersList: gdObjectsContainersList,
   objectType: ?string = undefined,
   requiredBehaviorTypes?: Array<string> = []
-): 
-  | { allGroupsList: Array<empty>, allObjectsList: Array<empty> }
-  | {
-    allGroupsList: GroupWithContextList,
-    allObjectsList: ObjectWithContextList,
-  } => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   // The objects must never be kept in a state as they may be temporary copies.
   // Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
   // in the codebase.

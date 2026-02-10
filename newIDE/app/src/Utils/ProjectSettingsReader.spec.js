@@ -76,13 +76,9 @@ preferences:
       // Step 4: Apply to preferences via setMultipleValues
       // $FlowFixMe[underconstrained-implicit-instantiation]
       const mockSetMultipleValues = jest.fn();
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - partial mock
-      // $FlowFixMe[incompatible-type]
       const mockPreferences: Preferences = {
-        // $FlowFixMe[incompatible-type]
         // $FlowFixMe[incompatible-type] - partial mock
-        // $FlowFixMe[incompatible-type]
         values: {},
         setMultipleValues: mockSetMultipleValues,
       };

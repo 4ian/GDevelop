@@ -930,7 +930,8 @@ const ProjectPropertiesDialog = (props: Props) => {
   );
 };
 
-const ProjectPropertiesDialogWithErrorBoundary = (props: Props): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+const ProjectPropertiesDialogWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Project properties</Trans>}
     scope="project-properties"

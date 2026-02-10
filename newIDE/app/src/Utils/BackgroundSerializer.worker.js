@@ -25,9 +25,8 @@ const getLibGDevelop = (versionWithHash /*: string */) => {
         return;
       }
 
-      // eslint-disable-next-line no-undef
       // $FlowFixMe[cannot-resolve-name]
-      initializeGDevelopJs({
+      initializeGDevelopJs({ // eslint-disable-line no-undef
         // Override the resolved URL for the .wasm file,
         // to ensure a new version is fetched when the version changes.
         locateFile: (path /*: string */, prefix /*: string */) => {
@@ -84,8 +83,8 @@ const unserializeBinarySnapshotToJson = (
 // eslint-disable-next-line no-restricted-globals
 self.onmessage = async (event /*: MessageEvent */) => {
   // $FlowFixMe[incompatible-type]
-  // $FlowFixMe[incompatible-use]
   // $FlowFixMe[prop-missing]
+  // $FlowFixMe[incompatible-use]
   const { type, binary, requestId, versionWithHash } = event.data || {};
 
   const startTime = Date.now();

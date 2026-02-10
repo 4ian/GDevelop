@@ -77,6 +77,7 @@ const initialConfirmState = {
   showYesNoCancelDialog: ShowYesNoCancelDialogOptionsWithCallback => {},
 };
 
-const AlertContext: React.Context<ConfirmState> = React.createContext<ConfirmState>(initialConfirmState);
+// $FlowFixMe[signature-verification-failure]
+const AlertContext = React.createContext<ConfirmState>(initialConfirmState);
 
 export default AlertContext;

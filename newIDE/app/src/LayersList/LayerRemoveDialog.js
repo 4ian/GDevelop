@@ -42,7 +42,9 @@ export default class LayerRemoveDialog extends Component<Props, State> {
     }
   }
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     if (!this.props.layersContainer || !this.props.open) return null;
 
     const instancesCountInLayout = this.props.layout
@@ -106,7 +108,6 @@ export default class LayerRemoveDialog extends Component<Props, State> {
     return (
       <Dialog
         title={<Trans>Objects on {this.props.layerRemoved}</Trans>}
-        // $FlowFixMe[incompatible-type]
         actions={actions}
         open={this.props.open}
         onRequestClose={() => this.props.onClose(false, null)}

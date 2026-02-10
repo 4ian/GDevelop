@@ -89,7 +89,8 @@ export const getEventsFunctionTreeViewItemId = (
 export const canFunctionBeRenamed = (
   eventsFunction: gdEventsFunction,
   containerType: 'extension' | 'behavior' | 'object'
-): boolean => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   const name = eventsFunction.getName();
   if (containerType === 'behavior') {
     return !gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
@@ -231,7 +232,9 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     }
   }
 
-  canBeRenamed(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  canBeRenamed() {
     return canFunctionBeRenamed(
       this.eventsFunction,
       this.getEventsBasedBehavior()
@@ -242,7 +245,9 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     );
   }
 
-  buildMenuTemplate(i18n: I18nType, index: number): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  buildMenuTemplate(i18n: I18nType, index: number) {
     return [
       {
         label: i18n._(t`Rename`),
@@ -477,7 +482,9 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     this.props.forceUpdate();
   }
 
-  getRightButton(i18n: I18nType): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getRightButton(i18n: I18nType) {
     return null;
   }
 

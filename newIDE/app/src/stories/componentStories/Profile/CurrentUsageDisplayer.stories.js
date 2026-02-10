@@ -18,7 +18,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const WithSubscriptionLimitNotReached = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithSubscriptionLimitNotReached = () => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={{
@@ -35,7 +36,8 @@ export const WithSubscriptionLimitNotReached = (): React.Node => (
   />
 );
 
-export const WithoutSubscriptionLimitNotReached = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithoutSubscriptionLimitNotReached = () => (
   <CurrentUsageDisplayer
     subscription={noSubscription}
     quota={{
@@ -52,7 +54,8 @@ export const WithoutSubscriptionLimitNotReached = (): React.Node => (
   />
 );
 
-export const WithSubscriptionLimitNotReached30Days = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithSubscriptionLimitNotReached30Days = () => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={{
@@ -69,7 +72,8 @@ export const WithSubscriptionLimitNotReached30Days = (): React.Node => (
   />
 );
 
-export const WithSubscription1BuildRemaining = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithSubscription1BuildRemaining = () => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={{
@@ -86,7 +90,8 @@ export const WithSubscription1BuildRemaining = (): React.Node => (
   />
 );
 
-export const WithSubscription1BuildRemaining30Days = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithSubscription1BuildRemaining30Days = () => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={{
@@ -103,7 +108,8 @@ export const WithSubscription1BuildRemaining30Days = (): React.Node => (
   />
 );
 
-export const WithSubscriptionRedemptionCode = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithSubscriptionRedemptionCode = () => (
   <CurrentUsageDisplayer
     subscription={silverSubscriptionWithRedemptionCode}
     quota={{
@@ -120,7 +126,8 @@ export const WithSubscriptionRedemptionCode = (): React.Node => (
   />
 );
 
-export const WithSubscriptionExpiredRedemptionCode = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithSubscriptionExpiredRedemptionCode = () => (
   <CurrentUsageDisplayer
     subscription={silverSubscriptionWithExpiredRedemptionCode}
     quota={{
@@ -137,7 +144,8 @@ export const WithSubscriptionExpiredRedemptionCode = (): React.Node => (
   />
 );
 
-export const WithSubscriptionLimitReached = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithSubscriptionLimitReached = () => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={limitsReached.quotas['cordova-build']}
@@ -149,7 +157,8 @@ export const WithSubscriptionLimitReached = (): React.Node => (
   />
 );
 
-export const WithProSubscriptionLimitReached = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithProSubscriptionLimitReached = () => (
   <CurrentUsageDisplayer
     subscription={subscriptionForStartupUser}
     quota={limitsReached.quotas['cordova-build']}
@@ -161,7 +170,8 @@ export const WithProSubscriptionLimitReached = (): React.Node => (
   />
 );
 
-export const WithoutSubscriptionLimitsReached = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithoutSubscriptionLimitsReached = () => (
   <CurrentUsageDisplayer
     subscription={noSubscription}
     quota={limitsReached.quotas['cordova-build']}

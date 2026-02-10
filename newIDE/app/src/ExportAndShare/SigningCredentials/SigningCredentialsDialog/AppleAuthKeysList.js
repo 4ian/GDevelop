@@ -24,7 +24,6 @@ import CircledInfo from '../../../UI/CustomSvgIcons/CircledInfo';
 
 type Props = {
   signingCredentials: Array<SigningCredential> | null,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   error: Error | null,
   onRefreshSigningCredentials: () => Promise<void>,
@@ -35,15 +34,14 @@ const styles = {
   bulletIcon: { width: 20, height: 20, marginRight: 10 },
 };
 
-export const AppleAuthKeysList = (
-  {
-    signingCredentials,
-    authenticatedUser,
-    error,
-    onRefreshSigningCredentials,
-    onAddNew
-  }: Props,
-): React.Node => {
+export const AppleAuthKeysList = ({
+  signingCredentials,
+  authenticatedUser,
+  error,
+  onRefreshSigningCredentials,
+  onAddNew,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const appleAuthKeySigningCredentials = filterAppleAuthKeySigningCredentials(
     signingCredentials
   );

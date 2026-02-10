@@ -8,7 +8,6 @@ import BuildsWatcher from './BuildsWatcher';
 
 type Props = {|
   onBuildsUpdated?: () => void,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   game: Game,
   onGameUpdated?: (game: Game) => void,
@@ -24,8 +23,9 @@ export default class Builds extends Component<Props, State> {
     builds: null,
     error: null,
   };
+  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  buildsWatcher = new BuildsWatcher() as BuildsWatcher;
+  buildsWatcher = new BuildsWatcher();
 
   componentDidMount() {
     this._refreshBuilds();
@@ -112,7 +112,9 @@ export default class Builds extends Component<Props, State> {
     });
   };
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     return (
       <BuildsList
         builds={this.state.builds}

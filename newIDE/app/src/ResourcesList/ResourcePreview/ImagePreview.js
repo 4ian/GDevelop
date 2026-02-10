@@ -121,23 +121,22 @@ type ZoomState = {
 /**
  * Display the preview for a resource of a project with kind "image".
  */
-const ImagePreview = (
-  {
-    resourceName,
-    imageResourceSource,
-    isImageResourceSmooth,
-    fixedHeight,
-    fixedWidth,
-    renderOverlay,
-    onImageSize,
-    hideCheckeredBackground,
-    deactivateControls,
-    displaySpacedView,
-    isImagePrivate,
-    onImageLoaded,
-    hideLoader
-  }: Props,
-): React.Node => {
+const ImagePreview = ({
+  resourceName,
+  imageResourceSource,
+  isImageResourceSmooth,
+  fixedHeight,
+  fixedWidth,
+  renderOverlay,
+  onImageSize,
+  hideCheckeredBackground,
+  deactivateControls,
+  displaySpacedView,
+  isImagePrivate,
+  onImageLoaded,
+  hideLoader,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const [errored, setErrored] = React.useState<boolean>(false);
   const [imageWidth, setImageWidth] = React.useState<?number>(null);
   const [imageHeight, setImageHeight] = React.useState<?number>(null);
@@ -335,7 +334,6 @@ const ImagePreview = (
       if (
         event.target &&
         (event.target instanceof HTMLElement ||
-          // $FlowFixMe[incompatible-type]
           // $FlowFixMe[incompatible-type] - Flow does not know about SVGElement
           // $FlowFixMe[cannot-resolve-name]
           event.target instanceof SVGElement) &&

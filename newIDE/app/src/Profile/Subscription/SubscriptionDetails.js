@@ -100,13 +100,12 @@ type Props = {
  *  - If the code is expired, show a message to invite the user to re-subscribe.
  *    We will need to cancel the current expired subscription, but don't show a warning.
  */
-const SubscriptionDetails = (
-  {
-    isManageSubscriptionLoading,
-    onManageSubscription,
-    simulateNativeMobileApp
-  }: Props,
-): React.Node => {
+const SubscriptionDetails = ({
+  isManageSubscriptionLoading,
+  onManageSubscription,
+  simulateNativeMobileApp,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const {
     openSubscriptionDialog,
     getUserSubscriptionPlanEvenIfLegacy,

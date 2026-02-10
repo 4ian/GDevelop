@@ -49,11 +49,8 @@ export const useLongTouch = (
     delay?: number,
     doNotCancelOnScroll?: boolean,
   }
-): {
-  onTouchEnd: () => void,
-  onTouchMove: (event: TouchEvent) => void,
-  onTouchStart: (event: TouchEvent) => void,
-} => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   const timeout = React.useRef<?TimeoutID>(null);
   const context = options && options.context ? options.context : null;
   const delay = options && options.delay ? options.delay : defaultDelay;

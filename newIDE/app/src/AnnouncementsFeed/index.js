@@ -48,7 +48,13 @@ type AnnouncementsFeedProps = {|
   hideLoader?: boolean,
 |};
 
-export const AnnouncementsFeed = ({level, canClose, addMargins, hideLoader}: AnnouncementsFeedProps): React.Node => {
+export const AnnouncementsFeed = ({
+  level,
+  canClose,
+  addMargins,
+  hideLoader,
+// $FlowFixMe[signature-verification-failure]
+}: AnnouncementsFeedProps) => {
   const {
     announcements,
     error,

@@ -14,7 +14,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => {
   return (
     <MockTeamProvider loading={false} teamSize={12}>
       <FixedHeightFlexContainer height={600}>

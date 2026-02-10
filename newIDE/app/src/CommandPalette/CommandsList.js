@@ -68,11 +68,16 @@ export type CommandName =
   | 'OPEN_PROFILE';
 
 export const commandAreas = {
-  GENERAL: t`General` as any,
-  IDE: t`IDE` as any,
-  PROJECT: t`Project` as any,
-  SCENE: t`Scene` as any,
-  EVENTS: t`Events` as any,
+  // $FlowFixMe[signature-verification-failure]
+  GENERAL: t`General`,
+  // $FlowFixMe[signature-verification-failure]
+  IDE: t`IDE`,
+  // $FlowFixMe[signature-verification-failure]
+  PROJECT: t`Project`,
+  // $FlowFixMe[signature-verification-failure]
+  SCENE: t`Scene`,
+  // $FlowFixMe[signature-verification-failure]
+  EVENTS: t`Events`,
 };
 
 type CommandArea = $Keys<typeof commandAreas>;

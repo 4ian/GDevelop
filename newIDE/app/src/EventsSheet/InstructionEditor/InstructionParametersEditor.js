@@ -111,9 +111,8 @@ const isParameterVisible = (
   return true;
 };
 
-const InstructionParametersEditor: component(
-  ...{ ...Props, +ref?: React.RefSetter<InstructionParametersEditorInterface> }
-) = React.forwardRef<
+// $FlowFixMe[signature-verification-failure]
+const InstructionParametersEditor = React.forwardRef<
   Props,
   InstructionParametersEditorInterface
 >(
@@ -308,7 +307,6 @@ const InstructionParametersEditor: component(
                   }}
                 />
                 <Column expand>
-                  {/* $FlowFixMe[incompatible-type] */}
                   <Text style={styles.description}>
                     {instructionMetadata.getDescription()}
                   </Text>

@@ -41,7 +41,8 @@ const useStyles = makeStyles(theme => {
   };
 });
 
-function PriceTag({ label, withOverlay }: Props): React.MixedElement {
+// $FlowFixMe[signature-verification-failure]
+function PriceTag({ label, withOverlay }: Props) {
   const classes = useStyles({ withOverlay });
 
   return <div className={classes.container}>{label}</div>;

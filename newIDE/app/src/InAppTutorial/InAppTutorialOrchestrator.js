@@ -213,9 +213,7 @@ const interpolateElementId = ({
   ) {
     const splittedElementId = elementId.split(':');
     const sceneKey = splittedElementId[1];
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - We're confident the data is reliable
-    // $FlowFixMe[incompatible-type]
     const editorType: EditorIdentifier = splittedElementId[2];
     if (!editorType) {
       throw new Error(
@@ -272,7 +270,6 @@ const containsProjectDataToDisplay = (text?: TranslatedText): boolean => {
   if (!text) return false;
   if (text.messageByLocale) {
     return Object.values(text.messageByLocale).some(localizedText =>
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - known error where Flow returns mixed for object value https://github.com/facebook/flow/issues/2221
       localizedText.includes(
         `$(${textInterpolationProjectDataAccessors.instancesCount}`
@@ -377,7 +374,6 @@ const gatherProjectDataOnMultipleSteps = ({
 
     if (mapProjectData) {
       Object.entries(mapProjectData).forEach(
-        // $FlowFixMe[incompatible-type]
         // $FlowFixMe[incompatible-type] - Object.entries does not keep value type
         ([key, dataAccessor]: [string, string]) => {
           if (dataAccessor === 'projectLastSceneName') {
@@ -421,7 +417,6 @@ const useGiveTrivialBadgeWhenTutorialIsFinished = ({
   displayEndDialog,
   tutorial,
 }: {
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   displayEndDialog: boolean,
   tutorial: InAppTutorial,
@@ -493,9 +488,8 @@ export type InAppTutorialOrchestratorInterface = {|
   getPreviewMessage: () => {| message: string, position: string |} | null,
 |};
 
-const InAppTutorialOrchestrator: component(
-  ...{ ...Props, +ref?: React.RefSetter<InAppTutorialOrchestratorInterface> }
-) = React.forwardRef<
+// $FlowFixMe[signature-verification-failure]
+const InAppTutorialOrchestrator = React.forwardRef<
   Props,
   InAppTutorialOrchestratorInterface
 >(

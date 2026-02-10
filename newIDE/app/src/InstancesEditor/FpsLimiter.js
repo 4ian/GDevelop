@@ -27,7 +27,9 @@ export default class FpsLimiter {
     this._lastInteractionTime = Date.now();
   }
 
-  shouldUpdate(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  shouldUpdate() {
     const now = Date.now();
     const delta = now - this._lastFrameTime;
 

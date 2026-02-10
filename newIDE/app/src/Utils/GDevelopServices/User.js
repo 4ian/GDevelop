@@ -201,8 +201,8 @@ export type UserLeaderboard = {
   topUserCommentQualityRatings: UserLeaderboardEntry[],
 };
 
-// $FlowFixMe[cannot-resolve-name]
-export const client: Axios = axios.create({
+// $FlowFixMe[signature-verification-failure]
+export const client = axios.create({
   baseURL: GDevelopUserApi.baseUrl,
 });
 
@@ -210,6 +210,7 @@ export const searchCreatorPublicProfilesByUsername = (
   searchString: string
 ): Promise<Array<UserPublicProfile>> => {
   return client
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     .get(`/user-public-profile/search`, {
       params: {
         username: searchString,
@@ -225,6 +226,7 @@ export const searchCreatorPublicProfilesByUsername = (
 };
 
 export const getUserBadges = async (id: string): Promise<Array<Badge>> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/user/${id}/badge`);
   return ensureIsArray({
     data: response.data,
@@ -237,6 +239,7 @@ export const listUserTeams = async (
   userId: string
 ): Promise<Array<Team>> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/team`, {
     headers: { Authorization: authorizationHeader },
     params: { userId, role: 'admin' },
@@ -253,6 +256,7 @@ export const listTeamMembers = async (
   teamId: string
 ): Promise<Array<User>> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/user`, {
     headers: { Authorization: authorizationHeader },
     params: {
@@ -274,6 +278,7 @@ export const listTeamAdmins = async (
   teamId: string
 ): Promise<Array<User>> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/user`, {
     headers: { Authorization: authorizationHeader },
     params: { userId, teamId, memberType: 'admin' },
@@ -290,6 +295,7 @@ export const listTeamMemberships = async (
   teamId: string
 ): Promise<Array<TeamMembership>> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/team-membership`, {
     headers: { Authorization: authorizationHeader },
     params: { userId, teamId },
@@ -306,6 +312,7 @@ export const listTeamGroups = async (
   teamId: string
 ): Promise<Array<TeamGroup>> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/team/${teamId}/group`, {
     headers: { Authorization: authorizationHeader },
     params: { userId },
@@ -324,6 +331,7 @@ export const updateGroup = async (
   attributes: {| name: string |}
 ): Promise<TeamGroup> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.patch(
     `/team/${teamId}/group/${groupId}`,
     attributes,
@@ -346,6 +354,7 @@ export const createGroup = async (
   attributes: {| name: string |}
 ): Promise<TeamGroup> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.post(`/team/${teamId}/group`, attributes, {
     headers: { Authorization: authorizationHeader },
     params: { userId },
@@ -364,6 +373,7 @@ export const deleteGroup = async (
   groupId: string
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   await client.delete(`/team/${teamId}/group/${groupId}`, {
     headers: { Authorization: authorizationHeader },
     params: { userId },
@@ -375,6 +385,7 @@ export const listRecommendations = async (
   { userId }: {| userId: string |}
 ): Promise<Array<Recommendation>> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/recommendation`, {
     headers: { Authorization: authorizationHeader },
     params: { userId },
@@ -388,6 +399,7 @@ export const listRecommendations = async (
 export const listDefaultRecommendations = async (): Promise<
   Array<Recommendation>
 > => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/recommendation`);
   return ensureIsArray({
     data: response.data,
@@ -403,6 +415,7 @@ export const updateUserGroup = async (
   userId: string
 ): Promise<Array<TeamGroup>> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.post(
     `/team/${teamId}/action/update-members`,
     [{ groupId, userId }],
@@ -422,6 +435,7 @@ export const getUserPublicProfilesByIds = async (
 ): Promise<UserPublicProfileByIds> => {
   // Ensure we don't send an empty list of ids, as the request would fail.
   if (ids.length === 0) return {};
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/user-public-profile`, {
     params: {
       id: ids.join(','),
@@ -436,6 +450,7 @@ export const getUserPublicProfilesByIds = async (
 export const getUserPublicProfile = async (
   id: string
 ): Promise<UserPublicProfile> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/user-public-profile/${id}`);
 
   return ensureObjectHasProperty({
@@ -458,6 +473,7 @@ export const changeTeamMemberPassword = async (
   |}
 ) => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   await client.post(
     `/user/action/change-password`,
     {
@@ -486,6 +502,7 @@ export const activateTeamMembers = async (
   |}
 ) => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   await client.post(
     `/user/action/activate-users`,
     {
@@ -513,6 +530,7 @@ export const createTeamMembers = async (
   |}
 ): Promise<BatchCreationResultUser[]> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.post(
     `/team/${teamId}/action/batch-create-users`,
     {
@@ -544,6 +562,7 @@ export const setUserAsAdmin = async (
   |}
 ) => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   await client.post(
     `/team/${teamId}/action/set-admin`,
     {
@@ -560,6 +579,7 @@ export const setUserAsAdmin = async (
 export const getUsernameAvailability = async (
   username: string
 ): Promise<UsernameAvailability> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/username-availability/${username}`);
   return ensureIsObjectWithPropertyOfType({
     data: response.data,
@@ -574,6 +594,7 @@ export const syncDiscordUsername = async (
   userId: string
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   await client.post(
     `/user/${userId}/action/update-discord-role`,
     {},
@@ -587,6 +608,7 @@ export const syncDiscordUsername = async (
 export const getUserCommentQualityRatingsLeaderboards = async (): Promise<
   Array<UserLeaderboard>
 > => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(
     '/user-comment-quality-ratings-leaderboard?leaderboardRegionName=global'
   );
@@ -608,6 +630,7 @@ export const registerUserInterest = async (
   |}
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   await client.post(`/action/register-user-interest`, data, {
     headers: { Authorization: authorizationHeader },
     params: { userId },
@@ -628,7 +651,8 @@ const tiktokUsernameFormattingErrorMessage = (
 );
 
 export const donateLinkConfig = {
-  getFormattingError: (value: string): React.Node | void =>
+  // $FlowFixMe[signature-verification-failure]
+  getFormattingError: (value: string) =>
     value && !simpleUrlRegex.test(value)
       ? profileLinkFormattingErrorMessage
       : undefined,
@@ -641,26 +665,32 @@ export const discordUsernameConfig = {
 
 export const communityLinksConfig = {
   personalWebsiteLink: {
-    icon: <Planet /> as React.Node,
-    getFormattingError: (value: string): React.Node | void =>
+    // $FlowFixMe[signature-verification-failure]
+    icon: <Planet />,
+    // $FlowFixMe[signature-verification-failure]
+    getFormattingError: (value: string) =>
       value && !simpleUrlRegex.test(value)
         ? profileLinkFormattingErrorMessage
         : undefined,
     maxLength: 150,
   },
   personalWebsite2Link: {
-    icon: <Planet /> as React.Node,
-    getFormattingError: (value: string): React.Node | void =>
+    // $FlowFixMe[signature-verification-failure]
+    icon: <Planet />,
+    // $FlowFixMe[signature-verification-failure]
+    getFormattingError: (value: string) =>
       value && !simpleUrlRegex.test(value)
         ? profileLinkFormattingErrorMessage
         : undefined,
     maxLength: 150,
   },
   githubUsername: {
-    icon: <GitHub style={{ width: 24, height: 24 }} /> as React.Node,
+    // $FlowFixMe[signature-verification-failure]
+    icon: <GitHub style={{ width: 24, height: 24 }} />,
     prefix: 'https://github.com/',
     maxLength: 39,
-    getMessageFromUpdate: (responseCode: string): null | { message: any, title: any } => {
+    // $FlowFixMe[signature-verification-failure]
+    getMessageFromUpdate: (responseCode: string) => {
       if (
         responseCode === 'github-star/badge-given' ||
         responseCode === 'github-star/badge-already-given'
@@ -682,16 +712,19 @@ export const communityLinksConfig = {
       }
       return null;
     },
-    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string): any =>
+    // $FlowFixMe[signature-verification-failure]
+    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string) =>
       !hasBadge
         ? t`[Star the GDevelop repository](https://github.com/4ian/GDevelop) and add your GitHub username here to get ${rewardValueInCredits} free credits as a thank you!`
         : t`Thank you for supporting the GDevelop open-source community. Credits were added to your account as a thank you.`,
   },
   twitterUsername: {
-    icon: <Twitter /> as React.Node,
+    // $FlowFixMe[signature-verification-failure]
+    icon: <Twitter />,
     prefix: 'https://twitter.com/',
     maxLength: 15,
-    getMessageFromUpdate: (responseCode: string): null | { message: any, title: any } => {
+    // $FlowFixMe[signature-verification-failure]
+    getMessageFromUpdate: (responseCode: string) => {
       if (
         responseCode === 'twitter-follow/badge-given' ||
         responseCode === 'twitter-follow/badge-already-given'
@@ -714,21 +747,25 @@ export const communityLinksConfig = {
 
       return null;
     },
-    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string): any =>
+    // $FlowFixMe[signature-verification-failure]
+    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string) =>
       !hasBadge
         ? t`[Follow GDevelop](https://twitter.com/GDevelopApp) and enter your Twitter username here to get ${rewardValueInCredits} free credits as a thank you!`
         : t`Thank you for supporting GDevelop. Credits were added to your account as a thank you.`,
   },
   facebookUsername: {
-    icon: <Facebook /> as React.Node,
+    // $FlowFixMe[signature-verification-failure]
+    icon: <Facebook />,
     prefix: 'https://facebook.com/',
     maxLength: 50,
   },
   youtubeUsername: {
-    icon: <YouTube /> as React.Node,
+    // $FlowFixMe[signature-verification-failure]
+    icon: <YouTube />,
     prefix: 'https://youtube.com/@',
     maxLength: 100,
-    getMessageFromUpdate: (responseCode: string): null | { message: any, title: any } => {
+    // $FlowFixMe[signature-verification-failure]
+    getMessageFromUpdate: (responseCode: string) => {
       if (
         responseCode === 'youtube-subscription/badge-given' ||
         responseCode === 'youtube-subscription/badge-already-given'
@@ -753,20 +790,24 @@ export const communityLinksConfig = {
 
       return null;
     },
-    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string): any =>
+    // $FlowFixMe[signature-verification-failure]
+    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string) =>
       !hasBadge
         ? t`[Subscribe to GDevelop](https://youtube.com/@gdevelopapp) and enter your YouTube username here to get ${rewardValueInCredits} free credits as a thank you!`
         : t`Thank you for supporting GDevelop. Credits were added to your account as a thank you.`,
   },
   tiktokUsername: {
-    icon: <TikTok /> as React.Node,
+    // $FlowFixMe[signature-verification-failure]
+    icon: <TikTok />,
     prefix: 'https://tiktok.com/@',
-    getFormattingError: (value: string): React.Node | void =>
+    // $FlowFixMe[signature-verification-failure]
+    getFormattingError: (value: string) =>
       !tiktokUsernameEmptyOrNoAtRegex.test(value)
         ? tiktokUsernameFormattingErrorMessage
         : undefined,
     maxLength: 30,
-    getMessageFromUpdate: (responseCode: string): null | { message: any, title: any } => {
+    // $FlowFixMe[signature-verification-failure]
+    getMessageFromUpdate: (responseCode: string) => {
       if (
         responseCode === 'tiktok-follow/badge-given' ||
         responseCode === 'tiktok-follow/badge-already-given'
@@ -789,29 +830,35 @@ export const communityLinksConfig = {
 
       return null;
     },
-    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string): any =>
+    // $FlowFixMe[signature-verification-failure]
+    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string) =>
       !hasBadge
         ? t`[Follow GDevelop](https://tiktok.com/@gdevelop) and enter your TikTok username here to get ${rewardValueInCredits} free credits as a thank you!`
         : t`Thank you for supporting GDevelop. Credits were added to your account as a thank you.`,
   },
   instagramUsername: {
-    icon: <Instagram /> as React.Node,
+    // $FlowFixMe[signature-verification-failure]
+    icon: <Instagram />,
     prefix: 'https://instagram.com/',
     maxLength: 30,
   },
   redditUsername: {
-    icon: <Reddit /> as React.Node,
+    // $FlowFixMe[signature-verification-failure]
+    icon: <Reddit />,
     prefix: 'https://reddit.com/user/',
     maxLength: 20,
   },
   snapchatUsername: {
-    icon: <Snapchat /> as React.Node,
+    // $FlowFixMe[signature-verification-failure]
+    icon: <Snapchat />,
     prefix: 'https://snapchat.com/add/',
     maxLength: 15,
   },
   discordServerLink: {
-    icon: <Discord /> as React.Node,
-    getFormattingError: (value: string): React.Node | void =>
+    // $FlowFixMe[signature-verification-failure]
+    icon: <Discord />,
+    // $FlowFixMe[signature-verification-failure]
+    getFormattingError: (value: string) =>
       value && !simpleDiscordUrlRegex.test(value)
         ? discordServerLinkFormattingErrorMessage
         : undefined,
@@ -826,6 +873,7 @@ export const fetchUserCourseProgress = async (
 ): Promise<UserCourseProgress | null> => {
   const authorizationHeader = await getAuthorizationHeader();
   try {
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     const response = await client.get(`/course/${courseId}/progress`, {
       headers: { Authorization: authorizationHeader },
       params: { userId },
@@ -850,6 +898,7 @@ export const updateUserCourseProgress = async (
   userCourseProgress: UserCourseProgress
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   await client.put(
     `/course/${userCourseProgress.courseId}/progress`,
     { progress: userCourseProgress.progress },
@@ -865,6 +914,7 @@ export const generateCustomAuthToken = async (
   userId: string
 ): Promise<string> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.post(
     `/user/action/generate-custom-auth-token`,
     {},
@@ -895,6 +945,7 @@ export const editUser = async (
   |}
 ): Promise<User> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.patch(`/user/${editedUserId}`, changes, {
     headers: { Authorization: authorizationHeader },
     params: { userId },

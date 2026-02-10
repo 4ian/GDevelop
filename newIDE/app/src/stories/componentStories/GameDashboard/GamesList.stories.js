@@ -27,11 +27,11 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const NoGamesOrProjects = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const NoGamesOrProjects = () => {
   // $FlowFixMe[missing-empty-array-annot]
   const projectFiles = [];
 
-  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
     // $FlowFixMe[incompatible-type]
@@ -79,7 +79,8 @@ export const NoGamesOrProjects = (): React.Node => {
   );
 };
 
-export const WithOnlyGames = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithOnlyGames = () => {
   const projectFiles = [
     {
       ...fakeFileMetadataAndStorageProviderNameForLocalProject,
@@ -90,7 +91,6 @@ export const WithOnlyGames = (): React.Node => {
     },
   ];
 
-  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
     // $FlowFixMe[incompatible-type]
@@ -138,13 +138,13 @@ export const WithOnlyGames = (): React.Node => {
   );
 };
 
-export const WithOnlyProjects = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithOnlyProjects = () => {
   const projectFiles = [
     fakeFileMetadataAndStorageProviderNameForCloudProject,
     fakeFileMetadataAndStorageProviderNameForLocalProject,
   ];
 
-  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
     // $FlowFixMe[incompatible-type]
@@ -190,7 +190,8 @@ export const WithOnlyProjects = (): React.Node => {
   );
 };
 
-export const WithGamesAndProjects = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithGamesAndProjects = () => {
   const projectFiles = [
     fakeFileMetadataAndStorageProviderNameForCloudProject,
     fakeFileMetadataAndStorageProviderNameForLocalProject,
@@ -203,7 +204,6 @@ export const WithGamesAndProjects = (): React.Node => {
     },
   ];
 
-  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
     // $FlowFixMe[incompatible-type]

@@ -8,7 +8,8 @@ export default function EmptyEditor({
   renderObjectNameField,
 }: {
   renderObjectNameField?: () => React.Node,
-}): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}) {
   return (
     <Column noMargin>
       {renderObjectNameField && renderObjectNameField()}

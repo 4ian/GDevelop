@@ -6,7 +6,8 @@ type Props = {|
   status: 'success' | 'error' | 'warning',
 |};
 
-const StatusIndicator = ({status}: Props): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+const StatusIndicator = ({ status }: Props) => {
   const GDevelopTheme = React.useContext(GDevelopThemeContext);
 
   const color =

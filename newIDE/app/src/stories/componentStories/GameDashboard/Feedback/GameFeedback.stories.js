@@ -23,11 +23,12 @@ import { getPaperDecorator } from '../../../PaperDecorator';
 export default {
   title: 'GameDashboard/Feedback/GameFeedback',
   component: GameFeedback,
-  // $FlowFixMe[cannot-resolve-name]
-  decorators: [getPaperDecorator('medium') as StoryDecorator],
+  // $FlowFixMe[signature-verification-failure]
+  decorators: [getPaperDecorator('medium')],
 };
 
-export const DefaultGameFeedback = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const DefaultGameFeedback = () => {
   const mock = new MockAdapter(Axios);
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)
@@ -52,7 +53,8 @@ export const DefaultGameFeedback = (): React.Node => {
   );
 };
 
-export const GameFeedbackOneSolvedComment = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const GameFeedbackOneSolvedComment = () => {
   const mock = new MockAdapter(Axios);
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)
@@ -77,7 +79,8 @@ export const GameFeedbackOneSolvedComment = (): React.Node => {
   );
 };
 
-export const GameFeedbackWithError = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const GameFeedbackWithError = () => {
   const mock = new MockAdapter(Axios);
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)
@@ -102,7 +105,8 @@ export const GameFeedbackWithError = (): React.Node => {
   );
 };
 
-export const GameFeedbackEmpty = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const GameFeedbackEmpty = () => {
   const mock = new MockAdapter(Axios);
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)

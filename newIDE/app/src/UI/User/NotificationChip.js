@@ -26,7 +26,8 @@ const styles = {
 
 type Props = {||};
 
-const NotificationChip = (props: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const NotificationChip = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const {
     notifications,

@@ -12,7 +12,8 @@ type Props = {|
   align?: 'center' | 'left' | 'right',
 |};
 
-const BackgroundText = (props: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const BackgroundText = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <Typography

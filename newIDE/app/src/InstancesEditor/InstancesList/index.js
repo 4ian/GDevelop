@@ -363,9 +363,8 @@ class InstancesList extends Component<Props, State> {
   }
 }
 
-const InstancesListWithErrorBoundary: component(
-  ...{ ...Props, +ref?: React.RefSetter<InstancesListInterface> }
-) = React.forwardRef<
+// $FlowFixMe[signature-verification-failure]
+const InstancesListWithErrorBoundary = React.forwardRef<
   Props,
   InstancesListInterface
 >((props, ref) => {

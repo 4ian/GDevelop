@@ -68,7 +68,6 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
 
   // $FlowFixMe[missing-local-annot]
   const handleClick = event => {
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - even if not defined, not a problem.
     if (item.enabled === false) {
       return;
@@ -81,7 +80,6 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
   };
 
   const handlePointerOver = (pointerEvent: SyntheticPointerEvent<>) => {
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - even if not defined, not a problem.
     if (item.enabled === false) {
       return;
@@ -145,7 +143,6 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
         style={styles.menuItemWithSubMenu}
         key={item.label}
         disabled={
-          // $FlowFixMe[incompatible-type]
           // $FlowFixMe[incompatible-type] - even if not defined, not a problem.
           item.enabled === false
         }
@@ -219,7 +216,9 @@ export default class MaterialUIMenuImplementation
   buildFromTemplate(
     template: Array<MenuItemTemplate>,
     forceUpdate?: () => void
-  ): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  ) {
     // This is not a real hook.
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const isTouchscreen = useScreenType() === 'touch';
@@ -240,12 +239,10 @@ export default class MaterialUIMenuImplementation
               dense={!!electron || !isTouchscreen}
               key={'checkbox' + item.label}
               checked={
-                // $FlowFixMe[incompatible-type]
                 // $FlowFixMe[incompatible-type] - existence should be inferred by Flow.
                 item.checked
               }
               disabled={
-                // $FlowFixMe[incompatible-type]
                 // $FlowFixMe[incompatible-type] - existence should be inferred by Flow.
                 item.enabled === false
               }
@@ -327,7 +324,9 @@ export default class MaterialUIMenuImplementation
     // Automatically done by IconMenu
   }
 
-  getMenuProps(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getMenuProps() {
     return {};
   }
 }

@@ -23,7 +23,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const OpenAndNotAuthenticated = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const OpenAndNotAuthenticated = () => {
   return (
     <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <NewProjectSetupDialog
@@ -58,7 +59,8 @@ export const OpenAndNotAuthenticated = (): React.Node => {
   );
 };
 
-export const OpenAndAuthenticated = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const OpenAndAuthenticated = () => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <NewProjectSetupDialog
@@ -93,7 +95,8 @@ export const OpenAndAuthenticated = (): React.Node => {
   );
 };
 
-export const Opening = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Opening = () => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <NewProjectSetupDialog
@@ -129,7 +132,8 @@ export const Opening = (): React.Node => {
   );
 };
 
-export const LimitsReached = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const LimitsReached = () => {
   return (
     <AuthenticatedUserContext.Provider
       value={fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects}
@@ -166,7 +170,8 @@ export const LimitsReached = (): React.Node => {
   );
 };
 
-export const FromExample = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const FromExample = () => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <NewProjectSetupDialog
@@ -201,7 +206,8 @@ export const FromExample = (): React.Node => {
   );
 };
 
-export const FromExampleWithoutGoingBack = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const FromExampleWithoutGoingBack = () => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <NewProjectSetupDialog
@@ -237,7 +243,8 @@ export const FromExampleWithoutGoingBack = (): React.Node => {
   );
 };
 
-export const FromPrivateGameTemplate = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const FromPrivateGameTemplate = () => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <NewProjectSetupDialog
@@ -274,7 +281,8 @@ export const FromPrivateGameTemplate = (): React.Node => {
   );
 };
 
-export const FromPrivateGameTemplateWithoutGoingBack = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const FromPrivateGameTemplateWithoutGoingBack = () => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <NewProjectSetupDialog

@@ -444,7 +444,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._sendSelectedInstances();
   }
 
-  getInstancesEditorSettings(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getInstancesEditorSettings() {
     return this.state.instancesEditorSettings;
   }
 
@@ -976,14 +978,15 @@ export default class SceneEditor extends React.Component<Props, State> {
    * bottleneck. We let the mutations be done and trigger an update only when the user
    * is done.
    */
+  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
   _onInstancesEditorSettingsMutated = debounce(
-  (instancesEditorSettings: InstancesEditorSettings) => {
-    this.setInstancesEditorSettings(instancesEditorSettings);
-  },
-  1000,
-  { leading: false, trailing: true },
-) as any;
+    (instancesEditorSettings: InstancesEditorSettings) => {
+      this.setInstancesEditorSettings(instancesEditorSettings);
+    },
+    1000,
+    { leading: false, trailing: true }
+  );
 
   undo = () => {
     // /!\ Drop the selection to avoid keeping any references to deleted instances.
@@ -1294,13 +1297,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._sendUpdatedInstances(instances);
   };
 
+  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  _exportDataOnly = debounce(
-  () => {
+  _exportDataOnly = debounce(() => {
     this.props.hotReloadPreviewButtonProps.launchProjectDataOnlyPreview();
-  },
-  250,
-) as any;
+  }, 250);
 
   _onInstancesModified = (instances: Array<gdInitialInstance>) => {
     this._sendUpdatedInstances(instances);
@@ -1705,7 +1706,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     newName: string,
     global: boolean,
     i18n: I18nType
-  ): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  ) => {
     const { project, layout, projectScopedContainersAccessor } = this.props;
 
     const projectScopedContainers = projectScopedContainersAccessor.get();
@@ -2068,7 +2071,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
-  getContextMenuZoomItems = (i18n: I18nType): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getContextMenuZoomItems = (i18n: I18nType) => {
     return [
       {
         label: i18n._(t`Zoom in`),
@@ -2099,7 +2104,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     ];
   };
 
-  getContextMenuLayoutItems = (i18n: I18nType): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getContextMenuLayoutItems = (i18n: I18nType) => {
     const { layout } = this.props;
 
     return [
@@ -2114,7 +2121,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     ].filter(Boolean);
   };
 
-  getContextMenuInstancesWiseItems = (i18n: I18nType): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getContextMenuInstancesWiseItems = (i18n: I18nType) => {
     const hasSelectedInstances = this.instancesSelection.hasSelectedInstances();
     return [
       {
@@ -2258,7 +2267,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
-  isInstanceOf3DObject = (instance: gdInitialInstance): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  isInstanceOf3DObject = (instance: gdInitialInstance) => {
     const { project, globalObjectsContainer, objectsContainer } = this.props;
 
     const object = getObjectByName(
@@ -2275,7 +2286,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
-  buildContextMenu = (i18n: I18nType, options: any): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  buildContextMenu = (i18n: I18nType, options: any) => {
     if (
       options.ignoreSelectedObjectsForContextMenu ||
       !this.instancesSelection.hasSelectedInstances()
@@ -2700,7 +2713,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const {
       project,
       projectScopedContainersAccessor,

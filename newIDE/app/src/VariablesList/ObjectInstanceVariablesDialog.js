@@ -23,23 +23,22 @@ type Props = {|
   isListLocked: boolean,
 |};
 
-const ObjectInstanceVariablesDialog = (
-  {
-    project,
-    layout,
-    objectsContainer,
-    globalObjectsContainer,
-    objectInstance,
-    open,
-    onCancel,
-    onApply,
-    hotReloadPreviewButtonProps,
-    initiallySelectedVariableName,
-    projectScopedContainersAccessor,
-    onEditObjectVariables,
-    isListLocked
-  }: Props,
-): React.Node => {
+const ObjectInstanceVariablesDialog = ({
+  project,
+  layout,
+  objectsContainer,
+  globalObjectsContainer,
+  objectInstance,
+  open,
+  onCancel,
+  onApply,
+  hotReloadPreviewButtonProps,
+  initiallySelectedVariableName,
+  projectScopedContainersAccessor,
+  onEditObjectVariables,
+  isListLocked,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const tabs = React.useMemo(
     () => {
       const objectName = objectInstance.getObjectName();

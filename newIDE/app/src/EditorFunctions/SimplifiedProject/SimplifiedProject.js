@@ -76,15 +76,8 @@ export type SimplifiedProjectOptions = {|
   scopeToScene?: string,
 |};
 
-export const makeSimplifiedProjectBuilder = (gd: libGDevelop): {
-  getProjectSpecificExtensionsSummary: (
-    project: gdProject
-  ) => ProjectSpecificExtensionsSummary,
-  getSimplifiedProject: (
-    project: gdProject,
-    options: SimplifiedProjectOptions
-  ) => SimplifiedProject,
-} => {
+// $FlowFixMe[signature-verification-failure]
+export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
   const getVariableType = (variable: gdVariable) => {
     const type = variable.getType();
     return type === gd.Variable.String
@@ -305,11 +298,9 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop): {
     const instancesCountPerLayer: { [string]: { [string]: number } } = {};
 
     const instancesListerFunctor = new gd.InitialInstanceJSFunctor();
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - invoke is not writable
     // $FlowFixMe[cannot-write]
     instancesListerFunctor.invoke = instancePtr => {
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
       const instance: gdInitialInstance = gd.wrapPointer(
         // $FlowFixMe[incompatible-type]
@@ -326,9 +317,7 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop): {
       layerInstancesCount[name] = (layerInstancesCount[name] || 0) + 1;
       isEmpty = false;
     };
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - JSFunctor is incompatible with Functor
-    // $FlowFixMe[incompatible-type]
     scene.getInitialInstances().iterateOverInstances(instancesListerFunctor);
     instancesListerFunctor.delete();
 

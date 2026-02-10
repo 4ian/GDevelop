@@ -2,7 +2,8 @@
 import * as React from 'react';
 
 // https://reactjs.org/docs/hooks-faq.html#is-there-something-like-forceupdate
-export default function useForceUpdate(): (() => void) {
+// $FlowFixMe[signature-verification-failure]
+export default function useForceUpdate() {
   const [, updateState] = React.useState();
   // $FlowFixMe[incompatible-type]
   const forceUpdate = React.useCallback(() => updateState({}), []);
@@ -10,7 +11,8 @@ export default function useForceUpdate(): (() => void) {
   return forceUpdate;
 }
 
-export function useForceRecompute(): Array<{} | (() => void)> {
+// $FlowFixMe[signature-verification-failure]
+export function useForceRecompute() {
   const [recomputeTrigger, updateState] = React.useState({});
   const forceRecompute = React.useCallback(() => updateState({}), []);
 

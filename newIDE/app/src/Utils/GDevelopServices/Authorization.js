@@ -3,24 +3,21 @@ import { GDevelopAuthorizationWebSocketApi } from './ApiConfigs';
 
 let webSocket: ?WebSocket;
 
-export const setupAuthenticationWebSocket = (
-  {
-    onConnectionEstablished,
-    onTokenReceived,
-    onError,
-    onTimeout
-  }: {|
-    onConnectionEstablished: (connectionId: string) => void,
-    onTokenReceived: (
-      {|
-        provider: 'apple' | 'google' | 'github',
-        data: any,
-      |}
-    ) => Promise<void>,
-    onError: (Error) => void,
-    onTimeout: () => void,
-  |},
-): ?WebSocket => {
+export const setupAuthenticationWebSocket = ({
+  onConnectionEstablished,
+  onTokenReceived,
+  onError,
+  onTimeout,
+}: {|
+  onConnectionEstablished: (connectionId: string) => void,
+  onTokenReceived: ({|
+    provider: 'apple' | 'google' | 'github',
+    data: any,
+  |}) => Promise<void>,
+  onError: Error => void,
+  onTimeout: () => void,
+// $FlowFixMe[signature-verification-failure]
+|}) => {
   webSocket = new WebSocket(GDevelopAuthorizationWebSocketApi.baseUrl);
   const timeoutId = setTimeout(onTimeout, 10000);
   // $FlowFixMe[incompatible-use]

@@ -15,6 +15,7 @@ export const getPaperDecorator = (
   </Paper>
 );
 
-const defaultPaperDecorator: StoryDecorator = getPaperDecorator('dark');
+// $FlowFixMe[signature-verification-failure]
+const defaultPaperDecorator = getPaperDecorator('dark');
 
 export default defaultPaperDecorator;

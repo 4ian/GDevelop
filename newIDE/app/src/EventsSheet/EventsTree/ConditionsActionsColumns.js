@@ -50,7 +50,8 @@ const getConditionWidthRatio = (eventsSheetWidth: number) => {
  * next to each other on a big screen (with proper sizing for the conditions column),
  * and stacked on a small one.
  */
-const ConditionsActionsColumns = (props: Props): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+const ConditionsActionsColumns = (props: Props) => {
   const isMobile = props.windowSize === 'small';
   if (isMobile) {
     return (

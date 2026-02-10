@@ -38,7 +38,8 @@ type ExtensionStoreState = {|
   hasExtensionNamed: (extensionName: string) => boolean,
 |};
 
-export const ExtensionStoreContext: React.Context<ExtensionStoreState> = React.createContext<ExtensionStoreState>({
+// $FlowFixMe[signature-verification-failure]
+export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
   filters: null,
   searchResults: null,
   fetchExtensionsAndFilters: () => {},
@@ -66,7 +67,12 @@ type ExtensionStoreStateProviderProps = {|
   defaultSearchText?: string,
 |};
 
-export const ExtensionStoreStateProvider = ({children, i18n, defaultSearchText}: ExtensionStoreStateProviderProps): React.MixedElement => {
+export const ExtensionStoreStateProvider = ({
+  children,
+  i18n,
+  defaultSearchText,
+// $FlowFixMe[signature-verification-failure]
+}: ExtensionStoreStateProviderProps) => {
   const [
     translatedExtensionShortHeadersByName,
     setTranslatedExtensionShortHeadersByName,

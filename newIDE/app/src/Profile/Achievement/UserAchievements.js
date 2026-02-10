@@ -36,7 +36,8 @@ type Props = {|
   badges: ?Array<Badge>,
 |};
 
-const UserAchievements = ({achievements, badges}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const UserAchievements = ({ achievements, badges }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
 
   return (

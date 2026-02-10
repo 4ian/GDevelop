@@ -90,12 +90,8 @@ export type InstanceOrObjectPropertiesEditorInterface = {|
   getEditorTitle: () => React.Node,
 |};
 
-export const InstanceOrObjectPropertiesEditorContainer: component(
-  ...{
-    ...Props,
-    +ref?: React.RefSetter<InstanceOrObjectPropertiesEditorInterface>,
-  }
-) = React.forwardRef<
+// $FlowFixMe[signature-verification-failure]
+export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
   Props,
   InstanceOrObjectPropertiesEditorInterface
 >((props, ref) => {

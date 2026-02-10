@@ -15,7 +15,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <EventsBasedBehaviorEditor
     project={testProject.project}
     eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
@@ -23,7 +24,8 @@ export const Default = (): React.Node => (
   />
 );
 
-export const WithoutFunction = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithoutFunction = () => (
   <EventsBasedBehaviorEditor
     project={testProject.project}
     eventsFunctionsExtension={testProject.testEventsFunctionsExtension}

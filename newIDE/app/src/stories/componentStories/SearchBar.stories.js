@@ -172,7 +172,8 @@ const WithTagsAndHelp = () => {
   );
 };
 
-export const AllOptions = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const AllOptions = () => (
   <ColumnStackLayout>
     <Vanilla />
     <WithPlaceholder />

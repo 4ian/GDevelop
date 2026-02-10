@@ -10,7 +10,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <ForgotPasswordDialog
     onClose={() => action('onClose')()}
     onForgotPassword={() => action('onForgotPassword')()}

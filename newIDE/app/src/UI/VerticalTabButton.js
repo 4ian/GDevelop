@@ -38,7 +38,15 @@ type Props = {|
   id?: string,
 |};
 
-const VerticalTabButton = ({label, getIcon, onClick, isActive, hideLabel, id}: Props): React.Node => {
+const VerticalTabButton = ({
+  label,
+  getIcon,
+  onClick,
+  isActive,
+  hideLabel,
+  id,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   return (
     <Button
       variant={isActive ? 'contained' : 'text'}

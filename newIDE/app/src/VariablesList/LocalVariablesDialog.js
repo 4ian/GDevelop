@@ -16,19 +16,18 @@ type Props = {|
   isListLocked: boolean,
 |};
 
-const LocalVariablesDialog = (
-  {
-    project,
-    projectScopedContainersAccessor,
-    variablesContainer,
-    open,
-    onCancel,
-    onApply,
-    initiallySelectedVariableName,
-    shouldCreateInitiallySelectedVariable,
-    isListLocked
-  }: Props,
-): React.Node => {
+const LocalVariablesDialog = ({
+  project,
+  projectScopedContainersAccessor,
+  variablesContainer,
+  open,
+  onCancel,
+  onApply,
+  initiallySelectedVariableName,
+  shouldCreateInitiallySelectedVariable,
+  isListLocked,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const tabs = React.useMemo(
     () => [
       {

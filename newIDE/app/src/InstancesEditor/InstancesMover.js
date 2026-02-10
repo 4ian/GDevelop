@@ -38,7 +38,9 @@ export default class InstancesMover {
     totalDeltaX: number,
     totalDeltaY: number,
     followAxis: boolean
-  ): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  ) {
     if (followAxis && Math.abs(totalDeltaX) < Math.abs(totalDeltaY)) return 0;
 
     return totalDeltaX;
@@ -48,7 +50,9 @@ export default class InstancesMover {
     totalDeltaX: number,
     totalDeltaY: number,
     followAxis: boolean
-  ): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  ) {
     if (followAxis && Math.abs(totalDeltaY) < Math.abs(totalDeltaX)) return 0;
 
     return totalDeltaY;
@@ -165,7 +169,9 @@ export default class InstancesMover {
     this.endMove();
   }
 
-  isMoving(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  isMoving() {
     return !!this._initialSelectionAABB;
   }
 }

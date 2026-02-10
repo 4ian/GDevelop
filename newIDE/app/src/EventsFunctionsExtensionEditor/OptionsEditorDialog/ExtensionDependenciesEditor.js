@@ -51,7 +51,12 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
 |};
 
-export const ExtensionDependenciesEditor = ({eventsFunctionsExtension, project, resourceManagementProps}: Props): React.Node => {
+export const ExtensionDependenciesEditor = ({
+  eventsFunctionsExtension,
+  project,
+  resourceManagementProps,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const deps = eventsFunctionsExtension.getAllDependencies();
   const forceUpdate = useForceUpdate();
 
@@ -101,18 +106,13 @@ export const ExtensionDependenciesEditor = ({eventsFunctionsExtension, project, 
               </TableHeaderColumn>
             </TableRow>
           </TableHeader>
-          {/* $FlowFixMe[incompatible-type] */}
           <TableBody>
-            // $FlowFixMe[incompatible-type]
             {// $FlowFixMe[incompatible-type] - unsure why Flow complains about TableRow.
-            // $FlowFixMe[incompatible-type]
             mapVector<gdDependencyMetadata, TableRow>(
               // $FlowFixMe[incompatible-exact]
               eventsFunctionsExtension.getAllDependencies(),
               (dependency, index) => (
-                // $FlowFixMe[incompatible-type]
                 // $FlowFixMe[incompatible-type] - unsure why Flow complains about TableRow.
-                // $FlowFixMe[incompatible-type]
                 <TableRow key={dependency.getName()}>
                   <TableRowColumn>
                     <CompactSemiControlledTextField
@@ -234,18 +234,13 @@ export const ExtensionDependenciesEditor = ({eventsFunctionsExtension, project, 
               </TableHeaderColumn>
             </TableRow>
           </TableHeader>
-          {/* $FlowFixMe[incompatible-type] */}
           <TableBody>
-            // $FlowFixMe[incompatible-type]
             {// $FlowFixMe[incompatible-type] - unsure why Flow complains about TableRow.
-            // $FlowFixMe[incompatible-type]
             mapVector<gdSourceFileMetadata, TableRow>(
               // $FlowFixMe[incompatible-exact]
               eventsFunctionsExtension.getAllSourceFiles(),
               (sourceFile, index) => (
-                // $FlowFixMe[incompatible-type]
                 // $FlowFixMe[incompatible-type] - unsure why Flow complains about TableRow.
-                // $FlowFixMe[incompatible-type]
                 <TableRow key={sourceFile.getResourceName()}>
                   <TableRowColumn>
                     <CompactResourceSelectorWithThumbnail

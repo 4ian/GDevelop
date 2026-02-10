@@ -50,25 +50,23 @@ const getPartiallySavedRecentProjectFiles = (count: number) =>
     storageProviderName: 'test',
   }));
 
-const WrappedCreateSection = (
-  {
-    project,
-    recentProjectFiles,
-    // $FlowFixMe[incompatible-type]
-    tutorialProgress = undefined,
-    inAppTutorialsFetchingError = null,
-    user,
-    games = []
-  }: {|
-    project: ?gdProject,
-    recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
-    tutorialProgress?: InAppTutorialUserProgress,
-    inAppTutorialsFetchingError?: string | null,
-    // $FlowFixMe[value-as-type]
-    user: AuthenticatedUser,
-    games?: ?Array<Game>,
-  |},
-): React.Node => {
+const WrappedCreateSection = ({
+  project,
+  recentProjectFiles,
+  // $FlowFixMe[incompatible-type]
+  tutorialProgress = undefined,
+  inAppTutorialsFetchingError = null,
+  user,
+  games = [],
+}: {|
+  project: ?gdProject,
+  recentProjectFiles: FileMetadataAndStorageProviderName[],
+  tutorialProgress?: InAppTutorialUserProgress,
+  inAppTutorialsFetchingError?: string | null,
+  user: AuthenticatedUser,
+  games?: ?Array<Game>,
+// $FlowFixMe[signature-verification-failure]
+|}) => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   // Adapt height for storybook to see the bottom menu on mobile.
   const fixedHeight = isMobile ? (isLandscape ? 400 : 850) : 1080;
@@ -77,7 +75,6 @@ const WrappedCreateSection = (
       {({ i18n }) => (
         <FixedHeightFlexContainer height={fixedHeight}>
           <PreferencesContext.Provider
-            // $FlowFixMe[incompatible-type]
             value={{
               ...initialPreferences,
               getRecentProjectFiles: () => recentProjectFiles,
@@ -146,7 +143,8 @@ export default {
   decorators: [GDevelopJsInitializerDecorator, inAppTutorialDecorator],
 };
 
-export const CreateSectionLoading = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const CreateSectionLoading = () => (
   <WrappedCreateSection
     project={null}
     // $FlowFixMe[incompatible-type]
@@ -155,7 +153,8 @@ export const CreateSectionLoading = (): React.Node => (
     games={null}
   />
 );
-export const NoProjectOpened = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const NoProjectOpened = () => (
   <WrappedCreateSection
     project={null}
     // $FlowFixMe[incompatible-type]
@@ -163,7 +162,8 @@ export const NoProjectOpened = (): React.Node => (
     user={fakeSilverAuthenticatedUser}
   />
 );
-export const ProjectOpened = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const ProjectOpened = () => (
   <WrappedCreateSection
     project={testProject.project}
     // $FlowFixMe[incompatible-type]
@@ -171,14 +171,16 @@ export const ProjectOpened = (): React.Node => (
     user={fakeSilverAuthenticatedUser}
   />
 );
-export const NoRecentFiles = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const NoRecentFiles = () => (
   <WrappedCreateSection
     project={testProject.project}
     recentProjectFiles={[]}
     user={fakeSilverAuthenticatedUser}
   />
 );
-export const LotOfRecentFiles = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const LotOfRecentFiles = () => (
   <WrappedCreateSection
     project={testProject.project}
     // $FlowFixMe[incompatible-type]
@@ -186,7 +188,8 @@ export const LotOfRecentFiles = (): React.Node => (
     user={fakeSilverAuthenticatedUser}
   />
 );
-export const SomeRecentFilesNotSavedYet = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const SomeRecentFilesNotSavedYet = () => (
   <WrappedCreateSection
     project={testProject.project}
     // $FlowFixMe[incompatible-type]

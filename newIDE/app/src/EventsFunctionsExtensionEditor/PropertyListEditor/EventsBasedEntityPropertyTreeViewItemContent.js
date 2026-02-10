@@ -285,7 +285,9 @@ export class EventsBasedEntityPropertyTreeViewItemContent
     this.props.editName(this.getId());
   }
 
-  buildMenuTemplate(i18n: I18nType, index: number): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  buildMenuTemplate(i18n: I18nType, index: number) {
     const property = this.property.getProperty();
     return [
       {
@@ -459,7 +461,9 @@ export class EventsBasedEntityPropertyTreeViewItemContent
     this.props.onPropertiesUpdated();
   }
 
-  getRightButton(i18n: I18nType): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getRightButton(i18n: I18nType) {
     return null;
   }
 }

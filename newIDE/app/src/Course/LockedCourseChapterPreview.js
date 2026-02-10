@@ -74,9 +74,8 @@ type Props = {|
   onClickUnlock: () => void,
 |};
 
-const LockedCourseChapterPreview: component(
-  ...{ ...Props, +ref?: React.RefSetter<HTMLDivElement> }
-) = React.forwardRef<Props, HTMLDivElement>(
+// $FlowFixMe[signature-verification-failure]
+const LockedCourseChapterPreview = React.forwardRef<Props, HTMLDivElement>(
   ({ course, courseChapter, onClickUnlock }, ref) => {
     const { windowSize } = useResponsiveWindowSize();
     const youtubeVideoId = courseChapter.videoUrl

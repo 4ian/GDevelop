@@ -23,7 +23,8 @@ export default {
   decorators: [alertDecorator, paperDecorator],
 };
 
-export const Errored = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Errored = () => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock.onAny().reply(500);
 
@@ -42,7 +43,8 @@ export const Errored = (): React.Node => {
   );
 };
 
-export const WithSigningCredentialsButNonePreSelected = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithSigningCredentialsButNonePreSelected = () => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock
     .onGet(`${GDevelopBuildApi.baseUrl}/signing-credential`)
@@ -80,7 +82,8 @@ export const WithSigningCredentialsButNonePreSelected = (): React.Node => {
   );
 };
 
-export const WithSigningCredentialsAndOnePreSelected = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithSigningCredentialsAndOnePreSelected = () => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock
     .onGet(`${GDevelopBuildApi.baseUrl}/signing-credential`)

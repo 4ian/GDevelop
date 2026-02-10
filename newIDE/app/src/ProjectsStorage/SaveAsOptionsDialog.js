@@ -21,7 +21,8 @@ type Props = {|
   displayOptionToGenerateNewProjectUuid: boolean,
 |};
 
-const SaveAsOptionsDialog = (props: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const SaveAsOptionsDialog = (props: Props) => {
   const [name, setName] = React.useState<string>(props.nameSuggestion);
   const [
     generateNewProjectUuid,

@@ -25,7 +25,8 @@ type Props = {|
  * Display the specified icon with a background so that it's suitable
  * for display anywhere with a consistent style.
  */
-export const IconContainer = ({src, alt, size}: Props): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+export const IconContainer = ({ src, alt, size }: Props) => {
   const padding = size > 24 ? 4 : 2;
   return (
     <span style={styles.iconBackground}>

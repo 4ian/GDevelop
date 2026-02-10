@@ -77,7 +77,8 @@ const getVariableValueAsString = (variable: gdVariable, i18n: I18nType) => {
     : null;
 };
 
-export const VariableDeclaration = (props: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const VariableDeclaration = (props: Props) => {
   const { variableName, variable, id } = props;
   /**
    * Render the different parts of the text of the instruction.

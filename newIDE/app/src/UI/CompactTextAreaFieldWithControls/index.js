@@ -33,12 +33,8 @@ export type CompactTextAreaFieldWithControlsInterface = {|
   setCursorPosition: (position: number) => void,
 |};
 
-export const CompactTextAreaFieldWithControls: component(
-  ...{
-    ...CompactTextAreaFieldWithControlsProps,
-    +ref?: React.RefSetter<CompactTextAreaFieldWithControlsInterface>,
-  }
-) = React.forwardRef<
+// $FlowFixMe[signature-verification-failure]
+export const CompactTextAreaFieldWithControls = React.forwardRef<
   CompactTextAreaFieldWithControlsProps,
   CompactTextAreaFieldWithControlsInterface
 >(

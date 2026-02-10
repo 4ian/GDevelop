@@ -19,13 +19,11 @@ const iconSize = 24;
 type Props<Item> = {|
   index: number,
   style: any,
-  // $FlowFixMe[value-as-type]
   data: ItemData<Item>,
   /** Used by react-window. */
   isScrolling?: boolean,
 |};
 
-// $FlowFixMe[value-as-type]
 // $FlowFixMe[missing-local-annot]
 const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   const { data, index, style } = props;
@@ -173,7 +171,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   );
 };
 
-// $FlowFixMe[incompatible-type]
 // $FlowFixMe[incompatible-type] - memo does not support having a generic in the props.
+// $FlowFixMe[signature-verification-failure]
 // $FlowFixMe[missing-type-arg]
-export default React.memo<Props>(TreeViewRow, areEqual) as component(...any);
+export default React.memo<Props>(TreeViewRow, areEqual);

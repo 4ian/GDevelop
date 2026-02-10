@@ -15,7 +15,6 @@ export type ExportPipelineContext<ExportState> = {|
 
 export type HeaderProps<ExportState> = {|
   project: gdProject,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   exportState: ExportState,
   updateExportState: (
@@ -114,7 +113,6 @@ export type ExportPipeline<
    */
   launchOnlineBuild?: (
     exportState: ExportState,
-    // $FlowFixMe[value-as-type]
     authenticatedUser: AuthenticatedUser,
     uploadBucketKey: string,
     gameId: string,

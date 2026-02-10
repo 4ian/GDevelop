@@ -4,7 +4,8 @@ import { type GDevelopTheme } from '.';
 import DefaultLightTheme from './DefaultLightTheme';
 
 // $FlowFixMe[value-as-type]
-const GDevelopThemeContext: React.Context<GDevelopTheme> = React.createContext<GDevelopTheme>(
+// $FlowFixMe[signature-verification-failure]
+const GDevelopThemeContext = React.createContext<GDevelopTheme>(
   DefaultLightTheme.gdevelopTheme
 );
 

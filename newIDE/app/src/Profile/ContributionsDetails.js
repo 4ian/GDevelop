@@ -24,7 +24,12 @@ type ContributionLineProps = {|
   shortDescription?: string,
 |};
 
-export const ContributionLine = ({fullName, previewIconUrl, shortDescription}: ContributionLineProps): React.Node => (
+export const ContributionLine = ({
+  fullName,
+  previewIconUrl,
+  shortDescription,
+// $FlowFixMe[signature-verification-failure]
+}: ContributionLineProps) => (
   <Line>
     {previewIconUrl && (
       <IconContainer alt={fullName} src={previewIconUrl} size={64} />
@@ -43,7 +48,11 @@ type ExamplesAccordionProps = {|
   exampleError: ?Error,
 |};
 
-export const ExamplesAccordion = ({examples, exampleError}: ExamplesAccordionProps): React.Node => {
+export const ExamplesAccordion = ({
+  examples,
+  exampleError,
+// $FlowFixMe[signature-verification-failure]
+}: ExamplesAccordionProps) => {
   if (exampleError)
     return (
       <Column>
@@ -91,7 +100,11 @@ type ExtensionsAccordionProps = {|
   extensionError: ?Error,
 |};
 
-export const ExtensionsAccordion = ({extensions, extensionError}: ExtensionsAccordionProps): React.Node => {
+export const ExtensionsAccordion = ({
+  extensions,
+  extensionError,
+// $FlowFixMe[signature-verification-failure]
+}: ExtensionsAccordionProps) => {
   if (extensionError)
     return (
       <Column>
@@ -151,7 +164,8 @@ type Props = {|
   userId: string,
 |};
 
-const ContributionDetails = ({userId}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const ContributionDetails = ({ userId }: Props) => {
   const [
     extensions,
     setExtensions,

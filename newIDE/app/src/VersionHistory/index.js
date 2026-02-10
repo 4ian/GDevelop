@@ -89,7 +89,8 @@ type Props = {|
   isVisible: boolean,
 |};
 
-const VersionHistory: component(...Props) = React.memo<Props>(
+// $FlowFixMe[signature-verification-failure]
+const VersionHistory = React.memo<Props>(
   ({
     projectId,
     authenticatedUserId,
@@ -297,7 +298,6 @@ const VersionHistory: component(...Props) = React.memo<Props>(
         </I18n>
         <ContextMenu
           ref={contextMenuRef}
-          // $FlowFixMe[incompatible-type]
           buildMenuTemplate={buildVersionMenuTemplate}
         />
       </>

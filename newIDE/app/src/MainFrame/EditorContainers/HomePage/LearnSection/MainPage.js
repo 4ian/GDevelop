@@ -79,21 +79,20 @@ type Props = {|
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
 |};
 
-const MainPage = (
-  {
-    onSelectCategory,
-    selectInAppTutorial,
-    courses,
-    onSelectCourse,
-    onSelectBundle,
-    getCourseCompletion,
-    getCourseChapterCompletion,
-    onOpenAskAi,
-    onOpenNewProjectSetupDialog,
-    onSelectPrivateGameTemplateListingData,
-    onSelectExampleShortHeader
-  }: Props,
-): React.Node => {
+const MainPage = ({
+  onSelectCategory,
+  selectInAppTutorial,
+  courses,
+  onSelectCourse,
+  onSelectBundle,
+  getCourseCompletion,
+  getCourseChapterCompletion,
+  onOpenAskAi,
+  onOpenNewProjectSetupDialog,
+  onSelectPrivateGameTemplateListingData,
+  onSelectExampleShortHeader,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const {
     palette: { type: paletteType },

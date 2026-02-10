@@ -20,9 +20,7 @@ describe('EnumerateInstructions', () => {
   it('can enumerate instructions being conditions', () => {
     const instructions = enumerateAllInstructions(
       true,
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] The fake I18n translates groups to empty strings.
-      // $FlowFixMe[incompatible-type]
       null
     );
 
@@ -75,9 +73,7 @@ describe('EnumerateInstructions', () => {
   it('can enumerate instructions being actions', () => {
     const instructions = enumerateAllInstructions(
       false,
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] The fake I18n translates groups to empty strings.
-      // $FlowFixMe[incompatible-type]
       null
     );
 

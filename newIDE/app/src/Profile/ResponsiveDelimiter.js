@@ -25,7 +25,8 @@ type Props = {|
   text: React.Node,
 |};
 
-const ResponsiveDelimiter = ({text}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const ResponsiveDelimiter = ({ text }: Props) => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
 
   const verticalDesign = isMobile && !isLandscape;

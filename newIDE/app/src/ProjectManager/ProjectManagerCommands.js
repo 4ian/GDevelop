@@ -11,7 +11,8 @@ type Props = {|
   onOpenPlatformSpecificAssetsDialog: () => void,
 |};
 
-const ProjectManagerCommands = (props: Props): null => {
+// $FlowFixMe[signature-verification-failure]
+const ProjectManagerCommands = (props: Props) => {
   useCommand('OPEN_PROJECT_PROPERTIES', !!props.project, {
     handler: props.onOpenProjectProperties,
   });

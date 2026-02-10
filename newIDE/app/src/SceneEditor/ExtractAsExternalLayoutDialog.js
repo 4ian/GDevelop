@@ -18,7 +18,8 @@ export default function ExtractAsExternalLayoutDialog({
   suggestedName,
   onApply,
   onCancel,
-}: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: Props) {
   const [chosenName, setChosenName] = React.useState<string>(suggestedName);
 
   const apply = React.useCallback(() => onApply(chosenName), [

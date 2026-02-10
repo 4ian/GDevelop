@@ -44,7 +44,8 @@ export default function ExtractAsCustomObjectDialog({
   selectedInstances,
   onApply,
   onCancel,
-}: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: Props) {
   const [extensionName, setExtensionName] = React.useState<string>('');
   const [isNewExtension, setNewExtension] = React.useState<boolean>(true);
   const [

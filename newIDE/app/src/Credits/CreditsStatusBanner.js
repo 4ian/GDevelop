@@ -23,7 +23,12 @@ type Props = {|
   onActionButtonClick?: () => void,
 |};
 
-const CreditsStatusBanner = ({displayPurchaseAction, actionButtonLabel, onActionButtonClick}: Props): React.Node => {
+const CreditsStatusBanner = ({
+  displayPurchaseAction,
+  actionButtonLabel,
+  onActionButtonClick,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { limits, onRefreshLimits } = React.useContext(
     AuthenticatedUserContext

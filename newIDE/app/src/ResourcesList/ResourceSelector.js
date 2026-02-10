@@ -66,9 +66,8 @@ type Props = {|
 
 export type ResourceSelectorInterface = {| focus: FieldFocusFunction |};
 
-const ResourceSelector: component(
-  ...{ ...Props, +ref?: React.RefSetter<ResourceSelectorInterface> }
-) = React.forwardRef<Props, ResourceSelectorInterface>(
+// $FlowFixMe[signature-verification-failure]
+const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
   (props, ref) => {
     const {
       project,
@@ -490,7 +489,6 @@ const ResourceSelector: component(
                   helperMarkdownText={props.helperMarkdownText}
                   hintText={props.hintText}
                   openOnFocus
-                  // $FlowFixMe[incompatible-type]
                   dataSource={autoCompleteData}
                   value={resourceName}
                   onChange={onChangeResourceName}

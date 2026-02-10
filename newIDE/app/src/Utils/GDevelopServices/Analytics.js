@@ -49,8 +49,8 @@ export type GameMetrics = {
   },
 };
 
-// $FlowFixMe[cannot-resolve-name]
-export const client: Axios = axios.create({
+// $FlowFixMe[signature-verification-failure]
+export const client = axios.create({
   baseURL: GDevelopAnalyticsApi.baseUrl,
 });
 
@@ -62,6 +62,7 @@ export const getGameMetrics = async (
 ): Promise<?GameMetrics> => {
   const authorizationHeader = await getAuthorizationHeader();
 
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/game-metrics`, {
     params: {
       userId,
@@ -90,6 +91,7 @@ export const getGameMetricsFrom = async (
 ): Promise<?(GameMetrics[])> => {
   const authorizationHeader = await getAuthorizationHeader();
 
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/game-metrics`, {
     params: {
       userId,

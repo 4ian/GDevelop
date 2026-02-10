@@ -17,18 +17,17 @@ type Props = {|
   isListLocked: boolean,
 |};
 
-const GlobalVariablesDialog = (
-  {
-    project,
-    open,
-    onCancel,
-    onApply,
-    hotReloadPreviewButtonProps,
-    initiallySelectedVariableName,
-    shouldCreateInitiallySelectedVariable,
-    isListLocked
-  }: Props,
-): React.Node => {
+const GlobalVariablesDialog = ({
+  project,
+  open,
+  onCancel,
+  onApply,
+  hotReloadPreviewButtonProps,
+  initiallySelectedVariableName,
+  shouldCreateInitiallySelectedVariable,
+  isListLocked,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const onComputeAllVariableNames = React.useCallback(
     () =>
       EventsRootVariablesFinder.findAllGlobalVariables(

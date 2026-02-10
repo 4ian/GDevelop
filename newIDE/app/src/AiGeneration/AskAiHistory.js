@@ -80,7 +80,11 @@ type AskAiHistoryContentProps = {|
   selectedAiRequestId: string | null,
 |};
 
-export const AskAiHistoryContent = ({onSelectAiRequest, selectedAiRequestId}: AskAiHistoryContentProps): React.Node => {
+export const AskAiHistoryContent = ({
+  onSelectAiRequest,
+  selectedAiRequestId,
+// $FlowFixMe[signature-verification-failure]
+}: AskAiHistoryContentProps) => {
   const {
     aiRequestStorage: {
       aiRequests,
@@ -91,10 +95,8 @@ export const AskAiHistoryContent = ({onSelectAiRequest, selectedAiRequestId}: As
       error,
     },
   } = React.useContext(AiRequestContext);
-  // $FlowFixMe[incompatible-type]
   // $FlowFixMe[incompatible-type] - Flow loses type with Object.values
   const aiRequestsArray: AiRequest[] = Object.values(aiRequests).sort(
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - Object.values() loses the type of aiRequests.
     (a: AiRequest, b: AiRequest) => {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -200,7 +202,13 @@ export const AskAiHistoryContent = ({onSelectAiRequest, selectedAiRequestId}: As
   );
 };
 
-export const AskAiHistory = ({open, onClose, onSelectAiRequest, selectedAiRequestId}: Props): React.Node => {
+export const AskAiHistory = ({
+  open,
+  onClose,
+  onSelectAiRequest,
+  selectedAiRequestId,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
 
   const handleSelectAiRequest = (aiRequest: AiRequest) => {

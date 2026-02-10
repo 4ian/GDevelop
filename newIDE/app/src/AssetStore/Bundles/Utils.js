@@ -543,22 +543,22 @@ const CreditsLineSummary = ({
   </LineStackLayout>
 );
 
-export const getSummaryLines = (
-  {
-    redemptionCodesIncludedInBundle,
-    bundleListingData,
-    productListingDatasIncludedInBundle
-  }: {|
-    redemptionCodesIncludedInBundle: Array<IncludedRedemptionCode>,
-    bundleListingData: BundleListingData,
-    productListingDatasIncludedInBundle: Array<
-      | PrivateAssetPackListingData
-      | PrivateGameTemplateListingData
-      | BundleListingData
-      | CreditsPackageListingData
-      | CourseListingData>,
-  |},
-): { desktopLines: Array<React.Node>, mobileLines: Array<React.Node> } => {
+export const getSummaryLines = ({
+  redemptionCodesIncludedInBundle,
+  bundleListingData,
+  productListingDatasIncludedInBundle,
+}: {|
+  redemptionCodesIncludedInBundle: IncludedRedemptionCode[],
+  bundleListingData: BundleListingData,
+  productListingDatasIncludedInBundle: (
+    | PrivateAssetPackListingData
+    | PrivateGameTemplateListingData
+    | BundleListingData
+    | CreditsPackageListingData
+    | CourseListingData
+  )[],
+// $FlowFixMe[signature-verification-failure]
+|}) => {
   const includedListableProducts =
     bundleListingData.includedListableProducts || [];
   const summaryLineItems = [];
@@ -569,7 +569,6 @@ export const getSummaryLines = (
 
   const courseListingDatasIncludedInBundle = includedCourseListableProducts
     .map(product => {
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - We know it's a course because of the filter.
       const courseListingData: ?CourseListingData = productListingDatasIncludedInBundle.find(
         listingData =>
@@ -598,7 +597,6 @@ export const getSummaryLines = (
 
   const assetPackListingDatasIncludedInBundle = includedAssetPackListableProducts
     .map(product => {
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - We know it's an asset pack because of the filter.
       const assetPackListingData: ?PrivateAssetPackListingData = productListingDatasIncludedInBundle.find(
         listingData =>
@@ -631,7 +629,6 @@ export const getSummaryLines = (
 
   const gameTemplateListingDatasIncludedInBundle = includedGameTemplateListableProducts
     .map(product => {
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - We know it's a game template because of the filter.
       const gameTemplateListingData: ?PrivateGameTemplateListingData = productListingDatasIncludedInBundle.find(
         listingData =>
@@ -727,9 +724,7 @@ export const getSummaryLines = (
   }
 
   return {
-    // $FlowFixMe[incompatible-type]
     mobileLines,
-    // $FlowFixMe[incompatible-type]
     desktopLines,
   };
 };

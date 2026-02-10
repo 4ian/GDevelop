@@ -47,7 +47,6 @@ const styles = {
 };
 
 type Props = {|
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   game: Game,
   i18n: I18nType,
@@ -124,7 +123,8 @@ const getDisplayedFeedbacks = (
   return filteredFeedbacksByBuildAndUnprocessed;
 };
 
-const GameFeedback = ({i18n, authenticatedUser, game}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const [showProcessed, setShowProcessed] = React.useState(false);

@@ -17,7 +17,8 @@ type Props = {|
   |},
 |};
 
-function CircularProgress(props: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+function CircularProgress(props: Props) {
   return (
     <MuiCircularProgress
       color="secondary"

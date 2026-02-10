@@ -11,7 +11,8 @@ type Props = {|
   description: React.Node,
 |};
 
-const TipCard = ({title, description}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const TipCard = ({ title, description }: Props) => {
   return (
     <Column noMargin>
       <Paper background="light">

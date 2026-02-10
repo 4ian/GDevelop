@@ -12,10 +12,10 @@ import { type Leaderboard } from '../../Utils/GDevelopServices/Play';
 import { hasValidSubscriptionPlan } from '../../Utils/GDevelopServices/Usage';
 
 export const checkIfHasTooManyLeaderboards = (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   leaderboards: ?Array<Leaderboard>
-): ?(false | boolean) => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   if (!authenticatedUser.authenticated) return false;
 
   const { limits } = authenticatedUser;
@@ -33,7 +33,8 @@ export const checkIfHasTooManyLeaderboards = (
   );
 };
 
-const MaxLeaderboardCountAlertMessage = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const MaxLeaderboardCountAlertMessage = () => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { limits, subscription } = authenticatedUser;
   if (!limits) return null;

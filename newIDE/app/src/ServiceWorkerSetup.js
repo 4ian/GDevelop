@@ -11,7 +11,8 @@ const electron = optionalRequire('electron');
 const serviceWorker =
   typeof navigator !== 'undefined' ? navigator.serviceWorker : undefined;
 
-export function isServiceWorkerSupported(): boolean {
+// $FlowFixMe[signature-verification-failure]
+export function isServiceWorkerSupported() {
   return !!serviceWorker;
 }
 

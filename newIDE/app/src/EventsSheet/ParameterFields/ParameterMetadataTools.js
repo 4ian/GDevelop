@@ -62,7 +62,8 @@ export const getLastObjectParameterValue = ({
 export const getLastObjectParameterObjectType = (
   parameters: gdParameterMetadataContainer,
   parameterIndex: number
-): string => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   const objectParameterIndex = gd.ParameterMetadataTools.getObjectParameterIndexFor(
     parameters,
     parameterIndex

@@ -110,5 +110,6 @@ function ListIcon(props: Props) {
   );
 }
 
-const ListIconMemo: component(...Props) = React.memo<Props>(ListIcon);
+// $FlowFixMe[signature-verification-failure]
+const ListIconMemo = React.memo<Props>(ListIcon);
 export default ListIconMemo;

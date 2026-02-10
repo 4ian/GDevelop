@@ -47,7 +47,6 @@ const ensureGDevelopGamesMonetizationReady = async () => {
       const module = await retryIfFailed(
         { times: 2 },
         async () =>
-          // $FlowFixMe[incompatible-type]
           // $FlowFixMe[incompatible-type] - Remote script cannot be found.
           // $FlowFixMe[cannot-resolve-module]
           (await import(/* webpackIgnore: true */ 'https://resources.gdevelop.io/a/ggm-web.js'))
@@ -128,7 +127,6 @@ const useUserCustomToken = (): {|
           // $FlowFixMe[incompatible-type]
           setUserCustomToken(userCustomToken);
           setLastTokenGenerationTime(Date.now());
-          // $FlowFixMe[incompatible-type]
           setCustomTokenUserId(userId);
         } catch (error) {
           console.error(
@@ -145,9 +143,7 @@ const useUserCustomToken = (): {|
 };
 
 const sendSoftKeyboardOffsetToFrame = async (offset: number) => {
-  // $FlowFixMe[incompatible-type]
   // $FlowFixMe[incompatible-type] - we know it's an iframe.
-  // $FlowFixMe[incompatible-type]
   const iframe: ?HTMLIFrameElement = document.getElementById(
     GAMES_PLATFORM_IFRAME_ID
   );
@@ -288,9 +284,7 @@ const useGamesPlatformFrame = ({
   const notifyIframeToChangeGame = React.useCallback(
     (gameId: string) => {
       if (iframeLoaded) {
-        // $FlowFixMe[incompatible-type]
         // $FlowFixMe[incompatible-type] - we know it's an iframe.
-        // $FlowFixMe[incompatible-type]
         const iframe: ?HTMLIFrameElement = document.getElementById(
           GAMES_PLATFORM_IFRAME_ID
         );
@@ -437,9 +431,7 @@ const useGamesPlatformFrame = ({
       // to automatically log the user in the frame,
       // or notify it the user is not connected (or just disconnected).
 
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - we know it's an iframe.
-      // $FlowFixMe[incompatible-type]
       const iframe: ?HTMLIFrameElement = document.getElementById(
         GAMES_PLATFORM_IFRAME_ID
       );

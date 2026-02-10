@@ -29,10 +29,8 @@ import ExtensionInstallDialog from '../ExtensionStore/ExtensionInstallDialog';
 import { getIDEVersion } from '../../Version';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
-export const useExtensionUpdateAlertDialog = (): ((
-  project: gdProject,
-  behaviorShortHeader: BehaviorShortHeader
-) => Promise<boolean>) => {
+// $FlowFixMe[signature-verification-failure]
+export const useExtensionUpdateAlertDialog = () => {
   const { showConfirmation } = useAlertDialog();
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
@@ -75,19 +73,18 @@ type Props = {|
 const getBehaviorType = (behaviorShortHeader: BehaviorShortHeader) =>
   behaviorShortHeader.type;
 
-export const BehaviorStore = (
-  {
-    isInstalling,
-    project,
-    objectType,
-    objectBehaviorsTypes,
-    isChildObject,
-    installedBehaviorMetadataList,
-    deprecatedBehaviorMetadataList,
-    onInstall,
-    onChoose
-  }: Props,
-): React.Node => {
+export const BehaviorStore = ({
+  isInstalling,
+  project,
+  objectType,
+  objectBehaviorsTypes,
+  isChildObject,
+  installedBehaviorMetadataList,
+  deprecatedBehaviorMetadataList,
+  onInstall,
+  onChoose,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const [
     selectedBehaviorShortHeader,
@@ -298,7 +295,6 @@ export const BehaviorStore = (
             filteredSearchResults.map(({ item }) => item)
           }
           getSearchItemUniqueId={getBehaviorType}
-          // $FlowFixMe[missing-local-annot]
           renderSearchItem={(behaviorShortHeader, onHeightComputed) => (
             <BehaviorListItem
               id={

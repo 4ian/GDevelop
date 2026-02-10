@@ -359,11 +359,12 @@ export const initialPreferences = {
     language: 'en',
     autoDownloadUpdates: true,
     themeName:
-      (typeof window !== 'undefined' &&
-  window.matchMedia('(prefers-color-scheme: dark)').matches
-  ? 'GDevelop default Dark'
-  : // TODO: Use the light theme back when it's adapted to the modern theme.
-  'GDevelop default Dark') as string,
+      // $FlowFixMe[signature-verification-failure]
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'GDevelop default Dark'
+        : // TODO: Use the light theme back when it's adapted to the modern theme.
+          'GDevelop default Dark',
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},
@@ -380,11 +381,13 @@ export const initialPreferences = {
     showEffectParameterNames: false,
     projectLastUsedPaths: {},
     defaultEditorMosaicNodes: {},
-    recentProjectFiles: [] as Array<empty>,
+    // $FlowFixMe[signature-verification-failure]
+    recentProjectFiles: [],
     autoOpenMostRecentProject: true,
     hasProjectOpened: false,
     userShortcutMap: {},
-    newObjectDialogDefaultTab: (electron ? 'new-object' : 'asset-store') as string,
+    // $FlowFixMe[signature-verification-failure]
+    newObjectDialogDefaultTab: electron ? 'new-object' : 'asset-store',
     shareDialogDefaultTab: 'publish',
     isMenuBarHiddenInPreview: true,
     isAlwaysOnTopInPreview: false,
@@ -396,10 +399,12 @@ export const initialPreferences = {
     showInAppTutorialDeveloperMode: false,
     openDiagnosticReportAutomatically: true,
     showDeprecatedInstructionWarning: false,
-    use3DEditor: isWebGLSupported() as boolean,
+    // $FlowFixMe[signature-verification-failure]
+    use3DEditor: isWebGLSupported(),
     showBasicProfilingCounters: false,
     inAppTutorialsProgress: {},
-    newProjectsDefaultFolder: (app ? findDefaultFolder(app) : '') as string,
+    // $FlowFixMe[signature-verification-failure]
+    newProjectsDefaultFolder: app ? findDefaultFolder(app) : '',
     newProjectsDefaultStorageProviderName: 'Cloud',
     useShortcutToClosePreviewWindow: true,
     watchProjectFolderFilesForLocalProjects: true,
@@ -431,7 +436,8 @@ export const initialPreferences = {
   showAllAnnouncements: () => {},
   showAskAiStandAloneForm: (identifier: string, show: boolean) => {},
   showAllAskAiStandAloneForms: () => {},
-  verifyIfIsNewVersion: (): boolean => false,
+  // $FlowFixMe[signature-verification-failure]
+  verifyIfIsNewVersion: () => false,
   setEventsSheetShowObjectThumbnails: () => {},
   setAutosaveOnPreview: () => {},
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => {},
@@ -439,9 +445,11 @@ export const initialPreferences = {
   setEventsSheetIndentScale: (scale: number) => {},
   setEventsSheetZoomLevel: (zoomLevel: number) => {},
   setShowEffectParameterNames: (enabled: boolean) => {},
-  getLastUsedPath: (project: gdProject, kind: ResourceKind): string => '',
+  // $FlowFixMe[signature-verification-failure]
+  getLastUsedPath: (project: gdProject, kind: ResourceKind) => '',
   setLastUsedPath: (project: gdProject, kind: ResourceKind, path: string) => {},
-  getDefaultEditorMosaicNode: (name: EditorMosaicName): null => null,
+  // $FlowFixMe[signature-verification-failure]
+  getDefaultEditorMosaicNode: (name: EditorMosaicName) => null,
   setDefaultEditorMosaicNode: (
     name: EditorMosaicName,
     node: ?EditorMosaicNode
@@ -451,32 +459,41 @@ export const initialPreferences = {
   getRecentProjectFiles: options => [],
   insertRecentProjectFile: () => {},
   removeRecentProjectFile: () => {},
-  getAutoOpenMostRecentProject: (): boolean => true,
+  // $FlowFixMe[signature-verification-failure]
+  getAutoOpenMostRecentProject: () => true,
   setAutoOpenMostRecentProject: () => {},
-  hadProjectOpenedDuringLastSession: (): boolean => false,
+  // $FlowFixMe[signature-verification-failure]
+  hadProjectOpenedDuringLastSession: () => false,
   setHasProjectOpened: () => {},
   resetShortcutsToDefault: () => {},
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => {},
-  getNewObjectDialogDefaultTab: (): string => 'asset-store',
+  // $FlowFixMe[signature-verification-failure]
+  getNewObjectDialogDefaultTab: () => 'asset-store',
   setNewObjectDialogDefaultTab: () => {},
-  getShareDialogDefaultTab: (): string => 'invite',
+  // $FlowFixMe[signature-verification-failure]
+  getShareDialogDefaultTab: () => 'invite',
   setShareDialogDefaultTab: () => {},
-  getIsMenuBarHiddenInPreview: (): boolean => true,
+  // $FlowFixMe[signature-verification-failure]
+  getIsMenuBarHiddenInPreview: () => true,
   setIsMenuBarHiddenInPreview: () => {},
   setBackdropClickBehavior: () => {},
   setResourcesImporationBehavior: () => {},
-  getIsAlwaysOnTopInPreview: (): boolean => true,
+  // $FlowFixMe[signature-verification-failure]
+  getIsAlwaysOnTopInPreview: () => true,
   setIsAlwaysOnTopInPreview: () => {},
   setEventsSheetCancelInlineParameter: () => {},
   setShowExperimentalExtensions: () => {},
   setShowCreateSectionByDefault: (enabled: boolean) => {},
   setShowInAppTutorialDeveloperMode: (enabled: boolean) => {},
   setShowDeprecatedInstructionWarning: (enabled: boolean) => {},
-  getOpenDiagnosticReportAutomatically: (): boolean => true,
+  // $FlowFixMe[signature-verification-failure]
+  getOpenDiagnosticReportAutomatically: () => true,
   setOpenDiagnosticReportAutomatically: (enabled: boolean) => {},
-  getShowDeprecatedInstructionWarning: (): boolean => false,
+  // $FlowFixMe[signature-verification-failure]
+  getShowDeprecatedInstructionWarning: () => false,
   setUse3DEditor: (enabled: boolean) => {},
-  getUse3DEditor: (): boolean => false,
+  // $FlowFixMe[signature-verification-failure]
+  getUse3DEditor: () => false,
   setShowBasicProfilingCounters: (enabled: boolean) => {},
   setDisableNpmScriptConfirmation: (enabled: boolean) => {},
   saveTutorialProgress: () => {},
@@ -490,7 +507,9 @@ export const initialPreferences = {
   // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
   getEditorStateForProject: projectId => {},
-  setEditorStateForProject: (projectId: any, editorState: any) => {},
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  setEditorStateForProject: (projectId, editorState) => {},
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => {},
   setPreviewCrashReportUploadLevel: (level: string) => {},
   setGamesDashboardOrderBy: (
@@ -503,7 +522,8 @@ export const initialPreferences = {
   setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
 };
 
+// $FlowFixMe[signature-verification-failure]
 // $FlowFixMe[incompatible-type]
-const PreferencesContext: React.Context<Preferences> = React.createContext<Preferences>(initialPreferences);
+const PreferencesContext = React.createContext<Preferences>(initialPreferences);
 
 export default PreferencesContext;

@@ -286,7 +286,6 @@ const ProjectFileList = ({
                   onOpenProject={onOpenProject}
                   lastModifiedInfo={
                     lastModifiedInfoByProjectId[
-                      // $FlowFixMe[invalid-computed-prop]
                       file.fileMetadata.fileIdentifier
                     ]
                   }
@@ -337,7 +336,8 @@ const ProjectFileList = ({
   );
 };
 
-const ProjectFileListWithErrorBoundary = (props: Props): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+const ProjectFileListWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Project file list</Trans>}
     scope="project-file-list"

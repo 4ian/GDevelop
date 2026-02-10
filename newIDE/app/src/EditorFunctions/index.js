@@ -536,8 +536,8 @@ const makeShortTextForNamedProperty = (
   const choices =
     type.toLowerCase() === 'choice'
       ? [
-          // $FlowFixMe[incompatible-exact]
           // $FlowFixMe[incompatible-use]
+          // $FlowFixMe[incompatible-exact]
           ...mapVector(property.getChoices(), choice => choice.getValue()),
           // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.
           ...property.getExtraInfo().toJSArray(),
@@ -2313,11 +2313,9 @@ const describeInstances: EditorFunction = {
 // $FlowFixMe[missing-local-annot]
 const iterateOnInstances = (initialInstances, callback) => {
   const instanceGetter = new gd.InitialInstanceJSFunctor();
-  // $FlowFixMe[incompatible-type]
   // $FlowFixMe[incompatible-type] - invoke is not writable
   // $FlowFixMe[cannot-write]
   instanceGetter.invoke = instancePtr => {
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
     const instance: gdInitialInstance = gd.wrapPointer(
       // $FlowFixMe[incompatible-type]
@@ -2326,7 +2324,6 @@ const iterateOnInstances = (initialInstances, callback) => {
     );
     callback(instance);
   };
-  // $FlowFixMe[incompatible-type]
   // $FlowFixMe[incompatible-type] - JSFunctor is incompatible with Functor
   initialInstances.iterateOverInstances(instanceGetter);
   instanceGetter.delete();

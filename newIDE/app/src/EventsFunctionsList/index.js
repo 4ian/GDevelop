@@ -1447,9 +1447,8 @@ const MemoizedObjectsList = React.memo<Props, EventsFunctionsListInterface>(
   arePropsEqual
 );
 
-const EventsFunctionsListWithErrorBoundary: component(
-  ...{ ...Props, +ref?: React.RefSetter<EventsFunctionsListInterface> }
-) = React.forwardRef<
+// $FlowFixMe[signature-verification-failure]
+const EventsFunctionsListWithErrorBoundary = React.forwardRef<
   Props,
   EventsFunctionsListInterface
 >((props, ref) => (

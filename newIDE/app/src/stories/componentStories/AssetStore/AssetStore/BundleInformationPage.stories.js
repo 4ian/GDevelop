@@ -77,7 +77,6 @@ const BundleInformationPageStory = ({
   errorMessage,
 }: {
   bundleListingDataToDisplay: BundleListingData,
-  // $FlowFixMe[value-as-type]
   authenticatedUser?: AuthenticatedUser,
   receivedBundles?: Array<Bundle>,
   delayResponse?: number,
@@ -197,34 +196,39 @@ const BundleInformationPageStory = ({
   );
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <BundleInformationPageStory
     bundleListingDataToDisplay={fakeBundleListingData}
   />
 );
 
-export const ForAlreadyPurchasedBundle = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const ForAlreadyPurchasedBundle = () => (
   <BundleInformationPageStory
     bundleListingDataToDisplay={fakeBundleListingData}
     receivedBundles={[fakeBundle]}
   />
 );
 
-export const Loading = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Loading = () => (
   <BundleInformationPageStory
     bundleListingDataToDisplay={fakeBundleListingData}
     delayResponse={10000}
   />
 );
 
-export const With404 = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const With404 = () => (
   <BundleInformationPageStory
     bundleListingDataToDisplay={fakeBundleListingData}
     errorCode={404}
   />
 );
 
-export const WithUnknownError = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithUnknownError = () => (
   <BundleInformationPageStory
     bundleListingDataToDisplay={fakeBundleListingData}
     errorCode={500}

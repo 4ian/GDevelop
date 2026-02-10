@@ -18,7 +18,8 @@ const styles = {
   iconStyle: { width: 40, height: 40 },
 };
 
-export const getIconForMarketingPlan = (marketingPlan: MarketingPlan): null | React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const getIconForMarketingPlan = (marketingPlan: MarketingPlan) => {
   switch (marketingPlan.icon) {
     case 'speaker':
       return <Speaker style={styles.iconStyle} />;
@@ -43,7 +44,8 @@ const getActiveFeaturingsOfMarketingPlan = (
 export const getMarketingPlanPrice = (
   marketingPlan: MarketingPlan,
   limits: ?Limits
-): null | number => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   if (!limits) return null;
 
   const prices = limits.credits.prices;
@@ -56,7 +58,8 @@ export const getMarketingPlanPrice = (
 export const isMarketingPlanActive = (
   marketingPlan: MarketingPlan,
   activeGameFeaturings: ?(GameFeaturing[])
-): boolean => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   if (!activeGameFeaturings) return false;
   const includedMarketingPlanFeaturings = marketingPlan.includedFeaturings;
 
@@ -93,19 +96,18 @@ export const getRequirementsErrors = (
   return requirementsErrors;
 };
 
-export const getActiveMessage = (
-  {
-    marketingPlan,
-    i18n,
-    hasErrors,
-    activeGameFeaturings
-  }: {|
-    marketingPlan: MarketingPlan,
-    i18n: I18nType,
-    hasErrors: boolean,
-    activeGameFeaturings: Array<GameFeaturing>,
-  |},
-): null | React.Node => {
+export const getActiveMessage = ({
+  marketingPlan,
+  i18n,
+  hasErrors,
+  activeGameFeaturings,
+}: {|
+  marketingPlan: MarketingPlan,
+  i18n: I18nType,
+  hasErrors: boolean,
+  activeGameFeaturings: GameFeaturing[],
+// $FlowFixMe[signature-verification-failure]
+|}) => {
   if (hasErrors) {
     return <Trans>Fix those issues to get the campaign up!</Trans>;
   }

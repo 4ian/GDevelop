@@ -151,8 +151,9 @@ export default class InstancesEditor extends Component<Props, State> {
   lastContextMenuY = 0;
   lastCursorX: number | null = null;
   lastCursorY: number | null = null;
+  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  fpsLimiter = new FpsLimiter({ maxFps: 60, idleFps: 10 }) as FpsLimiter;
+  fpsLimiter = new FpsLimiter({ maxFps: 60, idleFps: 10 });
   canvasArea: ?HTMLDivElement;
   // $FlowFixMe[value-as-type]
   pixiRenderer: PIXI.Renderer;
@@ -755,7 +756,9 @@ export default class InstancesEditor extends Component<Props, State> {
     );
   }
 
-  getTileMapTileSelection = (): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getTileMapTileSelection = () => {
     return this.props.tileMapTileSelection;
   };
 
@@ -766,9 +769,13 @@ export default class InstancesEditor extends Component<Props, State> {
     return { color: isLocked ? 0xbc5753 : 0x6868e8, alpha: 1 };
   };
 
-  shouldDisplayClickableHandles = (): any => !this.props.tileMapTileSelection;
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  shouldDisplayClickableHandles = () => !this.props.tileMapTileSelection;
 
-  getZoomFactor = (): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getZoomFactor = () => {
     return this.props.instancesEditorSettings.zoomFactor;
   };
 
@@ -840,7 +847,6 @@ export default class InstancesEditor extends Component<Props, State> {
     if (
       object.getType() === 'TileMap::SimpleTileMap' &&
       renderedInstance &&
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - We are confident the renderedInstance is an instance of RenderedSimpleTileMapInstance.
       !!renderedInstance.getEditableTileMap
     ) {
@@ -1052,7 +1058,9 @@ export default class InstancesEditor extends Component<Props, State> {
     }
   };
 
-  getRendererOfInstance = (instance: gdInitialInstance): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getRendererOfInstance = (instance: gdInitialInstance) => {
     return this.instancesRenderer.getRendererOfInstance(
       instance.getLayer(),
       instance
@@ -1107,7 +1115,9 @@ export default class InstancesEditor extends Component<Props, State> {
     }
   };
 
-  _getLayersLocks = (): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _getLayersLocks = () => {
     const { layersContainer } = this.props;
     const layersLocks = {};
     for (let i = 0; i < layersContainer.getLayersCount(); i++) {
@@ -1408,14 +1418,11 @@ export default class InstancesEditor extends Component<Props, State> {
 
   // Debounce function to avoid storing history for each pixel move when user
   // keeps pressing an arrow key.
+  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  onInstancesMovedDebounced = debounce(
-  this.props.onInstancesMoved,
-  50,
-  {
+  onInstancesMovedDebounced = debounce(this.props.onInstancesMoved, 50, {
     trailing: true,
-  },
-) as any;
+  });
 
   moveSelection = (x: number, y: number) => {
     this.fpsLimiter.notifyInteractionHappened();
@@ -1466,7 +1473,9 @@ export default class InstancesEditor extends Component<Props, State> {
     }
   }
 
-  getBoundingClientRect(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getBoundingClientRect() {
     if (!this.canvasArea) return { left: 0, top: 0, right: 0, bottom: 0 };
     return this.canvasArea.getBoundingClientRect();
   }
@@ -1478,11 +1487,9 @@ export default class InstancesEditor extends Component<Props, State> {
     const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
     let contentAABB: Rectangle | null = null;
     const getInstanceRectangle = new gd.InitialInstanceJSFunctor();
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - invoke is not writable
     // $FlowFixMe[cannot-write]
     getInstanceRectangle.invoke = instancePtr => {
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
       const instance: gdInitialInstance = gd.wrapPointer(
         // $FlowFixMe[incompatible-type]
@@ -1500,9 +1507,7 @@ export default class InstancesEditor extends Component<Props, State> {
         );
       }
     };
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - JSFunctor is incompatible with Functor
-    // $FlowFixMe[incompatible-type]
     initialInstances.iterateOverInstances(getInstanceRectangle);
     getInstanceRectangle.delete();
     return contentAABB;
@@ -1565,7 +1570,9 @@ export default class InstancesEditor extends Component<Props, State> {
     if (offset) this.scrollBy(offset[0], offset[1]);
   };
 
-  getLastContextMenuSceneCoordinates = (): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getLastContextMenuSceneCoordinates = () => {
     return this.viewPosition.toSceneCoordinates(
       this.lastContextMenuX,
       this.lastContextMenuY
@@ -1580,7 +1587,9 @@ export default class InstancesEditor extends Component<Props, State> {
     );
   };
 
-  getCoordinatesToRenderTileMapPreview = (): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getCoordinatesToRenderTileMapPreview = () => {
     const clickInterceptorPointerPathCoordinates = this.clickInterceptor.getPointerPathCoordinates();
     if (clickInterceptorPointerPathCoordinates) {
       return clickInterceptorPointerPathCoordinates;
@@ -1676,7 +1685,9 @@ export default class InstancesEditor extends Component<Props, State> {
       .getUnrotatedInstanceSize(initialInstance);
   };
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     if (!this.props.project) return null;
 
     if (this.state.renderingError) {

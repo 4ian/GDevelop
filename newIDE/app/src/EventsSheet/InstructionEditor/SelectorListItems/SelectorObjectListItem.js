@@ -25,23 +25,21 @@ type Props = {|
   keyPrefix?: string,
 |};
 
-export const renderObjectListItem = (
-  {
-    project,
-    objectWithContext,
-    iconSize,
-    onClick,
-    selectedValue,
-    matchesCoordinates,
-    id,
-    data,
-    withIndent,
-    keyPrefix
-  }: Props,
-): React.Node => {
+export const renderObjectListItem = ({
+  project,
+  objectWithContext,
+  iconSize,
+  onClick,
+  selectedValue,
+  matchesCoordinates,
+  id,
+  data,
+  withIndent,
+  keyPrefix,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const objectName: string = objectWithContext.object.getName();
   return (
-    // $FlowFixMe[incompatible-type]
     <ListItem
       id={id}
       data={data}

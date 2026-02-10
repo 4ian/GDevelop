@@ -11,7 +11,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <PlaceholderMessage>
     <p>
       Neque porro quisquam est qui dolorem ipsum quia dolor sit amet,

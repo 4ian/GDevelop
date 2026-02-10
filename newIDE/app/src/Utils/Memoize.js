@@ -4,9 +4,7 @@ export default function memoize<Input, Output>(
   func: Input => Output
 ): Input => Output {
   const primitives = new Map<Input, Output>();
-  // $FlowFixMe[incompatible-type]
   // $FlowFixMe[incompatible-type] - WeakMap is only used when Input is an object.
-  // $FlowFixMe[incompatible-type]
   const objects = new WeakMap<Input, Output>();
 
   function cacheFor(input: Input) {

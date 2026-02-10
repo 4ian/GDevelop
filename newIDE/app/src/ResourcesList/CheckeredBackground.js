@@ -22,7 +22,8 @@ type Props = {|
  * (or it just doesn't work as expected), ensure that the parent element and
  * at least one of the sibling elements have `position: relative` set.
  */
-const CheckeredBackground = ({borderRadius}: Props): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+const CheckeredBackground = ({ borderRadius }: Props) => {
   const theme = React.useContext(GDevelopThemeContext);
   const backgroundStyle = {
     position: 'absolute',

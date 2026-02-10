@@ -55,7 +55,8 @@ const elementIdToTooltip = {
   },
 };
 
-export const Default = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => {
   const [listItemRef, setListItemRef] = React.useState<any>(null);
   const [
     elementToHighlight,

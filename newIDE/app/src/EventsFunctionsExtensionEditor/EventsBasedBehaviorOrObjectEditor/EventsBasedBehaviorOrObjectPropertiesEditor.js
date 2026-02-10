@@ -108,12 +108,8 @@ export type EventsBasedBehaviorPropertiesEditorInterface = {|
   getPropertyEditorRef: (propertyName: string) => React.ElementRef<any>,
 |};
 
-export const EventsBasedBehaviorPropertiesEditor: component(
-  ...{
-    ...Props,
-    +ref?: React.RefSetter<EventsBasedBehaviorPropertiesEditorInterface>,
-  }
-) = React.forwardRef<
+// $FlowFixMe[signature-verification-failure]
+export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
   Props,
   EventsBasedBehaviorPropertiesEditorInterface
 >(

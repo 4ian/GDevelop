@@ -54,25 +54,24 @@ export const getSchemaWithOpenFullEditorButton = ({
   return schema;
 };
 
-export const CompactBehaviorPropertiesEditor = (
-  {
-    project,
-    behaviorMetadata,
-    behavior,
-    object,
-    onOpenFullEditor,
-    onBehaviorUpdated,
-    resourceManagementProps
-  }: {|
-    project: gdProject,
-    behaviorMetadata: gdBehaviorMetadata,
-    behavior: gdBehavior,
-    object: gdObject,
-    onOpenFullEditor: () => void,
-    onBehaviorUpdated: () => void,
-    resourceManagementProps: ResourceManagementProps,
-  |},
-): React.Node => {
+export const CompactBehaviorPropertiesEditor = ({
+  project,
+  behaviorMetadata,
+  behavior,
+  object,
+  onOpenFullEditor,
+  onBehaviorUpdated,
+  resourceManagementProps,
+}: {|
+  project: gdProject,
+  behaviorMetadata: gdBehaviorMetadata,
+  behavior: gdBehavior,
+  object: gdObject,
+  onOpenFullEditor: () => void,
+  onBehaviorUpdated: () => void,
+  resourceManagementProps: ResourceManagementProps,
+// $FlowFixMe[signature-verification-failure]
+|}) => {
   const fullEditorLabel = behaviorMetadata.getOpenFullEditorLabel();
 
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
@@ -114,7 +113,6 @@ export const CompactBehaviorPropertiesEditor = (
             onOpenFullEditor,
           })
         }
-        // $FlowFixMe[incompatible-type]
         onRefreshAllFields={forceRecomputeSchema}
       />
     </ColumnStackLayout>

@@ -113,7 +113,8 @@ export default function TabsTitlebar({
   displayMenuIcon,
   displayAskAi,
   onAskAiClicked,
-}: TabsTitlebarProps): React.MixedElement {
+// $FlowFixMe[signature-verification-failure]
+}: TabsTitlebarProps) {
   const isTouchscreen = useScreenType() === 'touch';
   const preferences = React.useContext(PreferencesContext);
   const { limits } = React.useContext(AuthenticatedUserContext);
@@ -212,7 +213,6 @@ export default function TabsTitlebar({
     >
       {isLeftMostPane && <TitleBarLeftSafeMargins />}
       {displayMenuIcon && (
-        // $FlowFixMe[incompatible-type]
         <IconButton
           size="small"
           // Even if not in the toolbar, keep this ID for backward compatibility for tutorials.

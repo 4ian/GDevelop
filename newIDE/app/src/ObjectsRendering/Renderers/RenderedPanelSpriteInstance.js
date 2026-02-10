@@ -469,14 +469,18 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     this.updatePosition();
   }
 
-  getDefaultWidth(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getDefaultWidth() {
     const panelSprite = gd.asPanelSpriteConfiguration(
       this._associatedObjectConfiguration
     );
     return panelSprite.getWidth();
   }
 
-  getDefaultHeight(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getDefaultHeight() {
     const panelSprite = gd.asPanelSpriteConfiguration(
       this._associatedObjectConfiguration
     );
@@ -490,7 +494,9 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  ) {
     const panelSprite = gd.asPanelSpriteConfiguration(objectConfiguration);
 
     return ResourcesLoader.getResourceFullUrl(

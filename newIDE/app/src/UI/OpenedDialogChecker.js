@@ -3,7 +3,8 @@
 /**
  * Checks if a dialog or overlay is currently open on screen
  */
-const isDialogOpen = (): false | boolean | true => {
+// $FlowFixMe[signature-verification-failure]
+const isDialogOpen = () => {
   // If currently focused element is inside MainFrame div, we can
   // be sure that no dialog or overlay is opened.
   // But clicking on some empty spaces like in properties panel leads

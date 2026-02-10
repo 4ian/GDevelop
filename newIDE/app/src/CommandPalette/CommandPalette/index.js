@@ -50,10 +50,8 @@ export type CommandPaletteInterface = {|
 
 type PaletteMode = 'closed' | 'command' | 'option';
 
-const CommandPalette: component(
-  '(Reason.OrdinaryName "ref")'?: React.RefSetter<CommandPaletteInterface>,
-// $FlowFixMe[incompatible-type]
-) = React.forwardRef<{||}, CommandPaletteInterface>(
+// $FlowFixMe[signature-verification-failure]
+const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
   (props, ref) => {
     const classes = useStyles();
     const paperClasses = useStylesForPaper();
@@ -219,15 +217,12 @@ const CommandPalette: component(
   }
 );
 
-export const CommandPaletteWithAlgoliaSearch: component(
-  '(Reason.OrdinaryName "ref")'?: React.RefSetter<CommandPaletteInterface>,
-// $FlowFixMe[incompatible-type]
-) = React.forwardRef<
+// $FlowFixMe[signature-verification-failure]
+export const CommandPaletteWithAlgoliaSearch = React.forwardRef<
   {},
   CommandPaletteInterface
 >((props, ref) => (
   <InstantSearch searchClient={searchClient} indexName={indexName}>
-    {/* $FlowFixMe[incompatible-type] */}
     <CommandPalette ref={ref} />
   </InstantSearch>
 ));

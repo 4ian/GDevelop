@@ -18,7 +18,8 @@ import { getProductPriceOrOwnedLabel } from '../../../../AssetStore/ProductPrice
 import Chip from '../../../../UI/Chip';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 
-export const getChipColorFromEnglishLevel = (englishLevel: string): string => {
+// $FlowFixMe[signature-verification-failure]
+export const getChipColorFromEnglishLevel = (englishLevel: string) => {
   if (englishLevel.toLowerCase().includes('advanced')) return '#FF8569';
   if (englishLevel.toLowerCase().includes('intermediate')) return '#FFBC57';
   return '#3BF7F4';
@@ -137,16 +138,15 @@ type Props = {|
   disabled?: boolean,
 |};
 
-const CourseCard = (
-  {
-    completion,
-    course,
-    courseListingData,
-    onClick,
-    discountedPrice,
-    disabled
-  }: Props,
-): React.Node => {
+const CourseCard = ({
+  completion,
+  course,
+  courseListingData,
+  onClick,
+  discountedPrice,
+  disabled,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const specializationConfig = getSpecializationConfig(
     course ? course.specializationId : 'loading'

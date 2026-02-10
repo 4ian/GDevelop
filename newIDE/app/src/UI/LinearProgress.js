@@ -28,7 +28,8 @@ type Props = {|
   style?: {| height?: number, borderRadius?: number, width?: number |},
 |};
 
-function LinearProgress(props: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+function LinearProgress(props: Props) {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const classes = useStyles(props.color, gdevelopTheme);
 

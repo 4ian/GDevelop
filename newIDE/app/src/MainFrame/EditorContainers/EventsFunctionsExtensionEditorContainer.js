@@ -82,7 +82,9 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // No thing to be done.
   }
 
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
     // We stop updates when the component is inactive.
     // If it's active, was active or becoming active again we let update propagate.
     // Especially important to note that when becoming inactive, a "last" update is allowed.
@@ -114,7 +116,9 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     }
   }
 
-  hasAnyEventBasedObject(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  hasAnyEventBasedObject() {
     const extension = this.getEventsFunctionsExtension();
     return extension ? extension.getEventsBasedObjects().getCount() > 0 : false;
   }
@@ -183,7 +187,9 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
       this.editor.selectEventsBasedBehaviorByName(eventBasedBehaviorName);
   }
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const { project, projectItemName } = this.props;
     const eventsFunctionsExtension = this.getEventsFunctionsExtension();
 
@@ -240,4 +246,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
   }
 }
 
-export const renderEventsFunctionsExtensionEditorContainer = (props: RenderEditorContainerPropsWithRef): React.Node => <EventsFunctionsExtensionEditorContainer {...props} />;
+export const renderEventsFunctionsExtensionEditorContainer = (
+  props: RenderEditorContainerPropsWithRef
+// $FlowFixMe[signature-verification-failure]
+) => <EventsFunctionsExtensionEditorContainer {...props} />;

@@ -204,7 +204,8 @@ type PointsListProps = {|
   spriteSize: [number, number],
 |};
 
-const PointsList = (props: PointsListProps): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const PointsList = (props: PointsListProps) => {
   return (
     <Column expand>
       <Table>

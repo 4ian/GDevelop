@@ -76,9 +76,8 @@ type Props = {|
  * A select field based on Material-UI select field.
  * To be used with `SelectOption`.
  */
-const SearchBarSelectField: component(
-  ...{ ...Props, +ref?: React.RefSetter<SearchBarSelectFieldInterface> }
-) = React.forwardRef<
+// $FlowFixMe[signature-verification-failure]
+const SearchBarSelectField = React.forwardRef<
   Props,
   SearchBarSelectFieldInterface
 >((props, ref) => {
@@ -102,8 +101,8 @@ const SearchBarSelectField: component(
   // Dig into children props to see if the current value is valid or not.
   let hasValidValue = true;
   const childrenValues = React.Children.map(props.children, child => {
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[prop-missing]
+    // $FlowFixMe[incompatible-type]
     if (child === null || !child.props) return null;
 
     // $FlowFixMe[incompatible-use]

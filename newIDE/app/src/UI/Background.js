@@ -25,7 +25,8 @@ type Props = {|
  * This is the component to be used to display the standard
  * background of editor/windows/dialogs.
  */
-const Background = (props: Props): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+const Background = (props: Props) => (
   <Paper
     square
     style={{

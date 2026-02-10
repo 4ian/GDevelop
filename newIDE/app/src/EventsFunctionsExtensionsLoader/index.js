@@ -660,7 +660,10 @@ export const unloadProjectEventsFunctionsExtension = (
  * Given metadata about an instruction or an expression, tells if this was created
  * from an event function.
  */
-export const isAnEventFunctionMetadata = (instructionOrExpression: gdInstructionMetadata | gdExpressionMetadata): boolean => {
+export const isAnEventFunctionMetadata = (
+  instructionOrExpression: gdInstructionMetadata | gdExpressionMetadata
+// $FlowFixMe[signature-verification-failure]
+) => {
   const parametersCount = instructionOrExpression.getParametersCount();
   if (parametersCount <= 0) return false;
 
@@ -674,9 +677,8 @@ export const isAnEventFunctionMetadata = (instructionOrExpression: gdInstruction
  * Get back the name a function from its type.
  * See also getFreeEventsFunctionType for the reverse operation.
  */
-export const getFunctionNameFromType = (type: string): 
-  | { behaviorName: string, extensionName: string, name: string }
-  | { behaviorName: string | void, extensionName: string, name: string } => {
+// $FlowFixMe[signature-verification-failure]
+export const getFunctionNameFromType = (type: string) => {
   const parts = type.split('::');
   if (!parts.length)
     return {
@@ -699,7 +701,8 @@ export const getFunctionNameFromType = (type: string):
 export const getFreeEventsFunctionType = (
   extensionName: string,
   eventsFunction: gdEventsFunction
-): string => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   return extensionName + '::' + eventsFunction.getName();
 };
 

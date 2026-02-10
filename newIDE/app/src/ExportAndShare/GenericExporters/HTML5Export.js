@@ -27,7 +27,8 @@ const getIconStyle = ({ isMobile }: {| isMobile: boolean |}) => {
   };
 };
 
-export const ExplanationHeader = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const ExplanationHeader = () => {
   const { isMobile } = useResponsiveWindowSize();
   const iconStyle = getIconStyle({ isMobile });
   return (
@@ -57,15 +58,14 @@ type HTML5ExportFlowProps = {|
   exportPipelineName: string,
 |};
 
-export const ExportFlow = (
-  {
-    disabled,
-    launchExport,
-    isExporting,
-    exportPipelineName,
-    exportStep
-  }: HTML5ExportFlowProps,
-): React.Node | null =>
+export const ExportFlow = ({
+  disabled,
+  launchExport,
+  isExporting,
+  exportPipelineName,
+  exportStep,
+// $FlowFixMe[signature-verification-failure]
+}: HTML5ExportFlowProps) =>
   exportStep !== 'done' ? (
     <Line justifyContent="center">
       <RaisedButton
@@ -84,13 +84,12 @@ export const ExportFlow = (
     </Line>
   ) : null;
 
-export const DoneFooter = (
-  {
-    renderGameButton
-  }: {|
-    renderGameButton: () => React.Node,
-  |},
-): React.Node => {
+export const DoneFooter = ({
+  renderGameButton,
+}: {|
+  renderGameButton: () => React.Node,
+// $FlowFixMe[signature-verification-failure]
+|}) => {
   const openLearnMore = () => {
     Window.openExternalURL(
       getHelpLink(
@@ -138,7 +137,9 @@ export const DoneFooter = (
 
 export const html5Exporter = {
   key: 'webexport',
-  tabName: <Trans>Web</Trans> as React.Node,
-  name: <Trans>HTML5</Trans> as React.Node,
+  // $FlowFixMe[signature-verification-failure]
+  tabName: <Trans>Web</Trans>,
+  // $FlowFixMe[signature-verification-failure]
+  name: <Trans>HTML5</Trans>,
   helpPage: '/publishing/html5_game_in_a_local_folder',
 };

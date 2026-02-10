@@ -110,7 +110,9 @@ export default class CommentEvent extends React.Component<
     );
   };
 
-  _getCommentHTML = (): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _getCommentHTML = () => {
     const commentEvent = gd.asCommentEvent(this.props.event);
     return commentEvent
       .getComment()
@@ -136,7 +138,9 @@ export default class CommentEvent extends React.Component<
     this._autoResizeTextArea();
   }
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const commentEvent = gd.asCommentEvent(this.props.event);
 
     const backgroundColor = `#${rgbToHex(

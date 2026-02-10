@@ -88,7 +88,8 @@ const noCourseChapters: {
   [courseId: string]: CourseChapter[],
 } = {};
 
-const useCourses = (): any => {
+// $FlowFixMe[signature-verification-failure]
+const useCourses = () => {
   const {
     userStatus,
     userId,

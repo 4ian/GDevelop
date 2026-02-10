@@ -10,7 +10,6 @@ export type EnsureResourcesAreFetchedOptions = {|
   fileMetadata: ?FileMetadata,
   storageProvider: StorageProvider,
   storageProviderOperations: StorageProviderOperations,
-  // $FlowFixMe[value-as-type]
   authenticatedUser?: AuthenticatedUser,
 |};
 
@@ -19,7 +18,6 @@ export type FetchAllProjectResourcesOptions = {|
   fileMetadata: FileMetadata,
   storageProvider: StorageProvider,
   storageProviderOperations: StorageProviderOperations,
-  // $FlowFixMe[value-as-type]
   authenticatedUser?: AuthenticatedUser,
   onProgress: (number, number) => void,
 |};

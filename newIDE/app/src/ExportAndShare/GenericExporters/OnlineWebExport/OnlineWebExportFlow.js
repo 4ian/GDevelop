@@ -13,22 +13,21 @@ type OnlineWebExportFlowProps = {|
   exportPipelineName: string,
 |};
 
-const OnlineWebExportFlow = (
-  {
-    project,
-    gameAndBuildsManager,
-    build,
-    onSaveProject,
-    isSavingProject,
-    errored,
-    exportStep,
-    disabled,
-    launchExport,
-    exportPipelineName,
-    isExporting,
-    uiMode
-  }: OnlineWebExportFlowProps,
-): React.Node => {
+const OnlineWebExportFlow = ({
+  project,
+  gameAndBuildsManager,
+  build,
+  onSaveProject,
+  isSavingProject,
+  errored,
+  exportStep,
+  disabled,
+  launchExport,
+  exportPipelineName,
+  isExporting,
+  uiMode,
+// $FlowFixMe[signature-verification-failure]
+}: OnlineWebExportFlowProps) => {
   const {
     game,
     gameBuilds,

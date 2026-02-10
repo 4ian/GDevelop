@@ -17,19 +17,14 @@ import { applyResourceDefaults } from '../ResourcesList/ResourceUtils';
 
 import PromisePool from '@supercharge/promise-pool';
 
-export const useSearchAndInstallResource = (
-  {
-    project,
-    resourceManagementProps
-  }: {|
-    project: ?gdProject,
-    resourceManagementProps: ResourceManagementProps,
-  |},
-): {
-  searchAndInstallResources: (
-    ResourceSearchAndInstallOptions
-  ) => Promise<ResourceSearchAndInstallResult>,
-} => {
+export const useSearchAndInstallResource = ({
+  project,
+  resourceManagementProps,
+}: {|
+  project: ?gdProject,
+  resourceManagementProps: ResourceManagementProps,
+// $FlowFixMe[signature-verification-failure]
+|}) => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );

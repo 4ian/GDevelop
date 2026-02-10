@@ -23,7 +23,15 @@ type Props = {|
   error: ?any,
 |};
 
-const LocalNetworkPreviewDialog = ({url, open, error, onExport, onClose, onRunPreviewLocally}: Props): React.Node => {
+const LocalNetworkPreviewDialog = ({
+  url,
+  open,
+  error,
+  onExport,
+  onClose,
+  onRunPreviewLocally,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   if (!open) return null;
   const urlWithProtocol = url ? `http://${url}` : null;

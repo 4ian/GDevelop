@@ -142,7 +142,8 @@ const notifications: Notification[] = [
   },
 ];
 
-export const Default = (): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => {
   return (
     <div style={{ maxWidth: 300 }}>
       <NotificationList

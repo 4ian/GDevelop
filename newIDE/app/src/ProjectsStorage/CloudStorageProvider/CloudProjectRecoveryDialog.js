@@ -26,7 +26,12 @@ type Props = {|
   onClose: () => void,
 |};
 
-const CloudProjectRecoveryDialog = ({cloudProjectId, onClose, onOpenPreviousVersion}: Props): React.Node => {
+const CloudProjectRecoveryDialog = ({
+  cloudProjectId,
+  onClose,
+  onOpenPreviousVersion,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile } = authenticatedUser;
   const [
@@ -161,7 +166,6 @@ const CloudProjectRecoveryDialog = ({cloudProjectId, onClose, onOpenPreviousVers
           maxWidth="sm"
           onRequestClose={onClose}
           onApply={onApply}
-          // $FlowFixMe[incompatible-type]
           actions={actions}
           title={
             lastSaneVersion && !isLoading ? (

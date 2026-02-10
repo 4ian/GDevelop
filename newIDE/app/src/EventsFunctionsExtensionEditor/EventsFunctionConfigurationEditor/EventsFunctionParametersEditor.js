@@ -64,7 +64,8 @@ const styles = {
   },
 };
 
-export const useParameterOverridingAlertDialog = (): ((existingParameterNames: Array<string>) => Promise<boolean>) => {
+// $FlowFixMe[signature-verification-failure]
+export const useParameterOverridingAlertDialog = () => {
   const { showConfirmation } = useAlertDialog();
   return async (existingParameterNames: Array<string>): Promise<boolean> => {
     return await showConfirmation({
@@ -138,26 +139,25 @@ type Props = {|
   ) => void,
 |};
 
-export const EventsFunctionParametersEditor = (
-  {
-    project,
-    projectScopedContainersAccessor,
-    eventsFunction,
-    eventsBasedBehavior,
-    eventsBasedObject,
-    eventsFunctionsContainer,
-    eventsFunctionsExtension,
-    onParametersUpdated,
-    helpPagePath,
-    freezeParameters,
-    onMoveFreeEventsParameter,
-    onMoveBehaviorEventsParameter,
-    onMoveObjectEventsParameter,
-    onFunctionParameterWillBeRenamed,
-    children,
-    onFunctionParameterTypeChanged
-  }: Props,
-): React.Node => {
+export const EventsFunctionParametersEditor = ({
+  project,
+  projectScopedContainersAccessor,
+  eventsFunction,
+  eventsBasedBehavior,
+  eventsBasedObject,
+  eventsFunctionsContainer,
+  eventsFunctionsExtension,
+  onParametersUpdated,
+  helpPagePath,
+  freezeParameters,
+  onMoveFreeEventsParameter,
+  onMoveBehaviorEventsParameter,
+  onMoveObjectEventsParameter,
+  onFunctionParameterWillBeRenamed,
+  children,
+  onFunctionParameterTypeChanged,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
     justAddedParameterName,

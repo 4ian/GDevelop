@@ -40,17 +40,16 @@ type Props = {|
   error: ?AuthError,
 |};
 
-const LoginDialog = (
-  {
-    onClose,
-    onGoToCreateAccount,
-    onLogin,
-    onLoginWithProvider,
-    onForgotPassword,
-    loginInProgress,
-    error
-  }: Props,
-): React.Node => {
+const LoginDialog = ({
+  onClose,
+  onGoToCreateAccount,
+  onLogin,
+  onLoginWithProvider,
+  onForgotPassword,
+  loginInProgress,
+  error,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -123,9 +122,7 @@ const LoginDialog = (
     <Dialog
       title={null} // This dialog has a custom design to be more welcoming, the title is set in the content.
       id="login-dialog"
-      // $FlowFixMe[incompatible-type]
       actions={actions}
-      // $FlowFixMe[incompatible-type]
       secondaryActions={secondaryActions}
       cannotBeDismissed={loginInProgress}
       onRequestClose={onClose}

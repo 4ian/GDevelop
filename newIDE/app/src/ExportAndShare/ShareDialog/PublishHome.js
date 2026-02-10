@@ -279,24 +279,23 @@ type PublishHomeProps = {|
   showOnlineWebExporterOnly?: boolean,
 |};
 
-const PublishHome = (
-  {
-    project,
-    onSaveProject,
-    isSavingProject,
-    gameAndBuildsManager,
-    onChangeSubscription,
-    isNavigationDisabled,
-    setIsNavigationDisabled,
-    selectedExporter,
-    onChooseSection,
-    onChooseSubSection,
-    chosenSection,
-    chosenSubSection,
-    allExportersRequireOnline,
-    showOnlineWebExporterOnly
-  }: PublishHomeProps,
-): React.Node => {
+const PublishHome = ({
+  project,
+  onSaveProject,
+  isSavingProject,
+  gameAndBuildsManager,
+  onChangeSubscription,
+  isNavigationDisabled,
+  setIsNavigationDisabled,
+  selectedExporter,
+  onChooseSection,
+  onChooseSubSection,
+  chosenSection,
+  chosenSubSection,
+  allExportersRequireOnline,
+  showOnlineWebExporterOnly,
+// $FlowFixMe[signature-verification-failure]
+}: PublishHomeProps) => {
   const { isMobile } = useResponsiveWindowSize();
   const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);

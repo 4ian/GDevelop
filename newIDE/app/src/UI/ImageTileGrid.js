@@ -155,14 +155,13 @@ type ImageTileGridProps = {|
   ) => number,
 |};
 
-const ImageTileGrid = (
-  {
-    items,
-    isLoading,
-    getColumnsFromWindowSize,
-    getLimitFromWindowSize
-  }: ImageTileGridProps,
-): React.Node => {
+const ImageTileGrid = ({
+  items,
+  isLoading,
+  getColumnsFromWindowSize,
+  getLimitFromWindowSize,
+// $FlowFixMe[signature-verification-failure]
+}: ImageTileGridProps) => {
   const { windowSize, isLandscape } = useResponsiveWindowSize();
   const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', isLandscape);
   const limit = getLimitFromWindowSize

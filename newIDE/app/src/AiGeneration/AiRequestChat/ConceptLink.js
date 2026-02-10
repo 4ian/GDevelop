@@ -84,6 +84,7 @@ const ConceptIconAndName = ({
   );
 };
 
+// $FlowFixMe[definition-cycle]
 const getConceptParent = (conceptMetadata: ConceptMetadata) => {
   // Check first for object or behavior parent:
   if (conceptMetadata.parentObject) {
@@ -145,7 +146,11 @@ const getConceptParent = (conceptMetadata: ConceptMetadata) => {
 /**
  * A link to a GDevelop concept.
  */
-export const ConceptLink = ({conceptMetadata, forceNoLink}: ConceptLinkProps): null | React.Node => {
+export const ConceptLink = ({
+  conceptMetadata,
+  forceNoLink,
+// $FlowFixMe[signature-verification-failure]
+}: ConceptLinkProps) => {
   if (!conceptMetadata) return null;
 
   const helpLink = forceNoLink ? '' : getHelpLink(conceptMetadata.helpPath);
@@ -321,7 +326,8 @@ const findEventsFunctionInExtensions = (
 /**
  * Gives a function that parses an url into a link to a GDevelop concept.
  */
-export const useGetConceptMetadata = (): { getConceptMetadataFromHref: (href: string) => ConceptMetadata | null } => {
+// $FlowFixMe[signature-verification-failure]
+export const useGetConceptMetadata = () => {
   const {
     translatedExtensionShortHeadersByName: extensionShortHeadersByName,
   } = React.useContext(ExtensionStoreContext);

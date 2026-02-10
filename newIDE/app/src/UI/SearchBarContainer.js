@@ -151,19 +151,18 @@ type Props = {|
   renderSubLine?: ?() => React.Node,
 |};
 
-const SearchBarContainer = (
-  {
-    renderContent,
-    disabled,
-    isSearchBarEmpty,
-    isFocused,
-    helpPagePath,
-    aspect,
-    buildMenuTemplate,
-    onCancel,
-    renderSubLine
-  }: Props,
-): React.Node => {
+const SearchBarContainer = ({
+  renderContent,
+  disabled,
+  isSearchBarEmpty,
+  isFocused,
+  helpPagePath,
+  aspect,
+  buildMenuTemplate,
+  onCancel,
+  renderSubLine,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const GDevelopTheme = React.useContext(GDevelopThemeContext);
 
   const styles = getStyles({
@@ -210,7 +209,6 @@ const SearchBarContainer = (
           {buildMenuTemplate && (
             <ElementWithMenu
               element={
-                // $FlowFixMe[incompatible-type]
                 <IconButton
                   style={styles.iconButtonFilter.style}
                   disabled={disabled}
@@ -231,7 +229,6 @@ const SearchBarContainer = (
               size="small"
             />
           )}
-          {/* $FlowFixMe[incompatible-type] */}
           <IconButton
             onClick={onCancel}
             style={styles.iconButtonClose.style}

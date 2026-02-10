@@ -37,7 +37,6 @@ type Props = {|
 |};
 
 const hexToNullableRGBColor = (color: string): RGBColor | null => {
-  // $FlowFixMe[incompatible-type]
   return /^#{0,1}[0-9a-fA-F]{6}$/.test(color) ? hexToRGBColor(color) : null;
 };
 
@@ -54,17 +53,16 @@ const areSameColor = (
 /**
  * Very similar to ColorField but it uses a #123456 format.
  */
-export const HexColorField = (
-  {
-    fullWidth,
-    disableAlpha,
-    id,
-    floatingLabelText,
-    helperMarkdownText,
-    onChange,
-    color
-  }: Props,
-): React.MixedElement => {
+export const HexColorField = ({
+  fullWidth,
+  disableAlpha,
+  id,
+  floatingLabelText,
+  helperMarkdownText,
+  onChange,
+  color,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const [colorString, setColorString] = React.useState<string>(
     color ? rgbColorToHex(color.r, color.g, color.b) : ''
   );

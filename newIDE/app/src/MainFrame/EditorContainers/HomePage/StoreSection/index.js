@@ -152,7 +152,8 @@ const StoreSection = ({
   );
 };
 
-const StoreSectionWithErrorBoundary = (props: Props): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+const StoreSectionWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Shop section</Trans>}
     scope="start-page-shop"

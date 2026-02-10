@@ -14,7 +14,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <ColumnStackLayout>
     <LineStackLayout>
       <PriceTag label={<Text>$8</Text>} />

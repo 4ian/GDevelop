@@ -12,7 +12,8 @@ const gd: libGDevelop = global.gd;
 export function serializeToJSObject(
   serializable: gdSerializable,
   methodName: string = 'serializeTo'
-): any {
+// $FlowFixMe[signature-verification-failure]
+) {
   const serializedElement = new gd.SerializerElement();
   serializable[methodName](serializedElement);
 
@@ -34,7 +35,8 @@ export function serializeToJSObject(
   }
 }
 
-export function serializeObjectWithCleanDefaultBehaviorFlags(object: gdObject): any {
+// $FlowFixMe[signature-verification-failure]
+export function serializeObjectWithCleanDefaultBehaviorFlags(object: gdObject) {
   const serializedElement = new gd.SerializerElement();
   gd.BehaviorDefaultFlagClearer.serializeObjectWithCleanDefaultBehaviorFlags(
     object,
@@ -63,7 +65,8 @@ export function serializeToObjectAsset(
   object: gdObject,
   objectFullName: string,
   usedResourceNames: Array<string>
-): any {
+// $FlowFixMe[signature-verification-failure]
+) {
   const usedResourceNamesVector = new gd.VectorString();
   const serializedElement = new gd.SerializerElement();
   gd.ObjectAssetSerializer.serializeTo(

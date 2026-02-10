@@ -45,7 +45,8 @@ type Props = {|
 /**
  * A checkbox based on Material-UI checkbox.
  */
-const Checkbox = (props: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const Checkbox = (props: Props) => {
   const { onCheck } = props;
   const classes = useStyles();
   const formGroupClasses = useFormGroupStyles();

@@ -14,7 +14,8 @@ type Props = {|
 /**
  * Load information about latest releases and display them.
  */
-const Changelog = ({onUpdated}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const Changelog = ({ onUpdated }: Props) => {
   const [releases, setReleases] = React.useState<?Array<Release>>(null);
   const [error, setError] = React.useState<?Error>(null);
 

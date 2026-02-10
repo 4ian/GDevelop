@@ -11,7 +11,8 @@ type Props = {|
   onClose: () => void,
 |};
 
-const MarketingPlansDialog = ({game, onClose}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const MarketingPlansDialog = ({ game, onClose }: Props) => {
   return (
     <Dialog
       title={<Trans>Marketing campaigns</Trans>}

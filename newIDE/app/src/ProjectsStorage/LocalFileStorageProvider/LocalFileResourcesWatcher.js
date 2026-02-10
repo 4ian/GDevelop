@@ -9,15 +9,8 @@ const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
-export const setupResourcesWatcher: 
-  | ((
-    {
-      callback: ({ identifier: string }) => void,
-      fileIdentifier: string,
-      options?: { isProjectSplitInMultipleFiles: boolean },
-    }
-  ) => () => void)
-  | void =
+export const setupResourcesWatcher =
+  // $FlowFixMe[signature-verification-failure]
   ipcRenderer && path
     ? ({
         fileIdentifier,

@@ -64,7 +64,6 @@ let offscreenCanvas = null;
 
 // Set up the renderer when worker is initialized
 const initRenderer = () => {
-  // $FlowFixMe[incompatible-type]
   // $FlowFixMe[incompatible-type] - OffscreenCanvas is not in Flow types
   // $FlowFixMe[cannot-resolve-name]
   offscreenCanvas = new OffscreenCanvas(width, height);

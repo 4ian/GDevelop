@@ -30,7 +30,8 @@ const styles = {
 };
 
 const getResourceName = (resource: gdResource) => resource.getName();
-export const getDefaultResourceThumbnail = (resource: gdResource): string => {
+// $FlowFixMe[signature-verification-failure]
+export const getDefaultResourceThumbnail = (resource: gdResource) => {
   switch (resource.getKind()) {
     case 'audio':
       return 'res/actions/music24.png';
@@ -77,8 +78,9 @@ type Props = {|
   getResourceActionsSpecificToStorageProvider?: ?ResourcesActionsMenuBuilder,
 |};
 
+// $FlowFixMe[signature-verification-failure]
 // $FlowFixMe[incompatible-type]
-const ResourcesList: component(...Props) = React.memo<Props, ResourcesListInterface>(
+const ResourcesList = React.memo<Props, ResourcesListInterface>(
   // $FlowFixMe[incompatible-type]
   // $FlowFixMe[incompatible-exact]
   React.forwardRef<Props, ResourcesListInterface>(

@@ -17,7 +17,8 @@ type Props = {|
   onForgotPassword: ForgotPasswordForm => Promise<void>,
 |};
 
-const ForgotPasswordDialog = ({onClose, onForgotPassword}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
   const [email, setEmail] = React.useState('');
   const [resetDone, setResetDone] = React.useState(false);
   const [resetInProgress, setResetInProgress] = React.useState(false);

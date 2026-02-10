@@ -18,8 +18,8 @@ import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 export default {
   title: 'UI Building Blocks/TreeView',
   component: TreeView,
-  // $FlowFixMe[cannot-resolve-name]
-  decorators: [getPaperDecorator('dark') as StoryDecorator],
+  // $FlowFixMe[signature-verification-failure]
+  decorators: [getPaperDecorator('dark')],
 };
 
 type Node = {|
@@ -448,7 +448,8 @@ const nodes: Node[] = [
     id: 'root-22000',
   },
 ];
-export const Default = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => {
   const [searchText, setSearchText] = React.useState<string>('');
   const [multiSelect, setMultiSelect] = React.useState<boolean>(true);
   const [selectedItems, setSelectedItems] = React.useState<Node[]>([]);

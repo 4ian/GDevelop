@@ -30,7 +30,8 @@ export default function VariableDeclarationsList({
   screenType,
   windowSize,
   idPrefix,
-}: Props): React.MixedElement {
+// $FlowFixMe[signature-verification-failure]
+}: Props) {
   const instructions = mapFor(0, variablesContainer.count(), i => {
     const variable = variablesContainer.getAt(i);
     const variableName = variablesContainer.getNameAt(i);

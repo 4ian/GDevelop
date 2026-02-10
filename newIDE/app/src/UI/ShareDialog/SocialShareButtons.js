@@ -55,7 +55,8 @@ const styles = {
   },
 };
 
-const SocialShareButtons = ({url}: Props): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+const SocialShareButtons = ({ url }: Props) => {
   const classNames = useStyles();
   return (
     <div style={styles.container}>

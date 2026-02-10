@@ -12,7 +12,13 @@ type Props = {
   justifyContent?: 'center',
 };
 
-const FixedWidthFlexContainer = ({children, width, alignItems, justifyContent}: Props): React.MixedElement => (
+const FixedWidthFlexContainer = ({
+  children,
+  width,
+  alignItems,
+  justifyContent,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => (
   <div style={{ ...style, width, alignItems, justifyContent }}>{children}</div>
 );
 

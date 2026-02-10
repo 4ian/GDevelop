@@ -17,7 +17,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const OperatorFieldString = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const OperatorFieldString = () => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (
@@ -37,7 +38,8 @@ export const OperatorFieldString = (): React.Node => (
     )}
   />
 );
-export const OperatorFieldNumber = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const OperatorFieldNumber = () => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (
@@ -57,7 +59,8 @@ export const OperatorFieldNumber = (): React.Node => (
     )}
   />
 );
-export const OperatorFieldColor = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const OperatorFieldColor = () => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (
@@ -75,7 +78,8 @@ export const OperatorFieldColor = (): React.Node => (
     )}
   />
 );
-export const OperatorFieldUnknownType = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const OperatorFieldUnknownType = () => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (

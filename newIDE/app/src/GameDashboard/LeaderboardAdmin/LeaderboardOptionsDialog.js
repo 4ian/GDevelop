@@ -48,7 +48,8 @@ function LeaderboardOptionsDialog({
   onClose,
   onSave,
   leaderboard,
-}: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: Props) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const canDisableLoginInLeaderboard =
@@ -170,9 +171,7 @@ function LeaderboardOptionsDialog({
               value={sortOrder}
               floatingLabelText={<Trans>Scores sort order</Trans>}
               onChange={(e, i, newValue) => {
-                // $FlowFixMe[incompatible-type]
                 // $FlowFixMe[incompatible-type] - new value is of type LeaderboardSortOption (either ASC or DESC)
-                // $FlowFixMe[incompatible-type]
                 setSortOrder(newValue);
               }}
             >

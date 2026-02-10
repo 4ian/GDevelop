@@ -37,7 +37,13 @@ const styles = {
 const gdGamesHost = 'https://gd.games';
 // const gdGamesHost = 'http://localhost:4000';
 
-export const GdGamesFrame = ({loadErrorMessage, path, onMessageReceived, supportedMessageIds}: Props): React.Node => {
+export const GdGamesFrame = ({
+  loadErrorMessage,
+  path,
+  onMessageReceived,
+  supportedMessageIds,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const paletteType = gdevelopTheme.palette.type;
 
@@ -61,9 +67,7 @@ export const GdGamesFrame = ({loadErrorMessage, path, onMessageReceived, support
             loadState.current = 'loaded';
             forceUpdate();
           } else {
-            // $FlowFixMe[incompatible-type]
             // $FlowFixMe[incompatible-type] - Trust gd.games to send the right data shapes.
-            // $FlowFixMe[incompatible-type]
             // $FlowFixMe[incompatible-indexer]
             onMessageReceived(event.data);
           }

@@ -8,9 +8,7 @@ const getRouteNavigationParamsFromLink = (
 ): {| route: Route, params: RouteArguments |} | null => {
   if (link.startsWith('https://editor.gdevelop.io')) {
     const url = new URL(link);
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - Assume that the arguments are always valid.
-    // $FlowFixMe[incompatible-type]
     const route: ?Route = url.searchParams.get('initial-dialog');
     const otherParams = {};
     url.searchParams.forEach((value, key) => {

@@ -37,7 +37,8 @@ const addFor = (map, key, value) => {
 export default function DiagnosticReportDialog({
   wholeProjectDiagnosticReport,
   onClose,
-}: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: Props) {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const preferences = React.useContext(PreferencesContext);
 

@@ -31,7 +31,8 @@ const eventsTreeTutorials: Array<Tutorial> = [
   },
 ];
 
-export const DefaultMediumScreenScopeInLayout = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const DefaultMediumScreenScopeInLayout = () => (
   <DragAndDropContextProvider>
     <div className="gd-events-sheet">
       <FixedHeightFlexContainer height={500}>
@@ -47,7 +48,6 @@ export const DefaultMediumScreenScopeInLayout = (): React.Node => (
           }
           globalObjectsContainer={testProject.project.getObjects()}
           objectsContainer={testProject.testLayout.getObjects()}
-          // $FlowFixMe[incompatible-type]
           selection={getInitialSelection()}
           onAddNewInstruction={action('add new instruction')}
           onPasteInstructions={action('paste instructions')}
@@ -76,7 +76,6 @@ export const DefaultMediumScreenScopeInLayout = (): React.Node => (
           eventsSheetHeight={500}
           eventsSheetWidth={500}
           indentScale={1}
-          // $FlowFixMe[incompatible-type]
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}
@@ -89,7 +88,8 @@ export const DefaultMediumScreenScopeInLayout = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const DefaultSmallScreenScopeInLayout = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const DefaultSmallScreenScopeInLayout = () => (
   <DragAndDropContextProvider>
     <div className="gd-events-sheet">
       <FixedHeightFlexContainer height={500}>
@@ -105,7 +105,6 @@ export const DefaultSmallScreenScopeInLayout = (): React.Node => (
           }
           globalObjectsContainer={testProject.project.getObjects()}
           objectsContainer={testProject.testLayout.getObjects()}
-          // $FlowFixMe[incompatible-type]
           selection={getInitialSelection()}
           onAddNewInstruction={action('add new instruction')}
           onPasteInstructions={action('paste instructions')}
@@ -134,7 +133,6 @@ export const DefaultSmallScreenScopeInLayout = (): React.Node => (
           eventsSheetHeight={500}
           eventsSheetWidth={500}
           indentScale={1}
-          // $FlowFixMe[incompatible-type]
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}
@@ -147,7 +145,8 @@ export const DefaultSmallScreenScopeInLayout = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const DefaultMediumScreenScopeNotInLayout = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const DefaultMediumScreenScopeNotInLayout = () => (
   <DragAndDropContextProvider>
     <div className="gd-events-sheet">
       <FixedHeightFlexContainer height={500}>
@@ -160,7 +159,6 @@ export const DefaultMediumScreenScopeNotInLayout = (): React.Node => (
           }
           globalObjectsContainer={testProject.project.getObjects()}
           objectsContainer={testProject.testLayout.getObjects()}
-          // $FlowFixMe[incompatible-type]
           selection={getInitialSelection()}
           onAddNewInstruction={action('add new instruction')}
           onPasteInstructions={action('paste instructions')}
@@ -189,7 +187,6 @@ export const DefaultMediumScreenScopeNotInLayout = (): React.Node => (
           eventsSheetHeight={500}
           eventsSheetWidth={500}
           indentScale={1}
-          // $FlowFixMe[incompatible-type]
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}
@@ -202,7 +199,8 @@ export const DefaultMediumScreenScopeNotInLayout = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const EmptySmallScreenScopeInALayout = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const EmptySmallScreenScopeInALayout = () => (
   <DragAndDropContextProvider>
     <div className="gd-events-sheet">
       <FixedHeightFlexContainer height={500}>
@@ -218,7 +216,6 @@ export const EmptySmallScreenScopeInALayout = (): React.Node => (
           }
           globalObjectsContainer={testProject.project.getObjects()}
           objectsContainer={testProject.testLayout.getObjects()}
-          // $FlowFixMe[incompatible-type]
           selection={getInitialSelection()}
           onAddNewInstruction={action('add new instruction')}
           onPasteInstructions={action('paste instructions')}
@@ -247,7 +244,6 @@ export const EmptySmallScreenScopeInALayout = (): React.Node => (
           eventsSheetHeight={500}
           eventsSheetWidth={500}
           indentScale={1}
-          // $FlowFixMe[incompatible-type]
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}

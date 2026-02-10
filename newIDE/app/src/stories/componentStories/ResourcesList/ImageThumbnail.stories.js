@@ -11,7 +11,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <ImageThumbnail
     project={testProject.project}
     resourceName="res/icon128.png"
@@ -20,7 +21,8 @@ export const Default = (): React.Node => (
   />
 );
 
-export const Small = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Small = () => (
   <ImageThumbnail
     project={testProject.project}
     resourceName="res/icon128.png"
@@ -29,7 +31,8 @@ export const Small = (): React.Node => (
   />
 );
 
-export const Selectable = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Selectable = () => (
   <ImageThumbnail
     selectable
     project={testProject.project}

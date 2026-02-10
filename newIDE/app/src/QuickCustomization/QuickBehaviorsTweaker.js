@@ -57,7 +57,6 @@ const QuickBehaviorPropertiesEditor = ({
         instances={[behavior]}
         onInstancesModified={onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
-        // $FlowFixMe[incompatible-type]
         onRefreshAllFields={forceRecomputeSchema}
       />
     </Column>
@@ -105,7 +104,11 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
 |};
 
-export const QuickBehaviorsTweaker = ({project, resourceManagementProps}: Props): React.Node => {
+export const QuickBehaviorsTweaker = ({
+  project,
+  resourceManagementProps,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   return (
     <ColumnStackLayout noMargin expand>
       <TipCard

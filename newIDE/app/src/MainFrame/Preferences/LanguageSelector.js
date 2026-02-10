@@ -76,7 +76,8 @@ const renderLanguageSelectOption = localeMetadata => {
   );
 };
 
-const LanguageSelector = ({onLanguageChanged}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const LanguageSelector = ({ onLanguageChanged }: Props) => {
   const { values, setLanguage } = useContext(PreferencesContext);
 
   return (

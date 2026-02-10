@@ -26,7 +26,12 @@ type Props = {|
   onClose: () => void,
 |};
 
-const CoursePurchaseDialog = ({course, courseListingData, onClose}: Props): React.Node => {
+const CoursePurchaseDialog = ({
+  course,
+  courseListingData,
+  onClose,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const {
     profile,
     onOpenLoginDialog,
@@ -298,7 +303,6 @@ const CoursePurchaseDialog = ({course, courseListingData, onClose}: Props): Reac
         maxWidth="sm"
         open
         onRequestClose={onClose}
-        // $FlowFixMe[incompatible-type]
         actions={dialogActions}
         onApply={purchaseSuccessful ? onClose : onWillPurchase}
         cannotBeDismissed // Prevent the user from continuing by clicking outside.

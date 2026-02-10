@@ -12,7 +12,8 @@ type Props = {|
   onSelectCategory: (category: LearnCategory) => void,
 |};
 
-const TutorialsPage = ({onSelectCategory}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const TutorialsPage = ({ onSelectCategory }: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const [
     selectedTutorial,

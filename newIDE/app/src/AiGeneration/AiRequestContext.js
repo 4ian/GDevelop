@@ -341,7 +341,6 @@ export const useAiRequestHistory = (
       // information about the request date, not the date of each user message.
       Object.values(aiRequests)
         .sort(
-          // $FlowFixMe[incompatible-type]
           // $FlowFixMe[incompatible-type] - Object.values() loses the type of aiRequests.
           (a: AiRequest, b: AiRequest) => {
             return (
@@ -350,7 +349,6 @@ export const useAiRequestHistory = (
           }
         )
         .forEach(
-          // $FlowFixMe[incompatible-type]
           // $FlowFixMe[incompatible-type] - Object.values() loses the type of aiRequests.
           (request: AiRequest) => {
             const userMessages = request.output
@@ -358,7 +356,6 @@ export const useAiRequestHistory = (
                 message => message.type === 'message' && message.role === 'user'
               )
               .map(
-                // $FlowFixMe[incompatible-type]
                 // $FlowFixMe[incompatible-type] - We filtered the type above.
                 // $FlowFixMe[cannot-resolve-name]
                 (message: AiRequestUserMessage) => {
@@ -467,7 +464,8 @@ export const initialAiRequestContextState: AiRequestContextState = {
   },
   getAiSettings: () => null,
 };
-export const AiRequestContext: React.Context<AiRequestContextState> = React.createContext<AiRequestContextState>(
+// $FlowFixMe[signature-verification-failure]
+export const AiRequestContext = React.createContext<AiRequestContextState>(
   initialAiRequestContextState
 );
 
@@ -475,7 +473,8 @@ type AiRequestProviderProps = {|
   children: React.Node,
 |};
 
-export const AiRequestProvider = ({children}: AiRequestProviderProps): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+export const AiRequestProvider = ({ children }: AiRequestProviderProps) => {
   const editorFunctionCallResultsStorage = useEditorFunctionCallResultsStorage();
   const aiRequestStorage = useAiRequestsStorage();
   const aiRequestHistory = useAiRequestHistory(aiRequestStorage);

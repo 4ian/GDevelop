@@ -512,7 +512,8 @@ class ObjectEditorDialog extends React.Component<Props, State> {
   }
 }
 
-const ObjectEditorWithErrorBoundary = (props: Props): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+const ObjectEditorWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Object editor</Trans>}
     scope="object-details"

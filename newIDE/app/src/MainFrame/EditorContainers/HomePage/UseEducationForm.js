@@ -1,7 +1,6 @@
 // @flow
 
 import * as React from 'react';
-// $FlowFixMe[untyped-type-import]
 import type { AuthenticatedUser } from '../../../Profile/AuthenticatedUserContext';
 import { Trans } from '@lingui/macro';
 import { registerUserInterest } from '../../../Utils/GDevelopServices/User';
@@ -25,17 +24,12 @@ const emptyForm = {
   email: '',
 };
 
-// $FlowFixMe[value-as-type]
 type Props = {| authenticatedUser: AuthenticatedUser |};
 
-const useEducationForm = ({authenticatedUser: {authenticated, profile, getAuthorizationHeader}}: Props): {
-  educationForm: EducationForm,
-  educationFormError: ?React.Node,
-  educationFormStatus: EducationFormStatus,
-  onChangeEducationForm: (newEducationForm: EducationForm) => void,
-  onResetEducationForm: () => void,
-  onSendEducationForm: () => Promise<void>,
-} => {
+const useEducationForm = ({
+  authenticatedUser: { authenticated, profile, getAuthorizationHeader },
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const [educationForm, setEducationForm] = React.useState<EducationForm>({
     ...emptyForm,
     email: profile ? profile.email : '',

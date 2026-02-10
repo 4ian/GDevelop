@@ -372,14 +372,14 @@ export type UserCourseProgress = {|
 
 export type Environment = 'staging' | 'live';
 
-// $FlowFixMe[cannot-resolve-name]
-export const client: Axios = axios.create({
+// $FlowFixMe[signature-verification-failure]
+export const client = axios.create({
   baseURL: GDevelopAssetApi.baseUrl,
 });
 
 // Separate client for fetching static JSON files from the CDN
-// $FlowFixMe[cannot-resolve-name]
-export const cdnClient: Axios = axios.create();
+// $FlowFixMe[signature-verification-failure]
+export const cdnClient = axios.create();
 
 export const isAssetPackAudioOnly = (assetPack: PrivateAssetPack): boolean => {
   const contentKeys = Object.keys(assetPack.content);
@@ -394,6 +394,7 @@ export const listAllPublicAssets = async ({
 }: {|
   environment: Environment,
 |}): Promise<AllPublicAssets> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/asset`, {
     params: {
       environment,
@@ -417,14 +418,17 @@ export const listAllPublicAssets = async ({
 
   const responsesData = await Promise.all([
     cdnClient
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       .get(assetShortHeadersUrl)
       .then(response => response.data)
       .catch(e => e),
     cdnClient
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       .get(filtersUrl)
       .then(response => response.data)
       .catch(e => e),
     cdnClient
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       .get(assetPacksUrl)
       .then(response => response.data)
       .catch(e => e),
@@ -455,6 +459,7 @@ export const getPublicAsset = async (
   assetShortHeader: AssetShortHeader,
   { environment }: {| environment: Environment |}
 ): Promise<Asset> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const assetResponse = await cdnClient.get(
     `${GDevelopAssetCdn.baseUrl[environment]}/assets/${
       assetShortHeader.id
@@ -483,6 +488,7 @@ export const getPrivateAsset = async (
     assetUrl,
     authorizationToken
   );
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const assetResponse = await client.get(authorizedUrl);
   return ensureObjectHasProperty({
     data: assetResponse.data,
@@ -510,6 +516,7 @@ export const listAllResources = async ({
 }: {|
   environment: Environment,
 |}): Promise<AllResources> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/resource`, {
     params: {
       environment,
@@ -520,8 +527,11 @@ export const listAllResources = async ({
     throw new Error('Unexpected response from the resource endpoint.');
   }
   const responses = await Promise.all([
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     client.get(resourcesUrl).then(response => response.data),
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     client.get(resourcesV2Url).then(response => response.data),
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     client.get(filtersUrl).then(response => response.data),
   ]);
   const [resources, resourcesV2, filters] = responses;
@@ -541,6 +551,7 @@ export const listAllAuthors = ({
   environment: Environment,
 |}): Promise<Array<Author>> => {
   return client
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     .get(`/author`, {
       params: {
         environment,
@@ -566,6 +577,7 @@ export const listAllLicenses = ({
   environment: Environment,
 |}): Promise<Array<License>> => {
   return client
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     .get(`/license`, {
       params: {
         environment,
@@ -588,6 +600,7 @@ export const listAllLicenses = ({
 export const getPrivateAssetPack = async (
   assetPackId: string
 ): Promise<PrivateAssetPack> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/asset-pack/${assetPackId}`);
   return ensureObjectHasProperty({
     data: response.data,
@@ -599,6 +612,7 @@ export const getPrivateAssetPack = async (
 export const getPrivateGameTemplate = async (
   gameTemplateId: string
 ): Promise<PrivateGameTemplate> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/game-template/${gameTemplateId}`);
   return ensureObjectHasProperty({
     data: response.data,
@@ -608,6 +622,7 @@ export const getPrivateGameTemplate = async (
 };
 
 export const getBundle = async (bundleId: string): Promise<Bundle> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/bundle/${bundleId}`);
   return ensureObjectHasProperty({
     data: response.data,
@@ -627,6 +642,7 @@ export const getPrivatePdfTutorial = async (
   |}
 ): Promise<PrivatePdfTutorial> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/pdf-tutorial/${tutorialId}`, {
     params: {
       userId,
@@ -680,6 +696,7 @@ export const listReceivedAssetShortHeaders = async (
   |}
 ): Promise<Array<AssetShortHeader>> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get('/asset-short-header', {
     headers: { Authorization: authorizationHeader },
     params: { userId },
@@ -699,6 +716,7 @@ export const listReceivedAssetPacks = async (
   |}
 ): Promise<Array<PrivateAssetPack>> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get('/asset-pack', {
     headers: { Authorization: authorizationHeader },
     params: { userId },
@@ -718,6 +736,7 @@ export const listReceivedGameTemplates = async (
   |}
 ): Promise<Array<PrivateGameTemplate>> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get('/game-template', {
     headers: { Authorization: authorizationHeader },
     params: { userId },
@@ -737,6 +756,7 @@ export const listReceivedBundles = async (
   |}
 ): Promise<Array<Bundle>> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get('/bundle', {
     headers: { Authorization: authorizationHeader },
     params: { userId },
@@ -747,7 +767,8 @@ export const listReceivedBundles = async (
   });
 };
 
-export const isPublicAssetResourceUrl = (url: string): boolean =>
+// $FlowFixMe[signature-verification-failure]
+export const isPublicAssetResourceUrl = (url: string) =>
   url.startsWith(GDevelopPublicAssetResourcesStorageBaseUrl) ||
   url.startsWith(GDevelopPublicAssetResourcesStorageStagingBaseUrl);
 // $FlowFixMe[missing-local-annot]
@@ -786,6 +807,7 @@ export const listCourses = async (
   if (userId) {
     const authorizationHeader = await getAuthorizationHeader();
 
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     const response = await client.get(`/course`, {
       params: {
         userId,
@@ -800,6 +822,7 @@ export const listCourses = async (
     });
   }
   return ensureIsArray({
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     data: (await client.get(`/course`)).data,
     endpointName: '/course of Asset API',
   });
@@ -820,6 +843,7 @@ export const listCourseChapters = async (
   if (userId) {
     const authorizationHeader = await getAuthorizationHeader();
 
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     const response = await client.get(`/course/${courseId}/chapter`, {
       params: {
         userId,
@@ -835,6 +859,7 @@ export const listCourseChapters = async (
     });
   }
   return ensureIsArray({
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     data: (await client.get(`/course/${courseId}/chapter`, {
       params: { language },
     })).data,

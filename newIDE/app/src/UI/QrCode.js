@@ -13,7 +13,8 @@ type Props = {|
   size?: number,
 |};
 
-const QrCode = ({url, size = 128}: Props): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+const QrCode = ({ url, size = 128 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const containerRef = React.useRef<?HTMLDivElement>(null);

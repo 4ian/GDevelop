@@ -11,7 +11,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const UserPublicProfileChip = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const UserPublicProfileChip = () => (
   <UserPublicProfileChipComponent
     user={{
       id: '123',

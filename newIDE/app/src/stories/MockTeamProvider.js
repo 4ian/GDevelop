@@ -26,7 +26,8 @@ export const emptySubscriptionPlanMockData = [
     url: `${GDevelopUsageApi.baseUrl}/subscription-plan?includeLegacy=true`,
     method: 'GET',
     status: 200,
-    response: [] as Array<empty>,
+    // $FlowFixMe[signature-verification-failure]
+    response: [],
     delay: 0,
   },
   {
@@ -35,7 +36,8 @@ export const emptySubscriptionPlanMockData = [
     }/subscription-plan-pricing-system?includeLegacy=true`,
     method: 'GET',
     status: 200,
-    response: [] as Array<empty>,
+    // $FlowFixMe[signature-verification-failure]
+    response: [],
     delay: 0,
   },
 ];
@@ -180,23 +182,22 @@ const initialMemberships: Array<TeamMembership> = [
   },
 ];
 
-export const MockTeamProvider = (
-  {
-    children,
-    loading,
-    noGroups,
-    noMembers,
-    noActiveMembers,
-    teamSize
-  }: {|
-    children: React.Node,
-    loading: boolean,
-    noGroups?: boolean,
-    noMembers?: boolean,
-    noActiveMembers?: boolean,
-    teamSize?: number,
-  |},
-): React.Node => {
+export const MockTeamProvider = ({
+  children,
+  loading,
+  noGroups,
+  noMembers,
+  noActiveMembers,
+  teamSize,
+}: {|
+  children: React.Node,
+  loading: boolean,
+  noGroups?: boolean,
+  noMembers?: boolean,
+  noActiveMembers?: boolean,
+  teamSize?: number,
+// $FlowFixMe[signature-verification-failure]
+|}) => {
   const team = { ...initialTeam, seats: teamSize || initialTeam.seats };
   const [nameChangeTryCount, setNameChangeTryCount] = React.useState<number>(0);
   const [userChangeTryCount, setUserChangeTryCount] = React.useState<number>(0);

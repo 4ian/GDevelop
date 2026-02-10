@@ -165,7 +165,6 @@ type Props = {|
 type ComponentProps = {|
   ...Props,
   windowSize: WindowSizeType,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   preferences: Preferences,
   tutorials: ?Array<Tutorial>,
@@ -246,14 +245,16 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _eventsTree: ?EventsTreeInterface;
   _eventSearcher: ?EventsSearcher;
   _searchPanel: ?SearchPanelInterface;
+  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  _containerDiv = React.createRef<HTMLDivElement>() as React$RefObject<HTMLDivElement | null>;
+  _containerDiv = React.createRef<HTMLDivElement>();
   // $FlowFixMe[missing-local-annot]
   _containerDivLastKnownSize = null;
+  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  _keyboardShortcuts = new KeyboardShortcuts(
-  {
-    isActive: () => !this.state.inlineEditing &&
+  _keyboardShortcuts = new KeyboardShortcuts({
+    isActive: () =>
+      !this.state.inlineEditing &&
       !this.state.editedInstruction.instruction &&
       !this.state.analyzedEventsContextResult &&
       !this.state.serializedEventsToExtract,
@@ -269,8 +270,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       onZoomIn: (event: KeyboardEvent) => this.onZoomEvent('IN')(event),
       onZoomOut: (event: KeyboardEvent) => this.onZoomEvent('OUT')(event),
     },
-  },
-) as KeyboardShortcuts;
+  });
 
   eventContextMenu: ?ContextMenuInterface;
   resourceExternallyChangedCallbackId: ?string;
@@ -282,12 +282,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   // $FlowFixMe[missing-local-annot]
   state = {
-    eventsHistory: getHistoryInitialState(
-  this.props.events,
-  {
-    historyMaxSize: 100,
-  },
-) as HistoryState,
+    // $FlowFixMe[signature-verification-failure]
+    eventsHistory: getHistoryInitialState(this.props.events, {
+      historyMaxSize: 100,
+    }),
 
     editedInstruction: {
       isCondition: true,
@@ -305,7 +303,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     },
     editedVariable: null,
 
-    selection: getInitialSelection() as any,
+    // $FlowFixMe[signature-verification-failure]
+    selection: getInitialSelection(),
 
     inlineEditing: false,
     inlineEditingAnchorEl: null,
@@ -322,7 +321,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
     layoutVariablesDialogOpen: false,
 
-    allEventsMetadata: [] as Array<empty>,
+    // $FlowFixMe[signature-verification-failure]
+    allEventsMetadata: [],
 
     textEditedEvent: null,
 
@@ -505,7 +505,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       });
   };
 
-  _selectionCanHaveSubEvents = (): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _selectionCanHaveSubEvents = () => {
     const eventContext =
       getLastSelectedEventContextWhichCanHaveSubEvents(this.state.selection) ||
       getLastSelectedInstructionEventContextWhichCanHaveSubEvents(
@@ -532,7 +534,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
   };
 
-  _selectionCanHaveLocalVariables = (): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _selectionCanHaveLocalVariables = () => {
     const eventContext =
       getLastSelectedEventContextWhichCanHaveVariables(this.state.selection) ||
       getLastSelectedInstructionEventContextWhichCanHaveVariables(
@@ -541,7 +545,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     return !!eventContext;
   };
 
-  _selectionCanToggleDisabled = (): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _selectionCanToggleDisabled = () => {
     return getSelectedEvents(this.state.selection).some(event => {
       return event.isExecutable();
     });
@@ -661,7 +667,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     });
   };
 
-  _buildInstructionContextMenu = (i18n: I18nType): any =>
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _buildInstructionContextMenu = (i18n: I18nType) =>
     [
       {
         label: i18n._(t`Copy`),
@@ -745,7 +753,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   openVariablesEditor = (
     eventContext: EventContext,
     variableDeclarationContext: VariableDeclarationContext,
-    shouldCreateVariable: any = false
+    // $FlowFixMe[signature-verification-failure]
+    // $FlowFixMe[missing-local-annot]
+    shouldCreateVariable = false
   ) => {
     this.setState({
       editedVariable: {
@@ -866,7 +876,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (this._eventsTree) this._eventsTree.unfoldToLevel(level);
   };
 
-  _buildEventContextMenu = (i18n: I18nType): any => [
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _buildEventContextMenu = (i18n: I18nType) => [
     {
       label: i18n._(t`Edit`),
       click: () => this.openEventTextDialog(),
@@ -1033,7 +1045,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     },
   ];
 
-  _selectionIsStandardEvent = (): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _selectionIsStandardEvent = () => {
     const eventContext = getLastSelectedEventContext(this.state.selection);
     return (
       !!eventContext &&
@@ -1041,7 +1055,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
   };
 
-  _selectionIsElseEvent = (): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _selectionIsElseEvent = () => {
     const eventContext = getLastSelectedEventContext(this.state.selection);
     return (
       !!eventContext &&
@@ -1485,7 +1501,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     });
   };
 
-  _getChangedEventRows = (events: Array<gdBaseEvent>): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _getChangedEventRows = (events: Array<gdBaseEvent>) => {
     const eventsTree = this._eventsTree;
     if (eventsTree) {
       return events.map(event => eventsTree.getEventRow(event));
@@ -1540,7 +1558,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         newEventsHistory.futureActions.length - 1
       ];
 
-      // $FlowFixMe[incompatible-type]
       let newSelection: SelectionState = getInitialSelection();
       // If it is a DELETE or EDIT, then the element will be present, so we can select them.
       // If it is an ADD, then it will not be present, so we can't select them.
@@ -1550,12 +1567,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         const eventContexts = eventsTree.getEventContextAtRowIndexes(
           positions.positionsBeforeAction
         );
-        // $FlowFixMe[incompatible-type]
         newSelection = selectEventsAfterHistoryChange(eventContexts);
       }
 
       this.setState(
-        // $FlowFixMe[incompatible-type]
         {
           selection: newSelection,
           eventsHistory: newEventsHistory,
@@ -1604,7 +1619,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
       // If it is a ADD or EDIT, then the element will be present, so we can select them.
       // If it is a DELETE, then they will not be present, so we can't select them.
-      // $FlowFixMe[incompatible-type]
       let newSelection: SelectionState = getInitialSelection();
       if (type === 'DELETE') {
         newSelection = clearSelection();
@@ -1612,12 +1626,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         const eventContexts = eventsTree.getEventContextAtRowIndexes(
           positions.positionAfterAction
         );
-        // $FlowFixMe[incompatible-type]
         newSelection = selectEventsAfterHistoryChange(eventContexts);
       }
 
       this.setState(
-        // $FlowFixMe[incompatible-type]
         {
           selection: newSelection,
           eventsHistory: newEventsHistory,
@@ -1834,7 +1846,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     });
   };
 
-  _renderInstructionEditorDialog = (): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _renderInstructionEditorDialog = () => {
     const {
       project,
       scope,
@@ -1954,7 +1968,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     }
   };
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const {
       isActive,
       project,
@@ -2390,6 +2406,5 @@ const EventsSheet = (props, ref) => {
   );
 };
 
-export default React.forwardRef<Props, EventsSheetInterface>(EventsSheet) as component(
-  ...{ ...Props, +ref?: React.RefSetter<EventsSheetInterface> }
-);
+// $FlowFixMe[signature-verification-failure]
+export default React.forwardRef<Props, EventsSheetInterface>(EventsSheet);

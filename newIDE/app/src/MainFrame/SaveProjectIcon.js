@@ -20,7 +20,8 @@ type Props = {|
 |};
 const CHECK_FREQUENCY = 5000;
 
-const SaveProjectIcon = (props: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const SaveProjectIcon = (props: Props) => {
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const unsavedChangesAmount = getUnsavedChangesAmount(unsavedChanges);
   const displayDotBadge = unsavedChangesAmount !== 'none';

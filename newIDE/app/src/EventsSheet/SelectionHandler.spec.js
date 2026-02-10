@@ -46,17 +46,12 @@ describe('SelectionHandler', () => {
     emptyStandardEvent.delete();
 
     let currentSelection = getInitialSelection();
-    // $FlowFixMe[incompatible-type]
     expect(getLastSelectedEventContext(currentSelection)).toBe(null);
     expect(
-      // $FlowFixMe[incompatible-type]
       getLastSelectedEventContextWhichCanHaveSubEvents(currentSelection)
     ).toBe(null);
-    // $FlowFixMe[incompatible-type]
     expect(getSelectedEventContexts(currentSelection)).toEqual([]);
-    // $FlowFixMe[incompatible-type]
     expect(getSelectedTopMostOnlyEventContexts(currentSelection)).toEqual([]);
-    // $FlowFixMe[incompatible-type]
     expect(getLastSelectedTopMostOnlyEventContext(currentSelection)).toEqual(
       null
     );
@@ -64,7 +59,6 @@ describe('SelectionHandler', () => {
     const { emptySceneProjectScopedContainersAccessor } = makeTestProject(gd);
 
     // Select a top-level event.
-    // $FlowFixMe[incompatible-type]
     currentSelection = selectEvent(currentSelection, {
       eventsList: topEventsList,
       event: standardEvent1,
@@ -114,7 +108,6 @@ describe('SelectionHandler', () => {
     });
 
     // Select a child event, but without multiselection (so the parent is removed).
-    // $FlowFixMe[incompatible-type]
     currentSelection = selectEvent(currentSelection, {
       eventsList: standardEvent1.getSubEvents(),
       event: standardEvent1_1,
@@ -165,7 +158,6 @@ describe('SelectionHandler', () => {
 
     // Add an unrelated grand-child event to the selection, with multiselection (so the previous child
     // stays in the selection).
-    // $FlowFixMe[incompatible-type]
     currentSelection = selectEvent(
       currentSelection,
       {
@@ -232,9 +224,7 @@ describe('SelectionHandler', () => {
     });
 
     // Restart from a empty selection, and select a parent and its child.
-    // $FlowFixMe[incompatible-type]
     currentSelection = selectEvent(
-      // $FlowFixMe[incompatible-type]
       getInitialSelection(),
       {
         eventsList: standardEvent1_2.getSubEvents(),
@@ -244,7 +234,6 @@ describe('SelectionHandler', () => {
       },
       /*multiSelection=*/ true
     );
-    // $FlowFixMe[incompatible-type]
     currentSelection = selectEvent(
       currentSelection,
       {
@@ -305,9 +294,7 @@ describe('SelectionHandler', () => {
     });
 
     // Restart from a empty selection, and select a grand-parent and its grand-child.
-    // $FlowFixMe[incompatible-type]
     currentSelection = selectEvent(
-      // $FlowFixMe[incompatible-type]
       getInitialSelection(),
       {
         eventsList: standardEvent1_2.getSubEvents(),
@@ -317,7 +304,6 @@ describe('SelectionHandler', () => {
       },
       /*multiSelection=*/ true
     );
-    // $FlowFixMe[incompatible-type]
     currentSelection = selectEvent(
       currentSelection,
       {
@@ -378,9 +364,7 @@ describe('SelectionHandler', () => {
     });
 
     // Restart from a empty selection, and select an event and a unrelated grand-child.
-    // $FlowFixMe[incompatible-type]
     currentSelection = selectEvent(
-      // $FlowFixMe[incompatible-type]
       getInitialSelection(),
       {
         eventsList: standardEvent1_2.getSubEvents(),
@@ -390,7 +374,6 @@ describe('SelectionHandler', () => {
       },
       /*multiSelection=*/ true
     );
-    // $FlowFixMe[incompatible-type]
     currentSelection = selectEvent(
       currentSelection,
       {
@@ -486,11 +469,8 @@ describe('SelectionHandler', () => {
     emptyStandardEvent.delete();
 
     let currentSelection = getInitialSelection();
-    // $FlowFixMe[incompatible-type]
     expect(getSelectedEventContexts(currentSelection)).toEqual([]);
-    // $FlowFixMe[incompatible-type]
     expect(getSelectedTopMostOnlyEventContexts(currentSelection)).toEqual([]);
-    // $FlowFixMe[incompatible-type]
     expect(getLastSelectedTopMostOnlyEventContext(currentSelection)).toEqual(
       null
     );
@@ -498,7 +478,6 @@ describe('SelectionHandler', () => {
     const { emptySceneProjectScopedContainersAccessor } = makeTestProject(gd);
 
     // Select a top-level event.
-    // $FlowFixMe[incompatible-type]
     currentSelection = selectEvent(currentSelection, {
       eventsList: topEventsList,
       event: standardEvent1,
@@ -537,7 +516,6 @@ describe('SelectionHandler', () => {
     });
 
     // Select a condition of a child event.
-    // $FlowFixMe[incompatible-type]
     currentSelection = selectInstruction(
       {
         event: standardEvent1_2,
@@ -633,7 +611,6 @@ describe('SelectionHandler', () => {
     });
 
     // Select an action of another event.
-    // $FlowFixMe[incompatible-type]
     currentSelection = selectInstruction(
       {
         event: standardEvent1_2_1,

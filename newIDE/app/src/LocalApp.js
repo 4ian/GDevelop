@@ -34,7 +34,8 @@ import LocalLoginProvider from './LoginProvider/LocalLoginProvider';
 
 const gd: libGDevelop = global.gd;
 
-export const create = (authentication: Authentication): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const create = (authentication: Authentication) => {
   Window.setUpContextMenu();
   const loginProvider = new LocalLoginProvider(authentication.auth);
   authentication.setLoginProvider(loginProvider);
@@ -47,11 +48,11 @@ export const create = (authentication: Authentication): React.Node => {
       authentication={authentication}
       disableCheckForUpdates={!!appArguments['disable-update-check']}
       makeEventsFunctionCodeWriter={makeLocalEventsFunctionCodeWriter}
-      // $FlowFixMe[incompatible-exact]
       // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-exact]
       eventsFunctionsExtensionWriter={LocalEventsFunctionsExtensionWriter}
-      // $FlowFixMe[incompatible-exact]
       // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-exact]
       eventsFunctionsExtensionOpener={LocalEventsFunctionsExtensionOpener}
     >
       {({ i18n }) => (

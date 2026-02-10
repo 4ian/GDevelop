@@ -16,7 +16,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Loading = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Loading = () => {
   return (
     <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <CreditsStatusBanner displayPurchaseAction />
@@ -24,7 +25,8 @@ export const Loading = (): React.Node => {
   );
 };
 
-export const Default = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => {
   return (
     <AuthenticatedUserContext.Provider
       value={fakeAuthenticatedUserWithNoSubscription}
@@ -34,7 +36,8 @@ export const Default = (): React.Node => {
   );
 };
 
-export const WithCredits = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithCredits = () => {
   return (
     <AuthenticatedUserContext.Provider
       value={fakeAuthenticatedUserWithNoSubscriptionAndCredits}
@@ -44,7 +47,8 @@ export const WithCredits = (): React.Node => {
   );
 };
 
-export const WithoutPurchaseAction = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithoutPurchaseAction = () => {
   return (
     <AuthenticatedUserContext.Provider
       value={fakeAuthenticatedUserWithNoSubscriptionAndCredits}

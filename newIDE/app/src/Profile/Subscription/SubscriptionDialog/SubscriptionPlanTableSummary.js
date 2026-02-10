@@ -39,19 +39,18 @@ const styles = {
   },
 };
 
-const SubscriptionPlanTableSummary = (
-  {
-    subscriptionPlanWithPricingSystems,
-    displayedFeatures,
-    hideFullTableLink,
-    actionLabel
-  }: {|
-    subscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems,
-    displayedFeatures?: Array<string>,
-    hideFullTableLink?: boolean,
-    actionLabel?: React.Node,
-  |},
-): React.Node => {
+const SubscriptionPlanTableSummary = ({
+  subscriptionPlanWithPricingSystems,
+  displayedFeatures,
+  hideFullTableLink,
+  actionLabel,
+}: {|
+  subscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems,
+  displayedFeatures?: Array<string>,
+  hideFullTableLink?: boolean,
+  actionLabel?: React.Node,
+// $FlowFixMe[signature-verification-failure]
+|}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
 
@@ -99,7 +98,6 @@ const SubscriptionPlanTableSummary = (
                     alignItems="center"
                     justifyContent="space-between"
                   >
-                    {/* $FlowFixMe[incompatible-type] */}
                     <Text style={styles.bulletText}>
                       {summarizedFeature.displayedFeatureName}
                     </Text>

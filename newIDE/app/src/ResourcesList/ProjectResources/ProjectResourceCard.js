@@ -112,7 +112,14 @@ type Props = {|
   isSelected?: boolean,
 |};
 
-export const ProjectResourceCard = ({project, resource, onChoose, size, isSelected}: Props): React.Node => {
+export const ProjectResourceCard = ({
+  project,
+  resource,
+  onChoose,
+  size,
+  isSelected,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const resourceName = resource.getName();
 
@@ -150,7 +157,6 @@ export const ProjectResourceCard = ({project, resource, onChoose, size, isSelect
       >
         {renderResourcePreview()}
         <div style={styles.titleContainer}>
-          {/* $FlowFixMe[incompatible-type] */}
           <Text noMargin style={styles.title} color="inherit">
             {resourceName}
           </Text>

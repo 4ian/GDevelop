@@ -49,9 +49,7 @@ const makeTestProjectWithResourcesToUpload = () => {
 const makeMoveAllLocalResourcesToCloudResourcesOptions = (
   project: gdProject
 ): MoveAllProjectResourcesOptions =>
-  // $FlowFixMe[incompatible-type]
   // $FlowFixMe[incompatible-type] - unused property were not mocked.
-  // $FlowFixMe[incompatible-type]
   ({
     project,
     onProgress: jest.fn(),

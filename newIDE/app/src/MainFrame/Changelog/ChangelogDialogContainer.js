@@ -19,7 +19,8 @@ const ChangelogDialogInnerContainer = ({
  * The container showing the ChangelogDialog only if a a new version
  * of GDevelop is detected.
  */
-const ChangelogDialogContainer = (props: {||}): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+const ChangelogDialogContainer = (props: {||}) => (
   <PreferencesContext.Consumer>
     {({ values, verifyIfIsNewVersion }) => (
       <ChangelogDialogInnerContainer

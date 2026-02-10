@@ -411,7 +411,6 @@ const CreateSection = ({
         const game = await registerGame(
           authenticatedUser.getAuthorizationHeader,
           id,
-          // $FlowFixMe[incompatible-type]
           getDefaultRegisterGameProperties({
             projectId,
             projectName: file.fileMetadata.name,
@@ -664,7 +663,8 @@ const CreateSection = ({
   );
 };
 
-const CreateSectionWithErrorBoundary = (props: Props): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+const CreateSectionWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Create section</Trans>}
     scope="start-page-create"

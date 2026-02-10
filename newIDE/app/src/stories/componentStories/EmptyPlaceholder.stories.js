@@ -13,7 +13,8 @@ export default {
   component: EmptyPlaceholder,
   decorators: [paperDecorator],
 };
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <FixedHeightFlexContainer
     height={500}
     justifyContent="center"
@@ -29,7 +30,8 @@ export const Default = (): React.Node => (
   </FixedHeightFlexContainer>
 );
 
-export const WithSecondaryAction = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithSecondaryAction = () => (
   <FixedHeightFlexContainer
     height={500}
     justifyContent="center"
@@ -48,7 +50,8 @@ export const WithSecondaryAction = (): React.Node => (
   </FixedHeightFlexContainer>
 );
 
-export const WithActionSplitMenu = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithActionSplitMenu = () => (
   <FixedHeightFlexContainer
     height={500}
     justifyContent="center"

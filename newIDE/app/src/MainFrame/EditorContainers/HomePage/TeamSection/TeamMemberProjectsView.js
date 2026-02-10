@@ -54,18 +54,17 @@ type Props = {|
   isLoadingProjects: boolean,
 |};
 
-const TeamMemberProjectsView = (
-  {
-    user,
-    currentFileMetadata,
-    onClickBack,
-    onOpenRecentFile,
-    storageProviders,
-    projects,
-    onRefreshProjects,
-    isLoadingProjects
-  }: Props,
-): React.Node => {
+const TeamMemberProjectsView = ({
+  user,
+  currentFileMetadata,
+  onClickBack,
+  onOpenRecentFile,
+  storageProviders,
+  projects,
+  onRefreshProjects,
+  isLoadingProjects,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const skeletonLineHeight = getProjectLineHeight({ isMobile });
   const contextMenu = React.useRef<?ContextMenuInterface>(null);

@@ -812,9 +812,8 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
   }
 );
 
-const LayersListWithErrorBoundary: component(
-  ...{ ...Props, +ref?: React.RefSetter<LayersListInterface> }
-) = React.forwardRef<
+// $FlowFixMe[signature-verification-failure]
+const LayersListWithErrorBoundary = React.forwardRef<
   Props,
   LayersListInterface
 >((props, ref) => (

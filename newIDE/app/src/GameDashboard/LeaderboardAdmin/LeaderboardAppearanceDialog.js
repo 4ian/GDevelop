@@ -104,7 +104,8 @@ function LeaderboardAppearanceDialog({
   onClose,
   onSave,
   leaderboardCustomizationSettings,
-}: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: Props) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { canUseTheme, canUseCustomCss } = canUserCustomizeLeaderboardTheme(
@@ -472,7 +473,6 @@ function LeaderboardAppearanceDialog({
               floatingLabelText={<Trans>Score display</Trans>}
               onChange={(e, i, newValue) =>
                 // $FlowIgnore
-                // $FlowFixMe[incompatible-type]
                 setScoreType(newValue)
               }
               disabled={isLoading}

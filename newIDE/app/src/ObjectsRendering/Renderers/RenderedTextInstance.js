@@ -80,7 +80,9 @@ export default class RenderedTextInstance extends RenderedInstance {
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  ) {
     return 'CppPlatform/Extensions/texticon24.png';
   }
 
@@ -240,13 +242,17 @@ export default class RenderedTextInstance extends RenderedInstance {
     this._pixiObject.alpha = alphaForDisplay;
   }
 
-  getDefaultWidth(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getDefaultWidth() {
     // The default width is dependent of the current wrapping width.
     // You should avoid to use this value.
     return this._pixiObject.width;
   }
 
-  getDefaultHeight(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getDefaultHeight() {
     // The default height is dependent of the current wrapping width.
     // You should avoid to use this value.
     return this._pixiObject.height;

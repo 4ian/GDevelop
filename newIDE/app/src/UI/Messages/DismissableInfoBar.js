@@ -16,7 +16,13 @@ type Props = {|
   show: boolean,
 |};
 
-const DismissableInfoBar = ({identifier, show, touchScreenMessage, message}: Props): React.Node => {
+const DismissableInfoBar = ({
+  identifier,
+  show,
+  touchScreenMessage,
+  message,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
   );

@@ -77,7 +77,8 @@ export type EditProfileDialogProps = {|
   error: ?AuthError,
 |};
 
-export const getUsernameErrorText = (error: ?AuthError): any | void => {
+// $FlowFixMe[signature-verification-failure]
+export const getUsernameErrorText = (error: ?AuthError) => {
   if (!error) return undefined;
 
   if (error.code === 'auth/username-used')
@@ -245,24 +246,23 @@ const CommunityLinkLine = ({
   );
 };
 
-const EditProfileDialog = (
-  {
-    profile,
-    subscription,
-    limits,
-    achievements,
-    badges,
-    onClose,
-    onEdit,
-    onUpdateGitHubStar,
-    onUpdateTiktokFollow,
-    onUpdateTwitterFollow,
-    onUpdateYoutubeSubscription,
-    onDelete,
-    actionInProgress,
-    error
-  }: EditProfileDialogProps,
-): React.Node => {
+const EditProfileDialog = ({
+  profile,
+  subscription,
+  limits,
+  achievements,
+  badges,
+  onClose,
+  onEdit,
+  onUpdateGitHubStar,
+  onUpdateTiktokFollow,
+  onUpdateTwitterFollow,
+  onUpdateYoutubeSubscription,
+  onDelete,
+  actionInProgress,
+  error,
+// $FlowFixMe[signature-verification-failure]
+}: EditProfileDialogProps) => {
   const { showDeleteConfirmation, showAlert } = useAlertDialog();
 
   const communityLinks = profile.communityLinks || {};
@@ -457,9 +457,7 @@ const EditProfileDialog = (
       {({ i18n }) => (
         <Dialog
           title={<Trans>Edit your GDevelop profile</Trans>}
-          // $FlowFixMe[incompatible-type]
           actions={actions}
-          // $FlowFixMe[incompatible-type]
           secondaryActions={secondaryActions}
           maxWidth="sm"
           cannotBeDismissed={actionInProgress}

@@ -380,7 +380,8 @@ export type Props = {|
   i18n: I18n,
 |};
 
-const MainFrame = (props: Props): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+const MainFrame = (props: Props) => {
   const [state, setState]: [
     State,
     ((State => State) | State) => Promise<State>,
@@ -4991,7 +4992,6 @@ const MainFrame = (props: Props): React.MixedElement => {
           onOpenHomePage={openHomePage}
           toggleProjectManager={toggleProjectManager}
           mainMenuCallbacks={mainMenuCallbacks}
-          // $FlowFixMe[incompatible-type]
           buildMainMenuProps={buildMainMenuProps}
         />
       </ProjectManagerDrawer>
@@ -5028,7 +5028,6 @@ const MainFrame = (props: Props): React.MixedElement => {
           )}
         />
       </LeaderboardProvider>
-      {/* $FlowFixMe[incompatible-type] */}
       <CommandPaletteWithAlgoliaSearch ref={commandPaletteRef} />
       <LoaderModal
         showImmediately={showLoaderImmediately}

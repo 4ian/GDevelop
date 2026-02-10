@@ -22,7 +22,8 @@ export default function MeasurementUnitDocumentation({
   label,
   description,
   elementsWithWords,
-}: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: Props) {
   return (
     <Column noMargin>
       <Text size="sub-title">{label}</Text>

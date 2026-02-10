@@ -188,7 +188,9 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       isGlobalObject,
       isFolder,
     }: {| isGlobalObject: boolean, isFolder: boolean |}
-  ): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  ) {
     let translation = t`Paste`;
     if (Clipboard.has(OBJECT_CLIPBOARD_KIND)) {
       const clipboardContent = Clipboard.get(OBJECT_CLIPBOARD_KIND);
@@ -201,7 +203,9 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     return i18n._(translation);
   }
 
-  buildMenuTemplate(i18n: I18nType, index: number): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  buildMenuTemplate(i18n: I18nType, index: number) {
     const {
       globalObjectsContainer,
       objectsContainer,
@@ -468,7 +472,9 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
 
   duplicate(): void {}
 
-  getRightButton(i18n: I18nType): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getRightButton(i18n: I18nType) {
     return null;
   }
 }

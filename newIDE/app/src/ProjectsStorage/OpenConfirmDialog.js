@@ -13,7 +13,11 @@ type OpenConfirmDialogProps = {|
   onConfirm: () => void,
 |};
 
-export const OpenConfirmDialog = ({onClose, onConfirm}: OpenConfirmDialogProps): React.Node => {
+export const OpenConfirmDialog = ({
+  onClose,
+  onConfirm,
+// $FlowFixMe[signature-verification-failure]
+}: OpenConfirmDialogProps) => {
   return (
     <Dialog
       title={<Trans>Confirm the opening</Trans>}
@@ -60,12 +64,8 @@ export const OpenConfirmDialog = ({onClose, onConfirm}: OpenConfirmDialogProps):
   );
 };
 
-export const useOpenConfirmDialog = (): {
-  ensureInteractionHappened: (
-    storageProviderOperations: StorageProviderOperations
-  ) => Promise<boolean>,
-  renderOpenConfirmDialog: () => null | React.Node,
-} => {
+// $FlowFixMe[signature-verification-failure]
+export const useOpenConfirmDialog = () => {
   const interactionMade = React.useRef(false);
   const pendingConfirmationPromiseResolve = React.useRef<?(boolean) => void>(
     null

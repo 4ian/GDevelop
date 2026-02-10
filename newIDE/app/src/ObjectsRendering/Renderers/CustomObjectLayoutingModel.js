@@ -112,31 +112,45 @@ export class LayoutedInstance {
     this._customDepth = instance.getCustomWidth();
   }
 
-  getX(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getX() {
     return this.x;
   }
 
-  getY(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getY() {
     return this.y;
   }
 
-  getZ(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getZ() {
     return this.z;
   }
 
-  getAngle(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getAngle() {
     return 0;
   }
 
-  getRotationX(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getRotationX() {
     return 0;
   }
 
-  getRotationY(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getRotationY() {
     return 0;
   }
 
-  getObjectName(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getObjectName() {
     return this.instance.getObjectName();
   }
 
@@ -152,49 +166,65 @@ export class LayoutedInstance {
 
   setRotationY(angle: number) {}
 
-  isLocked(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  isLocked() {
     return false;
   }
 
   setLocked(lock: boolean) {}
 
-  isSealed(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  isSealed() {
     return false;
   }
 
   setSealed(seal: boolean) {}
 
-  getZOrder(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getZOrder() {
     return 0;
   }
 
   setZOrder(zOrder: number) {}
 
-  getOpacity(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getOpacity() {
     return this.instance.getOpacity();
   }
 
   setOpacity(opacity: number) {}
 
-  isFlippedX(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  isFlippedX() {
     return this.instance.isFlippedX();
   }
 
   setFlippedX(flippedX: boolean) {}
 
-  isFlippedY(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  isFlippedY() {
     return this.instance.isFlippedY();
   }
 
   setFlippedY(flippedY: boolean) {}
 
-  isFlippedZ(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  isFlippedZ() {
     return this.instance.isFlippedZ();
   }
 
   setFlippedZ(flippedY: boolean) {}
 
-  getLayer(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getLayer() {
     return '';
   }
 
@@ -204,11 +234,15 @@ export class LayoutedInstance {
     this._hasCustomSize = enable;
   }
 
-  hasCustomSize(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  hasCustomSize() {
     return this._hasCustomSize;
   }
 
-  hasCustomDepth(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  hasCustomDepth() {
     return this._hasCustomDepth;
   }
 
@@ -217,7 +251,9 @@ export class LayoutedInstance {
     this._hasCustomSize = true;
   }
 
-  getCustomWidth(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getCustomWidth() {
     return this._customWidth;
   }
 
@@ -226,7 +262,9 @@ export class LayoutedInstance {
     this._hasCustomSize = true;
   }
 
-  getCustomHeight(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getCustomHeight() {
     return this._customHeight;
   }
 
@@ -235,11 +273,15 @@ export class LayoutedInstance {
     this._hasCustomDepth = true;
   }
 
-  getCustomDepth(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getCustomDepth() {
     return this._customDepth;
   }
 
-  resetPersistentUuid(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  resetPersistentUuid() {
     return this;
   }
 
@@ -253,18 +295,24 @@ export class LayoutedInstance {
   getCustomProperties(
     globalObjectsContainer: gdObjectsContainer,
     objectsContainer: gdObjectsContainer
-  ): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  ) {
     return this.instance.getCustomProperties(
       globalObjectsContainer,
       objectsContainer
     );
   }
 
-  getRawDoubleProperty(name: string): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getRawDoubleProperty(name: string) {
     return this.instance.getRawDoubleProperty(name);
   }
 
-  getRawStringProperty(name: string): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getRawStringProperty(name: string) {
     return this.instance.getRawStringProperty(name);
   }
 
@@ -272,7 +320,9 @@ export class LayoutedInstance {
 
   setRawStringProperty(name: string, value: string) {}
 
-  getVariables(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getVariables() {
     return [];
   }
 

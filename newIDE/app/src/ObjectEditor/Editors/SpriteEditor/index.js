@@ -54,7 +54,8 @@ export default function SpriteEditor({
   onObjectUpdated,
   isChildObject,
   renderObjectNameField,
-}: SpriteEditorProps): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: SpriteEditorProps) {
   const [pointsEditorOpen, setPointsEditorOpen] = React.useState(false);
   const [advancedOptionsOpen, setAdvancedOptionsOpen] = React.useState(false);
   const [

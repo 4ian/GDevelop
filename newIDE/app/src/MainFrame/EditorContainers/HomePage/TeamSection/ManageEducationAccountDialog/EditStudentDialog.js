@@ -22,7 +22,14 @@ type Props = {|
   error: ?Error,
 |};
 
-export const EditStudentDialog = ({member, onApply, onClose, isSaving, error}: Props): React.Node => {
+export const EditStudentDialog = ({
+  member,
+  onApply,
+  onClose,
+  isSaving,
+  error,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const [changes, setChanges] = React.useState<EditUserChanges | null>(null);
 
   const [

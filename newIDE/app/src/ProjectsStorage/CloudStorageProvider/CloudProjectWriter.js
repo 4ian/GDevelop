@@ -93,7 +93,6 @@ const zipAndPrepareProjectVersionForCommit = async ({
   cloudProjectId,
   options,
 }: {|
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   project: gdProject,
   cloudProjectId: string,
@@ -130,7 +129,6 @@ const commitProjectVersion = async ({
   cloudProjectId,
   options,
 }: {|
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   presignedUrl: string,
   zippedProject: Blob,
@@ -150,16 +148,10 @@ const commitProjectVersion = async ({
   return newVersion;
 };
 
-// $FlowFixMe[value-as-type]
-export const generateOnSaveProject = (authenticatedUser: AuthenticatedUser): ((
-  project: gdProject,
-  fileMetadata: FileMetadata,
-  options?: SaveProjectOptions,
-  actions: {
-    showAlert: ShowAlertFunction,
-    showConfirmation: ShowConfirmFunction,
-  }
-) => Promise<{ fileMetadata: FileMetadata, wasSaved: boolean }>) => async (
+export const generateOnSaveProject = (
+  authenticatedUser: AuthenticatedUser
+// $FlowFixMe[signature-verification-failure]
+) => async (
   project: gdProject,
   fileMetadata: FileMetadata,
   options?: SaveProjectOptions,
@@ -239,12 +231,10 @@ export const generateOnSaveProject = (authenticatedUser: AuthenticatedUser): ((
   };
 };
 
-// $FlowFixMe[value-as-type]
-export const generateOnChangeProjectProperty = (authenticatedUser: AuthenticatedUser): ((
-  project: gdProject,
-  fileMetadata: FileMetadata,
-  properties: { gameId?: string, name?: string }
-) => Promise<null | { lastModifiedDate: number, version: string }>) => async (
+export const generateOnChangeProjectProperty = (
+  authenticatedUser: AuthenticatedUser
+// $FlowFixMe[signature-verification-failure]
+) => async (
   project: gdProject,
   fileMetadata: FileMetadata,
   properties: {| name?: string, gameId?: string |}
@@ -297,24 +287,16 @@ export const getWriteErrorMessage = (
   return t`An error occurred when saving the project, please verify your internet connection or try again later.`;
 };
 
-export const generateOnChooseSaveProjectAsLocation = (
-  {
-    authenticatedUser,
-    setDialog,
-    closeDialog
-  }: {|
-    // $FlowFixMe[value-as-type]
-    authenticatedUser: AuthenticatedUser,
-    setDialog: (() => React.Node) => void,
-    closeDialog: () => void,
-  |},
-): ((
-  {
-    displayOptionToGenerateNewProjectUuid: boolean,
-    fileMetadata: ?FileMetadata,
-    project: gdProject,
-  }
-) => Promise<{ saveAsLocation: ?SaveAsLocation, saveAsOptions: ?SaveAsOptions }>) => async ({
+export const generateOnChooseSaveProjectAsLocation = ({
+  authenticatedUser,
+  setDialog,
+  closeDialog,
+}: {|
+  authenticatedUser: AuthenticatedUser,
+  setDialog: (() => React.Node) => void,
+  closeDialog: () => void,
+// $FlowFixMe[signature-verification-failure]
+|}) => async ({
   project,
   fileMetadata,
   displayOptionToGenerateNewProjectUuid,
@@ -367,20 +349,11 @@ export const generateOnChooseSaveProjectAsLocation = (
 };
 
 export const generateOnSaveProjectAs = (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   setDialog: (() => React.Node) => void,
   closeDialog: () => void
-): ((
-  project: gdProject,
-  saveAsLocation: ?SaveAsLocation,
-  options: {
-    onMoveResources: ({ newFileMetadata: FileMetadata }) => Promise<void>,
-    onStartSaving: () => void,
-  }
-) => 
-  | Promise<{ fileMetadata: null, wasSaved: boolean }>
-  | Promise<{ fileMetadata: FileMetadata, wasSaved: boolean }>) => async (
+// $FlowFixMe[signature-verification-failure]
+) => async (
   project: gdProject,
   saveAsLocation: ?SaveAsLocation,
   options: {|
@@ -467,19 +440,18 @@ export const getProjectLocation = ({
   };
 };
 
-export const renderNewProjectSaveAsLocationChooser = (
-  {
-    projectName,
-    saveAsLocation,
-    setSaveAsLocation,
-    newProjectsDefaultFolder
-  }: {|
-    projectName: string,
-    saveAsLocation: ?SaveAsLocation,
-    setSaveAsLocation: (?SaveAsLocation) => void,
-    newProjectsDefaultFolder?: string,
-  |},
-): null => {
+export const renderNewProjectSaveAsLocationChooser = ({
+  projectName,
+  saveAsLocation,
+  setSaveAsLocation,
+  newProjectsDefaultFolder,
+}: {|
+  projectName: string,
+  saveAsLocation: ?SaveAsLocation,
+  setSaveAsLocation: (?SaveAsLocation) => void,
+  newProjectsDefaultFolder?: string,
+// $FlowFixMe[signature-verification-failure]
+|}) => {
   if (!saveAsLocation || saveAsLocation.name !== projectName) {
     setSaveAsLocation(
       getProjectLocation({
@@ -492,8 +464,10 @@ export const renderNewProjectSaveAsLocationChooser = (
   return null;
 };
 
-// $FlowFixMe[value-as-type]
-export const generateOnAutoSaveProject = (authenticatedUser: AuthenticatedUser): ((project: gdProject, fileMetadata: FileMetadata) => Promise<void>) | void =>
+export const generateOnAutoSaveProject = (
+  authenticatedUser: AuthenticatedUser
+// $FlowFixMe[signature-verification-failure]
+) =>
   ProjectCache.isAvailable()
     ? async (project: gdProject, fileMetadata: FileMetadata): Promise<void> => {
         const { profile } = authenticatedUser;
@@ -511,7 +485,6 @@ export const generateOnAutoSaveProject = (authenticatedUser: AuthenticatedUser):
     : undefined;
 
 const canFileMetadataBeSafelySaved = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   fileMetadata: FileMetadata,
   options: ?SaveProjectOptions,

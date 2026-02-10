@@ -69,7 +69,8 @@ type Props = {|
   cloudProjectId: ?string,
 |};
 
-const InviteHome = ({cloudProjectId}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const InviteHome = ({ cloudProjectId }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile, limits } = authenticatedUser;
   const isOnline = useOnlineStatus();

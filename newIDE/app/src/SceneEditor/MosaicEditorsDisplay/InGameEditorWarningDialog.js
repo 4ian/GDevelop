@@ -9,7 +9,8 @@ type Props = {
   onClose: () => void,
 };
 
-export const InGameEditorWarningDialog = ({onClose}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const InGameEditorWarningDialog = ({ onClose }: Props) => {
   return (
     <Dialog
       open

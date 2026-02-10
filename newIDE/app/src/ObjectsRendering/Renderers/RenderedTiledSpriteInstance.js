@@ -56,7 +56,9 @@ export default class RenderedTiledSpriteInstance extends RenderedInstance {
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  ) {
     const tiledSprite = gd.asTiledSpriteConfiguration(objectConfiguration);
 
     return ResourcesLoader.getResourceFullUrl(
@@ -97,14 +99,18 @@ export default class RenderedTiledSpriteInstance extends RenderedInstance {
     this._pixiObject.alpha = alphaForDisplay;
   }
 
-  getDefaultWidth(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getDefaultWidth() {
     const tiledSprite = gd.asTiledSpriteConfiguration(
       this._associatedObjectConfiguration
     );
     return tiledSprite.getWidth();
   }
 
-  getDefaultHeight(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getDefaultHeight() {
     const tiledSprite = gd.asTiledSpriteConfiguration(
       this._associatedObjectConfiguration
     );

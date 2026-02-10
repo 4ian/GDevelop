@@ -269,7 +269,8 @@ type Props = {|
   onClose: () => void,
 |};
 
-const ManageEducationAccountDialog = ({onClose}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const ManageEducationAccountDialog = ({ onClose }: Props) => {
   const { profile, subscription } = React.useContext(AuthenticatedUserContext);
   const {
     openSubscriptionDialog,
@@ -373,10 +374,8 @@ const ManageEducationAccountDialog = ({onClose}: Props): React.Node => {
       // $FlowFixMe[missing-empty-array-annot]
       let membersToConsider = [];
       if (selectedUserIds.length === 0) {
-        // $FlowFixMe[incompatible-type]
         membersToConsider = members.filter(member => !member.deactivatedAt);
       } else {
-        // $FlowFixMe[incompatible-type]
         membersToConsider = members.filter(member =>
           selectedUserIds.includes(member.id)
         );

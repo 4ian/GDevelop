@@ -12,14 +12,16 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => {
   return (
     <PlaceholderError>
       <Text>This is an error</Text>
     </PlaceholderError>
   );
 };
-export const WithRetryButton = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithRetryButton = () => {
   return (
     <PlaceholderError onRetry={() => action('retry')()}>
       <Text>This is an error, but you can retry the failed action</Text>

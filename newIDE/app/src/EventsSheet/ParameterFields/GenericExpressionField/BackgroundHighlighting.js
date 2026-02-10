@@ -28,7 +28,8 @@ const highlightedText = {
   borderBottom: '3px solid rgba(244, 67, 54, 0.7)',
 };
 
-const BackgroundHighlighting = ({value, style, highlights}: Props): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+const BackgroundHighlighting = ({ value, style, highlights }: Props) => {
   const sortedHighlights = highlights
     .slice()
     .sort((highlight1, highlight2) => highlight1.begin - highlight2.begin);

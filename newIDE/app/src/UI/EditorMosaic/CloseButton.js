@@ -18,12 +18,12 @@ const styles = {
 
 type Props = {||};
 
-export default function CloseButton(props: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+export default function CloseButton(props: Props) {
   const { mosaicActions } = React.useContext(MosaicContext);
   const { mosaicWindowActions } = React.useContext(MosaicWindowContext);
 
   return (
-    // $FlowFixMe[incompatible-type]
     <IconButton
       onClick={() => {
         mosaicActions.remove(mosaicWindowActions.getPath());

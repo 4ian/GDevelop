@@ -19,7 +19,8 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
-export const Default = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => {
   const [value, setValue] = React.useState<string>('');
   const [value1, setValue1] = React.useState<string>('');
   const [value2, setValue2] = React.useState<string>('');

@@ -297,7 +297,8 @@ type Props = {|
   ) => void,
 |};
 
-const EditorTabsPane: component(...{ ...Props, +ref?: React.RefSetter<{}> }) = React.forwardRef<Props, {||}>((props, ref) => {
+// $FlowFixMe[signature-verification-failure]
+const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
   const {
     editorTabs,
     currentProject,

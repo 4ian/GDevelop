@@ -31,7 +31,8 @@ export default function OptionsEditorDialog({
   eventsFunctionsExtension,
   onClose,
   open,
-}: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: Props) {
   const [currentTab, setCurrentTab] = React.useState<TabName>('options');
   const [isLoading, setIsLoading] = React.useState(false);
   const [exportDialogOpen, setExportDialogOpen] = React.useState(false);

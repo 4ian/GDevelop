@@ -9,11 +9,12 @@ import { ColumnStackLayout } from '../../../UI/Layout';
 export default {
   title: 'UI Building Blocks/AlertMessage',
   component: AlertMessage,
-  // $FlowFixMe[cannot-resolve-name]
-  decorators: [getPaperDecorator('medium') as StoryDecorator],
+  // $FlowFixMe[signature-verification-failure]
+  decorators: [getPaperDecorator('medium')],
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <ColumnStackLayout>
     <AlertMessage>Hello World, this is an alert text</AlertMessage>
     <AlertMessage onHide={() => {}}>

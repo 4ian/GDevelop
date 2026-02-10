@@ -13,7 +13,9 @@ export default class PanelSpriteEditor extends React.Component<
   EditorProps,
   void
 > {
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const {
       objectConfiguration,
       project,

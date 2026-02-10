@@ -10,7 +10,8 @@ type Props = {|
   message?: React.Node,
 |};
 
-export const NoResultPlaceholder = (props: Props): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const NoResultPlaceholder = (props: Props) => (
   <Column noMargin expand justifyContent="center">
     <EmptyPlaceholder
       title={<Trans>No result</Trans>}

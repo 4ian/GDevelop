@@ -65,7 +65,9 @@ export class ExternalLayoutEditorContainer extends React.Component<
     return this.props.project;
   }
 
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
     if (!this.props.isActive && nextProps.isActive) {
       this._setPreviewedLayout();
     }
@@ -312,7 +314,9 @@ export class ExternalLayoutEditorContainer extends React.Component<
     }
   };
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const { project, projectItemName, isActive } = this.props;
     const externalLayout = this.getExternalLayout();
     const layout = this.getLayout();
@@ -453,4 +457,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
   }
 }
 
-export const renderExternalLayoutEditorContainer = (props: RenderEditorContainerPropsWithRef): React.Node => <ExternalLayoutEditorContainer {...props} />;
+export const renderExternalLayoutEditorContainer = (
+  props: RenderEditorContainerPropsWithRef
+// $FlowFixMe[signature-verification-failure]
+) => <ExternalLayoutEditorContainer {...props} />;

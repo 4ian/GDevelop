@@ -93,8 +93,8 @@ export type SigningCredential =
   | AppleCertificateSigningCredential
   | AppleAuthKeySigningCredential;
 
-// $FlowFixMe[cannot-resolve-name]
-export const client: Axios = axios.create({
+// $FlowFixMe[signature-verification-failure]
+export const client = axios.create({
   baseURL: GDevelopBuildApi.baseUrl,
 });
 
@@ -102,7 +102,6 @@ export const filterAppleCertificateSigningCredentials = (
   signingCredentials: Array<SigningCredential> | null
 ): Array<AppleCertificateSigningCredential> | null => {
   return signingCredentials
-    // $FlowFixMe[incompatible-type]
     ? // $FlowFixMe[incompatible-type] - we're sure this should refine the type.
       signingCredentials.filter(
         signingCredential => signingCredential.type === 'apple-certificate'
@@ -114,7 +113,6 @@ export const filterAppleAuthKeySigningCredentials = (
   signingCredentials: Array<SigningCredential> | null
 ): Array<AppleAuthKeySigningCredential> | null => {
   return signingCredentials
-    // $FlowFixMe[incompatible-type]
     ? // $FlowFixMe[incompatible-type] - we're sure this should refine the type.
       signingCredentials.filter(
         signingCredential => signingCredential.type === 'apple-auth-key'
@@ -437,6 +435,7 @@ export const deleteBuild = async (
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
 
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   await client.delete(`/build/${buildId}`, {
     params: {
       userId,
@@ -453,6 +452,7 @@ export const getUserSigningCredentials = async (
 ): Promise<Array<SigningCredential>> => {
   const authorizationHeader = await getAuthorizationHeader();
 
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/signing-credential`, {
     params: {
       userId,
@@ -479,6 +479,7 @@ export const signingCredentialApi = {
   ): Promise<{ certificateRequestUuid: string, csrPem: string }> => {
     const authorizationHeader = await getAuthorizationHeader();
 
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     const response = await client.post(
       `/signing-credential/action/create-csr`,
       {
@@ -508,6 +509,7 @@ export const signingCredentialApi = {
   ): Promise<{ certificateSerial: string, certificateKind: string }> => {
     const authorizationHeader = await getAuthorizationHeader();
 
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     const response = await client.post(
       `${
         GDevelopBuildApi.baseUrl
@@ -541,6 +543,7 @@ export const signingCredentialApi = {
   ): Promise<{ certificateSerial: string }> => {
     const authorizationHeader = await getAuthorizationHeader();
 
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     const response = await client.post(
       `${
         GDevelopBuildApi.baseUrl
@@ -572,6 +575,7 @@ export const signingCredentialApi = {
   ): Promise<{ uuid: string, name: string, certificatesCount: number }> => {
     const authorizationHeader = await getAuthorizationHeader();
 
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     const response = await client.post(
       `${
         GDevelopBuildApi.baseUrl
@@ -606,6 +610,7 @@ export const signingCredentialApi = {
   ): Promise<{}> => {
     const authorizationHeader = await getAuthorizationHeader();
 
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     const response = await client.post(
       `/signing-credential/action/upload-auth-key`,
       {
@@ -638,6 +643,7 @@ export const signingCredentialApi = {
   ): Promise<void> => {
     const authorizationHeader = await getAuthorizationHeader();
 
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     await client.delete(`/signing-credential`, {
       params: {
         userId,

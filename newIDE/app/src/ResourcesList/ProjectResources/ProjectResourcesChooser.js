@@ -64,7 +64,13 @@ type Props = {|
   multiSelection: boolean,
 |};
 
-const ProjectResourcesChooser = ({project, onResourcesSelected, resourceKind, multiSelection}: Props): React.Node => {
+const ProjectResourcesChooser = ({
+  project,
+  onResourcesSelected,
+  resourceKind,
+  multiSelection,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const [searchText, setSearchText] = React.useState<string>('');
 
   const searchResults = React.useMemo(

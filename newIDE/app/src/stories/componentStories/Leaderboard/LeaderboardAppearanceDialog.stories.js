@@ -17,7 +17,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const WithoutSubscription = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithoutSubscription = () => (
   <AuthenticatedUserContext.Provider
     value={fakeAuthenticatedUserWithNoSubscription}
   >
@@ -38,7 +39,8 @@ export const WithoutSubscription = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const WithSilverSubscription = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithSilverSubscription = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <LeaderboardAppearanceDialog
       open
@@ -57,7 +59,8 @@ export const WithSilverSubscription = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const WithStartupSubscription = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithStartupSubscription = () => (
   <AuthenticatedUserContext.Provider value={fakeStartupAuthenticatedUser}>
     <LeaderboardAppearanceDialog
       open

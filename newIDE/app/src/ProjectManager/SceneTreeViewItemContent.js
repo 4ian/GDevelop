@@ -117,7 +117,9 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     this.props.editName(this.getId());
   }
 
-  buildMenuTemplate(i18n: I18nType, index: number): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  buildMenuTemplate(i18n: I18nType, index: number) {
     return [
       {
         label: i18n._(t`Open scene editor`),
@@ -311,7 +313,9 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     this.props.forceUpdate();
   }
 
-  getRightButton(i18n: I18nType): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getRightButton(i18n: I18nType) {
     return null;
   }
 

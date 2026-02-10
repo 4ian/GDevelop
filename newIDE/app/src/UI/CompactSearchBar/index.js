@@ -21,12 +21,8 @@ export type CompactSearchBarProps = {|
   placeholder?: MessageDescriptor,
 |};
 
-const CompactSearchBar: component(
-  ...{
-    ...CompactSearchBarProps,
-    +ref?: React.RefSetter<CompactSearchBarInterface>,
-  }
-) = React.forwardRef<
+// $FlowFixMe[signature-verification-failure]
+const CompactSearchBar = React.forwardRef<
   CompactSearchBarProps,
   CompactSearchBarInterface
 >(({ value, onChange, id, disabled, errored, placeholder }, ref) => {

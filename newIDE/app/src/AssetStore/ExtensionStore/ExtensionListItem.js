@@ -35,16 +35,15 @@ type Props = {|
   onHeightComputed: number => void,
 |};
 
-export const ExtensionListItem = (
-  {
-    id,
-    project,
-    extensionShortHeader,
-    matches,
-    onChoose,
-    onHeightComputed
-  }: Props,
-): React.Node => {
+export const ExtensionListItem = ({
+  id,
+  project,
+  extensionShortHeader,
+  matches,
+  onChoose,
+  onHeightComputed,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(

@@ -124,13 +124,12 @@ const iconMap = {
   error: <ErrorIcon color="error" fontSize="small" />,
 };
 
-export const DebuggerConsole = (
-  {
-    logsManager
-  }: {
-    logsManager: LogsManager,
-  },
-): React.Node => {
+export const DebuggerConsole = ({
+  logsManager,
+}: {
+  logsManager: LogsManager,
+// $FlowFixMe[signature-verification-failure]
+}) => {
   const forceUpdate = useForceUpdate();
 
   const { logs, groups } = logsManager;

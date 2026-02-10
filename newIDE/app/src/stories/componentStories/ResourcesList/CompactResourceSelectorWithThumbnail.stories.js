@@ -20,7 +20,8 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
-export const Default = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => {
   return (
     <ElementHighlighterProvider
       elements={[{ label: 'Default', id: 'default' }]}

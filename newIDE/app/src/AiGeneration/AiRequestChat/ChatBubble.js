@@ -45,7 +45,13 @@ type ChatBubbleProps = {|
   |},
 |};
 
-export const ChatBubble = ({children, feedbackButtons, role, restoreProps}: ChatBubbleProps): React.Node => {
+export const ChatBubble = ({
+  children,
+  feedbackButtons,
+  role,
+  restoreProps,
+// $FlowFixMe[signature-verification-failure]
+}: ChatBubbleProps) => {
   const theme = React.useContext(GDevelopThemeContext);
   const isLightTheme = theme.palette.type === 'light';
 

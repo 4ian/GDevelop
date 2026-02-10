@@ -219,7 +219,6 @@ const PrivateGameTemplateInformationPageStory = ({
   errorMessage,
 }: {
   privateGameTemplateListingData: PrivateGameTemplateListingData,
-  // $FlowFixMe[value-as-type]
   authenticatedUser?: AuthenticatedUser,
   receivedGameTemplates?: Array<PrivateGameTemplate>,
   delayResponse?: number,
@@ -319,19 +318,22 @@ const PrivateGameTemplateInformationPageStory = ({
   );
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <PrivateGameTemplateInformationPageStory
     privateGameTemplateListingData={privateGameTemplate1ListingData}
   />
 );
 
-export const ForABundle = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const ForABundle = () => (
   <PrivateGameTemplateInformationPageStory
     privateGameTemplateListingData={privateGameTemplateBundleListingData}
   />
 );
 
-export const ForAlreadyPurchasedGameTemplate = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const ForAlreadyPurchasedGameTemplate = () => (
   <PrivateGameTemplateInformationPageStory
     privateGameTemplateListingData={privateGameTemplate1ListingData}
     receivedGameTemplates={[
@@ -349,7 +351,8 @@ export const ForAlreadyPurchasedGameTemplate = (): React.Node => (
     ]}
   />
 );
-export const ForAlreadyPurchasedBundle = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const ForAlreadyPurchasedBundle = () => (
   <PrivateGameTemplateInformationPageStory
     privateGameTemplateListingData={privateGameTemplateBundleListingData}
     receivedGameTemplates={[
@@ -368,21 +371,24 @@ export const ForAlreadyPurchasedBundle = (): React.Node => (
   />
 );
 
-export const Loading = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Loading = () => (
   <PrivateGameTemplateInformationPageStory
     privateGameTemplateListingData={privateGameTemplate1ListingData}
     delayResponse={10000}
   />
 );
 
-export const With404 = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const With404 = () => (
   <PrivateGameTemplateInformationPageStory
     privateGameTemplateListingData={privateGameTemplate1ListingData}
     errorCode={404}
   />
 );
 
-export const WithUnknownError = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithUnknownError = () => (
   <PrivateGameTemplateInformationPageStory
     privateGameTemplateListingData={privateGameTemplate1ListingData}
     errorCode={500}

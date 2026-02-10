@@ -219,7 +219,8 @@ export type HomePageEditorInterface = {|
   ) => void,
 |};
 
-export const HomePage: component(...Props) = React.memo<Props>(
+// $FlowFixMe[signature-verification-failure]
+export const HomePage = React.memo<Props>(
   React.forwardRef<Props, HomePageEditorInterface>(
     (
       {
@@ -408,7 +409,6 @@ export const HomePage: component(...Props) = React.memo<Props>(
                 if (routeArguments['games-dashboard-tab']) {
                   setGameDetailsCurrentTab(
                     // $FlowIgnore - We are confident the argument is one of the possible tab.
-                    // $FlowFixMe[incompatible-type]
                     routeArguments['games-dashboard-tab']
                   );
                   removeRouteArguments(['games-dashboard-tab']);
@@ -739,7 +739,10 @@ export const HomePage: component(...Props) = React.memo<Props>(
   (prevProps, nextProps) => prevProps.isActive || nextProps.isActive
 );
 
-export const renderHomePageContainer = (props: RenderEditorContainerPropsWithRef): React.MixedElement => (
+export const renderHomePageContainer = (
+  props: RenderEditorContainerPropsWithRef
+// $FlowFixMe[signature-verification-failure]
+) => (
   // $FlowFixMe[incompatible-type]
   <HomePage
     ref={props.ref}

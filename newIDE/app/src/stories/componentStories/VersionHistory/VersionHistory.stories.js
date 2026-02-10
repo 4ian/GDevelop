@@ -146,7 +146,8 @@ const userPublicProfilesByIds = {
   },
 };
 
-export const Default = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => {
   const [versions, setVersions] = React.useState<ExpandedCloudProjectVersion[]>(
     initialVersions
   );

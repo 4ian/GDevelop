@@ -20,7 +20,8 @@ export default {
   decorators: [paperDecorator, GDevelopJsInitializerDecorator],
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       createNewResource={() => new gd.ImageResource()}
@@ -37,7 +38,8 @@ export const Default = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const AutomaticallyOpenInput = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const AutomaticallyOpenInput = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       createNewResource={() => new gd.ImageResource()}
@@ -54,7 +56,8 @@ export const AutomaticallyOpenInput = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const SingleFile = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const SingleFile = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       createNewResource={() => new gd.ImageResource()}
@@ -71,7 +74,8 @@ export const SingleFile = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const IncompatibleStorageProvider = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const IncompatibleStorageProvider = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       createNewResource={() => new gd.ImageResource()}
@@ -88,7 +92,8 @@ export const IncompatibleStorageProvider = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const NotAuthenticatedUser = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const NotAuthenticatedUser = () => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       createNewResource={() => new gd.ImageResource()}

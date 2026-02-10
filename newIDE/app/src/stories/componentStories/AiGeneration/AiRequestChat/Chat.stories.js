@@ -256,10 +256,8 @@ const WrappedChatComponent = (allProps: any) => {
     <FixedHeightFlexContainer height={800}>
       <FixedWidthFlexContainer width={600}>
         <PreferencesContext.Provider
-          // $FlowFixMe[incompatible-type]
           value={{
             ...initialPreferences,
-            // $FlowFixMe[incompatible-type]
             values: {
               ...initialPreferences.values,
               automaticallyUseCreditsForAiRequests: automaticallyUseCredits,
@@ -290,7 +288,8 @@ const WrappedChatComponent = (allProps: any) => {
   );
 };
 
-export const ReadyAiRequest = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const ReadyAiRequest = () => (
   <WrappedChatComponent
     aiRequest={fakeAiRequest}
     quota={{
@@ -303,7 +302,8 @@ export const ReadyAiRequest = (): React.Node => (
   />
 );
 
-export const ReadyAiRequestWithAiResponses = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const ReadyAiRequestWithAiResponses = () => (
   <WrappedChatComponent
     aiRequest={aiRequestWithAiResponses}
     quota={{
@@ -316,7 +316,8 @@ export const ReadyAiRequestWithAiResponses = (): React.Node => (
   />
 );
 
-export const ReadyAiRequestWithMoreAiResponses = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const ReadyAiRequestWithMoreAiResponses = () => (
   <WrappedChatComponent
     aiRequest={aiRequestWithMoreAiResponses}
     quota={{
@@ -329,7 +330,8 @@ export const ReadyAiRequestWithMoreAiResponses = (): React.Node => (
   />
 );
 
-export const ReadyAiRequestWithEvenMoreAiResponses = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const ReadyAiRequestWithEvenMoreAiResponses = () => (
   <WrappedChatComponent
     aiRequest={aiRequestWithEvenMoreAiResponses}
     quota={{
@@ -342,18 +344,21 @@ export const ReadyAiRequestWithEvenMoreAiResponses = (): React.Node => (
   />
 );
 
-export const LaunchingFollowupAiRequest = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const LaunchingFollowupAiRequest = () => (
   <WrappedChatComponent aiRequest={aiRequestWithAiResponses} isSending={true} />
 );
 
-export const ErrorLaunchingFollowupAiRequest = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const ErrorLaunchingFollowupAiRequest = () => (
   <WrappedChatComponent
     aiRequest={aiRequestWithAiResponses}
     lastSendError={new Error('fake error while sending request')}
   />
 );
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCredits = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const QuotaLimitsReachedAndAutomaticallyUsingCredits = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -387,7 +392,8 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCredits = (): React.Node => 
   );
 };
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeft = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeft = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -421,7 +427,8 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeft = (): Rea
   );
 };
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -455,7 +462,8 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilver
   );
 };
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -489,7 +497,8 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartu
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -523,7 +532,8 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = (): React.Node 
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeft = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeft = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -557,7 +567,8 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeft = (): 
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubscription = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -591,7 +602,8 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubsc
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -625,7 +637,8 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSil
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = () => {
   const quota = {
     limitReached: true,
     current: 100,

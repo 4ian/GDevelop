@@ -122,22 +122,20 @@ type Props = {|
   setGameUpdating: boolean => void,
   onBuildUpdated: Build => void,
   onBuildDeleted: Build => void,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
 |};
 
-export const BuildCard = (
-  {
-    build,
-    game,
-    onGameUpdated,
-    gameUpdating,
-    setGameUpdating,
-    onBuildUpdated,
-    onBuildDeleted,
-    authenticatedUser
-  }: Props,
-): React.Node => {
+export const BuildCard = ({
+  build,
+  game,
+  onGameUpdated,
+  gameUpdating,
+  setGameUpdating,
+  onBuildUpdated,
+  onBuildDeleted,
+  authenticatedUser,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const defaultBuildName = `${game.gameName
     .toLowerCase()
@@ -298,7 +296,6 @@ export const BuildCard = (
               <Line noMargin>
                 {isEditingName ? (
                   <Line noMargin expand>
-                    {/* $FlowFixMe[incompatible-type] */}
                     <TextField
                       ref={nameInput}
                       style={styles.textField}

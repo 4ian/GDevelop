@@ -223,7 +223,8 @@ type Props = {|
   |}) => Promise<void>,
 |};
 
-export const ChatMessages: component(...Props) = React.memo<Props>(function ChatMessages({
+// $FlowFixMe[signature-verification-failure]
+export const ChatMessages = React.memo<Props>(function ChatMessages({
   aiRequest,
   onSendFeedback,
   editorFunctionCallResults,
@@ -567,8 +568,8 @@ export const ChatMessages: component(...Props) = React.memo<Props>(function Chat
             const hasVersionToRestore = !!message.projectVersionIdBeforeMessage;
 
             const previousMessage =
-              // $FlowFixMe[invalid-compare]
               // $FlowFixMe[unsafe-arithmetic]
+              // $FlowFixMe[invalid-compare]
               messageIndex > 0 ? aiRequest.output[messageIndex - 1] : null;
             const previousMessageHasSameVersionId =
               previousMessage &&

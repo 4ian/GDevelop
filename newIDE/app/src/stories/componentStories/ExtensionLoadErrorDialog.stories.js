@@ -10,7 +10,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const WithSingleExtensionError = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithSingleExtensionError = () => {
   const erroredExtensionLoadingResults = [
     {
       extensionModulePath: 'Physics2Behavior/Physics2Tools.js',
@@ -32,7 +33,8 @@ export const WithSingleExtensionError = (): React.Node => {
   );
 };
 
-export const WithMultipleExtensionErrors = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithMultipleExtensionErrors = () => {
   const erroredExtensionLoadingResults = [
     {
       extensionModulePath: 'Physics2Behavior/Physics2Tools.js',
@@ -70,7 +72,8 @@ export const WithMultipleExtensionErrors = (): React.Node => {
   );
 };
 
-export const WithGenericError = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithGenericError = () => {
   // $FlowFixMe[missing-empty-array-annot]
   const erroredExtensionLoadingResults = [];
   const genericError = new Error(
@@ -87,7 +90,8 @@ export const WithGenericError = (): React.Node => {
   );
 };
 
-export const WithBothExtensionAndGenericErrors = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithBothExtensionAndGenericErrors = () => {
   const erroredExtensionLoadingResults = [
     {
       extensionModulePath: 'Physics2Behavior/Physics2Tools.js',

@@ -263,7 +263,8 @@ type Props = {|
   category: string,
 |};
 
-const BundlePreviewBanner = ({onDisplayBundle, i18n, category}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const BundlePreviewBanner = ({ onDisplayBundle, i18n, category }: Props) => {
   const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();
   const numberOfTilesToDisplay = getColumnsFromWindowSize(windowSize) - 1; // Reserve one tile for the bundle preview.
   const { privateGameTemplateListingDatas } = React.useContext(

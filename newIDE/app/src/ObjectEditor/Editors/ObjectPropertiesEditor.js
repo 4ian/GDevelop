@@ -18,7 +18,8 @@ const gd: libGDevelop = global.gd;
 
 type Props = EditorProps;
 
-const ObjectPropertiesEditor = (props: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const ObjectPropertiesEditor = (props: Props) => {
   const {
     objectConfiguration,
     project,

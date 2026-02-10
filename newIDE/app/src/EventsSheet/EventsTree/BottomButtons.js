@@ -49,7 +49,8 @@ export default function BottomButtons({
   DnDComponent,
   draggedNode,
   rootEventsList,
-}: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: Props) {
   const screenType = useScreenType();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const onDrop = () => {

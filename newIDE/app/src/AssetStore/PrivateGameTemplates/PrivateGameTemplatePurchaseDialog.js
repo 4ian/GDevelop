@@ -30,14 +30,13 @@ type Props = {|
   simulateAppStoreProduct?: boolean,
 |};
 
-const PrivateGameTemplatePurchaseDialog = (
-  {
-    privateGameTemplateListingData,
-    usageType,
-    onClose,
-    simulateAppStoreProduct
-  }: Props,
-): React.Node => {
+const PrivateGameTemplatePurchaseDialog = ({
+  privateGameTemplateListingData,
+  usageType,
+  onClose,
+  simulateAppStoreProduct,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const {
     profile,
     onOpenLoginDialog,
@@ -354,7 +353,6 @@ const PrivateGameTemplatePurchaseDialog = (
         maxWidth="sm"
         open
         onRequestClose={onClose}
-        // $FlowFixMe[incompatible-type]
         actions={dialogActions}
         onApply={purchaseSuccessful ? onClose : onWillPurchase}
         cannotBeDismissed // Prevent the user from continuing by clicking outside.

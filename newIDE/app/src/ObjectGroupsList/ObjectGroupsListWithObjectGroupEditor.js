@@ -31,22 +31,21 @@ type Props = {|
 /**
  * Helper showing the list of groups and embedding the editor to edit a group.
  */
-const ObjectGroupsListWithObjectGroupEditor = (
-  {
-    project,
-    projectScopedContainersAccessor,
-    globalObjectsContainer,
-    objectsContainer,
-    globalObjectGroups,
-    objectGroups,
-    getValidatedObjectOrGroupName,
-    onDeleteGroup,
-    onRenameGroup,
-    onGroupsUpdated,
-    canSetAsGlobalGroup,
-    unsavedChanges
-  }: Props,
-): React.Node => {
+const ObjectGroupsListWithObjectGroupEditor = ({
+  project,
+  projectScopedContainersAccessor,
+  globalObjectsContainer,
+  objectsContainer,
+  globalObjectGroups,
+  objectGroups,
+  getValidatedObjectOrGroupName,
+  onDeleteGroup,
+  onRenameGroup,
+  onGroupsUpdated,
+  canSetAsGlobalGroup,
+  unsavedChanges,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const [editedGroup, setEditedGroup] = React.useState<gdObjectGroup | null>(
     null
   );

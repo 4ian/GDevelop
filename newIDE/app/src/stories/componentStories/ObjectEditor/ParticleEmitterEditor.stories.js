@@ -17,7 +17,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <SerializedObjectDisplay object={testProject.particleEmitterConfiguration}>
     <ParticleEmitterEditor
       objectConfiguration={testProject.particleEmitterConfiguration}

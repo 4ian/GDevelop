@@ -89,7 +89,8 @@ type Props<T> = {|
 
 type AlgoliaSearchHitItemProps = {| hit: AlgoliaSearchHitType |};
 
-export const AlgoliaSearchHit = ({hit}: AlgoliaSearchHitItemProps): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
   const { isMobile } = useResponsiveWindowSize();
   const classes = useStyles();
   let secondaryText;
@@ -124,7 +125,10 @@ export const AlgoliaSearchHit = ({hit}: AlgoliaSearchHitItemProps): React.Node =
   );
 };
 
-const AutocompletePicker = (props: Props<NamedCommand | GoToWikiCommand> | Props<CommandOption>): React.Node => {
+const AutocompletePicker = (
+  props: Props<NamedCommand | GoToWikiCommand> | Props<CommandOption>
+// $FlowFixMe[signature-verification-failure]
+) => {
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();
   const shouldAutofocusInput = useShouldAutofocusInput();
   const [open, setOpen] = React.useState(true);

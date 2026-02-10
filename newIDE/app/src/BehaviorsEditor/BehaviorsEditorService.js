@@ -7,7 +7,8 @@ import Physics3DEditor from './Editors/Physics3DEditor';
  * A service returning editor components for each behavior type.
  */
 const BehaviorsEditorService = {
-  getEditor(behaviorType: string): any {
+  // $FlowFixMe[signature-verification-failure]
+  getEditor(behaviorType: string) {
     // $FlowFixMe[object-this-reference]
     if (!this.components[behaviorType]) {
       return BehaviorPropertiesEditor; // Default properties editor

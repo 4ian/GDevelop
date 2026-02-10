@@ -25,7 +25,8 @@ type Props = {|
 /**
  * Display information about latest releases.
  */
-const ChangelogRenderer = ({releases, error, currentReleaseName}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const ChangelogRenderer = ({ releases, error, currentReleaseName }: Props) => {
   const openReleaseNote = () =>
     Window.openExternalURL('https://github.com/4ian/GDevelop/releases');
 

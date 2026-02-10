@@ -39,12 +39,14 @@ export const initialCreditsPackageStoreState: CreditsPackageStoreState = {
   openCreditsUsageDialog: () => {},
 };
 
-export const CreditsPackageStoreContext: React.Context<CreditsPackageStoreState> = React.createContext<CreditsPackageStoreState>(
+// $FlowFixMe[signature-verification-failure]
+export const CreditsPackageStoreContext = React.createContext<CreditsPackageStoreState>(
   initialCreditsPackageStoreState
 );
 
 // Ids are in the form "amount_credits" (e.g: "500_credits").
-export const getCreditsAmountFromId = (id: string): number => {
+// $FlowFixMe[signature-verification-failure]
+export const getCreditsAmountFromId = (id: string) => {
   return parseInt(id.split('_')[0], 10);
 };
 
@@ -52,7 +54,10 @@ type CreditsPackageStoreStateProviderProps = {|
   children: React.Node,
 |};
 
-export const CreditsPackageStoreStateProvider = ({children}: CreditsPackageStoreStateProviderProps): React.MixedElement => {
+export const CreditsPackageStoreStateProvider = ({
+  children,
+// $FlowFixMe[signature-verification-failure]
+}: CreditsPackageStoreStateProviderProps) => {
   const [error, setError] = React.useState<?Error>(null);
   const [
     creditsPackageListingDatas,

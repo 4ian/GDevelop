@@ -49,22 +49,21 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
-const LayerEditorDialog = (
-  {
-    initialTab,
-    project,
-    layout,
-    eventsFunctionsExtension,
-    eventsBasedObject,
-    layer,
-    initialInstances,
-    onCancel,
-    onApply,
-    hotReloadPreviewButtonProps,
-    resourceManagementProps,
-    projectScopedContainersAccessor
-  }: Props,
-): React.Node => {
+const LayerEditorDialog = ({
+  initialTab,
+  project,
+  layout,
+  eventsFunctionsExtension,
+  eventsBasedObject,
+  layer,
+  initialInstances,
+  onCancel,
+  onApply,
+  hotReloadPreviewButtonProps,
+  resourceManagementProps,
+  projectScopedContainersAccessor,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const forceUpdate = useForceUpdate();
   const {
     onCancelChanges,

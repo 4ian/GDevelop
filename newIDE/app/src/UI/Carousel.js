@@ -23,7 +23,8 @@ type Props = {|
 export const getCarouselColumnsFromWindowSize = (
   windowSize: WindowSizeType,
   isLandscape: boolean
-): number => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   switch (windowSize) {
     case 'small':
       return isLandscape ? 2 : 1;
@@ -84,7 +85,8 @@ const getAdditionalColumnToDisplayFromNumberOfColumns = (
   numberOfColumns: number
 ) => (numberOfColumns < 2 ? 0.6 : numberOfColumns < 4 ? 0.9 : 0.25);
 
-const Carousel = ({items}: Props): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+const Carousel = ({ items }: Props) => {
   const [canScrollLeft, setCanScrollLeft] = React.useState<boolean>(false);
   const [canScrollRight, setCanScrollRight] = React.useState<boolean>(false);
   const [isHoveringContainer, setIsHoveringContainer] = React.useState<boolean>(

@@ -34,6 +34,7 @@ const allowedPreferenceKeys: $ReadOnlyArray<
   'showInAppTutorialDeveloperMode',
   'showDeprecatedInstructionWarning',
   'openDiagnosticReportAutomatically',
+  'blockPreviewAndExportOnDiagnosticErrors',
   'use3DEditor',
   'showBasicProfilingCounters',
   'newProjectsDefaultFolder',

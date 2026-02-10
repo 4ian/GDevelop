@@ -1270,6 +1270,9 @@ namespace gdjs {
       if (this._inGameEditor) {
         this._inGameEditor.dispose();
       }
+      if (this._debuggerClient) {
+        this._debuggerClient.dispose();
+      }
       this._renderer.stopGameLoop();
       this._sceneStack.dispose();
       this._renderer.dispose(removeCanvas);

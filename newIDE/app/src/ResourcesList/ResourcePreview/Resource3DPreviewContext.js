@@ -42,7 +42,8 @@ const initialResource3DPreviewState = {
   getResourcePreview: async (_resourceUrl: string) => null,
 };
 
-const Resource3DPreviewContext: React.Context<Resource3DPreviewState> = React.createContext<Resource3DPreviewState>(
+// $FlowFixMe[signature-verification-failure]
+const Resource3DPreviewContext = React.createContext<Resource3DPreviewState>(
   // $FlowFixMe[incompatible-type]
   initialResource3DPreviewState
 );
@@ -68,7 +69,6 @@ class Resource3DPreviewWorkerManager {
   fallbackImagePath: string = 'JsPlatform/Extensions/3d_model.svg';
 
   constructor() {
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - worker-loader types aren't recognized by Flow
     // $FlowFixMe[invalid-constructor]
     this.worker = new Resource3DPreviewWorker();
@@ -164,7 +164,8 @@ type Props = {|
   children: React.Node,
 |};
 
-export const Resource3DPreviewProvider = ({children}: Props): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+export const Resource3DPreviewProvider = ({ children }: Props) => {
   const [currentResource, setCurrentResource] = React.useState<?string>(null);
   const queueRef = React.useRef<
     Array<{ url: string, resolve: (dataUrl: ?string) => void }>

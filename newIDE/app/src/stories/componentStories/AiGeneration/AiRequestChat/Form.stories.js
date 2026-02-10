@@ -121,10 +121,8 @@ const WrappedChatComponent = (allProps: any) => {
     <FixedHeightFlexContainer height={800}>
       <FixedWidthFlexContainer width={600}>
         <PreferencesContext.Provider
-          // $FlowFixMe[incompatible-type]
           value={{
             ...initialPreferences,
-            // $FlowFixMe[incompatible-type]
             values: {
               ...initialPreferences.values,
               automaticallyUseCreditsForAiRequests: automaticallyUseCredits,
@@ -155,10 +153,12 @@ const WrappedChatComponent = (allProps: any) => {
   );
 };
 
-export const LoggedOut = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const LoggedOut = () => (
   <WrappedChatComponent aiRequest={null} quota={null} />
 );
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <WrappedChatComponent
     aiRequest={null}
     quota={{
@@ -171,7 +171,8 @@ export const Default = (): React.Node => (
   />
 );
 
-export const AlmostReachedQuota = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const AlmostReachedQuota = () => {
   const quota = {
     limitReached: false,
     current: 40,
@@ -202,7 +203,8 @@ export const AlmostReachedQuota = (): React.Node => {
   );
 };
 
-export const QuotaLimitReachedAndAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const QuotaLimitReachedAndAutomaticallyUsingCreditsButNoneLeftNoSubscription = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -236,7 +238,8 @@ export const QuotaLimitReachedAndAutomaticallyUsingCreditsButNoneLeftNoSubscript
   );
 };
 
-export const QuotaLimitReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const QuotaLimitReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -270,7 +273,8 @@ export const QuotaLimitReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverS
   );
 };
 
-export const QuotaLimitReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const QuotaLimitReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -304,7 +308,8 @@ export const QuotaLimitReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartup
   );
 };
 
-export const QuotaLimitReachedAndNotAutomaticallyUsingCredits = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const QuotaLimitReachedAndNotAutomaticallyUsingCredits = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -337,7 +342,8 @@ export const QuotaLimitReachedAndNotAutomaticallyUsingCredits = (): React.Node =
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubscription = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -371,7 +377,8 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubsc
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -405,7 +412,8 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSil
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -439,11 +447,13 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSta
   );
 };
 
-export const Launching = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Launching = () => (
   <WrappedChatComponent aiRequest={null} isSending={true} />
 );
 
-export const ErrorLaunching = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const ErrorLaunching = () => (
   <WrappedChatComponent
     aiRequest={null}
     lastSendError={new Error('Fake error while sending request')}

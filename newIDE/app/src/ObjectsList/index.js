@@ -819,7 +819,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // If all parents are open, return the objectFolderOrObject given as input.
         return getTreeViewItemIdFromObjectFolderOrObject(objectFolderOrObject);
       }
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - We are confident this TreeView item is in fact a ObjectFolderOrObjectWithContext
       return topToBottomAscendanceId[firstClosedFolderIndex];
     };
@@ -1691,9 +1690,8 @@ const MemoizedObjectsList = React.memo<Props, ObjectsListInterface>(
   arePropsEqual
 );
 
-const ObjectsListWithErrorBoundary: component(
-  ...{ ...Props, +ref?: React.RefSetter<ObjectsListInterface> }
-) = React.forwardRef<
+// $FlowFixMe[signature-verification-failure]
+const ObjectsListWithErrorBoundary = React.forwardRef<
   Props,
   ObjectsListInterface
 >((props, ref) => (

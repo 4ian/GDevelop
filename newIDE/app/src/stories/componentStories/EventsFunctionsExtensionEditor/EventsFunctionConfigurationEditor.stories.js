@@ -16,7 +16,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const DefaultFreeFunction = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const DefaultFreeFunction = () => (
   <FixedHeightFlexContainer height={500}>
     <EventsFunctionConfigurationEditor
       project={testProject.project}
@@ -40,7 +41,8 @@ export const DefaultFreeFunction = (): React.Node => (
   </FixedHeightFlexContainer>
 );
 
-export const DefaultBehaviorFunction = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const DefaultBehaviorFunction = () => (
   <FixedHeightFlexContainer height={500}>
     <EventsFunctionConfigurationEditor
       project={testProject.project}
@@ -64,7 +66,8 @@ export const DefaultBehaviorFunction = (): React.Node => (
   </FixedHeightFlexContainer>
 );
 
-export const DefaultBehaviorLifecycleFunction = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const DefaultBehaviorLifecycleFunction = () => (
   <FixedHeightFlexContainer height={500}>
     <EventsFunctionConfigurationEditor
       project={testProject.project}
@@ -88,7 +91,8 @@ export const DefaultBehaviorLifecycleFunction = (): React.Node => (
   </FixedHeightFlexContainer>
 );
 
-export const DefaultObjectFunction = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const DefaultObjectFunction = () => (
   <FixedHeightFlexContainer height={500}>
     <EventsFunctionConfigurationEditor
       project={testProject.project}

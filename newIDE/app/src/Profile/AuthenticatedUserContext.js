@@ -171,7 +171,8 @@ export const initialAuthenticatedUser = {
   onSendEmailVerification: async () => {},
   onOpenEmailVerificationDialog: () => {},
   onAcceptGameStatsEmail: async () => {},
-  getAuthorizationHeader: (): Promise<> => Promise.reject(new Error('Unimplemented')),
+  // $FlowFixMe[signature-verification-failure]
+  getAuthorizationHeader: () => Promise.reject(new Error('Unimplemented')),
   achievements: null,
 };
 
@@ -201,7 +202,8 @@ export const authenticatedUserLoggedOutAttributes = {
   limits: null,
 };
 
-const AuthenticatedUserContext: React.Context<AuthenticatedUser> = React.createContext<AuthenticatedUser>(
+// $FlowFixMe[signature-verification-failure]
+const AuthenticatedUserContext = React.createContext<AuthenticatedUser>(
   // $FlowFixMe[incompatible-type]
   initialAuthenticatedUser
 );

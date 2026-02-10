@@ -75,7 +75,10 @@ export const filterEnumeratedBehaviorMetadata = (
   });
 };
 
-export const isBehaviorDefaultCapability = (behaviorMetadata: gdBehaviorMetadata): boolean => {
+export const isBehaviorDefaultCapability = (
+  behaviorMetadata: gdBehaviorMetadata
+// $FlowFixMe[signature-verification-failure]
+) => {
   return (
     behaviorMetadata.getName().includes('Capability') ||
     behaviorMetadata.getName() === 'Scene3D::Base3DBehavior'

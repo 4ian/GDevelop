@@ -21,7 +21,8 @@ export default {
   component: EventsFunctionsExtensionEditor,
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={700}>
       <EventsFunctionsExtensionEditor
@@ -49,7 +50,8 @@ export const Default = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const WithObjectEditor = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithObjectEditor = () => {
   // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,

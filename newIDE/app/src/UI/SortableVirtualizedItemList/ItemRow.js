@@ -59,7 +59,9 @@ function ItemRow<Item>({
   buildMenuTemplate,
   onEdit,
   hideMenuButton,
-}: Props<Item>): any {
+// $FlowFixMe[signature-verification-failure]
+// $FlowFixMe[missing-local-annot]
+}: Props<Item>) {
   const textFieldRef = React.useRef<?TextFieldInterface>(null);
   const shouldDiscardChanges = React.useRef<boolean>(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -78,7 +80,6 @@ function ItemRow<Item>({
   );
 
   const label = editingName ? (
-    // $FlowFixMe[incompatible-type]
     <TextField
       id="rename-item-field"
       margin="none"

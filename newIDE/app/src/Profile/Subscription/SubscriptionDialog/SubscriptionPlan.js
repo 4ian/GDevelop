@@ -42,35 +42,34 @@ const styles = {
   },
 };
 
-const SubscriptionPlan = (
-  {
-    subscriptionPlanWithPricingSystems,
-    disabled,
-    onClickRedeemCode,
-    onClickChoosePlan,
-    seatsCount,
-    setSeatsCount,
-    couponCode,
-    pricingSystemDiscounts,
-    couponErrorMessage,
-    isValidatingCoupon,
-    onClearCoupon
-  }: {|
-    subscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems,
-    disabled?: boolean,
-    onClickRedeemCode: () => void,
-    onClickChoosePlan: (
-      pricingSystem: SubscriptionPlanPricingSystem | null
-    ) => Promise<void>,
-    seatsCount: number,
-    setSeatsCount: (seatsCount: number) => void,
-    couponCode: ?string,
-    pricingSystemDiscounts: { [pricingSystemId: string]: PricingSystemDiscount },
-    couponErrorMessage: ?string,
-    isValidatingCoupon: boolean,
-    onClearCoupon: () => void,
-  |},
-): React.Node => {
+const SubscriptionPlan = ({
+  subscriptionPlanWithPricingSystems,
+  disabled,
+  onClickRedeemCode,
+  onClickChoosePlan,
+  seatsCount,
+  setSeatsCount,
+  couponCode,
+  pricingSystemDiscounts,
+  couponErrorMessage,
+  isValidatingCoupon,
+  onClearCoupon,
+}: {|
+  subscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems,
+  disabled?: boolean,
+  onClickRedeemCode: () => void,
+  onClickChoosePlan: (
+    pricingSystem: SubscriptionPlanPricingSystem | null
+  ) => Promise<void>,
+  seatsCount: number,
+  setSeatsCount: (seatsCount: number) => void,
+  couponCode: ?string,
+  pricingSystemDiscounts: { [pricingSystemId: string]: PricingSystemDiscount },
+  couponErrorMessage: ?string,
+  isValidatingCoupon: boolean,
+  onClearCoupon: () => void,
+// $FlowFixMe[signature-verification-failure]
+|}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { windowSize } = useResponsiveWindowSize();
   const isLargeScreen = windowSize === 'large' || windowSize === 'xlarge';

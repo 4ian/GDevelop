@@ -29,7 +29,8 @@ type Props = {|
 /**
  * Display a generic container to display an icon.
  */
-const GenericIconPreview = ({renderIcon}: Props): React.MixedElement => (
+// $FlowFixMe[signature-verification-failure]
+const GenericIconPreview = ({ renderIcon }: Props) => (
   <div style={styles.previewContainer}>
     <CheckeredBackground />
     <div style={styles.iconContainer}>{renderIcon({ style: styles.icon })}</div>

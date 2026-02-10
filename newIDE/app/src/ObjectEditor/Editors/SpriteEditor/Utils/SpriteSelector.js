@@ -40,24 +40,23 @@ type Props = {|
  * (typically, the points or the collision masks of the sprite) should be shared between
  * all sprites of an animation, or between all sprites of all animations of the object.
  */
-const SpriteSelector = (
-  {
-    animations,
-    animationIndex,
-    directionIndex,
-    spriteIndex,
-    sameForAllAnimations,
-    sameForAllSprites,
-    chooseAnimation,
-    chooseDirection,
-    chooseSprite,
-    setSameForAllAnimations,
-    setSameForAllSprites,
-    setSameForAllAnimationsLabel,
-    setSameForAllSpritesLabel,
-    hideControlsForSprite
-  }: Props,
-): React.Node => {
+const SpriteSelector = ({
+  animations,
+  animationIndex,
+  directionIndex,
+  spriteIndex,
+  sameForAllAnimations,
+  sameForAllSprites,
+  chooseAnimation,
+  chooseDirection,
+  chooseSprite,
+  setSameForAllAnimations,
+  setSameForAllSprites,
+  setSameForAllAnimationsLabel,
+  setSameForAllSpritesLabel,
+  hideControlsForSprite,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { animation, direction, sprite } = getCurrentElements(
     animations,
     animationIndex,

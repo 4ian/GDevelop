@@ -29,7 +29,8 @@ type ExampleStoreState = {|
   filtersState: FiltersState,
 |};
 
-export const ExampleStoreContext: React.Context<ExampleStoreState> = React.createContext<ExampleStoreState>({
+// $FlowFixMe[signature-verification-failure]
+export const ExampleStoreContext = React.createContext<ExampleStoreState>({
   exampleFilters: null,
   exampleShortHeadersSearchResults: null,
   fetchExamplesAndFilters: () => {},
@@ -50,7 +51,10 @@ type ExampleStoreStateProviderProps = {|
   children: React.Node,
 |};
 
-export const ExampleStoreStateProvider = ({children}: ExampleStoreStateProviderProps): React.MixedElement => {
+export const ExampleStoreStateProvider = ({
+  children,
+// $FlowFixMe[signature-verification-failure]
+}: ExampleStoreStateProviderProps) => {
   const [
     exampleShortHeadersById,
     setExampleShortHeadersById,

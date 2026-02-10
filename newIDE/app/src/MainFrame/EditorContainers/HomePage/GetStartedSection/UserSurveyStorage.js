@@ -3,7 +3,8 @@ import { type UserAnswers } from './UserSurvey';
 const localStoreUserSurveyKey = 'gd-user-survey';
 const TEN_MINUTES = 10 * 60 * 1000;
 
-export const getRecentPersistedState = (): any | null => {
+// $FlowFixMe[signature-verification-failure]
+export const getRecentPersistedState = () => {
   try {
     const serializedState = localStorage.getItem(localStoreUserSurveyKey);
     if (!serializedState) return null;
@@ -54,7 +55,8 @@ export const clearUserSurveyPersistedState = () => {
   }
 };
 
-export const hasStartedUserSurvey = (): boolean | void => {
+// $FlowFixMe[signature-verification-failure]
+export const hasStartedUserSurvey = () => {
   try {
     return localStorage.hasOwnProperty(localStoreUserSurveyKey);
   } catch (error) {

@@ -13,7 +13,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const WithErrors = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithErrors = () => (
   <MockLeaderboardProvider>
     <FixedHeightFlexContainer height={600}>
       <LeaderboardAdmin onLoading={() => action('onLoading')} />

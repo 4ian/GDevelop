@@ -23,7 +23,9 @@ export default class ParticleEmitterEditor extends React.Component<
   EditorProps,
   void
 > {
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const {
       objectConfiguration,
       project,

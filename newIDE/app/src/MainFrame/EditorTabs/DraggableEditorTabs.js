@@ -34,7 +34,8 @@ type DraggableEditorTabsProps = {|
   ) => void,
 |};
 
-export const getTabId = (editorTab: EditorTab): string =>
+// $FlowFixMe[signature-verification-failure]
+export const getTabId = (editorTab: EditorTab) =>
   `tab-${editorTab.key.replace(/\s/g, '-')}`;
 
 const homeTabApproximateWidth = 35;
@@ -50,7 +51,8 @@ export function DraggableEditorTabs({
   onTabActivated,
   onDropTab,
   onHoverTab,
-}: DraggableEditorTabsProps): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: DraggableEditorTabsProps) {
   let draggedTabIndex: ?number = null;
 
   // Ensure the component is re-rendered when the window is resized.
@@ -162,7 +164,8 @@ export function DraggableClosableTab({
   onDrop,
   onHover,
   maxWidth,
-}: DraggableClosableTabProps): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: DraggableClosableTabProps) {
   return (
     <ScreenTypeMeasurer>
       {screenType => (

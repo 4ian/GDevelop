@@ -21,7 +21,8 @@ type AnnouncementsFeedState = {|
   fetchAnnouncementsAndPromotions: () => Promise<void>,
 |};
 
-export const AnnouncementsFeedContext: React.Context<AnnouncementsFeedState> = React.createContext<AnnouncementsFeedState>(
+// $FlowFixMe[signature-verification-failure]
+export const AnnouncementsFeedContext = React.createContext<AnnouncementsFeedState>(
   {
     announcements: null,
     promotions: null,
@@ -34,7 +35,10 @@ type AnnouncementsFeedStateProviderProps = {|
   children: React.Node,
 |};
 
-export const AnnouncementsFeedStateProvider = ({children}: AnnouncementsFeedStateProviderProps): React.MixedElement => {
+export const AnnouncementsFeedStateProvider = ({
+  children,
+// $FlowFixMe[signature-verification-failure]
+}: AnnouncementsFeedStateProviderProps) => {
   const [announcements, setAnnouncements] = React.useState<?(Announcement[])>(
     null
   );

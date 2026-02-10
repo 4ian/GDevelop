@@ -18,7 +18,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Chapter1 = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Chapter1 = () => {
   return (
     <TextBasedCourseChapterView
       course={premiumCourse}
@@ -33,7 +34,8 @@ export const Chapter1 = (): React.Node => {
   );
 };
 
-export const Chapter2 = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Chapter2 = () => {
   return (
     <TextBasedCourseChapterView
       course={premiumCourse}
@@ -48,7 +50,8 @@ export const Chapter2 = (): React.Node => {
   );
 };
 
-export const Chapter3 = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Chapter3 = () => {
   return (
     <TextBasedCourseChapterView
       course={premiumCourse}
@@ -63,7 +66,8 @@ export const Chapter3 = (): React.Node => {
   );
 };
 
-export const Chapter4 = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Chapter4 = () => {
   return (
     <TextBasedCourseChapterView
       course={premiumCourse}

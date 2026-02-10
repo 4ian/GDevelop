@@ -56,7 +56,8 @@ type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
 |};
 
-const FlingGame = ({selectInAppTutorial}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const FlingGame = ({ selectInAppTutorial }: Props) => {
   const {
     inAppTutorialShortHeaders,
     inAppTutorialsFetchingError,

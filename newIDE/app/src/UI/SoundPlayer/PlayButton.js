@@ -13,7 +13,8 @@ type Props = {|
   onClick: () => void,
 |};
 
-const PlayButton = (props: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const PlayButton = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const playButtonTheme =
     gdevelopTheme.soundPlayer.playButton[

@@ -102,7 +102,9 @@ export default class ForEachEvent extends React.Component<
     });
   };
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const forEachEvent = gd.asForEachEvent(this.props.event);
     const objectName = forEachEvent.getObjectToPick();
 

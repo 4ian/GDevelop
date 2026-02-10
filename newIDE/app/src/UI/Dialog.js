@@ -40,7 +40,10 @@ export type OpenedDialogsCountCallback = ({
 }) => void;
 
 let openedDialogsCountCallbacks: OpenedDialogsCountCallback[] = [];
-export const registerOpenedDialogsCountCallback = (callback: OpenedDialogsCountCallback): (() => void) => {
+export const registerOpenedDialogsCountCallback = (
+  callback: OpenedDialogsCountCallback
+// $FlowFixMe[signature-verification-failure]
+) => {
   openedDialogsCountCallbacks.push(callback);
   callback({ openedDialogsCount }); // Ensure the callback is called with the current count.
 
@@ -525,7 +528,8 @@ const DialogWithoutWindowSizeProvider = ({
  * A enhanced material-ui Dialog that can have optional secondary actions
  * and no margins if required.
  */
-const Dialog = (props: DialogProps): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const Dialog = (props: DialogProps) => {
   return (
     <TopLevelWindowSizeProvider>
       <DialogWithoutWindowSizeProvider {...props} />

@@ -53,19 +53,17 @@ type ProjectStructureItemProps = {|
   open?: boolean,
 |};
 
-export const ProjectStructureItem = (
-  {
-    id,
-    error,
-    onRefresh,
-    autoGenerateNestedIndicator,
-    open,
-    primaryText,
-    renderNestedItems
-  }: ProjectStructureItemProps,
-): React.Node => {
+export const ProjectStructureItem = ({
+  id,
+  error,
+  onRefresh,
+  autoGenerateNestedIndicator,
+  open,
+  primaryText,
+  renderNestedItems,
+// $FlowFixMe[signature-verification-failure]
+}: ProjectStructureItemProps) => {
   return (
-    // $FlowFixMe[incompatible-type]
     <ListItem
       id={id}
       open={open}
@@ -121,34 +119,33 @@ type ItemProps = {|
   |},
 |};
 
-export const Item = (
-  {
-    id,
-    data,
-    primaryText,
-    textEndAdornment,
-    editingName,
-    leftIcon,
-    onEdit,
-    onDelete,
-    addLabel,
-    onAdd,
-    onRename,
-    onEditName,
-    onCopy,
-    onCut,
-    onPaste,
-    onDuplicate,
-    canPaste,
-    canMoveUp,
-    onMoveUp,
-    canMoveDown,
-    onMoveDown,
-    buildExtraMenuTemplate,
-    isLastItem,
-    dragAndDropProps: {DragSourceAndDropTarget, onBeginDrag, onDrop}
-  }: ItemProps,
-): React.Node => {
+export const Item = ({
+  id,
+  data,
+  primaryText,
+  textEndAdornment,
+  editingName,
+  leftIcon,
+  onEdit,
+  onDelete,
+  addLabel,
+  onAdd,
+  onRename,
+  onEditName,
+  onCopy,
+  onCut,
+  onPaste,
+  onDuplicate,
+  canPaste,
+  canMoveUp,
+  onMoveUp,
+  canMoveDown,
+  onMoveDown,
+  buildExtraMenuTemplate,
+  isLastItem,
+  dragAndDropProps: { DragSourceAndDropTarget, onBeginDrag, onDrop },
+// $FlowFixMe[signature-verification-failure]
+}: ItemProps) => {
   const textFieldRef = React.useRef<?TextFieldInterface>(null);
   const shouldDiscardChanges = React.useRef<boolean>(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -167,7 +164,6 @@ export const Item = (
   );
 
   const label = editingName ? (
-    // $FlowFixMe[incompatible-type]
     <TextField
       id="rename-item-field"
       margin="none"
@@ -355,28 +351,27 @@ type EventFunctionExtensionItemProps = {|
   |},
 |};
 
-export const EventFunctionExtensionItem = (
-  {
-    eventsFunctionsExtension,
-    onEdit,
-    onRename,
-    onEditName,
-    isEditingName,
-    onDelete,
-    onAdd,
-    onCopy,
-    onCut,
-    onPaste,
-    onDuplicate,
-    canPaste,
-    canMoveUp,
-    onMoveUp,
-    canMoveDown,
-    onMoveDown,
-    isLastItem,
-    dragAndDropProps
-  }: EventFunctionExtensionItemProps,
-): React.Node => {
+export const EventFunctionExtensionItem = ({
+  eventsFunctionsExtension,
+  onEdit,
+  onRename,
+  onEditName,
+  isEditingName,
+  onDelete,
+  onAdd,
+  onCopy,
+  onCut,
+  onPaste,
+  onDuplicate,
+  canPaste,
+  canMoveUp,
+  onMoveUp,
+  canMoveDown,
+  onMoveDown,
+  isLastItem,
+  dragAndDropProps,
+// $FlowFixMe[signature-verification-failure]
+}: EventFunctionExtensionItemProps) => {
   const name = eventsFunctionsExtension.getName();
   const iconUrl = eventsFunctionsExtension.getIconUrl();
 

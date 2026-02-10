@@ -50,18 +50,17 @@ type Props = {|
   ) => CourseChapterCompletion | null,
 |};
 
-const CoursesPage = (
-  {
-    onBack,
-    courses,
-    onSelectCourse,
-    onSelectBundle,
-    previewedCourse,
-    getCourseChapters,
-    getCourseChapterCompletion,
-    getCourseCompletion
-  }: Props,
-): React.Node => {
+const CoursesPage = ({
+  onBack,
+  courses,
+  onSelectCourse,
+  onSelectBundle,
+  previewedCourse,
+  getCourseChapters,
+  getCourseChapterCompletion,
+  getCourseCompletion,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { listedCourses } = React.useContext(CourseStoreContext);
   const { windowSize, isLandscape } = useResponsiveWindowSize();
   const numberOfItemsOnOneRow = getColumnsFromWindowSize(

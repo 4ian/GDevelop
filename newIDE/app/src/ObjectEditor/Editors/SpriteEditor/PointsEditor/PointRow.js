@@ -29,7 +29,8 @@ type Props = {|
   isAutomatic?: boolean,
 |};
 
-const PointRow = ({pointX, pointY, ...props}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const PointRow = ({ pointX, pointY, ...props }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <TableRow

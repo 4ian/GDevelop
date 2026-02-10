@@ -46,7 +46,12 @@ type Props = {|
   disableQuitting: boolean,
 |};
 
-const OpenedVersionStatusChip = ({openedVersionStatus, onQuit, disableQuitting}: Props): React.Node => {
+const OpenedVersionStatusChip = ({
+  openedVersionStatus,
+  onQuit,
+  disableQuitting,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const classes = useStylesCloseIconButton();
   if (!openedVersionStatus) return null;

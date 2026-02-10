@@ -46,7 +46,8 @@ const styles = {
   },
 };
 
-function InAppTutorialElementHighlighter({ element }: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+function InAppTutorialElementHighlighter({ element }: Props) {
   const forceUpdate = useForceUpdate();
   useOnResize(forceUpdate);
   const [showHighlighter, setShowHighlighter] = React.useState<boolean>(true);

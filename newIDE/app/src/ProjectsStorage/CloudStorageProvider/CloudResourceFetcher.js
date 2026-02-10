@@ -22,20 +22,18 @@ import {
 } from '../../ResourcesList/ResourceUtils';
 import { sanitizeFilename } from '../../Utils/Filename';
 
-export const moveUrlResourcesToCloudFilesIfPrivate = async (
-  {
-    project,
-    fileMetadata,
-    authenticatedUser,
-    onProgress
-  }: {|
-    project: gdProject,
-    fileMetadata: FileMetadata,
-    // $FlowFixMe[value-as-type]
-    authenticatedUser: AuthenticatedUser,
-    onProgress: (number, number) => void,
-  |},
-): Promise<{ erroredResources: Array<empty> }> => {
+export const moveUrlResourcesToCloudFilesIfPrivate = async ({
+  project,
+  fileMetadata,
+  authenticatedUser,
+  onProgress,
+}: {|
+  project: gdProject,
+  fileMetadata: FileMetadata,
+  authenticatedUser: AuthenticatedUser,
+  onProgress: (number, number) => void,
+// $FlowFixMe[signature-verification-failure]
+|}) => {
   const result = {
     erroredResources: [],
   };

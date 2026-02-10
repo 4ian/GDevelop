@@ -14,7 +14,8 @@ type Props = {|
   value?: ?number,
 |};
 
-function ColoredLinearProgress(props: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+function ColoredLinearProgress(props: Props) {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const classes = makeStyles({
     root: {

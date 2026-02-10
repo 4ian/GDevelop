@@ -12,7 +12,8 @@ type Props = {|
   children: React.Node,
 |};
 
-const ElementHighlighterProvider = (props: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const ElementHighlighterProvider = (props: Props) => {
   const [
     shouldHighlightField,
     setShouldHighlightField,

@@ -87,7 +87,8 @@ export const initialPrivateGameTemplateStoreState: PrivateGameTemplateStoreState
   },
 };
 
-export const PrivateGameTemplateStoreContext: React.Context<PrivateGameTemplateStoreState> = React.createContext<PrivateGameTemplateStoreState>(
+// $FlowFixMe[signature-verification-failure]
+export const PrivateGameTemplateStoreContext = React.createContext<PrivateGameTemplateStoreState>(
   initialPrivateGameTemplateStoreState
 );
 
@@ -95,7 +96,10 @@ type PrivateGameTemplateStoreStateProviderProps = {|
   children: React.Node,
 |};
 
-export const PrivateGameTemplateStoreStateProvider = ({children}: PrivateGameTemplateStoreStateProviderProps): React.MixedElement => {
+export const PrivateGameTemplateStoreStateProvider = ({
+  children,
+// $FlowFixMe[signature-verification-failure]
+}: PrivateGameTemplateStoreStateProviderProps) => {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const {
     searchText: shopSearchText,

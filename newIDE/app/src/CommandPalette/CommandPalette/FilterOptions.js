@@ -8,7 +8,9 @@ import { fuzzyOrEmptyFilter } from '../../Utils/FuzzyOrEmptyFilter';
 const filterOptions = <T: Object>(
   options: Array<T>,
   state: { getOptionLabel: T => string, inputValue: string }
-): any => {
+// $FlowFixMe[signature-verification-failure]
+// $FlowFixMe[missing-local-annot]
+) => {
   const searchText = state.inputValue.toLowerCase();
   if (searchText === '') return options;
 

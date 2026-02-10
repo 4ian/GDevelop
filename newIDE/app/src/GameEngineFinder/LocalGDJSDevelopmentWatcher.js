@@ -13,7 +13,8 @@ type Props = {
  * Set up some watchers for GDJS and Extensions sources.
  * Stop the watchers when the component is unmounted or `shouldWatch` prop is false.
  */
-export const LocalGDJSDevelopmentWatcher = ({onGDJSUpdated}: Props): null => {
+// $FlowFixMe[signature-verification-failure]
+export const LocalGDJSDevelopmentWatcher = ({ onGDJSUpdated }: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const shouldWatch = preferences.values.useGDJSDevelopmentWatcher;
 

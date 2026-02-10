@@ -14,7 +14,8 @@ export default {
   component: EventsBasedBehaviorOrObjectEditor,
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <DragAndDropContextProvider>
     <EventsBasedBehaviorOrObjectEditor
       project={testProject.project}

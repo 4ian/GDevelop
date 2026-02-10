@@ -38,7 +38,8 @@ export const initialInAppTutorialState: InAppTutorialState = {
   onLoadInAppTutorialFromLocalFile: async () => {},
 };
 
-const InAppTutorialContext: React.Context<InAppTutorialState> = React.createContext<InAppTutorialState>(
+// $FlowFixMe[signature-verification-failure]
+const InAppTutorialContext = React.createContext<InAppTutorialState>(
   initialInAppTutorialState
 );
 

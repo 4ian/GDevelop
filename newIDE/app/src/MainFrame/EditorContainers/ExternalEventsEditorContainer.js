@@ -58,7 +58,9 @@ export class ExternalEventsEditorContainer extends React.Component<
     externalPropertiesDialogOpen: false,
   };
 
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
     // We stop updates when the component is inactive.
     // If it's active, was active or becoming active again we let update propagate.
     // Especially important to note that when becoming inactive, a "last" update is allowed.
@@ -189,7 +191,9 @@ export class ExternalEventsEditorContainer extends React.Component<
     });
   };
 
-  onCreateEventsFunction = (extensionName: any, eventsFunction: any) => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  onCreateEventsFunction = (extensionName, eventsFunction) => {
     this.props.onCreateEventsFunction(
       extensionName,
       eventsFunction,
@@ -197,7 +201,9 @@ export class ExternalEventsEditorContainer extends React.Component<
     );
   };
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const { project, projectItemName } = this.props;
     const externalEvents = this.getExternalEvents();
     const layout = this.getLayout();
@@ -226,7 +232,6 @@ export class ExternalEventsEditorContainer extends React.Component<
             onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
             unsavedChanges={this.props.unsavedChanges}
             project={project}
-            // $FlowFixMe[incompatible-type]
             scope={scope}
             globalObjectsContainer={project.getObjects()}
             objectsContainer={layout.getObjects()}
@@ -291,4 +296,7 @@ export class ExternalEventsEditorContainer extends React.Component<
   }
 }
 
-export const renderExternalEventsEditorContainer = (props: RenderEditorContainerPropsWithRef): React.Node => <ExternalEventsEditorContainer {...props} />;
+export const renderExternalEventsEditorContainer = (
+  props: RenderEditorContainerPropsWithRef
+// $FlowFixMe[signature-verification-failure]
+) => <ExternalEventsEditorContainer {...props} />;

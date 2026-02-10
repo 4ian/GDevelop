@@ -19,7 +19,8 @@ import Model3DResourceField from '../../../EventsSheet/ParameterFields/Model3DRe
 import AtlasResourceField from '../../../EventsSheet/ParameterFields/AtlasResourceField';
 import SpineResourceField from '../../../EventsSheet/ParameterFields/SpineResourceField';
 
-export const AllResourceFields = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const AllResourceFields = () => (
   <Column expand>
     <Line expand>
       <ValueStateHolder
@@ -38,7 +39,6 @@ export const AllResourceFields = (): React.Node => (
             }
             value={value}
             onChange={onChange}
-            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -62,7 +62,6 @@ export const AllResourceFields = (): React.Node => (
             }
             value={value}
             onChange={onChange}
-            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -86,7 +85,6 @@ export const AllResourceFields = (): React.Node => (
             }
             value={value}
             onChange={onChange}
-            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -110,7 +108,6 @@ export const AllResourceFields = (): React.Node => (
             }
             value={value}
             onChange={onChange}
-            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -134,7 +131,6 @@ export const AllResourceFields = (): React.Node => (
             }
             value={value}
             onChange={onChange}
-            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -158,7 +154,6 @@ export const AllResourceFields = (): React.Node => (
             }
             value={value}
             onChange={onChange}
-            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -182,7 +177,6 @@ export const AllResourceFields = (): React.Node => (
             }
             value={value}
             onChange={onChange}
-            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -206,7 +200,6 @@ export const AllResourceFields = (): React.Node => (
             }
             value={value}
             onChange={onChange}
-            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -230,7 +223,6 @@ export const AllResourceFields = (): React.Node => (
             }
             value={value}
             onChange={onChange}
-            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -254,7 +246,6 @@ export const AllResourceFields = (): React.Node => (
             }
             value={value}
             onChange={onChange}
-            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />

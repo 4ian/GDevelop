@@ -83,7 +83,8 @@ const handleEdit = (edit, { onCall, onEdit }: Props) => {
   return true;
 };
 
-const RuntimeObjectInspector = (props: Props): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+const RuntimeObjectInspector = (props: Props) => (
   <React.Fragment>
     <Text>
       <Trans>General:</Trans>

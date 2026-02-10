@@ -21,7 +21,8 @@ type Props = {|
   onCloseAfterSuccess: () => void,
 |};
 
-const CancelReasonDialog = ({onClose, onCloseAfterSuccess}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const CancelReasonDialog = ({ onClose, onCloseAfterSuccess }: Props) => {
   const [isCancelingSubscription, setIsCancelingSubscription] = React.useState(
     false
   );
@@ -153,7 +154,6 @@ const CancelReasonDialog = ({onClose, onCloseAfterSuccess}: Props): React.Node =
       {({ i18n }) => (
         <Dialog
           title={null}
-          // $FlowFixMe[incompatible-type]
           actions={actions}
           // $FlowFixMe[incompatible-type]
           secondaryActions={secondaryActions}

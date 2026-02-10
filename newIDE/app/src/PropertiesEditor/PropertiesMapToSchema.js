@@ -98,7 +98,6 @@ const createField = (
             setValue(instance, defaultValueNumber);
           }
         : undefined;
-    // $FlowFixMe[incompatible-type]
     return {
       name,
       valueType,
@@ -228,9 +227,7 @@ const createField = (
   } else if (valueType === 'resource') {
     // Resource is a "string" (with a selector in the UI)
     const extraInfos = property.getExtraInfo().toJSArray();
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - assume the passed resource kind is always valid.
-    // $FlowFixMe[incompatible-type]
     const kind: ResourceKind = extraInfos[0] || '';
     return {
       name,

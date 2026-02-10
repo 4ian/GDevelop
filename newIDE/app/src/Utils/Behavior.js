@@ -4,7 +4,8 @@ import Window from './Window';
 
 const gd: libGDevelop = global.gd;
 
-export const hasBehaviorWithType = (object: gdObject, type: string): number =>
+// $FlowFixMe[signature-verification-failure]
+export const hasBehaviorWithType = (object: gdObject, type: string) =>
   object
     .getAllBehaviorNames()
     .toJSArray()

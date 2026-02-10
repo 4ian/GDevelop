@@ -11,7 +11,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <LocalNetworkPreviewDialog
     open
     url="192.168.0.1:2929"
@@ -21,7 +22,8 @@ export const Default = (): React.Node => (
     onClose={action('on close')}
   />
 );
-export const WaitingForUrl = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WaitingForUrl = () => (
   <LocalNetworkPreviewDialog
     open
     url=""
@@ -31,7 +33,8 @@ export const WaitingForUrl = (): React.Node => (
     onClose={action('on close')}
   />
 );
-export const Error = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Error = () => (
   <LocalNetworkPreviewDialog
     open
     url="192.168.0.1:2929"

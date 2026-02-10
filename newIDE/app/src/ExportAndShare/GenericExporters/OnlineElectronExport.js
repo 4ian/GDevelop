@@ -14,7 +14,13 @@ export type ExportState = {|
   targets: Array<TargetName>,
 |};
 
-export const SetupExportHeader = ({exportState, updateExportState, isExporting, build}: HeaderProps<ExportState>): React.Node => {
+export const SetupExportHeader = ({
+  exportState,
+  updateExportState,
+  isExporting,
+  build,
+// $FlowFixMe[signature-verification-failure]
+}: HeaderProps<ExportState>) => {
   // Build is finished, hide options.
   if (!!build && build.status === 'complete') return null;
 
@@ -84,19 +90,18 @@ type OnlineElectronExportFlowProps = {|
   exportPipelineName: string,
 |};
 
-export const ExportFlow = (
-  {
-    disabled,
-    launchExport,
-    isExporting,
-    exportPipelineName,
-    exportStep,
-    build,
-    stepMaxProgress,
-    stepCurrentProgress,
-    errored
-  }: OnlineElectronExportFlowProps,
-): React.Node => {
+export const ExportFlow = ({
+  disabled,
+  launchExport,
+  isExporting,
+  exportPipelineName,
+  exportStep,
+  build,
+  stepMaxProgress,
+  stepCurrentProgress,
+  errored,
+// $FlowFixMe[signature-verification-failure]
+}: OnlineElectronExportFlowProps) => {
   const isExportingOrbuildRunningOrFinished =
     isExporting || (!!build && build.status !== 'error');
 
@@ -131,7 +136,9 @@ export const ExportFlow = (
 
 export const onlineElectronExporter = {
   key: 'onlineelectronexport',
-  tabName: <Trans>Desktop</Trans> as React.Node,
-  name: <Trans>Windows, macOS &amp; Linux</Trans> as React.Node,
+  // $FlowFixMe[signature-verification-failure]
+  tabName: <Trans>Desktop</Trans>,
+  // $FlowFixMe[signature-verification-failure]
+  name: <Trans>Windows, macOS &amp; Linux</Trans>,
   helpPage: '/publishing/windows-macos-linux',
 };

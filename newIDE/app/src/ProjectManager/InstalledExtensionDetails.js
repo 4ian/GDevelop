@@ -31,7 +31,8 @@ function InstalledExtensionDetails({
   onWillInstallExtension,
   onExtensionInstalled,
   onOpenEventsFunctionsExtension,
-}: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: Props) {
   const [isInstalling, setIsInstalling] = React.useState<boolean>(false);
   const installExtension = useInstallExtension();
   const {

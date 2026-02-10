@@ -35,24 +35,23 @@ type Props = {|
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
-export const QuickCustomizationDialog = (
-  {
-    project,
-    resourceManagementProps,
-    onLaunchPreview,
-    onClose,
-    onlineWebExporter,
-    onSaveProject,
-    isSavingProject,
-    isRequiredToSaveAsNewCloudProject,
-    canClose,
-    sourceGameId,
-    gameScreenshotUrls,
-    onScreenshotsClaimed,
-    onWillInstallExtension,
-    onExtensionInstalled
-  }: Props,
-): React.Node => {
+export const QuickCustomizationDialog = ({
+  project,
+  resourceManagementProps,
+  onLaunchPreview,
+  onClose,
+  onlineWebExporter,
+  onSaveProject,
+  isSavingProject,
+  isRequiredToSaveAsNewCloudProject,
+  canClose,
+  sourceGameId,
+  gameScreenshotUrls,
+  onScreenshotsClaimed,
+  onWillInstallExtension,
+  onExtensionInstalled,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { triggerUnsavedChanges } = React.useContext(UnsavedChangesContext);
   const gameAndBuildsManager = useGameAndBuildsManager({
     project,

@@ -67,12 +67,14 @@ export const getAllRequiredBehaviorTypes = (
   platform: gdPlatform,
   functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
   parameterIndex: number
-): Array<string> => getRequiredBehaviorTypes(platform, functionMetadata, parameterIndex, null);
+// $FlowFixMe[signature-verification-failure]
+) => getRequiredBehaviorTypes(platform, functionMetadata, parameterIndex, null);
 
+// $FlowFixMe[signature-verification-failure]
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectField(props: ParameterFieldProps, ref) {
-    const {currentlyRunningInAppTutorial} = React.useContext(
-      InAppTutorialContext,
+    const { currentlyRunningInAppTutorial } = React.useContext(
+      InAppTutorialContext
     );
     const field = React.useRef<?ObjectSelectorInterface>(null);
     const focus: FieldFocusFunction = options => {
@@ -82,13 +84,10 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       if (field.current && !currentlyRunningInAppTutorial)
         field.current.focus(options);
     };
-    React.useImperativeHandle(
-      ref,
-      () => ({
-        focus,
-      }),
-    );
-    
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
+
     const {
       project,
       parameterMetadata,
@@ -96,21 +95,21 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       instructionMetadata,
       expressionMetadata,
       instruction,
-      projectScopedContainersAccessor
+      projectScopedContainersAccessor,
     } = props;
-    
+
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
-    
+
     const longDescription = parameterMetadata
       ? parameterMetadata.getLongDescription()
       : undefined;
-    
+
     const allowedObjectType = parameterMetadata
       ? parameterMetadata.getExtraInfo()
       : undefined;
-    
+
     const requiredCapabilitiesBehaviorTypes = React.useMemo(
       () => {
         const functionMetadata = instructionMetadata || expressionMetadata;
@@ -121,12 +120,12 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         return getRequiredCapabilitiesBehaviorTypes(
           project.getCurrentPlatform(),
           functionMetadata,
-          parameterIndex,
+          parameterIndex
         );
       },
-      [expressionMetadata, instructionMetadata, parameterIndex, project],
+      [expressionMetadata, instructionMetadata, parameterIndex, project]
     );
-    
+
     const requiredVisibleBehaviorTypes = React.useMemo(
       () => {
         const functionMetadata = instructionMetadata || expressionMetadata;
@@ -137,12 +136,12 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         return getRequiredVisibleBehaviorTypes(
           project.getCurrentPlatform(),
           functionMetadata,
-          parameterIndex,
+          parameterIndex
         );
       },
-      [expressionMetadata, instructionMetadata, parameterIndex, project],
+      [expressionMetadata, instructionMetadata, parameterIndex, project]
     );
-    
+
     const onChange = React.useCallback(
       (value: string) => {
         props.onChange(value);
@@ -151,7 +150,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             project.getCurrentPlatform(),
             projectScopedContainersAccessor.get(),
             instructionMetadata,
-            instruction,
+            instruction
           );
         }
       },
@@ -161,9 +160,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         instructionMetadata,
         instruction,
         props,
-      ],
+      ]
     );
-    
+
     return (
       <ObjectSelector
         margin={props.isInline ? 'none' : 'dense'}
@@ -180,33 +179,37 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         projectScopedContainersAccessor={projectScopedContainersAccessor}
         floatingLabelText={description}
         helperMarkdownText={longDescription}
-        id={parameterIndex !== undefined
-          ? `parameter-${parameterIndex}-object-selector`
-          : undefined}
+        id={
+          parameterIndex !== undefined
+            ? `parameter-${parameterIndex}-object-selector`
+            : undefined
+        }
         fullWidth
-        errorTextIfInvalid={allowedObjectType ||
-          requiredCapabilitiesBehaviorTypes.length > 0
-          ? <Trans>The object does not exist or can't be used here.</Trans>
-          : <Trans>Enter the name of an object.</Trans>}
-        openOnFocus={!props.value /* Only force showing the list if no object is entered, see https://github.com/4ian/GDevelop/issues/859 */}
+        errorTextIfInvalid={
+          allowedObjectType || requiredCapabilitiesBehaviorTypes.length > 0 ? (
+            <Trans>The object does not exist or can't be used here.</Trans>
+          ) : (
+            <Trans>Enter the name of an object.</Trans>
+          )
+        }
+        openOnFocus={
+          !props.value /* Only force showing the list if no object is entered, see https://github.com/4ian/GDevelop/issues/859 */
+        }
         ref={field}
       />
     );
-  },
-) as component(
-  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
+  }
 );
 
-export const renderInlineObjectWithThumbnail = (
-  {
-    value,
-    parameterMetadata,
-    renderObjectThumbnail,
-    expressionIsValid,
-    InvalidParameterValue,
-    MissingParameterValue
-  }: ParameterInlineRendererProps,
-): React.MixedElement => {
+export const renderInlineObjectWithThumbnail = ({
+  value,
+  parameterMetadata,
+  renderObjectThumbnail,
+  expressionIsValid,
+  InvalidParameterValue,
+  MissingParameterValue,
+// $FlowFixMe[signature-verification-failure]
+}: ParameterInlineRendererProps) => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }

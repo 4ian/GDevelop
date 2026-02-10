@@ -21,7 +21,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -80,7 +81,8 @@ export const Default = (): React.Node => {
   );
 };
 
-export const WithServerSideError = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithServerSideError = () => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,

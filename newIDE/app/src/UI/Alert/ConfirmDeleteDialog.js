@@ -26,7 +26,8 @@ type Props = {|
   header?: React.Node,
 |};
 
-function ConfirmDeleteDialog(props: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+function ConfirmDeleteDialog(props: Props) {
   const { open, confirmText } = props;
   const [textInput, setTextInput] = React.useState<string>('');
   const confirmButtonRef = React.useRef<?ButtonInterface>(null);

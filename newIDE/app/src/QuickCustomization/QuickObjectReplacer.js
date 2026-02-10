@@ -28,14 +28,13 @@ const styles = {
   },
 };
 
-export const QuickObjectReplacer = (
-  {
-    project,
-    resourceManagementProps,
-    onWillInstallExtension,
-    onExtensionInstalled
-  }: Props,
-): React.Node => {
+export const QuickObjectReplacer = ({
+  project,
+  resourceManagementProps,
+  onWillInstallExtension,
+  onExtensionInstalled,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const [selectedObjectToSwap, setSelectedObjectToSwap] = React.useState(null);
 
   return (

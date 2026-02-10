@@ -32,7 +32,8 @@ const sounds = [
   },
 ];
 
-export const Default = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => {
   const [currentSoundIndex, setCurrentSoundIndex] = React.useState<number>(0);
   const onSkipBack = () => {
     setCurrentSoundIndex(_currentSoundIndex => {

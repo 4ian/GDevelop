@@ -40,7 +40,9 @@ export default class ElementWithMenu extends React.Component<Props, State> {
     }
   };
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const {
       element,
       buildMenuTemplate,
@@ -53,7 +55,6 @@ export default class ElementWithMenu extends React.Component<Props, State> {
       <React.Fragment>
         {React.cloneElement(element, {
           onContextMenu: this.open,
-          // $FlowFixMe[incompatible-type]
           // $FlowFixMe[incompatible-type] - Flow complaining about using too much spread operators
           // $FlowFixMe[exponential-spread]
           ...(openMenuWithSecondaryClick ? {} : { onClick: this.open }),

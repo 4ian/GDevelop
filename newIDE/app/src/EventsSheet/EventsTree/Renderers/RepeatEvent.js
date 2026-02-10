@@ -100,7 +100,9 @@ export default class RepeatEvent extends React.Component<
     });
   };
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const repeatEvent = gd.asRepeatEvent(this.props.event);
     const expression = repeatEvent.getRepeatExpression();
     const expressionPlainString = expression.getPlainString();
@@ -270,7 +272,6 @@ export default class RepeatEvent extends React.Component<
               repeatEvent.setRepeatExpressionPlainString(text);
               this.props.onUpdate();
             }}
-            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             isInline
             ref={field => (this._field = field)}

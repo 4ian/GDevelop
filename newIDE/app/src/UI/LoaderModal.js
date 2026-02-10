@@ -60,7 +60,13 @@ type Props = {|
 
 const transitionDuration = { enter: 0, exit: 150 };
 
-const LoaderModal = ({progress, message, showImmediately, showAfterDelay}: Props): React.Node => {
+const LoaderModal = ({
+  progress,
+  message,
+  showImmediately,
+  showAfterDelay,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const delayedShow = useDelayedBoolean(!!showAfterDelay, 150);
   const isInfinite = progress === null || progress === undefined;
 

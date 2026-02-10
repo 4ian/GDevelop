@@ -163,7 +163,6 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       'MIT'
     );
     const fakeBehavior = new gd.BehaviorJsImplementation();
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
     // $FlowFixMe[cannot-write]
     fakeBehavior.updateProperty = function(
@@ -182,7 +181,6 @@ export const makeTestExtensions = (gd: libGDevelop) => {
 
       return false;
     };
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
     // $FlowFixMe[cannot-write]
     fakeBehavior.getProperties = function(behaviorContent) {
@@ -202,7 +200,6 @@ export const makeTestExtensions = (gd: libGDevelop) => {
 
       return behaviorProperties;
     };
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
     // $FlowFixMe[cannot-write]
     fakeBehavior.initializeContent = function(behaviorContent) {
@@ -253,7 +250,6 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       'MIT'
     );
     const fakeBehavior = new gd.BehaviorJsImplementation();
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
     // $FlowFixMe[cannot-write]
     fakeBehavior.updateProperty = function(
@@ -263,14 +259,12 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     ) {
       return false;
     };
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
     // $FlowFixMe[cannot-write]
     fakeBehavior.getProperties = function(behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
       return behaviorProperties;
     };
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
     // $FlowFixMe[cannot-write]
     fakeBehavior.initializeContent = function(behaviorContent) {};
@@ -309,8 +303,8 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       return false;
     };
     // $FlowFixMe[incompatible-type]
-    // $FlowFixMe[cannot-write]
     // $FlowFixMe[missing-this-annot]
+    // $FlowFixMe[cannot-write]
     fakeObject.getProperties = function() {
       const objectProperties = new gd.MapStringPropertyDescriptor();
       const objectContent = this.content;

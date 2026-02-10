@@ -19,9 +19,13 @@ export default class ValueStateHolder extends React.Component<Props, State> {
     };
   }
 
-  _handleChange = (value: any): any => this.setState({ value });
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _handleChange = (value: any) => this.setState({ value });
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     return this.props.render(this.state.value, this._handleChange);
   }
 }

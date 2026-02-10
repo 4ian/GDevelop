@@ -68,12 +68,8 @@ const defaultPanelConfigByEditor = {
 };
 
 // Forward ref to allow Scene editor to force update some editors
-const MosaicEditorsDisplay: component(
-  ...{
-    ...SceneEditorsDisplayProps,
-    +ref?: React.RefSetter<SceneEditorsDisplayInterface>,
-  }
-) = React.forwardRef<
+// $FlowFixMe[signature-verification-failure]
+const MosaicEditorsDisplay = React.forwardRef<
   SceneEditorsDisplayProps,
   SceneEditorsDisplayInterface
 >((props, ref) => {
@@ -540,11 +536,9 @@ const MosaicEditorsDisplay: component(
 
   return (
     <EditorMosaic
-      // $FlowFixMe[incompatible-type]
       editors={editors}
       centralNodeId="instances-editor"
       initialNodes={
-        // $FlowFixMe[incompatible-type]
         getDefaultEditorMosaicNode('scene-editor') || initialMosaicEditorNodes
       }
       isTransparent={gameEditorMode === 'embedded-game'}

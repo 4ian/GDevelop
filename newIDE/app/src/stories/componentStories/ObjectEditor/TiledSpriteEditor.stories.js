@@ -17,7 +17,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <SerializedObjectDisplay object={testProject.tiledSpriteObjectConfiguration}>
     <TiledSpriteEditor
       objectConfiguration={testProject.tiledSpriteObjectConfiguration}

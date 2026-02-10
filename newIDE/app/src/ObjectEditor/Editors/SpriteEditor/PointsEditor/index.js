@@ -60,7 +60,14 @@ type Props = {|
   onRenamedPoint: (oldName: string, newName: string) => void,
 |};
 
-const PointsEditor = ({animations, resourcesLoader, project, onPointsUpdated, onRenamedPoint}: Props): null | React.MixedElement => {
+const PointsEditor = ({
+  animations,
+  resourcesLoader,
+  project,
+  onPointsUpdated,
+  onRenamedPoint,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);

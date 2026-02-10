@@ -15,7 +15,12 @@ type Props = {|
   expand?: boolean,
 |};
 
-export const UserPublicProfileTextWithAvatar = ({user, avatarSize, expand}: Props): React.Node => {
+export const UserPublicProfileTextWithAvatar = ({
+  user,
+  avatarSize,
+  expand,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { openUserPublicProfile } = React.useContext(PublicProfileContext);
 
   return (

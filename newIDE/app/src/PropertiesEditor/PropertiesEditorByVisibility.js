@@ -21,7 +21,8 @@ import {
   isAnyPropertyModified,
 } from '../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
 
-export const hasSchemaAnyProperty = (propertiesSchema: Schema): boolean =>
+// $FlowFixMe[signature-verification-failure]
+export const hasSchemaAnyProperty = (propertiesSchema: Schema) =>
   !propertiesSchema.every(
     property =>
       property.isHiddenWhenOnlyOneChoice &&
@@ -47,20 +48,19 @@ type Props = {|
   resourceManagementProps?: ?ResourceManagementProps,
 |};
 
-const PropertiesEditorByVisibility = (
-  {
-    onInstancesModified,
-    instances,
-    schema,
-    object,
-    renderExtraDescriptionText,
-    unsavedChanges,
-    project,
-    projectScopedContainersAccessor,
-    resourceManagementProps,
-    placeholder
-  }: Props,
-): ?(false | 0 | "" | React$Portal | React.Node) => {
+const PropertiesEditorByVisibility = ({
+  onInstancesModified,
+  instances,
+  schema,
+  object,
+  renderExtraDescriptionText,
+  unsavedChanges,
+  project,
+  projectScopedContainersAccessor,
+  resourceManagementProps,
+  placeholder,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const [
     shouldShowDeprecatedProperties,
     setShouldShowDeprecatedProperties,

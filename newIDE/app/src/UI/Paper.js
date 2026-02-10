@@ -21,16 +21,16 @@ export const getBackgroundColor = (
   // $FlowFixMe[value-as-type]
   gdevelopTheme: GDevelopTheme,
   backgroundColor: 'light' | 'medium' | 'dark'
-): any =>
+// $FlowFixMe[signature-verification-failure]
+) =>
   backgroundColor === 'dark'
     ? gdevelopTheme.paper.backgroundColor.dark
     : backgroundColor === 'medium'
     ? gdevelopTheme.paper.backgroundColor.medium
     : gdevelopTheme.paper.backgroundColor.light;
 
-const Paper: component(
-  ...{ ...Props, +ref?: React.RefSetter<HTMLDivElement> }
-) = React.forwardRef<Props, HTMLDivElement>(
+// $FlowFixMe[signature-verification-failure]
+const Paper = React.forwardRef<Props, HTMLDivElement>(
   ({ id, children, background, elevation, variant, style, square }, ref) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const backgroundColor = getBackgroundColor(gdevelopTheme, background);

@@ -231,7 +231,8 @@ const ExtensionsSearchDialog = ({
   );
 };
 
-const ExtensionsSearchDialogWithErrorBoundary = (props: Props): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+const ExtensionsSearchDialogWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Extensions search</Trans>}
     scope="extensions-search-dialog"

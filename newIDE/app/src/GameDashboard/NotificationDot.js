@@ -10,15 +10,14 @@ const styles = {
   },
 };
 
-const NotificationDot = (
-  {
-    color,
-    size = 6
-  }: {
-    size?: number,
-    color: 'notification' | 'warning',
-  },
-): React.MixedElement => {
+const NotificationDot = ({
+  color,
+  size = 6,
+}: {
+  size?: number,
+  color: 'notification' | 'warning',
+// $FlowFixMe[signature-verification-failure]
+}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <span

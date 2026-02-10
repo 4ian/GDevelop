@@ -13,7 +13,6 @@ const gd: libGDevelop = global.gd;
 const jsExtensions = [
   {
     name: 'AdMob',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/AdMob/JsExtension.js'),
@@ -21,7 +20,6 @@ const jsExtensions = [
   },
   {
     name: 'AdvancedWindow',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/AdvancedWindow/JsExtension.js'),
@@ -29,7 +27,6 @@ const jsExtensions = [
   },
   {
     name: 'FacebookInstantGames',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/FacebookInstantGames/JsExtension.js'),
@@ -37,7 +34,6 @@ const jsExtensions = [
   },
   {
     name: 'DeviceSensors',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DeviceSensors/JsExtension.js'),
@@ -45,7 +41,6 @@ const jsExtensions = [
   },
   {
     name: 'DeviceVibration',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DeviceVibration/JsExtension.js'),
@@ -53,7 +48,6 @@ const jsExtensions = [
   },
   {
     name: 'SaveState',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/SaveState/JsExtension.js'),
@@ -61,7 +55,6 @@ const jsExtensions = [
   },
   {
     name: 'DebuggerTools',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DebuggerTools/JsExtension.js'),
@@ -69,7 +62,6 @@ const jsExtensions = [
   },
   {
     name: 'Physics2',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Physics2Behavior/JsExtension.js'),
@@ -77,7 +69,6 @@ const jsExtensions = [
   },
   {
     name: 'Physics3D',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Physics3DBehavior/JsExtension.js'),
@@ -85,7 +76,6 @@ const jsExtensions = [
   },
   {
     name: 'ExampleJsExtension',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/ExampleJsExtension/JsExtension.js'),
@@ -93,7 +83,6 @@ const jsExtensions = [
   },
   {
     name: 'Tween',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/TweenBehavior/JsExtension.js'),
@@ -101,7 +90,6 @@ const jsExtensions = [
   },
   {
     name: 'Video',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Video/JsExtension.js'),
@@ -109,7 +97,6 @@ const jsExtensions = [
   },
   {
     name: 'FileSystem',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/FileSystem/JsExtension.js'),
@@ -117,7 +104,6 @@ const jsExtensions = [
   },
   {
     name: 'Firebase',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Firebase/JsExtension.js'),
@@ -125,7 +111,6 @@ const jsExtensions = [
   },
   {
     name: 'Leaderboards',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Leaderboards/JsExtension.js'),
@@ -133,7 +118,6 @@ const jsExtensions = [
   },
   {
     name: 'PlayerAuthentication',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/PlayerAuthentication/JsExtension.js'),
@@ -141,7 +125,6 @@ const jsExtensions = [
   },
   {
     name: 'Multiplayer',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Multiplayer/JsExtension.js'),
@@ -149,7 +132,6 @@ const jsExtensions = [
   },
   {
     name: 'DialogueTree',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DialogueTree/JsExtension.js'),
@@ -157,12 +139,10 @@ const jsExtensions = [
   },
   {
     name: 'BBText',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/BBText/JsExtension.js'),
     objectsRenderingServiceModules: {
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
       // $FlowFixMe[cannot-resolve-module]
       'pixi-multistyle-text/dist/pixi-multistyle-text.umd': require('GDJS-for-web-app-only/Runtime/Extensions/BBText/pixi-multistyle-text/dist/pixi-multistyle-text.umd'),
@@ -170,20 +150,16 @@ const jsExtensions = [
   },
   {
     name: 'TileMap',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/JsExtension.js'),
     objectsRenderingServiceModules: {
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
       // $FlowFixMe[cannot-resolve-module]
       'pixi-tilemap/dist/pixi-tilemap.umd': require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd'),
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
       // $FlowFixMe[cannot-resolve-module]
       'helper/TileMapHelper': require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/helper/TileMapHelper.js'),
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
       // $FlowFixMe[cannot-resolve-module]
       'pako/dist/pako.min': require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/pako/dist/pako.min'),
@@ -191,7 +167,6 @@ const jsExtensions = [
   },
   {
     name: 'Effects',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Effects/JsExtension.js'),
@@ -199,7 +174,6 @@ const jsExtensions = [
   },
   {
     name: 'P2P',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/P2P/JsExtension.js'),
@@ -207,7 +181,6 @@ const jsExtensions = [
   },
   {
     name: 'Lighting',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Lighting/JsExtension.js'),
@@ -215,7 +188,6 @@ const jsExtensions = [
   },
   {
     name: 'SpatialSound',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/SpatialSound/JsExtension.js'),
@@ -223,7 +195,6 @@ const jsExtensions = [
   },
   {
     name: 'BitmapText',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/BitmapText/JsExtension.js'),
@@ -231,7 +202,6 @@ const jsExtensions = [
   },
   {
     name: 'Screenshot',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Screenshot/JsExtension.js'),
@@ -239,7 +209,6 @@ const jsExtensions = [
   },
   {
     name: 'TextInput',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/TextInput/JsExtension.js'),
@@ -247,7 +216,6 @@ const jsExtensions = [
   },
   {
     name: 'Scene3D',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/3D/JsExtension.js'),
@@ -255,7 +223,6 @@ const jsExtensions = [
   },
   {
     name: 'SpineObject',
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this path is ignored for Flow.
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Spine/JsExtension.js'),

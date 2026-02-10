@@ -31,7 +31,8 @@ type ProfilerRowData = {|
   isCollapsed: boolean,
 |};
 
-const MeasuresTable = (props: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const MeasuresTable = (props: Props) => {
   const [collapsedPaths, setCollapsedPaths] = React.useState({});
 
   const convertToDataRows = (

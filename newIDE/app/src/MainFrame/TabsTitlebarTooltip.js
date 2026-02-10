@@ -54,7 +54,8 @@ type Props = {|
   editorTab: EditorTab,
 |};
 
-const TabsTitlebarTooltip = ({anchorElement, editorTab}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const TabsTitlebarTooltip = ({ anchorElement, editorTab }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const [tooltipStyle, setTooltipStyle] = React.useState<Object>(
     styles.tooltip

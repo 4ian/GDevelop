@@ -56,24 +56,23 @@ type Props = {|
   hideAnimationLoader?: boolean,
 |};
 
-const AnimationPreview = (
-  {
-    animationName,
-    resourceNames,
-    getImageResourceSource,
-    isImageResourceSmooth,
-    timeBetweenFrames,
-    onChangeTimeBetweenFrames,
-    isLooping,
-    hideCheckeredBackground,
-    deactivateControls,
-    displaySpacedView,
-    fixedHeight,
-    fixedWidth,
-    isAssetPrivate,
-    hideAnimationLoader
-  }: Props,
-): React.Node => {
+const AnimationPreview = ({
+  animationName,
+  resourceNames,
+  getImageResourceSource,
+  isImageResourceSmooth,
+  timeBetweenFrames,
+  onChangeTimeBetweenFrames,
+  isLooping,
+  hideCheckeredBackground,
+  deactivateControls,
+  displaySpacedView,
+  fixedHeight,
+  fixedWidth,
+  isAssetPrivate,
+  hideAnimationLoader,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const forceUpdate = useForceUpdate();
 
   const fps = Number.parseFloat((1 / timeBetweenFrames).toFixed(4));

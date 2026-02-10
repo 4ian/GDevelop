@@ -24,7 +24,9 @@ type Props = {|
 |};
 
 export class Toolbar extends React.PureComponent<Props> {
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const {
       onPlay,
       onPause,

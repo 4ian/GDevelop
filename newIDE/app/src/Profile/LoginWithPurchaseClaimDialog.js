@@ -57,18 +57,17 @@ type Props = {|
   claimedProductOptions: ClaimedProductOptions,
 |};
 
-const LoginWithPurchaseClaimDialog = (
-  {
-    onClose,
-    onGoToCreateAccount,
-    onLogin,
-    onLoginWithProvider,
-    onForgotPassword,
-    loginInProgress,
-    error,
-    claimedProductOptions: {productListingData: claimedProduct}
-  }: Props,
-): React.Node => {
+const LoginWithPurchaseClaimDialog = ({
+  onClose,
+  onGoToCreateAccount,
+  onLogin,
+  onLoginWithProvider,
+  onForgotPassword,
+  loginInProgress,
+  error,
+  claimedProductOptions: { productListingData: claimedProduct },
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -149,9 +148,7 @@ const LoginWithPurchaseClaimDialog = (
     <Dialog
       title={null} // This dialog has a custom design to be more welcoming, the title is set in the content.
       id="login-dialog"
-      // $FlowFixMe[incompatible-type]
       actions={actions}
-      // $FlowFixMe[incompatible-type]
       secondaryActions={secondaryActions}
       cannotBeDismissed={loginInProgress}
       onRequestClose={onClose}

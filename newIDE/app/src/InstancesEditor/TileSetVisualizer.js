@@ -225,20 +225,19 @@ type Props = {|
   onScrollY: number => void,
 |};
 
-const TileSetVisualizer = (
-  {
-    project,
-    objectConfiguration,
-    tileMapTileSelection,
-    onSelectTileMapTile,
-    allowMultipleSelection,
-    allowRectangleSelection,
-    showPaintingToolbar,
-    interactive,
-    onAtlasImageLoaded,
-    onScrollY
-  }: Props,
-): React.Node => {
+const TileSetVisualizer = ({
+  project,
+  objectConfiguration,
+  tileMapTileSelection,
+  onSelectTileMapTile,
+  allowMultipleSelection,
+  allowRectangleSelection,
+  showPaintingToolbar,
+  interactive,
+  onAtlasImageLoaded,
+  onScrollY,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const forceUpdate = useForceUpdate();
   const atlasResourceName = objectConfiguration
     .getProperties()

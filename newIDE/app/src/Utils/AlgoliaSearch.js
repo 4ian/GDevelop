@@ -15,14 +15,14 @@ let firstLoad = true;
  * initialization (https://github.com/algolia/react-instantsearch/issues/1111).
  */
 export const searchClient = {
-  async search(requests: any): Promise<any> | Promise<{ results: Array<{ hits: Array<empty> }> }> {
+  // $FlowFixMe[signature-verification-failure]
+  async search(requests: any) {
     if (firstLoad === true) {
       firstLoad = false;
       return Promise.resolve({
         results: [{ hits: [] }],
       });
     }
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - The declaration is not clear.
     // $FlowFixMe[prop-missing]
     return algoliaClient.search(requests);
@@ -63,7 +63,8 @@ export const getHierarchyAsArray = (
     // $FlowFixMe[incompatible-return] - Object.entries does not keep values types.
     .map(item => item[1]);
 
-export const getHitLastHierarchyLevel = (hit: AlgoliaSearchHit): string => {
+// $FlowFixMe[signature-verification-failure]
+export const getHitLastHierarchyLevel = (hit: AlgoliaSearchHit) => {
   const hierarchyArray = getHierarchyAsArray(hit.hierarchy);
   return hierarchyArray[hierarchyArray.length - 1];
 };

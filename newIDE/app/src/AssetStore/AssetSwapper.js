@@ -91,7 +91,8 @@ const unswappableObjectTypes = [
   'TileMap::SimpleTileMap',
   'Video::VideoObject',
 ];
-export const canSwapAssetOfObject = (object: gdObject): boolean =>
+// $FlowFixMe[signature-verification-failure]
+export const canSwapAssetOfObject = (object: gdObject) =>
   !unswappableObjectTypes.includes(object.getType());
 
 const mergeAnimations = function<A: { name: string }>(

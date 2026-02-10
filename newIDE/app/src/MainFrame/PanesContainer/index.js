@@ -142,7 +142,12 @@ const useSwipeableDrawer = ({
   );
 };
 
-export const PanesContainer = ({renderPane, hasEditorsInLeftPane, hasEditorsInRightPane}: Props): React.MixedElement => {
+export const PanesContainer = ({
+  renderPane,
+  hasEditorsInLeftPane,
+  hasEditorsInRightPane,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const forceUpdate = useForceUpdate();
   const debouncedForceUpdate = useDebounce(forceUpdate, 200);

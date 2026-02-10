@@ -13,7 +13,12 @@ type Props = {|
   onSoundError?: () => void,
 |};
 
-const CompactSoundPlayer = ({soundSrc, onSoundLoaded, onSoundError}: Props): React.Node => {
+const CompactSoundPlayer = ({
+  soundSrc,
+  onSoundLoaded,
+  onSoundError,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const audioRef = React.useRef<?HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);

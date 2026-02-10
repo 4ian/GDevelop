@@ -15,7 +15,8 @@ type Props = {|
   onGameUpdated: (updatedGame: Game) => void,
 |};
 
-const GameMonetization = ({game, onGameUpdated}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const GameMonetization = ({ game, onGameUpdated }: Props) => {
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );

@@ -19,7 +19,8 @@ export default {
   decorators: [alertDecorator, paperDecorator],
 };
 
-export const AlwaysError = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const AlwaysError = () => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock.onAny().reply(500);
 
@@ -38,7 +39,8 @@ export const AlwaysError = (): React.Node => {
   );
 };
 
-export const WorkingCertificateRequestButCertificateError = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WorkingCertificateRequestButCertificateError = () => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock
     .onPost(`${GDevelopBuildApi.baseUrl}/signing-credential/action/create-csr`)
@@ -64,7 +66,8 @@ export const WorkingCertificateRequestButCertificateError = (): React.Node => {
   );
 };
 
-export const WorkingCertificateRequestButCertificateUnknownKind = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WorkingCertificateRequestButCertificateUnknownKind = () => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock
     .onPost(`${GDevelopBuildApi.baseUrl}/signing-credential/action/create-csr`)
@@ -97,7 +100,8 @@ export const WorkingCertificateRequestButCertificateUnknownKind = (): React.Node
   );
 };
 
-export const AllWorking = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const AllWorking = () => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock
     .onPost(`${GDevelopBuildApi.baseUrl}/signing-credential/action/create-csr`)

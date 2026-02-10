@@ -101,7 +101,8 @@ const searchPageState: AssetStorePageState = {
   displayAssets: true,
 };
 
-export const isHomePage = (pageState: AssetStorePageState): false | boolean => {
+// $FlowFixMe[signature-verification-failure]
+export const isHomePage = (pageState: AssetStorePageState) => {
   return (
     pageState === assetStoreHomePageState ||
     (!pageState.openedAssetShortHeader &&
@@ -114,7 +115,8 @@ export const isHomePage = (pageState: AssetStorePageState): false | boolean => {
   );
 };
 
-export const isSearchResultPage = (pageState: AssetStorePageState): false | true => {
+// $FlowFixMe[signature-verification-failure]
+export const isSearchResultPage = (pageState: AssetStorePageState) => {
   return (
     !isHomePage(pageState) &&
     !pageState.openedAssetShortHeader &&
@@ -128,7 +130,8 @@ type AssetStorePageHistory = {|
   previousPages: Array<AssetStorePageState>,
 |};
 
-export const AssetStoreNavigatorContext: React.Context<NavigationState> = React.createContext<NavigationState>({
+// $FlowFixMe[signature-verification-failure]
+export const AssetStoreNavigatorContext = React.createContext<NavigationState>({
   searchText: '',
   setSearchText: () => {},
   getCurrentPage: () => assetStoreHomePageState,
@@ -154,7 +157,10 @@ type AssetStoreNavigatorStateProviderProps = {|
   children: React.Node,
 |};
 
-export const AssetStoreNavigatorStateProvider = (props: AssetStoreNavigatorStateProviderProps): React.MixedElement => {
+export const AssetStoreNavigatorStateProvider = (
+  props: AssetStoreNavigatorStateProviderProps
+// $FlowFixMe[signature-verification-failure]
+) => {
   const [searchText, setSearchText] = React.useState<string>('');
   const [history, setHistory] = React.useState<AssetStorePageHistory>({
     previousPages: [assetStoreHomePageState],

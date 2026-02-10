@@ -16,7 +16,8 @@ export default {
   component: OptionsEditorDialog,
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <I18n>
     {({ i18n }) => (
       <EventsFunctionsExtensionsProvider

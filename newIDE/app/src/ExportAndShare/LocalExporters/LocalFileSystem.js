@@ -67,7 +67,9 @@ class LocalFileSystem {
       }));
   };
 
-  mkDir = (path: string): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  mkDir = (path: string) => {
     if (isURL(path)) {
       // URLs are always assumed to exist.
       return;
@@ -81,7 +83,9 @@ class LocalFileSystem {
     }
     return true;
   };
-  dirExists = (path: string): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  dirExists = (path: string) => {
     if (isURL(path)) {
       // URLs are always assumed to exist.
       return true;
@@ -96,19 +100,27 @@ class LocalFileSystem {
       console.error('clearDir(' + path + ') failed: ' + e);
     }
   };
-  getTempDir = (): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getTempDir = () => {
     return path.join(os.tmpdir(), `GDTMP-${getUID()}`);
   };
-  fileNameFrom = (fullPath: string): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  fileNameFrom = (fullPath: string) => {
     // If URLs are not downloaded, then filenames are not changed.
     if (!this._downloadUrlsToLocalFiles && isURL(fullPath)) return fullPath;
 
     return path.basename(fullPath);
   };
-  dirNameFrom = (fullPath: string): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  dirNameFrom = (fullPath: string) => {
     return path.dirname(fullPath).replace(/\\/g, '/');
   };
-  makeAbsolute = (filename: string, baseDirectory: string): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  makeAbsolute = (filename: string, baseDirectory: string) => {
     if (isURL(filename)) return filename;
 
     if (!this.isAbsolute(baseDirectory))
@@ -122,14 +134,18 @@ class LocalFileSystem {
       .resolve(baseDirectory, path.normalize(filename))
       .replace(/\\/g, '/');
   };
-  makeRelative = (filename: string, baseDirectory: string): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  makeRelative = (filename: string, baseDirectory: string) => {
     if (isURL(filename)) return filename;
 
     return path
       .relative(baseDirectory, path.normalize(filename))
       .replace(/\\/g, '/');
   };
-  isAbsolute = (fullPath: string): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  isAbsolute = (fullPath: string) => {
     if (isURL(fullPath)) return true;
 
     if (fullPath.length === 0) return true;
@@ -138,7 +154,9 @@ class LocalFileSystem {
       (fullPath.length > 1 && fullPath.charAt(1) === ':')
     );
   };
-  copyFile = (source: string, dest: string): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  copyFile = (source: string, dest: string) => {
     if (isURL(source)) {
       // If URLs are not downloaded, then there is nothing to copy.
       if (!this._downloadUrlsToLocalFiles) return true;
@@ -179,7 +197,9 @@ class LocalFileSystem {
     }
     return true;
   };
-  writeToFile = (file: string, contents: string): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  writeToFile = (file: string, contents: string) => {
     try {
       fs.outputFileSync(file, contents);
     } catch (e) {
@@ -188,7 +208,9 @@ class LocalFileSystem {
     }
     return true;
   };
-  readFile = (file: string): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  readFile = (file: string) => {
     try {
       var contents = fs.readFileSync(file);
       return contents.toString();
@@ -197,7 +219,9 @@ class LocalFileSystem {
       return '';
     }
   };
-  readDir = (path: string, ext: string): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  readDir = (path: string, ext: string) => {
     ext = ext.toUpperCase();
     var output = new gd.VectorString();
     try {
@@ -220,7 +244,9 @@ class LocalFileSystem {
 
     return output;
   };
-  fileExists = (filePath: string): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  fileExists = (filePath: string) => {
     // Check if a file WILL exists once downloaded.
     const normalizedFilePath = pathPosix.normalize(filePath);
     const shouldTheFileBeDownloaded = !!this._filesToDownload[

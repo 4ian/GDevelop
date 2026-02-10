@@ -74,20 +74,25 @@ export default class DebuggerContent extends React.Component<Props, State> {
   // $FlowFixMe[missing-local-annot]
   state = {
     selectedInspector: null,
-    selectedInspectorFullPath: [] as Array<empty>,
+    // $FlowFixMe[signature-verification-failure]
+    selectedInspectorFullPath: [],
     rawMode: false,
   };
 
   _editors: ?EditorMosaicInterface = null;
 
-  isProfilerShown = (): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  isProfilerShown = () => {
     return (
       !!this._editors &&
       this._editors.getOpenedEditorNames().includes('profiler')
     );
   };
 
-  isConsoleShown = (): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  isConsoleShown = () => {
     return (
       !!this._editors &&
       this._editors.getOpenedEditorNames().includes('console')
@@ -102,7 +107,9 @@ export default class DebuggerContent extends React.Component<Props, State> {
     if (this._editors) this._editors.toggleEditor('console', 'bottom');
   };
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const {
       gameData,
       onRefresh,
@@ -251,11 +258,9 @@ export default class DebuggerContent extends React.Component<Props, State> {
         {({ getDefaultEditorMosaicNode, setDefaultEditorMosaicNode }) => (
           <EditorMosaic
             ref={editors => (this._editors = editors)}
-            // $FlowFixMe[incompatible-type]
             editors={editors}
             centralNodeId="selected-inspector"
             initialNodes={
-              // $FlowFixMe[incompatible-type]
               getDefaultEditorMosaicNode('debugger') || initialMosaicEditorNodes
             }
             onPersistNodes={node =>

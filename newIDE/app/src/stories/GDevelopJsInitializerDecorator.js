@@ -17,9 +17,7 @@ global.gd = {
 
 // Will contain the result of makeTestProject
 export let testProject: TestProject =
-  // $FlowFixMe[incompatible-type]
   // $FlowFixMe[incompatible-type] - make a "bad" object on purpose to ease debugging
-  // $FlowFixMe[incompatible-type]
   {
     I_AM_NOT_YET_INITIALIZED_YOU_MUST_USE_TESTPROJECT_INSIDE_A_STORY_ONLY: true,
   };
@@ -63,7 +61,6 @@ const GDevelopJsInitializer = ({ children }: GDevelopJsInitializerProps) => {
         // $FlowFixMe[invalid-computed-prop]
         testProject[key] = newTestProject[key];
       }
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - clean the "bad" object made on purpose to ease debugging
       // $FlowFixMe[prop-missing]
       delete testProject.I_AM_NOT_YET_INITIALIZED_YOU_MUST_USE_TESTPROJECT_INSIDE_A_STORY_ONLY;

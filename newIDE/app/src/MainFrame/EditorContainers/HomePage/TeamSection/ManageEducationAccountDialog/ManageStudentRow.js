@@ -58,7 +58,15 @@ type Props = {|
   |}) => Promise<void>,
 |};
 
-const ManageStudentRow = ({member, isSelected, isArchived, onSelect, onChangePassword, onEdit}: Props): React.Node => {
+const ManageStudentRow = ({
+  member,
+  isSelected,
+  isArchived,
+  onSelect,
+  onChangePassword,
+  onEdit,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const [isEditingPassword, setIsEditingPassword] = React.useState<boolean>(
     false

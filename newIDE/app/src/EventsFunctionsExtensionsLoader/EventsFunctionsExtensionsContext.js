@@ -43,7 +43,8 @@ const defaultState = {
   getIncludeFileHashs: () => ({}),
 };
 
-const EventsFunctionsExtensionsContext: React.Context<EventsFunctionsExtensionsState> = React.createContext<EventsFunctionsExtensionsState>(
+// $FlowFixMe[signature-verification-failure]
+const EventsFunctionsExtensionsContext = React.createContext<EventsFunctionsExtensionsState>(
   // $FlowFixMe[incompatible-type]
   defaultState
 );

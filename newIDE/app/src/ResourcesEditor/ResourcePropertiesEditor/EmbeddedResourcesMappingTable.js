@@ -22,7 +22,8 @@ const styles = {
   },
 };
 
-export const EmbeddedResourcesMappingTable = ({resources}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const EmbeddedResourcesMappingTable = ({ resources }: Props) => {
   if (resources.length !== 1) return null;
 
   const resource = resources[0];

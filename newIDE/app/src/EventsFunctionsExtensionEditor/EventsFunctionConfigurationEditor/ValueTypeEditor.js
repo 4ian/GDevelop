@@ -60,7 +60,8 @@ export default function ValueTypeEditor({
   onTypeUpdated,
   getLastObjectParameterObjectType,
   isExpressionType,
-}: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: Props) {
   const forceUpdate = useForceUpdate();
 
   const type = convertTypeToSelectorValue(valueTypeMetadata.getName());

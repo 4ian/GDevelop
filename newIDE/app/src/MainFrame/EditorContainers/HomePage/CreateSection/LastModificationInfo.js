@@ -23,7 +23,6 @@ type LastModificationInfoProps = {|
   file: FileMetadataAndStorageProviderName,
   lastModifiedInfo?: LastModifiedInfo | null, // If null, the project has been modified last by the current user.
   storageProvider: ?StorageProvider,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   currentFileMetadata: ?FileMetadata,
   textColor?: 'primary' | 'secondary',
@@ -31,19 +30,18 @@ type LastModificationInfoProps = {|
   textPrefix?: React.Node,
 |};
 
-const LastModificationInfo = (
-  {
-    file,
-    lastModifiedInfo,
-    storageProvider,
-    authenticatedUser,
-    currentFileMetadata,
-    textColor = 'primary',
-    // $FlowFixMe[incompatible-type]
-    textSize = 'body',
-    textPrefix
-  }: LastModificationInfoProps,
-): React.Node => {
+const LastModificationInfo = ({
+  file,
+  lastModifiedInfo,
+  storageProvider,
+  authenticatedUser,
+  currentFileMetadata,
+  textColor = 'primary',
+  // $FlowFixMe[incompatible-type]
+  textSize = 'body',
+  textPrefix,
+// $FlowFixMe[signature-verification-failure]
+}: LastModificationInfoProps) => {
   const isProjectSavedOnCloud =
     !!storageProvider && storageProvider.internalName === 'Cloud';
   const isCurrentProjectOpened =

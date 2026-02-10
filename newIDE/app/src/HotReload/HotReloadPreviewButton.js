@@ -18,7 +18,8 @@ export default function HotReloadPreviewButton({
   launchProjectCodeAndDataPreview,
   hasPreviewsRunning,
   isCodeGenerationRequired,
-}: HotReloadPreviewButtonProps): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: HotReloadPreviewButtonProps) {
   const icon = hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />;
   const label = hasPreviewsRunning ? (
     <Trans>Apply changes to preview</Trans>

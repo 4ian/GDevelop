@@ -7,7 +7,8 @@ export type ClipboardKind = string;
 
 let internalClipboard = '';
 
-export const copyTextToClipboard = (text: string): Promise<void> =>
+// $FlowFixMe[signature-verification-failure]
+export const copyTextToClipboard = (text: string) =>
   navigator.clipboard.writeText(text);
 
 const mangleClipboardKind = (kind: ClipboardKind): string => {

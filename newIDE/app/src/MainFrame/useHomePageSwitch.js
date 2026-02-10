@@ -18,15 +18,14 @@ const homePageRoutes: Route[] = [
  * This hook is used to be able to use route arguments from anywhere to open the homepage.
  * It should close dialogs that prevent the navigation to the homepage.
  */
-const useHomePageSwitch = (
-  {
-    openHomePage,
-    closeDialogs
-  }: {|
-    openHomePage: () => void,
-    closeDialogs: () => void,
-  |},
-): { navigateToRoute: any } => {
+const useHomePageSwitch = ({
+  openHomePage,
+  closeDialogs,
+}: {|
+  openHomePage: () => void,
+  closeDialogs: () => void,
+// $FlowFixMe[signature-verification-failure]
+|}) => {
   const {
     navigateToRoute,
     removeRouteArguments,
@@ -39,7 +38,6 @@ const useHomePageSwitch = (
       const initialDialog = routeArguments['initial-dialog'];
       if (!initialDialog) return;
 
-      // $FlowFixMe[incompatible-type]
       if (homePageRoutes.includes(initialDialog)) {
         closeDialogs();
         openHomePage();

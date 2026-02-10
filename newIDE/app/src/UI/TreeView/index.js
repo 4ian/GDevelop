@@ -444,7 +444,6 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
       if (list) {
         // Browse flattenedData in reverse order since scrollToItem is mainly used
         // to scroll to newly added object that is appended at the end of the list.
-        // $FlowFixMe[incompatible-type]
         // $FlowFixMe[incompatible-type] - Method introduced in 2022.
         const index = flattenedData.findLastIndex(node => node.id === itemId);
         if (index >= 0) {
@@ -778,9 +777,7 @@ type TreeViewComponent = <Item: ItemBaseAttributes>(
 ) => React.Node;
 
 // Search for "treeview typing issues" in the codebase.
-// $FlowFixMe[incompatible-type]
 // $FlowFixMe[incompatible-type] - InnerTreeView ref is not properly typed.
-// $FlowFixMe[incompatible-type]
 // $FlowFixMe[incompatible-exact]
 const TreeView: TreeViewComponent = (React.forwardRef(InnerTreeView): any);
 

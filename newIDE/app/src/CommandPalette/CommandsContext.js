@@ -4,7 +4,8 @@ import * as React from 'react';
 import CommandManager, { CommandManagerInterface } from './CommandManager';
 import useValueWithInit from '../Utils/UseRefInitHook';
 
-const CommandsContext: React.Context<any> = React.createContext<CommandManagerInterface>(
+// $FlowFixMe[signature-verification-failure]
+const CommandsContext = React.createContext<CommandManagerInterface>(
   new CommandManager()
 );
 
@@ -12,7 +13,8 @@ type Props = {
   children: React.Node,
 };
 
-export const CommandsContextProvider = (props: Props): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+export const CommandsContextProvider = (props: Props) => {
   const commandManager = useValueWithInit<CommandManager>(
     () => new CommandManager()
   );

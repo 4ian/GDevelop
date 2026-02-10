@@ -133,9 +133,8 @@ const useStylesForGreyedListItem = makeStyles(theme => {
  *
  * Also used outside of a List by virtualized lists.
  */
-export const ListItem: component(
-  ...{ ...ListItemProps, +ref?: React.RefSetter<ListItemRefType> }
-) = React.forwardRef<ListItemProps, ListItemRefType>(
+// $FlowFixMe[signature-verification-failure]
+export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
   (props: ListItemProps, ref) => {
     const [isOpen, setIsOpen] = React.useState(!!props.initiallyOpen);
     const elementWithMenu = React.useRef<?ElementWithMenu>(null);
@@ -248,7 +247,6 @@ export const ListItem: component(
           disabled={props.disabled}
           selected={props.selected}
           style={{
-            // $FlowFixMe[incompatible-type]
             // $FlowFixMe[incompatible-type] - Flow is not happy about two spreads.
             // $FlowFixMe[exponential-spread]
             ...noPaddingStyle,
@@ -306,7 +304,6 @@ export const ListItem: component(
             onClick={onClickItem}
             disabled={props.disabled}
             style={{
-              // $FlowFixMe[incompatible-type]
               // $FlowFixMe[incompatible-type] - Flow is not happy about two spreads.
               // $FlowFixMe[exponential-spread]
               ...noPaddingStyle,
@@ -386,7 +383,8 @@ type ListProps = {|
 /**
  * List based on Material-UI List.
  */
-export const List = (props: ListProps): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const List = (props: ListProps) => {
   let listStyle = { ...props.style };
   if (props.useGap) {
     // $FlowFixMe[incompatible-type]

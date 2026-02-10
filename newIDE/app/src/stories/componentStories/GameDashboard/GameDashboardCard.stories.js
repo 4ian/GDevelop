@@ -22,7 +22,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const UnpublishedGame = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const UnpublishedGame = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       storageProviders={[CloudStorageProvider]}
@@ -47,7 +48,8 @@ export const UnpublishedGame = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const PublishedGame = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const PublishedGame = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       storageProviders={[CloudStorageProvider]}
@@ -72,7 +74,8 @@ export const PublishedGame = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const CurrentlyOpenedGame = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const CurrentlyOpenedGame = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       storageProviders={[CloudStorageProvider]}
@@ -97,7 +100,8 @@ export const CurrentlyOpenedGame = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const SavingGame = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const SavingGame = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       storageProviders={[CloudStorageProvider]}
@@ -122,7 +126,8 @@ export const SavingGame = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const DisabledGame = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const DisabledGame = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       storageProviders={[CloudStorageProvider]}
@@ -147,7 +152,8 @@ export const DisabledGame = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const LocalProject = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const LocalProject = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       dashboardItem={{
@@ -172,7 +178,8 @@ export const LocalProject = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const OpenedLocalProject = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const OpenedLocalProject = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       dashboardItem={{
@@ -197,7 +204,8 @@ export const OpenedLocalProject = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const DisabledLocalProject = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const DisabledLocalProject = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       dashboardItem={{
@@ -222,7 +230,8 @@ export const DisabledLocalProject = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const CloudProject = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const CloudProject = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       dashboardItem={{
@@ -247,7 +256,8 @@ export const CloudProject = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const OpenedCloudProject = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const OpenedCloudProject = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       dashboardItem={{
@@ -272,7 +282,8 @@ export const OpenedCloudProject = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const DisabledCloudProject = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const DisabledCloudProject = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameDashboardCard
       dashboardItem={{

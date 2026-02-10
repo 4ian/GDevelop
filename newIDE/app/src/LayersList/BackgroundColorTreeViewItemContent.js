@@ -27,7 +27,9 @@ export class BackgroundColorTreeViewItemContent implements TreeViewItemContent {
     return backgroundColorId;
   }
 
-  getRightButton(i18n: I18nType): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getRightButton(i18n: I18nType) {
     return [];
   }
 
@@ -45,7 +47,9 @@ export class BackgroundColorTreeViewItemContent implements TreeViewItemContent {
 
   onClick(): void {}
 
-  buildMenuTemplate(i18n: I18nType, index: number): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  buildMenuTemplate(i18n: I18nType, index: number) {
     return [];
   }
 

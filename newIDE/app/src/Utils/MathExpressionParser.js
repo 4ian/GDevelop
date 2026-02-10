@@ -105,7 +105,8 @@ const top = (stack: string[]): string | typeof undefined =>
  * https://github.com/poteat/shunting-yard-typescript
  * https://blog.kallisti.net.nz/2008/02/extension-to-the-shunting-yard-algorithm-to-allow-variable-numbers-of-arguments-to-functions/
  */
-export function shuntingYard(tokens: string[]): Array<string> {
+// $FlowFixMe[signature-verification-failure]
+export function shuntingYard(tokens: string[]) {
   const output: string[] = [];
   const operatorStack: string[] = [];
 
@@ -184,7 +185,8 @@ export function shuntingYard(tokens: string[]): Array<string> {
  * https://en.wikipedia.org/wiki/Reverse_Polish_notation
  * https://github.com/poteat/shunting-yard-typescript
  */
-export function evalReversePolishNotation(tokens: string[]): number {
+// $FlowFixMe[signature-verification-failure]
+export function evalReversePolishNotation(tokens: string[]) {
   const stack: string[] = [];
 
   // $FlowIgnore
@@ -223,7 +225,8 @@ export function evalReversePolishNotation(tokens: string[]): number {
  *
  * https://gist.github.com/tchayen/44c28e8d4230b3b05e9f
  */
-export function tokenize(expression: string): Array<string> {
+// $FlowFixMe[signature-verification-failure]
+export function tokenize(expression: string) {
   // "1  +" => "1 +"
   const expr = expression.replace(/\s+/g, ' ');
 
@@ -313,7 +316,8 @@ export function tokenize(expression: string): Array<string> {
   return tokens;
 }
 
-export function calculate(expression: string): number {
+// $FlowFixMe[signature-verification-failure]
+export function calculate(expression: string) {
   const tokens = tokenize(expression);
   const rpn = shuntingYard(tokens);
   return evalReversePolishNotation(rpn);

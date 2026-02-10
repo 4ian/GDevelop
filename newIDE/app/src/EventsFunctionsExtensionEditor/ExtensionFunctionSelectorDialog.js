@@ -46,7 +46,6 @@ const FunctionListItem = ({
   description: React.Node,
 |}) => {
   return (
-    // $FlowFixMe[incompatible-type]
     <ListItem
       leftIcon={icon}
       primaryText={name}
@@ -63,7 +62,8 @@ export default function ExtensionFunctionSelectorDialog({
   eventsFunctionsContainer,
   onChoose,
   onCancel,
-}: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: Props) {
   const [showAdvanced, setShowAdvanced] = React.useState(false);
 
   return (

@@ -49,7 +49,10 @@ const gd: libGDevelop = global.gd;
 
 const isDev = Window.isDev();
 
-export const useProjectNeedToBeSavedAlertDialog = (canInstallPrivateAsset: () => boolean): ((assetShortHeader: AssetShortHeader) => Promise<boolean>) => {
+export const useProjectNeedToBeSavedAlertDialog = (
+  canInstallPrivateAsset: () => boolean
+// $FlowFixMe[signature-verification-failure]
+) => {
   const { showAlert } = useAlertDialog();
   return async (assetShortHeader: AssetShortHeader): Promise<boolean> => {
     const isPrivate = isPrivateAsset(assetShortHeader);
@@ -67,7 +70,8 @@ export const useProjectNeedToBeSavedAlertDialog = (canInstallPrivateAsset: () =>
   };
 };
 
-export const useFetchAssets = (): ((assetShortHeaders: Array<AssetShortHeader>) => Promise<Array<Asset>>) => {
+// $FlowFixMe[signature-verification-failure]
+export const useFetchAssets = () => {
   const { environment } = React.useContext(AssetStoreContext);
 
   const { fetchPrivateAsset } = React.useContext(
@@ -103,28 +107,20 @@ export const useFetchAssets = (): ((assetShortHeaders: Array<AssetShortHeader>) 
   };
 };
 
-export const useInstallAsset = (
-  {
-    project,
-    targetObjectFolderOrObjectWithContext,
-    resourceManagementProps,
-    onWillInstallExtension,
-    onExtensionInstalled
-  }: {|
-    project: ?gdProject,
-    targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
-    resourceManagementProps: ResourceManagementProps,
-    onWillInstallExtension: (extensionNames: Array<string>) => void,
-    onExtensionInstalled: (extensionNames: Array<string>) => void,
-  |},
-): ((
-  {
-    assetShortHeader: AssetShortHeader,
-    objectsContainer: gdObjectsContainer,
-    requestedObjectName?: string,
-    setIsAssetBeingInstalled: (boolean) => void,
-  }
-) => Promise<InstallAssetOutput | null>) => {
+export const useInstallAsset = ({
+  project,
+  targetObjectFolderOrObjectWithContext,
+  resourceManagementProps,
+  onWillInstallExtension,
+  onExtensionInstalled,
+}: {|
+  project: ?gdProject,
+  targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
+  resourceManagementProps: ResourceManagementProps,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
+// $FlowFixMe[signature-verification-failure]
+|}) => {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const { openedAssetPack } = shopNavigationState.getCurrentPage();
   const { installPrivateAsset } = React.useContext(
@@ -631,7 +627,8 @@ function NewObjectDialog({
   );
 }
 
-const NewObjectDialogWithErrorBoundary = (props: Props): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+const NewObjectDialogWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>New Object dialog</Trans>}
     scope="new-object-dialog"

@@ -34,7 +34,8 @@ const onlineWebExporter: Exporter = {
   exportPipeline: fakeBrowserOnlineWebExportPipeline,
 };
 
-export const Default = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => {
   const [
     chosenExporterSection,
     setChosenExporterSection,
@@ -61,7 +62,8 @@ export const Default = (): React.Node => {
   );
 };
 
-export const OnlineWebExporterSelected = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const OnlineWebExporterSelected = () => {
   const [
     chosenExporterSection,
     setChosenExporterSection,
@@ -90,7 +92,8 @@ export const OnlineWebExporterSelected = (): React.Node => {
   );
 };
 
-export const OnlineWebExporterSelectedForGameNotOwned = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const OnlineWebExporterSelectedForGameNotOwned = () => {
   const [
     chosenExporterSection,
     setChosenExporterSection,
@@ -119,7 +122,8 @@ export const OnlineWebExporterSelectedForGameNotOwned = (): React.Node => {
   );
 };
 
-export const OnlyOnlineWebExporter = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const OnlyOnlineWebExporter = () => {
   const [
     chosenExporterSection,
     setChosenExporterSection,

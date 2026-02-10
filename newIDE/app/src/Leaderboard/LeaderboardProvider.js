@@ -136,7 +136,6 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
             // $FlowFixMe[prop-missing]
             leaderboardsByIdsWithUpdatedPrimaryFlags[leaderboardId] = {
               ...leaderboard,
-              // $FlowFixMe[incompatible-type]
               // $FlowFixMe[incompatible-type]: known error where Flow returns mixed for object value https://github.com/facebook/flow/issues/2221
               primary: action.payload.primary ? undefined : leaderboard.primary,
             };
@@ -185,7 +184,8 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
   }
 };
 
-const LeaderboardProvider = ({gameId, children}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const LeaderboardProvider = ({ gameId, children }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   // Ensure that only one request for leaderboards list is sent at the same time.
   const isListingLeaderboards = React.useRef(false);
@@ -438,7 +438,6 @@ const LeaderboardProvider = ({gameId, children}: Props): React.Node => {
     <LeaderboardContext.Provider
       value={{
         leaderboards: !!leaderboardsByIds
-          // $FlowFixMe[incompatible-type]
           ? // $FlowFixMe[incompatible-type]
             Object.values(leaderboardsByIds)
           : null,

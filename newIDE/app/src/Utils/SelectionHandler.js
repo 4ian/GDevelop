@@ -11,9 +11,11 @@ type SelectionState<T> = {
   [number]: ?T,
 };
 
-export const getInitialSelection = (): {} => ({});
+// $FlowFixMe[signature-verification-failure]
+export const getInitialSelection = () => ({});
 
-export const clearSelection = (): {} => getInitialSelection();
+// $FlowFixMe[signature-verification-failure]
+export const clearSelection = () => getInitialSelection();
 
 export const getSelection = <T: ObjectType>(
   selection: SelectionState<T>

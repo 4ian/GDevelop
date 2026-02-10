@@ -14,7 +14,8 @@ export default {
   component: ExtensionFunctionSelectorDialog,
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <I18n>
     {({ i18n }) => (
       <ExtensionFunctionSelectorDialog

@@ -38,7 +38,6 @@ const PrivateTutorialViewDialogStory = ({
 }: {
   tutorial: Tutorial,
   privatePdfTutorial: PrivatePdfTutorial,
-  // $FlowFixMe[value-as-type]
   authenticatedUser?: AuthenticatedUser,
   delayResponse?: number,
   errorCode?: number,
@@ -65,7 +64,8 @@ const PrivateTutorialViewDialogStory = ({
   );
 };
 
-export const Unauthenticated = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Unauthenticated = () => (
   // $FlowFixMe[incompatible-type]
   <PrivateTutorialViewDialogStory
     tutorial={fakeEducationCurriculumPrivateTutorial}
@@ -74,7 +74,8 @@ export const Unauthenticated = (): React.Node => (
   />
 );
 
-export const WithAccess = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithAccess = () => (
   // $FlowFixMe[incompatible-type]
   <PrivateTutorialViewDialogStory
     authenticatedUser={fakeAuthenticatedTeacherFromEducationPlan}
@@ -85,7 +86,8 @@ export const WithAccess = (): React.Node => (
   />
 );
 
-export const Errored = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Errored = () => (
   // $FlowFixMe[incompatible-type]
   <PrivateTutorialViewDialogStory
     authenticatedUser={fakeAuthenticatedTeacherFromEducationPlan}

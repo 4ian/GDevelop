@@ -150,9 +150,7 @@ export default class LegacyRenderedCustomObjectInstance
       const childInstance = new ChildInstance();
       const renderer = ObjectsRenderingService.createNewInstanceRenderer(
         project,
-        // $FlowFixMe[incompatible-type]
         // $FlowFixMe[incompatible-type] Use real object instances.
-        // $FlowFixMe[incompatible-type]
         childInstance,
         childObjectConfiguration,
         this._pixiObject,
@@ -208,7 +206,9 @@ export default class LegacyRenderedCustomObjectInstance
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  ) {
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       objectConfiguration
     );
@@ -330,19 +330,25 @@ export default class LegacyRenderedCustomObjectInstance
     }
   }
 
-  getDefaultWidth(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getDefaultWidth() {
     return this.childrenRenderedInstances.length > 0
       ? this.childrenRenderedInstances[0].getDefaultWidth()
       : 48;
   }
 
-  getDefaultHeight(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getDefaultHeight() {
     return this.childrenRenderedInstances.length > 0
       ? this.childrenRenderedInstances[0].getDefaultHeight()
       : 48;
   }
 
-  getDefaultDepth(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getDefaultDepth() {
     const firstInstance = this.childrenRenderedInstances[0];
     return firstInstance && firstInstance instanceof Rendered3DInstance
       ? firstInstance.getDefaultDepth()
@@ -391,15 +397,21 @@ export default class LegacyRenderedCustomObjectInstance
     return this._proportionalOriginZ * this.getDepth();
   }
 
-  getCenterX(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getCenterX() {
     return this.getWidth() / 2;
   }
 
-  getCenterY(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getCenterY() {
     return this.getHeight() / 2;
   }
 
-  getCenterZ(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getCenterZ() {
     return this.getDepth() / 2;
   }
 }

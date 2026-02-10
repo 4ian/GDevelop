@@ -26,7 +26,11 @@ type Props = {|
   simulateAppStoreProduct: boolean,
 |};
 
-const PrivateGameTemplateThumbnail = ({privateGameTemplateListingData, simulateAppStoreProduct}: Props): React.MixedElement => {
+const PrivateGameTemplateThumbnail = ({
+  privateGameTemplateListingData,
+  simulateAppStoreProduct,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const iconUrl = React.useMemo(
     () =>

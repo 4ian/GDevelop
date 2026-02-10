@@ -130,21 +130,20 @@ type Props = {|
   onEffectAdded: () => void,
 |};
 
-export const CompactLayerPropertiesEditor = (
-  {
-    project,
-    resourceManagementProps,
-    layersContainer,
-    projectScopedContainersAccessor,
-    unsavedChanges,
-    i18n,
-    layer,
-    onEditLayer,
-    onEditLayerEffects,
-    onLayersModified,
-    onEffectAdded
-  }: Props,
-): React.Node => {
+export const CompactLayerPropertiesEditor = ({
+  project,
+  resourceManagementProps,
+  layersContainer,
+  projectScopedContainersAccessor,
+  unsavedChanges,
+  i18n,
+  layer,
+  onEditLayer,
+  onEditLayerEffects,
+  onLayersModified,
+  onEffectAdded,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const forceUpdate = useForceUpdate();
   const [isPropertiesFoldedOrDefault, setIsPropertiesFolded] = React.useState<
     boolean | null
@@ -223,7 +222,6 @@ export const CompactLayerPropertiesEditor = (
                     schema={layerPropertiesSchema}
                     instances={[layer]}
                     onInstancesModified={onLayersModified}
-                    // $FlowFixMe[incompatible-type]
                     onRefreshAllFields={forceRecomputeSchema}
                   />
                 </ColumnStackLayout>

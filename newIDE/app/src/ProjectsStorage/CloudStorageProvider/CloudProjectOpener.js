@@ -16,7 +16,8 @@ import ProjectCache from '../../Utils/ProjectCache';
 const CLOUD_PROJECT_AUTOSAVE_PREFIX = 'cache-autosave:';
 let projectCache;
 
-export const getProjectCache = (): ProjectCache => {
+// $FlowFixMe[signature-verification-failure]
+export const getProjectCache = () => {
   if (projectCache) return projectCache;
   projectCache = new ProjectCache();
   return projectCache;
@@ -34,11 +35,8 @@ class CloudProjectReadingError extends Error {
   }
 }
 
-// $FlowFixMe[value-as-type]
-export const generateOnOpen = (authenticatedUser: AuthenticatedUser): ((
-  fileMetadata: FileMetadata,
-  onProgress?: (progress: number, message: MessageDescriptor) => void
-) => Promise<{ content: any }>) => async (
+// $FlowFixMe[signature-verification-failure]
+export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
   fileMetadata: FileMetadata,
   onProgress?: (progress: number, message: MessageDescriptor) => void
 ): Promise<{|
@@ -108,12 +106,10 @@ export const generateOnOpen = (authenticatedUser: AuthenticatedUser): ((
   }
 };
 
-// $FlowFixMe[value-as-type]
-export const generateOnEnsureCanAccessResources = (authenticatedUser: AuthenticatedUser): ((
-  project: gdProject,
-  fileMetadata: FileMetadata,
-  onProgress?: (progress: number, message: MessageDescriptor) => void
-) => Promise<void>) => async (
+export const generateOnEnsureCanAccessResources = (
+  authenticatedUser: AuthenticatedUser
+// $FlowFixMe[signature-verification-failure]
+) => async (
   project: gdProject,
   fileMetadata: FileMetadata,
   onProgress?: (progress: number, message: MessageDescriptor) => void
@@ -122,13 +118,10 @@ export const generateOnEnsureCanAccessResources = (authenticatedUser: Authentica
   await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
 };
 
-// $FlowFixMe[value-as-type]
-export const generateGetAutoSaveCreationDate = (authenticatedUser: AuthenticatedUser): 
-  | ((
-    fileMetadata: FileMetadata,
-    compareLastModified: boolean
-  ) => Promise<?number>)
-  | void =>
+export const generateGetAutoSaveCreationDate = (
+  authenticatedUser: AuthenticatedUser
+// $FlowFixMe[signature-verification-failure]
+) =>
   ProjectCache.isAvailable()
     ? async (
         fileMetadata: FileMetadata,
@@ -161,8 +154,8 @@ export const generateGetAutoSaveCreationDate = (authenticatedUser: Authenticated
       }
     : undefined;
 
-// $FlowFixMe[value-as-type]
-export const generateOnGetAutoSave = (authenticatedUser: AuthenticatedUser): ((fileMetadata: FileMetadata) => Promise<FileMetadata>) | void =>
+// $FlowFixMe[signature-verification-failure]
+export const generateOnGetAutoSave = (authenticatedUser: AuthenticatedUser) =>
   ProjectCache.isAvailable()
     ? async (fileMetadata: FileMetadata): Promise<FileMetadata> => {
         return {

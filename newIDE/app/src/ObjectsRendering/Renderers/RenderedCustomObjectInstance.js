@@ -106,13 +106,12 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   /** Functor used to render an instance */
   instancesRenderer: gdInitialInstanceJSFunctor;
 
+  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  layoutedInstances = new Map<number, LayoutedInstance>() as Map<number, LayoutedInstance>;
+  layoutedInstances = new Map<number, LayoutedInstance>();
+  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  renderedInstances = new Map<number, RenderedInstance | Rendered3DInstance>() as Map<
-  number,
-  RenderedInstance | Rendered3DInstance,
->;
+  renderedInstances = new Map<number, RenderedInstance | Rendered3DInstance>();
   _propertyMappingRules: Array<PropertyMappingRule>;
 
   constructor(
@@ -163,11 +162,9 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
 
     // Functor used to render an instance
     this.instancesRenderer = new gd.InitialInstanceJSFunctor();
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - invoke is not writable
     // $FlowFixMe[cannot-write]
     this.instancesRenderer.invoke = instancePtr => {
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
       const instance: gdInitialInstance = gd.wrapPointer(
         // $FlowFixMe[incompatible-type]
@@ -308,7 +305,6 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         : new RenderedUnknownInstance(
             this._project,
             instance,
-            // $FlowFixMe[incompatible-type]
             // $FlowFixMe[incompatible-type] It's not actually used.
             null,
             this._pixiObject,
@@ -384,7 +380,9 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  ) {
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       objectConfiguration
     );
@@ -493,9 +491,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       const layer = layers.getLayerAt(layerIndex);
       if (layer.getVisibility()) {
         variant.getInitialInstances().iterateOverInstancesWithZOrdering(
-          // $FlowFixMe[incompatible-type]
           // $FlowFixMe[incompatible-type] - gd.castObject is not supporting typings.
-          // $FlowFixMe[incompatible-type]
           this.instancesRenderer,
           layer.getName()
         );
@@ -603,17 +599,23 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     }
   }
 
-  getDefaultWidth(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getDefaultWidth() {
     const variant = this.getVariant();
     return variant ? variant.getAreaMaxX() - variant.getAreaMinX() : 48;
   }
 
-  getDefaultHeight(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getDefaultHeight() {
     const variant = this.getVariant();
     return variant ? variant.getAreaMaxY() - variant.getAreaMinY() : 48;
   }
 
-  getDefaultDepth(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getDefaultDepth() {
     const variant = this.getVariant();
     return variant ? variant.getAreaMaxZ() - variant.getAreaMinZ() : 48;
   }
@@ -644,15 +646,21 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     return (-variant.getAreaMinZ() / this.getDefaultDepth()) * this.getDepth();
   }
 
-  getCenterX(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getCenterX() {
     return this.getWidth() / 2;
   }
 
-  getCenterY(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getCenterY() {
     return this.getHeight() / 2;
   }
 
-  getCenterZ(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getCenterZ() {
     return this.getDepth() / 2;
   }
 }

@@ -15,7 +15,8 @@ type Props = {|
  * A very simple inspector that display the raw information given by the gameData
  * object.
  */
-const RawContentInspector = ({gameData, onEdit}: Props): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+const RawContentInspector = ({ gameData, onEdit }: Props) => (
   <React.Fragment>
     <EmptyMessage>
       <Trans>

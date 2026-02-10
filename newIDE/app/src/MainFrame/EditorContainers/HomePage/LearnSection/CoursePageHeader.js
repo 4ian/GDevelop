@@ -96,17 +96,16 @@ type Props = {|
   simulateAppStoreProduct?: boolean,
 |};
 
-const CoursePageHeader = (
-  {
-    course,
-    courseChapters,
-    onBuyCourseWithCredits,
-    onBuyCourse,
-    purchasingCourseListingData,
-    setPurchasingCourseListingData,
-    simulateAppStoreProduct
-  }: Props,
-): React.Node => {
+const CoursePageHeader = ({
+  course,
+  courseChapters,
+  onBuyCourseWithCredits,
+  onBuyCourse,
+  purchasingCourseListingData,
+  setPurchasingCourseListingData,
+  simulateAppStoreProduct,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { listedCourses } = React.useContext(CourseStoreContext);
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();
@@ -208,7 +207,6 @@ const CoursePageHeader = (
                           </div>
                         )}
                     </ResponsiveLineStackLayout>
-                    {/* $FlowFixMe[incompatible-type] */}
                     <Text size="title" noMargin style={styles.title}>
                       {selectMessageByLocale(i18n, course.titleByLocale)}
                     </Text>

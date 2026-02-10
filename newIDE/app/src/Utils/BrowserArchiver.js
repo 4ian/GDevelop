@@ -80,9 +80,7 @@ export const downloadUrlFilesToBlobFiles = async ({
 
   return downloadedBlobs.map(({ item, blob }) => {
     return {
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - any non existing blob is discarded before.
-      // $FlowFixMe[incompatible-type]
       blob,
       filePath: item.filePath,
     };

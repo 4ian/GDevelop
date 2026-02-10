@@ -92,7 +92,8 @@ const styles = {
   },
 };
 
-export const Separator = (): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+export const Separator = () => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <div
@@ -104,7 +105,8 @@ export const Separator = (): React.MixedElement => {
   );
 };
 
-export const Level2Separator = (): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+export const Level2Separator = () => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <div
@@ -182,22 +184,23 @@ const getFieldLabel = ({
   return field.name;
 };
 
-const CompactPropertiesEditor = (
-  {
-    onInstancesModified,
-    onRefreshAllFields,
-    instances,
-    schema,
-    mode,
-    renderExtraDescriptionText,
-    unsavedChanges,
-    project,
-    resourceManagementProps,
-    preventWrap,
-    removeSpacers,
-    isHidden
-  }: Props,
-): null | React.Node => {
+// $FlowFixMe[recursive-definition]
+// $FlowFixMe[definition-cycle]
+const CompactPropertiesEditor = ({
+  onInstancesModified,
+  onRefreshAllFields,
+  instances,
+  schema,
+  mode,
+  renderExtraDescriptionText,
+  unsavedChanges,
+  project,
+  resourceManagementProps,
+  preventWrap,
+  removeSpacers,
+  isHidden,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const forceUpdate = useForceUpdate();
 
   const onFieldChanged = React.useCallback(

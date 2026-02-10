@@ -20,7 +20,11 @@ type Props = {|
   }) => React.Node,
 |};
 
-const EditorMosaicPlayground = ({renderButtons, renderEditorMosaic}: Props): React.Node => {
+const EditorMosaicPlayground = ({
+  renderButtons,
+  renderEditorMosaic,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const editorRef = React.useRef<
     EditorMosaicInterface | EditorNavigatorInterface | null
   >(null);

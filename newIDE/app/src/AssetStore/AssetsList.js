@@ -263,9 +263,8 @@ type Props = {|
   hideDetails?: boolean,
 |};
 
-const AssetsList: component(
-  ...{ ...Props, +ref?: React.RefSetter<AssetsListInterface> }
-) = React.forwardRef<Props, AssetsListInterface>(
+// $FlowFixMe[signature-verification-failure]
+const AssetsList = React.forwardRef<Props, AssetsListInterface>(
   (
     {
       assetShortHeaders,

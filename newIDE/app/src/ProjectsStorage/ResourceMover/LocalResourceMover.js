@@ -177,7 +177,6 @@ const movers: {
     );
     gd.ProjectResourcesCopier.copyAllResourcesTo(
       project,
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - fileSystem is a gdAbstractFileSystem, despite the assignIn.
       fileSystem,
       projectPath,

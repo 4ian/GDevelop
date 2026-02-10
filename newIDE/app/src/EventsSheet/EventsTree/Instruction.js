@@ -205,7 +205,8 @@ const InstructionMissing = (props: {|
   }
 };
 
-const Instruction = (props: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const Instruction = (props: Props) => {
   const {
     platform,
     instruction,

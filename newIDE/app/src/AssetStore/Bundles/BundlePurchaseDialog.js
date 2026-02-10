@@ -39,16 +39,15 @@ type Props = {|
   onCloseAfterPurchaseDone?: () => void,
 |};
 
-const BundlePurchaseDialog = (
-  {
-    bundleListingData,
-    usageType,
-    onClose,
-    simulateAppStoreProduct,
-    fastCheckout,
-    onCloseAfterPurchaseDone
-  }: Props,
-): React.Node => {
+const BundlePurchaseDialog = ({
+  bundleListingData,
+  usageType,
+  onClose,
+  simulateAppStoreProduct,
+  fastCheckout,
+  onCloseAfterPurchaseDone,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const {
     profile,
     onOpenLoginDialog,
@@ -464,7 +463,6 @@ const BundlePurchaseDialog = (
         maxWidth="sm"
         open
         onRequestClose={onCloseDialog}
-        // $FlowFixMe[incompatible-type]
         actions={dialogActions}
         onApply={purchaseSuccessful ? onCloseDialog : onWillPurchase}
         flexColumnBody

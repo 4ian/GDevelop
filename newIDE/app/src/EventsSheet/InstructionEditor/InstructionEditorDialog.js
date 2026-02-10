@@ -473,7 +473,8 @@ const InstructionEditorDialog = ({
   );
 };
 
-const InstructionEditorDialogWithErrorBoundary = (props: Props): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+const InstructionEditorDialogWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Instruction editor</Trans>}
     scope="scene-events-instruction-editor"

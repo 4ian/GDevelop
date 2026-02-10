@@ -31,7 +31,6 @@ const setupWindowControlsOverlayWatcher = () => {
     return;
   }
 
-  // $FlowFixMe[incompatible-type]
   // $FlowFixMe[incompatible-type] - this API is not handled by Flow.
   // $FlowFixMe[prop-missing]
   const { windowControlsOverlay } = navigator;
@@ -106,7 +105,6 @@ export default class Window {
       // Update the window controls colors on Windows.
       ipcRenderer.invoke('titlebar-set-overlay-options', {
         color: newColor,
-        // $FlowFixMe[incompatible-type]
         symbolColor: isLightRgbColor(hexToRGBColor(newColor))
           ? '#000000'
           : '#ffffff',
@@ -183,19 +181,25 @@ export default class Window {
     }
   }
 
-  static onFocus(cb: () => void): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  static onFocus(cb: () => void) {
     if (!remote) return;
 
     return remote.getCurrentWindow().on('focus', cb);
   }
 
-  static onBlur(cb: () => void): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  static onBlur(cb: () => void) {
     if (!remote) return;
 
     return remote.getCurrentWindow().on('blur', cb);
   }
 
-  static onClose(cb: () => void): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  static onClose(cb: () => void) {
     if (!remote) return;
 
     return remote.getCurrentWindow().on('close', cb);
@@ -304,7 +308,9 @@ export default class Window {
   static showConfirmDialog(
     message: string,
     type?: 'none' | 'info' | 'error' | 'question' | 'warning'
-  ): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  ) {
     if (!dialog || !electron) {
       // eslint-disable-next-line
       return confirm(message);
@@ -382,7 +388,9 @@ export default class Window {
     }
   }
 
-  static hasMainMenu(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  static hasMainMenu() {
     return !!electron;
   }
 

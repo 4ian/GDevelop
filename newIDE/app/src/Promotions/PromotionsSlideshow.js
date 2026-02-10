@@ -23,7 +23,8 @@ type PromotionsSlideshowProps = {|
   type?: 'game' | 'asset-pack' | 'game-template',
 |};
 
-const PromotionsSlideshow = ({type}: PromotionsSlideshowProps): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const PromotionsSlideshow = ({ type }: PromotionsSlideshowProps) => {
   const { promotions, error } = React.useContext(AnnouncementsFeedContext);
   const { navigateToRoute } = React.useContext(RouterContext);
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();

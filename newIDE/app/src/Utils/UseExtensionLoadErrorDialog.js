@@ -31,13 +31,12 @@ type ExtensionLoadErrorDialogProps = {|
   onClose: () => void,
 |};
 
-export const ExtensionLoadErrorDialog = (
-  {
-    erroredExtensionLoadingResults,
-    genericError,
-    onClose
-  }: ExtensionLoadErrorDialogProps,
-): React.Node => {
+export const ExtensionLoadErrorDialog = ({
+  erroredExtensionLoadingResults,
+  genericError,
+  onClose,
+// $FlowFixMe[signature-verification-failure]
+}: ExtensionLoadErrorDialogProps) => {
   return (
     <Dialog
       title={

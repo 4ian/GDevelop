@@ -136,7 +136,13 @@ type Props = {|
   onOpenAbout: () => void,
 |};
 
-export const HomePageMenu = ({setActiveTab, activeTab, onOpenPreferences, onOpenAbout}: Props): React.MixedElement => {
+export const HomePageMenu = ({
+  setActiveTab,
+  activeTab,
+  onOpenPreferences,
+  onOpenAbout,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { limits } = React.useContext(AuthenticatedUserContext);
   const [

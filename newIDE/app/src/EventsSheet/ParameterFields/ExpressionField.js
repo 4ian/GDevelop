@@ -7,30 +7,28 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 
+// $FlowFixMe[signature-verification-failure]
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ExpressionField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?GenericExpressionField>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(
-      ref,
-      () => ({
-        focus,
-      }),
-    );
-    
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
+
     return (
       <GenericExpressionField
         expressionType="number"
         ref={field}
-        id={props.parameterIndex !== undefined
-          ? `parameter-${props.parameterIndex}-expression-field`
-          : undefined}
+        id={
+          props.parameterIndex !== undefined
+            ? `parameter-${props.parameterIndex}-expression-field`
+            : undefined
+        }
         {...props}
       />
     );
-  },
-) as component(
-  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
+  }
 );

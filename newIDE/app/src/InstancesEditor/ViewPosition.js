@@ -19,8 +19,9 @@ export default class ViewPosition {
   _width: number;
   _height: number;
   instancesEditorSettings: InstancesEditorSettings;
+  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  _pixiContainer = new PIXI.Container() as any;
+  _pixiContainer = new PIXI.Container();
 
   constructor({
     initialViewX,
@@ -44,15 +45,21 @@ export default class ViewPosition {
     this._height = height;
   }
 
-  getWidth(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getWidth() {
     return this._width;
   }
 
-  getHeight(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getHeight() {
     return this._height;
   }
 
-  containsPoint(x: number, y: number): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  containsPoint(x: number, y: number) {
     const canvasPoint = this.toCanvasCoordinates(x, y);
     return (
       0 <= canvasPoint[0] &&
@@ -143,11 +150,15 @@ export default class ViewPosition {
     return Math.min(idealZoomOnX, idealZoomOnY) * 0.95; // Add margin so that the object doesn't feel cut
   }
 
-  getViewX(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getViewX() {
     return this.viewX;
   }
 
-  getViewY(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getViewY() {
     return this.viewY;
   }
 

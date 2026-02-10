@@ -140,7 +140,9 @@ export class CodeEditor extends React.Component<Props, State> {
     event.stopPropagation();
   };
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const { MonacoEditor, error } = this.state;
     if (error) {
       return (
@@ -150,7 +152,6 @@ export class CodeEditor extends React.Component<Props, State> {
           </Text>
           <RaisedButton
             label={<Trans>Retry</Trans>}
-            // $FlowFixMe[method-unbinding]
             onClick={this.loadMonacoEditor}
           />
         </React.Fragment>

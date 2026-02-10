@@ -25,7 +25,14 @@ type Props = {|
   isSelected: boolean,
 |};
 
-const AudioResourceLine = ({audioResource, onClickPlay, onClickLine, isPlaying, isSelected}: Props): React.Node => {
+const AudioResourceLine = ({
+  audioResource,
+  onClickPlay,
+  onClickLine,
+  isPlaying,
+  isSelected,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { getAuthorsDisplayLinks } = React.useContext(ResourceStoreContext);

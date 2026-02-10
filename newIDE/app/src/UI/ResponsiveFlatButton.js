@@ -7,7 +7,8 @@ import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
  * A button which hides its label on small screens.
  * Same interface as FlatButton.
  */
-const ResponsiveFlatButton = (props: FlatButtonProps): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const ResponsiveFlatButton = (props: FlatButtonProps) => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   return (
     <FlatButton

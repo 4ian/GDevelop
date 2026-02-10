@@ -13,7 +13,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <ValueStateHolder
     initialValue={1}
     render={(value, onChange) => (

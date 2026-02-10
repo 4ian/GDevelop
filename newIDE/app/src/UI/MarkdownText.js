@@ -96,7 +96,8 @@ type Props = {|
 /**
  * Display a markdown text
  */
-export const MarkdownText = (props: Props): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+export const MarkdownText = (props: Props) => {
   const markdownCustomComponents = React.useMemo(
     () =>
       makeMarkdownCustomComponents(

@@ -34,7 +34,8 @@ const buildArray = [
   completeWebBuild,
 ];
 
-export const DefaultBuildsList = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const DefaultBuildsList = () => (
   <BuildsList
     // $FlowFixMe[incompatible-type]
     builds={buildArray}
@@ -47,7 +48,8 @@ export const DefaultBuildsList = (): React.Node => (
   />
 );
 
-export const ErroredBuildsList = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const ErroredBuildsList = () => (
   <BuildsList
     builds={null}
     authenticatedUser={fakeSilverAuthenticatedUser}

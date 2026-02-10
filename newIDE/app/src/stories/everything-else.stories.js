@@ -1107,7 +1107,6 @@ storiesOf('ParameterFields', module)
           }
           value={value}
           onChange={onChange}
-          // $FlowFixMe[incompatible-type]
           parameterRenderingService={ParameterRenderingService}
         />
       )}
@@ -1132,7 +1131,6 @@ storiesOf('ParameterFields', module)
           }
           value={value}
           onChange={onChange}
-          // $FlowFixMe[incompatible-type]
           parameterRenderingService={ParameterRenderingService}
         />
       )}
@@ -1155,7 +1153,6 @@ storiesOf('ParameterFields', module)
           }
           value={value}
           onChange={onChange}
-          // $FlowFixMe[incompatible-type]
           parameterRenderingService={ParameterRenderingService}
         />
       )}
@@ -1487,7 +1484,6 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
   .add('empty autocompletions (because exact expression)', () => (
     <ExpressionAutocompletionsDisplayer
       project={testProject.project}
-      // $FlowFixMe[incompatible-type]
       expressionAutocompletions={makeFakeExactExpressionAutocompletion()}
       remainingCount={0}
       // $FlowFixMe[incompatible-type]
@@ -2293,9 +2289,7 @@ storiesOf('BrowserPreviewErrorDialog', module)
   .add('networking error', () => (
     <BrowserPreviewErrorDialog
       error={
-        // $FlowFixMe[incompatible-type]
         // $FlowFixMe[incompatible-type] - mocking an Error with "code field"
-        // $FlowFixMe[incompatible-type]
         {
           code: 'NetworkingError',
           message: "Oops, you're offline",

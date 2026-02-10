@@ -21,21 +21,19 @@ import Functions from '@material-ui/icons/Functions';
 import { Trans, t } from '@lingui/macro';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 
+// $FlowFixMe[signature-verification-failure]
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectEffectNameField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?GenericExpressionField | SelectFieldInterface>(
-      null,
+      null
     );
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
-    React.useImperativeHandle(
-      ref,
-      () => ({
-        focus,
-      }),
-    );
-    
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
+
     const {
       scope,
       globalObjectsContainer,
@@ -44,30 +42,28 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       instruction,
       expressionMetadata,
       expression,
-      parameterIndex
+      parameterIndex,
     } = props;
-    const {eventsFunctionsExtension, eventsBasedObject} = scope;
-    
+    const { eventsFunctionsExtension, eventsBasedObject } = scope;
+
     // We don't memo/callback this, as we want to recompute it every time something changes.
     // Because of the function getLastObjectParameterValue.
     const getEffectNames = (): Array<string> => {
-      const objectOrGroupName = getLastObjectParameterValue(
-        {
-          instructionMetadata,
-          instruction,
-          expressionMetadata,
-          expression,
-          parameterIndex,
-        },
-      );
+      const objectOrGroupName = getLastObjectParameterValue({
+        instructionMetadata,
+        instruction,
+        expressionMetadata,
+        expression,
+        parameterIndex,
+      });
       if (!objectOrGroupName) {
         return [];
       }
-      
+
       const object = getObjectByName(
         globalObjectsContainer,
         objectsContainer,
-        objectOrGroupName,
+        objectOrGroupName
       );
       if (object) {
         return enumerateEffectNames(object.getEffects()).sort();
@@ -75,10 +71,10 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       const group = getObjectGroupByName(
         globalObjectsContainer,
         objectsContainer,
-        objectOrGroupName,
+        objectOrGroupName
       );
       if (group) {
-        const effectsNamesByObject: Array<Array<string>> = mapVector(
+        const effectsNamesByObject: string[][] = mapVector(
           // $FlowFixMe[incompatible-exact]
           group.getAllObjectsNames(),
           objectName => {
@@ -86,113 +82,124 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               globalObjectsContainer,
               objectsContainer,
               // $FlowFixMe[incompatible-type]
-              objectName,
+              objectName
             );
             if (!object) {
               return null;
             }
             return enumerateEffectNames(object.getEffects());
-          },
+          }
         ).filter(Boolean);
         return intersection(...effectsNamesByObject).sort();
       }
-      
+
       return [];
     };
-    
+
     const effectNames = getEffectNames();
-    
+
     const isCurrentValueInEffectNamesList = !!effectNames.find(
-      effectName => `"${effectName}"` === props.value,
+      effectName => `"${effectName}"` === props.value
     );
-    
+
     const canAutocomplete = !eventsFunctionsExtension || eventsBasedObject;
-    
+
     // If the current value is not in the list, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(
-      !!props.value && !isCurrentValueInEffectNamesList || !canAutocomplete,
+      (!!props.value && !isCurrentValueInEffectNamesList) || !canAutocomplete
     );
-    
+
     const switchFieldType = () => {
       setIsExpressionField(!isExpressionField);
     };
-    
+
     // $FlowFixMe[missing-local-annot]
     const onChangeSelectValue = (event, value) => {
       props.onChange(event.target.value);
     };
-    
+
     const onChangeTextValue = (value: string) => {
       props.onChange(value);
     };
-    
+
     const fieldLabel = props.parameterMetadata
       ? props.parameterMetadata.getDescription()
       : undefined;
-    
-    const selectOptions = effectNames.map(
-      effectName => {
-        return (
-          <SelectOption
-            key={effectName}
-            value={`"${effectName}"`}
-            label={effectName}
-            shouldNotTranslate
-          />
-        );
-      },
-    );
-    
+
+    const selectOptions = effectNames.map(effectName => {
+      return (
+        <SelectOption
+          key={effectName}
+          value={`"${effectName}"`}
+          label={effectName}
+          shouldNotTranslate
+        />
+      );
+    });
+
     return (
       <TextFieldWithButtonLayout
-        renderTextField={() => !isExpressionField
-          ? <SelectField
-            ref={field}
-            id={props.parameterIndex !== undefined
-              ? `parameter-${props.parameterIndex}-object-effect-name-field`
-              : undefined}
-            value={props.value}
-            onChange={onChangeSelectValue}
-            margin={props.isInline ? 'none' : 'dense'}
-            fullWidth
-            floatingLabelText={fieldLabel}
-            translatableHintText={t`Choose an effect`}
-            helperMarkdownText={props.parameterMetadata &&
-              props.parameterMetadata.getLongDescription() ||
-              null}>
-            {selectOptions}
-          </SelectField>
-          : <GenericExpressionField
-            ref={field}
-            id={props.parameterIndex !== undefined
-              ? `parameter-${props.parameterIndex}-object-effect-name-field`
-              : undefined}
-            expressionType="string"
-            {...props}
-            onChange={onChangeTextValue}
-          />}
-        renderButton={style => canAutocomplete
-          ? isExpressionField
-            ? <FlatButton
-              id="switch-expression-select"
-              leftIcon={<TypeCursorSelect />}
-              style={style}
-              primary
-              label={<Trans>Select</Trans>}
-              onClick={switchFieldType}
+        renderTextField={() =>
+          !isExpressionField ? (
+            <SelectField
+              ref={field}
+              id={
+                props.parameterIndex !== undefined
+                  ? `parameter-${props.parameterIndex}-object-effect-name-field`
+                  : undefined
+              }
+              value={props.value}
+              onChange={onChangeSelectValue}
+              margin={props.isInline ? 'none' : 'dense'}
+              fullWidth
+              floatingLabelText={fieldLabel}
+              translatableHintText={t`Choose an effect`}
+              helperMarkdownText={
+                (props.parameterMetadata &&
+                  props.parameterMetadata.getLongDescription()) ||
+                null
+              }
+            >
+              {selectOptions}
+            </SelectField>
+          ) : (
+            <GenericExpressionField
+              ref={field}
+              id={
+                props.parameterIndex !== undefined
+                  ? `parameter-${props.parameterIndex}-object-effect-name-field`
+                  : undefined
+              }
+              expressionType="string"
+              {...props}
+              onChange={onChangeTextValue}
             />
-            : <RaisedButton
-              id="switch-expression-select"
-              icon={<Functions />}
-              style={style}
-              primary
-              label={<Trans>Use an expression</Trans>}
-              onClick={switchFieldType}
-            />
-          : null}
+          )
+        }
+        renderButton={style =>
+          canAutocomplete ? (
+            isExpressionField ? (
+              <FlatButton
+                id="switch-expression-select"
+                leftIcon={<TypeCursorSelect />}
+                style={style}
+                primary
+                label={<Trans>Select</Trans>}
+                onClick={switchFieldType}
+              />
+            ) : (
+              <RaisedButton
+                id="switch-expression-select"
+                icon={<Functions />}
+                style={style}
+                primary
+                label={<Trans>Use an expression</Trans>}
+                onClick={switchFieldType}
+              />
+            )
+          ) : null
+        }
       />
     );
-  },
-) as component(
-  ...{ ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
+  }
 );

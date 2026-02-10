@@ -46,20 +46,19 @@ type Props = {|
   onBackgroundColorChanged: () => void,
 |};
 
-const ScenePropertiesDialog = (
-  {
-    open,
-    layout,
-    project,
-    onApply,
-    onClose,
-    onOpenMoreSettings,
-    onEditVariables,
-    resourceManagementProps,
-    projectScopedContainersAccessor,
-    onBackgroundColorChanged
-  }: Props,
-): React.Node => {
+const ScenePropertiesDialog = ({
+  open,
+  layout,
+  project,
+  onApply,
+  onClose,
+  onOpenMoreSettings,
+  onEditVariables,
+  resourceManagementProps,
+  projectScopedContainersAccessor,
+  onBackgroundColorChanged,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const [windowTitle, setWindowTitle] = React.useState<string>(
     layout.getWindowDefaultTitle()
   );
@@ -259,7 +258,6 @@ const ScenePropertiesDialog = (
   return (
     <Dialog
       title={<Trans>{layout.getName()} properties</Trans>}
-      // $FlowFixMe[incompatible-type]
       actions={actions}
       secondaryActions={[
         <RaisedButton

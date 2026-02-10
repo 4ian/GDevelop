@@ -38,7 +38,9 @@ export default class RenderedParticleEmitterInstance extends RenderedInstance {
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  ) {
     return 'CppPlatform/Extensions/particleSystemicon.png';
   }
 
@@ -94,19 +96,27 @@ export default class RenderedParticleEmitterInstance extends RenderedInstance {
     this._pixiObject.endFill();
   }
 
-  getDefaultWidth(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getDefaultWidth() {
     return 128;
   }
 
-  getDefaultHeight(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getDefaultHeight() {
     return 128;
   }
 
-  getOriginX(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getOriginX() {
     return 64;
   }
 
-  getOriginY(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getOriginY() {
     return 64;
   }
 }

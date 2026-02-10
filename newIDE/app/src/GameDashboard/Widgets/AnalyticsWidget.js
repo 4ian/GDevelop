@@ -33,7 +33,8 @@ type Props = {|
   gameUrl: ?string,
 |};
 
-const AnalyticsWidget = ({game, onSeeAll, gameMetrics, gameUrl}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const AnalyticsWidget = ({ game, onSeeAll, gameMetrics, gameUrl }: Props) => {
   const hasNoSession = gameMetrics && gameMetrics.length === 0;
   const { isMobile } = useResponsiveWindowSize();
   const oneWeekAgoIsoDate = new Date(

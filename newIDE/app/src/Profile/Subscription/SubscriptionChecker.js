@@ -36,9 +36,8 @@ type Props = {|
   isNotShownDuringInAppTutorial?: boolean,
 |};
 
-const SubscriptionChecker: component(
-  ...{ ...Props, +ref?: React.RefSetter<SubscriptionCheckerInterface> }
-) = React.forwardRef<
+// $FlowFixMe[signature-verification-failure]
+const SubscriptionChecker = React.forwardRef<
   Props,
   SubscriptionCheckerInterface
 >(

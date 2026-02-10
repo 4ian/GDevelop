@@ -7,8 +7,8 @@ import * as PIXI from 'pixi.js-legacy';
 /**
  * Create a renderer for an type of object displayed as an icon
  */
-// $FlowFixMe[cannot-resolve-name]
-export default function makeRenderer(iconPath: string): typeof RenderedIconInstance {
+// $FlowFixMe[signature-verification-failure]
+export default function makeRenderer(iconPath: string) {
   class RenderedIconInstance extends RenderedInstance {
     constructor(
       project: gdProject,

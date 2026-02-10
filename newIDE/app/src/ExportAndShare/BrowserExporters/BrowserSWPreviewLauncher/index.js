@@ -76,7 +76,9 @@ export default class BrowserSWPreviewLauncher extends React.Component<
   PreviewLauncherProps,
   State
 > {
-  canDoNetworkPreview = (): any => false;
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  canDoNetworkPreview = () => false;
 
   // $FlowFixMe[missing-local-annot]
   state = {
@@ -88,7 +90,11 @@ export default class BrowserSWPreviewLauncher extends React.Component<
     browserPreviewDebuggerServer.closeAllConnections();
   };
 
-  immediatelyPreparePreviewWindows = (options: PreparePreviewWindowsOptions): any => {
+  immediatelyPreparePreviewWindows = (
+    options: PreparePreviewWindowsOptions
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  ) => {
     const debuggerIds = options.isForInGameEdition
       ? this.getPreviewDebuggerServer().getExistingEmbeddedGameFrameDebuggerIds()
       : this.getPreviewDebuggerServer().getExistingPreviewDebuggerIds();
@@ -401,11 +407,15 @@ export default class BrowserSWPreviewLauncher extends React.Component<
     }
   };
 
-  getPreviewDebuggerServer(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getPreviewDebuggerServer() {
     return browserPreviewDebuggerServer;
   }
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const { error } = this.state;
 
     if (error) {

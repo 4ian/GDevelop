@@ -82,7 +82,9 @@ export default class LocalPreviewLauncher extends React.Component<
   PreviewLauncherProps,
   State
 > {
-  canDoNetworkPreview = (): any => true;
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  canDoNetworkPreview = () => true;
 
   // $FlowFixMe[missing-local-annot]
   state = {
@@ -459,17 +461,23 @@ export default class LocalPreviewLauncher extends React.Component<
     );
   };
 
-  getPreviewDebuggerServer(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getPreviewDebuggerServer() {
     return localPreviewDebuggerServer;
   }
 
-  _checkSubscriptionForNetworkPreview = (): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _checkSubscriptionForNetworkPreview = () => {
     if (!this._networkPreviewSubscriptionChecker) return true;
 
     return this._networkPreviewSubscriptionChecker.checkUserHasSubscription();
   };
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const {
       networkPreviewDialogOpen,
       networkPreviewHost,

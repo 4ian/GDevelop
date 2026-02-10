@@ -49,12 +49,11 @@ type Props = {|
   onClose: () => void,
 |};
 
-const PurchaseClaimDialog = (
-  {
-    claimedProductOptions: {productListingData, purchaseId, claimableToken},
-    onClose
-  }: Props,
-): React.Node => {
+const PurchaseClaimDialog = ({
+  claimedProductOptions: { productListingData, purchaseId, claimableToken },
+  onClose,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const {
     getAuthorizationHeader,
     profile,
@@ -263,7 +262,6 @@ const PurchaseClaimDialog = (
         maxWidth="md"
         open
         onRequestClose={onClose}
-        // $FlowFixMe[incompatible-type]
         actions={dialogActions}
         onApply={isPurchaseActivated ? onClose : activatePurchase}
         cannotBeDismissed={isActivating || showActivatePrompt} // Prevent the user from continuing by clicking outside.

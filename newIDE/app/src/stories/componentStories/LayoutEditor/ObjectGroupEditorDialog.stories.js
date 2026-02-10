@@ -13,7 +13,8 @@ export default {
   component: ObjectGroupEditorDialog,
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <ObjectGroupEditorDialog
     project={testProject.project}
     projectScopedContainersAccessor={
@@ -31,7 +32,8 @@ export const Default = (): React.Node => (
   />
 );
 
-export const WithLongObjectNames = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithLongObjectNames = () => (
   <ObjectGroupEditorDialog
     project={testProject.project}
     projectScopedContainersAccessor={
@@ -49,7 +51,8 @@ export const WithLongObjectNames = (): React.Node => (
   />
 );
 
-export const Empty = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Empty = () => (
   <ObjectGroupEditorDialog
     project={testProject.project}
     projectScopedContainersAccessor={

@@ -35,10 +35,8 @@ const WrappedChatComponent = (allProps: any) => {
     <FixedHeightFlexContainer height={800}>
       <FixedWidthFlexContainer width={600}>
         <PreferencesContext.Provider
-          // $FlowFixMe[incompatible-type]
           value={{
             ...initialPreferences,
-            // $FlowFixMe[incompatible-type]
             values: {
               ...initialPreferences.values,
               automaticallyUseCreditsForAiRequests: automaticallyUseCredits,
@@ -97,7 +95,8 @@ const addSceneEventsFunctionCallMessage = {
   ],
 };
 
-export const addSceneEventsWithNewlyAddedResources = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const addSceneEventsWithNewlyAddedResources = () => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',
@@ -122,7 +121,8 @@ export const addSceneEventsWithNewlyAddedResources = (): React.Node => (
   />
 );
 
-export const addSceneEventsWithNewlyAddedResourcesWithEditorFunctionCallResult = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const addSceneEventsWithNewlyAddedResourcesWithEditorFunctionCallResult = () => (
   <WrappedChatComponent
     aiRequest={{
       createdAt: '',

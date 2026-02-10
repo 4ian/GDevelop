@@ -156,7 +156,9 @@ export class EventsBasedObjectTreeViewItemContent
     this.props.editName(this.getId());
   }
 
-  buildMenuTemplate(i18n: I18nType, index: number): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  buildMenuTemplate(i18n: I18nType, index: number) {
     return [
       {
         label: i18n._(t`Open visual editor`),
@@ -377,7 +379,9 @@ export class EventsBasedObjectTreeViewItemContent
     this.props.forceUpdate();
   }
 
-  getRightButton(i18n: I18nType): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getRightButton(i18n: I18nType) {
     return {
       icon: <Add />,
       label: i18n._(t`Add a function`),

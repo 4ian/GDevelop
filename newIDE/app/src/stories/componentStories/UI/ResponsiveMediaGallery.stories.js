@@ -12,7 +12,8 @@ export default {
   component: ResponsiveMediaGallery,
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <Paper background="dark">
     <Column>
       <ResponsiveLineStackLayout noColumnMargin>

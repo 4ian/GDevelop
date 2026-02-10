@@ -44,9 +44,8 @@ const renderEmpty = () => {
   );
 };
 
-const ResourcePropertiesEditor: component(
-  ...{ ...Props, +ref?: React.RefSetter<ResourcePropertiesEditorInterface> }
-) = React.forwardRef<
+// $FlowFixMe[signature-verification-failure]
+const ResourcePropertiesEditor = React.forwardRef<
   Props,
   ResourcePropertiesEditorInterface
 >(

@@ -132,7 +132,8 @@ export const initialAssetStoreState: AssetStoreState = {
   getAssetShortHeaderFromId: (id: string) => null,
 };
 
-export const AssetStoreContext: React.Context<AssetStoreState> = React.createContext<AssetStoreState>(
+// $FlowFixMe[signature-verification-failure]
+export const AssetStoreContext = React.createContext<AssetStoreState>(
   initialAssetStoreState
 );
 
@@ -157,7 +158,10 @@ const getPrivateAssetPackListingDataSearchTerms = (
   privateAssetPack: PrivateAssetPackListingData
 ) => privateAssetPack.name + '\n' + privateAssetPack.description;
 
-export const AssetStoreStateProvider = ({children}: AssetStoreStateProviderProps): React.MixedElement => {
+export const AssetStoreStateProvider = ({
+  children,
+// $FlowFixMe[signature-verification-failure]
+}: AssetStoreStateProviderProps) => {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const { searchText } = shopNavigationState;
 
@@ -332,7 +336,6 @@ export const AssetStoreStateProvider = ({children}: AssetStoreStateProviderProps
       }
       if (receivedAssetShortHeaders) {
         receivedAssetShortHeaders.forEach(assetShortHeader => {
-          // $FlowFixMe[prop-missing]
           assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
         });
       }
@@ -485,7 +488,6 @@ export const AssetStoreStateProvider = ({children}: AssetStoreStateProviderProps
     searchText,
     chosenCategory,
     null,
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this filter works for both public and private packs
     assetPackSearchFilters
   );
@@ -496,7 +498,6 @@ export const AssetStoreStateProvider = ({children}: AssetStoreStateProviderProps
     searchText,
     chosenCategory,
     null,
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this filter works for both public and private packs
     assetPackSearchFilters
   );

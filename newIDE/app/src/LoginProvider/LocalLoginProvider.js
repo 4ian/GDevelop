@@ -51,7 +51,9 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
   }: {|
     provider: IdentityProvider,
     signal?: AbortSignal,
-  |}): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  |}) {
     if (signal && signal.aborted) {
       return Promise.reject(
         new UserCancellationError(

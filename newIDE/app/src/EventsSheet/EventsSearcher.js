@@ -281,7 +281,9 @@ export default class EventsSearcher extends React.Component<Props, State> {
     return this._goToSearchResults(+1);
   };
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     return this.props.children({
       eventsSearchResultEvents: this._resultEvents,
       searchFocusOffset: this.state.searchFocusOffset,

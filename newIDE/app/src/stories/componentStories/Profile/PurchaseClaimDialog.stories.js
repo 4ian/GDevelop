@@ -26,7 +26,8 @@ export default {
 const purchaseId = 'purchase-id-123';
 const claimableToken = 'claimable-token-123';
 
-export const ReadyToActivate = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const ReadyToActivate = () => {
   const shopServiceMock = new MockAdapter(shopApiAxiosClient, {
     delayResponse: 0,
   });
@@ -78,7 +79,8 @@ export const ReadyToActivate = (): React.Node => {
   );
 };
 
-export const NotLoggedIn = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const NotLoggedIn = () => {
   return (
     <RouterContext.Provider
       value={{
@@ -104,7 +106,8 @@ export const NotLoggedIn = (): React.Node => {
   );
 };
 
-export const AlreadyClaimed = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const AlreadyClaimed = () => {
   const shopServiceMock = new MockAdapter(shopApiAxiosClient, {
     delayResponse: 0,
   });
@@ -150,7 +153,8 @@ export const AlreadyClaimed = (): React.Node => {
   );
 };
 
-export const AlreadyOwned = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const AlreadyOwned = () => {
   const shopServiceMock = new MockAdapter(shopApiAxiosClient, {
     delayResponse: 0,
   });
@@ -196,7 +200,8 @@ export const AlreadyOwned = (): React.Node => {
   );
 };
 
-export const InvalidToken = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const InvalidToken = () => {
   const shopServiceMock = new MockAdapter(shopApiAxiosClient, {
     delayResponse: 0,
   });

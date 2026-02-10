@@ -20,7 +20,8 @@ const gd: libGDevelop = global.gd;
 
 export const CLIPBOARD_KIND = 'EventsAndInstructions';
 
-export const hasClipboardEvents = (): boolean => {
+// $FlowFixMe[signature-verification-failure]
+export const hasClipboardEvents = () => {
   if (!Clipboard.has(CLIPBOARD_KIND)) return false;
   const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
   const eventsCount = SafeExtractor.extractNumberProperty(
@@ -32,7 +33,8 @@ export const hasClipboardEvents = (): boolean => {
   return eventsCount > 0;
 };
 
-export const hasClipboardConditions = (): boolean => {
+// $FlowFixMe[signature-verification-failure]
+export const hasClipboardConditions = () => {
   if (!Clipboard.has(CLIPBOARD_KIND)) return false;
   const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
   const conditionsCount = SafeExtractor.extractNumberProperty(
@@ -44,7 +46,8 @@ export const hasClipboardConditions = (): boolean => {
   return conditionsCount > 0;
 };
 
-export const hasClipboardActions = (): boolean => {
+// $FlowFixMe[signature-verification-failure]
+export const hasClipboardActions = () => {
   if (!Clipboard.has(CLIPBOARD_KIND)) return false;
   const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
   const actionsCount = SafeExtractor.extractNumberProperty(
@@ -239,7 +242,8 @@ export const pasteInstructionsFromClipboardInSelection = (
 export const pasteInstructionsFromClipboardInInstructionsList = (
   project: gdProject,
   instructionsListContext: InstructionsListContext
-): void | boolean => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   if (!hasClipboardConditions() && !hasClipboardActions()) return false;
 
   const clipboardContent = Clipboard.get(CLIPBOARD_KIND);

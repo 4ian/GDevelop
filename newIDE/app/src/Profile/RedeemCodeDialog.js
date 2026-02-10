@@ -21,7 +21,8 @@ type Props = {|
   autoSubmit?: boolean,
 |};
 
-export const getRedeemCodeErrorText = (error: ?Error): void | React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const getRedeemCodeErrorText = (error: ?Error) => {
   if (!error) return undefined;
 
   const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
@@ -73,7 +74,8 @@ export default function RedeemCodeDialog({
   onClose,
   codeToPrefill,
   autoSubmit,
-}: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: Props) {
   const [redemptionCode, setRedemptionCode] = React.useState(
     codeToPrefill || ''
   );

@@ -59,8 +59,9 @@ export default class InstancesRenderer {
   temporaryRectangle: Rectangle;
   instanceMeasurer: InstanceMeasurer;
 
+  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  _basicProfilingCounters = makeBasicProfilingCounters() as BasicProfilingCounters;
+  _basicProfilingCounters = makeBasicProfilingCounters();
 
   constructor({
     project,
@@ -181,11 +182,15 @@ export default class InstancesRenderer {
     };
   }
 
-  getPixiContainer(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getPixiContainer() {
     return this.pixiContainer;
   }
 
-  getInstanceMeasurer(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getInstanceMeasurer() {
     return this.instanceMeasurer;
   }
 
@@ -381,7 +386,9 @@ export default class InstancesRenderer {
     }
   }
 
-  getRendererOfInstance(layerName: string, instance: gdInitialInstance): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getRendererOfInstance(layerName: string, instance: gdInitialInstance) {
     if (!this.layersRenderers.hasOwnProperty(layerName)) {
       return null;
     }

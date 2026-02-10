@@ -17,7 +17,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const ButtonObject = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const ButtonObject = () => (
   <SerializedObjectDisplay object={testProject.customObject.getConfiguration()}>
     <CustomObjectPropertiesEditor
       objectConfiguration={testProject.customObject.getConfiguration()}

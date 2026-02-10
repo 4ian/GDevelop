@@ -538,7 +538,8 @@ const MarketingPlansStory = ({
   );
 };
 
-export const LoadingAndError = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const LoadingAndError = () => {
   return (
     <MarketingPlansStory
       gameFeaturings={[]}
@@ -549,11 +550,13 @@ export const LoadingAndError = (): React.Node => {
   );
 };
 
-export const Default = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => {
   return <MarketingPlansStory gameFeaturings={[]} delayResponse={1000} />;
 };
 
-export const WithOwnedActiveBasicPlanIncompleteGame = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithOwnedActiveBasicPlanIncompleteGame = () => {
   return (
     <MarketingPlansStory
       gameFeaturings={[
@@ -570,7 +573,8 @@ export const WithOwnedActiveBasicPlanIncompleteGame = (): React.Node => {
   );
 };
 
-export const WithOwnedActiveBasicPlanFullGame = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithOwnedActiveBasicPlanFullGame = () => {
   return (
     <MarketingPlansStory
       gameFeaturings={[
@@ -586,7 +590,8 @@ export const WithOwnedActiveBasicPlanFullGame = (): React.Node => {
   );
 };
 
-export const WithOwnedExpiredBasicPlan = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithOwnedExpiredBasicPlan = () => {
   return (
     <MarketingPlansStory
       gameFeaturings={[
@@ -602,7 +607,8 @@ export const WithOwnedExpiredBasicPlan = (): React.Node => {
   );
 };
 
-export const WithOwnedProPlan = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithOwnedProPlan = () => {
   return (
     <MarketingPlansStory
       gameFeaturings={[
@@ -639,7 +645,8 @@ export const WithOwnedProPlan = (): React.Node => {
   );
 };
 
-export const WithOwnedPremiumPlan = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithOwnedPremiumPlan = () => {
   return (
     <MarketingPlansStory
       gameFeaturings={[

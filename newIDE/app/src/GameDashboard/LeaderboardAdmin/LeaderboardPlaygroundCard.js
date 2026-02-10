@@ -8,7 +8,8 @@ import { LineStackLayout } from '../../UI/Layout';
 import Link from '../../UI/Link';
 import Window from '../../Utils/Window';
 
-const LeaderboardPlaygroundCard = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const LeaderboardPlaygroundCard = () => {
   return (
     <LineStackLayout
       expand

@@ -186,7 +186,12 @@ type Props = {|
   leaderboardIdToSelectAtOpening?: string,
 |};
 
-export const LeaderboardAdmin = ({onLoading, project, leaderboardIdToSelectAtOpening}: Props): React.Node => {
+export const LeaderboardAdmin = ({
+  onLoading,
+  project,
+  leaderboardIdToSelectAtOpening,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const isOnline = useOnlineStatus();
   const { isMobile } = useResponsiveWindowSize();
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
@@ -576,7 +581,6 @@ export const LeaderboardAdmin = ({onLoading, project, leaderboardIdToSelectAtOpe
       avatar: <Tag />,
       text: isEditingName ? (
         <Line alignItems="center" expand noMargin>
-          {/* $FlowFixMe[incompatible-type] */}
           <TextField
             id="edit-name-field"
             ref={newNameTextFieldRef}
@@ -1133,7 +1137,11 @@ export const LeaderboardAdmin = ({onLoading, project, leaderboardIdToSelectAtOpe
 
 type ContainerProps = {| ...Props, gameId: string |};
 
-const LeaderboardAdminContainer = ({gameId, ...otherProps}: ContainerProps): React.Node => (
+const LeaderboardAdminContainer = ({
+  gameId,
+  ...otherProps
+// $FlowFixMe[signature-verification-failure]
+}: ContainerProps) => (
   <LeaderboardProvider gameId={gameId}>
     <LeaderboardAdmin {...otherProps} />
   </LeaderboardProvider>

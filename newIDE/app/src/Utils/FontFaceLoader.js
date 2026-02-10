@@ -6,8 +6,8 @@ import { checkIfCredentialsRequired } from './CrossOrigin';
  * A simple wrapper around FontFace (if supported) or @font-face + FontFaceObserver
  * to load a font from an url and be notified when loading is done (or failed).
  */
-export const loadFontFace = (fontFamily: string, src: string): any | Promise<void> => {
-  // $FlowFixMe[incompatible-type]
+// $FlowFixMe[signature-verification-failure]
+export const loadFontFace = (fontFamily: string, src: string) => {
   // $FlowFixMe[incompatible-type] - FontFace not recognised by Flow.
   // $FlowFixMe[cannot-resolve-name]
   if (typeof FontFace !== 'undefined') {
@@ -37,7 +37,6 @@ export const loadFontFace = (fontFamily: string, src: string): any | Promise<voi
         // $FlowFixMe[cannot-resolve-name]
         const fontFace = new FontFace(fontFamily, arrayBuffer, {});
 
-        // $FlowFixMe[incompatible-type]
         // $FlowFixMe[incompatible-type] - FontFace not recognised by Flow.
         // $FlowFixMe[prop-missing]
         document.fonts.add(fontFace);

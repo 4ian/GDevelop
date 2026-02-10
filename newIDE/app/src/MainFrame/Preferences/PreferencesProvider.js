@@ -74,7 +74,8 @@ export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
   }
 };
 
-export const getInitialPreferences = (): any => {
+// $FlowFixMe[signature-verification-failure]
+export const getInitialPreferences = () => {
   let languageOrLocale = 'en';
   const browserLanguageOrLocale = getBrowserLanguageOrLocale();
   if (browserLanguageOrLocale)
@@ -90,165 +91,285 @@ const getPreferences = (): PreferencesValues => {
   const preferences =
     loadPreferencesFromLocalStorage() || getInitialPreferences();
   setLanguageInDOM(preferences.language);
+  // $FlowFixMe[incompatible-type]
   return preferences;
 };
 
 export default class PreferencesProvider extends React.Component<Props, State> {
   // $FlowFixMe[missing-local-annot]
   state = {
-    values: getPreferences() as PreferencesValues,
+    // $FlowFixMe[signature-verification-failure]
+    values: getPreferences(),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setMultipleValues: this._setMultipleValues.bind(this) as any,
+    setMultipleValues: this._setMultipleValues.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setLanguage: this._setLanguage.bind(this) as any,
+    setLanguage: this._setLanguage.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setThemeName: this._setThemeName.bind(this) as any,
+    setThemeName: this._setThemeName.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setCodeEditorThemeName: this._setCodeEditorThemeName.bind(this) as any,
+    setCodeEditorThemeName: this._setCodeEditorThemeName.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setAutoDownloadUpdates: this._setAutoDownloadUpdates.bind(this) as any,
+    setAutoDownloadUpdates: this._setAutoDownloadUpdates.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    checkUpdates: this._checkUpdates.bind(this) as any,
+    checkUpdates: this._checkUpdates.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setAutoDisplayChangelog: this._setAutoDisplayChangelog.bind(this) as any,
+    setAutoDisplayChangelog: this._setAutoDisplayChangelog.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    showAlertMessage: this._showAlertMessage.bind(this) as any,
+    showAlertMessage: this._showAlertMessage.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    showAllAlertMessages: this._showAllAlertMessages.bind(this) as any,
+    showAllAlertMessages: this._showAllAlertMessages.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    showTutorialHint: this._showTutorialHint.bind(this) as any,
+    showTutorialHint: this._showTutorialHint.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    showAllTutorialHints: this._showAllTutorialHints.bind(this) as any,
+    showAllTutorialHints: this._showAllTutorialHints.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    showAnnouncement: this._showAnnouncement.bind(this) as any,
+    showAnnouncement: this._showAnnouncement.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    showAllAnnouncements: this._showAllAnnouncements.bind(this) as any,
+    showAllAnnouncements: this._showAllAnnouncements.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    showAskAiStandAloneForm: this._showAskAiStandAloneForm.bind(this) as any,
+    showAskAiStandAloneForm: this._showAskAiStandAloneForm.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    showAllAskAiStandAloneForms: this._showAllAskAiStandAloneForms.bind(this) as any,
+    showAllAskAiStandAloneForms: this._showAllAskAiStandAloneForms.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    verifyIfIsNewVersion: this._verifyIfIsNewVersion.bind(this) as any,
+    verifyIfIsNewVersion: this._verifyIfIsNewVersion.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setEventsSheetShowObjectThumbnails: this._setEventsSheetShowObjectThumbnails.bind(this) as any,
+    setEventsSheetShowObjectThumbnails: this._setEventsSheetShowObjectThumbnails.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setAutosaveOnPreview: this._setAutosaveOnPreview.bind(this) as any,
+    setAutosaveOnPreview: this._setAutosaveOnPreview.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setUseGDJSDevelopmentWatcher: this._setUseGDJSDevelopmentWatcher.bind(this) as any,
+    setUseGDJSDevelopmentWatcher: this._setUseGDJSDevelopmentWatcher.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setEventsSheetUseAssignmentOperators: this._setEventsSheetUseAssignmentOperators.bind(this) as any,
+    setEventsSheetUseAssignmentOperators: this._setEventsSheetUseAssignmentOperators.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setEventsSheetIndentScale: this._setEventsSheetIndentScale.bind(this) as any,
+    setEventsSheetIndentScale: this._setEventsSheetIndentScale.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setEventsSheetZoomLevel: this._setEventsSheetZoomLevel.bind(this) as any,
+    setEventsSheetZoomLevel: this._setEventsSheetZoomLevel.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setShowEffectParameterNames: this._setShowEffectParameterNames.bind(this) as any,
+    setShowEffectParameterNames: this._setShowEffectParameterNames.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    getLastUsedPath: this._getLastUsedPath.bind(this) as any,
+    getLastUsedPath: this._getLastUsedPath.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setLastUsedPath: this._setLastUsedPath.bind(this) as any,
+    setLastUsedPath: this._setLastUsedPath.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    getDefaultEditorMosaicNode: this._getDefaultEditorMosaicNode.bind(this) as any,
+    getDefaultEditorMosaicNode: this._getDefaultEditorMosaicNode.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setDefaultEditorMosaicNode: this._setDefaultEditorMosaicNode.bind(this) as any,
+    setDefaultEditorMosaicNode: this._setDefaultEditorMosaicNode.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    getRecentProjectFiles: this._getRecentProjectFiles.bind(this) as any,
+    getRecentProjectFiles: this._getRecentProjectFiles.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    insertRecentProjectFile: this._insertRecentProjectFile.bind(this) as any,
+    insertRecentProjectFile: this._insertRecentProjectFile.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    removeRecentProjectFile: this._removeRecentProjectFile.bind(this) as any,
+    removeRecentProjectFile: this._removeRecentProjectFile.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    getAutoOpenMostRecentProject: this._getAutoOpenMostRecentProject.bind(this) as any,
+    getAutoOpenMostRecentProject: this._getAutoOpenMostRecentProject.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setAutoOpenMostRecentProject: this._setAutoOpenMostRecentProject.bind(this) as any,
+    setAutoOpenMostRecentProject: this._setAutoOpenMostRecentProject.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    hadProjectOpenedDuringLastSession: this._hadProjectOpenedDuringLastSession.bind(this) as any,
+    hadProjectOpenedDuringLastSession: this._hadProjectOpenedDuringLastSession.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setHasProjectOpened: this._setHasProjectOpened.bind(this) as any,
+    setHasProjectOpened: this._setHasProjectOpened.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setShortcutForCommand: this._setShortcutForCommand.bind(this) as any,
+    setShortcutForCommand: this._setShortcutForCommand.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    resetShortcutsToDefault: this._resetShortcutsToDefault.bind(this) as any,
+    resetShortcutsToDefault: this._resetShortcutsToDefault.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    getNewObjectDialogDefaultTab: this._getNewObjectDialogDefaultTab.bind(this) as any,
+    getNewObjectDialogDefaultTab: this._getNewObjectDialogDefaultTab.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setNewObjectDialogDefaultTab: this._setNewObjectDialogDefaultTab.bind(this) as any,
+    setNewObjectDialogDefaultTab: this._setNewObjectDialogDefaultTab.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    getShareDialogDefaultTab: this._getShareDialogDefaultTab.bind(this) as any,
+    getShareDialogDefaultTab: this._getShareDialogDefaultTab.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setShareDialogDefaultTab: this._setShareDialogDefaultTab.bind(this) as any,
+    setShareDialogDefaultTab: this._setShareDialogDefaultTab.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    getIsMenuBarHiddenInPreview: this._getIsMenuBarHiddenInPreview.bind(this) as any,
+    getIsMenuBarHiddenInPreview: this._getIsMenuBarHiddenInPreview.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setIsMenuBarHiddenInPreview: this._setIsMenuBarHiddenInPreview.bind(this) as any,
+    setIsMenuBarHiddenInPreview: this._setIsMenuBarHiddenInPreview.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setBackdropClickBehavior: this._setBackdropClickBehavior.bind(this) as any,
+    setBackdropClickBehavior: this._setBackdropClickBehavior.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setResourcesImporationBehavior: this._setResourcesImporationBehavior.bind(this) as any,
+    setResourcesImporationBehavior: this._setResourcesImporationBehavior.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    getIsAlwaysOnTopInPreview: this._getIsAlwaysOnTopInPreview.bind(this) as any,
+    getIsAlwaysOnTopInPreview: this._getIsAlwaysOnTopInPreview.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setIsAlwaysOnTopInPreview: this._setIsAlwaysOnTopInPreview.bind(this) as any,
+    setIsAlwaysOnTopInPreview: this._setIsAlwaysOnTopInPreview.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setEventsSheetCancelInlineParameter: this._setEventsSheetCancelInlineParameter.bind(this) as any,
+    setEventsSheetCancelInlineParameter: this._setEventsSheetCancelInlineParameter.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setShowExperimentalExtensions: this._setShowCommunityExtensions.bind(this) as any,
+    setShowExperimentalExtensions: this._setShowCommunityExtensions.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setShowCreateSectionByDefault: this._setShowCreateSectionByDefault.bind(this) as any,
+    setShowCreateSectionByDefault: this._setShowCreateSectionByDefault.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setShowInAppTutorialDeveloperMode: this._setShowInAppTutorialDeveloperMode.bind(this) as any,
+    setShowInAppTutorialDeveloperMode: this._setShowInAppTutorialDeveloperMode.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setOpenDiagnosticReportAutomatically: this._setOpenDiagnosticReportAutomatically.bind(this) as any,
+    setOpenDiagnosticReportAutomatically: this._setOpenDiagnosticReportAutomatically.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    getOpenDiagnosticReportAutomatically: this._getOpenDiagnosticReportAutomatically.bind(this) as any,
+    getOpenDiagnosticReportAutomatically: this._getOpenDiagnosticReportAutomatically.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setShowDeprecatedInstructionWarning: this._setShowDeprecatedInstructionWarning.bind(this) as any,
+    setShowDeprecatedInstructionWarning: this._setShowDeprecatedInstructionWarning.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    getShowDeprecatedInstructionWarning: this._getShowDeprecatedInstructionWarning.bind(this) as any,
+    getShowDeprecatedInstructionWarning: this._getShowDeprecatedInstructionWarning.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setUse3DEditor: this._setUse3DEditor.bind(this) as any,
+    setUse3DEditor: this._setUse3DEditor.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    getUse3DEditor: this._getUse3DEditor.bind(this) as any,
+    getUse3DEditor: this._getUse3DEditor.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setShowBasicProfilingCounters: this._setShowBasicProfilingCounters.bind(this) as any,
+    setShowBasicProfilingCounters: this._setShowBasicProfilingCounters.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setDisableNpmScriptConfirmation: this._setDisableNpmScriptConfirmation.bind(this) as any,
+    setDisableNpmScriptConfirmation: this._setDisableNpmScriptConfirmation.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    saveTutorialProgress: this._saveTutorialProgress.bind(this) as any,
+    saveTutorialProgress: this._saveTutorialProgress.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    getTutorialProgress: this._getTutorialProgress.bind(this) as any,
+    getTutorialProgress: this._getTutorialProgress.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setNewProjectsDefaultFolder: this._setNewProjectsDefaultFolder.bind(this) as any,
+    setNewProjectsDefaultFolder: this._setNewProjectsDefaultFolder.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setNewProjectsDefaultStorageProviderName: this._setNewProjectsDefaultStorageProviderName.bind(this) as any,
+    setNewProjectsDefaultStorageProviderName: this._setNewProjectsDefaultStorageProviderName.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setUseShortcutToClosePreviewWindow: this._setUseShortcutToClosePreviewWindow.bind(this) as any,
+    setUseShortcutToClosePreviewWindow: this._setUseShortcutToClosePreviewWindow.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setWatchProjectFolderFilesForLocalProjects: this._setWatchProjectFolderFilesForLocalProjects.bind(this) as any,
+    setWatchProjectFolderFilesForLocalProjects: this._setWatchProjectFolderFilesForLocalProjects.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setNewFeaturesAcknowledgements: this._setNewFeaturesAcknowledgements.bind(this) as any,
+    setNewFeaturesAcknowledgements: this._setNewFeaturesAcknowledgements.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setDisplaySaveReminder: this._setDisplaySaveReminder.bind(this) as any,
+    setDisplaySaveReminder: this._setDisplaySaveReminder.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    getEditorStateForProject: this._getEditorStateForProject.bind(this) as any,
+    getEditorStateForProject: this._getEditorStateForProject.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setEditorStateForProject: this._setEditorStateForProject.bind(this) as any,
+    setEditorStateForProject: this._setEditorStateForProject.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setFetchPlayerTokenForPreviewAutomatically: this._setFetchPlayerTokenForPreviewAutomatically.bind(this) as any,
+    setFetchPlayerTokenForPreviewAutomatically: this._setFetchPlayerTokenForPreviewAutomatically.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setPreviewCrashReportUploadLevel: this._setPreviewCrashReportUploadLevel.bind(this) as any,
+    setPreviewCrashReportUploadLevel: this._setPreviewCrashReportUploadLevel.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setGamesDashboardOrderBy: this._setGamesDashboardOrderBy.bind(this) as any,
+    setGamesDashboardOrderBy: this._setGamesDashboardOrderBy.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setTakeScreenshotOnPreview: this._setTakeScreenshotOnPreview.bind(this) as any,
+    setTakeScreenshotOnPreview: this._setTakeScreenshotOnPreview.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setShowAiAskButtonInTitleBar: this._setShowAiAskButtonInTitleBar.bind(this) as any,
+    setShowAiAskButtonInTitleBar: this._setShowAiAskButtonInTitleBar.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setAiState: this._setAiState.bind(this) as any,
+    setAiState: this._setAiState.bind(this),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setAutomaticallyUseCreditsForAiRequests: this._setAutomaticallyUseCreditsForAiRequests.bind(this) as any,
+    setAutomaticallyUseCreditsForAiRequests: this._setAutomaticallyUseCreditsForAiRequests.bind(
+      this
+    ),
+    // $FlowFixMe[signature-verification-failure]
     // $FlowFixMe[method-unbinding]
-    setUseBackgroundSerializerForSaving: this._setUseBackgroundSerializerForSaving.bind(this) as any,
+    setUseBackgroundSerializerForSaving: this._setUseBackgroundSerializerForSaving.bind(
+      this
+    ),
   };
 
   componentDidMount() {
@@ -345,7 +466,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }: {|
     tutorialId: string,
     userId: ?string,
-  |}): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  |}) {
     const userIdKey: string = userId || 'anonymous';
     const tutorialProgresses = this.state.values.inAppTutorialsProgress[
       tutorialId
@@ -542,7 +665,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getOpenDiagnosticReportAutomatically(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _getOpenDiagnosticReportAutomatically() {
     return this.state.values.openDiagnosticReportAutomatically;
   }
 
@@ -560,7 +685,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getShowDeprecatedInstructionWarning(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _getShowDeprecatedInstructionWarning() {
     return this.state.values.showDeprecatedInstructionWarning;
   }
 
@@ -576,7 +703,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getUse3DEditor(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _getUse3DEditor() {
     return this.state.values.use3DEditor;
   }
 
@@ -618,7 +747,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     }
   }
 
-  _verifyIfIsNewVersion(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _verifyIfIsNewVersion() {
     const currentVersion = getIDEVersion();
     const { lastLaunchedVersion } = this.state.values;
     if (lastLaunchedVersion === currentVersion) {
@@ -653,7 +784,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           ...state.values,
           hiddenAlertMessages: {
             ...state.values.hiddenAlertMessages,
-            // $FlowFixMe[incompatible-type]
             // $FlowFixMe[incompatible-type] - Flow won't typecheck this because of https://medium.com/flow-type/spreads-common-errors-fixes-9701012e9d58
             [identifier]: !show,
           },
@@ -756,7 +886,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _persistValuesToLocalStorage(preferences: Preferences): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _persistValuesToLocalStorage(preferences: Preferences) {
     try {
       localStorage.setItem(
         localStorageItem,
@@ -769,7 +901,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     return preferences;
   }
 
-  _getLastUsedPath(project: gdProject, kind: ResourceKind): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _getLastUsedPath(project: gdProject, kind: ResourceKind) {
     const projectPath = project.getProjectFile();
     const { values } = this.state;
     const projectPaths = values.projectLastUsedPaths[projectPath];
@@ -801,7 +935,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getDefaultEditorMosaicNode(name: EditorMosaicName): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _getDefaultEditorMosaicNode(name: EditorMosaicName) {
     return this.state.values.defaultEditorMosaicNodes[name] || null;
   }
 
@@ -812,7 +948,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           ...state.values,
           defaultEditorMosaicNodes: {
             ...state.values.defaultEditorMosaicNodes,
-            // $FlowFixMe[incompatible-type]
             // $FlowFixMe[incompatible-type] - Flow errors on unions in computed properties
             [name]: node,
           },
@@ -867,7 +1002,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     ]);
   }
 
-  _getAutoOpenMostRecentProject(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _getAutoOpenMostRecentProject() {
     return this.state.values.autoOpenMostRecentProject;
   }
 
@@ -883,7 +1020,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _hadProjectOpenedDuringLastSession(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _hadProjectOpenedDuringLastSession() {
     return this.state.values.hasProjectOpened;
   }
 
@@ -924,7 +1063,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getNewObjectDialogDefaultTab(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _getNewObjectDialogDefaultTab() {
     return this.state.values.newObjectDialogDefaultTab;
   }
 
@@ -939,7 +1080,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getShareDialogDefaultTab(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _getShareDialogDefaultTab() {
     return this.state.values.shareDialogDefaultTab;
   }
 
@@ -952,7 +1095,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getIsMenuBarHiddenInPreview(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _getIsMenuBarHiddenInPreview() {
     return this.state.values.isMenuBarHiddenInPreview;
   }
 
@@ -990,7 +1135,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getIsAlwaysOnTopInPreview(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _getIsAlwaysOnTopInPreview() {
     return this.state.values.isAlwaysOnTopInPreview;
   }
 
@@ -1077,7 +1224,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getEditorStateForProject(projectId: string): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _getEditorStateForProject(projectId: string) {
     return this.state.values.editorStateByProject[projectId];
   }
 
@@ -1187,7 +1336,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     return (
       <PreferencesContext.Provider value={this.state}>
         {this.props.children}

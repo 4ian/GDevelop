@@ -19,9 +19,7 @@ export default class RenderedUnknownInstance extends RenderedInstance {
     super(
       project,
       instance,
-      // $FlowFixMe[incompatible-type]
       //$FlowFixMe[incompatible-type] It's ok because RenderedUnknownInstance don't use it.
-      // $FlowFixMe[incompatible-type]
       associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader
@@ -43,7 +41,9 @@ export default class RenderedUnknownInstance extends RenderedInstance {
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  ) {
     return 'res/unknown32.png';
   }
 

@@ -24,25 +24,27 @@ type Props = {|
   },
 |};
 
-export const hasNonCodeOnlyParameters = (expressionMetadata: gdExpressionMetadata): boolean =>
+export const hasNonCodeOnlyParameters = (
+  expressionMetadata: gdExpressionMetadata
+// $FlowFixMe[signature-verification-failure]
+) =>
   mapFor(0, expressionMetadata.getParametersCount(), i => {
     const parameterMetadata = expressionMetadata.getParameter(i);
     return !parameterMetadata.isCodeOnly();
   }).filter(isVisible => isVisible).length !== 0;
 
-const ExpressionParametersEditor = (
-  {
-    expressionMetadata,
-    parameterValues,
-    project,
-    scope,
-    globalObjectsContainer,
-    objectsContainer,
-    projectScopedContainersAccessor,
-    parameterRenderingService,
-    onChangeParameter
-  }: Props,
-): React.Node => {
+const ExpressionParametersEditor = ({
+  expressionMetadata,
+  parameterValues,
+  project,
+  scope,
+  globalObjectsContainer,
+  objectsContainer,
+  projectScopedContainersAccessor,
+  parameterRenderingService,
+  onChangeParameter,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   if (!parameterRenderingService) {
     console.error(
       'Missing parameterRenderingService for ExpressionParametersEditor'

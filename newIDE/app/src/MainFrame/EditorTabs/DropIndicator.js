@@ -13,7 +13,8 @@ const styles = {
   },
 };
 
-export function ColumnDropIndicator(): React.MixedElement {
+// $FlowFixMe[signature-verification-failure]
+export function ColumnDropIndicator() {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <div

@@ -16,7 +16,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => {
   return (
     <VideoBasedCourseChapterView
       course={premiumCourse}
@@ -31,7 +32,8 @@ export const Default = (): React.Node => {
   );
 };
 
-export const Locked = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Locked = () => {
   return (
     <VideoBasedCourseChapterView
       course={premiumCourse}

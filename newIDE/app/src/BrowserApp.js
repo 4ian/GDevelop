@@ -34,7 +34,8 @@ import BrowserLoginProvider from './LoginProvider/BrowserLoginProvider';
 import { isServiceWorkerSupported } from './ServiceWorkerSetup';
 import { ensureBrowserSWPreviewSession } from './ExportAndShare/BrowserExporters/BrowserSWPreviewLauncher/BrowserSWPreviewIndexedDB';
 
-export const create = (authentication: Authentication): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const create = (authentication: Authentication) => {
   Window.setUpContextMenu();
   const loginProvider = new BrowserLoginProvider(authentication.auth);
   authentication.setLoginProvider(loginProvider);
@@ -56,11 +57,11 @@ export const create = (authentication: Authentication): React.Node => {
           ? makeBrowserSWEventsFunctionCodeWriter
           : makeBrowserS3EventsFunctionCodeWriter
       }
-      // $FlowFixMe[incompatible-exact]
       // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-exact]
       eventsFunctionsExtensionWriter={BrowserEventsFunctionsExtensionWriter}
-      // $FlowFixMe[incompatible-exact]
       // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-exact]
       eventsFunctionsExtensionOpener={BrowserEventsFunctionsExtensionOpener}
     >
       {({ i18n }) => (

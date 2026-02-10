@@ -84,7 +84,8 @@ const getVariableTypeToString = () => {
   return variableTypeToString;
 };
 
-const VariableTypeSelector: component(...Props) = React.memo<Props>((props: Props) => {
+// $FlowFixMe[signature-verification-failure]
+const VariableTypeSelector = React.memo<Props>((props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const Icon = getVariableTypeToIcon()[props.variableType];
 

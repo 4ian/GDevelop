@@ -30,7 +30,8 @@ const Wrapper = ({ children }: {| children: React.Node |}) => {
   );
 };
 
-export const PublicAsset = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const PublicAsset = () => {
   const assetCdnMock = new MockAdapter(assetCdnClient);
   assetCdnMock
     .onGet(
@@ -53,7 +54,8 @@ export const PublicAsset = (): React.Node => {
   );
 };
 
-export const PrivateAsset = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const PrivateAsset = () => {
   const userServiceMock = new MockAdapter(userApiClient);
   userServiceMock
     .onGet('/user-public-profile', {
@@ -106,7 +108,8 @@ export const PrivateAsset = (): React.Node => {
   );
 };
 
-export const AssetWithMultipleAuthors = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const AssetWithMultipleAuthors = () => {
   const userServiceMock = new MockAdapter(userApiClient);
   userServiceMock
     .onGet('/user-public-profile', {

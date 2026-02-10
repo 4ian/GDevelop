@@ -24,7 +24,8 @@ type Props = {|
   onSeeAllBuilds: () => void,
 |};
 
-const BuildsWidget = ({builds, onSeeAllBuilds}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const BuildsWidget = ({ builds, onSeeAllBuilds }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const pendingBuilds = builds
     ? builds.filter(build => build.status === 'pending')

@@ -212,9 +212,8 @@ export type InstructionOrObjectSelectorInterface = {|
   reEnumerateInstructions: (i18n: I18nType) => void,
 |};
 
-const InstructionOrObjectSelector: component(
-  ...{ ...Props, +ref?: React.RefSetter<InstructionOrObjectSelectorInterface> }
-) = React.forwardRef<
+// $FlowFixMe[signature-verification-failure]
+const InstructionOrObjectSelector = React.forwardRef<
   Props,
   InstructionOrObjectSelectorInterface
 >(
@@ -239,11 +238,9 @@ const InstructionOrObjectSelector: component(
     ref
   ) => {
     const searchBarRef = React.useRef<?SearchBarInterface>(null);
-    // $FlowFixMe[value-as-type]
     const treeViewRef = React.useRef<?ReadOnlyTreeViewInterface<TreeViewItem>>(
       null
     );
-    // $FlowFixMe[value-as-type]
     const freeInstructionTreeViewRef = React.useRef<?ReadOnlyTreeViewInterface<TreeViewItem>>(
       null
     );

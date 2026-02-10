@@ -18,20 +18,19 @@ type Props = {|
   rounded?: boolean,
 |};
 
-const CompactSelectField = (
-  {
-    onChange,
-    value,
-    id,
-    disabled,
-    errored,
-    children,
-    renderLeftIcon,
-    renderOptionIcon,
-    leftIconTooltip,
-    rounded
-  }: Props,
-): React.MixedElement => {
+const CompactSelectField = ({
+  onChange,
+  value,
+  id,
+  disabled,
+  errored,
+  children,
+  renderLeftIcon,
+  renderOptionIcon,
+  leftIconTooltip,
+  rounded,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   return (
     <div
       className={classNames({

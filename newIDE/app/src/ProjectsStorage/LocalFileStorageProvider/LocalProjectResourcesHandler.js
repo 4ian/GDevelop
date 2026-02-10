@@ -96,8 +96,8 @@ export const scanForNewResources = async ({
     });
 
     const filesToCheck = new gd.VectorString();
-    // $FlowFixMe[incompatible-use]
     // $FlowFixMe[missing-local-annot]
+    // $FlowFixMe[incompatible-use]
     allFiles.forEach(filePath =>
       filesToCheck.push_back(path.relative(projectPath, filePath))
     );

@@ -360,10 +360,8 @@ const VariableRow = React.memo<VariableRowProps>(
                   >
                     <Line alignItems="center" noMargin expand>
                       {shouldWrap ? null : <Spacer />}
-                      {/* $FlowFixMe[incompatible-type] */}
                       <SimpleTextField
                         type="text"
-                        // $FlowFixMe[missing-local-annot]
                         ref={element => {
                           if (element) {
                             variableNameInputRefs.current[
@@ -434,7 +432,6 @@ const VariableRow = React.memo<VariableRowProps>(
                               {isInherited && !isTopLevel ? null : (
                                 <>
                                   <Spacer />
-                                  {/* $FlowFixMe[incompatible-type] */}
                                   <IconButton
                                     size="small"
                                     style={styles.inlineIcon}
@@ -464,9 +461,7 @@ const VariableRow = React.memo<VariableRowProps>(
                               )}
                             </Line>
                           ) : (
-                            // $FlowFixMe[incompatible-type]
                             <SimpleTextField
-                              // $FlowFixMe[missing-local-annot]
                               ref={element => {
                                 if (depth === 0 && element) {
                                   topLevelVariableValueInputRefs.current[
@@ -509,7 +504,6 @@ const VariableRow = React.memo<VariableRowProps>(
                         // and not for those who are in an inherited structure or array.
                         type === gd.Variable.String &&
                         !(isInherited && !isTopLevel) ? (
-                          // $FlowFixMe[incompatible-type]
                           <IconButton
                             size="small"
                             style={styles.inlineIcon}
@@ -529,7 +523,6 @@ const VariableRow = React.memo<VariableRowProps>(
                           </IconButton>
                         ) : null}
                         {isCollection && !isInherited ? (
-                          // $FlowFixMe[incompatible-type]
                           <IconButton
                             size="small"
                             style={styles.inlineIcon}
@@ -549,7 +542,6 @@ const VariableRow = React.memo<VariableRowProps>(
                           </IconButton>
                         ) : null}
                         {isCollection && isInherited && isTopLevel ? (
-                          // $FlowFixMe[incompatible-type]
                           <IconButton
                             size="small"
                             tooltip={t`Edit`}
@@ -569,7 +561,6 @@ const VariableRow = React.memo<VariableRowProps>(
                           </IconButton>
                         ) : null}
                         {overwritesInheritedVariable && isTopLevel ? (
-                          // $FlowFixMe[incompatible-type]
                           <IconButton
                             size="small"
                             tooltip={t`Reset`}
@@ -619,9 +610,8 @@ export type VariablesListInterface = {|
   addVariable: () => void,
 |};
 
-const VariablesList: component(
-  ...{ ...Props, +ref?: React.RefSetter<VariablesListInterface> }
-) = React.forwardRef<Props, VariablesListInterface>(
+// $FlowFixMe[signature-verification-failure]
+const VariablesList = React.forwardRef<Props, VariablesListInterface>(
   (props, ref) => {
     const historyRef = useRefWithInit(() =>
       getHistoryInitialState(props.variablesContainer, {
@@ -647,13 +637,9 @@ const VariablesList: component(
       // the new variable value field needs to be focused.
       [number]: SimpleTextFieldInterface,
     |}>({});
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - Hard to fix issue regarding strict checking with interface.
-    // $FlowFixMe[incompatible-type]
     const refocusNameField = useRefocusField(variableNameInputRefs);
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - Hard to fix issue regarding strict checking with interface.
-    // $FlowFixMe[incompatible-type]
     const refocusValueField = useRefocusField(topLevelVariableValueInputRefs);
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const draggedNodeId = React.useRef<?string>(null);
@@ -1192,16 +1178,12 @@ const VariablesList: component(
           case 'TopLevelToStructure':
             newName = newNameGenerator(
               draggedName,
-              // $FlowFixMe[incompatible-type]
               // $FlowFixMe[incompatible-type] - Regarding movement type, we are confident that the variable will exist
-              // $FlowFixMe[incompatible-use]
               name => targetVariableParentVariable.hasChild(name),
               'CopyOf'
             );
 
-            // $FlowFixMe[incompatible-type]
             // $FlowFixMe[incompatible-type] - Regarding movement type, we are confident that the variable will exist
-            // $FlowFixMe[incompatible-use]
             targetVariableParentVariable.insertChild(newName, draggedVariable);
 
             props.variablesContainer.remove(draggedName);
@@ -1225,9 +1207,7 @@ const VariablesList: component(
               props.variablesContainer.getPosition(targetName)
             );
 
-            // $FlowFixMe[incompatible-type]
             // $FlowFixMe[incompatible-type] - Regarding movement type, we are confident that the variable will exist
-            // $FlowFixMe[incompatible-use]
             draggedVariableParentVariable.removeChild(draggedName);
             updateExpandedAndSelectedNodesFollowingNodeMove(
               current,
@@ -1238,20 +1218,14 @@ const VariablesList: component(
           case 'FromStructureToAnotherStructure':
             newName = newNameGenerator(
               draggedName,
-              // $FlowFixMe[incompatible-type]
               // $FlowFixMe[incompatible-type] - Regarding movement type, we are confident that the variable will exist
-              // $FlowFixMe[incompatible-use]
               name => targetVariableParentVariable.hasChild(name),
               'CopyOf'
             );
-            // $FlowFixMe[incompatible-type]
             // $FlowFixMe[incompatible-type] - Regarding movement type, we are confident that the variable will exist
-            // $FlowFixMe[incompatible-use]
             targetVariableParentVariable.insertChild(newName, draggedVariable);
 
-            // $FlowFixMe[incompatible-type]
             // $FlowFixMe[incompatible-type] - Regarding movement type, we are confident that the variable will exist
-            // $FlowFixMe[incompatible-use]
             draggedVariableParentVariable.removeChild(draggedName);
             parentNodeId = getDirectParentNodeId(targetLineage);
             if (parentNodeId)
@@ -1265,17 +1239,13 @@ const VariablesList: component(
             draggedIndex = parseInt(draggedName, 10);
             targetIndex = parseInt(targetName, 10);
             correctedTargetIndex = targetIndex + (where === 'after' ? 1 : 0);
-            // $FlowFixMe[incompatible-type]
             // $FlowFixMe[incompatible-type] - Regarding movement type, we are confident that the variable will exist
-            // $FlowFixMe[incompatible-use]
             targetVariableParentVariable.insertAtIndex(
               draggedVariable,
               correctedTargetIndex
             );
 
-            // $FlowFixMe[incompatible-type]
             // $FlowFixMe[incompatible-type] - Regarding movement type, we are confident that the variable will exist
-            // $FlowFixMe[incompatible-use]
             draggedVariableParentVariable.removeAtIndex(draggedIndex);
             targetParentNodeId = getDirectParentNodeId(targetLineage);
             if (targetParentNodeId)
@@ -1291,9 +1261,7 @@ const VariablesList: component(
             correctedTargetIndex =
               (targetIndex > draggedIndex ? targetIndex - 1 : targetIndex) +
               (where === 'after' ? 1 : 0);
-            // $FlowFixMe[incompatible-type]
             // $FlowFixMe[incompatible-type] - Regarding movement type, we are confident that the variable will exist
-            // $FlowFixMe[incompatible-use]
             targetVariableParentVariable.moveChildInArray(
               draggedIndex,
               correctedTargetIndex

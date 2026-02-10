@@ -20,7 +20,9 @@ type Props = {|
 type State = {||};
 
 export class Toolbar extends PureComponent<Props, State> {
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const { canDelete, isPropertiesShown } = this.props;
 
     return (

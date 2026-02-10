@@ -1,6 +1,9 @@
 // @flow
 
-export const getInsertionParentAndPositionFromSelection = (selectedObjectFolderOrObject: gdObjectFolderOrObject): { folder: gdObjectFolderOrObject, position: number } => {
+export const getInsertionParentAndPositionFromSelection = (
+  selectedObjectFolderOrObject: gdObjectFolderOrObject
+// $FlowFixMe[signature-verification-failure]
+) => {
   const parentFolder = selectedObjectFolderOrObject.isFolder()
     ? selectedObjectFolderOrObject
     : selectedObjectFolderOrObject.getParent();

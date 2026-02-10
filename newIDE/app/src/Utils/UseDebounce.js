@@ -8,7 +8,8 @@ import debounce from 'lodash/debounce';
 /**
  * Debounces a React callback with a specified delay.
  */
-export const useDebounce = (cb: any, delay: number): any => {
+// $FlowFixMe[signature-verification-failure]
+export const useDebounce = (cb: any, delay: number) => {
   const options = {
     leading: false,
     trailing: true,

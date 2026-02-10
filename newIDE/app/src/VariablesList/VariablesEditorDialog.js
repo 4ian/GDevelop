@@ -57,27 +57,26 @@ type Props = {|
   id?: string,
 |};
 
-const VariablesEditorDialog = (
-  {
-    onCancel,
-    onApply,
-    open,
-    onEditObjectVariables,
-    title,
-    project,
-    hotReloadPreviewButtonProps,
-    helpPagePath,
-    id,
-    tabs,
-    initiallyOpenTabId,
-    initiallySelectedVariableName,
-    shouldCreateInitiallySelectedVariable,
-    projectScopedContainersAccessor,
-    objectName,
-    initialInstances,
-    isListLocked
-  }: Props,
-): React.Node => {
+const VariablesEditorDialog = ({
+  onCancel,
+  onApply,
+  open,
+  onEditObjectVariables,
+  title,
+  project,
+  hotReloadPreviewButtonProps,
+  helpPagePath,
+  id,
+  tabs,
+  initiallyOpenTabId,
+  initiallySelectedVariableName,
+  shouldCreateInitiallySelectedVariable,
+  projectScopedContainersAccessor,
+  objectName,
+  initialInstances,
+  isListLocked,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const serializableObjects = React.useMemo(
     () =>
       new Map(
@@ -111,8 +110,8 @@ const VariablesEditorDialog = (
     shouldCreateVariable.current = false;
     const tabIndex = Math.max(
       0,
-      // $FlowFixMe[incompatible-exact]
       // $FlowFixMe[missing-local-annot]
+      // $FlowFixMe[incompatible-exact]
       tabs.indexOf(({ id }) => id === initiallyOpenTabId)
     );
     const { variablesContainer, inheritedVariablesContainer } = tabs[tabIndex];

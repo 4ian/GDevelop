@@ -99,7 +99,8 @@ const useStylesForIconButton = ({
  * Supports displaying a tooltip.
  */
 
-const IconButton: component(...{ ...Props, +ref?: React.RefSetter<{}> }) = React.forwardRef<Props, {||}>((props: Props, ref) => {
+// $FlowFixMe[signature-verification-failure]
+const IconButton = React.forwardRef<Props, {||}>((props: Props, ref) => {
   const {
     selected,
     tooltip,

@@ -34,22 +34,21 @@ type Props = {|
   isObjectListLocked: boolean,
 |};
 
-const EditedObjectGroupEditorDialog = (
-  {
-    project,
-    projectScopedContainersAccessor,
-    group,
-    onApply,
-    onCancel,
-    globalObjectsContainer,
-    objectsContainer,
-    initialInstances,
-    initialTab,
-    onComputeAllVariableNames,
-    isVariableListLocked,
-    isObjectListLocked
-  }: Props,
-): React.Node => {
+const EditedObjectGroupEditorDialog = ({
+  project,
+  projectScopedContainersAccessor,
+  group,
+  onApply,
+  onCancel,
+  globalObjectsContainer,
+  objectsContainer,
+  initialInstances,
+  initialTab,
+  onComputeAllVariableNames,
+  isVariableListLocked,
+  isObjectListLocked,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const forceUpdate = useForceUpdate();
   const {
     onCancelChanges,

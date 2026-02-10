@@ -32,16 +32,15 @@ type Props = {|
   setSelectedMainMenuItemIndices: (Array<number>) => void,
 |};
 
-const ProjectManagerMainMenu = (
-  {
-    project,
-    closeDrawer,
-    mainMenuCallbacks,
-    buildMainMenuProps,
-    selectedMainMenuItemIndices,
-    setSelectedMainMenuItemIndices
-  }: Props,
-): React.Node => {
+const ProjectManagerMainMenu = ({
+  project,
+  closeDrawer,
+  mainMenuCallbacks,
+  buildMainMenuProps,
+  selectedMainMenuItemIndices,
+  setSelectedMainMenuItemIndices,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const mainMenuItems = React.useMemo(
     () =>
       adaptFromDeclarativeTemplate(
@@ -67,7 +66,6 @@ const ProjectManagerMainMenu = (
 
         if (menuItem.click) {
           const originalClick = menuItem.click;
-          // $FlowFixMe[incompatible-type]
           // $FlowFixMe[incompatible-type] - Flow is not able to make the difference between checkbox & classic item.
           const newMenuItem: MenuItemTemplate = {
             ...menuItem,

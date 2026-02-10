@@ -31,7 +31,9 @@ export default class BrowserS3PreviewLauncher extends React.Component<
   PreviewLauncherProps,
   State
 > {
-  canDoNetworkPreview = (): any => false;
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  canDoNetworkPreview = () => false;
 
   // $FlowFixMe[missing-local-annot]
   state = {
@@ -283,11 +285,15 @@ export default class BrowserS3PreviewLauncher extends React.Component<
     }
   };
 
-  getPreviewDebuggerServer(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getPreviewDebuggerServer() {
     return browserPreviewDebuggerServer;
   }
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const { error } = this.state;
 
     if (error) {

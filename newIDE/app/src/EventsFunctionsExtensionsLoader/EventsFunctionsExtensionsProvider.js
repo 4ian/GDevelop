@@ -36,15 +36,14 @@ type Props = {|
  * Useful when dealing with events functions extensions (new extension created,
  * removed, pasted, installed, etc...).
  */
-export const EventsFunctionsExtensionsProvider = (
-  {
-    children,
-    i18n,
-    makeEventsFunctionCodeWriter,
-    eventsFunctionsExtensionWriter,
-    eventsFunctionsExtensionOpener
-  }: Props,
-): React.Node => {
+export const EventsFunctionsExtensionsProvider = ({
+  children,
+  i18n,
+  makeEventsFunctionCodeWriter,
+  eventsFunctionsExtensionWriter,
+  eventsFunctionsExtensionOpener,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const [
     eventsFunctionsExtensionsError,
     setEventsFunctionsExtensionsError,

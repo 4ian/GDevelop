@@ -39,7 +39,6 @@ const gd: libGDevelop = global.gd;
 
 jest.mock('../Utils/GDevelopServices/Extension');
 
-// $FlowFixMe[incompatible-type]
 // $FlowFixMe[incompatible-type] - overriding method to do a mocked network call.
 // $FlowFixMe[cannot-write]
 Asset.getPublicAsset = jest.fn();

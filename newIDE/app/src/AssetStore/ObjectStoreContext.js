@@ -140,7 +140,8 @@ type ObjectStoreState = {|
   filtersState: FiltersState,
 |};
 
-export const ObjectStoreContext: React.Context<ObjectStoreState> = React.createContext<ObjectStoreState>({
+// $FlowFixMe[signature-verification-failure]
+export const ObjectStoreContext = React.createContext<ObjectStoreState>({
   filters: null,
   searchResults: null,
   fetchObjects: () => {},
@@ -168,7 +169,12 @@ type ObjectStoreStateProviderProps = {|
   defaultSearchText?: string,
 |};
 
-export const ObjectStoreStateProvider = ({children, i18n, defaultSearchText}: ObjectStoreStateProviderProps): React.MixedElement => {
+export const ObjectStoreStateProvider = ({
+  children,
+  i18n,
+  defaultSearchText,
+// $FlowFixMe[signature-verification-failure]
+}: ObjectStoreStateProviderProps) => {
   const [
     installedObjectMetadataList,
     setInstalledObjectMetadataList,
@@ -454,9 +460,7 @@ export const ObjectStoreStateProvider = ({children, i18n, defaultSearchText}: Ob
         ...[...builtInObjectTypes, ...firstObjectIds]
           .map(type => {
             const objectOrCategory: ObjectShortHeader =
-              // $FlowFixMe[incompatible-type]
               //$FlowFixMe[incompatible-type] It can't be an ObjectCategory
-              // $FlowFixMe[incompatible-type]
               allTranslatedObjectsAndCategories[type];
             return objectOrCategory;
           })
@@ -506,9 +510,7 @@ export const ObjectStoreStateProvider = ({children, i18n, defaultSearchText}: Ob
         [...builtInObjectTypes, ...firstObjectIds]
           .map(type => {
             const objectOrCategory: ObjectShortHeader =
-              // $FlowFixMe[incompatible-type]
               //$FlowFixMe[incompatible-type] It can't be an ObjectCategory
-              // $FlowFixMe[incompatible-type]
               allTranslatedObjectsAndCategories[type];
             return objectOrCategory;
           })

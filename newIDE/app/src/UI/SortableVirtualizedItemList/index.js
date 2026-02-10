@@ -45,8 +45,11 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
 > {
   // $FlowFixMe[value-as-type]
   _list: ?List;
+  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  DragSourceAndDropTarget = makeDragSourceAndDropTarget<Item>(this.props.reactDndType) as any;
+  DragSourceAndDropTarget = makeDragSourceAndDropTarget<Item>(
+    this.props.reactDndType
+  );
 
   forceUpdateGrid() {
     if (this._list) this._list.forceUpdateGrid();
@@ -62,7 +65,9 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     }
   }
 
-  _renderItemRow(item: Item, index: number, isMobile: boolean): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _renderItemRow(item: Item, index: number, isMobile: boolean) {
     const {
       selectedItems,
       getItemThumbnail,
@@ -107,7 +112,9 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     );
   }
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const {
       height,
       width,

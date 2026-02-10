@@ -265,7 +265,8 @@ const ProfileDialog = ({ onClose }: Props) => {
   );
 };
 
-const ProfileDialogWithErrorBoundary = (props: Props): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+const ProfileDialogWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Profile</Trans>}
     scope="profile"

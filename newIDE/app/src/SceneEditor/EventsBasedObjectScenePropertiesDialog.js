@@ -21,17 +21,16 @@ type Props = {|
   ) => void,
 |};
 
-const EventsBasedObjectScenePropertiesDialog = (
-  {
-    eventsBasedObject,
-    eventsBasedObjectVariant,
-    project,
-    onApply,
-    onClose,
-    getContentAABB,
-    onEventsBasedObjectChildrenEdited
-  }: Props,
-): React.Node => {
+const EventsBasedObjectScenePropertiesDialog = ({
+  eventsBasedObject,
+  eventsBasedObjectVariant,
+  project,
+  onApply,
+  onClose,
+  getContentAABB,
+  onEventsBasedObjectChildrenEdited,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const [areaMinX, setAreaMinX] = React.useState<number>(
     eventsBasedObjectVariant.getAreaMinX()
   );
@@ -130,7 +129,6 @@ const EventsBasedObjectScenePropertiesDialog = (
           properties
         </Trans>
       }
-      // $FlowFixMe[incompatible-type]
       actions={actions}
       onRequestClose={onClose}
       onApply={onSubmit}

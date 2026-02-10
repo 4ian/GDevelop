@@ -87,9 +87,7 @@ const openAndWaitForExternalEditorWindow = async ({
         console.info(
           `Received data from external editor "${externalEditorName}."`
         );
-        // $FlowFixMe[incompatible-type]
         // $FlowFixMe[incompatible-type] - assuming the typing is good.
-        // $FlowFixMe[incompatible-type]
         externalEditorOutput = payload;
       } else if (event.data.id === 'close') {
         externalEditorWindow.close();

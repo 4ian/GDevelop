@@ -74,22 +74,21 @@ type Props = {|
 // $FlowFixMe[missing-local-annot]
 const getTextStyle = disabled => (disabled ? { opacity: 0.4 } : undefined);
 
-const InAppTutorialPhaseCard = (
-  {
-    progress,
-    locked,
-    size = 'large',
-    disabled,
-    title,
-    description,
-    shortDescription,
-    durationInMinutes,
-    keyPoints,
-    onClick,
-    renderImage,
-    loading
-  }: Props,
-): React.Node => {
+const InAppTutorialPhaseCard = ({
+  progress,
+  locked,
+  size = 'large',
+  disabled,
+  title,
+  description,
+  shortDescription,
+  durationInMinutes,
+  keyPoints,
+  onClick,
+  renderImage,
+  loading,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const shouldTextBeDisabled = loading || disabled || locked;
   const { isMobile } = useResponsiveWindowSize();
@@ -154,7 +153,6 @@ const InAppTutorialPhaseCard = (
                     noMargin
                     color="primary"
                     align="left"
-                    // $FlowFixMe[incompatible-type]
                     style={getTextStyle(shouldTextBeDisabled)}
                   >
                     {i18n._(title)}
@@ -176,7 +174,6 @@ const InAppTutorialPhaseCard = (
                             key={`key-point-${index}`}
                             size="body2"
                             noMargin
-                            // $FlowFixMe[incompatible-type]
                             style={getTextStyle(shouldTextBeDisabled)}
                             color="secondary"
                             displayAsListItem

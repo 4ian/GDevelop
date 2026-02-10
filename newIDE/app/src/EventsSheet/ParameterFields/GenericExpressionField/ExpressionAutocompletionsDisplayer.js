@@ -122,7 +122,6 @@ const AutocompletionRow = React.forwardRef(
         <LineStackLayout noMargin expand>
           {icon || (iconSrc ? <AutocompletionIcon src={iconSrc} /> : null)}
           {secondaryIcon}
-          {/* $FlowFixMe[incompatible-type] */}
           <Text style={defaultTextStyle} noMargin align="left">
             {isSelected ? <b>{trimmedLabel}</b> : trimmedLabel}
             {parametersLabel && (
@@ -166,7 +165,6 @@ const ExpressionDocumentation = ({
 }: ExpressionDocumentationProps) => {
   return (
     <Column noMargin>
-      {/* $FlowFixMe[incompatible-type] */}
       <Text style={defaultTextStyle} size="body2">
         {expressionMetadata.getDescription()}
       </Text>
@@ -179,7 +177,6 @@ const ExpressionDocumentation = ({
             .getParameterAt(parameterIndex);
           return (
             isParameterVisible(expressionMetadata, parameterIndex) && (
-              // $FlowFixMe[incompatible-type]
               <Text style={defaultTextStyle} size="body2" key={parameterIndex}>
                 <i>
                   {i18n._(
@@ -245,7 +242,8 @@ export default function ExpressionAutocompletionsDisplayer({
   onChoose,
   onScroll,
   parameterRenderingService,
-}: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: Props) {
   const scrollView = React.useRef((null: ?ScrollViewInterface));
   const selectedAutocompletionElement = React.useRef(
     (null: ?React.Component<any, any>)

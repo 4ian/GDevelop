@@ -13,7 +13,6 @@ export const onOpenWithPicker = (): Promise<?FileMetadata> => {
     message:
       'If you want to open your GDevelop 4 project, be sure to save it as a .json file',
     filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
-  // $FlowFixMe[incompatible-type]
   }).then(filePath => (filePath ? { fileIdentifier: filePath } : null));
 };
 
@@ -66,16 +65,8 @@ export const getAutoSaveCreationDate = async (
   return null;
 };
 
-export const onGetAutoSave = (fileMetadata: FileMetadata): Promise<
-  {
-    fileIdentifier: string,
-    gameId?: string,
-    lastModifiedDate?: number,
-    name?: string,
-    ownerId?: string,
-    version?: string,
-  },
-> => {
+// $FlowFixMe[signature-verification-failure]
+export const onGetAutoSave = (fileMetadata: FileMetadata) => {
   return Promise.resolve({
     ...fileMetadata,
     fileIdentifier: fileMetadata.fileIdentifier + '.autosave',

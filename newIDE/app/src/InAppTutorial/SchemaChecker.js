@@ -33,7 +33,8 @@ const flowStepKeys = [
   'interactsWithCanvas',
   'disableBlockingLayer',
 ];
-export const checkInAppTutorialFileJsonSchema = (object: Object): Array<string> => {
+// $FlowFixMe[signature-verification-failure]
+export const checkInAppTutorialFileJsonSchema = (object: Object) => {
   const errors = [];
   topLevelKeys.forEach(topLevelKey => {
     if (!object[topLevelKey]) {

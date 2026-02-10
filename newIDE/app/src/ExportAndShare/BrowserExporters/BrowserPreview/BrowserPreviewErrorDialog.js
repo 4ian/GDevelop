@@ -13,7 +13,9 @@ type Props = {|
 |};
 
 export default class BrowserPreviewErrorDialog extends Component<Props> {
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const { error, onClose } = this.props;
 
     return (
@@ -34,7 +36,6 @@ export default class BrowserPreviewErrorDialog extends Component<Props> {
             <Line>
               <Column noMargin>
                 <Text>
-                  // $FlowFixMe[incompatible-type]
                   {// $FlowFixMe[incompatible-type] - AWS returned errors can have extra fields
                   // $FlowFixMe[prop-missing]
                   error.code === 'NetworkingError' ? (

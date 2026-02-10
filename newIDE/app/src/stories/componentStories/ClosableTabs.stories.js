@@ -24,7 +24,8 @@ export default {
   decorators: [GDevelopJsInitializerDecorator],
 };
 
-export const ThreeTabs = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const ThreeTabs = () => (
   <ValueStateHolder
     initialValue={0}
     render={(value, onChange) => (
@@ -110,7 +111,8 @@ export const ThreeTabs = (): React.Node => (
   />
 );
 
-export const LongLabels = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const LongLabels = () => (
   <ValueStateHolder
     initialValue={0}
     render={(value, onChange) => (
@@ -227,7 +229,8 @@ const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = {
   ),
 };
 
-export const WithObjectsList = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithObjectsList = () => (
   <ValueStateHolder
     initialValue={0}
     render={(value, onChange) => (

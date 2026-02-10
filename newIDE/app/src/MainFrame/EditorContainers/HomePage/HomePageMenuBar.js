@@ -87,15 +87,14 @@ type Props = {|
   onOpenHomePageMenuDrawer: () => void,
 |};
 
-const HomePageMenuBar = (
-  {
-    setActiveTab,
-    activeTab,
-    onOpenPreferences,
-    onOpenAbout,
-    onOpenHomePageMenuDrawer
-  }: Props,
-): React.Node => {
+const HomePageMenuBar = ({
+  setActiveTab,
+  activeTab,
+  onOpenPreferences,
+  onOpenAbout,
+  onOpenHomePageMenuDrawer,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();
   const isMobileOrSmallScreen = isMobile || isMediumScreen;
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -155,7 +154,6 @@ const HomePageMenuBar = (
                   }}
                   key={id}
                 >
-                  {/* $FlowFixMe[incompatible-type] */}
                   <IconButton
                     color="inherit"
                     disableRipple

@@ -15,7 +15,8 @@ export default {
   component: ObjectEditorDialog,
 };
 
-export const CustomObject = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const CustomObject = () => (
   <DragAndDropContextProvider>
     <ObjectEditorDialog
       open={true}
@@ -59,7 +60,8 @@ export const CustomObject = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const StandardObject = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const StandardObject = () => (
   <DragAndDropContextProvider>
     <ObjectEditorDialog
       open={true}
@@ -103,7 +105,8 @@ export const StandardObject = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const LockedStandardObject = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const LockedStandardObject = () => (
   <DragAndDropContextProvider>
     <ObjectEditorDialog
       open={true}

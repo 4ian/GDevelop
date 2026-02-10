@@ -36,7 +36,8 @@ export default {
   decorators: [paperDecorator, GDevelopJsInitializerDecorator],
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <FixedHeightFlexContainer height={600}>
     <DragAndDropContextProvider>
       <FullSizeInstancesEditorWithScrollbars

@@ -188,10 +188,13 @@ export default class ExpressionField extends React.Component<Props, State> {
     parametersDialogOpen: false,
     selectedExpressionInfo: null,
 
-    validatedValue: this.props.value as string,
+    // $FlowFixMe[signature-verification-failure]
+    validatedValue: this.props.value,
     errorText: null,
-    errorHighlights: [] as Array<empty>,
-    autocompletions: getAutocompletionsInitialState() as AutocompletionsState,
+    // $FlowFixMe[signature-verification-failure]
+    errorHighlights: [],
+    // $FlowFixMe[signature-verification-failure]
+    autocompletions: getAutocompletionsInitialState(),
   };
 
   componentDidMount() {
@@ -425,15 +428,15 @@ export default class ExpressionField extends React.Component<Props, State> {
     );
   };
 
+  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  _enqueueValidation = debounce(
-  () => {
+  _enqueueValidation = debounce(() => {
     this._doValidation();
-  },
-  250,
-) as any;
+  }, 250);
 
-  _doValidation = (): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _doValidation = () => {
     const {
       project,
       projectScopedContainersAccessor,
@@ -501,9 +504,7 @@ export default class ExpressionField extends React.Component<Props, State> {
         scope,
       },
       completionDescriptions,
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] The autocompletion doesn't display the groups so it doesn't need to be able to translate them.
-      // $FlowFixMe[incompatible-type]
       null
     );
 
@@ -523,7 +524,9 @@ export default class ExpressionField extends React.Component<Props, State> {
     }));
   };
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const {
       value,
       expressionType,
@@ -594,7 +597,6 @@ export default class ExpressionField extends React.Component<Props, State> {
                       onChange={this._handleChange}
                       onBlur={this._handleBlurEvent}
                       ref={field => (this._field = field)}
-                      // $FlowFixMe[incompatible-type]
                       onFocus={this._handleFocus}
                       errorText={this.state.errorText}
                       onClick={() => this._enqueueValidation()}

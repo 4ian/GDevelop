@@ -25,7 +25,8 @@ const styles = {
   },
 };
 
-const TextBasedCourseChapterTable = ({header, rows}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const TextBasedCourseChapterTable = ({ header, rows }: Props) => {
   const columnCount = React.useMemo(
     () => {
       const maxColumnsFromRows = rows.reduce(

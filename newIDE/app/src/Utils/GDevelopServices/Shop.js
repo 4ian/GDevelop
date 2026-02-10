@@ -20,8 +20,8 @@ import {
   ensureIsString,
 } from '../DataValidator';
 
-// $FlowFixMe[cannot-resolve-name]
-export const client: Axios = axios.create({
+// $FlowFixMe[signature-verification-failure]
+export const client = axios.create({
   baseURL: GDevelopShopApi.baseUrl,
 });
 
@@ -255,6 +255,7 @@ export const getArchivedPrivateGameTemplateListingData = ({
 export const listListedPrivateAssetPacks = async (): Promise<
   Array<PrivateAssetPackListingData>
 > => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get('/asset-pack');
   return ensureIsArray({
     data: response.data,
@@ -265,6 +266,7 @@ export const listListedPrivateAssetPacks = async (): Promise<
 export const listListedPrivateGameTemplates = async (): Promise<
   Array<PrivateGameTemplateListingData>
 > => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get('/game-template');
   return ensureIsArray({
     data: response.data,
@@ -275,6 +277,7 @@ export const listListedPrivateGameTemplates = async (): Promise<
 export const listListedCreditsPackages = async (): Promise<
   Array<CreditsPackageListingData>
 > => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get('/credits-package');
   return ensureIsArray({
     data: response.data,
@@ -285,6 +288,7 @@ export const listListedCreditsPackages = async (): Promise<
 export const listListedCourseChapters = async (): Promise<
   Array<CourseChapterListingData>
 > => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get('/course-chapter');
   return ensureIsArray({
     data: response.data,
@@ -295,6 +299,7 @@ export const listListedCourseChapters = async (): Promise<
 export const listListedCourses = async (): Promise<
   Array<CourseListingData>
 > => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get('/course');
   return ensureIsArray({
     data: response.data,
@@ -305,6 +310,7 @@ export const listListedCourses = async (): Promise<
 export const listListedBundles = async (): Promise<
   Array<BundleListingData>
 > => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get('/bundle');
   return ensureIsArray({
     data: response.data,
@@ -319,6 +325,7 @@ export const getListedBundle = async ({
   bundleId: string,
   visibility?: 'all',
 |}): Promise<?BundleListingData> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/bundle/${bundleId}`, {
     params: {
       visibility,
@@ -337,6 +344,7 @@ export const listSellerAssetPacks = async ({
 }: {|
   sellerId: string,
 |}): Promise<Array<PrivateAssetPackListingData>> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/user/${sellerId}/product`, {
     params: {
       productType: 'asset-pack',
@@ -350,6 +358,7 @@ export const listSellerGameTemplates = async ({
 }: {|
   sellerId: string,
 |}): Promise<Array<PrivateGameTemplateListingData>> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get(`/user/${sellerId}/product`, {
     params: {
       productType: 'game-template',
@@ -377,6 +386,7 @@ export const listUserPurchases = async (
   |}
 ): Promise<Array<Purchase>> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get('/purchase', {
     params: {
       userId,
@@ -402,6 +412,7 @@ export const getAuthorizationTokenForPrivateAssets = async (
   |}
 ): Promise<string> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.post(
     '/asset-pack/action/authorize',
     {},
@@ -425,6 +436,7 @@ export const getAuthorizationTokenForPrivateGameTemplates = async (
   |}
 ): Promise<string> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.post(
     '/game-template/action/authorize',
     {},
@@ -498,23 +510,22 @@ export const getPurchaseCheckoutUrl = ({
   return url.toString();
 };
 
-export const getStripeCheckoutUrl = (
-  {
-    userId,
-    userUuid,
-    productId,
-    priceName,
-    userEmail,
-    password
-  }: {|
-    userId?: string,
-    userUuid?: string,
-    productId: string,
-    priceName: string,
-    userEmail?: string,
-    password?: string,
-  |},
-): string => {
+export const getStripeCheckoutUrl = ({
+  userId,
+  userUuid,
+  productId,
+  priceName,
+  userEmail,
+  password,
+}: {|
+  userId?: string,
+  userUuid?: string,
+  productId: string,
+  priceName: string,
+  userEmail?: string,
+  password?: string,
+// $FlowFixMe[signature-verification-failure]
+|}) => {
   const url = new URL(
     `${GDevelopShopApi.baseUrl}/purchase/action/redirect-to-stripe-checkout`
   );
@@ -534,7 +545,6 @@ export const fetchTokenForPrivateGameTemplateAuthorizationIfNeeded = async ({
   authenticatedUser,
   allResourcePaths,
 }: {|
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   allResourcePaths: Array<string>,
 |}): Promise<?string> => {
@@ -565,6 +575,7 @@ export const listProductLicenses = async ({
 }: {|
   productType: 'asset-pack' | 'game-template',
 |}): Promise<ProductLicense[]> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get('/product-license', {
     params: {
       productType,
@@ -595,6 +606,7 @@ export const buyProductWithCredits = async (
   const queryParams: {| userId: string, password?: string |} = { userId };
   if (password) queryParams.password = password;
 
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   await client.post(
     `/product/${productId}/action/buy-with-credits`,
     {
@@ -749,6 +761,7 @@ export const redeemPrivateAssetPack = async ({
     priceUsageType: 'commercial',
   };
   if (password) payload.password = password;
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   await client.post(
     `/product/${privateAssetPackListingData.id}/action/redeem`,
     payload,
@@ -771,6 +784,7 @@ export const claimPurchase = async ({
   claimableToken: string,
 |}): Promise<Purchase> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const result = await client.post(
     `/purchase/${purchaseId}/action/claim`,
     { claimableToken },

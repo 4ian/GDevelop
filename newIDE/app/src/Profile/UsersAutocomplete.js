@@ -28,7 +28,14 @@ const getErrorMessage = (error: ?Error) => {
   if (error) return 'Error while loading users';
 };
 
-export const UsersAutocomplete = ({userIds, onChange, floatingLabelText, helperText, disabled}: Props): React.Node => {
+export const UsersAutocomplete = ({
+  userIds,
+  onChange,
+  floatingLabelText,
+  helperText,
+  disabled,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const forceUpdate = useForceUpdate();
   const [users, setUsers] = React.useState<Array<AutocompleteOption>>([]);
   const [userInput, setUserInput] = useState('');
@@ -147,13 +154,11 @@ export const UsersAutocomplete = ({userIds, onChange, floatingLabelText, helperT
       helperText={helperText}
       value={users}
       onChange={(event, values) => {
-        // $FlowFixMe[constant-condition]
         if (!values) return;
         // change users in state
         setUsers(values);
         // call top onChange on user ids
         onChange(
-          // $FlowFixMe[missing-local-annot]
           values.map(option => ({
             username: option.text,
             userId: option.value,
@@ -166,7 +171,6 @@ export const UsersAutocomplete = ({userIds, onChange, floatingLabelText, helperT
         setUserInput(value);
       }}
       ref={autocompleteRef}
-      // $FlowFixMe[incompatible-type]
       dataSource={completionOwnUserProfile.concat(
         completionUserPublicProfiles
           .map((userPublicProfile: UserPublicProfile) => {

@@ -24,45 +24,61 @@ export type LearnCategory =
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
-    title: <Trans>Make an entire game</Trans> as React.Node,
-    description: <Trans>Make complete games step by step</Trans> as React.Node,
+    // $FlowFixMe[signature-verification-failure]
+    title: <Trans>Make an entire game</Trans>,
+    // $FlowFixMe[signature-verification-failure]
+    description: <Trans>Make complete games step by step</Trans>,
   },
   'game-mechanic': {
-    title: <Trans>Specific game mechanics</Trans> as React.Node,
+    // $FlowFixMe[signature-verification-failure]
+    title: <Trans>Specific game mechanics</Trans>,
     description: (
+      // $FlowFixMe[signature-verification-failure]
       <Trans>
-  Find how to implement the most common game mechanics and more
-</Trans> as React.Node
+        Find how to implement the most common game mechanics and more
+      </Trans>
     ),
   },
   'official-beginner': {
-    title: <Trans>Beginner course</Trans> as React.Node,
-    description: <Trans>Learn the fundamental principles of GDevelop</Trans> as React.Node,
+    // $FlowFixMe[signature-verification-failure]
+    title: <Trans>Beginner course</Trans>,
+    // $FlowFixMe[signature-verification-failure]
+    description: <Trans>Learn the fundamental principles of GDevelop</Trans>,
   },
   'official-intermediate': {
-    title: <Trans>Intermediate course</Trans> as React.Node,
+    // $FlowFixMe[signature-verification-failure]
+    title: <Trans>Intermediate course</Trans>,
     description: (
-      <Trans>Learn all the game-building mechanics of GDevelop</Trans> as React.Node
+      // $FlowFixMe[signature-verification-failure]
+      <Trans>Learn all the game-building mechanics of GDevelop</Trans>
     ),
   },
   'official-advanced': {
-    title: <Trans>Advanced course</Trans> as React.Node,
-    description: <Trans>The icing on the cake</Trans> as React.Node,
+    // $FlowFixMe[signature-verification-failure]
+    title: <Trans>Advanced course</Trans>,
+    // $FlowFixMe[signature-verification-failure]
+    description: <Trans>The icing on the cake</Trans>,
   },
   'education-curriculum': {
-    title: <Trans>Education curriculum and resources</Trans> as React.Node,
+    // $FlowFixMe[signature-verification-failure]
+    title: <Trans>Education curriculum and resources</Trans>,
     description: (
+      // $FlowFixMe[signature-verification-failure]
       <Trans>
-  For teachers and educators having the GDevelop Education subscription. Ready to use resources for teaching.
-</Trans> as React.Node
+        For teachers and educators having the GDevelop Education subscription.
+        Ready to use resources for teaching.
+      </Trans>
     ),
   },
   course: {
-    title: <Trans>Loading</Trans> as React.Node,
-    description: <Trans>Loading course...</Trans> as React.Node,
+    // $FlowFixMe[signature-verification-failure]
+    title: <Trans>Loading</Trans>,
+    // $FlowFixMe[signature-verification-failure]
+    description: <Trans>Loading course...</Trans>,
   },
   recommendations: {
-    title: <Trans>Recommendations</Trans> as React.Node,
+    // $FlowFixMe[signature-verification-failure]
+    title: <Trans>Recommendations</Trans>,
     description: null,
   },
 };
@@ -70,7 +86,8 @@ export const TUTORIAL_CATEGORY_TEXTS = {
 export const getColumnsFromWindowSize = (
   windowSize: WindowSizeType,
   isLandscape: boolean
-): number => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   switch (windowSize) {
     case 'small':
       return isLandscape ? 4 : 2;
@@ -99,7 +116,8 @@ export const getChipColorFromTutorialCategory = (
 export const getChipTextFromTutorialCategory = (
   category: TutorialCategory,
   i18n: I18nType
-): any | null => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   if (category === 'official-beginner') return i18n._(t`Beginner`);
   if (category === 'official-intermediate') return i18n._(t`Intermediate`);
   if (category === 'official-advanced') return i18n._(t`Advanced`);

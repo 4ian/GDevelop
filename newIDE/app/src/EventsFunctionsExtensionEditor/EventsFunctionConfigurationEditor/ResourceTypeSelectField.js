@@ -23,7 +23,8 @@ export default function ResourceTypeSelectField({
   onChange,
   onFocus,
   fullWidth,
-}: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: Props) {
   return (
     <I18n>
       {({ i18n }) => (

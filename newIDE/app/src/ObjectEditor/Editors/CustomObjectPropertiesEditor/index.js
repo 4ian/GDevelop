@@ -71,7 +71,8 @@ const styles = {
   icon: { width: 16, height: 16 },
 };
 
-export const ChildrenOverridingDepreciationAlert = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const ChildrenOverridingDepreciationAlert = () => {
   return (
     <AlertMessage kind="warning">
       <MarkdownText
@@ -204,7 +205,8 @@ export const deleteVariant = (
 
 type Props = EditorProps;
 
-const CustomObjectPropertiesEditor = (props: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const CustomObjectPropertiesEditor = (props: Props) => {
   const forceUpdate = useForceUpdate();
 
   const {

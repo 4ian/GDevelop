@@ -57,12 +57,12 @@ type BuildProperties = {
 type Props = {|
   comment: Comment,
   buildProperties?: BuildProperties,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   onCommentUpdated: (comment: Comment) => void,
 |};
 
-export const getRatings = (ratings: ?GameRatings): ?Array<{ key: string, label: React.Node, value: number }> => {
+// $FlowFixMe[signature-verification-failure]
+export const getRatings = (ratings: ?GameRatings) => {
   if (!ratings) return null;
   if (ratings.version === 1) {
     return [
@@ -86,7 +86,13 @@ export const getRatings = (ratings: ?GameRatings): ?Array<{ key: string, label: 
   }
 };
 
-const FeedbackCard = ({comment, buildProperties, authenticatedUser, onCommentUpdated}: Props): React.Node => {
+const FeedbackCard = ({
+  comment,
+  buildProperties,
+  authenticatedUser,
+  onCommentUpdated,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const ratings = getRatings(comment.ratings);
   const theme = React.useContext(GDevelopThemeContext);
@@ -314,7 +320,6 @@ const FeedbackCard = ({comment, buildProperties, authenticatedUser, onCommentUpd
                 </ResponsiveLineStackLayout>
               )}
               <LargeSpacer />
-              {/* $FlowFixMe[incompatible-type] */}
               <Text style={styles.textComment} allowSelection>
                 {comment.text}
               </Text>

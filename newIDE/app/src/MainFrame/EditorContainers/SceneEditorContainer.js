@@ -30,7 +30,9 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     return this.props.project;
   }
 
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
     if (!this.props.isActive && nextProps.isActive) {
       this._setPreviewedLayout();
     }
@@ -211,7 +213,9 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     }
   };
 
-  render(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  render() {
     const { project, projectItemName, isActive } = this.props;
     const layout = this.getLayout();
     if (!layout || !project) {
@@ -293,4 +297,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
   }
 }
 
-export const renderSceneEditorContainer = (props: RenderEditorContainerPropsWithRef): React.Node => <SceneEditorContainer {...props} />;
+export const renderSceneEditorContainer = (
+  props: RenderEditorContainerPropsWithRef
+// $FlowFixMe[signature-verification-failure]
+) => <SceneEditorContainer {...props} />;

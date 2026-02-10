@@ -177,7 +177,6 @@ const PolygonSection = (props: PolygonSectionProps) => {
 
   return (
     <Accordion defaultExpanded>
-      {/* $FlowFixMe[incompatible-type] */}
       <AccordionHeader actions={polygonActions}>
         <Text displayInlineAsSpan>
           {verticesCount === 3 && <Trans>Triangle</Trans>}
@@ -217,7 +216,8 @@ type PolygonsListProps = {|
   spriteSize: [number, number],
 |};
 
-const PolygonsList = (props: PolygonsListProps): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const PolygonsList = (props: PolygonsListProps) => {
   const {
     polygons,
     spriteSize,

@@ -35,7 +35,8 @@ type Props = {|
   hideControls?: boolean,
 |};
 
-const CollisionMasksPreview = (props: Props): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+const CollisionMasksPreview = (props: Props) => {
   const svgRef = React.useRef<React.ElementRef<'svg'> | null>(null);
   const [
     draggedVertex,
@@ -134,13 +135,11 @@ const CollisionMasksPreview = (props: Props): React.MixedElement => {
     | null => {
     if (!svgRef.current) return null;
 
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] Flow doesn't have SVG typings yet (@facebook/flow#4551)
     // $FlowFixMe[prop-missing]
     const pointOnScreen = svgRef.current.createSVGPoint();
     pointOnScreen.x = event.clientX;
     pointOnScreen.y = event.clientY;
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] Flow doesn't have SVG typings yet (@facebook/flow#4551)
     // $FlowFixMe[prop-missing]
     // $FlowFixMe[incompatible-use]

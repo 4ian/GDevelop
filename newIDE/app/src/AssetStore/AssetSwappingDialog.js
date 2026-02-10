@@ -207,7 +207,8 @@ function AssetSwappingDialog({
   );
 }
 
-const AssetSwappingDialogWithErrorBoundary = (props: Props): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+const AssetSwappingDialogWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Asset store dialog</Trans>}
     scope="new-object-dialog"

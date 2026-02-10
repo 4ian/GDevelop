@@ -12,7 +12,11 @@ type Props = {|
   hasFilledSurveyAlready: boolean,
 |};
 
-export const SurveyCard = ({onStartSurvey, hasFilledSurveyAlready}: Props): React.Node => {
+export const SurveyCard = ({
+  onStartSurvey,
+  hasFilledSurveyAlready,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   return (
     <CalloutCard
       renderImage={style => (

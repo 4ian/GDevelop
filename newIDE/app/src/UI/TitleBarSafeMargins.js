@@ -15,13 +15,12 @@ const titleBarStyles = {
   rightSideArea: { alignSelf: 'stretch', flexShrink: 0 },
 };
 
-export const TitleBarLeftSafeMargins = (
-  {
-    backgroundColor
-  }: {|
-    backgroundColor?: string,
-  |},
-): null | React.MixedElement => {
+export const TitleBarLeftSafeMargins = ({
+  backgroundColor,
+}: {|
+  backgroundColor?: string,
+// $FlowFixMe[signature-verification-failure]
+|}) => {
   // An installed PWA can have window controls displayed as overlay. If supported,
   // we set up a listener to detect any change and force a refresh that will read
   // the latest size of the controls.
@@ -39,7 +38,6 @@ export const TitleBarLeftSafeMargins = (
   } else {
     // Otherwise, the windowControlsOverlay tells us how much space is needed.
     // This can happen for mac apps, or installed PWA.
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - this API is not handled by Flow.
     // $FlowFixMe[prop-missing]
     const { windowControlsOverlay } = navigator;
@@ -68,13 +66,12 @@ export const TitleBarLeftSafeMargins = (
   return null;
 };
 
-export const TitleBarRightSafeMargins = (
-  {
-    backgroundColor
-  }: {|
-    backgroundColor?: string,
-  |},
-): React.MixedElement => {
+export const TitleBarRightSafeMargins = ({
+  backgroundColor,
+}: {|
+  backgroundColor?: string,
+// $FlowFixMe[signature-verification-failure]
+|}) => {
   // An installed PWA can have window controls displayed as overlay. If supported,
   // we set up a listener to detect any change and force a refresh that will read
   // the latest size of the controls.
@@ -87,7 +84,6 @@ export const TitleBarRightSafeMargins = (
 
   // An installed PWA can have window controls displayed as overlay,
   // which we measure here to set the offsets.
-  // $FlowFixMe[incompatible-type]
   // $FlowFixMe[incompatible-type] - this API is not handled by Flow.
   // $FlowFixMe[prop-missing]
   const { windowControlsOverlay } = navigator;

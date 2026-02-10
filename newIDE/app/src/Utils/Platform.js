@@ -42,7 +42,11 @@ export const getPlatformName = (): string => {
         'Unknown platform (web-app)';
 };
 
-export const isWindows = (): boolean => _isWindows;
-export const isMacLike = (): boolean => _isMacLike;
-export const isMobile = (): boolean => _isMobile;
-export const isNativeMobileApp = (): boolean => false;
+// $FlowFixMe[signature-verification-failure]
+export const isWindows = () => _isWindows;
+// $FlowFixMe[signature-verification-failure]
+export const isMacLike = () => _isMacLike;
+// $FlowFixMe[signature-verification-failure]
+export const isMobile = () => _isMobile;
+// $FlowFixMe[signature-verification-failure]
+export const isNativeMobileApp = () => false;

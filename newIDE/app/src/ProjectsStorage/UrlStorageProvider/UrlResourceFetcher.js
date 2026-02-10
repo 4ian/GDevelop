@@ -17,9 +17,12 @@ type Options = {
  * must be located next to it.
  * This is helpful to work on a project stored publicly (like on GitHub).
  */
-export const fetchRelativeResourcesToFullUrls = async ({project, fileMetadata, onProgress}: Options): 
-  | Promise<{ erroredResources: Array<empty> }>
-  | Promise<{ erroredResources: Array<{ error: any, resourceName: string }> }> => {
+export const fetchRelativeResourcesToFullUrls = async ({
+  project,
+  fileMetadata,
+  onProgress,
+// $FlowFixMe[signature-verification-failure]
+}: Options) => {
   const resourcesManager = project.getResourcesManager();
   const allResourceNames = resourcesManager.getAllResourceNames().toJSArray();
   const erroredResources = [];

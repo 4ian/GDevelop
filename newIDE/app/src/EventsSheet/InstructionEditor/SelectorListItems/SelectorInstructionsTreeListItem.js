@@ -52,9 +52,7 @@ export const renderInstructionOrExpressionTree = <
       if (!instructionOrGroup) return null;
 
       if (typeof instructionOrGroup.type === 'string') {
-        // $FlowFixMe[incompatible-type]
         // $FlowFixMe[incompatible-type] - see above
-        // $FlowFixMe[incompatible-type]
         const instructionMetadata: T = instructionOrGroup;
         const value = getInstructionListItemValue(instructionOrGroup.type);
         const selected = selectedValue === value;
@@ -82,9 +80,7 @@ export const renderInstructionOrExpressionTree = <
           />
         );
       } else {
-        // $FlowFixMe[incompatible-type]
         // $FlowFixMe[incompatible-type] - see above
-        // $FlowFixMe[incompatible-type]
         const groupOfInstructionInformation: InstructionOrExpressionTreeNode = instructionOrGroup;
         if (useSubheaders) {
           const iconSrc = getGroupIconSrc(key) || parentGroupIconSrc;

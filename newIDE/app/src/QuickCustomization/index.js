@@ -154,25 +154,24 @@ type Props = {|
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
-export const renderQuickCustomization = (
-  {
-    project,
-    gameAndBuildsManager,
-    resourceManagementProps,
-    quickCustomizationState,
-    onLaunchPreview,
-    onlineWebExporter,
-    onSaveProject,
-    isSavingProject,
-    isRequiredToSaveAsNewCloudProject,
-    onClose,
-    onContinueQuickCustomization,
-    gameScreenshotUrls,
-    onScreenshotsClaimed,
-    onWillInstallExtension,
-    onExtensionInstalled
-  }: Props,
-): { content: React.Node, showPreview: boolean, title: React.Node } => {
+export const renderQuickCustomization = ({
+  project,
+  gameAndBuildsManager,
+  resourceManagementProps,
+  quickCustomizationState,
+  onLaunchPreview,
+  onlineWebExporter,
+  onSaveProject,
+  isSavingProject,
+  isRequiredToSaveAsNewCloudProject,
+  onClose,
+  onContinueQuickCustomization,
+  gameScreenshotUrls,
+  onScreenshotsClaimed,
+  onWillInstallExtension,
+  onExtensionInstalled,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   return {
     title: quickCustomizationState.step.title,
     content: (

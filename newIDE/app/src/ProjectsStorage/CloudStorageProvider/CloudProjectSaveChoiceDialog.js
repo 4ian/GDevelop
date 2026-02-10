@@ -16,7 +16,13 @@ type Props = {|
   onSaveAsDuplicate: () => void | Promise<void>,
 |};
 
-const CloudProjectRecoveryDialog = ({onClose, isLoading, onSaveAsDuplicate, onSaveAsMainVersion}: Props): React.Node => {
+const CloudProjectRecoveryDialog = ({
+  onClose,
+  isLoading,
+  onSaveAsDuplicate,
+  onSaveAsMainVersion,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const actions = [
     <FlatButton
       disabled={isLoading}
@@ -46,7 +52,6 @@ const CloudProjectRecoveryDialog = ({onClose, isLoading, onSaveAsDuplicate, onSa
       onApply={() => {
         onSaveAsMainVersion();
       }}
-      // $FlowFixMe[incompatible-type]
       actions={actions}
       title={
         <Trans>

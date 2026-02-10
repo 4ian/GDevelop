@@ -50,7 +50,8 @@ const styles = {
  * A raised button based on Material-UI button, that has a menu displayed
  * when the dropdown arrow is clicked.
  */
-const RaisedButtonWithSplitMenu = (props: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const RaisedButtonWithSplitMenu = (props: Props) => {
   const {
     id,
     buildMenuTemplate,

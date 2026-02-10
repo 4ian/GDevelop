@@ -12,7 +12,8 @@ export default {
   decorators: [inAppTutorialDecorator, paperDecorator],
 };
 
-export const MultichapterTutorial = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const MultichapterTutorial = () => {
   return (
     <StartInAppTutorialDialog
       open
@@ -25,7 +26,8 @@ export const MultichapterTutorial = (): React.Node => {
   );
 };
 
-export const Default = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => {
   return (
     <StartInAppTutorialDialog
       open
@@ -38,7 +40,8 @@ export const Default = (): React.Node => {
   );
 };
 
-export const Opening = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const Opening = () => {
   return (
     <StartInAppTutorialDialog
       open
@@ -51,7 +54,8 @@ export const Opening = (): React.Node => {
   );
 };
 
-export const WithTutorialAlreadyStarted = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithTutorialAlreadyStarted = () => {
   return (
     <StartInAppTutorialDialog
       open
@@ -63,7 +67,8 @@ export const WithTutorialAlreadyStarted = (): React.Node => {
     />
   );
 };
-export const WithTutorialCompleted = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const WithTutorialCompleted = () => {
   return (
     <StartInAppTutorialDialog
       open

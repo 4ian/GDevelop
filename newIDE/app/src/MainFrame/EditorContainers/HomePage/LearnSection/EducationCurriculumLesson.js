@@ -97,19 +97,18 @@ type Props = {|
   onClickSubscribe?: () => void,
 |};
 
-const EducationCurriculumLesson = (
-  {
-    i18n,
-    tutorial,
-    limits,
-    onSelectTutorial,
-    onSelectCourse,
-    index,
-    onOpenTemplateFromTutorial,
-    isLocked,
-    onClickSubscribe
-  }: Props,
-): React.MixedElement => {
+const EducationCurriculumLesson = ({
+  i18n,
+  tutorial,
+  limits,
+  onSelectTutorial,
+  onSelectCourse,
+  index,
+  onOpenTemplateFromTutorial,
+  isLocked,
+  onClickSubscribe,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const [isImageLoaded, setIsImageLoaded] = React.useState<boolean>(false);
   const isLessonLocked =

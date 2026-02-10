@@ -74,7 +74,6 @@ const openBrowserSWPreviewIndexedDB = (): Promise<IDBDatabase> => {
 
   return new Promise((resolve, reject) => {
     try {
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - indexedDB is available in all browsers
       // $FlowFixMe[cannot-resolve-name]
       const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -316,11 +315,9 @@ const acquireInstanceIdAndCleanup = async (
   const store = transaction.objectStore(INSTANCES_STORE_NAME);
 
   const [keys, records] = await Promise.all([
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - outdated Flow types.
     // $FlowFixMe[prop-missing]
     requestToPromise(store.getAllKeys()),
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - outdated Flow types.
     // $FlowFixMe[prop-missing]
     requestToPromise(store.getAll()),

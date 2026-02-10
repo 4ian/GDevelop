@@ -16,7 +16,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Loading = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Loading = () => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <CancelReasonDialog
       onClose={() => action('on close')()}
@@ -25,7 +26,8 @@ export const Loading = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <CancelReasonDialog
       onClose={() => action('on close')()}

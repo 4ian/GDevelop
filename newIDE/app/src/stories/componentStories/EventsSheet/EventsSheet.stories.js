@@ -15,7 +15,8 @@ export default {
   component: EventsSheet,
 };
 
-export const DefaultNoScope = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const DefaultNoScope = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={500}>
       <EventsSheet
@@ -44,7 +45,8 @@ export const DefaultNoScope = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const EmptyNoScope = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const EmptyNoScope = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={500}>
       <EventsSheet

@@ -463,7 +463,8 @@ const deleteItem = (item: TreeViewItem) => {
 const getTreeViewItemRightButton = (i18n: I18nType) => (item: TreeViewItem) =>
   item.content.getRightButton(i18n);
 
-export const usePropertyOverridingAlertDialog = (): ((existingPropertyNames: Array<string>) => Promise<boolean>) => {
+// $FlowFixMe[signature-verification-failure]
+export const usePropertyOverridingAlertDialog = () => {
   const { showConfirmation } = useAlertDialog();
   return async (existingPropertyNames: Array<string>): Promise<boolean> => {
     return await showConfirmation({
@@ -730,7 +731,6 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
           isSharedProperties
         );
       }
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - We are confident this TreeView item is in fact a PropertyFolderOrPropertyWithContext
       return topToBottomAscendanceId[firstClosedFolderIndex];
     };
@@ -1393,9 +1393,8 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
   }
 );
 
-const PropertyListEditorWithErrorBoundary: component(
-  ...{ ...Props, +ref?: React.RefSetter<PropertyListEditorInterface> }
-) = React.forwardRef<
+// $FlowFixMe[signature-verification-failure]
+const PropertyListEditorWithErrorBoundary = React.forwardRef<
   Props,
   PropertyListEditorInterface
 >((props, ref) => (

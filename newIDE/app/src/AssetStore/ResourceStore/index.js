@@ -167,7 +167,6 @@ const AudioResourceListAndFilters = ({
     subtitle = [];
     const authorsDisplayLinks = getAuthorsDisplayLinks(selectedResource);
     if (authorsDisplayLinks) {
-      // $FlowFixMe[incompatible-type]
       subtitle.push(authorsDisplayLinks);
       // $FlowFixMe[incompatible-type]
       subtitle.push(' - ');
@@ -389,7 +388,12 @@ type Props = {
   resourceKind: ResourceKindSupportedByResourceStore,
 };
 
-export const ResourceStore = ({onSelectResource, selectedResourceIndex, resourceKind}: Props): React.Node => {
+export const ResourceStore = ({
+  onSelectResource,
+  selectedResourceIndex,
+  resourceKind,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const {
     searchResults,
     fetchResourcesAndFilters,
@@ -476,7 +480,6 @@ export const ResourceStore = ({onSelectResource, selectedResourceIndex, resource
           setIsFiltersPanelOpen={setIsFiltersPanelOpen}
           searchResults={
             // $FlowIgnore - search results should return results for audio resources only.
-            // $FlowFixMe[incompatible-type]
             searchResultsForResourceKind
           }
         />
@@ -490,7 +493,6 @@ export const ResourceStore = ({onSelectResource, selectedResourceIndex, resource
           setIsFiltersPanelOpen={setIsFiltersPanelOpen}
           searchResults={
             // $FlowIgnore - search results should return results for font resources only.
-            // $FlowFixMe[incompatible-type]
             searchResultsForResourceKind
           }
         />
@@ -504,7 +506,6 @@ export const ResourceStore = ({onSelectResource, selectedResourceIndex, resource
           setIsFiltersPanelOpen={() => {}}
           searchResults={
             // $FlowIgnore - search results should return results for svg resources only.
-            // $FlowFixMe[incompatible-type]
             searchResultsForResourceKind
           }
         />

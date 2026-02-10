@@ -45,7 +45,8 @@ type State = {|
   draggedPointKind: ?PointKind,
 |};
 
-const PointsPreview = (props: Props): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+const PointsPreview = (props: Props) => {
   const svgRef = React.useRef<React.ElementRef<'svg'> | null>(null);
   const [state, setState] = React.useState<State>({
     draggedPoint: null,
@@ -86,13 +87,11 @@ const PointsPreview = (props: Props): React.MixedElement => {
     | null => {
     if (!svgRef.current) return null;
 
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] Flow doesn't have SVG typings yet (@facebook/flow#4551)
     // $FlowFixMe[prop-missing]
     const pointOnScreen = svgRef.current.createSVGPoint();
     pointOnScreen.x = event.clientX;
     pointOnScreen.y = event.clientY;
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] Flow doesn't have SVG typings yet (@facebook/flow#4551)
     // $FlowFixMe[prop-missing]
     // $FlowFixMe[incompatible-use]
@@ -304,8 +303,8 @@ const PointsPreview = (props: Props): React.MixedElement => {
 
   const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();
   const backgroundPointNames = [
-    // $FlowFixMe[incompatible-exact]
     // $FlowFixMe[incompatible-use]
+    // $FlowFixMe[incompatible-exact]
     ...mapVector(nonDefaultPoints, (point, i) => point.getName()),
     'Origin',
     'Center',

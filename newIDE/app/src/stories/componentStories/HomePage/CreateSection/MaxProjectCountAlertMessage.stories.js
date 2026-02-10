@@ -17,7 +17,8 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const ForFreeUser = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const ForFreeUser = () => (
   <AuthenticatedUserContext.Provider
     value={defaultAuthenticatedUserWithNoSubscription}
   >
@@ -25,31 +26,36 @@ export const ForFreeUser = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const ForIndieUser = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const ForIndieUser = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <MaxProjectCountAlertMessage />
   </AuthenticatedUserContext.Provider>
 );
 
-export const ForGoldUser = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const ForGoldUser = () => (
   <AuthenticatedUserContext.Provider value={fakeGoldAuthenticatedUser}>
     <MaxProjectCountAlertMessage />
   </AuthenticatedUserContext.Provider>
 );
 
-export const ForProUser = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const ForProUser = () => (
   <AuthenticatedUserContext.Provider value={fakeStartupAuthenticatedUser}>
     <MaxProjectCountAlertMessage />
   </AuthenticatedUserContext.Provider>
 );
 
-export const DenseMargins = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const DenseMargins = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <MaxProjectCountAlertMessage margin="dense" />
   </AuthenticatedUserContext.Provider>
 );
 
-export const DenseMarginsOnSmallDialog = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const DenseMarginsOnSmallDialog = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FixedWidthFlexContainer width={500}>
       <MaxProjectCountAlertMessage margin="dense" />

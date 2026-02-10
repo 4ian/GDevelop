@@ -190,7 +190,9 @@ class TileMapPaintingPreview {
     angle: number,
     // $FlowFixMe[value-as-type]
     texture: PIXI.Texture,
-  |}): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  |}) {
     const sprite = new PIXI.TilingSprite(texture);
     const workingPoint = [0, 0];
 
@@ -232,7 +234,6 @@ class TileMapPaintingPreview {
     const renderedInstance = this.getRendererOfInstance(instance);
     if (
       !renderedInstance ||
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - TODO: Replace this check with a `instanceof RenderedSimpleTileMapInstance`
       // $FlowFixMe[prop-missing]
       !renderedInstance.getEditableTileMap

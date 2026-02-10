@@ -29,7 +29,8 @@ import { showErrorBox } from '../../UI/Messages/MessageBox';
 
 type Props = {| children: React.Node |};
 
-const TeamProvider = ({children}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const TeamProvider = ({ children }: Props) => {
   const {
     limits,
     profile,

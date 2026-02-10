@@ -51,9 +51,7 @@ const getOrientationAndWindowSizeFromDimensions = (
       ? 'large'
       : 'xlarge';
 
-  // $FlowFixMe[incompatible-type]
   // $FlowFixMe[incompatible-type] - this is guaranteed to be a valid OrientationAndWindowSizeType.
-  // $FlowFixMe[incompatible-type]
   return sizeType + '-' + orientation;
 };
 
@@ -136,7 +134,10 @@ type TopLevelWindowSizeProviderProps = {|
  * "Reset" the dimensions to use the size of the window itself.
  * Typically: for dialogs.
  */
-export const TopLevelWindowSizeProvider = ({children}: TopLevelWindowSizeProviderProps): React.MixedElement => {
+export const TopLevelWindowSizeProvider = ({
+  children,
+// $FlowFixMe[signature-verification-failure]
+}: TopLevelWindowSizeProviderProps) => {
   return (
     <WindowSizeContext.Provider value={null}>
       {children}
@@ -155,7 +156,12 @@ type SpecificDimensionsWindowSizeProviderProps = {|
  * Useful when the component knows the dimensions in which its children are displayed.
  * Typically: a tab in an editor.
  */
-export const SpecificDimensionsWindowSizeProvider = ({children, innerWidth, innerHeight}: SpecificDimensionsWindowSizeProviderProps): React.MixedElement => {
+export const SpecificDimensionsWindowSizeProvider = ({
+  children,
+  innerWidth,
+  innerHeight,
+// $FlowFixMe[signature-verification-failure]
+}: SpecificDimensionsWindowSizeProviderProps) => {
   const windowSize = React.useMemo(
     () => {
       if (innerWidth === null || innerHeight === null) {
@@ -188,7 +194,10 @@ type ResponsiveWindowMeasurerProps = {|
 /**
  * Wraps useResponsiveWindowSize in a component.
  */
-export const ResponsiveWindowMeasurer = ({children}: ResponsiveWindowMeasurerProps): React.Node => children(useResponsiveWindowSize());
+export const ResponsiveWindowMeasurer = ({
+  children,
+// $FlowFixMe[signature-verification-failure]
+}: ResponsiveWindowMeasurerProps) => children(useResponsiveWindowSize());
 
 /**
  * Return the size of the window.

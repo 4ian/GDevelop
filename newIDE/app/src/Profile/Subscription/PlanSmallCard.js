@@ -27,7 +27,8 @@ import GDevelopGLogo from '../../UI/CustomSvgIcons/GDevelopGLogo';
 export const formatPriceWithCurrency = (
   amountInCents: number,
   currency: string
-): string => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   if (currency === 'USD') {
     return `$${amountInCents / 100}`;
   }
@@ -287,19 +288,18 @@ type Props = {|
   background: 'medium' | 'dark',
 |};
 
-const PlanSmallCard = (
-  {
-    subscriptionPlanWithPricingSystems,
-    subscriptionPricingSystem,
-    cancelAtPeriodEnd = false,
-    redemptionCodeExpirationDate,
-    isHighlighted,
-    actions,
-    isPending,
-    hidePrice = false,
-    background
-  }: Props,
-): React.Node => {
+const PlanSmallCard = ({
+  subscriptionPlanWithPricingSystems,
+  subscriptionPricingSystem,
+  cancelAtPeriodEnd = false,
+  redemptionCodeExpirationDate,
+  isHighlighted,
+  actions,
+  isPending,
+  hidePrice = false,
+  background,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { isMobile } = useResponsiveWindowSize();
 
@@ -410,7 +410,6 @@ const PlanSmallCard = (
                           ) : (
                             <CheckCircle style={styles.bulletIcon} />
                           )}
-                          {/* $FlowFixMe[incompatible-type] */}
                           <Text style={styles.bulletText}>
                             {selectMessageByLocale(i18n, bulletPointByLocale)}
                           </Text>

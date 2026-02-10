@@ -2,7 +2,8 @@
 import React from 'react';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
-const ToolbarSeparator = (): React.MixedElement => {
+// $FlowFixMe[signature-verification-failure]
+const ToolbarSeparator = () => {
   const theme = React.useContext(GDevelopThemeContext);
   return (
     <span

@@ -49,7 +49,8 @@ type Props = {|
   editorCallbacks: EditorCallbacks,
 |};
 
-export const FunctionCallRow: component(...Props) = React.memo<Props>(function FunctionCallRow({
+// $FlowFixMe[signature-verification-failure]
+export const FunctionCallRow = React.memo<Props>(function FunctionCallRow({
   project,
   functionCall,
   editorFunctionCallResult,
@@ -179,7 +180,6 @@ export const FunctionCallRow: component(...Props) = React.memo<Props>(function F
         <Text
           size="body-small"
           color="secondary"
-          // $FlowFixMe[incompatible-type]
           style={styles.functionCallText}
         >
           {text || <Trans>Working...</Trans>}

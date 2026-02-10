@@ -164,14 +164,16 @@ export const createNewInstructionForEventsFunction = (
 /**
  * Validate that a function name is valid.
  */
-export const validateEventsFunctionName = (functionName: string): boolean => {
+// $FlowFixMe[signature-verification-failure]
+export const validateEventsFunctionName = (functionName: string) => {
   return gd.Project.isNameSafe(functionName);
 };
 
 /**
  * Validate that an events functions extension name is valid.
  */
-export const validateExtensionName = (extensionName: string): boolean => {
+// $FlowFixMe[signature-verification-failure]
+export const validateExtensionName = (extensionName: string) => {
   return gd.Project.isNameSafe(extensionName);
 };
 
@@ -181,7 +183,8 @@ export const validateExtensionName = (extensionName: string): boolean => {
 export const validateExtensionNameUniqueness = (
   project: gdProject,
   extensionName: string
-): boolean => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   return !project.hasEventsFunctionsExtensionNamed(extensionName);
 };
 
@@ -192,7 +195,8 @@ export const validateEventsFunctionNameUniqueness = (
   project: gdProject,
   extensionName: string,
   eventsFunction: gdEventsFunction
-): boolean => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   if (project.hasEventsFunctionsExtensionNamed(extensionName)) {
     const eventsFunctionsExtension = project.getEventsFunctionsExtension(
       extensionName
@@ -214,7 +218,8 @@ export const canCreateEventsFunction = (
   project: gdProject,
   extensionName: string,
   eventsFunction: gdEventsFunction
-): false | boolean => {
+// $FlowFixMe[signature-verification-failure]
+) => {
   return (
     extensionName !== '' &&
     validateExtensionName(extensionName) &&
@@ -233,6 +238,9 @@ export const canCreateEventsFunction = (
 /**
  * Return true if the function is considered to have more parameters than usual.
  */
-export const functionHasLotsOfParameters = (eventsFunction: gdEventsFunction): boolean => {
+export const functionHasLotsOfParameters = (
+  eventsFunction: gdEventsFunction
+// $FlowFixMe[signature-verification-failure]
+) => {
   return eventsFunction.getParameters().getParametersCount() > 7;
 };

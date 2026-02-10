@@ -115,7 +115,8 @@ export default function SubscriptionDialog({
   recommendedPlanId,
   onOpenPendingDialog,
   couponCode,
-}: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: Props) {
   const [isChangingSubscription, setIsChangingSubscription] = React.useState(
     false
   );
@@ -200,7 +201,6 @@ export default function SubscriptionDialog({
     if (!subscriptionPlanPricingSystem) {
       // Cancelling the existing subscription.
       const answer = await showConfirmation(
-        // $FlowFixMe[incompatible-type]
         cancelConfirmationTexts.dialogTexts
       );
       if (!answer) return;
@@ -234,7 +234,6 @@ export default function SubscriptionDialog({
               confirmButtonLabel: dialogTexts.confirmButtonLabel,
               dismissButtonLabel: dialogTexts.dismissButtonLabel,
             })
-          // $FlowFixMe[incompatible-type]
           : await showConfirmation(dialogTexts);
       if (!answer) return;
     }

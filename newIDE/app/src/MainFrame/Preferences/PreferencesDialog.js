@@ -671,7 +671,8 @@ const PreferencesDialog = ({
   );
 };
 
-const PreferencesDialogWithErrorBoundary = (props: Props): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+const PreferencesDialogWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Preferences</Trans>}
     scope="preferences"

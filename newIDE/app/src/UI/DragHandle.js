@@ -20,12 +20,14 @@ type Props = {|
   color?: string,
 |};
 
-export const DragHandleIcon = (props: Props): React.MixedElement => (
+// $FlowFixMe[signature-verification-failure]
+export const DragHandleIcon = (props: Props) => (
   <span style={props.disabled ? styles.disabledHandle : styles.handle}>
     <MUIDragHandleIcon htmlColor={props.color || styles.handleColor} />
   </span>
 );
 
-const DragHandle: any = SortableHandle(DragHandleIcon);
+// $FlowFixMe[signature-verification-failure]
+const DragHandle = SortableHandle(DragHandleIcon);
 
 export default DragHandle;

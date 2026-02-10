@@ -486,7 +486,9 @@ export default class PixiResourcesLoader {
    * should listen to PIXI.Texture `update` event, and refresh your object
    * if this event is triggered.
    */
-  static getPIXITexture(project: gdProject, resourceName: string): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  static getPIXITexture(project: gdProject, resourceName: string) {
     // $FlowFixMe[invalid-computed-prop]
     if (loadedTextures[resourceName]) {
       // TODO: we never consider textures as not valid anymore. When we
@@ -887,7 +889,9 @@ export default class PixiResourcesLoader {
    * should listen to PIXI.Texture `update` event, and refresh your object
    * if this event is triggered.
    */
-  static getPIXIVideoTexture(project: gdProject, resourceName: string): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  static getPIXIVideoTexture(project: gdProject, resourceName: string) {
     // $FlowFixMe[invalid-computed-prop]
     if (loadedTextures[resourceName]) {
       // TODO: we never consider textures as not valid anymore. When we
@@ -1000,7 +1004,9 @@ export default class PixiResourcesLoader {
    * The font won't be loaded.
    * @returns The font-family to be used to render a text with the font.
    */
-  static getFontFamily(project: gdProject, resourceName: string): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  static getFontFamily(project: gdProject, resourceName: string) {
     // $FlowFixMe[invalid-computed-prop]
     if (loadedFontFamilies[resourceName]) {
       return loadedFontFamilies[resourceName];
@@ -1062,11 +1068,15 @@ export default class PixiResourcesLoader {
       });
   }
 
-  static getInvalidPIXITexture(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  static getInvalidPIXITexture() {
     return invalidTexture;
   }
 
-  static getLoadingPIXITexture(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  static getLoadingPIXITexture() {
     return loadingTexture;
   }
 

@@ -18,7 +18,13 @@ type DislikeFeedbackDialogProps = {|
   mode: 'chat' | 'agent',
 |};
 
-export const DislikeFeedbackDialog = ({mode, open, onClose, onSendFeedback}: DislikeFeedbackDialogProps): React.Node => {
+export const DislikeFeedbackDialog = ({
+  mode,
+  open,
+  onClose,
+  onSendFeedback,
+// $FlowFixMe[signature-verification-failure]
+}: DislikeFeedbackDialogProps) => {
   const [selectedReason, setSelectedReason] = React.useState<?string>(null);
   const [freeFormDetails, setFreeFormDetails] = React.useState<string>('');
 

@@ -16,7 +16,8 @@ type Props = {|
 /**
  * A native select option to be used with `SelectField`.
  */
-const SelectOption = (props: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const SelectOption = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (

@@ -12,8 +12,8 @@ import { client as assetApiClient } from '../../../../Utils/GDevelopServices/Ass
 export default {
   title: 'AssetStore/ResourceStore',
   component: ResourceStore,
-  // $FlowFixMe[cannot-resolve-name]
-  decorators: [getPaperDecorator('medium') as StoryDecorator],
+  // $FlowFixMe[signature-verification-failure]
+  decorators: [getPaperDecorator('medium')],
 };
 
 const ResourceStoreStory = ({ kind }: {| kind: 'audio' | 'font' | 'svg' |}) => {
@@ -36,13 +36,17 @@ const ResourceStoreStory = ({ kind }: {| kind: 'audio' | 'font' | 'svg' |}) => {
   );
 };
 
-export const AudioResource = (): React.Node => <ResourceStoreStory kind="audio" />;
+// $FlowFixMe[signature-verification-failure]
+export const AudioResource = () => <ResourceStoreStory kind="audio" />;
 
-export const FontResource = (): React.Node => <ResourceStoreStory kind="font" />;
+// $FlowFixMe[signature-verification-failure]
+export const FontResource = () => <ResourceStoreStory kind="font" />;
 
-export const SvgResource = (): React.Node => <ResourceStoreStory kind="svg" />;
+// $FlowFixMe[signature-verification-failure]
+export const SvgResource = () => <ResourceStoreStory kind="svg" />;
 
-export const FontResourceWithLoadingError = (): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+export const FontResourceWithLoadingError = () => {
   const axiosMock = new MockAdapter(assetApiClient, { delayResponse: 500 });
   axiosMock.onAny().reply(500);
 

@@ -120,24 +120,23 @@ type Props = {|
   onOpenAskAi: (?OpenAskAiOptions) => void,
 |};
 
-const CoursePage = (
-  {
-    course,
-    courseChapters,
-    onOpenTemplateFromCourseChapter,
-    onBack,
-    onCompleteTask,
-    isTaskCompleted,
-    getChapterCompletion,
-    getCourseCompletion,
-    onBuyCourseWithCredits,
-    onBuyCourse,
-    purchasingCourseListingData,
-    setPurchasingCourseListingData,
-    simulateAppStoreProduct,
-    onOpenAskAi
-  }: Props,
-): React.Node => {
+const CoursePage = ({
+  course,
+  courseChapters,
+  onOpenTemplateFromCourseChapter,
+  onBack,
+  onCompleteTask,
+  isTaskCompleted,
+  getChapterCompletion,
+  getCourseCompletion,
+  onBuyCourseWithCredits,
+  onBuyCourse,
+  purchasingCourseListingData,
+  setPurchasingCourseListingData,
+  simulateAppStoreProduct,
+  onOpenAskAi,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const { profile } = React.useContext(AuthenticatedUserContext);
   const userId = (profile && profile.id) || null;
   const {
@@ -378,7 +377,6 @@ const CoursePage = (
                         chapterIndex={index}
                         course={course}
                         // $FlowIgnore - Flow does not conclude this chapter can only be text-based.
-                        // $FlowFixMe[incompatible-type]
                         courseChapter={chapter}
                         onOpenTemplate={(templateId?: string) => {
                           onOpenTemplateFromCourseChapter(chapter, templateId);

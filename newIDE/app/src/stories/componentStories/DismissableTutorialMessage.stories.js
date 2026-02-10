@@ -44,14 +44,13 @@ type Props = {|
   tutorialId: string,
 |};
 
-const WrappedDismissableTutorialMessage = (
-  {
-    tutorials = defaultTutorials,
-    // $FlowFixMe[incompatible-type]
-    preferences = initialPreferences,
-    tutorialId
-  }: Props,
-): React.Node => (
+const WrappedDismissableTutorialMessage = ({
+  tutorials = defaultTutorials,
+  // $FlowFixMe[incompatible-type]
+  preferences = initialPreferences,
+  tutorialId,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => (
   <PreferencesContext.Provider value={preferences}>
     <TutorialContext.Provider
       value={{
@@ -71,18 +70,20 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const NoTutorialsLoaded = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const NoTutorialsLoaded = () => (
   <WrappedDismissableTutorialMessage tutorials={null} tutorialId="tutorial-1" />
 );
 
-export const NoTutorialsFound = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const NoTutorialsFound = () => (
   <WrappedDismissableTutorialMessage tutorials={[]} tutorialId="tutorial-1" />
 );
 
-export const HiddenTutorial = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const HiddenTutorial = () => (
   <WrappedDismissableTutorialMessage
     tutorialId="tutorial-1"
-    // $FlowFixMe[incompatible-type]
     preferences={{
       ...initialPreferences,
       // $FlowFixMe[incompatible-type]
@@ -94,14 +95,17 @@ export const HiddenTutorial = (): React.Node => (
   />
 );
 
-export const TutorialNotInList = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const TutorialNotInList = () => (
   <WrappedDismissableTutorialMessage tutorialId="tutorial-3" />
 );
 
-export const DefaultVideo = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const DefaultVideo = () => (
   <WrappedDismissableTutorialMessage tutorialId="tutorial-1" />
 );
 
-export const DefaultText = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const DefaultText = () => (
   <WrappedDismissableTutorialMessage tutorialId="tutorial-2" />
 );

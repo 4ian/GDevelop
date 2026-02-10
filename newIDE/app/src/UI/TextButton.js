@@ -31,9 +31,8 @@ type Props = {|
 /**
  * A "text" button based on Material-UI button.
  */
-const TextButton: component(
-  ...{ ...Props, +ref?: React.RefSetter<ButtonInterface> }
-) = React.forwardRef<Props, ButtonInterface>(
+// $FlowFixMe[signature-verification-failure]
+const TextButton = React.forwardRef<Props, ButtonInterface>(
   (
     {
       label,

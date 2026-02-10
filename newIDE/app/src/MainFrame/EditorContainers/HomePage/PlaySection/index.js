@@ -69,7 +69,8 @@ const PlaySection = ({ gamesPlatformFrameTools }: Props) => {
   );
 };
 
-const PlaySectionWithErrorBoundary = (props: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const PlaySectionWithErrorBoundary = (props: Props) => {
   return (
     <ErrorBoundary
       componentTitle={<Trans>Play section</Trans>}

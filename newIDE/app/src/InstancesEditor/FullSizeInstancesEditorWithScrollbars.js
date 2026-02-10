@@ -35,7 +35,8 @@ type Props = {|
 
 const noop = () => {};
 
-const FullSizeInstancesEditorWithScrollbars = (props: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
   const { wrappedEditorRef, ...otherProps } = props;
   const { values } = React.useContext(PreferencesContext);
   const isMounted = useIsMounted();

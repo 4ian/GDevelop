@@ -3,8 +3,8 @@ import Axios from 'axios';
 import { GDevelopUserApi } from './ApiConfigs';
 import { ensureIsArray } from '../DataValidator';
 
-// $FlowFixMe[value-as-type]
-export const client: Axios = Axios.create({
+// $FlowFixMe[signature-verification-failure]
+export const client = Axios.create({
   baseURL: GDevelopUserApi.baseUrl,
 });
 
@@ -99,6 +99,7 @@ export const listNotifications = async (
   { userId }: {| userId: string |}
 ): Promise<Array<Notification>> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await client.get('/notification', {
     headers: { Authorization: authorizationHeader },
     params: { userId, perPage: 25 },
@@ -139,6 +140,7 @@ export const markNotificationsAsSeen = async (
       'Either parameter notificationIds or allStartingFromNotificationId must be defined.'
     );
   }
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   await client.post('/notification/action/mark-as-seen', payload, {
     headers: { Authorization: authorizationHeader },
     params: { userId },

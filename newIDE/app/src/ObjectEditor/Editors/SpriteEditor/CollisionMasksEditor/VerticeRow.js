@@ -24,7 +24,13 @@ type Props = {|
   onPointerLeave: () => void,
 |};
 
-const VerticeRow = ({verticeX, verticeY, parentVerticeId, ...props}: Props): React.Node => {
+const VerticeRow = ({
+  verticeX,
+  verticeY,
+  parentVerticeId,
+  ...props
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (

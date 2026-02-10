@@ -53,7 +53,8 @@ type Props = {|
   onSelect: () => void,
 |};
 
-const FontResourceLine = ({fontResource, isSelected, onSelect}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const FontResourceLine = ({ fontResource, isSelected, onSelect }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const fontNameWithoutExtension = fontResource.name.replace(
     fontExtensionRegex,

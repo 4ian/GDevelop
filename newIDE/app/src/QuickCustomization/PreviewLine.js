@@ -16,7 +16,8 @@ type Props = {|
   onLaunchPreview: () => Promise<void>,
 |};
 
-const PreviewLine = ({onLaunchPreview}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const PreviewLine = ({ onLaunchPreview }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (

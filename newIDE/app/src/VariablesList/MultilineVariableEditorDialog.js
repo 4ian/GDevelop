@@ -9,7 +9,11 @@ type Props = {|
   onClose: (newValue: string) => void,
 |};
 
-export const MultilineVariableEditorDialog = ({initialValue, onClose}: Props): React.Node => {
+export const MultilineVariableEditorDialog = ({
+  initialValue,
+  onClose,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const [value, setValue] = React.useState(initialValue);
 
   return (

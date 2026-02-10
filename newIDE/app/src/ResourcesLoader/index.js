@@ -7,7 +7,8 @@ const path = optionalRequire('path');
 class UrlsCache {
   projectCache: { [number]: { [string]: string } } = {};
 
-  _getProjectCache(project: gdProject): any {
+  // $FlowFixMe[missing-local-annot]
+  _getProjectCache(project: gdProject) {
     const cache = this.projectCache[project.ptr];
     if (!cache) {
       return (this.projectCache[project.ptr] = {});
@@ -84,8 +85,9 @@ const isLocalFile = (urlOrFilename: string) => {
  * (notably images).
  */
 export default class ResourcesLoader {
+  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  static _cache = new UrlsCache() as UrlsCache;
+  static _cache = new UrlsCache();
 
   /**
    * Remove the specified resources resolved URLs from the cache. Useful if the
@@ -190,7 +192,9 @@ export default class ResourcesLoader {
     project: gdProject,
     resourceName: string,
     options: LoadingOptions
-  ): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  ) {
     if (project.getResourcesManager().hasResource(resourceName)) {
       const resourceRelativePath = project
         .getResourcesManager()

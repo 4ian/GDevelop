@@ -31,7 +31,8 @@ const styles = {
   unlockedAchievement: {},
 };
 
-const AchievementList = ({badges, achievements}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const AchievementList = ({ badges, achievements }: Props) => {
   const [
     achievementsWithBadgeData,
     setAchievementsWithBadgeData,
@@ -91,9 +92,7 @@ const AchievementList = ({badges, achievements}: Props): React.Node => {
                       size="sub-title"
                       style={
                         achievementWithBadgeData.unlockedAt
-                          // $FlowFixMe[incompatible-type]
                           ? styles.unlockedAchievement
-                          // $FlowFixMe[incompatible-type]
                           : styles.lockedAchievement
                       }
                     >
@@ -107,9 +106,7 @@ const AchievementList = ({badges, achievements}: Props): React.Node => {
                     noMargin
                     style={
                       achievementWithBadgeData.unlockedAt
-                        // $FlowFixMe[incompatible-type]
                         ? styles.unlockedAchievement
-                        // $FlowFixMe[incompatible-type]
                         : styles.lockedAchievement
                     }
                     size="body2"

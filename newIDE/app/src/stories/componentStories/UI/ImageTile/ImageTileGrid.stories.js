@@ -30,28 +30,32 @@ const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
   }
 };
 
-export const Default = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const Default = () => (
   <ImageTileGrid
     items={itemsWithJustImage}
     getColumnsFromWindowSize={getColumnsFromWindowSize}
   />
 );
 
-export const WithTitleAndDescription = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithTitleAndDescription = () => (
   <ImageTileGrid
     items={itemsWithTitleAndDescription}
     getColumnsFromWindowSize={getColumnsFromWindowSize}
   />
 );
 
-export const WithLocks = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithLocks = () => (
   <ImageTileGrid
     items={itemsWithLocks}
     getColumnsFromWindowSize={getColumnsFromWindowSize}
   />
 );
 
-export const WithOverlay = (): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+export const WithOverlay = () => (
   <ImageTileGrid
     items={itemsWithOverlay}
     getColumnsFromWindowSize={getColumnsFromWindowSize}

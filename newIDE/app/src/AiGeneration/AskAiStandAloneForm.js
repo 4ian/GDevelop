@@ -85,22 +85,21 @@ type Props = {|
   dismissableIdentifier?: string,
 |};
 
-export const AskAiStandAloneForm = (
-  {
-    project,
-    resourceManagementProps,
-    fileMetadata,
-    storageProvider,
-    i18n,
-    onCreateProjectFromExample,
-    onCreateEmptyProject,
-    onOpenLayout,
-    onCloseAskAi,
-    dismissableIdentifier,
-    onWillInstallExtension,
-    onExtensionInstalled
-  }: Props,
-): null | React.Node => {
+export const AskAiStandAloneForm = ({
+  project,
+  resourceManagementProps,
+  fileMetadata,
+  storageProvider,
+  i18n,
+  onCreateProjectFromExample,
+  onCreateEmptyProject,
+  onOpenLayout,
+  onCloseAskAi,
+  dismissableIdentifier,
+  onWillInstallExtension,
+  onExtensionInstalled,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const onCreateProject = React.useCallback(
     async ({
       name,

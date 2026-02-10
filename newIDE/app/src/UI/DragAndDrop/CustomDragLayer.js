@@ -203,9 +203,7 @@ const collect = (monitor: any): InternalCustomDragLayerProps => ({
   isDragging: monitor.isDragging(),
 });
 
-// $FlowFixMe[incompatible-type]
 // $FlowFixMe[incompatible-type] - Forcing the type of the component, unsure how to make the DragLayer happy.
-// $FlowFixMe[incompatible-type]
 const ExternalCustomDragLayer: ({||}) => React.Node = DragLayer(collect)(
   CustomDragLayer
 );

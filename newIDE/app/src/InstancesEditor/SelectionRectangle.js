@@ -42,13 +42,10 @@ export default class SelectionRectangle {
 
     this._temporaryAABB = new Rectangle();
     this.selector = new gd.InitialInstanceJSFunctor();
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - invoke is not writable
     // $FlowFixMe[cannot-write]
     this.selector.invoke = instancePtr => {
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
-      // $FlowFixMe[incompatible-type]
       const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
       const instanceAABB = this.instanceMeasurer.getInstanceAABB(
         instance,
@@ -78,7 +75,9 @@ export default class SelectionRectangle {
     };
   }
 
-  hasStartedSelectionRectangle(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  hasStartedSelectionRectangle() {
     return this.selectionRectangleStart;
   }
 
@@ -94,7 +93,9 @@ export default class SelectionRectangle {
     this.selectionRectangleEnd = { x: lastX, y: lastY };
   };
 
-  endSelectionRectangle = (): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  endSelectionRectangle = () => {
     if (!this.selectionRectangleStart || !this.selectionRectangleEnd) return [];
 
     this._instancesInSelectionRectangle.length = 0;
@@ -110,9 +111,7 @@ export default class SelectionRectangle {
     }
 
     this.instances.iterateOverInstances(
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - gd.castObject is not supporting typings.
-      // $FlowFixMe[incompatible-type]
       this.selector
     );
 
@@ -120,7 +119,9 @@ export default class SelectionRectangle {
     return this._instancesInSelectionRectangle;
   };
 
-  getPixiObject(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getPixiObject() {
     return this.pixiRectangle;
   }
 

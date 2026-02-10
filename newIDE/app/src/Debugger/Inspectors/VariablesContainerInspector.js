@@ -167,7 +167,8 @@ type Props = {|
   onEdit: EditFunction,
 |};
 
-const VariablesContainerInspector = (props: Props): React.Node => (
+// $FlowFixMe[signature-verification-failure]
+const VariablesContainerInspector = (props: Props) => (
   <ReactJsonView
     collapsed={false}
     name={false}

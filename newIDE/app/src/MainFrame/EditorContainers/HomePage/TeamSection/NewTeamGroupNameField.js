@@ -10,7 +10,8 @@ type Props = {|
   onDismiss: () => void,
 |};
 
-const NewTeamGroupNameField = ({onValidateGroupName, onDismiss}: Props): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const NewTeamGroupNameField = ({ onValidateGroupName, onDismiss }: Props) => {
   return (
     <Line noMargin>
       <AsyncSemiControlledTextField

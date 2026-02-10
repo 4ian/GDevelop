@@ -98,8 +98,9 @@ export default class LayerRenderer {
 
   _showObjectInstancesIn3D: boolean;
 
+  // $FlowFixMe[signature-verification-failure]
   // $FlowFixMe[missing-local-annot]
-  _basicProfilingCounters = makeBasicProfilingCounters() as BasicProfilingCounters;
+  _basicProfilingCounters = makeBasicProfilingCounters();
 
   constructor({
     project,
@@ -170,11 +171,9 @@ export default class LayerRenderer {
 
     // Functor used to render an instance
     this.instancesRenderer = new gd.InitialInstanceJSFunctor();
-    // $FlowFixMe[incompatible-type]
     // $FlowFixMe[incompatible-type] - invoke is not writable
     // $FlowFixMe[cannot-write]
     this.instancesRenderer.invoke = instancePtr => {
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
       const instance: gdInitialInstance = gd.wrapPointer(
         // $FlowFixMe[incompatible-type]
@@ -256,7 +255,9 @@ export default class LayerRenderer {
     }
   }
 
-  getPixiContainer(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getPixiContainer() {
     return this.pixiContainer;
   }
 
@@ -282,7 +283,9 @@ export default class LayerRenderer {
     return this.renderedInstances[instance.ptr];
   }
 
-  getUnrotatedInstanceLeft = (instance: gdInitialInstance): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getUnrotatedInstanceLeft = (instance: gdInitialInstance) => {
     return (
       instance.getX() -
       (this.renderedInstances[instance.ptr]
@@ -291,7 +294,9 @@ export default class LayerRenderer {
     );
   };
 
-  getUnrotatedInstanceTop = (instance: gdInitialInstance): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getUnrotatedInstanceTop = (instance: gdInitialInstance) => {
     return (
       instance.getY() -
       (this.renderedInstances[instance.ptr]
@@ -300,7 +305,9 @@ export default class LayerRenderer {
     );
   };
 
-  getUnrotatedInstanceZMin = (instance: gdInitialInstance): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getUnrotatedInstanceZMin = (instance: gdInitialInstance) => {
     return (
       instance.getZ() -
       // 3D objects Z position is always the "Z min":
@@ -311,7 +318,9 @@ export default class LayerRenderer {
     );
   };
 
-  getUnrotatedInstanceSize = (instance: gdInitialInstance): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getUnrotatedInstanceSize = (instance: gdInitialInstance) => {
     const renderedInstance = this.getOrCreateRendererOfInstance(instance);
     const hasCustomSize = instance.hasCustomSize();
     const hasCustomDepth = instance.hasCustomDepth();
@@ -423,7 +432,9 @@ export default class LayerRenderer {
     return bounds;
   }
 
-  getOrCreateRendererOfInstance = (instance: gdInitialInstance): any => {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getOrCreateRendererOfInstance = (instance: gdInitialInstance) => {
     var renderedInstance = this.renderedInstances[instance.ptr];
     if (renderedInstance === undefined) {
       //No renderer associated yet, the instance must have been just created!...
@@ -572,7 +583,9 @@ export default class LayerRenderer {
    * The approach is a naive bounding box testing but save rendering time on large
    * levels (though this could be improved with spatial partitioning).
    */
-  _isInstanceVisible(instance: gdInitialInstance): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  _isInstanceVisible(instance: gdInitialInstance) {
     const aabb = this.getInstanceAABB(instance, this._temporaryRectangle);
     if (
       aabb.left + aabb.width() < this.viewTopLeft[0] ||
@@ -609,9 +622,7 @@ export default class LayerRenderer {
 
     this._computeViewBounds();
     this.instances.iterateOverInstancesWithZOrdering(
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - gd.castObject is not supporting typings.
-      // $FlowFixMe[incompatible-type]
       this.instancesRenderer,
       this.layer.getName()
     );

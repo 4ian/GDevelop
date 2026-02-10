@@ -4,7 +4,8 @@ import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { type EnumeratedInstructionMetadata } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { type InstructionOrExpressionTreeNode } from '../../InstructionOrExpression/CreateTree';
 
-export const getInstructionGroupId = (groupName: string, parentId?: ?string): string =>
+// $FlowFixMe[signature-verification-failure]
+export const getInstructionGroupId = (groupName: string, parentId?: ?string) =>
   `${parentId ? `${parentId}-` : ''}instruction-group-${groupName}`;
 
 export interface TreeViewItemContent {
@@ -61,18 +62,14 @@ export const createFreeInstructionTreeViewItem = ({
       // (hence the flow errors, which are valid warnings)
       // $FlowFixMe[incompatible-type]
       if (typeof subInstructionOrGroup.type === 'string') {
-        // $FlowFixMe[incompatible-type]
         // $FlowFixMe[incompatible-type] - see above
-        // $FlowFixMe[incompatible-type]
         // $FlowFixMe[incompatible-indexer]
         const instructionMetadata: EnumeratedInstructionMetadata = subInstructionOrGroup;
         return new LeafTreeViewItem(
           new InstructionTreeViewItemContent(instructionMetadata)
         );
       }
-      // $FlowFixMe[incompatible-type]
       // $FlowFixMe[incompatible-type] - see above
-      // $FlowFixMe[incompatible-type]
       const groupOfInstructionInformation: InstructionOrExpressionTreeNode = subInstructionOrGroup;
       const parentGroupIconSrc =
         freeInstructionProps.getGroupIconSrc(categoryName) ||
@@ -145,26 +142,36 @@ export class InstructionGroupTreeViewItemContent
     this.props = props;
   }
 
-  getName(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getName() {
     return this.name;
   }
   getDescription(): string | null {
     return null;
   }
 
-  getId(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getId() {
     return getInstructionGroupId(this.name, this.props.parentId);
   }
 
-  getHtmlId(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getHtmlId() {
     return null;
   }
-  getDataSet(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getDataSet() {
     return {
       group: this.name,
     };
   }
-  getThumbnail(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getThumbnail() {
     return !this.props.parentId
       ? 'NONE'
       : this.props.getGroupIconSrc(this.name) || this.props.parentGroupIconSrc;
@@ -177,26 +184,36 @@ export class InstructionTreeViewItemContent implements TreeViewItemContent {
   constructor(instructionMetadata: EnumeratedInstructionMetadata) {
     this.instructionMetadata = instructionMetadata;
   }
-  getInstructionMetadata(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getInstructionMetadata() {
     return this.instructionMetadata;
   }
-  getName(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getName() {
     return this.instructionMetadata.displayedName;
   }
   getDescription(): string | null {
     return null;
   }
 
-  getId(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getId() {
     return `instruction-item-${this.instructionMetadata.type.replace(
       /:/g,
       '-'
     )}`;
   }
-  getHtmlId(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getHtmlId() {
     return this.getId();
   }
-  getDataSet(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getDataSet() {
     return {
       instructionType: this.instructionMetadata.type.replace(/:/g, '-'),
       object: this.instructionMetadata.scope.objectMetadata
@@ -207,7 +224,9 @@ export class InstructionTreeViewItemContent implements TreeViewItemContent {
         : undefined,
     };
   }
-  getThumbnail(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getThumbnail() {
     return this.instructionMetadata.iconFilename;
   }
 }
@@ -222,23 +241,33 @@ export class MoreResultsTreeViewItemContent implements TreeViewItemContent {
     this.onClick = onClick;
   }
 
-  getName(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getName() {
     return this.name;
   }
   getDescription(): string | null {
     return null;
   }
 
-  getId(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getId() {
     return `more-instructions`;
   }
-  getHtmlId(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getHtmlId() {
     return null;
   }
-  getDataSet(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getDataSet() {
     return {};
   }
-  getThumbnail(): any {
+  // $FlowFixMe[signature-verification-failure]
+  // $FlowFixMe[missing-local-annot]
+  getThumbnail() {
     return null;
   }
 }

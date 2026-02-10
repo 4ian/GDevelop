@@ -45,7 +45,6 @@ const MethodListItem = ({
   description: React.Node,
 |}) => {
   return (
-    // $FlowFixMe[incompatible-type]
     <ListItem
       leftIcon={icon}
       primaryText={name}
@@ -67,7 +66,8 @@ export default function ObjectMethodSelectorDialog({
   eventsBasedObject,
   onChoose,
   onCancel,
-}: Props): React.Node {
+// $FlowFixMe[signature-verification-failure]
+}: Props) {
   const eventsFunctions = eventsBasedObject.getEventsFunctions();
   const [showAdvanced, setShowAdvanced] = React.useState(false);
 

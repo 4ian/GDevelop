@@ -21,7 +21,12 @@ type Props = {|
   alignCenter?: boolean,
 |};
 
-const ProductLimitedTimeOffer = ({visibleUntil, hideMinutesAndSeconds, alignCenter}: Props): null | React.MixedElement => {
+const ProductLimitedTimeOffer = ({
+  visibleUntil,
+  hideMinutesAndSeconds,
+  alignCenter,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const [timeLeft, setTimeLeft] = React.useState<{|
     days: number,
     hours: number,

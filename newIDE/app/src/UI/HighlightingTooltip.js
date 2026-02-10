@@ -98,18 +98,17 @@ type Props = {|
   closeWithBackdropClick: boolean,
 |};
 
-const HighlightingTooltip = (
-  {
-    title,
-    thumbnailSource,
-    thumbnailAlt,
-    content,
-    anchorElement,
-    onClose,
-    placement,
-    closeWithBackdropClick
-  }: Props,
-): React.Node => {
+const HighlightingTooltip = ({
+  title,
+  thumbnailSource,
+  thumbnailAlt,
+  content,
+  anchorElement,
+  onClose,
+  placement,
+  closeWithBackdropClick,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const classes = useClasses();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { currentlyRunningInAppTutorial } = React.useContext(

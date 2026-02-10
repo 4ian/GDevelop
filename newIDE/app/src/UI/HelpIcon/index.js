@@ -33,7 +33,8 @@ type PropsType = {|
 /**
  * The icon that can be used in any dialog to open a help page
  */
-const HelpIcon = (props: PropsType): React.Node => {
+// $FlowFixMe[signature-verification-failure]
+const HelpIcon = (props: PropsType) => {
   const { helpPagePath } = props;
   if (!helpPagePath) return null;
 

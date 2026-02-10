@@ -64,26 +64,25 @@ type Props = {|
  * An instruction editor in a popover.
  * Does not show the parameters for the instruction.
  */
-const InstructionEditorMenu = (
-  {
-    project,
-    globalObjectsContainer,
-    objectsContainer,
-    projectScopedContainersAccessor,
-    onCancel,
-    open,
-    instruction,
-    isCondition,
-    isNewInstruction,
-    anchorEl,
-    scope,
-    onSubmit,
-    canPasteInstructions,
-    onPasteInstructions,
-    onExtensionInstalled,
-    i18n
-  }: Props,
-): React.Node => {
+const InstructionEditorMenu = ({
+  project,
+  globalObjectsContainer,
+  objectsContainer,
+  projectScopedContainersAccessor,
+  onCancel,
+  open,
+  instruction,
+  isCondition,
+  isNewInstruction,
+  anchorEl,
+  scope,
+  onSubmit,
+  canPasteInstructions,
+  onPasteInstructions,
+  onExtensionInstalled,
+  i18n,
+// $FlowFixMe[signature-verification-failure]
+}: Props) => {
   const forceUpdate = useForceUpdate();
   const [
     instructionEditorState,

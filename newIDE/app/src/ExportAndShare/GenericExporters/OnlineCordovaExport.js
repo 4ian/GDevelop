@@ -21,7 +21,13 @@ export type ExportState = {|
   signingDialogOpen: boolean,
 |};
 
-export const SetupExportHeader = ({exportState, updateExportState, isExporting, build}: HeaderProps<ExportState>): React.Node => {
+export const SetupExportHeader = ({
+  exportState,
+  updateExportState,
+  isExporting,
+  build,
+// $FlowFixMe[signature-verification-failure]
+}: HeaderProps<ExportState>) => {
   // Build is finished, hide options.
   if (!!build && build.status === 'complete') return null;
 
@@ -163,19 +169,18 @@ type OnlineCordovaExportFlowProps = {|
   exportPipelineName: string,
 |};
 
-export const ExportFlow = (
-  {
-    disabled,
-    launchExport,
-    isExporting,
-    exportPipelineName,
-    exportStep,
-    build,
-    stepMaxProgress,
-    stepCurrentProgress,
-    errored
-  }: OnlineCordovaExportFlowProps,
-): React.Node => {
+export const ExportFlow = ({
+  disabled,
+  launchExport,
+  isExporting,
+  exportPipelineName,
+  exportStep,
+  build,
+  stepMaxProgress,
+  stepCurrentProgress,
+  errored,
+// $FlowFixMe[signature-verification-failure]
+}: OnlineCordovaExportFlowProps) => {
   const isExportingOrbuildRunningOrFinished =
     isExporting || (!!build && build.status !== 'error');
 
@@ -210,7 +215,9 @@ export const ExportFlow = (
 
 export const onlineCordovaExporter = {
   key: 'onlinecordovaexport',
-  tabName: <Trans>Mobile</Trans> as React.Node,
-  name: <Trans>Android</Trans> as React.Node,
+  // $FlowFixMe[signature-verification-failure]
+  tabName: <Trans>Mobile</Trans>,
+  // $FlowFixMe[signature-verification-failure]
+  name: <Trans>Android</Trans>,
   helpPage: '/publishing/android',
 };

@@ -20,6 +20,123 @@ cd "$APP_DIR"
 echo "=== Flow Migration Fix Script ==="
 echo "Working directory: $APP_DIR"
 
+run_flowfixme_iterations() {
+  local step_title="$1"
+  local max_iterations="${2:-15}"
+
+  echo ""
+  echo "--- $step_title ---"
+
+  npx flow stop 2>/dev/null || true
+
+  local prev_error_count=""
+  for i in $(seq 1 "$max_iterations"); do
+    echo "  Iteration $i..."
+
+    # Add FlowFixMe comments for errors
+    FLOWFIXME_OUTPUT=$(python3 "$SCRIPT_DIR/add-flow-fixme.py" 2>&1 || true)
+    echo "$FLOWFIXME_OUTPUT" | grep -E "Added|Found|No" || true
+
+    # Convert // FlowFixMe in JSX context to {/* FlowFixMe */}
+    JSX_CONVERT_OUTPUT=$(python3 "$SCRIPT_DIR/convert-jsx-flowfixme.py" 2>&1 || true)
+    echo "$JSX_CONVERT_OUTPUT" | grep -E "Converted|Reverted" || true
+
+    npx flow stop 2>/dev/null || true
+
+    # Check remaining errors
+    set +e
+    ERROR_OUTPUT=$(npx flow 2>&1)
+    FLOW_EXIT=$?
+    set -e
+    if echo "$ERROR_OUTPUT" | grep -q "No errors"; then
+      echo "  No more errors!"
+      npx flow stop 2>/dev/null || true
+      return 0
+    fi
+
+    ERROR_COUNT=$(echo "$ERROR_OUTPUT" | grep "Found" | grep -o '[0-9]*' | head -1)
+    echo "  Remaining errors: ${ERROR_COUNT:-unknown} (flow exit: $FLOW_EXIT)"
+
+    if echo "$FLOWFIXME_OUTPUT" | grep -q "Added 0 \$FlowFixMe comments" && \
+      [ -n "$ERROR_COUNT" ] && [ "$ERROR_COUNT" = "$prev_error_count" ]; then
+      echo "  No automatic progress in this iteration; stopping early."
+      npx flow stop 2>/dev/null || true
+      return 0
+    fi
+
+    prev_error_count="$ERROR_COUNT"
+    npx flow stop 2>/dev/null || true
+  done
+}
+
+fix_eslint_flowfixme_comment_ordering() {
+  # When $FlowFixMe is inserted between eslint-disable-next-line and the code,
+  # eslint-disable no longer applies (it targets the FlowFixMe comment instead).
+  # Fix: convert eslint-disable-next-line to eslint-disable-line on the code line.
+  python3 << 'PYEOF'
+import os, re
+
+src_dir = os.path.join(os.environ.get('APP_DIR', os.getcwd()), 'src')
+fixed = 0
+
+for root, dirs, files in os.walk(src_dir):
+    for fname in files:
+        if not fname.endswith('.js'):
+            continue
+        filepath = os.path.join(root, fname)
+        with open(filepath) as f:
+            lines = f.readlines()
+
+        modified = False
+        new_lines = []
+        i = 0
+        while i < len(lines):
+            # Pattern: $FlowFixMe[...], then eslint-disable-next-line, then code
+            if (i + 2 < len(lines) and
+                '$FlowFixMe[' in lines[i] and
+                'eslint-disable-next-line' in lines[i + 1]):
+                m = re.search(r'eslint-disable-next-line\s+(.+)', lines[i + 1])
+                if m:
+                    rule = m.group(1).strip()
+                    new_lines.append(lines[i])  # Keep $FlowFixMe
+                    # Skip eslint-disable-next-line, add as inline on code line
+                    code_line = lines[i + 2].rstrip()
+                    if 'eslint-disable-line' not in code_line:
+                        code_line = code_line + f' // eslint-disable-line {rule}'
+                    new_lines.append(code_line + '\n')
+                    i += 3
+                    modified = True
+                    fixed += 1
+                    continue
+            # Pattern: eslint-disable-next-line, then $FlowFixMe[...], then code
+            elif (i + 2 < len(lines) and
+                  'eslint-disable-next-line' in lines[i] and
+                  '$FlowFixMe[' in lines[i + 1]):
+                m = re.search(r'eslint-disable-next-line\s+(.+)', lines[i])
+                if m:
+                    rule = m.group(1).strip()
+                    new_lines.append(lines[i + 1])  # Keep $FlowFixMe
+                    # Skip eslint-disable-next-line, add as inline on code line
+                    code_line = lines[i + 2].rstrip()
+                    if 'eslint-disable-line' not in code_line:
+                        code_line = code_line + f' // eslint-disable-line {rule}'
+                    new_lines.append(code_line + '\n')
+                    i += 3
+                    modified = True
+                    fixed += 1
+                    continue
+
+            new_lines.append(lines[i])
+            i += 1
+
+        if modified:
+            with open(filepath, 'w') as f:
+                f.writelines(new_lines)
+
+print(f"  Fixed {fixed} eslint/FlowFixMe orderings")
+PYEOF
+}
+
 ###############################################################################
 # STEP 1: Ensure flow-libs directory exists
 ###############################################################################
@@ -190,21 +307,40 @@ print("  Fixed GDevelop.js types")
 PYEOF
 fi
 
-# Fix Theme/index.js - $PropertyType replacement may leave empty type
+# Fix Theme/index.js - keep a syntax compatible with old prettier parser.
 THEME_FILE="$APP_DIR/src/UI/Theme/index.js"
-if grep -q 'export type GDevelopTheme = ;' "$THEME_FILE" 2>/dev/null; then
-  sed -i "s/export type GDevelopTheme = ;/export type GDevelopTheme = Theme['gdevelopTheme'];/" "$THEME_FILE"
-  # Remove any stray {/* $FlowFixMe */} on the line above
-  python3 -c "
-with open('$THEME_FILE') as f:
-    content = f.read()
+if [ -f "$THEME_FILE" ]; then
+  export THEME_FILE
+  python3 << 'PYEOF'
 import re
-content = re.sub(r'\{\\/\\* \\\$FlowFixMe\[incompatible-type\] \\*\\/\}\n(export type GDevelopTheme)', r'\1', content)
-content = re.sub(r'\{/\* \\\$FlowFixMe\[incompatible-type\] \*/\}\n(export type GDevelopTheme)', r'\1', content)
-with open('$THEME_FILE', 'w') as f:
-    f.write(content)
-"
-  echo "  Fixed Theme/index.js"
+import os
+
+theme_file = os.environ['THEME_FILE']
+with open(theme_file) as f:
+    content = f.read()
+updated = content
+updated = updated.replace(
+    'export type GDevelopTheme = ;',
+    "export type GDevelopTheme = $PropertyType<Theme, 'gdevelopTheme'>;",
+)
+updated = updated.replace(
+    "export type GDevelopTheme = Theme['gdevelopTheme'];",
+    "export type GDevelopTheme = $PropertyType<Theme, 'gdevelopTheme'>;",
+)
+updated = updated.replace(
+    'export type GDevelopTheme = Theme[\"gdevelopTheme\"];',
+    "export type GDevelopTheme = $PropertyType<Theme, 'gdevelopTheme'>;",
+)
+updated = re.sub(
+    r'\{/\* \$FlowFixMe\[[^\]]+\] \*/\}\n(export type GDevelopTheme)',
+    r'\1',
+    updated,
+)
+if updated != content:
+    with open(theme_file, 'w') as f:
+        f.write(updated)
+    print('  Fixed Theme/index.js')
+PYEOF
 fi
 
 # Fix known annotate-exports gaps (remaining signature-verification failures).
@@ -241,52 +377,40 @@ for filepath, pattern, replacement in replacements:
 print(f"  Fixed {fixed} known annotate-exports signature gaps")
 PYEOF
 
+# Fix unstable suppression in PrivateGameTemplateStoreContext by typing the map
+# directly instead of relying on line-sensitive FlowFixMe comments.
+PRIVATE_GAME_TEMPLATES_FILE="$APP_DIR/src/AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext.js"
+if [ -f "$PRIVATE_GAME_TEMPLATES_FILE" ]; then
+  export PRIVATE_GAME_TEMPLATES_FILE
+  python3 << 'PYEOF'
+import re
+import os
+
+private_game_templates_file = os.environ['PRIVATE_GAME_TEMPLATES_FILE']
+with open(private_game_templates_file) as f:
+    content = f.read()
+updated = content.replace(
+    'const privateGameTemplateListingDatasById = {};',
+    'const privateGameTemplateListingDatasById: { [string]: PrivateGameTemplateListingData } = {};',
+)
+updated = re.sub(
+    r'(?:\s*// \$FlowFixMe\[prop-missing\]\n)+(\s*privateGameTemplateListingDatasById\[)',
+    r'\1',
+    updated,
+)
+if updated != content:
+    with open(private_game_templates_file, 'w') as f:
+        f.write(updated)
+    print('  Fixed PrivateGameTemplateStoreContext.js map typing')
+PYEOF
+fi
+
 echo "  Done."
 
 ###############################################################################
 # STEP 6: Add $FlowFixMe for all remaining errors (iterative)
 ###############################################################################
-echo ""
-echo "--- Step 6: Adding \$FlowFixMe for all errors (iterative) ---"
-
-npx flow stop 2>/dev/null || true
-
-PREV_ERROR_COUNT=""
-for i in $(seq 1 15); do
-  echo "  Iteration $i..."
-
-  # Add FlowFixMe comments for errors
-  FLOWFIXME_OUTPUT=$(python3 "$SCRIPT_DIR/add-flow-fixme.py" 2>&1 || true)
-  echo "$FLOWFIXME_OUTPUT" | grep -E "Added|Found|No" || true
-
-  # Convert // FlowFixMe in JSX context to {/* FlowFixMe */}
-  JSX_CONVERT_OUTPUT=$(python3 "$SCRIPT_DIR/convert-jsx-flowfixme.py" 2>&1 || true)
-  echo "$JSX_CONVERT_OUTPUT" | grep -E "Converted|Reverted" || true
-
-  npx flow stop 2>/dev/null || true
-
-  # Check remaining errors
-  set +e
-  ERROR_OUTPUT=$(npx flow 2>&1)
-  FLOW_EXIT=$?
-  set -e
-  if echo "$ERROR_OUTPUT" | grep -q "No errors"; then
-    echo "  No more errors!"
-    break
-  fi
-
-  ERROR_COUNT=$(echo "$ERROR_OUTPUT" | grep "Found" | grep -o '[0-9]*' | head -1)
-  echo "  Remaining errors: ${ERROR_COUNT:-unknown} (flow exit: $FLOW_EXIT)"
-
-  if echo "$FLOWFIXME_OUTPUT" | grep -q "Added 0 \$FlowFixMe comments" && \
-     [ -n "$ERROR_COUNT" ] && [ "$ERROR_COUNT" = "$PREV_ERROR_COUNT" ]; then
-    echo "  No automatic progress in this iteration; stopping early."
-    break
-  fi
-
-  PREV_ERROR_COUNT="$ERROR_COUNT"
-  npx flow stop 2>/dev/null || true
-done
+run_flowfixme_iterations "Step 6: Adding \$FlowFixMe for all errors (iterative)"
 
 ###############################################################################
 # STEP 7: Fix eslint-disable-next-line ordering with $FlowFixMe
@@ -294,71 +418,49 @@ done
 echo ""
 echo "--- Step 7: Fixing eslint/FlowFixMe comment ordering ---"
 
-# When $FlowFixMe is inserted between eslint-disable-next-line and the code,
-# eslint-disable no longer applies (it targets the FlowFixMe comment instead).
-# Fix: convert eslint-disable-next-line to eslint-disable-line on the code line.
-python3 << 'PYEOF'
-import os, re
+fix_eslint_flowfixme_comment_ordering
 
-src_dir = os.path.join(os.environ.get('APP_DIR', os.getcwd()), 'src')
-fixed = 0
+###############################################################################
+# STEP 8: Format files and re-stabilize Flow comments
+###############################################################################
+echo ""
+echo "--- Step 8: Running format and stabilizing Flow ---"
 
-for root, dirs, files in os.walk(src_dir):
-    for fname in files:
-        if not fname.endswith('.js'):
-            continue
-        filepath = os.path.join(root, fname)
-        with open(filepath) as f:
-            lines = f.readlines()
-        
-        modified = False
-        new_lines = []
-        i = 0
-        while i < len(lines):
-            # Pattern: $FlowFixMe[...], then eslint-disable-next-line, then code
-            if (i + 2 < len(lines) and
-                '$FlowFixMe[' in lines[i] and
-                'eslint-disable-next-line' in lines[i + 1]):
-                m = re.search(r'eslint-disable-next-line\s+(.+)', lines[i + 1])
-                if m:
-                    rule = m.group(1).strip()
-                    new_lines.append(lines[i])  # Keep $FlowFixMe
-                    # Skip eslint-disable-next-line, add as inline on code line
-                    code_line = lines[i + 2].rstrip()
-                    if 'eslint-disable-line' not in code_line:
-                        code_line = code_line + f' // eslint-disable-line {rule}'
-                    new_lines.append(code_line + '\n')
-                    i += 3
-                    modified = True
-                    fixed += 1
-                    continue
-            # Pattern: eslint-disable-next-line, then $FlowFixMe[...], then code
-            elif (i + 2 < len(lines) and
-                  'eslint-disable-next-line' in lines[i] and
-                  '$FlowFixMe[' in lines[i + 1]):
-                m = re.search(r'eslint-disable-next-line\s+(.+)', lines[i])
-                if m:
-                    rule = m.group(1).strip()
-                    new_lines.append(lines[i + 1])  # Keep $FlowFixMe
-                    # Skip eslint-disable-next-line, add as inline on code line
-                    code_line = lines[i + 2].rstrip()
-                    if 'eslint-disable-line' not in code_line:
-                        code_line = code_line + f' // eslint-disable-line {rule}'
-                    new_lines.append(code_line + '\n')
-                    i += 3
-                    modified = True
-                    fixed += 1
-                    continue
-            
-            new_lines.append(lines[i])
-            i += 1
-        
-        if modified:
-            with open(filepath, 'w') as f:
-                f.writelines(new_lines)
+POST_FORMAT_CLEAN=0
+for pass in $(seq 1 3); do
+  echo "  Post-format stabilization pass $pass..."
+  echo "  Running formatter..."
+  npm run format
 
-print(f"  Fixed {fixed} eslint/FlowFixMe orderings")
-PYEOF
+  run_flowfixme_iterations "Post-format FlowFixMe pass $pass" 8
+
+  echo "  Re-checking eslint/FlowFixMe ordering..."
+  fix_eslint_flowfixme_comment_ordering
+
+  echo "  Re-running formatter after suppressions..."
+  npm run format
+
+  npx flow stop 2>/dev/null || true
+  set +e
+  POST_FORMAT_FLOW_OUTPUT=$(npx flow 2>&1)
+  POST_FORMAT_FLOW_EXIT=$?
+  set -e
+
+  if echo "$POST_FORMAT_FLOW_OUTPUT" | grep -q "No errors"; then
+    echo "  Flow is clean after pass $pass."
+    POST_FORMAT_CLEAN=1
+    npx flow stop 2>/dev/null || true
+    break
+  fi
+
+  POST_FORMAT_ERROR_COUNT=$(echo "$POST_FORMAT_FLOW_OUTPUT" | grep "Found" | grep -o '[0-9]*' | head -1)
+  echo "  Flow still has ${POST_FORMAT_ERROR_COUNT:-unknown} errors after pass $pass (flow exit: $POST_FORMAT_FLOW_EXIT)."
+  npx flow stop 2>/dev/null || true
+done
+
+if [ "$POST_FORMAT_CLEAN" -ne 1 ]; then
+  echo "  WARNING: Flow still reports errors after post-format stabilization."
+fi
 
 echo ""
 echo "=== Flow Migration Fix Script Complete ==="

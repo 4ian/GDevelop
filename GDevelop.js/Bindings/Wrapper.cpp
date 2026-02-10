@@ -383,7 +383,7 @@ class ReadOnlyArbitraryEventsWorkerWithContextJS : public ReadOnlyArbitraryEvent
           var self = Module['getCache'](Module['ReadOnlyArbitraryEventsWorkerWithContextJS'])[$0];
           if (!self.hasOwnProperty('doVisitEvent'))
             throw 'a JSImplementation must implement all functions, you forgot ReadOnlyArbitraryEventsWorkerWithContextJS::doVisitEvent.';
-          self.doVisitEvent($1);
+          self.doVisitEvent(wrapPointer($1, Module['BaseEvent']));
         },
         (int)this,
         (int)&event);
@@ -395,7 +395,7 @@ class ReadOnlyArbitraryEventsWorkerWithContextJS : public ReadOnlyArbitraryEvent
           var self = Module['getCache'](Module['ReadOnlyArbitraryEventsWorkerWithContextJS'])[$0];
           if (!self.hasOwnProperty('doVisitInstruction'))
             throw 'a JSImplementation must implement all functions, you forgot ReadOnlyArbitraryEventsWorkerWithContextJS::doVisitInstruction.';
-          self.doVisitInstruction($1, $2, $3);
+          self.doVisitInstruction(wrapPointer($1, Module['Instruction']), !!$2, wrapPointer($3, Module['ProjectScopedContainers']));
         },
         (int)this,
         (int)&instruction,

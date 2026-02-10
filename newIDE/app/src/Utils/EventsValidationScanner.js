@@ -77,26 +77,19 @@ const createValidationWorker = (
 
   let currentEventPath: Array<number> = [];
 
-  worker.doVisitEvent = (eventPtr: number) => {
-    const path = eventPtrToPathMap.get(eventPtr);
+  worker.doVisitEvent = (event: gdBaseEvent) => {
+    // $FlowFixMe - ptr is a number identifying the C++ object
+    const path = eventPtrToPathMap.get(event.ptr);
     if (path) {
       currentEventPath = path;
     }
   };
 
   worker.doVisitInstruction = (
-    instructionPtr: number,
-    isConditionInt: number,
-    projectScopedContainersPtr: number
+    instruction: gdInstruction,
+    isCondition: boolean,
+    projectScopedContainers: gdProjectScopedContainers
   ) => {
-    const instruction = gd.wrapPointer(instructionPtr, gd.Instruction);
-    const projectScopedContainers = gd.wrapPointer(
-      projectScopedContainersPtr,
-      gd.ProjectScopedContainers
-    );
-    // C++ passes boolean as 0/1 through EM_ASM
-    const isCondition: boolean = !!isConditionInt;
-
     const type = instruction.getType();
 
     // Skip empty instruction types

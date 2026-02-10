@@ -468,7 +468,7 @@ const MainFrame = (props: Props) => {
    * Checks for diagnostic errors in the project if blocking is enabled.
    * Returns true if there are errors and the action should be blocked.
    */
-  const checkDiagnosticErrorsAndBlock = React.useCallback(
+  const checkDiagnosticErrorsAndIfShouldBlock = React.useCallback(
     async (
       project: ?gdProject,
       actionType: 'preview' | 'export'
@@ -852,7 +852,9 @@ const MainFrame = (props: Props) => {
 
   const openShareDialog = React.useCallback(
     async (initialTab?: ShareTab) => {
-      if (await checkDiagnosticErrorsAndBlock(currentProject, 'export')) {
+      if (
+        await checkDiagnosticErrorsAndIfShouldBlock(currentProject, 'export')
+      ) {
         return;
       }
 
@@ -861,7 +863,7 @@ const MainFrame = (props: Props) => {
       setShareDialogInitialTab(initialTab || null);
       setShareDialogOpen(true);
     },
-    [state.editorTabs, currentProject, checkDiagnosticErrorsAndBlock]
+    [state.editorTabs, currentProject, checkDiagnosticErrorsAndIfShouldBlock]
   );
 
   const closeShareDialog = React.useCallback(
@@ -2200,7 +2202,9 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
 
-      if (await checkDiagnosticErrorsAndBlock(currentProject, 'preview')) {
+      if (
+        await checkDiagnosticErrorsAndIfShouldBlock(currentProject, 'preview')
+      ) {
         return;
       }
 
@@ -2421,7 +2425,7 @@ const MainFrame = (props: Props) => {
       inGameEditorSettings,
       previewLoadingRef,
       setPreviewLoading,
-      checkDiagnosticErrorsAndBlock,
+      checkDiagnosticErrorsAndIfShouldBlock,
     ]
   );
 

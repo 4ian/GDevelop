@@ -17,10 +17,9 @@ const getLibGDevelop = (versionWithHash /*: string */) => {
       // eslint-disable-next-line no-undef
       importScripts(url);
 
-      // eslint-disable-next-line no-undef
       // $FlowFixMe[incompatible-type]
       // $FlowFixMe[cannot-resolve-name]
-      if (typeof initializeGDevelopJs !== 'function') {
+      if (typeof initializeGDevelopJs !== 'function') { // eslint-disable-line no-undef
         reject(new Error('Missing initializeGDevelopJs in worker'));
         return;
       }

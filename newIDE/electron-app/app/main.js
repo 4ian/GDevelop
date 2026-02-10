@@ -48,13 +48,11 @@ const { setupWatcher, disableWatcher } = require('./LocalFilesystemWatcher');
 
 const isMac = process.platform === 'darwin';
 
+const monacoFocusedByWebContentsId = new Map();
+
 /**
- * Ensures paste operations work in all web content (notably Monaco editor)
- * by intercepting Cmd/Ctrl+V before Electron's menu accelerators consume the
- * event, and explicitly calling webContents.paste().
- * See https://github.com/microsoft/monaco-editor/issues/4855
- *
- * This may be fixed in future monaco-editor versions, starting from 0.56.0 when it's released.
+ * Ensures paste operations work in Monaco editor by intercepting Cmd/Ctrl+V
+ * only when Monaco is focused and injecting clipboard text.
  */
 const setupPasteHandler = window => {
   window.webContents.on('before-input-event', (event, input) => {
@@ -65,10 +63,22 @@ const setupPasteHandler = window => {
     const shouldPaste =
       input.type === 'keyDown' && isCmdOrCtrl && !hasShift && !hasAlt && isV;
 
-    if (shouldPaste) {
-      window.webContents.paste();
-      event.preventDefault();
+    if (!shouldPaste) return;
+
+    const isMonacoFocused = !!monacoFocusedByWebContentsId.get(
+      window.webContents.id
+    );
+    if (!isMonacoFocused) {
+      return;
     }
+
+    const text = electron.clipboard.readText();
+    if (!text) {
+      return;
+    }
+
+    window.webContents.insertText(text);
+    event.preventDefault();
   });
 };
 
@@ -265,6 +275,8 @@ function createNewWindow(windowArgs = args) {
   });
 
   newWindow.on('closed', function() {
+    monacoFocusedByWebContentsId.delete(newWindow.webContents.id);
+
     // Remove from tracked windows
     mainWindows.delete(newWindow);
 
@@ -339,6 +351,10 @@ app.on('ready', function() {
       },
     ]);
   }
+
+  ipcMain.on('monaco-focus-changed', (event, { isFocused }) => {
+    monacoFocusedByWebContentsId.set(event.sender.id, !!isFocused);
+  });
 
   ipcMain.on('set-main-menu', (event, mainMenuTemplate) => {
     const window = BrowserWindow.fromWebContents(event.sender);

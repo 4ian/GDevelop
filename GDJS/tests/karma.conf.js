@@ -13,7 +13,27 @@ module.exports = function (config) {
   config.set({
     frameworks: ['mocha', 'sinon'],
     browserNoActivityTimeout: 400000,
-    browsers: ['ChromeHeadless', 'EdgeHeadless', 'Chrome', 'Edge', 'Firefox'],
+    browsers: [
+      'ChromeHeadless',
+      'EdgeHeadless',
+      'Chrome',
+      'Edge',
+      'Firefox',
+      'ChromeHeadlessNoSandbox',
+    ],
+    customLaunchers: {
+      // This is useful to run tests in a CI environment like Ubuntu 24.04 on Semaphore CI.
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: [
+          '--no-sandbox',
+          '--disable-gpu',
+          '--use-gl=swiftshader',
+          '--enable-webgl',
+          '--use-angle=swiftshader',
+        ],
+      },
+    },
     plugins: [
       require('karma-chrome-launcher'),
       require('@chiragrupani/karma-chromium-edge-launcher'),

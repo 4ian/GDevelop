@@ -29,10 +29,7 @@ import ExtensionInstallDialog from '../ExtensionStore/ExtensionInstallDialog';
 import { getIDEVersion } from '../../Version';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
-export const useExtensionUpdateAlertDialog = (): ((
-  project: gdProject,
-  behaviorShortHeader: BehaviorShortHeader
-) => Promise<boolean>) => {
+export const useExtensionUpdateAlertDialog = () => {
   const { showConfirmation } = useAlertDialog();
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
@@ -85,7 +82,7 @@ export const BehaviorStore = ({
   deprecatedBehaviorMetadataList,
   onInstall,
   onChoose,
-}: Props): React.Node => {
+}: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const [
     selectedBehaviorShortHeader,
@@ -296,7 +293,6 @@ export const BehaviorStore = ({
             filteredSearchResults.map(({ item }) => item)
           }
           getSearchItemUniqueId={getBehaviorType}
-          // $FlowFixMe[missing-local-annot]
           renderSearchItem={(behaviorShortHeader, onHeightComputed) => (
             <BehaviorListItem
               id={

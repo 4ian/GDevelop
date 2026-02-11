@@ -5,7 +5,6 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import Clipboard from '../Utils/Clipboard';
 import { SafeExtractor } from '../Utils/SafeExtractor';
-// $FlowFixMe[import-type-as-value]
 import { TreeViewItemContent } from '.';
 import {
   enumerateFoldersInContainer,
@@ -188,7 +187,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       isGlobalObject,
       isFolder,
     }: {| isGlobalObject: boolean, isFolder: boolean |}
-  ): any {
+  ) {
     let translation = t`Paste`;
     if (Clipboard.has(OBJECT_CLIPBOARD_KIND)) {
       const clipboardContent = Clipboard.get(OBJECT_CLIPBOARD_KIND);
@@ -201,7 +200,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     return i18n._(translation);
   }
 
-  buildMenuTemplate(i18n: I18nType, index: number): any {
+  buildMenuTemplate(i18n: I18nType, index: number) {
     const {
       globalObjectsContainer,
       objectsContainer,
@@ -468,7 +467,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
 
   duplicate(): void {}
 
-  getRightButton(i18n: I18nType): any {
+  getRightButton(i18n: I18nType) {
     return null;
   }
 }

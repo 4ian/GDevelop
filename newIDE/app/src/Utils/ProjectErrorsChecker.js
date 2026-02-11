@@ -15,7 +15,7 @@ export type ProjectErrors = {
   [string]: Array<ProjectError>,
 };
 
-export const validatePackageName = (packageName: string): boolean => {
+export const validatePackageName = (packageName: string) => {
   const pattern = /^([A-Za-z]{1}[A-Za-z\d_]*\.)+[A-Za-z][A-Za-z\d_]*$/i;
 
   return pattern.test(packageName);

@@ -29,7 +29,7 @@ import { showErrorBox } from '../../UI/Messages/MessageBox';
 
 type Props = {| children: React.Node |};
 
-const TeamProvider = ({ children }: Props): React.Node => {
+const TeamProvider = ({ children }: Props) => {
   const {
     limits,
     profile,
@@ -131,7 +131,6 @@ const TeamProvider = ({ children }: Props): React.Node => {
   );
 
   const onCreateMembers = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     async quantity => {
       if (!team || !adminUserId) return;
       try {
@@ -286,7 +285,6 @@ const TeamProvider = ({ children }: Props): React.Node => {
 
   const onListUserProjects = React.useCallback(
     async (user: User) => {
-      // $FlowFixMe[missing-empty-array-annot]
       if (!adminUserId) return [];
       return listOtherUserCloudProjects(
         getAuthorizationHeader,

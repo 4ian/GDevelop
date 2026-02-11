@@ -47,7 +47,7 @@ type Props = {|
  * Works like a dialog when opened (trapping the focus, dismissed on Escape,
  * dismissed on click/touch outside) but positioned under the edited parameter.
  */
-export default function InlinePopover(props: Props): React.Node {
+export default function InlinePopover(props: Props) {
   const startSentinel = React.useRef<?HTMLDivElement>(null);
   const endSentinel = React.useRef<?HTMLDivElement>(null);
   const { isMobile } = useResponsiveWindowSize();

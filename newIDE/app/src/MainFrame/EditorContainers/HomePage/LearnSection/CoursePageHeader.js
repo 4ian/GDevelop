@@ -104,7 +104,7 @@ const CoursePageHeader = ({
   purchasingCourseListingData,
   setPurchasingCourseListingData,
   simulateAppStoreProduct,
-}: Props): React.Node => {
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { listedCourses } = React.useContext(CourseStoreContext);
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();

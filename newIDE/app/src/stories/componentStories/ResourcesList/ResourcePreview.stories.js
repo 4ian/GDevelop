@@ -12,7 +12,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Image = (): React.Node => (
+export const Image = () => (
   <FixedHeightFlexContainer height={300}>
     <ResourcePreview
       project={testProject.project}
@@ -22,7 +22,7 @@ export const Image = (): React.Node => (
   </FixedHeightFlexContainer>
 );
 
-export const NotExisting = (): React.Node => (
+export const NotExisting = () => (
   <FixedHeightFlexContainer height={300}>
     <ResourcePreview
       project={testProject.project}
@@ -32,7 +32,7 @@ export const NotExisting = (): React.Node => (
   </FixedHeightFlexContainer>
 );
 
-export const Audio = (): React.Node => (
+export const Audio = () => (
   <FixedHeightFlexContainer height={300}>
     <ResourcePreview
       project={testProject.project}

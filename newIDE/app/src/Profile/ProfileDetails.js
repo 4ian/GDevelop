@@ -64,7 +64,7 @@ const ProfileDetails = ({
   authenticatedUser,
   onOpenChangeEmailDialog,
   onOpenEditProfileDialog,
-}: Props): React.Node => {
+}: Props) => {
   const {
     firebaseUser,
     achievements,

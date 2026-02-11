@@ -15,7 +15,6 @@ import { type ResourceKind } from '../ResourcesList/ResourceSource';
 const gd: libGDevelop = global.gd;
 
 type SpineTextureAtlasOrLoadingError = {|
-  // $FlowFixMe[value-as-type]
   textureAtlas: ?TextureAtlas,
   loadingError: ?Error,
   loadingErrorReason:
@@ -26,7 +25,6 @@ type SpineTextureAtlasOrLoadingError = {|
 |};
 
 export type SpineDataOrLoadingError = {|
-  // $FlowFixMe[value-as-type]
   skeleton: ?ISkeleton,
   loadingError: ?Error,
   loadingErrorReason:
@@ -49,16 +47,12 @@ const invalidTexture = PIXI.Texture.from('res/invalid_texture.png');
 const loadingTexture = PIXI.Texture.from(
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAAA1BMVEXX19f5cgrAAAAAAXRSTlMz/za5cAAAAApJREFUCNdjQAMAABAAAbSqgB8AAAAASUVORK5CYII='
 );
-// $FlowFixMe[value-as-type]
 let loadedOrLoadingThreeTextures: ResourcePromise<THREE.Texture> = {};
-// $FlowFixMe[value-as-type]
 let loadedOrLoadingThreeMaterials: ResourcePromise<THREE.Material> = {};
-// $FlowFixMe[value-as-type]
 let loadedOrLoading3DModelPromises: ResourcePromise<THREE.THREE_ADDONS.GLTF> = {};
 let spineAtlasPromises: ResourcePromise<SpineTextureAtlasOrLoadingError> = {};
 let spineDataPromises: ResourcePromise<SpineDataOrLoadingError> = {};
 
-// $FlowFixMe[value-as-type]
 const createInvalidModel = (): GLTF => {
   /**
    * The invalid model is a box with magenta (#ff00ff) faces, to be
@@ -81,7 +75,6 @@ const createInvalidModel = (): GLTF => {
     parser: null,
   };
 };
-// $FlowFixMe[value-as-type]
 const invalidModel: GLTF = createInvalidModel();
 
 let gltfLoader = null;
@@ -98,7 +91,6 @@ const getOrCreateGltfLoader = () => {
 const load3DModel = (
   project: gdProject,
   resourceName: string
-  // $FlowFixMe[value-as-type]
 ): Promise<THREE.THREE_ADDONS.GLTF> => {
   if (
     resourceName.length === 0 ||
@@ -152,7 +144,6 @@ const applyPixiTextureSettings = (resource: gdResource, texture: any) => {
 
 const applyThreeTextureSettings = (
   resource: gdResource,
-  // $FlowFixMe[value-as-type]
   threeTexture: THREE.Texture
 ) => {
   if (resource.getKind() !== 'image') return;
@@ -165,7 +156,6 @@ const applyThreeTextureSettings = (
 };
 
 // If modifying this function, make sure to update Resource3DPreview.worker.js copy.
-// $FlowFixMe[value-as-type]
 const removeMetalness = (material: THREE.Material): void => {
   if (material.metalness) {
     material.metalness = 0;
@@ -173,9 +163,7 @@ const removeMetalness = (material: THREE.Material): void => {
 };
 
 // If modifying this function, make sure to update Resource3DPreview.worker.js copy.
-// $FlowFixMe[value-as-type]
 const removeMetalnessFromMesh = (node: THREE.Object3D): void => {
-  // $FlowFixMe[value-as-type]
   const mesh = (node: THREE.Mesh);
   if (!mesh.material) {
     return;
@@ -189,7 +177,6 @@ const removeMetalnessFromMesh = (node: THREE.Object3D): void => {
   }
 };
 
-// $FlowFixMe[value-as-type]
 const traverseToRemoveMetalnessFromMeshes = (node: THREE.Object3D) =>
   node.traverse(removeMetalnessFromMesh);
 
@@ -284,7 +271,6 @@ export default class PixiResourcesLoader {
   }
 
   static async reloadResource(project: gdProject, resourceName: string) {
-    // $FlowFixMe[invalid-computed-prop]
     const loadedTexture = loadedTextures[resourceName];
     if (loadedTexture && loadedTexture.textureCacheIds) {
       // The property textureCacheIds indicates that the PIXI.Texture object has some
@@ -295,7 +281,6 @@ export default class PixiResourcesLoader {
       // has been cached (if file was not found for instance), and a corresponding file has
       // been added and detected by file watcher. When reloading the texture, the cache must
       // be cleaned too.
-      // $FlowFixMe[prop-missing]
       delete loadedTextures[resourceName];
 
       // Also reload any resource embedding this resource:
@@ -307,14 +292,10 @@ export default class PixiResourcesLoader {
     if (loadedOrLoading3DModelPromises[resourceName]) {
       delete loadedOrLoading3DModelPromises[resourceName];
     }
-    // $FlowFixMe[invalid-computed-prop]
     if (loadedFontFamilies[resourceName]) {
-      // $FlowFixMe[prop-missing]
       delete loadedFontFamilies[resourceName];
     }
-    // $FlowFixMe[invalid-computed-prop]
     if (loadedBitmapFonts[resourceName]) {
-      // $FlowFixMe[prop-missing]
       delete loadedBitmapFonts[resourceName];
     }
     if (loadedOrLoadingThreeTextures[resourceName]) {
@@ -415,7 +396,6 @@ export default class PixiResourcesLoader {
             crossOrigin: determineCrossOrigin(url),
           });
           const loadedTexture = await PIXI.Assets.load(url);
-          // $FlowFixMe[prop-missing]
           loadedTextures[resourceName] = loadedTexture;
           // TODO What if 2 assets share the same file with different settings?
           applyPixiTextureSettings(resource, loadedTexture);
@@ -437,7 +417,6 @@ export default class PixiResourcesLoader {
             }
           );
 
-          // $FlowFixMe[prop-missing]
           loadedTextures[resourceName] = PIXI.Texture.from(url, {
             scaleMode: PIXI.SCALE_MODES.LINEAR,
             resourceOptions: {
@@ -451,14 +430,11 @@ export default class PixiResourcesLoader {
               crossorigin: determineCrossOrigin(url),
             },
           });
-          // $FlowFixMe[invalid-computed-prop]
           if (!loadedTextures[resourceName]) {
             console.error(`Texture loading for ${url} returned nothing`);
-            // $FlowFixMe[prop-missing]
             loadedTextures[resourceName] = invalidTexture;
           }
 
-          // $FlowFixMe[invalid-computed-prop]
           loadedTextures[resourceName].baseTexture.resource
             .load()
             .catch(error => {
@@ -466,7 +442,6 @@ export default class PixiResourcesLoader {
                 `Unable to load video texture from url ${url}:`,
                 error
               );
-              // $FlowFixMe[prop-missing]
               loadedTextures[resourceName] = invalidTexture;
             });
         } catch (error) {
@@ -486,8 +461,7 @@ export default class PixiResourcesLoader {
    * should listen to PIXI.Texture `update` event, and refresh your object
    * if this event is triggered.
    */
-  static getPIXITexture(project: gdProject, resourceName: string): any {
-    // $FlowFixMe[invalid-computed-prop]
+  static getPIXITexture(project: gdProject, resourceName: string) {
     if (loadedTextures[resourceName]) {
       // TODO: we never consider textures as not valid anymore. When we
       // update the IDE to unload textures, we should handle loading them again
@@ -508,30 +482,23 @@ export default class PixiResourcesLoader {
     const url = ResourcesLoader.getResourceFullUrl(project, resourceName, {
       isResourceForPixi: true,
     });
-    // $FlowFixMe[prop-missing]
     loadedTextures[resourceName] = PIXI.Texture.from(url, {
       resourceOptions: {
         crossorigin: determineCrossOrigin(url),
         autoLoad: false,
       },
     });
-    // $FlowFixMe[invalid-computed-prop]
     if (!loadedTextures[resourceName]) {
       console.error(`Texture loading for ${url} returned nothing`);
-      // $FlowFixMe[prop-missing]
       loadedTextures[resourceName] = invalidTexture;
-      // $FlowFixMe[invalid-computed-prop]
       return loadedTextures[resourceName];
     }
     loadedTextures[resourceName].baseTexture.resource.load().catch(error => {
       console.error(`Unable to load texture from url ${url}:`, error);
-      // $FlowFixMe[prop-missing]
       loadedTextures[resourceName] = invalidTexture;
     });
 
-    // $FlowFixMe[invalid-computed-prop]
     applyPixiTextureSettings(resource, loadedTextures[resourceName]);
-    // $FlowFixMe[invalid-computed-prop]
     return loadedTextures[resourceName];
   }
 
@@ -545,10 +512,8 @@ export default class PixiResourcesLoader {
   static async getThreeTexture(
     project: gdProject,
     resourceName: string
-    // $FlowFixMe[value-as-type]
   ): Promise<THREE.Texture> {
     const loadedOrLoadingPromise = loadedOrLoadingThreeTextures[resourceName];
-    // $FlowFixMe[constant-condition]
     if (loadedOrLoadingPromise) return loadedOrLoadingPromise;
 
     // Texture is not loaded, load it now from the PixiJS texture.
@@ -607,11 +572,9 @@ export default class PixiResourcesLoader {
     }: {|
       useTransparentTexture: boolean,
     |}
-  ): // $FlowFixMe[value-as-type]
-  Promise<THREE.Material> {
+  ): Promise<THREE.Material> {
     const cacheKey = `${resourceName}|transparent:${useTransparentTexture.toString()}`;
     const loadedOrLoadingPromise = loadedOrLoadingThreeMaterials[cacheKey];
-    // $FlowFixMe[constant-condition]
     if (loadedOrLoadingPromise) return loadedOrLoadingPromise;
 
     return (loadedOrLoadingThreeMaterials[cacheKey] = this.getThreeTexture(
@@ -639,10 +602,8 @@ export default class PixiResourcesLoader {
   static get3DModel(
     project: gdProject,
     resourceName: string
-    // $FlowFixMe[value-as-type]
   ): Promise<THREE.THREE_ADDONS.GLTF> {
     const promise = loadedOrLoading3DModelPromises[resourceName];
-    // $FlowFixMe[constant-condition]
     if (promise) return promise;
 
     const loadingPromise = load3DModel(project, resourceName);
@@ -661,7 +622,6 @@ export default class PixiResourcesLoader {
     spineTextureAtlasName: string
   ): Promise<SpineTextureAtlasOrLoadingError> {
     const promise = spineAtlasPromises[spineTextureAtlasName];
-    // $FlowFixMe[constant-condition]
     if (promise) return promise;
 
     if (!spineTextureAtlasName) {
@@ -792,7 +752,6 @@ export default class PixiResourcesLoader {
     spineName: string
   ): Promise<SpineDataOrLoadingError> {
     const promise = spineDataPromises[spineName];
-    // $FlowFixMe[constant-condition]
     if (promise) return promise;
 
     const resourceManager = project.getResourcesManager();
@@ -887,8 +846,7 @@ export default class PixiResourcesLoader {
    * should listen to PIXI.Texture `update` event, and refresh your object
    * if this event is triggered.
    */
-  static getPIXIVideoTexture(project: gdProject, resourceName: string): any {
-    // $FlowFixMe[invalid-computed-prop]
+  static getPIXIVideoTexture(project: gdProject, resourceName: string) {
     if (loadedTextures[resourceName]) {
       // TODO: we never consider textures as not valid anymore. When we
       // update the IDE to unload textures, we should handle loading them again
@@ -910,7 +868,6 @@ export default class PixiResourcesLoader {
       isResourceForPixi: true,
     });
 
-    // $FlowFixMe[prop-missing]
     loadedTextures[resourceName] = PIXI.Texture.from(url, {
       scaleMode: PIXI.SCALE_MODES.LINEAR,
       resourceOptions: {
@@ -922,22 +879,17 @@ export default class PixiResourcesLoader {
         crossorigin: determineCrossOrigin(url),
       },
     });
-    // $FlowFixMe[invalid-computed-prop]
     if (!loadedTextures[resourceName]) {
       console.error(`Texture loading for ${url} returned nothing`);
-      // $FlowFixMe[prop-missing]
       loadedTextures[resourceName] = invalidTexture;
-      // $FlowFixMe[invalid-computed-prop]
       return loadedTextures[resourceName];
     }
 
     loadedTextures[resourceName].baseTexture.resource.load().catch(error => {
       console.error(`Unable to load video texture from url ${url}:`, error);
-      // $FlowFixMe[prop-missing]
       loadedTextures[resourceName] = invalidTexture;
     });
 
-    // $FlowFixMe[invalid-computed-prop]
     return loadedTextures[resourceName];
   }
 
@@ -951,7 +903,6 @@ export default class PixiResourcesLoader {
     resourceName: string
   ): Promise<string> {
     // Avoid reloading a font if it's already cached
-    // $FlowFixMe[invalid-computed-prop]
     if (loadedFontFamilies[resourceName]) {
       return Promise.resolve(loadedFontFamilies[resourceName]);
     }
@@ -988,7 +939,6 @@ export default class PixiResourcesLoader {
     }
 
     return loadFontFace(fontFamily, fullFilename).then(loadedFace => {
-      // $FlowFixMe[prop-missing]
       loadedFontFamilies[resourceName] = fontFamily;
 
       return fontFamily;
@@ -1000,8 +950,7 @@ export default class PixiResourcesLoader {
    * The font won't be loaded.
    * @returns The font-family to be used to render a text with the font.
    */
-  static getFontFamily(project: gdProject, resourceName: string): any {
-    // $FlowFixMe[invalid-computed-prop]
+  static getFontFamily(project: gdProject, resourceName: string) {
     if (loadedFontFamilies[resourceName]) {
       return loadedFontFamilies[resourceName];
     }
@@ -1017,7 +966,6 @@ export default class PixiResourcesLoader {
     project: gdProject,
     resourceName: string
   ): Promise<any> {
-    // $FlowFixMe[invalid-computed-prop]
     if (loadedBitmapFonts[resourceName]) {
       return Promise.resolve(loadedBitmapFonts[resourceName].data);
     }
@@ -1031,7 +979,6 @@ export default class PixiResourcesLoader {
       );
 
     const resource = project.getResourcesManager().getResource(resourceName);
-    // $FlowFixMe[invalid-compare]
     if (resource.getKind() !== 'bitmapFont')
       return Promise.reject(
         new Error(
@@ -1050,25 +997,21 @@ export default class PixiResourcesLoader {
       );
     }
 
-    return (
-      axios
-        // $FlowFixMe[underconstrained-implicit-instantiation]
-        .get(fullUrl, {
-          withCredentials: checkIfCredentialsRequired(fullUrl),
-        })
-        .then(response => {
-          // $FlowFixMe[prop-missing]
-          loadedBitmapFonts[resourceName] = response;
-          return response.data;
-        })
-    );
+    return axios
+      .get(fullUrl, {
+        withCredentials: checkIfCredentialsRequired(fullUrl),
+      })
+      .then(response => {
+        loadedBitmapFonts[resourceName] = response;
+        return response.data;
+      });
   }
 
-  static getInvalidPIXITexture(): any {
+  static getInvalidPIXITexture() {
     return invalidTexture;
   }
 
-  static getLoadingPIXITexture(): any {
+  static getLoadingPIXITexture() {
     return loadingTexture;
   }
 
@@ -1100,13 +1043,10 @@ export default class PixiResourcesLoader {
     const fullUrl = ResourcesLoader.getResourceFullUrl(project, resourceName, {
       isResourceForPixi: true,
     });
-    return (
-      axios
-        // $FlowFixMe[underconstrained-implicit-instantiation]
-        .get(fullUrl, {
-          withCredentials: checkIfCredentialsRequired(fullUrl),
-        })
-        .then(response => response.data)
-    );
+    return axios
+      .get(fullUrl, {
+        withCredentials: checkIfCredentialsRequired(fullUrl),
+      })
+      .then(response => response.data);
   }
 }

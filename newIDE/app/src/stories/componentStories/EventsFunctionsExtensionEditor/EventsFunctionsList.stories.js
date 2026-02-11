@@ -17,7 +17,7 @@ export default {
   decorators: [alertDecorator],
 };
 
-export const Default = (): React.Node => (
+export const Default = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={500}>
       <EventsFunctionsListWithErrorBoundary

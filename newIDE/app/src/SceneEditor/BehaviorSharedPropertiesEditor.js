@@ -17,7 +17,7 @@ type Props = {|
 |};
 
 export default class BehaviorSharedPropertiesEditor extends React.Component<Props> {
-  render(): any {
+  render() {
     const { behaviorSharedData } = this.props;
 
     const propertiesSchema = propertiesMapToSchema({

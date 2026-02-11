@@ -22,9 +22,7 @@ const authenticationPortalUrl = 'https://auth.gdevelop.io';
 
 class BrowserLoginProvider
   implements LoginProvider, FirebaseBasedLoginProvider {
-  // $FlowFixMe[value-as-type]
   auth: Auth;
-  // $FlowFixMe[value-as-type]
   constructor(auth: Auth) {
     this.auth = auth;
   }
@@ -35,7 +33,6 @@ class BrowserLoginProvider
   }: {|
     email: string,
     password: string,
-    // $FlowFixMe[missing-local-annot]
   |}) {
     try {
       await signInWithEmailAndPassword(this.auth, email, password);
@@ -52,7 +49,7 @@ class BrowserLoginProvider
   }: {|
     provider: IdentityProvider,
     signal?: AbortSignal,
-  |}): any {
+  |}) {
     if (signal && signal.aborted) {
       return Promise.reject(
         new Error('Login or Signup with provider already aborted.')

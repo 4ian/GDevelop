@@ -48,7 +48,7 @@ const TeamMemberRow = ({
   onListUserProjects,
   onDrag,
   onOpenContextMenu,
-}: Props): React.MixedElement => {
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const [emailCopySuccess, setEmailCopySuccess] = React.useState<boolean>(

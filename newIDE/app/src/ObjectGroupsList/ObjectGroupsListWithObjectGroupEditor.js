@@ -44,7 +44,7 @@ const ObjectGroupsListWithObjectGroupEditor = ({
   onGroupsUpdated,
   canSetAsGlobalGroup,
   unsavedChanges,
-}: Props): React.Node => {
+}: Props) => {
   const [editedGroup, setEditedGroup] = React.useState<gdObjectGroup | null>(
     null
   );

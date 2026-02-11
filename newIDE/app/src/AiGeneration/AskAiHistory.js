@@ -83,7 +83,7 @@ type AskAiHistoryContentProps = {|
 export const AskAiHistoryContent = ({
   onSelectAiRequest,
   selectedAiRequestId,
-}: AskAiHistoryContentProps): React.Node => {
+}: AskAiHistoryContentProps) => {
   const {
     aiRequestStorage: {
       aiRequests,
@@ -94,9 +94,9 @@ export const AskAiHistoryContent = ({
       error,
     },
   } = React.useContext(AiRequestContext);
-  // $FlowFixMe[incompatible-type] - Flow loses type with Object.values
+  // $FlowFixMe - Flow loses type with Object.values
   const aiRequestsArray: AiRequest[] = Object.values(aiRequests).sort(
-    // $FlowFixMe[incompatible-type] - Object.values() loses the type of aiRequests.
+    // $FlowFixMe - Object.values() loses the type of aiRequests.
     (a: AiRequest, b: AiRequest) => {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     }
@@ -206,7 +206,7 @@ export const AskAiHistory = ({
   onClose,
   onSelectAiRequest,
   selectedAiRequestId,
-}: Props): React.Node => {
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
 
   const handleSelectAiRequest = (aiRequest: AiRequest) => {

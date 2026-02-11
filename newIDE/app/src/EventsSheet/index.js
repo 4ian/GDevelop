@@ -245,12 +245,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _eventsTree: ?EventsTreeInterface;
   _eventSearcher: ?EventsSearcher;
   _searchPanel: ?SearchPanelInterface;
-  // $FlowFixMe[missing-local-annot]
-  _containerDiv = (React.createRef<HTMLDivElement>(): React$RefObject<HTMLDivElement | null>);
-  // $FlowFixMe[missing-local-annot]
+  _containerDiv = React.createRef<HTMLDivElement>();
   _containerDivLastKnownSize = null;
-  // $FlowFixMe[missing-local-annot]
-  _keyboardShortcuts = (new KeyboardShortcuts({
+  _keyboardShortcuts = new KeyboardShortcuts({
     isActive: () =>
       !this.state.inlineEditing &&
       !this.state.editedInstruction.instruction &&
@@ -268,7 +265,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       onZoomIn: (event: KeyboardEvent) => this.onZoomEvent('IN')(event),
       onZoomOut: (event: KeyboardEvent) => this.onZoomEvent('OUT')(event),
     },
-  }): KeyboardShortcuts);
+  });
 
   eventContextMenu: ?ContextMenuInterface;
   resourceExternallyChangedCallbackId: ?string;
@@ -278,11 +275,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     context: ?EventInsertionContext
   ) => Array<gdBaseEvent>;
 
-  // $FlowFixMe[missing-local-annot]
   state = {
-    eventsHistory: (getHistoryInitialState(this.props.events, {
+    eventsHistory: getHistoryInitialState(this.props.events, {
       historyMaxSize: 100,
-    }): HistoryState),
+    }),
 
     editedInstruction: {
       isCondition: true,
@@ -300,7 +296,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     },
     editedVariable: null,
 
-    selection: (getInitialSelection(): any),
+    selection: getInitialSelection(),
 
     inlineEditing: false,
     inlineEditingAnchorEl: null,
@@ -317,7 +313,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
     layoutVariablesDialogOpen: false,
 
-    allEventsMetadata: ([]: Array<empty>),
+    allEventsMetadata: [],
 
     textEditedEvent: null,
 
@@ -363,7 +359,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     }
   }
 
-  onResourceExternallyChanged = (resourceInfo: any) => {
+  onResourceExternallyChanged = resourceInfo => {
     if (this._eventsTree) this._eventsTree.forceEventsUpdate();
   };
 
@@ -444,7 +440,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           this._searchPanel &&
           this._searchPanel.isSearchOngoing()
         ) {
-          // $FlowFixMe[incompatible-use]
           this._searchPanel.focus();
           return;
         }
@@ -498,7 +493,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       });
   };
 
-  _selectionCanHaveSubEvents = (): any => {
+  _selectionCanHaveSubEvents = () => {
     const eventContext =
       getLastSelectedEventContextWhichCanHaveSubEvents(this.state.selection) ||
       getLastSelectedInstructionEventContextWhichCanHaveSubEvents(
@@ -525,7 +520,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
   };
 
-  _selectionCanHaveLocalVariables = (): any => {
+  _selectionCanHaveLocalVariables = () => {
     const eventContext =
       getLastSelectedEventContextWhichCanHaveVariables(this.state.selection) ||
       getLastSelectedInstructionEventContextWhichCanHaveVariables(
@@ -534,7 +529,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     return !!eventContext;
   };
 
-  _selectionCanToggleDisabled = (): any => {
+  _selectionCanToggleDisabled = () => {
     return getSelectedEvents(this.state.selection).some(event => {
       return event.isExecutable();
     });
@@ -654,7 +649,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     });
   };
 
-  _buildInstructionContextMenu = (i18n: I18nType): any =>
+  _buildInstructionContextMenu = (i18n: I18nType) =>
     [
       {
         label: i18n._(t`Copy`),
@@ -738,7 +733,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   openVariablesEditor = (
     eventContext: EventContext,
     variableDeclarationContext: VariableDeclarationContext,
-    shouldCreateVariable: any = false
+    shouldCreateVariable = false
   ) => {
     this.setState({
       editedVariable: {
@@ -859,7 +854,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (this._eventsTree) this._eventsTree.unfoldToLevel(level);
   };
 
-  _buildEventContextMenu = (i18n: I18nType): any => [
+  _buildEventContextMenu = (i18n: I18nType) => [
     {
       label: i18n._(t`Edit`),
       click: () => this.openEventTextDialog(),
@@ -1026,7 +1021,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     },
   ];
 
-  _selectionIsStandardEvent = (): any => {
+  _selectionIsStandardEvent = () => {
     const eventContext = getLastSelectedEventContext(this.state.selection);
     return (
       !!eventContext &&
@@ -1034,7 +1029,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
   };
 
-  _selectionIsElseEvent = (): any => {
+  _selectionIsElseEvent = () => {
     const eventContext = getLastSelectedEventContext(this.state.selection);
     return (
       !!eventContext &&
@@ -1141,7 +1136,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   ) => {
     const { instruction, parameterIndex } = parameterContext;
 
-    // $FlowFixMe[incompatible-type]
     this.setState({
       editedParameter: { eventContext, ...parameterContext },
       inlineEditing: true,
@@ -1478,7 +1472,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     });
   };
 
-  _getChangedEventRows = (events: Array<gdBaseEvent>): any => {
+  _getChangedEventRows = (events: Array<gdBaseEvent>) => {
     const eventsTree = this._eventsTree;
     if (eventsTree) {
       return events.map(event => eventsTree.getEventRow(event));
@@ -1533,7 +1527,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         newEventsHistory.futureActions.length - 1
       ];
 
-      // $FlowFixMe[incompatible-type]
       let newSelection: SelectionState = getInitialSelection();
       // If it is a DELETE or EDIT, then the element will be present, so we can select them.
       // If it is an ADD, then it will not be present, so we can't select them.
@@ -1543,12 +1536,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         const eventContexts = eventsTree.getEventContextAtRowIndexes(
           positions.positionsBeforeAction
         );
-        // $FlowFixMe[incompatible-type]
         newSelection = selectEventsAfterHistoryChange(eventContexts);
       }
 
       this.setState(
-        // $FlowFixMe[incompatible-type]
         {
           selection: newSelection,
           eventsHistory: newEventsHistory,
@@ -1597,7 +1588,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
       // If it is a ADD or EDIT, then the element will be present, so we can select them.
       // If it is a DELETE, then they will not be present, so we can't select them.
-      // $FlowFixMe[incompatible-type]
       let newSelection: SelectionState = getInitialSelection();
       if (type === 'DELETE') {
         newSelection = clearSelection();
@@ -1605,12 +1595,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         const eventContexts = eventsTree.getEventContextAtRowIndexes(
           positions.positionAfterAction
         );
-        // $FlowFixMe[incompatible-type]
         newSelection = selectEventsAfterHistoryChange(eventContexts);
       }
 
       this.setState(
-        // $FlowFixMe[incompatible-type]
         {
           selection: newSelection,
           eventsHistory: newEventsHistory,
@@ -1827,7 +1815,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     });
   };
 
-  _renderInstructionEditorDialog = (): any => {
+  _renderInstructionEditorDialog = () => {
     const {
       project,
       scope,
@@ -1947,7 +1935,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     }
   };
 
-  render(): any {
+  render() {
     const {
       isActive,
       project,
@@ -1984,19 +1972,15 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         (scope.eventsBasedBehavior &&
           gd.EventsFunctionSelfCallChecker.isBehaviorFunctionOnlyCallingItself(
             project,
-            // $FlowFixMe[incompatible-type]
             scope.eventsFunctionsExtension,
             scope.eventsBasedBehavior,
-            // $FlowFixMe[incompatible-type]
             scope.eventsFunction
           )) ||
         (scope.eventsBasedObject &&
           gd.EventsFunctionSelfCallChecker.isObjectFunctionOnlyCallingItself(
             project,
-            // $FlowFixMe[incompatible-type]
             scope.eventsFunctionsExtension,
             scope.eventsBasedObject,
-            // $FlowFixMe[incompatible-type]
             scope.eventsFunction
           )));
 
@@ -2336,7 +2320,6 @@ export type EventsSheetInterface = {|
 
 // EventsSheet is a wrapper so that the component can use multiple
 // context in class methods while correctly exposing the interface.
-// $FlowFixMe[missing-local-annot]
 const EventsSheet = (props, ref) => {
   React.useImperativeHandle(ref, () => ({
     updateToolbar,
@@ -2353,7 +2336,7 @@ const EventsSheet = (props, ref) => {
   const updateToolbar = () => {
     if (component.current) component.current.updateToolbar();
   };
-  const onResourceExternallyChanged = (resourceInfo: any) => {
+  const onResourceExternallyChanged = resourceInfo => {
     if (component.current)
       component.current.onResourceExternallyChanged(resourceInfo);
   };
@@ -2383,10 +2366,4 @@ const EventsSheet = (props, ref) => {
   );
 };
 
-export default (React.forwardRef<Props, EventsSheetInterface>(
-  EventsSheet
-  // $FlowFixMe[prop-missing]
-): React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<EventsSheetInterface> },
-  React.RefSetter<EventsSheetInterface>
->);
+export default React.forwardRef<Props, EventsSheetInterface>(EventsSheet);

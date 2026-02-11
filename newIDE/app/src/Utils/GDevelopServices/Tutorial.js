@@ -63,8 +63,7 @@ export const canAccessTutorial = (
   return false;
 };
 
-// $FlowFixMe[cannot-resolve-name]
-export const client: Axios = axios.create({
+export const client = axios.create({
   baseURL: GDevelopAssetApi.baseUrl,
 });
 

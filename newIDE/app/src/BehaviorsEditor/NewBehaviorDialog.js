@@ -53,7 +53,7 @@ export default function NewBehaviorDialog({
   isChildObject,
   onWillInstallExtension,
   onExtensionInstalled,
-}: Props): null | React.Node {
+}: Props) {
   const [isInstalling, setIsInstalling] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
@@ -72,25 +72,20 @@ export default function NewBehaviorDialog({
     []
   );
 
-  // $FlowFixMe[recursive-definition]
   const getAllRequiredBehaviorTypes = React.useCallback(
     (
       behaviorMetadata: gdBehaviorMetadata,
       allRequiredBehaviorTypes: Array<string> = []
     ): Array<string> => {
       mapVector(
-        // $FlowFixMe[incompatible-exact]
         behaviorMetadata.getRequiredBehaviorTypes(),
         requiredBehaviorType => {
-          // $FlowFixMe[incompatible-type]
           if (allRequiredBehaviorTypes.includes(requiredBehaviorType)) {
             return;
           }
-          // $FlowFixMe[incompatible-type]
           allRequiredBehaviorTypes.push(requiredBehaviorType);
           const requiredBehaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
             project.getCurrentPlatform(),
-            // $FlowFixMe[incompatible-type]
             requiredBehaviorType
           );
           getAllRequiredBehaviorTypes(

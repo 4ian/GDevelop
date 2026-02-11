@@ -48,7 +48,6 @@ export const useAsyncLazyMemo = <T>(fn: () => Promise<T>): (() => T | null) => {
             // Update the version of the value only if the computation is still
             // for the same version that is requested.
             if (requestedVersion === requestedVersionRef.current) {
-              // $FlowFixMe[incompatible-type]
               setValue(result);
               valueVersion.current = requestedVersion;
             }

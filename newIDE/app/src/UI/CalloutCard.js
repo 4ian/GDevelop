@@ -35,10 +35,7 @@ type Props = {|
   renderImage: (style: {| width: number, height: number |}) => React.Node,
 |};
 
-export const CalloutCard = ({
-  children,
-  renderImage,
-}: Props): React.MixedElement => {
+export const CalloutCard = ({ children, renderImage }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { windowSize } = useResponsiveWindowSize();
 

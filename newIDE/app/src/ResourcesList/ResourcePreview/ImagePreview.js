@@ -135,7 +135,7 @@ const ImagePreview = ({
   isImagePrivate,
   onImageLoaded,
   hideLoader,
-}: Props): React.Node => {
+}: Props) => {
   const [errored, setErrored] = React.useState<boolean>(false);
   const [imageWidth, setImageWidth] = React.useState<?number>(null);
   const [imageHeight, setImageHeight] = React.useState<?number>(null);
@@ -333,8 +333,7 @@ const ImagePreview = ({
       if (
         event.target &&
         (event.target instanceof HTMLElement ||
-          // $FlowFixMe[incompatible-type] - Flow does not know about SVGElement
-          // $FlowFixMe[cannot-resolve-name]
+          // $FlowFixMe - Flow does not know about SVGElement
           event.target instanceof SVGElement) &&
         event.target.dataset &&
         'draggable' in event.target.dataset

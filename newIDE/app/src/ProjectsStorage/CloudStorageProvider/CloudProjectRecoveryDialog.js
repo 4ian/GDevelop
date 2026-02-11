@@ -30,7 +30,7 @@ const CloudProjectRecoveryDialog = ({
   cloudProjectId,
   onClose,
   onOpenPreviousVersion,
-}: Props): React.Node => {
+}: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile } = authenticatedUser;
   const [

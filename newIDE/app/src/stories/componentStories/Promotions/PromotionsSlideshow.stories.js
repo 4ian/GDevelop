@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => {
+export const Default = () => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -34,7 +34,7 @@ export const Default = (): React.Node => {
   );
 };
 
-export const ErrorLoadingPromotions = (): React.Node => {
+export const ErrorLoadingPromotions = () => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -51,7 +51,7 @@ export const ErrorLoadingPromotions = (): React.Node => {
   );
 };
 
-export const LoadingPromotions = (): React.Node => {
+export const LoadingPromotions = () => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -68,7 +68,7 @@ export const LoadingPromotions = (): React.Node => {
   );
 };
 
-export const OnlyGame = (): React.Node => {
+export const OnlyGame = () => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -85,7 +85,7 @@ export const OnlyGame = (): React.Node => {
   );
 };
 
-export const OnlyAssetPack = (): React.Node => {
+export const OnlyAssetPack = () => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{

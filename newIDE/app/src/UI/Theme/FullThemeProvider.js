@@ -23,9 +23,7 @@ type MuiThemeProviderProps = {|
  * Useful for panes which are having a different "responsive window size"
  * than the rest of the application.
  */
-export const MuiThemeOnlyProvider = ({
-  children,
-}: MuiThemeProviderProps): React.Node => {
+export const MuiThemeOnlyProvider = ({ children }: MuiThemeProviderProps) => {
   const { values } = React.useContext(PreferencesContext);
   const { themeName, language } = values;
   const { isMobile } = useResponsiveWindowSize();
@@ -51,10 +49,7 @@ type Props = {|
   forcedThemeName?: string,
 |};
 
-export const FullThemeProvider = ({
-  children,
-  forcedThemeName,
-}: Props): React.Node => {
+export const FullThemeProvider = ({ children, forcedThemeName }: Props) => {
   const { values } = React.useContext(PreferencesContext);
   const { themeName, language } = values;
   const { isMobile } = useResponsiveWindowSize();

@@ -30,7 +30,7 @@ const CoursePurchaseDialog = ({
   course,
   courseListingData,
   onClose,
-}: Props): React.Node => {
+}: Props) => {
   const {
     profile,
     onOpenLoginDialog,

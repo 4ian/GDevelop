@@ -86,8 +86,7 @@ export default class InstancesAdder {
   _instances: gdInitialInstancesContainer;
   _temporaryInstances: Array<gdInitialInstance>;
   _instancesEditorSettings: InstancesEditorSettings;
-  // $FlowFixMe[missing-local-annot]
-  _zOrderFinder = (new gd.HighestZOrderFinder(): gdHighestZOrderFinder);
+  _zOrderFinder = new gd.HighestZOrderFinder();
 
   constructor({ project, instances, instancesEditorSettings }: Props) {
     this._project = project;

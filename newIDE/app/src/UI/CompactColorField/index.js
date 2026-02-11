@@ -30,12 +30,11 @@ export const CompactColorField = ({
   disabled,
   errored,
   placeholder,
-}: CompactColorFieldProps): React.MixedElement => {
+}: CompactColorFieldProps) => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
   const [colorValue, setColorValue] = React.useState<string>(color);
   // alpha can be equal to 0, so we have to check if it is not undefined
   const [alphaValue, setAlphaValue] = React.useState<number>(
-    // $FlowFixMe[constant-condition]
     !disableAlpha && alpha !== undefined ? alpha : 1
   );
 
@@ -55,7 +54,6 @@ export const CompactColorField = ({
 
   const handlePickerChange = (color: ColorResult) => {
     const rgbString = rgbColorToRGBString(color.rgb);
-    // $FlowFixMe[constant-condition]
     const newAlpha = disableAlpha ? 1 : color.rgb.a;
     setColorValue(rgbString);
     if (newAlpha) setAlphaValue(newAlpha);

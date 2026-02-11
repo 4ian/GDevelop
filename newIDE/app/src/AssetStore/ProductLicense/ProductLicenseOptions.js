@@ -179,7 +179,7 @@ const ProductLicenseOptions = ({
   product,
   ownedLicense,
   disabled,
-}: Props): React.Node => {
+}: Props) => {
   const {
     gameTemplateLicenses,
     assetPackLicenses,
@@ -254,7 +254,7 @@ export const OwnedProductLicense = ({
 }: {|
   ownedLicense: ?string,
   productType: 'game-template' | 'asset-pack',
-|}): null | React.Node => {
+|}) => {
   const { gameTemplateLicenses, assetPackLicenses, error } = React.useContext(
     ProductLicenseStoreContext
   );

@@ -19,7 +19,7 @@ export const CreateIosSigningCredentialsDialog = ({
   onClose,
   initialTab,
   authenticatedUser,
-}: Props): React.Node => {
+}: Props) => {
   const [currentTab, setCurrentTab] = React.useState<string>(initialTab);
 
   return (

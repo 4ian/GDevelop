@@ -11,7 +11,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const WrongEditorInfo = (): React.Node => {
+export const WrongEditorInfo = () => {
   return (
     <>
       <div id="step-text">Test text</div>
@@ -27,7 +27,7 @@ export const WrongEditorInfo = (): React.Node => {
   );
 };
 
-export const WrongEditorInfoWithSceneName = (): React.Node => {
+export const WrongEditorInfoWithSceneName = () => {
   return (
     <>
       <div id="step-text">Test text</div>
@@ -43,7 +43,7 @@ export const WrongEditorInfoWithSceneName = (): React.Node => {
   );
 };
 
-export const StandaloneTooltip = (): React.Node => {
+export const StandaloneTooltip = () => {
   return (
     <>
       <div id="step-text">Test text</div>

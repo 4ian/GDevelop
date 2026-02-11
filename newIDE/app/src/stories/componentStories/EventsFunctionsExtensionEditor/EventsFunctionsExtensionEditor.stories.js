@@ -21,7 +21,7 @@ export default {
   component: EventsFunctionsExtensionEditor,
 };
 
-export const Default = (): React.Node => (
+export const Default = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={700}>
       <EventsFunctionsExtensionEditor
@@ -49,8 +49,7 @@ export const Default = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const WithObjectEditor = (): React.Node => {
-  // $FlowFixMe[incompatible-type]
+export const WithObjectEditor = () => {
   const preferences: Preferences = {
     ...initialPreferences,
   };

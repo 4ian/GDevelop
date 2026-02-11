@@ -13,7 +13,6 @@ import {
 } from '../Utils/Serializer';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import {
-  // $FlowFixMe[import-type-as-value]
   TreeViewItemContent,
   type TreeItemProps,
   extensionFunctionsRootFolderId,
@@ -89,7 +88,7 @@ export const getEventsFunctionTreeViewItemId = (
 export const canFunctionBeRenamed = (
   eventsFunction: gdEventsFunction,
   containerType: 'extension' | 'behavior' | 'object'
-): boolean => {
+) => {
   const name = eventsFunction.getName();
   if (containerType === 'behavior') {
     return !gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
@@ -231,7 +230,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     }
   }
 
-  canBeRenamed(): any {
+  canBeRenamed() {
     return canFunctionBeRenamed(
       this.eventsFunction,
       this.getEventsBasedBehavior()
@@ -242,7 +241,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     );
   }
 
-  buildMenuTemplate(i18n: I18nType, index: number): any {
+  buildMenuTemplate(i18n: I18nType, index: number) {
     return [
       {
         label: i18n._(t`Rename`),
@@ -477,7 +476,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     this.props.forceUpdate();
   }
 
-  getRightButton(i18n: I18nType): any {
+  getRightButton(i18n: I18nType) {
     return null;
   }
 

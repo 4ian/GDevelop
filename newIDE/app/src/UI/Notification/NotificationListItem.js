@@ -182,7 +182,6 @@ const getNotificationClickCallback = ({
       } else return null; // should not happen.
     }
     if (
-      // $FlowFixMe[invalid-compare]
       notification.data.gameCount === 'all' ||
       Number.isInteger(notification.data.gameCount)
     ) {
@@ -209,7 +208,7 @@ const NotificationListItem = ({
   notification,
   onCloseNotificationList,
   onMarkNotificationAsSeen,
-}: Props): null | React.Node => {
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { addRouteArguments } = React.useContext(RouterContext);
   const onClickNotification = getNotificationClickCallback({

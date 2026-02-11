@@ -10,9 +10,7 @@ import {
   enumerateObjectExpressions,
 } from '../../../InstructionOrExpression/EnumerateExpressions';
 
-// $FlowFixMe[incompatible-type]
-// $FlowFixMe[missing-local-annot]
-// $FlowFixMe[cannot-resolve-name]
+// $FlowExpectedError
 const makeFakeI18n = (fakeI18n): I18nType => ({
   ...fakeI18n,
   _: message => message.id,

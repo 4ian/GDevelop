@@ -37,7 +37,7 @@ const CreditsPackagePurchaseDialog = ({
   onClose,
   onCloseWhenPurchaseSuccessful,
   simulateAppStoreProduct,
-}: Props): React.Node => {
+}: Props) => {
   const {
     profile,
     onOpenLoginDialog,
@@ -140,7 +140,6 @@ const CreditsPackagePurchaseDialog = ({
     () => {
       (async () => {
         if (limits && initialCreditsAmount === null) {
-          // $FlowFixMe[incompatible-type]
           setInitialCreditsAmount(limits.credits.userBalance.amount);
         }
       })();

@@ -50,7 +50,7 @@ export const getSentenceErrorText = (
   eventsBasedBehavior: ?gdEventsBasedBehavior,
   eventsBasedObject: ?gdEventsBasedObject,
   eventsFunction: gdEventsFunction
-): any | string | void => {
+) => {
   const sentence = eventsFunction.getSentence();
   if (!sentence)
     return i18n._(
@@ -162,7 +162,7 @@ export const EventsFunctionPropertiesEditor = ({
   eventsBasedObject,
   getFunctionGroupNames,
   eventsFunctionsContainer,
-}: Props): React.Node => {
+}: Props) => {
   const forceUpdate = useForceUpdate();
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
   const { isMobile } = useResponsiveWindowSize();
@@ -274,7 +274,7 @@ export const EventsFunctionPropertiesEditor = ({
                         fullWidth
                         disabled={!!freezeEventsFunctionType}
                         onChange={(e, i, valueString: string) => {
-                          // $FlowFixMe[incompatible-type]
+                          // $FlowFixMe
                           const value: EventsFunction_FunctionType = valueString;
                           eventsFunction.setFunctionType(value);
                           if (onConfigurationUpdated)

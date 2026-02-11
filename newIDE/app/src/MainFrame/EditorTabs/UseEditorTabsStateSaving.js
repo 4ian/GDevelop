@@ -70,10 +70,7 @@ const useEditorTabsStateSaving = ({
   editorTabs,
   getEditorOpeningOptions,
   setEditorTabs,
-}: Props): {
-  hasAPreviousSaveForEditorTabsState: (project: gdProject) => boolean,
-  openEditorTabsFromPersistedState: (project: gdProject) => number,
-} => {
+}: Props) => {
   const {
     setEditorStateForProject,
     getEditorStateForProject,

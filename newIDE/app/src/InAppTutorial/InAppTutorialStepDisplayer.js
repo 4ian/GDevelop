@@ -159,7 +159,7 @@ function InAppTutorialStepDisplayer({
   endTutorial,
   progress,
   goToNextStep,
-}: Props): React.Node {
+}: Props) {
   const [
     elementToHighlight,
     setElementToHighlight,
@@ -172,10 +172,8 @@ function InAppTutorialStepDisplayer({
   const [assistantImage, setAssistantImage] = React.useState<?HTMLDivElement>(
     null
   );
-  // $FlowFixMe[missing-empty-array-annot]
   const [blockingLayerHoles, setBlockingLayerHoles] = React.useState([]);
 
-  // $FlowFixMe[missing-local-annot]
   const defineAssistantImage = React.useCallback(node => {
     if (node) {
       setAssistantImage(node);
@@ -297,7 +295,6 @@ function InAppTutorialStepDisplayer({
       // $FlowIgnore - checked above that valueEquals in in nextStepTrigger.
       const { valueEquals } = nextStepTrigger;
       if (
-        // $FlowFixMe[invalid-compare]
         valueEquals === null ||
         valueEquals === undefined ||
         typeof valueEquals !== 'string'

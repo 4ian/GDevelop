@@ -172,7 +172,7 @@ const WithTagsAndHelp = () => {
   );
 };
 
-export const AllOptions = (): React.Node => (
+export const AllOptions = () => (
   <ColumnStackLayout>
     <Vanilla />
     <WithPlaceholder />

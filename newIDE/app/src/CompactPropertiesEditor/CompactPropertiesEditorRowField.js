@@ -24,7 +24,7 @@ type Props = {|
   labelColor?: 'primary' | 'secondary',
 |};
 
-const CompactPropertiesEditorRowField = (props: Props): React.Node => {
+const CompactPropertiesEditorRowField = (props: Props) => {
   const title = !props.markdownDescription
     ? props.label
     : [

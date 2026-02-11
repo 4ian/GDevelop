@@ -59,7 +59,6 @@ const SearchPanel = (
     onGoToNextSearchResult,
     searchFocusOffset,
   }: Props,
-  // $FlowFixMe[missing-local-annot]
   ref
 ) => {
   const { isMobile } = useResponsiveWindowSize();
@@ -397,10 +396,4 @@ const SearchPanel = (
   );
 };
 
-export default (React.forwardRef<Props, SearchPanelInterface>(
-  SearchPanel
-  // $FlowFixMe[prop-missing]
-): React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<SearchPanelInterface> },
-  React.RefSetter<SearchPanelInterface>
->);
+export default React.forwardRef<Props, SearchPanelInterface>(SearchPanel);

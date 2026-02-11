@@ -36,7 +36,7 @@ export const renderObjectListItem = ({
   data,
   withIndent,
   keyPrefix,
-}: Props): React.Node => {
+}: Props) => {
   const objectName: string = objectWithContext.object.getName();
   return (
     <ListItem

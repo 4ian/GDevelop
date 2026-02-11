@@ -55,7 +55,7 @@ export const EducationCurriculum = ({
   isLocked,
   onClickSubscribe,
   renderInterstitialCallout,
-}: EducationCurriculumProps): React.MixedElement => {
+}: EducationCurriculumProps) => {
   const listItems: React.Node[] = React.useMemo(
     () => {
       const items = [];
@@ -82,7 +82,6 @@ export const EducationCurriculum = ({
             </div>
           );
           sectionIndex = 0;
-          // $FlowFixMe[definition-cycle]
           currentSection = section;
         }
         items.push(
@@ -154,7 +153,7 @@ const TutorialsCategoryPage = ({
   onBack,
   onOpenTemplateFromTutorial,
   onSelectCourse,
-}: Props): React.Node => {
+}: Props) => {
   const { listedCourses } = React.useContext(CourseStoreContext);
   const { limits } = React.useContext(AuthenticatedUserContext);
   const { tutorials } = React.useContext(TutorialContext);

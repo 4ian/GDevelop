@@ -6,8 +6,7 @@ import ContextMenu, { type ContextMenuInterface } from './ContextMenu';
 import { type MenuItemTemplate } from './Menu.flow';
 
 type Props = {|
-  // $FlowFixMe[prop-missing]
-  element: React.Element<any>,
+  element: React$Element<any>,
   buildMenuTemplate: (i18n: I18nType) => Array<MenuItemTemplate>,
   openMenuWithSecondaryClick?: boolean,
   passExtraProps?: boolean,
@@ -24,7 +23,6 @@ export default class ElementWithMenu extends React.Component<Props, State> {
   _wrappedElement: ?any;
 
   open = (event?: Event) => {
-    // $FlowFixMe[method-unbinding]
     if (event && event.stopPropagation) event.stopPropagation();
     const { _contextMenu } = this;
     if (!_contextMenu) return;
@@ -40,7 +38,7 @@ export default class ElementWithMenu extends React.Component<Props, State> {
     }
   };
 
-  render(): any {
+  render() {
     const {
       element,
       buildMenuTemplate,
@@ -53,8 +51,7 @@ export default class ElementWithMenu extends React.Component<Props, State> {
       <React.Fragment>
         {React.cloneElement(element, {
           onContextMenu: this.open,
-          // $FlowFixMe[incompatible-type] - Flow complaining about using too much spread operators
-          // $FlowFixMe[exponential-spread]
+          // $FlowFixMe - Flow complaining about using too much spread operators
           ...(openMenuWithSecondaryClick ? {} : { onClick: this.open }),
           ref: wrappedElement => (this._wrappedElement = wrappedElement),
           ...(passExtraProps ? otherProps : {}),

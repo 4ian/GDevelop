@@ -19,13 +19,12 @@ export default {
   decorators: [alertDecorator, paperDecorator],
 };
 
-export const AlwaysError = (): React.Node => {
+export const AlwaysError = () => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock.onAny().reply(500);
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      {/* $FlowFixMe[incompatible-type] */}
       <CreateIosSigningCredentialsDialog
         initialTab={'apple-certificate'}
         authenticatedUser={fakeSilverAuthenticatedUser}
@@ -38,7 +37,7 @@ export const AlwaysError = (): React.Node => {
   );
 };
 
-export const WorkingCertificateRequestButCertificateError = (): React.Node => {
+export const WorkingCertificateRequestButCertificateError = () => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock
     .onPost(`${GDevelopBuildApi.baseUrl}/signing-credential/action/create-csr`)
@@ -51,7 +50,6 @@ export const WorkingCertificateRequestButCertificateError = (): React.Node => {
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      {/* $FlowFixMe[incompatible-type] */}
       <CreateIosSigningCredentialsDialog
         initialTab={'apple-certificate'}
         authenticatedUser={fakeSilverAuthenticatedUser}
@@ -64,7 +62,7 @@ export const WorkingCertificateRequestButCertificateError = (): React.Node => {
   );
 };
 
-export const WorkingCertificateRequestButCertificateUnknownKind = (): React.Node => {
+export const WorkingCertificateRequestButCertificateUnknownKind = () => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock
     .onPost(`${GDevelopBuildApi.baseUrl}/signing-credential/action/create-csr`)
@@ -84,7 +82,6 @@ export const WorkingCertificateRequestButCertificateUnknownKind = (): React.Node
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      {/* $FlowFixMe[incompatible-type] */}
       <CreateIosSigningCredentialsDialog
         initialTab={'apple-certificate'}
         authenticatedUser={fakeSilverAuthenticatedUser}
@@ -97,7 +94,7 @@ export const WorkingCertificateRequestButCertificateUnknownKind = (): React.Node
   );
 };
 
-export const AllWorking = (): React.Node => {
+export const AllWorking = () => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock
     .onPost(`${GDevelopBuildApi.baseUrl}/signing-credential/action/create-csr`)
@@ -133,7 +130,6 @@ export const AllWorking = (): React.Node => {
 
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
-      {/* $FlowFixMe[incompatible-type] */}
       <CreateIosSigningCredentialsDialog
         initialTab={'apple-certificate'}
         authenticatedUser={fakeSilverAuthenticatedUser}

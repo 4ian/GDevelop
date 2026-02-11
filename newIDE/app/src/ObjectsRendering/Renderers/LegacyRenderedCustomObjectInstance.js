@@ -11,7 +11,6 @@ import {
   applyChildLayouts,
   ChildInstance,
   type ChildLayout,
-  // $FlowFixMe[import-type-as-value]
   LayoutedParent,
   getProportionalPositionX,
   getProportionalPositionY,
@@ -46,9 +45,7 @@ export default class LegacyRenderedCustomObjectInstance
     project: gdProject,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
-    // $FlowFixMe[value-as-type]
     pixiContainer: PIXI.Container,
-    // $FlowFixMe[value-as-type]
     threeGroup: THREE.Group,
     pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {
@@ -150,7 +147,7 @@ export default class LegacyRenderedCustomObjectInstance
       const childInstance = new ChildInstance();
       const renderer = ObjectsRenderingService.createNewInstanceRenderer(
         project,
-        // $FlowFixMe[incompatible-type] Use real object instances.
+        // $FlowFixMe Use real object instances.
         childInstance,
         childObjectConfiguration,
         this._pixiObject,
@@ -168,7 +165,6 @@ export default class LegacyRenderedCustomObjectInstance
         renderer._pixiObject.style.align = 'center';
       }
       this.childrenInstances.push(childInstance);
-      // $FlowFixMe[incompatible-type]
       this.childrenLayouts.push(childLayout);
       this.childrenRenderedInstances.push(renderer);
       this.childrenRenderedInstanceByNames.set(childObject.getName(), renderer);
@@ -206,7 +202,7 @@ export default class LegacyRenderedCustomObjectInstance
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ): any {
+  ) {
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       objectConfiguration
     );
@@ -328,19 +324,19 @@ export default class LegacyRenderedCustomObjectInstance
     }
   }
 
-  getDefaultWidth(): any {
+  getDefaultWidth() {
     return this.childrenRenderedInstances.length > 0
       ? this.childrenRenderedInstances[0].getDefaultWidth()
       : 48;
   }
 
-  getDefaultHeight(): any {
+  getDefaultHeight() {
     return this.childrenRenderedInstances.length > 0
       ? this.childrenRenderedInstances[0].getDefaultHeight()
       : 48;
   }
 
-  getDefaultDepth(): any {
+  getDefaultDepth() {
     const firstInstance = this.childrenRenderedInstances[0];
     return firstInstance && firstInstance instanceof Rendered3DInstance
       ? firstInstance.getDefaultDepth()
@@ -389,15 +385,15 @@ export default class LegacyRenderedCustomObjectInstance
     return this._proportionalOriginZ * this.getDepth();
   }
 
-  getCenterX(): any {
+  getCenterX() {
     return this.getWidth() / 2;
   }
 
-  getCenterY(): any {
+  getCenterY() {
     return this.getHeight() / 2;
   }
 
-  getCenterZ(): any {
+  getCenterZ() {
     return this.getDepth() / 2;
   }
 }

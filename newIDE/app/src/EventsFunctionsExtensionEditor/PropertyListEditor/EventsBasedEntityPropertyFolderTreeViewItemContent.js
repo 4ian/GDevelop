@@ -6,7 +6,6 @@ import * as React from 'react';
 import Clipboard from '../../Utils/Clipboard';
 import { SafeExtractor } from '../../Utils/SafeExtractor';
 import {
-  // $FlowFixMe[import-type-as-value]
   TreeViewItemContent,
   type TreeItemProps,
   propertiesRootFolderId,
@@ -161,7 +160,7 @@ export class EventsBasedEntityPropertyFolderTreeViewItemContent
 
   edit(): void {}
 
-  _getPasteLabel(i18n: I18nType): any {
+  _getPasteLabel(i18n: I18nType) {
     let translation = t`Paste`;
     if (Clipboard.has(PROPERTIES_CLIPBOARD_KIND)) {
       const clipboardContent = Clipboard.get(PROPERTIES_CLIPBOARD_KIND);
@@ -172,7 +171,7 @@ export class EventsBasedEntityPropertyFolderTreeViewItemContent
     return i18n._(translation);
   }
 
-  buildMenuTemplate(i18n: I18nType, index: number): any {
+  buildMenuTemplate(i18n: I18nType, index: number) {
     const {
       properties,
       isSharedProperties,
@@ -344,7 +343,7 @@ export class EventsBasedEntityPropertyFolderTreeViewItemContent
     this.props.onPropertiesUpdated();
   }
 
-  getRightButton(i18n: I18nType): any {
+  getRightButton(i18n: I18nType) {
     return null;
   }
 }

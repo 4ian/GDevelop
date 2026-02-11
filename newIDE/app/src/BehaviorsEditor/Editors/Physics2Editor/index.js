@@ -37,7 +37,7 @@ export const NumericProperty = (props: {|
   propertyName: string,
   step: number,
   onUpdate: (newValue: string) => void,
-|}): React.Node => {
+|}) => {
   const { properties, propertyName, step, onUpdate, id } = props;
   const property = properties.get(propertyName);
 
@@ -67,7 +67,7 @@ export const ChoiceProperty = (props: {|
     text: string // Note that even for number values, a string is returned
   ) => void,
   disabled?: boolean,
-|}): React.Node => {
+|}) => {
   const { properties, propertyName, onUpdate, id, value, disabled } = props;
   const property = properties.get(propertyName);
 
@@ -81,14 +81,10 @@ export const ChoiceProperty = (props: {|
       onChange={onUpdate}
       disabled={disabled}
     >
-      {/* $FlowFixMe[incompatible-exact] */}
       {mapVector(property.getChoices(), choice => (
         <SelectOption
-          // $FlowFixMe[incompatible-use]
           key={choice.getValue().toLowerCase()}
-          // $FlowFixMe[incompatible-use]
           value={choice.getValue()}
-          // $FlowFixMe[incompatible-use]
           label={choice.getLabel()}
         />
       ))}
@@ -96,9 +92,7 @@ export const ChoiceProperty = (props: {|
   );
 };
 
-export const UnitAdornment = (props: {|
-  property: gdPropertyDescriptor,
-|}): React.Node => {
+export const UnitAdornment = (props: {| property: gdPropertyDescriptor |}) => {
   const { property } = props;
   const measurementUnit = property.getMeasurementUnit();
   if (measurementUnit.isUndefined() && property.getDescription()) {
@@ -165,14 +159,13 @@ const enableBit = (bitsValue: number, pos: number, enable: boolean) => {
   return bitsValue;
 };
 
-const Physics2Editor = (props: Props): React.Node => {
+const Physics2Editor = (props: Props) => {
   const { current: resourcesLoader } = React.useRef(ResourcesLoader);
   const [image, setImage] = React.useState('');
   const { behavior, onBehaviorUpdated } = props;
   const forceUpdate = useForceUpdate();
 
   const updateBehaviorProperty = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     (property, value) => {
       behavior.updateProperty(property, value);
       forceUpdate();

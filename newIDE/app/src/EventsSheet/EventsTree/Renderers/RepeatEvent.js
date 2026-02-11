@@ -36,11 +36,9 @@ const styles = {
 
 export default class RepeatEvent extends React.Component<
   EventRendererProps,
-  // $FlowFixMe[unsupported-syntax]
   *
 > {
   _field: ?ParameterFieldInterface = null;
-  // $FlowFixMe[missing-local-annot]
   state = {
     editing: false,
     editingPreviousValue: null,
@@ -90,7 +88,7 @@ export default class RepeatEvent extends React.Component<
     const { anchorEl } = this.state;
 
     // Put back the focus after closing the inline popover.
-    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe
     if (anchorEl) anchorEl.focus();
 
     this.setState({
@@ -100,7 +98,7 @@ export default class RepeatEvent extends React.Component<
     });
   };
 
-  render(): any {
+  render() {
     const repeatEvent = gd.asRepeatEvent(this.props.event);
     const expression = repeatEvent.getRepeatExpression();
     const expressionPlainString = expression.getPlainString();

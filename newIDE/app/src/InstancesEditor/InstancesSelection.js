@@ -7,7 +7,7 @@ const gd: libGDevelop = global.gd;
 export default class InstancesSelection {
   selection: Array<gdInitialInstance> = [];
 
-  hasSelectedInstances(): any {
+  hasSelectedInstances() {
     return !!this.getSelectedInstances().length;
   }
 
@@ -15,9 +15,8 @@ export default class InstancesSelection {
     return this.selection;
   }
 
-  isInstanceSelected(instance: gdInitialInstance): any {
+  isInstanceSelected(instance: gdInitialInstance) {
     for (var i = 0; i < this.selection.length; i++) {
-      // $FlowFixMe[incompatible-exact]
       if (gd.compare(this.selection[i], instance)) return true;
     }
 
@@ -110,12 +109,11 @@ export default class InstancesSelection {
   cleanNonExistingInstances(instancesContainer: gdInitialInstancesContainer) {
     const allExistingInstancePointers = new Set<number>();
     const functor = new gd.InitialInstanceJSFunctor();
-    // $FlowFixMe[incompatible-type] - typing is not correct.
-    // $FlowFixMe[cannot-write]
+    // $FlowFixMe - typing is not correct.
     functor.invoke = (instancePtr: number) => {
       allExistingInstancePointers.add(instancePtr);
     };
-    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe
     instancesContainer.iterateOverInstances(functor);
     functor.delete();
 

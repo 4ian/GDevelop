@@ -65,7 +65,7 @@ const ManageStudentRow = ({
   onSelect,
   onChangePassword,
   onEdit,
-}: Props): React.Node => {
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const [isEditingPassword, setIsEditingPassword] = React.useState<boolean>(
     false
@@ -209,7 +209,6 @@ const ManageStudentRow = ({
           }
           emptyErrorText={<Trans>Password cannot be empty</Trans>}
           onCancel={() => setIsEditingPassword(false)}
-          // $FlowFixMe[incompatible-type]
           style={styles.passwordTextField}
         />
       </div>
@@ -274,15 +273,12 @@ const ManageStudentRow = ({
   if (isMobile) {
     return (
       <>
-        {/* $FlowFixMe[constant-condition] */}
         <Grid item xs={4} style={isMobile ? styles.mobileCell : styles.cell}>
           {usernameCell}
         </Grid>
-        {/* $FlowFixMe[constant-condition] */}
         <Grid item xs={4} style={isMobile ? styles.mobileCell : styles.cell}>
           {emailCell}
         </Grid>
-        {/* $FlowFixMe[constant-condition] */}
         <Grid item xs={4} style={isMobile ? styles.mobileCell : styles.cell}>
           {passwordCell}
         </Grid>
@@ -293,14 +289,12 @@ const ManageStudentRow = ({
 
   return (
     <>
-      {/* $FlowFixMe[constant-condition] */}
       <Grid item xs={9} style={isMobile ? styles.mobileCell : styles.cell}>
         <LineStackLayout noMargin alignItems="center">
           {usernameCell}
           {emailCell}
         </LineStackLayout>
       </Grid>
-      {/* $FlowFixMe[constant-condition] */}
       <Grid item xs={3} style={isMobile ? styles.mobileCell : styles.cell}>
         {passwordCell}
       </Grid>

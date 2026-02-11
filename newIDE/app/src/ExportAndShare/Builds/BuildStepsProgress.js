@@ -88,7 +88,7 @@ const BuildStepsProgress = ({
   errored,
   hasBuildStep,
   showSeeAllMyBuildsExplanation,
-}: Props): React.Node => {
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const getActiveStep = React.useCallback(
     () =>

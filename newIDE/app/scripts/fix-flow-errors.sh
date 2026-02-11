@@ -189,11 +189,107 @@ find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
 # 8. jest.fn() - leave as-is, prettier 1.15 can't parse jest.fn<any>()
 #    These will get FlowFixMe[underconstrained-implicit-instantiation] automatically.
 
-# 9. Fix method-unbinding for common patterns: .push.apply and event.stopPropagation
-#    For .push.apply: use spread instead
+# 9. Fix method-unbinding for common patterns: .push.apply -> spread syntax
+#    Handles both single-line and multi-line push.apply patterns.
+python3 << 'PYEOF'
+import os, re
+
+src_dir = os.path.join(os.environ.get('APP_DIR', os.getcwd()), 'src')
+fixed = 0
+
+for root, dirs, files in os.walk(src_dir):
+    for fname in files:
+        if not fname.endswith('.js'):
+            continue
+        filepath = os.path.join(root, fname)
+        with open(filepath) as f:
+            content = f.read()
+        original = content
+        # Multi-line pattern: arr.push.apply(\n  arr,\n  items\n)
+        content = re.sub(
+            r'(\w+)\.push\.apply\(\s*\1\s*,\s*([^)]+?)\s*\)',
+            lambda m: f'{m.group(1)}.push(...{m.group(2).strip()})',
+            content,
+            flags=re.DOTALL)
+        if content != original:
+            with open(filepath, 'w') as f:
+                f.write(content)
+            fixed += 1
+
+print(f"  Converted {fixed} push.apply to spread syntax")
+PYEOF
+
+# 10. Fix import-type-as-value: convert value imports of type-only symbols to import type.
+#     I18n from @lingui/core is a type (interface) used only in type positions.
 find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
-  s/([a-zA-Z_]+)\.push\.apply\(\1, ([^)]+)\)/$1.push(...$2)/g;
+  s/^(\/\/ \$FlowFixMe\[import-type-as-value\]\n)?import \{ I18n as I18nType \} from/import type { I18n as I18nType } from/g;
 ' {} +
+
+# Fix TreeViewItemContent import-type-as-value: these are interfaces (type-only)
+python3 << 'PYEOF'
+import os, re
+
+app_dir = os.environ.get('APP_DIR', os.getcwd())
+src_dir = os.path.join(app_dir, 'src')
+fixed = 0
+
+for root, dirs, files in os.walk(src_dir):
+    for fname in files:
+        if not fname.endswith('.js'):
+            continue
+        filepath = os.path.join(root, fname)
+        with open(filepath) as f:
+            content = f.read()
+        original = content
+
+        # Remove FlowFixMe[import-type-as-value] above import lines where
+        # we can safely convert to import type
+        lines = content.split('\n')
+        new_lines = []
+        i = 0
+        while i < len(lines):
+            line = lines[i]
+            # Skip FlowFixMe[import-type-as-value] if the next line is an import we'll fix
+            if '$FlowFixMe[import-type-as-value]' in line:
+                # Check if this is a standalone FlowFixMe comment line
+                stripped = line.lstrip()
+                if stripped.startswith('// $FlowFixMe[import-type-as-value]'):
+                    # Check if next line is an import statement
+                    if i + 1 < len(lines) and 'import' in lines[i + 1]:
+                        # Skip this FlowFixMe comment
+                        i += 1
+                        continue
+                    # Check if this is inside an import block (destructured import)
+                    # Look backwards for the import statement
+                    is_in_import = False
+                    for j in range(i - 1, max(i - 10, -1), -1):
+                        if 'import' in lines[j] and '{' in lines[j]:
+                            is_in_import = True
+                            break
+                        if '}' in lines[j] and 'from' in lines[j]:
+                            break
+                    if is_in_import:
+                        # Skip this FlowFixMe
+                        i += 1
+                        continue
+            new_lines.append(line)
+            i += 1
+
+        content = '\n'.join(new_lines)
+
+        # Convert import { I18n as I18nType } to import type
+        content = re.sub(
+            r"import \{ I18n as I18nType \} from '@lingui/core'",
+            "import type { I18n as I18nType } from '@lingui/core'",
+            content)
+
+        if content != original:
+            with open(filepath, 'w') as f:
+                f.write(content)
+            fixed += 1
+
+print(f"  Fixed {fixed} import-type-as-value issues")
+PYEOF
 
 # 4. Fix inline object return types on multi-line arrow function params
 #    that fix-arrow-return-types.py couldn't handle (nested parens in destructured args).

@@ -62,9 +62,7 @@ export const sharedFuseConfiguration = {
 /**
  * This helper allows creating the search query for a search within a simple array of strings.
  */
-export const getFuseSearchQueryForSimpleArray = (
-  searchText: string
-): string => {
+export const getFuseSearchQueryForSimpleArray = (searchText: string) => {
   const tokenisedSearchQuery = searchText.trim().split(' ');
   return `'${tokenisedSearchQuery.join(" '")}`;
 };
@@ -78,13 +76,11 @@ export const getFuseSearchQueryForSimpleArray = (
 export const getFuseSearchQueryForMultipleKeys = (
   searchText: string,
   keys: Array<string>
-): { $or: Array<{ $or: Array<any> }> } => {
+) => {
   const tokenisedSearchQuery = searchText.trim().split(' ');
   const searchQuery: {
-    // $FlowFixMe[value-as-type]
     $or: Fuse.Expression[],
   }[] = tokenisedSearchQuery.map((searchToken: string) => {
-    // $FlowFixMe[value-as-type]
     const orFields: Fuse.Expression[] = keys.map(key => ({
       [key]: searchToken,
     }));
@@ -166,9 +162,7 @@ const getFirstExactMatchPosition = (
   };
 };
 
-export const nullifySingleCharacterMatches = <T>(
-  result: SearchResult<T>
-): any => {
+export const nullifySingleCharacterMatches = <T>(result: SearchResult<T>) => {
   const matchesWithAtLeastOneSignificantIndex = result.matches
     .map(match => {
       const newIndices = match.indices
@@ -200,27 +194,17 @@ export const augmentSearchResult = <T>(
   };
 };
 
-export const tuneMatches = <T>(
-  result: SearchResult<T>,
-  searchText: string
-): any =>
-  // $FlowFixMe[missing-type-arg]
+export const tuneMatches = <T>(result: SearchResult<T>, searchText: string) =>
   result.matches.map<SearchMatch>(match => ({
     key: match.key,
     value: match.value,
     indices: tuneMatchIndices(match, searchText),
   }));
 
-export const sortResultsUsingExactMatches = (
-  orderedKeys: Array<string>
-): (<T>(
-  resultA: AugmentedSearchResult<T>,
-  resultB: AugmentedSearchResult<T>
-) => any) => {
+export const sortResultsUsingExactMatches = (orderedKeys: string[]) => {
   return <T>(
     resultA: AugmentedSearchResult<T>,
     resultB: AugmentedSearchResult<T>
-    // $FlowFixMe[missing-local-annot]
   ) => {
     // First give priority to result that have an exact match at start of word and not the other.
     const resultAExactMatchesAtStartOfWordCount = resultA.matches.filter(
@@ -397,7 +381,7 @@ export const filterSearchResults = <SearchItem: SearchableItem>(
       return passTier && passChosenFilters;
     })
     .filter(({ item }) => {
-      //$FlowFixMe[incompatible-type] Only categories are excluded.
+      //$FlowFixMe Only categories are excluded.
       const category: ObjectCategory = item;
       return (isSearchTextEmpty && !chosenItemCategory) || !category.categoryId;
     });

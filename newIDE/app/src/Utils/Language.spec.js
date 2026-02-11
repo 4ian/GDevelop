@@ -27,11 +27,9 @@ jest.mock('../locales/LocalesMetadata', () => [
   },
 ]);
 
-// $FlowFixMe[underconstrained-implicit-instantiation]
 const mockGetBrowserLanguageOrLocale = jest.fn();
 
 jest.mock('./Language', () => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const originalModule = jest.requireActual('./Language');
 
   return {

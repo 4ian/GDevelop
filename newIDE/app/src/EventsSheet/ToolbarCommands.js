@@ -32,7 +32,7 @@ type Props = {|
   onOpenSceneVariables: () => void,
 |};
 
-const ToolbarCommands = (props: Props): null => {
+const ToolbarCommands = (props: Props) => {
   const { onAddEvent } = props;
 
   useCommand('ADD_STANDARD_EVENT', true, {

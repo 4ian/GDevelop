@@ -27,9 +27,7 @@ class ClickInterceptor {
   _touchingPointerIds: Set<number> = new Set();
   _cancelUntilNoMoreTouches: boolean = false;
 
-  // $FlowFixMe[value-as-type]
   pixiContainer: PIXI.Container;
-  // $FlowFixMe[value-as-type]
   interceptingSprite: PIXI.sprite;
 
   constructor({
@@ -60,7 +58,6 @@ class ClickInterceptor {
 
     this.interceptingSprite.addEventListener(
       'pointerdown',
-      // $FlowFixMe[value-as-type]
       (e: PIXI.FederatedPointerEvent) => {
         if (e.pointerType === 'touch') {
           this._touchingPointerIds.add(e.pointerId);
@@ -80,7 +77,6 @@ class ClickInterceptor {
     );
     this.interceptingSprite.addEventListener(
       'pointerup',
-      // $FlowFixMe[value-as-type]
       (e: PIXI.FederatedMouseEvent) => {
         if (e.pointerType === 'touch') {
           this._touchingPointerIds.delete(e.pointerId);
@@ -98,7 +94,6 @@ class ClickInterceptor {
     // is NOT called.
     this.interceptingSprite.addEventListener(
       'pointerleave',
-      // $FlowFixMe[value-as-type]
       (e: PIXI.FederatedMouseEvent) => {
         if (e.pointerType === 'touch') {
           this._touchingPointerIds.delete(e.pointerId);
@@ -111,7 +106,6 @@ class ClickInterceptor {
     );
     this.interceptingSprite.addEventListener(
       'pointermove',
-      // $FlowFixMe[value-as-type]
       (e: PIXI.FederatedPointerEvent) => {
         this._interceptPointerMove(
           e.originalEvent.globalX,
@@ -170,7 +164,6 @@ class ClickInterceptor {
     }
   }
 
-  // $FlowFixMe[value-as-type]
   getPixiObject(): PIXI.Container {
     return this.pixiContainer;
   }

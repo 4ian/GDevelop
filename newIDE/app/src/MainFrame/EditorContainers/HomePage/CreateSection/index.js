@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-// $FlowFixMe[import-type-as-value]
 import { I18n as I18nType } from '@lingui/core';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
@@ -411,7 +410,6 @@ const CreateSection = ({
         const game = await registerGame(
           authenticatedUser.getAuthorizationHeader,
           id,
-          // $FlowFixMe[incompatible-type]
           getDefaultRegisterGameProperties({
             projectId,
             projectName: file.fileMetadata.name,
@@ -564,7 +562,6 @@ const CreateSection = ({
                     game: Game,
                     widgetToScrollTo?: 'projects',
                   }) => {
-                    // $FlowFixMe[incompatible-type]
                     setInitialWidgetToScrollTo(widgetToScrollTo);
                     setOpenedGameId(game.id);
                   }}
@@ -664,7 +661,7 @@ const CreateSection = ({
   );
 };
 
-const CreateSectionWithErrorBoundary = (props: Props): React.Node => (
+const CreateSectionWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Create section</Trans>}
     scope="start-page-create"

@@ -8,7 +8,6 @@ export const useInterval = (callback: () => void, delay: number | null) => {
   const savedCallback = useRef();
 
   useEffect(() => {
-    // $FlowFixMe[incompatible-type]
     savedCallback.current = callback;
   });
 

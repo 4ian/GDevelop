@@ -12,7 +12,6 @@ import {
   unserializeFromJSObject,
 } from '../../Utils/Serializer';
 import {
-  // $FlowFixMe[import-type-as-value]
   TreeViewItemContent,
   type TreeItemProps,
   propertiesRootFolderId,
@@ -285,7 +284,7 @@ export class EventsBasedEntityPropertyTreeViewItemContent
     this.props.editName(this.getId());
   }
 
-  buildMenuTemplate(i18n: I18nType, index: number): any {
+  buildMenuTemplate(i18n: I18nType, index: number) {
     const property = this.property.getProperty();
     return [
       {
@@ -459,7 +458,7 @@ export class EventsBasedEntityPropertyTreeViewItemContent
     this.props.onPropertiesUpdated();
   }
 
-  getRightButton(i18n: I18nType): any {
+  getRightButton(i18n: I18nType) {
     return null;
   }
 }

@@ -12,14 +12,10 @@ export default class Rendered3DInstance {
   _project: gdProject;
   _instance: gdInitialInstance;
   _associatedObjectConfiguration: gdObjectConfiguration;
-  // $FlowFixMe[value-as-type]
   _pixiContainer: PIXI.Container;
-  // $FlowFixMe[value-as-type]
   _threeGroup: THREE.Group;
   _pixiResourcesLoader: Class<PixiResourcesLoader>;
-  // $FlowFixMe[value-as-type]
   _pixiObject: PIXI.DisplayObject;
-  // $FlowFixMe[value-as-type]
   _threeObject: THREE.Object3D | null;
   wasUsed: boolean;
   _wasDestroyed: boolean;
@@ -29,9 +25,7 @@ export default class Rendered3DInstance {
     project: gdProject,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
-    // $FlowFixMe[value-as-type]
     pixiContainer: PIXI.Container,
-    // $FlowFixMe[value-as-type]
     threeGroup: THREE.Group,
     pixiResourcesLoader: Class<PixiResourcesLoader>,
     getPropertyOverridings: (() => Map<string, string>) | null = null
@@ -82,15 +76,15 @@ export default class Rendered3DInstance {
     //Nothing to do.
   }
 
-  getPixiObject(): any {
+  getPixiObject() {
     return this._pixiObject;
   }
 
-  getThreeObject(): any {
+  getThreeObject() {
     return this._threeObject;
   }
 
-  getInstance(): any {
+  getInstance() {
     return this._instance;
   }
 
@@ -106,27 +100,27 @@ export default class Rendered3DInstance {
     if (this._threeObject !== null) this._threeGroup.remove(this._threeObject);
   }
 
-  getOriginX(): any {
+  getOriginX() {
     return 0;
   }
 
-  getOriginY(): any {
+  getOriginY() {
     return 0;
   }
 
-  getOriginZ(): any {
+  getOriginZ() {
     return 0;
   }
 
-  getCenterX(): any {
+  getCenterX() {
     return this.getWidth() / 2;
   }
 
-  getCenterY(): any {
+  getCenterY() {
     return this.getHeight() / 2;
   }
 
-  getCenterZ(): any {
+  getCenterZ() {
     return this.getDepth() / 2;
   }
 
@@ -164,21 +158,21 @@ export default class Rendered3DInstance {
   /**
    * Return the width of the instance when the instance doesn't have a custom size.
    */
-  getDefaultWidth(): any {
+  getDefaultWidth() {
     return 32;
   }
 
   /**
    * Return the height of the instance when the instance doesn't have a custom size.
    */
-  getDefaultHeight(): any {
+  getDefaultHeight() {
     return 32;
   }
 
   /**
    * Return the depth of the instance when the instance doesn't have a custom size.
    */
-  getDefaultDepth(): any {
+  getDefaultDepth() {
     return 32;
   }
 

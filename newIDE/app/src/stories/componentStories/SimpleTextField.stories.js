@@ -12,7 +12,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => (
+export const Default = () => (
   <ColumnStackLayout>
     <SimpleTextField
       disabled={false}

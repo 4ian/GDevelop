@@ -34,7 +34,6 @@ import Window from '../../Utils/Window';
 
 const gd: libGDevelop = global.gd;
 
-// $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget(
   'spine-animations-list'
 );
@@ -67,7 +66,7 @@ const SpineEditor = ({
   resourceManagementProps,
   projectScopedContainersAccessor,
   renderObjectNameField,
-}: EditorProps): React.Node => {
+}: EditorProps) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
     justAddedAnimationName,
@@ -145,7 +144,6 @@ const SpineEditor = ({
       if (spineData.skeleton && spineData.skeleton.skins) {
         return spineData.skeleton.skins.map(skin => skin.name);
       } else {
-        // $FlowFixMe[missing-empty-array-annot]
         return [];
       }
     },
@@ -155,7 +153,6 @@ const SpineEditor = ({
   const skinName = spineConfiguration.getSkinName();
 
   const changeSpineSkin = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     skinName => {
       objectConfiguration.updateProperty('skinName', skinName);
       if (onObjectUpdated) onObjectUpdated();
@@ -273,7 +270,6 @@ const SpineEditor = ({
   );
 
   const removeAnimation = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     animationIndex => {
       setNameErrors({});
 
@@ -302,7 +298,6 @@ const SpineEditor = ({
   );
 
   const changeAnimationName = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     (animationIndex, newName) => {
       const currentName = spineConfiguration
         .getAnimation(animationIndex)

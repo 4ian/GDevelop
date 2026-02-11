@@ -18,9 +18,7 @@ type ExplanationHeaderProps = {|
   uiMode: 'minimal' | 'full',
 |};
 
-const ExplanationHeader = ({
-  uiMode,
-}: ExplanationHeaderProps): null | React.Node => {
+const ExplanationHeader = ({ uiMode }: ExplanationHeaderProps) => {
   if (uiMode === 'minimal') return null;
 
   return (
@@ -43,7 +41,7 @@ const ExplanationHeader = ({
 const onlineWebExporter = {
   key: 'onlinewebexport',
   tabName: 'Web',
-  name: (<Trans>gd.games</Trans>: React.Node),
+  name: <Trans>gd.games</Trans>,
   helpPage: '/publishing/web',
 };
 

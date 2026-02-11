@@ -70,7 +70,7 @@ const CollisionMasksEditor = ({
   project,
   onMasksUpdated,
   onCreateMatchingSpriteCollisionMask,
-}: Props): null | React.MixedElement => {
+}: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
@@ -115,7 +115,6 @@ const CollisionMasksEditor = ({
   );
 
   const updateCollisionMasks = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     (sameCollisionMasksForAnimations, sameCollisionMasksForSprites) => {
       if (animation && sprite) {
         if (sameCollisionMasksForAnimations) {
@@ -134,20 +133,17 @@ const CollisionMasksEditor = ({
     [animation, sprite, animations, forceUpdate, onMasksUpdated]
   );
 
-  // $FlowFixMe[missing-local-annot]
   const chooseAnimation = index => {
     setAnimationIndex(index);
     setDirectionIndex(0);
     setSpriteIndex(0);
   };
 
-  // $FlowFixMe[missing-local-annot]
   const chooseDirection = index => {
     setDirectionIndex(index);
     setSpriteIndex(0);
   };
 
-  // $FlowFixMe[missing-local-annot]
   const chooseSprite = index => {
     setSpriteIndex(index);
   };
@@ -247,7 +243,6 @@ const CollisionMasksEditor = ({
   );
 
   const onSetAutomaticallyAdaptCollisionMasks = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     async value => {
       // If enabling automatic while custom was selected, then ask for confirmation.
       if (value && sprite && !sprite.isFullImageCollisionMask()) {

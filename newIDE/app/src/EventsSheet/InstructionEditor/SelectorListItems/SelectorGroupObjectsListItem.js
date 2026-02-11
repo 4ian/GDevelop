@@ -28,7 +28,7 @@ export const renderGroupObjectsListItem = ({
   matchesCoordinates,
   id,
   data,
-}: Props): React.Node => {
+}: Props) => {
   const groupName: string = groupWithContext.group.getName();
   return (
     <ListItem

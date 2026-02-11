@@ -45,7 +45,7 @@ const LocalFilePicker = ({
   defaultPath,
   fullWidth,
   filters,
-}: Props): React.MixedElement => {
+}: Props) => {
   const onChooseFolder = async () => {
     if (!dialog || !electron) return;
 

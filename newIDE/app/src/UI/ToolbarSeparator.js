@@ -2,7 +2,7 @@
 import React from 'react';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
-const ToolbarSeparator = (): React.MixedElement => {
+const ToolbarSeparator = () => {
   const theme = React.useContext(GDevelopThemeContext);
   return (
     <span

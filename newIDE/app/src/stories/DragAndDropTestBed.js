@@ -76,7 +76,7 @@ const DropTargetBox = ({ name }: {| name: string |}) => (
   </DropTarget>
 );
 
-export default (props: Props): React.MixedElement => (
+export default (props: Props) => (
   <div>
     <DragSourceAndDropTargetBox name="box1" />
     <DragSourceAndDropTargetBox name="box2, cant-drop-here" />

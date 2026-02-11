@@ -76,17 +76,7 @@ export type SimplifiedProjectOptions = {|
   scopeToScene?: string,
 |};
 
-export const makeSimplifiedProjectBuilder = (
-  gd: libGDevelop
-): {
-  getProjectSpecificExtensionsSummary: (
-    project: gdProject
-  ) => ProjectSpecificExtensionsSummary,
-  getSimplifiedProject: (
-    project: gdProject,
-    options: SimplifiedProjectOptions
-  ) => SimplifiedProject,
-} => {
+export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
   const getVariableType = (variable: gdVariable) => {
     const type = variable.getType();
     return type === gd.Variable.String
@@ -124,7 +114,6 @@ export const makeSimplifiedProjectBuilder = (
   const getSimplifiedVariable = (
     name: string,
     variable: gdVariable,
-    // $FlowFixMe[missing-local-annot]
     depth = 0
   ): SimplifiedVariable => {
     const isCollection = isCollectionVariable(variable);
@@ -307,12 +296,10 @@ export const makeSimplifiedProjectBuilder = (
     const instancesCountPerLayer: { [string]: { [string]: number } } = {};
 
     const instancesListerFunctor = new gd.InitialInstanceJSFunctor();
-    // $FlowFixMe[incompatible-type] - invoke is not writable
-    // $FlowFixMe[cannot-write]
+    // $FlowFixMe - invoke is not writable
     instancesListerFunctor.invoke = instancePtr => {
-      // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
+      // $FlowFixMe - wrapPointer is not exposed
       const instance: gdInitialInstance = gd.wrapPointer(
-        // $FlowFixMe[incompatible-type]
         instancePtr,
         gd.InitialInstance
       );
@@ -326,7 +313,7 @@ export const makeSimplifiedProjectBuilder = (
       layerInstancesCount[name] = (layerInstancesCount[name] || 0) + 1;
       isEmpty = false;
     };
-    // $FlowFixMe[incompatible-type] - JSFunctor is incompatible with Functor
+    // $FlowFixMe - JSFunctor is incompatible with Functor
     scene.getInitialInstances().iterateOverInstances(instancesListerFunctor);
     instancesListerFunctor.delete();
 
@@ -432,12 +419,9 @@ export const makeSimplifiedProjectBuilder = (
       })
     );
 
-    // $FlowFixMe[incompatible-type]
     const projectSpecificExtensions: Array<gdPlatformExtension> = mapVector(
-      // $FlowFixMe[incompatible-exact]
       allExtensions,
       extension => {
-        // $FlowFixMe[incompatible-use]
         if (projectExtensionNames.has(extension.getName())) {
           return extension;
         }

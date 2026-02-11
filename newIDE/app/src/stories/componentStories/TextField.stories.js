@@ -42,9 +42,9 @@ const TextFieldStoryTemplate = (args: {|
   );
 };
 
-export const Default = (): React.Node => <TextFieldStoryTemplate />;
+export const Default = () => <TextFieldStoryTemplate />;
 
-export const EndAdornment = (): React.Node => (
+export const EndAdornment = () => (
   <TextFieldStoryTemplate
     endAdornment={
       <IconButton>
@@ -54,7 +54,7 @@ export const EndAdornment = (): React.Node => (
   />
 );
 
-export const WithLoader = (): React.Node => (
+export const WithLoader = () => (
   <TextFieldStoryTemplate
     endAdornment={
       <IconButton>
@@ -64,7 +64,7 @@ export const WithLoader = (): React.Node => (
   />
 );
 
-export const WithoutFloatingTextAndEndAdornment = (): React.Node => (
+export const WithoutFloatingTextAndEndAdornment = () => (
   <TextFieldStoryTemplate
     endAdornment={
       <IconButton edge="end" size="small">
@@ -75,8 +75,8 @@ export const WithoutFloatingTextAndEndAdornment = (): React.Node => (
   />
 );
 
-export const Required = (): React.Node => <TextFieldStoryTemplate required />;
+export const Required = () => <TextFieldStoryTemplate required />;
 
-export const WithMarkdownText = (): React.Node => (
+export const WithMarkdownText = () => (
   <TextFieldStoryTemplate helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)." />
 );

@@ -45,7 +45,7 @@ const ResourceSelectorWithThumbnail = ({
   fallbackResourceKind,
   id,
   disabled,
-}: Props): React.Node => {
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const itemsAlignment = isMobile ? 'center' : 'flex-end';
   const displayThumbnail = resourcesKindsWithThumbnail.includes(resourceKind);

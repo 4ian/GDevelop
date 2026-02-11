@@ -297,11 +297,7 @@ type Props = {|
   ) => void,
 |};
 
-// $FlowFixMe[prop-missing]
-const EditorTabsPane: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<{}> },
-  React.RefSetter<{}>
-> = React.forwardRef<Props, {||}>((props, ref) => {
+const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
   const {
     editorTabs,
     currentProject,

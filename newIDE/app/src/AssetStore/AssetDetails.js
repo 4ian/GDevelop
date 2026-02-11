@@ -97,11 +97,7 @@ export type AssetDetailsInterface = {|
   scrollToPosition: (y: number) => void,
 |};
 
-// $FlowFixMe[prop-missing]
-export const AssetDetails: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<AssetDetailsInterface> },
-  React.RefSetter<AssetDetailsInterface>
-> = React.forwardRef<Props, AssetDetailsInterface>(
+export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
   (
     {
       onTagSelection,
@@ -354,7 +350,6 @@ export const AssetDetails: React.AbstractComponent<
                           ({ name }) => name
                         )}
                         getImageResourceSource={(resourceName: string) => {
-                          // $FlowFixMe[invalid-computed-prop]
                           const resource = assetResources[resourceName];
                           return resource ? resource.file : '';
                         }}

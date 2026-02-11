@@ -34,7 +34,7 @@ export const UsersAutocomplete = ({
   floatingLabelText,
   helperText,
   disabled,
-}: Props): React.Node => {
+}: Props) => {
   const forceUpdate = useForceUpdate();
   const [users, setUsers] = React.useState<Array<AutocompleteOption>>([]);
   const [userInput, setUserInput] = useState('');
@@ -104,7 +104,6 @@ export const UsersAutocomplete = ({
           userIds
         );
         setUsers(
-          // $FlowFixMe[incompatible-type]
           userIds
             .map(userId => {
               const userPublicProfile: UserPublicProfile =

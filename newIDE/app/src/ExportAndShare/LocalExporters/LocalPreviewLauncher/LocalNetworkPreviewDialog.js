@@ -30,7 +30,7 @@ const LocalNetworkPreviewDialog = ({
   onExport,
   onClose,
   onRunPreviewLocally,
-}: Props): null | React.Node => {
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   if (!open) return null;
   const urlWithProtocol = url ? `http://${url}` : null;
@@ -87,7 +87,6 @@ const LocalNetworkPreviewDialog = ({
             </Text>
           </Line>
           <ShareLink url={urlWithProtocol} />
-          {/* $FlowFixMe[constant-condition] */}
           {urlWithProtocol && (
             <>
               <Line>

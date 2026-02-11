@@ -47,13 +47,9 @@ const styles = {
   },
 };
 
-export default class LinkEvent extends React.Component<
-  EventRendererProps,
-  any
-> {
+export default class LinkEvent extends React.Component<EventRendererProps, *> {
   _externalEventsAutoComplete: ?ExternalEventsAutoComplete = null;
 
-  // $FlowFixMe[missing-local-annot]
   state = {
     editing: false,
     editingPreviousValue: null,
@@ -123,7 +119,7 @@ export default class LinkEvent extends React.Component<
     const linkEvent = gd.asLinkEvent(this.props.event);
 
     // Put back the focus after closing the inline popover.
-    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe
     if (anchorEl) anchorEl.focus();
     if (this.state.editingPreviousValue !== linkEvent.getTarget()) {
       this.props.onEndEditingEvent();
@@ -154,7 +150,7 @@ export default class LinkEvent extends React.Component<
     );
   };
 
-  render(): any {
+  render() {
     const linkEvent = gd.asLinkEvent(this.props.event);
     const target = linkEvent.getTarget();
 

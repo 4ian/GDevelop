@@ -111,7 +111,6 @@ export default class AuthenticatedUserProvider extends React.Component<
   Props,
   State
 > {
-  // $FlowFixMe[missing-local-annot]
   state = {
     authenticatedUser: initialAuthenticatedUser,
     loginDialogOpen: false,
@@ -144,12 +143,9 @@ export default class AuthenticatedUserProvider extends React.Component<
   // - First one comes from user authenticating and automatically fetching
   //   their cloud projects;
   // - Second one comes from the homepage fetching the cloud projects regularly.
-  // $FlowFixMe[missing-local-annot]
-  _cloudProjectListingDeduplicator = (new RequestDeduplicator<
+  _cloudProjectListingDeduplicator = new RequestDeduplicator<
     Array<CloudProjectWithUserAccessInfo>
-  >(listUserCloudProjects): RequestDeduplicator<
-    Array<CloudProjectWithUserAccessInfo>
-  >);
+  >(listUserCloudProjects);
 
   async componentDidMount() {
     // Wait for Firebase to complete its initial auth check before doing anything.
@@ -287,7 +283,6 @@ export default class AuthenticatedUserProvider extends React.Component<
       clearInterval(this._notificationPollingIntervalId);
       this._notificationPollingIntervalId = null;
     }
-    // $FlowFixMe[incompatible-type]
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
         ...authenticatedUser,
@@ -310,7 +305,6 @@ export default class AuthenticatedUserProvider extends React.Component<
     );
   }
 
-  // $FlowFixMe[value-as-type]
   _reloadFirebaseProfile = async (): Promise<?FirebaseUser> => {
     const { authentication } = this.props;
 
@@ -361,7 +355,6 @@ export default class AuthenticatedUserProvider extends React.Component<
        */
       resetState?: boolean,
     }
-    // $FlowFixMe[missing-local-annot]
   ) => {
     const { authentication } = this.props;
 
@@ -430,7 +423,6 @@ export default class AuthenticatedUserProvider extends React.Component<
             subscription.pricingSystemId
           )
         ) {
-          // $FlowFixMe[incompatible-type]
           getSubscriptionPlanPricingSystem(subscription.pricingSystemId).then(
             subscriptionPricingSystem => {
               this.setState(({ authenticatedUser }) => ({
@@ -734,7 +726,6 @@ export default class AuthenticatedUserProvider extends React.Component<
         )
       ) {
         const subscriptionPricingSystem = await getSubscriptionPlanPricingSystem(
-          // $FlowFixMe[incompatible-type]
           subscription.pricingSystemId
         );
         this.setState(({ authenticatedUser }) => ({
@@ -1295,7 +1286,6 @@ export default class AuthenticatedUserProvider extends React.Component<
   _doEdit = async (
     payload: EditUserChanges,
     preferences: PreferencesValues
-    // $FlowFixMe[missing-local-annot]
   ) => {
     const { authentication } = this.props;
     if (!authentication) return;
@@ -1616,7 +1606,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   _onUpdateGithubStar = async (
     githubUsername: string,
     preferences: PreferencesValues
-  ): any => {
+  ) => {
     const { authentication } = this.props;
 
     await this._doEdit(
@@ -1646,7 +1636,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   _onUpdateTiktokFollow = async (
     communityLinks: CommunityLinks,
     preferences: PreferencesValues
-  ): any => {
+  ) => {
     const { authentication } = this.props;
 
     await this._doEdit(
@@ -1676,7 +1666,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   _onUpdateTwitterFollow = async (
     communityLinks: CommunityLinks,
     preferences: PreferencesValues
-  ): any => {
+  ) => {
     const { authentication } = this.props;
 
     await this._doEdit(
@@ -1706,7 +1696,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   _onUpdateYoutubeSubscription = async (
     communityLinks: CommunityLinks,
     preferences: PreferencesValues
-  ): any => {
+  ) => {
     const { authentication } = this.props;
 
     await this._doEdit(
@@ -1733,7 +1723,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
-  render(): any {
+  render() {
     return (
       <AuthenticatedUserContext.Provider value={this.state.authenticatedUser}>
         {this.props.children}

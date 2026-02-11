@@ -44,7 +44,7 @@ export const GenericRetryableProcessWithProgressDialog = ({
   onAbandon,
   onRetry,
   genericError,
-}: GenericRetryableProcessWithProgressProps): React.Node => {
+}: GenericRetryableProcessWithProgressProps) => {
   const hasErrors =
     (result && result.erroredResources.length > 0) || !!genericError;
 
@@ -107,11 +107,9 @@ export const GenericRetryableProcessWithProgressDialog = ({
               {result
                 ? result.erroredResources.map(({ resourceName, error }) => (
                     <TableRow key={resourceName}>
-                      {/* $FlowFixMe[incompatible-type] */}
                       <TableRowColumn style={styles.tableCell}>
                         {resourceName}
                       </TableRowColumn>
-                      {/* $FlowFixMe[incompatible-type] */}
                       <TableRowColumn style={styles.tableCell}>
                         {error.toString()}
                       </TableRowColumn>
@@ -120,9 +118,7 @@ export const GenericRetryableProcessWithProgressDialog = ({
                 : null}
               {genericError ? (
                 <TableRow>
-                  {/* $FlowFixMe[incompatible-type] */}
                   <TableRowColumn style={styles.tableCell}>-</TableRowColumn>
-                  {/* $FlowFixMe[incompatible-type] */}
                   <TableRowColumn style={styles.tableCell}>
                     {genericError.toString()}
                   </TableRowColumn>
@@ -173,7 +169,6 @@ export const useGenericRetryableProcessWithProgress = <DoProcessOptions>({
     null
   );
 
-  // $FlowFixMe[recursive-definition]
   const ensureProcessIsDone = React.useCallback(
     async (options: DoProcessOptions) => {
       setProgress(0);

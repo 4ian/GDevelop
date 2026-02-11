@@ -143,6 +143,15 @@ done
 
 echo "  Normalizing codemod syntax to Babel-compatible Flow..."
 python3 "$SCRIPT_DIR/fix-codemod-syntax.py"
+
+# Fix arrow-function inline object return types that prettier 1.15 can't parse.
+# The codemod may add return type annotations like:
+#   const foo = (): { prop: Type } => { ... }
+# Prettier 1.15 can't parse the `: { ... } =>` pattern.
+# Fix: extract the inline type into a named type alias, preserving typing.
+echo "  Fixing arrow-function return types for prettier compatibility..."
+python3 "$SCRIPT_DIR/fix-arrow-return-types.py"
+
 echo "  Done."
 
 ###############################################################################
@@ -190,29 +199,50 @@ print("  Fixed GDevelop.js types")
 PYEOF
 fi
 
-# Fix Theme/index.js - $PropertyType replacement may leave empty type
+# Fix Theme/index.js - $PropertyType replacement may leave empty type or
+# indexed access type (Theme['gdevelopTheme']) that prettier 1.15 can't parse.
+# Use typeof DefaultLightTheme.gdevelopTheme which both Flow 0.299 and prettier understand.
 THEME_FILE="$APP_DIR/src/UI/Theme/index.js"
-if grep -q 'export type GDevelopTheme = ;' "$THEME_FILE" 2>/dev/null; then
-  sed -i "s/export type GDevelopTheme = ;/export type GDevelopTheme = Theme['gdevelopTheme'];/" "$THEME_FILE"
-  # Remove any stray {/* $FlowFixMe */} on the line above
-  python3 -c "
-with open('$THEME_FILE') as f:
-    content = f.read()
-import re
-content = re.sub(r'\{\\/\\* \\\$FlowFixMe\[incompatible-type\] \\*\\/\}\n(export type GDevelopTheme)', r'\1', content)
-content = re.sub(r'\{/\* \\\$FlowFixMe\[incompatible-type\] \*/\}\n(export type GDevelopTheme)', r'\1', content)
-with open('$THEME_FILE', 'w') as f:
-    f.write(content)
-"
-  echo "  Fixed Theme/index.js"
-fi
+python3 << 'PYEOF'
+import os, re
+theme_file = os.path.join(os.environ.get('APP_DIR', os.getcwd()), 'src/UI/Theme/index.js')
+if os.path.isfile(theme_file):
+    with open(theme_file) as f:
+        content = f.read()
+    original = content
+    # Fix empty type from $PropertyType removal
+    content = content.replace("export type GDevelopTheme = ;",
+        "export type GDevelopTheme = typeof DefaultLightTheme.gdevelopTheme;")
+    # Fix indexed access type that prettier 1.15 can't parse
+    content = re.sub(
+        r"export type GDevelopTheme = Theme\['gdevelopTheme'\];",
+        "export type GDevelopTheme = typeof DefaultLightTheme.gdevelopTheme;",
+        content)
+    # Remove any stray FlowFixMe above the type export
+    content = re.sub(
+        r'(?://\s*\$FlowFixMe\[incompatible-type\]\s*\n|\{/\*\s*\$FlowFixMe\[incompatible-type\]\s*\*/\}\s*\n)'
+        r'(export type GDevelopTheme)',
+        r'\1', content)
+    # Remove any stale prettier-ignore before the line
+    content = re.sub(
+        r'// prettier-ignore\n(export type GDevelopTheme)',
+        r'\1', content)
+    if content != original:
+        with open(theme_file, 'w') as f:
+            f.write(content)
+        print("  Fixed Theme/index.js")
+    else:
+        print("  Theme/index.js already correct")
+PYEOF
 
-# Fix known annotate-exports gaps (remaining signature-verification failures).
+# Fix known annotate-exports gaps and formatting-displacement issues.
 python3 << 'PYEOF'
 import os
 import re
 
 app_dir = os.environ.get('APP_DIR', os.getcwd())
+
+# Regex-based replacements for signature-verification gaps
 replacements = [
     (
         os.path.join(app_dir, 'src/EventsSheet/index.js'),
@@ -238,16 +268,52 @@ for filepath, pattern, replacement in replacements:
             f.write(updated)
         fixed += 1
 
-print(f"  Fixed {fixed} known annotate-exports signature gaps")
+# Fix PrivateGameTemplateStoreContext: add type annotation to empty object
+# that prettier splits across lines (causing FlowFixMe displacement).
+pgts_file = os.path.join(app_dir,
+    'src/AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext.js')
+if os.path.isfile(pgts_file):
+    with open(pgts_file) as f:
+        content = f.read()
+    # Add type annotation to the untyped empty object
+    updated = content.replace(
+        'const privateGameTemplateListingDatasById = {};',
+        'const privateGameTemplateListingDatasById: {[string]: any} = {};')
+    # Remove any stacked FlowFixMe[prop-missing] that accumulated from previous runs
+    updated = re.sub(
+        r'(\s*// \$FlowFixMe\[prop-missing\]\n)+(\s*privateGameTemplateListingDatasById\[)',
+        r'\2', updated)
+    # Also remove FlowFixMe[invalid-computed-prop] for the typed object (no longer needed)
+    updated = re.sub(
+        r'\s*// \$FlowFixMe\[invalid-computed-prop\]\n(\s*if \(privateGameTemplateListingDatasById\[)',
+        r'\n\1', updated)
+    if updated != content:
+        with open(pgts_file, 'w') as f:
+            f.write(updated)
+        fixed += 1
+
+print(f"  Fixed {fixed} known annotate-exports signature gaps and type issues")
 PYEOF
 
 echo "  Done."
 
 ###############################################################################
-# STEP 6: Add $FlowFixMe for all remaining errors (iterative)
+# STEP 6: Run prettier formatting (pre-FlowFixMe)
 ###############################################################################
 echo ""
-echo "--- Step 6: Adding \$FlowFixMe for all errors (iterative) ---"
+echo "--- Step 6: Running prettier formatting (pre-FlowFixMe) ---"
+
+# Format all source files before adding FlowFixMe.
+# This ensures FlowFixMe comments will be placed at the correct post-format
+# line numbers.
+npm run format 2>&1 || true
+echo "  Done."
+
+###############################################################################
+# STEP 7: Add $FlowFixMe for all remaining errors (iterative)
+###############################################################################
+echo ""
+echo "--- Step 7: Adding \$FlowFixMe for all errors (iterative) ---"
 
 npx flow stop 2>/dev/null || true
 
@@ -289,10 +355,65 @@ for i in $(seq 1 15); do
 done
 
 ###############################################################################
-# STEP 7: Fix eslint-disable-next-line ordering with $FlowFixMe
+# STEP 8: Post-FlowFixMe format + fix cycle
 ###############################################################################
 echo ""
-echo "--- Step 7: Fixing eslint/FlowFixMe comment ordering ---"
+echo "--- Step 8: Post-FlowFixMe format and fix cycle ---"
+
+# After adding FlowFixMe comments, formatting may introduce new errors
+# (e.g., FlowFixMe comments getting displaced from error lines).
+# Run format + flow check + FlowFixMe in a cycle until stable.
+for j in $(seq 1 3); do
+  echo "  Format-fix cycle iteration $j..."
+
+  npm run format 2>&1 || true
+
+  npx flow stop 2>/dev/null || true
+  set +e
+  CYCLE_CHECK=$(npx flow 2>&1)
+  set -e
+
+  if echo "$CYCLE_CHECK" | grep -q "No errors"; then
+    echo "  No errors after formatting - cycle complete!"
+    break
+  fi
+
+  CYCLE_ERRORS=$(echo "$CYCLE_CHECK" | grep "Found" | grep -o '[0-9]*' | head -1)
+  echo "  $CYCLE_ERRORS errors after formatting, adding FlowFixMe..."
+
+  python3 "$SCRIPT_DIR/add-flow-fixme.py" 2>&1 || true
+  python3 "$SCRIPT_DIR/convert-jsx-flowfixme.py" 2>&1 || true
+done
+
+echo "  Done."
+
+###############################################################################
+# STEP 9: Final format verification
+###############################################################################
+echo ""
+echo "--- Step 9: Final format verification ---"
+
+npm run format 2>&1 || true
+
+npx flow stop 2>/dev/null || true
+set +e
+FINAL_CHECK=$(npx flow 2>&1)
+set -e
+
+if echo "$FINAL_CHECK" | grep -q "No errors"; then
+  echo "  All clean!"
+else
+  echo "  WARNING: Still have errors after all cycles:"
+  echo "$FINAL_CHECK" | grep "Found" || true
+fi
+
+echo "  Done."
+
+###############################################################################
+# STEP 10: Fix eslint-disable-next-line ordering with $FlowFixMe
+###############################################################################
+echo ""
+echo "--- Step 10: Fixing eslint/FlowFixMe comment ordering ---"
 
 # When $FlowFixMe is inserted between eslint-disable-next-line and the code,
 # eslint-disable no longer applies (it targets the FlowFixMe comment instead).

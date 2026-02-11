@@ -10,6 +10,7 @@ import * as PIXI from 'pixi.js-legacy';
 // $FlowFixMe[cannot-resolve-name]
 export default function makeRenderer(
   iconPath: string
+  // $FlowFixMe[cannot-resolve-name]
 ): typeof RenderedIconInstance {
   class RenderedIconInstance extends RenderedInstance {
     constructor(

@@ -155,6 +155,31 @@ python3 "$SCRIPT_DIR/fix-arrow-return-types.py"
 echo "  Done."
 
 ###############################################################################
+# STEP 4b: Fix codemod artifacts that cause parse errors or Flow issues
+###############################################################################
+echo ""
+echo "--- Step 4b: Fixing codemod artifacts ---"
+
+# 1. Fix missing commas after ([]: Array<empty>) in object literals.
+#    The codemod turns "[]," into "([]: Array<empty>)" but loses the comma.
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
+  s/\(\[\]: Array<empty>\)(\s*\/\/.*)$/([]: Array<empty>),$1/g;
+' {} +
+
+# 2. Fix "new Array(n)" -> "new Array<number>(n)" to avoid underconstrained type
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
+  s/new Array\(([^)]+)\)\.fill\(0\)/new Array<number>($1).fill(0)/g;
+' {} +
+
+# 3. Fix !== null comparisons on number types -> != null
+#    (Flow 0.299 is strict about comparing non-nullable numbers to null)
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
+  s/selectedCompletionIndex !== null/selectedCompletionIndex != null/g;
+' {} +
+
+echo "  Done."
+
+###############################################################################
 # STEP 5: Fix specific known issues
 ###############################################################################
 echo ""
@@ -289,6 +314,49 @@ if os.path.isfile(pgts_file):
         r'\n\1', updated)
     if updated != content:
         with open(pgts_file, 'w') as f:
+            f.write(updated)
+        fixed += 1
+
+# Fix ConditionsActionsColumns.js - renderActionsList type needs style prop
+cac_file = os.path.join(app_dir, 'src/EventsSheet/EventsTree/ConditionsActionsColumns.js')
+if os.path.isfile(cac_file):
+    with open(cac_file) as f:
+        content = f.read()
+    updated = content.replace(
+        'renderActionsList: ({ className: string }) => React.Node,',
+        'renderActionsList: ({ style?: Object, className: string }) => React.Node,')
+    if updated != content:
+        with open(cac_file, 'w') as f:
+            f.write(updated)
+        fixed += 1
+
+# Fix PreferencesContext.js - annotate missing params for signature-verification
+pref_file = os.path.join(app_dir, 'src/MainFrame/Preferences/PreferencesContext.js')
+if os.path.isfile(pref_file):
+    with open(pref_file) as f:
+        content = f.read()
+    updated = content
+    updated = updated.replace(
+        'getRecentProjectFiles: options => [],',
+        'getRecentProjectFiles: (options: any): any => [],')
+    updated = updated.replace(
+        'getEditorStateForProject: projectId => {},',
+        'getEditorStateForProject: (projectId: any): any => {},')
+    if updated != content:
+        with open(pref_file, 'w') as f:
+            f.write(updated)
+        fixed += 1
+
+# Fix ShortcutsList.js - annotate commandName parameter
+sc_file = os.path.join(app_dir, 'src/KeyboardShortcuts/ShortcutsList.js')
+if os.path.isfile(sc_file):
+    with open(sc_file) as f:
+        content = f.read()
+    updated = content.replace(
+        'areaWiseCommands[areaName].map(commandName =>',
+        'areaWiseCommands[areaName].map((commandName: string) =>')
+    if updated != content:
+        with open(sc_file, 'w') as f:
             f.write(updated)
         fixed += 1
 

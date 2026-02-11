@@ -212,97 +212,78 @@ namespace gdjs {
       return this._physics3D;
     }
 
-    override updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
-      if (oldBehaviorData.steerAngleMax !== newBehaviorData.steerAngleMax) {
-        this.setSteerAngleMax(newBehaviorData.steerAngleMax);
+    override applyBehaviorOverriding(behaviorData): boolean {
+      if (behaviorData.steerAngleMax !== undefined) {
+        this.setSteerAngleMax(behaviorData.steerAngleMax);
       }
-      if (
-        oldBehaviorData.beginningSteerSpeed !==
-        newBehaviorData.beginningSteerSpeed
-      ) {
-        this.setBeginningSteerSpeed(newBehaviorData.beginningSteerSpeed);
+      if (behaviorData.beginningSteerSpeed !== undefined) {
+        this.setBeginningSteerSpeed(behaviorData.beginningSteerSpeed);
       }
-      if (oldBehaviorData.endSteerSpeed !== newBehaviorData.endSteerSpeed) {
-        this.setEndSteerSpeed(newBehaviorData.endSteerSpeed);
+      if (behaviorData.endSteerSpeed !== undefined) {
+        this.setEndSteerSpeed(behaviorData.endSteerSpeed);
       }
-      if (oldBehaviorData.engineTorqueMax !== newBehaviorData.engineTorqueMax) {
-        this.setEngineTorqueMax(newBehaviorData.engineTorqueMax);
+      if (behaviorData.engineTorqueMax !== undefined) {
+        this.setEngineTorqueMax(behaviorData.engineTorqueMax);
       }
-      if (oldBehaviorData.engineSpeedMax !== newBehaviorData.engineSpeedMax) {
-        this.setEngineSpeedMax(newBehaviorData.engineSpeedMax);
+      if (behaviorData.engineSpeedMax !== undefined) {
+        this.setEngineSpeedMax(behaviorData.engineSpeedMax);
       }
-      if (oldBehaviorData.engineInertia !== newBehaviorData.engineInertia) {
-        this.setEngineInertia(newBehaviorData.engineInertia);
+      if (behaviorData.engineInertia !== undefined) {
+        this.setEngineInertia(behaviorData.engineInertia);
       }
-      if (
-        oldBehaviorData.reverseGearRatio1 !== newBehaviorData.reverseGearRatio1
-      ) {
-        this.setGearRatio(-1, newBehaviorData.reverseGearRatio1);
+      if (behaviorData.reverseGearRatio1 !== undefined) {
+        this.setGearRatio(-1, behaviorData.reverseGearRatio1);
       }
-      if (oldBehaviorData.gearRatio1 !== newBehaviorData.gearRatio1) {
-        this.setGearRatio(1, newBehaviorData.gearRatio1);
+      if (behaviorData.gearRatio1 !== undefined) {
+        this.setGearRatio(1, behaviorData.gearRatio1);
       }
-      if (oldBehaviorData.gearRatio2 !== newBehaviorData.gearRatio2) {
-        this.setGearRatio(2, newBehaviorData.gearRatio2);
+      if (behaviorData.gearRatio2 !== undefined) {
+        this.setGearRatio(2, behaviorData.gearRatio2);
       }
-      if (oldBehaviorData.gearRatio3 !== newBehaviorData.gearRatio3) {
-        this.setGearRatio(3, newBehaviorData.gearRatio3);
+      if (behaviorData.gearRatio3 !== undefined) {
+        this.setGearRatio(3, behaviorData.gearRatio3);
       }
-      if (oldBehaviorData.gearRatio4 !== newBehaviorData.gearRatio4) {
-        this.setGearRatio(4, newBehaviorData.gearRatio4);
+      if (behaviorData.gearRatio4 !== undefined) {
+        this.setGearRatio(4, behaviorData.gearRatio4);
       }
-      if (oldBehaviorData.gearRatio5 !== newBehaviorData.gearRatio5) {
-        this.setGearRatio(5, newBehaviorData.gearRatio5);
+      if (behaviorData.gearRatio5 !== undefined) {
+        this.setGearRatio(5, behaviorData.gearRatio5);
       }
-      if (oldBehaviorData.gearRatio6 !== newBehaviorData.gearRatio6) {
-        this.setGearRatio(6, newBehaviorData.gearRatio6);
+      if (behaviorData.gearRatio6 !== undefined) {
+        this.setGearRatio(6, behaviorData.gearRatio6);
       }
-      if (
-        oldBehaviorData.backWheelOffsetX !== newBehaviorData.backWheelOffsetX
-      ) {
-        this.setBackWheelOffsetX(newBehaviorData.backWheelOffsetX);
+      if (behaviorData.backWheelOffsetX !== undefined) {
+        this.setBackWheelOffsetX(behaviorData.backWheelOffsetX);
       }
-      if (
-        oldBehaviorData.frontWheelOffsetX !== newBehaviorData.frontWheelOffsetX
-      ) {
-        this.setFrontWheelOffsetX(newBehaviorData.frontWheelOffsetX);
+      if (behaviorData.frontWheelOffsetX !== undefined) {
+        this.setFrontWheelOffsetX(behaviorData.frontWheelOffsetX);
       }
-      if (oldBehaviorData.wheelOffsetY !== newBehaviorData.wheelOffsetY) {
-        this.setWheelOffsetY(newBehaviorData.wheelOffsetY);
+      if (behaviorData.wheelOffsetY !== undefined) {
+        this.setWheelOffsetY(behaviorData.wheelOffsetY);
       }
-      if (oldBehaviorData.wheelOffsetZ !== newBehaviorData.wheelOffsetZ) {
-        this.setWheelOffsetZ(newBehaviorData.wheelOffsetZ);
+      if (behaviorData.wheelOffsetZ !== undefined) {
+        this.setWheelOffsetZ(behaviorData.wheelOffsetZ);
       }
-      if (oldBehaviorData.wheelRadius !== newBehaviorData.wheelRadius) {
-        this.setWheelRadius(newBehaviorData.wheelRadius);
+      if (behaviorData.wheelRadius !== undefined) {
+        this.setWheelRadius(behaviorData.wheelRadius);
       }
-      if (oldBehaviorData.wheelWidth !== newBehaviorData.wheelWidth) {
-        this.setWheelWidth(newBehaviorData.wheelWidth);
+      if (behaviorData.wheelWidth !== undefined) {
+        this.setWheelWidth(behaviorData.wheelWidth);
       }
-      if (oldBehaviorData.brakeTorqueMax !== newBehaviorData.brakeTorqueMax) {
-        this.setBrakeTorqueMax(newBehaviorData.brakeTorqueMax);
+      if (behaviorData.brakeTorqueMax !== undefined) {
+        this.setBrakeTorqueMax(behaviorData.brakeTorqueMax);
       }
-      if (
-        oldBehaviorData.handBrakeTorqueMax !==
-        newBehaviorData.handBrakeTorqueMax
-      ) {
-        this.setHandBrakeTorqueMax(newBehaviorData.handBrakeTorqueMax);
+      if (behaviorData.handBrakeTorqueMax !== undefined) {
+        this.setHandBrakeTorqueMax(behaviorData.handBrakeTorqueMax);
       }
-      if (
-        oldBehaviorData.hasBackWheelDrive !== newBehaviorData.hasBackWheelDrive
-      ) {
-        this.setBackWheelDrive(newBehaviorData.hasBackWheelDrive);
+      if (behaviorData.hasBackWheelDrive !== undefined) {
+        this.setBackWheelDrive(behaviorData.hasBackWheelDrive);
       }
-      if (
-        oldBehaviorData.hasFrontWheelDrive !==
-        newBehaviorData.hasFrontWheelDrive
-      ) {
-        this.setFrontWheelDrive(newBehaviorData.hasFrontWheelDrive);
+      if (behaviorData.hasFrontWheelDrive !== undefined) {
+        this.setFrontWheelDrive(behaviorData.hasFrontWheelDrive);
       }
-      if (
-        oldBehaviorData.pitchRollAngleMax !== newBehaviorData.pitchRollAngleMax
-      ) {
-        this.setPitchRollAngleMax(newBehaviorData.pitchRollAngleMax);
+      if (behaviorData.pitchRollAngleMax !== undefined) {
+        this.setPitchRollAngleMax(behaviorData.pitchRollAngleMax);
       }
       return true;
     }

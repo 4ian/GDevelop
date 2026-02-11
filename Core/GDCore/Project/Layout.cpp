@@ -334,7 +334,7 @@ void Layout::UnserializeFrom(gd::Project& project,
   objectsContainer.AddMissingObjectsInRootFolder();
 
   initialInstances.UnserializeFrom(
-      element.GetChild("instances", 0, "Positions"));
+      project, element.GetChild("instances", 0, "Positions"));
   variables.UnserializeFrom(element.GetChild("variables", 0, "Variables"));
 
   layers.UnserializeLayersFrom(element.GetChild("layers", 0, "Layers"));

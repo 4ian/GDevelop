@@ -224,6 +224,19 @@ class GD_CORE_API EventsFunction {
   }
 
   /**
+   * \brief Get the help URL for this function.
+   */
+  const gd::String& GetHelpUrl() const { return helpUrl; }
+
+  /**
+   * \brief Set the help URL for this function.
+   */
+  EventsFunction& SetHelpUrl(const gd::String& helpUrl_) {
+    helpUrl = helpUrl_;
+    return *this;
+  }
+
+  /**
    * \brief Return the events.
    */
   const gd::EventsList& GetEvents() const { return events; };
@@ -304,6 +317,7 @@ class GD_CORE_API EventsFunction {
   gd::ObjectGroupsContainer objectGroups;
   bool isPrivate = false;
   bool isAsync = false;
+  gd::String helpUrl;
 };
 
 }  // namespace gd

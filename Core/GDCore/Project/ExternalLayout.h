@@ -4,8 +4,8 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef GDCORE_EXTERNALLAYOUT_H
-#define GDCORE_EXTERNALLAYOUT_H
+#pragma once
+
 #include <memory>
 
 #include "GDCore/Project/InitialInstancesContainer.h"
@@ -86,7 +86,7 @@ class GD_CORE_API ExternalLayout {
   /**
    * \brief Unserialize the external layout.
    */
-  void UnserializeFrom(const SerializerElement& element);
+  void UnserializeFrom(gd::Project &project, const SerializerElement& element);
   ///@}
 
  private:
@@ -98,4 +98,3 @@ class GD_CORE_API ExternalLayout {
 
 }  // namespace gd
 
-#endif  // GDCORE_EXTERNALLAYOUT_H

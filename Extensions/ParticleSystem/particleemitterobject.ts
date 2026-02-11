@@ -180,9 +180,10 @@ namespace gdjs {
      */
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      particleObjectData: ParticleEmitterObjectData
+      particleObjectData: ParticleEmitterObjectData,
+      instanceData?: InstanceData
     ) {
-      super(instanceContainer, particleObjectData);
+      super(instanceContainer, particleObjectData, instanceData);
       this._renderer = new gdjs.ParticleEmitterObjectRenderer(
         instanceContainer,
         this,

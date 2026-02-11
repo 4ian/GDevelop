@@ -22,7 +22,7 @@ const styles = {
   },
 };
 
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function YesNoField(props: ParameterFieldProps, ref) {
     const button = React.useRef<?TwoStatesButtonInterface>(null);
     const focus: FieldFocusFunction = options => {
@@ -71,12 +71,16 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </Column>
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);
 
 export const renderInlineYesNo = ({
   value,
   parameterMetadata,
-}: ParameterInlineRendererProps) => {
+}: ParameterInlineRendererProps): React.Node => {
   if (getParameterValueOrDefault(value, parameterMetadata) === 'yes') {
     return <Trans>yes</Trans>;
   } else {

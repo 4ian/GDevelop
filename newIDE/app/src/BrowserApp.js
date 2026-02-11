@@ -34,7 +34,7 @@ import BrowserLoginProvider from './LoginProvider/BrowserLoginProvider';
 import { isServiceWorkerSupported } from './ServiceWorkerSetup';
 import { ensureBrowserSWPreviewSession } from './ExportAndShare/BrowserExporters/BrowserSWPreviewLauncher/BrowserSWPreviewIndexedDB';
 
-export const create = (authentication: Authentication) => {
+export const create = (authentication: Authentication): React.Node => {
   Window.setUpContextMenu();
   const loginProvider = new BrowserLoginProvider(authentication.auth);
   authentication.setLoginProvider(loginProvider);
@@ -56,7 +56,11 @@ export const create = (authentication: Authentication) => {
           ? makeBrowserSWEventsFunctionCodeWriter
           : makeBrowserS3EventsFunctionCodeWriter
       }
+      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-exact]
       eventsFunctionsExtensionWriter={BrowserEventsFunctionsExtensionWriter}
+      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-exact]
       eventsFunctionsExtensionOpener={BrowserEventsFunctionsExtensionOpener}
     >
       {({ i18n }) => (
@@ -80,8 +84,10 @@ export const create = (authentication: Authentication) => {
               i18n={i18n}
               renderPreviewLauncher={(props, ref) =>
                 canUseBrowserSW ? (
+                  // $FlowFixMe[incompatible-type]
                   <BrowserSWPreviewLauncher {...props} ref={ref} />
                 ) : (
+                  // $FlowFixMe[incompatible-type]
                   <BrowserS3PreviewLauncher {...props} ref={ref} />
                 )
               }

@@ -18,7 +18,18 @@ type PropsType = {|
 /**
  * The button that can be used in any dialog to open a Youtube tutorial.
  */
-const TutorialButton = (props: PropsType) => {
+const TutorialButton = (
+  props: PropsType
+):
+  | null
+  | boolean
+  | number
+  | string
+  // $FlowFixMe[internal-type]
+  | $Iterable<?React$Node, void, void>
+  | React.MixedElement
+  | React$Portal
+  | React.Node => {
   const { tutorials } = React.useContext(TutorialContext);
   if (!tutorials || !props.tutorialId) return props.renderIfNotFound || null; // Loading or errored, do not display the tutorial.
   const tutorial: ?Tutorial = tutorials.find(

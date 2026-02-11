@@ -51,7 +51,7 @@ const DefaultHelpButton = ({
  * A placeholder for when there is no content to display.
  * Also take a look at EmptyMessage for a less visible message.
  */
-export const EmptyPlaceholder = (props: Props) => (
+export const EmptyPlaceholder = (props: Props): React.Node => (
   <Column alignItems="center">
     <Container
       style={{

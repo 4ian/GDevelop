@@ -15,7 +15,7 @@ export default {
   component: EventsSheet,
 };
 
-export const DefaultNoScope = () => (
+export const DefaultNoScope = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={500}>
       <EventsSheet
@@ -44,7 +44,7 @@ export const DefaultNoScope = () => (
   </DragAndDropContextProvider>
 );
 
-export const EmptyNoScope = () => (
+export const EmptyNoScope = (): React.Node => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={500}>
       <EventsSheet

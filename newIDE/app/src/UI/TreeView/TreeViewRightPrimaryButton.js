@@ -14,10 +14,14 @@ export type TreeViewRightPrimaryButtonProps = {|
   onClick: ?(MouseEvent) => void | Promise<void>,
 |};
 
-export const TreeViewRightPrimaryButton = React.forwardRef<
-  TreeViewRightPrimaryButtonProps,
-  ButtonInterface
->(
+// $FlowFixMe[prop-missing]
+export const TreeViewRightPrimaryButton: React.AbstractComponent<
+  {
+    ...TreeViewRightPrimaryButtonProps,
+    +ref?: React.RefSetter<ButtonInterface>,
+  },
+  React.RefSetter<ButtonInterface>
+> = React.forwardRef<TreeViewRightPrimaryButtonProps, ButtonInterface>(
   (
     { label, icon, disabled, ...otherProps }: TreeViewRightPrimaryButtonProps,
     ref

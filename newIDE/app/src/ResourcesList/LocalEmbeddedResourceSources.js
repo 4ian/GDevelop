@@ -40,7 +40,7 @@ type ParseEmbeddedFiles = (
 export async function copyAllEmbeddedResourcesToProjectFolder(
   project: gdProject,
   filesWithEmbeddedResources: Map<string, EmbeddedResources>
-) {
+): Promise<void> | Promise<Array<Awaited<any>>> {
   if (!fs || !path) {
     return;
   }
@@ -115,6 +115,7 @@ export function createAndMapEmbeddedResources(
         theEmbeddedResource.setName(resourceName);
         theEmbeddedResource.setFile(resourceName);
 
+        // $FlowFixMe[prop-missing]
         mapping[relPath] = resourceName;
 
         // embedded resources can have mappings too

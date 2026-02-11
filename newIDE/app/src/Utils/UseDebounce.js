@@ -8,7 +8,7 @@ import debounce from 'lodash/debounce';
 /**
  * Debounces a React callback with a specified delay.
  */
-export const useDebounce = (cb: any, delay: number) => {
+export const useDebounce = (cb: any, delay: number): any => {
   const options = {
     leading: false,
     trailing: true,

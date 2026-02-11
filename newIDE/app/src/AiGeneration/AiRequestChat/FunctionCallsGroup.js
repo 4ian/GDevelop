@@ -11,7 +11,7 @@ type Props = {|
   children: React.Node,
 |};
 
-export const FunctionCallsGroup = ({ children }: Props) => {
+export const FunctionCallsGroup = ({ children }: Props): React.MixedElement => {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
 
   return (

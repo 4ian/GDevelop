@@ -21,7 +21,7 @@ export const AiConfigurationPresetSelector = ({
   aiConfigurationPresetsWithAvailability,
   aiRequestMode,
   disabled,
-}: AiConfigurationPresetSelectorProps) => {
+}: AiConfigurationPresetSelectorProps): React.Node => {
   const filteredAiConfigurationPresets = aiConfigurationPresetsWithAvailability.filter(
     preset => preset.mode === aiRequestMode
   );

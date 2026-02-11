@@ -9,12 +9,14 @@ const gd: libGDevelop = global.gd;
  * Renderer for gd.TiledSpriteObject
  */
 export default class RenderedTiledSpriteInstance extends RenderedInstance {
+  // $FlowFixMe[value-as-type]
   _texture: PIXI.Texture;
 
   constructor(
     project: gdProject,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
+    // $FlowFixMe[value-as-type]
     pixiContainer: PIXI.Container,
     pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {
@@ -54,7 +56,7 @@ export default class RenderedTiledSpriteInstance extends RenderedInstance {
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ) {
+  ): any {
     const tiledSprite = gd.asTiledSpriteConfiguration(objectConfiguration);
 
     return ResourcesLoader.getResourceFullUrl(
@@ -95,14 +97,14 @@ export default class RenderedTiledSpriteInstance extends RenderedInstance {
     this._pixiObject.alpha = alphaForDisplay;
   }
 
-  getDefaultWidth() {
+  getDefaultWidth(): any {
     const tiledSprite = gd.asTiledSpriteConfiguration(
       this._associatedObjectConfiguration
     );
     return tiledSprite.getWidth();
   }
 
-  getDefaultHeight() {
+  getDefaultHeight(): any {
     const tiledSprite = gd.asTiledSpriteConfiguration(
       this._associatedObjectConfiguration
     );

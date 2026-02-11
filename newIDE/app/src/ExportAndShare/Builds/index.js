@@ -18,11 +18,13 @@ type State = {|
 |};
 
 export default class Builds extends Component<Props, State> {
+  // $FlowFixMe[missing-local-annot]
   state = {
     builds: null,
     error: null,
   };
-  buildsWatcher = new BuildsWatcher();
+  // $FlowFixMe[missing-local-annot]
+  buildsWatcher = (new BuildsWatcher(): BuildsWatcher);
 
   componentDidMount() {
     this._refreshBuilds();
@@ -109,7 +111,7 @@ export default class Builds extends Component<Props, State> {
     });
   };
 
-  render() {
+  render(): any {
     return (
       <BuildsList
         builds={this.state.builds}

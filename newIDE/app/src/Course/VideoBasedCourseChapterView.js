@@ -67,7 +67,11 @@ type Props = {|
   onClickUnlock: () => void,
 |};
 
-const VideoBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
+// $FlowFixMe[prop-missing]
+const VideoBasedCourseChapterView: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<HTMLDivElement> },
+  React.RefSetter<HTMLDivElement>
+> = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       chapterIndex,
@@ -182,6 +186,7 @@ const VideoBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
               <Paper background="medium" style={styles.sideBar}>
                 <ColumnStackLayout noMargin>
                   <Line noMargin>
+                    {/* $FlowFixMe[invalid-computed-prop] */}
                     <Text noMargin>{rankLabel[chapterIndex + 1]}</Text>
                     &nbsp;
                     <Text noMargin>

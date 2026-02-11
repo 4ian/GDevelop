@@ -65,12 +65,13 @@ const getAcceptedExtensions = (
 };
 
 const getAcceptedMimeTypes = (resourceKind: ResourceKind): string[] => {
+  // $FlowFixMe[incompatible-type]
   return resourceKindToInputAcceptedMimes[resourceKind] || [];
 };
 
 export const getInputAcceptedMimesAndExtensions = (
   resourceKind: ResourceKind
-) => {
+): string => {
   const acceptedExtensions = getAcceptedExtensions(resourceKind);
   const acceptedMimes = getAcceptedMimeTypes(resourceKind);
 
@@ -84,7 +85,7 @@ export const FileToCloudProjectResourceUploader = ({
   onChooseResources,
   createNewResource,
   automaticallyOpenInput,
-}: FileToCloudProjectResourceUploaderProps) => {
+}: FileToCloudProjectResourceUploaderProps): React.Node => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
   const hasAutomaticallyOpenedInput = React.useRef(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

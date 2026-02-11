@@ -60,10 +60,17 @@ const remote = optionalRequire('@electron/remote');
 const shell = remote ? remote.shell : null;
 const path = optionalRequire('path');
 
-export const getThumbnailWidth = ({ isMobile }: {| isMobile: boolean |}) =>
+export const getThumbnailWidth = ({
+  isMobile,
+}: {|
+  isMobile: boolean,
+|}): void | number =>
   isMobile ? undefined : Math.min(245, Math.max(130, window.innerWidth / 4));
 
-export const getProjectDisplayDate = (i18n: I18nType, date: number) =>
+export const getProjectDisplayDate = (
+  i18n: I18nType,
+  date: number
+): React.Node =>
   getRelativeOrAbsoluteDisplayDate({
     i18n,
     dateAsNumber: date,
@@ -72,7 +79,10 @@ export const getProjectDisplayDate = (i18n: I18nType, date: number) =>
     relativeLimit: 'currentWeek',
     sameWeekFormat: 'thisWeek',
   });
-export const getDetailedProjectDisplayDate = (i18n: I18nType, date: number) =>
+export const getDetailedProjectDisplayDate = (
+  i18n: I18nType,
+  date: number
+): any =>
   i18n.date(date, {
     dateStyle: 'short',
     timeStyle: 'short',
@@ -199,7 +209,7 @@ const GameDashboardCard = ({
   onRefreshGames,
   onDeleteCloudProject,
   onRegisterProject,
-}: Props) => {
+}: Props): React.Node => {
   useOnResize(useForceUpdate());
   const projectsList = React.useMemo(() => dashboardItem.projectFiles || [], [
     dashboardItem.projectFiles,
@@ -419,10 +429,12 @@ const GameDashboardCard = ({
   const buildOpenProjectContextMenu = (
     i18n: I18nType
   ): Array<MenuItemTemplate> => {
+    // $FlowFixMe[missing-empty-array-annot]
     const actions = [];
     if (projectsList.length > 1) {
       actions.push(
         ...projectsList.slice(0, 3).map(fileMetadataAndStorageProviderName => {
+          // $FlowFixMe[incompatible-type]
           return {
             label: getProjectItemLabel(
               fileMetadataAndStorageProviderName,
@@ -437,7 +449,9 @@ const GameDashboardCard = ({
       if (game) {
         actions.push(
           ...[
+            // $FlowFixMe[incompatible-type]
             { type: 'separator' },
+            // $FlowFixMe[incompatible-type]
             {
               label: i18n._(t`See all in the game dashboard`),
               click: () =>
@@ -448,6 +462,7 @@ const GameDashboardCard = ({
       }
     }
 
+    // $FlowFixMe[incompatible-type]
     return actions;
   };
 
@@ -482,6 +497,7 @@ const GameDashboardCard = ({
             if (file && file.storageProviderName === 'LocalFile') {
               actions.push({
                 label: i18n._(t`Show in local folder`),
+                // $FlowFixMe[incompatible-type]
                 click: () => locateProjectFile(file),
               });
             }
@@ -493,8 +509,10 @@ const GameDashboardCard = ({
               label: i18n._(t`See all projects`),
               click: game
                 ? () =>
+                    // $FlowFixMe[incompatible-type]
                     onOpenGameManager({ game, widgetToScrollTo: 'projects' })
-                : undefined,
+                : // $FlowFixMe[incompatible-type]
+                  undefined,
             });
           }
 
@@ -505,6 +523,7 @@ const GameDashboardCard = ({
             // No delete action possible.
           } else {
             if (actions.length > 0) {
+              // $FlowFixMe[incompatible-type]
               actions.push({
                 type: 'separator',
               });
@@ -570,6 +589,7 @@ const GameDashboardCard = ({
             });
           }
 
+          // $FlowFixMe[incompatible-type]
           return actions;
         }}
       />

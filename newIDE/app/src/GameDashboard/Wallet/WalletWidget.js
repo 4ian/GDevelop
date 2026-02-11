@@ -23,7 +23,7 @@ const WalletWidget = ({
   size,
   showOneItem,
   showAllItems,
-}: Props) => {
+}: Props): React.Node => {
   const {
     profile,
     limits,

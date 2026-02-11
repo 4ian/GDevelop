@@ -18,7 +18,7 @@ export default {
   decorators: [alertDecorator, paperDecorator],
 };
 
-export const Default = () => (
+export const Default = (): React.Node => (
   <DragAndDropContextProvider>
     <SerializedObjectDisplay object={testProject.testLayout}>
       <div style={{ height: 250 }}>
@@ -42,7 +42,7 @@ export const Default = () => (
   </DragAndDropContextProvider>
 );
 
-export const Locked = () => (
+export const Locked = (): React.Node => (
   <DragAndDropContextProvider>
     <SerializedObjectDisplay object={testProject.testLayout}>
       <div style={{ height: 250 }}>

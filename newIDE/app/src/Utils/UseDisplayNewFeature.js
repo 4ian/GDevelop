@@ -18,7 +18,11 @@ const ONE_DAY = 24 * 3600 * 1000;
 
 type Feature = string;
 
-const useDisplayNewFeature = () => {
+type _UseDisplayNewFeatureReturnType = {
+  acknowledgeNewFeature: ({ featureId: Feature }) => void,
+  shouldDisplayNewFeatureHighlighting: ({ featureId: Feature }) => boolean,
+};
+const useDisplayNewFeature = (): _UseDisplayNewFeatureReturnType => {
   const {
     values: { newFeaturesAcknowledgements },
     setNewFeaturesAcknowledgements,
@@ -65,6 +69,7 @@ const useDisplayNewFeature = () => {
         ...newFeaturesAcknowledgements,
         [featureId]: {
           ...acknowledgments,
+          // $FlowFixMe[invalid-tuple-arity]
           dates: [...acknowledgments.dates, Date.now()],
         },
       });

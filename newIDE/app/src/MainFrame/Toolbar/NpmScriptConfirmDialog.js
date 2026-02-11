@@ -19,7 +19,7 @@ function NpmScriptConfirmDialog({
   scriptNames,
   onConfirm,
   onDismiss,
-}: Props) {
+}: Props): React.Node {
   const [dontShowAgain, setDontShowAgain] = React.useState(false);
 
   const handleConfirm = React.useCallback(

@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import {
+  // $FlowFixMe[import-type-as-value]
   CommandManagerInterface,
   type Command,
   type NamedCommand,
@@ -14,6 +15,7 @@ class ScopedCommandManager implements CommandManagerInterface {
   _centralManager: CommandManagerInterface;
   _isActive: boolean;
 
+  // $FlowFixMe[missing-local-annot]
   constructor(centralCommandManager) {
     this._commands = {};
     this._isActive = false;
@@ -50,14 +52,17 @@ class ScopedCommandManager implements CommandManagerInterface {
     });
   };
 
+  // $FlowFixMe[missing-local-annot]
   getAllNamedCommands = () => {
+    // $FlowFixMe[missing-type-arg]
     return Object.keys(this._commands).map<NamedCommand>(commandName => {
       const cmd = this._commands[commandName];
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
       return { ...cmd, name: commandName };
     });
   };
 
+  // $FlowFixMe[missing-local-annot]
   getNamedCommand = (commandName: CommandName) => {
     const command = this._commands[commandName];
     if (command) return { name: commandName, ...(command: Command) };
@@ -70,7 +75,7 @@ type Props = {|
   active: boolean,
 |};
 
-const CommandsContextScopedProvider = (props: Props) => {
+const CommandsContextScopedProvider = (props: Props): React.Node => {
   const centralManager = React.useContext(CommandsContext);
   const scopedManager = useValueWithInit(
     () => new ScopedCommandManager(centralManager)

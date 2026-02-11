@@ -61,7 +61,11 @@ export type SoundPlayerInterface = {|
   playPause: (forcePlay: boolean) => void,
 |};
 
-const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
+// $FlowFixMe[prop-missing]
+const SoundPlayer: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<SoundPlayerInterface> },
+  React.RefSetter<SoundPlayerInterface>
+> = React.forwardRef<Props, SoundPlayerInterface>(
   (
     {
       soundSrc,
@@ -84,6 +88,7 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
     const [isPlaying, setIsPlaying] = React.useState(false);
 
     const onWaveSurferReady = React.useCallback(
+      // $FlowFixMe[missing-local-annot]
       ws => {
         waveSurferRef.current = ws;
         setDuration(Math.ceil(ws.getDuration()));
@@ -161,6 +166,7 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
       setIsPlaying(false);
     }, []);
 
+    // $FlowFixMe[incompatible-type]
     React.useImperativeHandle(ref, () => ({
       playPause: onPlayPause,
     }));

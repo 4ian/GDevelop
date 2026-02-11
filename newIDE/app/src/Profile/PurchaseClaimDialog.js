@@ -52,7 +52,7 @@ type Props = {|
 const PurchaseClaimDialog = ({
   claimedProductOptions: { productListingData, purchaseId, claimableToken },
   onClose,
-}: Props) => {
+}: Props): null | React.Node => {
   const {
     getAuthorizationHeader,
     profile,

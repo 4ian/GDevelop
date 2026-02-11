@@ -27,7 +27,7 @@ export const PropertyField = ({
   objectConfiguration,
   propertyName,
   onChange,
-}: PropertyFieldProps) => {
+}: PropertyFieldProps): React.Node => {
   const forceUpdate = useForceUpdate();
   const properties = objectConfiguration.getProperties();
 
@@ -82,7 +82,7 @@ export const PropertyField = ({
 export const PropertyCheckbox = ({
   objectConfiguration,
   propertyName,
-}: PropertyFieldProps) => {
+}: PropertyFieldProps): React.Node => {
   const forceUpdate = useForceUpdate();
   const properties = objectConfiguration.getProperties();
 
@@ -129,7 +129,7 @@ export const PropertyResourceSelector = ({
   projectScopedContainersAccessor,
   resourceManagementProps,
   onChange,
-}: PropertyResourceSelectorProps) => {
+}: PropertyResourceSelectorProps): React.Node => {
   const forceUpdate = useForceUpdate();
   const { current: resourcesLoader } = React.useRef(ResourcesLoader);
   const properties = objectConfiguration.getProperties();
@@ -153,7 +153,7 @@ export const PropertyResourceSelector = ({
     <ResourceSelector
       project={project}
       projectScopedContainersAccessor={projectScopedContainersAccessor}
-      // $FlowExpectedError
+      // $FlowFixMe[incompatible-type]
       resourceKind={extraInfos.size() > 0 ? extraInfos.at(0) : ''}
       floatingLabelText={label}
       resourceManagementProps={resourceManagementProps}

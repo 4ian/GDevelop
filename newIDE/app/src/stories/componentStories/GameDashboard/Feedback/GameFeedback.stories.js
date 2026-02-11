@@ -23,10 +23,11 @@ import { getPaperDecorator } from '../../../PaperDecorator';
 export default {
   title: 'GameDashboard/Feedback/GameFeedback',
   component: GameFeedback,
-  decorators: [getPaperDecorator('medium')],
+  // $FlowFixMe[cannot-resolve-name]
+  decorators: [(getPaperDecorator('medium'): StoryDecorator)],
 };
 
-export const DefaultGameFeedback = () => {
+export const DefaultGameFeedback = (): React.Node => {
   const mock = new MockAdapter(Axios);
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)
@@ -51,7 +52,7 @@ export const DefaultGameFeedback = () => {
   );
 };
 
-export const GameFeedbackOneSolvedComment = () => {
+export const GameFeedbackOneSolvedComment = (): React.Node => {
   const mock = new MockAdapter(Axios);
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)
@@ -76,7 +77,7 @@ export const GameFeedbackOneSolvedComment = () => {
   );
 };
 
-export const GameFeedbackWithError = () => {
+export const GameFeedbackWithError = (): React.Node => {
   const mock = new MockAdapter(Axios);
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)
@@ -101,7 +102,7 @@ export const GameFeedbackWithError = () => {
   );
 };
 
-export const GameFeedbackEmpty = () => {
+export const GameFeedbackEmpty = (): React.Node => {
   const mock = new MockAdapter(Axios);
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)

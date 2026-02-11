@@ -21,6 +21,7 @@ import { CorsAwareImage } from '../UI/CorsAwareImage';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { type ClaimedProductOptions } from './PurchaseClaimDialog';
 
+// $FlowFixMe[missing-local-annot]
 const getStyles = ({ isMobile }) => {
   return {
     formContainer: {
@@ -64,7 +65,7 @@ const CreateAccountWithPurchaseClaimDialog = ({
   createAccountInProgress,
   error,
   claimedProductOptions: { productListingData: claimedProduct },
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const styles = getStyles({ isMobile });
   const [email, setEmail] = React.useState<string>('');

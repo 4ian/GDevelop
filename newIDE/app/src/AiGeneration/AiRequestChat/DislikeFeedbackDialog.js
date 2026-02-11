@@ -23,7 +23,7 @@ export const DislikeFeedbackDialog = ({
   open,
   onClose,
   onSendFeedback,
-}: DislikeFeedbackDialogProps) => {
+}: DislikeFeedbackDialogProps): React.Node => {
   const [selectedReason, setSelectedReason] = React.useState<?string>(null);
   const [freeFormDetails, setFreeFormDetails] = React.useState<string>('');
 

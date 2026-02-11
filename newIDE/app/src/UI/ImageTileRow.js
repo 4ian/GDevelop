@@ -38,7 +38,7 @@ const ImageTileRow = ({
   getColumnsFromWindowSize,
   seeAllLabel,
   margin,
-}: ImageTileRowProps) => {
+}: ImageTileRowProps): React.Node => {
   return (
     <>
       <LineStackLayout

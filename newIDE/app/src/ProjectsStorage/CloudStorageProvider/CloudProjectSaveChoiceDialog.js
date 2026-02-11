@@ -21,7 +21,7 @@ const CloudProjectRecoveryDialog = ({
   isLoading,
   onSaveAsDuplicate,
   onSaveAsMainVersion,
-}: Props) => {
+}: Props): React.Node => {
   const actions = [
     <FlatButton
       disabled={isLoading}

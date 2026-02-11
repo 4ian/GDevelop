@@ -23,6 +23,7 @@ import { type DraggedItem } from '../DragAndDrop/DragSourceAndDropTarget';
 import classNames from 'classnames';
 import { TreeViewRightPrimaryButton } from './TreeViewRightPrimaryButton';
 
+// $FlowFixMe[missing-local-annot]
 const stopPropagation = e => e.stopPropagation();
 
 const DELAY_BEFORE_OPENING_FOLDER_ON_DRAG_HOVER = 800;
@@ -107,6 +108,7 @@ const SemiControlledRowInput = ({
   );
 };
 
+// $FlowFixMe[missing-local-annot]
 const memoized = memoizeOne((initialValue, callback) => callback());
 
 type Props<Item> = {|
@@ -117,6 +119,7 @@ type Props<Item> = {|
   isScrolling?: boolean,
 |};
 
+// $FlowFixMe[missing-local-annot]
 const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   const { data, index, style } = props;
   const {
@@ -147,6 +150,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   >('before');
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const openContextMenu = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     ({ clientX, clientY }) => {
       onContextMenu({
         index: index,
@@ -163,6 +167,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   });
 
   const onClickItem = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     event => {
       if (!node || node.item.isPlaceholder) return;
       if (node.item.isRoot) {
@@ -176,6 +181,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   );
 
   const onDoubleClickItem = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     e => {
       if (!node || !node.hasChildren || node.disableCollapse) return;
       onOpen(node);
@@ -268,10 +274,11 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
               name: node.name,
               thumbnail: node.thumbnailSrc || undefined,
               is3D:
-                // $FlowFixMe
+                // $FlowFixMe[incompatible-type]
+                // $FlowFixMe[prop-missing]
                 !!node.item.content &&
                 !!node.item.content.is3D &&
-                // $FlowFixMe
+                // $FlowFixMe[incompatible-type]
                 node.item.content.is3D(),
             };
             return draggedItem;
@@ -577,5 +584,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   );
 };
 
-// $FlowFixMe - memo does not support having a generic in the props.
-export default React.memo<Props>(TreeViewRow, areEqual);
+// $FlowFixMe[incompatible-type] - memo does not support having a generic in the props.
+// $FlowFixMe[missing-type-arg]
+export default (React.memo<Props>(
+  TreeViewRow,
+  areEqual
+): React.ComponentType<any>);

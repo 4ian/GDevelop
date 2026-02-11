@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+// $FlowFixMe[import-type-as-value]
 import { I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 import {
@@ -31,10 +32,12 @@ const chartMargins = {
 // in a flexbox component. check https://github.com/recharts/recharts/issues/172
 const chartWidth = '99%';
 
+// $FlowFixMe[missing-local-annot]
 const minutesFormatter = value => {
   return value.toFixed(2);
 };
 
+// $FlowFixMe[missing-local-annot]
 const percentFormatter = value => {
   return value.toFixed(2);
 };
@@ -101,7 +104,7 @@ export const SessionsChart = ({
   chartData,
   height,
   fontSize,
-}: ChartProps) => {
+}: ChartProps): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
 
@@ -160,7 +163,7 @@ export const BounceRateChart = ({
   chartData,
   height,
   fontSize,
-}: ChartProps) => {
+}: ChartProps): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
 
@@ -210,7 +213,7 @@ export const MeanPlayTimeChart = ({
   chartData,
   height,
   fontSize,
-}: ChartProps) => {
+}: ChartProps): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
 
@@ -260,7 +263,7 @@ export const PlayersRepartitionPerDurationChart = ({
   chartData,
   height,
   fontSize,
-}: ChartProps) => {
+}: ChartProps): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
   return (
@@ -314,7 +317,7 @@ export const PlayersDurationPerDayChart = ({
   chartData,
   height,
   fontSize,
-}: ChartProps) => {
+}: ChartProps): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const styles = getChartsStyleFromTheme(gdevelopTheme);
 

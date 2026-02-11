@@ -212,10 +212,11 @@ export type InstructionOrObjectSelectorInterface = {|
   reEnumerateInstructions: (i18n: I18nType) => void,
 |};
 
-const InstructionOrObjectSelector = React.forwardRef<
-  Props,
-  InstructionOrObjectSelectorInterface
->(
+// $FlowFixMe[prop-missing]
+const InstructionOrObjectSelector: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<InstructionOrObjectSelectorInterface> },
+  React.RefSetter<InstructionOrObjectSelectorInterface>
+> = React.forwardRef<Props, InstructionOrObjectSelectorInterface>(
   (
     {
       project,
@@ -282,6 +283,7 @@ const InstructionOrObjectSelector = React.forwardRef<
     // in different attributes of the object. Objects, groups and folders search is
     // directly handled by the tree view since they only have one field and their name
     // are straightforward.
+    // $FlowFixMe[value-as-type]
     const instructionSearchApiRef = React.useRef<Fuse>(
       new Fuse(allInstructionsInfoRef.current, {
         ...sharedFuseConfiguration,
@@ -425,6 +427,7 @@ const InstructionOrObjectSelector = React.forwardRef<
             treeView.scrollToItem(itemToSelect, 'start');
           }
         } else if (chosenInstructionType) {
+          // $FlowFixMe[invalid-declaration]
           let itemToSelect;
 
           const treeView = freeInstructionTreeViewRef.current;
@@ -441,6 +444,7 @@ const InstructionOrObjectSelector = React.forwardRef<
               }
             }
           }
+          // $FlowFixMe[constant-condition]
           if (itemToSelect) {
             setSelectedItem(itemToSelect);
             treeView.scrollToItem(itemToSelect, 'start');
@@ -519,9 +523,11 @@ const InstructionOrObjectSelector = React.forwardRef<
 
     const isSearching = !!searchText;
 
+    // $FlowFixMe[missing-empty-array-annot]
     let filteredInstructionsList = [];
 
     if (isSearching) {
+      // $FlowFixMe[incompatible-type]
       filteredInstructionsList = searchResults.instructions;
     }
     const displayedInstructionsList = filteredInstructionsList.slice(
@@ -559,6 +565,7 @@ const InstructionOrObjectSelector = React.forwardRef<
 
     const labels = React.useMemo(() => getLabelsForContainers(scope), [scope]);
 
+    // $FlowFixMe[missing-local-annot]
     const getFreeInstructionsTreeViewItems = i18n =>
       [
         ...createFreeInstructionTreeViewItem({
@@ -580,6 +587,7 @@ const InstructionOrObjectSelector = React.forwardRef<
           : null,
       ].filter(Boolean);
 
+    // $FlowFixMe[missing-local-annot]
     const getTreeViewItems = i18n =>
       [
         new ObjectFolderTreeViewItem({
@@ -654,6 +662,7 @@ const InstructionOrObjectSelector = React.forwardRef<
                 'instructions',
                 i18n._(isCondition ? t`Conditions` : t`Actions`)
               ),
+              // $FlowFixMe[incompatible-type]
               [
                 ...displayedInstructionsList.map(searchResult => {
                   return new LeafTreeViewItem(

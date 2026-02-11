@@ -53,7 +53,7 @@ export const AnnouncementsFeed = ({
   canClose,
   addMargins,
   hideLoader,
-}: AnnouncementsFeedProps) => {
+}: AnnouncementsFeedProps): null | React.Node => {
   const {
     announcements,
     error,

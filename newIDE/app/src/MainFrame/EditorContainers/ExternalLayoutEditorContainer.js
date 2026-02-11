@@ -56,6 +56,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
 > {
   editor: ?SceneEditor;
   resourceExternallyChangedCallbackId: ?string;
+  // $FlowFixMe[missing-local-annot]
   state = {
     externalPropertiesDialogOpen: false,
   };
@@ -64,7 +65,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
     return this.props.project;
   }
 
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     if (!this.props.isActive && nextProps.isActive) {
       this._setPreviewedLayout();
     }
@@ -80,6 +81,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
       this._setPreviewedLayout();
     }
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
+      // $FlowFixMe[method-unbinding]
       this.onResourceExternallyChanged.bind(this)
     );
   }
@@ -310,7 +312,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
     }
   };
 
-  render() {
+  render(): any {
     const { project, projectItemName, isActive } = this.props;
     const externalLayout = this.getExternalLayout();
     const layout = this.getLayout();
@@ -453,4 +455,4 @@ export class ExternalLayoutEditorContainer extends React.Component<
 
 export const renderExternalLayoutEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-) => <ExternalLayoutEditorContainer {...props} />;
+): React.Node => <ExternalLayoutEditorContainer {...props} />;

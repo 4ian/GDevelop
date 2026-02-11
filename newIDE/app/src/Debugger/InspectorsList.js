@@ -36,7 +36,8 @@ export default class InspectorsList extends React.Component<Props, void> {
     gameData: GameData,
     getInspectorDescriptions: InspectorDescriptionsGetter,
     path: Array<string>
-  ): Array<React$Element<any> | null> {
+    // $FlowFixMe[prop-missing]
+  ): Array<React.Element<any> | null> {
     return getInspectorDescriptions(gameData).map(inspectorDescription => {
       if (!inspectorDescription) return null;
       const fullInspectorPath = path.concat(inspectorDescription.key);
@@ -69,8 +70,9 @@ export default class InspectorsList extends React.Component<Props, void> {
     });
   }
 
-  render() {
+  render(): any {
     return this.props.gameData ? (
+      // $FlowFixMe[incompatible-type]
       <List style={styles.list}>
         {this._renderInspectorList(
           this.props.gameData,

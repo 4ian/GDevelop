@@ -26,7 +26,7 @@ const CompactToggleButtons = ({
   noSeparator,
   buttons,
   expand,
-}: CompactToggleButtonsProps) => {
+}: CompactToggleButtonsProps): React.MixedElement => {
   return (
     <div
       id={id}

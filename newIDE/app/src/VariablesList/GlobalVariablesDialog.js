@@ -26,7 +26,7 @@ const GlobalVariablesDialog = ({
   initiallySelectedVariableName,
   shouldCreateInitiallySelectedVariable,
   isListLocked,
-}: Props) => {
+}: Props): React.Node => {
   const onComputeAllVariableNames = React.useCallback(
     () =>
       EventsRootVariablesFinder.findAllGlobalVariables(
@@ -70,6 +70,7 @@ const GlobalVariablesDialog = ({
       onCancel={onCancel}
       onApply={onApply}
       title={<Trans>Global variables</Trans>}
+      // $FlowFixMe[incompatible-type]
       tabs={tabs}
       initiallySelectedVariableName={initiallySelectedVariableName}
       shouldCreateInitiallySelectedVariable={

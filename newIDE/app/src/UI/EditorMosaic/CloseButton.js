@@ -18,7 +18,7 @@ const styles = {
 
 type Props = {||};
 
-export default function CloseButton(props: Props) {
+export default function CloseButton(props: Props): React.Node {
   const { mosaicActions } = React.useContext(MosaicContext);
   const { mosaicWindowActions } = React.useContext(MosaicWindowContext);
 

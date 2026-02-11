@@ -16,7 +16,7 @@ import ProjectCache from '../../Utils/ProjectCache';
 const CLOUD_PROJECT_AUTOSAVE_PREFIX = 'cache-autosave:';
 let projectCache;
 
-export const getProjectCache = () => {
+export const getProjectCache = (): ProjectCache => {
   if (projectCache) return projectCache;
   projectCache = new ProjectCache();
   return projectCache;
@@ -34,7 +34,12 @@ class CloudProjectReadingError extends Error {
   }
 }
 
-export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
+export const generateOnOpen = (
+  authenticatedUser: AuthenticatedUser
+): ((
+  fileMetadata: FileMetadata,
+  onProgress?: (progress: number, message: MessageDescriptor) => void
+) => Promise<{ content: any }>) => async (
   fileMetadata: FileMetadata,
   onProgress?: (progress: number, message: MessageDescriptor) => void
 ): Promise<{|
@@ -106,7 +111,11 @@ export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
 
 export const generateOnEnsureCanAccessResources = (
   authenticatedUser: AuthenticatedUser
-) => async (
+): ((
+  project: gdProject,
+  fileMetadata: FileMetadata,
+  onProgress?: (progress: number, message: MessageDescriptor) => void
+) => Promise<void>) => async (
   project: gdProject,
   fileMetadata: FileMetadata,
   onProgress?: (progress: number, message: MessageDescriptor) => void
@@ -117,7 +126,12 @@ export const generateOnEnsureCanAccessResources = (
 
 export const generateGetAutoSaveCreationDate = (
   authenticatedUser: AuthenticatedUser
-) =>
+):
+  | ((
+      fileMetadata: FileMetadata,
+      compareLastModified: boolean
+    ) => Promise<?number>)
+  | void =>
   ProjectCache.isAvailable()
     ? async (
         fileMetadata: FileMetadata,
@@ -150,7 +164,9 @@ export const generateGetAutoSaveCreationDate = (
       }
     : undefined;
 
-export const generateOnGetAutoSave = (authenticatedUser: AuthenticatedUser) =>
+export const generateOnGetAutoSave = (
+  authenticatedUser: AuthenticatedUser
+): ((fileMetadata: FileMetadata) => Promise<FileMetadata>) | void =>
   ProjectCache.isAvailable()
     ? async (fileMetadata: FileMetadata): Promise<FileMetadata> => {
         return {

@@ -21,7 +21,7 @@ const styles = {
 
 // We create the style outside of this component to avoid it
 // being re-created at each render.
-export const useStylesForArrowButtons = () =>
+export const useStylesForArrowButtons = (): any =>
   makeStyles(theme =>
     createStyles({
       root: {
@@ -53,7 +53,7 @@ const SlideshowArrow = ({
   onClick,
   position,
   classes,
-}: SlideshowArrowProps) => {
+}: SlideshowArrowProps): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (

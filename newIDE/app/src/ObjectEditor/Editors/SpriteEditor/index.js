@@ -54,7 +54,7 @@ export default function SpriteEditor({
   onObjectUpdated,
   isChildObject,
   renderObjectNameField,
-}: SpriteEditorProps) {
+}: SpriteEditorProps): React.Node {
   const [pointsEditorOpen, setPointsEditorOpen] = React.useState(false);
   const [advancedOptionsOpen, setAdvancedOptionsOpen] = React.useState(false);
   const [
@@ -180,6 +180,7 @@ export default function SpriteEditor({
                   onClick={() => setCollisionMasksEditorOpen(true)}
                   disabled={!hasAnyFrame(animations)}
                   buildMenuTemplate={i18n =>
+                    // $FlowFixMe[incompatible-type]
                     [
                       {
                         label: i18n._(t`Edit points`),

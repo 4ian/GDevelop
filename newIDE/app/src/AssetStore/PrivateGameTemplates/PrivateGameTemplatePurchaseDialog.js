@@ -35,7 +35,7 @@ const PrivateGameTemplatePurchaseDialog = ({
   usageType,
   onClose,
   simulateAppStoreProduct,
-}: Props) => {
+}: Props): React.Node => {
   const {
     profile,
     onOpenLoginDialog,

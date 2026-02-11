@@ -209,7 +209,10 @@ export type PreferencesValues = {|
   showExperimentalExtensions: boolean,
   showCreateSectionByDefault: boolean,
   showInAppTutorialDeveloperMode: boolean,
-  showDeprecatedInstructionWarning: boolean,
+  showDeprecatedInstructionWarning:
+    | 'no'
+    | 'icon'
+    | 'icon-and-deprecated-warning-text',
   openDiagnosticReportAutomatically: boolean,
   use3DEditor: boolean,
   showBasicProfilingCounters: boolean,
@@ -309,8 +312,13 @@ export type Preferences = {|
   setShowInAppTutorialDeveloperMode: (enabled: boolean) => void,
   setOpenDiagnosticReportAutomatically: (enabled: boolean) => void,
   getOpenDiagnosticReportAutomatically: () => boolean,
-  setShowDeprecatedInstructionWarning: (enabled: boolean) => void,
-  getShowDeprecatedInstructionWarning: () => boolean,
+  setShowDeprecatedInstructionWarning: (
+    value: 'no' | 'icon' | 'icon-and-deprecated-warning-text'
+  ) => void,
+  getShowDeprecatedInstructionWarning: () =>
+    | 'no'
+    | 'icon'
+    | 'icon-and-deprecated-warning-text',
   setUse3DEditor: (enabled: boolean) => void,
   getUse3DEditor: () => boolean,
   setShowBasicProfilingCounters: (enabled: boolean) => void,
@@ -394,7 +402,7 @@ export const initialPreferences = {
     showCreateSectionByDefault: false,
     showInAppTutorialDeveloperMode: false,
     openDiagnosticReportAutomatically: true,
-    showDeprecatedInstructionWarning: false,
+    showDeprecatedInstructionWarning: 'no',
     use3DEditor: isWebGLSupported(),
     showBasicProfilingCounters: false,
     inAppTutorialsProgress: {},
@@ -468,10 +476,12 @@ export const initialPreferences = {
   setShowExperimentalExtensions: () => {},
   setShowCreateSectionByDefault: (enabled: boolean) => {},
   setShowInAppTutorialDeveloperMode: (enabled: boolean) => {},
-  setShowDeprecatedInstructionWarning: (enabled: boolean) => {},
+  setShowDeprecatedInstructionWarning: (
+    value: 'no' | 'icon' | 'icon-and-deprecated-warning-text'
+  ) => {},
   getOpenDiagnosticReportAutomatically: () => true,
   setOpenDiagnosticReportAutomatically: (enabled: boolean) => {},
-  getShowDeprecatedInstructionWarning: () => false,
+  getShowDeprecatedInstructionWarning: () => 'no',
   setUse3DEditor: (enabled: boolean) => {},
   getUse3DEditor: () => false,
   setShowBasicProfilingCounters: (enabled: boolean) => {},

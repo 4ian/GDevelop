@@ -140,6 +140,7 @@ def main():
             lines = f.readlines()
         
         modified = False
+        converted_indices = set()
         for idx in sorted(fixme_indices):
             if idx >= len(lines):
                 continue
@@ -155,10 +156,15 @@ def main():
                     lines[idx] = f'{indent}{{/* {fixme} */}}\n'
                 modified = True
                 fixes_count += 1
+                converted_indices.add(idx)
 
         # If a JSX-style FlowFixMe ended up outside JSX (can happen with noisy
         # parse errors), restore it back to normal // comment syntax.
+        # Skip indices that were just converted from Flow error analysis -
+        # those are known to be in JSX context even if the heuristic can't tell.
         for idx, line in enumerate(lines):
+            if idx in converted_indices:
+                continue
             m = re.match(r'^(\s*)\{/\*\s*(\$FlowFixMe\[[^\]]+\])(?:\s+(.*?))?\s*\*/\}\s*$', line.rstrip())
             if not m:
                 continue

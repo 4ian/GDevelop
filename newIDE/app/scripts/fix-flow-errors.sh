@@ -177,6 +177,139 @@ find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
   s/selectedCompletionIndex !== null/selectedCompletionIndex != null/g;
 ' {} +
 
+# 4. Fix inline object return types on multi-line arrow function params
+#    that fix-arrow-return-types.py couldn't handle (nested parens in destructured args).
+#    Pattern: ): { ... } => { (where the object return type causes prettier parse error)
+python3 << 'PYEOF'
+import os, re, subprocess
+
+app_dir = os.environ.get('APP_DIR', os.getcwd())
+
+# Find files with prettier parse errors
+result = subprocess.run(
+    ['npx', 'prettier', '--list-different', 'src/!(locales)/**/*.js'],
+    capture_output=True, text=True, cwd=app_dir, timeout=120
+)
+all_output = result.stdout + '\n' + result.stderr
+error_files = set()
+for line in all_output.split('\n'):
+    m = re.match(r'\[error\]\s+(src/\S+\.js):\s+SyntaxError', line)
+    if m:
+        error_files.add(os.path.join(app_dir, m.group(1)))
+
+fixed = 0
+for filepath in error_files:
+    if not os.path.isfile(filepath):
+        continue
+    with open(filepath) as f:
+        content = f.read()
+    original = content
+
+    # Find ): { ... } => patterns (multi-line object return types)
+    # This regex works on the whole content to find the ): { ... } => pattern
+    # We need to use a balanced-brace approach
+    pos = 0
+    replacements = []
+    while True:
+        idx = content.find('):', pos)
+        if idx == -1:
+            break
+        # Check if followed by whitespace then {
+        rest = content[idx+2:].lstrip()
+        if not rest.startswith('{'):
+            pos = idx + 2
+            continue
+        brace_start = content.index('{', idx + 2)
+        # Find matching close brace
+        depth = 0
+        i = brace_start
+        while i < len(content):
+            if content[i] == '{':
+                depth += 1
+            elif content[i] == '}':
+                depth -= 1
+                if depth == 0:
+                    break
+            elif content[i] in ('"', "'", '`'):
+                q = content[i]
+                i += 1
+                while i < len(content) and content[i] != q:
+                    if content[i] == '\\':
+                        i += 1
+                    i += 1
+            i += 1
+        if depth != 0:
+            pos = idx + 2
+            continue
+        brace_end = i
+        # Check if followed by => (arrow)
+        after = content[brace_end+1:].lstrip()
+        if not after.startswith('=>'):
+            pos = idx + 2
+            continue
+        type_text = content[brace_start:brace_end+1]
+        if '\n' not in type_text:
+            pos = idx + 2
+            continue
+        # Find function name for type alias
+        line_start = content.rfind('\n', 0, idx)
+        if line_start == -1:
+            line_start = 0
+        # Find export const/let/var name = ... pattern
+        preceding = content[max(0, line_start-200):idx+2]
+        name_match = re.search(r'(?:const|let|var|function)\s+(\w+)', preceding)
+        name = name_match.group(1) if name_match else 'Func'
+        type_name = f'_{name[0].upper()}{name[1:]}ReturnType'
+        # Check if type alias already exists
+        if f'type {type_name}' in content:
+            pos = idx + 2
+            continue
+        replacements.append((brace_start, brace_end+1, type_name, type_text))
+        pos = brace_end + 1
+
+    if not replacements:
+        continue
+
+    # Apply in reverse
+    for brace_start, brace_end, type_name, type_text in reversed(replacements):
+        content = content[:brace_start] + type_name + content[brace_end:]
+
+    # Insert type declarations at the top (after imports)
+    insert_lines = []
+    for _, _, type_name, type_text in replacements:
+        insert_lines.append(f'type {type_name} = {type_text};\n')
+
+    # Find insertion point (after last import)
+    last_import = 0
+    for m in re.finditer(r'^(?:import\s|from\s)', content, re.MULTILINE):
+        eol = content.find('\n', m.start())
+        # Handle multi-line imports
+        if '{' in content[m.start():eol] and '}' not in content[m.start():eol]:
+            eol = content.find('}', eol)
+            eol = content.find('\n', eol)
+        # Handle from '...' on next line
+        next_line_start = eol + 1
+        if next_line_start < len(content):
+            next_stripped = content[next_line_start:].lstrip()
+            if next_stripped.startswith("from ") or next_stripped.startswith("} from "):
+                eol = content.find('\n', next_line_start)
+        if eol > last_import:
+            last_import = eol
+    if last_import > 0:
+        insert_pos = last_import + 1
+    else:
+        insert_pos = 0
+    insert_text = '\n' + ''.join(insert_lines) + '\n'
+    content = content[:insert_pos] + insert_text + content[insert_pos:]
+
+    if content != original:
+        with open(filepath, 'w') as f:
+            f.write(content)
+        fixed += 1
+
+print(f"  Fixed {fixed} additional arrow-return-type files")
+PYEOF
+
 echo "  Done."
 
 ###############################################################################
@@ -357,6 +490,40 @@ if os.path.isfile(sc_file):
         'areaWiseCommands[areaName].map((commandName: string) =>')
     if updated != content:
         with open(sc_file, 'w') as f:
+            f.write(updated)
+        fixed += 1
+
+# Fix ProjectManager/index.js - useState(null) needs type param for ?gdLayout
+pm_file = os.path.join(app_dir, 'src/ProjectManager/index.js')
+if os.path.isfile(pm_file):
+    with open(pm_file) as f:
+        content = f.read()
+    updated = content
+    # Add type annotation to useState calls that should be ?gdLayout
+    updated = re.sub(
+        r'const \[editedPropertiesLayout, setEditedPropertiesLayout\] = React\.useState\(\s*\n\s*null\s*\n\s*\)',
+        'const [editedPropertiesLayout, setEditedPropertiesLayout] = React.useState<?gdLayout>(\n      null\n    )',
+        updated)
+    updated = re.sub(
+        r'const \[editedVariablesLayout, setEditedVariablesLayout\] = React\.useState\(\s*\n\s*null\s*\n\s*\)',
+        'const [editedVariablesLayout, setEditedVariablesLayout] = React.useState<?gdLayout>(\n      null\n    )',
+        updated)
+    if updated != content:
+        with open(pm_file, 'w') as f:
+            f.write(updated)
+        fixed += 1
+
+# Fix CollisionMasksPreview.js - use type cast for inexact/exact mismatch
+cmp_file = os.path.join(app_dir, 'src/ObjectEditor/Editors/SpriteEditor/CollisionMasksEditor/CollisionMasksPreview.js')
+if os.path.isfile(cmp_file):
+    with open(cmp_file) as f:
+        content = f.read()
+    # Cast polygons to any to bypass inexact/exact mismatch
+    updated = content.replace(
+        'mapVector(polygons,',
+        'mapVector((polygons: any),')
+    if updated != content:
+        with open(cmp_file, 'w') as f:
             f.write(updated)
         fixed += 1
 

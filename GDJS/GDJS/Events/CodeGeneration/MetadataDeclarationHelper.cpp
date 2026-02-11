@@ -486,8 +486,6 @@ gd::String MetadataDeclarationHelper::GetDefaultSentence(
 };
 
 gd::String MetadataDeclarationHelper::GetFreeFunctionSentence(const gd::EventsFunction &eventsFunction) {
-  // Note: [DEPRECATED] prefix is now added in the UI layer (Instruction.js)
-  // based on user preference "showDeprecatedInstructionWarning"
   return GetTranslation(eventsFunction.GetSentence()).empty()
              ? GetDefaultSentence(eventsFunction, 0, 1)
              : GetTranslation(eventsFunction.GetSentence());

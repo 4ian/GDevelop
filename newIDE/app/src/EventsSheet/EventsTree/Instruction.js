@@ -313,7 +313,6 @@ const Instruction = (props: Props) => {
             if (showDeprecatedInstructionWarning) {
               hasDeprecationWarning = validationResult.hasDeprecationWarning();
             }
-            validationResult.delete();
             // TODO Move this code inside `InstructionValidator.isParameterValid`
             if (
               expressionIsValid &&

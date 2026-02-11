@@ -25,6 +25,18 @@ export default class InstancesRotator {
    */
   _fixedPoint: [number, number] = [0, 0];
 
+  /**
+   * The initial rotation button position, used to calculate the correct
+   * initial angle when the selection is already rotated.
+   */
+  _initialButtonPosition: [number, number] | null = null;
+
+  /**
+   * The initial angle offset calculated from the button position.
+   * This is subtracted from the calculated angle to prevent jumps.
+   */
+  _initialAngleOffset: number = 0;
+
   constructor(instanceMeasurer: InstanceMeasurer) {
     this._instanceMeasurer = instanceMeasurer;
   }
@@ -38,7 +50,8 @@ export default class InstancesRotator {
     const angle =
       (Math.atan2(this.totalDeltaY, this.totalDeltaX) * 180) / Math.PI +
       90 +
-      initialAngle;
+      initialAngle -
+      this._initialAngleOffset;
     return proportional ? Math.round(angle / 15) * 15 : angle;
   }
 
@@ -92,9 +105,20 @@ export default class InstancesRotator {
       this._fixedPoint[0] = selectionAABB.centerX();
       this._fixedPoint[1] = selectionAABB.centerY();
 
-      // Because the button is on top, consider the initial rotation vector to
-      // be directed to the top.
-      this.totalDeltaY -= selectionAABB.height() / 2;
+      // If we have an initial button position set, use it to calculate the initial vector
+      if (this._initialButtonPosition) {
+        this.totalDeltaX += this._initialButtonPosition[0] - this._fixedPoint[0];
+        this.totalDeltaY += this._initialButtonPosition[1] - this._fixedPoint[1];
+
+        // Calculate the initial angle offset from the button position
+        // This is the angle that the button currently represents
+        this._initialAngleOffset =
+          (Math.atan2(this.totalDeltaY, this.totalDeltaX) * 180) / Math.PI + 90;
+      } else {
+        // Fallback: assume the button is on top (for backwards compatibility)
+        this.totalDeltaY -= selectionAABB.height() / 2;
+        this._initialAngleOffset = 0;
+      }
     }
 
     this.totalDeltaX += deltaX;
@@ -139,6 +163,10 @@ export default class InstancesRotator {
     }
   }
 
+  setInitialButtonPosition(x: number, y: number) {
+    this._initialButtonPosition = [x, y];
+  }
+
   endRotate() {
     this._instanceAngles = {};
     this._instancePositions = {};
@@ -146,5 +174,7 @@ export default class InstancesRotator {
     this.totalDeltaX = 0;
     this.totalDeltaY = 0;
     this._fixedPointIsUpToDate = false;
+    this._initialButtonPosition = null;
+    this._initialAngleOffset = 0;
   }
 }

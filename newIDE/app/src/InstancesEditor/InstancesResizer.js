@@ -68,6 +68,12 @@ export default class InstancesResizer {
    */
   _temporaryGrabbingPosition: [number, number] = [0, 0];
 
+  /**
+   * The initial grabbing position, used when handles are on rotated corners
+   * rather than AABB corners.
+   */
+  _initialGrabbingPosition: [number, number] | null = null;
+
   constructor({
     instanceMeasurer,
     instancesEditorSettings,
@@ -81,6 +87,10 @@ export default class InstancesResizer {
 
   setInstancesEditorSettings(instancesEditorSettings: InstancesEditorSettings) {
     this.instancesEditorSettings = instancesEditorSettings;
+  }
+
+  setInitialGrabbingPosition(x: number, y: number) {
+    this._initialGrabbingPosition = [x, y];
   }
 
   _getOrCreateInstanceAABB(instance: gdInitialInstance) {
@@ -156,12 +166,23 @@ export default class InstancesResizer {
     // Round the grabbed handle position on the grid.
     const grabbingRelativePosition =
       resizeGrabbingRelativePositions[grabbingLocation];
-    const initialGrabbingX =
-      initialSelectionAABB.left +
-      initialSelectionAABB.width() * grabbingRelativePosition[0];
-    const initialGrabbingY =
-      initialSelectionAABB.top +
-      initialSelectionAABB.height() * grabbingRelativePosition[1];
+    let initialGrabbingX;
+    let initialGrabbingY;
+
+    // Use the provided initial grabbing position if available (for rotated instances)
+    // Otherwise calculate from the AABB (for non-rotated or multi-selection)
+    if (this._initialGrabbingPosition) {
+      initialGrabbingX = this._initialGrabbingPosition[0];
+      initialGrabbingY = this._initialGrabbingPosition[1];
+    } else {
+      initialGrabbingX =
+        initialSelectionAABB.left +
+        initialSelectionAABB.width() * grabbingRelativePosition[0];
+      initialGrabbingY =
+        initialSelectionAABB.top +
+        initialSelectionAABB.height() * grabbingRelativePosition[1];
+    }
+
     const grabbingPosition = this._temporaryGrabbingPosition;
     grabbingPosition[0] = initialGrabbingX + this.totalDeltaX;
     grabbingPosition[1] = initialGrabbingY + this.totalDeltaY;
@@ -378,5 +399,6 @@ export default class InstancesResizer {
     this._instancePositions = {};
     this.totalDeltaX = 0;
     this.totalDeltaY = 0;
+    this._initialGrabbingPosition = null;
   }
 }

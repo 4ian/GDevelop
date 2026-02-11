@@ -205,6 +205,81 @@ export default class LayerRenderer {
             objectName,
             duration
           );
+
+          // Set hitArea to match the full instance bounds so that
+          // selection works by clicking anywhere in the object's
+          // bounding box, not just on visible pixels.
+          // This fixes e.g. text objects whose custom size is larger
+          // than the rendered text (see https://github.com/4ian/GDevelop/issues/1042).
+          if (pixiObject) {
+            const hasCustomSize = instance.hasCustomSize();
+            const instanceWidth = hasCustomSize
+              ? instance.getCustomWidth()
+              : renderedInstance.getDefaultWidth();
+            const instanceHeight = hasCustomSize
+              ? instance.getCustomHeight()
+              : renderedInstance.getDefaultHeight();
+            const instanceLeft =
+              instance.getX() - renderedInstance.getOriginX();
+            const instanceTop = instance.getY() - renderedInstance.getOriginY();
+
+            const angle = (instance.getAngle() * Math.PI) / 180;
+            const isFlippedX = instance.isFlippedX();
+            const isFlippedY = instance.isFlippedY();
+
+            // If the instance is rotated or flipped, use a polygon for accurate hit detection
+            if (angle !== 0 || isFlippedX || isFlippedY) {
+              // Compute the corners of the unrotated/unflipped rectangle
+              const unrotatedLeft = instanceLeft;
+              const unrotatedTop = instanceTop;
+              const unrotatedRight = unrotatedLeft + instanceWidth;
+              const unrotatedBottom = unrotatedTop + instanceHeight;
+
+              // Create a polygon representing the corners
+              const corners: Polygon = [
+                [unrotatedLeft, unrotatedTop],
+                [unrotatedLeft, unrotatedBottom],
+                [unrotatedRight, unrotatedBottom],
+                [unrotatedRight, unrotatedTop],
+              ];
+
+              // Get the center point for rotation
+              const centerX = unrotatedLeft + renderedInstance.getCenterX();
+              const centerY = unrotatedTop + renderedInstance.getCenterY();
+
+              // Apply flip and rotation transformations
+              flipPolygon(corners, centerX, centerY, isFlippedX, isFlippedY);
+              rotatePolygon(corners, centerX, centerY, angle);
+
+              // Convert the rotated corners to local coordinates relative to pixiObject
+              const sx = pixiObject.scale.x || 1;
+              const sy = pixiObject.scale.y || 1;
+              const localPoints = [];
+              for (let i = 0; i < corners.length; i++) {
+                const rawX = (corners[i][0] - pixiObject.position.x) / sx;
+                const rawY = (corners[i][1] - pixiObject.position.y) / sy;
+                localPoints.push(rawX, rawY);
+              }
+
+              pixiObject.hitArea = new PIXI.Polygon(localPoints);
+            } else {
+              // For non-rotated instances, use a simple rectangle (more efficient)
+              const sx = pixiObject.scale.x || 1;
+              const sy = pixiObject.scale.y || 1;
+              const rawX = (instanceLeft - pixiObject.position.x) / sx;
+              const rawY = (instanceTop - pixiObject.position.y) / sy;
+              const rawW = instanceWidth / sx;
+              const rawH = instanceHeight / sy;
+
+              if (!pixiObject.hitArea || pixiObject.hitArea instanceof PIXI.Polygon) {
+                pixiObject.hitArea = new PIXI.Rectangle();
+              }
+              pixiObject.hitArea.x = rawW >= 0 ? rawX : rawX + rawW;
+              pixiObject.hitArea.y = rawH >= 0 ? rawY : rawY + rawH;
+              pixiObject.hitArea.width = Math.abs(rawW);
+              pixiObject.hitArea.height = Math.abs(rawH);
+            }
+          }
         }
 
         if (renderedInstance instanceof Rendered3DInstance) {

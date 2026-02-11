@@ -19,6 +19,7 @@ export type InstanceMeasurer = {|
   getInstanceAABB: (gdInitialInstance, Rectangle) => Rectangle,
   getUnrotatedInstanceAABB: (gdInitialInstance, Rectangle) => Rectangle,
   getUnrotatedInstanceSize: gdInitialInstance => [number, number, number],
+  getRendererOfInstance: (gdInitialInstance) => any | null,
 |};
 
 export default class InstancesRenderer {
@@ -175,6 +176,15 @@ export default class InstancesRenderer {
         }
 
         return layerRenderer.getUnrotatedInstanceSize(instance);
+      },
+      getRendererOfInstance: instance => {
+        const layerName = instance.getLayer();
+        const layerRenderer = this.layersRenderers[layerName];
+        if (!layerRenderer) {
+          return null;
+        }
+
+        return layerRenderer.getRendererOfInstance(instance);
       },
     };
   }

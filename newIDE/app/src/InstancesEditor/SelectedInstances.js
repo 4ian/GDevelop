@@ -14,6 +14,11 @@ import {
 import { type InstanceMeasurer } from './InstancesRenderer';
 import Rectangle from '../Utils/Rectangle';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
+import {
+  flipPolygon,
+  rotatePolygon,
+  type Polygon,
+} from '../Utils/PolygonHelper';
 
 type Props = {|
   instancesSelection: InstancesSelection,
@@ -33,6 +38,8 @@ type Props = {|
   onPanMove: (deltaX: number, deltaY: number, x: number, y: number) => void,
   onPanEnd: () => void,
   getFillColor: (isLocked: boolean) => {| color: number, alpha: number |},
+  instancesRotator: any,
+  instancesResizer: any,
 |};
 
 const getButtonSizes = (screenType: ScreenType) => {
@@ -65,6 +72,49 @@ const resizeGrabbingIconNames = {
   Left: 'ew-resize',
   Bottom: 'ns-resize',
   Right: 'ew-resize',
+};
+
+// Calculate the appropriate cursor for a resize direction based on rotation angle
+const getRotatedCursor = (
+  grabbingLocation: ResizeGrabbingLocation,
+  angleDegrees: number
+): string => {
+  // For corner handles, calculate the actual direction after rotation
+  const cornerDirections = {
+    TopLeft: -135, // northwest
+    TopRight: -45, // northeast
+    BottomRight: 45, // southeast
+    BottomLeft: 135, // southwest
+  };
+
+  if (cornerDirections[grabbingLocation] !== undefined) {
+    // Calculate actual angle of the handle direction
+    const handleAngle = (cornerDirections[grabbingLocation] + angleDegrees) % 360;
+    // Normalize to -180 to 180
+    const normalized = handleAngle > 180 ? handleAngle - 360 : handleAngle;
+
+    // Map to closest cursor (4 directions)
+    if (normalized >= -22.5 && normalized < 22.5) {
+      return 'ew-resize'; // horizontal
+    } else if (normalized >= 22.5 && normalized < 67.5) {
+      return 'nwse-resize'; // diagonal \
+    } else if (normalized >= 67.5 && normalized < 112.5) {
+      return 'ns-resize'; // vertical
+    } else if (normalized >= 112.5 && normalized < 157.5) {
+      return 'nesw-resize'; // diagonal /
+    } else if (normalized >= 157.5 || normalized < -157.5) {
+      return 'ew-resize'; // horizontal
+    } else if (normalized >= -157.5 && normalized < -112.5) {
+      return 'nesw-resize'; // diagonal /
+    } else if (normalized >= -112.5 && normalized < -67.5) {
+      return 'ns-resize'; // vertical
+    } else {
+      return 'nwse-resize'; // diagonal \
+    }
+  }
+
+  // For non-corner handles, return default
+  return resizeGrabbingIconNames[grabbingLocation] || 'default';
 };
 
 /**
@@ -103,6 +153,35 @@ export default class SelectedInstances {
    * associated of the proper interaction (buttonInteraction or viewMoving).
    */
   _currentPanMovingGoal: null | 'buttonInteraction' | 'viewMoving' = null;
+  /**
+   * The scene position of the rotate button, used to initialize rotation correctly
+   * when the selection is already rotated.
+   */
+  _rotateButtonScenePosition: [number, number] | null = null;
+  /**
+   * Track whether rotation has started to set initial button position only once
+   */
+  _rotationStarted: boolean = false;
+  /**
+   * Track whether resize has started to set initial grabbing position only once
+   */
+  _resizeStarted: boolean = false;
+  /**
+   * Store the scene positions of resize handles for rotated instances
+   * Format: [sceneX, sceneY, aabbGrabbingLocation]
+   */
+  _resizeHandleScenePositions: { [ResizeGrabbingLocation]: Array<any> } = {};
+  /**
+   * Store the current effective grabbing location (AABB-relative) for the active resize
+   */
+  _currentResizeGrabbingLocation: ResizeGrabbingLocation | null = null;
+  /**
+   * Store the cursor styles for each resize button (for rotated instances)
+   */
+  _resizeButtonCursors: { [ResizeGrabbingLocation]: string } = {};
+
+  instancesRotator: any;
+  instancesResizer: any;
 
   constructor({
     instancesSelection,
@@ -118,6 +197,8 @@ export default class SelectedInstances {
     onPanMove,
     onPanEnd,
     getFillColor,
+    instancesRotator,
+    instancesResizer,
   }: Props) {
     this.instanceMeasurer = instanceMeasurer;
     this.onResize = onResize;
@@ -132,18 +213,38 @@ export default class SelectedInstances {
     this.onPanMove = onPanMove;
     this.onPanEnd = onPanEnd;
     this.getFillColor = getFillColor;
+    this.instancesRotator = instancesRotator;
+    this.instancesResizer = instancesResizer;
 
     this.pixiContainer.addChild(this.rectanglesContainer);
 
     for (const resizeGrabbingLocation of resizeGrabbingLocationValues) {
       const resizeButton = new PIXI.Graphics();
+      // Store the grabbing location on the button so we can look up the cursor later
+      resizeButton._grabbingLocation = resizeGrabbingLocation;
       this.resizeButtons[resizeGrabbingLocation] = resizeButton;
       this._makeButton({
         objectButton: resizeButton,
         onMove: event => {
-          this.onResize(event.deltaX, event.deltaY, resizeGrabbingLocation);
+          // On the first resize movement, set the initial grabbing position and effective location
+          if (!this._resizeStarted && this._resizeHandleScenePositions[resizeGrabbingLocation] && this.instancesResizer) {
+            this._resizeStarted = true;
+            const handleData = this._resizeHandleScenePositions[resizeGrabbingLocation];
+            this.instancesResizer.setInitialGrabbingPosition(handleData[0], handleData[1]);
+            // Use the AABB-relative location if available (for rotated instances)
+            if (handleData.length > 2 && handleData[2]) {
+              this._currentResizeGrabbingLocation = handleData[2];
+            } else {
+              this._currentResizeGrabbingLocation = resizeGrabbingLocation;
+            }
+          }
+          // Use the stored effective location for all resize calls
+          const effectiveLocation = this._currentResizeGrabbingLocation || resizeGrabbingLocation;
+          this.onResize(event.deltaX, event.deltaY, effectiveLocation);
         },
         onEnd: () => {
+          this._resizeStarted = false;
+          this._currentResizeGrabbingLocation = null;
           this.onResizeEnd();
         },
         onPanMove: event => {
@@ -158,14 +259,28 @@ export default class SelectedInstances {
           this.onPanEnd();
         },
         cursor: resizeGrabbingIconNames[resizeGrabbingLocation],
+        getCursorForButton: (button) => {
+          // Look up the dynamically calculated cursor for rotated instances
+          const location = button._grabbingLocation;
+          return this._resizeButtonCursors[location] || resizeGrabbingIconNames[location];
+        },
       });
     }
     this._makeButton({
       objectButton: this.rotateButton,
       onMove: event => {
+        // On the first rotation movement, set the initial button position
+        if (!this._rotationStarted && this._rotateButtonScenePosition && this.instancesRotator) {
+          this._rotationStarted = true;
+          this.instancesRotator.setInitialButtonPosition(
+            this._rotateButtonScenePosition[0],
+            this._rotateButtonScenePosition[1]
+          );
+        }
         this.onRotate(event.deltaX, event.deltaY);
       },
       onEnd: () => {
+        this._rotationStarted = false;
         this.onRotateEnd();
       },
       onPanMove: event => {
@@ -194,6 +309,7 @@ export default class SelectedInstances {
     onPanMove,
     onPanEnd,
     cursor,
+    getCursorForButton,
   }: {
     objectButton: PIXI.Graphics,
     onMove: (event: PanMoveEvent) => void,
@@ -201,6 +317,7 @@ export default class SelectedInstances {
     onPanMove: (event: PanMoveEvent) => void,
     onPanEnd: () => void,
     cursor: string,
+    getCursorForButton?: (button: PIXI.Graphics) => string,
   }) {
     objectButton.eventMode = 'static';
     objectButton.buttonMode = true;
@@ -212,7 +329,8 @@ export default class SelectedInstances {
       if (this.keyboardShortcuts.shouldMoveView()) {
         objectButton.cursor = 'grab';
       } else {
-        objectButton.cursor = cursor;
+        // Use dynamic cursor if available, otherwise use the static one
+        objectButton.cursor = getCursorForButton ? getCursorForButton(objectButton) : cursor;
       }
     });
 
@@ -315,6 +433,70 @@ export default class SelectedInstances {
     let y2 = 0;
     let initialised = false;
 
+    // Track if we have a single rotated/flipped instance for special handle positioning
+    let singleRotatedInstanceCorners: Polygon | null = null;
+    let singleInstanceAngleDegrees: number = 0;
+    const isSingleInstance = selection.length === 1;
+    if (isSingleInstance) {
+      const instance = selection[0];
+      const angle = (instance.getAngle() * Math.PI) / 180;
+      const isFlippedX = instance.isFlippedX();
+      const isFlippedY = instance.isFlippedY();
+      if (angle !== 0 || isFlippedX || isFlippedY) {
+        // We'll compute this later when we process the instance
+        singleRotatedInstanceCorners = [[0, 0], [0, 0], [0, 0], [0, 0]];
+        singleInstanceAngleDegrees = instance.getAngle();
+      }
+    }
+
+    // Map corner visual position to AABB-relative grabbing location
+    // based on rotation. This is needed because the resizer logic uses
+    // isLeft/isTop which are based on AABB positions, not visual positions.
+    const getAABBGrabbingLocation = (visualLocation: ResizeGrabbingLocation, angleDegrees: number): ResizeGrabbingLocation => {
+      // Normalize angle to 0-360
+      const normalizedAngle = ((angleDegrees % 360) + 360) % 360;
+
+      // For angles close to 0, 90, 180, 270, snap to those values
+      let snappedAngle = normalizedAngle;
+      if (Math.abs(normalizedAngle - 0) < 5 || Math.abs(normalizedAngle - 360) < 5) snappedAngle = 0;
+      else if (Math.abs(normalizedAngle - 90) < 5) snappedAngle = 90;
+      else if (Math.abs(normalizedAngle - 180) < 5) snappedAngle = 180;
+      else if (Math.abs(normalizedAngle - 270) < 5) snappedAngle = 270;
+
+      // Map based on rotation quadrant
+      if (snappedAngle >= 45 && snappedAngle < 135) {
+        // Rotated ~90 degrees: top-left -> top-right, top-right -> bottom-right, etc.
+        const mapping = {
+          'TopLeft': 'TopRight',
+          'TopRight': 'BottomRight',
+          'BottomRight': 'BottomLeft',
+          'BottomLeft': 'TopLeft',
+        };
+        return mapping[visualLocation] || visualLocation;
+      } else if (snappedAngle >= 135 && snappedAngle < 225) {
+        // Rotated ~180 degrees: top-left -> bottom-right, bottom-right -> top-left, etc.
+        const mapping = {
+          'TopLeft': 'BottomRight',
+          'TopRight': 'BottomLeft',
+          'BottomRight': 'TopLeft',
+          'BottomLeft': 'TopRight',
+        };
+        return mapping[visualLocation] || visualLocation;
+      } else if (snappedAngle >= 225 && snappedAngle < 315) {
+        // Rotated ~270 degrees: top-left -> bottom-left, bottom-left -> bottom-right, etc.
+        const mapping = {
+          'TopLeft': 'BottomLeft',
+          'TopRight': 'TopLeft',
+          'BottomRight': 'TopRight',
+          'BottomLeft': 'BottomRight',
+        };
+        return mapping[visualLocation] || visualLocation;
+      }
+
+      // For angles close to 0 or 360, no remapping needed
+      return visualLocation;
+    };
+
     // Update the selection rectangle of each instance.
     for (var i = 0; i < selection.length; i++) {
       if (this.selectedRectangles.length === i) {
@@ -325,13 +507,15 @@ export default class SelectedInstances {
       }
 
       const instance = selection[i];
+      const angle = (instance.getAngle() * Math.PI) / 180;
+      const isFlippedX = instance.isFlippedX();
+      const isFlippedY = instance.isFlippedY();
+      const isRotatedOrFlipped = angle !== 0 || isFlippedX || isFlippedY;
+
+      // Get the bounding box (rotated AABB for bounds calculation)
       const instanceRect = this.instanceMeasurer.getInstanceAABB(
         instance,
         new Rectangle()
-      );
-      const selectionRectangle = transformRect(
-        this.toCanvasCoordinates,
-        instanceRect
       );
 
       this.selectedRectangles[i].clear();
@@ -340,12 +524,78 @@ export default class SelectedInstances {
       this.selectedRectangles[i].lineStyle(1, color, 1);
       this.selectedRectangles[i].fill.alpha = 0.3;
       this.selectedRectangles[i].alpha = 0.8;
-      this.selectedRectangles[i].drawRect(
-        selectionRectangle.left,
-        selectionRectangle.top,
-        selectionRectangle.width(),
-        selectionRectangle.height()
-      );
+
+      if (isRotatedOrFlipped) {
+        // For rotated/flipped instances, draw a polygon that matches the rotation
+        const unrotatedRect = this.instanceMeasurer.getUnrotatedInstanceAABB(
+          instance,
+          new Rectangle()
+        );
+        const unrotatedLeft = unrotatedRect.left;
+        const unrotatedTop = unrotatedRect.top;
+        const unrotatedRight = unrotatedLeft + unrotatedRect.width();
+        const unrotatedBottom = unrotatedTop + unrotatedRect.height();
+
+        // Create polygon corners in scene coordinates
+        const corners: Polygon = [
+          [unrotatedLeft, unrotatedTop],
+          [unrotatedLeft, unrotatedBottom],
+          [unrotatedRight, unrotatedBottom],
+          [unrotatedRight, unrotatedTop],
+        ];
+
+        // Get the center point for rotation using the rendered instance
+        let centerX;
+        let centerY;
+        const renderedInstance = this.instanceMeasurer.getRendererOfInstance(
+          instance
+        );
+        if (renderedInstance) {
+          centerX = unrotatedLeft + renderedInstance.getCenterX();
+          centerY = unrotatedTop + renderedInstance.getCenterY();
+        } else {
+          // Fallback to geometric center if no renderer available
+          centerX = (unrotatedLeft + unrotatedRight) / 2;
+          centerY = (unrotatedTop + unrotatedBottom) / 2;
+        }
+
+        // Apply flip and rotation transformations
+        flipPolygon(corners, centerX, centerY, isFlippedX, isFlippedY);
+        rotatePolygon(corners, centerX, centerY, angle);
+
+        // Store corners for single instance handle positioning
+        if (singleRotatedInstanceCorners) {
+          for (let j = 0; j < 4; j++) {
+            singleRotatedInstanceCorners[j][0] = corners[j][0];
+            singleRotatedInstanceCorners[j][1] = corners[j][1];
+          }
+        }
+
+        // Convert to canvas coordinates and flatten for drawPolygon
+        const canvasPoints = [];
+        for (let j = 0; j < corners.length; j++) {
+          const canvasCoords = this.toCanvasCoordinates(
+            corners[j][0],
+            corners[j][1]
+          );
+          canvasPoints.push(canvasCoords[0], canvasCoords[1]);
+        }
+
+        this.selectedRectangles[i].drawPolygon(canvasPoints);
+      } else {
+        // For non-rotated instances, use the simple rectangle (more efficient)
+        const selectionRectangle = transformRect(
+          this.toCanvasCoordinates,
+          instanceRect
+        );
+        this.selectedRectangles[i].drawRect(
+          selectionRectangle.left,
+          selectionRectangle.top,
+          selectionRectangle.width(),
+          selectionRectangle.height()
+        );
+      }
+
       this.selectedRectangles[i].endFill();
 
       if (instance.isLocked()) {
@@ -377,45 +627,188 @@ export default class SelectedInstances {
       displayHandle;
 
     // Position the resize buttons.
-    for (const grabbingLocation of resizeGrabbingLocationValues) {
-      const resizeButton = this.resizeButtons[grabbingLocation];
-      const relativePositions =
-        resizeGrabbingRelativePositions[grabbingLocation];
+    if (singleRotatedInstanceCorners) {
+      // For a single rotated instance, position buttons on the rotated corners
+      // Map corner indices to grabbing locations:
+      // corners[0] = top-left, corners[1] = bottom-left,
+      // corners[2] = bottom-right, corners[3] = top-right
+      const cornerToGrabLocation = {
+        0: 'TopLeft',
+        1: 'BottomLeft',
+        2: 'BottomRight',
+        3: 'TopRight',
+      };
 
-      const useBigButton =
-        canMoveOnX(grabbingLocation) && canMoveOnY(grabbingLocation);
-      const buttonSize = useBigButton ? bigButtonSize : smallButtonSize;
-      const padding = buttonPadding + buttonSize / 2;
-      const resizeButtonPos = this.toCanvasCoordinates(
-        x1 + relativePositions[0] * (x2 - x1),
-        y1 + relativePositions[1] * (y2 - y1)
+      // Calculate the center of the rotated rectangle
+      const centerX = (singleRotatedInstanceCorners[0][0] +
+                       singleRotatedInstanceCorners[1][0] +
+                       singleRotatedInstanceCorners[2][0] +
+                       singleRotatedInstanceCorners[3][0]) / 4;
+      const centerY = (singleRotatedInstanceCorners[0][1] +
+                       singleRotatedInstanceCorners[1][1] +
+                       singleRotatedInstanceCorners[2][1] +
+                       singleRotatedInstanceCorners[3][1]) / 4;
+
+      // Position corner buttons on the rotated corners
+      for (let cornerIdx = 0; cornerIdx < 4; cornerIdx++) {
+        const visualGrabbingLocation = cornerToGrabLocation[cornerIdx];
+        const resizeButton = this.resizeButtons[visualGrabbingLocation];
+        const corner = singleRotatedInstanceCorners[cornerIdx];
+
+        // Map visual location to AABB-relative location for the resizer
+        const aabbGrabbingLocation = getAABBGrabbingLocation(visualGrabbingLocation, singleInstanceAngleDegrees);
+
+        // Store the corner position in scene coordinates with the AABB-relative location
+        this._resizeHandleScenePositions[visualGrabbingLocation] = [corner[0], corner[1], aabbGrabbingLocation];
+
+        // Calculate and store the appropriate cursor for this rotated handle
+        this._resizeButtonCursors[visualGrabbingLocation] = getRotatedCursor(visualGrabbingLocation, singleInstanceAngleDegrees);
+
+        const buttonSize = bigButtonSize;
+        const padding = buttonPadding + buttonSize / 2;
+
+        // Convert corner to canvas coordinates first
+        const canvasCorner = this.toCanvasCoordinates(corner[0], corner[1]);
+
+        // Calculate direction from center to corner (in canvas coordinates)
+        const canvasCenter = this.toCanvasCoordinates(centerX, centerY);
+        const dirX = canvasCorner[0] - canvasCenter[0];
+        const dirY = canvasCorner[1] - canvasCenter[1];
+        const dirLength = Math.sqrt(dirX * dirX + dirY * dirY);
+        const normalizedDirX = dirX / dirLength;
+        const normalizedDirY = dirY / dirLength;
+
+        // Apply offset in canvas space (same as non-rotated case)
+        const canvasCoords = [
+          canvasCorner[0] - buttonSize / 2 + normalizedDirX * padding,
+          canvasCorner[1] - buttonSize / 2 + normalizedDirY * padding
+        ];
+
+        this._renderButton(
+          show,
+          resizeButton,
+          canvasCoords,
+          buttonSize,
+          RECTANGLE_BUTTON_SHAPE,
+          hitAreaPadding
+        );
+      }
+
+      // Hide edge buttons for rotated instances (only show corner buttons)
+      for (const grabbingLocation of ['Top', 'Bottom', 'Left', 'Right']) {
+        const resizeButton = this.resizeButtons[grabbingLocation];
+        this._renderButton(
+          false,
+          resizeButton,
+          [0, 0],
+          smallButtonSize,
+          RECTANGLE_BUTTON_SHAPE,
+          hitAreaPadding
+        );
+      }
+
+      // Position rotate button at the top-center of the rotated rectangle
+      const topCenterX =
+        (singleRotatedInstanceCorners[0][0] +
+          singleRotatedInstanceCorners[3][0]) /
+        2;
+      const topCenterY =
+        (singleRotatedInstanceCorners[0][1] +
+          singleRotatedInstanceCorners[3][1]) /
+        2;
+
+      // Calculate the normal vector pointing outward from the top edge (in scene coordinates)
+      // Top edge goes from corner[0] (top-left) to corner[3] (top-right)
+      const topEdgeVector = [
+        singleRotatedInstanceCorners[3][0] - singleRotatedInstanceCorners[0][0],
+        singleRotatedInstanceCorners[3][1] - singleRotatedInstanceCorners[0][1],
+      ];
+      const topEdgeLength = Math.sqrt(
+        topEdgeVector[0] ** 2 + topEdgeVector[1] ** 2
       );
-      resizeButtonPos[0] +=
-        -buttonSize / 2 + padding * Math.sign(relativePositions[0] - 0.5);
-      resizeButtonPos[1] +=
-        -buttonSize / 2 + padding * Math.sign(relativePositions[1] - 0.5);
+      // Normal vector perpendicular to the top edge (pointing upward/outward)
+      // For a counter-clockwise wound polygon, the outward normal is (dy, -dx)
+      const normalVector = [
+        topEdgeVector[1] / topEdgeLength,
+        -topEdgeVector[0] / topEdgeLength,
+      ];
+
+      // Apply offset in scene coordinates
+      const offset = buttonPadding * 8;
+      const rotateButtonSceneX = topCenterX + normalVector[0] * offset;
+      const rotateButtonSceneY = topCenterY + normalVector[1] * offset;
+
+      // Store the scene position for rotation initialization
+      this._rotateButtonScenePosition = [rotateButtonSceneX, rotateButtonSceneY];
+
+      // Convert to canvas coordinates
+      const rotateButtonPos = this.toCanvasCoordinates(
+        rotateButtonSceneX,
+        rotateButtonSceneY
+      );
+      rotateButtonPos[0] -= smallButtonSize / 2;
+      rotateButtonPos[1] -= smallButtonSize / 2;
 
       this._renderButton(
         show,
-        resizeButton,
-        resizeButtonPos,
-        buttonSize,
-        RECTANGLE_BUTTON_SHAPE,
+        this.rotateButton,
+        rotateButtonPos,
+        smallButtonSize,
+        CIRCLE_BUTTON_SHAPE,
+        hitAreaPadding
+      );
+    } else {
+      // For multiple instances or non-rotated, use AABB positioning
+      // Clear stored handle positions and cursors so the resizer uses calculated positions
+      this._resizeHandleScenePositions = {};
+      this._resizeButtonCursors = {};
+
+      for (const grabbingLocation of resizeGrabbingLocationValues) {
+        const resizeButton = this.resizeButtons[grabbingLocation];
+        const relativePositions =
+          resizeGrabbingRelativePositions[grabbingLocation];
+
+        const useBigButton =
+          canMoveOnX(grabbingLocation) && canMoveOnY(grabbingLocation);
+        const buttonSize = useBigButton ? bigButtonSize : smallButtonSize;
+        const padding = buttonPadding + buttonSize / 2;
+        const resizeButtonPos = this.toCanvasCoordinates(
+          x1 + relativePositions[0] * (x2 - x1),
+          y1 + relativePositions[1] * (y2 - y1)
+        );
+        resizeButtonPos[0] +=
+          -buttonSize / 2 + padding * Math.sign(relativePositions[0] - 0.5);
+        resizeButtonPos[1] +=
+          -buttonSize / 2 + padding * Math.sign(relativePositions[1] - 0.5);
+
+        this._renderButton(
+          show,
+          resizeButton,
+          resizeButtonPos,
+          buttonSize,
+          RECTANGLE_BUTTON_SHAPE,
+          hitAreaPadding
+        );
+      }
+
+      const rotateButtonSceneX = x1 + (x2 - x1) / 2;
+      const rotateButtonSceneY = y1;
+
+      // Store the scene position for rotation initialization
+      this._rotateButtonScenePosition = [rotateButtonSceneX, rotateButtonSceneY];
+
+      const rotateButtonPos = this.toCanvasCoordinates(rotateButtonSceneX, rotateButtonSceneY);
+      rotateButtonPos[0] -= smallButtonSize / 2;
+      rotateButtonPos[1] -= buttonPadding * 8;
+
+      this._renderButton(
+        show,
+        this.rotateButton,
+        rotateButtonPos,
+        smallButtonSize,
+        CIRCLE_BUTTON_SHAPE,
         hitAreaPadding
       );
     }
-
-    const rotateButtonPos = this.toCanvasCoordinates(x1 + (x2 - x1) / 2, y1);
-    rotateButtonPos[0] -= smallButtonSize / 2;
-    rotateButtonPos[1] -= buttonPadding * 8;
-
-    this._renderButton(
-      show,
-      this.rotateButton,
-      rotateButtonPos,
-      smallButtonSize,
-      CIRCLE_BUTTON_SHAPE,
-      hitAreaPadding
-    );
   }
 }

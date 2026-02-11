@@ -525,6 +525,13 @@ export default class InstancesEditor extends Component<Props, State> {
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       toSceneCoordinates: this.viewPosition.toSceneCoordinates,
     });
+    this.instancesResizer = new InstancesResizer({
+      instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
+      instancesEditorSettings: this.props.instancesEditorSettings,
+    });
+    this.instancesRotator = new InstancesRotator(
+      this.instancesRenderer.getInstanceMeasurer()
+    );
     this.selectedInstances = new SelectedInstances({
       instancesSelection: this.props.instancesSelection,
       shouldDisplayHandles: this.shouldDisplayClickableHandles,
@@ -539,6 +546,8 @@ export default class InstancesEditor extends Component<Props, State> {
       keyboardShortcuts: this.keyboardShortcuts,
       onPanMove: this._onPanMove,
       onPanEnd: this._onPanEnd,
+      instancesRotator: this.instancesRotator,
+      instancesResizer: this.instancesResizer,
     });
     this.tileMapPaintingPreview = new TileMapPaintingPreview({
       instancesSelection: this.props.instancesSelection,
@@ -564,13 +573,6 @@ export default class InstancesEditor extends Component<Props, State> {
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
       isInstanceOf3DObject: this.props.isInstanceOf3DObject,
     });
-    this.instancesResizer = new InstancesResizer({
-      instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
-      instancesEditorSettings: this.props.instancesEditorSettings,
-    });
-    this.instancesRotator = new InstancesRotator(
-      this.instancesRenderer.getInstanceMeasurer()
-    );
     this.instancesMover = new InstancesMover({
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       instancesEditorSettings: this.props.instancesEditorSettings,

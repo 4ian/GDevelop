@@ -586,19 +586,25 @@ app.on('ready', function() {
     // app quits.
     log.info('Starting check for updates (with auto-download if any)');
     autoUpdater.autoDownload = true;
-    autoUpdater.checkForUpdatesAndNotify();
+    autoUpdater.checkForUpdatesAndNotify().catch(err => {
+      log.error('Error checking for updates:', err);
+    });
   });
 
   ipcMain.on('updates-check', event => {
     log.info('Starting check for updates (without auto-download)');
     autoUpdater.autoDownload = false;
-    autoUpdater.checkForUpdates();
+    autoUpdater.checkForUpdates().catch(err => {
+      log.error('Error checking for updates:', err);
+    });
   });
 
   function sendUpdateStatus(status) {
     log.info(status);
     mainWindows.forEach(window => {
-      window.webContents.send('update-status', status);
+      if (!window.isDestroyed()) {
+        window.webContents.send('update-status', status);
+      }
     });
   }
   autoUpdater.on('checking-for-update', () => {

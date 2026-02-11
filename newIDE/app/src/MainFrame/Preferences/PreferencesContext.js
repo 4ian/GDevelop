@@ -502,6 +502,7 @@ export const initialPreferences = {
 
 // $FlowFixMe[incompatible-type]
 const PreferencesContext: React.Context<Preferences> = React.createContext<Preferences>(
+  // $FlowFixMe[incompatible-type]
   initialPreferences
 );
 

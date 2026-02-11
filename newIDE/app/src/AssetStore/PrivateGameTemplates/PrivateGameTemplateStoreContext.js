@@ -269,18 +269,16 @@ export const PrivateGameTemplateStoreStateProvider = ({
       if (!privateGameTemplateListingDatas) {
         return null;
       }
-      const privateGameTemplateListingDatasById = {};
+      const privateGameTemplateListingDatasById: { [string]: any } = {};
       if (hidePremiumProducts) return privateGameTemplateListingDatasById;
       privateGameTemplateListingDatas.forEach(
         privateGameTemplateListingData => {
           const id = privateGameTemplateListingData.id;
-          // $FlowFixMe[invalid-computed-prop]
           if (privateGameTemplateListingDatasById[id]) {
             console.warn(
               `Multiple private game templates with the same id: ${id}`
             );
           }
-          // $FlowFixMe[prop-missing]
           privateGameTemplateListingDatasById[
             id
           ] = privateGameTemplateListingData;

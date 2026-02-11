@@ -107,7 +107,7 @@ export const roundPositionForResizing = (
   gridOffsetX: number,
   gridOffsetY: number,
   gridType: string
-) => {
+): void => {
   if (gridType === 'isometric') {
     // There is no point to align on the isometric grid when resizing.
     // Use half cells to give a bit more of freedom than for positioning.

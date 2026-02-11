@@ -93,6 +93,7 @@ const parseVariablePath = (
     segments.push({ type: 'property', value: currentSegment.trim() });
   }
 
+  // $FlowFixMe[incompatible-type]
   return segments;
 };
 
@@ -148,7 +149,11 @@ export const applyVariableChange = ({
   forcedVariableType: string | null,
   variablesContainer: gd.VariablesContainer,
   value: string,
-|}) => {
+|}): {
+  addedNewVariable: boolean,
+  variable: null | gdVariable,
+  variableType: string,
+} => {
   const pathSegments = parseVariablePath(variablePath);
 
   if (pathSegments.length === 0) {
@@ -176,22 +181,29 @@ export const applyVariableChange = ({
 
     if (segment.type === 'property') {
       // Navigate to structure property
+      // $FlowFixMe[incompatible-use]
       variable.castTo('Structure');
+      // $FlowFixMe[incompatible-use]
       if (!variable.hasChild(segment.value)) {
         addedNewVariable = true;
       }
+      // $FlowFixMe[incompatible-use]
       variable = variable.getChild(segment.value);
     } else if (segment.type === 'index') {
       // Navigate to array element
       const index = parseInt(segment.value, 10);
+      // $FlowFixMe[incompatible-use]
       variable.castTo('Array');
 
       // Ensure array has enough elements
+      // $FlowFixMe[incompatible-use]
       while (variable.getChildrenCount() <= index) {
+        // $FlowFixMe[incompatible-use]
         variable.pushNew();
         addedNewVariable = true;
       }
 
+      // $FlowFixMe[incompatible-use]
       variable = variable.getAtIndex(index);
     }
   }
@@ -200,11 +212,13 @@ export const applyVariableChange = ({
 
   if (arrayOrObjectValue) {
     // Value is an object or array.
+    // $FlowFixMe[incompatible-type]
     convertJsObjectToVariable(arrayOrObjectValue, variable);
 
     return {
       variable,
       variableType:
+        // $FlowFixMe[incompatible-use]
         variable.getType() === gd.Variable.Array ? 'Array' : 'Structure',
       addedNewVariable,
     };
@@ -214,10 +228,13 @@ export const applyVariableChange = ({
     const variableType = readOrInferVariableType(forcedVariableType, value);
 
     if (variableType === 'String') {
+      // $FlowFixMe[incompatible-use]
       variable.setString(value);
     } else if (variableType === 'Number') {
+      // $FlowFixMe[incompatible-use]
       variable.setValue(parseFloat(value));
     } else if (variableType === 'Boolean') {
+      // $FlowFixMe[incompatible-use]
       variable.setBool(value.toLowerCase() === 'true');
     }
 

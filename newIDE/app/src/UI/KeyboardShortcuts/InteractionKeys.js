@@ -8,28 +8,30 @@ type SupportedEvent = KeyboardEvent | SyntheticKeyboardEvent<any>;
 /**
  * Check if the user asked to close/cancel what is being edited.
  */
-export const shouldCloseOrCancel = (event: SupportedEvent) => {
+export const shouldCloseOrCancel = (event: SupportedEvent): boolean => {
   return event.key === 'Escape';
 };
 
 /**
  * Check if the user asked to validate what is being edited.
  */
-export const shouldValidate = (event: SupportedEvent) => {
+export const shouldValidate = (event: SupportedEvent): false | boolean => {
   return event.key === 'Enter' && !event.shiftKey;
 };
 
 /**
  * Check if the user asked to go to previous match.
  */
-export const shouldBrowsePrevious = (event: SupportedEvent) => {
+export const shouldBrowsePrevious = (
+  event: SupportedEvent
+): false | boolean => {
   return event.shiftKey && event.key === 'Enter';
 };
 
 /**
  * Check if the user asked to activate something.
  */
-export const shouldActivate = (event: SupportedEvent) => {
+export const shouldActivate = (event: SupportedEvent): boolean => {
   return event.key === 'Enter' || event.key === ' ';
 };
 
@@ -38,14 +40,14 @@ export const shouldActivate = (event: SupportedEvent) => {
  * This is more intentional from the user than just
  * `shouldValidate` or `shouldActivate`.
  */
-export const shouldSubmit = (event: SupportedEvent) => {
+export const shouldSubmit = (event: SupportedEvent): false | boolean => {
   return (event.metaKey || event.ctrlKey) && event.key === 'Enter';
 };
 
 /**
  * Check if the user wants to zoom when scrolling.
  */
-export const shouldZoom = (event: SupportedEvent | WheelEvent) => {
+export const shouldZoom = (event: SupportedEvent | WheelEvent): boolean => {
   return event.metaKey || event.ctrlKey;
 };
 
@@ -54,7 +56,9 @@ export const shouldZoom = (event: SupportedEvent | WheelEvent) => {
  * Note that in most case, this should be automatically handled by the browser
  * (or material-ui), and using this should not be needed.
  */
-export const shouldFocusNextField = (event: SupportedEvent) => {
+export const shouldFocusNextField = (
+  event: SupportedEvent
+): false | boolean => {
   return event.key === 'Tab' && !event.shiftKey;
 };
 
@@ -63,6 +67,8 @@ export const shouldFocusNextField = (event: SupportedEvent) => {
  * Note that in most case, this should be automatically handled by the browser
  * (or material-ui), and using this should not be needed.
  */
-export const shouldFocusPreviousField = (event: SupportedEvent) => {
+export const shouldFocusPreviousField = (
+  event: SupportedEvent
+): false | boolean => {
   return event.key === 'Tab' && event.shiftKey;
 };

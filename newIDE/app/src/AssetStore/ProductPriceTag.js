@@ -189,7 +189,7 @@ type ProductPriceOrOwnedProps = {|
   discountedPrice?: boolean,
 |};
 
-export const OwnedLabel = () => {
+export const OwnedLabel = (): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <LineStackLayout noMargin alignItems="center">
@@ -249,7 +249,7 @@ const ProductPriceTag = ({
   withOverlay,
   owned,
   discountedPrice,
-}: ProductPriceTagProps) => {
+}: ProductPriceTagProps): React.Node => {
   return (
     <I18n>
       {({ i18n }) => {

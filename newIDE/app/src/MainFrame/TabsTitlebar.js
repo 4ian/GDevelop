@@ -113,7 +113,7 @@ export default function TabsTitlebar({
   displayMenuIcon,
   displayAskAi,
   onAskAiClicked,
-}: TabsTitlebarProps) {
+}: TabsTitlebarProps): React.MixedElement {
   const isTouchscreen = useScreenType() === 'touch';
   const preferences = React.useContext(PreferencesContext);
   const { limits } = React.useContext(AuthenticatedUserContext);

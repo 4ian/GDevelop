@@ -190,7 +190,7 @@ export const LeaderboardAdmin = ({
   onLoading,
   project,
   leaderboardIdToSelectAtOpening,
-}: Props) => {
+}: Props): React.Node => {
   const isOnline = useOnlineStatus();
   const { isMobile } = useResponsiveWindowSize();
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
@@ -849,7 +849,7 @@ export const LeaderboardAdmin = ({
           value={currentLeaderboard.playerUnicityDisplayChoice}
           onChange={(e, i, value) => {
             onUpdateLeaderboard(i18n, {
-              // $FlowFixMe
+              // $FlowFixMe[incompatible-type]
               playerUnicityDisplayChoice: value,
             });
           }}
@@ -1139,7 +1139,7 @@ type ContainerProps = {| ...Props, gameId: string |};
 const LeaderboardAdminContainer = ({
   gameId,
   ...otherProps
-}: ContainerProps) => (
+}: ContainerProps): React.Node => (
   <LeaderboardProvider gameId={gameId}>
     <LeaderboardAdmin {...otherProps} />
   </LeaderboardProvider>

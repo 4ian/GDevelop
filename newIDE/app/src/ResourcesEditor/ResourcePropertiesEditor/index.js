@@ -44,10 +44,11 @@ const renderEmpty = () => {
   );
 };
 
-const ResourcePropertiesEditor = React.forwardRef<
-  Props,
-  ResourcePropertiesEditorInterface
->(
+// $FlowFixMe[prop-missing]
+const ResourcePropertiesEditor: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<ResourcePropertiesEditorInterface> },
+  React.RefSetter<ResourcePropertiesEditorInterface>
+> = React.forwardRef<Props, ResourcePropertiesEditorInterface>(
   (
     {
       project,
@@ -204,6 +205,7 @@ const ResourcePropertiesEditor = React.forwardRef<
               : renderResourcesProperties()}
             {resources.length > 0 &&
               resources.some(
+                // $FlowFixMe[invalid-compare]
                 resource => resource.getKind() === 'javascript'
               ) && (
                 <AlertMessage kind="info">

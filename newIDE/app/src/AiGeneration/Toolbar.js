@@ -17,7 +17,7 @@ export const Toolbar = ({
   onStartNewChat,
   canStartNewChat,
   onOpenHistory,
-}: Props) => {
+}: Props): React.Node => {
   return (
     <>
       <ToolbarGroup firstChild>

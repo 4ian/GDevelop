@@ -24,6 +24,7 @@ const operatorLabels = {
 };
 
 const mapTypeToOperators: { [string]: Array<string> } = {
+  // $FlowFixMe[incompatible-type]
   unknown: Object.keys(operatorLabels),
   number: ['=', '<', '>', '<=', '>=', '!='],
   time: ['<', '>', '<=', '>='],
@@ -38,7 +39,7 @@ const defaultOperators: { [string]: string } = {
   color: '=',
 };
 
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function RelationalOperatorField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SelectFieldInterface>(null);
     const focus: FieldFocusFunction = options => {
@@ -83,19 +84,30 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           <SelectOption
             key={operator}
             value={operator}
+            // $FlowFixMe[invalid-computed-prop]
             label={operatorLabels[operator]}
           />
         ))}
       </SelectField>
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);
 
 export const renderInlineRelationalOperator = ({
   value,
   InvalidParameterValue,
   parameterMetadata,
-}: ParameterInlineRendererProps) => {
+}: ParameterInlineRendererProps):
+  | '<'
+  | '='
+  | '>'
+  | string
+  | React.MixedElement
+  | React.Node => {
   const comparedValueType = parameterMetadata
     ? parameterMetadata.getExtraInfo()
     : 'unknown';

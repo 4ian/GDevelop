@@ -14,7 +14,7 @@ const SerializedObjectDisplay = ({
   children: React.Node,
   object: any,
   methodName?: string,
-}) => {
+}): React.MixedElement => {
   const forceUpdate = useForceUpdate();
 
   return (

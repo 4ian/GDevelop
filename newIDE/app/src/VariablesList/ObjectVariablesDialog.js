@@ -35,7 +35,7 @@ const ObjectVariablesDialog = ({
   projectScopedContainersAccessor,
   onComputeAllVariableNames,
   isListLocked,
-}: Props) => {
+}: Props): React.Node => {
   const tabs = React.useMemo(
     () => [
       {
@@ -64,6 +64,7 @@ const ObjectVariablesDialog = ({
       onCancel={onCancel}
       onApply={onApply}
       title={<Trans>{objectName} variables</Trans>}
+      // $FlowFixMe[incompatible-type]
       tabs={tabs}
       initiallySelectedVariableName={initiallySelectedVariableName}
       shouldCreateInitiallySelectedVariable={

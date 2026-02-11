@@ -19,6 +19,7 @@ import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import CreateAccountForm from './CreateAccountForm';
 
+// $FlowFixMe[missing-local-annot]
 const getStyles = ({ isMobile }) => {
   return {
     formContainer: {
@@ -39,7 +40,7 @@ type Props = {|
   error: ?AuthError,
 |};
 
-export const getEmailErrorText = (error: ?AuthError) => {
+export const getEmailErrorText = (error: ?AuthError): void | React.Node => {
   if (!error) return undefined;
 
   if (error.code === 'auth/invalid-email')
@@ -76,7 +77,7 @@ export const getEmailErrorText = (error: ?AuthError) => {
   return undefined;
 };
 
-export const getPasswordErrorText = (error: ?AuthError) => {
+export const getPasswordErrorText = (error: ?AuthError): void | React.Node => {
   if (!error) return undefined;
 
   if (error.code === 'auth/too-many-requests')
@@ -112,7 +113,7 @@ const CreateAccountDialog = ({
   onLoginWithProvider,
   createAccountInProgress,
   error,
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const styles = getStyles({ isMobile });
   const [email, setEmail] = React.useState<string>('');

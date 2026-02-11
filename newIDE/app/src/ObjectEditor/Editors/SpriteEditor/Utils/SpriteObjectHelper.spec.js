@@ -160,6 +160,7 @@ describe('SpriteObjectHelper', () => {
 
   describe('Collision masks related methods', () => {
     it('can tell if two sprite have the exact same collision masks', () => {
+      // $FlowFixMe[missing-local-annot]
       const addVertice = (polygon, x, y) => {
         const vertice = new gd.Vector2f();
         vertice.x = x;

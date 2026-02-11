@@ -190,6 +190,7 @@ const transformTagsAsStringToTagsAsArray = <
   // return tags as an array of strings.
   if (Array.isArray(dataWithTags.tags)) {
     // $FlowIgnore
+    // $FlowFixMe[incompatible-type]
     return dataWithTags;
   }
 
@@ -200,10 +201,12 @@ const transformTagsAsStringToTagsAsArray = <
   };
 };
 
-export const client = axios.create({
+// $FlowFixMe[cannot-resolve-name]
+export const client: Axios = axios.create({
   baseURL: GDevelopAssetApi.baseUrl,
 });
-export const cdnClient = axios.create();
+// $FlowFixMe[cannot-resolve-name]
+export const cdnClient: Axios = axios.create();
 
 export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
   const response = await client.get(`/extension`, {
@@ -238,6 +241,7 @@ export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
   return {
     ...extensionsRegistry,
     // TODO: move this to backend endpoint
+    // $FlowFixMe[incompatible-type]
     headers: extensionsRegistry.headers.map(transformTagsAsStringToTagsAsArray),
   };
 };
@@ -273,6 +277,7 @@ const adaptBehaviorHeader = (
     header.extensionNamespace || header.extensionName,
     header.name
   );
+  // $FlowFixMe[incompatible-type]
   header = transformTagsAsStringToTagsAsArray(header);
   if ((header.tier: string) === 'community') {
     header.tier = 'experimental';
@@ -309,6 +314,7 @@ const adaptObjectHeader = (header: ObjectShortHeader): ObjectShortHeader => {
     header.extensionNamespace || header.extensionName,
     header.name
   );
+  // $FlowFixMe[incompatible-type]
   header = transformTagsAsStringToTagsAsArray(header);
   if ((header.tier: string) === 'community') {
     header.tier = 'experimental';
@@ -325,6 +331,7 @@ export const getExtensionHeader = (
   return cdnClient.get(extensionShortHeader.headerUrl).then(response => {
     const data: ExtensionHeaderWithTagsAsString = response.data;
     const transformedData: ExtensionHeader = transformTagsAsStringToTagsAsArray(
+      // $FlowFixMe[incompatible-type]
       data
     );
     if ((data.tier: string) === 'community') {
@@ -339,7 +346,9 @@ export const getExtension = (
 ): Promise<SerializedExtension> => {
   return cdnClient.get(extensionHeader.url).then(response => {
     const data: SerializedExtensionWithTagsAsString = response.data;
+    // $FlowFixMe[incompatible-type]
     const transformedData: SerializedExtension = transformTagsAsStringToTagsAsArray(
+      // $FlowFixMe[incompatible-type]
       data
     );
     return transformedData;

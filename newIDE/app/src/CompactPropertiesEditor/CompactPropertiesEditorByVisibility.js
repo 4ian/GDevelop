@@ -60,7 +60,10 @@ const getFieldVisibility = (field: Field): FieldVisibility | '' => {
   return '';
 };
 
-export const filterSchema = (source: Schema, visibility: FieldVisibility) => {
+export const filterSchema = (
+  source: Schema,
+  visibility: FieldVisibility
+): Schema => {
   const destination: Schema = [];
   for (const field of source) {
     if (field.children) {
@@ -175,7 +178,7 @@ export const CompactPropertiesEditorByVisibility = ({
   project?: ?gdProject,
   object?: ?gdObject,
   resourceManagementProps?: ?ResourceManagementProps,
-|}) => {
+|}): React.Node => {
   const basicPropertiesSchema = React.useMemo(
     () => {
       const basicSchema = filterSchema(schema, 'basic');

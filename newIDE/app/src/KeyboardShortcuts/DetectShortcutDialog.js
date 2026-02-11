@@ -20,7 +20,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const DetectShortcutDialog = (props: Props) => {
+const DetectShortcutDialog = (props: Props): React.Node => {
   const [shortcutString, setShortcutString] = React.useState('');
   const [isValid, setIsValid] = React.useState(false);
 
@@ -33,6 +33,7 @@ const DetectShortcutDialog = (props: Props) => {
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       e.preventDefault();
+      // $FlowFixMe[incompatible-exact]
       const metadata = getShortcutMetadataFromEvent(e);
       if (e.type === 'keyup') return;
       setIsValid(metadata.isValid);

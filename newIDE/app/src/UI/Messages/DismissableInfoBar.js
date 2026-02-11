@@ -21,7 +21,7 @@ const DismissableInfoBar = ({
   show,
   touchScreenMessage,
   message,
-}: Props) => {
+}: Props): null | React.Node => {
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
   );

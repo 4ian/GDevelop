@@ -134,7 +134,7 @@ export const BuildCard = ({
   onBuildUpdated,
   onBuildDeleted,
   authenticatedUser,
-}: Props) => {
+}: Props): React.Node => {
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const defaultBuildName = `${game.gameName
     .toLowerCase()
@@ -322,6 +322,7 @@ export const BuildCard = ({
                     {gameUpdating && (
                       <>
                         <Spacer />
+                        {/* $FlowFixMe[incompatible-type] */}
                         <CircularProgress style={styles.circularProgress} />
                       </>
                     )}

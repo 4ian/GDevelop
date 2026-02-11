@@ -53,7 +53,9 @@ const gd: libGDevelop = global.gd;
 
 const BEHAVIORS_CLIPBOARD_KIND = 'Behaviors';
 
-export const useBehaviorOverridingAlertDialog = () => {
+export const useBehaviorOverridingAlertDialog = (): ((
+  existingBehaviorNames: Array<string>
+) => Promise<boolean>) => {
   const { showConfirmation } = useAlertDialog();
   return async (existingBehaviorNames: Array<string>): Promise<boolean> => {
     return await showConfirmation({
@@ -449,7 +451,9 @@ export const useManageObjectBehaviors = ({
     () => {
       Clipboard.set(
         BEHAVIORS_CLIPBOARD_KIND,
+        // $FlowFixMe[incompatible-exact]
         mapVector(object.getAllBehaviorNames(), behaviorName => {
+          // $FlowFixMe[incompatible-type]
           const behavior = object.getBehavior(behaviorName);
           if (behavior.isDefaultBehavior()) {
             return null;
@@ -646,7 +650,7 @@ type Props = {|
   isListLocked: boolean,
 |};
 
-const BehaviorsEditor = (props: Props) => {
+const BehaviorsEditor = (props: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const justAddedBehaviorAccordionElement = React.useRef<?BehaviorConfigurationEditorInterface>(

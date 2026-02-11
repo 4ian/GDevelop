@@ -160,7 +160,7 @@ export const ResourceCard = ({
   onChoose,
   size,
   isSelected,
-}: Props) => {
+}: Props): null | React.MixedElement | React.Node => {
   const resourceKind = resource.type;
   const theme = React.useContext(GDevelopThemeContext);
 
@@ -183,8 +183,10 @@ export const ResourceCard = ({
           size={size}
           imageStyle={
             theme.palette.type === 'light'
-              ? styles.previewIconLightTheme
-              : styles.previewIconDarkTheme
+              ? // $FlowFixMe[incompatible-type]
+                styles.previewIconLightTheme
+              : // $FlowFixMe[incompatible-type]
+                styles.previewIconDarkTheme
           }
         />
       );

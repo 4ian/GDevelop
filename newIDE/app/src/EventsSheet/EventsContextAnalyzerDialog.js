@@ -37,6 +37,7 @@ export const toEventsContextResult = (
       .toJSArray();
 
     if (behaviorNames.length) {
+      // $FlowFixMe[prop-missing]
       objectOrGroupBehaviorNames[objectOrGroupName] = behaviorNames;
     }
   });
@@ -57,7 +58,7 @@ export default class EventsContextAnalyzerDialog extends React.Component<
   Props,
   {}
 > {
-  render() {
+  render(): any {
     const { onClose, eventsContextResult } = this.props;
     const actions = [
       <FlatButton

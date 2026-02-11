@@ -450,7 +450,7 @@ export const DayGroupRow = ({
   openedVersionStatus,
   usersPublicProfileByIds,
   getAnonymousAvatar,
-}: DayGroupRowProps) => {
+}: DayGroupRowProps): React.Node => {
   const [isOpen, setIsOpen] = React.useState<boolean>(isOpenedInitially);
   const displayYear = new Date(day).getFullYear() !== thisYear;
   const namedVersions = React.useMemo(

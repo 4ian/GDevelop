@@ -43,10 +43,12 @@ const useStylesForWidget = ({
     };
     if (!disableHoverAndFocusEffects) {
       // $FlowIgnore
+      // $FlowFixMe[prop-missing]
       rootStyles['&:hover'] = {
         backgroundColor: theme.palette.action.hover,
       };
       // $FlowIgnore
+      // $FlowFixMe[prop-missing]
       rootStyles['&:focus'] = {
         backgroundColor: theme.palette.action.hover,
       };
@@ -75,7 +77,7 @@ export const CardWidget = ({
   disabled,
   useDefaultDisabledStyle,
   noBorder,
-}: Props) => {
+}: Props): React.Node | React.MixedElement => {
   const classes = useStylesForWidget({
     useDefaultDisabledStyle,
     noBorder,

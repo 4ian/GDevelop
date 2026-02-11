@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+// $FlowFixMe[import-type-as-value]
 import { I18n as I18nType } from '@lingui/core';
 import { useDebounce } from '../Utils/UseDebounce';
 import { useInterval } from '../Utils/UseInterval';
@@ -136,6 +137,7 @@ const interpolateExpectedEditor = (
         data
       );
     }
+    // $FlowFixMe[incompatible-type]
     scene = sceneName;
   }
   return {
@@ -211,7 +213,7 @@ const interpolateElementId = ({
   ) {
     const splittedElementId = elementId.split(':');
     const sceneKey = splittedElementId[1];
-    // $FlowFixMe - We're confident the data is reliable
+    // $FlowFixMe[incompatible-type] - We're confident the data is reliable
     const editorType: EditorIdentifier = splittedElementId[2];
     if (!editorType) {
       throw new Error(
@@ -268,7 +270,7 @@ const containsProjectDataToDisplay = (text?: TranslatedText): boolean => {
   if (!text) return false;
   if (text.messageByLocale) {
     return Object.values(text.messageByLocale).some(localizedText =>
-      // $FlowFixMe - known error where Flow returns mixed for object value https://github.com/facebook/flow/issues/2221
+      // $FlowFixMe[incompatible-type] - known error where Flow returns mixed for object value https://github.com/facebook/flow/issues/2221
       localizedText.includes(
         `$(${textInterpolationProjectDataAccessors.instancesCount}`
       )
@@ -346,7 +348,8 @@ const getInputValue = (element: HTMLElement): any => {
   }
   // Flow errors on missing value prop in generic type HTMLElement but this
   // line cannot break.
-  // $FlowFixMe
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[prop-missing]
   return element.value;
 };
 
@@ -371,7 +374,7 @@ const gatherProjectDataOnMultipleSteps = ({
 
     if (mapProjectData) {
       Object.entries(mapProjectData).forEach(
-        // $FlowFixMe - Object.entries does not keep value type
+        // $FlowFixMe[incompatible-type] - Object.entries does not keep value type
         ([key, dataAccessor]: [string, string]) => {
           if (dataAccessor === 'projectLastSceneName') {
             if (!project) return;
@@ -485,10 +488,11 @@ export type InAppTutorialOrchestratorInterface = {|
   getPreviewMessage: () => {| message: string, position: string |} | null,
 |};
 
-const InAppTutorialOrchestrator = React.forwardRef<
-  Props,
-  InAppTutorialOrchestratorInterface
->(
+// $FlowFixMe[prop-missing]
+const InAppTutorialOrchestrator: React.AbstractComponent<
+  { ...Props, +ref?: React.RefSetter<InAppTutorialOrchestratorInterface> },
+  React.RefSetter<InAppTutorialOrchestratorInterface>
+> = React.forwardRef<Props, InAppTutorialOrchestratorInterface>(
   (
     {
       tutorial,
@@ -595,10 +599,12 @@ const InAppTutorialOrchestrator = React.forwardRef<
             tutorial.editorSwitches.hasOwnProperty(tutorial.flow[index].id)
           ) {
             newExpectedEditor =
+              // $FlowFixMe[incompatible-type]
               tutorial.editorSwitches[tutorial.flow[index].id];
             break;
           }
         }
+        // $FlowFixMe[incompatible-type]
         setExpectedEditor(newExpectedEditor);
       },
       [tutorial, changeStep, startStepIndex]
@@ -931,6 +937,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
         if (
           nextStepTrigger &&
           nextStepTrigger.valueEquals !== undefined &&
+          // $FlowFixMe[invalid-compare]
           nextStepTrigger.valueEquals !== null
         ) {
           if (!elementToHighlightId) return;

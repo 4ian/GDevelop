@@ -117,6 +117,7 @@ export const enumerateObjectFolderOrObjects = (
 
       enumerateObjectFolderOrObjects(child).forEach(
         ({ folderName, objects }) => {
+          // $FlowFixMe[method-unbinding]
           currentFolderObjects.push.apply(currentFolderObjects, objects);
         }
       );
@@ -169,7 +170,7 @@ export const renderQuickCustomization = ({
   onScreenshotsClaimed,
   onWillInstallExtension,
   onExtensionInstalled,
-}: Props) => {
+}: Props): { content: React.Node, showPreview: boolean, title: React.Node } => {
   return {
     title: quickCustomizationState.step.title,
     content: (

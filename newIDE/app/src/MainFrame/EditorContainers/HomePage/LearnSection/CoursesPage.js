@@ -59,7 +59,7 @@ const CoursesPage = ({
   getCourseChapters,
   getCourseChapterCompletion,
   getCourseCompletion,
-}: Props) => {
+}: Props): React.Node => {
   const { listedCourses } = React.useContext(CourseStoreContext);
   const { windowSize, isLandscape } = useResponsiveWindowSize();
   const numberOfItemsOnOneRow = getColumnsFromWindowSize(
@@ -123,7 +123,7 @@ const CoursesPage = ({
                         </GridListTile>
                       );
                     })
-                  : new Array(6).fill(0).map((_, index) => (
+                  : new Array<number>(6).fill(0).map((_, index) => (
                       <GridListTile key={`skeleton-course-${index}`}>
                         <CourseCard
                           course={null}

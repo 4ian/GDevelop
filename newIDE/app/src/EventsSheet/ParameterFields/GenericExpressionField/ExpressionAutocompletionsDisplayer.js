@@ -47,6 +47,7 @@ const getTypeToIcon = (type: string) => {
   }
 };
 
+// $FlowFixMe[missing-local-annot]
 const AutocompletionIcon = React.memo(({ src }) => {
   const {
     palette: { type: paletteType },
@@ -83,56 +84,55 @@ const formatParameterTypesString = (
     .join(', ');
 };
 
-const AutocompletionRow = React.forwardRef(
-  (
-    {
-      icon,
-      iconSrc,
-      secondaryIcon,
-      label,
-      parametersLabel,
-      isSelected,
-      onClick,
-    }: {|
-      icon: React.Node | null,
-      iconSrc: string | null,
-      secondaryIcon: React.Node | null,
-      label: string,
-      parametersLabel: string | null,
-      isSelected: boolean,
-      onClick: () => void,
-    |},
-    ref
-  ) => {
-    const trimmedLabel = label.length > 46 ? label.substr(0, 46) + '…' : label;
+const AutocompletionRow = React.forwardRef((
+  {
+    icon,
+    iconSrc,
+    secondaryIcon,
+    label,
+    parametersLabel,
+    isSelected,
+    onClick,
+  }: {|
+    icon: React.Node | null,
+    iconSrc: string | null,
+    secondaryIcon: React.Node | null,
+    label: string,
+    parametersLabel: string | null,
+    isSelected: boolean,
+    onClick: () => void,
+  |},
+  // $FlowFixMe[missing-local-annot]
+  ref
+) => {
+  const trimmedLabel = label.length > 46 ? label.substr(0, 46) + '…' : label;
 
-    return (
-      <ButtonBase
-        style={styles.button}
-        onPointerDown={e =>
-          // Prevent default behavior that gives the focus to the button and makes
-          // the field lose focus, hence closing the autocompletion displayer.
-          e.preventDefault()
-        }
-        onClick={onClick}
-        ref={ref}
-      >
-        <LineStackLayout noMargin expand>
-          {icon || (iconSrc ? <AutocompletionIcon src={iconSrc} /> : null)}
-          {secondaryIcon}
-          <Text style={defaultTextStyle} noMargin align="left">
-            {isSelected ? <b>{trimmedLabel}</b> : trimmedLabel}
-            {parametersLabel && (
-              <>
-                (<i>{parametersLabel}</i>)
-              </>
-            )}
-          </Text>
-        </LineStackLayout>
-      </ButtonBase>
-    );
-  }
-);
+  return (
+    <ButtonBase
+      style={styles.button}
+      onPointerDown={e =>
+        // Prevent default behavior that gives the focus to the button and makes
+        // the field lose focus, hence closing the autocompletion displayer.
+        e.preventDefault()
+      }
+      onClick={onClick}
+      ref={ref}
+    >
+      <LineStackLayout noMargin expand>
+        {icon || (iconSrc ? <AutocompletionIcon src={iconSrc} /> : null)}
+        {secondaryIcon}
+        <Text style={defaultTextStyle} noMargin align="left">
+          {isSelected ? <b>{trimmedLabel}</b> : trimmedLabel}
+          {parametersLabel && (
+            <>
+              (<i>{parametersLabel}</i>)
+            </>
+          )}
+        </Text>
+      </LineStackLayout>
+    </ButtonBase>
+  );
+});
 
 const isParameterVisible = (
   expressionMetadata: gdExpressionMetadata,
@@ -240,10 +240,10 @@ export default function ExpressionAutocompletionsDisplayer({
   onChoose,
   onScroll,
   parameterRenderingService,
-}: Props) {
+}: Props): null | React.Node {
   const scrollView = React.useRef((null: ?ScrollViewInterface));
   const selectedAutocompletionElement = React.useRef(
-    (null: ?React$Component<any, any>)
+    (null: ?React.Component<any, any>)
   );
   React.useEffect(
     () => {
@@ -386,7 +386,7 @@ export default function ExpressionAutocompletionsDisplayer({
               )}
             </ScrollView>
           </Paper>
-          {selectedCompletionIndex !== null &&
+          {selectedCompletionIndex != null &&
             expressionAutocompletions[selectedCompletionIndex].kind ===
               'Expression' &&
             !expressionAutocompletions[selectedCompletionIndex].isExact && (

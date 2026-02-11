@@ -195,6 +195,7 @@ const AddTeacherDialog = ({ onClose, onAddTeacher }: AddTeacherDialogProps) => {
           } else {
             error = 'unexpected';
           }
+          // $FlowFixMe[incompatible-type]
           setAddError(error);
         }
       } finally {
@@ -268,7 +269,9 @@ type Props = {|
   onClose: () => void,
 |};
 
-const ManageEducationAccountDialog = ({ onClose }: Props) => {
+const ManageEducationAccountDialog = ({
+  onClose,
+}: Props): null | React.Node => {
   const { profile, subscription } = React.useContext(AuthenticatedUserContext);
   const {
     openSubscriptionDialog,
@@ -369,10 +372,13 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     () => {
       if (!members) return;
       let content = 'Username,Full Name,Email,Password';
+      // $FlowFixMe[missing-empty-array-annot]
       let membersToConsider = [];
       if (selectedUserIds.length === 0) {
+        // $FlowFixMe[incompatible-type]
         membersToConsider = members.filter(member => !member.deactivatedAt);
       } else {
+        // $FlowFixMe[incompatible-type]
         membersToConsider = members.filter(member =>
           selectedUserIds.includes(member.id)
         );
@@ -449,6 +455,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
           } else {
             error = 'unexpected';
           }
+          // $FlowFixMe[incompatible-type]
           setRemoveAdminError(error);
         }
       } finally {

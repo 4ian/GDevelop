@@ -93,7 +93,7 @@ const HomePageMenuBar = ({
   onOpenPreferences,
   onOpenAbout,
   onOpenHomePageMenuDrawer,
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();
   const isMobileOrSmallScreen = isMobile || isMediumScreen;
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

@@ -17,7 +17,10 @@ type Props = {|
   onForgotPassword: ForgotPasswordForm => Promise<void>,
 |};
 
-const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
+const ForgotPasswordDialog = ({
+  onClose,
+  onForgotPassword,
+}: Props): React.Node => {
   const [email, setEmail] = React.useState('');
   const [resetDone, setResetDone] = React.useState(false);
   const [resetInProgress, setResetInProgress] = React.useState(false);

@@ -46,7 +46,7 @@ type Props = {|
 /**
  * Wraps useScreenType in a component.
  */
-export const ScreenTypeMeasurer = ({ children }: Props) =>
+export const ScreenTypeMeasurer = ({ children }: Props): React.Node =>
   children(useScreenType());
 
 /**

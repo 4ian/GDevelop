@@ -18,7 +18,7 @@ export const Line = (props: {|
   useFullHeight?: boolean,
   neverShrink?: boolean,
   id?: string,
-|}) => (
+|}): React.MixedElement => (
   <div
     id={props.id}
     style={{
@@ -58,7 +58,7 @@ export const Column = (props: {|
   useFullHeight?: boolean,
   noOverflowParent?: boolean,
   id?: string,
-|}) => (
+|}): React.MixedElement => (
   <div
     id={props.id}
     style={{
@@ -97,7 +97,9 @@ const spacerStyle = {
  * Check `Layout` first to see if there is already a layout made
  * specifically for your components (like `TextFieldWithButton`).
  */
-export const Spacer = React.memo<NoProps>(() => <span style={spacerStyle} />);
+export const Spacer: React.ComponentType<NoProps> = React.memo<NoProps>(() => (
+  <span style={spacerStyle} />
+));
 
 const largeSpacerStyle = {
   width: 24,
@@ -106,9 +108,9 @@ const largeSpacerStyle = {
 };
 
 /** A large spacer that is 24px width. */
-export const LargeSpacer = React.memo<NoProps>(() => (
-  <span style={largeSpacerStyle} />
-));
+export const LargeSpacer: React.ComponentType<NoProps> = React.memo<NoProps>(
+  () => <span style={largeSpacerStyle} />
+);
 
 type FixedHeightFlexContainerProps = {|
   children: React.Node,
@@ -123,7 +125,7 @@ type FixedHeightFlexContainerProps = {|
 export const FixedHeightFlexContainer = ({
   children,
   heights,
-}: FixedHeightFlexContainerProps) => {
+}: FixedHeightFlexContainerProps): React.MixedElement => {
   const { windowSize } = useResponsiveWindowSize();
   const height =
     windowSize === 'xlarge'

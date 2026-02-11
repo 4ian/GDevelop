@@ -71,7 +71,7 @@ const styles = {
   icon: { width: 16, height: 16 },
 };
 
-export const ChildrenOverridingDepreciationAlert = () => {
+export const ChildrenOverridingDepreciationAlert = (): React.Node => {
   return (
     <AlertMessage kind="warning">
       <MarkdownText
@@ -204,7 +204,7 @@ export const deleteVariant = (
 
 type Props = EditorProps;
 
-const CustomObjectPropertiesEditor = (props: Props) => {
+const CustomObjectPropertiesEditor = (props: Props): React.Node => {
   const forceUpdate = useForceUpdate();
 
   const {

@@ -45,7 +45,7 @@ const VerticalTabButton = ({
   isActive,
   hideLabel,
   id,
-}: Props) => {
+}: Props): React.Node => {
   return (
     <Button
       variant={isActive ? 'contained' : 'text'}

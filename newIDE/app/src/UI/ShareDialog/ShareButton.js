@@ -9,7 +9,7 @@ type Props = {|
   url: string,
 |};
 
-const ShareButton = ({ url }: Props) => {
+const ShareButton = ({ url }: Props): null | React.Node => {
   const onShare = async () => {
     if (!url || !navigator.share) return;
 
@@ -21,6 +21,7 @@ const ShareButton = ({ url }: Props) => {
     };
 
     try {
+      // $FlowFixMe[incompatible-type]
       await navigator.share(shareData);
     } catch (err) {
       console.error("Couldn't share the game", err);

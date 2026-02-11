@@ -49,7 +49,7 @@ const ObjectGroupEditorDialog = ({
   onComputeAllVariableNames,
   isVariableListLocked,
   isObjectListLocked,
-}: Props) => {
+}: Props): React.Node => {
   const [
     editedObjectGroup,
     setEditedObjectGroup,

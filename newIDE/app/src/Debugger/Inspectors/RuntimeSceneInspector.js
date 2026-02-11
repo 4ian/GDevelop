@@ -26,6 +26,7 @@ type State = {|
   newObjectName: string,
 |};
 
+// $FlowFixMe[missing-local-annot]
 const transformLayer = layer => {
   if (!layer) return null;
   return {
@@ -38,6 +39,7 @@ const transformLayer = layer => {
   };
 };
 
+// $FlowFixMe[missing-local-annot]
 const transform = runtimeScene => {
   if (!runtimeScene) return null;
 
@@ -54,6 +56,7 @@ const transform = runtimeScene => {
   };
 };
 
+// $FlowFixMe[missing-local-annot]
 const handleEdit = (edit, { onCall, onEdit }: Props) => {
   if (edit.namespace.length === 0 && edit.name === 'Time scale') {
     onCall(['_timeManager', 'setTimeScale'], [parseFloat(edit.new_value)]);
@@ -100,11 +103,12 @@ export default class RuntimeSceneInspector extends React.Component<
   Props,
   State
 > {
+  // $FlowFixMe[missing-local-annot]
   state = {
     newObjectName: '',
   };
 
-  render() {
+  render(): any {
     const { runtimeScene, onCall } = this.props;
     if (!runtimeScene) return null;
 

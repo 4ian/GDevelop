@@ -39,7 +39,7 @@ const ProjectManagerMainMenu = ({
   buildMainMenuProps,
   selectedMainMenuItemIndices,
   setSelectedMainMenuItemIndices,
-}: Props) => {
+}: Props): React.Node => {
   const mainMenuItems = React.useMemo(
     () =>
       adaptFromDeclarativeTemplate(
@@ -52,6 +52,7 @@ const ProjectManagerMainMenu = ({
   const { isMobile } = useResponsiveWindowSize();
   const shouldUseNativeMenu = !isNativeMobileApp() && !isMobile;
 
+  // $FlowFixMe[recursive-definition]
   const enhanceMenuItems = React.useCallback(
     (menuItems: Array<MenuItemTemplate>): Array<MenuItemTemplate> =>
       menuItems.map((menuItem, index) => {
@@ -64,7 +65,7 @@ const ProjectManagerMainMenu = ({
 
         if (menuItem.click) {
           const originalClick = menuItem.click;
-          // $FlowFixMe - Flow is not able to make the difference between checkbox & classic item.
+          // $FlowFixMe[incompatible-type] - Flow is not able to make the difference between checkbox & classic item.
           const newMenuItem: MenuItemTemplate = {
             ...menuItem,
             click: () => {

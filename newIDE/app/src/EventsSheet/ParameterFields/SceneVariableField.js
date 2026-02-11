@@ -17,7 +17,7 @@ import GlobalAndSceneVariablesDialog from '../../VariablesList/GlobalAndSceneVar
 
 const gd: libGDevelop = global.gd;
 
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function SceneVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
     const [
@@ -129,7 +129,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </React.Fragment>
     );
   }
-);
+  // $FlowFixMe[prop-missing]
+): React.AbstractComponent<
+  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
+  React.RefSetter<ParameterFieldInterface>
+>);
 
 const getVariableSourceFromIdentifier = (
   identifier: string,
@@ -138,7 +142,7 @@ const getVariableSourceFromIdentifier = (
 
 export const renderInlineSceneVariable = (
   props: ParameterInlineRendererProps
-) =>
+): any =>
   renderVariableWithIcon(
     props,
     'scene variable',

@@ -141,6 +141,7 @@ const getDashboardItemsToDisplay = ({
   currentFileMetadata: ?FileMetadata,
   allDashboardItems: ?Array<DashboardItem>,
   searchText: string,
+  // $FlowFixMe[value-as-type]
   searchClient: Fuse,
   currentPage: number,
   orderBy: GamesDashboardOrderBy,
@@ -293,7 +294,7 @@ const GamesList = ({
   setCurrentPage,
   searchText,
   setSearchText,
-}: Props) => {
+}: Props): React.Node => {
   const { cloudProjects, profile, onCloudProjectsChanged } = React.useContext(
     AuthenticatedUserContext
   );
@@ -322,6 +323,7 @@ const GamesList = ({
         .map(file => ({ projectFiles: [file] }));
       const allItems = [...projectFilesWithGame, ...projectFilesWithoutGame];
 
+      // $FlowFixMe[incompatible-type]
       return allItems.filter(
         item =>
           // Filter out draft games which don't have a project file linked to it (local or cloud)
@@ -341,6 +343,7 @@ const GamesList = ({
     ? Math.ceil(allDashboardItems.length / pageSize)
     : 1;
   const onCurrentPageChange = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     newPage => {
       const minPage = 1;
       const maxPage = totalNumberOfPages;
@@ -452,6 +455,7 @@ const GamesList = ({
             profile,
           }
         );
+        // $FlowFixMe[incompatible-type]
         setLastModifiedInfoByProjectId(_lastModifiedInfoByProjectId);
       };
 
@@ -550,7 +554,7 @@ const GamesList = ({
                 <SearchBarSelectField
                   value={orderBy}
                   onChange={(e, i, value: string) =>
-                    // $FlowFixMe
+                    // $FlowFixMe[incompatible-type]
                     setGamesDashboardOrderBy(value)
                   }
                 >

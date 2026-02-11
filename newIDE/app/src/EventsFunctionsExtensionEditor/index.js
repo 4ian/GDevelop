@@ -139,6 +139,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   Props,
   State
 > {
+  // $FlowFixMe[missing-local-annot]
   state = {
     selectedEventsFunction: null,
     selectedEventsBasedBehavior: null,
@@ -243,6 +244,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       eventsFunction,
     };
     this._projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+      // $FlowFixMe[incompatible-type]
       scope,
       this._objectsContainer,
       this._parameterVariablesContainer,
@@ -369,8 +371,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             selectedEventsFunction &&
             !selectedEventsFunction.getEvents().getEventsCount()
           ) {
+            // $FlowFixMe[incompatible-use]
             this._editorNavigator.openEditor('parameters');
           } else {
+            // $FlowFixMe[incompatible-use]
             this._editorNavigator.openEditor('events-sheet');
           }
         }
@@ -378,7 +382,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  _makeRenameEventsFunction = (i18n: I18nType) => (
+  _makeRenameEventsFunction = (i18n: I18nType): any => (
     eventsBasedBehavior: ?gdEventsBasedBehavior,
     eventsBasedObject: ?gdEventsBasedObject,
     eventsFunction: gdEventsFunction,
@@ -528,7 +532,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
   };
 
-  _makeMoveFreeEventsParameter = (i18n: I18nType) => (
+  _makeMoveFreeEventsParameter = (i18n: I18nType): any => (
     eventsFunction: gdEventsFunction,
     oldIndex: number,
     newIndex: number,
@@ -548,7 +552,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done(true);
   };
 
-  _makeMoveBehaviorEventsParameter = (i18n: I18nType) => (
+  _makeMoveBehaviorEventsParameter = (i18n: I18nType): any => (
     eventsBasedBehavior: gdEventsBasedBehavior,
     eventsFunction: gdEventsFunction,
     oldIndex: number,
@@ -570,7 +574,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done(true);
   };
 
-  _makeMoveObjectEventsParameter = (i18n: I18nType) => (
+  _makeMoveObjectEventsParameter = (i18n: I18nType): any => (
     eventsBasedObject: gdEventsBasedObject,
     eventsFunction: gdEventsFunction,
     oldIndex: number,
@@ -598,6 +602,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   ) => {
     if (
       this.state.selectedEventsFunction &&
+      // $FlowFixMe[incompatible-exact]
       gd.compare(eventsFunction, this.state.selectedEventsFunction)
     ) {
       this._selectEventsFunction(null, null, null);
@@ -691,7 +696,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  _makeRenameEventsBasedBehavior = (i18n: I18nType) => (
+  _makeRenameEventsBasedBehavior = (i18n: I18nType): any => (
     eventsBasedBehavior: gdEventsBasedBehavior,
     newName: string,
     done: boolean => void
@@ -723,7 +728,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done(true);
   };
 
-  _makeRenameEventsBasedObject = (i18n: I18nType) => (
+  _makeRenameEventsBasedObject = (i18n: I18nType): any => (
     eventsBasedObject: gdEventsBasedObject,
     newName: string,
     done: boolean => void
@@ -858,6 +863,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   ) => {
     if (
       this.state.selectedEventsBasedBehavior &&
+      // $FlowFixMe[incompatible-exact]
       gd.compare(eventsBasedBehavior, this.state.selectedEventsBasedBehavior)
     ) {
       this._selectEventsBasedBehavior(null);
@@ -872,6 +878,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   ) => {
     if (
       this.state.selectedEventsBasedObject &&
+      // $FlowFixMe[incompatible-exact]
       gd.compare(eventsBasedObject, this.state.selectedEventsBasedObject)
     ) {
       this._selectEventsBasedObject(null);
@@ -1344,7 +1351,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  render() {
+  render(): any {
     const { project, eventsFunctionsExtension } = this.props;
 
     const {
@@ -1831,6 +1838,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       mosaicContainsNode(
                         getDefaultEditorMosaicNode(
                           'events-functions-extension-editor'
+                          // $FlowFixMe[incompatible-type]
                         ) || getInitialMosaicEditorNodes(),
                         'functions-list'
                       )

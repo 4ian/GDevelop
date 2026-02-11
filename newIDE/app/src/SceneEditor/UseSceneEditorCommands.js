@@ -17,7 +17,7 @@ type Props = {|
   onEditLayer: (layer: gdLayer) => void,
 |};
 
-const UseSceneEditorCommands = (props: Props) => {
+const UseSceneEditorCommands = (props: Props): null => {
   const {
     project,
     layersContainer,

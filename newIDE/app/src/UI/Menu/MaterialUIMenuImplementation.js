@@ -46,6 +46,7 @@ const styles = {
   },
 };
 
+// $FlowFixMe[missing-local-annot]
 const SubMenuItem = ({ item, buildFromTemplate }) => {
   // The invisible backdrop behind the submenu is either:
   // - not clickable, when using a mouse (it's like it does not exist).
@@ -65,19 +66,21 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
   // When null, the submenu stays closed.
   const [anchorElement, setAnchorElement] = React.useState(null);
 
+  // $FlowFixMe[missing-local-annot]
   const handleClick = event => {
-    // $FlowFixMe - even if not defined, not a problem.
+    // $FlowFixMe[incompatible-type] - even if not defined, not a problem.
     if (item.enabled === false) {
       return;
     }
 
+    // $FlowFixMe[constant-condition]
     if (!anchorElement) {
       setAnchorElement(event.currentTarget);
     }
   };
 
   const handlePointerOver = (pointerEvent: SyntheticPointerEvent<>) => {
-    // $FlowFixMe - even if not defined, not a problem.
+    // $FlowFixMe[incompatible-type] - even if not defined, not a problem.
     if (item.enabled === false) {
       return;
     }
@@ -91,7 +94,9 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
       return;
     }
 
+    // $FlowFixMe[constant-condition]
     if (!anchorElement) {
+      // $FlowFixMe[incompatible-type]
       setAnchorElement(pointerEvent.currentTarget);
     }
   };
@@ -138,7 +143,7 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
         style={styles.menuItemWithSubMenu}
         key={item.label}
         disabled={
-          // $FlowFixMe - even if not defined, not a problem.
+          // $FlowFixMe[incompatible-type] - even if not defined, not a problem.
           item.enabled === false
         }
         onClick={handleClick}
@@ -211,7 +216,7 @@ export default class MaterialUIMenuImplementation
   buildFromTemplate(
     template: Array<MenuItemTemplate>,
     forceUpdate?: () => void
-  ) {
+  ): any {
     // This is not a real hook.
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const isTouchscreen = useScreenType() === 'touch';
@@ -232,11 +237,11 @@ export default class MaterialUIMenuImplementation
               dense={!!electron || !isTouchscreen}
               key={'checkbox' + item.label}
               checked={
-                // $FlowFixMe - existence should be inferred by Flow.
+                // $FlowFixMe[incompatible-type] - existence should be inferred by Flow.
                 item.checked
               }
               disabled={
-                // $FlowFixMe - existence should be inferred by Flow.
+                // $FlowFixMe[incompatible-type] - existence should be inferred by Flow.
                 item.enabled === false
               }
               onClick={async e => {
@@ -317,7 +322,7 @@ export default class MaterialUIMenuImplementation
     // Automatically done by IconMenu
   }
 
-  getMenuProps() {
+  getMenuProps(): any {
     return {};
   }
 }

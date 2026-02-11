@@ -672,50 +672,65 @@ for root, dirs, files in os.walk(src_dir):
         new_lines = []
         i = 0
         while i < len(lines):
-            # Pattern: $FlowFixMe[...], then eslint-disable-next-line, then code
+            # Pattern: eslint-disable-next-line, then one or more $FlowFixMe[...], then code
             if (i + 2 < len(lines) and
-                '$FlowFixMe[' in lines[i] and
-                'eslint-disable-next-line' in lines[i + 1]):
-                m = re.search(r'eslint-disable-next-line\s+(.+)', lines[i + 1])
-                if m:
-                    rule = m.group(1).strip()
-                    indent = ''
-                    for ch in lines[i + 2]:
-                        if ch in (' ', '\t'):
-                            indent += ch
-                        else:
-                            break
-                    # Use eslint-disable/enable block instead
-                    new_lines.append(f'{indent}/* eslint-disable {rule} */\n')
-                    new_lines.append(lines[i])  # Keep $FlowFixMe
-                    new_lines.append(lines[i + 2])  # Keep code
-                    new_lines.append(f'{indent}/* eslint-enable {rule} */\n')
-                    i += 3
-                    modified = True
-                    fixed += 1
-                    continue
-            # Pattern: eslint-disable-next-line, then $FlowFixMe[...], then code
-            elif (i + 2 < len(lines) and
                   'eslint-disable-next-line' in lines[i] and
                   '$FlowFixMe[' in lines[i + 1]):
                 m = re.search(r'eslint-disable-next-line\s+(.+)', lines[i])
                 if m:
                     rule = m.group(1).strip()
-                    indent = ''
-                    for ch in lines[i + 2]:
-                        if ch in (' ', '\t'):
-                            indent += ch
-                        else:
-                            break
-                    # Use eslint-disable/enable block instead
-                    new_lines.append(f'{indent}/* eslint-disable {rule} */\n')
-                    new_lines.append(lines[i + 1])  # Keep $FlowFixMe
-                    new_lines.append(lines[i + 2])  # Keep code
-                    new_lines.append(f'{indent}/* eslint-enable {rule} */\n')
-                    i += 3
-                    modified = True
-                    fixed += 1
-                    continue
+                    # Collect all consecutive FlowFixMe lines
+                    fixme_lines = []
+                    j = i + 1
+                    while j < len(lines) and '$FlowFixMe[' in lines[j]:
+                        fixme_lines.append(lines[j])
+                        j += 1
+                    if j < len(lines):
+                        code_line = lines[j]
+                        indent = ''
+                        for ch in code_line:
+                            if ch in (' ', '\t'):
+                                indent += ch
+                            else:
+                                break
+                        # Use eslint-disable/enable block wrapping FlowFixMe + code
+                        new_lines.append(f'{indent}/* eslint-disable {rule} */\n')
+                        for fl in fixme_lines:
+                            new_lines.append(fl)
+                        new_lines.append(code_line)
+                        new_lines.append(f'{indent}/* eslint-enable {rule} */\n')
+                        i = j + 1
+                        modified = True
+                        fixed += 1
+                        continue
+            # Pattern: one or more $FlowFixMe[...], then eslint-disable-next-line, then code
+            elif (i + 2 < len(lines) and
+                '$FlowFixMe[' in lines[i] and
+                'eslint-disable-next-line' in lines[i + 1]):
+                # Find where the FlowFixMe block starts
+                fixme_start = i
+                # The eslint line is after one FlowFixMe; collect FlowFixMe after it too
+                m = re.search(r'eslint-disable-next-line\s+(.+)', lines[i + 1])
+                if m:
+                    rule = m.group(1).strip()
+                    j = i + 2
+                    # Code line is right after eslint-disable-next-line
+                    if j < len(lines):
+                        code_line = lines[j]
+                        indent = ''
+                        for ch in code_line:
+                            if ch in (' ', '\t'):
+                                indent += ch
+                            else:
+                                break
+                        new_lines.append(f'{indent}/* eslint-disable {rule} */\n')
+                        new_lines.append(lines[i])  # Keep $FlowFixMe
+                        new_lines.append(code_line)
+                        new_lines.append(f'{indent}/* eslint-enable {rule} */\n')
+                        i = j + 1
+                        modified = True
+                        fixed += 1
+                        continue
             
             new_lines.append(lines[i])
             i += 1
@@ -726,6 +741,14 @@ for root, dirs, files in os.walk(src_dir):
 
 print(f"  Fixed {fixed} eslint/FlowFixMe orderings")
 PYEOF
+
+###############################################################################
+# STEP 11: Final format after all fixes
+###############################################################################
+echo ""
+echo "--- Step 11: Final format pass ---"
+npm run format 2>&1 || true
+echo "  Done."
 
 echo ""
 echo "=== Flow Migration Fix Script Complete ==="

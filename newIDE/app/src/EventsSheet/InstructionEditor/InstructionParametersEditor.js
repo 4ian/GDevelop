@@ -325,7 +325,8 @@ const InstructionParametersEditor = React.forwardRef<
                   </Line>
                 </Column>
               </Line>
-              {showDeprecatedInstructionWarning && instructionMetadata.isHidden() && (
+              {showDeprecatedInstructionWarning !== 'no' &&
+                instructionMetadata.isHidden() && (
                 <Line>
                   <AlertMessage kind="warning">
                     {instructionMetadata.getDeprecationMessage() ? (

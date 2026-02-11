@@ -63,19 +63,36 @@ export default class Clipboard {
    * Quickly check that the clipboard content *should* be containing valid JSON content
    * of the specified kind.
    *
-   * This is a synchronous check against the in-memory clipboard (or Electron clipboard).
-   * It does NOT read the system clipboard (which is async on the web).
-   * Use `Clipboard.read` for a full async read that checks the system clipboard.
+   * On Electron, this is a synchronous check against the system clipboard.
+   * On the web, this checks the in-memory clipboard first. If nothing is found
+   * but the Web Clipboard API is available, it optimistically returns true
+   * because the system clipboard might contain valid content from another tab.
+   * Paste operations use `Clipboard.read` which handles invalid content gracefully.
    */
   static has(kind: ClipboardKind): boolean {
-    let text = '';
     if (electronClipboard) {
-      text = electronClipboard.readText();
-    } else {
-      text = internalClipboard;
+      return (
+        electronClipboard.readText().indexOf(mangleClipboardKind(kind)) === 12
+      );
     }
 
-    return text.indexOf(mangleClipboardKind(kind)) === 12; /// 12 is the position of '000kind' value
+    // Check in-memory clipboard first.
+    if (internalClipboard.indexOf(mangleClipboardKind(kind)) === 12) {
+      return true;
+    }
+
+    // If Web Clipboard API is available, the system clipboard might contain
+    // valid content from another tab — optimistically return true.
+    // Paste operations use Clipboard.read() which handles invalid content gracefully.
+    if (
+      typeof navigator !== 'undefined' &&
+      navigator.clipboard &&
+      navigator.clipboard.readText
+    ) {
+      return true;
+    }
+
+    return false;
   }
 
   /**

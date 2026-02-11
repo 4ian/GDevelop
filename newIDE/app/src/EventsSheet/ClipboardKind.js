@@ -23,6 +23,9 @@ export const CLIPBOARD_KIND = 'EventsAndInstructions';
 export const hasClipboardEvents = () => {
   if (!Clipboard.has(CLIPBOARD_KIND)) return false;
   const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
+  // If in-memory clipboard has no content but has() returned true,
+  // it means Web Clipboard API is available and might have content.
+  if (clipboardContent === null) return true;
   const eventsCount = SafeExtractor.extractNumberProperty(
     clipboardContent,
     'eventsCount'
@@ -35,6 +38,9 @@ export const hasClipboardEvents = () => {
 export const hasClipboardConditions = () => {
   if (!Clipboard.has(CLIPBOARD_KIND)) return false;
   const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
+  // If in-memory clipboard has no content but has() returned true,
+  // it means Web Clipboard API is available and might have content.
+  if (clipboardContent === null) return true;
   const conditionsCount = SafeExtractor.extractNumberProperty(
     clipboardContent,
     'conditionsCount'
@@ -47,6 +53,9 @@ export const hasClipboardConditions = () => {
 export const hasClipboardActions = () => {
   if (!Clipboard.has(CLIPBOARD_KIND)) return false;
   const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
+  // If in-memory clipboard has no content but has() returned true,
+  // it means Web Clipboard API is available and might have content.
+  if (clipboardContent === null) return true;
   const actionsCount = SafeExtractor.extractNumberProperty(
     clipboardContent,
     'actionsCount'

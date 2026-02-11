@@ -566,7 +566,9 @@ export const useManageEffects = ({
 
   const pasteEffects = React.useCallback(
     async effectInsertionIndex => {
-      const clipboardContent = Clipboard.get(EFFECTS_CLIPBOARD_KIND);
+      const clipboardContent = await Clipboard.read(EFFECTS_CLIPBOARD_KIND);
+      if (!clipboardContent) return;
+
       const effectContents = SafeExtractor.extractArray(clipboardContent);
       if (!effectContents) return;
 

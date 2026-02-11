@@ -406,47 +406,51 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
   }
 
   paste(): void {
-    if (!Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND)) return;
+    Clipboard.read(EVENTS_FUNCTION_CLIPBOARD_KIND).then(clipboardContent => {
+      if (!clipboardContent) return;
 
-    const clipboardContent = Clipboard.get(EVENTS_FUNCTION_CLIPBOARD_KIND);
-    const copiedEventsFunction = SafeExtractor.extractObjectProperty(
-      clipboardContent,
-      'eventsFunction'
-    );
-    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
-    if (!name || !copiedEventsFunction) return;
+      const copiedEventsFunction = SafeExtractor.extractObjectProperty(
+        clipboardContent,
+        'eventsFunction'
+      );
+      const name = SafeExtractor.extractStringProperty(
+        clipboardContent,
+        'name'
+      );
+      if (!name || !copiedEventsFunction) return;
 
-    const { project, eventsFunctionsContainer } = this.props;
+      const { project, eventsFunctionsContainer } = this.props;
 
-    const newName = newNameGenerator(name, name =>
-      eventsFunctionsContainer.hasEventsFunctionNamed(name)
-    );
+      const newName = newNameGenerator(name, name =>
+        eventsFunctionsContainer.hasEventsFunctionNamed(name)
+      );
 
-    const newEventsFunction = eventsFunctionsContainer.insertNewEventsFunction(
-      newName,
-      this.getIndex() + 1
-    );
+      const newEventsFunction = eventsFunctionsContainer.insertNewEventsFunction(
+        newName,
+        this.getIndex() + 1
+      );
 
-    unserializeFromJSObject(
-      newEventsFunction,
-      copiedEventsFunction,
-      'unserializeFrom',
-      project
-    );
-    newEventsFunction.setName(newName);
-    this.props.onEventsFunctionAdded(
-      newEventsFunction,
-      this.props.eventsBasedBehavior,
-      this.props.eventsBasedObject
-    );
+      unserializeFromJSObject(
+        newEventsFunction,
+        copiedEventsFunction,
+        'unserializeFrom',
+        project
+      );
+      newEventsFunction.setName(newName);
+      this.props.onEventsFunctionAdded(
+        newEventsFunction,
+        this.props.eventsBasedBehavior,
+        this.props.eventsBasedObject
+      );
 
-    this._onEventsFunctionModified();
-    this.props.onSelectEventsFunction(
-      newEventsFunction,
-      this.props.eventsBasedBehavior,
-      this.props.eventsBasedObject
-    );
-    this.props.editName(getEventsFunctionTreeViewItemId(newEventsFunction));
+      this._onEventsFunctionModified();
+      this.props.onSelectEventsFunction(
+        newEventsFunction,
+        this.props.eventsBasedBehavior,
+        this.props.eventsBasedObject
+      );
+      this.props.editName(getEventsFunctionTreeViewItemId(newEventsFunction));
+    });
   }
 
   _duplicateEventsFunction(): void {

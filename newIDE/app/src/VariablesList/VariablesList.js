@@ -839,11 +839,12 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
     );
 
     const pasteClipboardContent = React.useCallback(
-      () => {
-        if (!Clipboard.has(CLIPBOARD_KIND)) return;
+      async () => {
+        const clipboardContent = await Clipboard.read(CLIPBOARD_KIND);
+        if (!clipboardContent) return;
+
         const newSelectedNodes = [];
 
-        const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
         const variablesContent = SafeExtractor.extractArray(clipboardContent);
         if (!variablesContent) return;
 

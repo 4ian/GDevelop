@@ -178,37 +178,41 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
   }
 
   paste(): void {
-    if (!Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND)) return;
+    Clipboard.read(EXTERNAL_EVENTS_CLIPBOARD_KIND).then(clipboardContent => {
+      if (!clipboardContent) return;
 
-    const clipboardContent = Clipboard.get(EXTERNAL_EVENTS_CLIPBOARD_KIND);
-    const copiedExternalEvents = SafeExtractor.extractObjectProperty(
-      clipboardContent,
-      'externalEvents'
-    );
-    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
-    if (!name || !copiedExternalEvents) return;
+      const copiedExternalEvents = SafeExtractor.extractObjectProperty(
+        clipboardContent,
+        'externalEvents'
+      );
+      const name = SafeExtractor.extractStringProperty(
+        clipboardContent,
+        'name'
+      );
+      if (!name || !copiedExternalEvents) return;
 
-    const project = this.props.project;
-    const newName = newNameGenerator(name, name =>
-      project.hasExternalEventsNamed(name)
-    );
+      const project = this.props.project;
+      const newName = newNameGenerator(name, name =>
+        project.hasExternalEventsNamed(name)
+      );
 
-    const newExternalEvents = project.insertNewExternalEvents(
-      newName,
-      this.getIndex() + 1
-    );
+      const newExternalEvents = project.insertNewExternalEvents(
+        newName,
+        this.getIndex() + 1
+      );
 
-    unserializeFromJSObject(
-      newExternalEvents,
-      copiedExternalEvents,
-      'unserializeFrom',
-      project
-    );
-    // Unserialization has overwritten the name.
-    newExternalEvents.setName(newName);
+      unserializeFromJSObject(
+        newExternalEvents,
+        copiedExternalEvents,
+        'unserializeFrom',
+        project
+      );
+      // Unserialization has overwritten the name.
+      newExternalEvents.setName(newName);
 
-    this._onProjectItemModified();
-    this.props.editName(getExternalEventsTreeViewItemId(newExternalEvents));
+      this._onProjectItemModified();
+      this.props.editName(getExternalEventsTreeViewItemId(newExternalEvents));
+    });
   }
 
   _duplicate(): void {

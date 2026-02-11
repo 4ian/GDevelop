@@ -407,62 +407,63 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   cut(): void {}
 
   paste(): void {
-    if (!Clipboard.has(OBJECT_CLIPBOARD_KIND)) return;
+    Clipboard.read(OBJECT_CLIPBOARD_KIND).then(clipboardContent => {
+      if (!clipboardContent) return;
 
-    const clipboardContent = Clipboard.get(OBJECT_CLIPBOARD_KIND);
-    const serializedObject = SafeExtractor.extractObjectProperty(
-      clipboardContent,
-      'object'
-    );
-    const objectName = SafeExtractor.extractStringProperty(
-      clipboardContent,
-      'name'
-    );
-    const objectType = SafeExtractor.extractStringProperty(
-      clipboardContent,
-      'type'
-    );
-    if (!objectName || !objectType || !serializedObject) return;
+      const serializedObject = SafeExtractor.extractObjectProperty(
+        clipboardContent,
+        'object'
+      );
+      const objectName = SafeExtractor.extractStringProperty(
+        clipboardContent,
+        'name'
+      );
+      const objectType = SafeExtractor.extractStringProperty(
+        clipboardContent,
+        'type'
+      );
+      if (!objectName || !objectType || !serializedObject) return;
 
-    const {
-      project,
-      globalObjectsContainer,
-      objectsContainer,
-      onObjectPasted,
-      expandFolders,
-      onObjectModified,
-      onObjectCreated,
-    } = this.props;
+      const {
+        project,
+        globalObjectsContainer,
+        objectsContainer,
+        onObjectPasted,
+        expandFolders,
+        onObjectModified,
+        onObjectCreated,
+      } = this.props;
 
-    const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
-      project,
-      objectType
-    );
+      const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+        project,
+        objectType
+      );
 
-    const newObjectWithContext = addSerializedObjectToObjectsContainer({
-      project,
-      globalObjectsContainer,
-      objectsContainer,
-      objectName,
-      positionObjectFolderOrObjectWithContext: {
-        objectFolderOrObject: this.objectFolder,
-        global: this._isGlobal,
-      },
-      objectType,
-      serializedObject,
-      addInsideFolder: true,
+      const newObjectWithContext = addSerializedObjectToObjectsContainer({
+        project,
+        globalObjectsContainer,
+        objectsContainer,
+        objectName,
+        positionObjectFolderOrObjectWithContext: {
+          objectFolderOrObject: this.objectFolder,
+          global: this._isGlobal,
+        },
+        objectType,
+        serializedObject,
+        addInsideFolder: true,
+      });
+
+      onObjectCreated(
+        [newObjectWithContext.object],
+        isTheFirstOfItsTypeInProject
+      );
+
+      onObjectModified(false);
+      if (onObjectPasted) onObjectPasted(newObjectWithContext.object);
+      expandFolders([
+        { objectFolderOrObject: this.objectFolder, global: this._isGlobal },
+      ]);
     });
-
-    onObjectCreated(
-      [newObjectWithContext.object],
-      isTheFirstOfItsTypeInProject
-    );
-
-    onObjectModified(false);
-    if (onObjectPasted) onObjectPasted(newObjectWithContext.object);
-    expandFolders([
-      { objectFolderOrObject: this.objectFolder, global: this._isGlobal },
-    ]);
   }
 
   duplicate(): void {}

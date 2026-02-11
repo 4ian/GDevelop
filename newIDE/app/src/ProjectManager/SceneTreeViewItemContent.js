@@ -254,31 +254,40 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   paste(): void {
-    if (!Clipboard.has(SCENE_CLIPBOARD_KIND)) return;
+    Clipboard.read(SCENE_CLIPBOARD_KIND).then(clipboardContent => {
+      if (!clipboardContent) return;
 
-    const clipboardContent = Clipboard.get(SCENE_CLIPBOARD_KIND);
-    const copiedScene = SafeExtractor.extractObjectProperty(
-      clipboardContent,
-      'layout'
-    );
-    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
-    if (!name || !copiedScene) return;
+      const copiedScene = SafeExtractor.extractObjectProperty(
+        clipboardContent,
+        'layout'
+      );
+      const name = SafeExtractor.extractStringProperty(
+        clipboardContent,
+        'name'
+      );
+      if (!name || !copiedScene) return;
 
-    const project = this.props.project;
-    const newName = newNameGenerator(name, name =>
-      project.hasLayoutNamed(name)
-    );
+      const project = this.props.project;
+      const newName = newNameGenerator(name, name =>
+        project.hasLayoutNamed(name)
+      );
 
-    const newScene = project.insertNewLayout(newName, this.getIndex() + 1);
+      const newScene = project.insertNewLayout(newName, this.getIndex() + 1);
 
-    unserializeFromJSObject(newScene, copiedScene, 'unserializeFrom', project);
-    // Unserialization has overwritten the name.
-    newScene.setName(newName);
-    newScene.updateBehaviorsSharedData(project);
+      unserializeFromJSObject(
+        newScene,
+        copiedScene,
+        'unserializeFrom',
+        project
+      );
+      // Unserialization has overwritten the name.
+      newScene.setName(newName);
+      newScene.updateBehaviorsSharedData(project);
 
-    this._onProjectItemModified();
-    this.props.editName(getSceneTreeViewItemId(newScene));
-    this.props.onSceneAdded();
+      this._onProjectItemModified();
+      this.props.editName(getSceneTreeViewItemId(newScene));
+      this.props.onSceneAdded();
+    });
   }
 
   _duplicate(): void {

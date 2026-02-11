@@ -179,38 +179,42 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
   }
 
   paste(): void {
-    if (!Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)) return;
+    Clipboard.read(EXTERNAL_LAYOUT_CLIPBOARD_KIND).then(clipboardContent => {
+      if (!clipboardContent) return;
 
-    const clipboardContent = Clipboard.get(EXTERNAL_LAYOUT_CLIPBOARD_KIND);
-    const copiedExternalLayout = SafeExtractor.extractObjectProperty(
-      clipboardContent,
-      'externalLayout'
-    );
-    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
-    if (!name || !copiedExternalLayout) return;
+      const copiedExternalLayout = SafeExtractor.extractObjectProperty(
+        clipboardContent,
+        'externalLayout'
+      );
+      const name = SafeExtractor.extractStringProperty(
+        clipboardContent,
+        'name'
+      );
+      if (!name || !copiedExternalLayout) return;
 
-    const project = this.props.project;
-    const newName = newNameGenerator(name, name =>
-      project.hasExternalLayoutNamed(name)
-    );
+      const project = this.props.project;
+      const newName = newNameGenerator(name, name =>
+        project.hasExternalLayoutNamed(name)
+      );
 
-    const newExternalLayout = project.insertNewExternalLayout(
-      newName,
-      this.getIndex() + 1
-    );
+      const newExternalLayout = project.insertNewExternalLayout(
+        newName,
+        this.getIndex() + 1
+      );
 
-    unserializeFromJSObject(
-      newExternalLayout,
-      copiedExternalLayout,
-      'unserializeFrom',
-      project
-    );
-    // Unserialization has overwritten the name.
-    newExternalLayout.setName(newName);
+      unserializeFromJSObject(
+        newExternalLayout,
+        copiedExternalLayout,
+        'unserializeFrom',
+        project
+      );
+      // Unserialization has overwritten the name.
+      newExternalLayout.setName(newName);
 
-    this._onProjectItemModified();
-    this.props.editName(getExternalLayoutTreeViewItemId(newExternalLayout));
-    this.props.onExternalLayoutAdded();
+      this._onProjectItemModified();
+      this.props.editName(getExternalLayoutTreeViewItemId(newExternalLayout));
+      this.props.onExternalLayoutAdded();
+    });
   }
 
   _duplicate(): void {

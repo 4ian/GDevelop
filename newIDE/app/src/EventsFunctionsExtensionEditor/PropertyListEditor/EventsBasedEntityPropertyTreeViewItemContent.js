@@ -60,9 +60,9 @@ export const pasteProperties = async (
     existingPropertyNames: string[]
   ) => Promise<boolean>
 ): Promise<boolean> => {
-  if (!Clipboard.has(PROPERTIES_CLIPBOARD_KIND)) return false;
+  const clipboardContent = await Clipboard.read(PROPERTIES_CLIPBOARD_KIND);
+  if (!clipboardContent) return false;
 
-  const clipboardContent = Clipboard.get(PROPERTIES_CLIPBOARD_KIND);
   const propertyContents = SafeExtractor.extractArray(clipboardContent);
   if (!propertyContents) return false;
 

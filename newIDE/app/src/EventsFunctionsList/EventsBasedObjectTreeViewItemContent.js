@@ -292,54 +292,57 @@ export class EventsBasedObjectTreeViewItemContent
   }
 
   paste(): void {
-    if (!Clipboard.has(EVENTS_BASED_OBJECT_CLIPBOARD_KIND)) return;
+    Clipboard.read(EVENTS_BASED_OBJECT_CLIPBOARD_KIND).then(
+      clipboardContent => {
+        if (!clipboardContent) return;
 
-    const clipboardContent = Clipboard.get(EVENTS_BASED_OBJECT_CLIPBOARD_KIND);
-    const copiedEventsBasedObject = SafeExtractor.extractObjectProperty(
-      clipboardContent,
-      'eventsBasedObject'
+        const copiedEventsBasedObject = SafeExtractor.extractObjectProperty(
+          clipboardContent,
+          'eventsBasedObject'
+        );
+        const sourceEventsBasedObjectName = SafeExtractor.extractStringProperty(
+          clipboardContent,
+          'name'
+        );
+        if (!sourceEventsBasedObjectName || !copiedEventsBasedObject) return;
+
+        const { project, eventsBasedObjectsList } = this.props;
+
+        const newName = newNameGenerator(sourceEventsBasedObjectName, name =>
+          eventsBasedObjectsList.has(name)
+        );
+
+        const newEventsBasedObject = eventsBasedObjectsList.insertNew(
+          newName,
+          this.getIndex() + 1
+        );
+
+        unserializeFromJSObject(
+          newEventsBasedObject,
+          copiedEventsBasedObject,
+          'unserializeFrom',
+          project
+        );
+        newEventsBasedObject.setName(newName);
+
+        const sourceExtensionName = SafeExtractor.extractStringProperty(
+          clipboardContent,
+          'extensionName'
+        );
+        if (sourceExtensionName) {
+          this.props.onEventsBasedObjectPasted(
+            newEventsBasedObject,
+            sourceExtensionName,
+            sourceEventsBasedObjectName
+          );
+        }
+
+        this._onEventsBasedObjectModified();
+        this.props.onEventBasedObjectTypeChanged();
+        this.props.onSelectEventsBasedObject(newEventsBasedObject);
+        this.props.editName(getObjectTreeViewItemId(newEventsBasedObject));
+      }
     );
-    const sourceEventsBasedObjectName = SafeExtractor.extractStringProperty(
-      clipboardContent,
-      'name'
-    );
-    if (!sourceEventsBasedObjectName || !copiedEventsBasedObject) return;
-
-    const { project, eventsBasedObjectsList } = this.props;
-
-    const newName = newNameGenerator(sourceEventsBasedObjectName, name =>
-      eventsBasedObjectsList.has(name)
-    );
-
-    const newEventsBasedObject = eventsBasedObjectsList.insertNew(
-      newName,
-      this.getIndex() + 1
-    );
-
-    unserializeFromJSObject(
-      newEventsBasedObject,
-      copiedEventsBasedObject,
-      'unserializeFrom',
-      project
-    );
-    newEventsBasedObject.setName(newName);
-
-    const sourceExtensionName = SafeExtractor.extractStringProperty(
-      clipboardContent,
-      'extensionName'
-    );
-    if (sourceExtensionName) {
-      this.props.onEventsBasedObjectPasted(
-        newEventsBasedObject,
-        sourceExtensionName,
-        sourceEventsBasedObjectName
-      );
-    }
-
-    this._onEventsBasedObjectModified();
-    this.props.onEventBasedObjectTypeChanged();
-    this.props.onSelectEventsBasedObject(newEventsBasedObject);
-    this.props.editName(getObjectTreeViewItemId(newEventsBasedObject));
   }
 
   _addNewEventsBasedObject(): void {

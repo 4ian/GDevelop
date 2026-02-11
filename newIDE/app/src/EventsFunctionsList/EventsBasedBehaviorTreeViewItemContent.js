@@ -283,56 +283,58 @@ export class EventsBasedBehaviorTreeViewItemContent
   }
 
   paste(): void {
-    if (!Clipboard.has(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND)) return;
+    Clipboard.read(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND).then(
+      clipboardContent => {
+        if (!clipboardContent) return;
 
-    const clipboardContent = Clipboard.get(
-      EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND
-    );
-    const sourceEventsBasedBehavior = SafeExtractor.extractObjectProperty(
-      clipboardContent,
-      'eventsBasedBehavior'
-    );
-    const sourceEventsBasedBehaviorName = SafeExtractor.extractStringProperty(
-      clipboardContent,
-      'name'
-    );
-    if (!sourceEventsBasedBehaviorName || !sourceEventsBasedBehavior) return;
+        const sourceEventsBasedBehavior = SafeExtractor.extractObjectProperty(
+          clipboardContent,
+          'eventsBasedBehavior'
+        );
+        const sourceEventsBasedBehaviorName = SafeExtractor.extractStringProperty(
+          clipboardContent,
+          'name'
+        );
+        if (!sourceEventsBasedBehaviorName || !sourceEventsBasedBehavior)
+          return;
 
-    const { project, eventsBasedBehaviorsList } = this.props;
+        const { project, eventsBasedBehaviorsList } = this.props;
 
-    const newName = newNameGenerator(sourceEventsBasedBehaviorName, name =>
-      eventsBasedBehaviorsList.has(name)
-    );
+        const newName = newNameGenerator(sourceEventsBasedBehaviorName, name =>
+          eventsBasedBehaviorsList.has(name)
+        );
 
-    const newEventsBasedBehavior = eventsBasedBehaviorsList.insertNew(
-      newName,
-      this.getIndex() + 1
-    );
+        const newEventsBasedBehavior = eventsBasedBehaviorsList.insertNew(
+          newName,
+          this.getIndex() + 1
+        );
 
-    unserializeFromJSObject(
-      newEventsBasedBehavior,
-      sourceEventsBasedBehavior,
-      'unserializeFrom',
-      project
-    );
-    newEventsBasedBehavior.setName(newName);
+        unserializeFromJSObject(
+          newEventsBasedBehavior,
+          sourceEventsBasedBehavior,
+          'unserializeFrom',
+          project
+        );
+        newEventsBasedBehavior.setName(newName);
 
-    const sourceExtensionName = SafeExtractor.extractStringProperty(
-      clipboardContent,
-      'extensionName'
-    );
-    if (sourceExtensionName) {
-      this.props.onEventsBasedBehaviorPasted(
-        newEventsBasedBehavior,
-        sourceExtensionName,
-        sourceEventsBasedBehaviorName
-      );
-    }
+        const sourceExtensionName = SafeExtractor.extractStringProperty(
+          clipboardContent,
+          'extensionName'
+        );
+        if (sourceExtensionName) {
+          this.props.onEventsBasedBehaviorPasted(
+            newEventsBasedBehavior,
+            sourceExtensionName,
+            sourceEventsBasedBehaviorName
+          );
+        }
 
-    this._onEventsBasedBehaviorModified();
-    this.props.onSelectEventsBasedBehavior(newEventsBasedBehavior);
-    this.props.editName(
-      getEventsBasedBehaviorTreeViewItemId(newEventsBasedBehavior)
+        this._onEventsBasedBehaviorModified();
+        this.props.onSelectEventsBasedBehavior(newEventsBasedBehavior);
+        this.props.editName(
+          getEventsBasedBehaviorTreeViewItemId(newEventsBasedBehavior)
+        );
+      }
     );
   }
 

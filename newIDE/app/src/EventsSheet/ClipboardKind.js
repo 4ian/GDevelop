@@ -120,14 +120,22 @@ export const copySelectionToClipboard = (selection: SelectionState) => {
   conditionsList.delete();
 };
 
-export const pasteEventsFromClipboardInSelection = (
+export const pasteEventsFromClipboardInSelection = async (
   project: gdProject,
   selection: SelectionState
-): boolean => {
+): Promise<boolean> => {
   const lastSelectEventContext = getLastSelectedEventContext(selection);
-  if (!lastSelectEventContext || !hasClipboardEvents()) return false;
+  if (!lastSelectEventContext) return false;
 
-  const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
+  const clipboardContent = await Clipboard.read(CLIPBOARD_KIND);
+  if (!clipboardContent) return false;
+
+  const eventsCount = SafeExtractor.extractNumberProperty(
+    clipboardContent,
+    'eventsCount'
+  );
+  if (eventsCount === null || eventsCount <= 0) return false;
+
   const eventsListContent = SafeExtractor.extractArrayProperty(
     clipboardContent,
     'eventsList'
@@ -153,18 +161,19 @@ export const pasteEventsFromClipboardInSelection = (
   return true;
 };
 
-export const pasteInstructionsFromClipboardInSelection = (
+export const pasteInstructionsFromClipboardInSelection = async (
   project: gdProject,
   selection: SelectionState
-): boolean => {
+): Promise<boolean> => {
   if (
-    (!hasInstructionSelected(selection) &&
-      !hasInstructionsListSelected(selection)) ||
-    (!hasClipboardConditions() && !hasClipboardActions())
+    !hasInstructionSelected(selection) &&
+    !hasInstructionsListSelected(selection)
   )
     return false;
 
-  const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
+  const clipboardContent = await Clipboard.read(CLIPBOARD_KIND);
+  if (!clipboardContent) return false;
+
   const actionsListContent = SafeExtractor.extractArrayProperty(
     clipboardContent,
     'actionsList'
@@ -236,13 +245,13 @@ export const pasteInstructionsFromClipboardInSelection = (
   return true;
 };
 
-export const pasteInstructionsFromClipboardInInstructionsList = (
+export const pasteInstructionsFromClipboardInInstructionsList = async (
   project: gdProject,
   instructionsListContext: InstructionsListContext
-) => {
-  if (!hasClipboardConditions() && !hasClipboardActions()) return false;
+): Promise<boolean> => {
+  const clipboardContent = await Clipboard.read(CLIPBOARD_KIND);
+  if (!clipboardContent) return false;
 
-  const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
   const actionsListContent = SafeExtractor.extractArrayProperty(
     clipboardContent,
     'actionsList'
@@ -251,7 +260,7 @@ export const pasteInstructionsFromClipboardInInstructionsList = (
     clipboardContent,
     'conditionsList'
   );
-  if (!actionsListContent || !conditionsListContent) return;
+  if (!actionsListContent || !conditionsListContent) return false;
 
   const actionsList = new gd.InstructionsList();
   const conditionsList = new gd.InstructionsList();

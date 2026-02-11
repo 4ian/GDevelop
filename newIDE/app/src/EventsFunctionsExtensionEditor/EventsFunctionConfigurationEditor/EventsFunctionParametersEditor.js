@@ -329,7 +329,9 @@ export const EventsFunctionParametersEditor = ({
 
   const pasteParameters = React.useCallback(
     async propertyInsertionIndex => {
-      const clipboardContent = Clipboard.get(PARAMETERS_CLIPBOARD_KIND);
+      const clipboardContent = await Clipboard.read(PARAMETERS_CLIPBOARD_KIND);
+      if (!clipboardContent) return;
+
       const parameterContents = SafeExtractor.extractArray(clipboardContent);
       if (!parameterContents) return;
 

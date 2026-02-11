@@ -468,7 +468,9 @@ export const useManageObjectBehaviors = ({
 
   const pasteBehaviors = React.useCallback(
     async () => {
-      const clipboardContent = Clipboard.get(BEHAVIORS_CLIPBOARD_KIND);
+      const clipboardContent = await Clipboard.read(BEHAVIORS_CLIPBOARD_KIND);
+      if (!clipboardContent) return;
+
       const behaviorContents = SafeExtractor.extractArray(clipboardContent);
       if (!behaviorContents) return;
 

@@ -1301,12 +1301,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     this.deleteSelection();
   };
 
-  pasteEvents = () => {
+  pasteEvents = async () => {
     if (
-      !pasteEventsFromClipboardInSelection(
+      !(await pasteEventsFromClipboardInSelection(
         this.props.project,
         this.state.selection
-      )
+      ))
     ) {
       return;
     }
@@ -1325,12 +1325,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
   };
 
-  pasteInstructions = () => {
+  pasteInstructions = async () => {
     if (
-      !pasteInstructionsFromClipboardInSelection(
+      !(await pasteInstructionsFromClipboardInSelection(
         this.props.project,
         this.state.selection
-      )
+      ))
     ) {
       return;
     }
@@ -1350,23 +1350,23 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
   };
 
-  pasteEventsOrInstructions = () => {
-    if (hasEventSelected(this.state.selection)) this.pasteEvents();
+  pasteEventsOrInstructions = async () => {
+    if (hasEventSelected(this.state.selection)) await this.pasteEvents();
     else if (hasInstructionSelected(this.state.selection))
-      this.pasteInstructions();
+      await this.pasteInstructions();
     else if (hasInstructionsListSelected(this.state.selection))
-      this.pasteInstructions();
+      await this.pasteInstructions();
   };
 
-  pasteInstructionsInInstructionsList = (
+  pasteInstructionsInInstructionsList = async (
     eventContext: EventContext,
     instructionsListContext: InstructionsListContext
   ) => {
     if (
-      !pasteInstructionsFromClipboardInInstructionsList(
+      !(await pasteInstructionsFromClipboardInInstructionsList(
         this.props.project,
         instructionsListContext
-      )
+      ))
     ) {
       return;
     }

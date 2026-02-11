@@ -2450,8 +2450,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.forceUpdatePropertiesEditor();
   };
 
-  paste = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
-    const clipboardContent = Clipboard.get(INSTANCES_CLIPBOARD_KIND);
+  paste = async ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
+    const clipboardContent = await Clipboard.read(INSTANCES_CLIPBOARD_KIND);
+    if (!clipboardContent) return;
+
     const instancesContent = SafeExtractor.extractArrayProperty(
       clipboardContent,
       'instances'

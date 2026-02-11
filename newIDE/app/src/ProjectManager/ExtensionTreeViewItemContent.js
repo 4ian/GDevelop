@@ -191,43 +191,47 @@ export class ExtensionTreeViewItemContent implements TreeViewItemContent {
   }
 
   paste(): void {
-    if (!Clipboard.has(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND)) return;
+    Clipboard.read(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND).then(
+      clipboardContent => {
+        if (!clipboardContent) return;
 
-    const clipboardContent = Clipboard.get(
-      EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND
-    );
-    const copiedEventsFunctionsExtension = SafeExtractor.extractObjectProperty(
-      clipboardContent,
-      'eventsFunctionsExtension'
-    );
-    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
-    if (!name || !copiedEventsFunctionsExtension) return;
+        const copiedEventsFunctionsExtension = SafeExtractor.extractObjectProperty(
+          clipboardContent,
+          'eventsFunctionsExtension'
+        );
+        const name = SafeExtractor.extractStringProperty(
+          clipboardContent,
+          'name'
+        );
+        if (!name || !copiedEventsFunctionsExtension) return;
 
-    const project = this.props.project;
-    const newName = newNameGenerator(name, name =>
-      isExtensionNameTaken(name, project)
-    );
+        const project = this.props.project;
+        const newName = newNameGenerator(name, name =>
+          isExtensionNameTaken(name, project)
+        );
 
-    const newEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
-      newName,
-      this.getIndex() + 1
-    );
+        const newEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+          newName,
+          this.getIndex() + 1
+        );
 
-    unserializeFromJSObject(
-      newEventsFunctionsExtension,
-      copiedEventsFunctionsExtension,
-      'unserializeFrom',
-      project
-    );
-    newEventsFunctionsExtension.setName(newName); // Unserialization has overwritten the name.
-    if (newName !== name) {
-      newEventsFunctionsExtension.setOrigin('', '');
-    }
+        unserializeFromJSObject(
+          newEventsFunctionsExtension,
+          copiedEventsFunctionsExtension,
+          'unserializeFrom',
+          project
+        );
+        newEventsFunctionsExtension.setName(newName); // Unserialization has overwritten the name.
+        if (newName !== name) {
+          newEventsFunctionsExtension.setOrigin('', '');
+        }
 
-    this._onProjectItemModified();
-    this.props.onReloadEventsFunctionsExtensions();
-    this.props.editName(
-      getExtensionTreeViewItemId(newEventsFunctionsExtension)
+        this._onProjectItemModified();
+        this.props.onReloadEventsFunctionsExtensions();
+        this.props.editName(
+          getExtensionTreeViewItemId(newEventsFunctionsExtension)
+        );
+      }
     );
   }
 

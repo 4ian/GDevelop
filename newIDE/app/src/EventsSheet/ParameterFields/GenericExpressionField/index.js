@@ -136,7 +136,10 @@ const extractErrors = (
   expressionType: string,
   parameterMetadata: ?gdParameterMetadata,
   expressionNode: gdExpressionNode,
-  showDeprecatedInstructionWarning: boolean
+  showDeprecatedInstructionWarning:
+    | 'no'
+    | 'icon'
+    | 'icon-and-deprecated-warning-text'
 ): {|
   errorText: ?string,
   errorHighlights: Array<Highlight>,
@@ -157,8 +160,8 @@ const extractErrors = (
     const errorType = error.getType();
     const isDeprecated =
       errorType === gd.ExpressionParserError.DeprecatedExpression;
-    // Skip deprecation warnings if the preference is disabled
-    if (isDeprecated && !showDeprecatedInstructionWarning) {
+    // Skip deprecation warnings if the preference is set to 'no'
+    if (isDeprecated && showDeprecatedInstructionWarning === 'no') {
       return null;
     }
     return {
@@ -469,7 +472,7 @@ export default class ExpressionField extends React.Component<Props, State> {
 
     const showDeprecatedInstructionWarning = this.context
       ? this.context.values.showDeprecatedInstructionWarning
-      : true;
+      : 'icon';
 
     const { errorText, errorHighlights, isOnlyWarning } = extractErrors(
       gd.JsPlatform.get(),

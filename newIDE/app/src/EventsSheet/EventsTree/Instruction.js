@@ -280,10 +280,13 @@ const Instruction = (props: Props) => {
                 />
               );
             }
-            // Add [DEPRECATED] prefix for the first text segment if the preference is enabled
+            // Add [DEPRECATED] prefix for the first text segment if the preference is set to show text
             // and the instruction is deprecated (hidden)
             const deprecatedPrefix =
-              i === 0 && showDeprecatedInstructionWarning && metadata.isHidden()
+              i === 0 &&
+              showDeprecatedInstructionWarning ===
+                'icon-and-deprecated-warning-text' &&
+              metadata.isHidden()
                 ? '[DEPRECATED] '
                 : '';
             return <span key={i}>{deprecatedPrefix + value}</span>;
@@ -309,8 +312,8 @@ const Instruction = (props: Props) => {
               value
             );
             expressionIsValid = validationResult.isValid();
-            // Check for deprecation warnings (only if the preference is enabled)
-            if (showDeprecatedInstructionWarning) {
+            // Check for deprecation warnings (only if the preference is not 'no')
+            if (showDeprecatedInstructionWarning !== 'no') {
               hasDeprecationWarning = validationResult.hasDeprecationWarning();
             }
             // TODO Move this code inside `InstructionValidator.isParameterValid`
@@ -478,7 +481,7 @@ const Instruction = (props: Props) => {
                   [selectableArea]: true,
                   [selectedArea]: props.selected,
                   [warningInstruction]:
-                    showDeprecatedInstructionWarning &&
+                    showDeprecatedInstructionWarning !== 'no' &&
                     (!isInstructionVisible(scope, metadata) ||
                       metadata.isHidden()),
                 })}
@@ -515,7 +518,8 @@ const Instruction = (props: Props) => {
                 tabIndex={0}
                 id={id}
               >
-                {showDeprecatedInstructionWarning && metadata.isHidden() ? (
+                {showDeprecatedInstructionWarning !== 'no' &&
+                metadata.isHidden() ? (
                   <Tooltip
                     title={
                       metadata.getDeprecationMessage() ? (

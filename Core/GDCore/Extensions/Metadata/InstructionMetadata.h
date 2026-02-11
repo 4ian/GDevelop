@@ -201,6 +201,21 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
   }
 
   /**
+   * \brief Set the deprecation message that explains why the instruction
+   * is deprecated and what to use instead.
+   */
+  InstructionMetadata &SetDeprecationMessage(const gd::String &message) override {
+    deprecationMessage = message;
+    return *this;
+  }
+
+  /**
+   * \brief Get the deprecation message that explains why the instruction
+   * is deprecated and what to use instead.
+   */
+  const gd::String &GetDeprecationMessage() const { return deprecationMessage; }
+
+  /**
    * \brief Set the group of the instruction in the IDE.
    */
   InstructionMetadata &SetGroup(const gd::String &str) {
@@ -586,6 +601,7 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
   bool isBehaviorInstruction;
   gd::String requiredBaseObjectCapability;
   gd::String relevantContext;
+  gd::String deprecationMessage;
 };
 
 }  // namespace gd

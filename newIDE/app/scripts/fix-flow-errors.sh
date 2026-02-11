@@ -652,7 +652,8 @@ echo "--- Step 10: Fixing eslint/FlowFixMe comment ordering ---"
 
 # When $FlowFixMe is inserted between eslint-disable-next-line and the code,
 # eslint-disable no longer applies (it targets the FlowFixMe comment instead).
-# Fix: convert eslint-disable-next-line to eslint-disable-line on the code line.
+# Fix: wrap the code with eslint-disable/eslint-enable block comments, so that
+# both the FlowFixMe suppression and the eslint suppression work correctly.
 python3 << 'PYEOF'
 import os, re
 
@@ -678,12 +679,17 @@ for root, dirs, files in os.walk(src_dir):
                 m = re.search(r'eslint-disable-next-line\s+(.+)', lines[i + 1])
                 if m:
                     rule = m.group(1).strip()
+                    indent = ''
+                    for ch in lines[i + 2]:
+                        if ch in (' ', '\t'):
+                            indent += ch
+                        else:
+                            break
+                    # Use eslint-disable/enable block instead
+                    new_lines.append(f'{indent}/* eslint-disable {rule} */\n')
                     new_lines.append(lines[i])  # Keep $FlowFixMe
-                    # Skip eslint-disable-next-line, add as inline on code line
-                    code_line = lines[i + 2].rstrip()
-                    if 'eslint-disable-line' not in code_line:
-                        code_line = code_line + f' // eslint-disable-line {rule}'
-                    new_lines.append(code_line + '\n')
+                    new_lines.append(lines[i + 2])  # Keep code
+                    new_lines.append(f'{indent}/* eslint-enable {rule} */\n')
                     i += 3
                     modified = True
                     fixed += 1
@@ -695,12 +701,17 @@ for root, dirs, files in os.walk(src_dir):
                 m = re.search(r'eslint-disable-next-line\s+(.+)', lines[i])
                 if m:
                     rule = m.group(1).strip()
+                    indent = ''
+                    for ch in lines[i + 2]:
+                        if ch in (' ', '\t'):
+                            indent += ch
+                        else:
+                            break
+                    # Use eslint-disable/enable block instead
+                    new_lines.append(f'{indent}/* eslint-disable {rule} */\n')
                     new_lines.append(lines[i + 1])  # Keep $FlowFixMe
-                    # Skip eslint-disable-next-line, add as inline on code line
-                    code_line = lines[i + 2].rstrip()
-                    if 'eslint-disable-line' not in code_line:
-                        code_line = code_line + f' // eslint-disable-line {rule}'
-                    new_lines.append(code_line + '\n')
+                    new_lines.append(lines[i + 2])  # Keep code
+                    new_lines.append(f'{indent}/* eslint-enable {rule} */\n')
                     i += 3
                     modified = True
                     fixed += 1

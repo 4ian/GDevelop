@@ -23,7 +23,7 @@ export const useSearchAndInstallAsset = ({
   resourceManagementProps: ResourceManagementProps,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
-|}): any => {
+|}) => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );

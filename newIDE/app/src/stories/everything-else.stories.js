@@ -123,12 +123,10 @@ configureActions({
 
 // No i18n in this file
 
-// $FlowFixMe[invalid-export]
 storiesOf('Welcome', module)
   .addDecorator(paperDecorator)
   .add('to Storybook', () => <Welcome />);
 
-// $FlowFixMe[invalid-export]
 storiesOf('UI Building Blocks/SemiControlledTextField', module)
   .addDecorator(paperDecorator)
   .add('default', () => {
@@ -260,14 +258,12 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
     );
   });
 
-// $FlowFixMe[invalid-export]
 storiesOf('UI Building Blocks/DragAndDrop', module).add('test bed', () => (
   <DragAndDropContextProvider>
     <DragAndDropTestBed />
   </DragAndDropContextProvider>
 ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('UI Building Blocks/SemiControlledMultiAutoComplete', module)
   .addDecorator(paperDecorator)
   .add('default', () => (
@@ -374,7 +370,6 @@ storiesOf('UI Building Blocks/SemiControlledMultiAutoComplete', module)
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('UI Building Blocks/Layout/Grid', module).add(
   'Line and ScrollView in a fixed height container',
   () => (
@@ -403,7 +398,6 @@ storiesOf('UI Building Blocks/Layout/Grid', module).add(
   )
 );
 
-// $FlowFixMe[invalid-export]
 storiesOf('UI Building Blocks/Layout/ResponsiveLineStackLayout', module)
   .add('Default', () => (
     <ResponsiveLineStackLayout>
@@ -437,7 +431,6 @@ storiesOf('UI Building Blocks/Layout/ResponsiveLineStackLayout', module)
     </ResponsiveLineStackLayout>
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
   .addDecorator(paperDecorator)
   .add('Empty text field', () => (
@@ -653,12 +646,10 @@ storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('UI Building Blocks/Background', module).add('default', () => (
   <Background>Hello world</Background>
 ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('UI Building Blocks/Accordion', module)
   .addDecorator(paperDecorator)
   .add('default', () => (
@@ -713,17 +704,14 @@ storiesOf('UI Building Blocks/Accordion', module)
     </React.Fragment>
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('UI Building Blocks/PlaceholderLoader', module)
   .addDecorator(paperDecorator)
   .add('default', () => <PlaceholderLoader />);
 
-// $FlowFixMe[invalid-export]
 storiesOf('UI Building Blocks/DragHandle', module)
   .addDecorator(paperDecorator)
   .add('default', () => <DragHandle />);
 
-// $FlowFixMe[invalid-export]
 storiesOf('UI Building Blocks/EmptyMessage', module)
   .addDecorator(paperDecorator)
   .add('default', () => (
@@ -732,7 +720,6 @@ storiesOf('UI Building Blocks/EmptyMessage', module)
     </EmptyMessage>
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('UI Building Blocks/Text', module)
   .add('default', () => (
     <Column>
@@ -767,14 +754,12 @@ storiesOf('UI Building Blocks/Text', module)
     </Background>
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('UI Building Blocks/BackgroundText', module)
   .addDecorator(paperDecorator)
   .add('default', () => (
     <BackgroundText>Hello World, this is a background text</BackgroundText>
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('UI Building Blocks/ColorField', module)
   .addDecorator(paperDecorator)
   .add('default', () => (
@@ -803,7 +788,6 @@ storiesOf('UI Building Blocks/ColorField', module)
     </div>
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('UI Building Blocks/EditorMosaic', module).add('default', () => (
   <EditorMosaicPlayground
     renderButtons={({ openEditor }) => (
@@ -859,7 +843,6 @@ storiesOf('UI Building Blocks/EditorMosaic', module).add('default', () => (
   />
 ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('UI Building Blocks/EditorNavigator', module)
   .addDecorator(paperDecorator)
   .add('default', () => (
@@ -925,17 +908,18 @@ storiesOf('UI Building Blocks/EditorNavigator', module)
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('UI Building Blocks/HelpButton', module)
   .addDecorator(paperDecorator)
   .add('default', () => <HelpButton helpPagePath="/test" />);
 
-// $FlowFixMe[invalid-export]
 storiesOf('UI Building Blocks/HelpIcon', module)
   .addDecorator(paperDecorator)
-  .add('default', () => <HelpIcon helpPagePath="/test" />);
+  .add('default (wiki path)', () => <HelpIcon helpPagePath="/test" />)
+  .add('absolute URL (custom help)', () => (
+    <HelpIcon helpPagePath="https://example.com/custom-help" />
+  ))
+  .add('small size', () => <HelpIcon helpPagePath="/test" size="small" />);
 
-// $FlowFixMe[invalid-export]
 storiesOf('PropertiesEditor', module)
   .addDecorator(paperDecorator)
   .add('default', () => (
@@ -1083,7 +1067,6 @@ storiesOf('PropertiesEditor', module)
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('ParameterFields', module)
   .addDecorator(paperDecorator)
   .add('ExpressionField', () => (
@@ -1447,18 +1430,16 @@ storiesOf('ParameterFields', module)
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('ExpressionAutcompletionsDisplayer', module)
   .add('autocompletions (first selected)', () => (
     <ExpressionAutocompletionsDisplayer
       project={testProject.project}
       expressionAutocompletions={makeFakeExpressionAutocompletions()}
       remainingCount={3}
-      // $FlowFixMe[incompatible-type]
+      // $FlowExpectedError
       anchorEl={getFakePopperJsAnchorElement()}
       onChoose={action('chosen')}
       selectedCompletionIndex={0}
-      // $FlowFixMe[incompatible-type]
       parameterRenderingService={ParameterRenderingService}
       onScroll={() => {}}
     />
@@ -1468,11 +1449,10 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       project={testProject.project}
       expressionAutocompletions={makeFakeExpressionAutocompletions()}
       remainingCount={3}
-      // $FlowFixMe[incompatible-type]
+      // $FlowExpectedError
       anchorEl={getFakePopperJsAnchorElement()}
       onChoose={action('chosen')}
       selectedCompletionIndex={6}
-      // $FlowFixMe[incompatible-type]
       parameterRenderingService={ParameterRenderingService}
       onScroll={() => {}}
     />
@@ -1480,14 +1460,12 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
   .add('empty autocompletions (because exact expression)', () => (
     <ExpressionAutocompletionsDisplayer
       project={testProject.project}
-      // $FlowFixMe[incompatible-type]
       expressionAutocompletions={makeFakeExactExpressionAutocompletion()}
       remainingCount={0}
-      // $FlowFixMe[incompatible-type]
+      // $FlowExpectedError
       anchorEl={getFakePopperJsAnchorElement()}
       onChoose={action('chosen')}
       selectedCompletionIndex={0}
-      // $FlowFixMe[incompatible-type]
       parameterRenderingService={ParameterRenderingService}
       onScroll={() => {}}
     />
@@ -1497,17 +1475,15 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       project={testProject.project}
       expressionAutocompletions={[]}
       remainingCount={0}
-      // $FlowFixMe[incompatible-type]
+      // $FlowExpectedError
       anchorEl={getFakePopperJsAnchorElement()}
       onChoose={action('chosen')}
       selectedCompletionIndex={0}
-      // $FlowFixMe[incompatible-type]
       parameterRenderingService={ParameterRenderingService}
       onScroll={() => {}}
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('BuildStepsProgress', module)
   .addDecorator(paperDecorator)
   .add('BuildStepsProgress (not started)', () => (
@@ -1669,7 +1645,6 @@ storiesOf('BuildStepsProgress', module)
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('LocalFolderPicker', module)
   .addDecorator(paperDecorator)
   .add('default', () => (
@@ -1694,7 +1669,6 @@ storiesOf('LocalFolderPicker', module)
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('LocalFilePicker', module)
   .addDecorator(paperDecorator)
   .add('full width', () => (
@@ -1719,7 +1693,6 @@ storiesOf('LocalFilePicker', module)
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('DebuggerContent', module)
   .add('with data', () => (
     <DragAndDropContextProvider>
@@ -1762,7 +1735,6 @@ storiesOf('DebuggerContent', module)
     </DragAndDropContextProvider>
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('Profiler', module)
   .add('without profiler output', () => (
     <DragAndDropContextProvider>
@@ -1813,7 +1785,6 @@ storiesOf('Profiler', module)
     </DragAndDropContextProvider>
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('MeasuresTable', module).add('default', () => (
   <div style={{ height: 250 }}>
     <MeasuresTable
@@ -1822,7 +1793,6 @@ storiesOf('MeasuresTable', module).add('default', () => (
   </div>
 ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('AboutDialog', module).add('default', () => (
   <AboutDialog
     open
@@ -1831,7 +1801,6 @@ storiesOf('AboutDialog', module).add('default', () => (
   />
 ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('OpenConfirmDialog', module).add('default', () => (
   <OpenConfirmDialog
     onClose={action('on close')}
@@ -1839,7 +1808,6 @@ storiesOf('OpenConfirmDialog', module).add('default', () => (
   />
 ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('ExternalPropertiesDialog', module)
   .add('with layout selection', () => (
     <ExternalPropertiesDialog
@@ -1864,7 +1832,6 @@ storiesOf('ExternalPropertiesDialog', module)
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
   .add('default', () => (
     <EventsFunctionExtractorDialog
@@ -1889,7 +1856,6 @@ storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('SearchPanel', module)
   .add('default (no search done)', () => (
     <SearchPanel
@@ -1940,7 +1906,6 @@ storiesOf('SearchPanel', module)
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('InstructionOrObjectSelector', module)
   .addDecorator(paperDecorator)
   .add('"KeyPressed" condition chosen, scope: layout', () => (
@@ -2012,7 +1977,6 @@ storiesOf('InstructionOrObjectSelector', module)
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('InstructionEditorDialog', module)
   .addDecorator(paperDecorator)
   .add('Existing condition (scope: in a layout)', () => (
@@ -2113,7 +2077,6 @@ storiesOf('InstructionEditorDialog', module)
     </Column>
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('InstructionEditorMenu', module)
   .addDecorator(paperDecorator)
   .add('default', () => (
@@ -2162,7 +2125,6 @@ storiesOf('InstructionEditorMenu', module)
       </PopoverButton>
     </Column>
   ));
-// $FlowFixMe[invalid-export]
 storiesOf('ObjectSelector', module)
   .addDecorator(paperDecorator)
   .add('without groups', () => (
@@ -2205,7 +2167,6 @@ storiesOf('ObjectSelector', module)
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('Changelog', module)
   .addDecorator(paperDecorator)
   .add('no breaking changes in this version (but in a previous)', () => (
@@ -2247,7 +2208,6 @@ storiesOf('Changelog', module)
     <ChangelogDialog open onClose={action('close dialog')} />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('Profile/ContributionsDetails', module)
   .add('default', () => (
     <>
@@ -2274,7 +2234,6 @@ storiesOf('Profile/ContributionsDetails', module)
     </>
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('BrowserPreviewErrorDialog', module)
   .addDecorator(paperDecorator)
   .add('generic error', () => (
@@ -2286,7 +2245,7 @@ storiesOf('BrowserPreviewErrorDialog', module)
   .add('networking error', () => (
     <BrowserPreviewErrorDialog
       error={
-        // $FlowFixMe[incompatible-type] - mocking an Error with "code field"
+        // $FlowFixMe - mocking an Error with "code field"
         {
           code: 'NetworkingError',
           message: "Oops, you're offline",
@@ -2296,7 +2255,6 @@ storiesOf('BrowserPreviewErrorDialog', module)
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('BehaviorTypeSelector', module)
   .addDecorator(paperDecorator)
   .add('default, for a base object', () => (
@@ -2327,7 +2285,6 @@ storiesOf('BehaviorTypeSelector', module)
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('ObjectTypeSelector', module)
   .addDecorator(paperDecorator)
   .add('default (Sprite selected)', () => (
@@ -2348,7 +2305,6 @@ storiesOf('ObjectTypeSelector', module)
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('HotReloadPreviewButton', module)
   .add('default', () => (
     <HotReloadPreviewButton
@@ -2367,7 +2323,6 @@ storiesOf('HotReloadPreviewButton', module)
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('HotReloadLogsDialog', module)
   .add('with an error', () => (
     <HotReloadLogsDialog
@@ -2394,7 +2349,6 @@ storiesOf('HotReloadLogsDialog', module)
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('ProjectPropertiesDialog', module)
   .addDecorator(paperDecorator)
   .add('default', () => (
@@ -2417,7 +2371,6 @@ storiesOf('ProjectPropertiesDialog', module)
     </I18n>
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
   .addDecorator(getPaperDecorator('medium'))
   .add('default', () => (
@@ -2434,7 +2387,6 @@ storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
     />
   ));
 
-// $FlowFixMe[invalid-export]
 storiesOf('PreferencesDialog', module).add('default', () => (
   <I18n>
     {({ i18n }) => (

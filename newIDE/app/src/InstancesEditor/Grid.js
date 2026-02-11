@@ -9,8 +9,7 @@ type Props = {|
 |};
 
 export default class Grid {
-  // $FlowFixMe[missing-local-annot]
-  pixiGrid = (new PIXI.Graphics(): any);
+  pixiGrid = new PIXI.Graphics();
   instancesEditorSettings: InstancesEditorSettings;
   viewPosition: ViewPosition;
 
@@ -25,7 +24,7 @@ export default class Grid {
     this.instancesEditorSettings = instancesEditorSettings;
   }
 
-  getPixiObject(): any {
+  getPixiObject() {
     return this.pixiGrid;
   }
 

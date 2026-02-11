@@ -14,11 +14,7 @@ import { prepareAiUserContent } from './PrepareAiUserContent';
 
 const gd: libGDevelop = global.gd;
 
-export const useGenerateEvents = ({
-  project,
-}: {|
-  project: ?gdProject,
-|}): any => {
+export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );

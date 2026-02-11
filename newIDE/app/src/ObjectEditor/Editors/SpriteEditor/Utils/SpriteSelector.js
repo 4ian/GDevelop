@@ -55,7 +55,7 @@ const SpriteSelector = ({
   setSameForAllAnimationsLabel,
   setSameForAllSpritesLabel,
   hideControlsForSprite,
-}: Props): React.Node => {
+}: Props) => {
   const { animation, direction, sprite } = getCurrentElements(
     animations,
     animationIndex,

@@ -65,7 +65,7 @@ const Toggle = ({
   disabled,
   labelPosition,
   style,
-}: Props): React.Node => {
+}: Props) => {
   const formClasses = useFormStyles();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const switchClasses = useSwitchStyles({

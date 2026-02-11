@@ -18,13 +18,10 @@ import RaisedButton from '../../../UI/RaisedButton';
 import { getBase64FromFile } from './CreateIosCertificateSteps';
 
 type Props = {
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
 };
 
-export const CreateAuthKeySteps = ({
-  authenticatedUser,
-}: Props): React.Node => {
+export const CreateAuthKeySteps = ({ authenticatedUser }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const userId = authenticatedUser.profile
     ? authenticatedUser.profile.id
@@ -55,7 +52,6 @@ export const CreateAuthKeySteps = ({
           userId,
           {
             name,
-            // $FlowFixMe[incompatible-type]
             appleAuthKeyP8AsBase64,
             appleApiKey: apiKey,
             appleApiIssuer: apiIssuer,

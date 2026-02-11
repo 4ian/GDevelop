@@ -51,7 +51,7 @@ const InlineCheckbox = ({
   checkedIcon,
   tooltipOrHelperText,
   paddingSize,
-}: Props): React.Node => {
+}: Props) => {
   const labelClasses = useLabelStyles();
   const formGroupClasses = useFormGroupStyles();
   const smallPaddingClasses = useSmallPaddingCheckboxStyles();

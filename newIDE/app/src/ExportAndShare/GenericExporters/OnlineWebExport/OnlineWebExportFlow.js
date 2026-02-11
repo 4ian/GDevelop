@@ -26,7 +26,7 @@ const OnlineWebExportFlow = ({
   exportPipelineName,
   isExporting,
   uiMode,
-}: OnlineWebExportFlowProps): React.Node => {
+}: OnlineWebExportFlowProps) => {
   const {
     game,
     gameBuilds,

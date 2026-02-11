@@ -8,7 +8,6 @@ type Props = {
 };
 
 export default class Background {
-  // $FlowFixMe[value-as-type]
   _checkeredBackground: PIXI.TilingSprite;
 
   constructor({ width, height, layout }: Props) {
@@ -26,7 +25,6 @@ export default class Background {
     this._checkeredBackground.height = height;
   }
 
-  // $FlowFixMe[value-as-type]
   getPixiObject(): PIXI.TilingSprite {
     return this._checkeredBackground;
   }

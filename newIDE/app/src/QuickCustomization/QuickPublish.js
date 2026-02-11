@@ -62,7 +62,7 @@ export const QuickPublish = ({
   gameScreenshotUrls,
   onScreenshotsClaimed,
   onLaunchPreview,
-}: Props): React.Node => {
+}: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
     profile,
@@ -140,11 +140,9 @@ export const QuickPublish = ({
 
         setBuildOrGameUrl(
           game
-            ? // $FlowFixMe[incompatible-type]
-              getGameUrl(game)
+            ? getGameUrl(game)
             : build
-            ? // $FlowFixMe[incompatible-type]
-              getBuildArtifactUrl(build, 's3Key')
+            ? getBuildArtifactUrl(build, 's3Key')
             : ''
         );
         setExportState('succeeded');

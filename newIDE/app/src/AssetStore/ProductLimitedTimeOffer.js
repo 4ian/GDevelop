@@ -25,7 +25,7 @@ const ProductLimitedTimeOffer = ({
   visibleUntil,
   hideMinutesAndSeconds,
   alignCenter,
-}: Props): null | React.MixedElement => {
+}: Props) => {
   const [timeLeft, setTimeLeft] = React.useState<{|
     days: number,
     hours: number,

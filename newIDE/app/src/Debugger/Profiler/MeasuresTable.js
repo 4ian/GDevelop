@@ -31,7 +31,7 @@ type ProfilerRowData = {|
   isCollapsed: boolean,
 |};
 
-const MeasuresTable = (props: Props): null | React.Node => {
+const MeasuresTable = (props: Props) => {
   const [collapsedPaths, setCollapsedPaths] = React.useState({});
 
   const convertToDataRows = (
@@ -79,15 +79,12 @@ const MeasuresTable = (props: Props): null | React.Node => {
   };
 
   const isSectionCollapsed = (path: string) => {
-    // $FlowFixMe[invalid-computed-prop]
     return collapsedPaths[path];
   };
 
   const toggleSection = (path: string) => {
-    // $FlowFixMe[incompatible-type]
     setCollapsedPaths({
       ...collapsedPaths,
-      // $FlowFixMe[invalid-computed-prop]
       [path]: !collapsedPaths[path],
     });
   };

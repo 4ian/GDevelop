@@ -19,7 +19,7 @@ import Model3DResourceField from '../../../EventsSheet/ParameterFields/Model3DRe
 import AtlasResourceField from '../../../EventsSheet/ParameterFields/AtlasResourceField';
 import SpineResourceField from '../../../EventsSheet/ParameterFields/SpineResourceField';
 
-export const AllResourceFields = (): React.Node => (
+export const AllResourceFields = () => (
   <Column expand>
     <Line expand>
       <ValueStateHolder

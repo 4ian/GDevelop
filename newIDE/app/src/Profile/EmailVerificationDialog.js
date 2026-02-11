@@ -16,7 +16,6 @@ import UserVerified from '../UI/CustomSvgIcons/UserVerified';
 
 type Props = {|
   onClose: () => void,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   sendEmailAutomatically: boolean,
   showSendEmailButton: boolean,
@@ -29,7 +28,7 @@ export default function EmailVerificationDialog({
   sendEmailAutomatically,
   showSendEmailButton,
   onSendEmail,
-}: Props): React.Node {
+}: Props) {
   const isVerified =
     !!authenticatedUser.firebaseUser &&
     !!authenticatedUser.firebaseUser.emailVerified;

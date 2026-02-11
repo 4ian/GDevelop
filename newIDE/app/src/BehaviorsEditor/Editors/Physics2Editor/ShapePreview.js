@@ -25,7 +25,7 @@ type State = {|
   draggedIndex: number,
 |};
 
-const ShapePreview = (props: Props): React.MixedElement => {
+const ShapePreview = (props: Props) => {
   const { forcedCursor, deactivateControls } = props;
 
   const svgRef = React.useRef<React.ElementRef<'svg'> | null>(null);
@@ -65,15 +65,11 @@ const ShapePreview = (props: Props): React.MixedElement => {
     const { draggedVertex, draggedIndex } = state;
     if (!draggedVertex) return;
 
-    // $FlowFixMe[incompatible-type] Flow doesn't have SVG typings yet (@facebook/flow#4551)
-    // $FlowFixMe[prop-missing]
-    // $FlowFixMe[incompatible-use]
+    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
     const pointOnScreen = svgRef.current.createSVGPoint();
     pointOnScreen.x = event.clientX;
     pointOnScreen.y = event.clientY;
-    // $FlowFixMe[incompatible-type] Flow doesn't have SVG typings yet (@facebook/flow#4551)
-    // $FlowFixMe[prop-missing]
-    // $FlowFixMe[incompatible-use]
+    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
     const screenToSvgMatrix = svgRef.current.getScreenCTM().inverse();
     const pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
 

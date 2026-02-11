@@ -59,7 +59,7 @@ const MarketingPlanFeatures = ({
   onPurchase,
   isPlanActive,
   hideBorder,
-}: Props): React.Node => {
+}: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const {

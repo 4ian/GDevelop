@@ -23,16 +23,12 @@ export type PrivateAssetsState = {|
 const initialPrivateAssetsState = {
   authorizationToken: null,
   updateAuthorizationToken: async () => {},
-  // $FlowFixMe[missing-local-annot]
   fetchPrivateAsset: async (assetShortHeader, options) => null,
-  // $FlowFixMe[missing-local-annot]
   installPrivateAsset: async options => null,
-  // $FlowFixMe[missing-local-annot]
   getPrivateAssetPackAudioArchiveUrl: async id => null,
 };
 
-const PrivateAssetsAuthorizationContext: React.Context<PrivateAssetsState> = React.createContext<PrivateAssetsState>(
-  // $FlowFixMe[incompatible-type]
+const PrivateAssetsAuthorizationContext = React.createContext<PrivateAssetsState>(
   initialPrivateAssetsState
 );
 

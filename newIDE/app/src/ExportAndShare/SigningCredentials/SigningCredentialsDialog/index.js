@@ -24,7 +24,6 @@ type UseGetUserSigningCredentialsOutput = {|
 |};
 
 export const useGetUserSigningCredentials = (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser
 ): UseGetUserSigningCredentialsOutput => {
   const [
@@ -72,7 +71,6 @@ export const useGetUserSigningCredentials = (
 
 type Props = {
   signingCredentials: Array<SigningCredential> | null,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   error: Error | null,
   onRefreshSigningCredentials: () => Promise<void>,
@@ -85,7 +83,7 @@ export const SigningCredentialsDialog = ({
   signingCredentials,
   error,
   onRefreshSigningCredentials,
-}: Props): React.Node => {
+}: Props) => {
   const [currentTab, setCurrentTab] = React.useState<string>(
     'apple-certificate'
   );

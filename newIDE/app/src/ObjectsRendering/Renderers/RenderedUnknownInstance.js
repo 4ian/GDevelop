@@ -12,14 +12,13 @@ export default class RenderedUnknownInstance extends RenderedInstance {
     project: gdProject,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration | null,
-    // $FlowFixMe[value-as-type]
     pixiContainer: PIXI.Container,
     pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {
     super(
       project,
       instance,
-      //$FlowFixMe[incompatible-type] It's ok because RenderedUnknownInstance don't use it.
+      //$FlowFixMe It's ok because RenderedUnknownInstance don't use it.
       associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader
@@ -41,7 +40,7 @@ export default class RenderedUnknownInstance extends RenderedInstance {
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ): any {
+  ) {
     return 'res/unknown32.png';
   }
 

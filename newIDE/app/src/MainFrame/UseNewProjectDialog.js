@@ -68,7 +68,7 @@ const useNewProjectDialog = ({
   onOpenLayout,
   onWillInstallExtension,
   onExtensionInstalled,
-}: Props): any => {
+}: Props) => {
   const [isFetchingExample, setIsFetchingExample] = React.useState(false);
   const [
     selectedPrivateGameTemplateListingData,

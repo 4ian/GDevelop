@@ -89,14 +89,14 @@ const objectVariablesHelpLink = getHelpLink(
   '/all-features/variables/object-variables'
 );
 
-type TitleBarButton = {|
+export type TitleBarButton = {|
   id: string,
   icon: any,
   label?: MessageDescriptor,
   onClick?: () => void,
 |};
 
-const CollapsibleSubPanel = ({
+export const CollapsibleSubPanel = ({
   renderContent,
   isFolded,
   toggleFolded,
@@ -157,7 +157,7 @@ const CollapsibleSubPanel = ({
   </Paper>
 );
 
-const TopLevelCollapsibleSection = ({
+export const TopLevelCollapsibleSection = ({
   title,
   isFolded,
   toggleFolded,
@@ -173,7 +173,7 @@ const TopLevelCollapsibleSection = ({
   renderContent: () => React.Node,
   renderContentAsHiddenWhenFolded?: boolean,
   noContentMargin?: boolean,
-  onOpenFullEditor: () => void,
+  onOpenFullEditor?: () => void,
   onAdd?: (() => void) | null,
 |}) => (
   <>
@@ -193,9 +193,11 @@ const TopLevelCollapsibleSection = ({
           </Text>
         </LineStackLayout>
         <Line alignItems="center" noMargin>
-          <IconButton size="small" onClick={onOpenFullEditor}>
-            <ShareExternal style={styles.icon} />
-          </IconButton>
+          {onOpenFullEditor && (
+            <IconButton size="small" onClick={onOpenFullEditor}>
+              <ShareExternal style={styles.icon} />
+            </IconButton>
+          )}
           {onAdd && (
             <IconButton size="small" onClick={onAdd}>
               <Add style={styles.icon} />
@@ -273,7 +275,7 @@ export const CompactObjectPropertiesEditor = ({
   onExtensionInstalled,
   isVariableListLocked,
   isBehaviorListLocked,
-}: Props): React.Node => {
+}: Props) => {
   const forceUpdate = useForceUpdate();
   const [isPropertiesFolded, setIsPropertiesFolded] = React.useState(false);
   const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(false);
@@ -306,7 +308,6 @@ export const CompactObjectPropertiesEditor = ({
   // the arguments will be mismatched. To workaround this, always cast the object to
   // a base gdObject to ensure C++ methods are called.
   const objectConfigurationAsGd = gd.castObject(
-    // $FlowFixMe[incompatible-exact]
     objectConfiguration,
     gd.ObjectConfiguration
   );
@@ -493,8 +494,11 @@ export const CompactObjectPropertiesEditor = ({
           ? customObjectEventsBasedObject.getPropertyDescriptors()
           : // We can't access default values for built-in objects.
             null,
-        getProperties: ({ objectConfiguration }) =>
-          objectConfiguration.getProperties(),
+        getPropertyValue: ({ objectConfiguration }, name) =>
+          objectConfiguration
+            .getProperties()
+            .get(name)
+            .getValue(),
         onUpdateProperty: ({ objectConfiguration }, name, value) => {
           objectConfiguration.updateProperty(name, value);
           onObjectsModified([object]);
@@ -583,7 +587,6 @@ export const CompactObjectPropertiesEditor = ({
                       onEditObject,
                     })
                   }
-                  // $FlowFixMe[incompatible-type]
                   onRefreshAllFields={forceRecomputeSchema}
                 />
                 {shouldDisplayVariant && (
@@ -751,6 +754,8 @@ export const CompactObjectPropertiesEditor = ({
                           project={project}
                           behaviorMetadata={behaviorMetadata}
                           behavior={behavior}
+                          behaviorOverriding={null}
+                          initialInstance={null}
                           object={object}
                           onBehaviorUpdated={() => {}}
                           resourceManagementProps={resourceManagementProps}

@@ -314,42 +314,29 @@ export const getLayouts = (
       }
       if (layoutField === 'Show') {
         if (propertyValueString !== 'true') {
-          // $FlowFixMe[incompatible-type]
           layout.isShown = false;
         }
       } else if (layoutField === 'LeftPadding') {
-        // $FlowFixMe[prop-missing]
         layout.horizontalLayout.minSideAbsoluteMargin = propertyValueNumber;
       } else if (layoutField === 'RightPadding') {
-        // $FlowFixMe[prop-missing]
         layout.horizontalLayout.maxSideAbsoluteMargin = propertyValueNumber;
       } else if (layoutField === 'TopPadding') {
-        // $FlowFixMe[prop-missing]
         layout.verticalLayout.minSideAbsoluteMargin = propertyValueNumber;
       } else if (layoutField === 'BottomPadding') {
-        // $FlowFixMe[prop-missing]
         layout.verticalLayout.maxSideAbsoluteMargin = propertyValueNumber;
       } else if (layoutField === 'AnchorDeltaX') {
-        // $FlowFixMe[prop-missing]
         layout.horizontalLayout.anchorDelta = propertyValueNumber;
       } else if (layoutField === 'AnchorDeltaY') {
-        // $FlowFixMe[prop-missing]
         layout.verticalLayout.anchorDelta = propertyValueNumber;
       } else if (layoutField === 'IsScaledProportionallyOnX') {
-        // $FlowFixMe[prop-missing]
         layout.horizontalLayout.isScaledProportionally = propertyValueBoolean;
       } else if (layoutField === 'IsScaledProportionallyOnY') {
-        // $FlowFixMe[prop-missing]
         layout.verticalLayout.isScaledProportionally = propertyValueBoolean;
       } else if (layoutField === 'IsScaledProportionallyOnZ') {
-        // $FlowFixMe[prop-missing]
         layout.depthLayout.isScaledProportionally = propertyValueBoolean;
       } else if (layoutField === 'IsScaledProportionally') {
-        // $FlowFixMe[prop-missing]
         layout.horizontalLayout.isScaledProportionally = propertyValueBoolean;
-        // $FlowFixMe[prop-missing]
         layout.verticalLayout.isScaledProportionally = propertyValueBoolean;
-        // $FlowFixMe[prop-missing]
         layout.depthLayout.isScaledProportionally = propertyValueBoolean;
       } else {
         if (
@@ -362,16 +349,12 @@ export const getLayouts = (
               instanceProperties,
               horizontalAnchorTarget
             ) || propertyValueNumber;
-          // $FlowFixMe[invalid-compare]
           if (anchorOrigin !== null) {
-            // $FlowFixMe[prop-missing]
             layout.horizontalLayout.anchorOrigin = anchorOrigin;
           }
           if (horizontalAnchorTarget !== null) {
-            // $FlowFixMe[prop-missing]
             layout.horizontalLayout.anchorTarget = horizontalAnchorTarget;
           }
-          // $FlowFixMe[prop-missing]
           layout.horizontalLayout.anchorTargetObject = targetObjectName;
         }
         if (
@@ -384,16 +367,12 @@ export const getLayouts = (
               instanceProperties,
               horizontalAnchorTarget
             ) || propertyValueNumber;
-          // $FlowFixMe[invalid-compare]
           if (anchorOrigin !== null) {
-            // $FlowFixMe[prop-missing]
             layout.verticalLayout.anchorOrigin = anchorOrigin;
           }
           if (verticalAnchorTarget !== null) {
-            // $FlowFixMe[prop-missing]
             layout.verticalLayout.anchorTarget = verticalAnchorTarget;
           }
-          // $FlowFixMe[prop-missing]
           layout.verticalLayout.anchorTargetObject = targetObjectName;
         }
       }
@@ -431,33 +410,33 @@ export class ChildInstance {
     this._hasCustomDepth = false;
   }
 
-  getX(): any {
+  getX() {
     return this.x;
   }
 
-  getY(): any {
+  getY() {
     return this.y;
   }
 
-  getZ(): any {
+  getZ() {
     return this.z;
   }
 
-  getAngle(): any {
+  getAngle() {
     return 0;
   }
 
-  getRotationX(): any {
+  getRotationX() {
     return 0;
   }
 
-  getRotationY(): any {
+  getRotationY() {
     return 0;
   }
 
   setObjectName(name: string) {}
 
-  getObjectName(): any {
+  getObjectName() {
     return '';
   }
 
@@ -473,49 +452,49 @@ export class ChildInstance {
 
   setRotationY(angle: number) {}
 
-  isLocked(): any {
+  isLocked() {
     return false;
   }
 
   setLocked(lock: boolean) {}
 
-  isSealed(): any {
+  isSealed() {
     return false;
   }
 
   setSealed(seal: boolean) {}
 
-  getZOrder(): any {
+  getZOrder() {
     return 0;
   }
 
   setZOrder(zOrder: number) {}
 
-  getOpacity(): any {
+  getOpacity() {
     return 255;
   }
 
   setOpacity(opacity: number) {}
 
-  isFlippedX(): any {
+  isFlippedX() {
     return false;
   }
 
   setFlippedX(flippedX: boolean) {}
 
-  isFlippedY(): any {
+  isFlippedY() {
     return false;
   }
 
   setFlippedY(flippedY: boolean) {}
 
-  isFlippedZ(): any {
+  isFlippedZ() {
     return false;
   }
 
   setFlippedZ(flippedY: boolean) {}
 
-  getLayer(): any {
+  getLayer() {
     return '';
   }
 
@@ -525,11 +504,11 @@ export class ChildInstance {
     this._hasCustomSize = enable;
   }
 
-  hasCustomSize(): any {
+  hasCustomSize() {
     return this._hasCustomSize;
   }
 
-  hasCustomDepth(): any {
+  hasCustomDepth() {
     return this._hasCustomDepth;
   }
 
@@ -538,7 +517,7 @@ export class ChildInstance {
     this._hasCustomSize = true;
   }
 
-  getCustomWidth(): any {
+  getCustomWidth() {
     return this._customWidth;
   }
 
@@ -547,7 +526,7 @@ export class ChildInstance {
     this._hasCustomSize = true;
   }
 
-  getCustomHeight(): any {
+  getCustomHeight() {
     return this._customHeight;
   }
 
@@ -556,11 +535,11 @@ export class ChildInstance {
     this._hasCustomDepth = true;
   }
 
-  getCustomDepth(): any {
+  getCustomDepth() {
     return this._customDepth;
   }
 
-  resetPersistentUuid(): any {
+  resetPersistentUuid() {
     return this;
   }
 
@@ -574,15 +553,15 @@ export class ChildInstance {
   getCustomProperties(
     globalObjectsContainer: gdObjectsContainer,
     objectsContainer: gdObjectsContainer
-  ): any {
+  ) {
     return null;
   }
 
-  getRawDoubleProperty(name: string): any {
+  getRawDoubleProperty(name: string) {
     return 0;
   }
 
-  getRawStringProperty(name: string): any {
+  getRawStringProperty(name: string) {
     return '';
   }
 
@@ -590,7 +569,7 @@ export class ChildInstance {
 
   setRawStringProperty(name: string, value: string) {}
 
-  getVariables(): any {
+  getVariables() {
     return [];
   }
 

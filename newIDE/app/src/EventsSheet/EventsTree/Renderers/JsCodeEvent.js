@@ -71,7 +71,6 @@ export default class JsCodeEvent extends React.Component<
   State
 > {
   _objectField: ?ParameterFieldInterface = null;
-  // $FlowFixMe[missing-local-annot]
   state = {
     editingObject: false,
     editingPreviousValue: null,
@@ -141,7 +140,7 @@ export default class JsCodeEvent extends React.Component<
     const { anchorEl } = this.state;
 
     // Put back the focus after closing the inline popover.
-    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe
     if (anchorEl) anchorEl.focus();
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
     const { editingPreviousValue } = this.state;
@@ -160,7 +159,7 @@ export default class JsCodeEvent extends React.Component<
     jsCodeEvent.setEventsSheetExpanded(!jsCodeEvent.isEventsSheetExpanded());
   };
 
-  _getCodeEditorHeight = (): any => {
+  _getCodeEditorHeight = () => {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
 
     // Always use the minimum height when collapsed.
@@ -173,7 +172,7 @@ export default class JsCodeEvent extends React.Component<
     return Math.max(MINIMUM_EDITOR_HEIGHT, heightToFillSheet);
   };
 
-  render(): any {
+  render() {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
     const parameterObjects = jsCodeEvent.getParameterObjects();
 

@@ -138,24 +138,18 @@ describe('ResourceUtils', () => {
     it('can update a resource metadata', () => {
       resource = new gd.Resource();
       updateResourceJsonMetadata(resource, { test: 123, test2: { '4': '56' } });
-      // $FlowFixMe[incompatible-use]
       expect(resource.getMetadata()).toMatchInlineSnapshot(
         `"{\\"test\\":123,\\"test2\\":{\\"4\\":\\"56\\"}}"`
       );
-      // $FlowFixMe[incompatible-type]
       updateResourceJsonMetadata(resource, { test2: 789 });
-      // $FlowFixMe[incompatible-use]
       expect(resource.getMetadata()).toMatchInlineSnapshot(
         `"{\\"test\\":123,\\"test2\\":789}"`
       );
 
-      // $FlowFixMe[incompatible-use]
       resource.setMetadata('invalid json');
-      // $FlowFixMe[incompatible-type]
       updateResourceJsonMetadata(resource, {
         test3: 'this overwrote everything',
       });
-      // $FlowFixMe[incompatible-use]
       expect(resource.getMetadata()).toMatchInlineSnapshot(
         `"{\\"test3\\":\\"this overwrote everything\\"}"`
       );
@@ -166,7 +160,6 @@ describe('ResourceUtils', () => {
 
       // No extension and no localFilePath found.
       updateResourceJsonMetadata(resource, { other: 'thing' });
-      // $FlowFixMe[incompatible-type]
       expect(parseLocalFilePathOrExtensionFromMetadata(resource))
         .toMatchInlineSnapshot(`
         Object {
@@ -176,12 +169,10 @@ describe('ResourceUtils', () => {
       `);
 
       // Just an extension found.
-      // $FlowFixMe[incompatible-type]
       updateResourceJsonMetadata(resource, {
         extension: '.png',
         other: 'thing',
       });
-      // $FlowFixMe[incompatible-type]
       expect(parseLocalFilePathOrExtensionFromMetadata(resource))
         .toMatchInlineSnapshot(`
         Object {
@@ -191,13 +182,11 @@ describe('ResourceUtils', () => {
       `);
 
       // Both found.
-      // $FlowFixMe[incompatible-type]
       updateResourceJsonMetadata(resource, {
         localFilePath: 'test',
         extension: '.png',
         other: 'thing',
       });
-      // $FlowFixMe[incompatible-type]
       expect(parseLocalFilePathOrExtensionFromMetadata(resource))
         .toMatchInlineSnapshot(`
         Object {
@@ -207,13 +196,11 @@ describe('ResourceUtils', () => {
       `);
 
       // Both found but not the proper type.
-      // $FlowFixMe[incompatible-type]
       updateResourceJsonMetadata(resource, {
         localFilePath: 456,
         extension: 123,
         other: 'thing',
       });
-      // $FlowFixMe[incompatible-type]
       expect(parseLocalFilePathOrExtensionFromMetadata(resource))
         .toMatchInlineSnapshot(`
         Object {

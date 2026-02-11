@@ -69,7 +69,7 @@ const AssetPackInstallDialog = ({
   objectsContainer,
   resourceManagementProps,
   targetObjectFolderOrObjectWithContext,
-}: Props): React.Node => {
+}: Props) => {
   const missingAssetShortHeaders = assetShortHeaders.filter(
     assetShortHeader => !addedAssetIds.has(assetShortHeader.id)
   );

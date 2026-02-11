@@ -40,7 +40,7 @@ const Wrapper = ({ children }: {| children: React.Node |}) => {
   );
 };
 
-export const LayoutPublicAssetInstallSuccess = (): React.Node => {
+export const LayoutPublicAssetInstallSuccess = () => {
   const assetServiceMock = new MockAdapter(assetClient, {
     delayResponse: 250,
   });
@@ -79,7 +79,7 @@ export const LayoutPublicAssetInstallSuccess = (): React.Node => {
   );
 };
 
-export const LayoutPublicAssetInstallFailure = (): React.Node => {
+export const LayoutPublicAssetInstallFailure = () => {
   const assetServiceMock = new MockAdapter(assetClient, {
     delayResponse: 250,
   });
@@ -114,7 +114,7 @@ export const LayoutPublicAssetInstallFailure = (): React.Node => {
   );
 };
 
-export const LayoutPublicAssetAllAlreadyInstalled = (): React.Node => (
+export const LayoutPublicAssetAllAlreadyInstalled = () => (
   <Wrapper>
     <AssetPackInstallDialog
       assetPack={fakeAssetPacks.starterPacks[0]}
@@ -134,7 +134,7 @@ export const LayoutPublicAssetAllAlreadyInstalled = (): React.Node => (
   </Wrapper>
 );
 
-export const LayoutPublicAssetSomeAlreadyInstalled = (): React.Node => {
+export const LayoutPublicAssetSomeAlreadyInstalled = () => {
   const assetServiceMock = new MockAdapter(assetClient, {
     delayResponse: 250,
   });
@@ -181,7 +181,7 @@ export const LayoutPublicAssetSomeAlreadyInstalled = (): React.Node => {
   );
 };
 
-export const LayoutPrivateAssetInstallSuccess = (): React.Node => {
+export const LayoutPrivateAssetInstallSuccess = () => {
   return (
     <PrivateAssetsAuthorizationContext.Provider
       value={{
@@ -219,7 +219,7 @@ export const LayoutPrivateAssetInstallSuccess = (): React.Node => {
   );
 };
 
-export const LayoutPrivateAssetInstallFailure = (): React.Node => {
+export const LayoutPrivateAssetInstallFailure = () => {
   return (
     <PrivateAssetsAuthorizationContext.Provider
       value={{
@@ -257,7 +257,7 @@ export const LayoutPrivateAssetInstallFailure = (): React.Node => {
   );
 };
 
-export const LayoutPrivateAssetButCantInstall = (): React.Node => (
+export const LayoutPrivateAssetButCantInstall = () => (
   <Wrapper>
     <AssetPackInstallDialog
       assetPack={fakeAssetPacks.starterPacks[0]}
@@ -274,7 +274,7 @@ export const LayoutPrivateAssetButCantInstall = (): React.Node => (
   </Wrapper>
 );
 
-export const LayoutPrivateAssetButInstallingTooMany = (): React.Node => (
+export const LayoutPrivateAssetButInstallingTooMany = () => (
   <Wrapper>
     <AssetPackInstallDialog
       assetPack={fakeAssetPacks.starterPacks[0]}
@@ -297,7 +297,7 @@ export const LayoutPrivateAssetButInstallingTooMany = (): React.Node => (
   </Wrapper>
 );
 
-export const NoObjectsContainerPublicAssetInstallSuccess = (): React.Node => {
+export const NoObjectsContainerPublicAssetInstallSuccess = () => {
   const assetServiceMock = new MockAdapter(assetClient, {
     delayResponse: 250,
   });
@@ -344,7 +344,7 @@ export const NoObjectsContainerPublicAssetInstallSuccess = (): React.Node => {
   );
 };
 
-export const NoObjectsContainerPrivateAssetButCantInstall = (): React.Node => (
+export const NoObjectsContainerPrivateAssetButCantInstall = () => (
   <Wrapper>
     <AssetPackInstallDialog
       assetPack={fakeAssetPacks.starterPacks[0]}

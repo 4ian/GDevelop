@@ -179,7 +179,6 @@ function HorizontalDraggedNodeDropContainer({
   const { depth } = node;
   return (
     <>
-      {/* $FlowFixMe[underconstrained-implicit-instantiation] */}
       {new Array(depth).fill(0).map((_, depthStep) => {
         // Skip so that it does not hinder dragging and so that we don't have to
         // worry about delaying the drop target activation.
@@ -232,7 +231,7 @@ export function DropContainer({
   indentScale,
   draggedNodeHeight,
   getNodeAtPath,
-}: DropContainerProps): React.MixedElement {
+}: DropContainerProps) {
   const isDraggedNodeSibling = isSibling(node, draggedNode);
   const isDraggedNodeJustBelow = isJustBelow(node, draggedNode);
   // We want to allow dropping below if the event has no children OR if the only
@@ -343,7 +342,7 @@ export function AutoScroll({
   DnDComponent: DropTargetComponent<SortableTreeNode>,
   activateTargets: boolean,
   onHover: () => void,
-|}): React.MixedElement {
+|}) {
   const delayActivationTimer = React.useRef<?TimeoutID>(null);
   const [show, setShow] = React.useState(false);
 

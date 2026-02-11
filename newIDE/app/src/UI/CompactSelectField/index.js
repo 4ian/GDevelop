@@ -29,7 +29,7 @@ const CompactSelectField = ({
   renderOptionIcon,
   leftIconTooltip,
   rounded,
-}: Props): React.MixedElement => {
+}: Props) => {
   return (
     <div
       className={classNames({

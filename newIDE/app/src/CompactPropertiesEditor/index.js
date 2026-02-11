@@ -92,7 +92,7 @@ const styles = {
   },
 };
 
-export const Separator = (): React.MixedElement => {
+export const Separator = () => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <div
@@ -104,7 +104,7 @@ export const Separator = (): React.MixedElement => {
   );
 };
 
-export const Level2Separator = (): React.MixedElement => {
+export const Level2Separator = () => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <div
@@ -146,6 +146,23 @@ const getFieldEndAdornmentIcon = ({
   return null;
 };
 
+const isFieldHighlighted = ({
+  instances,
+  field,
+}: {|
+  instances: Instances,
+  field: ValueField,
+|}): any => {
+  if (!instances[0]) {
+    console.warn(
+      'isFieldHighlighted was called with an empty list of instances (or containing undefined). This is a bug that should be fixed.'
+    );
+    return false;
+  }
+
+  return field.isHighlighted ? field.isHighlighted(instances[0]) : false;
+};
+
 const getFieldLabel = ({
   instances,
   field,
@@ -178,7 +195,7 @@ const CompactPropertiesEditor = ({
   preventWrap,
   removeSpacers,
   isHidden,
-}: Props): null | React.Node => {
+}: Props) => {
   const forceUpdate = useForceUpdate();
 
   const onFieldChanged = React.useCallback(
@@ -195,7 +212,6 @@ const CompactPropertiesEditor = ({
       if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
       if (onInstancesModified) onInstancesModified(instances);
       if (hasImpactOnAllOtherFields) {
-        // $FlowFixMe[constant-condition]
         if (onRefreshAllFields) onRefreshAllFields();
       }
       forceUpdate();
@@ -248,6 +264,9 @@ const CompactPropertiesEditor = ({
             }}
             disabled={getDisabled({ instances, field })}
             fullWidth
+            labelColor={
+              isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
+            }
           />
         );
       } else if (field.valueType === 'number') {
@@ -260,7 +279,6 @@ const CompactPropertiesEditor = ({
             instances,
             field,
           }),
-          // $FlowFixMe[missing-local-annot]
           onChange: newValue => {
             // If the value is not a number, the user is probably still typing, adding a dot or a comma.
             // So don't update the value, it will be reverted if they leave the field.
@@ -308,6 +326,11 @@ const CompactPropertiesEditor = ({
                   {...otherCommonProps}
                 />
               }
+              labelColor={
+                isFieldHighlighted({ instances, field })
+                  ? 'primary'
+                  : 'secondary'
+              }
             />
           );
         }
@@ -333,6 +356,9 @@ const CompactPropertiesEditor = ({
                   });
                 }}
               />
+            }
+            labelColor={
+              isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
             }
           />
         );
@@ -374,6 +400,9 @@ const CompactPropertiesEditor = ({
             value={getFieldValue({ instances, field })}
             label={getFieldLabel({ instances, field })}
             markdownDescription={getFieldDescription(field)}
+            labelColor={
+              isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
+            }
           />
         );
       } else {
@@ -392,7 +421,6 @@ const CompactPropertiesEditor = ({
             field,
             mixedValueFallback: '(Multiple values)',
           }),
-          // $FlowFixMe[missing-local-annot]
           onChange: newValue => {
             instances.forEach(i => setValue(i, newValue || ''));
             onFieldChanged({
@@ -429,12 +457,17 @@ const CompactPropertiesEditor = ({
               label={getFieldLabel({ instances, field })}
               markdownDescription={getFieldDescription(field)}
               field={<CompactSemiControlledTextField {...otherCommonProps} />}
+              labelColor={
+                isFieldHighlighted({ instances, field })
+                  ? 'primary'
+                  : 'secondary'
+              }
             />
           );
         }
       }
     },
-    [instances, onFieldChanged, getFieldDescription]
+    [instances, getFieldDescription, onFieldChanged]
   );
 
   const renderSelectField = React.useCallback(
@@ -455,13 +488,12 @@ const CompactPropertiesEditor = ({
       ));
 
       let compactSelectField;
-      // $FlowFixMe[invalid-compare]
       if (field.valueType === 'number') {
         const { setValue } = field;
         compactSelectField = (
           <CompactSelectField
             key={field.name}
-            value={getFieldValue({ instances, field })}
+            value={'' + getFieldValue({ instances, field })}
             id={field.name}
             onChange={(newValue: string) => {
               instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
@@ -470,7 +502,7 @@ const CompactPropertiesEditor = ({
                 hasImpactOnAllOtherFields: field.hasImpactOnAllOtherFields,
               });
             }}
-            disabled={field.disabled}
+            disabled={getDisabled({ instances, field })}
           >
             {children}
           </CompactSelectField>
@@ -511,10 +543,13 @@ const CompactPropertiesEditor = ({
           label={getFieldLabel({ instances, field })}
           markdownDescription={getFieldDescription(field)}
           field={compactSelectField}
+          labelColor={
+            isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
+          }
         />
       );
     },
-    [instances, onFieldChanged, getFieldDescription]
+    [instances, getFieldDescription, onFieldChanged]
   );
 
   const renderButton = React.useCallback(
@@ -583,7 +618,6 @@ const CompactPropertiesEditor = ({
 
       return (
         <React.Fragment key={`toggle-buttons-${field.name}`}>
-          {/* $FlowFixMe[incompatible-type] */}
           <CompactToggleButtons id={field.name} buttons={buttons} expand />
         </React.Fragment>
       );
@@ -624,6 +658,9 @@ const CompactPropertiesEditor = ({
             }}
           />
         }
+        labelColor={
+          isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
+        }
       />
     );
   };
@@ -656,6 +693,9 @@ const CompactPropertiesEditor = ({
               });
             }}
           />
+        }
+        labelColor={
+          isFieldHighlighted({ instances, field }) ? 'primary' : 'secondary'
         }
       />
     );
@@ -796,7 +836,6 @@ const CompactPropertiesEditor = ({
         if (field.nonFieldType === 'title') {
           return renderTitle(field);
         } else if (field.nonFieldType === 'sectionTitle') {
-          // $FlowFixMe[incompatible-type]
           return renderSectionTitle(field);
         } else if (field.nonFieldType === 'button') {
           return renderButton(field);

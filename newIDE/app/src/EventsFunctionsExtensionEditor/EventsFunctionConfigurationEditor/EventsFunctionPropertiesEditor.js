@@ -24,6 +24,10 @@ import useForceUpdate from '../../Utils/UseForceUpdate';
 import Checkbox from '../../UI/Checkbox';
 import { type ExtensionItemConfigurationAttribute } from '../../EventsFunctionsExtensionEditor';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import {
+  isRelativePathToDocumentationRoot,
+  isDocumentationAbsoluteUrl,
+} from '../../Utils/HelpLink';
 
 const gd: libGDevelop = global.gd;
 
@@ -46,7 +50,7 @@ export const getSentenceErrorText = (
   eventsBasedBehavior: ?gdEventsBasedBehavior,
   eventsBasedObject: ?gdEventsBasedObject,
   eventsFunction: gdEventsFunction
-): any | string | void => {
+) => {
   const sentence = eventsFunction.getSentence();
   if (!sentence)
     return i18n._(
@@ -158,7 +162,7 @@ export const EventsFunctionPropertiesEditor = ({
   eventsBasedObject,
   getFunctionGroupNames,
   eventsFunctionsContainer,
-}: Props): React.Node => {
+}: Props) => {
   const forceUpdate = useForceUpdate();
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
   const { isMobile } = useResponsiveWindowSize();
@@ -270,7 +274,7 @@ export const EventsFunctionPropertiesEditor = ({
                         fullWidth
                         disabled={!!freezeEventsFunctionType}
                         onChange={(e, i, valueString: string) => {
-                          // $FlowFixMe[incompatible-type]
+                          // $FlowFixMe
                           const value: EventsFunction_FunctionType = valueString;
                           eventsFunction.setFunctionType(value);
                           if (onConfigurationUpdated)
@@ -445,6 +449,41 @@ export const EventsFunctionPropertiesEditor = ({
                         }}
                       />
                     )}
+                  </Line>
+                  <Line noMargin>
+                    {(() => {
+                      const helpUrl = eventsFunction.getHelpUrl();
+                      const isValidHelpUrl =
+                        !helpUrl ||
+                        isDocumentationAbsoluteUrl(helpUrl) ||
+                        isRelativePathToDocumentationRoot(helpUrl);
+                      return (
+                        <SemiControlledTextField
+                          commitOnBlur
+                          floatingLabelText={<Trans>Help page URL</Trans>}
+                          translatableHintText={t`Enter a URL to a help page for this action/condition/expression`}
+                          helperMarkdownText={i18n._(
+                            t`Optional. Enter a full URL (starting with https://) to a help page. A help icon will appear next to the action/condition/expression title in the editor, allowing users to quickly access documentation.`
+                          )}
+                          errorText={
+                            !isValidHelpUrl ? (
+                              <Trans>
+                                This is not a URL starting with "http://" or
+                                "https://".
+                              </Trans>
+                            ) : null
+                          }
+                          fullWidth
+                          value={helpUrl}
+                          onChange={text => {
+                            eventsFunction.setHelpUrl(text);
+                            if (onConfigurationUpdated)
+                              onConfigurationUpdated();
+                            forceUpdate();
+                          }}
+                        />
+                      );
+                    })()}
                   </Line>
                   {type === gd.EventsFunction.ActionWithOperator ? (
                     <Line noMargin>

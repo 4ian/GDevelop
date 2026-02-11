@@ -74,11 +74,7 @@ type Props = {|
   onClickUnlock: () => void,
 |};
 
-// $FlowFixMe[prop-missing]
-const LockedCourseChapterPreview: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<HTMLDivElement> },
-  React.RefSetter<HTMLDivElement>
-> = React.forwardRef<Props, HTMLDivElement>(
+const LockedCourseChapterPreview = React.forwardRef<Props, HTMLDivElement>(
   ({ course, courseChapter, onClickUnlock }, ref) => {
     const { windowSize } = useResponsiveWindowSize();
     const youtubeVideoId = courseChapter.videoUrl

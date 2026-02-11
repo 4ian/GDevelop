@@ -18,7 +18,7 @@ export default function ExtractAsExternalLayoutDialog({
   suggestedName,
   onApply,
   onCancel,
-}: Props): React.Node {
+}: Props) {
   const [chosenName, setChosenName] = React.useState<string>(suggestedName);
 
   const apply = React.useCallback(() => onApply(chosenName), [

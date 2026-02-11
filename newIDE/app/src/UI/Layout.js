@@ -60,7 +60,7 @@ export const TextFieldWithButtonLayout = ({
   noFloatingLabelText,
   renderTextField,
   renderButton,
-}: TextFieldWithButtonLayoutProps): React.Node => {
+}: TextFieldWithButtonLayoutProps) => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   return (
     <ResponsiveLineStackLayout
@@ -72,19 +72,14 @@ export const TextFieldWithButtonLayout = ({
       {renderTextField()}
       {renderButton(
         isMobile && !isLandscape
-          ? // $FlowFixMe[incompatible-type]
-            textFieldWithButtonLayoutStyles.textFieldOnMobileMargins
+          ? textFieldWithButtonLayoutStyles.textFieldOnMobileMargins
           : margin === 'none'
           ? noFloatingLabelText
-            ? // $FlowFixMe[incompatible-type]
-              textFieldWithButtonLayoutStyles.standardTextFieldWithoutLabelRightButtonMargins
-            : // $FlowFixMe[incompatible-type]
-              textFieldWithButtonLayoutStyles.standardTextFieldWithLabelRightButtonMargins
+            ? textFieldWithButtonLayoutStyles.standardTextFieldWithoutLabelRightButtonMargins
+            : textFieldWithButtonLayoutStyles.standardTextFieldWithLabelRightButtonMargins
           : noFloatingLabelText
-          ? // $FlowFixMe[incompatible-type]
-            textFieldWithButtonLayoutStyles.filledTextFieldWithoutLabelRightButtonMargins
-          : // $FlowFixMe[incompatible-type]
-            textFieldWithButtonLayoutStyles.filledTextFieldWithLabelRightButtonMargins
+          ? textFieldWithButtonLayoutStyles.filledTextFieldWithoutLabelRightButtonMargins
+          : textFieldWithButtonLayoutStyles.filledTextFieldWithLabelRightButtonMargins
       )}
     </ResponsiveLineStackLayout>
   );
@@ -112,7 +107,7 @@ export const LineStackLayout = ({
   useLargeSpacer,
   overflow,
   neverShrink,
-}: LineStackLayoutProps): React.Node => {
+}: LineStackLayoutProps) => {
   let isFirstChild = true;
   return (
     <Line
@@ -170,7 +165,7 @@ export const ResponsiveLineStackLayout = ({
   noResponsiveLandscape,
   useLargeSpacer,
   children,
-}: ResponsiveLineStackLayoutProps): React.Node => {
+}: ResponsiveLineStackLayoutProps) => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const assumeMobileScreen = forceMobileLayout || isMobile;
   const shouldPreventSwitchingToColumn = noResponsiveLandscape && isLandscape;
@@ -223,7 +218,7 @@ export const ColumnStackLayout = ({
   noOverflowParent,
   useFullHeight,
   useLargeSpacer,
-}: ColumnStackLayoutProps): React.Node => {
+}: ColumnStackLayoutProps) => {
   let isFirstChild = true;
   return (
     <Column

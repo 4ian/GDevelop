@@ -51,7 +51,6 @@ export default class EventsFunctionExtractorDialog extends React.Component<
   Props,
   State
 > {
-  // $FlowFixMe[missing-local-annot]
   state = {
     eventsFunction: null,
     extensionName: '',
@@ -131,7 +130,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
     return [...groupNames].sort((a, b) => a.localeCompare(b));
   };
 
-  render(): any {
+  render() {
     const { project, onClose, onCreate } = this.props;
     const { eventsFunction, extensionName, createNewExtension } = this.state;
     if (!eventsFunction) return null;

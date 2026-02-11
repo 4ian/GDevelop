@@ -48,7 +48,7 @@ const CurrentUsageDisplayer = ({
   onChangeSubscription,
   onStartBuildWithCredits,
   hidePurchaseWithCredits,
-}: Props): React.Node => {
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { openCreditsPackageDialog, openCreditsUsageDialog } = React.useContext(
     CreditsPackageStoreContext

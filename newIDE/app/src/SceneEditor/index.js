@@ -444,7 +444,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._sendSelectedInstances();
   }
 
-  getInstancesEditorSettings(): any {
+  getInstancesEditorSettings() {
     return this.state.instancesEditorSettings;
   }
 
@@ -571,7 +571,12 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const justAddedInstances = changes.addedInstances.map(addedInstance => {
       const instance: gdInitialInstance = this.props.initialInstances.insertNewInitialInstance();
-      unserializeFromJSObject(instance, addedInstance);
+      unserializeFromJSObject(
+        instance,
+        addedInstance,
+        'unserializeFrom',
+        this.props.project
+      );
       return instance;
     });
     if (justAddedInstances.length) {
@@ -619,7 +624,6 @@ export default class SceneEditor extends React.Component<Props, State> {
           resourceName
         );
         // $FlowIgnore - Flow does not know ObjectsUsingResourceCollector inherits from ArbitraryObjectsWorker
-        // $FlowFixMe[incompatible-type]
         gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
         const objectNames = objectsCollector.getObjectNames().toJSArray();
         objectsCollector.delete();
@@ -976,14 +980,13 @@ export default class SceneEditor extends React.Component<Props, State> {
    * bottleneck. We let the mutations be done and trigger an update only when the user
    * is done.
    */
-  // $FlowFixMe[missing-local-annot]
-  _onInstancesEditorSettingsMutated = (debounce(
+  _onInstancesEditorSettingsMutated = debounce(
     (instancesEditorSettings: InstancesEditorSettings) => {
       this.setInstancesEditorSettings(instancesEditorSettings);
     },
     1000,
     { leading: false, trailing: true }
-  ): any);
+  );
 
   undo = () => {
     // /!\ Drop the selection to avoid keeping any references to deleted instances.
@@ -991,7 +994,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.instancesSelection.clearSelection();
     this.setState(
       {
-        history: undo(this.state.history, this.props.initialInstances),
+        history: undo(
+          this.state.history,
+          this.props.initialInstances,
+          this.props.project
+        ),
       },
       () => {
         // /!\ Force the instances editor to destroy and mount again the
@@ -1010,7 +1017,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.instancesSelection.clearSelection();
     this.setState(
       {
-        history: redo(this.state.history, this.props.initialInstances),
+        history: redo(
+          this.state.history,
+          this.props.initialInstances,
+          this.props.project
+        ),
       },
       () => {
         // /!\ Force the instances editor to destroy and mount again the
@@ -1088,7 +1099,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     const viewPosition = this.editorDisplay.viewControls.getViewPosition();
     let position = [0, 0];
     if (viewPosition) {
-      // $FlowFixMe[incompatible-type]
       position = viewPosition.toSceneCoordinates(
         viewPosition.getWidth() / 2,
         viewPosition.getHeight() /
@@ -1294,10 +1304,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._sendUpdatedInstances(instances);
   };
 
-  // $FlowFixMe[missing-local-annot]
-  _exportDataOnly = (debounce(() => {
+  _exportDataOnly = debounce(() => {
     this.props.hotReloadPreviewButtonProps.launchProjectDataOnlyPreview();
-  }, 250): any);
+  }, 250);
 
   _onInstancesModified = (instances: Array<gdInitialInstance>) => {
     this._sendUpdatedInstances(instances);
@@ -1702,7 +1711,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     newName: string,
     global: boolean,
     i18n: I18nType
-  ): any => {
+  ) => {
     const { project, layout, projectScopedContainersAccessor } = this.props;
 
     const projectScopedContainers = projectScopedContainersAccessor.get();
@@ -1866,7 +1875,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       highestZOrderFinder.reset();
       highestZOrderFinder.restrictSearchToLayer(layerName);
       this.props.initialInstances.iterateOverInstances(highestZOrderFinder);
-      // $FlowFixMe[prop-missing]
       extremeZOrderByLayerName[layerName] =
         where === 'back'
           ? highestZOrderFinder.getLowestZOrder()
@@ -1876,7 +1884,6 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     selectedInstances.forEach(instance => {
       if (!instance.isLocked()) {
-        // $FlowFixMe[invalid-computed-prop]
         const extremeZOrder = extremeZOrderByLayerName[instance.getLayer()];
         // If instance is already at the extreme z order, do nothing.
         if (instance.getZOrder() === extremeZOrder) return;
@@ -2065,7 +2072,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
-  getContextMenuZoomItems = (i18n: I18nType): any => {
+  getContextMenuZoomItems = (i18n: I18nType) => {
     return [
       {
         label: i18n._(t`Zoom in`),
@@ -2096,7 +2103,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     ];
   };
 
-  getContextMenuLayoutItems = (i18n: I18nType): any => {
+  getContextMenuLayoutItems = (i18n: I18nType) => {
     const { layout } = this.props;
 
     return [
@@ -2111,7 +2118,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     ].filter(Boolean);
   };
 
-  getContextMenuInstancesWiseItems = (i18n: I18nType): any => {
+  getContextMenuInstancesWiseItems = (i18n: I18nType) => {
     const hasSelectedInstances = this.instancesSelection.hasSelectedInstances();
     return [
       {
@@ -2255,7 +2262,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
-  isInstanceOf3DObject = (instance: gdInitialInstance): any => {
+  isInstanceOf3DObject = (instance: gdInitialInstance) => {
     const { project, globalObjectsContainer, objectsContainer } = this.props;
 
     const object = getObjectByName(
@@ -2272,7 +2279,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
-  buildContextMenu = (i18n: I18nType, options: any): any => {
+  buildContextMenu = (i18n: I18nType, options: any) => {
     if (
       options.ignoreSelectedObjectsForContextMenu ||
       !this.instancesSelection.hasSelectedInstances()
@@ -2422,6 +2429,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       .map(instance => serializeToJSObject(instance));
 
     const newInstances = addSerializedInstances({
+      project: this.props.project,
       instancesContainer: this.props.initialInstances,
       copyReferential: [-2 * MOVEMENT_BIG_DELTA, -2 * MOVEMENT_BIG_DELTA],
       serializedInstances: serializedSelection,
@@ -2458,6 +2466,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (x === null || y === null || instancesContent === null) return;
 
     const newInstances = addSerializedInstances({
+      project: this.props.project,
       instancesContainer: this.props.initialInstances,
       copyReferential: [x, y],
       serializedInstances: instancesContent,
@@ -2523,7 +2532,12 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     for (const serializedInstance of serializedSelection) {
       const instance = new gd.InitialInstance();
-      unserializeFromJSObject(instance, serializedInstance);
+      unserializeFromJSObject(
+        instance,
+        serializedInstance,
+        'unserializeFrom',
+        project
+      );
       newExternalLayout
         .getInitialInstances()
         .insertInitialInstance(instance)
@@ -2552,7 +2566,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       onExtractAsEventBasedObject,
     } = this.props;
     const { editorDisplay, deleteSelection, instancesSelection } = this;
-    // $FlowFixMe[constant-condition]
     if (!onExtractAsEventBasedObject) return;
 
     let selectionAABB = new Rectangle();
@@ -2697,7 +2710,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
-  render(): any {
+  render() {
     const {
       project,
       projectScopedContainersAccessor,

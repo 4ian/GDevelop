@@ -1,5 +1,4 @@
 /* eslint-env worker */
-/* eslint-disable no-undef */
 // @flow
 
 let modulePromise /*: ?Promise<libGDevelop>*/ = null;
@@ -15,16 +14,17 @@ const getLibGDevelop = (versionWithHash /*: string */) => {
     try {
       const url = `/libGD.js?cache-buster=${versionWithHash}`;
       // Load libGD.js in the worker context.
+      // eslint-disable-next-line no-undef
       importScripts(url);
 
-      // $FlowFixMe[incompatible-type]
-      // $FlowFixMe[cannot-resolve-name]
+      // eslint-disable-next-line no-undef
+      // $FlowFixMe
       if (typeof initializeGDevelopJs !== 'function') {
         reject(new Error('Missing initializeGDevelopJs in worker'));
         return;
       }
 
-      // $FlowFixMe[cannot-resolve-name]
+      // eslint-disable-next-line no-undef
       initializeGDevelopJs({
         // Override the resolved URL for the .wasm file,
         // to ensure a new version is fetched when the version changes.
@@ -81,26 +81,20 @@ const unserializeBinarySnapshotToJson = (
 
 // eslint-disable-next-line no-restricted-globals
 self.onmessage = async (event /*: MessageEvent */) => {
-  // $FlowFixMe[incompatible-type]
-  // $FlowFixMe[prop-missing]
-  // $FlowFixMe[incompatible-use]
+  // $FlowExpectedError
   const { type, binary, requestId, versionWithHash } = event.data || {};
 
   const startTime = Date.now();
 
-  // $FlowFixMe[incompatible-type]
   log(`Request #${requestId} received (${type}).`);
   if (type !== 'SERIALIZE_TO_JSON' && type !== 'SERIALIZE_TO_JS_OBJECT') return;
 
   try {
-    // $FlowFixMe[incompatible-type]
     const gd = await getLibGDevelop(versionWithHash);
 
-    // $FlowFixMe[incompatible-type]
     const json = unserializeBinarySnapshotToJson(gd, binary);
     const result = type === 'SERIALIZE_TO_JSON' ? json : JSON.parse(json);
 
-    // $FlowFixMe[incompatible-type]
     log(`Request #${requestId} done in ${Date.now() - startTime}ms.`);
 
     // eslint-disable-next-line no-restricted-globals

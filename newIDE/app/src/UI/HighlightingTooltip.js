@@ -107,7 +107,7 @@ const HighlightingTooltip = ({
   onClose,
   placement,
   closeWithBackdropClick,
-}: Props): null | React.Node => {
+}: Props) => {
   const classes = useClasses();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { currentlyRunningInAppTutorial } = React.useContext(

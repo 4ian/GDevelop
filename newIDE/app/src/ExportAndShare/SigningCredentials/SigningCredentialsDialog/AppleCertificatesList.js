@@ -31,7 +31,6 @@ import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 
 type Props = {
   signingCredentials: Array<SigningCredential> | null,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   error: Error | null,
   onRefreshSigningCredentials: () => Promise<void>,
@@ -48,7 +47,7 @@ export const AppleCertificatesList = ({
   error,
   onRefreshSigningCredentials,
   onAddNew,
-}: Props): React.Node => {
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { showConfirmation } = useAlertDialog();
 

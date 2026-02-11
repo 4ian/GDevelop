@@ -23,7 +23,7 @@ export default function ResourceTypeSelectField({
   onChange,
   onFocus,
   fullWidth,
-}: Props): React.Node {
+}: Props) {
   return (
     <I18n>
       {({ i18n }) => (

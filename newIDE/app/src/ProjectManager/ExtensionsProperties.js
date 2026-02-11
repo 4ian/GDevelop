@@ -10,7 +10,7 @@ type Props = {|
   project: gdProject,
 |};
 
-function ExtensionsProperties(props: Props): React.Node | null {
+function ExtensionsProperties(props: Props) {
   const { project } = props;
   const allExtensions = project.getCurrentPlatform().getAllPlatformExtensions();
   const propertyList = [];
@@ -23,10 +23,12 @@ function ExtensionsProperties(props: Props): React.Node | null {
     const propertiesSchema = propertiesMapToSchema({
       properties,
       defaultValueProperties: null,
-      getProperties: instance =>
+      getPropertyValue: (instance, name) =>
         project
           .getExtensionProperties()
-          .getAllExtensionProperties(extension.getName(), project),
+          .getAllExtensionProperties(extension.getName(), project)
+          .get(name)
+          .getValue(),
       onUpdateProperty: (instance, propertyName, newValue) => {
         if (
           project

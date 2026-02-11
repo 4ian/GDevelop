@@ -48,7 +48,7 @@ export const getExtensionHeader = (
     [name: string]: ExtensionShortHeader,
   },
   extensionName: string
-): ExtensionShortHeader => {
+) => {
   const extensionShortHeader = extensionShortHeadersByName[extensionName];
   if (!extensionShortHeader) {
     throw new Error(
@@ -171,11 +171,7 @@ export const checkRequiredExtensionsUpdate = async ({
   };
 };
 
-export const useExtensionUpdateAlertDialog = (): (({
-  outOfDateExtensionShortHeaders: Array<ExtensionShortHeader>,
-  project: gdProject,
-  reason: 'asset' | 'extension' | 'behavior',
-}) => Promise<string>) => {
+export const useExtensionUpdateAlertDialog = () => {
   const { showConfirmation, showDeleteConfirmation } = useAlertDialog();
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
@@ -288,15 +284,7 @@ export const getRequiredExtensions = (
   );
 };
 
-export const useInstallExtension = (): (({
-  importedSerializedExtensions: Array<SerializedExtension>,
-  onExtensionInstalled: (extensionNames: Array<string>) => void,
-  onWillInstallExtension: (extensionNames: Array<string>) => void,
-  project: gdProject,
-  reason: 'asset' | 'extension' | 'behavior',
-  requiredExtensionInstallation: RequiredExtensionInstallation,
-  updateMode: 'all' | 'safeOnly',
-}) => Promise<boolean>) => {
+export const useInstallExtension = () => {
   const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
   const { showAlert } = useAlertDialog();
   const eventsFunctionsExtensionsState = React.useContext(
@@ -363,10 +351,8 @@ const filterMissingExtensions = (
   requiredExtensions: Array<ExtensionShortHeader>
 ): Array<ExtensionShortHeader> => {
   const loadedExtensionNames = mapVector(
-    // $FlowFixMe[incompatible-exact]
     gd.asPlatform(gd.JsPlatform.get()).getAllPlatformExtensions(),
     extension => {
-      // $FlowFixMe[incompatible-use]
       return extension.getName();
     }
   );
@@ -437,7 +423,8 @@ export const installRequiredExtensions = async ({
   await addSerializedExtensionsToProject(
     eventsFunctionsExtensionsState,
     project,
-    installedExtensions
+    installedExtensions,
+    downloadedSerializedExtensions.map(extensions => extensions.name)
   );
   onExtensionInstalled(installedExtensionNames);
 
@@ -461,13 +448,11 @@ export const addSerializedExtensionsToProject = async (
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   project: gdProject,
   serializedExtensions: Array<SerializedExtension>,
-  fromExtensionStore: boolean = true
+  fromStoreExtensionNames: Array<string>
 ): Promise<void> => {
-  const extensionNames = serializedExtensions.map(serializedExtension => {
+  serializedExtensions.forEach(serializedExtension => {
     const { name } = serializedExtension;
     if (!name) throw new Error('Malformed extension (missing name).');
-
-    return name;
   });
 
   // Unserialize the extensions in the project. Let the project do it
@@ -479,21 +464,19 @@ export const addSerializedExtensionsToProject = async (
   serializedExtensionsElement.delete();
 
   // Keep track of extensions added from the extension store.
-  if (fromExtensionStore) {
-    extensionNames.forEach(extensionName => {
-      if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
-        return;
-      }
+  fromStoreExtensionNames.forEach(extensionName => {
+    if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
+      return;
+    }
 
-      const eventsFunctionsExtension = project.getEventsFunctionsExtension(
-        extensionName
-      );
-      eventsFunctionsExtension.setOrigin(
-        'gdevelop-extension-store',
-        extensionName
-      );
-    });
-  }
+    const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+      extensionName
+    );
+    eventsFunctionsExtension.setOrigin(
+      'gdevelop-extension-store',
+      extensionName
+    );
+  });
 
   return eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
     project
@@ -503,12 +486,7 @@ export const addSerializedExtensionsToProject = async (
 /**
  * Open a dialog to choose an extension and install it in the project.
  */
-export const useImportExtension = (): (({
-  i18n: I18nType,
-  onExtensionInstalled: (extensionNames: Array<string>) => void,
-  onWillInstallExtension: (extensionNames: Array<string>) => void,
-  project: gdProject,
-}) => Promise<Array<string>>) => {
+export const useImportExtension = () => {
   const { showConfirmation, showAlert } = useAlertDialog();
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
@@ -572,9 +550,7 @@ export const useImportExtension = (): (({
         const allExtensions = gd
           .asPlatform(gd.JsPlatform.get())
           .getAllPlatformExtensions();
-        // $FlowFixMe[incompatible-exact]
         mapVector(allExtensions, extension => {
-          // $FlowFixMe[incompatible-use]
           if (importedExtensionNames.includes(extension.getName())) {
             hasConflictWithBuiltInExtension = true;
           }

@@ -263,11 +263,7 @@ type Props = {|
   category: string,
 |};
 
-const BundlePreviewBanner = ({
-  onDisplayBundle,
-  i18n,
-  category,
-}: Props): React.Node => {
+const BundlePreviewBanner = ({ onDisplayBundle, i18n, category }: Props) => {
   const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();
   const numberOfTilesToDisplay = getColumnsFromWindowSize(windowSize) - 1; // Reserve one tile for the bundle preview.
   const { privateGameTemplateListingDatas } = React.useContext(
@@ -410,7 +406,6 @@ const BundlePreviewBanner = ({
         return null; // Don't display course tiles on mobile, they take too much space.
       }
       if (!productListingDatasIncludedInBundle) {
-        // $FlowFixMe[underconstrained-implicit-instantiation]
         return new Array(numberOfTilesToDisplay).fill(0).map((_, index) => (
           <React.Fragment key={`skeleton-${index}`}>
             {index > 0 &&
@@ -438,10 +433,9 @@ const BundlePreviewBanner = ({
         productListingData => productListingData.productType === 'COURSE'
       );
 
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       return new Array(numberOfTilesToDisplay).fill(0).map((_, index) => {
         const courseListingData: ?CourseListingData =
-          // $FlowFixMe[incompatible-type]
+          // $FlowFixMe
           coursesIncludedInBundle[index];
         if (!courseListingData) {
           return <div style={{ flex: 1 }} key={`empty-tile-${index}`} />;

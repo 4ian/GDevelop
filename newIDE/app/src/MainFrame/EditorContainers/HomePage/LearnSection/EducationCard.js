@@ -20,10 +20,7 @@ type Props = {|
   unlocked?: boolean,
 |};
 
-export const EducationCard = ({
-  onSeeResources,
-  unlocked,
-}: Props): React.Node => {
+export const EducationCard = ({ onSeeResources, unlocked }: Props) => {
   if (unlocked) {
     return (
       <Paper background="medium" style={{ padding: 20 }}>

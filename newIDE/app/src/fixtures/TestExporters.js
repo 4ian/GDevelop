@@ -123,7 +123,6 @@ export const fakeBrowserOnlineWebExportPipeline: ExportPipeline<
 
   launchOnlineBuild: async (
     exportState: ExportState,
-    // $FlowFixMe[value-as-type]
     authenticatedUser: AuthenticatedUser,
     uploadBucketKey: string,
     gameId: string,

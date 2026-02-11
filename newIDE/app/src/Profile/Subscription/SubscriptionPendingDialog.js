@@ -20,7 +20,6 @@ import { canBenefitFromDiscordRole } from '../../Utils/GDevelopServices/Usage';
 
 type Props = {|
   onClose: () => void,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   onSuccess: () => void,
   immediatelyShowSuccessMessage?: boolean,
@@ -31,7 +30,7 @@ export default function SubscriptionPendingDialog({
   authenticatedUser,
   onSuccess,
   immediatelyShowSuccessMessage,
-}: Props): React.Node {
+}: Props) {
   const userPlanIdAtOpening = React.useRef<?string>(
     !!authenticatedUser.subscription
       ? authenticatedUser.subscription.planId

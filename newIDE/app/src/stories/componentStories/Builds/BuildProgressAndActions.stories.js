@@ -20,54 +20,54 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Errored = (): React.Node => (
+export const Errored = () => (
   <BuildProgressAndActions build={erroredCordovaBuild} game={game1} />
 );
 
-export const PendingElectronBuild = (): React.Node => (
+export const PendingElectronBuild = () => (
   <BuildProgressAndActions
     build={{ ...pendingElectronBuild, updatedAt: Date.now() }}
     game={game1}
   />
 );
 
-export const PendingCordovaBuild = (): React.Node => (
+export const PendingCordovaBuild = () => (
   <BuildProgressAndActions
     build={{ ...pendingCordovaBuild, updatedAt: Date.now() }}
     game={game1}
   />
 );
 
-export const SlowPendingCordovaBuild = (): React.Node => (
+export const SlowPendingCordovaBuild = () => (
   <BuildProgressAndActions
     build={{ ...pendingCordovaBuild, updatedAt: Date.now() - 1000 * 400 }}
     game={game1}
   />
 );
 
-export const TimedOutPendingCordovaBuild = (): React.Node => (
+export const TimedOutPendingCordovaBuild = () => (
   <BuildProgressAndActions
     build={{ ...pendingCordovaBuild, updatedAt: Date.now() - 1000 * 3600 * 24 }}
     game={game1}
   />
 );
 
-export const CompleteCordovaBuild = (): React.Node => (
+export const CompleteCordovaBuild = () => (
   <BuildProgressAndActions build={completeCordovaBuild} game={game1} />
 );
 
-export const CompleteElectronBuild = (): React.Node => (
+export const CompleteElectronBuild = () => (
   <BuildProgressAndActions build={completeElectronBuild} game={game1} />
 );
 
-export const CompleteUnpublishedWebBuild = (): React.Node => (
+export const CompleteUnpublishedWebBuild = () => (
   <BuildProgressAndActions
     build={completeWebBuild}
     game={{ ...game1, publicWebBuildId: 'other-build-id' }}
   />
 );
 
-export const CompletePublishedWebBuild = (): React.Node => (
+export const CompletePublishedWebBuild = () => (
   <BuildProgressAndActions
     build={completeWebBuild}
     game={{ ...game1, publicWebBuildId: completeWebBuild.id }}

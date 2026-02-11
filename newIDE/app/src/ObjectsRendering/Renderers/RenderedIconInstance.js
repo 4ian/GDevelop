@@ -7,17 +7,12 @@ import * as PIXI from 'pixi.js-legacy';
 /**
  * Create a renderer for an type of object displayed as an icon
  */
-// $FlowFixMe[cannot-resolve-name]
-export default function makeRenderer(
-  iconPath: string
-  // $FlowFixMe[cannot-resolve-name]
-): typeof RenderedIconInstance {
+export default function makeRenderer(iconPath: string) {
   class RenderedIconInstance extends RenderedInstance {
     constructor(
       project: gdProject,
       instance: gdInitialInstance,
       associatedObjectConfiguration: gdObjectConfiguration,
-      // $FlowFixMe[value-as-type]
       pixiContainer: PIXI.Container,
       pixiResourcesLoader: Class<PixiResourcesLoader>
     ) {
@@ -52,7 +47,6 @@ export default function makeRenderer(
       project: gdProject,
       resourcesLoader: Class<ResourcesLoader>,
       objectConfiguration: gdObjectConfiguration
-      // $FlowFixMe[missing-local-annot]
     ) {
       return iconPath;
     }

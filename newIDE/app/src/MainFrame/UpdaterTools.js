@@ -18,7 +18,7 @@ export type ElectronUpdateStatus = {
 
 export const getElectronUpdateNotificationTitle = (
   updateStatus: ElectronUpdateStatus
-): string => {
+) => {
   if (updateStatus.status === 'update-available')
     return 'A new update is available!';
 
@@ -27,16 +27,14 @@ export const getElectronUpdateNotificationTitle = (
 
 export const getElectronUpdateNotificationBody = (
   updateStatus: ElectronUpdateStatus
-): string => {
+) => {
   if (updateStatus.status === 'update-available')
     return 'It will be downloaded and installed automatically (unless you deactivated this in preferences)';
 
   return '';
 };
 
-export const getElectronUpdateStatusLabel = (
-  status: string
-): string | React.Node => {
+export const getElectronUpdateStatusLabel = (status: string) => {
   if (status === 'checking-for-update')
     return <Trans>Checking for update...</Trans>;
   if (status === 'update-available')
@@ -55,13 +53,13 @@ export const getElectronUpdateStatusLabel = (
   return '';
 };
 
-export const getElectronUpdateButtonLabel = (status: string): React.Node => {
+export const getElectronUpdateButtonLabel = (status: string) => {
   if (status === 'update-available')
     return <Trans>Update GDevelop to latest version</Trans>;
   return <Trans>Check again for new updates</Trans>;
 };
 
-export const canDownloadElectronUpdate = (status: string): boolean => {
+export const canDownloadElectronUpdate = (status: string) => {
   return status === 'update-available';
 };
 
@@ -72,7 +70,7 @@ type ServiceWorkerUpdateStatus =
   | 'update-installing'
   | 'update-ready';
 
-export const useServiceWorkerUpdateStatus = (): ServiceWorkerUpdateStatus => {
+export const useServiceWorkerUpdateStatus = () => {
   const [
     serviceWorkerUpdateStatus,
     setServiceWorkerUpdateStatus,
@@ -107,7 +105,7 @@ export const useServiceWorkerUpdateStatus = (): ServiceWorkerUpdateStatus => {
 
 export const getServiceWorkerStatusLabel = (
   status: ServiceWorkerUpdateStatus
-): React.Node => {
+) => {
   if (status === 'not-installed') {
     return <Trans>Not installed as an app. No updates available.</Trans>;
   } else if (status === 'installed') {

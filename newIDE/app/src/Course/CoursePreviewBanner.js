@@ -123,7 +123,6 @@ const ChapterTile = ({
       <Spacer />
       <Line noMargin>
         <Text color="secondary" noMargin>
-          {/* $FlowFixMe[invalid-computed-prop] */}
           {rankLabel[chapterIndex + 1]}
         </Text>
         &nbsp;
@@ -160,7 +159,7 @@ const CoursePreviewBanner = ({
   getCourseCompletion,
   getCourseChapterCompletion,
   onDisplayCourse,
-}: Props): React.Node => {
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { achievements, badges } = React.useContext(AuthenticatedUserContext);
   const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();
@@ -171,7 +170,6 @@ const CoursePreviewBanner = ({
     () => {
       const courseChapters = course ? getCourseChapters(course.id) : null;
       if (!course || !courseChapters) {
-        // $FlowFixMe[underconstrained-implicit-instantiation]
         return new Array(numberOfTilesToDisplay).fill(0).map((_, index) => {
           return (
             <React.Fragment key={`skeleton-${index}`}>
@@ -196,7 +194,6 @@ const CoursePreviewBanner = ({
           );
         });
       }
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const completionByChapter = new Array(course.chaptersTargetCount)
         .fill(0)
         .map((_, index) => {
@@ -229,7 +226,6 @@ const CoursePreviewBanner = ({
         )
       );
 
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       return new Array(numberOfTilesToDisplay).fill(0).map((_, index) => {
         const chapterIndex = startChapterIndex + index;
         if (chapterIndex >= course.chaptersTargetCount) return null;
@@ -280,7 +276,6 @@ const CoursePreviewBanner = ({
           <LinearProgress
             value={courseCompletion.percentage * 100}
             variant="determinate"
-            // $FlowFixMe[incompatible-type]
             style={styles.progress}
             color="success"
           />

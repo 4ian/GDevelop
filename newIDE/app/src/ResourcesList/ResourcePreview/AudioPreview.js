@@ -9,10 +9,7 @@ type Props = {|
   audioResourceSource: string,
 |};
 
-const AudioPreview = ({
-  resourceName,
-  audioResourceSource,
-}: Props): React.Node => {
+const AudioPreview = ({ resourceName, audioResourceSource }: Props) => {
   const [hasError, setHasError] = React.useState(false);
 
   const onSoundLoaded = React.useCallback(() => {

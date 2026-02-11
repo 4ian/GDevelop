@@ -166,7 +166,6 @@ export const browserOnlineCordovaIosExportPipeline: ExportPipeline<
     return getBuildFileUploadOptions().then(uploadOptions => {
       return uploadBlobFile(
         blobFile,
-        // $FlowFixMe[incompatible-type]
         uploadOptions,
         context.updateStepProgress
       ).then(() => uploadOptions.key);
@@ -175,7 +174,6 @@ export const browserOnlineCordovaIosExportPipeline: ExportPipeline<
 
   launchOnlineBuild: (
     exportState: ExportState,
-    // $FlowFixMe[value-as-type]
     authenticatedUser: AuthenticatedUser,
     uploadBucketKey: string,
     gameId: string,

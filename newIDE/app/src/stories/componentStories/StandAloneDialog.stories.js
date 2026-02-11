@@ -68,7 +68,6 @@ const allPrivateAssetPackListingData = [
 
 const allPrivateGameTemplateListingData = [fakePrivateGameTemplateListingData];
 
-// $FlowFixMe[missing-empty-array-annot]
 const mockCourses = [];
 
 const StandAloneDialogStory = ({
@@ -80,7 +79,6 @@ const StandAloneDialogStory = ({
   errorMessage,
 }: {
   bundleCategory: string,
-  // $FlowFixMe[value-as-type]
   authenticatedUser?: AuthenticatedUser,
   receivedBundles?: Array<Bundle>,
   delayResponse?: number,
@@ -206,10 +204,8 @@ const StandAloneDialogStory = ({
   );
 };
 
-export const Default = (): React.Node => (
-  <StandAloneDialogStory bundleCategory="starter" />
-);
+export const Default = () => <StandAloneDialogStory bundleCategory="starter" />;
 
-export const Loading = (): React.Node => (
+export const Loading = () => (
   <StandAloneDialogStory bundleCategory="starter" delayResponse={10000} />
 );

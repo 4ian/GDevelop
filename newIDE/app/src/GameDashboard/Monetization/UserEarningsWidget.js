@@ -38,7 +38,7 @@ type Props = {|
   size: DashboardWidgetSize,
 |};
 
-const UserEarningsWidget = ({ size }: Props): React.Node => {
+const UserEarningsWidget = ({ size }: Props) => {
   const {
     userEarningsBalance,
     onRefreshEarningsBalance,
@@ -76,7 +76,6 @@ const UserEarningsWidget = ({ size }: Props): React.Node => {
         let currentCredits = 0;
         let step = 0;
 
-        // $FlowFixMe[incompatible-type]
         intervalValuesUpdate.current = setInterval(() => {
           step++;
           currentMilliUsd += milliUsdIncrement;
@@ -128,7 +127,6 @@ const UserEarningsWidget = ({ size }: Props): React.Node => {
     userEarningsBalance &&
     earningsInMilliUsd >= userEarningsBalance.minAmountToCashoutInMilliUSDs;
 
-  // $FlowFixMe[constant-condition]
   const content = error ? (
     <LineStackLayout noMargin alignItems="center">
       <PlaceholderError onRetry={onRefreshEarningsBalance}>

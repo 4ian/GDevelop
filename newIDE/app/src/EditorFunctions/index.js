@@ -375,7 +375,6 @@ const findPropertyByName = ({
       foundPropertyName: null,
     };
 
-  // $FlowFixMe[missing-local-annot]
   const normalizeName = name => name.toLowerCase().replace(/\s|_|-/g, '');
   const normalizedName = normalizeName(name);
 
@@ -536,8 +535,6 @@ const makeShortTextForNamedProperty = (
   const choices =
     type.toLowerCase() === 'choice'
       ? [
-          // $FlowFixMe[incompatible-use]
-          // $FlowFixMe[incompatible-exact]
           ...mapVector(property.getChoices(), choice => choice.getValue()),
           // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.
           ...property.getExtraInfo().toJSArray(),
@@ -1292,7 +1289,6 @@ const changeObjectProperty: EditorFunction = {
     };
 
     if (!project || !project.hasLayoutNamed(scene_name)) {
-      // $FlowFixMe[incompatible-type]
       return renderChanges(
         listLabelAndValuesFromChangedProperties(changed_properties)
       );
@@ -1311,7 +1307,6 @@ const changeObjectProperty: EditorFunction = {
     }
 
     if (!object) {
-      // $FlowFixMe[incompatible-type]
       return renderChanges(
         listLabelAndValuesFromChangedProperties(changed_properties)
       );
@@ -1353,7 +1348,6 @@ const changeObjectProperty: EditorFunction = {
       })
       .filter(Boolean);
 
-    // $FlowFixMe[incompatible-type]
     return renderChanges(changes);
   },
   launchFunction: async ({ project, args }) => {
@@ -1568,7 +1562,6 @@ const addBehavior: EditorFunction = {
     };
 
     if (!project) {
-      // $FlowFixMe[incompatible-type]
       return makeText(behavior_type);
     }
 
@@ -1577,7 +1570,6 @@ const addBehavior: EditorFunction = {
       behavior_type
     );
     if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
-      // $FlowFixMe[incompatible-type]
       return makeText(behavior_type);
     }
 
@@ -1586,7 +1578,6 @@ const addBehavior: EditorFunction = {
     const behaviorName =
       optionalBehaviorName || behaviorMetadata.getDefaultName();
 
-    // $FlowFixMe[incompatible-type]
     return makeText(behaviorMetadata.getFullName());
   },
   launchFunction: async ({
@@ -1895,7 +1886,6 @@ const inspectBehaviorProperties: EditorFunction = {
       const behaviorSharedDataPropertyNames = behaviorSharedDataProperties
         .keys()
         .toJSArray();
-      // $FlowFixMe[incompatible-type]
       sharedProperties = behaviorSharedDataPropertyNames
         .map(name => {
           const propertyDescriptor = behaviorSharedDataProperties.get(name);
@@ -1977,7 +1967,6 @@ const changeBehaviorProperty: EditorFunction = {
     };
 
     if (!project || !project.hasLayoutNamed(scene_name)) {
-      // $FlowFixMe[incompatible-type]
       return renderChanges(
         listLabelAndValuesFromChangedProperties(changed_properties)
       );
@@ -1996,14 +1985,12 @@ const changeBehaviorProperty: EditorFunction = {
     }
 
     if (!object) {
-      // $FlowFixMe[incompatible-type]
       return renderChanges(
         listLabelAndValuesFromChangedProperties(changed_properties)
       );
     }
 
     if (!object.hasBehaviorNamed(behavior_name)) {
-      // $FlowFixMe[incompatible-type]
       return renderChanges(
         listLabelAndValuesFromChangedProperties(changed_properties)
       );
@@ -2065,7 +2052,6 @@ const changeBehaviorProperty: EditorFunction = {
       })
       .filter(Boolean);
 
-    // $FlowFixMe[incompatible-type]
     return renderChanges(changes);
   },
   launchFunction: async ({ project, args }) => {
@@ -2118,7 +2104,6 @@ const changeBehaviorProperty: EditorFunction = {
     }
 
     const warnings = [];
-    // $FlowFixMe[missing-empty-array-annot]
     const changes = [];
 
     changedProperties.forEach(changed_property => {
@@ -2169,7 +2154,6 @@ const changeBehaviorProperty: EditorFunction = {
           requestedNewValue: sanitizedNewValue,
         });
         warnings.push(...propertyWarnings);
-        // $FlowFixMe[incompatible-type]
         changes.push(...propertyChanges);
       } else if (
         behaviorSharedData &&
@@ -2202,7 +2186,6 @@ const changeBehaviorProperty: EditorFunction = {
           requestedNewValue: sanitizedNewValue,
         });
         warnings.push(...propertyWarnings);
-        // $FlowFixMe[incompatible-type]
         changes.push(...propertyChanges);
       } else {
         warnings.push(
@@ -2211,7 +2194,6 @@ const changeBehaviorProperty: EditorFunction = {
       }
     });
 
-    // $FlowFixMe[incompatible-type]
     return makeMultipleChangesOutput(changes, warnings);
   },
 };
@@ -2310,21 +2292,18 @@ const describeInstances: EditorFunction = {
   },
 };
 
-// $FlowFixMe[missing-local-annot]
 const iterateOnInstances = (initialInstances, callback) => {
   const instanceGetter = new gd.InitialInstanceJSFunctor();
-  // $FlowFixMe[incompatible-type] - invoke is not writable
-  // $FlowFixMe[cannot-write]
+  // $FlowFixMe - invoke is not writable
   instanceGetter.invoke = instancePtr => {
-    // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
+    // $FlowFixMe - wrapPointer is not exposed
     const instance: gdInitialInstance = gd.wrapPointer(
-      // $FlowFixMe[incompatible-type]
       instancePtr,
       gd.InitialInstance
     );
     callback(instance);
   };
-  // $FlowFixMe[incompatible-type] - JSFunctor is incompatible with Functor
+  // $FlowFixMe - JSFunctor is incompatible with Functor
   initialInstances.iterateOverInstances(instanceGetter);
   instanceGetter.delete();
 };
@@ -2491,7 +2470,6 @@ const put2dInstances: EditorFunction = {
       const brushSize = brush_size || 0;
 
       // Iterate on existing instances and remove them, and/or those inside the brush radius.
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const instancesToDelete = new Set();
       const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
 
@@ -2601,7 +2579,6 @@ const put2dInstances: EditorFunction = {
       }
 
       // Store original states of existing instances for comparison
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const existingInstanceStates = new Map();
       const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
 
@@ -3037,7 +3014,6 @@ const put3dInstances: EditorFunction = {
       const brushSize = brush_size || 0;
 
       // Iterate on existing instances and remove them, and/or those inside the brush radius.
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const instancesToDelete = new Set();
       const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
 
@@ -3142,7 +3118,6 @@ const put3dInstances: EditorFunction = {
       }
 
       // Store original states of existing instances for comparison
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const existingInstanceStates = new Map();
       const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
 
@@ -3640,7 +3615,6 @@ const addSceneEvents: EditorFunction = {
       };
 
       if (aiGeneratedEvent.error) {
-        // $FlowFixMe[incompatible-type]
         return makeAiGeneratedEventFailure(
           `Infrastructure error when generating events (${
             aiGeneratedEvent.error.message
@@ -3653,7 +3627,6 @@ const addSceneEvents: EditorFunction = {
         const resultMessage =
           aiGeneratedEvent.resultMessage ||
           'No generated events found and no other information was given.';
-        // $FlowFixMe[incompatible-type]
         return makeAiGeneratedEventFailure(
           `Error when generating events: ${resultMessage}\nConsider trying again or a different approach.`
         );
@@ -3666,7 +3639,6 @@ const addSceneEvents: EditorFunction = {
         const resultMessage =
           aiGeneratedEvent.resultMessage ||
           'This probably means what you asked for is not possible or does not work like this.';
-        // $FlowFixMe[incompatible-type]
         return makeAiGeneratedEventFailure(
           `Generated events are not valid: ${resultMessage}\nRead also the attached diagnostics to try to understand what went wrong and either try again differently or consider a different approach.`,
           {
@@ -3678,7 +3650,6 @@ const addSceneEvents: EditorFunction = {
       }
 
       try {
-        // $FlowFixMe[underconstrained-implicit-instantiation]
         const extensionNames = new Set();
         for (const change of changes) {
           for (const extensionName of change.extensionNames || []) {
@@ -3693,7 +3664,6 @@ const addSceneEvents: EditorFunction = {
           });
         }
       } catch (e) {
-        // $FlowFixMe[incompatible-type]
         return makeAiGeneratedEventFailure(
           `Error when installing extensions: ${
             e.message
@@ -3773,7 +3743,6 @@ const addSceneEvents: EditorFunction = {
           }):`,
           error
         );
-        // $FlowFixMe[incompatible-type]
         return makeAiGeneratedEventFailure(
           `An unexpected error happened in the GDevelop editor while adding generated events: ${
             error.message
@@ -4828,7 +4797,6 @@ const initializeProject: EditorFunctionWithoutProject = {
           const scene = createdProject.getLayoutAt(i);
           const events = scene.getEvents();
           eventsAsTextByScene[
-            // $FlowFixMe[prop-missing]
             scene.getName()
           ] = renderNonTranslatedEventsAsText({
             eventsList: events,

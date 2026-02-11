@@ -25,7 +25,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => {
+export const Default = () => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -78,15 +78,13 @@ export const Default = (): React.Node => {
   );
 };
 
-export const WithCommunityExtensions = (): React.Node => {
+export const WithCommunityExtensions = () => {
   const [
     showExperimentalExtensions,
     setShowExperimentalExtensions,
   ] = React.useState(true);
-  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
-    // $FlowFixMe[incompatible-type]
     values: { ...initialPreferences.values, showExperimentalExtensions },
     setShowExperimentalExtensions,
   };
@@ -145,7 +143,7 @@ export const WithCommunityExtensions = (): React.Node => {
   );
 };
 
-export const WithServerSideErrors = (): React.Node => {
+export const WithServerSideErrors = () => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -183,7 +181,7 @@ export const WithServerSideErrors = (): React.Node => {
   );
 };
 
-export const ShowingAnAlreadyInstalledExtension = (): React.Node => {
+export const ShowingAnAlreadyInstalledExtension = () => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -239,7 +237,7 @@ export const ShowingAnAlreadyInstalledExtension = (): React.Node => {
   );
 };
 
-export const ExtensionBeingInstalled = (): React.Node => {
+export const ExtensionBeingInstalled = () => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -292,7 +290,7 @@ export const ExtensionBeingInstalled = (): React.Node => {
   );
 };
 
-export const OnlyWithBehaviors = (): React.Node => {
+export const OnlyWithBehaviors = () => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,

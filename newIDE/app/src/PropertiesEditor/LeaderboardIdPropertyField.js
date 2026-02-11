@@ -29,7 +29,7 @@ export type LeaderboardIdPropertyFieldInterface = {|
   focus: FieldFocusFunction,
 |};
 
-export default (React.forwardRef<Props, LeaderboardIdPropertyFieldInterface>(
+export default React.forwardRef<Props, LeaderboardIdPropertyFieldInterface>(
   function LeaderboardIdPropertyField(props, ref) {
     const isOnline = useOnlineStatus();
     const leaderboards = useFetchLeaderboards();
@@ -53,7 +53,6 @@ export default (React.forwardRef<Props, LeaderboardIdPropertyFieldInterface>(
       !leaderboards || (!!props.value && !isCurrentValueInLeaderboardList)
     );
 
-    // $FlowFixMe[missing-local-annot]
     const onChangeSelectValue = (event, value) => {
       props.onChange(event.target.value);
     };
@@ -171,8 +170,4 @@ export default (React.forwardRef<Props, LeaderboardIdPropertyFieldInterface>(
       </I18n>
     );
   }
-  // $FlowFixMe[prop-missing]
-): React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<LeaderboardIdPropertyFieldInterface> },
-  React.RefSetter<LeaderboardIdPropertyFieldInterface>
->);
+);

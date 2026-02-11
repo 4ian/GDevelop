@@ -1,6 +1,5 @@
 // @flow
 import { makeTestProject } from '../../fixtures/TestProject';
-// $FlowFixMe[cannot-resolve-module]
 import path from 'path';
 import { moveAllLocalResourcesToCloudResources } from './LocalResourceMover';
 import { readLocalFileToFile } from '../../Utils/LocalFileUploader';
@@ -49,7 +48,7 @@ const makeTestProjectWithResourcesToUpload = () => {
 const makeMoveAllLocalResourcesToCloudResourcesOptions = (
   project: gdProject
 ): MoveAllProjectResourcesOptions =>
-  // $FlowFixMe[incompatible-type] - unused property were not mocked.
+  // $FlowFixMe - unused property were not mocked.
   ({
     project,
     onProgress: jest.fn(),

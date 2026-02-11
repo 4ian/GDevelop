@@ -35,7 +35,7 @@ const FeedbackWidget = ({
   game,
   onUpdateGame,
   gameUrl,
-}: Props): React.Node => {
+}: Props) => {
   const unprocessedFeedbacks = feedbacks
     ? feedbacks.filter(comment => !comment.processedAt)
     : null;

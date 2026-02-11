@@ -11,7 +11,7 @@ import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flo
 import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 
-export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function MouseField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SelectFieldInterface>(null);
     const focus: FieldFocusFunction = options => {
@@ -56,16 +56,12 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </SelectField>
     );
   }
-  // $FlowFixMe[prop-missing]
-): React.AbstractComponent<
-  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
-  React.RefSetter<ParameterFieldInterface>
->);
+);
 
 export const renderInlineMouse = ({
   value,
   InvalidParameterValue,
-}: ParameterInlineRendererProps): string | React.MixedElement => {
+}: ParameterInlineRendererProps) => {
   return value ? (
     value
   ) : (

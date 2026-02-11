@@ -14,10 +14,9 @@ type Props = {|
   margin?: 'dense',
 |};
 
-// $FlowFixMe[value-as-type]
 export const checkIfHasTooManyCloudProjects = (
   authenticatedUser: AuthenticatedUser
-): boolean => {
+) => {
   if (!authenticatedUser.authenticated) return false;
 
   const { limits, cloudProjects } = authenticatedUser;
@@ -30,9 +29,7 @@ export const checkIfHasTooManyCloudProjects = (
     : false;
 };
 
-export const MaxProjectCountAlertMessage = ({
-  margin,
-}: Props): null | React.Node => {
+export const MaxProjectCountAlertMessage = ({ margin }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { limits, subscription } = authenticatedUser;
   if (!limits) return null;

@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-// $FlowFixMe[import-type-as-value]
 import { I18n as I18nType } from '@lingui/core';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
@@ -330,11 +329,7 @@ export type AiRequestChatInterface = {|
   resetUserInput: (aiRequestId: string | null) => void,
 |};
 
-// $FlowFixMe[prop-missing]
-export const AiRequestChat: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<AiRequestChatInterface> },
-  React.RefSetter<AiRequestChatInterface>
-> = React.forwardRef<Props, AiRequestChatInterface>(
+export const AiRequestChat = React.forwardRef<Props, AiRequestChatInterface>(
   (
     {
       aiConfigurationPresetsWithAvailability,
@@ -1031,7 +1026,6 @@ export const AiRequestChat: React.AbstractComponent<
             alignItems="stretch"
             noMargin
           >
-            {/* $FlowFixMe[constant-condition] */}
             {!standAloneForm && (
               <CompactTextAreaFieldWithControls
                 maxLength={6000}

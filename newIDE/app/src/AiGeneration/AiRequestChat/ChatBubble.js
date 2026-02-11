@@ -50,7 +50,7 @@ export const ChatBubble = ({
   feedbackButtons,
   role,
   restoreProps,
-}: ChatBubbleProps): React.Node => {
+}: ChatBubbleProps) => {
   const theme = React.useContext(GDevelopThemeContext);
   const isLightTheme = theme.palette.type === 'light';
 

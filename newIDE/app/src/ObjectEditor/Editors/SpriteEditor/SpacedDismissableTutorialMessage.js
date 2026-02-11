@@ -7,7 +7,7 @@ import useDismissableTutorialMessage from '../../../Hints/useDismissableTutorial
  * TODO: Use context directly in SpriteEditor
  * when switching SpriteEditor class component to functional component.
  */
-const SpacedDismissableTutorialMessage = (): React.Node | null => {
+const SpacedDismissableTutorialMessage = () => {
   const { DismissableTutorialMessage } = useDismissableTutorialMessage(
     'intermediate-changing-animations'
   );

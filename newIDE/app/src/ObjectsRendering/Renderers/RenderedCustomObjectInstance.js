@@ -8,7 +8,6 @@ import ObjectsRenderingService from '../ObjectsRenderingService';
 import {
   getLayoutedRenderedInstance,
   LayoutedInstance,
-  // $FlowFixMe[import-type-as-value]
   LayoutedParent,
 } from './CustomObjectLayoutingModel';
 import { mapVector } from '../../Utils/MapFor';
@@ -77,9 +76,7 @@ const getPropertyMappingRules = (
   if (!properties.has('_PropertyMapping')) {
     return [];
   }
-  // $FlowFixMe[incompatible-exact]
   return mapVector(properties.get('_PropertyMapping').getChoices(), choice => {
-    // $FlowFixMe[incompatible-use]
     const mapping = choice.getValue().split('=');
     if (mapping.length < 2) {
       return null;
@@ -106,25 +103,15 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   /** Functor used to render an instance */
   instancesRenderer: gdInitialInstanceJSFunctor;
 
-  // $FlowFixMe[missing-local-annot]
-  layoutedInstances = (new Map<number, LayoutedInstance>(): Map<
-    number,
-    LayoutedInstance
-  >);
-  // $FlowFixMe[missing-local-annot]
-  renderedInstances = (new Map<
-    number,
-    RenderedInstance | Rendered3DInstance
-  >(): Map<number, RenderedInstance | Rendered3DInstance>);
+  layoutedInstances = new Map<number, LayoutedInstance>();
+  renderedInstances = new Map<number, RenderedInstance | Rendered3DInstance>();
   _propertyMappingRules: Array<PropertyMappingRule>;
 
   constructor(
     project: gdProject,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
-    // $FlowFixMe[value-as-type]
     pixiContainer: PIXI.Container,
-    // $FlowFixMe[value-as-type]
     threeGroup: THREE.Group,
     pixiResourcesLoader: Class<PixiResourcesLoader>,
     getPropertyOverridings: (() => Map<string, string>) | null = null
@@ -166,12 +153,10 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
 
     // Functor used to render an instance
     this.instancesRenderer = new gd.InitialInstanceJSFunctor();
-    // $FlowFixMe[incompatible-type] - invoke is not writable
-    // $FlowFixMe[cannot-write]
+    // $FlowFixMe - invoke is not writable
     this.instancesRenderer.invoke = instancePtr => {
-      // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
+      // $FlowFixMe - wrapPointer is not exposed
       const instance: gdInitialInstance = gd.wrapPointer(
-        // $FlowFixMe[incompatible-type]
         instancePtr,
         gd.InitialInstance
       );
@@ -186,7 +171,6 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
 
       if (!renderedInstance) return;
 
-      // $FlowFixMe[value-as-type]
       const pixiObject: PIXI.DisplayObject | null = renderedInstance.getPixiObject();
       if (pixiObject) {
         if (renderedInstance.isRenderedIn3D()) {
@@ -204,7 +188,6 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
           pixiObject.visible = isVisible;
           pixiObject.eventMode = 'auto';
         }
-        // $FlowFixMe[constant-condition]
         if (isVisible) renderedInstance.update();
 
         if (renderedInstance instanceof Rendered3DInstance) {
@@ -309,7 +292,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         : new RenderedUnknownInstance(
             this._project,
             instance,
-            // $FlowFixMe[incompatible-type] It's not actually used.
+            // $FlowFixMe It's not actually used.
             null,
             this._pixiObject,
             PixiResourcesLoader
@@ -384,7 +367,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ): any {
+  ) {
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       objectConfiguration
     );
@@ -493,7 +476,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       const layer = layers.getLayerAt(layerIndex);
       if (layer.getVisibility()) {
         variant.getInitialInstances().iterateOverInstancesWithZOrdering(
-          // $FlowFixMe[incompatible-type] - gd.castObject is not supporting typings.
+          // $FlowFixMe - gd.castObject is not supporting typings.
           this.instancesRenderer,
           layer.getName()
         );
@@ -573,8 +556,8 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         threeObject.position.y += this._instance.getY() + centerY - originY;
         threeObject.position.z += this._instance.getZ() + centerZ - originZ;
       }
-      this._pixiObject.pivot.x = centerX;
-      this._pixiObject.pivot.y = centerY;
+      this._pixiObject.pivot.x = centerX - originX;
+      this._pixiObject.pivot.y = centerY - originY;
       this._pixiObject.position.x = this._instance.getX() + centerX - originX;
       this._pixiObject.position.y = this._instance.getY() + centerY - originY;
 
@@ -601,17 +584,17 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     }
   }
 
-  getDefaultWidth(): any {
+  getDefaultWidth() {
     const variant = this.getVariant();
     return variant ? variant.getAreaMaxX() - variant.getAreaMinX() : 48;
   }
 
-  getDefaultHeight(): any {
+  getDefaultHeight() {
     const variant = this.getVariant();
     return variant ? variant.getAreaMaxY() - variant.getAreaMinY() : 48;
   }
 
-  getDefaultDepth(): any {
+  getDefaultDepth() {
     const variant = this.getVariant();
     return variant ? variant.getAreaMaxZ() - variant.getAreaMinZ() : 48;
   }
@@ -642,15 +625,15 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     return (-variant.getAreaMinZ() / this.getDefaultDepth()) * this.getDepth();
   }
 
-  getCenterX(): any {
+  getCenterX() {
     return this.getWidth() / 2;
   }
 
-  getCenterY(): any {
+  getCenterY() {
     return this.getHeight() / 2;
   }
 
-  getCenterZ(): any {
+  getCenterZ() {
     return this.getDepth() / 2;
   }
 }

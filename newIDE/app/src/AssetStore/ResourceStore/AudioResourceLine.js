@@ -31,7 +31,7 @@ const AudioResourceLine = ({
   onClickLine,
   isPlaying,
   isSelected,
-}: Props): React.Node => {
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { getAuthorsDisplayLinks } = React.useContext(ResourceStoreContext);

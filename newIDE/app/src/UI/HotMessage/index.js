@@ -26,7 +26,7 @@ const HotMessage = ({
   message,
   onClickRightButton,
   rightButtonLabel,
-}: Props): React.Node => {
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <Paper

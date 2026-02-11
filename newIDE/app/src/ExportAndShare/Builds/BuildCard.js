@@ -122,7 +122,6 @@ type Props = {|
   setGameUpdating: boolean => void,
   onBuildUpdated: Build => void,
   onBuildDeleted: Build => void,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
 |};
 
@@ -135,7 +134,7 @@ export const BuildCard = ({
   onBuildUpdated,
   onBuildDeleted,
   authenticatedUser,
-}: Props): React.Node => {
+}: Props) => {
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const defaultBuildName = `${game.gameName
     .toLowerCase()
@@ -323,7 +322,6 @@ export const BuildCard = ({
                     {gameUpdating && (
                       <>
                         <Spacer />
-                        {/* $FlowFixMe[incompatible-type] */}
                         <CircularProgress style={styles.circularProgress} />
                       </>
                     )}

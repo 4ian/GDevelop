@@ -237,7 +237,6 @@ export type PreferencesValues = {|
 /**
  * Partial PreferencesValues that can be overridden per-project via preferences block in gdevelop-settings.yaml.
  */
-// $FlowFixMe[deprecated-utility]
 export type ProjectSpecificPreferencesValues = $Shape<PreferencesValues>;
 
 /**
@@ -358,11 +357,12 @@ export const initialPreferences = {
   values: {
     language: 'en',
     autoDownloadUpdates: true,
-    themeName: ((typeof window !== 'undefined' &&
-    window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'GDevelop default Dark'
-      : // TODO: Use the light theme back when it's adapted to the modern theme.
-        'GDevelop default Dark'): string),
+    themeName:
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'GDevelop default Dark'
+        : // TODO: Use the light theme back when it's adapted to the modern theme.
+          'GDevelop default Dark',
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},
@@ -379,13 +379,11 @@ export const initialPreferences = {
     showEffectParameterNames: false,
     projectLastUsedPaths: {},
     defaultEditorMosaicNodes: {},
-    recentProjectFiles: ([]: Array<empty>),
+    recentProjectFiles: [],
     autoOpenMostRecentProject: true,
     hasProjectOpened: false,
     userShortcutMap: {},
-    newObjectDialogDefaultTab: ((electron
-      ? 'new-object'
-      : 'asset-store'): string),
+    newObjectDialogDefaultTab: electron ? 'new-object' : 'asset-store',
     shareDialogDefaultTab: 'publish',
     isMenuBarHiddenInPreview: true,
     isAlwaysOnTopInPreview: false,
@@ -397,10 +395,10 @@ export const initialPreferences = {
     showInAppTutorialDeveloperMode: false,
     openDiagnosticReportAutomatically: true,
     showDeprecatedInstructionWarning: false,
-    use3DEditor: (isWebGLSupported(): boolean),
+    use3DEditor: isWebGLSupported(),
     showBasicProfilingCounters: false,
     inAppTutorialsProgress: {},
-    newProjectsDefaultFolder: ((app ? findDefaultFolder(app) : ''): string),
+    newProjectsDefaultFolder: app ? findDefaultFolder(app) : '',
     newProjectsDefaultStorageProviderName: 'Cloud',
     useShortcutToClosePreviewWindow: true,
     watchProjectFolderFilesForLocalProjects: true,
@@ -432,7 +430,7 @@ export const initialPreferences = {
   showAllAnnouncements: () => {},
   showAskAiStandAloneForm: (identifier: string, show: boolean) => {},
   showAllAskAiStandAloneForms: () => {},
-  verifyIfIsNewVersion: (): boolean => false,
+  verifyIfIsNewVersion: () => false,
   setEventsSheetShowObjectThumbnails: () => {},
   setAutosaveOnPreview: () => {},
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => {},
@@ -440,42 +438,42 @@ export const initialPreferences = {
   setEventsSheetIndentScale: (scale: number) => {},
   setEventsSheetZoomLevel: (zoomLevel: number) => {},
   setShowEffectParameterNames: (enabled: boolean) => {},
-  getLastUsedPath: (project: gdProject, kind: ResourceKind): string => '',
+  getLastUsedPath: (project: gdProject, kind: ResourceKind) => '',
   setLastUsedPath: (project: gdProject, kind: ResourceKind, path: string) => {},
-  getDefaultEditorMosaicNode: (name: EditorMosaicName): null => null,
+  getDefaultEditorMosaicNode: (name: EditorMosaicName) => null,
   setDefaultEditorMosaicNode: (
     name: EditorMosaicName,
     node: ?EditorMosaicNode
   ) => {},
-  getRecentProjectFiles: (options: any): Array<any> => [],
+  getRecentProjectFiles: options => [],
   insertRecentProjectFile: () => {},
   removeRecentProjectFile: () => {},
-  getAutoOpenMostRecentProject: (): boolean => true,
+  getAutoOpenMostRecentProject: () => true,
   setAutoOpenMostRecentProject: () => {},
-  hadProjectOpenedDuringLastSession: (): boolean => false,
+  hadProjectOpenedDuringLastSession: () => false,
   setHasProjectOpened: () => {},
   resetShortcutsToDefault: () => {},
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => {},
-  getNewObjectDialogDefaultTab: (): string => 'asset-store',
+  getNewObjectDialogDefaultTab: () => 'asset-store',
   setNewObjectDialogDefaultTab: () => {},
-  getShareDialogDefaultTab: (): string => 'invite',
+  getShareDialogDefaultTab: () => 'invite',
   setShareDialogDefaultTab: () => {},
-  getIsMenuBarHiddenInPreview: (): boolean => true,
+  getIsMenuBarHiddenInPreview: () => true,
   setIsMenuBarHiddenInPreview: () => {},
   setBackdropClickBehavior: () => {},
   setResourcesImporationBehavior: () => {},
-  getIsAlwaysOnTopInPreview: (): boolean => true,
+  getIsAlwaysOnTopInPreview: () => true,
   setIsAlwaysOnTopInPreview: () => {},
   setEventsSheetCancelInlineParameter: () => {},
   setShowExperimentalExtensions: () => {},
   setShowCreateSectionByDefault: (enabled: boolean) => {},
   setShowInAppTutorialDeveloperMode: (enabled: boolean) => {},
   setShowDeprecatedInstructionWarning: (enabled: boolean) => {},
-  getOpenDiagnosticReportAutomatically: (): boolean => true,
+  getOpenDiagnosticReportAutomatically: () => true,
   setOpenDiagnosticReportAutomatically: (enabled: boolean) => {},
-  getShowDeprecatedInstructionWarning: (): boolean => false,
+  getShowDeprecatedInstructionWarning: () => false,
   setUse3DEditor: (enabled: boolean) => {},
-  getUse3DEditor: (): boolean => false,
+  getUse3DEditor: () => false,
   setShowBasicProfilingCounters: (enabled: boolean) => {},
   setDisableNpmScriptConfirmation: (enabled: boolean) => {},
   saveTutorialProgress: () => {},
@@ -486,8 +484,8 @@ export const initialPreferences = {
   setWatchProjectFolderFilesForLocalProjects: () => {},
   setNewFeaturesAcknowledgements: () => {},
   setDisplaySaveReminder: () => {},
-  getEditorStateForProject: (projectId: any): any => {},
-  setEditorStateForProject: (projectId: any, editorState: any) => {},
+  getEditorStateForProject: projectId => {},
+  setEditorStateForProject: (projectId, editorState) => {},
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => {},
   setPreviewCrashReportUploadLevel: (level: string) => {},
   setGamesDashboardOrderBy: (
@@ -500,10 +498,6 @@ export const initialPreferences = {
   setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
 };
 
-// $FlowFixMe[incompatible-type]
-const PreferencesContext: React.Context<Preferences> = React.createContext<Preferences>(
-  // $FlowFixMe[incompatible-type]
-  initialPreferences
-);
+const PreferencesContext = React.createContext<Preferences>(initialPreferences);
 
 export default PreferencesContext;

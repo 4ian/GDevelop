@@ -55,7 +55,6 @@ const CommunityLinksLines = ({
 );
 
 type Props = {|
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   onOpenChangeEmailDialog?: () => void,
   onOpenEditProfileDialog?: () => void,
@@ -65,7 +64,7 @@ const ProfileDetails = ({
   authenticatedUser,
   onOpenChangeEmailDialog,
   onOpenEditProfileDialog,
-}: Props): React.Node => {
+}: Props) => {
   const {
     firebaseUser,
     achievements,

@@ -265,7 +265,7 @@ const ProfileDialog = ({ onClose }: Props) => {
   );
 };
 
-const ProfileDialogWithErrorBoundary = (props: Props): React.Node => (
+const ProfileDialogWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Profile</Trans>}
     scope="profile"

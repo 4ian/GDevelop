@@ -22,7 +22,7 @@ export const useEnsureExtensionInstalled = ({
 }: {|
   project: ?gdProject,
   i18n: I18nType,
-|}): any => {
+|}) => {
   const {
     translatedExtensionShortHeadersByName: extensionShortHeadersByName,
   } = React.useContext(ExtensionStoreContext);

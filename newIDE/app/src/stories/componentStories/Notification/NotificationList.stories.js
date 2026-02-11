@@ -76,7 +76,6 @@ const notifications: Notification[] = [
     },
   },
   // $FlowIgnore - Unknown notification on purpose.
-  // $FlowFixMe[incompatible-type]
   {
     id: 'notification-id-33',
     userId,
@@ -142,7 +141,7 @@ const notifications: Notification[] = [
   },
 ];
 
-export const Default = (): React.MixedElement => {
+export const Default = () => {
   return (
     <div style={{ maxWidth: 300 }}>
       <NotificationList

@@ -305,7 +305,7 @@ const PlatformSpecificAssets = ({
   );
 };
 
-const PlatformSpecificAssetsWithErrorBoundary = (props: Props): React.Node => (
+const PlatformSpecificAssetsWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Project icons</Trans>}
     scope="project-icons"

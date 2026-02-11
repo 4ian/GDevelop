@@ -216,7 +216,6 @@ const PrivateAssetPackInformationPageStory = ({
   errorMessage,
 }: {
   privateAssetPackListingData: PrivateAssetPackListingData,
-  // $FlowFixMe[value-as-type]
   authenticatedUser?: AuthenticatedUser,
   receivedAssetPacks?: Array<PrivateAssetPack>,
   delayResponse?: number,
@@ -313,19 +312,19 @@ const PrivateAssetPackInformationPageStory = ({
   );
 };
 
-export const Default = (): React.Node => (
+export const Default = () => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPack1ListingData}
   />
 );
 
-export const ForABundle = (): React.Node => (
+export const ForABundle = () => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPackBundleListingData}
   />
 );
 
-export const ForAlreadyPurchasedAssetPack = (): React.Node => (
+export const ForAlreadyPurchasedAssetPack = () => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPack1ListingData}
     receivedAssetPacks={[
@@ -344,14 +343,14 @@ export const ForAlreadyPurchasedAssetPack = (): React.Node => (
   />
 );
 
-export const Loading = (): React.Node => (
+export const Loading = () => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPack1ListingData}
     delayResponse={10000}
   />
 );
 
-export const WithRedeemableAssetPackWithoutSubscription = (): React.Node => (
+export const WithRedeemableAssetPackWithoutSubscription = () => (
   <PrivateAssetPackInformationPageStory
     authenticatedUser={defaultAuthenticatedUserWithNoSubscription}
     privateAssetPackListingData={{
@@ -368,7 +367,7 @@ export const WithRedeemableAssetPackWithoutSubscription = (): React.Node => (
   />
 );
 
-export const WithRedeemableAssetPackWithSilverSubscription = (): React.Node => (
+export const WithRedeemableAssetPackWithSilverSubscription = () => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={{
       ...privateAssetPack1ListingData,
@@ -384,7 +383,7 @@ export const WithRedeemableAssetPackWithSilverSubscription = (): React.Node => (
   />
 );
 
-export const WithRedeemableAssetPackWithGoldSubscription = (): React.Node => (
+export const WithRedeemableAssetPackWithGoldSubscription = () => (
   <PrivateAssetPackInformationPageStory
     authenticatedUser={fakeGoldAuthenticatedUser}
     privateAssetPackListingData={{
@@ -401,7 +400,7 @@ export const WithRedeemableAssetPackWithGoldSubscription = (): React.Node => (
   />
 );
 
-export const WithRedeemableAssetPackWithEducationSubscription = (): React.Node => (
+export const WithRedeemableAssetPackWithEducationSubscription = () => (
   <PrivateAssetPackInformationPageStory
     authenticatedUser={fakeAuthenticatedUserWithEducationPlan}
     privateAssetPackListingData={{
@@ -418,14 +417,14 @@ export const WithRedeemableAssetPackWithEducationSubscription = (): React.Node =
   />
 );
 
-export const With404 = (): React.Node => (
+export const With404 = () => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPack1ListingData}
     errorCode={404}
   />
 );
 
-export const WithUnknownError = (): React.Node => (
+export const WithUnknownError = () => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPack1ListingData}
     errorCode={500}

@@ -26,7 +26,7 @@ const styles = {
 
 type Props = {||};
 
-const NotificationChip = (props: Props): null | React.Node => {
+const NotificationChip = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const {
     notifications,

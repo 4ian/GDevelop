@@ -49,7 +49,6 @@ type TabProps<TabName> = {|
 /**
  * A Tab based on Material-UI Tab.
  */
-// $FlowFixMe[missing-local-annot]
 function Tab<TabName>(props: TabProps<TabName>) {
   const classes = useStylesForTab();
   return <MUITab classes={classes} {...props} />;
@@ -79,7 +78,7 @@ export function Tabs<TabName>({
   onChange,
   options,
   variant,
-}: TabsProps<TabName>): any {
+}: TabsProps<TabName>) {
   const { windowSize } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 

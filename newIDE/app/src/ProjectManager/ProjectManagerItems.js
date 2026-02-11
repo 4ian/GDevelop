@@ -45,8 +45,7 @@ const styles = {
 type ProjectStructureItemProps = {|
   id?: string,
   autoGenerateNestedIndicator?: boolean,
-  // $FlowFixMe[prop-missing]
-  renderNestedItems: () => Array<React.Element<any> | null>,
+  renderNestedItems: () => Array<React$Element<any> | null>,
   primaryText: React.Node,
   error?: ?Error,
   onRefresh?: () => void,
@@ -61,7 +60,7 @@ export const ProjectStructureItem = ({
   open,
   primaryText,
   renderNestedItems,
-}: ProjectStructureItemProps): React.Node => {
+}: ProjectStructureItemProps) => {
   return (
     <ListItem
       id={id}
@@ -92,7 +91,6 @@ type ItemProps = {|
   primaryText: string,
   textEndAdornment?: React.Node,
   editingName: boolean,
-  // $FlowFixMe[prop-missing]
   leftIcon: React.Element<any>,
   onEdit: () => void,
   onDelete: () => void,
@@ -143,7 +141,7 @@ export const Item = ({
   buildExtraMenuTemplate,
   isLastItem,
   dragAndDropProps: { DragSourceAndDropTarget, onBeginDrag, onDrop },
-}: ItemProps): React.Node => {
+}: ItemProps) => {
   const textFieldRef = React.useRef<?TextFieldInterface>(null);
   const shouldDiscardChanges = React.useRef<boolean>(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -368,7 +366,7 @@ export const EventFunctionExtensionItem = ({
   onMoveDown,
   isLastItem,
   dragAndDropProps,
-}: EventFunctionExtensionItemProps): React.Node => {
+}: EventFunctionExtensionItemProps) => {
   const name = eventsFunctionsExtension.getName();
   const iconUrl = eventsFunctionsExtension.getIconUrl();
 

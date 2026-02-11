@@ -55,21 +55,16 @@ export const formatUserAnswers = (userAnswers: UserAnswers): UserSurveyType => {
       questionId === 'buildingKindOfProjects' ||
       questionId === 'learningKindOfProjects'
     ) {
-      // $FlowFixMe[prop-missing]
       userSurvey.kindOfProjects = cleanedAnswers;
     } else {
-      // $FlowFixMe[prop-missing]
       userSurvey[questionId] = cleanedAnswers;
     }
     const trimmedUserInput = userInput ? userInput.trim() : null;
     if (isOnlyOneFreeAnswerPossible(questionnaire[questionId].answers)) {
-      // $FlowFixMe[prop-missing]
       userSurvey[questionId] = trimmedUserInput || '';
     } else if (trimmedUserInput) {
-      // $FlowFixMe[prop-missing]
       userSurvey[`${questionId}Input`] = trimmedUserInput;
       if (questionId === firstQuestion) {
-        // $FlowFixMe[prop-missing]
         delete userSurvey[questionId];
       }
     }
@@ -77,7 +72,6 @@ export const formatUserAnswers = (userAnswers: UserAnswers): UserSurveyType => {
   // We are confident the keys used in the questionnaire correspond
   // to the answers step names
   // $FlowIgnore
-  // $FlowFixMe[incompatible-type]
   return userSurvey;
 };
 
@@ -85,7 +79,6 @@ const NavigationStep = ({ stepIndex }: {| stepIndex: number |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <Line justifyContent="center">
-      {/* $FlowFixMe[underconstrained-implicit-instantiation] */}
       {new Array(STEP_MAX_COUNT).fill(0).map((_, index) => {
         return (
           <div
@@ -147,7 +140,6 @@ const DesktopDisplay = ({
       key: userAnswer.questionId,
       questionData: relatedQuestionData,
       selectedAnswers: userAnswer.answers,
-      // $FlowFixMe[missing-local-annot]
       onSelectAnswer: answer => onSelectAnswer(userAnswer.questionId, answer),
       showNextButton:
         (relatedQuestionData.multi ||
@@ -159,7 +151,6 @@ const DesktopDisplay = ({
       onClickSend:
         userAnswer.questionId === firstQuestion ? onClickSend : undefined,
       userInputValue: userAnswer.userInput || '',
-      // $FlowFixMe[missing-local-annot]
       onChangeUserInputValue: value =>
         onChangeUserInputValue(userAnswer.questionId, value),
     };
@@ -181,14 +172,12 @@ const DesktopDisplay = ({
 
   if (shouldDisplayQuestion) {
     const questionData = questionnaire[questionId];
-    // $FlowFixMe[incompatible-type]
     questionsPropsToRender.push({
       key: questionId,
       questionData: questionData,
       selectedAnswers: [],
       onSelectAnswer: answer => onSelectAnswer(questionId, answer),
       onClickNext: () => goToNextQuestion(questionData),
-      // $FlowFixMe[incompatible-type]
       showNextButton: questionData.multi,
       showQuestionText: true,
     });
@@ -341,10 +330,7 @@ type Props = {|
   onStarted: () => void,
 |};
 
-const UserSurvey = ({
-  onCompleted,
-  onStarted,
-}: Props): React.Node | React.MixedElement => {
+const UserSurvey = ({ onCompleted, onStarted }: Props) => {
   const persistedState = getRecentPersistedState();
   const [questionId, setQuestionId] = React.useState<string>(
     persistedState ? persistedState.questionId : firstQuestion

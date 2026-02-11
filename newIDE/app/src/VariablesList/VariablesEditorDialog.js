@@ -75,7 +75,7 @@ const VariablesEditorDialog = ({
   objectName,
   initialInstances,
   isListLocked,
-}: Props): React.Node => {
+}: Props) => {
   const serializableObjects = React.useMemo(
     () =>
       new Map(
@@ -109,8 +109,6 @@ const VariablesEditorDialog = ({
     shouldCreateVariable.current = false;
     const tabIndex = Math.max(
       0,
-      // $FlowFixMe[missing-local-annot]
-      // $FlowFixMe[incompatible-exact]
       tabs.indexOf(({ id }) => id === initiallyOpenTabId)
     );
     const { variablesContainer, inheritedVariablesContainer } = tabs[tabIndex];

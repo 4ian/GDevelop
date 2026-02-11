@@ -1,6 +1,5 @@
 // @flow
 import LocalFileSystem from './LocalFileSystem';
-// $FlowFixMe[cannot-resolve-module]
 import path from 'path';
 
 describe('LocalFileSystem', () => {

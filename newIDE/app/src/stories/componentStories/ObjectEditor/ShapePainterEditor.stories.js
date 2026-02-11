@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => (
+export const Default = () => (
   <SerializedObjectDisplay object={testProject.shapePainterObjectConfiguration}>
     <ShapePainterEditor
       objectConfiguration={testProject.shapePainterObjectConfiguration}

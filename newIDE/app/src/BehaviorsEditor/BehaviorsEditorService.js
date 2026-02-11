@@ -7,12 +7,10 @@ import Physics3DEditor from './Editors/Physics3DEditor';
  * A service returning editor components for each behavior type.
  */
 const BehaviorsEditorService = {
-  getEditor(behaviorType: string): any {
-    // $FlowFixMe[object-this-reference]
+  getEditor(behaviorType: string) {
     if (!this.components[behaviorType]) {
       return BehaviorPropertiesEditor; // Default properties editor
     }
-    // $FlowFixMe[object-this-reference]
     return this.components[behaviorType].component; // Custom  behavior editor
   },
   components: {

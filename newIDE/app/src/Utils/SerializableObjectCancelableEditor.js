@@ -33,12 +33,7 @@ export const useSerializableObjectCancelableEditor = ({
   useProjectToUnserialize,
   onCancel,
   resetThenClearPersistentUuid,
-}: Props): {
-  getOriginalContentSerializedElement: () => gdSerializerElement,
-  hasUnsavedChanges: () => boolean,
-  notifyOfChange: () => void,
-  onCancelChanges: () => Promise<void>,
-} => {
+}: Props) => {
   const serializedElementRef = React.useRef<gdSerializerElement | null>(null);
   const numberOfChangesRef = React.useRef(0);
   const { showConfirmation } = useAlertDialog();
@@ -174,12 +169,7 @@ export const useSerializableObjectsCancelableEditor = ({
   useProjectToUnserialize,
   onCancel,
   resetThenClearPersistentUuid,
-}: SerializableObjectsCancelableEditorProps): {
-  getOriginalContentSerializedElements: () => Map<string, gdSerializerElement>,
-  hasUnsavedChanges: () => boolean,
-  notifyOfChange: () => void,
-  onCancelChanges: () => Promise<void>,
-} => {
+}: SerializableObjectsCancelableEditorProps) => {
   const serializedElementsRef = React.useRef<Map<string, gdSerializerElement>>(
     new Map()
   );

@@ -34,7 +34,6 @@ import Window from '../../Utils/Window';
 
 const gd: libGDevelop = global.gd;
 
-// $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget(
   'spine-animations-list'
 );
@@ -67,7 +66,7 @@ const SpineEditor = ({
   resourceManagementProps,
   projectScopedContainersAccessor,
   renderObjectNameField,
-}: EditorProps): React.Node => {
+}: EditorProps) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
     justAddedAnimationName,
@@ -138,6 +137,41 @@ const SpineEditor = ({
       })();
     },
     [project, spineResourceName, setSourceSelectOptions]
+  );
+
+  const skinsSelectOptionsList = React.useMemo(
+    () => {
+      if (spineData.skeleton && spineData.skeleton.skins) {
+        return spineData.skeleton.skins.map(skin => skin.name);
+      } else {
+        return [];
+      }
+    },
+    [spineData.skeleton]
+  );
+
+  const skinName = spineConfiguration.getSkinName();
+
+  const changeSpineSkin = React.useCallback(
+    skinName => {
+      objectConfiguration.updateProperty('skinName', skinName);
+      if (onObjectUpdated) onObjectUpdated();
+      forceUpdate();
+    },
+    [objectConfiguration, onObjectUpdated, forceUpdate]
+  );
+
+  React.useEffect(
+    () => {
+      if (
+        skinsSelectOptionsList.length &&
+        (!skinName || !skinsSelectOptionsList.includes(skinName))
+      ) {
+        const defaultSkinObject = skinsSelectOptionsList[0] || '';
+        changeSpineSkin(defaultSkinObject);
+      }
+    },
+    [changeSpineSkin, skinName, skinsSelectOptionsList]
   );
 
   const onChangeSpineResourceName = React.useCallback(
@@ -236,7 +270,6 @@ const SpineEditor = ({
   );
 
   const removeAnimation = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     animationIndex => {
       setNameErrors({});
 
@@ -265,7 +298,6 @@ const SpineEditor = ({
   );
 
   const changeAnimationName = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     (animationIndex, newName) => {
       const currentName = spineConfiguration
         .getAnimation(animationIndex)
@@ -397,6 +429,35 @@ const SpineEditor = ({
           objectConfiguration={objectConfiguration}
           propertyName="scale"
         />
+        {skinsSelectOptionsList.length > 0 && (
+          <>
+            <Text size="block-title">
+              <Trans>Skins</Trans>
+            </Text>
+            <SelectField
+              id="skin-name-field"
+              value={skinName}
+              onChange={event => {
+                changeSpineSkin(event.target.value);
+              }}
+              margin="dense"
+              fullWidth
+              floatingLabelText={<Trans>Default skin</Trans>}
+              translatableHintText={t`Choose a skin`}
+            >
+              {skinsSelectOptionsList.map(skinName => {
+                return (
+                  <SelectOption
+                    key={skinName}
+                    value={skinName}
+                    label={skinName}
+                    shouldNotTranslate
+                  />
+                );
+              })}
+            </SelectField>
+          </>
+        )}
         {sourceSelectOptions.length && (
           <>
             <Text size="block-title">Animations</Text>

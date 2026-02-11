@@ -10,7 +10,6 @@ export type Release = {
 };
 
 export const getReleases = async (): Promise<Array<Release>> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(`${GDevelopReleaseApi.baseUrl}/release`, {
     params: {
       last: 4,

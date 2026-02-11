@@ -106,7 +106,6 @@ const gameServiceMock = new MockAdapter(gameApiAxiosClient, {
 
 const sessionDurations = [60, 180, 300, 600, 900];
 
-// $FlowFixMe[underconstrained-implicit-instantiation]
 const fakeGameMetrics = new Array(7).fill(0).map((_, index) => {
   const date = new Date(Date.now() - (7 - index) * 24 * 3600 * 1000)
     .toISOString()
@@ -160,7 +159,7 @@ export const Default = ({
   userBalance: 'None' | 'Some',
   leaderboards: 'None' | 'Some' | 'Too many',
   exports: 'None' | 'Some ongoing' | 'All complete',
-|}): React.Node => {
+|}) => {
   const [game, setGame] = React.useState<Game>(game1);
   const [tab, setTab] = React.useState<GameDetailsTab>('details');
   const [renderCount, setRenderCount] = React.useState<number>(0);
@@ -298,21 +297,17 @@ export const Default = ({
       return [504, null];
     });
 
-  // $FlowFixMe[value-as-type]
   const authenticatedUser: AuthenticatedUser = {
     ...fakeSilverAuthenticatedUser,
     userEarningsBalance: userEarningsBalanceToDisplay,
     // $FlowIgnore - We know those fields are filled.
-    // $FlowFixMe[incompatible-type]
     limits: {
       ...fakeSilverAuthenticatedUser.limits,
       capabilities: {
         // $FlowIgnore - We know those fields are filled.
-        // $FlowFixMe[incompatible-use]
         ...fakeSilverAuthenticatedUser.limits.capabilities,
         leaderboards: {
           // $FlowIgnore - We know those fields are filled.
-          // $FlowFixMe[incompatible-use]
           ...fakeSilverAuthenticatedUser.limits.capabilities.leaderboards,
           maximumCountPerGame: leaderboards === 'Too many' ? 3 : -1,
         },

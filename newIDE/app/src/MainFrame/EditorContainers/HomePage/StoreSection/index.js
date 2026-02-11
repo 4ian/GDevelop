@@ -152,7 +152,7 @@ const StoreSection = ({
   );
 };
 
-const StoreSectionWithErrorBoundary = (props: Props): React.Node => (
+const StoreSectionWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Shop section</Trans>}
     scope="start-page-shop"

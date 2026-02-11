@@ -4,7 +4,7 @@ import { Column } from '../UI/Grid';
 import Text from '../UI/Text';
 import AlertMessage from '../UI/AlertMessage';
 
-export default function Welcome(): React.Node {
+export default function Welcome() {
   return (
     <Column>
       <Text size="title">Welcome to GDevelop Storybook</Text>

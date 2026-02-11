@@ -35,7 +35,7 @@ export const ExtensionLoadErrorDialog = ({
   erroredExtensionLoadingResults,
   genericError,
   onClose,
-}: ExtensionLoadErrorDialogProps): React.Node => {
+}: ExtensionLoadErrorDialogProps) => {
   return (
     <Dialog
       title={

@@ -4,9 +4,7 @@ import { enumerateAllInstructions } from './EnumerateInstructions';
 
 const gd: libGDevelop = global.gd;
 
-// $FlowFixMe[incompatible-type]
-// $FlowFixMe[missing-local-annot]
-// $FlowFixMe[cannot-resolve-name]
+// $FlowExpectedError
 const makeFakeI18n = (fakeI18n): I18nType => ({
   ...fakeI18n,
   _: message => message.id,
@@ -14,7 +12,6 @@ const makeFakeI18n = (fakeI18n): I18nType => ({
 
 describe('EnumeratedInstructionOrExpressionMetadata', () => {
   it('can hide actions that are not relevant to layouts', () => {
-    // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = new gd.Layout();
 
@@ -39,7 +36,6 @@ describe('EnumeratedInstructionOrExpressionMetadata', () => {
   });
 
   it('can show actions that are only relevant for functions', () => {
-    // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const eventsFunctionsExtension = new gd.EventsFunctionsExtension();
     const eventsFunction = new gd.EventsFunction();

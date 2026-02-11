@@ -109,8 +109,7 @@ export type LobbyConfiguration = {|
 export const shortenUuidForDisplay = (uuid: string): string =>
   `${uuid.split('-')[0]}-...`;
 
-// $FlowFixMe[cannot-resolve-name]
-export const client: Axios = axios.create({
+export const client = axios.create({
   baseURL: GDevelopPlayApi.baseUrl,
 });
 
@@ -138,14 +137,11 @@ export const extractNextPageUriFromLinkHeader = (
     const relationRegexMatch = link.match(/;\srel="(\w*)"/);
     const uriMatch = link.match(/^<(.*)>/);
     if (acc && relationRegexMatch && uriMatch) {
-      // $FlowFixMe[prop-missing]
       acc[relationRegexMatch[1]] = uriMatch[1];
     }
     return acc;
   }, {});
-  // $FlowFixMe[incompatible-type]
   if (Object.keys(mapRelationToUri).includes('next')) {
-    // $FlowFixMe[prop-missing]
     return mapRelationToUri.next;
   }
   return null;
@@ -161,7 +157,7 @@ export const listLeaderboardEntries = async (
 |}> => {
   const uri =
     options.forceUri || `/game/${gameId}/leaderboard/${leaderboardId}/entry`;
-  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe
   const response = await client.get(uri, {
     params: options.forceUri
       ? null
@@ -183,7 +179,6 @@ export const listLeaderboardEntries = async (
 };
 
 export const createLeaderboard = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   { name, sort }: {| name: string, sort: LeaderboardSortOption |}
@@ -217,7 +212,6 @@ type LeaderboardDuplicationPayload = {|
 |};
 
 export const duplicateLeaderboard = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   payload: LeaderboardDuplicationPayload
@@ -243,7 +237,6 @@ export const duplicateLeaderboard = async (
 };
 
 export const updateLeaderboard = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   leaderboardId: string,
@@ -270,7 +263,6 @@ export const updateLeaderboard = async (
 };
 
 export const resetLeaderboard = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   leaderboardId: string
@@ -296,7 +288,6 @@ export const resetLeaderboard = async (
 };
 
 export const deleteLeaderboard = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   leaderboardId: string
@@ -321,7 +312,6 @@ export const deleteLeaderboard = async (
 };
 
 export const deleteLeaderboardEntry = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   leaderboardId: string,
@@ -426,7 +416,7 @@ export const updateComment = async (
     processed?: boolean,
     qualityRating?: string,
   |}
-): Promise<any> => {
+) => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
       client.patch(
@@ -450,7 +440,6 @@ export const updateComment = async (
 };
 
 export const canUserCustomizeLeaderboardTheme = (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser
 ): {|
   canUseTheme: boolean,

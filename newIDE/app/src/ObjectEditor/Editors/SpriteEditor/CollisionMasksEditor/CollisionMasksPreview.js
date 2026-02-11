@@ -35,7 +35,7 @@ type Props = {|
   hideControls?: boolean,
 |};
 
-const CollisionMasksPreview = (props: Props): React.MixedElement => {
+const CollisionMasksPreview = (props: Props) => {
   const svgRef = React.useRef<React.ElementRef<'svg'> | null>(null);
   const [
     draggedVertex,
@@ -134,14 +134,11 @@ const CollisionMasksPreview = (props: Props): React.MixedElement => {
     | null => {
     if (!svgRef.current) return null;
 
-    // $FlowFixMe[incompatible-type] Flow doesn't have SVG typings yet (@facebook/flow#4551)
-    // $FlowFixMe[prop-missing]
+    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
     const pointOnScreen = svgRef.current.createSVGPoint();
     pointOnScreen.x = event.clientX;
     pointOnScreen.y = event.clientY;
-    // $FlowFixMe[incompatible-type] Flow doesn't have SVG typings yet (@facebook/flow#4551)
-    // $FlowFixMe[prop-missing]
-    // $FlowFixMe[incompatible-use]
+    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
     const screenToSvgMatrix = svgRef.current.getScreenCTM().inverse();
     const pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
 
@@ -315,9 +312,7 @@ const CollisionMasksPreview = (props: Props): React.MixedElement => {
   const renderPolygons = () => {
     return (
       <React.Fragment>
-        {/* $FlowFixMe[incompatible-exact] */}
         {mapVector(polygons, (polygon, i) => {
-          // $FlowFixMe[incompatible-use]
           const vertices = polygon.getVertices();
           return (
             <polygon
@@ -337,9 +332,7 @@ const CollisionMasksPreview = (props: Props): React.MixedElement => {
           );
         })}
         {!hideControls &&
-          // $FlowFixMe[incompatible-exact]
           mapVector(polygons, (polygon, polygonIndex) => {
-            // $FlowFixMe[incompatible-use]
             const vertices = polygon.getVertices();
             return mapVector(vertices, (vertex, vertexIndex) => (
               <circle

@@ -178,20 +178,17 @@ export const makeSchema = ({
   onEditLayer: (layer: gdLayer) => void,
   layersContainer: gdLayersContainer,
 |}): Schema => {
-  // $FlowFixMe[incompatible-type]
   return [
     getDefaultCameraBehaviorField({ i18n }),
     {
       name: 'Not a lighting layer',
       type: 'column',
-      // $FlowFixMe[missing-local-annot]
       isHidden: layers => layers[0] && layers[0].isLightingLayer(),
       children: [
         getRenderingTypeField({ i18n, forceUpdate }),
         {
           name: 'Optional 3D settings',
           type: 'column',
-          // $FlowFixMe[missing-local-annot]
           isHidden: layers =>
             layers[0] && layers[0].getRenderingType() === '2d',
           children: [
@@ -213,7 +210,6 @@ export const makeSchema = ({
     {
       name: 'Optional lighting layer settings',
       type: 'column',
-      // $FlowFixMe[missing-local-annot]
       isHidden: layers => layers[0] && !layers[0].isLightingLayer(),
       children: [
         {

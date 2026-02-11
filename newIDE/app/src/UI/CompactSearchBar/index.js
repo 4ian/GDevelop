@@ -21,49 +21,43 @@ export type CompactSearchBarProps = {|
   placeholder?: MessageDescriptor,
 |};
 
-// $FlowFixMe[prop-missing]
-const CompactSearchBar: React.AbstractComponent<
-  {
-    ...CompactSearchBarProps,
-    +ref?: React.RefSetter<CompactSearchBarInterface>,
-  },
-  React.RefSetter<CompactSearchBarInterface>
-> = React.forwardRef<CompactSearchBarProps, CompactSearchBarInterface>(
-  ({ value, onChange, id, disabled, errored, placeholder }, ref) => {
-    const idToUse = React.useRef<string>(id || makeTimestampedId());
+const CompactSearchBar = React.forwardRef<
+  CompactSearchBarProps,
+  CompactSearchBarInterface
+>(({ value, onChange, id, disabled, errored, placeholder }, ref) => {
+  const idToUse = React.useRef<string>(id || makeTimestampedId());
 
-    return (
-      <I18n>
-        {({ i18n }) => (
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <div
+          className={classNames({
+            [classes.container]: true,
+            [classes.disabled]: disabled,
+            [classes.errored]: errored,
+          })}
+        >
           <div
             className={classNames({
-              [classes.container]: true,
-              [classes.disabled]: disabled,
-              [classes.errored]: errored,
+              [classes.compactSearchBar]: true,
             })}
           >
-            <div
-              className={classNames({
-                [classes.compactSearchBar]: true,
-              })}
-            >
-              <div className={classes.searchIconContainer}>
-                <Search className={classes.searchIcon} />
-              </div>
-              <input
-                id={idToUse.current}
-                type={'text'}
-                disabled={disabled}
-                value={value}
-                onChange={e => onChange(e.currentTarget.value)}
-                placeholder={i18n._(placeholder || t`Search`)}
-              />
+            <div className={classes.searchIconContainer}>
+              <Search className={classes.searchIcon} />
             </div>
+            <input
+              id={idToUse.current}
+              type={'text'}
+              disabled={disabled}
+              value={value}
+              onChange={e => onChange(e.currentTarget.value)}
+              placeholder={i18n._(placeholder || t`Search`)}
+            />
           </div>
-        )}
-      </I18n>
-    );
-  }
-);
+        </div>
+      )}
+    </I18n>
+  );
+});
 
 export default CompactSearchBar;

@@ -24,10 +24,10 @@ export const openFilePicker = ({
   filters,
 }: {|
   title: string,
-  properties: Array<string>,
+  properties: string[],
   message: string,
-  filters: Array<{| name: string, extensions: Array<string> |}>,
-|}): any | Promise<> => {
+  filters: {| name: string, extensions: string[] |}[],
+|}) => {
   if (!dialog) return Promise.reject('Not supported');
   const browserWindow = remote.getCurrentWindow();
 
@@ -51,10 +51,10 @@ export const openFilesPicker = ({
   filters,
 }: {|
   title: string,
-  properties: Array<string>,
+  properties: string[],
   message: string,
-  filters: Array<{| name: string, extensions: Array<string> |}>,
-|}): any | Promise<> => {
+  filters: {| name: string, extensions: string[] |}[],
+|}) => {
   if (!dialog) return Promise.reject('Not supported');
   const browserWindow = remote.getCurrentWindow();
 

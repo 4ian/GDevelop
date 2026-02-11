@@ -23,7 +23,7 @@ export const useSearchAndInstallResource = ({
 }: {|
   project: ?gdProject,
   resourceManagementProps: ResourceManagementProps,
-|}): any => {
+|}) => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );

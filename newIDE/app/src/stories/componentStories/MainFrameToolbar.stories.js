@@ -73,11 +73,11 @@ const defaultProps: MainFrameToolbarProps = {
   projectPath: '',
 };
 
-export const NoProjectOpen = (): React.Node => (
+export const NoProjectOpen = () => (
   <MainFrameToolbar {...defaultProps} showProjectButtons={false} />
 );
 
-export const NoProjectOpenWithFakeButtons = (): React.Node => {
+export const NoProjectOpenWithFakeButtons = () => {
   const toolbar = React.useRef<?ToolbarInterface>(null);
   React.useEffect(
     () => {
@@ -96,11 +96,11 @@ export const NoProjectOpenWithFakeButtons = (): React.Node => {
   );
 };
 
-export const ProjectOpen = (): React.Node => {
+export const ProjectOpen = () => {
   return <MainFrameToolbar {...defaultProps} isPreviewEnabled />;
 };
 
-export const ProjectOpenPreviewDisabled = (): React.Node => (
+export const ProjectOpenPreviewDisabled = () => (
   <MainFrameToolbar
     {...defaultProps}
     previewState={{
@@ -113,7 +113,7 @@ export const ProjectOpenPreviewDisabled = (): React.Node => (
   />
 );
 
-export const ProjectOpenOnScene = (): React.Node => (
+export const ProjectOpenOnScene = () => (
   <MainFrameToolbar
     {...defaultProps}
     isPreviewEnabled
@@ -127,7 +127,7 @@ export const ProjectOpenOnScene = (): React.Node => (
   />
 );
 
-export const ProjectOpenOnExternalLayout = (): React.Node => (
+export const ProjectOpenOnExternalLayout = () => (
   <MainFrameToolbar
     {...defaultProps}
     isPreviewEnabled
@@ -141,7 +141,7 @@ export const ProjectOpenOnExternalLayout = (): React.Node => (
   />
 );
 
-export const ProjectOpenPreviewOverridenOnScene = (): React.Node => (
+export const ProjectOpenPreviewOverridenOnScene = () => (
   <MainFrameToolbar
     {...defaultProps}
     isPreviewEnabled
@@ -155,7 +155,7 @@ export const ProjectOpenPreviewOverridenOnScene = (): React.Node => (
   />
 );
 
-export const ProjectOpenPreviewOverridenOnExternalLayout = (): React.Node => (
+export const ProjectOpenPreviewOverridenOnExternalLayout = () => (
   <MainFrameToolbar
     {...defaultProps}
     isPreviewEnabled
@@ -169,7 +169,7 @@ export const ProjectOpenPreviewOverridenOnExternalLayout = (): React.Node => (
   />
 );
 
-export const ProjectOpenWithFakeButtons = (): React.Node => {
+export const ProjectOpenWithFakeButtons = () => {
   const toolbar = React.useRef<?ToolbarInterface>(null);
   React.useEffect(
     () => {
@@ -182,7 +182,7 @@ export const ProjectOpenWithFakeButtons = (): React.Node => {
   return <MainFrameToolbar {...defaultProps} ref={toolbar} isPreviewEnabled />;
 };
 
-export const ProjectOpenPreviewRunning = (): React.Node => {
+export const ProjectOpenPreviewRunning = () => {
   return (
     <MainFrameToolbar {...defaultProps} isPreviewEnabled hasPreviewsRunning />
   );

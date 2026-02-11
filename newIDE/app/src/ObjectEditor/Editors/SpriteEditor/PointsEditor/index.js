@@ -66,7 +66,7 @@ const PointsEditor = ({
   project,
   onPointsUpdated,
   onRenamedPoint,
-}: Props): null | React.MixedElement => {
+}: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
@@ -122,20 +122,17 @@ const PointsEditor = ({
     [animation, sprite, animations, forceUpdate, onPointsUpdated]
   );
 
-  // $FlowFixMe[missing-local-annot]
   const chooseAnimation = index => {
     setAnimationIndex(index);
     setDirectionIndex(0);
     setSpriteIndex(0);
   };
 
-  // $FlowFixMe[missing-local-annot]
   const chooseDirection = index => {
     setDirectionIndex(index);
     setSpriteIndex(0);
   };
 
-  // $FlowFixMe[missing-local-annot]
   const chooseSprite = index => {
     setSpriteIndex(index);
   };

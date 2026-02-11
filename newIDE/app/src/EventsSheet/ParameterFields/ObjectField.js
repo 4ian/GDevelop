@@ -67,10 +67,9 @@ export const getAllRequiredBehaviorTypes = (
   platform: gdPlatform,
   functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
   parameterIndex: number
-): Array<string> =>
-  getRequiredBehaviorTypes(platform, functionMetadata, parameterIndex, null);
+) => getRequiredBehaviorTypes(platform, functionMetadata, parameterIndex, null);
 
-export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectField(props: ParameterFieldProps, ref) {
     const { currentlyRunningInAppTutorial } = React.useContext(
       InAppTutorialContext
@@ -113,7 +112,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       () => {
         const functionMetadata = instructionMetadata || expressionMetadata;
         if (!project || !functionMetadata || parameterIndex === undefined) {
-          // $FlowFixMe[missing-empty-array-annot]
           return [];
         }
         return getRequiredCapabilitiesBehaviorTypes(
@@ -129,7 +127,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       () => {
         const functionMetadata = instructionMetadata || expressionMetadata;
         if (!project || !functionMetadata || parameterIndex === undefined) {
-          // $FlowFixMe[missing-empty-array-annot]
           return [];
         }
         return getRequiredVisibleBehaviorTypes(
@@ -198,11 +195,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-  // $FlowFixMe[prop-missing]
-): React.AbstractComponent<
-  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
-  React.RefSetter<ParameterFieldInterface>
->);
+);
 
 export const renderInlineObjectWithThumbnail = ({
   value,
@@ -211,7 +204,7 @@ export const renderInlineObjectWithThumbnail = ({
   expressionIsValid,
   InvalidParameterValue,
   MissingParameterValue,
-}: ParameterInlineRendererProps): React.MixedElement => {
+}: ParameterInlineRendererProps) => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }

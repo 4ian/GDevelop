@@ -280,8 +280,6 @@ const Instruction = (props: Props) => {
                 />
               );
             }
-            // Add [DEPRECATED] prefix for the first text segment if the preference is set to show text
-            // and the instruction is deprecated (hidden)
             const deprecatedPrefix =
               i === 0 &&
               showDeprecatedInstructionWarning ===
@@ -302,7 +300,6 @@ const Instruction = (props: Props) => {
           let expressionIsValid = true;
           let hasDeprecationWarning = false;
           if (!shouldNotBeValidated({ value, parameterType })) {
-            // Use validateParameter for combined validation (single pass)
             const validationResult = gd.InstructionValidator.validateParameter(
               platform,
               projectScopedContainers,
@@ -312,7 +309,6 @@ const Instruction = (props: Props) => {
               value
             );
             expressionIsValid = validationResult.isValid();
-            // Check for deprecation warnings (only if the preference is not 'no')
             if (showDeprecatedInstructionWarning !== 'no') {
               hasDeprecationWarning = validationResult.hasDeprecationWarning();
             }

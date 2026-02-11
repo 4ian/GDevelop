@@ -67,7 +67,6 @@ export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
       values.themeName = 'Blue Dark';
     }
 
-    // Migrate showDeprecatedInstructionWarning from boolean to enum.
     if (typeof values.showDeprecatedInstructionWarning === 'boolean') {
       values.showDeprecatedInstructionWarning = values.showDeprecatedInstructionWarning
         ? 'icon'

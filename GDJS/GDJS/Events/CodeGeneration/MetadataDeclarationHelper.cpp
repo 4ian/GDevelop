@@ -494,8 +494,6 @@ gd::String MetadataDeclarationHelper::GetFreeFunctionSentence(const gd::EventsFu
 gd::String MetadataDeclarationHelper::GetBehaviorFunctionSentence(
     const gd::EventsFunction &eventsFunction,
     const bool excludeObjectParameter) {
-  // Note: [DEPRECATED] prefix is now added in the UI layer (Instruction.js)
-  // based on user preference "showDeprecatedInstructionWarning"
   return GetTranslation(eventsFunction.GetSentence()).empty()
              ? GetDefaultSentence(eventsFunction,
                                   excludeObjectParameter ? 2 : 0, 0)
@@ -505,8 +503,6 @@ gd::String MetadataDeclarationHelper::GetBehaviorFunctionSentence(
 gd::String MetadataDeclarationHelper::GetObjectFunctionSentence(
     const gd::EventsFunction &eventsFunction,
     const bool excludeObjectParameter) {
-  // Note: [DEPRECATED] prefix is now added in the UI layer (Instruction.js)
-  // based on user preference "showDeprecatedInstructionWarning"
   return GetTranslation(eventsFunction.GetSentence()).empty()
              ? GetDefaultSentence(eventsFunction,
                                   excludeObjectParameter ? 1 : 0, 0)

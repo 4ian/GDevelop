@@ -545,13 +545,13 @@ MetadataDeclarationHelper::DeclareExpressionMetadata(
         eventsFunction.GetExpressionType().IsNumber()
             ? extension.AddExpression(
                   eventsFunction.GetName(),
-                  GetFullName(eventsFunction),
+                  MetadataDeclarationHelper::GetFullName(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
                   eventsFunction.GetGroup(), GetExtensionIconUrl(extension))
             : extension.AddStrExpression(
                   eventsFunction.GetName(),
-                  GetFullName(eventsFunction),
+                  MetadataDeclarationHelper::GetFullName(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
                   eventsFunction.GetGroup(), GetExtensionIconUrl(extension));
@@ -754,7 +754,7 @@ MetadataDeclarationHelper::DeclareBehaviorExpressionMetadata(
         (eventsFunction.GetExpressionType().IsNumber())
             ? behaviorMetadata.AddExpression(
                   eventsFunction.GetName(),
-                  GetFullName(eventsFunction),
+                  MetadataDeclarationHelper::GetFullName(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
                   eventsFunction.GetGroup() ||
@@ -763,7 +763,7 @@ MetadataDeclarationHelper::DeclareBehaviorExpressionMetadata(
                   GetExtensionIconUrl(extension))
             : behaviorMetadata.AddStrExpression(
                   eventsFunction.GetName(),
-                  GetFullName(eventsFunction),
+                  MetadataDeclarationHelper::GetFullName(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
                   eventsFunction.GetGroup() ||
@@ -946,7 +946,7 @@ MetadataDeclarationHelper::DeclareObjectExpressionMetadata(
         (eventsFunction.GetExpressionType().IsNumber())
             ? objectMetadata.AddExpression(
                   eventsFunction.GetName(),
-                  GetFullName(eventsFunction),
+                  MetadataDeclarationHelper::GetFullName(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
                   eventsFunction.GetGroup() ||
@@ -955,7 +955,7 @@ MetadataDeclarationHelper::DeclareObjectExpressionMetadata(
                   GetExtensionIconUrl(extension))
             : objectMetadata.AddStrExpression(
                   eventsFunction.GetName(),
-                  GetFullName(eventsFunction),
+                  MetadataDeclarationHelper::GetFullName(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
                   eventsFunction.GetGroup() ||
@@ -1611,6 +1611,12 @@ MetadataDeclarationHelper::GenerateFreeFunctionMetadata(
   if (eventsFunction.IsPrivate())
     instructionOrExpression.SetPrivate();
 
+  if (eventsFunction.IsDeprecated()) {
+    instructionOrExpression.SetHidden();
+    instructionOrExpression.SetDeprecationMessage(
+        eventsFunction.GetDeprecationMessage());
+  }
+
   return instructionOrExpression;
 };
 
@@ -1648,6 +1654,12 @@ gd::BehaviorMetadata &MetadataDeclarationHelper::GenerateBehaviorMetadata(
 
     if (eventsFunction.IsPrivate())
       instructionOrExpression.SetPrivate();
+
+    if (eventsFunction.IsDeprecated()) {
+      instructionOrExpression.SetHidden();
+      instructionOrExpression.SetDeprecationMessage(
+          eventsFunction.GetDeprecationMessage());
+    }
   }
 
   return behaviorMetadata;
@@ -1687,6 +1699,12 @@ gd::ObjectMetadata &MetadataDeclarationHelper::GenerateObjectMetadata(
 
     if (eventsFunction.IsPrivate())
       instructionOrExpression.SetPrivate();
+
+    if (eventsFunction.IsDeprecated()) {
+      instructionOrExpression.SetHidden();
+      instructionOrExpression.SetDeprecationMessage(
+          eventsFunction.GetDeprecationMessage());
+    }
   }
 
   UpdateCustomObjectDefaultBehaviors(project, objectMetadata);

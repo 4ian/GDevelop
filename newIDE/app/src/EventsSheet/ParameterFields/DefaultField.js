@@ -45,8 +45,10 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 export const renderInlineDefaultField = ({
   value,
   expressionIsValid,
+  hasDeprecationWarning,
   parameterMetadata,
   InvalidParameterValue,
+  DeprecatedParameterValue,
   MissingParameterValue,
 }: ParameterInlineRendererProps) => {
   if (!value && !parameterMetadata.isOptional()) {
@@ -54,6 +56,9 @@ export const renderInlineDefaultField = ({
   }
   if (!expressionIsValid) {
     return <InvalidParameterValue>{value}</InvalidParameterValue>;
+  }
+  if (hasDeprecationWarning) {
+    return <DeprecatedParameterValue>{value}</DeprecatedParameterValue>;
   }
   return value;
 };

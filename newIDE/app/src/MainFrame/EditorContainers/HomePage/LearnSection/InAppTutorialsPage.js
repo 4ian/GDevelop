@@ -16,10 +16,7 @@ type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
 |};
 
-const InAppTutorialsPage = ({
-  onBack,
-  selectInAppTutorial,
-}: Props): React.Node => {
+const InAppTutorialsPage = ({ onBack, selectInAppTutorial }: Props) => {
   const {
     values: { showInAppTutorialDeveloperMode },
   } = React.useContext(PreferencesContext);

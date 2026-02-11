@@ -47,7 +47,7 @@ const EditedObjectGroupEditorDialog = ({
   onComputeAllVariableNames,
   isVariableListLocked,
   isObjectListLocked,
-}: Props): React.Node => {
+}: Props) => {
   const forceUpdate = useForceUpdate();
   const {
     onCancelChanges,

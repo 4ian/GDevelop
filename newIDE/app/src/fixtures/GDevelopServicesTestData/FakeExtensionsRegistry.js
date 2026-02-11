@@ -5,7 +5,6 @@ import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extensio
 export const fakeExtensionsRegistry: ExtensionsRegistry & {
   // The service gives CSV but it's converted on the fly to an array.
   headers: Array<ExtensionShortHeader & { tags: any }>,
-  // $FlowFixMe[incompatible-type]
 } = {
   version: '0.0.1',
   views: {
@@ -14,7 +13,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
     },
   },
   headers: [
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: ['this-is-a-fake-id', 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2'],
@@ -28,7 +26,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/extensions/SomeAlreadyInstalledExtension.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/SomeAlreadyInstalledExtension-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'ledge tolerance,jump,platform',
       category: 'Movement',
       previewIconUrl:
@@ -59,7 +56,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: ['this-is-a-fake-id', 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2'],
@@ -72,7 +68,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/AdvancedJump.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/AdvancedJump-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'ledge tolerance,jump,platform',
       category: 'Movement',
       previewIconUrl:
@@ -103,7 +98,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'experimental',
       authorIds: ['ZgrsWuRTAkXgeuPV9bo0zuEcA2w1'],
@@ -117,7 +111,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/extensions/AdvancedP2PEventHandling.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/AdvancedP2PEventHandling-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'p2p,performance,advanced',
       category: 'Network',
       previewIconUrl:
@@ -138,7 +131,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'experimental',
       authorIds: ['I0kdjvsICFML0APq45CZjZ6PyEQ2'],
@@ -151,7 +143,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/AlignObject.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/AlignObject-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'align,alignment,center',
       category: 'User interface',
       previewIconUrl:
@@ -172,7 +163,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'experimental',
       authorIds: ['wWP8BSlAW0UP4NeaHa2LcmmDzmH2'],
@@ -186,7 +176,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/extensions/AnimatedBackAndForthMovement.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/AnimatedBackAndForthMovement-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'back,forth,movement',
       category: 'Movement',
       previewIconUrl:
@@ -207,7 +196,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: ['ZgrsWuRTAkXgeuPV9bo0zuEcA2w1'],
@@ -221,7 +209,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/ArrayTools-header.json',
       tags:
-        // $FlowFixMe[incompatible-type]
         'array,variable,index,tool,math,string,sort,find,slice,cut,random,copy,combine,concat,append,insert',
       category: 'General',
       previewIconUrl:
@@ -242,7 +229,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: ['2OwwM8ToR9dx9RJ2sAKTcrLmCB92'],
@@ -255,7 +241,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/AutoTyping.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/AutoTyping-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'text,bbtext,dialogue,visual novel,autotyping,bitmap',
       category: 'User interface',
       previewIconUrl:
@@ -276,7 +261,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: ['ZgrsWuRTAkXgeuPV9bo0zuEcA2w1'],
@@ -288,7 +272,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/BackButton.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/BackButton-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'back,mobile,button,input',
       category: 'Input',
       previewIconUrl:
@@ -309,7 +292,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: ['onPsboRtDkUHNOsx7OPr8R8G1oj2'],
@@ -322,7 +304,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/BaseConversion.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/BaseConversion-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'binary,numbers,number,base,hex,decimal',
       category: 'Advanced',
       previewIconUrl:
@@ -343,7 +324,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'experimental',
       authorIds: ['AlZ3D1xkH0QDao7T37VZZUeYNpn1'],
@@ -356,7 +336,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/extensions/BehaviorRemapper.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/BehaviorRemapper-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'remapper,key,bindings,presets,platformer,top-down',
       category: 'Input',
       previewIconUrl:
@@ -377,7 +356,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'experimental',
       authorIds: [
@@ -392,7 +370,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/BoidsMovement.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/BoidsMovement-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'flock,swarm,boids,crowd,horde',
       category: 'Movement',
       previewIconUrl:
@@ -423,7 +400,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'experimental',
       authorIds: ['this-is-a-fake-id', 'gqDaZjCfevOOxBYkK6zlhtZnXCg1'],
@@ -436,7 +412,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/Boomerang.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/Boomerang-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'boomerang,throw,attack,projectile,ricochet,rebound,launch',
       category: 'Movement',
       previewIconUrl:
@@ -467,7 +442,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: ['wWP8BSlAW0UP4NeaHa2LcmmDzmH2'],
@@ -480,7 +454,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/Bounce.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/Bounce-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'bounce,bullet',
       category: 'Movement',
       previewIconUrl:
@@ -501,7 +474,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: [
@@ -517,7 +489,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/CameraShake.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CameraShake-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'shaking,camera,effect,screen,shake,zoom,position,rotate',
       category: 'Camera',
       previewIconUrl:
@@ -548,7 +519,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'experimental',
       authorIds: [
@@ -564,7 +534,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/CameraZoom.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CameraZoom-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'Camera,Layer,Zoom',
       category: 'Camera',
       previewIconUrl:
@@ -595,7 +564,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: ['IWykYNRvhCZBN3vEgKEbBPOR3Oc2'],
@@ -609,7 +577,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/extensions/CancellableDraggable.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CancellableDraggable-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'drag,drop',
       category: 'User interface',
       previewIconUrl:
@@ -630,7 +597,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: ['gqDaZjCfevOOxBYkK6zlhtZnXCg1'],
@@ -643,7 +609,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/Checkbox.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/Checkbox-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'checkbox,ui,widget,shape painter,toggle,checkmark',
       category: 'User interface',
       previewIconUrl:
@@ -664,7 +629,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: [
@@ -679,7 +643,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/Checkpoints.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/Checkpoints-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'position,checkpoint',
       category: 'Game mechanic',
       previewIconUrl:
@@ -710,7 +673,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'experimental',
       authorIds: ['ZShmW1xkW7WWl9AkB78VITJMiTw1'],
@@ -723,7 +685,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/Choose.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/Choose-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'choose,random',
       category: 'General',
       previewIconUrl:
@@ -744,7 +705,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: [
@@ -759,7 +719,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/Clipboard.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/Clipboard-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'clipboard,pasteboard,paste,copy,write',
       category: 'User interface',
       previewIconUrl:
@@ -790,7 +749,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: [
@@ -807,7 +765,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/ColorConversion.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/ColorConversion-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'color,conversion,hexadecimal,rgb,hsl,hsv,hsb',
       category: 'Advanced',
       previewIconUrl:
@@ -848,7 +805,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: ['ZgrsWuRTAkXgeuPV9bo0zuEcA2w1'],
@@ -860,7 +816,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/Compressor.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/Compressor-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'string,compression,zip',
       category: 'Advanced',
       previewIconUrl:
@@ -881,7 +836,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: ['gqDaZjCfevOOxBYkK6zlhtZnXCg1'],
@@ -895,7 +849,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/extensions/CopyCameraSettings.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CopyCameraSettings-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'camera,clone,zoom,position,layer,angle,copy',
       category: 'Camera',
       previewIconUrl:
@@ -916,7 +869,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: ['gqDaZjCfevOOxBYkK6zlhtZnXCg1'],
@@ -930,7 +882,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/extensions/CreateMultipleCopiesOfObject.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CreateMultipleCopiesOfObject-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'create,multiple,object,grid,row,column',
       category: 'Visual effect',
       previewIconUrl:
@@ -951,7 +902,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: ['ZShmW1xkW7WWl9AkB78VITJMiTw1'],
@@ -965,7 +915,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/extensions/CurrentGameVersion.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CurrentGameVersion-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'version',
       category: 'Advanced',
       previewIconUrl:
@@ -986,7 +935,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'experimental',
       authorIds: ['IWykYNRvhCZBN3vEgKEbBPOR3Oc2'],
@@ -999,7 +947,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/CursorMovement.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CursorMovement-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'mouse,pointer,cursor',
       category: 'Input',
       previewIconUrl:
@@ -1020,7 +967,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'experimental',
       authorIds: [
@@ -1036,7 +982,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/CursorType.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CursorType-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'cursor,javascript,desktop',
       category: 'User interface',
       previewIconUrl:
@@ -1067,7 +1012,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: ['gqDaZjCfevOOxBYkK6zlhtZnXCg1'],
@@ -1080,7 +1024,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/DepthEffect.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/DepthEffect-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'depth,effect,scale,y,text,sprite',
       category: 'Visual effect',
       previewIconUrl:
@@ -1101,7 +1044,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'experimental',
       authorIds: ['ZgrsWuRTAkXgeuPV9bo0zuEcA2w1'],
@@ -1114,7 +1056,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/extensions/DiscordRichPresence.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/DiscordRichPresence-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'discord,rich,presence,integration,status',
       category: 'Third-party',
       previewIconUrl:
@@ -1135,7 +1076,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: ['8Ih1aa8f5gWUp4UB2BdhQ2iXWxJ3'],
@@ -1148,7 +1088,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/DoubleClick.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/DoubleClick-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'double-click,double-tap',
       category: 'Input',
       previewIconUrl:
@@ -1169,7 +1108,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: [
@@ -1185,7 +1123,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/extensions/DragCameraWithPointer.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/DragCameraWithPointer-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'pointer,drag,camera,scroll,gestures',
       category: 'Camera',
       previewIconUrl:
@@ -1216,7 +1153,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: ['gqDaZjCfevOOxBYkK6zlhtZnXCg1'],
@@ -1229,7 +1165,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/extensions/DraggablePhysics.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/DraggablePhysics-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'draggable,mouse,touch,physics,object,joint,fling',
       category: 'Movement',
       previewIconUrl:
@@ -1250,7 +1185,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: [
@@ -1267,7 +1201,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'https://resources.gdevelop-app.com/extensions/DraggableSliderControl.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/DraggableSliderControl-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'draggable,slider,shape painter,ui,widget',
       category: 'User interface',
       previewIconUrl:
@@ -1298,7 +1231,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         },
       ],
     },
-    // $FlowFixMe[incompatible-type]
     {
       tier: 'reviewed',
       authorIds: ['this-is-a-fake-id'],
@@ -1311,7 +1243,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/DrawPathfinding.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/DrawPathfinding-header.json',
-      // $FlowFixMe[incompatible-type]
       tags: 'pathfinding,debug,shape painter,draw',
       category: 'Movement',
       previewIconUrl:

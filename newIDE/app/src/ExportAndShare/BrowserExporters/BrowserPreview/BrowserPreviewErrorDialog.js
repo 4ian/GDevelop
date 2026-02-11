@@ -13,7 +13,7 @@ type Props = {|
 |};
 
 export default class BrowserPreviewErrorDialog extends Component<Props> {
-  render(): any {
+  render() {
     const { error, onClose } = this.props;
 
     return (
@@ -34,8 +34,7 @@ export default class BrowserPreviewErrorDialog extends Component<Props> {
             <Line>
               <Column noMargin>
                 <Text>
-                  {// $FlowFixMe[incompatible-type] - AWS returned errors can have extra fields
-                  // $FlowFixMe[prop-missing]
+                  {// $FlowFixMe - AWS returned errors can have extra fields
                   error.code === 'NetworkingError' ? (
                     <Trans>
                       The preview could not be launched because you're offline.

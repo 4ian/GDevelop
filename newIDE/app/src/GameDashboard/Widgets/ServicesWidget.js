@@ -32,7 +32,7 @@ const ServicesWidget = ({
   onSeeAllLeaderboards,
   onSeeLobbyConfiguration,
   displayUnlockMoreLeaderboardsCallout,
-}: Props): React.Node => {
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
   return (

@@ -23,14 +23,13 @@ export const renderInstructionOrExpressionListItem = ({
   onClick,
   selectedValue,
   matches,
-}: Props): React.Node => {
+}: Props) => {
   const getRenderedText = (field: 'displayedName' | 'fullGroupName') => {
     let text = instructionOrExpressionMetadata[field];
     if (matches && matches.length) {
       const matchesForGivenField = matches.filter(match => match.key === field);
       if (!!matchesForGivenField.length) {
         text = (
-          // $FlowFixMe[incompatible-type]
           <HighlightedText
             text={text}
             matchesCoordinates={matchesForGivenField[0].indices}

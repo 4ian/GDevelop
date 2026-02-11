@@ -17,9 +17,7 @@ const initialState: UnsavedChanges = {
   getTimeOfFirstChangeSinceLastSave: () => null,
 };
 
-const UnsavedChangesContext: React.Context<UnsavedChanges> = React.createContext<UnsavedChanges>(
-  initialState
-);
+const UnsavedChangesContext = React.createContext<UnsavedChanges>(initialState);
 
 export default UnsavedChangesContext;
 
@@ -27,9 +25,7 @@ type Props = {|
   children?: React.Node,
 |};
 
-export const UnsavedChangesContextProvider = (
-  props: Props
-): React.MixedElement => {
+export const UnsavedChangesContextProvider = (props: Props) => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState<boolean>(
     false
   );

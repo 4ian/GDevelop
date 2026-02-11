@@ -25,7 +25,7 @@ const iconContainerStyle = {
   fontSize: 16,
 };
 
-const CustomToolbarButton = ({ name, icon, onClick }: Props): React.Node => {
+const CustomToolbarButton = ({ name, icon, onClick }: Props) => {
   return (
     <Tooltip title={name} placement="bottom" enterDelay={tooltipEnterDelay}>
       <IconButton size="small" onClick={onClick} color="default">

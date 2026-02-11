@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-// $FlowFixMe[import-type-as-value]
 import { I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
 import { AnnouncementsFeedContext } from '../AnnouncementsFeed/AnnouncementsFeedContext';
@@ -23,9 +22,7 @@ type PromotionsSlideshowProps = {|
   type?: 'game' | 'asset-pack' | 'game-template',
 |};
 
-const PromotionsSlideshow = ({
-  type,
-}: PromotionsSlideshowProps): null | React.Node => {
+const PromotionsSlideshow = ({ type }: PromotionsSlideshowProps) => {
   const { promotions, error } = React.useContext(AnnouncementsFeedContext);
   const { navigateToRoute } = React.useContext(RouterContext);
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();

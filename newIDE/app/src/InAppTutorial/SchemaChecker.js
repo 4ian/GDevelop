@@ -33,9 +33,7 @@ const flowStepKeys = [
   'interactsWithCanvas',
   'disableBlockingLayer',
 ];
-export const checkInAppTutorialFileJsonSchema = (
-  object: Object
-): Array<string> => {
+export const checkInAppTutorialFileJsonSchema = (object: Object) => {
   const errors = [];
   topLevelKeys.forEach(topLevelKey => {
     if (!object[topLevelKey]) {

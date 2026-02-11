@@ -31,9 +31,8 @@ export default class BrowserS3PreviewLauncher extends React.Component<
   PreviewLauncherProps,
   State
 > {
-  canDoNetworkPreview = (): any => false;
+  canDoNetworkPreview = () => false;
 
-  // $FlowFixMe[missing-local-annot]
   state = {
     error: null,
   };
@@ -283,11 +282,11 @@ export default class BrowserS3PreviewLauncher extends React.Component<
     }
   };
 
-  getPreviewDebuggerServer(): any {
+  getPreviewDebuggerServer() {
     return browserPreviewDebuggerServer;
   }
 
-  render(): any {
+  render() {
     const { error } = this.state;
 
     if (error) {

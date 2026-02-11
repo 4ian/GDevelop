@@ -43,7 +43,6 @@ const MaterialUIContextMenu = React.forwardRef<
     onClose: () => setOpenMenu(false),
   });
 
-  // $FlowFixMe[missing-local-annot]
   const open = (x, y, options) => {
     setAnchorPosition([x, y]);
     setBuildOptions(options);
@@ -132,7 +131,6 @@ const ElectronContextMenu = React.forwardRef<
 >((props, ref) => {
   const menuImplementation = new ElectronMenuImplementation();
 
-  // $FlowFixMe[missing-local-annot]
   const open = (x, y, options) => {
     menuImplementation.buildFromTemplate(
       props.buildMenuTemplate(props.i18n, options)
@@ -154,7 +152,7 @@ const ElectronContextMenu = React.forwardRef<
 
 const ContextMenu = electron ? ElectronContextMenu : MaterialUIContextMenu;
 
-export default (React.forwardRef<ContextMenuWrapperProps, ContextMenuInterface>(
+export default React.forwardRef<ContextMenuWrapperProps, ContextMenuInterface>(
   (props, ref) => {
     const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
     React.useImperativeHandle(ref, () => ({
@@ -171,11 +169,4 @@ export default (React.forwardRef<ContextMenuWrapperProps, ContextMenuInterface>(
       </I18n>
     );
   }
-  // $FlowFixMe[prop-missing]
-): React.AbstractComponent<
-  {
-    ...ContextMenuWrapperProps,
-    +ref?: React.RefSetter<ContextMenuInterface>,
-  },
-  React.RefSetter<ContextMenuInterface>
->);
+);

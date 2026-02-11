@@ -71,7 +71,7 @@ const CompactSemiControlledNumberField = ({
   getValueFromDisplayedValue,
   getDisplayedValueFromValue,
   ...otherProps
-}: Props): React.MixedElement => {
+}: Props) => {
   const textFieldRef = React.useRef<?CompactTextFieldInterface>(null);
   const cancelEditionRef = React.useRef<boolean>(false);
   const [focused, setFocused] = React.useState<boolean>(false);
@@ -106,7 +106,6 @@ const CompactSemiControlledNumberField = ({
         const isNewValueAsFloatValidOrStartsWithSign =
           newValueAsValidFloat !== null &&
           (!containsMathCharacters ||
-            // $FlowFixMe[constant-condition]
             (containsMathCharacters && isValueWithLeadingSign));
         let updateTemporaryValueWithCalculatedValue = false;
         let newValueAfterCalculation: number | null = null;

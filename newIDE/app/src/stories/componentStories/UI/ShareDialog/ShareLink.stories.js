@@ -10,6 +10,6 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const DefaultShareLink = (): React.Node => (
+export const DefaultShareLink = () => (
   <ShareLink url={'https://gd.games/username/game-slug'} />
 );

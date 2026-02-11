@@ -51,7 +51,7 @@ const isDev = Window.isDev();
 
 export const useProjectNeedToBeSavedAlertDialog = (
   canInstallPrivateAsset: () => boolean
-): ((assetShortHeader: AssetShortHeader) => Promise<boolean>) => {
+) => {
   const { showAlert } = useAlertDialog();
   return async (assetShortHeader: AssetShortHeader): Promise<boolean> => {
     const isPrivate = isPrivateAsset(assetShortHeader);
@@ -69,9 +69,7 @@ export const useProjectNeedToBeSavedAlertDialog = (
   };
 };
 
-export const useFetchAssets = (): ((
-  assetShortHeaders: Array<AssetShortHeader>
-) => Promise<Array<Asset>>) => {
+export const useFetchAssets = () => {
   const { environment } = React.useContext(AssetStoreContext);
 
   const { fetchPrivateAsset } = React.useContext(
@@ -119,12 +117,7 @@ export const useInstallAsset = ({
   resourceManagementProps: ResourceManagementProps,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
-|}): (({
-  assetShortHeader: AssetShortHeader,
-  objectsContainer: gdObjectsContainer,
-  requestedObjectName?: string,
-  setIsAssetBeingInstalled: boolean => void,
-}) => Promise<InstallAssetOutput | null>) => {
+|}) => {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const { openedAssetPack } = shopNavigationState.getCurrentPage();
   const { installPrivateAsset } = React.useContext(
@@ -343,7 +336,6 @@ function NewObjectDialog({
   const installExtension = useInstallExtension();
 
   const onInstallAsset = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     async (assetShortHeader): Promise<boolean> => {
       if (!assetShortHeader) return false;
 
@@ -631,7 +623,7 @@ function NewObjectDialog({
   );
 }
 
-const NewObjectDialogWithErrorBoundary = (props: Props): React.Node => (
+const NewObjectDialogWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>New Object dialog</Trans>}
     scope="new-object-dialog"

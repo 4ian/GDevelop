@@ -37,7 +37,7 @@ const GamesPlatformFrame = ({
   loaded,
   visible,
   iframePosition,
-}: Props): React.Node => {
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const paletteType = gdevelopTheme.palette.type;
 

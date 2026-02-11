@@ -97,7 +97,7 @@ const Slideshow = ({
   // The slideshow bases its width on the full window width, so if used in a
   // container, use this prop to calculate the width accurately.
   additionalMarginForWidthCalculation,
-}: SlideshowProps): null | React.Node => {
+}: SlideshowProps) => {
   // Ensure the component is re-rendered when the window is resized.
   useOnResize(useForceUpdate());
   const windowInnerWidth = window.innerWidth;
@@ -159,7 +159,6 @@ const Slideshow = ({
 
   React.useEffect(
     () => {
-      // $FlowFixMe[incompatible-type]
       nextSlideTimeoutId.current = setTimeout(() => {
         handleRightArrowClick();
       }, 5000);
@@ -192,7 +191,6 @@ const Slideshow = ({
       // so just return.
       if (!isFocusingOrOverContainer || leftImageRecentlyTimeoutId.current)
         return;
-      // $FlowFixMe[incompatible-type]
       leftImageRecentlyTimeoutId.current = setTimeout(() => {
         setIsFocusingContainer(false);
       }, 1000);

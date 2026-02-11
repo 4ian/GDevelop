@@ -115,7 +115,7 @@ export default function SubscriptionDialog({
   recommendedPlanId,
   onOpenPendingDialog,
   couponCode,
-}: Props): React.Node {
+}: Props) {
   const [isChangingSubscription, setIsChangingSubscription] = React.useState(
     false
   );
@@ -200,7 +200,6 @@ export default function SubscriptionDialog({
     if (!subscriptionPlanPricingSystem) {
       // Cancelling the existing subscription.
       const answer = await showConfirmation(
-        // $FlowFixMe[incompatible-type]
         cancelConfirmationTexts.dialogTexts
       );
       if (!answer) return;
@@ -234,8 +233,7 @@ export default function SubscriptionDialog({
               confirmButtonLabel: dialogTexts.confirmButtonLabel,
               dismissButtonLabel: dialogTexts.dismissButtonLabel,
             })
-          : // $FlowFixMe[incompatible-type]
-            await showConfirmation(dialogTexts);
+          : await showConfirmation(dialogTexts);
       if (!answer) return;
     }
 
@@ -329,15 +327,11 @@ export default function SubscriptionDialog({
             purchasablePlanWithPricingSystems.id === planIdToSelect
         );
         if (foundPlanPricingSystem) {
-          // $FlowFixMe[incompatible-type]
           setSelectedPlanId(planIdToSelect);
-          // $FlowFixMe[incompatible-type]
           setAvailableRecommendedPlanId(planIdToRecommend);
         } else {
           const firstPlanId = purchasablePlansWithPricingSystems[0].id;
-          // $FlowFixMe[incompatible-type]
           setSelectedPlanId(firstPlanId);
-          // $FlowFixMe[incompatible-type]
           setAvailableRecommendedPlanId(firstPlanId);
         }
       }
@@ -356,7 +350,6 @@ export default function SubscriptionDialog({
       purchasablePlansWithPricingSystems
         ? purchasablePlansWithPricingSystems.find(
             purchasablePlanWithPricingSystems =>
-              // $FlowFixMe[invalid-compare]
               purchasablePlanWithPricingSystems.id === selectedPlanId
           )
         : null,
@@ -583,7 +576,6 @@ export default function SubscriptionDialog({
                     ownedPlanId={userPlanId}
                     selectedPlanId={selectedPlanId}
                     recommendedPlanId={availableRecommendedPlanId}
-                    // $FlowFixMe[incompatible-type]
                     onClick={setSelectedPlanId}
                     disabled={isLoading}
                   />

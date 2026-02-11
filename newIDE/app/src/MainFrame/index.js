@@ -355,7 +355,6 @@ export type Props = {|
   renderPreviewLauncher?: (
     props: PreviewLauncherProps,
     ref: (previewLauncher: ?PreviewLauncherInterface) => void
-    // $FlowFixMe[prop-missing]
   ) => React.Element<PreviewLauncherComponent>,
   onEditObject?: gdObject => void,
   storageProviders: Array<StorageProvider>,
@@ -380,7 +379,7 @@ export type Props = {|
   i18n: I18n,
 |};
 
-const MainFrame = (props: Props): React.MixedElement => {
+const MainFrame = (props: Props) => {
   const [state, setState]: [
     State,
     ((State => State) | State) => Promise<State>,
@@ -752,7 +751,6 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const setEditorTabs = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     newEditorTabs => {
       setState(state => ({
         ...state,
@@ -771,7 +769,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       : null,
     editorTabs: state.editorTabs,
     setEditorTabs: setEditorTabs,
-    // $FlowFixMe[incompatible-type]
     getEditorOpeningOptions,
   });
 
@@ -915,7 +912,6 @@ const MainFrame = (props: Props): React.MixedElement => {
             );
             newEditorTabs = openEditorTab(
               newEditorTabs,
-              // $FlowFixMe[incompatible-type]
               getEditorOpeningOptions({
                 kind: 'ask-ai',
                 name: '',
@@ -928,7 +924,6 @@ const MainFrame = (props: Props): React.MixedElement => {
 
         newEditorTabs = openEditorTab(
           newEditorTabs,
-          // $FlowFixMe[incompatible-type]
           getEditorOpeningOptions({
             kind: 'ask-ai',
             name: '',
@@ -1045,8 +1040,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   const loadFromProject = React.useCallback(
     async (project: gdProject, fileMetadata: ?FileMetadata): Promise<State> => {
       let updatedFileMetadata: ?FileMetadata = fileMetadata
-        ? // $FlowFixMe[incompatible-type]
-          updateFileMetadataWithOpenedProject(fileMetadata, project)
+        ? updateFileMetadataWithOpenedProject(fileMetadata, project)
         : null;
 
       if (updatedFileMetadata) {
@@ -1360,7 +1354,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       // it can have been updated in the meantime (gameId, project name, etc...).
       // Use the ref here to be sure to have the latest file metadata.
       if (currentFileMetadataRef.current) {
-        // $FlowFixMe[incompatible-type]
         const newFileMetadata: FileMetadata = updateFileMetadataWithOpenedProject(
           currentFileMetadataRef.current,
           project
@@ -2120,7 +2113,6 @@ const MainFrame = (props: Props): React.MixedElement => {
     );
   };
 
-  // $FlowFixMe[missing-local-annot]
   const setPreviewOverride = ({
     isPreviewOverriden,
     overridenPreviewLayoutName,
@@ -2418,7 +2410,6 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const launchNewPreview = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     async options => {
       const launchCaptureOptions =
         currentProject && !hasNonEditionPreviewsRunning
@@ -2596,12 +2587,10 @@ const MainFrame = (props: Props): React.MixedElement => {
       });
 
       const tabsWithSceneEditor = openSceneEditor
-        ? // $FlowFixMe[incompatible-type]
-          openEditorTab(editorTabs, sceneEditorOptions)
+        ? openEditorTab(editorTabs, sceneEditorOptions)
         : editorTabs;
       return openEventsEditor
-        ? // $FlowFixMe[incompatible-type]
-          openEditorTab(tabsWithSceneEditor, eventsEditorOptions)
+        ? openEditorTab(tabsWithSceneEditor, eventsEditorOptions)
         : tabsWithSceneEditor;
     },
     [getEditorOpeningOptions]
@@ -2647,7 +2636,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         ...state,
         editorTabs: openEditorTab(
           state.editorTabs,
-          // $FlowFixMe[incompatible-type]
           getEditorOpeningOptions({ kind: 'external events', name })
         ),
       }));
@@ -2661,7 +2649,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         ...state,
         editorTabs: openEditorTab(
           state.editorTabs,
-          // $FlowFixMe[incompatible-type]
           getEditorOpeningOptions({ kind: 'external layout', name })
         ),
       }));
@@ -2678,7 +2665,6 @@ const MainFrame = (props: Props): React.MixedElement => {
     ) => {
       setState(state => ({
         ...state,
-        // $FlowFixMe[incompatible-type]
         editorTabs: openEditorTab(state.editorTabs, {
           ...getEditorOpeningOptions({
             kind: 'events functions extension',
@@ -2702,7 +2688,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         ...state,
         editorTabs: openEditorTab(
           state.editorTabs,
-          // $FlowFixMe[incompatible-type]
           getEditorOpeningOptions({ kind: 'resources', name: '' })
         ),
       }));
@@ -2716,7 +2701,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         ...state,
         editorTabs: openEditorTab(
           state.editorTabs,
-          // $FlowFixMe[incompatible-type]
           getEditorOpeningOptions({ kind: 'start page', name: '' })
         ),
       }));
@@ -2746,7 +2730,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         ...state,
         editorTabs: openEditorTab(
           state.editorTabs,
-          // $FlowFixMe[incompatible-type]
           getEditorOpeningOptions({ kind: 'debugger', name: '' })
         ),
       }));
@@ -2866,7 +2849,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         // Open a new editor for the extension and the given function
         setState(state => ({
           ...state,
-          // $FlowFixMe[incompatible-type]
           editorTabs: openEditorTab(state.editorTabs, {
             ...getEditorOpeningOptions({
               kind: 'custom object',
@@ -2900,7 +2882,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       setState(state => ({
         ...state,
         editorTabs: openEditorTab(
-          // $FlowFixMe[incompatible-type]
           openEditorTab(state.editorTabs, {
             ...getEditorOpeningOptions({
               kind: 'events functions extension',
@@ -2913,7 +2894,6 @@ const MainFrame = (props: Props): React.MixedElement => {
               initiallyFocusedObjectName: eventsBasedObject.getName(),
             },
           }),
-          // $FlowFixMe[incompatible-type]
           {
             ...getEditorOpeningOptions({
               kind: 'custom object',
@@ -4237,7 +4217,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         newFileMetadata = { ...newFileMetadata, ...fileMetadataNewAttributes };
       }
     }
-    // $FlowFixMe[incompatible-type]
     await setState(state => ({
       ...state,
       currentFileMetadata: newFileMetadata,
@@ -4522,7 +4501,6 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   /** (Stable) callback to launch the fetching of the resources of the project. */
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const onFetchNewlyAddedResources = useStableUpToDateCallback(
     fetchNewlyAddedResources
   );
@@ -4834,7 +4812,6 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenAskAi: openAskAi,
     onCloseAskAi: closeAskAi,
     getStorageProvider: getStorageProvider,
-    // $FlowFixMe[incompatible-type]
     setPreviewedLayout: setPreviewedLayout,
     openExternalEvents: openExternalEvents,
     openLayout: openLayout,

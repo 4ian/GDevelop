@@ -109,8 +109,7 @@ export type LobbyConfiguration = {|
 export const shortenUuidForDisplay = (uuid: string): string =>
   `${uuid.split('-')[0]}-...`;
 
-// $FlowFixMe[cannot-resolve-name]
-export const client: Axios = axios.create({
+export const client = axios.create({
   baseURL: GDevelopPlayApi.baseUrl,
 });
 
@@ -138,14 +137,11 @@ export const extractNextPageUriFromLinkHeader = (
     const relationRegexMatch = link.match(/;\srel="(\w*)"/);
     const uriMatch = link.match(/^<(.*)>/);
     if (acc && relationRegexMatch && uriMatch) {
-      // $FlowFixMe[prop-missing]
       acc[relationRegexMatch[1]] = uriMatch[1];
     }
     return acc;
   }, {});
-  // $FlowFixMe[incompatible-type]
   if (Object.keys(mapRelationToUri).includes('next')) {
-    // $FlowFixMe[prop-missing]
     return mapRelationToUri.next;
   }
   return null;
@@ -161,7 +157,7 @@ export const listLeaderboardEntries = async (
 |}> => {
   const uri =
     options.forceUri || `/game/${gameId}/leaderboard/${leaderboardId}/entry`;
-  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe
   const response = await client.get(uri, {
     params: options.forceUri
       ? null
@@ -420,7 +416,7 @@ export const updateComment = async (
     processed?: boolean,
     qualityRating?: string,
   |}
-): Promise<any> => {
+) => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
       client.patch(

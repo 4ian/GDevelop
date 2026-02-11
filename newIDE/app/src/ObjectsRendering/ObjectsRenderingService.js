@@ -53,11 +53,10 @@ const ObjectsRenderingService = {
     'ParticleSystem::ParticleEmitter': RenderedParticleEmitterInstance,
   },
   renderers3D: {},
-  // $FlowFixMe[missing-this-annot]
   getThumbnail: function(
     project: gdProject,
     objectConfiguration: gdObjectConfiguration
-  ): any {
+  ) {
     const objectType = objectConfiguration.getType();
     if (this.renderers.hasOwnProperty(objectType))
       return this.renderers[objectType].getThumbnail(
@@ -79,11 +78,9 @@ const ObjectsRenderingService = {
       );
     }
   },
-  // $FlowFixMe[missing-this-annot]
   createNewUnknownInstanceRenderer: function(
     project: gdProject,
     instance: gdInitialInstance,
-    // $FlowFixMe[value-as-type]
     pixiContainer: PIXI.Container
   ): RenderedInstance | Rendered3DInstance {
     return new this.renderers['unknownObjectType'](
@@ -94,14 +91,11 @@ const ObjectsRenderingService = {
       PixiResourcesLoader
     );
   },
-  // $FlowFixMe[missing-this-annot]
   createNewInstanceRenderer: function(
     project: gdProject,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
-    // $FlowFixMe[value-as-type]
     pixiContainer: PIXI.Container,
-    // $FlowFixMe[value-as-type]
     threeGroup: THREE.Group | null,
     getPropertyOverridings: (() => Map<string, string>) | null = null
   ): RenderedInstance | Rendered3DInstance {
@@ -174,7 +168,6 @@ const ObjectsRenderingService = {
       );
     }
   },
-  // $FlowFixMe[missing-this-annot]
   registerInstanceRenderer: function(objectType: string, renderer: any) {
     if (!renderer.getThumbnail) {
       console.warn(
@@ -196,7 +189,6 @@ const ObjectsRenderingService = {
 
     this.renderers[objectType] = renderer;
   },
-  // $FlowFixMe[missing-this-annot]
   registerInstance3DRenderer: function(objectType: string, renderer: any) {
     if (this.renderers3D.hasOwnProperty(objectType)) {
       console.warn(
@@ -210,8 +202,7 @@ const ObjectsRenderingService = {
 
     this.renderers3D[objectType] = renderer;
   },
-  renderersCacheClearingMethods: ([]: Array<empty>),
-  // $FlowFixMe[missing-this-annot]
+  renderersCacheClearingMethods: [],
   registerClearCache: function(clearCache: (project: gdProject) => void) {
     this.renderersCacheClearingMethods.push(clearCache);
   },
@@ -220,7 +211,6 @@ const ObjectsRenderingService = {
    * This is necessary for the web-app, as all files must be bundled.
    */
   registerModule: function(requirePath: string, module: any) {
-    // $FlowFixMe[prop-missing]
     requirableModules[requirePath] = module;
   },
   /**
@@ -297,7 +287,6 @@ const ObjectsRenderingService = {
       return requiredModule;
     } else {
       // On the web-app, modules need to be registered manually.
-      // $FlowFixMe[invalid-computed-prop]
       if (requirableModules[requirePath]) return requirableModules[requirePath];
 
       console.error(

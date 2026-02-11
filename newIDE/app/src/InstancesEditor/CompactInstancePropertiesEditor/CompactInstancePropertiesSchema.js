@@ -63,8 +63,7 @@ const getEditObjectButton = ({
   disabled: 'onValuesDifferent',
   nonFieldType: 'button',
   getIcon: is3DInstance
-    ? // $FlowFixMe[missing-local-annot]
-      props => <Object3d {...props} />
+    ? props => <Object3d {...props} />
     : props => <Object2d {...props} />,
   getValue: (instance: gdInitialInstance) => instance.getObjectName(),
   onClick: (instance: gdInitialInstance) =>
@@ -79,7 +78,6 @@ const getRotationXAndRotationYFields = ({ i18n }: {| i18n: I18nType |}) => [
     getValue: (instance: gdInitialInstance) => instance.getRotationX(),
     setValue: (instance: gdInitialInstance, newValue: number) =>
       instance.setRotationX(newValue),
-    // $FlowFixMe[missing-local-annot]
     renderLeftIcon: className => <RotateX className={className} />,
   },
   {
@@ -89,7 +87,6 @@ const getRotationXAndRotationYFields = ({ i18n }: {| i18n: I18nType |}) => [
     getValue: (instance: gdInitialInstance) => instance.getRotationY(),
     setValue: (instance: gdInitialInstance, newValue: number) =>
       instance.setRotationY(newValue),
-    // $FlowFixMe[missing-local-annot]
     renderLeftIcon: className => <RotateY className={className} />,
   },
 ];
@@ -100,7 +97,6 @@ const getRotationZField = ({ i18n }: {| i18n: I18nType |}) => ({
   getValue: (instance: gdInitialInstance) => instance.getAngle(),
   setValue: (instance: gdInitialInstance, newValue: number) =>
     instance.setAngle(newValue),
-  // $FlowFixMe[missing-local-annot]
   renderLeftIcon: className => <RotateZ className={className} />,
 });
 const getXAndYFields = ({ i18n }: {| i18n: I18nType |}): Schema => [
@@ -130,7 +126,6 @@ const getZField = ({ i18n }: {| i18n: I18nType |}) => ({
   getValue: (instance: gdInitialInstance) => instance.getZ(),
   setValue: (instance: gdInitialInstance, newValue: number) =>
     instance.setZ(newValue),
-  // $FlowFixMe[missing-local-annot]
   renderLeftIcon: className => <LetterZ className={className} />,
 });
 const getLayerField = ({
@@ -147,7 +142,6 @@ const getLayerField = ({
   getValue: (instance: gdInitialInstance) => instance.getLayer(),
   setValue: (instance: gdInitialInstance, newValue: string) =>
     instance.setLayer(newValue),
-  // $FlowFixMe[missing-local-annot]
   renderLeftIcon: className => <Layers className={className} />,
 });
 const getZOrderField = ({ i18n }: {| i18n: I18nType |}) => ({
@@ -157,7 +151,6 @@ const getZOrderField = ({ i18n }: {| i18n: I18nType |}) => ({
   getValue: (instance: gdInitialInstance) => instance.getZOrder(),
   setValue: (instance: gdInitialInstance, newValue: number) =>
     instance.setZOrder(newValue),
-  // $FlowFixMe[missing-local-annot]
   renderLeftIcon: className => <LetterZ className={className} />,
 });
 
@@ -169,7 +162,6 @@ const getTitleRow = ({ i18n }: {| i18n: I18nType |}) => ({
     {
       name: 'Instance',
       title: i18n._(t`Instance`),
-      // $FlowFixMe[missing-local-annot]
       renderLeftIcon: className => (
         <Instance className={className} style={styles.icon} />
       ),
@@ -186,7 +178,6 @@ const getTitleRow = ({ i18n }: {| i18n: I18nType |}) => ({
           ? i18n._(t`Prevent selection in the editor`)
           : i18n._(t`Lock position/angle in the editor`),
       valueType: 'enumIcon',
-      // $FlowFixMe[missing-local-annot]
       renderIcon: value =>
         value === 'sealed' ? (
           <RemoveCircle style={styles.icon} />
@@ -195,7 +186,6 @@ const getTitleRow = ({ i18n }: {| i18n: I18nType |}) => ({
         ) : (
           <LockOpen style={styles.icon} />
         ),
-      // $FlowFixMe[missing-local-annot]
       isHighlighted: value => value === 'locked' || value === 'sealed',
       getValue: (instance: gdInitialInstance) =>
         instance.isSealed()
@@ -271,11 +261,9 @@ const getWidthField = ({
     instance.setHasCustomDepth(true);
     forceUpdate();
   },
-  // $FlowFixMe[missing-local-annot]
   renderLeftIcon: className => <LetterW className={className} />,
   getEndAdornmentIcon: (instance: gdInitialInstance) => {
     if (instance.hasCustomDepth() || instance.hasCustomSize()) {
-      // $FlowFixMe[missing-local-annot]
       return className => <Restore className={className} />;
     }
     return null;
@@ -334,11 +322,9 @@ const getHeightField = ({
     instance.setHasCustomDepth(true);
     forceUpdate();
   },
-  // $FlowFixMe[missing-local-annot]
   renderLeftIcon: className => <LetterH className={className} />,
   getEndAdornmentIcon: (instance: gdInitialInstance) => {
     if (instance.hasCustomDepth() || instance.hasCustomSize()) {
-      // $FlowFixMe[missing-local-annot]
       return className => <Restore className={className} />;
     }
     return null;
@@ -397,11 +383,9 @@ const getDepthField = ({
     instance.setHasCustomDepth(true);
     forceUpdate();
   },
-  // $FlowFixMe[missing-local-annot]
   renderLeftIcon: className => <LetterD className={className} />,
   getEndAdornmentIcon: (instance: gdInitialInstance) => {
     if (instance.hasCustomDepth() || instance.hasCustomSize()) {
-      // $FlowFixMe[missing-local-annot]
       return className => <Restore className={className} />;
     }
     return null;
@@ -428,9 +412,7 @@ const getKeepRatioField = ({
   name: 'Keep ratio',
   getLabel: () => i18n._(t`Keep ratio`),
   valueType: 'enumIcon',
-  // $FlowFixMe[missing-local-annot]
   isHighlighted: value => value,
-  // $FlowFixMe[missing-local-annot]
   renderIcon: value =>
     value ? <Link style={styles.icon} /> : <Unlink style={styles.icon} />,
   getValue: (instance: gdInitialInstance) => instance.shouldKeepRatio(),
@@ -452,7 +434,6 @@ const getOpacityField = ({ i18n }: {| i18n: I18nType |}) => ({
     const opacity = Math.max(0, Math.min(255, newOpacity));
     instance.setOpacity(opacity);
   },
-  // $FlowFixMe[missing-local-annot]
   renderLeftIcon: className => <Opacity className={className} />,
   getDisplayedValueFromValue: (value: string): string => {
     return `${value}%`;
@@ -474,7 +455,6 @@ const getFlippableButtons = ({
   buttons: [
     {
       name: 'Flip horizontal',
-      // $FlowFixMe[missing-local-annot]
       renderIcon: className => <FlipHorizontal className={className} />,
       tooltip: i18n._(t`Flip horizontally`),
       getValue: (instance: gdInitialInstance): boolean => instance.isFlippedX(),
@@ -484,7 +464,6 @@ const getFlippableButtons = ({
     {
       name: 'Flip vertical',
       tooltip: i18n._(t`Flip vertically`),
-      // $FlowFixMe[missing-local-annot]
       renderIcon: className => <FlipVertical className={className} />,
       getValue: (instance: gdInitialInstance): boolean => instance.isFlippedY(),
       setValue: (instance: gdInitialInstance, newValue: boolean) =>
@@ -494,7 +473,6 @@ const getFlippableButtons = ({
       ? {
           name: 'Flip Z',
           tooltip: i18n._(t` Flip along Z axis`),
-          // $FlowFixMe[missing-local-annot]
           renderIcon: className => <FlipZ className={className} />,
           getValue: (instance: gdInitialInstance): boolean =>
             instance.isFlippedZ(),
@@ -542,7 +520,6 @@ export const makeSchema = ({
       : onGetInstanceSize(instance)[2];
 
   if (is3DInstance) {
-    // $FlowFixMe[incompatible-type]
     return [
       getTitleRow({ i18n }),
       getEditObjectButton({ i18n, onEditObject, is3DInstance }),
@@ -631,7 +608,6 @@ export const makeSchema = ({
     ].filter(Boolean);
   }
 
-  // $FlowFixMe[incompatible-type]
   return [
     getTitleRow({ i18n }),
     getEditObjectButton({ i18n, onEditObject, is3DInstance }),
@@ -735,7 +711,6 @@ export const reorderInstanceSchemaForCustomProperties = (
   const [animationField] = newSchema.splice(animationFieldIndex, 1);
 
   const firstFields: Schema = [
-    // $FlowFixMe[incompatible-type]
     {
       name: 'Animation',
       type: 'row',

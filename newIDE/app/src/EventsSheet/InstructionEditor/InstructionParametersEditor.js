@@ -116,11 +116,10 @@ const isParameterVisible = (
   return true;
 };
 
-// $FlowFixMe[prop-missing]
-const InstructionParametersEditor: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<InstructionParametersEditorInterface> },
-  React.RefSetter<InstructionParametersEditorInterface>
-> = React.forwardRef<Props, InstructionParametersEditorInterface>(
+const InstructionParametersEditor = React.forwardRef<
+  Props,
+  InstructionParametersEditorInterface
+>(
   (
     {
       instruction,
@@ -431,7 +430,6 @@ const InstructionParametersEditor: React.AbstractComponent<
                     label={<Trans>Invert condition</Trans>}
                     labelPosition="right"
                     toggled={instruction.isInverted()}
-                    // $FlowFixMe[incompatible-type]
                     style={styles.invertToggle}
                     onToggle={(e, enabled) => {
                       instruction.setInverted(enabled);
@@ -449,7 +447,6 @@ const InstructionParametersEditor: React.AbstractComponent<
                     }
                     labelPosition="right"
                     toggled={instruction.isAwaited()}
-                    // $FlowFixMe[incompatible-type]
                     style={styles.invertToggle}
                     onToggle={(e, enabled) => {
                       instruction.setAwaited(enabled);

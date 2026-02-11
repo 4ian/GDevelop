@@ -63,7 +63,7 @@ const TeamMemberProjectsView = ({
   projects,
   onRefreshProjects,
   isLoadingProjects,
-}: Props): React.Node => {
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const skeletonLineHeight = getProjectLineHeight({ isMobile });
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
@@ -132,7 +132,7 @@ const TeamMemberProjectsView = ({
           <Column noMargin expand>
             {!fileMetadataAndStorageProviderNames ? (
               <List>
-                {new Array<number>(5).fill(0).map((_, index) => (
+                {new Array(5).fill(0).map((_, index) => (
                   <ListItem style={styles.listItem} key={`skeleton-${index}`}>
                     <Line expand>
                       <Column expand>

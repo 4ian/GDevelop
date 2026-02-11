@@ -19,7 +19,6 @@ const gd: libGDevelop = global.gd;
 
 const emptySearchText = '';
 
-// $FlowFixMe[underconstrained-implicit-instantiation]
 const noExcludedTiers = new Set();
 const excludedExperimentalTiers = new Set(['experimental']);
 
@@ -48,29 +47,27 @@ type BehaviorStoreState = {|
   filtersState: FiltersState,
 |};
 
-export const BehaviorStoreContext: React.Context<BehaviorStoreState> = React.createContext<BehaviorStoreState>(
-  {
-    filters: null,
-    searchResults: null,
-    fetchBehaviors: () => {},
-    error: null,
-    searchText: '',
-    setSearchText: () => {},
-    allCategories: [],
-    // '' means all categories.
-    chosenCategory: '',
+export const BehaviorStoreContext = React.createContext<BehaviorStoreState>({
+  filters: null,
+  searchResults: null,
+  fetchBehaviors: () => {},
+  error: null,
+  searchText: '',
+  setSearchText: () => {},
+  allCategories: [],
+  // '' means all categories.
+  chosenCategory: '',
+  setChosenCategory: () => {},
+  setInstalledBehaviorMetadataList: () => {},
+  translatedBehaviorShortHeadersByType: {},
+  filtersState: {
+    chosenFilters: new Set(),
+    addFilter: () => {},
+    removeFilter: () => {},
+    chosenCategory: null,
     setChosenCategory: () => {},
-    setInstalledBehaviorMetadataList: () => {},
-    translatedBehaviorShortHeadersByType: {},
-    filtersState: {
-      chosenFilters: new Set(),
-      addFilter: () => {},
-      removeFilter: () => {},
-      chosenCategory: null,
-      setChosenCategory: () => {},
-    },
-  }
-);
+  },
+});
 
 type BehaviorStoreStateProviderProps = {|
   children: React.Node,
@@ -82,7 +79,7 @@ export const BehaviorStoreStateProvider = ({
   children,
   i18n,
   defaultSearchText,
-}: BehaviorStoreStateProviderProps): React.MixedElement => {
+}: BehaviorStoreStateProviderProps) => {
   const [
     installedBehaviorMetadataList,
     setInstalledBehaviorMetadataList,
@@ -141,7 +138,6 @@ export const BehaviorStoreStateProvider = ({
               englishDescription: behaviorShortHeader.description,
             };
             translatedBehaviorShortHeadersByType[
-              // $FlowFixMe[prop-missing]
               behaviorShortHeader.type
             ] = translatedBehaviorShortHeader;
           });
@@ -282,7 +278,6 @@ export const BehaviorStoreStateProvider = ({
           : installedBehaviorMetadata;
         allTranslatedBehaviors[
           installedBehaviorMetadata.type
-          // $FlowFixMe[incompatible-type]
         ] = behaviorMetadata;
       }
       return allTranslatedBehaviors;
@@ -292,7 +287,6 @@ export const BehaviorStoreStateProvider = ({
 
   const allCategories = React.useMemo(
     () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const categoriesSet = new Set();
       for (const type in allTranslatedBehaviors) {
         categoriesSet.add(allTranslatedBehaviors[type].category);
@@ -307,7 +301,6 @@ export const BehaviorStoreStateProvider = ({
 
   const filters = React.useMemo(
     () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const tagsSet = new Set();
       for (const type in allTranslatedBehaviors) {
         const behavior = allTranslatedBehaviors[type];
@@ -327,7 +320,6 @@ export const BehaviorStoreStateProvider = ({
       return {
         allTags: sortedTags,
         defaultTags: sortedTags,
-        // $FlowFixMe[missing-empty-array-annot]
         tagsTree: [],
       };
     },
@@ -396,7 +388,6 @@ export const BehaviorStoreStateProvider = ({
   );
 
   return (
-    // $FlowFixMe[incompatible-type]
     <BehaviorStoreContext.Provider value={behaviorStoreState}>
       {children}
     </BehaviorStoreContext.Provider>

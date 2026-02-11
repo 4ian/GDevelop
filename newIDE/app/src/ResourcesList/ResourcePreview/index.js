@@ -18,7 +18,7 @@ type Props = {|
 /**
  * Display the right preview for any given resource of a project
  */
-const ResourcePreview = (props: Props): null | React.Node => {
+const ResourcePreview = (props: Props) => {
   const { project, resourceName } = props;
   const resourcesManager = project.getResourcesManager();
   const resourceKind = resourcesManager.hasResource(resourceName)
@@ -72,7 +72,6 @@ const ResourcePreview = (props: Props): null | React.Node => {
     case 'video':
       return <GenericIconPreview renderIcon={props => <Video {...props} />} />;
     case 'font':
-    // $FlowFixMe[invalid-compare]
     case 'bitmapFont':
       return (
         <GenericIconPreview renderIcon={props => <FontDownload {...props} />} />

@@ -24,14 +24,14 @@ export const isUsernameValid = (
   return !!username && /^[\w|-]+$/.test(username) && username.length < 31;
 };
 
-export const usernameFormatErrorMessage: React.Node = (
+export const usernameFormatErrorMessage = (
   <Trans>
     Please pick a short username with only alphanumeric characters as well as _
     and -
   </Trans>
 );
 
-export const usernameAvailabilityErrorMessage: React.Node = (
+export const usernameAvailabilityErrorMessage = (
   <Trans>This username is already used, please pick another one.</Trans>
 );
 
@@ -57,7 +57,7 @@ export const UsernameField = ({
   onAvailabilityCheckLoading,
   isValidatingUsername,
   disabled,
-}: Props): React.Node => {
+}: Props) => {
   const usernameFormattingError = isUsernameValid(value, {
     allowEmpty: !!allowEmpty,
   })
@@ -148,7 +148,6 @@ export const UsernameField = ({
       }
       endAdornment={
         isValidatingUsername && (
-          // $FlowFixMe[incompatible-type]
           <CircularProgress style={styles.circularProgress} />
         )
       }

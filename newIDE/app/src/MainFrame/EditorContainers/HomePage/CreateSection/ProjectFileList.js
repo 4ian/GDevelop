@@ -121,7 +121,6 @@ const ProjectFileList = ({
             profile,
           }
         );
-        // $FlowFixMe[incompatible-type]
         setLastModifiedInfoByProjectId(_lastModifiedInfoByProjectId);
       };
 
@@ -146,7 +145,6 @@ const ProjectFileList = ({
   );
 
   const onWillDeleteCloudProject = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     async (i18n, file: FileMetadataAndStorageProviderName) => {
       setLoadingProjectId(file.fileMetadata.fileIdentifier);
       try {
@@ -169,7 +167,6 @@ const ProjectFileList = ({
     ];
     if (file.storageProviderName === 'Cloud') {
       actions.push(
-        // $FlowFixMe[incompatible-type]
         { type: 'separator' },
         {
           label: i18n._(t`Delete`),
@@ -181,10 +178,8 @@ const ProjectFileList = ({
         ...[
           {
             label: i18n._(t`Show in local folder`),
-            // $FlowFixMe[incompatible-type]
             click: () => locateProjectFile(file),
           },
-          // $FlowFixMe[incompatible-type]
           { type: 'separator' },
           {
             label: i18n._(t`Remove from list`),
@@ -194,7 +189,6 @@ const ProjectFileList = ({
       );
     } else {
       actions.push(
-        // $FlowFixMe[incompatible-type]
         { type: 'separator' },
         {
           label: i18n._(t`Remove from list`),
@@ -203,7 +197,6 @@ const ProjectFileList = ({
       );
     }
 
-    // $FlowFixMe[incompatible-type]
     return actions;
   };
 
@@ -234,7 +227,7 @@ const ProjectFileList = ({
     <>
       {authenticatedUser.loginState === 'loggingIn' &&
       projectFiles.length === 0 ? ( // Only show skeleton on first load
-        new Array<number>(3).fill(0).map((_, index) => (
+        new Array(3).fill(0).map((_, index) => (
           <ListItem style={styles.listItem} key={`skeleton-${index}`}>
             <Line expand>
               <Column expand>
@@ -285,7 +278,6 @@ const ProjectFileList = ({
                   onOpenProject={onOpenProject}
                   lastModifiedInfo={
                     lastModifiedInfoByProjectId[
-                      // $FlowFixMe[invalid-computed-prop]
                       file.fileMetadata.fileIdentifier
                     ]
                   }
@@ -336,7 +328,7 @@ const ProjectFileList = ({
   );
 };
 
-const ProjectFileListWithErrorBoundary = (props: Props): React.Node => (
+const ProjectFileListWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Project file list</Trans>}
     scope="project-file-list"

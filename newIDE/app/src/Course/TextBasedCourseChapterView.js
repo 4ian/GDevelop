@@ -54,11 +54,7 @@ type Props = {|
   onClickUnlock: () => void,
 |};
 
-// $FlowFixMe[prop-missing]
-const TextBasedCourseChapterView: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<HTMLDivElement> },
-  React.RefSetter<HTMLDivElement>
-> = React.forwardRef<Props, HTMLDivElement>(
+const TextBasedCourseChapterView = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       chapterIndex,
@@ -97,7 +93,6 @@ const TextBasedCourseChapterView: React.AbstractComponent<
                 <ColumnStackLayout noMargin>
                   {courseChapter.templates.map(template => (
                     <Line noMargin alignItems="center" key={template.id}>
-                      {/* $FlowFixMe[invalid-computed-prop] */}
                       <Text noMargin>{rankLabel[chapterIndex + 1]}</Text>
                       &nbsp;
                       <Text noMargin>

@@ -30,7 +30,7 @@ const CashOutDialog = ({
   userEarningsBalance,
   onSuccess,
   type,
-}: Props): React.Node => {
+}: Props) => {
   const [isCashingOut, setIsCashingOut] = React.useState(false);
   const [isCashOutSuccesfull, setIsCashOutSuccessful] = React.useState(false);
   const { showAlert } = useAlertDialog();

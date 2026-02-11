@@ -21,9 +21,7 @@ const isDev = Window.isDev();
 const authenticationPortalUrl = 'https://auth.gdevelop.io';
 
 class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
-  // $FlowFixMe[value-as-type]
   auth: Auth;
-  // $FlowFixMe[value-as-type]
   constructor(auth: Auth) {
     this.auth = auth;
   }
@@ -34,7 +32,6 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
   }: {|
     email: string,
     password: string,
-    // $FlowFixMe[missing-local-annot]
   |}) {
     try {
       await signInWithEmailAndPassword(this.auth, email, password);
@@ -51,7 +48,7 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
   }: {|
     provider: IdentityProvider,
     signal?: AbortSignal,
-  |}): any {
+  |}) {
     if (signal && signal.aborted) {
       return Promise.reject(
         new UserCancellationError(

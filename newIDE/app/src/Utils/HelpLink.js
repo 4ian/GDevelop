@@ -1,10 +1,10 @@
 // @flow
 
-export const isRelativePathToDocumentationRoot = (path: string): boolean => {
+export const isRelativePathToDocumentationRoot = (path: string) => {
   return path.startsWith('/');
 };
 
-export const isDocumentationAbsoluteUrl = (path: string): boolean => {
+export const isDocumentationAbsoluteUrl = (path: string) => {
   return path.startsWith('http://') || path.startsWith('https://');
 };
 

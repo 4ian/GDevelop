@@ -38,21 +38,16 @@ const styles = {
   },
 };
 
-// $FlowFixMe[missing-local-annot]
 const stopPropagation = e => e.stopPropagation();
 
 /**
  * A text field, inspired from Material UI, but lightweight
  * and faster to render (2 DOM elements, uncontrolled, pure CSS styling).
  */
-// $FlowFixMe[prop-missing]
-export const SimpleTextField: React.AbstractComponent<
+export const SimpleTextField = React.memo<
   SimpleTextFieldProps,
   SimpleTextFieldInterface
-  // $FlowFixMe[incompatible-type]
-> = React.memo<SimpleTextFieldProps, SimpleTextFieldInterface>(
-  // $FlowFixMe[incompatible-type]
-  // $FlowFixMe[incompatible-exact]
+>(
   React.forwardRef<SimpleTextFieldProps, SimpleTextFieldInterface>(
     (props, ref) => {
       const inputRef = React.useRef<?HTMLInputElement>(null);

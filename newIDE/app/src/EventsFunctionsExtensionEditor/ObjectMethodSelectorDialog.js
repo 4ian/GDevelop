@@ -66,7 +66,7 @@ export default function ObjectMethodSelectorDialog({
   eventsBasedObject,
   onChoose,
   onCancel,
-}: Props): React.Node {
+}: Props) {
   const eventsFunctions = eventsBasedObject.getEventsFunctions();
   const [showAdvanced, setShowAdvanced] = React.useState(false);
 

@@ -71,7 +71,6 @@ type Props = {|
   loading?: boolean,
 |};
 
-// $FlowFixMe[missing-local-annot]
 const getTextStyle = disabled => (disabled ? { opacity: 0.4 } : undefined);
 
 const InAppTutorialPhaseCard = ({
@@ -87,7 +86,7 @@ const InAppTutorialPhaseCard = ({
   onClick,
   renderImage,
   loading,
-}: Props): React.Node => {
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const shouldTextBeDisabled = loading || disabled || locked;
   const { isMobile } = useResponsiveWindowSize();

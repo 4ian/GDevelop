@@ -14,7 +14,6 @@ export const submitQuestion = async (
   |}
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.post(
     `${GDevelopUserApi.baseUrl}/question`,
     {

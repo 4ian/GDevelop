@@ -38,7 +38,6 @@ const getList = (
     })),
   ];
 
-  // $FlowFixMe[incompatible-type]
   return externalEvents;
 };
 
@@ -63,7 +62,7 @@ export default class ExternalEventsAutoComplete extends React.Component<
     if (this._field) this._field.focus();
   }
 
-  render(): any {
+  render() {
     const {
       value,
       onChange,

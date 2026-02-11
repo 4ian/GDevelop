@@ -7,7 +7,7 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 
-export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function StringField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?GenericExpressionField>(null);
     const focus: FieldFocusFunction = options => {
@@ -30,8 +30,4 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-  // $FlowFixMe[prop-missing]
-): React.AbstractComponent<
-  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
-  React.RefSetter<ParameterFieldInterface>
->);
+);

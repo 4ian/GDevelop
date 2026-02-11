@@ -20,7 +20,7 @@ const NewVariantDialog = ({
   onApply,
   onCancel,
   isDuplicationBeforeEdition,
-}: Props): React.Node => {
+}: Props) => {
   const [variantName, setVariantName] = React.useState<string>(initialName);
 
   const apply = React.useCallback(

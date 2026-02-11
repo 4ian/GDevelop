@@ -14,7 +14,7 @@ export default {
   component: BehaviorMethodSelectorDialog,
 };
 
-export const Default = (): React.Node => (
+export const Default = () => (
   <I18n>
     {({ i18n }) => (
       <BehaviorMethodSelectorDialog

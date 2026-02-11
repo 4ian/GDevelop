@@ -14,7 +14,6 @@ export default class LocalEventsFunctionsExtensionOpener {
           extensions: ['json'],
         },
       ],
-      // $FlowFixMe[incompatible-type]
     }).then(filePaths => filePaths);
   };
 

@@ -10,7 +10,6 @@ const nodeIdSeparator = ';-/>'; // A seemingly random string to ensure no clashe
 const toNodeId = (nodes: Array<TagsTreeNode>) =>
   nodes.map(node => node.name).join(nodeIdSeparator);
 
-// $FlowFixMe[recursive-definition]
 const TagsTreeItems = ({
   tagsTreeNodes,
   onChoose,

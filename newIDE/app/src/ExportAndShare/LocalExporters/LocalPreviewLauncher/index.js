@@ -82,9 +82,8 @@ export default class LocalPreviewLauncher extends React.Component<
   PreviewLauncherProps,
   State
 > {
-  canDoNetworkPreview = (): any => true;
+  canDoNetworkPreview = () => true;
 
-  // $FlowFixMe[missing-local-annot]
   state = {
     networkPreviewDialogOpen: false,
     networkPreviewHost: null,
@@ -156,7 +155,6 @@ export default class LocalPreviewLauncher extends React.Component<
     options: PreviewOptions
   ): void => {
     this.setState(
-      // $FlowFixMe[incompatible-type]
       {
         previewBrowserWindowOptions: {
           width: project.getGameResolutionWidth(),
@@ -459,17 +457,17 @@ export default class LocalPreviewLauncher extends React.Component<
     );
   };
 
-  getPreviewDebuggerServer(): any {
+  getPreviewDebuggerServer() {
     return localPreviewDebuggerServer;
   }
 
-  _checkSubscriptionForNetworkPreview = (): any => {
+  _checkSubscriptionForNetworkPreview = () => {
     if (!this._networkPreviewSubscriptionChecker) return true;
 
     return this._networkPreviewSubscriptionChecker.checkUserHasSubscription();
   };
 
-  render(): any {
+  render() {
     const {
       networkPreviewDialogOpen,
       networkPreviewHost,

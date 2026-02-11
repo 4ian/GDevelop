@@ -11,7 +11,6 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import {
-  // $FlowFixMe[import-type-as-value]
   TreeViewItemContent,
   type TreeItemProps,
   externalEventsRootFolderId,
@@ -102,7 +101,7 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
     this.props.editName(this.getId());
   }
 
-  buildMenuTemplate(i18n: I18nType, index: number): any {
+  buildMenuTemplate(i18n: I18nType, index: number) {
     return [
       {
         label: i18n._(t`Rename`),
@@ -223,7 +222,7 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
     this.props.forceUpdate();
   }
 
-  getRightButton(i18n: I18nType): any {
+  getRightButton(i18n: I18nType) {
     return null;
   }
 }

@@ -9,9 +9,7 @@ import {
 
 const gd: libGDevelop = global.gd;
 
-// $FlowFixMe[incompatible-type]
-// $FlowFixMe[missing-local-annot]
-// $FlowFixMe[cannot-resolve-name]
+// $FlowExpectedError
 const makeFakeI18n = (fakeI18n): I18nType => ({
   ...fakeI18n,
   _: message => message.id,
@@ -77,7 +75,6 @@ describe('editorFunctions', () => {
     let testScene: gdLayout;
 
     beforeEach(() => {
-      // $FlowFixMe[invalid-constructor]
       project = new gd.ProjectHelper.createNewGDJSProject();
       testScene = project.insertNewLayout('TestScene', 0);
 
@@ -103,7 +100,6 @@ describe('editorFunctions', () => {
     });
 
     it('creates a new object (from the asset store)', async () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const onObjectsModifiedOutsideEditor = jest.fn();
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
@@ -129,7 +125,6 @@ describe('editorFunctions', () => {
     });
 
     it('creates a new object (from scratch if not found in the asset store)', async () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const onObjectsModifiedOutsideEditor = jest.fn();
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
@@ -167,7 +162,6 @@ describe('editorFunctions', () => {
     });
 
     it('returns success without creating when object already exists with same type', async () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const onObjectsModifiedOutsideEditor = jest.fn();
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
@@ -193,7 +187,6 @@ describe('editorFunctions', () => {
     });
 
     it('returns success when duplicating an existing object (same scene)', async () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const onObjectsModifiedOutsideEditor = jest.fn();
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
@@ -222,7 +215,6 @@ describe('editorFunctions', () => {
     });
 
     it('returns success when duplicating an existing object (and making it global)', async () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const onObjectsModifiedOutsideEditor = jest.fn();
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
@@ -252,7 +244,6 @@ describe('editorFunctions', () => {
     });
 
     it('returns success when duplicating an existing object (from another scene)', async () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const onObjectsModifiedOutsideEditor = jest.fn();
       const otherScene = project.insertNewLayout('OtherScene', 1);
       const otherSceneObjects = otherScene.getObjects();
@@ -347,7 +338,6 @@ describe('editorFunctions', () => {
     });
 
     it('returns success when replacing an existing object', async () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const onObjectsModifiedOutsideEditor = jest.fn();
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
@@ -383,7 +373,6 @@ describe('editorFunctions', () => {
     });
 
     it('returns success when moving an existing object to the global objects', async () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const onObjectsModifiedOutsideEditor = jest.fn();
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
@@ -457,7 +446,6 @@ describe('editorFunctions', () => {
     });
 
     it('fails when moving an existing global object to a scene', async () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const onObjectsModifiedOutsideEditor = jest.fn();
 
       const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
@@ -510,7 +498,6 @@ describe('editorFunctions', () => {
     let testScene: gdLayout;
 
     beforeEach(() => {
-      // $FlowFixMe[invalid-constructor]
       project = new gd.ProjectHelper.createNewGDJSProject();
       testScene = project.insertNewLayout('TestScene', 0);
 
@@ -646,7 +633,6 @@ describe('editorFunctions', () => {
     let testScene: gdLayout;
 
     beforeEach(() => {
-      // $FlowFixMe[invalid-constructor]
       project = new gd.ProjectHelper.createNewGDJSProject();
       testScene = project.insertNewLayout('TestScene', 0);
 
@@ -767,7 +753,6 @@ describe('editorFunctions', () => {
     let testScene: gdLayout;
 
     beforeEach(() => {
-      // $FlowFixMe[invalid-constructor]
       project = new gd.ProjectHelper.createNewGDJSProject();
       testScene = project.insertNewLayout('TestScene', 0);
 
@@ -870,7 +855,6 @@ describe('editorFunctions', () => {
     let testScene: gdLayout;
 
     beforeEach(() => {
-      // $FlowFixMe[invalid-constructor]
       project = new gd.ProjectHelper.createNewGDJSProject();
       testScene = project.insertNewLayout('TestScene', 0);
     });
@@ -880,9 +864,7 @@ describe('editorFunctions', () => {
     });
 
     it('adds events to a scene and installs missing resources', async () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const onSceneEventsModifiedOutsideEditor = jest.fn();
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const searchAndInstallResources = jest.fn().mockResolvedValue({
         results: [
           {
@@ -897,7 +879,6 @@ describe('editorFunctions', () => {
           },
         ],
       });
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const ensureExtensionInstalled = jest.fn().mockResolvedValue(undefined);
 
       const result = await editorFunctions.add_scene_events.launchFunction({
@@ -909,7 +890,6 @@ describe('editorFunctions', () => {
           extension_names_list: '',
           objects_list: 'Player',
         },
-        // $FlowFixMe[underconstrained-implicit-instantiation]
         generateEvents: jest.fn().mockResolvedValue({
           generationCompleted: true,
           aiGeneratedEvent: {

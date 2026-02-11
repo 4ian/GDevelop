@@ -107,7 +107,7 @@ const EducationCurriculumLesson = ({
   onOpenTemplateFromTutorial,
   isLocked,
   onClickSubscribe,
-}: Props): React.MixedElement => {
+}: Props) => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const [isImageLoaded, setIsImageLoaded] = React.useState<boolean>(false);
   const isLessonLocked =
@@ -126,7 +126,6 @@ const EducationCurriculumLesson = ({
 
   const title = (
     <LineStackLayout noMargin alignItems="center">
-      {/* $FlowFixMe[invalid-computed-prop] */}
       <Chip size="small" color="secondary" label={rankLabel[index + 1]} />
       <Text size="block-title" noMargin>
         {selectMessageByLocale(i18n, tutorial.titleByLocale)}

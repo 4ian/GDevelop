@@ -125,7 +125,7 @@ export const AssetCardTile = ({
   margin?: number,
   hideShortDescription?: boolean,
   disabled?: boolean,
-|}): React.Node => {
+|}) => {
   return (
     <GridListTile style={{ margin }}>
       <CardWidget
@@ -156,7 +156,7 @@ export const AssetFolderTile = ({
   /** Props needed so that GridList component can adjust tile size */
   style?: any,
   disabled?: boolean,
-|}): React.Node => {
+|}) => {
   return (
     <GridListTile style={style}>
       <CardWidget
@@ -193,7 +193,7 @@ export const PublicAssetPackTile = ({
   /** Props needed so that GridList component can adjust tile size */
   style?: any,
   disabled?: boolean,
-|}): React.Node => {
+|}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <GridListTile style={style}>
@@ -253,7 +253,7 @@ export const PrivateAssetPackTile = ({
   owned: boolean,
   disabled?: boolean,
   discountedPrice?: boolean,
-|}): React.Node => {
+|}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <GridListTile style={style}>
@@ -329,7 +329,7 @@ export const PromoBundleCard = ({
     | BundleListingData,
   onSelect: () => void,
   owned: boolean,
-|}): React.Node => {
+|}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <I18n>
@@ -428,7 +428,7 @@ export const CategoryTile = ({
   /** Props needed so that GridList component can adjust tile size */
   style?: any,
   disabled?: boolean,
-|}): React.Node => {
+|}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <GridListTile style={style}>
@@ -476,7 +476,7 @@ export const PrivateGameTemplateTile = ({
   owned: boolean,
   disabled?: boolean,
   discountedPrice?: boolean,
-|}): React.Node => {
+|}) => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
@@ -537,7 +537,7 @@ export const CourseTile = ({
   owned: boolean,
   disabled?: boolean,
   discountedPrice?: boolean,
-|}): React.Node => {
+|}) => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
@@ -596,7 +596,7 @@ export const BundleTile = ({
   owned: boolean,
   disabled?: boolean,
   discountedPrice?: boolean,
-|}): React.Node => {
+|}) => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
@@ -675,7 +675,7 @@ export const ExampleTile = ({
   centerTitle?: boolean,
   useQuickCustomizationThumbnail?: boolean,
   disabled?: boolean,
-|}): React.Node => {
+|}) => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const thumbnailImgUrl = React.useMemo(

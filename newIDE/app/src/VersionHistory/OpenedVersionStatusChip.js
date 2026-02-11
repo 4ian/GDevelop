@@ -50,7 +50,7 @@ const OpenedVersionStatusChip = ({
   openedVersionStatus,
   onQuit,
   disableQuitting,
-}: Props): null | React.Node => {
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const classes = useStylesCloseIconButton();
   if (!openedVersionStatus) return null;

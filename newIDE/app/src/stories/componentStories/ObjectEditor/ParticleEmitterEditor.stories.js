@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => (
+export const Default = () => (
   <SerializedObjectDisplay object={testProject.particleEmitterConfiguration}>
     <ParticleEmitterEditor
       objectConfiguration={testProject.particleEmitterConfiguration}

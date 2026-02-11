@@ -3,7 +3,6 @@ import { containsSubInstructions } from './ContainsSubInstruction';
 const gd: libGDevelop = global.gd;
 
 describe('ContainsSubInstructions', () => {
-  // $FlowFixMe[missing-local-annot]
   const insertInstruction = (list, type) => {
     const instruction = new gd.Instruction();
     instruction.setType(type);

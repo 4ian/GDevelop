@@ -53,9 +53,7 @@ export const downloadResourcesAsBlobs = async ({
   resourceNames,
   onAddBlobFile,
   onProgress,
-}: DownloadResourcesAsBlobsOptions): Promise<{
-  erroredResources: Array<empty>,
-}> => {
+}: DownloadResourcesAsBlobsOptions) => {
   const result = {
     erroredResources: [],
   };
@@ -87,7 +85,6 @@ export const downloadResourcesAsBlobs = async ({
 
   const downloadedBlobsAndResources: Array<
     ItemResult<ResourceToFetch>
-    // $FlowFixMe[incompatible-type]
   > = await downloadUrlsToBlobs({
     urlContainers: resourcesToFetchAndUpload,
     onProgress: (count, total) => {
@@ -98,7 +95,6 @@ export const downloadResourcesAsBlobs = async ({
   downloadedBlobsAndResources.forEach(({ item, error, blob }) => {
     const { resource } = item;
     if (error || !blob) {
-      // $FlowFixMe[incompatible-type]
       result.erroredResources.push({
         resourceName: resource.getName(),
         error: error || new Error('Unknown error during download.'),
@@ -221,11 +217,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const ObjectExporterDialog = ({
-  project,
-  layout: scene,
-  onClose,
-}: Props): React.Node => {
+const ObjectExporterDialog = ({ project, layout: scene, onClose }: Props) => {
   const [
     zippedSceneAssetsBlob,
     setZippedSceneAssetsBlob,
@@ -237,7 +229,6 @@ const ObjectExporterDialog = ({
     {
       onDoProcess: React.useCallback(
         (options, onProgress) =>
-          // $FlowFixMe[incompatible-type]
           downloadResourcesAsBlobs({ ...options, onProgress }),
         []
       ),

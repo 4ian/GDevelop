@@ -10,7 +10,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const WithSingleExtensionError = (): React.Node => {
+export const WithSingleExtensionError = () => {
   const erroredExtensionLoadingResults = [
     {
       extensionModulePath: 'Physics2Behavior/Physics2Tools.js',
@@ -24,7 +24,6 @@ export const WithSingleExtensionError = (): React.Node => {
 
   return (
     <ExtensionLoadErrorDialog
-      // $FlowFixMe[incompatible-type]
       erroredExtensionLoadingResults={erroredExtensionLoadingResults}
       genericError={null}
       onClose={action('On close')}
@@ -32,7 +31,7 @@ export const WithSingleExtensionError = (): React.Node => {
   );
 };
 
-export const WithMultipleExtensionErrors = (): React.Node => {
+export const WithMultipleExtensionErrors = () => {
   const erroredExtensionLoadingResults = [
     {
       extensionModulePath: 'Physics2Behavior/Physics2Tools.js',
@@ -62,7 +61,6 @@ export const WithMultipleExtensionErrors = (): React.Node => {
 
   return (
     <ExtensionLoadErrorDialog
-      // $FlowFixMe[incompatible-type]
       erroredExtensionLoadingResults={erroredExtensionLoadingResults}
       genericError={null}
       onClose={action('On close')}
@@ -70,8 +68,7 @@ export const WithMultipleExtensionErrors = (): React.Node => {
   );
 };
 
-export const WithGenericError = (): React.Node => {
-  // $FlowFixMe[missing-empty-array-annot]
+export const WithGenericError = () => {
   const erroredExtensionLoadingResults = [];
   const genericError = new Error(
     'Some extension modules could not be loaded. Please check the console for more details.'
@@ -79,7 +76,6 @@ export const WithGenericError = (): React.Node => {
 
   return (
     <ExtensionLoadErrorDialog
-      // $FlowFixMe[incompatible-type]
       erroredExtensionLoadingResults={erroredExtensionLoadingResults}
       genericError={genericError}
       onClose={action('On close')}
@@ -87,7 +83,7 @@ export const WithGenericError = (): React.Node => {
   );
 };
 
-export const WithBothExtensionAndGenericErrors = (): React.Node => {
+export const WithBothExtensionAndGenericErrors = () => {
   const erroredExtensionLoadingResults = [
     {
       extensionModulePath: 'Physics2Behavior/Physics2Tools.js',
@@ -104,7 +100,6 @@ export const WithBothExtensionAndGenericErrors = (): React.Node => {
 
   return (
     <ExtensionLoadErrorDialog
-      // $FlowFixMe[incompatible-type]
       erroredExtensionLoadingResults={erroredExtensionLoadingResults}
       genericError={genericError}
       onClose={action('On close')}

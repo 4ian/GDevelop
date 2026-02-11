@@ -17,7 +17,6 @@ import { EXTENSIONS_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 
 const emptySearchText = '';
 
-// $FlowFixMe[underconstrained-implicit-instantiation]
 const noExcludedTiers = new Set();
 const excludedExperimentalTiers = new Set(['experimental']);
 
@@ -38,29 +37,27 @@ type ExtensionStoreState = {|
   hasExtensionNamed: (extensionName: string) => boolean,
 |};
 
-export const ExtensionStoreContext: React.Context<ExtensionStoreState> = React.createContext<ExtensionStoreState>(
-  {
-    filters: null,
-    searchResults: null,
-    fetchExtensionsAndFilters: () => {},
-    error: null,
-    searchText: '',
-    setSearchText: () => {},
-    allCategories: [],
-    // '' means all categories.
-    chosenCategory: '',
+export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
+  filters: null,
+  searchResults: null,
+  fetchExtensionsAndFilters: () => {},
+  error: null,
+  searchText: '',
+  setSearchText: () => {},
+  allCategories: [],
+  // '' means all categories.
+  chosenCategory: '',
+  setChosenCategory: () => {},
+  translatedExtensionShortHeadersByName: {},
+  filtersState: {
+    chosenFilters: new Set(),
+    addFilter: () => {},
+    removeFilter: () => {},
+    chosenCategory: null,
     setChosenCategory: () => {},
-    translatedExtensionShortHeadersByName: {},
-    filtersState: {
-      chosenFilters: new Set(),
-      addFilter: () => {},
-      removeFilter: () => {},
-      chosenCategory: null,
-      setChosenCategory: () => {},
-    },
-    hasExtensionNamed: () => false,
-  }
-);
+  },
+  hasExtensionNamed: () => false,
+});
 
 type ExtensionStoreStateProviderProps = {|
   children: React.Node,
@@ -72,7 +69,7 @@ export const ExtensionStoreStateProvider = ({
   children,
   i18n,
   defaultSearchText,
-}: ExtensionStoreStateProviderProps): React.MixedElement => {
+}: ExtensionStoreStateProviderProps) => {
   const [
     translatedExtensionShortHeadersByName,
     setTranslatedExtensionShortHeadersByName,
@@ -124,7 +121,6 @@ export const ExtensionStoreStateProvider = ({
               shortDescription: i18n._(extensionShortHeader.shortDescription),
             };
             translatedExtensionShortHeadersByName[
-              // $FlowFixMe[prop-missing]
               extensionShortHeader.name
             ] = translatedExtensionShortHeader;
           });
@@ -187,7 +183,6 @@ export const ExtensionStoreStateProvider = ({
 
   const allCategories = React.useMemo(
     () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const categoriesSet = new Set();
       for (const name in translatedExtensionShortHeadersByName) {
         categoriesSet.add(translatedExtensionShortHeadersByName[name].category);
@@ -202,7 +197,6 @@ export const ExtensionStoreStateProvider = ({
 
   const filters = React.useMemo(
     () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const tagsSet = new Set();
       for (const name in translatedExtensionShortHeadersByName) {
         translatedExtensionShortHeadersByName[name].tags.forEach(tag =>
@@ -215,7 +209,6 @@ export const ExtensionStoreStateProvider = ({
       return {
         allTags: sortedTags,
         defaultTags: sortedTags,
-        // $FlowFixMe[missing-empty-array-annot]
         tagsTree: [],
       };
     },
@@ -273,7 +266,6 @@ export const ExtensionStoreStateProvider = ({
   );
 
   return (
-    // $FlowFixMe[incompatible-type]
     <ExtensionStoreContext.Provider value={extensionStoreState}>
       {children}
     </ExtensionStoreContext.Provider>

@@ -19,7 +19,7 @@ type Props = {|
   onOpenSceneVariables: () => void,
 |};
 
-const ToolbarCommands = (props: Props): null => {
+const ToolbarCommands = (props: Props) => {
   useCommand('OPEN_OBJECTS_PANEL', true, {
     handler: props.toggleObjectsList,
   });

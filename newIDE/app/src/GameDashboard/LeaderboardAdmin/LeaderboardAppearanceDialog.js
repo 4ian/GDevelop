@@ -57,9 +57,7 @@ const getIdentifierFromUnits = (units: {|
   let identifier = '';
   for (let index = biggestUnitIndex; index <= smallestUnitIndex; index++) {
     const unit = orderedTimeUnits[index];
-    // $FlowFixMe[invalid-computed-prop]
     identifier += `${unitToAbbreviation[unit]}${
-      // $FlowFixMe[invalid-computed-prop]
       index === smallestUnitIndex ? '' : unitToNextSeparator[unit]
     }`;
   }
@@ -77,8 +75,6 @@ const unitSelectOptions = orderedTimeUnits.reduce(
         biggestUnit: orderedTimeUnits[currentUnitIndex],
         smallestUnit: orderedTimeUnits[otherUnitIndex],
       };
-      // $FlowFixMe[prop-missing]
-      // $FlowFixMe[incompatible-type]
       acc[getIdentifierFromUnits(selectedUnits)] = selectedUnits;
     }
     return acc;
@@ -104,7 +100,7 @@ function LeaderboardAppearanceDialog({
   onClose,
   onSave,
   leaderboardCustomizationSettings,
-}: Props): React.Node {
+}: Props) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { canUseTheme, canUseCustomCss } = canUserCustomizeLeaderboardTheme(
@@ -228,8 +224,7 @@ function LeaderboardAppearanceDialog({
               suffix,
               precision,
             }
-          : // $FlowFixMe[invalid-computed-prop]
-            { type: scoreType, ...unitSelectOptions[timeUnits] },
+          : { type: scoreType, ...unitSelectOptions[timeUnits] },
       theme: canUseTheme
         ? {
             backgroundColor: rgbStringToHexString(backgroundColor),
@@ -599,7 +594,6 @@ function LeaderboardAppearanceDialog({
                   scoreType === 'time'
                     ? {
                         type: scoreType,
-                        // $FlowFixMe[invalid-computed-prop]
                         ...unitSelectOptions[timeUnits],
                       }
                     : {

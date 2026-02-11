@@ -26,7 +26,7 @@ const CompactSemiControlledTextField = ({
   errorText,
   commitOnBlur,
   ...otherProps
-}: Props): React.MixedElement => {
+}: Props) => {
   const [focused, setFocused] = React.useState<boolean>(false);
   const [text, setText] = React.useState<string>('');
 

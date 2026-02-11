@@ -14,7 +14,7 @@ export default {
   component: EventsBasedBehaviorOrObjectEditor,
 };
 
-export const Default = (): React.Node => (
+export const Default = () => (
   <DragAndDropContextProvider>
     <EventsBasedBehaviorOrObjectEditor
       project={testProject.project}
@@ -37,7 +37,7 @@ export const Default = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const WithoutFunction = (): React.Node => (
+export const WithoutFunction = () => (
   <DragAndDropContextProvider>
     <EventsBasedBehaviorOrObjectEditor
       project={testProject.project}

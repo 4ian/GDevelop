@@ -42,7 +42,7 @@ export const EventsFunctionsExtensionsProvider = ({
   makeEventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener,
-}: Props): React.Node => {
+}: Props) => {
   const [
     eventsFunctionsExtensionsError,
     setEventsFunctionsExtensionsError,

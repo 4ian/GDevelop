@@ -90,35 +90,35 @@ export default class KeyboardShortcuts {
     this._shortcutCallbacks[key] = callback;
   }
 
-  shouldCloneInstances(): any {
+  shouldCloneInstances() {
     return this._isControlOrCmdPressed();
   }
 
-  shouldMultiSelect(): any {
+  shouldMultiSelect() {
     return this._shiftPressed;
   }
 
-  shouldFollowAxis(): any {
+  shouldFollowAxis() {
     return this._shiftPressed;
   }
 
-  shouldStartRectangleSelectionInsteadOfSelecting(): any {
+  shouldStartRectangleSelectionInsteadOfSelecting() {
     return this._shiftPressed;
   }
 
-  shouldNotSnapToGrid(): any {
+  shouldNotSnapToGrid() {
     return this._altPressed;
   }
 
-  shouldResizeProportionally(): any {
+  shouldResizeProportionally() {
     return this._shiftPressed;
   }
 
-  shouldScrollHorizontally(): any {
+  shouldScrollHorizontally() {
     return this._altPressed;
   }
 
-  shouldMoveView(): any {
+  shouldMoveView() {
     return this._spacePressed || this._mouseMidButtonPressed;
   }
 
@@ -148,7 +148,7 @@ export default class KeyboardShortcuts {
     }
   }
 
-  shouldZoom(evt: WheelEvent): any {
+  shouldZoom(evt: WheelEvent) {
     // Browsers trigger a wheel event with ctrlKey or metaKey to true when the user
     // does a pinch gesture on a trackpad. If this is the case, we zoom.
     // see https://dev.to/danburzo/pinch-me-i-m-zooming-gestures-in-the-dom-a0e
@@ -164,7 +164,7 @@ export default class KeyboardShortcuts {
     }
   }
 
-  shouldIgnoreDoubleClick(): any {
+  shouldIgnoreDoubleClick() {
     return (
       this._metaPressed ||
       this._altPressed ||
@@ -182,7 +182,7 @@ export default class KeyboardShortcuts {
     this._setSpacePressed(false);
   };
 
-  _updateModifiersFromEvent = (evt: KeyboardEvent | DragEvent): any => {
+  _updateModifiersFromEvent = (evt: KeyboardEvent | DragEvent) => {
     const hasModifierChanged =
       this._metaPressed !== evt.metaKey ||
       this._altPressed !== evt.altKey ||
@@ -209,7 +209,7 @@ export default class KeyboardShortcuts {
     }
   };
 
-  _isControlOrCmdPressed = (): any => {
+  _isControlOrCmdPressed = () => {
     // On macOS, meta key (Apple/Command key) acts as Control key on Windows/Linux.
     return this._metaPressed || this._ctrlPressed;
   };
@@ -243,8 +243,7 @@ export default class KeyboardShortcuts {
     if (this._isActive && !this._isActive()) return;
 
     const textEditorSelectors = 'textarea, input, [contenteditable="true"]';
-    // $FlowFixMe[incompatible-type]
-    // $FlowFixMe[prop-missing]
+    // $FlowFixMe
     if (evt.target && evt.target.closest(textEditorSelectors)) {
       return; // Something else is currently being edited.
     }

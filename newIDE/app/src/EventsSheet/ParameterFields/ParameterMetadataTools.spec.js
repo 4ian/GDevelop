@@ -28,7 +28,6 @@ describe('getLastObjectParameterValue', () => {
     instruction.setParameter(1, 'MyObject');
     instruction.setParameter(2, 'MyBehavior');
 
-    // $FlowFixMe[missing-local-annot]
     const getValueForParameter = parameterIndex =>
       getLastObjectParameterValue({
         instructionMetadata,
@@ -69,7 +68,6 @@ describe('getLastObjectParameterValue', () => {
     instruction.setParameter(5, 'MyOtherBehavior');
     instruction.setParameter(6, 'MyOtherVariable');
 
-    // $FlowFixMe[missing-local-annot]
     const getValueForParameter = parameterIndex =>
       getLastObjectParameterValue({
         instructionMetadata,

@@ -27,7 +27,7 @@ const CreateProfile = ({
   onOpenLoginDialog,
   onOpenCreateAccountDialog,
   justifyContent,
-}: Props): React.Node => (
+}: Props) => (
   <Column alignItems="center">
     <div style={styles.container}>
       <ColumnStackLayout>

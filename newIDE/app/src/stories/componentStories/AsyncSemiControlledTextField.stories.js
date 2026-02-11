@@ -20,11 +20,10 @@ export const Default = (args: {|
   endAdornment?: React.Node,
   helperMarkdownText?: string,
   required?: boolean,
-|}): React.Node => {
+|}) => {
   const [value, setValue] = React.useState('Hello world');
   const [isEditing, setIsEditing] = React.useState<boolean>(false);
 
-  // $FlowFixMe[missing-local-annot]
   const onValidateValue = React.useCallback(async newValue => {
     await delay(1000);
     if (Math.random() < 0.15) {
@@ -66,11 +65,10 @@ export const NoMargin = (args: {|
   endAdornment?: React.Node,
   helperMarkdownText?: string,
   required?: boolean,
-|}): React.Node => {
+|}) => {
   const [value, setValue] = React.useState('Hello world');
   const [isEditing, setIsEditing] = React.useState<boolean>(false);
 
-  // $FlowFixMe[missing-local-annot]
   const onValidateValue = React.useCallback(async newValue => {
     await delay(1000);
     if (Math.random() < 0.15) {

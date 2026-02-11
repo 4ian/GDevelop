@@ -55,31 +55,29 @@ type ResourceStoreState = {|
   |},
 |};
 
-export const ResourceStoreContext: React.Context<ResourceStoreState> = React.createContext<ResourceStoreState>(
-  {
-    filters: null,
-    authors: null,
-    licenses: null,
-    searchResults: null,
-    fetchResourcesAndFilters: () => {},
-    error: null,
-    searchText: '',
-    setSearchText: () => {},
-    clearAllFilters: () => {},
-    setSearchResourceKind: () => {},
-    getAuthorsDisplayLinks: () => null,
-    audioFiltersState: {
-      durationFilter: new DurationResourceStoreSearchFilter(),
-      setDurationFilter: DurationResourceStoreSearchFilter => {},
-      audioTypeFilter: new AudioTypeResourceStoreSearchFilter(),
-      setAudioTypeFilter: AudioTypeResourceStoreSearchFilter => {},
-    },
-    fontFiltersState: {
-      alphabetSupportFilter: new AlphabetSupportResourceStoreSearchFilter(),
-      setAlphabetSupportFilter: () => {},
-    },
-  }
-);
+export const ResourceStoreContext = React.createContext<ResourceStoreState>({
+  filters: null,
+  authors: null,
+  licenses: null,
+  searchResults: null,
+  fetchResourcesAndFilters: () => {},
+  error: null,
+  searchText: '',
+  setSearchText: () => {},
+  clearAllFilters: () => {},
+  setSearchResourceKind: () => {},
+  getAuthorsDisplayLinks: () => null,
+  audioFiltersState: {
+    durationFilter: new DurationResourceStoreSearchFilter(),
+    setDurationFilter: DurationResourceStoreSearchFilter => {},
+    audioTypeFilter: new AudioTypeResourceStoreSearchFilter(),
+    setAudioTypeFilter: AudioTypeResourceStoreSearchFilter => {},
+  },
+  fontFiltersState: {
+    alphabetSupportFilter: new AlphabetSupportResourceStoreSearchFilter(),
+    setAlphabetSupportFilter: () => {},
+  },
+});
 
 type ResourceStoreStateProviderProps = {|
   children: React.Node,
@@ -91,7 +89,7 @@ const getResourceSearchTerms = (resource: ResourceV2 | Resource) => {
 
 export const ResourceStoreStateProvider = ({
   children,
-}: ResourceStoreStateProviderProps): React.MixedElement => {
+}: ResourceStoreStateProviderProps) => {
   const [svgResourcesByUrl, setSvgResourcesByUrl] = React.useState<?{
     [string]: Resource,
   }>(null);
@@ -190,22 +188,18 @@ export const ResourceStoreStateProvider = ({
           const audioResourcesByUrl = {};
           resources.forEach(resource => {
             if (resource.type === 'font') {
-              // $FlowFixMe[prop-missing]
               fontResourcesByUrl[resource.url] = resource;
             } else if (resource.type === 'audio') {
-              // $FlowFixMe[prop-missing]
               audioResourcesByUrl[resource.url] = resource;
             }
           });
           oldResources.forEach(resource => {
             if (resource.type === 'svg') {
-              // $FlowFixMe[prop-missing]
               svgResourcesByUrl[resource.url] = resource;
             }
           });
           const authorsByAuthorName = {};
           authors.forEach(author => {
-            // $FlowFixMe[prop-missing]
             authorsByAuthorName[author.name] = author;
           });
 
@@ -346,7 +340,6 @@ export const ResourceStoreStateProvider = ({
   );
 
   return (
-    // $FlowFixMe[incompatible-type]
     <ResourceStoreContext.Provider value={resourceStoreState}>
       {children}
     </ResourceStoreContext.Provider>

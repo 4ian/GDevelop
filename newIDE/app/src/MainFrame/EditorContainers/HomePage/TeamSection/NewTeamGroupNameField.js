@@ -10,10 +10,7 @@ type Props = {|
   onDismiss: () => void,
 |};
 
-const NewTeamGroupNameField = ({
-  onValidateGroupName,
-  onDismiss,
-}: Props): React.Node => {
+const NewTeamGroupNameField = ({ onValidateGroupName, onDismiss }: Props) => {
   return (
     <Line noMargin>
       <AsyncSemiControlledTextField

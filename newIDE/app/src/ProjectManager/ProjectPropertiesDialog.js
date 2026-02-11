@@ -334,7 +334,6 @@ const ProjectPropertiesDialog = (props: Props) => {
     const specialPropertiesChanged =
       name !== initialProperties.name ? { newName: name } : {};
 
-    // $FlowFixMe[incompatible-type]
     const proceed = await props.onApply(specialPropertiesChanged);
     if (!proceed) return;
 
@@ -372,7 +371,6 @@ const ProjectPropertiesDialog = (props: Props) => {
     );
 
     if (wasProjectPropertiesApplied) {
-      // $FlowFixMe[incompatible-type]
       props.onPropertiesApplied(specialPropertiesChanged);
     }
   };
@@ -930,7 +928,7 @@ const ProjectPropertiesDialog = (props: Props) => {
   );
 };
 
-const ProjectPropertiesDialogWithErrorBoundary = (props: Props): React.Node => (
+const ProjectPropertiesDialogWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Project properties</Trans>}
     scope="project-properties"

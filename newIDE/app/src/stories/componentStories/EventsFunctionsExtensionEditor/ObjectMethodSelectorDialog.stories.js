@@ -14,7 +14,7 @@ export default {
   component: ObjectMethodSelectorDialog,
 };
 
-export const Default = (): React.Node => (
+export const Default = () => (
   <I18n>
     {({ i18n }) => (
       <ObjectMethodSelectorDialog

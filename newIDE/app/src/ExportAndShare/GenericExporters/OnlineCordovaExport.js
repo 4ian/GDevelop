@@ -26,7 +26,7 @@ export const SetupExportHeader = ({
   updateExportState,
   isExporting,
   build,
-}: HeaderProps<ExportState>): null | React.Node => {
+}: HeaderProps<ExportState>) => {
   // Build is finished, hide options.
   if (!!build && build.status === 'complete') return null;
 
@@ -178,7 +178,7 @@ export const ExportFlow = ({
   stepMaxProgress,
   stepCurrentProgress,
   errored,
-}: OnlineCordovaExportFlowProps): React.Node => {
+}: OnlineCordovaExportFlowProps) => {
   const isExportingOrbuildRunningOrFinished =
     isExporting || (!!build && build.status !== 'error');
 
@@ -213,7 +213,7 @@ export const ExportFlow = ({
 
 export const onlineCordovaExporter = {
   key: 'onlinecordovaexport',
-  tabName: (<Trans>Mobile</Trans>: React.Node),
-  name: (<Trans>Android</Trans>: React.Node),
+  tabName: <Trans>Mobile</Trans>,
+  name: <Trans>Android</Trans>,
   helpPage: '/publishing/android',
 };

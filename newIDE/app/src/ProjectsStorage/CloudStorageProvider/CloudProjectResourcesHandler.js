@@ -21,10 +21,7 @@ export const generateGetResourceActions = ({
   authenticatedUser,
 }: {
   authenticatedUser: AuthenticatedUser,
-}): (ResourcesActionsProps => Array<{
-  click: () => Promise<void>,
-  label: any,
-}>) => ({
+}) => ({
   project,
   resource,
   i18n,

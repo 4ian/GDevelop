@@ -8,7 +8,6 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
       en: 'Top 5 best feedback givers',
     },
     topUserCommentQualityRatings: [
-      // $FlowFixMe[incompatible-type]
       {
         userId: 'FbKIILxuBlgSp8wMb3jwgJQ6guA2',
         count: 1,
@@ -37,7 +36,6 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
             'https://www.gravatar.com/avatar/2491459e79fcb1982c1e5a900a2165d7?s=40&d=retro',
         },
       },
-      // $FlowFixMe[incompatible-type]
       {
         userId: 'mnVo2kO4b8QgKIrTXBR5hMg3L5F2',
         count: 1,
@@ -64,7 +62,6 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
             'https://www.gravatar.com/avatar/5d58d308bb0390b5b9ca6e1e8315ba3c?s=40&d=retro',
         },
       },
-      // $FlowFixMe[incompatible-type]
       {
         userId: 'qaPOb3aaVWWYlOVNiF6WWWQQs732',
         count: 1,
@@ -94,7 +91,6 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
             'https://www.gravatar.com/avatar/668eb53c3bff91cfec835c02f330d9d3?s=40&d=retro',
         },
       },
-      // $FlowFixMe[incompatible-type]
       {
         userId: 'JCyXMuGPACQwiprTfsUqv6pluIy1',
         count: 1,
@@ -122,7 +118,6 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
             'https://www.gravatar.com/avatar/ec9fceb6ad3683c2d05ccee0069cef0d?s=40&d=retro',
         },
       },
-      // $FlowFixMe[incompatible-type]
       {
         userId: 'wY5eR2lNDrgEV3kOoeeWDExRQtr2',
         count: 1,
@@ -149,7 +144,6 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
             'https://www.gravatar.com/avatar/916c1365a6b523c471eb59567389cffd?s=40&d=retro',
         },
       },
-      // $FlowFixMe[incompatible-type]
       {
         userId: '3YxRqY6QbXhcwvMoVVSmNySexgB2',
         count: 1,
@@ -184,7 +178,6 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
       en: 'Top 5 best feedback givers',
     },
     topUserCommentQualityRatings: [
-      // $FlowFixMe[incompatible-type]
       {
         userId: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
         count: 4,
@@ -201,7 +194,6 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
             'https://www.gravatar.com/avatar/157a7ef41059be0b087427948c8b5bd0?s=40&d=retro',
         },
       },
-      // $FlowFixMe[incompatible-type]
       {
         userId: 'FbKIILxuBlgSp8wMb3jwgJQ6guA2',
         count: 1,
@@ -230,7 +222,6 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
             'https://www.gravatar.com/avatar/2491459e79fcb1982c1e5a900a2165d7?s=40&d=retro',
         },
       },
-      // $FlowFixMe[incompatible-type]
       {
         userId: '09pfOz99PXg8Ps3ocfH9G3X1DNw1',
         count: 1,
@@ -246,7 +237,6 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
             'https://www.gravatar.com/avatar/b08657fcdbabf7752574053120de7f84?s=40&d=retro',
         },
       },
-      // $FlowFixMe[incompatible-type]
       {
         userId: 'mnVo2kO4b8QgKIrTXBR5hMg3L5F2',
         count: 1,
@@ -273,7 +263,6 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
             'https://www.gravatar.com/avatar/5d58d308bb0390b5b9ca6e1e8315ba3c?s=40&d=retro',
         },
       },
-      // $FlowFixMe[incompatible-type]
       {
         userId: 'yXupbJwqoecBbI7qJSyAYdGAMZk1',
         count: 1,
@@ -289,7 +278,6 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
             'https://www.gravatar.com/avatar/789b77ffb7108ec8457ba41a75363595?s=40&d=retro',
         },
       },
-      // $FlowFixMe[incompatible-type]
       {
         userId: 'qaPOb3aaVWWYlOVNiF6WWWQQs732',
         count: 1,
@@ -319,7 +307,6 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
             'https://www.gravatar.com/avatar/668eb53c3bff91cfec835c02f330d9d3?s=40&d=retro',
         },
       },
-      // $FlowFixMe[incompatible-type]
       {
         userId: 'I35IITL2J2OGKEIYfJ6YhrEIwag2',
         count: 1,
@@ -346,7 +333,6 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
             'https://www.gravatar.com/avatar/cf7da2235bc6c563452898194fdd7629?s=40&d=retro',
         },
       },
-      // $FlowFixMe[incompatible-type]
       {
         userId: 'JCyXMuGPACQwiprTfsUqv6pluIy1',
         count: 1,
@@ -374,7 +360,6 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
             'https://www.gravatar.com/avatar/ec9fceb6ad3683c2d05ccee0069cef0d?s=40&d=retro',
         },
       },
-      // $FlowFixMe[incompatible-type]
       {
         userId: 'wY5eR2lNDrgEV3kOoeeWDExRQtr2',
         count: 1,
@@ -401,7 +386,6 @@ export const fakeUserLeaderboards: UserLeaderboard[] = [
             'https://www.gravatar.com/avatar/916c1365a6b523c471eb59567389cffd?s=40&d=retro',
         },
       },
-      // $FlowFixMe[incompatible-type]
       {
         userId: '3YxRqY6QbXhcwvMoVVSmNySexgB2',
         count: 1,

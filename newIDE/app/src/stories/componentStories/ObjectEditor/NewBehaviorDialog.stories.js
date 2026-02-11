@@ -26,7 +26,7 @@ export default {
   component: NewBehaviorDialog,
 };
 
-export const DefaultForSpriteObject = (): React.Node => {
+export const DefaultForSpriteObject = () => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -86,15 +86,13 @@ export const DefaultForSpriteObject = (): React.Node => {
   );
 };
 
-export const WithCommunityExtensions = (): React.Node => {
+export const WithCommunityExtensions = () => {
   const [
     showExperimentalExtensions,
     setShowExperimentalExtensions,
   ] = React.useState(true);
-  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
-    // $FlowFixMe[incompatible-type]
     values: { ...initialPreferences.values, showExperimentalExtensions },
     setShowExperimentalExtensions,
   };
@@ -162,7 +160,7 @@ export const WithCommunityExtensions = (): React.Node => {
   );
 };
 
-export const WithServerSideErrors = (): React.Node => {
+export const WithServerSideErrors = () => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,

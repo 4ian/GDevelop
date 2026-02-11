@@ -185,12 +185,11 @@ export type GameLeaderboard = {
   topGameCommentQualityRatings: GameLeaderboardEntry[],
 };
 
-// $FlowFixMe[cannot-resolve-name]
-export const client: Axios = axios.create({
+export const client = axios.create({
   baseURL: GDevelopGameApi.baseUrl,
 });
 
-export const getCategoryName = (category: string, i18n: I18nType): any => {
+export const getCategoryName = (category: string, i18n: I18nType) => {
   switch (category) {
     case 'action':
       return i18n._(t`Action`);
@@ -231,7 +230,7 @@ export const getCategoryName = (category: string, i18n: I18nType): any => {
   }
 };
 
-export const getGameUrl = (game: ?Game): any | null => {
+export const getGameUrl = (game: ?Game) => {
   if (!game) return null;
   const slug = game.cachedCurrentSlug;
   return slug
@@ -239,7 +238,7 @@ export const getGameUrl = (game: ?Game): any | null => {
     : GDevelopGamesPlatform.getGameUrl(game.id);
 };
 
-export const getPublicGameUrl = (publicGame: ?PublicGame): any | null => {
+export const getPublicGameUrl = (publicGame: ?PublicGame) => {
   if (!publicGame) return null;
 
   return publicGame.gameSlug && publicGame.userSlug
@@ -267,12 +266,10 @@ export const listAllShowcasedGames = async (): Promise<AllShowcasedGames> => {
 
   const responsesData = await Promise.all([
     axios
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       .get(gamesShowcaseUrl)
       .then(response => response.data)
       .catch(e => e),
     axios
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       .get(filtersUrl)
       .then(response => response.data)
       .catch(e => e),

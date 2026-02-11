@@ -175,7 +175,6 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
 
   onClick(): void {}
 
-  // $FlowFixMe[missing-local-annot]
   buildMenuTemplate(i18n: I18nType, index: number) {
     return this.buildMenuTemplateFunction(i18n, index);
   }
@@ -589,14 +588,12 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         if (!project || !layerTreeViewItemProps) {
           return [];
         }
-        // $FlowFixMe[incompatible-type]
         return [
           {
             isRoot: false,
             content: new LabelTreeViewItemContent(
               layersRootFolderId,
               '',
-              // $FlowFixMe[incompatible-type]
               [
                 gameEditorMode === 'embedded-game'
                   ? {
@@ -626,7 +623,6 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                 },
               ].filter(Boolean),
               () =>
-                // $FlowFixMe[incompatible-type]
                 [
                   gameEditorMode === 'embedded-game'
                     ? {
@@ -763,8 +759,6 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
             >
               <AutoSizer style={styles.autoSizer} disableWidth>
                 {({ height }) => (
-                  // $FlowFixMe[incompatible-type]
-                  // $FlowFixMe[incompatible-exact]
                   <TreeView
                     key={listKey}
                     ref={treeViewRef}
@@ -811,11 +805,10 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
   }
 );
 
-// $FlowFixMe[prop-missing]
-const LayersListWithErrorBoundary: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<LayersListInterface> },
-  React.RefSetter<LayersListInterface>
-> = React.forwardRef<Props, LayersListInterface>((props, ref) => (
+const LayersListWithErrorBoundary = React.forwardRef<
+  Props,
+  LayersListInterface
+>((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Layers list</Trans>}
     scope="scene-editor-layers-list"

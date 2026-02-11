@@ -10,10 +10,7 @@ type Props = {|
   elements: Array<HTMLElement>,
 |};
 
-const BlockingLayerWithHoles = ({
-  elements,
-}: Props): null | React.MixedElement => {
-  // $FlowFixMe[missing-empty-array-annot]
+const BlockingLayerWithHoles = ({ elements }: Props) => {
   const [holes, setHoles] = React.useState([]);
 
   const updateHoles = React.useCallback(

@@ -11,7 +11,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => (
+export const Default = () => (
   <AuthenticatedUserContext.Provider
     value={defaultAuthenticatedUserWithNoSubscription}
   >

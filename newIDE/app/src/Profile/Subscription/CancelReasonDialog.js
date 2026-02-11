@@ -21,10 +21,7 @@ type Props = {|
   onCloseAfterSuccess: () => void,
 |};
 
-const CancelReasonDialog = ({
-  onClose,
-  onCloseAfterSuccess,
-}: Props): React.Node => {
+const CancelReasonDialog = ({ onClose, onCloseAfterSuccess }: Props) => {
   const [isCancelingSubscription, setIsCancelingSubscription] = React.useState(
     false
   );
@@ -157,7 +154,6 @@ const CancelReasonDialog = ({
         <Dialog
           title={null}
           actions={actions}
-          // $FlowFixMe[incompatible-type]
           secondaryActions={secondaryActions}
           open
           cannotBeDismissed

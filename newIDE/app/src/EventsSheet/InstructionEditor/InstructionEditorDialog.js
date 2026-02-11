@@ -376,7 +376,6 @@ const InstructionEditorDialog = ({
           }}
           getColumns={() => {
             if (isLargeScreen) {
-              // $FlowFixMe[incompatible-type]
               return [
                 {
                   columnName: 'instruction-or-object-selector',
@@ -400,7 +399,6 @@ const InstructionEditorDialog = ({
                   },
                 ];
               } else {
-                // $FlowFixMe[incompatible-type]
                 return [
                   chosenObjectName
                     ? { columnName: 'object-instruction-selector' }
@@ -473,7 +471,7 @@ const InstructionEditorDialog = ({
   );
 };
 
-const InstructionEditorDialogWithErrorBoundary = (props: Props): React.Node => (
+const InstructionEditorDialogWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Instruction editor</Trans>}
     scope="scene-events-instruction-editor"

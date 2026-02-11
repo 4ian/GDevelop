@@ -82,7 +82,7 @@ const ResponsiveMediaGallery = ({
   mediaItems,
   altTextTemplate,
   horizontalOuterMarginToEatOnMobile,
-}: Props): React.Node | React.MixedElement => {
+}: Props) => {
   const [selectedMediaIndex, setSelectedMediaIndex] = React.useState<number>(0);
   const { isMobile } = useResponsiveWindowSize();
 

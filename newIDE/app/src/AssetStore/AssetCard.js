@@ -46,7 +46,7 @@ export const AssetCard = ({
   assetShortHeader,
   size,
   hideShortDescription,
-}: Props): React.MixedElement => {
+}: Props) => {
   const displayShortDescription =
     !hideShortDescription && !!assetShortHeader.shortDescription;
 

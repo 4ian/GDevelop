@@ -414,9 +414,7 @@ describe('unsplit', () => {
   });
 
   // Helper that "load" references from a list of partial objects returned by split.
-  // $FlowFixMe[missing-local-annot]
   const getReferencePartialObjectInArray = partialObjects => {
-    // $FlowFixMe[missing-local-annot]
     return referencePath => {
       const partialObject = partialObjects.find(
         partialObject => partialObject.reference === referencePath
@@ -430,7 +428,6 @@ describe('unsplit', () => {
   };
 
   // Helper to create an "integration" test, testing both splitting and unsplitting.
-  // $FlowFixMe[missing-local-annot]
   const testSplitThenUnsplit = (object, shouldSplit) => {
     const originalObjectJSON = JSON.stringify(object);
     const partialObjects = split(object, {

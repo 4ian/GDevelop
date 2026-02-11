@@ -15,7 +15,7 @@ type Props = {|
 export const SurveyCard = ({
   onStartSurvey,
   hasFilledSurveyAlready,
-}: Props): React.Node => {
+}: Props) => {
   return (
     <CalloutCard
       renderImage={style => (

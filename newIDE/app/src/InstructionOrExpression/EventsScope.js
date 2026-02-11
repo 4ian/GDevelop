@@ -164,7 +164,7 @@ export class ProjectScopedContainersAccessor {
     return projectScopedContainers;
   }
 
-  makeNewProjectScopedContainersWithLocalVariables(event: gdBaseEvent): any {
+  makeNewProjectScopedContainersWithLocalVariables(event: gdBaseEvent) {
     return new ProjectScopedContainersAccessor(
       this._scope,
       this._parameterObjectsContainer,

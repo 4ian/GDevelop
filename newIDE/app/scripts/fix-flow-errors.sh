@@ -177,6 +177,47 @@ find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
   s/selectedCompletionIndex !== null/selectedCompletionIndex != null/g;
 ' {} +
 
+# 5. Fix underconstrained generic instantiations by adding explicit type params.
+#    new Set() -> new Set<any>()
+#    new Map() -> new Map<any, any>()
+#    React.createRef() -> React.createRef<any>()
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
+  s/new Set\(\)/new Set<any>()/g;
+  s/new Map\(\)/new Map<any, any>()/g;
+  s/React\.createRef\(\)/React.createRef<any>()/g;
+' {} +
+
+# 6. Fix new Array(n) patterns beyond just .fill(0) (underconstrained)
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
+  s/new Array\(([^)]+)\)\.fill\(/new Array<any>($1).fill(/g unless /new Array<number>/;
+' {} +
+
+# 7. Fix axios calls: add <any> type param to avoid underconstrained errors
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
+  s/await axios\.get\(/await axios.get<any>(/g;
+  s/await axios\.post\(/await axios.post<any>(/g;
+  s/await axios\.put\(/await axios.put<any>(/g;
+  s/await axios\.delete\(/await axios.delete<any>(/g;
+  s/await axios\.patch\(/await axios.patch<any>(/g;
+  s/axios\.get\(signedUrls/axios.get<any>(signedUrls/g;
+  s/axios\.put\(signedUrls/axios.put<any>(signedUrls/g;
+  s/axios\.get<any><any>/axios.get<any>/g;
+  s/axios\.post<any><any>/axios.post<any>/g;
+  s/axios\.put<any><any>/axios.put<any>/g;
+' {} +
+
+# 8. Fix jest.fn() underconstrained by adding type param
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
+  s/jest\.fn\(\)/jest.fn<any>()/g;
+  s/jest\.fn<any><any>/jest.fn<any>/g;
+' {} +
+
+# 9. Fix method-unbinding for common patterns: .push.apply and event.stopPropagation
+#    For .push.apply: use spread instead
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
+  s/([a-zA-Z_]+)\.push\.apply\(\1, ([^)]+)\)/$1.push(...$2)/g;
+' {} +
+
 # 4. Fix inline object return types on multi-line arrow function params
 #    that fix-arrow-return-types.py couldn't handle (nested parens in destructured args).
 #    Pattern: ): { ... } => { (where the object return type causes prettier parse error)

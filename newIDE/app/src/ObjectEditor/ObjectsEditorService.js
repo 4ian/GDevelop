@@ -19,10 +19,8 @@ const gd: libGDevelop = global.gd;
  * A service returning editor components for each object type.
  */
 const ObjectsEditorService = {
-  getEditorConfiguration(project: gdProject, objectType: string): any {
-    // $FlowFixMe[object-this-reference]
+  getEditorConfiguration(project: gdProject, objectType: string) {
     if (this.editorConfigurations[objectType]) {
-      // $FlowFixMe[object-this-reference]
       return this.editorConfigurations[objectType];
     }
     if (project.hasEventsBasedObject(objectType)) {
@@ -30,7 +28,6 @@ const ObjectsEditorService = {
         gd.JsPlatform.get(),
         objectType
       );
-      // $FlowFixMe[object-this-reference]
       return this.getCustomObjectPropertiesEditor({
         helpPagePath: objectMetadata.getHelpPath(),
       });
@@ -38,12 +35,10 @@ const ObjectsEditorService = {
     console.warn(
       `Object with type ${objectType} has no editor configuration registered. Please use registerEditorConfiguration to register your editor.`
     );
-    // $FlowFixMe[object-this-reference]
     return this.getDefaultObjectJsImplementationPropertiesEditor({
       helpPagePath: '',
     });
   },
-  // $FlowFixMe[missing-this-annot]
   registerEditorConfiguration: function(
     objectType: string,
     editorConfiguration: any
@@ -78,7 +73,7 @@ const ObjectsEditorService = {
   },
   getDefaultObjectJsImplementationPropertiesEditor(options: {
     helpPagePath: string,
-  }): any {
+  }) {
     return {
       component: ObjectPropertiesEditor,
       createNewObject: (
@@ -95,7 +90,7 @@ const ObjectsEditorService = {
       helpPagePath: options.helpPagePath,
     };
   },
-  getCustomObjectPropertiesEditor(options: { helpPagePath: string }): any {
+  getCustomObjectPropertiesEditor(options: { helpPagePath: string }) {
     return {
       component: CustomObjectPropertiesEditor,
       createNewObject: (

@@ -67,7 +67,6 @@ export type EnumeratedInstructionOrExpressionMetadata =
  * filter the ones that are not usable from the current "scope".
  */
 export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
-  // $FlowFixMe[unsupported-variance-annotation]
   +T: EnumeratedInstructionOrExpressionMetadata
 >(
   list: Array<T>,

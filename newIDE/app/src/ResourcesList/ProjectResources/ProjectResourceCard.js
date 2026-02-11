@@ -118,7 +118,7 @@ export const ProjectResourceCard = ({
   onChoose,
   size,
   isSelected,
-}: Props): React.Node => {
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const resourceName = resource.getName();
 

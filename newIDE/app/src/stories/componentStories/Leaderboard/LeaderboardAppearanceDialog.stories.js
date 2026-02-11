@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const WithoutSubscription = (): React.Node => (
+export const WithoutSubscription = () => (
   <AuthenticatedUserContext.Provider
     value={fakeAuthenticatedUserWithNoSubscription}
   >
@@ -38,7 +38,7 @@ export const WithoutSubscription = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const WithSilverSubscription = (): React.Node => (
+export const WithSilverSubscription = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <LeaderboardAppearanceDialog
       open
@@ -57,7 +57,7 @@ export const WithSilverSubscription = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const WithStartupSubscription = (): React.Node => (
+export const WithStartupSubscription = () => (
   <AuthenticatedUserContext.Provider value={fakeStartupAuthenticatedUser}>
     <LeaderboardAppearanceDialog
       open

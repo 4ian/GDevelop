@@ -14,7 +14,7 @@ type Props = {|
   noMargin?: boolean,
 |};
 
-export const AddListItem = (props: Props): React.Node => {
+export const AddListItem = (props: Props) => {
   return (
     <Column expand noMargin={props.noMargin}>
       <Line>

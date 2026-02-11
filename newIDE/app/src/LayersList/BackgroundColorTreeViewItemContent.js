@@ -3,7 +3,6 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-// $FlowFixMe[import-type-as-value]
 import { TreeViewItemContent } from '.';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import ColorPicker from '../UI/ColorField/ColorPicker';
@@ -27,7 +26,7 @@ export class BackgroundColorTreeViewItemContent implements TreeViewItemContent {
     return backgroundColorId;
   }
 
-  getRightButton(i18n: I18nType): any {
+  getRightButton(i18n: I18nType) {
     return [];
   }
 
@@ -45,7 +44,7 @@ export class BackgroundColorTreeViewItemContent implements TreeViewItemContent {
 
   onClick(): void {}
 
-  buildMenuTemplate(i18n: I18nType, index: number): any {
+  buildMenuTemplate(i18n: I18nType, index: number) {
     return [];
   }
 

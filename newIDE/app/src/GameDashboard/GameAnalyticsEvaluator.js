@@ -195,7 +195,6 @@ const mergeGameMetrics = (
   a: GameMetrics,
   b: GameMetrics
 ): MergedGameMetrics => {
-  // $FlowFixMe[incompatible-type]
   return {
     date: a.date,
     startDate: b.date,
@@ -418,7 +417,6 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
     const endDate = parseISO(metric.date);
     const formattedDate = endDate.toLocaleDateString(
       undefined,
-      // $FlowFixMe[incompatible-type]
       dateFormatOptions
     );
     if (!startIsoDate) {
@@ -429,10 +427,8 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
       startDate.toLocaleDateString(
         undefined,
         endDate.getMonth() === startDate.getMonth()
-          ? // $FlowFixMe[incompatible-type]
-            noMonthDateFormatOptions
-          : // $FlowFixMe[incompatible-type]
-            dateFormatOptions
+          ? noMonthDateFormatOptions
+          : dateFormatOptions
       ) +
       '-' +
       formattedDate
@@ -644,7 +640,6 @@ export const buildChartData = (
     monthChartData: evaluateChartData(
       filledGameRollingMetrics
         .slice(0, 30)
-        // $FlowFixMe[incompatible-type]
         .map(metric => ({ ...metric, startDate: null }: MergedGameMetrics))
     ),
   };
@@ -671,7 +666,6 @@ export const buildLastWeekChartData = (
   return evaluateChartData(
     filledGameRollingMetrics
       .slice(0, 7)
-      // $FlowFixMe[incompatible-type]
       .map(metric => ({ ...metric, startDate: null }: MergedGameMetrics))
   );
 };

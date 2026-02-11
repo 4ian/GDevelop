@@ -24,7 +24,6 @@ type Props<Item> = {|
   isScrolling?: boolean,
 |};
 
-// $FlowFixMe[missing-local-annot]
 const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   const { data, index, style } = props;
   const { flattenedData, onOpen, onClick, onSelect, getItemHtmlId } = data;
@@ -33,7 +32,6 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   const containerRef = React.useRef<?HTMLDivElement>(null);
 
   const onClickItem = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     event => {
       if (!node || node.item.isPlaceholder) return;
       if (
@@ -50,7 +48,6 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   );
 
   const onDoubleClickItem = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     e => {
       if (!node || !node.hasChildren || node.disableCollapse) return;
       onOpen(node, index);
@@ -171,9 +168,5 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   );
 };
 
-// $FlowFixMe[incompatible-type] - memo does not support having a generic in the props.
-// $FlowFixMe[missing-type-arg]
-export default (React.memo<Props>(
-  TreeViewRow,
-  areEqual
-): React.ComponentType<any>);
+// $FlowFixMe - memo does not support having a generic in the props.
+export default React.memo<Props>(TreeViewRow, areEqual);

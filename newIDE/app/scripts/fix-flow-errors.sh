@@ -160,6 +160,165 @@ echo "  Done."
 echo ""
 echo "--- Step 4b: Fixing codemod artifacts ---"
 
+# 0. Replace React.AbstractComponent<T1, T2> with React.ComponentType<T1>.
+#    React.AbstractComponent does not exist in Flow 0.299.
+#    Also removes // $FlowFixMe[prop-missing] comments that were added to
+#    suppress the error caused by the non-existent type.
+echo "  Replacing React.AbstractComponent with React.ComponentType..."
+python3 << 'PYEOF'
+import os
+
+src_dir = os.path.join(os.environ.get('APP_DIR', os.getcwd()), 'src')
+fixed_files = 0
+
+for root, dirs, files in os.walk(src_dir):
+    for fname in files:
+        if not fname.endswith('.js'):
+            continue
+        filepath = os.path.join(root, fname)
+        with open(filepath) as f:
+            content = f.read()
+        if 'React.AbstractComponent' not in content:
+            continue
+        original = content
+
+        # Phase 1: Replace React.AbstractComponent<T1, T2> with React.ComponentType<T1>
+        result = []
+        pos = 0
+        while pos < len(content):
+            idx = content.find('React.AbstractComponent<', pos)
+            if idx == -1:
+                result.append(content[pos:])
+                break
+
+            result.append(content[pos:idx])
+            open_angle = idx + len('React.AbstractComponent')
+            # open_angle points to '<'
+
+            # Parse type arguments with balanced bracket tracking
+            i = open_angle + 1
+            angle_depth = 1
+            brace_depth = 0
+            paren_depth = 0
+            first_comma = None
+
+            while i < len(content) and angle_depth > 0:
+                ch = content[i]
+                if ch == '<':
+                    angle_depth += 1
+                elif ch == '>':
+                    angle_depth -= 1
+                    if angle_depth == 0:
+                        break
+                elif ch == '{':
+                    brace_depth += 1
+                elif ch == '}':
+                    brace_depth -= 1
+                elif ch == '(':
+                    paren_depth += 1
+                elif ch == ')':
+                    paren_depth -= 1
+                elif (ch == ',' and angle_depth == 1
+                      and brace_depth == 0 and paren_depth == 0):
+                    if first_comma is None:
+                        first_comma = i
+                elif ch == '/' and i + 1 < len(content) and content[i + 1] == '/':
+                    # Line comment - skip to end of line
+                    while i < len(content) and content[i] != '\n':
+                        i += 1
+                    continue
+                elif ch in ("'", '"', '`'):
+                    quote = ch
+                    i += 1
+                    while i < len(content) and content[i] != quote:
+                        if content[i] == '\\':
+                            i += 1
+                        i += 1
+                i += 1
+
+            closing_angle = i  # points to '>'
+
+            if angle_depth != 0:
+                # Couldn't find matching '>', copy as-is
+                result.append('React.AbstractComponent<')
+                pos = open_angle + 1
+                continue
+
+            if first_comma is not None:
+                first_arg = content[open_angle + 1:first_comma]
+
+                # Check if the type annotation is single-line vs multi-line
+                type_text = content[idx:closing_angle + 1]
+                is_single_line = '\n' not in type_text
+
+                if is_single_line:
+                    replacement = 'React.ComponentType<' + first_arg.strip() + '>'
+                else:
+                    first_arg = first_arg.rstrip()
+
+                    # Preserve non-prop-missing FlowFixMe from the second arg section
+                    second_section = content[first_comma + 1:closing_angle]
+                    preserved_comments = []
+                    for line in second_section.split('\n'):
+                        stripped = line.strip()
+                        if (stripped.startswith('// $FlowFixMe')
+                                and 'prop-missing' not in stripped):
+                            preserved_comments.append(line)
+
+                    # Find the indentation of the closing '>'
+                    line_start = content.rfind('\n', 0, closing_angle)
+                    if line_start == -1:
+                        closing_indent = ''
+                    else:
+                        closing_line = content[line_start + 1:closing_angle]
+                        closing_indent = ''
+                        for ch in closing_line:
+                            if ch in (' ', '\t'):
+                                closing_indent += ch
+                            else:
+                                break
+
+                    replacement = 'React.ComponentType<' + first_arg
+                    for comment in preserved_comments:
+                        replacement += '\n' + comment
+                    replacement += '\n' + closing_indent + '>'
+                result.append(replacement)
+            else:
+                # Only one type arg, just replace the name
+                inner = content[open_angle + 1:closing_angle]
+                result.append('React.ComponentType<' + inner + '>')
+
+            pos = closing_angle + 1
+
+        content = ''.join(result)
+
+        # Phase 2: Remove // $FlowFixMe[prop-missing] lines before React.ComponentType
+        lines = content.split('\n')
+        new_lines = []
+        i = 0
+        while i < len(lines):
+            if ('$FlowFixMe[prop-missing]' in lines[i]
+                    and lines[i].strip().startswith(
+                        '// $FlowFixMe[prop-missing]')):
+                # Check if next non-empty line contains React.ComponentType<
+                j = i + 1
+                while j < len(lines) and lines[j].strip() == '':
+                    j += 1
+                if j < len(lines) and 'React.ComponentType<' in lines[j]:
+                    i += 1
+                    continue
+            new_lines.append(lines[i])
+            i += 1
+        content = '\n'.join(new_lines)
+
+        if content != original:
+            with open(filepath, 'w') as f:
+                f.write(content)
+            fixed_files += 1
+
+print(f"  Replaced React.AbstractComponent -> React.ComponentType in {fixed_files} files")
+PYEOF
+
 # 1. Fix missing commas after ([]: Array<empty>) in object literals.
 #    The codemod turns "[]," into "([]: Array<empty>)" but loses the comma.
 find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '

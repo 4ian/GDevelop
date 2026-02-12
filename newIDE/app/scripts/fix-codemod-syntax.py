@@ -10,7 +10,7 @@ project cannot parse:
 
 This script rewrites those constructs while preserving runtime behavior and as much
 type information as possible:
-  - component(...) -> React.ComponentType<Props> (or React.AbstractComponent when needed)
+  - component(...) -> React.ComponentType<Props>
   - renders T -> T (with renders any/mixed/empty/Fragment normalized to React.Node)
   - expr as T -> (expr: T)
 
@@ -172,14 +172,9 @@ def _component_to_legacy_type(
         if isinstance(rendered, dict) and "range" in rendered:
             renders_type = _node_text(content, rendered).strip()
 
-    if ref_type:
-        return f"React.AbstractComponent<{props_type}, {ref_type}>"
-
-    # In component syntax, non-React-node render targets are generally used for
-    # forwarded refs/interfaces. Preserve this with AbstractComponent.
-    if renders_type and not _is_render_node_like(renders_type):
-        return f"React.AbstractComponent<{props_type}, {renders_type}>"
-
+    # Always use React.ComponentType (React.AbstractComponent does not exist in
+    # Flow 0.299).  Ref and renders information that cannot be captured in
+    # ComponentType will be handled by FlowFixMe if needed.
     return f"React.ComponentType<{props_type}>"
 
 

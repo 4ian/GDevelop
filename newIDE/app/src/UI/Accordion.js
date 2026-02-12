@@ -151,7 +151,7 @@ export const Accordion: React.ComponentType<{
   ...AccordionProps,
   +ref?: React.RefSetter<any>,
 }> = React.forwardRef<AccordionProps, MUIAccordion>((props, ref) => {
-// $FlowFixMe[value-as-type]
+  // $FlowFixMe[value-as-type]
   const { costlyBody, noMargin, kind, ...otherProps } = props;
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 

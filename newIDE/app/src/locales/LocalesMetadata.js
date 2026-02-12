@@ -353,7 +353,7 @@ module.exports = [
     "languageCode": "zh_CN",
     "languageName": "Chinese Simplified",
     "languageNativeName": "简化字",
-    "translationRatio": 0.9927944862155389
+    "translationRatio": 0.9925856307435255
   },
   {
     "languageCode": "zh_TW",

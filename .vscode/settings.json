@@ -130,6 +130,7 @@
   // Support for Flowtype (for newIDE):
   "javascript.validate.enable": false,
   "flow.useNPMPackagedFlow": true,
+  "flow.pathToFlow": "{workspaceFolder}/newIDE/app/node_modules/.bin/flow",
 
   // Clang format styling (duplicated in scripts/CMakeClangUtils.txt)
   "C_Cpp.clang_format_style": "{BasedOnStyle: Google, BinPackParameters: false, BinPackArguments: false}"

@@ -89,7 +89,9 @@ export const BehaviorListItem = ({
   const containerRef = React.useRef<?HTMLDivElement>(null);
   React.useLayoutEffect(() => {
     if (containerRef.current)
-      onHeightComputed(containerRef.current.getBoundingClientRect().height);
+      onHeightComputed(
+        Math.ceil(containerRef.current.getBoundingClientRect().height)
+      );
   });
 
   const renderField = (field: 'description' | 'fullName') => {

@@ -1702,6 +1702,12 @@ export default class SceneEditor extends React.Component<Props, State> {
     done(true);
     onObjectsDeleted();
 
+    // /!\ Force the instances editor to destroy and mount again the
+    // renderers to avoid keeping any references to existing instances
+    if (this.editorDisplay) {
+      this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
+    }
+
     // We modified the selection, so force an update of editors dealing with it.
     this.forceUpdatePropertiesEditor();
     this.updateToolbar();

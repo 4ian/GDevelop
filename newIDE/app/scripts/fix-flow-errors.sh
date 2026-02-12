@@ -44,10 +44,6 @@ function walkFiles(dir, files) {
   }
 }
 
-function isWhitespace(char) {
-  return char === ' ' || char === '\n' || char === '\r' || char === '\t';
-}
-
 function skipString(text, index, quoteChar) {
   let i = index + 1;
   while (i < text.length) {

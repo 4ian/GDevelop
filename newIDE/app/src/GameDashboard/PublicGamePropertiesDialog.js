@@ -48,7 +48,7 @@ export const applyPublicPropertiesToProject = (
   project: gdProject,
   i18n: I18nType,
   newProperties: PublicProjectProperties
-) => {
+): boolean => {
   const {
     name,
     authorIds,
@@ -102,7 +102,7 @@ export const PublicGamePropertiesDialog = ({
   onGameUpdated,
   canBePublishedOnGdGames,
   onUnregisterGame,
-}: Props) => {
+}: Props): React.Node => {
   const { profile } = React.useContext(AuthenticatedUserContext);
 
   const publicGameAuthorIds = publicGame.authors.map(author => author.id);
@@ -198,6 +198,7 @@ export const PublicGamePropertiesDialog = ({
   return (
     <Dialog
       title={publicGame.gameName}
+      // $FlowFixMe[incompatible-type]
       actions={actions}
       cannotBeDismissed={isLoading}
       onRequestClose={onClose}

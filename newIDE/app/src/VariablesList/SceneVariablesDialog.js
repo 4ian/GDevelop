@@ -28,7 +28,7 @@ const SceneVariablesDialog = ({
   initiallySelectedVariableName,
   shouldCreateInitiallySelectedVariable,
   isListLocked,
-}: Props) => {
+}: Props): React.Node => {
   const onComputeAllVariableNames = React.useCallback(
     () =>
       EventsRootVariablesFinder.findAllLayoutVariables(
@@ -72,6 +72,7 @@ const SceneVariablesDialog = ({
       onCancel={onCancel}
       onApply={onApply}
       title={<Trans>{layout.getName()} variables</Trans>}
+      // $FlowFixMe[incompatible-type]
       tabs={tabs}
       initiallySelectedVariableName={initiallySelectedVariableName}
       shouldCreateInitiallySelectedVariable={

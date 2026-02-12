@@ -16,7 +16,7 @@ import SelectOption from '../../UI/SelectOption';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function SceneNameField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?(
       | GenericExpressionField
@@ -49,6 +49,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       setIsExpressionField(!isExpressionField);
     };
 
+    // $FlowFixMe[missing-local-annot]
     const onChangeSelectValue = (event, value) => {
       props.onChange(event.target.value);
     };
@@ -133,4 +134,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-);
+): React.ComponentType<{
+  ...ParameterFieldProps,
+  +ref?: React.RefSetter<ParameterFieldInterface>,
+}>);

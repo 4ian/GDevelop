@@ -91,7 +91,7 @@ const enableBit = (bitsValue: number, pos: number, enable: boolean) => {
   return bitsValue;
 };
 
-const Physics3DEditor = (props: Props) => {
+const Physics3DEditor = (props: Props): React.Node => {
   const {
     object,
     behavior,
@@ -122,6 +122,7 @@ const Physics3DEditor = (props: Props) => {
   );
 
   const updateBehaviorProperty = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     (property, value) => {
       behavior.updateProperty(property, value);
       forceUpdate();
@@ -143,6 +144,7 @@ const Physics3DEditor = (props: Props) => {
     properties.get('shape').getValue() !== 'Sphere' &&
     properties.get('shape').getValue() !== 'Box';
 
+  // $FlowFixMe[value-as-type]
   const [gltf, setGltf] = React.useState<GLTF | null>(null);
   const loadGltf = React.useCallback(
     async (modelResourceName: string) => {
@@ -174,6 +176,7 @@ const Physics3DEditor = (props: Props) => {
       }
       let triangleCount = 0;
       gltf.scene.traverse(object3d => {
+        // $FlowFixMe[value-as-type]
         const mesh = (object3d: THREE.Mesh);
         if (!mesh.isMesh) {
           return;

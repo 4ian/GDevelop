@@ -85,7 +85,7 @@ export const CompactInstancePropertiesEditor = ({
   tileMapTileSelection,
   onSelectTileMapTile,
   isVariableListLocked,
-}: Props) => {
+}: Props): null | React.Node => {
   const forceUpdate = useForceUpdate();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
@@ -99,6 +99,7 @@ export const CompactInstancePropertiesEditor = ({
    */
   const shouldDisplayVariablesList = instances.length === 1;
 
+  // $FlowFixMe[missing-local-annot]
   const onScrollY = React.useCallback(deltaY => {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollBy(deltaY);

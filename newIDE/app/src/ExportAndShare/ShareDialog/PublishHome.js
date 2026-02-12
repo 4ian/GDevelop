@@ -294,7 +294,7 @@ const PublishHome = ({
   chosenSubSection,
   allExportersRequireOnline,
   showOnlineWebExporterOnly,
-}: PublishHomeProps) => {
+}: PublishHomeProps): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);

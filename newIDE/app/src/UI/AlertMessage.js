@@ -45,7 +45,7 @@ const AlertMessage = ({
   renderLeftIcon,
   markdownImageOnly,
   background = 'dark',
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const theme = useTheme();
   const paperStyle: {|
@@ -119,6 +119,7 @@ const AlertMessage = ({
                       )}
                     </React.Fragment>
                   )}
+                  {/* $FlowFixMe[incompatible-type] */}
                   <Text style={styles.content}>{children}</Text>
                 </Line>
                 {renderRightButton && renderRightButton()}

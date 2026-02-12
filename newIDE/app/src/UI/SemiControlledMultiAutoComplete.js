@@ -75,87 +75,90 @@ export type SemiControlledMultiAutoCompleteInterface = {|
   focusInput: () => void,
 |};
 
-const SemiControlledMultiAutoComplete = React.forwardRef<
-  Props,
-  SemiControlledMultiAutoCompleteInterface
->((props, ref) => {
-  const chipStyles = useChipStyles();
-  const inputRef = React.useRef<?TextField>(null);
+const SemiControlledMultiAutoComplete: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<SemiControlledMultiAutoCompleteInterface>,
+}> = React.forwardRef<Props, SemiControlledMultiAutoCompleteInterface>(
+  (props, ref) => {
+    const chipStyles = useChipStyles();
+    // $FlowFixMe[value-as-type]
+    const inputRef = React.useRef<?TextField>(null);
 
-  React.useImperativeHandle(ref, () => ({
-    focusInput: () => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-    },
-  }));
+    React.useImperativeHandle(ref, () => ({
+      focusInput: () => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      },
+    }));
 
-  return (
-    <I18n>
-      {({ i18n }) => (
-        <Autocomplete
-          multiple
-          value={props.value}
-          onChange={props.onChange}
-          inputValue={props.inputValue}
-          onInputChange={props.onInputChange}
-          options={props.dataSource}
-          popupIcon={<ChevronArrowBottom />}
-          PaperComponent={AutocompletePaperComponent}
-          renderOption={renderItem}
-          getOptionLabel={(option: AutocompleteOption) => option.text}
-          getOptionDisabled={(option: AutocompleteOption) =>
-            option.disabled ||
-            !!props.value.find(
-              element => element && element.value === option.value
-            ) ||
-            (props.optionsLimit && props.value.length >= props.optionsLimit)
-          }
-          getOptionSelected={(option, value) => option.value === value.value}
-          loading={props.loading}
-          ListboxProps={{
-            className: props.disableAutoTranslate ? 'notranslate' : '',
-            style: {
-              ...autocompleteStyles.listbox,
-              ...styles.listbox,
-            },
-          }}
-          renderInput={params => (
-            <TextField
-              {...params}
-              color="secondary"
-              InputProps={{
-                ...params.InputProps,
-                placeholder: props.hintText && i18n._(props.hintText),
-              }}
-              label={props.floatingLabelText}
-              helperText={props.error || props.helperText}
-              variant="filled"
-              error={!!props.error}
-              inputRef={inputRef}
-              disabled={props.disabled || props.loading}
-            />
-          )}
-          fullWidth={props.fullWidth}
-          disabled={props.disabled || props.loading}
-          noOptionsText={
-            <Text noMargin>
-              <Trans>No options</Trans>
-            </Text>
-          }
-          loadingText={
-            <Text noMargin>
-              <Trans>Loading...</Trans>
-            </Text>
-          }
-          ChipProps={{
-            classes: chipStyles,
-            className: props.disableAutoTranslate ? 'notranslate' : '',
-          }}
-        />
-      )}
-    </I18n>
-  );
-});
+    return (
+      <I18n>
+        {({ i18n }) => (
+          <Autocomplete
+            multiple
+            value={props.value}
+            onChange={props.onChange}
+            inputValue={props.inputValue}
+            onInputChange={props.onInputChange}
+            options={props.dataSource}
+            popupIcon={<ChevronArrowBottom />}
+            PaperComponent={AutocompletePaperComponent}
+            renderOption={renderItem}
+            getOptionLabel={(option: AutocompleteOption) => option.text}
+            getOptionDisabled={(option: AutocompleteOption) =>
+              option.disabled ||
+              !!props.value.find(
+                element => element && element.value === option.value
+              ) ||
+              (props.optionsLimit && props.value.length >= props.optionsLimit)
+            }
+            getOptionSelected={(option, value) => option.value === value.value}
+            loading={props.loading}
+            ListboxProps={{
+              className: props.disableAutoTranslate ? 'notranslate' : '',
+              style: {
+                ...autocompleteStyles.listbox,
+                ...styles.listbox,
+              },
+            }}
+            renderInput={params => (
+              <TextField
+                {...params}
+                color="secondary"
+                InputProps={{
+                  ...params.InputProps,
+                  placeholder: props.hintText && i18n._(props.hintText),
+                }}
+                label={props.floatingLabelText}
+                helperText={props.error || props.helperText}
+                variant="filled"
+                error={!!props.error}
+                inputRef={inputRef}
+                disabled={props.disabled || props.loading}
+              />
+            )}
+            fullWidth={props.fullWidth}
+            disabled={props.disabled || props.loading}
+            noOptionsText={
+              <Text noMargin>
+                <Trans>No options</Trans>
+              </Text>
+            }
+            loadingText={
+              <Text noMargin>
+                <Trans>Loading...</Trans>
+              </Text>
+            }
+            ChipProps={{
+              classes: chipStyles,
+              className: props.disableAutoTranslate ? 'notranslate' : '',
+            }}
+          />
+        )}
+      </I18n>
+    );
+  }
+);
 
 export default SemiControlledMultiAutoComplete;

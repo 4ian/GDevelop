@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const DefaultWithText = () => (
+export const DefaultWithText = (): React.Node => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -36,7 +36,7 @@ export const DefaultWithText = () => (
   />
 );
 
-export const WithError = () => (
+export const WithError = (): React.Node => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -56,7 +56,7 @@ export const WithError = () => (
   />
 );
 
-export const WithTranslatableElementsAndSeparator = () => (
+export const WithTranslatableElementsAndSeparator = (): React.Node => (
   <ValueStateHolder
     initialValue={''}
     render={(value, onChange) => (
@@ -87,7 +87,7 @@ export const WithTranslatableElementsAndSeparator = () => (
   />
 );
 
-export const WithOnClickForSomeElements = () => (
+export const WithOnClickForSomeElements = (): React.Node => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -95,6 +95,7 @@ export const WithOnClickForSomeElements = () => (
         <SemiControlledAutoComplete
           value={value}
           onChange={onChange}
+          // $FlowFixMe[incompatible-type]
           dataSource={[
             {
               text: '',
@@ -122,7 +123,7 @@ export const WithOnClickForSomeElements = () => (
   />
 );
 
-export const WithOnClickLongTextsAndRenderIcon = () => (
+export const WithOnClickLongTextsAndRenderIcon = (): React.Node => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -130,6 +131,7 @@ export const WithOnClickLongTextsAndRenderIcon = () => (
         <SemiControlledAutoComplete
           value={value}
           onChange={onChange}
+          // $FlowFixMe[incompatible-type]
           dataSource={[
             {
               text: '',
@@ -173,7 +175,7 @@ export const WithOnClickLongTextsAndRenderIcon = () => (
   />
 );
 
-export const InDialog = () => (
+export const InDialog = (): React.Node => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -181,6 +183,7 @@ export const InDialog = () => (
         <SemiControlledAutoComplete
           value={value}
           onChange={onChange}
+          // $FlowFixMe[incompatible-type]
           dataSource={[
             {
               text: '',
@@ -208,7 +211,7 @@ export const InDialog = () => (
   />
 );
 
-export const WithReducedMarginInMiniToolbar = () => (
+export const WithReducedMarginInMiniToolbar = (): React.Node => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -231,7 +234,7 @@ export const WithReducedMarginInMiniToolbar = () => (
   />
 );
 
-export const WithMarkdownHelperText = () => (
+export const WithMarkdownHelperText = (): React.Node => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -251,7 +254,7 @@ export const WithMarkdownHelperText = () => (
   />
 );
 
-export const WithFloatingLabel = () => (
+export const WithFloatingLabel = (): React.Node => (
   <ValueStateHolder
     initialValue={'Choice 6'}
     render={(value, onChange) => (
@@ -272,7 +275,7 @@ export const WithFloatingLabel = () => (
   />
 );
 
-export const WithInputValueListener = () => {
+export const WithInputValueListener = (): React.Node => {
   const [value, setValue] = React.useState('Choice 6');
   const [inputValue, setInputValue] = React.useState('Choice 6');
 

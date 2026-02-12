@@ -30,7 +30,7 @@ export const ProjectManagerDrawer = ({
   children,
   projectManagerOpen,
   toggleProjectManager,
-}: Props) => {
+}: Props): React.Node => {
   const softKeyboardBottomOffset = useSoftKeyboardBottomOffset();
 
   return (

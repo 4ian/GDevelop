@@ -18,7 +18,7 @@ export const renderFolderListItem = ({
   folderWithPath,
   iconSize,
   matchesCoordinates,
-}: Props) => {
+}: Props): React.Node => {
   const folderPath: string = folderWithPath.path;
   return (
     <ListItem

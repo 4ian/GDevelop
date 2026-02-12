@@ -209,7 +209,7 @@ const ResolutionOptions = ({
   customHeight: ?number,
   onCustomWidthChange: (?number) => void,
   onCustomHeightChange: (?number) => void,
-|}) => {
+|}): React.MixedElement => {
   return (
     <div style={styles.optionsContainer}>
       {Object.keys(resolutionOptions).map((key, index) => {

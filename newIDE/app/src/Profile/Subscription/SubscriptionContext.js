@@ -42,6 +42,7 @@ const mergeSubscriptionPlansWithPrices = (
       if (subscriptionPlan.id === 'free') {
         return {
           ...subscriptionPlan,
+          // $FlowFixMe[missing-empty-array-annot]
           pricingSystems: [],
         };
       }
@@ -108,14 +109,16 @@ type SubscriptionState = {|
   |}) => void,
 |};
 
-export const SubscriptionContext = React.createContext<SubscriptionState>({
-  getSubscriptionPlansWithPricingSystems: () => null,
-  getUserSubscriptionPlanEvenIfLegacy: () => null,
-  openSubscriptionDialog: () => {},
-  getCouponCode: () => null,
-  clearCouponCode: () => {},
-  openRedeemCodeDialog: () => {},
-});
+export const SubscriptionContext: React.Context<SubscriptionState> = React.createContext<SubscriptionState>(
+  {
+    getSubscriptionPlansWithPricingSystems: () => null,
+    getUserSubscriptionPlanEvenIfLegacy: () => null,
+    openSubscriptionDialog: () => {},
+    getCouponCode: () => null,
+    clearCouponCode: () => {},
+    openRedeemCodeDialog: () => {},
+  }
+);
 
 type SubscriptionProviderProps = {|
   children: React.Node,
@@ -125,7 +128,7 @@ type SubscriptionProviderProps = {|
 export const SubscriptionProvider = ({
   children,
   simulateMobileApp,
-}: SubscriptionProviderProps) => {
+}: SubscriptionProviderProps): React.MixedElement => {
   const [
     analyticsMetadata,
     setAnalyticsMetadata,
@@ -230,6 +233,7 @@ export const SubscriptionProvider = ({
   };
 
   const openSubscriptionDialog = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     ({ analyticsMetadata: metadata, couponCode: coupon }) => {
       if (isNativeMobileApp() || simulateMobileApp) {
         if (hasValidSubscriptionPlan(authenticatedUser.subscription)) {

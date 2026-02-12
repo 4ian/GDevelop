@@ -265,7 +265,8 @@ export type RedemptionCode = {|
 
 export const EDUCATION_PLAN_MIN_SEATS = 5;
 export const EDUCATION_PLAN_MAX_SEATS = 300;
-export const apiClient = axios.create({
+// $FlowFixMe[cannot-resolve-name]
+export const apiClient: Axios = axios.create({
   baseURL: GDevelopUsageApi.baseUrl,
 });
 
@@ -537,7 +538,9 @@ export const isSubscriptionComingFromTeam = (
   return !!subscription && subscription.pricingSystemId === 'TEAM_MEMBER';
 };
 
-export const hasValidSubscriptionPlan = (subscription: ?Subscription) => {
+export const hasValidSubscriptionPlan = (
+  subscription: ?Subscription
+): boolean => {
   const hasValidSubscription =
     !!subscription &&
     !!subscription.planId &&
@@ -692,30 +695,36 @@ export const validateCoupon = async (
   return response.data;
 };
 
-export const canBenefitFromDiscordRole = (subscription: ?Subscription) => {
+export const canBenefitFromDiscordRole = (
+  subscription: ?Subscription
+): false | true | boolean => {
   return (
     !!subscription &&
     ['gdevelop_education', 'gdevelop_startup', 'gdevelop_gold'].includes(
+      // $FlowFixMe[incompatible-type]
       subscription.planId
     ) &&
     !subscription.benefitsFromEducationPlan
   );
 };
 
-export const canUpgradeSubscription = (subscription: ?Subscription) => {
+export const canUpgradeSubscription = (
+  subscription: ?Subscription
+): false | true | boolean => {
   return (
     !!subscription &&
+    // $FlowFixMe[incompatible-type]
     !['gdevelop_education', 'gdevelop_startup'].includes(subscription.planId) &&
     !subscription.benefitsFromEducationPlan
   );
 };
 
-export const canUseClassroomFeature = (limits: ?Limits) =>
+export const canUseClassroomFeature = (limits: ?Limits): ?boolean =>
   limits &&
   limits.capabilities.classrooms &&
   limits.capabilities.classrooms.showClassroomTab;
 
-export const shouldHideClassroomTab = (limits: ?Limits) =>
+export const shouldHideClassroomTab = (limits: ?Limits): boolean =>
   !limits ||
   !limits.capabilities.classrooms ||
   limits.capabilities.classrooms.showClassroomTab
@@ -756,18 +765,23 @@ export function getSummarizedSubscriptionPlanFeatures(
     };
 
     if (feature.enabled) {
+      // $FlowFixMe[prop-missing]
       planFeature.enabled = feature.enabled;
     }
     if (feature.unlimited) {
+      // $FlowFixMe[prop-missing]
       planFeature.unlimited = feature.unlimited;
     }
     if (feature.upcoming) {
+      // $FlowFixMe[prop-missing]
       planFeature.upcoming = feature.upcoming;
     }
     if (feature.trialLike) {
+      // $FlowFixMe[prop-missing]
       planFeature.trialLike = feature.trialLike;
     }
     if (feature.descriptionByLocale) {
+      // $FlowFixMe[prop-missing]
       planFeature.description = selectMessageByLocale(
         i18n,
         feature.descriptionByLocale

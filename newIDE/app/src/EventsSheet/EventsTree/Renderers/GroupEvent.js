@@ -35,7 +35,11 @@ const styles = {
   },
 };
 
-export default class GroupEvent extends React.Component<EventRendererProps, *> {
+export default class GroupEvent extends React.Component<
+  EventRendererProps,
+  any
+> {
+  // $FlowFixMe[missing-local-annot]
   state = {
     editing: false,
     editingPreviousValue: null,
@@ -69,7 +73,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
     }
   };
 
-  render() {
+  render(): any {
     var groupEvent = gd.asGroupEvent(this.props.event);
 
     const r = groupEvent.getBackgroundColorR(),
@@ -100,6 +104,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
         }`}
       >
         {this.state.editing ? (
+          // $FlowFixMe[incompatible-type]
           <TextField
             margin="none"
             ref={textField => (this._textField = textField)}

@@ -93,7 +93,7 @@ const HomePageMenuBar = ({
   onOpenPreferences,
   onOpenAbout,
   onOpenHomePageMenuDrawer,
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();
   const isMobileOrSmallScreen = isMobile || isMediumScreen;
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -153,6 +153,7 @@ const HomePageMenuBar = ({
                   }}
                   key={id}
                 >
+                  {/* $FlowFixMe[incompatible-type] */}
                   <IconButton
                     color="inherit"
                     disableRipple

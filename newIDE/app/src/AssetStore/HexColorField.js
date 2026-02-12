@@ -37,6 +37,7 @@ type Props = {|
 |};
 
 const hexToNullableRGBColor = (color: string): RGBColor | null => {
+  // $FlowFixMe[incompatible-type]
   return /^#{0,1}[0-9a-fA-F]{6}$/.test(color) ? hexToRGBColor(color) : null;
 };
 
@@ -61,7 +62,7 @@ export const HexColorField = ({
   helperMarkdownText,
   onChange,
   color,
-}: Props) => {
+}: Props): React.MixedElement => {
   const [colorString, setColorString] = React.useState<string>(
     color ? rgbColorToHex(color.r, color.g, color.b) : ''
   );

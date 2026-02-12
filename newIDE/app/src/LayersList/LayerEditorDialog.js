@@ -62,7 +62,7 @@ const LayerEditorDialog = ({
   hotReloadPreviewButtonProps,
   resourceManagementProps,
   projectScopedContainersAccessor,
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const {
     onCancelChanges,
@@ -104,6 +104,7 @@ const LayerEditorDialog = ({
   const [hasAnyEffectBeenAdded, setAnyEffectBeenAdded] = React.useState(false);
 
   const onChangeCamera3DFieldOfView = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     value => {
       setCamera3DFieldOfViewError(null);
       const newValue = parseFloat(value) || 0;
@@ -124,6 +125,7 @@ const LayerEditorDialog = ({
   );
 
   const checkNearPlaneDistanceError = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     value => {
       setCamera3DNearPlaneDistanceError(null);
       const hasError =
@@ -143,6 +145,7 @@ const LayerEditorDialog = ({
   );
 
   const onChangeCamera3DNearPlaneDistance = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     value => {
       const newValue = parseFloat(value) || 0;
       const hasError = checkNearPlaneDistanceError(newValue);
@@ -158,6 +161,7 @@ const LayerEditorDialog = ({
   );
 
   const onChangeCamera3DFarPlaneDistance = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     value => {
       setCamera3DFarPlaneDistanceError(null);
       const newValue = parseFloat(value) || 0;
@@ -179,6 +183,7 @@ const LayerEditorDialog = ({
   );
 
   const onChangeCamera2DPlaneMaxDrawingDistance = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     value => {
       setCamera2DPlaneMaxDrawingDistanceError(null);
       const newValue = parseFloat(value) || 0;

@@ -241,7 +241,8 @@ export type ResourceSearch = {
   }> | null,
 };
 
-export const apiClient = axios.create({
+// $FlowFixMe[cannot-resolve-name]
+export const apiClient: Axios = axios.create({
   baseURL: GDevelopGenerationApi.baseUrl,
 });
 
@@ -256,6 +257,7 @@ export const getAiRequest = async (
   |}
 ): Promise<AiRequest> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(
     `${GDevelopGenerationApi.baseUrl}/ai-request/${aiRequestId}`,
     {
@@ -285,8 +287,10 @@ export const getPartialAiRequest = async (
     aiRequestId: string,
     include: string,
   |}
-): Promise<$Shape<AiRequest>> => {
+): // $FlowFixMe[deprecated-utility]
+Promise<$Shape<AiRequest>> => {
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(
     `${GDevelopGenerationApi.baseUrl}/ai-request/${aiRequestId}`,
     {
@@ -322,7 +326,7 @@ export const getAiRequests = async (
   const authorizationHeader = await getAuthorizationHeader();
   const uri = forceUri || '/ai-request';
 
-  // $FlowFixMe
+  // $FlowFixMe[incompatible-type]
   const response = await apiClient.get(uri, {
     headers: {
       Authorization: authorizationHeader,
@@ -918,6 +922,7 @@ export const fetchAiSettings = async ({
 }: {|
   environment: Environment,
 |}): Promise<AiSettings> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(
     `${GDevelopAiCdn.baseUrl[environment]}/ai-settings.json`
   );

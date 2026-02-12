@@ -40,7 +40,7 @@ export const AppleAuthKeysList = ({
   error,
   onRefreshSigningCredentials,
   onAddNew,
-}: Props) => {
+}: Props): React.Node => {
   const appleAuthKeySigningCredentials = filterAppleAuthKeySigningCredentials(
     signingCredentials
   );

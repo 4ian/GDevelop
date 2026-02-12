@@ -13,7 +13,14 @@ export const getCurrentElements = (
   animationIndex: number,
   directionIndex: number,
   spriteIndex: number
-) => {
+):
+  | { animation: null, direction: null, sprite: null }
+  | { animation: gdAnimation, direction: null, sprite: null }
+  | {
+      animation: gdAnimation,
+      direction: gdDirection,
+      sprite: gdSprite | null,
+    } => {
   const hasValidAnimation = animationIndex < animations.getAnimationsCount();
   const animation = hasValidAnimation
     ? animations.getAnimation(animationIndex)
@@ -48,7 +55,9 @@ export const getCurrentElements = (
   };
 };
 
-export const getTotalSpritesCount = (animations: gdSpriteAnimationList) => {
+export const getTotalSpritesCount = (
+  animations: gdSpriteAnimationList
+): number => {
   let totalSpritesCount = 0;
   for (
     let animationIndex = 0;
@@ -72,7 +81,10 @@ export const getTotalSpritesCount = (animations: gdSpriteAnimationList) => {
 /**
  * Return all the point names
  */
-export const getAllPointNames = (animations: gdSpriteAnimationList) => {
+export const getAllPointNames = (
+  animations: gdSpriteAnimationList
+): Array<any> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const allPointNames = new Set();
   for (
     let animationIndex = 0;
@@ -126,7 +138,9 @@ export const copySpritePoints = (
   );
 
   destinationSprite.getAllNonDefaultPoints().clear();
+  // $FlowFixMe[incompatible-exact]
   mapVector(originalSprite.getAllNonDefaultPoints(), originalPoint => {
+    // $FlowFixMe[incompatible-type]
     destinationSprite.addPoint(originalPoint);
   });
 };
@@ -145,7 +159,10 @@ export const copyAnimationsSpritePoints = (
   });
 };
 
-export const isSamePoint = (point1: gdPoint, point2: gdPoint) => {
+export const isSamePoint = (
+  point1: gdPoint,
+  point2: gdPoint
+): false | boolean => {
   return (
     point1.getX() === point2.getX() &&
     point1.getY() === point2.getY() &&
@@ -153,7 +170,10 @@ export const isSamePoint = (point1: gdPoint, point2: gdPoint) => {
   );
 };
 
-export const haveSamePoints = (sprite1: gdSprite, sprite2: gdSprite) => {
+export const haveSamePoints = (
+  sprite1: gdSprite,
+  sprite2: gdSprite
+): any | boolean => {
   if (!isSamePoint(sprite1.getCenter(), sprite2.getCenter())) return false;
   if (!isSamePoint(sprite1.getOrigin(), sprite2.getOrigin())) return false;
   if (sprite1.isDefaultCenterPoint() !== sprite2.isDefaultCenterPoint())
@@ -166,11 +186,15 @@ export const haveSamePoints = (sprite1: gdSprite, sprite2: gdSprite) => {
     return false;
 
   return every(
+    // $FlowFixMe[incompatible-exact]
     mapVector(sprite1.getAllNonDefaultPoints(), sprite1Point => {
+      // $FlowFixMe[incompatible-use]
       if (!sprite2.hasPoint(sprite1Point.getName())) return false;
 
       return isSamePoint(
+        // $FlowFixMe[incompatible-type]
         sprite1Point,
+        // $FlowFixMe[incompatible-use]
         sprite2.getPoint(sprite1Point.getName())
       );
     })
@@ -180,7 +204,7 @@ export const haveSamePoints = (sprite1: gdSprite, sprite2: gdSprite) => {
 export const allDirectionSpritesHaveSamePointsAs = (
   originalSprite: gdSprite,
   direction: gdDirection
-) => {
+): any => {
   return every(
     mapFor(0, direction.getSpritesCount(), j => {
       const sprite = direction.getSprite(j);
@@ -192,7 +216,7 @@ export const allDirectionSpritesHaveSamePointsAs = (
 export const allAnimationSpritesHaveSamePointsAs = (
   originalSprite: gdSprite,
   animation: gdAnimation
-) => {
+): any => {
   return every(
     mapFor(0, animation.getDirectionsCount(), i => {
       const direction = animation.getDirection(i);
@@ -204,7 +228,7 @@ export const allAnimationSpritesHaveSamePointsAs = (
 export const allObjectSpritesHaveSamePointsAs = (
   originalSprite: gdSprite,
   animations: gdSpriteAnimationList
-) => {
+): any => {
   return every(
     mapFor(0, animations.getAnimationsCount(), i => {
       const animation = animations.getAnimation(i);
@@ -224,7 +248,9 @@ export const copySpritePolygons = (
   );
 
   destinationSprite.getCustomCollisionMask().clear();
+  // $FlowFixMe[incompatible-exact]
   mapVector(originalSprite.getCustomCollisionMask(), originalPolygon => {
+    // $FlowFixMe[incompatible-type]
     destinationSprite.getCustomCollisionMask().push_back(originalPolygon);
   });
 };
@@ -243,16 +269,21 @@ export const copyAnimationsSpriteCollisionMasks = (
   });
 };
 
-export const isSamePolygon = (polygon1: gdPolygon2d, polygon2: gdPolygon2d) => {
+export const isSamePolygon = (
+  polygon1: gdPolygon2d,
+  polygon2: gdPolygon2d
+): any | boolean => {
   const polygon1Vertices = polygon1.getVertices();
   const polygon2Vertices = polygon2.getVertices();
 
   if (polygon1Vertices.size() !== polygon2Vertices.size()) return false;
 
   return every(
+    // $FlowFixMe[incompatible-exact]
     mapVector(polygon1Vertices, (point1, index) => {
       const point2 = polygon2Vertices.at(index);
       return (
+        // $FlowFixMe[incompatible-use]
         point1.get_x() === point2.get_x() && point1.get_y() === point2.get_y()
       );
     })
@@ -262,7 +293,7 @@ export const isSamePolygon = (polygon1: gdPolygon2d, polygon2: gdPolygon2d) => {
 export const haveSameCollisionMasks = (
   sprite1: gdSprite,
   sprite2: gdSprite
-) => {
+): any | boolean => {
   if (sprite1.isFullImageCollisionMask() !== sprite2.isFullImageCollisionMask())
     return false;
 
@@ -275,7 +306,9 @@ export const haveSameCollisionMasks = (
   if (sprite1CollisionMask.size() !== sprite2CollisionMask.size()) return false;
 
   return every(
+    // $FlowFixMe[incompatible-exact]
     mapVector(sprite1CollisionMask, (sprite1Polygon, index) => {
+      // $FlowFixMe[incompatible-type]
       return isSamePolygon(sprite1Polygon, sprite2CollisionMask.at(index));
     })
   );
@@ -284,7 +317,7 @@ export const haveSameCollisionMasks = (
 export const allDirectionSpritesHaveSameCollisionMasksAs = (
   originalSprite: gdSprite,
   direction: gdDirection
-) => {
+): any => {
   return every(
     mapFor(0, direction.getSpritesCount(), j => {
       const sprite = direction.getSprite(j);
@@ -296,7 +329,7 @@ export const allDirectionSpritesHaveSameCollisionMasksAs = (
 export const allAnimationSpritesHaveSameCollisionMasksAs = (
   originalSprite: gdSprite,
   animation: gdAnimation
-) => {
+): any => {
   return every(
     mapFor(0, animation.getDirectionsCount(), i => {
       const direction = animation.getDirection(i);
@@ -311,7 +344,7 @@ export const allAnimationSpritesHaveSameCollisionMasksAs = (
 export const allObjectSpritesHaveSameCollisionMaskAs = (
   originalSprite: gdSprite,
   animations: gdSpriteAnimationList
-) => {
+): any => {
   return every(
     mapFor(0, animations.getAnimationsCount(), i => {
       const animation = animations.getAnimation(i);
@@ -325,7 +358,7 @@ export const allObjectSpritesHaveSameCollisionMaskAs = (
 
 export const isFirstSpriteUsingFullImageCollisionMask = (
   animations: gdSpriteAnimationList
-) => {
+): boolean => {
   const firstSprite = getCurrentElements(animations, 0, 0, 0).sprite;
   return firstSprite ? firstSprite.isFullImageCollisionMask() : false;
 };

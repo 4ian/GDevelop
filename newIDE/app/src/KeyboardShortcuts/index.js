@@ -155,8 +155,11 @@ const getCodeFromEvent = (e: KeyEventLike): string => {
     typeof e.keyCode === 'number' &&
     e.keyCode.toString() in eventKeyCodeToCode
   )
+    // $FlowFixMe[invalid-computed-prop]
+    // $FlowFixMe[incompatible-use]
     return eventKeyCodeToCode[e.keyCode.toString()];
   if (typeof e.which === 'number' && e.which.toString() in eventKeyCodeToCode)
+    // $FlowFixMe[incompatible-use]
     return eventKeyCodeToCode[e.which.toString()];
 
   if (e.code) return e.code;
@@ -256,6 +259,7 @@ export const useKeyboardShortcuts = ({
     () => {
       const handler = (e: KeyboardEvent) => {
         // Extract shortcut from event object and check if it's valid
+        // $FlowFixMe[incompatible-exact]
         const shortcutData = getShortcutMetadataFromEvent(e);
         if (!shortcutData.isValid) return;
 
@@ -386,9 +390,10 @@ const getKeyDisplayName = (code: string) => {
 /**
  * Parses shortcut string into array of platform-specific key strings
  */
-export const getShortcutDisplayName = (shortcutString: ?string) => {
+export const getShortcutDisplayName = (shortcutString: ?string): string => {
   if (!shortcutString) return '';
 
+  // $FlowFixMe[missing-type-arg]
   return shortcutString
     .split('+')
     .map<string>(keyCode => {
@@ -416,7 +421,8 @@ const getElectronKeyString = (code: string) => {
 /**
  * Converts given shortcut string into an Electron accelerator string
  */
-export const getElectronAccelerator = (shortcutString: string) => {
+export const getElectronAccelerator = (shortcutString: string): string => {
+  // $FlowFixMe[missing-type-arg]
   return shortcutString
     .split('+')
     .map<string>(keyCode => {

@@ -10,7 +10,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => (
+export const Default = (): React.Node => (
   <CreateProfile
     onOpenLoginDialog={action('onOpenLoginDialog')}
     onOpenCreateAccountDialog={action('onOpenCreateAccountDialog')}

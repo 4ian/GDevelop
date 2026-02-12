@@ -102,7 +102,17 @@ export const useProcessFunctionCalls = ({
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   isReadyToProcessFunctionCalls: boolean,
-|}) => {
+|}): {
+  isAutoProcessingFunctionCalls: (aiRequestId: string) => boolean,
+  onProcessFunctionCalls: (
+    functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
+    options: ?{ ignore?: boolean }
+  ) => Promise<void>,
+  setAutoProcessFunctionCalls: (
+    aiRequestId: string,
+    shouldAutoProcess: boolean
+  ) => void,
+} => {
   const { ensureExtensionInstalled } = useEnsureExtensionInstalled({
     project,
     i18n,
@@ -167,6 +177,7 @@ export const useProcessFunctionCalls = ({
       } = await processEditorFunctionCalls({
         project,
         editorCallbacks,
+        // $FlowFixMe[incompatible-type]
         toolOptions: selectedAiRequest.toolOptions || null,
         i18n,
         functionCalls: functionCalls.map(functionCall => ({
@@ -287,7 +298,13 @@ export const useAiRequestState = ({
       createdProject?: gdProject,
     |}
   ) => Promise<?FileMetadata>,
-|}) => {
+|}): {
+  isFetchingSuggestions: boolean,
+  savingProjectForMessageId: ?string,
+  selectedAiRequest: any,
+  selectedAiRequestId: any,
+  setAiState: any,
+} => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile, getAuthorizationHeader } = authenticatedUser;
   const {
@@ -596,7 +613,7 @@ export const useAiRequestState = ({
                 message.messageId === lastMessageId &&
                 message.role !== 'user'
               ) {
-                // $FlowFixMe - Flow is not able to understand this is the right type.
+                // $FlowFixMe[incompatible-type] - Flow is not able to understand this is the right type.
                 return {
                   ...message,
                   projectVersionIdAfterMessage,
@@ -606,7 +623,7 @@ export const useAiRequestState = ({
                 message.messageId === lastMessageId &&
                 message.role === 'user'
               ) {
-                // $FlowFixMe - Flow is not able to understand this is the right type.
+                // $FlowFixMe[incompatible-type] - Flow is not able to understand this is the right type.
                 return {
                   ...message,
                   projectVersionIdBeforeMessage,

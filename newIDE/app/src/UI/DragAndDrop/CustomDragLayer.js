@@ -66,6 +66,7 @@ type XYCoord = {|
 
 type InternalCustomDragLayerProps = {|
   item?: DraggedItem,
+  // $FlowFixMe[value-as-type]
   itemType?: Identifier | null,
   initialOffset?: XYCoord | null,
   currentOffset?: XYCoord | null,
@@ -202,7 +203,7 @@ const collect = (monitor: any): InternalCustomDragLayerProps => ({
   isDragging: monitor.isDragging(),
 });
 
-// $FlowFixMe - Forcing the type of the component, unsure how to make the DragLayer happy.
+// $FlowFixMe[incompatible-type] - Forcing the type of the component, unsure how to make the DragLayer happy.
 const ExternalCustomDragLayer: ({||}) => React.Node = DragLayer(collect)(
   CustomDragLayer
 );

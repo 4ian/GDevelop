@@ -64,7 +64,9 @@ export const downloadResourcesAsBlobs = async ({
   project,
   onAddBlobFile,
   onProgress,
-}: DownloadResourcesAsBlobsOptions) => {
+}: DownloadResourcesAsBlobsOptions): Promise<{
+  erroredResources: Array<empty>,
+}> => {
   const result = {
     erroredResources: [],
   };
@@ -99,6 +101,7 @@ export const downloadResourcesAsBlobs = async ({
             }
           } else {
             // Local resource: unsupported.
+            // $FlowFixMe[incompatible-type]
             result.erroredResources.push({
               resourceName: resource.getName(),
               error: new Error(
@@ -117,6 +120,7 @@ export const downloadResourcesAsBlobs = async ({
   // Download all the project resources as blob (much like what is done during an export).
   const downloadedBlobsAndResources: Array<
     ItemResult<ResourceToFetch>
+    // $FlowFixMe[incompatible-type]
   > = await downloadUrlsToBlobs({
     urlContainers: resourcesToFetchAndUpload,
     onProgress: (count, total) => {
@@ -129,6 +133,7 @@ export const downloadResourcesAsBlobs = async ({
   downloadedBlobsAndResources.forEach(({ item, error, blob }) => {
     const { resource, filename } = item;
     if (error || !blob) {
+      // $FlowFixMe[incompatible-type]
       result.erroredResources.push({
         resourceName: resource.getName(),
         error: error || new Error('Unknown error during download.'),
@@ -160,7 +165,10 @@ type Props = {|
   onDone: () => void,
 |};
 
-export default function DownloadFileSaveAsDialog({ project, onDone }: Props) {
+export default function DownloadFileSaveAsDialog({
+  project,
+  onDone,
+}: Props): React.Node {
   const [zippedProjectBlob, setZippedProjectBlob] = React.useState<?Blob>(null);
   const {
     ensureProcessIsDone,
@@ -169,6 +177,7 @@ export default function DownloadFileSaveAsDialog({ project, onDone }: Props) {
     {
       onDoProcess: React.useCallback(
         (options, onProgress) =>
+          // $FlowFixMe[incompatible-type]
           downloadResourcesAsBlobs({ ...options, onProgress }),
         []
       ),

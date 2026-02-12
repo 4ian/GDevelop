@@ -7,7 +7,7 @@ type Props = {|
   children: (childrenProps: ChildrenProps) => React.Node,
 |};
 
-export function PopoverButton({ children }: Props) {
+export function PopoverButton({ children }: Props): React.Node {
   const [buttonElement, setButtonElement] = React.useState(
     (null: ?HTMLElement)
   );

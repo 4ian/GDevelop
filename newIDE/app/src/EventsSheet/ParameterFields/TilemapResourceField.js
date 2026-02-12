@@ -12,7 +12,7 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function TileMapResourceField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?ResourceSelectorInterface>(null);
     const focus: FieldFocusFunction = options => {
@@ -48,4 +48,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-);
+): React.ComponentType<{
+  ...ParameterFieldProps,
+  +ref?: React.RefSetter<ParameterFieldInterface>,
+}>);

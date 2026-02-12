@@ -31,7 +31,7 @@ const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
   }
 };
 
-export const Default = () => (
+export const Default = (): React.Node => (
   <ImageTileRow
     items={itemsWithJustImage}
     title="Recommended templates"
@@ -42,7 +42,7 @@ export const Default = () => (
   />
 );
 
-export const Loading = () => (
+export const Loading = (): React.Node => (
   <ImageTileRow
     items={itemsWithJustImage}
     isLoading
@@ -54,7 +54,7 @@ export const Loading = () => (
   />
 );
 
-export const WithDescription = () => (
+export const WithDescription = (): React.Node => (
   <ImageTileRow
     items={itemsWithJustImage}
     title="Recommended templates"
@@ -66,7 +66,7 @@ export const WithDescription = () => (
   />
 );
 
-export const WithTitleAndDescription = () => (
+export const WithTitleAndDescription = (): React.Node => (
   <ImageTileRow
     items={itemsWithTitleAndDescription}
     title="Recommended templates"
@@ -77,7 +77,7 @@ export const WithTitleAndDescription = () => (
   />
 );
 
-export const WithOverlay = () => (
+export const WithOverlay = (): React.Node => (
   <ImageTileRow
     items={itemsWithOverlay}
     title="Recommended templates"
@@ -88,7 +88,7 @@ export const WithOverlay = () => (
   />
 );
 
-export const WithLocks = () => (
+export const WithLocks = (): React.Node => (
   <ImageTileRow
     items={itemsWithLocks}
     title="Recommended templates"
@@ -99,7 +99,7 @@ export const WithLocks = () => (
   />
 );
 
-export const WithNoCroppingOnMobile = () => (
+export const WithNoCroppingOnMobile = (): React.Node => (
   <ImageTileRow
     items={itemsWithJustImage}
     title="Recommended templates"

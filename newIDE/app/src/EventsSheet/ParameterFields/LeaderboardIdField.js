@@ -31,7 +31,7 @@ const getInlineParameterDisplayValue = (
   return leaderboard ? leaderboard.name : value;
 };
 
-export const useFetchLeaderboards = () => {
+export const useFetchLeaderboards = (): any => {
   const { leaderboards, listLeaderboards } = React.useContext(
     LeaderboardContext
   );
@@ -58,7 +58,7 @@ export const useFetchLeaderboards = () => {
   return leaderboards;
 };
 
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function LeaderboardIdField(props, ref) {
     const isOnline = useOnlineStatus();
     const leaderboards = useFetchLeaderboards();
@@ -82,6 +82,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       !leaderboards || (!!props.value && !isCurrentValueInLeaderboardList)
     );
 
+    // $FlowFixMe[missing-local-annot]
     const onChangeSelectValue = (event, value) => {
       props.onChange(event.target.value);
     };
@@ -210,7 +211,10 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </I18n>
     );
   }
-);
+): React.ComponentType<{
+  ...ParameterFieldProps,
+  +ref?: React.RefSetter<ParameterFieldInterface>,
+}>);
 
 const InlineLeaderboardIdField = ({
   value,
@@ -240,4 +244,4 @@ const InlineLeaderboardIdField = ({
 
 export const renderInlineLeaderboardIdField = (
   props: ParameterInlineRendererProps
-) => <InlineLeaderboardIdField {...props} />;
+): React.MixedElement => <InlineLeaderboardIdField {...props} />;

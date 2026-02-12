@@ -29,7 +29,7 @@ type Props = {|
   isAutomatic?: boolean,
 |};
 
-const PointRow = ({ pointX, pointY, ...props }: Props) => {
+const PointRow = ({ pointX, pointY, ...props }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <TableRow
@@ -42,6 +42,7 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => {
       onPointerEnter={() => props.onPointerEnter(props.pointName)}
       onPointerLeave={props.onPointerLeave}
     >
+      {/* $FlowFixMe[incompatible-type] */}
       <TableRowColumn style={styles.nameColumn}>
         <SemiControlledTextField
           margin="none"
@@ -59,6 +60,7 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => {
           onChange={props.onChangePointName || (newName => {})}
         />
       </TableRowColumn>
+      {/* $FlowFixMe[incompatible-type] */}
       <TableRowColumn style={styles.coordinateColumn} padding="none">
         <Column>
           <SemiControlledTextField
@@ -83,6 +85,7 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => {
           />
         </Column>
       </TableRowColumn>
+      {/* $FlowFixMe[incompatible-type] */}
       <TableRowColumn style={styles.coordinateColumn} padding="none">
         <Column>
           <SemiControlledTextField
@@ -107,6 +110,7 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => {
           />
         </Column>
       </TableRowColumn>
+      {/* $FlowFixMe[incompatible-type] */}
       <TableRowColumn style={styles.toolColumn}>
         {!!props.onRemove && (
           <IconButton size="small" onClick={props.onRemove}>

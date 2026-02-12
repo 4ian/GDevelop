@@ -79,6 +79,7 @@ const QuickObjectPropertiesEditor = ({
           instances={[objectConfiguration]}
           onInstancesModified={onObjectUpdated}
           resourceManagementProps={resourceManagementProps}
+          // $FlowFixMe[incompatible-type]
           onRefreshAllFields={forceRecomputeSchema}
         />
       </Column>
@@ -94,7 +95,7 @@ type Props = {|
 export const QuickTitleTweaker = ({
   project,
   resourceManagementProps,
-}: Props) => {
+}: Props): React.Node => {
   const titleObject = React.useMemo(
     () => {
       for (let i = 0; i < project.getLayoutsCount(); i++) {
@@ -126,6 +127,7 @@ export const QuickTitleTweaker = ({
       // the arguments will be mismatched. To workaround this, always cast the object to
       // a base gdObject to ensure C++ methods are called.
       const objectConfigurationAsGd = gd.castObject(
+        // $FlowFixMe[incompatible-exact]
         objectConfiguration,
         gd.ObjectConfiguration
       );

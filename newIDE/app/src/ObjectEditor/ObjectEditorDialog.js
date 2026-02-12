@@ -215,6 +215,7 @@ const InnerDialog = (props: InnerDialogProps) => {
   );
 
   const askConfirmationAndOpenBehaviorEvents = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     async (extensionName, behaviorName) => {
       if (hasUnsavedChanges()) {
         const answer = await showConfirmation({
@@ -264,7 +265,9 @@ const InnerDialog = (props: InnerDialogProps) => {
       fixedContent={
         <Tabs
           value={currentTab}
+          // $FlowFixMe[incompatible-type]
           onChange={setCurrentTab}
+          // $FlowFixMe[incompatible-type]
           options={[
             {
               label: <Trans>Properties</Trans>,
@@ -442,6 +445,7 @@ type State = {|
 |};
 
 class ObjectEditorDialog extends React.Component<Props, State> {
+  // $FlowFixMe[missing-local-annot]
   state = {
     editorComponent: null,
     castToObjectType: null,
@@ -464,6 +468,7 @@ class ObjectEditorDialog extends React.Component<Props, State> {
     }
   }
 
+  // $FlowFixMe[missing-local-annot]
   _loadFrom(object: ?gdObject) {
     if (!object) return;
 
@@ -486,6 +491,7 @@ class ObjectEditorDialog extends React.Component<Props, State> {
     });
   }
 
+  // $FlowFixMe[missing-local-annot]
   render() {
     const { object, initialTab } = this.props;
     const { editorComponent, castToObjectType, helpPagePath } = this.state;
@@ -506,7 +512,7 @@ class ObjectEditorDialog extends React.Component<Props, State> {
   }
 }
 
-const ObjectEditorWithErrorBoundary = (props: Props) => (
+const ObjectEditorWithErrorBoundary = (props: Props): React.Node => (
   <ErrorBoundary
     componentTitle={<Trans>Object editor</Trans>}
     scope="object-details"

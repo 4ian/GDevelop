@@ -19,7 +19,8 @@ export default class ViewPosition {
   _width: number;
   _height: number;
   instancesEditorSettings: InstancesEditorSettings;
-  _pixiContainer = new PIXI.Container();
+  // $FlowFixMe[missing-local-annot]
+  _pixiContainer = (new PIXI.Container(): any);
 
   constructor({
     initialViewX,
@@ -43,15 +44,15 @@ export default class ViewPosition {
     this._height = height;
   }
 
-  getWidth() {
+  getWidth(): any {
     return this._width;
   }
 
-  getHeight() {
+  getHeight(): any {
     return this._height;
   }
 
-  containsPoint(x: number, y: number) {
+  containsPoint(x: number, y: number): any {
     const canvasPoint = this.toCanvasCoordinates(x, y);
     return (
       0 <= canvasPoint[0] &&
@@ -142,14 +143,15 @@ export default class ViewPosition {
     return Math.min(idealZoomOnX, idealZoomOnY) * 0.95; // Add margin so that the object doesn't feel cut
   }
 
-  getViewX() {
+  getViewX(): any {
     return this.viewX;
   }
 
-  getViewY() {
+  getViewY(): any {
     return this.viewY;
   }
 
+  // $FlowFixMe[value-as-type]
   applyTransformationToPixi(container: PIXI.Container) {
     container.position.x =
       -this.viewX * this.instancesEditorSettings.zoomFactor;
@@ -162,7 +164,9 @@ export default class ViewPosition {
   }
 
   applyTransformationToThree(
+    // $FlowFixMe[value-as-type]
     threeCamera: THREE.Camera,
+    // $FlowFixMe[value-as-type]
     threePlaneMesh: THREE.Mesh
   ) {
     threeCamera.aspect = this._width / this._height;

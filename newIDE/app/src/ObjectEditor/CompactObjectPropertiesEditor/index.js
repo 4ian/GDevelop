@@ -273,7 +273,7 @@ export const CompactObjectPropertiesEditor = ({
   onExtensionInstalled,
   isVariableListLocked,
   isBehaviorListLocked,
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const [isPropertiesFolded, setIsPropertiesFolded] = React.useState(false);
   const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(false);
@@ -306,6 +306,7 @@ export const CompactObjectPropertiesEditor = ({
   // the arguments will be mismatched. To workaround this, always cast the object to
   // a base gdObject to ensure C++ methods are called.
   const objectConfigurationAsGd = gd.castObject(
+    // $FlowFixMe[incompatible-exact]
     objectConfiguration,
     gd.ObjectConfiguration
   );
@@ -582,6 +583,7 @@ export const CompactObjectPropertiesEditor = ({
                       onEditObject,
                     })
                   }
+                  // $FlowFixMe[incompatible-type]
                   onRefreshAllFields={forceRecomputeSchema}
                 />
                 {shouldDisplayVariant && (

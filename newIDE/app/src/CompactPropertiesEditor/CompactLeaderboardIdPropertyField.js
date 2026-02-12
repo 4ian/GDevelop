@@ -33,7 +33,7 @@ const CompactLeaderboardIdPropertyField = ({
   value: string,
   onChange: (newValue: string) => void,
   id?: string,
-|}) => {
+|}): React.Node => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
 
   const isOnline = useOnlineStatus();

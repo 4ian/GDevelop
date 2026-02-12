@@ -16,7 +16,7 @@ import { enumerateVariables } from './EnumerateVariables';
 
 const gd: libGDevelop = global.gd;
 
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function GlobalVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
     const [
@@ -90,7 +90,10 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </React.Fragment>
     );
   }
-);
+): React.ComponentType<{
+  ...ParameterFieldProps,
+  +ref?: React.RefSetter<ParameterFieldInterface>,
+}>);
 
 const getVariableSourceFromIdentifier = (
   variableName: string,
@@ -99,7 +102,7 @@ const getVariableSourceFromIdentifier = (
 
 export const renderInlineGlobalVariable = (
   props: ParameterInlineRendererProps
-) =>
+): any =>
   renderVariableWithIcon(
     props,
     'global variable',

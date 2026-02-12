@@ -43,7 +43,7 @@ type Props = {|
   size?: number,
 |};
 
-const ImageThumbnail = (props: Props) => {
+const ImageThumbnail = (props: Props): React.MixedElement => {
   const { onContextMenu, resourcesLoader, resourceName, project } = props;
   const theme = React.useContext(GDevelopThemeContext);
   const [error, setError] = React.useState(false);
@@ -95,6 +95,7 @@ const ImageThumbnail = (props: Props) => {
         alt={resourceName}
         src={resourcesLoader.getResourceFullUrl(project, resourceName, {})}
         onError={error => {
+          // $FlowFixMe[incompatible-type]
           setError(error);
         }}
         onLoad={() => {

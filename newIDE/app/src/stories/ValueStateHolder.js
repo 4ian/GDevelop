@@ -19,9 +19,9 @@ export default class ValueStateHolder extends React.Component<Props, State> {
     };
   }
 
-  _handleChange = (value: any) => this.setState({ value });
+  _handleChange = (value: any): any => this.setState({ value });
 
-  render() {
+  render(): any {
     return this.props.render(this.state.value, this._handleChange);
   }
 }

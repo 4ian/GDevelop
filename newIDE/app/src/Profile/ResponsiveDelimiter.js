@@ -7,6 +7,7 @@ import Text from '../UI/Text';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
+// $FlowFixMe[missing-local-annot]
 const getStyles = ({ verticalDesign, theme }) => ({
   delimiter: {
     display: 'flex',
@@ -24,7 +25,7 @@ type Props = {|
   text: React.Node,
 |};
 
-const ResponsiveDelimiter = ({ text }: Props) => {
+const ResponsiveDelimiter = ({ text }: Props): React.Node => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
 
   const verticalDesign = isMobile && !isLandscape;

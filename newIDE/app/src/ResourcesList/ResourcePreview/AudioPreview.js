@@ -28,6 +28,7 @@ const AudioPreview = ({
   }
 
   return (
+    // $FlowFixMe[incompatible-type]
     <SoundPlayer
       soundSrc={audioResourceSource || null}
       onSoundLoaded={onSoundLoaded}

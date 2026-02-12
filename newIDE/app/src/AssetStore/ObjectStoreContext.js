@@ -21,6 +21,7 @@ const gd: libGDevelop = global.gd;
 
 const emptySearchText = '';
 
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const noExcludedTiers = new Set();
 const excludedExperimentalTiers = new Set(['experimental']);
 
@@ -139,27 +140,29 @@ type ObjectStoreState = {|
   filtersState: FiltersState,
 |};
 
-export const ObjectStoreContext = React.createContext<ObjectStoreState>({
-  filters: null,
-  searchResults: null,
-  fetchObjects: () => {},
-  error: null,
-  searchText: '',
-  setSearchText: () => {},
-  allCategories: [],
-  // '' means all categories.
-  chosenCategory: '',
-  setChosenCategory: () => {},
-  setInstalledObjectMetadataList: () => {},
-  translatedObjectShortHeadersByType: {},
-  filtersState: {
-    chosenFilters: new Set(),
-    addFilter: () => {},
-    removeFilter: () => {},
-    chosenCategory: null,
+export const ObjectStoreContext: React.Context<ObjectStoreState> = React.createContext<ObjectStoreState>(
+  {
+    filters: null,
+    searchResults: null,
+    fetchObjects: () => {},
+    error: null,
+    searchText: '',
+    setSearchText: () => {},
+    allCategories: [],
+    // '' means all categories.
+    chosenCategory: '',
     setChosenCategory: () => {},
-  },
-});
+    setInstalledObjectMetadataList: () => {},
+    translatedObjectShortHeadersByType: {},
+    filtersState: {
+      chosenFilters: new Set(),
+      addFilter: () => {},
+      removeFilter: () => {},
+      chosenCategory: null,
+      setChosenCategory: () => {},
+    },
+  }
+);
 
 type ObjectStoreStateProviderProps = {|
   children: React.Node,
@@ -171,7 +174,7 @@ export const ObjectStoreStateProvider = ({
   children,
   i18n,
   defaultSearchText,
-}: ObjectStoreStateProviderProps) => {
+}: ObjectStoreStateProviderProps): React.MixedElement => {
   const [
     installedObjectMetadataList,
     setInstalledObjectMetadataList,
@@ -242,6 +245,7 @@ export const ObjectStoreStateProvider = ({
               : [objectExtension];
 
             translatedObjectShortHeadersByType[
+              // $FlowFixMe[prop-missing]
               objectShortHeader.type
             ] = translatedObjectShortHeader;
           });
@@ -392,6 +396,7 @@ export const ObjectStoreStateProvider = ({
                   : installedObjectMetadata.description,
             }
           : installedObjectMetadata;
+        // $FlowFixMe[incompatible-type]
         allTranslatedObjects[installedObjectMetadata.type] = objectMetadata;
       }
       return allTranslatedObjects;
@@ -401,6 +406,7 @@ export const ObjectStoreStateProvider = ({
 
   const allCategories = React.useMemo(
     () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       const categoriesSet = new Set();
       for (const type in allTranslatedObjects) {
         categoriesSet.add(allTranslatedObjects[type].category);
@@ -415,6 +421,7 @@ export const ObjectStoreStateProvider = ({
 
   const filters = React.useMemo(
     () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       const tagsSet = new Set();
       for (const type in allTranslatedObjects) {
         const object = allTranslatedObjects[type];
@@ -434,6 +441,7 @@ export const ObjectStoreStateProvider = ({
       return {
         allTags: sortedTags,
         defaultTags: sortedTags,
+        // $FlowFixMe[missing-empty-array-annot]
         tagsTree: [],
       };
     },
@@ -452,7 +460,7 @@ export const ObjectStoreStateProvider = ({
         ...[...builtInObjectTypes, ...firstObjectIds]
           .map(type => {
             const objectOrCategory: ObjectShortHeader =
-              //$FlowFixMe It can't be an ObjectCategory
+              //$FlowFixMe[incompatible-type] It can't be an ObjectCategory
               allTranslatedObjectsAndCategories[type];
             return objectOrCategory;
           })
@@ -502,7 +510,7 @@ export const ObjectStoreStateProvider = ({
         [...builtInObjectTypes, ...firstObjectIds]
           .map(type => {
             const objectOrCategory: ObjectShortHeader =
-              //$FlowFixMe It can't be an ObjectCategory
+              //$FlowFixMe[incompatible-type] It can't be an ObjectCategory
               allTranslatedObjectsAndCategories[type];
             return objectOrCategory;
           })
@@ -572,6 +580,7 @@ export const ObjectStoreStateProvider = ({
   );
 
   return (
+    // $FlowFixMe[incompatible-type]
     <ObjectStoreContext.Provider value={objectStoreState}>
       {children}
     </ObjectStoreContext.Provider>

@@ -13,7 +13,9 @@ import {
 import { EXAMPLES_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 
 const defaultSearchText = '';
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const excludedTiers = new Set(); // No tiers for examples.
+// $FlowFixMe[missing-empty-array-annot]
 const firstExampleIds = [];
 
 type ExampleStoreState = {|
@@ -27,22 +29,24 @@ type ExampleStoreState = {|
   filtersState: FiltersState,
 |};
 
-export const ExampleStoreContext = React.createContext<ExampleStoreState>({
-  exampleFilters: null,
-  exampleShortHeadersSearchResults: null,
-  fetchExamplesAndFilters: () => {},
-  exampleShortHeaders: null,
-  error: null,
-  searchText: '',
-  setSearchText: () => {},
-  filtersState: {
-    chosenFilters: new Set(),
-    addFilter: () => {},
-    removeFilter: () => {},
-    chosenCategory: null,
-    setChosenCategory: () => {},
-  },
-});
+export const ExampleStoreContext: React.Context<ExampleStoreState> = React.createContext<ExampleStoreState>(
+  {
+    exampleFilters: null,
+    exampleShortHeadersSearchResults: null,
+    fetchExamplesAndFilters: () => {},
+    exampleShortHeaders: null,
+    error: null,
+    searchText: '',
+    setSearchText: () => {},
+    filtersState: {
+      chosenFilters: new Set(),
+      addFilter: () => {},
+      removeFilter: () => {},
+      chosenCategory: null,
+      setChosenCategory: () => {},
+    },
+  }
+);
 
 type ExampleStoreStateProviderProps = {|
   children: React.Node,
@@ -50,7 +54,7 @@ type ExampleStoreStateProviderProps = {|
 
 export const ExampleStoreStateProvider = ({
   children,
-}: ExampleStoreStateProviderProps) => {
+}: ExampleStoreStateProviderProps): React.MixedElement => {
   const [
     exampleShortHeadersById,
     setExampleShortHeadersById,
@@ -97,6 +101,7 @@ export const ExampleStoreStateProvider = ({
 
           const exampleShortHeadersById = {};
           fetchedExampleShortHeaders.forEach(exampleShortHeader => {
+            // $FlowFixMe[prop-missing]
             exampleShortHeadersById[exampleShortHeader.id] = exampleShortHeader;
           });
           setExampleShortHeadersById(exampleShortHeadersById);
@@ -137,6 +142,7 @@ export const ExampleStoreStateProvider = ({
     chosenCategory,
     chosenFilters,
     excludedTiers,
+    // $FlowFixMe[incompatible-type]
     defaultFirstSearchItemIds: firstExampleIds,
     shuffleResults: false,
   });
@@ -164,6 +170,7 @@ export const ExampleStoreStateProvider = ({
   );
 
   return (
+    // $FlowFixMe[incompatible-type]
     <ExampleStoreContext.Provider value={exampleStoreState}>
       {children}
     </ExampleStoreContext.Provider>

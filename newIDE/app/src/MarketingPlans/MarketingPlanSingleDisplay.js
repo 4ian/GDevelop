@@ -39,7 +39,7 @@ const MarketingPlanSingleDisplay = ({
   marketingPlan,
   gameFeaturings,
   fetchGameFeaturings,
-}: Props) => {
+}: Props): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const [

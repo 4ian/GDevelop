@@ -26,7 +26,7 @@ const InfoBar = ({
   onActionClick,
   closable,
   duration = 3000,
-}: Props) => {
+}: Props): React.Node => {
   const screenType = useScreenType();
 
   React.useEffect(

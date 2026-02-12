@@ -68,10 +68,12 @@ export const getObjectAnchor = (
 ): ObjectAnchor => {
   const objects = eventBasedObjectVariant.getObjects();
   if (!objects.hasObjectNamed(objectName)) {
+    // $FlowFixMe[incompatible-type]
     return getDefaultAnchor();
   }
   const childObject = objects.getObject(objectName);
   if (!childObject.hasBehaviorNamed('Anchor')) {
+    // $FlowFixMe[incompatible-type]
     return getDefaultAnchor();
   }
   const properties = childObject.getBehavior('Anchor').getProperties();
@@ -110,31 +112,31 @@ export class LayoutedInstance {
     this._customDepth = instance.getCustomWidth();
   }
 
-  getX() {
+  getX(): any {
     return this.x;
   }
 
-  getY() {
+  getY(): any {
     return this.y;
   }
 
-  getZ() {
+  getZ(): any {
     return this.z;
   }
 
-  getAngle() {
+  getAngle(): any {
     return 0;
   }
 
-  getRotationX() {
+  getRotationX(): any {
     return 0;
   }
 
-  getRotationY() {
+  getRotationY(): any {
     return 0;
   }
 
-  getObjectName() {
+  getObjectName(): any {
     return this.instance.getObjectName();
   }
 
@@ -150,49 +152,49 @@ export class LayoutedInstance {
 
   setRotationY(angle: number) {}
 
-  isLocked() {
+  isLocked(): any {
     return false;
   }
 
   setLocked(lock: boolean) {}
 
-  isSealed() {
+  isSealed(): any {
     return false;
   }
 
   setSealed(seal: boolean) {}
 
-  getZOrder() {
+  getZOrder(): any {
     return 0;
   }
 
   setZOrder(zOrder: number) {}
 
-  getOpacity() {
+  getOpacity(): any {
     return this.instance.getOpacity();
   }
 
   setOpacity(opacity: number) {}
 
-  isFlippedX() {
+  isFlippedX(): any {
     return this.instance.isFlippedX();
   }
 
   setFlippedX(flippedX: boolean) {}
 
-  isFlippedY() {
+  isFlippedY(): any {
     return this.instance.isFlippedY();
   }
 
   setFlippedY(flippedY: boolean) {}
 
-  isFlippedZ() {
+  isFlippedZ(): any {
     return this.instance.isFlippedZ();
   }
 
   setFlippedZ(flippedY: boolean) {}
 
-  getLayer() {
+  getLayer(): any {
     return '';
   }
 
@@ -202,11 +204,11 @@ export class LayoutedInstance {
     this._hasCustomSize = enable;
   }
 
-  hasCustomSize() {
+  hasCustomSize(): any {
     return this._hasCustomSize;
   }
 
-  hasCustomDepth() {
+  hasCustomDepth(): any {
     return this._hasCustomDepth;
   }
 
@@ -215,7 +217,7 @@ export class LayoutedInstance {
     this._hasCustomSize = true;
   }
 
-  getCustomWidth() {
+  getCustomWidth(): any {
     return this._customWidth;
   }
 
@@ -224,7 +226,7 @@ export class LayoutedInstance {
     this._hasCustomSize = true;
   }
 
-  getCustomHeight() {
+  getCustomHeight(): any {
     return this._customHeight;
   }
 
@@ -233,11 +235,11 @@ export class LayoutedInstance {
     this._hasCustomDepth = true;
   }
 
-  getCustomDepth() {
+  getCustomDepth(): any {
     return this._customDepth;
   }
 
-  resetPersistentUuid() {
+  resetPersistentUuid(): any {
     return this;
   }
 
@@ -251,18 +253,18 @@ export class LayoutedInstance {
   getCustomProperties(
     globalObjectsContainer: gdObjectsContainer,
     objectsContainer: gdObjectsContainer
-  ) {
+  ): any {
     return this.instance.getCustomProperties(
       globalObjectsContainer,
       objectsContainer
     );
   }
 
-  getRawDoubleProperty(name: string) {
+  getRawDoubleProperty(name: string): any {
     return this.instance.getRawDoubleProperty(name);
   }
 
-  getRawStringProperty(name: string) {
+  getRawStringProperty(name: string): any {
     return this.instance.getRawStringProperty(name);
   }
 
@@ -270,7 +272,7 @@ export class LayoutedInstance {
 
   setRawStringProperty(name: string, value: string) {}
 
-  getVariables() {
+  getVariables(): any {
     return [];
   }
 

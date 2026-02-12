@@ -144,9 +144,13 @@ const extractErrors = (
   expressionNode.visit(expressionValidator);
   const errors = expressionValidator.getAllErrors();
 
+  // $FlowFixMe[incompatible-exact]
   const errorHighlights: Array<Highlight> = mapVector(errors, error => ({
+    // $FlowFixMe[incompatible-use]
     begin: error.getStartPosition(),
+    // $FlowFixMe[incompatible-use]
     end: error.getEndPosition() + 1,
+    // $FlowFixMe[incompatible-use]
     message: error.getMessage(),
     type: 'error',
   }));
@@ -178,15 +182,16 @@ export default class ExpressionField extends React.Component<Props, State> {
   _fieldElementWidth: ?number = null;
   _inputElement: ?HTMLInputElement = null;
 
+  // $FlowFixMe[missing-local-annot]
   state = {
     popoverOpen: false,
     parametersDialogOpen: false,
     selectedExpressionInfo: null,
 
-    validatedValue: this.props.value,
+    validatedValue: (this.props.value: string),
     errorText: null,
-    errorHighlights: [],
-    autocompletions: getAutocompletionsInitialState(),
+    errorHighlights: ([]: Array<empty>),
+    autocompletions: (getAutocompletionsInitialState(): AutocompletionsState),
   };
 
   componentDidMount() {
@@ -266,6 +271,7 @@ export default class ExpressionField extends React.Component<Props, State> {
   _handleExpressionChosen = (expressionInfo: EnumeratedExpressionMetadata) => {
     let newState = { popoverOpen: false };
     if (this._shouldOpenParametersDialog(expressionInfo)) {
+      // $FlowFixMe[incompatible-type]
       newState = {
         ...newState,
         parametersDialogOpen: true,
@@ -419,11 +425,12 @@ export default class ExpressionField extends React.Component<Props, State> {
     );
   };
 
-  _enqueueValidation = debounce(() => {
+  // $FlowFixMe[missing-local-annot]
+  _enqueueValidation = (debounce(() => {
     this._doValidation();
-  }, 250);
+  }, 250): any);
 
-  _doValidation = () => {
+  _doValidation = (): any => {
     const {
       project,
       projectScopedContainersAccessor,
@@ -491,7 +498,7 @@ export default class ExpressionField extends React.Component<Props, State> {
         scope,
       },
       completionDescriptions,
-      // $FlowFixMe The autocompletion doesn't display the groups so it doesn't need to be able to translate them.
+      // $FlowFixMe[incompatible-type] The autocompletion doesn't display the groups so it doesn't need to be able to translate them.
       null
     );
 
@@ -511,7 +518,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     }));
   };
 
-  render() {
+  render(): any {
     const {
       value,
       expressionType,
@@ -582,6 +589,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                       onChange={this._handleChange}
                       onBlur={this._handleBlurEvent}
                       ref={field => (this._field = field)}
+                      // $FlowFixMe[incompatible-type]
                       onFocus={this._handleFocus}
                       errorText={this.state.errorText}
                       onClick={() => this._enqueueValidation()}
@@ -740,6 +748,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                       selectedExpressionInfo: null,
                     });
                   }}
+                  // $FlowFixMe[incompatible-type]
                   parameterRenderingService={parameterRenderingService}
                 />
               )}

@@ -50,7 +50,6 @@ export const SimpleTextField: React.ComponentType<{
   ref?: React.RefSetter<SimpleTextFieldInterface>,
 }> = React.memo<SimpleTextFieldProps, SimpleTextFieldInterface>(
   // $FlowFixMe[incompatible-type]
-  // $FlowFixMe[incompatible-type]
   // $FlowFixMe[incompatible-exact]
   React.forwardRef<SimpleTextFieldProps, SimpleTextFieldInterface>(
     (props, ref) => {

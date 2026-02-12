@@ -82,7 +82,6 @@ const ResourcesList: React.ComponentType<{
   ref?: React.RefSetter<ResourcesListInterface>,
 }> = React.memo<Props, ResourcesListInterface>(
   // $FlowFixMe[incompatible-type]
-  // $FlowFixMe[incompatible-type]
   // $FlowFixMe[incompatible-exact]
   React.forwardRef<Props, ResourcesListInterface>(
     (

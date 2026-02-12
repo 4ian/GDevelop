@@ -257,16 +257,20 @@ for root, dirs, files in os.walk(src_dir):
                         second_arg_clean = stripped
                         break
 
-                # Preserve non-prop-missing FlowFixMe from the second section
-                preserved_comments = []
-                for line in second_section.split('\n'):
-                    stripped = line.strip()
-                    if (stripped.startswith('// $FlowFixMe')
-                            and 'prop-missing' not in stripped):
-                        preserved_comments.append(line)
-
                 # Check if first_arg already contains a ref prop
                 has_ref = 'ref?' in first_arg_raw or 'ref:' in first_arg_raw
+
+                # Find the closing '>' indentation (for multi-line)
+                closing_indent = ''
+                if not is_single_line:
+                    line_start = content.rfind('\n', 0, closing_angle)
+                    if line_start != -1:
+                        closing_line = content[line_start + 1:closing_angle]
+                        for ch in closing_line:
+                            if ch in (' ', '\t'):
+                                closing_indent += ch
+                            else:
+                                break
 
                 if not has_ref and second_arg_clean:
                     # First arg doesn't include ref — add it.
@@ -278,7 +282,6 @@ for root, dirs, files in os.walk(src_dir):
                     if is_single_line:
                         replacement = 'React.ComponentType<' + new_first_arg + '>'
                     else:
-                        # Find the indentation used for the first arg
                         first_arg_indent = '  '
                         for line in first_arg_raw.split('\n'):
                             stripped_line = line.lstrip()
@@ -286,20 +289,8 @@ for root, dirs, files in os.walk(src_dir):
                                 first_arg_indent = line[:len(line) - len(stripped_line)]
                                 break
 
-                        line_start = content.rfind('\n', 0, closing_angle)
-                        closing_indent = ''
-                        if line_start != -1:
-                            closing_line = content[line_start + 1:closing_angle]
-                            for ch in closing_line:
-                                if ch in (' ', '\t'):
-                                    closing_indent += ch
-                                else:
-                                    break
-
                         replacement = 'React.ComponentType<\n'
                         replacement += first_arg_indent + new_first_arg
-                        for comment in preserved_comments:
-                            replacement += '\n' + comment
                         replacement += '\n' + closing_indent + '>'
                 else:
                     # First arg already has ref — just drop the second arg
@@ -307,19 +298,7 @@ for root, dirs, files in os.walk(src_dir):
                     if is_single_line:
                         replacement = 'React.ComponentType<' + first_arg.strip() + '>'
                     else:
-                        line_start = content.rfind('\n', 0, closing_angle)
-                        closing_indent = ''
-                        if line_start != -1:
-                            closing_line = content[line_start + 1:closing_angle]
-                            for ch in closing_line:
-                                if ch in (' ', '\t'):
-                                    closing_indent += ch
-                                else:
-                                    break
-
                         replacement = 'React.ComponentType<' + first_arg
-                        for comment in preserved_comments:
-                            replacement += '\n' + comment
                         replacement += '\n' + closing_indent + '>'
                 result.append(replacement)
             else:

@@ -14,6 +14,8 @@ let mainWindow = null;
 
 function createWindow() {
   // Create the browser window.
+  // Values below are replaced by ExporterHelper.cpp during export.
+  // If you change their format, update the FindAndReplace calls there too.
   mainWindow = new BrowserWindow({
     width: 800 /*GDJS_WINDOW_WIDTH*/,
     height: 600 /*GDJS_WINDOW_HEIGHT*/,

@@ -24,7 +24,7 @@ import {
 import { textEllipsisStyle } from './TextEllipsis';
 import Paper from './Paper';
 
-export const AutocompletePaperComponent = (props: any): React.Node => (
+export const AutocompletePaperComponent = (props: any) => (
   // Use light background so that it's in contrast with background that
   // is either dark or medium (in dialogs).
   <Paper {...props} background="light" />
@@ -39,7 +39,6 @@ export type AutoCompleteOption =
       value: string, // The value to show on screen and to be selected
       translatableValue?: MessageDescriptor,
       onClick?: () => void | Promise<void>, // If defined, will be called when the item is clicked. onChange/onChoose won't be called.
-      // $FlowFixMe[prop-missing]
       renderIcon?: ?() => React.Element<typeof ListIcon | typeof SvgIcon>,
       disabled?: boolean, // If true, the item is disabled and cannot be selected.
     |};
@@ -253,7 +252,7 @@ const getDefaultStylingProps = (params: Object, props: Props): Object => {
 const getOptionLabel = (option: AutoCompleteOption, value: string): string =>
   option.value ? option.value : value;
 
-export default (React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
+export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
   function SemiControlledAutoComplete(props, ref) {
     const input = React.useRef((null: ?HTMLInputElement));
     const [inputValue, setInputValue] = useState((null: string | null));
@@ -388,7 +387,6 @@ export default (React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
                     },
                   }}
                   {...otherStylingProps}
-                  // $FlowFixMe[incompatible-type]
                   {...computeTextFieldStyleProps(props)}
                   style={props.textFieldStyle}
                   label={props.floatingLabelText}
@@ -405,7 +403,4 @@ export default (React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
       </I18n>
     );
   }
-): React.ComponentType<{
-  ...Props,
-  +ref?: React.RefSetter<SemiControlledAutoCompleteInterface>,
-}>);
+);

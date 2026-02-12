@@ -27,7 +27,7 @@ export default class FpsLimiter {
     this._lastInteractionTime = Date.now();
   }
 
-  shouldUpdate(): any {
+  shouldUpdate() {
     const now = Date.now();
     const delta = now - this._lastFrameTime;
 

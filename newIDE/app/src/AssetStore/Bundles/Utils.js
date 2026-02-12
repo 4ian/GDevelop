@@ -175,17 +175,14 @@ const getEstimatedTotalPriceAndCurrencyCode = ({
         totalPrice += price ? price.value : 0;
       }
     } else if (
-      // $FlowFixMe[invalid-compare]
       product.productType === 'BUNDLE' &&
       (!filter || filter === 'BUNDLE')
     ) {
       const listedBundle = productListingDatasIncludedInBundle.find(
-        // $FlowFixMe[invalid-compare]
         bundle => bundle.id === product.productId
       );
       if (listedBundle) {
         const price = listedBundle.prices.find(
-          // $FlowFixMe[invalid-compare]
           price => price.usageType === product.usageType
         );
         totalPrice += price ? price.value : 0;
@@ -548,16 +545,16 @@ export const getSummaryLines = ({
   bundleListingData,
   productListingDatasIncludedInBundle,
 }: {|
-  redemptionCodesIncludedInBundle: Array<IncludedRedemptionCode>,
+  redemptionCodesIncludedInBundle: IncludedRedemptionCode[],
   bundleListingData: BundleListingData,
-  productListingDatasIncludedInBundle: Array<
+  productListingDatasIncludedInBundle: (
     | PrivateAssetPackListingData
     | PrivateGameTemplateListingData
     | BundleListingData
     | CreditsPackageListingData
     | CourseListingData
-  >,
-|}): { desktopLines: Array<React.Node>, mobileLines: Array<React.Node> } => {
+  )[],
+|}) => {
   const includedListableProducts =
     bundleListingData.includedListableProducts || [];
   const summaryLineItems = [];
@@ -568,7 +565,7 @@ export const getSummaryLines = ({
 
   const courseListingDatasIncludedInBundle = includedCourseListableProducts
     .map(product => {
-      // $FlowFixMe[incompatible-type] - We know it's a course because of the filter.
+      // $FlowFixMe - We know it's a course because of the filter.
       const courseListingData: ?CourseListingData = productListingDatasIncludedInBundle.find(
         listingData =>
           listingData.id === product.productId &&
@@ -596,7 +593,7 @@ export const getSummaryLines = ({
 
   const assetPackListingDatasIncludedInBundle = includedAssetPackListableProducts
     .map(product => {
-      // $FlowFixMe[incompatible-type] - We know it's an asset pack because of the filter.
+      // $FlowFixMe - We know it's an asset pack because of the filter.
       const assetPackListingData: ?PrivateAssetPackListingData = productListingDatasIncludedInBundle.find(
         listingData =>
           listingData.id === product.productId &&
@@ -628,7 +625,7 @@ export const getSummaryLines = ({
 
   const gameTemplateListingDatasIncludedInBundle = includedGameTemplateListableProducts
     .map(product => {
-      // $FlowFixMe[incompatible-type] - We know it's a game template because of the filter.
+      // $FlowFixMe - We know it's a game template because of the filter.
       const gameTemplateListingData: ?PrivateGameTemplateListingData = productListingDatasIncludedInBundle.find(
         listingData =>
           listingData.id === product.productId &&
@@ -664,7 +661,6 @@ export const getSummaryLines = ({
   }
 
   const includedCreditsAmount = includedListableProducts
-    // $FlowFixMe[invalid-compare]
     .filter(product => product.productType === 'CREDIT_PACKAGE')
     .reduce(
       (total, product) => total + getCreditsAmountFromId(product.productId),
@@ -723,9 +719,7 @@ export const getSummaryLines = ({
   }
 
   return {
-    // $FlowFixMe[incompatible-type]
     mobileLines,
-    // $FlowFixMe[incompatible-type]
     desktopLines,
   };
 };

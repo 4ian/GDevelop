@@ -47,7 +47,7 @@ export const ObjectListItem = ({
   onShowDetails,
   onHeightComputed,
   platform,
-}: Props): React.Node => {
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const isEngineCompatible = isCompatibleWithGDevelopVersion(
@@ -59,9 +59,7 @@ export const ObjectListItem = ({
   const containerRef = React.useRef<?HTMLDivElement>(null);
   React.useLayoutEffect(() => {
     if (containerRef.current)
-      onHeightComputed(
-        Math.ceil(containerRef.current.getBoundingClientRect().height)
-      );
+      onHeightComputed(containerRef.current.getBoundingClientRect().height);
   });
 
   const renderField = (field: 'description' | 'fullName') => {

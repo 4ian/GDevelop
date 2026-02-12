@@ -17,7 +17,6 @@ type Props = {|
   onLanguageChanged: (language: string) => void,
 |};
 
-// $FlowFixMe[missing-local-annot]
 const displayLocaleMetadata = localeMetadata => {
   if (localeMetadata.languageCode === 'en') return false;
   if (localeMetadata.languageCode === 'pseudo_LOCALE') return Window.isDev();
@@ -53,7 +52,6 @@ const incompleteLocales = localesToDisplay.filter(
   localeMetadata => localeMetadata.translationRatio < 0.3
 );
 
-// $FlowFixMe[missing-local-annot]
 const renderLanguageSelectOption = localeMetadata => {
   const translationRatio = localeMetadata.translationRatio || 0;
   const percent = (100 * localeMetadata.translationRatio).toFixed(0);
@@ -76,7 +74,7 @@ const renderLanguageSelectOption = localeMetadata => {
   );
 };
 
-const LanguageSelector = ({ onLanguageChanged }: Props): React.Node => {
+const LanguageSelector = ({ onLanguageChanged }: Props) => {
   const { values, setLanguage } = useContext(PreferencesContext);
 
   return (

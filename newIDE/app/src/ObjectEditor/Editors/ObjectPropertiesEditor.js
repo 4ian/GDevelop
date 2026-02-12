@@ -18,7 +18,7 @@ const gd: libGDevelop = global.gd;
 
 type Props = EditorProps;
 
-const ObjectPropertiesEditor = (props: Props): React.Node => {
+const ObjectPropertiesEditor = (props: Props) => {
   const {
     objectConfiguration,
     project,
@@ -34,7 +34,6 @@ const ObjectPropertiesEditor = (props: Props): React.Node => {
   // the arguments will be mismatched. To workaround this, always cast the object to
   // a base gdObject to ensure C++ methods are called.
   const objectConfigurationAsGd = gd.castObject(
-    // $FlowFixMe[incompatible-exact]
     objectConfiguration,
     gd.ObjectConfiguration
   );

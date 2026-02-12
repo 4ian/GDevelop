@@ -16,7 +16,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const ImageNotSelected = (): React.Node => (
+export const ImageNotSelected = () => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
@@ -30,7 +30,7 @@ export const ImageNotSelected = (): React.Node => (
   />
 );
 
-export const ImageSelected = (): React.Node => (
+export const ImageSelected = () => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
@@ -44,7 +44,7 @@ export const ImageSelected = (): React.Node => (
   />
 );
 
-export const ImageWithMultipleExternalEditors = (): React.Node => (
+export const ImageWithMultipleExternalEditors = () => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
@@ -63,7 +63,6 @@ export const ImageWithMultipleExternalEditors = (): React.Node => (
           createDisplayName: 'Create with Super Image Editor 2',
           editDisplayName: 'Edit with Super Image Editor 2',
           kind: 'image',
-          // $FlowFixMe[missing-local-annot]
           edit: async options => {
             console.log('Open the image editor with these options:', options);
             return null;
@@ -81,7 +80,7 @@ export const ImageWithMultipleExternalEditors = (): React.Node => (
   />
 );
 
-export const NotExisting = (): React.Node => (
+export const NotExisting = () => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
@@ -95,7 +94,7 @@ export const NotExisting = (): React.Node => (
   />
 );
 
-export const ImageNoMargin = (): React.Node => (
+export const ImageNoMargin = () => (
   <ResourceSelector
     margin="none"
     resourceKind="image"
@@ -110,7 +109,7 @@ export const ImageNoMargin = (): React.Node => (
   />
 );
 
-export const ImageWithThumbnail = (): React.Node => (
+export const ImageWithThumbnail = () => (
   <ResourceSelectorWithThumbnail
     resourceKind="image"
     project={testProject.project}
@@ -123,7 +122,7 @@ export const ImageWithThumbnail = (): React.Node => (
   />
 );
 
-export const Audio = (): React.Node => (
+export const Audio = () => (
   <ResourceSelector
     resourceKind="audio"
     project={testProject.project}
@@ -137,7 +136,7 @@ export const Audio = (): React.Node => (
   />
 );
 
-export const FontWithResetButton = (): React.Node => (
+export const FontWithResetButton = () => (
   <ResourceSelector
     canBeReset
     resourceKind="font"
@@ -152,7 +151,7 @@ export const FontWithResetButton = (): React.Node => (
   />
 );
 
-export const FontNoMarginWithResetButton = (): React.Node => (
+export const FontNoMarginWithResetButton = () => (
   <ResourceSelector
     canBeReset
     margin="none"

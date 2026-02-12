@@ -42,8 +42,7 @@ const initialResource3DPreviewState = {
   getResourcePreview: async (_resourceUrl: string) => null,
 };
 
-const Resource3DPreviewContext: React.Context<Resource3DPreviewState> = React.createContext<Resource3DPreviewState>(
-  // $FlowFixMe[incompatible-type]
+const Resource3DPreviewContext = React.createContext<Resource3DPreviewState>(
   initialResource3DPreviewState
 );
 
@@ -68,8 +67,7 @@ class Resource3DPreviewWorkerManager {
   fallbackImagePath: string = 'JsPlatform/Extensions/3d_model.svg';
 
   constructor() {
-    // $FlowFixMe[incompatible-type] - worker-loader types aren't recognized by Flow
-    // $FlowFixMe[invalid-constructor]
+    // $FlowExpectedError - worker-loader types aren't recognized by Flow
     this.worker = new Resource3DPreviewWorker();
     this.setupMessageHandlers();
     this.initWorker();
@@ -77,21 +75,21 @@ class Resource3DPreviewWorkerManager {
 
   setupMessageHandlers() {
     this.worker.onmessage = (event: MessageEvent) => {
-      // $FlowFixMe[incompatible-type]
+      // $FlowExpectedError
       const workerOutMessageData = (event.data: WorkerOutMessage);
       const type = workerOutMessageData.type;
 
       switch (type) {
         case MESSAGE_TYPES.INIT:
           const { success } =
-            // $FlowFixMe[incompatible-type]
+            // $FlowExpectedError
             (workerOutMessageData: WorkerOutInitMessage);
           this.isInitialized = success;
           break;
 
         case MESSAGE_TYPES.RENDER_COMPLETE:
           const { resourceUrl, screenshot } =
-            // $FlowFixMe[incompatible-type]
+            // $FlowExpectedError
             (workerOutMessageData: WorkerOutRenderCompleteMessage);
           const pendingPromise = this.pendingPromises.get(resourceUrl);
           if (pendingPromise) {
@@ -102,7 +100,7 @@ class Resource3DPreviewWorkerManager {
 
         case MESSAGE_TYPES.RENDER_ERROR:
           const { resourceUrl: errorResourceUrl, error } =
-            // $FlowFixMe[incompatible-type]
+            // $FlowExpectedError
             (workerOutMessageData: WorkerOutRenderErrorMessage);
           console.error('Worker error rendering 3D model:', error);
           const pendingErrorPromise = this.pendingPromises.get(
@@ -130,7 +128,6 @@ class Resource3DPreviewWorkerManager {
   }
 
   initWorker() {
-    // $FlowFixMe[incompatible-type]
     const message: WorkerInitMessage = { type: MESSAGE_TYPES.INIT };
     this.worker.postMessage(message);
   }
@@ -144,7 +141,6 @@ class Resource3DPreviewWorkerManager {
 
       this.pendingPromises.set(resourceUrl, { resolve, reject });
       const message: WorkerRenderModelMessage = {
-        // $FlowFixMe[incompatible-type]
         type: MESSAGE_TYPES.RENDER_MODEL,
         resourceUrl,
       };
@@ -163,9 +159,7 @@ type Props = {|
   children: React.Node,
 |};
 
-export const Resource3DPreviewProvider = ({
-  children,
-}: Props): React.MixedElement => {
+export const Resource3DPreviewProvider = ({ children }: Props) => {
   const [currentResource, setCurrentResource] = React.useState<?string>(null);
   const queueRef = React.useRef<
     Array<{ url: string, resolve: (dataUrl: ?string) => void }>
@@ -242,7 +236,6 @@ export const Resource3DPreviewProvider = ({
           );
           queueItemsToResolve.forEach(item => {
             const { resolve } = item;
-            // $FlowFixMe[constant-condition]
             if (resolve) resolve(dataUrl);
           });
 

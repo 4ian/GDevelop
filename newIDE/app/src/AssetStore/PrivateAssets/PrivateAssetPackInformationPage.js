@@ -179,7 +179,7 @@ const PrivateAssetPackInformationPage = ({
   onGameTemplateOpen,
   onBundleOpen,
   simulateAppStoreProduct,
-}: Props): React.Node => {
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const { id, name, sellerId } = privateAssetPackListingData;
   const { privateAssetPackListingDatas } = React.useContext(AssetStoreContext);

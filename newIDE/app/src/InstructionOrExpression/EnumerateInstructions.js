@@ -212,7 +212,6 @@ const enumerateFreeInstructionsWithoutExtra = (
     : extension.getAllActions();
   const prefix = getExtensionPrefix(extension, i18n);
   const extensionInstructionsToKeep =
-    // $FlowFixMe[invalid-computed-prop]
     freeInstructionsToKeep[extension.getName()];
 
   // Get the map containing the metadata of the instructions provided by the extension...
@@ -264,7 +263,6 @@ const enumerateInstruction = (
   instrMetadata: gdInstructionMetadata,
   scope: InstructionOrExpressionScope,
   i18n: I18nType,
-  // $FlowFixMe[missing-local-annot]
   ignoresGroups = false
 ): EnumeratedInstructionMetadata => {
   const displayedName = instrMetadata.getFullName();
@@ -346,7 +344,6 @@ export const enumerateAllInstructions = (
   isCondition: boolean,
   i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
-  // $FlowFixMe[missing-empty-array-annot]
   let allInstructions = [];
 
   const allExtensions = gd
@@ -369,7 +366,6 @@ export const enumerateAllInstructions = (
       },
       i18n
     );
-    // $FlowFixMe[recursive-definition]
     allInstructions = [...allInstructions, ...extensionFreeInstructions];
 
     //Objects instructions:
@@ -390,7 +386,6 @@ export const enumerateAllInstructions = (
           isCondition
             ? extension.getAllConditionsForObject(objectType)
             : extension.getAllActionsForObject(objectType),
-          // $FlowFixMe[incompatible-type]
           scope,
           i18n
         ),
@@ -416,7 +411,6 @@ export const enumerateAllInstructions = (
           isCondition
             ? extension.getAllConditionsForBehavior(behaviorType)
             : extension.getAllActionsForBehavior(behaviorType),
-          // $FlowFixMe[incompatible-type]
           scope,
           i18n
         ),
@@ -424,7 +418,6 @@ export const enumerateAllInstructions = (
     }
   }
 
-  // $FlowFixMe[incompatible-type]
   return allInstructions;
 };
 
@@ -504,7 +497,6 @@ export const enumerateObjectAndBehaviorsInstructions = (
       isCondition
         ? extension.getAllConditionsForObject(objectType)
         : extension.getAllActionsForObject(objectType),
-      // $FlowFixMe[incompatible-type]
       scope,
       i18n
     ),
@@ -531,7 +523,6 @@ export const enumerateObjectAndBehaviorsInstructions = (
         extension,
         objectType,
         objectBehaviorTypes,
-        // $FlowFixMe[incompatible-type]
         scope,
         i18n
       ),
@@ -554,7 +545,6 @@ export const enumerateObjectAndBehaviorsInstructions = (
         isCondition
           ? baseObjectExtension.getAllConditionsForObject(baseObjectType)
           : baseObjectExtension.getAllActionsForObject(baseObjectType),
-        // $FlowFixMe[incompatible-type]
         scope,
         i18n
       ),
@@ -585,13 +575,13 @@ export const enumerateObjectAndBehaviorsInstructions = (
       const freeBehaviorInstructions: Array<EnumeratedInstructionMetadata> = [];
       for (let i = 0; i < allExtensions.size(); ++i) {
         const extension = allExtensions.at(i);
-        freeBehaviorInstructions.push(
-          ...enumerateExtraBehaviorInstructions(
+        freeBehaviorInstructions.push.apply(
+          freeBehaviorInstructions,
+          enumerateExtraBehaviorInstructions(
             isCondition,
             extension,
             behaviorType,
             prefix,
-            // $FlowFixMe[incompatible-type]
             scope,
             i18n
           )
@@ -605,7 +595,6 @@ export const enumerateObjectAndBehaviorsInstructions = (
           isCondition
             ? extension.getAllConditionsForBehavior(behaviorType)
             : extension.getAllActionsForBehavior(behaviorType),
-          // $FlowFixMe[incompatible-type]
           scope,
           i18n,
           // Allow behaviors to have some of their instruction to be restricted
@@ -640,7 +629,6 @@ export const enumerateFreeInstructions = (
   isCondition: boolean,
   i18n: I18nType
 ): Array<EnumeratedInstructionMetadata> => {
-  // $FlowFixMe[missing-empty-array-annot]
   let allFreeInstructions = [];
 
   const allExtensions = gd
@@ -649,9 +637,9 @@ export const enumerateFreeInstructions = (
   for (let i = 0; i < allExtensions.size(); ++i) {
     const extension = allExtensions.at(i);
 
-    // $FlowFixMe[incompatible-type]
-    allFreeInstructions.push(
-      ...enumerateFreeInstructionsWithoutExtra(
+    allFreeInstructions.push.apply(
+      allFreeInstructions,
+      enumerateFreeInstructionsWithoutExtra(
         isCondition,
         extension,
         {
@@ -663,7 +651,6 @@ export const enumerateFreeInstructions = (
       )
     );
   }
-  // $FlowFixMe[incompatible-type]
   return allFreeInstructions;
 };
 
@@ -673,7 +660,7 @@ export type InstructionFilteringOptions = {|
 
 export const getObjectParameterIndex = (
   instructionMetadata: gdInstructionMetadata
-): number => {
+) => {
   const parametersCount = instructionMetadata.getParametersCount();
   if (parametersCount >= 1) {
     const firstParameterType = instructionMetadata.getParameter(0).getType();

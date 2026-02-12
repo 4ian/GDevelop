@@ -17,7 +17,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const OperatorFieldString = (): React.Node => (
+export const OperatorFieldString = () => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (
@@ -37,7 +37,7 @@ export const OperatorFieldString = (): React.Node => (
     )}
   />
 );
-export const OperatorFieldNumber = (): React.Node => (
+export const OperatorFieldNumber = () => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (
@@ -57,7 +57,7 @@ export const OperatorFieldNumber = (): React.Node => (
     )}
   />
 );
-export const OperatorFieldColor = (): React.Node => (
+export const OperatorFieldColor = () => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (
@@ -75,7 +75,7 @@ export const OperatorFieldColor = (): React.Node => (
     )}
   />
 );
-export const OperatorFieldUnknownType = (): React.Node => (
+export const OperatorFieldUnknownType = () => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (

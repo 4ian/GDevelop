@@ -190,7 +190,7 @@ export const LeaderboardAdmin = ({
   onLoading,
   project,
   leaderboardIdToSelectAtOpening,
-}: Props): React.Node => {
+}: Props) => {
   const isOnline = useOnlineStatus();
   const { isMobile } = useResponsiveWindowSize();
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
@@ -580,7 +580,6 @@ export const LeaderboardAdmin = ({
       avatar: <Tag />,
       text: isEditingName ? (
         <Line alignItems="center" expand noMargin>
-          {/* $FlowFixMe[incompatible-type] */}
           <TextField
             id="edit-name-field"
             ref={newNameTextFieldRef}
@@ -850,7 +849,7 @@ export const LeaderboardAdmin = ({
           value={currentLeaderboard.playerUnicityDisplayChoice}
           onChange={(e, i, value) => {
             onUpdateLeaderboard(i18n, {
-              // $FlowFixMe[incompatible-type]
+              // $FlowFixMe
               playerUnicityDisplayChoice: value,
             });
           }}
@@ -1140,7 +1139,7 @@ type ContainerProps = {| ...Props, gameId: string |};
 const LeaderboardAdminContainer = ({
   gameId,
   ...otherProps
-}: ContainerProps): React.Node => (
+}: ContainerProps) => (
   <LeaderboardProvider gameId={gameId}>
     <LeaderboardAdmin {...otherProps} />
   </LeaderboardProvider>

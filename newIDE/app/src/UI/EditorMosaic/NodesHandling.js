@@ -13,7 +13,8 @@ const STACK_NEW_SECOND_GETS_50 = 50;
 
 /* ===== Type Guards & Utilities ===== */
 
-const isBranch = (n: EditorMosaicNode): boolean => typeof n !== 'string';
+const isBranch = (n: EditorMosaicNode): boolean %checks =>
+  typeof n !== 'string';
 
 type PathItem = {|
   parent: EditorMosaicBranch,
@@ -59,9 +60,7 @@ const addVertical = (
   if (!base) return newNode;
   if (isBranch(base) && base.direction === 'column') {
     return {
-      // $FlowFixMe[not-an-object]
       ...base,
-      // $FlowFixMe[prop-missing]
       second: addVertical(base.second, newNode),
     };
   }
@@ -81,9 +80,7 @@ const addHorizontal = (
   if (!base) return newNode;
   if (isBranch(base) && base.direction === 'row') {
     return {
-      // $FlowFixMe[not-an-object]
       ...base,
-      // $FlowFixMe[prop-missing]
       second: addHorizontal(base.second, newNode),
     };
   }
@@ -258,14 +255,10 @@ const ensureCanonicalPreserveSplits = (
   if (
     isBranch(current) &&
     current.direction === 'row' &&
-    // $FlowFixMe[prop-missing]
     isBranch(current.second) &&
     current.second.direction === 'row' &&
-    // $FlowFixMe[prop-missing]
     isBranch(current.second.first) &&
-    // $FlowFixMe[prop-missing]
     current.second.first.direction === 'column' &&
-    // $FlowFixMe[prop-missing]
     current.second.first.first === centralId
   ) {
     return current;

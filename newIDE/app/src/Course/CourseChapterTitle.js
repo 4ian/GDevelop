@@ -30,10 +30,7 @@ type Props = {|
   getChapterCompletion: (chapterId: string) => CourseChapterCompletion | null,
 |};
 
-const CourseChapterTitle: React.ComponentType<{
-  ...Props,
-  +ref?: React.RefSetter<HTMLDivElement>,
-}> = React.forwardRef<Props, HTMLDivElement>(
+const CourseChapterTitle = React.forwardRef<Props, HTMLDivElement>(
   ({ course, chapterIndex, courseChapter, getChapterCompletion }, ref) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const { isMobile, isLandscape } = useResponsiveWindowSize();

@@ -52,10 +52,10 @@ const TextBasedCourseChapterItems = ({
   items,
   onCompleteTask,
   isTaskCompleted,
-}: Props): React.Node => {
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
-  // $FlowFixMe[incompatible-type] - map does not recognize time of items.
+  // $FlowFixMe - map does not recognize time of items.
   return (
     <Line>
       <Column noMargin>

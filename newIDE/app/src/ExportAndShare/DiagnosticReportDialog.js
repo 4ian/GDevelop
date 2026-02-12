@@ -24,7 +24,6 @@ type Props = {|
   onClose: () => void,
 |};
 
-// $FlowFixMe[missing-local-annot]
 const addFor = (map, key, value) => {
   let set = map.get(key);
   if (!set) {
@@ -37,7 +36,7 @@ const addFor = (map, key, value) => {
 export default function DiagnosticReportDialog({
   wholeProjectDiagnosticReport,
   onClose,
-}: Props): React.Node {
+}: Props) {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const preferences = React.useContext(PreferencesContext);
 

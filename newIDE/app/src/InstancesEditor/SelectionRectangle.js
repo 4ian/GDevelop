@@ -9,7 +9,6 @@ export default class SelectionRectangle {
   instanceMeasurer: InstanceMeasurer;
   toSceneCoordinates: (x: number, y: number) => [number, number];
 
-  // $FlowFixMe[value-as-type]
   pixiRectangle: PIXI.Graphics;
   selectionRectangleStart: { x: number, y: number } | null;
   selectionRectangleEnd: { x: number, y: number } | null;
@@ -42,10 +41,9 @@ export default class SelectionRectangle {
 
     this._temporaryAABB = new Rectangle();
     this.selector = new gd.InitialInstanceJSFunctor();
-    // $FlowFixMe[incompatible-type] - invoke is not writable
-    // $FlowFixMe[cannot-write]
+    // $FlowFixMe - invoke is not writable
     this.selector.invoke = instancePtr => {
-      // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
+      // $FlowFixMe - wrapPointer is not exposed
       const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
       const instanceAABB = this.instanceMeasurer.getInstanceAABB(
         instance,
@@ -75,7 +73,7 @@ export default class SelectionRectangle {
     };
   }
 
-  hasStartedSelectionRectangle(): any {
+  hasStartedSelectionRectangle() {
     return this.selectionRectangleStart;
   }
 
@@ -91,7 +89,7 @@ export default class SelectionRectangle {
     this.selectionRectangleEnd = { x: lastX, y: lastY };
   };
 
-  endSelectionRectangle = (): any => {
+  endSelectionRectangle = () => {
     if (!this.selectionRectangleStart || !this.selectionRectangleEnd) return [];
 
     this._instancesInSelectionRectangle.length = 0;
@@ -107,7 +105,7 @@ export default class SelectionRectangle {
     }
 
     this.instances.iterateOverInstances(
-      // $FlowFixMe[incompatible-type] - gd.castObject is not supporting typings.
+      // $FlowFixMe - gd.castObject is not supporting typings.
       this.selector
     );
 
@@ -115,7 +113,7 @@ export default class SelectionRectangle {
     return this._instancesInSelectionRectangle;
   };
 
-  getPixiObject(): any {
+  getPixiObject() {
     return this.pixiRectangle;
   }
 

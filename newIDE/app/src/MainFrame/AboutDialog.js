@@ -419,7 +419,7 @@ const AboutDialog = ({ onClose, updateStatus }: Props) => {
   );
 };
 
-const AboutDialogWithErrorBoundary = (props: Props): React.Node => (
+const AboutDialogWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>About dialog</Trans>}
     scope="about"

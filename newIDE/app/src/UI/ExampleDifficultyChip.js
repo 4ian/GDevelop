@@ -20,9 +20,7 @@ type Props = {|
   difficultyLevel: string,
 |};
 
-export const ExampleDifficultyChip = ({
-  difficultyLevel,
-}: Props): React.Node => {
+export const ExampleDifficultyChip = ({ difficultyLevel }: Props) => {
   const theme = React.useContext(GDevelopThemeContext);
   const color: ?string = theme.example.difficulty.color[difficultyLevel];
 

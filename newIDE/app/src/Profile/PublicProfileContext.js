@@ -40,8 +40,7 @@ const initialPublicProfileState = {
   configureNewProjectActions: () => {},
 };
 
-const PublicProfileContext: React.Context<PublicProfileState> = React.createContext<PublicProfileState>(
-  // $FlowFixMe[incompatible-type]
+const PublicProfileContext = React.createContext<PublicProfileState>(
   initialPublicProfileState
 );
 
@@ -51,7 +50,7 @@ type Props = {|
   children: React.Node,
 |};
 
-export const PublicProfileProvider = ({ children }: Props): React.Node => {
+export const PublicProfileProvider = ({ children }: Props) => {
   const [
     visitedPublicProfileUserId,
     setVisitedPublicProfileUserId,

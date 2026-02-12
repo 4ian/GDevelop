@@ -50,7 +50,7 @@ export const CompactResourceSelectorWithThumbnail = ({
   defaultNewResourceName,
   onChange,
   id,
-}: Props): React.Node => {
+}: Props) => {
   const resourcesLoader = ResourcesLoader;
   const forceUpdate = useForceUpdate();
   const displayThumbnail = resourcesKindsWithThumbnail.includes(resourceKind);
@@ -303,7 +303,6 @@ export const CompactResourceSelectorWithThumbnail = ({
                 },
               ]
             : []),
-          // $FlowFixMe[incompatible-type]
           ...externalEditors.map(externalEditor => ({
             label: resourceName
               ? i18n._(externalEditor.editDisplayName)

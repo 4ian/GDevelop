@@ -21,7 +21,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => (
+export const Default = () => (
   <FeedbackCard
     comment={commentUnprocessed}
     authenticatedUser={fakeSilverAuthenticatedUser}
@@ -29,7 +29,7 @@ export const Default = (): React.Node => (
   />
 );
 
-export const WithoutText = (): React.Node => (
+export const WithoutText = () => (
   <FeedbackCard
     comment={commentWithNoTextUnprocessed}
     authenticatedUser={fakeSilverAuthenticatedUser}
@@ -37,7 +37,7 @@ export const WithoutText = (): React.Node => (
   />
 );
 
-export const Processed = (): React.Node => (
+export const Processed = () => (
   <FeedbackCard
     comment={commentProcessed}
     authenticatedUser={fakeSilverAuthenticatedUser}
@@ -45,7 +45,7 @@ export const Processed = (): React.Node => (
   />
 );
 
-export const WithContact = (): React.Node => (
+export const WithContact = () => (
   <FeedbackCard
     comment={{
       ...commentUnprocessed,
@@ -56,7 +56,7 @@ export const WithContact = (): React.Node => (
   />
 );
 
-export const WithNamedBuild = (): React.Node => (
+export const WithNamedBuild = () => (
   <FeedbackCard
     comment={commentUnprocessed}
     buildProperties={{
@@ -69,7 +69,7 @@ export const WithNamedBuild = (): React.Node => (
   />
 );
 
-export const WithAuthenticatedPlayer = (): React.Node => (
+export const WithAuthenticatedPlayer = () => (
   <FeedbackCard
     comment={{
       ...commentUnprocessed,
@@ -80,7 +80,7 @@ export const WithAuthenticatedPlayer = (): React.Node => (
   />
 );
 
-export const WithAuthenticatedPlayerAndContact = (): React.Node => (
+export const WithAuthenticatedPlayerAndContact = () => (
   <FeedbackCard
     comment={{
       ...commentUnprocessed,
@@ -92,7 +92,7 @@ export const WithAuthenticatedPlayerAndContact = (): React.Node => (
   />
 );
 
-export const FeedbackCardWithUnnamedBuild = (): React.Node => (
+export const FeedbackCardWithUnnamedBuild = () => (
   <FeedbackCard
     comment={commentUnprocessed}
     buildProperties={{ id: 'build-id', isDeleted: false }}
@@ -101,7 +101,7 @@ export const FeedbackCardWithUnnamedBuild = (): React.Node => (
   />
 );
 
-export const FeedbackCardWithDeletedBuild = (): React.Node => (
+export const FeedbackCardWithDeletedBuild = () => (
   <FeedbackCard
     comment={commentUnprocessed}
     buildProperties={{ id: 'build-id', isDeleted: true }}

@@ -52,7 +52,7 @@ const GameImage = ({
   previewScreenshotUrls,
   onLaunchPreview,
   disabled,
-}: Props): React.Node => {
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
 
   const gameThumbnailUrl = React.useMemo(

@@ -111,10 +111,10 @@ const isParameterVisible = (
   return true;
 };
 
-const InstructionParametersEditor: React.ComponentType<{
-  ...Props,
-  +ref?: React.RefSetter<InstructionParametersEditorInterface>,
-}> = React.forwardRef<Props, InstructionParametersEditorInterface>(
+const InstructionParametersEditor = React.forwardRef<
+  Props,
+  InstructionParametersEditorInterface
+>(
   (
     {
       instruction,
@@ -306,7 +306,6 @@ const InstructionParametersEditor: React.ComponentType<{
                   }}
                 />
                 <Column expand>
-                  {/* $FlowFixMe[incompatible-type] */}
                   <Text style={styles.description}>
                     {instructionMetadata.getDescription()}
                   </Text>
@@ -421,7 +420,6 @@ const InstructionParametersEditor: React.ComponentType<{
                     label={<Trans>Invert condition</Trans>}
                     labelPosition="right"
                     toggled={instruction.isInverted()}
-                    // $FlowFixMe[incompatible-type]
                     style={styles.invertToggle}
                     onToggle={(e, enabled) => {
                       instruction.setInverted(enabled);
@@ -439,7 +437,6 @@ const InstructionParametersEditor: React.ComponentType<{
                     }
                     labelPosition="right"
                     toggled={instruction.isAwaited()}
-                    // $FlowFixMe[incompatible-type]
                     style={styles.invertToggle}
                     onToggle={(e, enabled) => {
                       instruction.setAwaited(enabled);

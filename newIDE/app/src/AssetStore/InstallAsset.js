@@ -95,7 +95,7 @@ export const installResource = (
   unserializeFromJSObject(newResource, serializedResource);
 
   if (newResource.getKind() === 'image') {
-    // $FlowFixMe[prop-missing] - We know the resource is an ImageResource and has the setSmooth method.
+    // $FlowExpectedError[prop-missing] - We know the resource is an ImageResource and has the setSmooth method.
     newResource.setSmooth(
       project.getScaleMode() !== 'nearest' && !isPixelArt(asset)
     );
@@ -274,7 +274,6 @@ export const addAssetToProject = async ({
         objectsContainer.getObjectsCount()
       );
     }
-    // $FlowFixMe[prop-missing]
     objectNewNames[originalName] = newName;
 
     unserializeFromJSObject(

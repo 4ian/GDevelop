@@ -30,12 +30,11 @@ export class DebuggerEditorContainer extends React.Component<
 > {
   editor: ?Debugger;
   _subscriptionChecker: ?SubscriptionCheckerInterface;
-  // $FlowFixMe[missing-local-annot]
   state = {
     subscriptionChecked: false,
   };
 
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
     // We stop updates when the component is inactive.
     // If it's active, was active or becoming active again we let update propagate.
     // Especially important to note that when becoming inactive, a "last" update is allowed.
@@ -116,7 +115,7 @@ export class DebuggerEditorContainer extends React.Component<
     }
   }
 
-  render(): any {
+  render() {
     const { project, previewDebuggerServer } = this.props;
     if (!project || !previewDebuggerServer) return null;
 
@@ -144,4 +143,4 @@ export class DebuggerEditorContainer extends React.Component<
 
 export const renderDebuggerEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-): React.Node => <DebuggerEditorContainer {...props} />;
+) => <DebuggerEditorContainer {...props} />;

@@ -29,7 +29,7 @@ type Props = {|
 const PrivateGameTemplateThumbnail = ({
   privateGameTemplateListingData,
   simulateAppStoreProduct,
-}: Props): React.MixedElement => {
+}: Props) => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const iconUrl = React.useMemo(
     () =>

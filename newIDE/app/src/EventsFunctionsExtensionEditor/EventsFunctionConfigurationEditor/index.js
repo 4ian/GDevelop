@@ -74,12 +74,11 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
   Props,
   State
 > {
-  // $FlowFixMe[missing-local-annot]
   state = {
     currentTab: 'config',
   };
 
-  _getValidatedObjectOrGroupName = (newName: string): any => {
+  _getValidatedObjectOrGroupName = (newName: string) => {
     const { projectScopedContainersAccessor } = this.props;
     const objectsContainersList = projectScopedContainersAccessor
       .get()
@@ -133,12 +132,12 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     done(true);
   };
 
-  _chooseTab = (currentTab: TabNames): any =>
+  _chooseTab = (currentTab: TabNames) =>
     this.setState({
       currentTab,
     });
 
-  render(): any {
+  render() {
     const {
       project,
       projectScopedContainersAccessor,

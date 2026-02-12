@@ -19,7 +19,7 @@ const MiniToolbar = ({
   justifyContent,
   children,
   noPadding,
-}: MiniToolbarProps): React.MixedElement => (
+}: MiniToolbarProps) => (
   <div
     style={{
       ...style,
@@ -48,10 +48,9 @@ type MiniToolbarTextProps = {|
 export const MiniToolbarText = ({
   children,
   firstChild,
-}: MiniToolbarTextProps): React.Node => (
+}: MiniToolbarTextProps) => (
   <Text
     noShrink
-    // $FlowFixMe[incompatible-type]
     style={firstChild ? firstChildToolbarTextStyle : toolbarTextStyle}
   >
     {children}

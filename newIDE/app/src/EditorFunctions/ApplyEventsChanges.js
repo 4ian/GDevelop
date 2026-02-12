@@ -532,10 +532,8 @@ export const applyEventsChanges = (
         // Check already done by getParentListAndIndex for 'insertion'
         if (op.eventsToInsert && !op.eventsToInsert.isEmpty()) {
           parentList.insertEvents(
-            // $FlowFixMe[incompatible-type]
             op.eventsToInsert,
             0,
-            // $FlowFixMe[incompatible-use]
             op.eventsToInsert.getEventsCount(),
             insertionIndex
           );
@@ -556,10 +554,8 @@ export const applyEventsChanges = (
         const subEventsList = parentEvent.getSubEvents();
         if (op.eventsToInsert && !op.eventsToInsert.isEmpty()) {
           subEventsList.insertEvents(
-            // $FlowFixMe[incompatible-type]
             op.eventsToInsert,
             0,
-            // $FlowFixMe[incompatible-use]
             op.eventsToInsert.getEventsCount(),
             subEventsList.getEventsCount() // Insert at the end of sub-events
           );
@@ -596,10 +592,8 @@ export const applyEventsChanges = (
         // Insert new events from generated events
         if (op.eventsToInsert && !op.eventsToInsert.isEmpty()) {
           parentList.insertEvents(
-            // $FlowFixMe[incompatible-type]
             op.eventsToInsert,
             0,
-            // $FlowFixMe[incompatible-use]
             op.eventsToInsert.getEventsCount(),
             eventIndexInParentList
           );

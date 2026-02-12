@@ -93,7 +93,6 @@ export const downloadAndPrepareExternalEditorBase64Resources = async ({
 
   const downloadedBlobs: Array<
     ItemResult<ResourceToDownload>
-    // $FlowFixMe[incompatible-type]
   > = await downloadUrlsToBlobs({
     urlContainers: urlsToDownload,
     onProgress: (count, total) => {},
@@ -270,7 +269,6 @@ const editors: Array<ResourceExternalEditor> = [
     editDisplayName: t`Edit with Piskel`,
     kind: 'image',
     edit: async options => {
-      // $FlowFixMe[incompatible-type]
       return await editWithLocalExternalEditor({
         options,
         externalEditorName: 'piskel',

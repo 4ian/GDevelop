@@ -45,9 +45,7 @@ const sortCommandsIntoAreasAndGetReverseMap = (
     .forEach(name => {
       // Sort commands by area
       const areaName = commandsList[name].area;
-      // $FlowFixMe[prop-missing]
       if (!areaWiseCommands[areaName]) areaWiseCommands[areaName] = [];
-      // $FlowFixMe[prop-missing]
       areaWiseCommands[areaName].push(name);
 
       // Add to shortcut-command mapping
@@ -73,7 +71,7 @@ type Props = {|
   onReset: () => void,
 |};
 
-const ShortcutsList = (props: Props): React.Node => {
+const ShortcutsList = (props: Props) => {
   const [
     editedShortcut,
     setEditedShortcut,
@@ -124,11 +122,9 @@ const ShortcutsList = (props: Props): React.Node => {
             <Text size="block-title">
               {props.i18n._(commandAreas[areaName])}
             </Text>
-            {areaWiseCommands[areaName].map((commandName: string) => {
+            {areaWiseCommands[areaName].map(commandName => {
               // Get default and user-set shortcuts
-              // $FlowFixMe[incompatible-type]
               const userShortcut = props.userShortcutMap[commandName];
-              // $FlowFixMe[incompatible-type]
               const defaultShortcut = defaultShortcuts[commandName] || '';
               const shortcutString = getPatchedShortcutString(
                 defaultShortcut,
@@ -146,13 +142,10 @@ const ShortcutsList = (props: Props): React.Node => {
                   i18n={props.i18n}
                   key={commandName}
                   shortcutString={shortcutDisplayName}
-                  // $FlowFixMe[incompatible-type]
                   commandName={commandName}
                   isDefault={shortcutString === defaultShortcut}
                   isClashing={hasClash}
-                  // $FlowFixMe[incompatible-type]
                   onEditShortcut={() => setEditedShortcut(commandName)}
-                  // $FlowFixMe[incompatible-type]
                   onResetShortcut={() => resetShortcut(commandName)}
                 />
               );

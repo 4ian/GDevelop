@@ -65,7 +65,6 @@ describe('groupMembersByGroupId', () => {
     expect(
       groupMembersByGroupId({
         groups: [],
-        // $FlowFixMe[incompatible-type]
         members: [user1, user2],
         memberships: [
           getDefaultMembership({ userId: 'user-id-1', groups: null }),
@@ -91,7 +90,6 @@ describe('groupMembersByGroupId', () => {
     expect(
       groupMembersByGroupId({
         groups: [group1, group2],
-        // $FlowFixMe[incompatible-type]
         members: [user1, user2, user3, user4, user5],
         memberships: [
           getDefaultMembership({ userId: 'user-id-1', groups: null }),
@@ -104,9 +102,7 @@ describe('groupMembersByGroupId', () => {
     ).toEqual({
       active: {
         NONE: { group: { id: 'none', name: 'none' }, members: [user1, user4] },
-        // $FlowFixMe[invalid-computed-prop]
         [group1.id]: { group: group1, members: [user3] },
-        // $FlowFixMe[invalid-computed-prop]
         [group2.id]: { group: group2, members: [user2, user5] },
       },
       inactive: [],
@@ -124,7 +120,6 @@ describe('groupMembersByGroupId', () => {
     expect(
       groupMembersByGroupId({
         groups: [group1, group2],
-        // $FlowFixMe[incompatible-type]
         members: [user1, user2, user3, user4, user5],
         memberships: [
           getDefaultMembership({ userId: 'user-id-1', groups: null }),
@@ -137,9 +132,7 @@ describe('groupMembersByGroupId', () => {
     ).toEqual({
       active: {
         NONE: { group: { id: 'none', name: 'none' }, members: [] },
-        // $FlowFixMe[invalid-computed-prop]
         [group1.id]: { group: group1, members: [] },
-        // $FlowFixMe[invalid-computed-prop]
         [group2.id]: { group: group2, members: [] },
       },
       inactive: [user1, user2, user3, user4, user5],
@@ -157,7 +150,6 @@ describe('groupMembersByGroupId', () => {
     expect(
       groupMembersByGroupId({
         groups: [group1, group2],
-        // $FlowFixMe[incompatible-type]
         members: [user1, user2, user3, user4, user5],
         memberships: [
           getDefaultMembership({ userId: 'user-id-1', groups: [group1.id] }),
@@ -170,9 +162,7 @@ describe('groupMembersByGroupId', () => {
     ).toEqual({
       active: {
         NONE: { group: { id: 'none', name: 'none' }, members: [] },
-        // $FlowFixMe[invalid-computed-prop]
         [group1.id]: { group: group1, members: [user1, user2, user3, user5] },
-        // $FlowFixMe[invalid-computed-prop]
         [group2.id]: { group: group2, members: [] },
       },
       inactive: [user4],

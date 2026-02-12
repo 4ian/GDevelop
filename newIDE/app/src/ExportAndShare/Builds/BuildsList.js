@@ -108,7 +108,7 @@ const BuildsList = ({
   onGameUpdated,
   onBuildUpdated,
   onBuildDeleted,
-}: Props): React.Node => {
+}: Props) => {
   const [gameUpdating, setGameUpdating] = React.useState(false);
   const [buildFilter, setBuildFilter] = React.useState<BuildFilter>(
     'all-build'
@@ -132,7 +132,7 @@ const BuildsList = ({
             floatingLabelText={<Trans>Show</Trans>}
             value={buildFilter}
             onChange={(e, i, value) => {
-              // $FlowFixMe[incompatible-type] - We are confident that the selected option's value is of type BuildFilter.
+              // $FlowFixMe - We are confident that the selected option's value is of type BuildFilter.
               setBuildFilter(value);
             }}
           >

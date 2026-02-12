@@ -13,7 +13,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => (
+export const Default = () => (
   <ValueStateHolder
     initialValue={1}
     render={(value, onChange) => (

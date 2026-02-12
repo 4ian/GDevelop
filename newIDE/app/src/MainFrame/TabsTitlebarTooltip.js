@@ -54,10 +54,7 @@ type Props = {|
   editorTab: EditorTab,
 |};
 
-const TabsTitlebarTooltip = ({
-  anchorElement,
-  editorTab,
-}: Props): React.Node => {
+const TabsTitlebarTooltip = ({ anchorElement, editorTab }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const [tooltipStyle, setTooltipStyle] = React.useState<Object>(
     styles.tooltip

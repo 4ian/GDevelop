@@ -19,7 +19,7 @@ const LeaderboardDialog = ({
   open,
   project,
   leaderboardId,
-}: Props): React.Node => {
+}: Props) => {
   const [isLoading, setIsLoading] = React.useState(false);
   return (
     <Dialog

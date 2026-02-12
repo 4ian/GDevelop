@@ -42,7 +42,7 @@ export const ExtensionListItem = ({
   matches,
   onChoose,
   onHeightComputed,
-}: Props): React.Node => {
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(
@@ -60,9 +60,7 @@ export const ExtensionListItem = ({
   const containerRef = React.useRef<?HTMLDivElement>(null);
   React.useLayoutEffect(() => {
     if (containerRef.current)
-      onHeightComputed(
-        Math.ceil(containerRef.current.getBoundingClientRect().height)
-      );
+      onHeightComputed(containerRef.current.getBoundingClientRect().height);
   });
 
   const renderExtensionField = (field: 'shortDescription' | 'fullName') => {

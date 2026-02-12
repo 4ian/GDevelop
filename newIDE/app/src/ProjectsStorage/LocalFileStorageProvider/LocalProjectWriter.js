@@ -223,7 +223,6 @@ export const onSaveProject = async (
   });
   return {
     wasSaved: true,
-    // $FlowFixMe[incompatible-type]
     fileMetadata: newFileMetadata,
   };
 };
@@ -234,14 +233,7 @@ export const generateOnChooseSaveProjectAsLocation = ({
 }: {
   setDialog: (() => React.Node) => void,
   closeDialog: () => void,
-}): (({
-  displayOptionToGenerateNewProjectUuid: boolean,
-  fileMetadata: ?FileMetadata,
-  project: gdProject,
-}) => Promise<{
-  saveAsLocation: ?SaveAsLocation,
-  saveAsOptions: ?SaveAsOptions,
-}>) => async ({
+}) => async ({
   project,
   fileMetadata,
   displayOptionToGenerateNewProjectUuid,
@@ -278,7 +270,6 @@ export const generateOnChooseSaveProjectAsLocation = ({
   if (!options) return { saveAsLocation: null, saveAsOptions: null }; // Save was cancelled.
 
   let defaultPath = fileMetadata ? fileMetadata.fileIdentifier : '';
-  // $FlowFixMe[incompatible-use]
   const { name } = options;
   if (path && defaultPath && name) {
     const safeFilename = name.replace(/[<>:"/\\|?*]/g, '_');
@@ -301,12 +292,10 @@ export const generateOnChooseSaveProjectAsLocation = ({
 
   return {
     saveAsLocation: {
-      // $FlowFixMe[incompatible-use]
       name: options.name,
       fileIdentifier: filePath,
     },
     saveAsOptions: {
-      // $FlowFixMe[incompatible-use]
       generateNewProjectUuid: options.generateNewProjectUuid,
     },
   };
@@ -342,7 +331,6 @@ export const onSaveProjectAs = async (
   };
 
   // Move (copy or download, etc...) the resources first.
-  // $FlowFixMe[incompatible-type]
   await options.onMoveResources({ newFileMetadata });
 
   // Save the project when resources have been copied.
@@ -357,7 +345,6 @@ export const onSaveProjectAs = async (
   });
   return {
     wasSaved: true,
-    // $FlowFixMe[incompatible-type]
     fileMetadata: newFileMetadata,
   };
 };
@@ -422,7 +409,7 @@ export const renderNewProjectSaveAsLocationChooser = ({
   saveAsLocation: ?SaveAsLocation,
   setSaveAsLocation: (?SaveAsLocation) => void,
   newProjectsDefaultFolder?: string,
-|}): React.Node => {
+|}) => {
   const projectLocation = getProjectLocation({
     projectName,
     saveAsLocation,
@@ -469,7 +456,7 @@ export const canFileMetadataBeSafelySaved = async (
     showAlert: ShowAlertFunction,
     showConfirmation: ShowConfirmFunction,
   |}
-): Promise<boolean> => {
+) => {
   const path = fileMetadata.fileIdentifier;
   if (isTryingToSaveInForbiddenPath(path)) {
     await actions.showAlert({
@@ -488,7 +475,7 @@ export const canFileMetadataBeSafelySavedAs = async (
     showAlert: ShowAlertFunction,
     showConfirmation: ShowConfirmFunction,
   |}
-): Promise<boolean> => {
+) => {
   const path = fileMetadata.fileIdentifier;
   if (isTryingToSaveInForbiddenPath(path)) {
     await actions.showAlert({

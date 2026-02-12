@@ -46,7 +46,6 @@ const sceneTweenExistsCondition = {
   fullGroupName: 'Visual effect/Tweening/Scene Tweens',
 };
 
-// $FlowFixMe[missing-local-annot]
 const applySearch = (lowerCaseSearchText: string, instructions) => {
   const searchApi = new Fuse(instructions, {
     ...sharedFuseConfiguration,

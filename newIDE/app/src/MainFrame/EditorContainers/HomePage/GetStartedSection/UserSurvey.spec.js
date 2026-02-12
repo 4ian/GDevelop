@@ -12,7 +12,6 @@ describe('formatUserAnswers', () => {
       },
     ];
 
-    // $FlowFixMe[incompatible-type]
     expect(formatUserAnswers(userAnswers)).toEqual({
       projectDescription: '',
     });
@@ -27,7 +26,6 @@ describe('formatUserAnswers', () => {
       },
     ];
 
-    // $FlowFixMe[incompatible-type]
     expect(formatUserAnswers(userAnswers)).toEqual({
       creationGoalInput: 'Bonjour',
     });
@@ -41,7 +39,6 @@ describe('formatUserAnswers', () => {
       },
     ];
 
-    // $FlowFixMe[incompatible-type]
     expect(formatUserAnswers(userAnswers)).toEqual({
       painPoints: ['lackGraphics', 'lackSound'],
     });
@@ -95,7 +92,6 @@ describe('formatUserAnswers', () => {
       gameDevelopmentExperience: ['someNoCode'],
       targetPlatform: ['client', 'androidApp', 'console'],
     };
-    // $FlowFixMe[incompatible-type]
     expect(formatUserAnswers(userAnswers)).toEqual(expectedUSerSurvey);
   });
 });

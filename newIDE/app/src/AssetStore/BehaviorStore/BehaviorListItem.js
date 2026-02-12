@@ -54,7 +54,7 @@ export const BehaviorListItem = ({
   onShowDetails,
   onHeightComputed,
   platform,
-}: Props): React.Node => {
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const alreadyAdded = objectBehaviorsTypes.includes(behaviorShortHeader.type);
@@ -89,9 +89,7 @@ export const BehaviorListItem = ({
   const containerRef = React.useRef<?HTMLDivElement>(null);
   React.useLayoutEffect(() => {
     if (containerRef.current)
-      onHeightComputed(
-        Math.ceil(containerRef.current.getBoundingClientRect().height)
-      );
+      onHeightComputed(containerRef.current.getBoundingClientRect().height);
   });
 
   const renderField = (field: 'description' | 'fullName') => {

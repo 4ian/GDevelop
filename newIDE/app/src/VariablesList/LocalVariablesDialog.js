@@ -26,14 +26,13 @@ const LocalVariablesDialog = ({
   initiallySelectedVariableName,
   shouldCreateInitiallySelectedVariable,
   isListLocked,
-}: Props): React.Node => {
+}: Props) => {
   const tabs = React.useMemo(
     () => [
       {
         id: 'local-variables',
         label: '',
         variablesContainer,
-        // $FlowFixMe[missing-empty-array-annot]
         onComputeAllVariableNames: () => [],
       },
     ],
@@ -48,7 +47,6 @@ const LocalVariablesDialog = ({
       onCancel={onCancel}
       onApply={onApply}
       title={<Trans>Local variables</Trans>}
-      // $FlowFixMe[incompatible-type]
       tabs={tabs}
       helpPagePath={'/all-features/variables/local-variables'}
       id="local-variables-dialog"

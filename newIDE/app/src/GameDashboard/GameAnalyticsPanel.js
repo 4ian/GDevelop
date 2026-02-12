@@ -47,7 +47,7 @@ export const GameAnalyticsPanel = ({
   recommendedMarketingPlan,
   gameFeaturings,
   fetchGameFeaturings,
-}: Props): React.Node => {
+}: Props) => {
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );

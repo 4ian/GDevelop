@@ -92,7 +92,7 @@ const styles = {
   },
 };
 
-export const Separator = (): React.MixedElement => {
+export const Separator = () => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <div
@@ -104,7 +104,7 @@ export const Separator = (): React.MixedElement => {
   );
 };
 
-export const Level2Separator = (): React.MixedElement => {
+export const Level2Separator = () => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <div
@@ -178,7 +178,7 @@ const CompactPropertiesEditor = ({
   preventWrap,
   removeSpacers,
   isHidden,
-}: Props): null | React.Node => {
+}: Props) => {
   const forceUpdate = useForceUpdate();
 
   const onFieldChanged = React.useCallback(
@@ -195,7 +195,6 @@ const CompactPropertiesEditor = ({
       if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
       if (onInstancesModified) onInstancesModified(instances);
       if (hasImpactOnAllOtherFields) {
-        // $FlowFixMe[constant-condition]
         if (onRefreshAllFields) onRefreshAllFields();
       }
       forceUpdate();
@@ -260,7 +259,6 @@ const CompactPropertiesEditor = ({
             instances,
             field,
           }),
-          // $FlowFixMe[missing-local-annot]
           onChange: newValue => {
             // If the value is not a number, the user is probably still typing, adding a dot or a comma.
             // So don't update the value, it will be reverted if they leave the field.
@@ -392,7 +390,6 @@ const CompactPropertiesEditor = ({
             field,
             mixedValueFallback: '(Multiple values)',
           }),
-          // $FlowFixMe[missing-local-annot]
           onChange: newValue => {
             instances.forEach(i => setValue(i, newValue || ''));
             onFieldChanged({
@@ -455,7 +452,6 @@ const CompactPropertiesEditor = ({
       ));
 
       let compactSelectField;
-      // $FlowFixMe[invalid-compare]
       if (field.valueType === 'number') {
         const { setValue } = field;
         compactSelectField = (
@@ -583,7 +579,6 @@ const CompactPropertiesEditor = ({
 
       return (
         <React.Fragment key={`toggle-buttons-${field.name}`}>
-          {/* $FlowFixMe[incompatible-type] */}
           <CompactToggleButtons id={field.name} buttons={buttons} expand />
         </React.Fragment>
       );
@@ -796,7 +791,6 @@ const CompactPropertiesEditor = ({
         if (field.nonFieldType === 'title') {
           return renderTitle(field);
         } else if (field.nonFieldType === 'sectionTitle') {
-          // $FlowFixMe[incompatible-type]
           return renderSectionTitle(field);
         } else if (field.nonFieldType === 'button') {
           return renderButton(field);

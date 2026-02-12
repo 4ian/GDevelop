@@ -59,7 +59,6 @@ export const getBrowserSWPreviewBaseUrl = (): string => {
     );
   }
 
-  // $FlowFixMe[incompatible-type]
   return `${getBrowserSWPreviewRootUrl()}/${currentInstanceId}`;
 };
 
@@ -74,8 +73,7 @@ const openBrowserSWPreviewIndexedDB = (): Promise<IDBDatabase> => {
 
   return new Promise((resolve, reject) => {
     try {
-      // $FlowFixMe[incompatible-type] - indexedDB is available in all browsers
-      // $FlowFixMe[cannot-resolve-name]
+      // $FlowFixMe - indexedDB is available in all browsers
       const request = indexedDB.open(DB_NAME, DB_VERSION);
 
       request.onerror = () => {
@@ -89,7 +87,6 @@ const openBrowserSWPreviewIndexedDB = (): Promise<IDBDatabase> => {
         console.log('[BrowserSWIndexedDB] Database opened successfully');
 
         // Handle unexpected close
-        // $FlowFixMe[incompatible-use]
         dbInstance.onclose = () => {
           console.warn(
             '[BrowserSWIndexedDB] Database connection closed unexpectedly'
@@ -98,7 +95,6 @@ const openBrowserSWPreviewIndexedDB = (): Promise<IDBDatabase> => {
         };
 
         // Handle version change (e.g., if another tab upgrades the DB)
-        // $FlowFixMe[incompatible-use]
         dbInstance.onversionchange = () => {
           console.warn(
             '[BrowserSWIndexedDB] Database version changed, closing connection'
@@ -109,7 +105,6 @@ const openBrowserSWPreviewIndexedDB = (): Promise<IDBDatabase> => {
           }
         };
 
-        // $FlowFixMe[incompatible-type]
         resolve(dbInstance);
       };
 
@@ -315,11 +310,9 @@ const acquireInstanceIdAndCleanup = async (
   const store = transaction.objectStore(INSTANCES_STORE_NAME);
 
   const [keys, records] = await Promise.all([
-    // $FlowFixMe[incompatible-type] - outdated Flow types.
-    // $FlowFixMe[prop-missing]
+    // $FlowFixMe - outdated Flow types.
     requestToPromise(store.getAllKeys()),
-    // $FlowFixMe[incompatible-type] - outdated Flow types.
-    // $FlowFixMe[prop-missing]
+    // $FlowFixMe - outdated Flow types.
     requestToPromise(store.getAll()),
   ]);
 

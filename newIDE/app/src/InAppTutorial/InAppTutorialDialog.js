@@ -30,7 +30,7 @@ function InAppTutorialDialog({
   endTutorial,
   goToNextStep,
   isLastStep,
-}: Props): React.Node {
+}: Props) {
   const onApply = () => {
     if (isLastStep) {
       endTutorial({ reason: 'completed' });
@@ -69,7 +69,6 @@ function InAppTutorialDialog({
           title={null} // Specific end dialog where the title is handled by the content.
           onApply={onApply}
           open
-          // $FlowFixMe[incompatible-type]
           actions={actions}
           maxWidth="sm"
           flexColumnBody
@@ -80,7 +79,7 @@ function InAppTutorialDialog({
               if (item.messageDescriptor) {
                 return (
                   <MarkdownText
-                    // $FlowFixMe[incompatible-type] - Message descriptor are usually an object with a `id` key containing the translation key.
+                    // $FlowFixMe - Message descriptor are usually an object with a `id` key containing the translation key.
                     key={item.messageDescriptor.id || item.messageDescriptor}
                     translatableSource={item.messageDescriptor}
                   />
@@ -88,7 +87,7 @@ function InAppTutorialDialog({
               } else if (item.messageByLocale) {
                 return (
                   <MarkdownText
-                    // $FlowFixMe[incompatible-type] - We suppose the message by locale has at least one key (one language) and we use the translation key.
+                    // $FlowFixMe - We suppose the message by locale has at least one key (one language) and we use the translation key.
                     key={Object.values(item.messageByLocale)[0]}
                     source={selectMessageByLocale(i18n, item.messageByLocale)}
                   />

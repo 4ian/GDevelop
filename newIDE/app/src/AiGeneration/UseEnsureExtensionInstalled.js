@@ -16,16 +16,13 @@ export type EnsureExtensionInstalledOptions = {|
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
-type _UseEnsureExtensionInstalledReturnType = {
-  ensureExtensionInstalled: EnsureExtensionInstalledOptions => Promise<void>,
-};
 export const useEnsureExtensionInstalled = ({
   project,
   i18n,
 }: {|
   project: ?gdProject,
   i18n: I18nType,
-|}): _UseEnsureExtensionInstalledReturnType => {
+|}) => {
   const {
     translatedExtensionShortHeadersByName: extensionShortHeadersByName,
   } = React.useContext(ExtensionStoreContext);

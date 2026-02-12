@@ -35,7 +35,7 @@ const StorageProviderListItem = ({
   storageProvider,
   onChooseProvider,
   disabled,
-}: Props): React.Node => {
+}: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const classesForListItem = useListItemStyles();

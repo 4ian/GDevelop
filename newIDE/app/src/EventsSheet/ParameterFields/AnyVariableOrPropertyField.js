@@ -18,7 +18,7 @@ import { mapFor } from '../../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
-export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function AnyVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
     const [
@@ -137,10 +137,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </React.Fragment>
     );
   }
-): React.ComponentType<{
-  ...ParameterFieldProps,
-  +ref?: React.RefSetter<ParameterFieldInterface>,
-}>);
+);
 
 export const getVariableSourceFromIdentifier = (
   variableName: string,
@@ -157,5 +154,4 @@ export const getVariableSourceFromIdentifier = (
 
 export const renderInlineAnyVariableOrProperty = (
   props: ParameterInlineRendererProps
-): any =>
-  renderVariableWithIcon(props, 'variable', getVariableSourceFromIdentifier);
+) => renderVariableWithIcon(props, 'variable', getVariableSourceFromIdentifier);

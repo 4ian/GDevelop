@@ -18,13 +18,13 @@ export type AppStoreProduct = {|
 /**
  * Check if the user has subscription bought on the app store.
  */
-export const hasAppStoreUserSubscription = (): boolean => {
+export const hasAppStoreUserSubscription = () => {
   return false;
 };
 
 // Products:
 
-export const shouldUseAppStoreProduct = (): boolean => false;
+export const shouldUseAppStoreProduct = () => false;
 
 export const getAppStoreProduct = (
   productId: string | null

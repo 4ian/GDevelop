@@ -18,7 +18,6 @@ describe('applyEventsChanges', () => {
   const fakeGeneratedEventId = 'fakeGeneratedEventId';
 
   beforeEach(() => {
-    // $FlowFixMe[invalid-constructor]
     project = new gd.ProjectHelper.createNewGDJSProject();
     sceneEventsList = new gd.EventsList();
   });
@@ -1250,7 +1249,6 @@ describe('addMissingObjectBehaviors', () => {
   let testScene: gdLayout;
 
   beforeEach(() => {
-    // $FlowFixMe[invalid-constructor]
     project = new gd.ProjectHelper.createNewGDJSProject();
     testScene = project.insertNewLayout('TestScene', 0);
   });

@@ -13,7 +13,7 @@ export default {
   component: EmptyPlaceholder,
   decorators: [paperDecorator],
 };
-export const Default = (): React.Node => (
+export const Default = () => (
   <FixedHeightFlexContainer
     height={500}
     justifyContent="center"
@@ -29,7 +29,7 @@ export const Default = (): React.Node => (
   </FixedHeightFlexContainer>
 );
 
-export const WithSecondaryAction = (): React.Node => (
+export const WithSecondaryAction = () => (
   <FixedHeightFlexContainer
     height={500}
     justifyContent="center"
@@ -48,7 +48,7 @@ export const WithSecondaryAction = (): React.Node => (
   </FixedHeightFlexContainer>
 );
 
-export const WithActionSplitMenu = (): React.Node => (
+export const WithActionSplitMenu = () => (
   <FixedHeightFlexContainer
     height={500}
     justifyContent="center"

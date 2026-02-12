@@ -67,18 +67,12 @@ export type ConfirmState = {|
 |};
 
 const initialConfirmState = {
-  // $FlowFixMe[missing-local-annot]
   showAlertDialog: ShowAlertDialogOptionsWithCallback => {},
-  // $FlowFixMe[missing-local-annot]
   showConfirmDialog: ShowConfirmDialogOptionsWithCallback => {},
-  // $FlowFixMe[missing-local-annot]
   showConfirmDeleteDialog: ShowConfirmDeleteDialogOptionsWithCallback => {},
-  // $FlowFixMe[missing-local-annot]
   showYesNoCancelDialog: ShowYesNoCancelDialogOptionsWithCallback => {},
 };
 
-const AlertContext: React.Context<ConfirmState> = React.createContext<ConfirmState>(
-  initialConfirmState
-);
+const AlertContext = React.createContext<ConfirmState>(initialConfirmState);
 
 export default AlertContext;

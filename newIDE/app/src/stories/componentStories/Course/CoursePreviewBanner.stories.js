@@ -18,7 +18,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const CompletedCourse = (): React.Node => {
+export const CompletedCourse = () => {
   return (
     <AuthenticatedUserContext.Provider
       value={{

@@ -14,7 +14,7 @@ export default {
   component: ExtensionFunctionSelectorDialog,
 };
 
-export const Default = (): React.Node => (
+export const Default = () => (
   <I18n>
     {({ i18n }) => (
       <ExtensionFunctionSelectorDialog

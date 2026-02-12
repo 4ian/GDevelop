@@ -41,7 +41,6 @@ const StandaloneDialog = ({ onClose }: Props) => {
 
       let bundleListingData: ?BundleListingData = null;
       // Open the information page of a the bundle.
-      // $FlowFixMe[constant-condition]
       if (bundleCategory) {
         bundleListingData = getBundleListingDataFromCategory({
           bundleListingDatas,
@@ -113,7 +112,7 @@ const StandaloneDialog = ({ onClose }: Props) => {
   );
 };
 
-const StandaloneDialogWithErrorBoundary = (props: Props): React.Node => (
+const StandaloneDialogWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Standalone dialog</Trans>}
     scope="standalone"

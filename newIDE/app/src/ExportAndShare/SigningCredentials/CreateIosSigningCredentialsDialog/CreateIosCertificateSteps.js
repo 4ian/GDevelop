@@ -19,7 +19,7 @@ import { type AuthenticatedUser } from '../../../Profile/AuthenticatedUserContex
 import { signingCredentialApi } from '../../../Utils/GDevelopServices/Build';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 
-export const getBase64FromFile = async (file: File): Promise<unknown> => {
+export const getBase64FromFile = async (file: File) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
@@ -51,9 +51,7 @@ type Props = {
   authenticatedUser: AuthenticatedUser,
 };
 
-export const CreateIosCertificateSteps = ({
-  authenticatedUser,
-}: Props): React.Node => {
+export const CreateIosCertificateSteps = ({ authenticatedUser }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { showConfirmation } = useAlertDialog();
   const userId = authenticatedUser.profile
@@ -143,7 +141,6 @@ export const CreateIosCertificateSteps = ({
           authenticatedUser.getAuthorizationHeader,
           userId,
           {
-            // $FlowFixMe[incompatible-type]
             certificateAsBase64,
           }
         );
@@ -197,7 +194,6 @@ export const CreateIosCertificateSteps = ({
           authenticatedUser.getAuthorizationHeader,
           userId,
           {
-            // $FlowFixMe[incompatible-type]
             mobileProvisionAsBase64,
           }
         );

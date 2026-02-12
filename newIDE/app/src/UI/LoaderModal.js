@@ -65,7 +65,7 @@ const LoaderModal = ({
   message,
   showImmediately,
   showAfterDelay,
-}: Props): React.Node => {
+}: Props) => {
   const delayedShow = useDelayedBoolean(!!showAfterDelay, 150);
   const isInfinite = progress === null || progress === undefined;
 

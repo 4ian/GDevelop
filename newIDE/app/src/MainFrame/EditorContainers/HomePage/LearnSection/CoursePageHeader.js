@@ -104,7 +104,7 @@ const CoursePageHeader = ({
   purchasingCourseListingData,
   setPurchasingCourseListingData,
   simulateAppStoreProduct,
-}: Props): React.Node => {
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { listedCourses } = React.useContext(CourseStoreContext);
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();
@@ -206,7 +206,6 @@ const CoursePageHeader = ({
                           </div>
                         )}
                     </ResponsiveLineStackLayout>
-                    {/* $FlowFixMe[incompatible-type] */}
                     <Text size="title" noMargin style={styles.title}>
                       {selectMessageByLocale(i18n, course.titleByLocale)}
                     </Text>

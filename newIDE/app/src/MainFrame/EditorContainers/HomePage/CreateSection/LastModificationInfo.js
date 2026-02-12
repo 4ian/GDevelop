@@ -37,10 +37,9 @@ const LastModificationInfo = ({
   authenticatedUser,
   currentFileMetadata,
   textColor = 'primary',
-  // $FlowFixMe[incompatible-type]
   textSize = 'body',
   textPrefix,
-}: LastModificationInfoProps): null | React.Node => {
+}: LastModificationInfoProps) => {
   const isProjectSavedOnCloud =
     !!storageProvider && storageProvider.internalName === 'Cloud';
   const isCurrentProjectOpened =

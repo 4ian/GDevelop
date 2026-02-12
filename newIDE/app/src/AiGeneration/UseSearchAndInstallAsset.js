@@ -13,10 +13,6 @@ import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { useInstallAsset } from '../AssetStore/NewObjectDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 
-type _FuncReturnType = {
-  searchAndInstallAsset: AssetSearchAndInstallOptions => Promise<AssetSearchAndInstallResult>,
-};
-
 export const useSearchAndInstallAsset = ({
   project,
   resourceManagementProps,
@@ -27,7 +23,7 @@ export const useSearchAndInstallAsset = ({
   resourceManagementProps: ResourceManagementProps,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
-|}): _FuncReturnType => {
+|}) => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );

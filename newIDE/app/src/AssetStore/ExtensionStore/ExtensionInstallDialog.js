@@ -34,7 +34,7 @@ import HelpButton from '../../UI/HelpButton';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { Accordion, AccordionHeader, AccordionBody } from '../../UI/Accordion';
 
-export const useOutOfDateAlertDialog = (): (() => Promise<boolean>) => {
+export const useOutOfDateAlertDialog = () => {
   const { showConfirmation } = useAlertDialog();
   return async (): Promise<boolean> => {
     return await showConfirmation({
@@ -81,7 +81,7 @@ const ExtensionInstallDialog = ({
   onInstall,
   onEdit,
   project,
-}: Props): React.Node => {
+}: Props) => {
   const isAlreadyInstalled: boolean = project.hasEventsFunctionsExtensionNamed(
     extensionShortHeader.name
   );
@@ -227,7 +227,6 @@ const ExtensionInstallDialog = ({
           </LeftLoader>
         ) : null,
       ]}
-      // $FlowFixMe[incompatible-type]
       secondaryActions={[
         onEdit ? (
           <FlatButton

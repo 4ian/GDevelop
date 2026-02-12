@@ -6,11 +6,8 @@ import {
 } from './InstancesRenderer/BasicProfilingCounters';
 
 export default class ProfilerBar {
-  // $FlowFixMe[value-as-type]
   _profilerBarContainer: PIXI.Container;
-  // $FlowFixMe[value-as-type]
   _profilerBarBackground: PIXI.Graphics;
-  // $FlowFixMe[value-as-type]
   _profilerBarText: PIXI.Text;
 
   constructor() {
@@ -27,7 +24,6 @@ export default class ProfilerBar {
     this._profilerBarContainer.addChild(this._profilerBarText);
   }
 
-  // $FlowFixMe[value-as-type]
   getPixiObject(): PIXI.Container {
     return this._profilerBarContainer;
   }

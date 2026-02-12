@@ -131,7 +131,6 @@ const formatValue = ({
     ? i18n._(t`Base layer`)
     : value;
 
-// $FlowFixMe[missing-local-annot]
 const isInstructionVisible = (scope, instructionMetadata) =>
   (instructionMetadata.isRelevantForLayoutEvents() &&
     (scope.layout || scope.externalEvents)) ||
@@ -205,7 +204,7 @@ const InstructionMissing = (props: {|
   }
 };
 
-const Instruction = (props: Props): React.Node => {
+const Instruction = (props: Props) => {
   const {
     platform,
     instruction,
@@ -356,7 +355,6 @@ const Instruction = (props: Props): React.Node => {
               className={classNames({
                 [selectableArea]: true,
                 [instructionParameter]: true,
-                // $FlowFixMe[invalid-computed-prop]
                 [parameterType]: true,
               })}
               onClick={domEvent => {

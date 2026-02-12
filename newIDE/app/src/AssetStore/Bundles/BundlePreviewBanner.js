@@ -263,11 +263,7 @@ type Props = {|
   category: string,
 |};
 
-const BundlePreviewBanner = ({
-  onDisplayBundle,
-  i18n,
-  category,
-}: Props): React.Node => {
+const BundlePreviewBanner = ({ onDisplayBundle, i18n, category }: Props) => {
   const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();
   const numberOfTilesToDisplay = getColumnsFromWindowSize(windowSize) - 1; // Reserve one tile for the bundle preview.
   const { privateGameTemplateListingDatas } = React.useContext(
@@ -410,60 +406,56 @@ const BundlePreviewBanner = ({
         return null; // Don't display course tiles on mobile, they take too much space.
       }
       if (!productListingDatasIncludedInBundle) {
-        return new Array<number>(numberOfTilesToDisplay)
-          .fill(0)
-          .map((_, index) => (
-            <React.Fragment key={`skeleton-${index}`}>
-              {index > 0 &&
-                (isMobile && !isLandscape ? (
-                  <Column noMargin>
-                    <Divider orientation="horizontal" />
-                  </Column>
-                ) : (
-                  <Line noMargin>
-                    <Divider orientation="vertical" />
-                  </Line>
-                ))}
-              {index > 0 && <Spacer />}
-              <Column expand>
-                <Skeleton height={140} />
-                <Skeleton height={20} />
-                <Skeleton height={20} />
-                <LargeSpacer />
-              </Column>
-            </React.Fragment>
-          ));
+        return new Array(numberOfTilesToDisplay).fill(0).map((_, index) => (
+          <React.Fragment key={`skeleton-${index}`}>
+            {index > 0 &&
+              (isMobile && !isLandscape ? (
+                <Column noMargin>
+                  <Divider orientation="horizontal" />
+                </Column>
+              ) : (
+                <Line noMargin>
+                  <Divider orientation="vertical" />
+                </Line>
+              ))}
+            {index > 0 && <Spacer />}
+            <Column expand>
+              <Skeleton height={140} />
+              <Skeleton height={20} />
+              <Skeleton height={20} />
+              <LargeSpacer />
+            </Column>
+          </React.Fragment>
+        ));
       }
 
       const coursesIncludedInBundle = productListingDatasIncludedInBundle.filter(
         productListingData => productListingData.productType === 'COURSE'
       );
 
-      return new Array<number>(numberOfTilesToDisplay)
-        .fill(0)
-        .map((_, index) => {
-          const courseListingData: ?CourseListingData =
-            // $FlowFixMe[incompatible-type]
-            coursesIncludedInBundle[index];
-          if (!courseListingData) {
-            return <div style={{ flex: 1 }} key={`empty-tile-${index}`} />;
-          }
+      return new Array(numberOfTilesToDisplay).fill(0).map((_, index) => {
+        const courseListingData: ?CourseListingData =
+          // $FlowFixMe
+          coursesIncludedInBundle[index];
+        if (!courseListingData) {
+          return <div style={{ flex: 1 }} key={`empty-tile-${index}`} />;
+        }
 
-          return (
-            <React.Fragment key={`course-${courseListingData.id}`}>
-              {index > 0 && (
-                <Line noMargin>
-                  <Divider orientation="vertical" />
-                </Line>
-              )}
-              {index > 0 && <Spacer />}
-              <CourseTile
-                courseListingData={courseListingData}
-                isAlreadyReceived={isAlreadyReceived}
-              />
-            </React.Fragment>
-          );
-        });
+        return (
+          <React.Fragment key={`course-${courseListingData.id}`}>
+            {index > 0 && (
+              <Line noMargin>
+                <Divider orientation="vertical" />
+              </Line>
+            )}
+            {index > 0 && <Spacer />}
+            <CourseTile
+              courseListingData={courseListingData}
+              isAlreadyReceived={isAlreadyReceived}
+            />
+          </React.Fragment>
+        );
+      });
     },
     [
       isMobile,

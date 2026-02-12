@@ -23,7 +23,7 @@ export default class Rectangle {
     this.zMax = zMax;
   }
 
-  static fromDOMRect(domRect: DOMRect | ClientRect): any {
+  static fromDOMRect(domRect: DOMRect | ClientRect) {
     return new this(domRect.left, domRect.top, domRect.right, domRect.bottom);
   }
 
@@ -80,27 +80,27 @@ export default class Rectangle {
     this.zMax = rectangle.zMax;
   }
 
-  width(): any {
+  width() {
     return this.right - this.left;
   }
 
-  height(): any {
+  height() {
     return this.bottom - this.top;
   }
 
-  depth(): any {
+  depth() {
     return this.zMax - this.zMin;
   }
 
-  centerX(): any {
+  centerX() {
     return (this.left + this.right) / 2;
   }
 
-  centerY(): any {
+  centerY() {
     return (this.top + this.bottom) / 2;
   }
 
-  centerZ(): any {
+  centerZ() {
     return (this.zMin + this.zMax) / 2;
   }
 
@@ -129,7 +129,7 @@ export default class Rectangle {
     return this.left <= x && this.right > x && this.bottom > y && this.top <= y;
   }
 
-  toCSSPosition(): any {
+  toCSSPosition() {
     return {
       top: this.top,
       left: this.left,
@@ -138,7 +138,7 @@ export default class Rectangle {
     };
   }
 
-  toString(): any {
+  toString() {
     return (
       '[' +
       this.left +

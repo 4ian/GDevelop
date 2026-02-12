@@ -11,11 +11,8 @@ export default class StatusBar {
   _width: number;
   _height: number;
   _getLastCursorSceneCoordinates: () => [number, number] | null;
-  // $FlowFixMe[value-as-type]
   _statusBarContainer: PIXI.Container;
-  // $FlowFixMe[value-as-type]
   _statusBarBackground: PIXI.Graphics;
-  // $FlowFixMe[value-as-type]
   _statusBarText: PIXI.Text;
 
   constructor({ getLastCursorSceneCoordinates, width, height }: Props) {
@@ -39,7 +36,6 @@ export default class StatusBar {
     this._height = height;
   }
 
-  // $FlowFixMe[value-as-type]
   getPixiObject(): PIXI.Container {
     return this._statusBarContainer;
   }

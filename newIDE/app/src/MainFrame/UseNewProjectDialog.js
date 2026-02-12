@@ -52,24 +52,6 @@ type Props = {|
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
-type _UseNewProjectDialogReturnType = {
-  closeNewProjectDialog: () => void,
-  fetchAndOpenNewProjectSetupDialogForExample: (
-    exampleSlug: string
-  ) => Promise<void>,
-  onSelectExampleShortHeader: ({
-    exampleShortHeader: ?ExampleShortHeader,
-    preventBackHome?: boolean,
-  }) => void,
-  onSelectPrivateGameTemplateListingData: ({
-    preventBackHome?: boolean,
-    privateGameTemplateListingData: ?PrivateGameTemplateListingData,
-  }) => void,
-  openNewProjectDialog: () => void,
-  renderNewProjectDialog: () => React.Node,
-  selectedExampleShortHeader: ?ExampleShortHeader,
-  selectedPrivateGameTemplateListingData: ?PrivateGameTemplateListingData,
-};
 const useNewProjectDialog = ({
   project,
   fileMetadata,
@@ -86,7 +68,7 @@ const useNewProjectDialog = ({
   onOpenLayout,
   onWillInstallExtension,
   onExtensionInstalled,
-}: Props): _UseNewProjectDialogReturnType => {
+}: Props) => {
   const [isFetchingExample, setIsFetchingExample] = React.useState(false);
   const [
     selectedPrivateGameTemplateListingData,

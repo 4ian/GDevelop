@@ -212,10 +212,10 @@ export type InstructionOrObjectSelectorInterface = {|
   reEnumerateInstructions: (i18n: I18nType) => void,
 |};
 
-const InstructionOrObjectSelector: React.ComponentType<{
-  ...Props,
-  +ref?: React.RefSetter<InstructionOrObjectSelectorInterface>,
-}> = React.forwardRef<Props, InstructionOrObjectSelectorInterface>(
+const InstructionOrObjectSelector = React.forwardRef<
+  Props,
+  InstructionOrObjectSelectorInterface
+>(
   (
     {
       project,
@@ -282,7 +282,6 @@ const InstructionOrObjectSelector: React.ComponentType<{
     // in different attributes of the object. Objects, groups and folders search is
     // directly handled by the tree view since they only have one field and their name
     // are straightforward.
-    // $FlowFixMe[value-as-type]
     const instructionSearchApiRef = React.useRef<Fuse>(
       new Fuse(allInstructionsInfoRef.current, {
         ...sharedFuseConfiguration,
@@ -426,7 +425,6 @@ const InstructionOrObjectSelector: React.ComponentType<{
             treeView.scrollToItem(itemToSelect, 'start');
           }
         } else if (chosenInstructionType) {
-          // $FlowFixMe[invalid-declaration]
           let itemToSelect;
 
           const treeView = freeInstructionTreeViewRef.current;
@@ -443,7 +441,6 @@ const InstructionOrObjectSelector: React.ComponentType<{
               }
             }
           }
-          // $FlowFixMe[constant-condition]
           if (itemToSelect) {
             setSelectedItem(itemToSelect);
             treeView.scrollToItem(itemToSelect, 'start');
@@ -522,11 +519,9 @@ const InstructionOrObjectSelector: React.ComponentType<{
 
     const isSearching = !!searchText;
 
-    // $FlowFixMe[missing-empty-array-annot]
     let filteredInstructionsList = [];
 
     if (isSearching) {
-      // $FlowFixMe[incompatible-type]
       filteredInstructionsList = searchResults.instructions;
     }
     const displayedInstructionsList = filteredInstructionsList.slice(
@@ -564,7 +559,6 @@ const InstructionOrObjectSelector: React.ComponentType<{
 
     const labels = React.useMemo(() => getLabelsForContainers(scope), [scope]);
 
-    // $FlowFixMe[missing-local-annot]
     const getFreeInstructionsTreeViewItems = i18n =>
       [
         ...createFreeInstructionTreeViewItem({
@@ -586,7 +580,6 @@ const InstructionOrObjectSelector: React.ComponentType<{
           : null,
       ].filter(Boolean);
 
-    // $FlowFixMe[missing-local-annot]
     const getTreeViewItems = i18n =>
       [
         new ObjectFolderTreeViewItem({
@@ -661,7 +654,6 @@ const InstructionOrObjectSelector: React.ComponentType<{
                 'instructions',
                 i18n._(isCondition ? t`Conditions` : t`Actions`)
               ),
-              // $FlowFixMe[incompatible-type]
               [
                 ...displayedInstructionsList.map(searchResult => {
                   return new LeafTreeViewItem(
@@ -787,7 +779,6 @@ const InstructionOrObjectSelector: React.ComponentType<{
                 getItemHeight={getTreeViewItemHeight}
                 getItemName={getTreeViewItemName}
                 shouldApplySearchToItem={shouldApplySearchToItem}
-                // $FlowFixMe[incompatible-type]
                 getItemDescription={getTreeViewItemDescription}
                 forceAllOpened={!!currentlyRunningInAppTutorial}
                 getItemId={getTreeViewItemId}
@@ -868,7 +859,6 @@ const InstructionOrObjectSelector: React.ComponentType<{
         >
           <AutoSizer style={styles.treeViewAutoSizer} disableWidth>
             {({ height }) => (
-              // $FlowFixMe[incompatible-type]
               <ReadOnlyTreeView
                 key="free-instructions"
                 ref={freeInstructionTreeViewRef}
@@ -877,7 +867,6 @@ const InstructionOrObjectSelector: React.ComponentType<{
                 getItemHeight={getTreeViewItemHeight}
                 getItemName={getTreeViewItemName}
                 shouldApplySearchToItem={() => false}
-                // $FlowFixMe[incompatible-type]
                 getItemDescription={getTreeViewItemDescription}
                 getItemId={getTreeViewItemId}
                 getItemHtmlId={getTreeViewItemHtmlId}

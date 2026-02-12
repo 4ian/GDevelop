@@ -39,7 +39,7 @@ const useLinkStyles = (
     },
   })();
 
-const Link = (props: Props): React.Node => {
+const Link = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const linkStyles = useLinkStyles(
     gdevelopTheme,

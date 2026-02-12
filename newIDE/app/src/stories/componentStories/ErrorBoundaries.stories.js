@@ -71,7 +71,7 @@ TypeError: Cannot read properties of undefined (reading 'toString') at a.getProp
 `;
 fakeErrorWithCriticalStack.stack = fakeCriticalErrorStack;
 
-export const Default = (): React.Node => (
+export const Default = () => (
   <ErrorFallbackComponent
     componentStack={fakeComponentStack}
     error={fakeError}
@@ -80,7 +80,7 @@ export const Default = (): React.Node => (
   />
 );
 
-export const Critical = (): React.Node => (
+export const Critical = () => (
   <ErrorFallbackComponent
     componentStack={fakeComponentStack}
     error={fakeErrorWithCriticalStack}

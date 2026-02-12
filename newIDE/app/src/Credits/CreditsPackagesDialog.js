@@ -88,7 +88,7 @@ const CreditsPackagesDialog = ({
   suggestedPackage,
   missingCredits,
   showCalloutTip,
-}: Props): React.Node => {
+}: Props) => {
   const {
     error,
     fetchCreditsPackages,

@@ -46,7 +46,7 @@ type Props = {|
   id: string,
 |};
 
-const DrawerTopBar = (props: Props): React.Node => {
+const DrawerTopBar = (props: Props) => {
   const closeButton = (
     <IconButton
       onClick={props.onClose}

@@ -150,15 +150,7 @@ const commitProjectVersion = async ({
 
 export const generateOnSaveProject = (
   authenticatedUser: AuthenticatedUser
-): ((
-  project: gdProject,
-  fileMetadata: FileMetadata,
-  options?: SaveProjectOptions,
-  actions: {
-    showAlert: ShowAlertFunction,
-    showConfirmation: ShowConfirmFunction,
-  }
-) => Promise<{ fileMetadata: FileMetadata, wasSaved: boolean }>) => async (
+) => async (
   project: gdProject,
   fileMetadata: FileMetadata,
   options?: SaveProjectOptions,
@@ -240,11 +232,7 @@ export const generateOnSaveProject = (
 
 export const generateOnChangeProjectProperty = (
   authenticatedUser: AuthenticatedUser
-): ((
-  project: gdProject,
-  fileMetadata: FileMetadata,
-  properties: { gameId?: string, name?: string }
-) => Promise<null | { lastModifiedDate: number, version: string }>) => async (
+) => async (
   project: gdProject,
   fileMetadata: FileMetadata,
   properties: {| name?: string, gameId?: string |}
@@ -305,14 +293,7 @@ export const generateOnChooseSaveProjectAsLocation = ({
   authenticatedUser: AuthenticatedUser,
   setDialog: (() => React.Node) => void,
   closeDialog: () => void,
-|}): (({
-  displayOptionToGenerateNewProjectUuid: boolean,
-  fileMetadata: ?FileMetadata,
-  project: gdProject,
-}) => Promise<{
-  saveAsLocation: ?SaveAsLocation,
-  saveAsOptions: ?SaveAsOptions,
-}>) => async ({
+|}) => async ({
   project,
   fileMetadata,
   displayOptionToGenerateNewProjectUuid,
@@ -354,11 +335,9 @@ export const generateOnChooseSaveProjectAsLocation = ({
 
   return {
     saveAsLocation: {
-      // $FlowFixMe[incompatible-use]
       name: options.name,
     },
     saveAsOptions: {
-      // $FlowFixMe[incompatible-use]
       generateNewProjectUuid: options.generateNewProjectUuid,
     },
   };
@@ -368,16 +347,7 @@ export const generateOnSaveProjectAs = (
   authenticatedUser: AuthenticatedUser,
   setDialog: (() => React.Node) => void,
   closeDialog: () => void
-): ((
-  project: gdProject,
-  saveAsLocation: ?SaveAsLocation,
-  options: {
-    onMoveResources: ({ newFileMetadata: FileMetadata }) => Promise<void>,
-    onStartSaving: () => void,
-  }
-) =>
-  | Promise<{ fileMetadata: null, wasSaved: boolean }>
-  | Promise<{ fileMetadata: FileMetadata, wasSaved: boolean }>) => async (
+) => async (
   project: gdProject,
   saveAsLocation: ?SaveAsLocation,
   options: {|
@@ -474,7 +444,7 @@ export const renderNewProjectSaveAsLocationChooser = ({
   saveAsLocation: ?SaveAsLocation,
   setSaveAsLocation: (?SaveAsLocation) => void,
   newProjectsDefaultFolder?: string,
-|}): null => {
+|}) => {
   if (!saveAsLocation || saveAsLocation.name !== projectName) {
     setSaveAsLocation(
       getProjectLocation({
@@ -489,7 +459,7 @@ export const renderNewProjectSaveAsLocationChooser = ({
 
 export const generateOnAutoSaveProject = (
   authenticatedUser: AuthenticatedUser
-): ((project: gdProject, fileMetadata: FileMetadata) => Promise<void>) | void =>
+) =>
   ProjectCache.isAvailable()
     ? async (project: gdProject, fileMetadata: FileMetadata): Promise<void> => {
         const { profile } = authenticatedUser;

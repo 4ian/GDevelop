@@ -248,9 +248,10 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
     const x = Math.floor(coordinatesInTileMapGrid[0] / tileSize);
     const y = Math.floor(coordinatesInTileMapGrid[1] / tileSize);
 
-    // For multi-tile freehand/brush selections, expand to show all tiles in the selection
+    // For multi-tile brush selections, expand to show all tiles in the selection
     if (
-      tileMapTileSelection.kind === 'freehand' &&
+      (tileMapTileSelection.kind === 'freehand' ||
+        tileMapTileSelection.kind === 'rectangle') &&
       !isSelectionASingleTileRectangle(tileMapTileSelection)
     ) {
       const selectionTopLeftCorner = tileMapTileSelection.coordinates[0];
@@ -302,30 +303,85 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
 
   const tilesCoordinatesInTileMapGrid: TileMapTilePatch[] = [];
 
-  // Freehand mode: each coordinate in the path maps to a single tile.
+  // Freehand mode: each coordinate in the path maps to the brush stamp.
   if (tileMapTileSelection.kind === 'freehand' && coordinates.length >= 1) {
-    const seen = new Set<string>();
-    const topLeftCorner = tileMapTileSelection.coordinates[0];
+    const selectionTopLeftCorner = tileMapTileSelection.coordinates[0];
+    const selectionBottomRightCorner = tileMapTileSelection.coordinates[1];
+    const isMultiTile = !isSelectionASingleTileRectangle(tileMapTileSelection);
 
-    coordinates.forEach(coord => {
-      const gridPos = [0, 0];
-      sceneToTileMapTransformation.transform([coord.x, coord.y], gridPos);
-      const x = Math.floor(gridPos[0] / tileSize);
-      const y = Math.floor(gridPos[1] / tileSize);
-      const key = `${x},${y}`;
-      if (!seen.has(key)) {
-        seen.add(key);
-        tilesCoordinatesInTileMapGrid.push({
+    if (isMultiTile) {
+      // Multi-tile brush: stamp the full brush at each point in the path
+      const selectionWidth =
+        selectionBottomRightCorner.x - selectionTopLeftCorner.x + 1;
+      const selectionHeight =
+        selectionBottomRightCorner.y - selectionTopLeftCorner.y + 1;
+
+      // Use a map to track the latest tile at each position
+      const tileMap = new Map<string, TileMapTilePatch>();
+
+      coordinates.forEach(coord => {
+        const gridPos = [0, 0];
+        sceneToTileMapTransformation.transform([coord.x, coord.y], gridPos);
+        const baseX = Math.floor(gridPos[0] / tileSize);
+        const baseY = Math.floor(gridPos[1] / tileSize);
+
+        // Stamp all tiles in the brush pattern
+        for (let dx = 0; dx < selectionWidth; dx++) {
+          for (let dy = 0; dy < selectionHeight; dy++) {
+            const x = baseX + dx;
+            const y = baseY + dy;
+            const key = `${x},${y}`;
+            const tileCoordinates = getTileCorrespondingToFlippingInstructions({
+              tileMapTileSelection,
+              tileCoordinates: {
+                x: selectionTopLeftCorner.x + dx,
+                y: selectionTopLeftCorner.y + dy,
+              },
+            });
+            // Delete and re-add to move to end (painted on top)
+            if (tileMap.has(key)) {
+              tileMap.delete(key);
+            }
+            tileMap.set(key, {
+              erase: false,
+              tileCoordinates,
+              topLeftCorner: { x, y },
+              bottomRightCorner: { x, y },
+            });
+          }
+        }
+      });
+
+      // Convert map to array
+      tilesCoordinatesInTileMapGrid.push(...tileMap.values());
+    } else {
+      // Single tile: stamp one tile at each point in the path
+      const tileMap = new Map<string, TileMapTilePatch>();
+
+      coordinates.forEach(coord => {
+        const gridPos = [0, 0];
+        sceneToTileMapTransformation.transform([coord.x, coord.y], gridPos);
+        const x = Math.floor(gridPos[0] / tileSize);
+        const y = Math.floor(gridPos[1] / tileSize);
+        const key = `${x},${y}`;
+        // Delete and re-add to move to end (painted on top)
+        if (tileMap.has(key)) {
+          tileMap.delete(key);
+        }
+        tileMap.set(key, {
           erase: false,
           tileCoordinates: getTileCorrespondingToFlippingInstructions({
             tileMapTileSelection,
-            tileCoordinates: topLeftCorner,
+            tileCoordinates: selectionTopLeftCorner,
           }),
           topLeftCorner: { x, y },
           bottomRightCorner: { x, y },
         });
-      }
-    });
+      });
+
+      // Convert map to array
+      tilesCoordinatesInTileMapGrid.push(...tileMap.values());
+    }
     return tilesCoordinatesInTileMapGrid;
   }
 

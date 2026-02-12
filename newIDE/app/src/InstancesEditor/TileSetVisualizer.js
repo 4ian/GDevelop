@@ -615,21 +615,21 @@ const TileSetVisualizer = ({
               tileMapTileSelection.kind === 'floodfill')
           ) {
             newSelection = ({
-                kind: (tileMapTileSelection.kind: any),
-                coordinates: ([
-                  topLeftCorner,
-                  bottomRightCorner,
-                ]: TileMapCoordinates[]),
-                flipHorizontally: shouldFlipHorizontally,
-                flipVertically: shouldFlipVertically,
-              }: TileMapTileSelection);
-            } else {
-              newSelection = {
-                kind: 'rectangle',
-                coordinates: [topLeftCorner, bottomRightCorner],
-                flipHorizontally: shouldFlipHorizontally,
-                flipVertically: shouldFlipVertically,
-              };
+              kind: (tileMapTileSelection.kind: any),
+              coordinates: ([
+                topLeftCorner,
+                bottomRightCorner,
+              ]: TileMapCoordinates[]),
+              flipHorizontally: shouldFlipHorizontally,
+              flipVertically: shouldFlipVertically,
+            }: TileMapTileSelection);
+          } else {
+            newSelection = {
+              kind: 'rectangle',
+              coordinates: [topLeftCorner, bottomRightCorner],
+              flipHorizontally: shouldFlipHorizontally,
+              flipVertically: shouldFlipVertically,
+            };
           }
           onSelectTileMapTile(newSelection);
         }

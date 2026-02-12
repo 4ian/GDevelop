@@ -189,9 +189,10 @@ type Props = {|
   onOpenProfile?: () => void,
 |};
 
-export const AssetsHome: React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<AssetsHomeInterface> }
-> = React.forwardRef<Props, AssetsHomeInterface>(
+export const AssetsHome: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<AssetsHomeInterface>,
+}> = React.forwardRef<Props, AssetsHomeInterface>(
   (
     {
       publicAssetPacks: { starterPacks },

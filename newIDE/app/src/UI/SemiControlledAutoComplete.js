@@ -405,6 +405,7 @@ export default (React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
       </I18n>
     );
   }
-): React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<SemiControlledAutoCompleteInterface> }
->);
+): React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<SemiControlledAutoCompleteInterface>,
+}>);

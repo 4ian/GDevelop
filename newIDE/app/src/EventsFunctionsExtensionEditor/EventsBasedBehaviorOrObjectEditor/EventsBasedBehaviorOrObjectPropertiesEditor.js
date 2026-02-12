@@ -108,12 +108,10 @@ export type EventsBasedBehaviorPropertiesEditorInterface = {|
   getPropertyEditorRef: (propertyName: string) => React.ElementRef<any>,
 |};
 
-export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<
-  {
-    ...Props,
-    +ref?: React.RefSetter<EventsBasedBehaviorPropertiesEditorInterface>,
-  }
-> = React.forwardRef<Props, EventsBasedBehaviorPropertiesEditorInterface>(
+export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<EventsBasedBehaviorPropertiesEditorInterface>,
+}> = React.forwardRef<Props, EventsBasedBehaviorPropertiesEditorInterface>(
   (
     {
       project,

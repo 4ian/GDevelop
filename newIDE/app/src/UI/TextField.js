@@ -190,9 +190,10 @@ export type TextFieldInterface = {|
 /**
  * A text field based on Material-UI text field.
  */
-const TextField: React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<TextFieldInterface> }
-> = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
+const TextField: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<TextFieldInterface>,
+}> = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
   // $FlowFixMe[value-as-type]
   const muiTextFieldRef = React.useRef<?MUITextField>(null);

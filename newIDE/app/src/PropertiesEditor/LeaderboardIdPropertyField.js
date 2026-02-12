@@ -171,6 +171,7 @@ export default (React.forwardRef<Props, LeaderboardIdPropertyFieldInterface>(
       </I18n>
     );
   }
-): React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<LeaderboardIdPropertyFieldInterface> }
->);
+): React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<LeaderboardIdPropertyFieldInterface>,
+}>);

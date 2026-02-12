@@ -2385,6 +2385,7 @@ const EventsSheet = (props, ref) => {
 
 export default (React.forwardRef<Props, EventsSheetInterface>(
   EventsSheet
-): React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<EventsSheetInterface> }
->);
+): React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<EventsSheetInterface>,
+}>);

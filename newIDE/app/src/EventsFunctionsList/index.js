@@ -1446,9 +1446,10 @@ const MemoizedObjectsList = React.memo<Props, EventsFunctionsListInterface>(
   arePropsEqual
 );
 
-const EventsFunctionsListWithErrorBoundary: React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<EventsFunctionsListInterface> }
-> = React.forwardRef<Props, EventsFunctionsListInterface>((props, ref) => (
+const EventsFunctionsListWithErrorBoundary: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<EventsFunctionsListInterface>,
+}> = React.forwardRef<Props, EventsFunctionsListInterface>((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Objects list</Trans>}
     scope="scene-editor-objects-list"

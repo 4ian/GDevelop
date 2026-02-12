@@ -133,9 +133,10 @@ const useStylesForGreyedListItem = makeStyles(theme => {
  *
  * Also used outside of a List by virtualized lists.
  */
-export const ListItem: React.ComponentType<
-  { ...ListItemProps, +ref?: React.RefSetter<ListItemRefType> }
-> = React.forwardRef<ListItemProps, ListItemRefType>(
+export const ListItem: React.ComponentType<{
+  ...ListItemProps,
+  +ref?: React.RefSetter<ListItemRefType>,
+}> = React.forwardRef<ListItemProps, ListItemRefType>(
   (props: ListItemProps, ref) => {
     const [isOpen, setIsOpen] = React.useState(!!props.initiallyOpen);
     const elementWithMenu = React.useRef<?ElementWithMenu>(null);

@@ -75,12 +75,10 @@ export type SemiControlledMultiAutoCompleteInterface = {|
   focusInput: () => void,
 |};
 
-const SemiControlledMultiAutoComplete: React.ComponentType<
-  {
-    ...Props,
-    +ref?: React.RefSetter<SemiControlledMultiAutoCompleteInterface>,
-  }
-> = React.forwardRef<Props, SemiControlledMultiAutoCompleteInterface>(
+const SemiControlledMultiAutoComplete: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<SemiControlledMultiAutoCompleteInterface>,
+}> = React.forwardRef<Props, SemiControlledMultiAutoCompleteInterface>(
   (props, ref) => {
     const chipStyles = useChipStyles();
     // $FlowFixMe[value-as-type]

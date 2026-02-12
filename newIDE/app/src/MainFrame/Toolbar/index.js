@@ -219,6 +219,7 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
       </Toolbar>
     );
   }
-): React.ComponentType<
-  { ...MainFrameToolbarProps, +ref?: React.RefSetter<ToolbarInterface> }
->);
+): React.ComponentType<{
+  ...MainFrameToolbarProps,
+  +ref?: React.RefSetter<ToolbarInterface>,
+}>);

@@ -212,9 +212,10 @@ export type InstructionOrObjectSelectorInterface = {|
   reEnumerateInstructions: (i18n: I18nType) => void,
 |};
 
-const InstructionOrObjectSelector: React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<InstructionOrObjectSelectorInterface> }
-> = React.forwardRef<Props, InstructionOrObjectSelectorInterface>(
+const InstructionOrObjectSelector: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<InstructionOrObjectSelectorInterface>,
+}> = React.forwardRef<Props, InstructionOrObjectSelectorInterface>(
   (
     {
       project,

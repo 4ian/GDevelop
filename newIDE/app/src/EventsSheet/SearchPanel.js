@@ -399,6 +399,7 @@ const SearchPanel = (
 
 export default (React.forwardRef<Props, SearchPanelInterface>(
   SearchPanel
-): React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<SearchPanelInterface> }
->);
+): React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<SearchPanelInterface>,
+}>);

@@ -171,9 +171,7 @@ export default (React.forwardRef<ContextMenuWrapperProps, ContextMenuInterface>(
       </I18n>
     );
   }
-): React.ComponentType<
-  {
-    ...ContextMenuWrapperProps,
-    +ref?: React.RefSetter<ContextMenuInterface>,
-  }
->);
+): React.ComponentType<{
+  ...ContextMenuWrapperProps,
+  +ref?: React.RefSetter<ContextMenuInterface>,
+}>);

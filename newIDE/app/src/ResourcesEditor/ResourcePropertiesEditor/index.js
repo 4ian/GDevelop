@@ -44,9 +44,10 @@ const renderEmpty = () => {
   );
 };
 
-const ResourcePropertiesEditor: React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<ResourcePropertiesEditorInterface> }
-> = React.forwardRef<Props, ResourcePropertiesEditorInterface>(
+const ResourcePropertiesEditor: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<ResourcePropertiesEditorInterface>,
+}> = React.forwardRef<Props, ResourcePropertiesEditorInterface>(
   (
     {
       project,

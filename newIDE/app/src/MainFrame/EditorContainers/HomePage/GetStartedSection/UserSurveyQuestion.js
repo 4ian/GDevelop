@@ -355,9 +355,10 @@ type Props = {|
   onChangeUserInputValue?: string => void,
 |};
 
-const UserSurveyQuestion: React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<HTMLDivElement> }
-> = React.forwardRef<Props, HTMLDivElement>(
+const UserSurveyQuestion: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<HTMLDivElement>,
+}> = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       questionData,

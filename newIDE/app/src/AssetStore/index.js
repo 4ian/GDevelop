@@ -114,9 +114,10 @@ const identifyAssetPackKind = ({
     : 'unknown';
 };
 
-export const AssetStore: React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<AssetStoreInterface> }
-> = React.forwardRef<Props, AssetStoreInterface>(
+export const AssetStore: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<AssetStoreInterface>,
+}> = React.forwardRef<Props, AssetStoreInterface>(
   (
     {
       onlyShowAssets,

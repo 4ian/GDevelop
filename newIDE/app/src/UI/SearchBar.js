@@ -60,9 +60,10 @@ const noop = () => {};
  *
  * Customized to add optional menu button and chips corresponding to tags.
  */
-const SearchBar: React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<SearchBarInterface> }
-> = React.forwardRef<Props, SearchBarInterface>(
+const SearchBar: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<SearchBarInterface>,
+}> = React.forwardRef<Props, SearchBarInterface>(
   (
     {
       id,

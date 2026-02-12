@@ -725,9 +725,10 @@ const MemoizedObjectGroupsList = React.memo<Props, ObjectGroupsListInterface>(
   arePropsEqual
 );
 
-const ObjectGroupsListWithErrorBoundary: React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<ObjectGroupsListInterface> }
-> = React.forwardRef<Props, ObjectGroupsListInterface>((props, ref) => (
+const ObjectGroupsListWithErrorBoundary: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<ObjectGroupsListInterface>,
+}> = React.forwardRef<Props, ObjectGroupsListInterface>((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Object groups list</Trans>}
     scope="scene-editor-object-groups-list"

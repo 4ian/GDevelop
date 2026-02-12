@@ -66,9 +66,10 @@ type Props = {|
 
 export type ResourceSelectorInterface = {| focus: FieldFocusFunction |};
 
-const ResourceSelector: React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<ResourceSelectorInterface> }
-> = React.forwardRef<Props, ResourceSelectorInterface>((props, ref) => {
+const ResourceSelector: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<ResourceSelectorInterface>,
+}> = React.forwardRef<Props, ResourceSelectorInterface>((props, ref) => {
   const {
     project,
     projectScopedContainersAccessor,

@@ -12,9 +12,10 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 
-const ImageResourceField: React.ComponentType<
-  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> }
-> = React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+const ImageResourceField: React.ComponentType<{
+  ...ParameterFieldProps,
+  +ref?: React.RefSetter<ParameterFieldInterface>,
+}> = React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   (props, ref) => {
     const field = React.useRef<?ResourceSelectorInterface>(null);
     const focus: FieldFocusFunction = options => {

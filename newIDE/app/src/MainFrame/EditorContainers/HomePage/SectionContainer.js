@@ -73,9 +73,10 @@ type Props = {|
   showUrgentAnnouncements?: boolean,
 |};
 
-const SectionContainer: React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<HTMLDivElement> }
-> = React.forwardRef<Props, HTMLDivElement>(
+const SectionContainer: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<HTMLDivElement>,
+}> = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       children,

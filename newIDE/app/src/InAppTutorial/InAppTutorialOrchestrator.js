@@ -487,9 +487,10 @@ export type InAppTutorialOrchestratorInterface = {|
   getPreviewMessage: () => {| message: string, position: string |} | null,
 |};
 
-const InAppTutorialOrchestrator: React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<InAppTutorialOrchestratorInterface> }
-> = React.forwardRef<Props, InAppTutorialOrchestratorInterface>(
+const InAppTutorialOrchestrator: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<InAppTutorialOrchestratorInterface>,
+}> = React.forwardRef<Props, InAppTutorialOrchestratorInterface>(
   (
     {
       tutorial,

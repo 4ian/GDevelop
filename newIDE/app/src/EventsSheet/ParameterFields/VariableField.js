@@ -512,9 +512,10 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
       </I18n>
     );
   }
-): React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<VariableFieldInterface> }
->);
+): React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<VariableFieldInterface>,
+}>);
 
 export const renderVariableWithIcon = (
   {

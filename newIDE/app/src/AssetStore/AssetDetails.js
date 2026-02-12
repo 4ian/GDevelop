@@ -97,9 +97,10 @@ export type AssetDetailsInterface = {|
   scrollToPosition: (y: number) => void,
 |};
 
-export const AssetDetails: React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<AssetDetailsInterface> }
-> = React.forwardRef<Props, AssetDetailsInterface>(
+export const AssetDetails: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<AssetDetailsInterface>,
+}> = React.forwardRef<Props, AssetDetailsInterface>(
   (
     {
       onTagSelection,

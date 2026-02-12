@@ -363,9 +363,10 @@ class InstancesList extends Component<Props, State> {
   }
 }
 
-const InstancesListWithErrorBoundary: React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<InstancesListInterface> }
-> = React.forwardRef<Props, InstancesListInterface>((props, ref) => {
+const InstancesListWithErrorBoundary: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<InstancesListInterface>,
+}> = React.forwardRef<Props, InstancesListInterface>((props, ref) => {
   const forceUpdate = useForceUpdate();
   React.useImperativeHandle(ref, () => ({
     forceUpdate,

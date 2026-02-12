@@ -811,9 +811,10 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
   }
 );
 
-const LayersListWithErrorBoundary: React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<LayersListInterface> }
-> = React.forwardRef<Props, LayersListInterface>((props, ref) => (
+const LayersListWithErrorBoundary: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<LayersListInterface>,
+}> = React.forwardRef<Props, LayersListInterface>((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Layers list</Trans>}
     scope="scene-editor-layers-list"

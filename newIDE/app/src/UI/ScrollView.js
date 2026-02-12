@@ -135,6 +135,7 @@ export default (React.forwardRef<Props, ScrollViewInterface>(
       </div>
     );
   }
-): React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<ScrollViewInterface> }
->);
+): React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<ScrollViewInterface>,
+}>);

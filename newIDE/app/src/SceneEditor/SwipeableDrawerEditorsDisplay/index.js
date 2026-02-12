@@ -60,12 +60,10 @@ const styles = {
 };
 
 // Forward ref to allow Scene editor to force update some editors
-const SwipeableDrawerEditorsDisplay: React.ComponentType<
-  {
-    ...SceneEditorsDisplayProps,
-    +ref?: React.RefSetter<SceneEditorsDisplayInterface>,
-  }
-> = React.forwardRef<SceneEditorsDisplayProps, SceneEditorsDisplayInterface>(
+const SwipeableDrawerEditorsDisplay: React.ComponentType<{
+  ...SceneEditorsDisplayProps,
+  +ref?: React.RefSetter<SceneEditorsDisplayInterface>,
+}> = React.forwardRef<SceneEditorsDisplayProps, SceneEditorsDisplayInterface>(
   (props, ref) => {
     const {
       gameEditorMode,

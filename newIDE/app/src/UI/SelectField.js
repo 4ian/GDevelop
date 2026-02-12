@@ -70,9 +70,10 @@ type Props = {|
  * A select field based on Material-UI select field.
  * To be used with `SelectOption`.
  */
-const SelectField: React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<SelectFieldInterface> }
-> = React.forwardRef<Props, SelectFieldInterface>((props, ref) => {
+const SelectField: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<SelectFieldInterface>,
+}> = React.forwardRef<Props, SelectFieldInterface>((props, ref) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
 
   const focus: FieldFocusFunction = options => {

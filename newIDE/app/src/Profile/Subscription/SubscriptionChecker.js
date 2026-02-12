@@ -36,9 +36,10 @@ type Props = {|
   isNotShownDuringInAppTutorial?: boolean,
 |};
 
-const SubscriptionChecker: React.ComponentType<
-  { ...Props, +ref?: React.RefSetter<SubscriptionCheckerInterface> }
-> = React.forwardRef<Props, SubscriptionCheckerInterface>(
+const SubscriptionChecker: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<SubscriptionCheckerInterface>,
+}> = React.forwardRef<Props, SubscriptionCheckerInterface>(
   (
     {
       mode,

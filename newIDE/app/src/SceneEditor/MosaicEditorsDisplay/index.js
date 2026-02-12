@@ -68,12 +68,10 @@ const defaultPanelConfigByEditor = {
 };
 
 // Forward ref to allow Scene editor to force update some editors
-const MosaicEditorsDisplay: React.ComponentType<
-  {
-    ...SceneEditorsDisplayProps,
-    +ref?: React.RefSetter<SceneEditorsDisplayInterface>,
-  }
-> = React.forwardRef<SceneEditorsDisplayProps, SceneEditorsDisplayInterface>(
+const MosaicEditorsDisplay: React.ComponentType<{
+  ...SceneEditorsDisplayProps,
+  +ref?: React.RefSetter<SceneEditorsDisplayInterface>,
+}> = React.forwardRef<SceneEditorsDisplayProps, SceneEditorsDisplayInterface>(
   (props, ref) => {
     const {
       gameEditorMode,

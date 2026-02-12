@@ -39,18 +39,10 @@ export type ObjectAnchor = {
 };
 
 const getPropertyValue = (
-  name: string,
   properties: gdMapStringPropertyDescriptor,
-  behaviorOverriding: gdBehavior | null
+  name: string
 ): CustomObjectConfiguration_EdgeAnchor =>
-  behaviorOverriding && behaviorOverriding.hasPropertyValue(name)
-    ? gd.CustomObjectConfiguration.getEdgeAnchorFromString(
-        behaviorOverriding
-          .getProperties()
-          .get(name)
-          .getValue()
-      )
-    : properties.has(name)
+  properties.has(name)
     ? gd.CustomObjectConfiguration.getEdgeAnchorFromString(
         properties.get(name).getValue()
       )
@@ -72,8 +64,7 @@ const getDefaultAnchor = () => ({
  */
 export const getObjectAnchor = (
   eventBasedObjectVariant: gdEventsBasedObjectVariant,
-  objectName: string,
-  initialInstance: gdInitialInstance
+  objectName: string
 ): ObjectAnchor => {
   const objects = eventBasedObjectVariant.getObjects();
   if (!objects.hasObjectNamed(objectName)) {
@@ -84,31 +75,10 @@ export const getObjectAnchor = (
     return getDefaultAnchor();
   }
   const properties = childObject.getBehavior('Anchor').getProperties();
-  const behaviorOverriding = initialInstance.hasBehaviorOverridingNamed(
-    'Anchor'
-  )
-    ? initialInstance.getBehaviorOverriding('Anchor')
-    : null;
-  const leftEdgeAnchor = getPropertyValue(
-    'leftEdgeAnchor',
-    properties,
-    behaviorOverriding
-  );
-  const topEdgeAnchor = getPropertyValue(
-    'topEdgeAnchor',
-    properties,
-    behaviorOverriding
-  );
-  const rightEdgeAnchor = getPropertyValue(
-    'rightEdgeAnchor',
-    properties,
-    behaviorOverriding
-  );
-  const bottomEdgeAnchor = getPropertyValue(
-    'bottomEdgeAnchor',
-    properties,
-    behaviorOverriding
-  );
+  const leftEdgeAnchor = getPropertyValue(properties, 'leftEdgeAnchor');
+  const topEdgeAnchor = getPropertyValue(properties, 'topEdgeAnchor');
+  const rightEdgeAnchor = getPropertyValue(properties, 'rightEdgeAnchor');
+  const bottomEdgeAnchor = getPropertyValue(properties, 'bottomEdgeAnchor');
   return { leftEdgeAnchor, topEdgeAnchor, rightEdgeAnchor, bottomEdgeAnchor };
 };
 
@@ -153,15 +123,15 @@ export class LayoutedInstance {
   }
 
   getAngle() {
-    return this.instance.getAngle();
+    return 0;
   }
 
   getRotationX() {
-    return this.instance.getRotationX();
+    return 0;
   }
 
   getRotationY() {
-    return this.instance.getRotationY();
+    return 0;
   }
 
   getObjectName() {
@@ -193,7 +163,7 @@ export class LayoutedInstance {
   setSealed(seal: boolean) {}
 
   getZOrder() {
-    return this.instance.getZOrder();
+    return 0;
   }
 
   setZOrder(zOrder: number) {}
@@ -223,7 +193,7 @@ export class LayoutedInstance {
   setFlippedZ(flippedY: boolean) {}
 
   getLayer() {
-    return this.instance.getLayer();
+    return '';
   }
 
   setLayer(layer: string) {}
@@ -304,14 +274,6 @@ export class LayoutedInstance {
     return [];
   }
 
-  hasBehaviorOverridingNamed(name: string): boolean {
-    return this.instance.hasBehaviorOverridingNamed(name);
-  }
-
-  getBehaviorOverriding(name: string): gdBehavior {
-    return this.instance.getBehaviorOverriding(name);
-  }
-
   serializeTo(element: gdSerializerElement) {}
 
   unserializeFrom(element: gdSerializerElement) {}
@@ -375,8 +337,7 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
 
   const objectAnchor = getObjectAnchor(
     eventBasedObjectVariant,
-    layoutedInstance.getObjectName(),
-    initialInstance
+    layoutedInstance.getObjectName()
   );
   const leftEdgeAnchor = objectAnchor
     ? objectAnchor.leftEdgeAnchor

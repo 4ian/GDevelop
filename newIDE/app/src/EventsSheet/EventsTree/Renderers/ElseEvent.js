@@ -9,7 +9,6 @@ import {
   executableEventContainer,
   invalidElse,
   elseTextContainer,
-  disabledText,
 } from '../ClassNames';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
@@ -58,11 +57,7 @@ export default class ElseEvent extends React.Component<EventRendererProps, *> {
               )
             }
           >
-            <span
-              className={classNames({
-                [disabledText]: this.props.disabled,
-              })}
-            >
+            <span>
               {elseEvent.getConditions().size() > 0 ? (
                 <Trans>Else if</Trans>
               ) : (

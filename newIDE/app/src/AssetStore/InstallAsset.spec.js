@@ -897,8 +897,7 @@ describe('InstallAsset', () => {
       addSerializedExtensionsToProject(
         mockEventsFunctionsExtensionsState,
         project,
-        [serializedExtension],
-        [serializedExtension.name]
+        [serializedExtension]
       );
 
       expect(
@@ -923,7 +922,7 @@ describe('InstallAsset', () => {
         mockEventsFunctionsExtensionsState,
         project,
         [serializedExtension],
-        []
+        false
       );
 
       expect(

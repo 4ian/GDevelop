@@ -157,11 +157,7 @@ const ResourcePropertiesEditor = React.forwardRef<
         const resourceSchema = propertiesMapToSchema({
           properties,
           defaultValueProperties: null,
-          getPropertyValue: (resource, name) =>
-            resource
-              .getProperties()
-              .get(name)
-              .getValue(),
+          getProperties: resource => resource.getProperties(),
           onUpdateProperty: (resource, name, value) => {
             resource.updateProperty(name, value);
             forceUpdate();

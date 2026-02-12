@@ -23,12 +23,10 @@ function ExtensionsProperties(props: Props) {
     const propertiesSchema = propertiesMapToSchema({
       properties,
       defaultValueProperties: null,
-      getPropertyValue: (instance, name) =>
+      getProperties: instance =>
         project
           .getExtensionProperties()
-          .getAllExtensionProperties(extension.getName(), project)
-          .get(name)
-          .getValue(),
+          .getAllExtensionProperties(extension.getName(), project),
       onUpdateProperty: (instance, propertyName, newValue) => {
         if (
           project

@@ -16,7 +16,6 @@ export type ValueFieldCommonProperties = {|
   getLabel?: Instance => string,
   getDescription?: Instance => string,
   hideLabel?: boolean,
-  isHighlighted?: Instance => boolean,
   getExtraDescription?: Instance => string,
   hasImpactOnAllOtherFields?: boolean,
   canBeUnlimitedUsingMinus1?: boolean,
@@ -33,13 +32,8 @@ export type ValueFieldCommonProperties = {|
 export type PrimitiveValueField =
   | {|
       valueType: 'number',
-      getValue: Instance => number | null,
+      getValue: Instance => number,
       setValue: (instance: Instance, newValue: number) => void,
-      getChoices?: ?() => Array<{|
-        value: string,
-        label: string,
-        labelIsUserDefined?: boolean,
-      |}>,
       /** Only supported on non compact property editors. */
       getEndAdornment?: Instance => {|
         label: string,
@@ -52,7 +46,7 @@ export type PrimitiveValueField =
     |}
   | {|
       valueType: 'string',
-      getValue: Instance => string | null,
+      getValue: Instance => string,
       setValue: (instance: Instance, newValue: string) => void,
       getChoices?: ?() => Array<{|
         value: string,
@@ -69,7 +63,7 @@ export type PrimitiveValueField =
     |}
   | {|
       valueType: 'boolean',
-      getValue: Instance => boolean | null,
+      getValue: Instance => boolean,
       setValue: (instance: Instance, newValue: boolean) => void,
       ...ValueFieldCommonProperties,
     |}

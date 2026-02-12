@@ -58,11 +58,7 @@ const QuickObjectPropertiesEditor = ({
       const schema = propertiesMapToSchema({
         properties,
         defaultValueProperties: null,
-        getPropertyValue: (object, name) =>
-          object
-            .getProperties()
-            .get(name)
-            .getValue(),
+        getProperties: object => object.getProperties(),
         onUpdateProperty: (object, name, value) =>
           object.updateProperty(name, value),
         object,

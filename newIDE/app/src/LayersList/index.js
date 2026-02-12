@@ -335,14 +335,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
     }));
 
     const editName = React.useCallback(
-      (layerName: string) => {
-        // Don't allow renaming base layer (empty name)
-        if (!layerName) return;
-
-        if (!layersContainer.hasLayerNamed(layerName)) return;
-        const layer = layersContainer.getLayer(layerName);
-
-        const itemId = getLayerTreeViewItemId(layer);
+      (itemId: string) => {
         const treeView = treeViewRef.current;
         if (treeView) {
           if (isMobile) {
@@ -353,7 +346,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
           treeView.renameItemFromId(itemId);
         }
       },
-      [isMobile, layersContainer]
+      [isMobile]
     );
 
     const onTreeModified = React.useCallback(

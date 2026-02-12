@@ -89,14 +89,14 @@ const objectVariablesHelpLink = getHelpLink(
   '/all-features/variables/object-variables'
 );
 
-export type TitleBarButton = {|
+type TitleBarButton = {|
   id: string,
   icon: any,
   label?: MessageDescriptor,
   onClick?: () => void,
 |};
 
-export const CollapsibleSubPanel = ({
+const CollapsibleSubPanel = ({
   renderContent,
   isFolded,
   toggleFolded,
@@ -157,7 +157,7 @@ export const CollapsibleSubPanel = ({
   </Paper>
 );
 
-export const TopLevelCollapsibleSection = ({
+const TopLevelCollapsibleSection = ({
   title,
   isFolded,
   toggleFolded,
@@ -173,7 +173,7 @@ export const TopLevelCollapsibleSection = ({
   renderContent: () => React.Node,
   renderContentAsHiddenWhenFolded?: boolean,
   noContentMargin?: boolean,
-  onOpenFullEditor?: () => void,
+  onOpenFullEditor: () => void,
   onAdd?: (() => void) | null,
 |}) => (
   <>
@@ -193,11 +193,9 @@ export const TopLevelCollapsibleSection = ({
           </Text>
         </LineStackLayout>
         <Line alignItems="center" noMargin>
-          {onOpenFullEditor && (
-            <IconButton size="small" onClick={onOpenFullEditor}>
-              <ShareExternal style={styles.icon} />
-            </IconButton>
-          )}
+          <IconButton size="small" onClick={onOpenFullEditor}>
+            <ShareExternal style={styles.icon} />
+          </IconButton>
           {onAdd && (
             <IconButton size="small" onClick={onAdd}>
               <Add style={styles.icon} />
@@ -494,11 +492,8 @@ export const CompactObjectPropertiesEditor = ({
           ? customObjectEventsBasedObject.getPropertyDescriptors()
           : // We can't access default values for built-in objects.
             null,
-        getPropertyValue: ({ objectConfiguration }, name) =>
-          objectConfiguration
-            .getProperties()
-            .get(name)
-            .getValue(),
+        getProperties: ({ objectConfiguration }) =>
+          objectConfiguration.getProperties(),
         onUpdateProperty: ({ objectConfiguration }, name, value) => {
           objectConfiguration.updateProperty(name, value);
           onObjectsModified([object]);
@@ -754,8 +749,6 @@ export const CompactObjectPropertiesEditor = ({
                           project={project}
                           behaviorMetadata={behaviorMetadata}
                           behavior={behavior}
-                          behaviorOverriding={null}
-                          initialInstance={null}
                           object={object}
                           onBehaviorUpdated={() => {}}
                           resourceManagementProps={resourceManagementProps}

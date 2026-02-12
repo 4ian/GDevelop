@@ -199,12 +199,7 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
       this.getIndex() + 1
     );
 
-    unserializeFromJSObject(
-      newExternalLayout,
-      copiedExternalLayout,
-      'unserializeFrom',
-      project
-    );
+    unserializeFromJSObject(newExternalLayout, copiedExternalLayout);
     // Unserialization has overwritten the name.
     newExternalLayout.setName(newName);
 

@@ -77,12 +77,7 @@ export const extractAsCustomObject = ({
   let isRenderedIn3D = null;
   for (const serializedInstance of serializedSelection) {
     const instance = new gd.InitialInstance();
-    unserializeFromJSObject(
-      instance,
-      serializedInstance,
-      'unserializeFrom',
-      project
-    );
+    unserializeFromJSObject(instance, serializedInstance);
     layer = instance.getLayer();
     zOrder = Math.max(zOrder, instance.getZOrder());
 

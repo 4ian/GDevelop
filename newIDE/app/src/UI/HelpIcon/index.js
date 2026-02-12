@@ -39,10 +39,7 @@ const HelpIcon = (props: PropsType) => {
 
   return (
     <IconButton
-      onClick={event => {
-        event.stopPropagation();
-        Window.openExternalURL(getHelpLink(helpPagePath));
-      }}
+      onClick={() => Window.openExternalURL(getHelpLink(helpPagePath))}
       disabled={props.disabled}
       style={props.style}
       size={props.size}

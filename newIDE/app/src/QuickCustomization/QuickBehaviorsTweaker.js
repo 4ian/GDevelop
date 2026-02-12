@@ -37,11 +37,7 @@ const QuickBehaviorPropertiesEditor = ({
       return propertiesMapToSchema({
         properties: behavior.getProperties(),
         defaultValueProperties: null,
-        getPropertyValue: (behavior, name) =>
-          behavior
-            .getProperties()
-            .get(name)
-            .getValue(),
+        getProperties: behavior => behavior.getProperties(),
         onUpdateProperty: (behavior, name, value) => {
           behavior.updateProperty(name, value);
         },

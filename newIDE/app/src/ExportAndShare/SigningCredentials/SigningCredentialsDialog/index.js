@@ -83,7 +83,7 @@ export const SigningCredentialsDialog = ({
   signingCredentials,
   error,
   onRefreshSigningCredentials,
-}: Props): React.Node => {
+}: Props) => {
   const [currentTab, setCurrentTab] = React.useState<string>(
     'apple-certificate'
   );

@@ -39,37 +39,31 @@ const PointsListBody = (props: PointsListBodyProps) => {
     props.onPointsUpdated();
   };
 
-  // $FlowFixMe[missing-local-annot]
   const updateOriginPointX = newValue => {
     pointsContainer.getOrigin().setX(newValue);
     onPointsUpdated();
   };
 
-  // $FlowFixMe[missing-local-annot]
   const updateOriginPointY = newValue => {
     pointsContainer.getOrigin().setY(newValue);
     onPointsUpdated();
   };
 
-  // $FlowFixMe[missing-local-annot]
   const updateCenterPointX = newValue => {
     pointsContainer.getCenter().setX(newValue);
     onPointsUpdated();
   };
 
-  // $FlowFixMe[missing-local-annot]
   const updateCenterPointY = newValue => {
     pointsContainer.getCenter().setY(newValue);
     onPointsUpdated();
   };
 
-  // $FlowFixMe[missing-local-annot]
   const updatePointX = (point, newValue) => {
     point.setX(newValue);
     onPointsUpdated();
   };
 
-  // $FlowFixMe[missing-local-annot]
   const updatePointY = (point, newValue) => {
     point.setY(newValue);
     onPointsUpdated();
@@ -80,18 +74,13 @@ const PointsListBody = (props: PointsListBodyProps) => {
   ]);
 
   const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();
-  // $FlowFixMe[incompatible-exact]
   const pointsRows = mapVector(nonDefaultPoints, (point, i) => {
-    // $FlowFixMe[incompatible-use]
     const pointName = point.getName();
 
     return (
       <PointRow
-        // $FlowFixMe[incompatible-use]
         key={`point-${point.ptr}`}
-        // $FlowFixMe[incompatible-use]
         pointX={point.getX()}
-        // $FlowFixMe[incompatible-use]
         pointY={point.getY()}
         onChangePointX={newValue => updatePointX(point, newValue)}
         onChangePointY={newValue => updatePointY(point, newValue)}
@@ -106,9 +95,7 @@ const PointsListBody = (props: PointsListBodyProps) => {
           if (pointsContainer.hasPoint(newName)) {
             success = false;
           } else {
-            // $FlowFixMe[incompatible-use]
             const oldName = point.getName();
-            // $FlowFixMe[incompatible-use]
             point.setName(newName);
             props.onRenamedPoint(oldName, newName);
             if (props.selectedPointName === pointName) {
@@ -117,7 +104,6 @@ const PointsListBody = (props: PointsListBodyProps) => {
             onPointsUpdated();
           }
 
-          // $FlowFixMe[incompatible-type]
           setNameErrors(old => ({ ...old, [pointName]: !success }));
         }}
         onPointerEnter={props.onHoverPoint}
@@ -204,25 +190,21 @@ type PointsListProps = {|
   spriteSize: [number, number],
 |};
 
-const PointsList = (props: PointsListProps): React.Node => {
+const PointsList = (props: PointsListProps) => {
   return (
     <Column expand>
       <Table>
         <TableHeader>
           <TableRow>
-            {/* $FlowFixMe[incompatible-type] */}
             <TableHeaderColumn style={styles.nameColumn}>
               <Trans>Point name</Trans>
             </TableHeaderColumn>
-            {/* $FlowFixMe[incompatible-type] */}
             <TableHeaderColumn style={styles.coordinateColumn} padding="none">
               <Column>X</Column>
             </TableHeaderColumn>
-            {/* $FlowFixMe[incompatible-type] */}
             <TableHeaderColumn style={styles.coordinateColumn} padding="none">
               <Column>Y</Column>
             </TableHeaderColumn>
-            {/* $FlowFixMe[incompatible-type] */}
             <TableHeaderColumn style={styles.toolColumn} />
           </TableRow>
         </TableHeader>

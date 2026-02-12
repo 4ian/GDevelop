@@ -55,7 +55,7 @@ export const ExtensionDependenciesEditor = ({
   eventsFunctionsExtension,
   project,
   resourceManagementProps,
-}: Props): React.Node => {
+}: Props) => {
   const deps = eventsFunctionsExtension.getAllDependencies();
   const forceUpdate = useForceUpdate();
 
@@ -106,12 +106,11 @@ export const ExtensionDependenciesEditor = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {// $FlowFixMe[incompatible-type] - unsure why Flow complains about TableRow.
+            {// $FlowFixMe - unsure why Flow complains about TableRow.
             mapVector<gdDependencyMetadata, TableRow>(
-              // $FlowFixMe[incompatible-exact]
               eventsFunctionsExtension.getAllDependencies(),
               (dependency, index) => (
-                // $FlowFixMe[incompatible-type] - unsure why Flow complains about TableRow.
+                // $FlowFixMe - unsure why Flow complains about TableRow.
                 <TableRow key={dependency.getName()}>
                   <TableRowColumn>
                     <CompactSemiControlledTextField
@@ -234,12 +233,11 @@ export const ExtensionDependenciesEditor = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {// $FlowFixMe[incompatible-type] - unsure why Flow complains about TableRow.
+            {// $FlowFixMe - unsure why Flow complains about TableRow.
             mapVector<gdSourceFileMetadata, TableRow>(
-              // $FlowFixMe[incompatible-exact]
               eventsFunctionsExtension.getAllSourceFiles(),
               (sourceFile, index) => (
-                // $FlowFixMe[incompatible-type] - unsure why Flow complains about TableRow.
+                // $FlowFixMe - unsure why Flow complains about TableRow.
                 <TableRow key={sourceFile.getResourceName()}>
                   <TableRowColumn>
                     <CompactResourceSelectorWithThumbnail

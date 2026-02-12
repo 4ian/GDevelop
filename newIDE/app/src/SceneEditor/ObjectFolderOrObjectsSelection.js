@@ -11,19 +11,15 @@ export const cleanNonExistingObjectFolderOrObjectWithContexts = (
   const allObjectFolderOrObjectPtrs = new Set<number>();
   if (objectsContainer)
     mapVector(
-      // $FlowFixMe[incompatible-exact]
       objectsContainer.getAllObjectFolderOrObjects(),
       objectFolderOrObject => {
-        // $FlowFixMe[incompatible-type]
         allObjectFolderOrObjectPtrs.add(gd.getPointer(objectFolderOrObject));
       }
     );
   if (globalObjectsContainer)
     mapVector(
-      // $FlowFixMe[incompatible-exact]
       globalObjectsContainer.getAllObjectFolderOrObjects(),
       objectFolderOrObject => {
-        // $FlowFixMe[incompatible-type]
         allObjectFolderOrObjectPtrs.add(gd.getPointer(objectFolderOrObject));
       }
     );
@@ -31,7 +27,6 @@ export const cleanNonExistingObjectFolderOrObjectWithContexts = (
   return objectFolderOrObjectWithContexts.filter(
     objectFolderOrObjectWithContext =>
       allObjectFolderOrObjectPtrs.has(
-        // $FlowFixMe[incompatible-exact]
         gd.getPointer(objectFolderOrObjectWithContext.objectFolderOrObject)
       )
   );
@@ -45,13 +40,10 @@ export const getObjectFolderOrObjectWithContextFromObjectName = (
   let foundObjectFolderObjectWithContext = null;
   if (globalObjectsContainer)
     mapVector(
-      // $FlowFixMe[incompatible-exact]
       globalObjectsContainer.getAllObjectFolderOrObjects(),
       objectFolderOrObject => {
         if (
-          // $FlowFixMe[incompatible-use]
           !objectFolderOrObject.isFolder() &&
-          // $FlowFixMe[incompatible-use]
           objectFolderOrObject.getObject().getName() === objectName
         ) {
           foundObjectFolderObjectWithContext = {
@@ -63,13 +55,10 @@ export const getObjectFolderOrObjectWithContextFromObjectName = (
     );
   if (objectsContainer)
     mapVector(
-      // $FlowFixMe[incompatible-exact]
       objectsContainer.getAllObjectFolderOrObjects(),
       objectFolderOrObject => {
         if (
-          // $FlowFixMe[incompatible-use]
           !objectFolderOrObject.isFolder() &&
-          // $FlowFixMe[incompatible-use]
           objectFolderOrObject.getObject().getName() === objectName
         ) {
           foundObjectFolderObjectWithContext = {
@@ -80,6 +69,5 @@ export const getObjectFolderOrObjectWithContextFromObjectName = (
       }
     );
 
-  // $FlowFixMe[incompatible-type]
   return foundObjectFolderObjectWithContext;
 };

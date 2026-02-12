@@ -34,7 +34,7 @@ export const createOrUpdateResource = (
 export const getLocalResourceFullPath = (
   project: gdProject,
   resourceName: string
-): any => {
+) => {
   let resourcePath = ResourcesLoader.getResourceFullUrl(
     project,
     resourceName,
@@ -54,7 +54,7 @@ export const getLocalResourceFullPath = (
 export const isPathInProjectFolder = (
   project: gdProject,
   resourcePath: string
-): boolean => {
+) => {
   const projectPath = path.dirname(project.getProjectFile());
   return resourcePath.includes(projectPath);
 };
@@ -70,7 +70,6 @@ export const copyAllToProjectFolder = (
 
   const projectPath = path.dirname(project.getProjectFile());
 
-  // $FlowFixMe[incompatible-type]
   return Promise.all(
     resourcePaths.map(resourcePath => {
       if (isPathInProjectFolder(project, resourcePath)) {
@@ -120,7 +119,7 @@ export const copyAllToProjectFolder = (
 export const getResourceFilePathStatus = (
   project: gdProject,
   resourceName: string
-): string => {
+) => {
   if (!project.getResourcesManager().hasResource(resourceName)) return '';
   if (!fs) return '';
 
@@ -239,7 +238,7 @@ export const updateResourceJsonMetadata = (
   resource.setMetadata(JSON.stringify(newMetadata));
 };
 
-export const isFetchableUrl = (url: string): boolean => {
+export const isFetchableUrl = (url: string) => {
   return (
     url.startsWith('http://') ||
     url.startsWith('https://') ||
@@ -247,7 +246,7 @@ export const isFetchableUrl = (url: string): boolean => {
   );
 };
 
-export const isURL = (filename: string): boolean => {
+export const isURL = (filename: string) => {
   return (
     filename.startsWith('http://') ||
     filename.startsWith('https://') ||
@@ -257,6 +256,6 @@ export const isURL = (filename: string): boolean => {
   );
 };
 
-export const isBlobURL = (filename: string): boolean => {
+export const isBlobURL = (filename: string) => {
   return filename.startsWith('blob:');
 };

@@ -43,7 +43,7 @@ export const CustomObjectPackResults = ({
   onAssetSelect,
   onBack,
   isAssetBeingInstalled,
-}: CustomObjectPackResultsProps): React.Node => {
+}: CustomObjectPackResultsProps) => {
   const { useSearchItem, error } = React.useContext(AssetStoreContext);
   // Memoizing the parameters of the search as it seems to trigger infinite rendering if not.
   const chosenCategory: ChosenCategory = React.useMemo(
@@ -57,7 +57,6 @@ export const CustomObjectPackResults = ({
     }),
     [packTag]
   );
-  // $FlowFixMe[missing-empty-array-annot]
   const filters = React.useMemo(() => [], []);
   const selectedAssetPackSearchResults = useSearchItem(
     '',
@@ -114,7 +113,7 @@ const TitleListItem = ({ value, onHeightComputed }: TitleListItemProps) => {
 
 const getObjectType = (
   objectShortHeader: ObjectShortHeader | ObjectCategory
-  //$FlowFixMe[incompatible-type]
+  //$FlowFixMe
 ): string => objectShortHeader.type || objectShortHeader.categoryId;
 
 type Props = {|
@@ -131,7 +130,7 @@ export default function NewObjectFromScratch({
   eventsBasedObject,
   onObjectTypeSelected,
   i18n,
-}: Props): React.Node {
+}: Props) {
   const preferences = React.useContext(PreferencesContext);
   const [
     selectedObjectShortHeader,
@@ -171,7 +170,6 @@ export default function NewObjectFromScratch({
               eventsBasedObject
             );
           }
-          // $FlowFixMe[incompatible-type]
           return {
             type: object.type,
             fullName: object.fullName,
@@ -225,7 +223,7 @@ export default function NewObjectFromScratch({
       if (!searchResults) return [];
       const extensionMatches = searchResults.find(result => {
         const resultItem: ObjectShortHeader =
-          //$FlowFixMe[incompatible-type] Categories will never match since they have no type.
+          //$FlowFixMe Categories will never match since they have no type.
           result.item;
         return resultItem.type === extensionShortHeader.type;
       });
@@ -302,7 +300,6 @@ export default function NewObjectFromScratch({
             filteredSearchResults.map(({ item }) => item)
           }
           getSearchItemUniqueId={getObjectType}
-          // $FlowFixMe[missing-local-annot]
           renderSearchItem={(objectShortHeaderOrCategory, onHeightComputed) => {
             if (objectShortHeaderOrCategory.categoryId) {
               return (
@@ -313,7 +310,7 @@ export default function NewObjectFromScratch({
               );
             }
             const objectShortHeader: ObjectShortHeader =
-              //$FlowFixMe[incompatible-type] It can't be a category at this point
+              //$FlowFixMe It can't be a category at this point
               objectShortHeaderOrCategory;
             return (
               <ObjectListItem

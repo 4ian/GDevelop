@@ -34,7 +34,6 @@ export type EnumeratedVariable = {|
   source: VariablesContainer_SourceType,
 |};
 
-// $FlowFixMe[missing-local-annot]
 const variableSort = [variable => variable.name.toLowerCase()];
 
 const enumerateVariablesOfContainersListExcludingSourceTypes = (
@@ -140,7 +139,6 @@ export const enumerateVariables = (
       return [
         enumeratedVariable,
         ...flatMap(
-          // $FlowFixMe[underconstrained-implicit-instantiation]
           new Array(variable.getChildrenCount()).fill(''),
           (_, index) =>
             enumerateVariableAndChildrenNames(

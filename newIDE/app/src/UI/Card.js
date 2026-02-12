@@ -40,7 +40,7 @@ const Card = ({
   isHighlighted,
   disabled,
   padding,
-}: Props): React.Node => {
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const cardContentStyle: {|

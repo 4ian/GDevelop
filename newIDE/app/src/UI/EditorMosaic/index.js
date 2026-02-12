@@ -62,9 +62,9 @@ export const mosaicContainsNode = (
   return (
     !!mosaic &&
     (mosaic === node ||
-      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe
       ((!!mosaic.first && mosaicContainsNode(mosaic.first, node)) ||
-        // $FlowFixMe[incompatible-type]
+        // $FlowFixMe
         (!!mosaic.second && mosaicContainsNode(mosaic.second, node))))
   );
 };
@@ -262,7 +262,6 @@ const shallowClone = (node: EditorMosaicNode): EditorMosaicNode => {
 
 const defaultToolbarControls = [<CloseButton key="close" />];
 
-// $FlowFixMe[missing-local-annot]
 const renderMosaicWindowPreview = props => (
   <div className="mosaic-preview">
     <div className="mosaic-window-toolbar">
@@ -304,10 +303,7 @@ type Props = {|
  * Can be used to create a mosaic of resizable editors.
  * Must be used inside a component wrapped in a DragDropContext.
  */
-const EditorMosaic: React.ComponentType<{
-  ...Props,
-  +ref?: React.RefSetter<EditorMosaicInterface>,
-}> = React.forwardRef<Props, EditorMosaicInterface>(
+const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
   (
     {
       initialNodes,
@@ -369,7 +365,6 @@ const EditorMosaic: React.ComponentType<{
       [editors, hidableMosaicNode, centralNodeId]
     );
 
-    // $FlowFixMe[incompatible-type]
     React.useImperativeHandle(ref, () => ({
       getOpenedEditorNames: (): Array<string> => {
         return mosaicNode ? getVisibleLeaves(mosaicNode) : [];
@@ -457,7 +452,6 @@ const EditorMosaic: React.ComponentType<{
     );
 
     const onChange = React.useCallback(
-      // $FlowFixMe[missing-local-annot]
       nodes => {
         if (!isResizing.current) {
           if (onDragOrResizedStarted) {

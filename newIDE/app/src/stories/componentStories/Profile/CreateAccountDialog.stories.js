@@ -18,31 +18,29 @@ const defaultProps = {
   createAccountInProgress: false,
   error: null,
 };
-export const Default = (): React.Node => (
-  <CreateAccountDialog {...defaultProps} />
-);
+export const Default = () => <CreateAccountDialog {...defaultProps} />;
 
-export const PasswordErrorFromBackend = (): React.Node => (
+export const PasswordErrorFromBackend = () => (
   <CreateAccountDialog
     {...defaultProps}
     error={{ code: 'auth/weak-password' }}
   />
 );
 
-export const EmailErrorFromBackend = (): React.Node => (
+export const EmailErrorFromBackend = () => (
   <CreateAccountDialog
     {...defaultProps}
     error={{ code: 'auth/invalid-email' }}
   />
 );
 
-export const AccountExists = (): React.Node => (
+export const AccountExists = () => (
   <CreateAccountDialog
     {...defaultProps}
     error={{ code: 'auth/account-exists-with-different-credential' }}
   />
 );
 
-export const Submitting = (): React.Node => (
+export const Submitting = () => (
   <CreateAccountDialog {...defaultProps} createAccountInProgress />
 );

@@ -11,7 +11,6 @@ import paperDecorator from '../../PaperDecorator';
 import { CompactInstancePropertiesEditor } from '../../../InstancesEditor/CompactInstancePropertiesEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
-import fakeResourceManagementProps from '../../FakeResourceManagement';
 
 export default {
   title: 'LayoutEditor/CompactInstancePropertiesEditor',
@@ -19,7 +18,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const InstanceSprite2d = (): React.Node => (
+export const InstanceSprite2d = () => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (
@@ -37,14 +36,10 @@ export const InstanceSprite2d = (): React.Node => (
             instances={[testProject.testSpriteObjectInstance]}
             editInstanceVariables={action('edit instance variables')}
             onGetInstanceSize={() => [100, 101, 102]}
-            editObjectInPropertiesPanel={action(
-              'edit object in property panel'
-            )}
+            editObjectInPropertiesPanel={action('edit object')}
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
             isVariableListLocked={false}
-            canOverrideBehaviorProperties={true}
-            resourceManagementProps={fakeResourceManagementProps}
           />
         </SerializedObjectDisplay>
       )}
@@ -52,7 +47,7 @@ export const InstanceSprite2d = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const InstanceCube3d = (): React.Node => (
+export const InstanceCube3d = () => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (
@@ -70,14 +65,10 @@ export const InstanceCube3d = (): React.Node => (
             instances={[testProject.testLayoutInstance2]}
             editInstanceVariables={action('edit instance variables')}
             onGetInstanceSize={() => [100, 101, 102]}
-            editObjectInPropertiesPanel={action(
-              'edit object in property panel'
-            )}
+            editObjectInPropertiesPanel={action('edit object')}
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
             isVariableListLocked={false}
-            canOverrideBehaviorProperties={true}
-            resourceManagementProps={fakeResourceManagementProps}
           />
         </SerializedObjectDisplay>
       )}
@@ -85,7 +76,7 @@ export const InstanceCube3d = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const InstanceTextInput = (): React.Node => (
+export const InstanceTextInput = () => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (
@@ -103,14 +94,10 @@ export const InstanceTextInput = (): React.Node => (
             instances={[testProject.testLayoutInstance3]}
             editInstanceVariables={action('edit instance variables')}
             onGetInstanceSize={() => [120, 40, 0]}
-            editObjectInPropertiesPanel={action(
-              'edit object in property panel'
-            )}
+            editObjectInPropertiesPanel={action('edit object')}
             tileMapTileSelection={null}
             onSelectTileMapTile={() => {}}
             isVariableListLocked={false}
-            canOverrideBehaviorProperties={true}
-            resourceManagementProps={fakeResourceManagementProps}
           />
         </SerializedObjectDisplay>
       )}

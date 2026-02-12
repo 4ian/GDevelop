@@ -39,8 +39,7 @@ const gd: libGDevelop = global.gd;
 
 jest.mock('../Utils/GDevelopServices/Extension');
 
-// $FlowFixMe[incompatible-type] - overriding method to do a mocked network call.
-// $FlowFixMe[cannot-write]
+// $FlowFixMe - overriding method to do a mocked network call.
 Asset.getPublicAsset = jest.fn();
 
 const mockFn = (fn: Function): JestMockFn<any, any> => fn;
@@ -898,8 +897,7 @@ describe('InstallAsset', () => {
       addSerializedExtensionsToProject(
         mockEventsFunctionsExtensionsState,
         project,
-        [serializedExtension],
-        [serializedExtension.name]
+        [serializedExtension]
       );
 
       expect(
@@ -924,7 +922,7 @@ describe('InstallAsset', () => {
         mockEventsFunctionsExtensionsState,
         project,
         [serializedExtension],
-        []
+        false
       );
 
       expect(

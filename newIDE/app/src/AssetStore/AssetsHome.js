@@ -72,21 +72,7 @@ const getShopItemsColumns = (
 
 export const gameTemplatesCategoryId = 'game-template';
 
-export const shopCategories: {
-  background: { imageAlt: string, imageSource: string, title: React.Node },
-  character: { imageAlt: string, imageSource: string, title: React.Node },
-  'full-game-pack': {
-    imageAlt: string,
-    imageSource: string,
-    title: React.Node,
-  },
-  'game-template': { imageAlt: string, imageSource: string, title: React.Node },
-  interface: { imageAlt: string, imageSource: string, title: React.Node },
-  prefab: { imageAlt: string, imageSource: string, title: React.Node },
-  props: { imageAlt: string, imageSource: string, title: React.Node },
-  sounds: { imageAlt: string, imageSource: string, title: React.Node },
-  'visual-effect': { imageAlt: string, imageSource: string, title: React.Node },
-} = {
+export const shopCategories = {
   [gameTemplatesCategoryId]: {
     title: <Trans>Ready-made games</Trans>,
     imageAlt: 'Premium game templates category',
@@ -189,10 +175,7 @@ type Props = {|
   onOpenProfile?: () => void,
 |};
 
-export const AssetsHome: React.ComponentType<{
-  ...Props,
-  +ref?: React.RefSetter<AssetsHomeInterface>,
-}> = React.forwardRef<Props, AssetsHomeInterface>(
+export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
   (
     {
       publicAssetPacks: { starterPacks },
@@ -242,8 +225,7 @@ export const AssetsHome: React.ComponentType<{
     const categoryTiles = React.useMemo(
       () =>
         Object.entries(shopCategories).map(
-          // $FlowFixMe[incompatible-type] - Object.entries does not infer well the type of the value.
-          // $FlowFixMe[incompatible-use]
+          // $FlowExpectedError - Object.entries does not infer well the type of the value.
           ([id, { title, imageSource, imageAlt }]) =>
             onlyShowAssets && id === 'game-template' ? null : (
               <CategoryTile
@@ -265,8 +247,7 @@ export const AssetsHome: React.ComponentType<{
     );
 
     const openedShopCategoryTitle = openedShopCategory
-      ? // $FlowFixMe[invalid-computed-prop]
-        shopCategories[openedShopCategory].title
+      ? shopCategories[openedShopCategory].title
       : null;
 
     const publicPackTiles: Array<React.Node> = React.useMemo(

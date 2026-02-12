@@ -20,7 +20,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const NotAuthenticatedTryMode = (): React.Node => {
+export const NotAuthenticatedTryMode = () => {
   const checkerRef = React.useRef<?SubscriptionCheckerInterface>(null);
 
   const onClick = () => {
@@ -42,7 +42,7 @@ export const NotAuthenticatedTryMode = (): React.Node => {
     </AuthenticatedUserContext.Provider>
   );
 };
-export const NotAuthenticatedMandatoryMode = (): React.Node => {
+export const NotAuthenticatedMandatoryMode = () => {
   const checkerRef = React.useRef(null);
 
   const onClick = () => {
@@ -54,7 +54,6 @@ export const NotAuthenticatedMandatoryMode = (): React.Node => {
     <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <RaisedButton label="Click here" onClick={onClick} primary />
       <SubscriptionChecker
-        // $FlowFixMe[incompatible-type]
         ref={checkerRef}
         title="Preview over wifi"
         id="Preview over wifi"
@@ -65,7 +64,7 @@ export const NotAuthenticatedMandatoryMode = (): React.Node => {
     </AuthenticatedUserContext.Provider>
   );
 };
-export const UserWithNoSubscription = (): React.Node => {
+export const UserWithNoSubscription = () => {
   const checkerRef = React.useRef(null);
 
   const onClick = () => {
@@ -79,7 +78,6 @@ export const UserWithNoSubscription = (): React.Node => {
     >
       <RaisedButton label="Click here" onClick={onClick} primary />
       <SubscriptionChecker
-        // $FlowFixMe[incompatible-type]
         ref={checkerRef}
         title="Preview over wifi"
         id="Preview over wifi"
@@ -90,7 +88,7 @@ export const UserWithNoSubscription = (): React.Node => {
     </AuthenticatedUserContext.Provider>
   );
 };
-export const UserWithGoldSubscription = (): React.Node => {
+export const UserWithGoldSubscription = () => {
   const checkerRef = React.useRef(null);
 
   const onClick = () => {
@@ -102,7 +100,6 @@ export const UserWithGoldSubscription = (): React.Node => {
     <AuthenticatedUserContext.Provider value={fakeGoldAuthenticatedUser}>
       <RaisedButton label="Click here" onClick={onClick} primary />
       <SubscriptionChecker
-        // $FlowFixMe[incompatible-type]
         ref={checkerRef}
         title="Preview over wifi"
         id="Preview over wifi"

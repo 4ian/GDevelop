@@ -45,8 +45,7 @@ const styles = {
 type ProjectStructureItemProps = {|
   id?: string,
   autoGenerateNestedIndicator?: boolean,
-  // $FlowFixMe[prop-missing]
-  renderNestedItems: () => Array<React.Element<any> | null>,
+  renderNestedItems: () => Array<React$Element<any> | null>,
   primaryText: React.Node,
   error?: ?Error,
   onRefresh?: () => void,
@@ -61,9 +60,8 @@ export const ProjectStructureItem = ({
   open,
   primaryText,
   renderNestedItems,
-}: ProjectStructureItemProps): React.Node => {
+}: ProjectStructureItemProps) => {
   return (
-    // $FlowFixMe[incompatible-type]
     <ListItem
       id={id}
       open={open}
@@ -93,7 +91,6 @@ type ItemProps = {|
   primaryText: string,
   textEndAdornment?: React.Node,
   editingName: boolean,
-  // $FlowFixMe[prop-missing]
   leftIcon: React.Element<any>,
   onEdit: () => void,
   onDelete: () => void,
@@ -144,7 +141,7 @@ export const Item = ({
   buildExtraMenuTemplate,
   isLastItem,
   dragAndDropProps: { DragSourceAndDropTarget, onBeginDrag, onDrop },
-}: ItemProps): React.Node => {
+}: ItemProps) => {
   const textFieldRef = React.useRef<?TextFieldInterface>(null);
   const shouldDiscardChanges = React.useRef<boolean>(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -163,7 +160,6 @@ export const Item = ({
   );
 
   const label = editingName ? (
-    // $FlowFixMe[incompatible-type]
     <TextField
       id="rename-item-field"
       margin="none"
@@ -370,7 +366,7 @@ export const EventFunctionExtensionItem = ({
   onMoveDown,
   isLastItem,
   dragAndDropProps,
-}: EventFunctionExtensionItemProps): React.Node => {
+}: EventFunctionExtensionItemProps) => {
   const name = eventsFunctionsExtension.getName();
   const iconUrl = eventsFunctionsExtension.getIconUrl();
 

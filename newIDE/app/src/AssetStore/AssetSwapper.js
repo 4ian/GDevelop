@@ -91,7 +91,7 @@ const unswappableObjectTypes = [
   'TileMap::SimpleTileMap',
   'Video::VideoObject',
 ];
-export const canSwapAssetOfObject = (object: gdObject): boolean =>
+export const canSwapAssetOfObject = (object: gdObject) =>
   !unswappableObjectTypes.includes(object.getType());
 
 const mergeAnimations = function<A: { name: string }>(
@@ -105,7 +105,6 @@ const mergeAnimations = function<A: { name: string }>(
     objectsAnimation: A,
     assetAnimation: A
   ) => A
-  // $FlowFixMe[missing-local-annot]
 ) {
   const animations = [];
   // Ensure the object don't loose any animation.
@@ -233,11 +232,8 @@ const mergeSpriteFrame = (
 ): SpriteFrameData => {
   return {
     ...assetFrame,
-    // $FlowFixMe[incompatible-type]
     originPoint: scalePoint(objectFrame.originPoint, scaleX, scaleY),
-    // $FlowFixMe[incompatible-type]
     centerPoint: scalePoint(objectFrame.centerPoint, scaleX, scaleY),
-    // $FlowFixMe[incompatible-type]
     points: objectFrame.points.map(point => scalePoint(point, scaleX, scaleY)),
   };
 };
@@ -280,7 +276,6 @@ const mergeSpriteAnimations = (
   scaleX: number,
   scaleY: number
 ) =>
-  // $FlowFixMe[incompatible-type]
   mergeAnimations<SpriteAnimationData>(
     project,
     PixiResourcesLoader,
@@ -300,9 +295,7 @@ const mergeSpriteAnimations = (
 const mergeModel3DAnimation = (
   project: gdProject,
   PixiResourcesLoader: any,
-  // $FlowFixMe[missing-local-annot]
   objectsAnimation,
-  // $FlowFixMe[missing-local-annot]
   assetAnimation
 ) => assetAnimation;
 

@@ -11,35 +11,31 @@ const gd: libGDevelop = global.gd;
 // (object, group, instruction) to allow them to be living
 // in the same list (in search results) and be selected.
 
-export const getObjectGroupListItemKey = (
-  groupWithContext: GroupWithContext
-): string =>
+export const getObjectGroupListItemKey = (groupWithContext: GroupWithContext) =>
   `object-group-key-${groupWithContext.group.getName()}-${
     groupWithContext.global ? '-global' : ''
   }`;
-export const getObjectListItemKey = (
-  objectWithContext: ObjectWithContext
-): string =>
+export const getObjectListItemKey = (objectWithContext: ObjectWithContext) =>
   `object-key-${objectWithContext.object.getName()}-${
     objectWithContext.global ? '-global' : ''
   }`;
 export const getObjectOrObjectGroupListItemValue = (
   objectOrObjectGroupName: string
-): string => `object-or-object-group-value-${objectOrObjectGroupName}`;
+) => `object-or-object-group-value-${objectOrObjectGroupName}`;
 
 export const getInstructionListItemKey = (
   instruction: EnumeratedInstructionOrExpressionMetadata
-): string =>
+) =>
   `instruction-key-${instruction.fullGroupName}${
     instruction.scope.objectMetadata
       ? '-' + instruction.scope.objectMetadata.name
       : ''
   }-${instruction.type}`;
 
-export const getInstructionListItemValue = (instructionType: string): string =>
+export const getInstructionListItemValue = (instructionType: string) =>
   `instruction-value-${getInstructionType(instructionType)}`;
 
-export const getInstructionType = (instructionType: string): string => {
+export const getInstructionType = (instructionType: string) => {
   const switchableVariableInstructionIdentifier = gd.VariableInstructionSwitcher.getSwitchableVariableInstructionIdentifier(
     instructionType
   );
@@ -48,7 +44,7 @@ export const getInstructionType = (instructionType: string): string => {
     : instructionType;
 };
 
-export const getSubheaderListItemKey = (subheader: string): string =>
+export const getSubheaderListItemKey = (subheader: string) =>
   `subheader-key-${subheader}`;
 
 export const getInstructionOrExpressionIdentifier = (

@@ -28,12 +28,7 @@ const usePurchaseMarketingPlan = ({
   game,
   activeGameFeaturings,
   fetchGameFeaturings,
-}: Props): {
-  onPurchaseMarketingPlan: (
-    i18n: I18nType,
-    marketingPlan: MarketingPlan
-  ) => Promise<void>,
-} => {
+}: Props) => {
   const { profile, getAuthorizationHeader, limits } = React.useContext(
     AuthenticatedUserContext
   );

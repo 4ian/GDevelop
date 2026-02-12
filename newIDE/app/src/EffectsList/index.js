@@ -62,11 +62,9 @@ const gd: libGDevelop = global.gd;
 
 const EFFECTS_CLIPBOARD_KIND = 'Effects';
 
-// $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget2D = makeDragSourceAndDropTarget(
   '2d-effects-list'
 );
-// $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget3D = makeDragSourceAndDropTarget(
   '3d-effects-list'
 );
@@ -84,9 +82,7 @@ const styles = {
   },
 };
 
-export const useEffectOverridingAlertDialog = (): ((
-  existingEffectNames: Array<string>
-) => Promise<boolean>) => {
+export const useEffectOverridingAlertDialog = () => {
   const { showConfirmation } = useAlertDialog();
   return async (existingEffectNames: Array<string>): Promise<boolean> => {
     return await showConfirmation({
@@ -100,255 +96,257 @@ export const useEffectOverridingAlertDialog = (): ((
   };
 };
 
-const Effect = React.forwardRef((
-  {
-    layerRenderingType,
-    target,
-    project,
-    resourceManagementProps,
-    projectScopedContainersAccessor,
-    effectsContainer,
-    effect,
-    removeEffect,
-    copyEffect,
-    pasteEffectsBefore,
-    chooseEffectType,
-    allEffectMetadata,
-    onEffectsUpdated,
-    onEffectsRenamed,
-    nameErrors,
-    setNameErrors,
-    connectDragSource,
-  }: {|
-    layerRenderingType: '2d' | '3d',
-    target: 'object' | 'layer',
-    project: gdProject,
-    resourceManagementProps: ResourceManagementProps,
-    projectScopedContainersAccessor: ProjectScopedContainersAccessor,
-    effectsContainer: gdEffectsContainer,
-    effect: gdEffect,
-    onEffectsUpdated: () => void,
-    onEffectsRenamed: (oldName: string, newName: string) => void,
-    removeEffect: (effect: gdEffect) => void,
-    copyEffect: (effect: gdEffect) => void,
-    pasteEffectsBefore: (effect: gdEffect) => Promise<void>,
-    chooseEffectType: (effect: gdEffect, newEffectType: string) => void,
-    allEffectMetadata: Array<EnumeratedEffectMetadata>,
-    nameErrors: { [number]: React.Node },
-    setNameErrors: (nameErrors: { [number]: React.Node }) => void,
-    connectDragSource: ConnectDragSource,
-  |},
-  // $FlowFixMe[missing-local-annot]
-  ref
-) => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const preferences = React.useContext(PreferencesContext);
-  const showEffectParameterNames = preferences.values.showEffectParameterNames;
-  const setShowEffectParameterNames = preferences.setShowEffectParameterNames;
-
-  const forceUpdate = useForceUpdate();
-  const isClipboardContainingEffects = Clipboard.has(EFFECTS_CLIPBOARD_KIND);
-
-  const renameEffect = React.useCallback(
-    (effect: gdEffect, newName: string) => {
-      if (newName === effect.getName()) return;
-      if (nameErrors[effect.ptr]) {
-        const newNameErrors = { ...nameErrors };
-        delete newNameErrors[effect.ptr];
-        setNameErrors(newNameErrors);
-      }
-
-      if (!newName) {
-        setNameErrors({
-          ...nameErrors,
-          [effect.ptr]: <Trans>Effects cannot have empty names</Trans>,
-        });
-        return;
-      }
-
-      if (effectsContainer.hasEffectNamed(newName)) {
-        setNameErrors({
-          ...nameErrors,
-          [effect.ptr]: (
-            <Trans>The effect name {newName} is already taken</Trans>
-          ),
-        });
-        return;
-      }
-      const oldName = effect.getName();
-      effect.setName(newName);
-      forceUpdate();
-      onEffectsRenamed(oldName, newName);
-      onEffectsUpdated();
-    },
-    [
+const Effect = React.forwardRef(
+  (
+    {
+      layerRenderingType,
+      target,
+      project,
+      resourceManagementProps,
+      projectScopedContainersAccessor,
       effectsContainer,
-      forceUpdate,
-      nameErrors,
-      onEffectsRenamed,
+      effect,
+      removeEffect,
+      copyEffect,
+      pasteEffectsBefore,
+      chooseEffectType,
+      allEffectMetadata,
       onEffectsUpdated,
+      onEffectsRenamed,
+      nameErrors,
       setNameErrors,
-    ]
-  );
+      connectDragSource,
+    }: {|
+      layerRenderingType: '2d' | '3d',
+      target: 'object' | 'layer',
+      project: gdProject,
+      resourceManagementProps: ResourceManagementProps,
+      projectScopedContainersAccessor: ProjectScopedContainersAccessor,
+      effectsContainer: gdEffectsContainer,
+      effect: gdEffect,
+      onEffectsUpdated: () => void,
+      onEffectsRenamed: (oldName: string, newName: string) => void,
+      removeEffect: (effect: gdEffect) => void,
+      copyEffect: (effect: gdEffect) => void,
+      pasteEffectsBefore: (effect: gdEffect) => Promise<void>,
+      chooseEffectType: (effect: gdEffect, newEffectType: string) => void,
+      allEffectMetadata: Array<EnumeratedEffectMetadata>,
+      nameErrors: { [number]: React.Node },
+      setNameErrors: (nameErrors: { [number]: React.Node }) => void,
+      connectDragSource: ConnectDragSource,
+    |},
+    ref
+  ) => {
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
+    const preferences = React.useContext(PreferencesContext);
+    const showEffectParameterNames =
+      preferences.values.showEffectParameterNames;
+    const setShowEffectParameterNames = preferences.setShowEffectParameterNames;
 
-  const effectType = effect.getEffectType();
-  const effectMetadata = getEnumeratedEffectMetadata(
-    allEffectMetadata,
-    effectType
-  );
+    const forceUpdate = useForceUpdate();
+    const isClipboardContainingEffects = Clipboard.has(EFFECTS_CLIPBOARD_KIND);
 
-  return (
-    <I18n>
-      {({ i18n }) => (
-        <React.Fragment>
-          <div
-            ref={ref}
-            style={{
-              ...styles.rowContent,
-              backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
-            }}
-          >
-            {connectDragSource(
-              <span>
-                <Column>
-                  <DragHandleIcon />
-                </Column>
-              </span>
-            )}
-            <ResponsiveLineStackLayout expand>
-              <Line noMargin expand alignItems="center">
-                <Text noMargin noShrink>
-                  <Trans>Effect name:</Trans>
-                </Text>
-                <Spacer />
-                <SemiControlledTextField
-                  margin="none"
-                  commitOnBlur
-                  errorText={nameErrors[effect.ptr]}
-                  translatableHintText={t`Enter the effect name`}
-                  value={effect.getName()}
-                  onChange={newName => {
-                    renameEffect(effect, newName);
-                  }}
-                  fullWidth
-                />
-              </Line>
-              <Line noMargin expand alignItems="center">
-                <Text noMargin noShrink>
-                  <Trans>Type:</Trans>
-                </Text>
-                <Spacer />
-                <SelectField
-                  margin="none"
-                  value={effectType}
-                  onChange={(e, i, newEffectType: string) =>
-                    chooseEffectType(effect, newEffectType)
-                  }
-                  fullWidth
-                  translatableHintText={t`Choose the effect to apply`}
-                >
-                  {allEffectMetadata.map(effectMetadata => (
-                    <SelectOption
-                      key={effectMetadata.type}
-                      value={effectMetadata.type}
-                      label={effectMetadata.fullName}
-                      disabled={
-                        target === 'object' &&
-                        effectMetadata.isMarkedAsNotWorkingForObjects
-                      }
-                    />
-                  ))}
-                </SelectField>
-              </Line>
-            </ResponsiveLineStackLayout>
-            <InlineCheckbox
-              id="effect-visibility"
-              paddingSize="small"
-              checkedIcon={<VisibilityIcon />}
-              uncheckedIcon={<VisibilityOffIcon />}
-              checked={effect.isEnabled()}
-              onCheck={(e, checked) => {
-                effect.setEnabled(checked);
-                forceUpdate();
+    const renameEffect = React.useCallback(
+      (effect: gdEffect, newName: string) => {
+        if (newName === effect.getName()) return;
+        if (nameErrors[effect.ptr]) {
+          const newNameErrors = { ...nameErrors };
+          delete newNameErrors[effect.ptr];
+          setNameErrors(newNameErrors);
+        }
+
+        if (!newName) {
+          setNameErrors({
+            ...nameErrors,
+            [effect.ptr]: <Trans>Effects cannot have empty names</Trans>,
+          });
+          return;
+        }
+
+        if (effectsContainer.hasEffectNamed(newName)) {
+          setNameErrors({
+            ...nameErrors,
+            [effect.ptr]: (
+              <Trans>The effect name {newName} is already taken</Trans>
+            ),
+          });
+          return;
+        }
+        const oldName = effect.getName();
+        effect.setName(newName);
+        forceUpdate();
+        onEffectsRenamed(oldName, newName);
+        onEffectsUpdated();
+      },
+      [
+        effectsContainer,
+        forceUpdate,
+        nameErrors,
+        onEffectsRenamed,
+        onEffectsUpdated,
+        setNameErrors,
+      ]
+    );
+
+    const effectType = effect.getEffectType();
+    const effectMetadata = getEnumeratedEffectMetadata(
+      allEffectMetadata,
+      effectType
+    );
+
+    return (
+      <I18n>
+        {({ i18n }) => (
+          <React.Fragment>
+            <div
+              ref={ref}
+              style={{
+                ...styles.rowContent,
+                backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
               }}
-              tooltipOrHelperText={
-                effect.isEnabled() ? (
-                  <Trans>Hide effect</Trans>
-                ) : (
-                  <Trans>Show effect</Trans>
-                )
-              }
-            />
-            <ElementWithMenu
-              element={
-                <IconButton size="small">
-                  <ThreeDotsMenu />
-                </IconButton>
-              }
-              buildMenuTemplate={(i18n: I18nType) => [
-                {
-                  label: i18n._(t`Delete`),
-                  click: () => removeEffect(effect),
-                },
-                {
-                  label: i18n._(t`Copy`),
-                  click: () => copyEffect(effect),
-                },
-                {
-                  label: i18n._(t`Paste`),
-                  click: () => pasteEffectsBefore(effect),
-                  enabled: isClipboardContainingEffects,
-                },
-                { type: 'separator' },
-                {
-                  type: 'checkbox',
-                  label: i18n._(t`Show Properties Names`),
-                  checked: showEffectParameterNames,
-                  click: () =>
-                    setShowEffectParameterNames(!showEffectParameterNames),
-                },
-              ]}
-            />
-            <Spacer />
-          </div>
-          {effectMetadata && (
-            <Line expand noMargin>
-              <Column expand>
-                <Line>
-                  <BackgroundText>
-                    <MarkdownText source={effectMetadata.description} />
-                  </BackgroundText>
+            >
+              {connectDragSource(
+                <span>
+                  <Column>
+                    <DragHandleIcon />
+                  </Column>
+                </span>
+              )}
+              <ResponsiveLineStackLayout expand>
+                <Line noMargin expand alignItems="center">
+                  <Text noMargin noShrink>
+                    <Trans>Effect name:</Trans>
+                  </Text>
+                  <Spacer />
+                  <SemiControlledTextField
+                    margin="none"
+                    commitOnBlur
+                    errorText={nameErrors[effect.ptr]}
+                    translatableHintText={t`Enter the effect name`}
+                    value={effect.getName()}
+                    onChange={newName => {
+                      renameEffect(effect, newName);
+                    }}
+                    fullWidth
+                  />
                 </Line>
-                <PropertiesEditorByVisibility
-                  project={project}
-                  schema={effectMetadata.parametersSchema}
-                  instances={[effect]}
-                  resourceManagementProps={resourceManagementProps}
-                  projectScopedContainersAccessor={
-                    projectScopedContainersAccessor
-                  }
-                  renderExtraDescriptionText={
-                    showEffectParameterNames
-                      ? parameterName =>
-                          i18n._(
-                            t`Property name in events: \`${parameterName}\` `
-                          )
-                      : undefined
-                  }
-                  placeholder={
-                    <Trans>
-                      There is nothing to configure for this effect.
-                    </Trans>
-                  }
-                />
-              </Column>
-            </Line>
-          )}
-        </React.Fragment>
-      )}
-    </I18n>
-  );
-});
+                <Line noMargin expand alignItems="center">
+                  <Text noMargin noShrink>
+                    <Trans>Type:</Trans>
+                  </Text>
+                  <Spacer />
+                  <SelectField
+                    margin="none"
+                    value={effectType}
+                    onChange={(e, i, newEffectType: string) =>
+                      chooseEffectType(effect, newEffectType)
+                    }
+                    fullWidth
+                    translatableHintText={t`Choose the effect to apply`}
+                  >
+                    {allEffectMetadata.map(effectMetadata => (
+                      <SelectOption
+                        key={effectMetadata.type}
+                        value={effectMetadata.type}
+                        label={effectMetadata.fullName}
+                        disabled={
+                          target === 'object' &&
+                          effectMetadata.isMarkedAsNotWorkingForObjects
+                        }
+                      />
+                    ))}
+                  </SelectField>
+                </Line>
+              </ResponsiveLineStackLayout>
+              <InlineCheckbox
+                id="effect-visibility"
+                paddingSize="small"
+                checkedIcon={<VisibilityIcon />}
+                uncheckedIcon={<VisibilityOffIcon />}
+                checked={effect.isEnabled()}
+                onCheck={(e, checked) => {
+                  effect.setEnabled(checked);
+                  forceUpdate();
+                }}
+                tooltipOrHelperText={
+                  effect.isEnabled() ? (
+                    <Trans>Hide effect</Trans>
+                  ) : (
+                    <Trans>Show effect</Trans>
+                  )
+                }
+              />
+              <ElementWithMenu
+                element={
+                  <IconButton size="small">
+                    <ThreeDotsMenu />
+                  </IconButton>
+                }
+                buildMenuTemplate={(i18n: I18nType) => [
+                  {
+                    label: i18n._(t`Delete`),
+                    click: () => removeEffect(effect),
+                  },
+                  {
+                    label: i18n._(t`Copy`),
+                    click: () => copyEffect(effect),
+                  },
+                  {
+                    label: i18n._(t`Paste`),
+                    click: () => pasteEffectsBefore(effect),
+                    enabled: isClipboardContainingEffects,
+                  },
+                  { type: 'separator' },
+                  {
+                    type: 'checkbox',
+                    label: i18n._(t`Show Properties Names`),
+                    checked: showEffectParameterNames,
+                    click: () =>
+                      setShowEffectParameterNames(!showEffectParameterNames),
+                  },
+                ]}
+              />
+              <Spacer />
+            </div>
+            {effectMetadata && (
+              <Line expand noMargin>
+                <Column expand>
+                  <Line>
+                    <BackgroundText>
+                      <MarkdownText source={effectMetadata.description} />
+                    </BackgroundText>
+                  </Line>
+                  <PropertiesEditorByVisibility
+                    project={project}
+                    schema={effectMetadata.parametersSchema}
+                    instances={[effect]}
+                    resourceManagementProps={resourceManagementProps}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
+                    renderExtraDescriptionText={
+                      showEffectParameterNames
+                        ? parameterName =>
+                            i18n._(
+                              t`Property name in events: \`${parameterName}\` `
+                            )
+                        : undefined
+                    }
+                    placeholder={
+                      <Trans>
+                        There is nothing to configure for this effect.
+                      </Trans>
+                    }
+                  />
+                </Column>
+              </Line>
+            )}
+          </React.Fragment>
+        )}
+      </I18n>
+    );
+  }
+);
 
 export const getEnumeratedEffectMetadata = (
   allEffectDescriptions: Array<EnumeratedEffectMetadata>,
@@ -362,7 +360,7 @@ export const getEnumeratedEffectMetadata = (
 export const getEffects2DCount = (
   platform: gdPlatform,
   effectsContainer: gdEffectsContainer
-): number => {
+) => {
   const effectCount = effectsContainer.getEffectsCount();
   let effect2DCount = 0;
   for (let i = 0; i < effectCount; i++) {
@@ -381,7 +379,7 @@ export const getEffects2DCount = (
 export const getEffects3DCount = (
   platform: gdPlatform,
   effectsContainer: gdEffectsContainer
-): number => {
+) => {
   const effectCount = effectsContainer.getEffectsCount();
   let effect3DCount = 0;
   for (let i = 0; i < effectCount; i++) {
@@ -567,7 +565,6 @@ export const useManageEffects = ({
   );
 
   const pasteEffects = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     async effectInsertionIndex => {
       const clipboardContent = Clipboard.get(EFFECTS_CLIPBOARD_KIND);
       const effectContents = SafeExtractor.extractArray(clipboardContent);
@@ -649,7 +646,6 @@ export const useManageEffects = ({
         setJustAddedEffectName(existingNamedEffects[0].name);
       }
       if (firstAddedEffectName || shouldOverrideEffects) {
-        // $FlowFixMe[constant-condition]
         if (onEffectsUpdated) onEffectsUpdated();
       }
     },
@@ -706,7 +702,6 @@ export const useManageEffects = ({
       if (effectsContainer.getEffectsCount() < 2) {
         return null;
       }
-      // $FlowFixMe[definition-cycle]
       const uniqueEffectTypes = [];
       for (let i = 0; i < effectsContainer.getEffectsCount(); i++) {
         const effect: gdEffect = effectsContainer.getEffectAt(i);
@@ -777,7 +772,7 @@ type Props = {|
  *
  * All available effects are fetched from the project's platform.
  */
-export default function EffectsList(props: Props): React.Node {
+export default function EffectsList(props: Props) {
   const {
     effectsContainer,
     onEffectsUpdated,

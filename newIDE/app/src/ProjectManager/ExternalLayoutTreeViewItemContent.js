@@ -11,7 +11,6 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import {
-  // $FlowFixMe[import-type-as-value]
   TreeViewItemContent,
   type TreeItemProps,
   externalLayoutsRootFolderId,
@@ -103,7 +102,7 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
     this.props.editName(this.getId());
   }
 
-  buildMenuTemplate(i18n: I18nType, index: number): any {
+  buildMenuTemplate(i18n: I18nType, index: number) {
     return [
       {
         label: i18n._(t`Rename`),
@@ -200,12 +199,7 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
       this.getIndex() + 1
     );
 
-    unserializeFromJSObject(
-      newExternalLayout,
-      copiedExternalLayout,
-      'unserializeFrom',
-      project
-    );
+    unserializeFromJSObject(newExternalLayout, copiedExternalLayout);
     // Unserialization has overwritten the name.
     newExternalLayout.setName(newName);
 
@@ -225,7 +219,7 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
     this.props.forceUpdate();
   }
 
-  getRightButton(i18n: I18nType): any {
+  getRightButton(i18n: I18nType) {
     return null;
   }
 }

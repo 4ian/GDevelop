@@ -26,7 +26,6 @@ type Props = {|
 
 const getExtraInfoArray = (type: gdValueTypeMetadata) => {
   const extraInfoJson = type.getExtraInfo();
-  // $FlowFixMe[missing-empty-array-annot]
   let array = [];
   try {
     if (extraInfoJson !== '') array = JSON.parse(extraInfoJson);
@@ -60,7 +59,7 @@ export default function ValueTypeEditor({
   onTypeUpdated,
   getLastObjectParameterObjectType,
   isExpressionType,
-}: Props): React.Node {
+}: Props) {
   const forceUpdate = useForceUpdate();
 
   const type = convertTypeToSelectorValue(valueTypeMetadata.getName());

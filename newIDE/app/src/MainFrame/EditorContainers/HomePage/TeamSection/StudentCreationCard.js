@@ -23,7 +23,7 @@ const StudentCreationCard = ({
   availableSeats,
   onCreateStudentAccounts,
   isCreatingMembers,
-}: Props): React.Node => {
+}: Props) => {
   const [quantity, setQuantity] = React.useState<string>(
     availableSeats.toString()
   );

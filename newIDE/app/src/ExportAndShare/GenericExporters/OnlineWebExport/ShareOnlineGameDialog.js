@@ -46,7 +46,7 @@ const ShareOnlineGameDialog = ({
   onClose,
   isBuildPublished,
   loadingText,
-}: Props): React.Node => {
+}: Props) => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState<boolean>(
     false

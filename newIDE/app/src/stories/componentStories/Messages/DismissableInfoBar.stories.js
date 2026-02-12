@@ -12,7 +12,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => {
+export const Default = () => {
   return (
     <FixedHeightFlexContainer height={600}>
       <DismissableInfoBar

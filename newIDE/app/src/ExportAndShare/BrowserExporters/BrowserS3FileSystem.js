@@ -46,8 +46,7 @@ export default class BrowserS3FileSystem {
 
   // Store a set of all external URLs copied so that we can simulate
   // readDir result.
-  // $FlowFixMe[missing-local-annot]
-  _allCopiedExternalUrls = (new Set<string>(): Set<string>);
+  _allCopiedExternalUrls = new Set<string>();
 
   constructor({ filesContent, prefix, bucketBaseUrl }: ConstructorArgs) {
     this.prefix = prefix;
@@ -61,7 +60,6 @@ export default class BrowserS3FileSystem {
     });
   }
 
-  // $FlowFixMe[missing-local-annot]
   uploadPendingObjects = async () => {
     try {
       console.log(
@@ -80,27 +78,27 @@ export default class BrowserS3FileSystem {
   mkDir = (path: string) => {
     // Assume required directories always exist.
   };
-  dirExists = (path: string): any => {
+  dirExists = (path: string) => {
     // Assume required directories always exist.
     return true;
   };
   clearDir = (path: string) => {
     // Assume path is cleared.
   };
-  getTempDir = (): any => {
+  getTempDir = () => {
     return '/virtual-unused-tmp-dir';
   };
-  fileNameFrom = (fullpath: string): any => {
+  fileNameFrom = (fullpath: string) => {
     if (isURL(fullpath)) return fullpath;
 
     return path.basename(fullpath);
   };
-  dirNameFrom = (fullpath: string): any => {
+  dirNameFrom = (fullpath: string) => {
     if (isURL(fullpath)) return '';
 
     return path.dirname(fullpath);
   };
-  makeAbsolute = (filename: string, baseDirectory: string): any => {
+  makeAbsolute = (filename: string, baseDirectory: string) => {
     if (isURL(filename)) return filename;
 
     if (!this.isAbsolute(baseDirectory))
@@ -112,12 +110,12 @@ export default class BrowserS3FileSystem {
 
     return path.resolve(baseDirectory, path.normalize(filename));
   };
-  makeRelative = (filename: string, baseDirectory: string): any => {
+  makeRelative = (filename: string, baseDirectory: string) => {
     if (isURL(filename)) return filename;
 
     return path.relative(baseDirectory, path.normalize(filename));
   };
-  isAbsolute = (fullpath: string): any => {
+  isAbsolute = (fullpath: string) => {
     if (isURL(fullpath)) return true;
 
     if (fullpath.length === 0) return true;
@@ -126,7 +124,7 @@ export default class BrowserS3FileSystem {
       (fullpath.length > 1 && fullpath.charAt(1) === ':')
     );
   };
-  copyFile = (source: string, dest: string): any => {
+  copyFile = (source: string, dest: string) => {
     //URL are not copied.
     if (isURL(source)) {
       this._allCopiedExternalUrls.add(source);
@@ -136,7 +134,7 @@ export default class BrowserS3FileSystem {
     console.warn('Copy not done from', source, 'to', dest);
     return true;
   };
-  writeToFile = (fullPath: string, contents: string): any => {
+  writeToFile = (fullPath: string, contents: string) => {
     const key = fullPath.replace(this.bucketBaseUrl, '');
     const mime = {
       '.js': 'text/javascript',
@@ -154,7 +152,7 @@ export default class BrowserS3FileSystem {
     return true;
   };
 
-  readFile = (file: string): any => {
+  readFile = (file: string) => {
     if (!!this._indexedFilesContent[file])
       return this._indexedFilesContent[file].text;
 
@@ -162,7 +160,7 @@ export default class BrowserS3FileSystem {
     return '';
   };
 
-  readDir = (path: string, ext: string): any => {
+  readDir = (path: string, ext: string) => {
     ext = ext.toUpperCase();
     var output = new gd.VectorString();
 
@@ -178,7 +176,7 @@ export default class BrowserS3FileSystem {
     return output;
   };
 
-  fileExists = (filename: string): any => {
+  fileExists = (filename: string) => {
     if (isURL(filename)) return true;
 
     // Assume all files asked for exists.

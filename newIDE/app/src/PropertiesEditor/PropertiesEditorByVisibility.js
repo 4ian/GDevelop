@@ -21,7 +21,7 @@ import {
   isAnyPropertyModified,
 } from '../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
 
-export const hasSchemaAnyProperty = (propertiesSchema: Schema): boolean =>
+export const hasSchemaAnyProperty = (propertiesSchema: Schema) =>
   !propertiesSchema.every(
     property =>
       property.isHiddenWhenOnlyOneChoice &&
@@ -58,7 +58,7 @@ const PropertiesEditorByVisibility = ({
   projectScopedContainersAccessor,
   resourceManagementProps,
   placeholder,
-}: Props): ?(false | 0 | '' | React$Portal | React.Node) => {
+}: Props) => {
   const [
     shouldShowDeprecatedProperties,
     setShouldShowDeprecatedProperties,

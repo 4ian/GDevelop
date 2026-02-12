@@ -52,7 +52,6 @@ export default ({
         url = `https://resources.gdevelop-app.com/examples/${exampleName}/${exampleName}.json`;
       }
 
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       const response = await axios.get(url);
       if (!response.data)
         throw new Error("Can't parse data from the URL (is it valid JSON?)");

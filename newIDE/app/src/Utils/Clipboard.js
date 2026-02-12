@@ -7,7 +7,7 @@ export type ClipboardKind = string;
 
 let internalClipboard = '';
 
-export const copyTextToClipboard = (text: string): Promise<void> =>
+export const copyTextToClipboard = (text: string) =>
   navigator.clipboard.writeText(text);
 
 const mangleClipboardKind = (kind: ClipboardKind): string => {

@@ -20,7 +20,7 @@ export default {
   component: SaveToStorageProviderDialog,
 };
 
-export const UserNotAuthenticated = (): React.Node => (
+export const UserNotAuthenticated = () => (
   <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <SaveToStorageProviderDialog
       storageProviders={[
@@ -34,7 +34,7 @@ export const UserNotAuthenticated = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const UserAuthenticatedWithEnoughStorage = (): React.Node => (
+export const UserAuthenticatedWithEnoughStorage = () => (
   <AuthenticatedUserContext.Provider
     value={fakeAuthenticatedUserWithEmailVerified}
   >
@@ -50,7 +50,7 @@ export const UserAuthenticatedWithEnoughStorage = (): React.Node => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const UserAuthenticatedWithNotEnoughStorage = (): React.Node => (
+export const UserAuthenticatedWithNotEnoughStorage = () => (
   <AuthenticatedUserContext.Provider
     value={{
       ...fakeAuthenticatedUserWithEmailVerified,

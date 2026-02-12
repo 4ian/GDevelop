@@ -3,8 +3,7 @@ import Axios from 'axios';
 import { GDevelopUserApi } from './ApiConfigs';
 import { ensureIsArray } from '../DataValidator';
 
-// $FlowFixMe[value-as-type]
-export const client: Axios = Axios.create({
+export const client = Axios.create({
   baseURL: GDevelopUserApi.baseUrl,
 });
 

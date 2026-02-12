@@ -263,10 +263,7 @@ type Props = {|
   hideDetails?: boolean,
 |};
 
-const AssetsList: React.ComponentType<{
-  ...Props,
-  +ref?: React.RefSetter<AssetsListInterface>,
-}> = React.forwardRef<Props, AssetsListInterface>(
+const AssetsList = React.forwardRef<Props, AssetsListInterface>(
   (
     {
       assetShortHeaders,
@@ -331,7 +328,6 @@ const AssetsList: React.ComponentType<{
     const { openedAssetPack, selectedFolders } = React.useMemo(
       () => {
         if (!currentPage) {
-          // $FlowFixMe[missing-empty-array-annot]
           return { openedAssetPack: null, selectedFolders: [] };
         }
         return {
@@ -452,7 +448,6 @@ const AssetsList: React.ComponentType<{
     const folderTiles = React.useMemo(
       () => {
         // Don't show folders if we are searching.
-        // $FlowFixMe[missing-empty-array-annot]
         if (!folderTags.length || !onFolderSelection) return [];
         return folderTags.map(folderTag => (
           <AssetFolderTile
@@ -492,7 +487,6 @@ const AssetsList: React.ComponentType<{
         // Loading
         if (!assetShortHeaders) return null;
         // Don't show assets if filtering on asset packs.)
-        // $FlowFixMe[missing-empty-array-annot]
         if (hasAssetPackFiltersApplied && !openedAssetPack) return [];
         const assetSize = getAssetSize(windowSize);
 

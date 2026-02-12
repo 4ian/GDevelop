@@ -13,7 +13,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => (
+export const Default = () => (
   <DragAndDropContextProvider>
     <div style={{ height: 200 }}>
       <ValueStateHolder

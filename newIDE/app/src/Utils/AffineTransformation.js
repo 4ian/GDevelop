@@ -122,7 +122,7 @@ export class AffineTransformation {
    * Copy a transformation.
    * @param other The transformation to copy.
    */
-  copyFrom(other: AffineTransformation): any {
+  copyFrom(other: AffineTransformation) {
     const matrix = this.matrix;
     const otherMatrix = other.matrix;
 
@@ -477,7 +477,7 @@ export class AffineTransformation {
   /**
    * Invert the matrix.
    */
-  invert(): any {
+  invert() {
     const matrix = this.matrix;
 
     const m0 = matrix[0];
@@ -499,7 +499,7 @@ export class AffineTransformation {
     return this;
   }
 
-  toString(): any {
+  toString() {
     const matrix = this.matrix;
     return `[[${matrix[0]} ${matrix[1]}] [${matrix[2]} ${matrix[3]}] [${
       matrix[4]

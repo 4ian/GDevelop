@@ -71,23 +71,22 @@ const initialMosaicEditorNodes = {
  * currently selected inspector.
  */
 export default class DebuggerContent extends React.Component<Props, State> {
-  // $FlowFixMe[missing-local-annot]
   state = {
     selectedInspector: null,
-    selectedInspectorFullPath: ([]: Array<empty>),
+    selectedInspectorFullPath: [],
     rawMode: false,
   };
 
   _editors: ?EditorMosaicInterface = null;
 
-  isProfilerShown = (): any => {
+  isProfilerShown = () => {
     return (
       !!this._editors &&
       this._editors.getOpenedEditorNames().includes('profiler')
     );
   };
 
-  isConsoleShown = (): any => {
+  isConsoleShown = () => {
     return (
       !!this._editors &&
       this._editors.getOpenedEditorNames().includes('console')
@@ -102,7 +101,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
     if (this._editors) this._editors.toggleEditor('console', 'bottom');
   };
 
-  render(): any {
+  render() {
     const {
       gameData,
       onRefresh,
@@ -251,11 +250,9 @@ export default class DebuggerContent extends React.Component<Props, State> {
         {({ getDefaultEditorMosaicNode, setDefaultEditorMosaicNode }) => (
           <EditorMosaic
             ref={editors => (this._editors = editors)}
-            // $FlowFixMe[incompatible-type]
             editors={editors}
             centralNodeId="selected-inspector"
             initialNodes={
-              // $FlowFixMe[incompatible-type]
               getDefaultEditorMosaicNode('debugger') || initialMosaicEditorNodes
             }
             onPersistNodes={node =>

@@ -45,7 +45,7 @@ const LeaderboardEntriesTable = ({
   isLoading,
   erroredEntry,
   navigation,
-}: Props): React.Node => {
+}: Props) => {
   if (!entries) return <PlaceholderLoader />;
 
   return (

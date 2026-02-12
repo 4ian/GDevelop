@@ -472,8 +472,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     const renderGroupMenuTemplate = React.useCallback(
       (i18n: I18nType) => (item: TreeViewItem, index: number) =>
         item.isRoot || item.isPlaceholder
-          ? // $FlowFixMe[missing-empty-array-annot]
-            []
+          ? []
           : [
               {
                 label: i18n._(t`Duplicate`),
@@ -567,7 +566,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
             children:
               globalObjectGroupsList.length > 0
                 ? globalObjectGroupsList
-                : // $FlowFixMe[incompatible-type]
+                : // $FlowFixMe
                   [getGlobalGroupsEmptyPlaceholder(i18n)],
             isRoot: true,
             id: globalGroupsRootFolderId,
@@ -577,7 +576,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
             children:
               objectGroupsList.length > 0
                 ? objectGroupsList
-                : // $FlowFixMe[incompatible-type]
+                : // $FlowFixMe
                   [getSceneGroupsEmptyPlaceholder(i18n)],
             isRoot: true,
             id: sceneGroupsRootFolderId,
@@ -661,7 +660,6 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                 <div style={{ flex: 1 }}>
                   <AutoSizer style={{ width: '100%' }} disableWidth>
                     {({ height }) => (
-                      // $FlowFixMe[incompatible-type]
                       <TreeView
                         key={listKey}
                         ref={treeViewRef}
@@ -692,7 +690,6 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                         reactDndType={groupWithContextReactDndType}
                         initiallyOpenedNodeIds={initiallyOpenedNodeIds}
                         shouldSelectUponContextMenuOpening
-                        // $FlowFixMe[incompatible-type]
                         getItemRightButton={getRightButton(i18n)}
                       />
                     )}
@@ -717,23 +714,19 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.globalObjectGroups === nextProps.globalObjectGroups &&
   prevProps.objectGroups === nextProps.objectGroups;
 
-// $FlowFixMe[incompatible-type]
 const MemoizedObjectGroupsList = React.memo<Props, ObjectGroupsListInterface>(
-  // $FlowFixMe[incompatible-type]
-  // $FlowFixMe[incompatible-exact]
   ObjectGroupsList,
   arePropsEqual
 );
 
-const ObjectGroupsListWithErrorBoundary: React.ComponentType<{
-  ...Props,
-  +ref?: React.RefSetter<ObjectGroupsListInterface>,
-}> = React.forwardRef<Props, ObjectGroupsListInterface>((props, ref) => (
+const ObjectGroupsListWithErrorBoundary = React.forwardRef<
+  Props,
+  ObjectGroupsListInterface
+>((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Object groups list</Trans>}
     scope="scene-editor-object-groups-list"
   >
-    {/* $FlowFixMe[incompatible-type] */}
     <MemoizedObjectGroupsList ref={ref} {...props} />
   </ErrorBoundary>
 ));

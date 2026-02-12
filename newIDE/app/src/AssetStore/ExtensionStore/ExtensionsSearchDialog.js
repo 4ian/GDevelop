@@ -231,7 +231,7 @@ const ExtensionsSearchDialog = ({
   );
 };
 
-const ExtensionsSearchDialogWithErrorBoundary = (props: Props): React.Node => (
+const ExtensionsSearchDialogWithErrorBoundary = (props: Props) => (
   <ErrorBoundary
     componentTitle={<Trans>Extensions search</Trans>}
     scope="extensions-search-dialog"

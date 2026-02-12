@@ -45,7 +45,7 @@ const LocalFilePicker = ({
   defaultPath,
   fullWidth,
   filters,
-}: Props): React.MixedElement => {
+}: Props) => {
   const onChooseFolder = async () => {
     if (!dialog || !electron) return;
 
@@ -66,7 +66,6 @@ const LocalFilePicker = ({
         width: fullWidth ? '100%' : undefined,
       }}
     >
-      {/* $FlowFixMe[incompatible-type] */}
       <TextField
         margin="dense"
         style={styles.textField}
@@ -77,7 +76,6 @@ const LocalFilePicker = ({
       />
       <FlatButton
         label={<Trans>Choose</Trans>}
-        // $FlowFixMe[incompatible-type]
         style={styles.button}
         onClick={onChooseFolder}
       />

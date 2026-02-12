@@ -81,7 +81,7 @@ const InstructionEditorMenu = ({
   onPasteInstructions,
   onExtensionInstalled,
   i18n,
-}: Props): React.Node => {
+}: Props) => {
   const forceUpdate = useForceUpdate();
   const [
     instructionEditorState,

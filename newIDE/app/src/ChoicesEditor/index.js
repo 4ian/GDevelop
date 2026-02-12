@@ -33,7 +33,7 @@ const ChoicesEditor = ({
   disabled,
   hideLabels,
   isNumber,
-}: ChoicesEditorProps): React.Node => {
+}: ChoicesEditorProps) => {
   const updateChoices = () => setChoices(choices);
 
   return (

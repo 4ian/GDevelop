@@ -30,7 +30,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     return this.props.project;
   }
 
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
     if (!this.props.isActive && nextProps.isActive) {
       this._setPreviewedLayout();
     }
@@ -211,7 +211,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     }
   };
 
-  render(): any {
+  render() {
     const { project, projectItemName, isActive } = this.props;
     const layout = this.getLayout();
     if (!layout || !project) {
@@ -295,4 +295,4 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
 export const renderSceneEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-): React.Node => <SceneEditorContainer {...props} />;
+) => <SceneEditorContainer {...props} />;

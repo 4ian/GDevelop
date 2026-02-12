@@ -7,10 +7,7 @@ type Props = {| children: React.Node, isEmpty?: boolean |};
 /**
  * Displayed when a parameter is invalid
  */
-const InvalidParameterValue = ({
-  children,
-  isEmpty,
-}: Props): React.MixedElement =>
+const InvalidParameterValue = ({ children, isEmpty }: Props) =>
   isEmpty ? (
     <span className={instructionInvalidParameter}>&lt; {children} &gt;</span>
   ) : (

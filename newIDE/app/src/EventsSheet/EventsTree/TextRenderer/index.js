@@ -3,8 +3,6 @@ import { mapFor, mapVector } from '../../../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
-// $FlowFixMe[recursive-definition]
-// $FlowFixMe[definition-cycle]
 const renderInstructionsAsText = ({
   instructionsList,
   padding,
@@ -191,7 +189,6 @@ ${padding}${actions}`;
   },
 };
 
-// $FlowFixMe[recursive-definition]
 const convertVariableToJsObject = (variable: gdVariable) => {
   if (variable.getType() === gd.Variable.String) {
     return variable.getString();
@@ -203,7 +200,6 @@ const convertVariableToJsObject = (variable: gdVariable) => {
     const childrenNames = variable.getAllChildrenNames().toJSArray();
     const object = {};
     childrenNames.forEach(childName => {
-      // $FlowFixMe[prop-missing]
       object[childName] = convertVariableToJsObject(
         variable.getChild(childName)
       );
@@ -211,7 +207,6 @@ const convertVariableToJsObject = (variable: gdVariable) => {
     return object;
   } else if (variable.getType() === gd.Variable.Array) {
     const children = variable.getAllChildrenArray();
-    // $FlowFixMe[incompatible-exact]
     return mapVector(children, child => convertVariableToJsObject(child));
   }
 
@@ -256,7 +251,6 @@ const renderEventAsText = ({
       : '';
 
   const textRenderer = eventsTextRenderers[event.getType()];
-  // $FlowFixMe[constant-condition]
   const eventText = textRenderer
     ? [localVariablesText, textRenderer({ event, padding })]
         .filter(Boolean)
@@ -304,14 +298,12 @@ export const renderNonTranslatedEventsAsText = ({
   eventsList,
 }: {
   eventsList: gdEventsList,
-}): string | 'Error while rendering events as text.' => {
+}) => {
   // Temporarily override the getTranslation function to return the original
   // string, so that events are always rendered in English.
-  // $FlowFixMe[incompatible-type]
-  // $FlowFixMe[prop-missing]
+  // $FlowFixMe
   const previousGetTranslation = gd.getTranslation;
-  // $FlowFixMe[incompatible-type]
-  // $FlowFixMe[prop-missing]
+  // $FlowFixMe
   gd.getTranslation = (str: string) => str;
 
   let text = '';
@@ -325,8 +317,7 @@ export const renderNonTranslatedEventsAsText = ({
     console.error('Error while rendering events as text:', error);
     text = 'Error while rendering events as text.';
   } finally {
-    // $FlowFixMe[incompatible-type]
-    // $FlowFixMe[prop-missing]
+    // $FlowFixMe
     gd.getTranslation = previousGetTranslation;
   }
 

@@ -33,10 +33,7 @@ export type CompactTextAreaFieldWithControlsInterface = {|
   setCursorPosition: (position: number) => void,
 |};
 
-export const CompactTextAreaFieldWithControls: React.ComponentType<{
-  ...CompactTextAreaFieldWithControlsProps,
-  +ref?: React.RefSetter<CompactTextAreaFieldWithControlsInterface>,
-}> = React.forwardRef<
+export const CompactTextAreaFieldWithControls = React.forwardRef<
   CompactTextAreaFieldWithControlsProps,
   CompactTextAreaFieldWithControlsInterface
 >(
@@ -192,7 +189,6 @@ export const CompactTextAreaFieldWithControls: React.ComponentType<{
                 ref={textareaRef}
                 id={idToUse.current}
                 disabled={disabled}
-                // $FlowFixMe[invalid-compare]
                 value={value === null ? '' : value}
                 onChange={e => onChange(e.currentTarget.value)}
                 placeholder={i18n._(placeholder)}

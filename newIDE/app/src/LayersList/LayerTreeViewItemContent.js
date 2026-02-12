@@ -3,7 +3,6 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t, Trans } from '@lingui/macro';
 
 import * as React from 'react';
-// $FlowFixMe[import-type-as-value]
 import { TreeViewItemContent, type TreeItemProps, layersRootFolderId } from '.';
 import Tooltip from '@material-ui/core/Tooltip';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
@@ -59,7 +58,7 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
     return this._isBaseLayer() ? i18n._(t`Base layer`) : this.layer.getName();
   }
 
-  _isBaseLayer(): any {
+  _isBaseLayer() {
     return !this.layer.getName();
   }
 
@@ -122,7 +121,7 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
     this.props.triggerOnLayersModified();
   }
 
-  getRightButton(i18n: I18nType): any {
+  getRightButton(i18n: I18nType) {
     return [
       {
         icon: this._isVisible() ? <VisibilityIcon /> : <VisibilityOffIcon />,
@@ -145,11 +144,11 @@ export class LayerTreeViewItemContent implements TreeViewItemContent {
     ];
   }
 
-  buildMenuTemplate(i18n: I18nType, index: number): any {
+  buildMenuTemplate(i18n: I18nType, index: number) {
     return [
       {
         label: i18n._(t`Rename`),
-        click: () => this.props.editName(this.layer.getName()),
+        click: () => this.props.editName(this.getId()),
         accelerator: 'F2',
         enabled: !this._isBaseLayer(),
       },

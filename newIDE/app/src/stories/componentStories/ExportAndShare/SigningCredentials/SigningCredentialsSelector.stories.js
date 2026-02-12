@@ -23,7 +23,7 @@ export default {
   decorators: [alertDecorator, paperDecorator],
 };
 
-export const Errored = (): React.Node => {
+export const Errored = () => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock.onAny().reply(500);
 
@@ -35,14 +35,13 @@ export const Errored = (): React.Node => {
         targets={['iosAppStore']}
         authenticatedUser={fakeSilverAuthenticatedUser}
         buildSigningOptions={buildSigningOptions}
-        // $FlowFixMe[incompatible-type]
         onSelectBuildSigningOptions={setBuildSigningOptions}
       />
     </AuthenticatedUserContext.Provider>
   );
 };
 
-export const WithSigningCredentialsButNonePreSelected = (): React.Node => {
+export const WithSigningCredentialsButNonePreSelected = () => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock
     .onGet(`${GDevelopBuildApi.baseUrl}/signing-credential`)
@@ -73,14 +72,13 @@ export const WithSigningCredentialsButNonePreSelected = (): React.Node => {
         targets={targets}
         authenticatedUser={fakeSilverAuthenticatedUser}
         buildSigningOptions={buildSigningOptions}
-        // $FlowFixMe[incompatible-type]
         onSelectBuildSigningOptions={setBuildSigningOptions}
       />
     </AuthenticatedUserContext.Provider>
   );
 };
 
-export const WithSigningCredentialsAndOnePreSelected = (): React.Node => {
+export const WithSigningCredentialsAndOnePreSelected = () => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 500 });
   axiosMock
     .onGet(`${GDevelopBuildApi.baseUrl}/signing-credential`)
@@ -113,9 +111,7 @@ export const WithSigningCredentialsAndOnePreSelected = (): React.Node => {
       <IosSigningCredentialsSelector
         targets={targets}
         authenticatedUser={fakeSilverAuthenticatedUser}
-        // $FlowFixMe[incompatible-type]
         buildSigningOptions={buildSigningOptions}
-        // $FlowFixMe[incompatible-type]
         onSelectBuildSigningOptions={setBuildSigningOptions}
       />
     </AuthenticatedUserContext.Provider>

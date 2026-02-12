@@ -17,7 +17,7 @@ import FlatButton from '../../UI/FlatButton';
 import TypeCursorSelect from '../../UI/CustomSvgIcons/TypeCursorSelect';
 import { getParameterChoiceValues } from './ParameterMetadataTools';
 
-export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function NumberWithChoicesField(props: ParameterFieldProps, ref) {
     const {
       value,
@@ -63,7 +63,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       setIsExpressionField(!isExpressionField);
     };
 
-    // $FlowFixMe[missing-local-annot]
     const onChangeSelectValue = (event, value) => {
       onChange(event.target.value);
     };
@@ -145,7 +144,4 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-): React.ComponentType<{
-  ...ParameterFieldProps,
-  +ref?: React.RefSetter<ParameterFieldInterface>,
-}>);
+);

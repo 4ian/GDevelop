@@ -146,7 +146,7 @@ export const PanesContainer = ({
   renderPane,
   hasEditorsInLeftPane,
   hasEditorsInRightPane,
-}: Props): React.MixedElement => {
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const forceUpdate = useForceUpdate();
   const debouncedForceUpdate = useDebounce(forceUpdate, 200);

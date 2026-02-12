@@ -33,7 +33,7 @@ export type PreviewAndShareButtonsProps = {|
   isSharingEnabled: boolean,
 |};
 
-const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> = React.memo<PreviewAndShareButtonsProps>(
+const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
   function PreviewAndShareButtons({
     onPreviewWithoutHotReload,
     onNetworkPreview,
@@ -201,7 +201,6 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
           }
           id="toolbar-preview-button"
           splitMenuButtonId="toolbar-preview-split-menu-button"
-          // $FlowFixMe[incompatible-type]
           buildMenuTemplate={previewBuildMenuTemplate}
         />
         <ResponsiveRaisedButton

@@ -68,7 +68,7 @@ const GetSubscriptionCard = ({
   recommendedPlanId,
   canHide,
   placementId,
-}: Props): null | React.MixedElement => {
+}: Props) => {
   const [isHidden, setIsHidden] = React.useState(false);
   const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
   const { isMobile } = useResponsiveWindowSize();

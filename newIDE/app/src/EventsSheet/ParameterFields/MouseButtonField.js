@@ -56,7 +56,7 @@ const isInvalidLiteralMouseButton = (expression: string): boolean => {
       false;
 };
 
-export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function MouseButtonField(props, ref) {
     const field = React.useRef<?(
       | GenericExpressionField
@@ -79,7 +79,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       setIsExpressionField(!isExpressionField);
     };
 
-    // $FlowFixMe[missing-local-annot]
     const onChangeSelectValue = (event, value) => {
       props.onChange(event.target.value);
     };
@@ -159,16 +158,13 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-): React.ComponentType<{
-  ...ParameterFieldProps,
-  +ref?: React.RefSetter<ParameterFieldInterface>,
-}>);
+);
 
 export const renderInlineMouseButton = ({
   value,
   expressionIsValid,
   InvalidParameterValue,
-}: ParameterInlineRendererProps): string | React.MixedElement => {
+}: ParameterInlineRendererProps) => {
   if (!value) {
     return (
       <InvalidParameterValue isEmpty>

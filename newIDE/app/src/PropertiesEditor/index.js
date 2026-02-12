@@ -187,7 +187,7 @@ const PropertiesEditor = ({
   project,
   projectScopedContainersAccessor,
   resourceManagementProps,
-}: Props): React.Node => {
+}: Props) => {
   const forceUpdate = useForceUpdate();
 
   const _onInstancesModified = React.useCallback(
@@ -406,7 +406,7 @@ const PropertiesEditor = ({
         const { setValue } = field;
         return (
           <SelectField
-            value={'' + getFieldValue({ instances, field })}
+            value={getFieldValue({ instances, field })}
             key={field.name}
             id={field.name}
             floatingLabelText={getFieldLabel({ instances, field })}
@@ -415,9 +415,8 @@ const PropertiesEditor = ({
               instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
               _onInstancesModified(instances);
             }}
-            // $FlowFixMe[incompatible-type]
             style={styles.field}
-            disabled={getDisabled({ instances, field })}
+            disabled={field.disabled}
           >
             {children}
           </SelectField>
@@ -439,7 +438,6 @@ const PropertiesEditor = ({
               instances.forEach(i => setValue(i, newValue || ''));
               _onInstancesModified(instances);
             }}
-            // $FlowFixMe[incompatible-type]
             style={styles.field}
             disabled={getDisabled({ instances, field })}
           >

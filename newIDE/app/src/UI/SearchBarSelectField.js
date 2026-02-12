@@ -9,10 +9,8 @@ import Paper from './Paper';
 import ChevronArrowBottom from './CustomSvgIcons/ChevronArrowBottom';
 
 const INVALID_VALUE = '';
-// $FlowFixMe[missing-local-annot]
 const stopPropagation = event => event.stopPropagation();
 
-// $FlowFixMe[missing-local-annot]
 const useSelectStyles = textAlign =>
   makeStyles({
     root: {
@@ -76,10 +74,10 @@ type Props = {|
  * A select field based on Material-UI select field.
  * To be used with `SelectOption`.
  */
-const SearchBarSelectField: React.ComponentType<{
-  ...Props,
-  +ref?: React.RefSetter<SearchBarSelectFieldInterface>,
-}> = React.forwardRef<Props, SearchBarSelectFieldInterface>((props, ref) => {
+const SearchBarSelectField = React.forwardRef<
+  Props,
+  SearchBarSelectFieldInterface
+>((props, ref) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
   const focus = React.useCallback(
     () => {
@@ -100,11 +98,8 @@ const SearchBarSelectField: React.ComponentType<{
   // Dig into children props to see if the current value is valid or not.
   let hasValidValue = true;
   const childrenValues = React.Children.map(props.children, child => {
-    // $FlowFixMe[prop-missing]
-    // $FlowFixMe[incompatible-type]
     if (child === null || !child.props) return null;
 
-    // $FlowFixMe[incompatible-use]
     return child.props.value;
   });
   if (!childrenValues) {

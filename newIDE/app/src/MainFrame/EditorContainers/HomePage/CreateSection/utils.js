@@ -31,11 +31,7 @@ export type LastModifiedInfoByProjectId = {|
   [projectId: string]: LastModifiedInfo,
 |};
 
-export const getProjectLineHeight = ({
-  isMobile,
-}: {|
-  isMobile: boolean,
-|}): number => {
+export const getProjectLineHeight = ({ isMobile }: {| isMobile: boolean |}) => {
   const lineHeight = isMobile ? 52 : 36;
 
   return lineHeight - 2 * marginsSize;
@@ -102,9 +98,7 @@ export const getStorageProviderByInternalName = (
   );
 };
 
-export const useProjectsListFor = (
-  gameId: string | null
-): Array<FileMetadataAndStorageProviderName> => {
+export const useProjectsListFor = (gameId: string | null) => {
   const { getRecentProjectFiles } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 

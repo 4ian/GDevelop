@@ -236,7 +236,7 @@ const TileSetVisualizer = ({
   interactive,
   onAtlasImageLoaded,
   onScrollY,
-}: Props): React.Node => {
+}: Props) => {
   const forceUpdate = useForceUpdate();
   const atlasResourceName = objectConfiguration
     .getProperties()
@@ -309,7 +309,6 @@ const TileSetVisualizer = ({
       : null;
 
   const _onAtlasImageLoaded = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     e => {
       if (onAtlasImageLoaded) onAtlasImageLoaded(e, atlasResourceName);
     },
@@ -518,7 +517,6 @@ const TileSetVisualizer = ({
               }
             }
           }
-          // $FlowFixMe[incompatible-type]
           onSelectTileMapTile(newSelection);
         } else if (allowRectangleSelection) {
           const shouldRemoveSelection =
@@ -548,7 +546,6 @@ const TileSetVisualizer = ({
               flipHorizontally: shouldFlipHorizontally,
               flipVertically: shouldFlipVertically,
             };
-            // $FlowFixMe[incompatible-type]
             onSelectTileMapTile(newSelection);
           }
         }
@@ -600,7 +597,6 @@ const TileSetVisualizer = ({
   );
 
   const onMouseMove = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     event => {
       if (!displayedTileSize) return;
       onHoverAtlas(event);
@@ -632,7 +628,6 @@ const TileSetVisualizer = ({
     [onHoverAtlas, rowCount, columnCount, displayedTileSize]
   );
   const onMouseEnter = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     event => {
       if (!displayedTileSize) return;
       const imageCoordinates = getImageCoordinatesFromPointerEvent(event);

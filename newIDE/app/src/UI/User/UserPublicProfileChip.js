@@ -23,7 +23,7 @@ export const UserPublicProfileChip = ({
   user,
   isClickable = false,
   variant,
-}: Props): React.Node => {
+}: Props) => {
   const { openUserPublicProfile } = React.useContext(PublicProfileContext);
 
   return (

@@ -9,10 +9,7 @@ type Props = {|
   text: string,
 |};
 
-const TextBasedCourseChapterCalloutBlock = ({
-  text,
-  kind,
-}: Props): React.Node => {
+const TextBasedCourseChapterCalloutBlock = ({ text, kind }: Props) => {
   return (
     <AlertMessage kind={kind}>
       <MarkdownText allowParagraphs source={text} />

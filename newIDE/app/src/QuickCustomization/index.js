@@ -117,7 +117,7 @@ export const enumerateObjectFolderOrObjects = (
 
       enumerateObjectFolderOrObjects(child).forEach(
         ({ folderName, objects }) => {
-          currentFolderObjects.push(...objects);
+          currentFolderObjects.push.apply(currentFolderObjects, objects);
         }
       );
     } else {
@@ -169,7 +169,7 @@ export const renderQuickCustomization = ({
   onScreenshotsClaimed,
   onWillInstallExtension,
   onExtensionInstalled,
-}: Props): { content: React.Node, showPreview: boolean, title: React.Node } => {
+}: Props) => {
   return {
     title: quickCustomizationState.step.title,
     content: (

@@ -11,6 +11,6 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = (): React.Node => (
+export const Default = () => (
   <AssetCard size={128} assetShortHeader={fakeAssetShortHeader1} />
 );

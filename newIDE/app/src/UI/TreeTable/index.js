@@ -20,7 +20,7 @@ type TreeTableRowProps = {|
   alignItems?: ?'flex-start',
 |};
 
-export const TreeTableRow = (props: TreeTableRowProps): React.MixedElement => {
+export const TreeTableRow = (props: TreeTableRowProps) => {
   return (
     <div
       id={props.id}
@@ -40,9 +40,7 @@ type TreeTableCellProps = {|
   children?: React.Node,
 |};
 
-export const TreeTableCell = (
-  props: TreeTableCellProps
-): React.MixedElement => (
+export const TreeTableCell = (props: TreeTableCellProps) => (
   <div
     style={{
       ...styles.cell,

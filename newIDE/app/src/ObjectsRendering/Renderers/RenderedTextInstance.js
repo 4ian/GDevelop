@@ -38,7 +38,6 @@ export default class RenderedTextInstance extends RenderedInstance {
     project: gdProject,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
-    // $FlowFixMe[value-as-type]
     pixiContainer: PIXI.Container,
     pixiResourcesLoader: Class<PixiResourcesLoader>,
     getPropertyOverridings: (() => Map<string, string>) | null
@@ -80,7 +79,7 @@ export default class RenderedTextInstance extends RenderedInstance {
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ): any {
+  ) {
     return 'CppPlatform/Extensions/texticon24.png';
   }
 
@@ -240,13 +239,13 @@ export default class RenderedTextInstance extends RenderedInstance {
     this._pixiObject.alpha = alphaForDisplay;
   }
 
-  getDefaultWidth(): any {
+  getDefaultWidth() {
     // The default width is dependent of the current wrapping width.
     // You should avoid to use this value.
     return this._pixiObject.width;
   }
 
-  getDefaultHeight(): any {
+  getDefaultHeight() {
     // The default height is dependent of the current wrapping width.
     // You should avoid to use this value.
     return this._pixiObject.height;

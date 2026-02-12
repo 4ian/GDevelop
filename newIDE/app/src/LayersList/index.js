@@ -175,7 +175,6 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
 
   onClick(): void {}
 
-  // $FlowFixMe[missing-local-annot]
   buildMenuTemplate(i18n: I18nType, index: number) {
     return this.buildMenuTemplateFunction(i18n, index);
   }
@@ -336,14 +335,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
     }));
 
     const editName = React.useCallback(
-      (layerName: string) => {
-        // Don't allow renaming base layer (empty name)
-        if (!layerName) return;
-
-        if (!layersContainer.hasLayerNamed(layerName)) return;
-        const layer = layersContainer.getLayer(layerName);
-
-        const itemId = getLayerTreeViewItemId(layer);
+      (itemId: string) => {
         const treeView = treeViewRef.current;
         if (treeView) {
           if (isMobile) {
@@ -354,7 +346,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
           treeView.renameItemFromId(itemId);
         }
       },
-      [isMobile, layersContainer]
+      [isMobile]
     );
 
     const onTreeModified = React.useCallback(
@@ -589,14 +581,12 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         if (!project || !layerTreeViewItemProps) {
           return [];
         }
-        // $FlowFixMe[incompatible-type]
         return [
           {
             isRoot: false,
             content: new LabelTreeViewItemContent(
               layersRootFolderId,
               '',
-              // $FlowFixMe[incompatible-type]
               [
                 gameEditorMode === 'embedded-game'
                   ? {
@@ -626,7 +616,6 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                 },
               ].filter(Boolean),
               () =>
-                // $FlowFixMe[incompatible-type]
                 [
                   gameEditorMode === 'embedded-game'
                     ? {
@@ -763,8 +752,6 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
             >
               <AutoSizer style={styles.autoSizer} disableWidth>
                 {({ height }) => (
-                  // $FlowFixMe[incompatible-type]
-                  // $FlowFixMe[incompatible-exact]
                   <TreeView
                     key={listKey}
                     ref={treeViewRef}
@@ -811,10 +798,10 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
   }
 );
 
-const LayersListWithErrorBoundary: React.ComponentType<{
-  ...Props,
-  +ref?: React.RefSetter<LayersListInterface>,
-}> = React.forwardRef<Props, LayersListInterface>((props, ref) => (
+const LayersListWithErrorBoundary = React.forwardRef<
+  Props,
+  LayersListInterface
+>((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Layers list</Trans>}
     scope="scene-editor-layers-list"

@@ -10,10 +10,8 @@ export default class RenderedInstance {
   _project: gdProject;
   _instance: gdInitialInstance;
   _associatedObjectConfiguration: gdObjectConfiguration;
-  // $FlowFixMe[value-as-type]
   _pixiContainer: PIXI.Container;
   _pixiResourcesLoader: Class<PixiResourcesLoader>;
-  // $FlowFixMe[value-as-type]
   _pixiObject: PIXI.DisplayObject;
   wasUsed: boolean;
   _wasDestroyed: boolean;
@@ -23,7 +21,6 @@ export default class RenderedInstance {
     project: gdProject,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
-    // $FlowFixMe[value-as-type]
     pixiContainer: PIXI.Container,
     pixiResourcesLoader: Class<PixiResourcesLoader>,
     getPropertyOverridings: (() => Map<string, string>) | null = null
@@ -46,7 +43,7 @@ export default class RenderedInstance {
   /**
    * Convert an angle from degrees to radians.
    */
-  static toRad(angleInDegrees: number): any {
+  static toRad(angleInDegrees: number) {
     return (angleInDegrees / 180) * Math.PI;
   }
 
@@ -57,7 +54,6 @@ export default class RenderedInstance {
     //Nothing to do.
   }
 
-  // $FlowFixMe[value-as-type]
   getPixiObject(): PIXI.DisplayObject | null {
     return this._pixiObject;
   }

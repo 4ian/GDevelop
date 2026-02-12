@@ -10,7 +10,6 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-// $FlowFixMe[import-type-as-value]
 import { TreeViewItemContent, type TreeItemProps, scenesRootFolderId } from '.';
 import Tooltip from '@material-ui/core/Tooltip';
 import Flag from '@material-ui/icons/Flag';
@@ -117,7 +116,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     this.props.editName(this.getId());
   }
 
-  buildMenuTemplate(i18n: I18nType, index: number): any {
+  buildMenuTemplate(i18n: I18nType, index: number) {
     return [
       {
         label: i18n._(t`Open scene editor`),
@@ -311,7 +310,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     this.props.forceUpdate();
   }
 
-  getRightButton(i18n: I18nType): any {
+  getRightButton(i18n: I18nType) {
     return null;
   }
 

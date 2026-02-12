@@ -31,7 +31,6 @@ type RuntimeObjectData = {|
   'Is hidden?': boolean,
 |};
 
-// $FlowFixMe[missing-local-annot]
 const transform = runtimeObject => {
   if (!runtimeObject) return null;
   const runtimeObjectData: RuntimeObjectData = {
@@ -55,7 +54,6 @@ const transform = runtimeObject => {
   return runtimeObjectData;
 };
 
-// $FlowFixMe[missing-local-annot]
 const handleEdit = (edit, { onCall, onEdit }: Props) => {
   if (edit.name === 'X position') {
     onCall(['setX'], [parseFloat(edit.new_value)]);
@@ -83,7 +81,7 @@ const handleEdit = (edit, { onCall, onEdit }: Props) => {
   return true;
 };
 
-const RuntimeObjectInspector = (props: Props): React.Node => (
+const RuntimeObjectInspector = (props: Props) => (
   <React.Fragment>
     <Text>
       <Trans>General:</Trans>

@@ -44,10 +44,10 @@ const renderEmpty = () => {
   );
 };
 
-const ResourcePropertiesEditor: React.ComponentType<{
-  ...Props,
-  +ref?: React.RefSetter<ResourcePropertiesEditorInterface>,
-}> = React.forwardRef<Props, ResourcePropertiesEditorInterface>(
+const ResourcePropertiesEditor = React.forwardRef<
+  Props,
+  ResourcePropertiesEditorInterface
+>(
   (
     {
       project,
@@ -157,11 +157,7 @@ const ResourcePropertiesEditor: React.ComponentType<{
         const resourceSchema = propertiesMapToSchema({
           properties,
           defaultValueProperties: null,
-          getPropertyValue: (resource, name) =>
-            resource
-              .getProperties()
-              .get(name)
-              .getValue(),
+          getProperties: resource => resource.getProperties(),
           onUpdateProperty: (resource, name, value) => {
             resource.updateProperty(name, value);
             forceUpdate();
@@ -204,7 +200,6 @@ const ResourcePropertiesEditor: React.ComponentType<{
               : renderResourcesProperties()}
             {resources.length > 0 &&
               resources.some(
-                // $FlowFixMe[invalid-compare]
                 resource => resource.getKind() === 'javascript'
               ) && (
                 <AlertMessage kind="info">

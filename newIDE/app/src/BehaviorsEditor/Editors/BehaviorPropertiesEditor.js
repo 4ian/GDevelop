@@ -18,7 +18,7 @@ const BehaviorPropertiesEditor = ({
   onBehaviorUpdated,
   resourceManagementProps,
   projectScopedContainersAccessor,
-}: Props): React.Node => {
+}: Props) => {
   const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
     gd.JsPlatform.get(),
     behavior.getTypeName()
@@ -29,11 +29,7 @@ const BehaviorPropertiesEditor = ({
       propertiesMapToSchema({
         properties: behavior.getProperties(),
         defaultValueProperties: behaviorMetadata.getProperties(),
-        getPropertyValue: (instance, name) =>
-          instance
-            .getProperties()
-            .get(name)
-            .getValue(),
+        getProperties: instance => instance.getProperties(),
         onUpdateProperty: (instance, name, value) => {
           instance.updateProperty(name, value);
         },

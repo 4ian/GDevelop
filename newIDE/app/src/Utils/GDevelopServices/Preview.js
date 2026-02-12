@@ -28,7 +28,6 @@ export const uploadObjects = async (
 
   await Promise.all(
     uploadedObjects.map((params, index) =>
-      // $FlowFixMe[underconstrained-implicit-instantiation]
       axios.put(signedUrls[index], params.Body, {
         headers: {
           'Content-Type': params.ContentType,
@@ -38,6 +37,6 @@ export const uploadObjects = async (
   );
 };
 
-export const getBaseUrl = (): string => {
+export const getBaseUrl = () => {
   return GDevelopGamePreviews.baseUrl;
 };

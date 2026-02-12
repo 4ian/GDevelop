@@ -24,7 +24,7 @@ const BuildsDialog = ({
   open,
   onClose,
   onGameUpdated,
-}: Props): null | React.Node => {
+}: Props) => {
   const forceUpdate = useForceUpdate();
   if (!open) return null;
 

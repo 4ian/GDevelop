@@ -17,17 +17,13 @@ type Props = {|
 |};
 
 export default class BehaviorSharedPropertiesEditor extends React.Component<Props> {
-  render(): any {
+  render() {
     const { behaviorSharedData } = this.props;
 
     const propertiesSchema = propertiesMapToSchema({
       properties: behaviorSharedData.getProperties(),
       defaultValueProperties: null,
-      getPropertyValue: (behavior, name) =>
-        behavior
-          .getProperties()
-          .get(name)
-          .getValue(),
+      getProperties: behavior => behavior.getProperties(),
       onUpdateProperty: (behavior, name, value) => {
         behavior.updateProperty(name, value);
       },

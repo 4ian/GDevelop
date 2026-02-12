@@ -21,7 +21,7 @@ const CloudProjectRecoveryDialog = ({
   isLoading,
   onSaveAsDuplicate,
   onSaveAsMainVersion,
-}: Props): React.Node => {
+}: Props) => {
   const actions = [
     <FlatButton
       disabled={isLoading}
@@ -51,7 +51,6 @@ const CloudProjectRecoveryDialog = ({
       onApply={() => {
         onSaveAsMainVersion();
       }}
-      // $FlowFixMe[incompatible-type]
       actions={actions}
       title={
         <Trans>

@@ -71,11 +71,11 @@ const app = remote ? remote.app : null;
 export const getItemsColumns = (
   windowSize: WindowSizeType,
   isLandscape: boolean
-): number => {
+) => {
   return windowSize === 'small' && !isLandscape ? 2 : 4;
 };
 
-export const generateProjectName = (nameToAppend: ?string): string =>
+export const generateProjectName = (nameToAppend: ?string) =>
   (nameToAppend ? `${generateName()} (${nameToAppend})` : generateName()).slice(
     0,
     CLOUD_PROJECT_NAME_MAX_LENGTH
@@ -366,7 +366,6 @@ const NewProjectSetupDialog = ({
   );
 
   const onCheckOptimizeForPixelArt = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     (e, checked) => {
       if (!!linkedNonPixelArtExampleShortHeader && !checked) {
         // If trying to uncheck the optimization for pixel art, on a template
@@ -516,7 +515,6 @@ const NewProjectSetupDialog = ({
   );
 
   const onChangeProjectName = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     (event, text) => {
       if (projectNameError) setProjectNameError(null);
       setProjectName(text);
@@ -615,7 +613,6 @@ const NewProjectSetupDialog = ({
           title={<Trans>Create a new game</Trans>}
           id="project-pre-creation-dialog"
           maxWidth="md"
-          // $FlowFixMe[incompatible-type]
           actions={[
             <FlatButton
               disabled={isLoading}

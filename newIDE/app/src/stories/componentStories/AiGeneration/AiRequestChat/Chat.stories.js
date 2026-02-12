@@ -135,7 +135,6 @@ const fakeAiRequest: AiRequest = {
   status: 'ready',
   userId: 'fake-user-id',
   gameProjectJson: 'FAKE DATA',
-  // $FlowFixMe[incompatible-type]
   output: fakeOutputWithUserRequestOnly,
   error: null,
 };
@@ -159,13 +158,11 @@ const fakeOutputWithAiResponses = [
 ];
 const aiRequestWithAiResponses: AiRequest = {
   ...fakeAiRequest,
-  // $FlowFixMe[incompatible-type]
   output: fakeOutputWithAiResponses,
 };
 
 const fakeOutputWithMoreAiResponses = [
   ...fakeOutputWithUserRequestOnly,
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   ...new Array(7)
     .fill([
       {
@@ -198,13 +195,11 @@ const fakeOutputWithMoreAiResponses = [
 ];
 const aiRequestWithMoreAiResponses: AiRequest = {
   ...fakeAiRequest,
-  // $FlowFixMe[incompatible-type]
   output: fakeOutputWithMoreAiResponses,
 };
 
 const fakeOutputWithEvenMoreAiResponses = [
   ...fakeOutputWithUserRequestOnly,
-  // $FlowFixMe[underconstrained-implicit-instantiation]
   ...new Array(15)
     .fill([
       {
@@ -237,7 +232,6 @@ const fakeOutputWithEvenMoreAiResponses = [
 ];
 const aiRequestWithEvenMoreAiResponses: AiRequest = {
   ...fakeAiRequest,
-  // $FlowFixMe[incompatible-type]
   output: fakeOutputWithEvenMoreAiResponses,
 };
 
@@ -256,10 +250,8 @@ const WrappedChatComponent = (allProps: any) => {
     <FixedHeightFlexContainer height={800}>
       <FixedWidthFlexContainer width={600}>
         <PreferencesContext.Provider
-          // $FlowFixMe[incompatible-type]
           value={{
             ...initialPreferences,
-            // $FlowFixMe[incompatible-type]
             values: {
               ...initialPreferences.values,
               automaticallyUseCreditsForAiRequests: automaticallyUseCredits,
@@ -290,7 +282,7 @@ const WrappedChatComponent = (allProps: any) => {
   );
 };
 
-export const ReadyAiRequest = (): React.Node => (
+export const ReadyAiRequest = () => (
   <WrappedChatComponent
     aiRequest={fakeAiRequest}
     quota={{
@@ -303,7 +295,7 @@ export const ReadyAiRequest = (): React.Node => (
   />
 );
 
-export const ReadyAiRequestWithAiResponses = (): React.Node => (
+export const ReadyAiRequestWithAiResponses = () => (
   <WrappedChatComponent
     aiRequest={aiRequestWithAiResponses}
     quota={{
@@ -316,7 +308,7 @@ export const ReadyAiRequestWithAiResponses = (): React.Node => (
   />
 );
 
-export const ReadyAiRequestWithMoreAiResponses = (): React.Node => (
+export const ReadyAiRequestWithMoreAiResponses = () => (
   <WrappedChatComponent
     aiRequest={aiRequestWithMoreAiResponses}
     quota={{
@@ -329,7 +321,7 @@ export const ReadyAiRequestWithMoreAiResponses = (): React.Node => (
   />
 );
 
-export const ReadyAiRequestWithEvenMoreAiResponses = (): React.Node => (
+export const ReadyAiRequestWithEvenMoreAiResponses = () => (
   <WrappedChatComponent
     aiRequest={aiRequestWithEvenMoreAiResponses}
     quota={{
@@ -342,18 +334,18 @@ export const ReadyAiRequestWithEvenMoreAiResponses = (): React.Node => (
   />
 );
 
-export const LaunchingFollowupAiRequest = (): React.Node => (
+export const LaunchingFollowupAiRequest = () => (
   <WrappedChatComponent aiRequest={aiRequestWithAiResponses} isSending={true} />
 );
 
-export const ErrorLaunchingFollowupAiRequest = (): React.Node => (
+export const ErrorLaunchingFollowupAiRequest = () => (
   <WrappedChatComponent
     aiRequest={aiRequestWithAiResponses}
     lastSendError={new Error('fake error while sending request')}
   />
 );
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCredits = (): React.Node => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCredits = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -387,7 +379,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCredits = (): React.Node => 
   );
 };
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeft = (): React.Node => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeft = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -421,7 +413,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeft = (): Rea
   );
 };
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): React.Node => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -455,7 +447,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithSilver
   );
 };
 
-export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): React.Node => {
+export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -489,7 +481,7 @@ export const QuotaLimitsReachedAndAutomaticallyUsingCreditsButNoneLeftWithStartu
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = (): React.Node => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -523,7 +515,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCredits = (): React.Node 
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeft = (): React.Node => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeft = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -557,7 +549,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeft = (): 
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubscription = (): React.Node => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubscription = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -591,7 +583,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftNoSubsc
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = (): React.Node => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSilverSubscription = () => {
   const quota = {
     limitReached: true,
     current: 100,
@@ -625,7 +617,7 @@ export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithSil
   );
 };
 
-export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = (): React.Node => {
+export const QuotaLimitsReachedAndNotAutomaticallyUsingCreditsButNoneLeftWithStartupSubscription = () => {
   const quota = {
     limitReached: true,
     current: 100,

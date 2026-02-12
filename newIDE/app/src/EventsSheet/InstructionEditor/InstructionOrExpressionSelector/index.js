@@ -69,7 +69,7 @@ const InstructionOrExpressionSelector = <
   style,
   onClickMore,
   id,
-}: Props<T>): any => {
+}: Props<T>) => {
   const searchBarRef = React.useRef<?SearchBarInterface>(null);
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
   const selectedItemRef = React.useRef<?ListItemRefType>(null);

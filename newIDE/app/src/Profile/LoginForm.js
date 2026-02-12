@@ -28,7 +28,6 @@ import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasur
 import RaisedButton from '../UI/RaisedButton';
 import ResponsiveDelimiter from './ResponsiveDelimiter';
 
-// $FlowFixMe[missing-local-annot]
 const getStyles = ({ verticalDesign }) => ({
   createAccountContainer: {
     width: '100%',
@@ -46,7 +45,7 @@ const getStyles = ({ verticalDesign }) => ({
   },
 });
 
-export const accountsAlreadyExistsWithDifferentProviderCopy: React.Node = (
+export const accountsAlreadyExistsWithDifferentProviderCopy = (
   <Trans>
     You already have an account for this email address with a different provider
     (Google, Apple or GitHub). Please try with one of those.
@@ -77,7 +76,7 @@ const LoginForm = ({
   loginInProgress,
   error,
   onGoToCreateAccount,
-}: Props): React.Node => {
+}: Props) => {
   const [
     isForgotPasswordDialogOpen,
     setIsForgotPasswordDialogOpen,

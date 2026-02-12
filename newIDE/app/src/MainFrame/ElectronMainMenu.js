@@ -30,7 +30,6 @@ const useIPCEventListener = ({
     () => {
       if (!ipcRenderer || !shouldApply) return;
 
-      // $FlowFixMe[missing-local-annot]
       const handler = (event, ...eventArgs) => callback(...eventArgs);
       ipcRenderer.on(ipcEvent, handler);
       return () => ipcRenderer.removeListener(ipcEvent, handler);
@@ -49,7 +48,6 @@ const useAppEventListener = ({
   React.useEffect(
     () => {
       if (!app) return;
-      // $FlowFixMe[missing-local-annot]
       const handler = (event, ...eventArgs) => callback(...eventArgs);
       app.on(event, handler);
       return () => app.removeListener(event, handler);
@@ -80,7 +78,7 @@ const ElectronMainMenu = ({
   props: BuildMainMenuProps,
   callbacks: MainMenuCallbacks,
   extraCallbacks: MainMenuExtraCallbacks,
-|}): null => {
+|}) => {
   const {
     i18n,
     project,

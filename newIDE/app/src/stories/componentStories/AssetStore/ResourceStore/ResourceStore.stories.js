@@ -12,8 +12,7 @@ import { client as assetApiClient } from '../../../../Utils/GDevelopServices/Ass
 export default {
   title: 'AssetStore/ResourceStore',
   component: ResourceStore,
-  // $FlowFixMe[cannot-resolve-name]
-  decorators: [(getPaperDecorator('medium'): StoryDecorator)],
+  decorators: [getPaperDecorator('medium')],
 };
 
 const ResourceStoreStory = ({ kind }: {| kind: 'audio' | 'font' | 'svg' |}) => {
@@ -24,7 +23,6 @@ const ResourceStoreStory = ({ kind }: {| kind: 'audio' | 'font' | 'svg' |}) => {
   return (
     <FixedHeightFlexContainer height={600}>
       <ResourceStoreStateProvider>
-        {/* $FlowFixMe[incompatible-type] */}
         <ResourceStore
           onChoose={action('onChoose')}
           resourceKind={kind}
@@ -36,17 +34,13 @@ const ResourceStoreStory = ({ kind }: {| kind: 'audio' | 'font' | 'svg' |}) => {
   );
 };
 
-export const AudioResource = (): React.Node => (
-  <ResourceStoreStory kind="audio" />
-);
+export const AudioResource = () => <ResourceStoreStory kind="audio" />;
 
-export const FontResource = (): React.Node => (
-  <ResourceStoreStory kind="font" />
-);
+export const FontResource = () => <ResourceStoreStory kind="font" />;
 
-export const SvgResource = (): React.Node => <ResourceStoreStory kind="svg" />;
+export const SvgResource = () => <ResourceStoreStory kind="svg" />;
 
-export const FontResourceWithLoadingError = (): React.Node => {
+export const FontResourceWithLoadingError = () => {
   const axiosMock = new MockAdapter(assetApiClient, { delayResponse: 500 });
   axiosMock.onAny().reply(500);
 

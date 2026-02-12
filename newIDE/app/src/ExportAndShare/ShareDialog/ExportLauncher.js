@@ -117,7 +117,6 @@ const getErrorMessage = (i18n: I18nType, exportStep: BuildStep) => {
  * of an export.
  */
 export default class ExportLauncher extends Component<Props, State> {
-  // $FlowFixMe[missing-local-annot]
   state = {
     exportStep: '',
     build: null,
@@ -127,13 +126,12 @@ export default class ExportLauncher extends Component<Props, State> {
     doneFooterOpen: false,
     errored: false,
     shouldBumpVersionNumber: true,
-    exportState: (this.props.exportPipeline.getInitialExportState(
+    exportState: this.props.exportPipeline.getInitialExportState(
       this.props.project
-    ): any),
+    ),
   };
   _candidateBumpedVersionNumber = '';
-  // $FlowFixMe[missing-local-annot]
-  buildsWatcher = (new BuildsWatcher(): BuildsWatcher);
+  buildsWatcher = new BuildsWatcher();
   launchWholeExport: ({|
     payWithCredits?: boolean,
   |}) => Promise<void>;
@@ -186,7 +184,7 @@ export default class ExportLauncher extends Component<Props, State> {
   _updateStepProgress = (
     stepCurrentProgress: number,
     stepMaxProgress: number
-  ): any =>
+  ) =>
     this.setState({
       stepCurrentProgress,
       stepMaxProgress,
@@ -387,7 +385,7 @@ export default class ExportLauncher extends Component<Props, State> {
     }));
   };
 
-  render(): any {
+  render() {
     const {
       exportStep,
       compressionOutput,

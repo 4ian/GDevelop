@@ -288,7 +288,7 @@ const SpritesList = ({
   onChangeName,
   objectName,
   animationName,
-}: Props): React.Node => {
+}: Props) => {
   // It's important to save the selected sprites in a ref, so that
   // we can update the selection when a context menu is opened without relying on the state.
   // Otherwise, the selection would be updated after the context menu is opened.
@@ -555,7 +555,6 @@ const SpritesList = ({
   );
 
   const addSpriteToSelection = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     (sprite, selected) => {
       selectedSprites.current = {
         ...selectedSprites.current,
@@ -577,7 +576,6 @@ const SpritesList = ({
   );
 
   const openSpriteContextMenu = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
     (x, y, sprite) => {
       // If the sprite is not selected, select only it.
       if (!selectedSprites.current[sprite.ptr]) {

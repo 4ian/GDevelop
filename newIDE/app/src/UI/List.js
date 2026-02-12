@@ -88,8 +88,7 @@ type ListItemProps = {|
   disableAutoTranslate?: boolean,
   selected?: boolean,
   autoGenerateNestedIndicator?: boolean, // TODO: Rename?
-  // $FlowFixMe[prop-missing]
-  renderNestedItems?: () => Array<React.Element<any> | null>,
+  renderNestedItems?: () => Array<React$Element<any> | null>,
   isGreyed?: boolean,
   open?: boolean,
   initiallyOpen?: boolean,
@@ -133,10 +132,7 @@ const useStylesForGreyedListItem = makeStyles(theme => {
  *
  * Also used outside of a List by virtualized lists.
  */
-export const ListItem: React.ComponentType<{
-  ...ListItemProps,
-  +ref?: React.RefSetter<ListItemRefType>,
-}> = React.forwardRef<ListItemProps, ListItemRefType>(
+export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
   (props: ListItemProps, ref) => {
     const [isOpen, setIsOpen] = React.useState(!!props.initiallyOpen);
     const elementWithMenu = React.useRef<?ElementWithMenu>(null);
@@ -249,8 +245,7 @@ export const ListItem: React.ComponentType<{
           disabled={props.disabled}
           selected={props.selected}
           style={{
-            // $FlowFixMe[incompatible-type] - Flow is not happy about two spreads.
-            // $FlowFixMe[exponential-spread]
+            // $FlowFixMe - Flow is not happy about two spreads.
             ...noPaddingStyle,
             ...props.style,
           }}
@@ -306,8 +301,7 @@ export const ListItem: React.ComponentType<{
             onClick={onClickItem}
             disabled={props.disabled}
             style={{
-              // $FlowFixMe[incompatible-type] - Flow is not happy about two spreads.
-              // $FlowFixMe[exponential-spread]
+              // $FlowFixMe - Flow is not happy about two spreads.
               ...noPaddingStyle,
               ...props.style,
             }}
@@ -385,10 +379,9 @@ type ListProps = {|
 /**
  * List based on Material-UI List.
  */
-export const List = (props: ListProps): React.Node => {
+export const List = (props: ListProps) => {
   let listStyle = { ...props.style };
   if (props.useGap) {
-    // $FlowFixMe[incompatible-type]
     listStyle = { ...listStyle, ...styles.listWithGap };
   }
   return (

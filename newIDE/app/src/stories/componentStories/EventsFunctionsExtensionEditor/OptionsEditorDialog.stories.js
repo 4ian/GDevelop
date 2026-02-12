@@ -16,7 +16,7 @@ export default {
   component: OptionsEditorDialog,
 };
 
-export const Default = (): React.Node => (
+export const Default = () => (
   <I18n>
     {({ i18n }) => (
       <EventsFunctionsExtensionsProvider

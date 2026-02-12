@@ -60,10 +60,7 @@ const getFieldVisibility = (field: Field): FieldVisibility | '' => {
   return '';
 };
 
-export const filterSchema = (
-  source: Schema,
-  visibility: FieldVisibility
-): Schema => {
+export const filterSchema = (source: Schema, visibility: FieldVisibility) => {
   const destination: Schema = [];
   for (const field of source) {
     if (field.children) {
@@ -87,11 +84,6 @@ export const isAnyPropertyModified = (
   instances: Instances
 ): boolean => {
   for (const field of schema) {
-    if (field.children) {
-      if (isAnyPropertyModified(field.children, instances)) {
-        return true;
-      }
-    }
     if (
       !field.getValue ||
       !field.setValue ||
@@ -165,7 +157,7 @@ export const CompactPropertiesEditorByVisibility = ({
   instances: Instances,
   preventWrap?: boolean,
   removeSpacers?: boolean,
-  customizeBasicSchema?: (Schema => Schema) | null,
+  customizeBasicSchema?: Schema => Schema,
   placeholder: React.Node,
   onRefreshAllFields: () => void,
 
@@ -178,7 +170,7 @@ export const CompactPropertiesEditorByVisibility = ({
   project?: ?gdProject,
   object?: ?gdObject,
   resourceManagementProps?: ?ResourceManagementProps,
-|}): React.Node => {
+|}) => {
   const basicPropertiesSchema = React.useMemo(
     () => {
       const basicSchema = filterSchema(schema, 'basic');

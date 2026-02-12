@@ -31,8 +31,7 @@ const setupWindowControlsOverlayWatcher = () => {
     return;
   }
 
-  // $FlowFixMe[incompatible-type] - this API is not handled by Flow.
-  // $FlowFixMe[prop-missing]
+  // $FlowFixMe - this API is not handled by Flow.
   const { windowControlsOverlay } = navigator;
 
   if (windowControlsOverlay) {
@@ -105,7 +104,6 @@ export default class Window {
       // Update the window controls colors on Windows.
       ipcRenderer.invoke('titlebar-set-overlay-options', {
         color: newColor,
-        // $FlowFixMe[incompatible-type]
         symbolColor: isLightRgbColor(hexToRGBColor(newColor))
           ? '#000000'
           : '#ffffff',
@@ -182,19 +180,19 @@ export default class Window {
     }
   }
 
-  static onFocus(cb: () => void): any {
+  static onFocus(cb: () => void) {
     if (!remote) return;
 
     return remote.getCurrentWindow().on('focus', cb);
   }
 
-  static onBlur(cb: () => void): any {
+  static onBlur(cb: () => void) {
     if (!remote) return;
 
     return remote.getCurrentWindow().on('blur', cb);
   }
 
-  static onClose(cb: () => void): any {
+  static onClose(cb: () => void) {
     if (!remote) return;
 
     return remote.getCurrentWindow().on('close', cb);
@@ -218,7 +216,6 @@ export default class Window {
 
     // Emulate the minimist behavior of putting the positional arguments
     // in "_".
-    // $FlowFixMe[prop-missing]
     argumentsObject[POSITIONAL_ARGUMENTS_KEY] = argumentsObject.project
       ? [argumentsObject.project]
       : [];
@@ -303,7 +300,7 @@ export default class Window {
   static showConfirmDialog(
     message: string,
     type?: 'none' | 'info' | 'error' | 'question' | 'warning'
-  ): any {
+  ) {
     if (!dialog || !electron) {
       // eslint-disable-next-line
       return confirm(message);
@@ -381,13 +378,12 @@ export default class Window {
     }
   }
 
-  static hasMainMenu(): any {
+  static hasMainMenu() {
     return !!electron;
   }
 
   static isDev(): boolean {
     if (!electron || !remote)
-      // $FlowFixMe[cannot-resolve-name]
       return !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
     try {

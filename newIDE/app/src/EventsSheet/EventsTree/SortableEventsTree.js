@@ -109,7 +109,6 @@ const walkNodes = (
     if (result === false) return false;
 
     if (node.children.length > 0 && (!ignoreCollapsed || node.expanded)) {
-      // $FlowFixMe[incompatible-type]
       currentIndex = walkNodes(
         node.children,
         callback,
@@ -201,7 +200,6 @@ const getSearchMatches = ({
   searchQuery?: any,
 }) => {
   if (!searchMethod || !searchQuery) {
-    // $FlowFixMe[underconstrained-implicit-instantiation]
     return { matchIndexes: [], matchIndexSet: new Set() };
   }
 
@@ -357,8 +355,7 @@ const SortableEventsTree = ({
   searchFocusOffset,
   className,
   reactVirtualizedListProps,
-}: Props): React.MixedElement => {
-  // $FlowFixMe[value-as-type]
+}: Props) => {
   const listRef = React.useRef<?VariableSizeList>(null);
   const outerRef = React.useRef<?HTMLDivElement>(null);
   const alignment =
@@ -430,7 +427,6 @@ const SortableEventsTree = ({
     () => ({
       flatData,
       matchIndexSet,
-      // $FlowFixMe[incompatible-type]
       matchIndexes,
       onVisibilityToggle,
       scaffoldBlockPxWidth,

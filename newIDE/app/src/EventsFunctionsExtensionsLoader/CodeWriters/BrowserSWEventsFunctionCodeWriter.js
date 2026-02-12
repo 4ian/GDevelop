@@ -98,7 +98,6 @@ export const makeBrowserSWEventsFunctionCodeWriter = ({
       onWriteFile({ includeFile: path, content: code });
       const relativePath = path.replace(rootUrl, '');
 
-      // $FlowFixMe[incompatible-type]
       return writeFileInNextBatch(relativePath, code);
     },
 
@@ -110,7 +109,6 @@ export const makeBrowserSWEventsFunctionCodeWriter = ({
       onWriteFile({ includeFile: path, content: code });
       const relativePath = path.replace(rootUrl, '');
 
-      // $FlowFixMe[incompatible-type]
       return writeFileInNextBatch(relativePath, code);
     },
 
@@ -122,7 +120,6 @@ export const makeBrowserSWEventsFunctionCodeWriter = ({
       onWriteFile({ includeFile: path, content: code });
       const relativePath = path.replace(rootUrl, '');
 
-      // $FlowFixMe[incompatible-type]
       return writeFileInNextBatch(relativePath, code);
     },
   };

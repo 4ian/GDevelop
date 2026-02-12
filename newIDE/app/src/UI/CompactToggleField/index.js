@@ -24,10 +24,10 @@ type Props = {|
   disabled?: boolean,
   fullWidth?: boolean,
   hideTooltip?: boolean,
-  labelColor?: 'primary' | 'secondary',
+  labelColor?: 'primary',
 |};
 
-export const CompactToggleField = (props: Props): React.MixedElement => {
+export const CompactToggleField = (props: Props) => {
   const title = props.hideTooltip
     ? null
     : !props.markdownDescription
@@ -41,7 +41,6 @@ export const CompactToggleField = (props: Props): React.MixedElement => {
   const label = (
     <Text
       noMargin
-      // $FlowFixMe[incompatible-type]
       style={styles.label}
       color={props.labelColor === 'primary' ? 'primary' : 'secondary'}
     >

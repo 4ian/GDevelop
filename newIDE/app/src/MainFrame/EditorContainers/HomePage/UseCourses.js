@@ -88,38 +88,7 @@ const noCourseChapters: {
   [courseId: string]: CourseChapter[],
 } = {};
 
-const useCourses = (): {
-  areCoursesFetched: boolean,
-  courses: ?Array<Course>,
-  fetchCourses: () => Promise<Array<Course>>,
-  getChapterCompletion: (
-    courseId: string,
-    chapterId: string
-  ) => CourseChapterCompletion | null,
-  getCourseChapters: (courseId: string) => null | Array<CourseChapter>,
-  getCourseCompletion: (courseId: string) => CourseCompletion | null,
-  isTaskCompleted: (chapterId: string, taskIndex: number) => false | boolean,
-  onBuyCourse: (
-    course: Course,
-    password: string,
-    i18n: I18nType
-  ) => Promise<void>,
-  onBuyCourseWithCredits: (
-    course: Course,
-    password: string,
-    i18n: I18nType
-  ) => Promise<void>,
-  onCompleteTask: (
-    chapterId: string,
-    taskIndex: number,
-    completed: boolean
-  ) => void,
-  onSelectCourse: (courseId: string | null) => void,
-  purchasingCourseListingData: ?CourseListingData,
-  selectedCourse: null | Course,
-  // $FlowFixMe[cannot-resolve-name]
-  setPurchasingCourseListingData: ReactSetStateFunction<?CourseListingData>,
-} => {
+const useCourses = () => {
   const {
     userStatus,
     userId,
@@ -556,7 +525,6 @@ const useCourses = (): {
         }
 
         if (userId) {
-          // $FlowFixMe[constant-condition]
           const userIdOrEmpty: string = userId || '';
           // we empty the chapters fetched for the user to ensure they are re-fetched
           // and up-to-date (notably in case subscription changed or purchase count changed).

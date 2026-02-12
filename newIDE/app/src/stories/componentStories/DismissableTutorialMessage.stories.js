@@ -46,10 +46,9 @@ type Props = {|
 
 const WrappedDismissableTutorialMessage = ({
   tutorials = defaultTutorials,
-  // $FlowFixMe[incompatible-type]
   preferences = initialPreferences,
   tutorialId,
-}: Props): React.Node => (
+}: Props) => (
   <PreferencesContext.Provider value={preferences}>
     <TutorialContext.Provider
       value={{
@@ -69,21 +68,19 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const NoTutorialsLoaded = (): React.Node => (
+export const NoTutorialsLoaded = () => (
   <WrappedDismissableTutorialMessage tutorials={null} tutorialId="tutorial-1" />
 );
 
-export const NoTutorialsFound = (): React.Node => (
+export const NoTutorialsFound = () => (
   <WrappedDismissableTutorialMessage tutorials={[]} tutorialId="tutorial-1" />
 );
 
-export const HiddenTutorial = (): React.Node => (
+export const HiddenTutorial = () => (
   <WrappedDismissableTutorialMessage
     tutorialId="tutorial-1"
-    // $FlowFixMe[incompatible-type]
     preferences={{
       ...initialPreferences,
-      // $FlowFixMe[incompatible-type]
       values: {
         ...initialPreferences.values,
         hiddenTutorialHints: { 'tutorial-1': true },
@@ -92,14 +89,14 @@ export const HiddenTutorial = (): React.Node => (
   />
 );
 
-export const TutorialNotInList = (): React.Node => (
+export const TutorialNotInList = () => (
   <WrappedDismissableTutorialMessage tutorialId="tutorial-3" />
 );
 
-export const DefaultVideo = (): React.Node => (
+export const DefaultVideo = () => (
   <WrappedDismissableTutorialMessage tutorialId="tutorial-1" />
 );
 
-export const DefaultText = (): React.Node => (
+export const DefaultText = () => (
   <WrappedDismissableTutorialMessage tutorialId="tutorial-2" />
 );

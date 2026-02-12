@@ -50,10 +50,7 @@ const styles = {
   },
 };
 
-export const ObjectPreview = ({
-  project,
-  object,
-}: Props): React.MixedElement => {
+export const ObjectPreview = ({ project, object }: Props) => {
   const size = 128;
   const { getAssetShortHeaderFromId } = React.useContext(AssetStoreContext);
   const assetStoreId = object.getAssetStoreId();

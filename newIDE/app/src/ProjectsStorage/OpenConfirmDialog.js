@@ -16,7 +16,7 @@ type OpenConfirmDialogProps = {|
 export const OpenConfirmDialog = ({
   onClose,
   onConfirm,
-}: OpenConfirmDialogProps): React.Node => {
+}: OpenConfirmDialogProps) => {
   return (
     <Dialog
       title={<Trans>Confirm the opening</Trans>}
@@ -63,12 +63,7 @@ export const OpenConfirmDialog = ({
   );
 };
 
-export const useOpenConfirmDialog = (): {
-  ensureInteractionHappened: (
-    storageProviderOperations: StorageProviderOperations
-  ) => Promise<boolean>,
-  renderOpenConfirmDialog: () => null | React.Node,
-} => {
+export const useOpenConfirmDialog = () => {
   const interactionMade = React.useRef(false);
   const pendingConfirmationPromiseResolve = React.useRef<?(boolean) => void>(
     null

@@ -22,7 +22,7 @@ const styles = {
   },
 };
 
-export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function YesNoField(props: ParameterFieldProps, ref) {
     const button = React.useRef<?TwoStatesButtonInterface>(null);
     const focus: FieldFocusFunction = options => {
@@ -44,7 +44,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     return (
       <Column noMargin>
         <Line alignItems="center" justifyContent="space-between">
-          {/* $FlowFixMe[incompatible-type] */}
           <Text style={styles.description} displayInlineAsSpan>
             {description}
           </Text>
@@ -72,15 +71,12 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </Column>
     );
   }
-): React.ComponentType<{
-  ...ParameterFieldProps,
-  +ref?: React.RefSetter<ParameterFieldInterface>,
-}>);
+);
 
 export const renderInlineYesNo = ({
   value,
   parameterMetadata,
-}: ParameterInlineRendererProps): React.Node => {
+}: ParameterInlineRendererProps) => {
   if (getParameterValueOrDefault(value, parameterMetadata) === 'yes') {
     return <Trans>yes</Trans>;
   } else {

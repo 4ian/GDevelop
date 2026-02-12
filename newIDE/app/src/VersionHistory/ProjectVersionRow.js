@@ -246,7 +246,6 @@ const ProjectVersionRow = ({
               </>
             )}
             {isEditing ? (
-              // $FlowFixMe[incompatible-type]
               <TextField
                 ref={textFieldRef}
                 margin="none"
@@ -305,7 +304,6 @@ const ProjectVersionRow = ({
                   </Column>
                 )}
                 <div style={styles.dateContainer}>
-                  {/* $FlowFixMe[incompatible-type] */}
                   <Text noMargin style={styles.greyed}>
                     {displayFullDate
                       ? i18n.date(version.createdAt, {
@@ -356,7 +354,6 @@ const ProjectVersionRow = ({
                   src={authorPublicProfile.iconUrl}
                   style={styles.avatar}
                 />
-                {/* $FlowFixMe[incompatible-type] */}
                 <Text noMargin style={styles.greyed}>
                   {authorPublicProfile.username ||
                     (version.userId === authenticatedUserId ? (
@@ -373,7 +370,6 @@ const ProjectVersionRow = ({
                   alt={anonymousAvatar.alt}
                   style={styles.avatar}
                 />
-                {/* $FlowFixMe[incompatible-type] */}
                 <Text noMargin style={styles.greyed}>
                   <Trans>Anonymous</Trans>
                 </Text>
@@ -454,7 +450,7 @@ export const DayGroupRow = ({
   openedVersionStatus,
   usersPublicProfileByIds,
   getAnonymousAvatar,
-}: DayGroupRowProps): React.Node => {
+}: DayGroupRowProps) => {
   const [isOpen, setIsOpen] = React.useState<boolean>(isOpenedInitially);
   const displayYear = new Date(day).getFullYear() !== thisYear;
   const namedVersions = React.useMemo(

@@ -18,6 +18,7 @@ const styles = {
     textOverflow: 'ellipsis',
     lineHeight: '17px',
     maxHeight: 34, // 2 * lineHeight to limit to 2 lines.
+    opacity: 0.7,
   },
 };
 
@@ -33,7 +34,6 @@ export type CompactTextAreaFieldProps = {|
   placeholder?: MessageDescriptor,
   rows?: number,
   maxLength?: number,
-  labelColor?: 'primary' | 'secondary',
 |};
 
 export const CompactTextAreaField = ({
@@ -48,8 +48,7 @@ export const CompactTextAreaField = ({
   rows,
   maxLength,
   onSubmit,
-  labelColor,
-}: CompactTextAreaFieldProps): React.Node => {
+}: CompactTextAreaFieldProps) => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
 
   const title = !markdownDescription
@@ -88,12 +87,7 @@ export const CompactTextAreaField = ({
                 },
               }}
             >
-              <Text
-                noMargin
-                // $FlowFixMe[incompatible-type]
-                style={styles.label}
-                color={labelColor === 'primary' ? 'primary' : 'secondary'}
-              >
+              <Text noMargin style={styles.label}>
                 {label}
               </Text>
             </Tooltip>
@@ -106,7 +100,6 @@ export const CompactTextAreaField = ({
             <textarea
               id={idToUse.current}
               disabled={disabled}
-              // $FlowFixMe[invalid-compare]
               value={value === null ? '' : value}
               onChange={e => onChange(e.currentTarget.value)}
               placeholder={i18n._(placeholder)}

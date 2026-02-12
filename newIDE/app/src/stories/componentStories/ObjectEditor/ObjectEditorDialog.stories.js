@@ -15,7 +15,7 @@ export default {
   component: ObjectEditorDialog,
 };
 
-export const CustomObject = (): React.Node => (
+export const CustomObject = () => (
   <DragAndDropContextProvider>
     <ObjectEditorDialog
       open={true}
@@ -59,7 +59,7 @@ export const CustomObject = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const StandardObject = (): React.Node => (
+export const StandardObject = () => (
   <DragAndDropContextProvider>
     <ObjectEditorDialog
       open={true}
@@ -103,7 +103,7 @@ export const StandardObject = (): React.Node => (
   </DragAndDropContextProvider>
 );
 
-export const LockedStandardObject = (): React.Node => (
+export const LockedStandardObject = () => (
   <DragAndDropContextProvider>
     <ObjectEditorDialog
       open={true}

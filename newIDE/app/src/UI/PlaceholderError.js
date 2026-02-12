@@ -11,7 +11,7 @@ type Props = {|
   onRetry?: () => void | Promise<void>,
 |};
 
-const PlaceholderError = ({ onRetry, children }: Props): React.Node => {
+const PlaceholderError = ({ onRetry, children }: Props) => {
   return (
     <Column expand alignItems="center" justifyContent="center">
       <Line noMargin>

@@ -27,32 +27,32 @@ const defaultProps = {
   claimedProductOptions,
 };
 
-export const Default = (): React.Node => (
+export const Default = () => (
   <CreateAccountWithPurchaseClaimDialog {...defaultProps} />
 );
 
-export const PasswordErrorFromBackend = (): React.Node => (
+export const PasswordErrorFromBackend = () => (
   <CreateAccountWithPurchaseClaimDialog
     {...defaultProps}
     error={{ code: 'auth/weak-password' }}
   />
 );
 
-export const EmailErrorFromBackend = (): React.Node => (
+export const EmailErrorFromBackend = () => (
   <CreateAccountWithPurchaseClaimDialog
     {...defaultProps}
     error={{ code: 'auth/invalid-email' }}
   />
 );
 
-export const AccountExists = (): React.Node => (
+export const AccountExists = () => (
   <CreateAccountWithPurchaseClaimDialog
     {...defaultProps}
     error={{ code: 'auth/account-exists-with-different-credential' }}
   />
 );
 
-export const Submitting = (): React.Node => (
+export const Submitting = () => (
   <CreateAccountWithPurchaseClaimDialog
     {...defaultProps}
     createAccountInProgress

@@ -41,7 +41,7 @@ export const NewResourceDialog = ({
   resourceSources,
   onClose,
   onChooseResources,
-}: Props): null | React.Node => {
+}: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const { searchResults } = React.useContext(ResourceStoreContext);
   const storageProvider = React.useMemo(() => getStorageProvider(), [

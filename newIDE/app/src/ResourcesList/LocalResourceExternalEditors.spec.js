@@ -1,7 +1,6 @@
 // @flow
 import { makeTestProject } from '../fixtures/TestProject';
 import optionalRequire from '../Utils/OptionalRequire';
-// $FlowFixMe[cannot-resolve-module]
 import path from 'path';
 import {
   downloadUrlsToBlobs,
@@ -73,7 +72,6 @@ describe('LocalResourceExternalEditors', () => {
       );
 
       const result = await downloadAndPrepareExternalEditorBase64Resources({
-        // $FlowFixMe[incompatible-type]
         project,
         resourceNames: ['NotExisting', 'MyResourceToDownload', 'MyLocalFile'],
       });

@@ -297,10 +297,7 @@ type Props = {|
   ) => void,
 |};
 
-const EditorTabsPane: React.ComponentType<{
-  ...Props,
-  +ref?: React.RefSetter<{}>,
-}> = React.forwardRef<Props, {||}>((props, ref) => {
+const EditorTabsPane = React.forwardRef<Props, {||}>((props, ref) => {
   const {
     editorTabs,
     currentProject,

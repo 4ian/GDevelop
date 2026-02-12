@@ -369,6 +369,7 @@ const SpineEditor = ({
           kind="warning"
           renderRightButton={() => (
             <FlatButton
+              // $FlowFixMe[incompatible-type]
               style={styles.neverShrinkingButton}
               label={<Trans>Purchase Spine</Trans>}
               onClick={() =>

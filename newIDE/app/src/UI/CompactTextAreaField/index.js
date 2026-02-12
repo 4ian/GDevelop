@@ -90,6 +90,7 @@ export const CompactTextAreaField = ({
             >
               <Text
                 noMargin
+                // $FlowFixMe[incompatible-type]
                 style={styles.label}
                 color={labelColor === 'primary' ? 'primary' : 'secondary'}
               >

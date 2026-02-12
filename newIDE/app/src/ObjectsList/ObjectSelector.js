@@ -166,11 +166,10 @@ const getMissingBehaviors = ({
 
 export type ObjectSelectorInterface = {| focus: FieldFocusFunction |};
 
-// $FlowFixMe[prop-missing]
-const ObjectSelector: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<ObjectSelectorInterface> },
-  React.RefSetter<ObjectSelectorInterface>
-> = React.forwardRef<Props, ObjectSelectorInterface>((props, ref) => {
+const ObjectSelector: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<ObjectSelectorInterface>,
+}> = React.forwardRef<Props, ObjectSelectorInterface>((props, ref) => {
   const fieldRef = React.useRef<?SemiControlledAutoCompleteInterface>(null);
 
   const focus: FieldFocusFunction = options => {

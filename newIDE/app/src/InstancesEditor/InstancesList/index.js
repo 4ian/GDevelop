@@ -363,11 +363,10 @@ class InstancesList extends Component<Props, State> {
   }
 }
 
-// $FlowFixMe[prop-missing]
-const InstancesListWithErrorBoundary: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<InstancesListInterface> },
-  React.RefSetter<InstancesListInterface>
-> = React.forwardRef<Props, InstancesListInterface>((props, ref) => {
+const InstancesListWithErrorBoundary: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<InstancesListInterface>,
+}> = React.forwardRef<Props, InstancesListInterface>((props, ref) => {
   const forceUpdate = useForceUpdate();
   React.useImperativeHandle(ref, () => ({
     forceUpdate,

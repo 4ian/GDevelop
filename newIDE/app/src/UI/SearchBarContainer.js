@@ -206,6 +206,7 @@ const SearchBarContainer = ({
           {buildMenuTemplate && (
             <ElementWithMenu
               element={
+                // $FlowFixMe[incompatible-type]
                 <IconButton
                   style={styles.iconButtonFilter.style}
                   disabled={disabled}
@@ -226,6 +227,7 @@ const SearchBarContainer = ({
               size="small"
             />
           )}
+          {/* $FlowFixMe[incompatible-type] */}
           <IconButton
             onClick={onCancel}
             style={styles.iconButtonClose.style}

@@ -386,11 +386,10 @@ const getNodeKey = ({ treeIndex }) => treeIndex;
  * Display a tree of event. Builtin on react-sortable-tree so that event
  * can be drag'n'dropped and events rows are virtualized.
  */
-// $FlowFixMe[prop-missing]
-const EventsTree: React.AbstractComponent<
-  { ...EventsTreeProps, +ref?: React.RefSetter<EventsTreeInterface> },
-  React.RefSetter<EventsTreeInterface>
-> = React.forwardRef<EventsTreeProps, EventsTreeInterface>((props, ref) => {
+const EventsTree: React.ComponentType<{
+  ...EventsTreeProps,
+  +ref?: React.RefSetter<EventsTreeInterface>,
+}> = React.forwardRef<EventsTreeProps, EventsTreeInterface>((props, ref) => {
   const forceUpdate = useForceUpdate();
 
   const _list = React.useRef<?any>(null);

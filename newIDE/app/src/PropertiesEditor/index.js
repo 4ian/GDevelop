@@ -415,6 +415,7 @@ const PropertiesEditor = ({
               instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
               _onInstancesModified(instances);
             }}
+            // $FlowFixMe[incompatible-type]
             style={styles.field}
             disabled={getDisabled({ instances, field })}
           >
@@ -438,6 +439,7 @@ const PropertiesEditor = ({
               instances.forEach(i => setValue(i, newValue || ''));
               _onInstancesModified(instances);
             }}
+            // $FlowFixMe[incompatible-type]
             style={styles.field}
             disabled={getDisabled({ instances, field })}
           >

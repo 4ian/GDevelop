@@ -431,6 +431,7 @@ const VariableRow = React.memo<VariableRowProps>(
                               {isInherited && !isTopLevel ? null : (
                                 <>
                                   <Spacer />
+                                  {/* $FlowFixMe[incompatible-type] */}
                                   <IconButton
                                     size="small"
                                     style={styles.inlineIcon}
@@ -503,6 +504,7 @@ const VariableRow = React.memo<VariableRowProps>(
                         // and not for those who are in an inherited structure or array.
                         type === gd.Variable.String &&
                         !(isInherited && !isTopLevel) ? (
+                          // $FlowFixMe[incompatible-type]
                           <IconButton
                             size="small"
                             style={styles.inlineIcon}
@@ -522,6 +524,7 @@ const VariableRow = React.memo<VariableRowProps>(
                           </IconButton>
                         ) : null}
                         {isCollection && !isInherited ? (
+                          // $FlowFixMe[incompatible-type]
                           <IconButton
                             size="small"
                             style={styles.inlineIcon}
@@ -541,6 +544,7 @@ const VariableRow = React.memo<VariableRowProps>(
                           </IconButton>
                         ) : null}
                         {isCollection && isInherited && isTopLevel ? (
+                          // $FlowFixMe[incompatible-type]
                           <IconButton
                             size="small"
                             tooltip={t`Edit`}
@@ -560,6 +564,7 @@ const VariableRow = React.memo<VariableRowProps>(
                           </IconButton>
                         ) : null}
                         {overwritesInheritedVariable && isTopLevel ? (
+                          // $FlowFixMe[incompatible-type]
                           <IconButton
                             size="small"
                             tooltip={t`Reset`}
@@ -609,11 +614,10 @@ export type VariablesListInterface = {|
   addVariable: () => void,
 |};
 
-// $FlowFixMe[prop-missing]
-const VariablesList: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<VariablesListInterface> },
-  React.RefSetter<VariablesListInterface>
-> = React.forwardRef<Props, VariablesListInterface>((props, ref) => {
+const VariablesList: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<VariablesListInterface>,
+}> = React.forwardRef<Props, VariablesListInterface>((props, ref) => {
   const historyRef = useRefWithInit(() =>
     getHistoryInitialState(props.variablesContainer, {
       historyMaxSize: 50,

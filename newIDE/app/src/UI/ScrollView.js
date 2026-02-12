@@ -135,8 +135,7 @@ export default (React.forwardRef<Props, ScrollViewInterface>(
       </div>
     );
   }
-  // $FlowFixMe[prop-missing]
-): React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<ScrollViewInterface> },
-  React.RefSetter<ScrollViewInterface>
->);
+): React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<ScrollViewInterface>,
+}>);

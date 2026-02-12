@@ -37,11 +37,10 @@ export type RaisedButtonProps = {|
 /**
  * A raised button based on Material-UI button.
  */
-// $FlowFixMe[prop-missing]
-const RaisedButton: React.AbstractComponent<
-  { ...RaisedButtonProps, +ref?: React.RefSetter<ButtonInterface> },
-  React.RefSetter<ButtonInterface>
-> = React.forwardRef<RaisedButtonProps, ButtonInterface>(
+const RaisedButton: React.ComponentType<{
+  ...RaisedButtonProps,
+  +ref?: React.RefSetter<ButtonInterface>,
+}> = React.forwardRef<RaisedButtonProps, ButtonInterface>(
   (
     {
       label,

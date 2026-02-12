@@ -1562,11 +1562,10 @@ const MemoizedProjectManager = React.memo<Props, ProjectManagerInterface>(
   arePropsEqual
 );
 
-// $FlowFixMe[prop-missing]
-const ProjectManagerWithErrorBoundary: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<ProjectManagerInterface> },
-  React.RefSetter<ProjectManagerInterface>
-> = React.forwardRef<Props, ProjectManagerInterface>((props, outerRef) => {
+const ProjectManagerWithErrorBoundary: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<ProjectManagerInterface>,
+}> = React.forwardRef<Props, ProjectManagerInterface>((props, outerRef) => {
   const projectManagerRef = React.useRef<?ProjectManagerInterface>(null);
   const shouldAutofocusInput = useShouldAutofocusInput();
 

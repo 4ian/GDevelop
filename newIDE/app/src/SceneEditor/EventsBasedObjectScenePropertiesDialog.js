@@ -128,6 +128,7 @@ const EventsBasedObjectScenePropertiesDialog = ({
           properties
         </Trans>
       }
+      // $FlowFixMe[incompatible-type]
       actions={actions}
       onRequestClose={onClose}
       onApply={onSubmit}

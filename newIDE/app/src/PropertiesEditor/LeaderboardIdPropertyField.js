@@ -171,8 +171,7 @@ export default (React.forwardRef<Props, LeaderboardIdPropertyFieldInterface>(
       </I18n>
     );
   }
-  // $FlowFixMe[prop-missing]
-): React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<LeaderboardIdPropertyFieldInterface> },
-  React.RefSetter<LeaderboardIdPropertyFieldInterface>
->);
+): React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<LeaderboardIdPropertyFieldInterface>,
+}>);

@@ -408,6 +408,8 @@ export function PublicGameProperties({
               }
               onChange={(event, values) => {
                 setCategories(
+                  // $FlowFixMe[missing-local-annot]
+                  // $FlowFixMe[constant-condition]
                   values ? values.map(category => category.value) : []
                 );
                 setCategoryInput('');

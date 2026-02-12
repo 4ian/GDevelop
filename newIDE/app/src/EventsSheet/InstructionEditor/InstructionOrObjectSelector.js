@@ -212,11 +212,10 @@ export type InstructionOrObjectSelectorInterface = {|
   reEnumerateInstructions: (i18n: I18nType) => void,
 |};
 
-// $FlowFixMe[prop-missing]
-const InstructionOrObjectSelector: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<InstructionOrObjectSelectorInterface> },
-  React.RefSetter<InstructionOrObjectSelectorInterface>
-> = React.forwardRef<Props, InstructionOrObjectSelectorInterface>(
+const InstructionOrObjectSelector: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<InstructionOrObjectSelectorInterface>,
+}> = React.forwardRef<Props, InstructionOrObjectSelectorInterface>(
   (
     {
       project,
@@ -788,6 +787,7 @@ const InstructionOrObjectSelector: React.AbstractComponent<
                 getItemHeight={getTreeViewItemHeight}
                 getItemName={getTreeViewItemName}
                 shouldApplySearchToItem={shouldApplySearchToItem}
+                // $FlowFixMe[incompatible-type]
                 getItemDescription={getTreeViewItemDescription}
                 forceAllOpened={!!currentlyRunningInAppTutorial}
                 getItemId={getTreeViewItemId}
@@ -868,6 +868,7 @@ const InstructionOrObjectSelector: React.AbstractComponent<
         >
           <AutoSizer style={styles.treeViewAutoSizer} disableWidth>
             {({ height }) => (
+              // $FlowFixMe[incompatible-type]
               <ReadOnlyTreeView
                 key="free-instructions"
                 ref={freeInstructionTreeViewRef}
@@ -876,6 +877,7 @@ const InstructionOrObjectSelector: React.AbstractComponent<
                 getItemHeight={getTreeViewItemHeight}
                 getItemName={getTreeViewItemName}
                 shouldApplySearchToItem={() => false}
+                // $FlowFixMe[incompatible-type]
                 getItemDescription={getTreeViewItemDescription}
                 getItemId={getTreeViewItemId}
                 getItemHtmlId={getTreeViewItemHtmlId}

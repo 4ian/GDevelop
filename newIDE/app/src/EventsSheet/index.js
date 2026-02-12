@@ -2385,8 +2385,7 @@ const EventsSheet = (props, ref) => {
 
 export default (React.forwardRef<Props, EventsSheetInterface>(
   EventsSheet
-  // $FlowFixMe[prop-missing]
-): React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<EventsSheetInterface> },
-  React.RefSetter<EventsSheetInterface>
->);
+): React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<EventsSheetInterface>,
+}>);

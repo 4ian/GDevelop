@@ -4991,6 +4991,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           onOpenHomePage={openHomePage}
           toggleProjectManager={toggleProjectManager}
           mainMenuCallbacks={mainMenuCallbacks}
+          // $FlowFixMe[incompatible-type]
           buildMainMenuProps={buildMainMenuProps}
         />
       </ProjectManagerDrawer>

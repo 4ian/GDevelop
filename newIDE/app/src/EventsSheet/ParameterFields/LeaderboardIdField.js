@@ -211,11 +211,10 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </I18n>
     );
   }
-  // $FlowFixMe[prop-missing]
-): React.AbstractComponent<
-  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
-  React.RefSetter<ParameterFieldInterface>
->);
+): React.ComponentType<{
+  ...ParameterFieldProps,
+  +ref?: React.RefSetter<ParameterFieldInterface>,
+}>);
 
 const InlineLeaderboardIdField = ({
   value,

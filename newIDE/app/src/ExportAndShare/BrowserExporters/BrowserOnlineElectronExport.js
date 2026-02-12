@@ -172,7 +172,6 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
 
   launchOnlineBuild: (
     exportState: ExportState,
-    // $FlowFixMe[value-as-type]
     authenticatedUser: AuthenticatedUser,
     uploadBucketKey: string,
     gameId: string,

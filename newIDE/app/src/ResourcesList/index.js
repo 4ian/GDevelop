@@ -78,7 +78,6 @@ type Props = {|
 |};
 
 // $FlowFixMe[prop-missing]
-// $FlowFixMe[incompatible-type]
 const ResourcesList: React.AbstractComponent<
   Props,
   ResourcesListInterface

@@ -216,7 +216,6 @@ const PrivateAssetPackInformationPageStory = ({
   errorMessage,
 }: {
   privateAssetPackListingData: PrivateAssetPackListingData,
-  // $FlowFixMe[value-as-type]
   authenticatedUser?: AuthenticatedUser,
   receivedAssetPacks?: Array<PrivateAssetPack>,
   delayResponse?: number,

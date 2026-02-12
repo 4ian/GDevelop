@@ -147,7 +147,6 @@ type AccordionProps = {|
  * and accordion-specific actions.
  * Based on Material-UI Accordion.
  */
-// $FlowFixMe[value-as-type]
 // $FlowFixMe[prop-missing]
 export const Accordion: React.AbstractComponent<
   { ...AccordionProps, +ref?: React.RefSetter<any> },

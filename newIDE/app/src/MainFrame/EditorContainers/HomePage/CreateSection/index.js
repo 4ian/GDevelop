@@ -2,8 +2,7 @@
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-// $FlowFixMe[import-type-as-value]
-import { I18n as I18nType } from '@lingui/core';
+import type { I18n as I18nType } from '@lingui/core';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';

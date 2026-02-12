@@ -8,7 +8,6 @@ import BuildsWatcher from './BuildsWatcher';
 
 type Props = {|
   onBuildsUpdated?: () => void,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   game: Game,
   onGameUpdated?: (game: Game) => void,

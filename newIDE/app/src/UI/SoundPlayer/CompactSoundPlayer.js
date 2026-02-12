@@ -88,7 +88,7 @@ const CompactSoundPlayer = ({
         }
       });
     },
-    [soundSrc, onSoundLoaded, onSoundError]
+    [soundSrc, onSoundLoaded, onSoundError, isMountedRef]
   );
 
   const onPlayPause = React.useCallback(

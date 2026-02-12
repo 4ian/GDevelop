@@ -4,8 +4,7 @@ import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import Grid from '@material-ui/core/Grid';
 import { I18n } from '@lingui/react';
-// $FlowFixMe[import-type-as-value]
-import { I18n as I18nType } from '@lingui/core';
+import type { I18n as I18nType } from '@lingui/core';
 import {
   getRecommendedMarketingPlan,
   listGameFeaturings,

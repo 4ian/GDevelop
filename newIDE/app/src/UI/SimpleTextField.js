@@ -49,11 +49,8 @@ const stopPropagation = e => e.stopPropagation();
 export const SimpleTextField: React.AbstractComponent<
   SimpleTextFieldProps,
   SimpleTextFieldInterface
-> = React.memo<
-  SimpleTextFieldProps,
   // $FlowFixMe[incompatible-type]
-  SimpleTextFieldInterface
->(
+> = React.memo<SimpleTextFieldProps, SimpleTextFieldInterface>(
   // $FlowFixMe[incompatible-type]
   // $FlowFixMe[incompatible-exact]
   React.forwardRef<SimpleTextFieldProps, SimpleTextFieldInterface>(

@@ -47,7 +47,6 @@ const styles = {
 };
 
 type Props = {|
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   game: Game,
   i18n: I18nType,

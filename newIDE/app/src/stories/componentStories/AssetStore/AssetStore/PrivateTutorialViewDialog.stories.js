@@ -38,7 +38,6 @@ const PrivateTutorialViewDialogStory = ({
 }: {
   tutorial: Tutorial,
   privatePdfTutorial: PrivatePdfTutorial,
-  // $FlowFixMe[value-as-type]
   authenticatedUser?: AuthenticatedUser,
   delayResponse?: number,
   errorCode?: number,

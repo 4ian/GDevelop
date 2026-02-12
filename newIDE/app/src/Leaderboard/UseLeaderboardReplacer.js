@@ -211,7 +211,6 @@ export const replaceLeaderboardsInProject = async ({
   leaderboardsToReplace,
   setProgress,
 }: {|
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   project: gdProject,
   sourceGameId: string,
@@ -259,7 +258,6 @@ export const replaceLeaderboardsInProject = async ({
   setProgress(progressStep);
 
   const duplicateLeaderboardAndStepProgress = async (
-    // $FlowFixMe[value-as-type]
     authenticatedUser: AuthenticatedUser,
     leaderboardId: string
   ): Promise<?ErroredLeaderboard> => {

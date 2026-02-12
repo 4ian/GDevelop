@@ -183,7 +183,6 @@ export const listLeaderboardEntries = async (
 };
 
 export const createLeaderboard = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   { name, sort }: {| name: string, sort: LeaderboardSortOption |}
@@ -217,7 +216,6 @@ type LeaderboardDuplicationPayload = {|
 |};
 
 export const duplicateLeaderboard = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   payload: LeaderboardDuplicationPayload
@@ -243,7 +241,6 @@ export const duplicateLeaderboard = async (
 };
 
 export const updateLeaderboard = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   leaderboardId: string,
@@ -270,7 +267,6 @@ export const updateLeaderboard = async (
 };
 
 export const resetLeaderboard = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   leaderboardId: string
@@ -296,7 +292,6 @@ export const resetLeaderboard = async (
 };
 
 export const deleteLeaderboard = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   leaderboardId: string
@@ -321,7 +316,6 @@ export const deleteLeaderboard = async (
 };
 
 export const deleteLeaderboardEntry = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   leaderboardId: string,
@@ -450,7 +444,6 @@ export const updateComment = async (
 };
 
 export const canUserCustomizeLeaderboardTheme = (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser
 ): {|
   canUseTheme: boolean,

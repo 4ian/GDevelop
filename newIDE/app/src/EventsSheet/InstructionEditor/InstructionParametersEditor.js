@@ -10,6 +10,11 @@ import { mapFor } from '../../Utils/MapFor';
 import EmptyMessage from '../../UI/EmptyMessage';
 import ParameterRenderingService from '../ParameterRenderingService';
 import HelpButton from '../../UI/HelpButton';
+import HelpIcon from '../../UI/HelpIcon';
+import {
+  isRelativePathToDocumentationRoot,
+  isDocumentationAbsoluteUrl,
+} from '../../Utils/HelpLink';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
@@ -294,8 +299,8 @@ const InstructionParametersEditor: React.AbstractComponent<
       <I18n>
         {({ i18n }) => (
           <ScrollView autoHideScrollbar id={id}>
-            <Column expand>
-              <Line alignItems="flex-start">
+            <ColumnStackLayout expand>
+              <Line alignItems="flex-start" noMargin>
                 <img
                   src={iconFilename}
                   alt=""
@@ -307,9 +312,14 @@ const InstructionParametersEditor: React.AbstractComponent<
                   }}
                 />
                 <Column expand>
-                  <Text style={styles.description}>
-                    {instructionMetadata.getDescription()}
-                  </Text>
+                  <Line noMargin alignItems="flex-start">
+                    <Text style={styles.description} noMargin>
+                      {instructionMetadata.getDescription()}
+                    </Text>
+                    {helpPage && isDocumentationAbsoluteUrl(helpPage) && (
+                      <HelpIcon size="small" helpPagePath={helpPage} />
+                    )}
+                  </Line>
                 </Column>
               </Line>
               {instructionExtraInformation && (
@@ -467,20 +477,22 @@ const InstructionParametersEditor: React.AbstractComponent<
                 )}
               </div>
               <Line>
-                {!noHelpButton && helpPage && (
-                  <HelpButton
-                    helpPagePath={instructionMetadata.getHelpPath()}
-                    label={
-                      isCondition ? (
-                        <Trans>Help for this condition</Trans>
-                      ) : (
-                        <Trans>Help for this action</Trans>
-                      )
-                    }
-                  />
-                )}
+                {!noHelpButton &&
+                  helpPage &&
+                  isRelativePathToDocumentationRoot(helpPage) && (
+                    <HelpButton
+                      helpPagePath={helpPage}
+                      label={
+                        isCondition ? (
+                          <Trans>Help for this condition</Trans>
+                        ) : (
+                          <Trans>Help for this action</Trans>
+                        )
+                      }
+                    />
+                  )}
               </Line>
-            </Column>
+            </ColumnStackLayout>
           </ScrollView>
         )}
       </I18n>

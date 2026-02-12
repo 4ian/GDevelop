@@ -57,7 +57,6 @@ type BuildProperties = {
 type Props = {|
   comment: Comment,
   buildProperties?: BuildProperties,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   onCommentUpdated: (comment: Comment) => void,
 |};

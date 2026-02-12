@@ -9,7 +9,7 @@ import {
 
 type Props = {|
   renderConditionsList: ({ style: Object, className: string }) => React.Node,
-  renderActionsList: ({ className: string }) => React.Node,
+  renderActionsList: ({ style?: Object, className: string }) => React.Node,
   windowSize: WindowSizeType,
   className?: string,
   leftIndentWidth: number,
@@ -59,7 +59,6 @@ const ConditionsActionsColumns = (props: Props): React.MixedElement => {
           style: {},
           className: `${conditionsContainer} ${smallWidthContainer}`,
         })}
-        {/* $FlowFixMe[incompatible-type] */}
         {props.renderActionsList({
           style: {},
           className: `${actionsContainer} ${smallWidthContainer}`,

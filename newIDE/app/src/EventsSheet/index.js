@@ -165,7 +165,6 @@ type Props = {|
 type ComponentProps = {|
   ...Props,
   windowSize: WindowSizeType,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   preferences: Preferences,
   tutorials: ?Array<Tutorial>,
@@ -2384,7 +2383,6 @@ const EventsSheet = (props, ref) => {
   );
 };
 
-// $FlowFixMe[prop-missing]
 export default (React.forwardRef<Props, EventsSheetInterface>(
   EventsSheet
   // $FlowFixMe[prop-missing]

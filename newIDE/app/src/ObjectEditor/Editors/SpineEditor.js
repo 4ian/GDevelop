@@ -145,6 +145,7 @@ const SpineEditor = ({
       if (spineData.skeleton && spineData.skeleton.skins) {
         return spineData.skeleton.skins.map(skin => skin.name);
       } else {
+        // $FlowFixMe[missing-empty-array-annot]
         return [];
       }
     },
@@ -154,6 +155,7 @@ const SpineEditor = ({
   const skinName = spineConfiguration.getSkinName();
 
   const changeSpineSkin = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     skinName => {
       objectConfiguration.updateProperty('skinName', skinName);
       if (onObjectUpdated) onObjectUpdated();

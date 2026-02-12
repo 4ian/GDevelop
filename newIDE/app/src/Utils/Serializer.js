@@ -75,11 +75,7 @@ export function serializeToObjectAsset(
     serializedElement,
     usedResourceNamesVector
   );
-  // $FlowFixMe[method-unbinding]
-  usedResourceNames.push.apply(
-    usedResourceNames,
-    usedResourceNamesVector.toJSArray()
-  );
+  usedResourceNames.push(...usedResourceNamesVector.toJSArray());
   usedResourceNamesVector.delete();
 
   // JSON.parse + toJSON is 30% faster than gd.Serializer.toJSObject.

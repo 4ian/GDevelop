@@ -85,8 +85,7 @@ const NavigationStep = ({ stepIndex }: {| stepIndex: number |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <Line justifyContent="center">
-      {/* $FlowFixMe[underconstrained-implicit-instantiation] */}
-      {new Array(STEP_MAX_COUNT).fill(0).map((_, index) => {
+      {new Array<number>(STEP_MAX_COUNT).fill(0).map((_, index) => {
         return (
           <div
             key={index}

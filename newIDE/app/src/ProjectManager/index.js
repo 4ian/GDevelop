@@ -587,18 +587,18 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       setProjectVariablesEditorOpen(true);
     }, []);
 
-    const [editedPropertiesLayout, setEditedPropertiesLayout] = React.useState(
-      null
-    );
-    const [editedVariablesLayout, setEditedVariablesLayout] = React.useState(
-      null
-    );
+    const [
+      editedPropertiesLayout,
+      setEditedPropertiesLayout,
+    ] = React.useState<?gdLayout>(null);
+    const [
+      editedVariablesLayout,
+      setEditedVariablesLayout,
+    ] = React.useState<?gdLayout>(null);
     const onOpenLayoutProperties = React.useCallback((layout: ?gdLayout) => {
-      // $FlowFixMe[incompatible-type]
       setEditedPropertiesLayout(layout);
     }, []);
     const onOpenLayoutVariables = React.useCallback((layout: ?gdLayout) => {
-      // $FlowFixMe[incompatible-type]
       setEditedVariablesLayout(layout);
     }, []);
 
@@ -1467,7 +1467,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       isListLocked={false}
                     />
                   )}
-                  {/* $FlowFixMe[constant-condition] */}
                   {!!editedPropertiesLayout &&
                     project &&
                     projectScopedContainersAccessor && (

@@ -163,13 +163,10 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const [editorToolbar, setEditorToolbar] = React.useState<?React.Node>(null);
 
-    React.useImperativeHandle(
-      // $FlowFixMe[incompatible-type]
-      ref,
-      () => ({
-        setEditorToolbar,
-      })
-    );
+    // $FlowFixMe[incompatible-type]
+    React.useImperativeHandle(ref, () => ({
+      setEditorToolbar,
+    }));
 
     const borderBottomColor = React.useMemo(
       () => {

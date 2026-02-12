@@ -386,8 +386,7 @@ export default function ExpressionAutocompletionsDisplayer({
               )}
             </ScrollView>
           </Paper>
-          {/* $FlowFixMe[invalid-compare] */}
-          {selectedCompletionIndex !== null &&
+          {selectedCompletionIndex != null &&
             expressionAutocompletions[selectedCompletionIndex].kind ===
               'Expression' &&
             !expressionAutocompletions[selectedCompletionIndex].isExact && (

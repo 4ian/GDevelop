@@ -22,7 +22,6 @@ const styles = {
 };
 type Props = {|
   builds: ?Array<Build>,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   error: ?Error,
   loadBuilds: () => void,

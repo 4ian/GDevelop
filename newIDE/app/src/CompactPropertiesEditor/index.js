@@ -491,7 +491,6 @@ const CompactPropertiesEditor = ({
       ));
 
       let compactSelectField;
-      // $FlowFixMe[invalid-compare]
       if (field.valueType === 'number') {
         const { setValue } = field;
         compactSelectField = (

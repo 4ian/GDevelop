@@ -198,8 +198,7 @@ const ImageTileGrid = ({
         spacing={SPACING * 2}
       >
         {isLoading
-          ? // $FlowFixMe[underconstrained-implicit-instantiation]
-            new Array(columns).fill(0).map((_, index) => (
+          ? new Array<number>(columns).fill(0).map((_, index) => (
               // Display tiles but with skeletons while the data is loading.
               <GridListTile key={index}>
                 <Skeleton

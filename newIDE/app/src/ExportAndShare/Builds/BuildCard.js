@@ -122,7 +122,6 @@ type Props = {|
   setGameUpdating: boolean => void,
   onBuildUpdated: Build => void,
   onBuildDeleted: Build => void,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
 |};
 

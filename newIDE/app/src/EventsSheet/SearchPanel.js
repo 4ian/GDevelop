@@ -397,7 +397,6 @@ const SearchPanel = (
   );
 };
 
-// $FlowFixMe[prop-missing]
 export default (React.forwardRef<Props, SearchPanelInterface>(
   SearchPanel
   // $FlowFixMe[prop-missing]

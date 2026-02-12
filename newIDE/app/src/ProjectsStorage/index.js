@@ -199,11 +199,9 @@ export type StorageProvider = {|
     setDialog: (() => React.Node) => void,
     /** Close the dialog */
     closeDialog: () => void,
-    // $FlowFixMe[value-as-type]
     authenticatedUser: AuthenticatedUser,
   |}) => StorageProviderOperations,
   createResourceOperations?: ({|
-    // $FlowFixMe[value-as-type]
     authenticatedUser: AuthenticatedUser,
   |}) => ResourcesActionsMenuBuilder,
   /** Resources external changes */

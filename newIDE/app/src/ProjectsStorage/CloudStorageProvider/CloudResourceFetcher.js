@@ -30,7 +30,6 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async ({
 }: {|
   project: gdProject,
   fileMetadata: FileMetadata,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   onProgress: (number, number) => void,
 |}): Promise<{ erroredResources: Array<empty> }> => {

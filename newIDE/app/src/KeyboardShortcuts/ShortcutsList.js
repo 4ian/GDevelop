@@ -124,10 +124,11 @@ const ShortcutsList = (props: Props): React.Node => {
             <Text size="block-title">
               {props.i18n._(commandAreas[areaName])}
             </Text>
-            {/* $FlowFixMe[missing-local-annot] */}
-            {areaWiseCommands[areaName].map(commandName => {
+            {areaWiseCommands[areaName].map((commandName: string) => {
               // Get default and user-set shortcuts
+              // $FlowFixMe[incompatible-type]
               const userShortcut = props.userShortcutMap[commandName];
+              // $FlowFixMe[incompatible-type]
               const defaultShortcut = defaultShortcuts[commandName] || '';
               const shortcutString = getPatchedShortcutString(
                 defaultShortcut,
@@ -145,10 +146,13 @@ const ShortcutsList = (props: Props): React.Node => {
                   i18n={props.i18n}
                   key={commandName}
                   shortcutString={shortcutDisplayName}
+                  // $FlowFixMe[incompatible-type]
                   commandName={commandName}
                   isDefault={shortcutString === defaultShortcut}
                   isClashing={hasClash}
+                  // $FlowFixMe[incompatible-type]
                   onEditShortcut={() => setEditedShortcut(commandName)}
+                  // $FlowFixMe[incompatible-type]
                   onResetShortcut={() => resetShortcut(commandName)}
                 />
               );

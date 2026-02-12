@@ -18,7 +18,6 @@ import RaisedButton from '../../../UI/RaisedButton';
 import { getBase64FromFile } from './CreateIosCertificateSteps';
 
 type Props = {
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
 };
 

@@ -110,7 +110,7 @@ export const CollapsibleSubPanel = ({
   titleIcon?: ?React.Node,
   title: string,
   titleBarButtons?: Array<TitleBarButton>,
-|}) => (
+|}): React.Node => (
   <Paper background="medium">
     <Line expand>
       <ColumnStackLayout noMargin expand noOverflowParent>
@@ -175,7 +175,7 @@ export const TopLevelCollapsibleSection = ({
   noContentMargin?: boolean,
   onOpenFullEditor?: () => void,
   onAdd?: (() => void) | null,
-|}) => (
+|}): React.Node => (
   <>
     <Separator />
     <Column noOverflowParent>

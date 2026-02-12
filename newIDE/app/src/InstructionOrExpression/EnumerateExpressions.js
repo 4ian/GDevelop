@@ -236,10 +236,9 @@ export const enumerateAllExpressions = (
       };
 
       if (!shouldOnlyBeNumberType(type))
-        // $FlowFixMe[method-unbinding]
-        objectsExpressions.push.apply(
-          objectsExpressions,
-          enumerateExpressionMetadataMap(
+        // $FlowFixMe[incompatible-type]
+        objectsExpressions.push(
+          ...enumerateExpressionMetadataMap(
             prefix,
             // $FlowFixMe[incompatible-use]
             extension.getAllStrExpressionsForObject(objectType),
@@ -247,10 +246,9 @@ export const enumerateAllExpressions = (
             scope
           )
         );
-      // $FlowFixMe[method-unbinding]
-      objectsExpressions.push.apply(
-        objectsExpressions,
-        enumerateExpressionMetadataMap(
+      // $FlowFixMe[incompatible-type]
+      objectsExpressions.push(
+        ...enumerateExpressionMetadataMap(
           prefix,
           // $FlowFixMe[incompatible-use]
           extension.getAllExpressionsForObject(objectType),
@@ -275,10 +273,9 @@ export const enumerateAllExpressions = (
       };
 
       if (!shouldOnlyBeNumberType(type))
-        // $FlowFixMe[method-unbinding]
-        behaviorsExpressions.push.apply(
-          behaviorsExpressions,
-          enumerateExpressionMetadataMap(
+        // $FlowFixMe[incompatible-type]
+        behaviorsExpressions.push(
+          ...enumerateExpressionMetadataMap(
             prefix,
             // $FlowFixMe[incompatible-use]
             extension.getAllStrExpressionsForBehavior(behaviorType),
@@ -286,10 +283,9 @@ export const enumerateAllExpressions = (
             scope
           )
         );
-      // $FlowFixMe[method-unbinding]
-      behaviorsExpressions.push.apply(
-        behaviorsExpressions,
-        enumerateExpressionMetadataMap(
+      // $FlowFixMe[incompatible-type]
+      behaviorsExpressions.push(
+        ...enumerateExpressionMetadataMap(
           prefix,
           // $FlowFixMe[incompatible-use]
           extension.getAllExpressionsForBehavior(behaviorType),

@@ -48,6 +48,8 @@ import TileMapPaintingPreview, {
 } from './TileMapPaintingPreview';
 import {
   getTileIdFromGridCoordinates,
+  getGridCoordinatesFromTileId,
+  createSelectionWithPreviousTool,
   type TileMapTileSelection,
   isTileMapPaintingSelection,
 } from './TileSetVisualizer';
@@ -186,6 +188,7 @@ export default class InstancesEditor extends Component<Props, State> {
   contextMenuLongTouchTimeoutID: TimeoutID;
   hasCursorMovedSinceItIsDown = false;
   _showObjectInstancesIn3D: boolean = false;
+  _previousToolBeforePicker: ?TileMapTileSelection = null;
 
   state = {
     renderingError: null,
@@ -198,12 +201,27 @@ export default class InstancesEditor extends Component<Props, State> {
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps: Props) {
     // Initialize the PIXI renderer, if not already done.
     // This can happen if canvasArea was not rendered
     // just after the mount (depends on react-dnd versions?).
     if (this.canvasArea && !this.pixiRenderer) {
       this._initializeCanvasAndRenderer();
+    }
+
+    // Track previous tool before picker is activated
+    const { tileMapTileSelection } = this.props;
+    const prevTileMapTileSelection = prevProps.tileMapTileSelection;
+
+    const isPickerActive = tileMapTileSelection?.kind === 'picker';
+    const wasPickerActive = prevTileMapTileSelection?.kind === 'picker';
+
+    if (isPickerActive && !wasPickerActive) {
+      // Picker just activated, store the previous tool
+      this._previousToolBeforePicker = prevTileMapTileSelection;
+    } else if (!isPickerActive && wasPickerActive) {
+      // Picker just deactivated, clear the stored previous tool
+      this._previousToolBeforePicker = null;
     }
   }
 
@@ -877,6 +895,40 @@ export default class InstancesEditor extends Component<Props, State> {
       );
 
       let shouldTrimAfterOperations = false;
+
+      // Handle picker tool: select the tile that was clicked on the scene
+      if (tileMapTileSelection.kind === 'picker') {
+        if (tileMapGridCoordinates.length === 0) return;
+        const { topLeftCorner } = tileMapGridCoordinates[0];
+
+        const clickX = topLeftCorner.x;
+        const clickY = topLeftCorner.y;
+
+        const layer = editableTileMap.getTileLayer(0);
+        if (!layer) return;
+
+        // Get the tile ID at the clicked position
+        const tileId = layer.getTileId(clickX, clickY);
+
+        // If there's no tile at this position, do nothing
+        if (tileId === -1) return;
+
+        // Convert the tile ID to tileset grid coordinates
+        const tilesetCoordinates = getGridCoordinatesFromTileId({
+          id: tileId,
+          columnCount: tileSet.columnCount,
+        });
+
+        // Select this tile in the tileset and restore the previous tool
+        const newSelection = createSelectionWithPreviousTool(
+          this._previousToolBeforePicker,
+          [tilesetCoordinates, tilesetCoordinates],
+          { horizontal: false, vertical: false }
+        );
+        this.props.onSelectTileMapTile(newSelection);
+
+        return;
+      }
 
       if (tileMapTileSelection.kind === 'floodfill') {
         // Flood fill: get the single clicked grid coordinate.

@@ -247,6 +247,41 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
     );
     const x = Math.floor(coordinatesInTileMapGrid[0] / tileSize);
     const y = Math.floor(coordinatesInTileMapGrid[1] / tileSize);
+
+    // For multi-tile freehand/brush selections, expand to show all tiles in the selection
+    if (
+      tileMapTileSelection.kind === 'freehand' &&
+      !isSelectionASingleTileRectangle(tileMapTileSelection)
+    ) {
+      const selectionTopLeftCorner = tileMapTileSelection.coordinates[0];
+      const selectionBottomRightCorner = tileMapTileSelection.coordinates[1];
+      const selectionWidth =
+        selectionBottomRightCorner.x - selectionTopLeftCorner.x + 1;
+      const selectionHeight =
+        selectionBottomRightCorner.y - selectionTopLeftCorner.y + 1;
+
+      const tilesCoordinatesInTileMapGrid: TileMapTilePatch[] = [];
+      for (let dx = 0; dx < selectionWidth; dx++) {
+        for (let dy = 0; dy < selectionHeight; dy++) {
+          const tileCoordinates = getTileCorrespondingToFlippingInstructions({
+            tileMapTileSelection,
+            tileCoordinates: {
+              x: selectionTopLeftCorner.x + dx,
+              y: selectionTopLeftCorner.y + dy,
+            },
+          });
+          tilesCoordinatesInTileMapGrid.push({
+            erase: false,
+            tileCoordinates,
+            topLeftCorner: { x: x + dx, y: y + dy },
+            bottomRightCorner: { x: x + dx, y: y + dy },
+          });
+        }
+      }
+      return tilesCoordinatesInTileMapGrid;
+    }
+
+    // Single tile, rectangle, floodfill, or erase mode
     let tileCoordinates;
     if (isTileMapPaintingSelection(tileMapTileSelection)) {
       const topLeftCorner = tileMapTileSelection.coordinates[0];

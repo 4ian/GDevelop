@@ -439,7 +439,6 @@ export default class InstancesEditor extends Component<Props, State> {
     });
 
     this._instancesAdder = new InstancesAdder({
-      project: this.props.project,
       instances: this.props.initialInstances,
       instancesEditorSettings: this.props.instancesEditorSettings,
     });

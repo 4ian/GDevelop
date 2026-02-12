@@ -278,6 +278,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         type: 'primary',
         noTitleBar: true,
         renderEditor: () => (
+          // $FlowFixMe[incompatible-type]
           <ResourcesList
             project={project}
             fileMetadata={fileMetadata}
@@ -285,6 +286,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
             onRenameResource={onRenameResource}
             onSelectResource={this._onResourceSelected}
             selectedResource={selectedResource}
+            // $FlowFixMe[missing-local-annot]
             ref={resourcesList => (this._resourcesList = resourcesList)}
             onRemoveUnusedResources={this._removeUnusedResources}
             onRemoveAllResourcesWithInvalidPath={
@@ -303,11 +305,13 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         <PreferencesContext.Consumer>
           {({ getDefaultEditorMosaicNode, setDefaultEditorMosaicNode }) => (
             <EditorMosaic
+              // $FlowFixMe[incompatible-type]
               editors={editors}
               centralNodeId="resources-list"
               ref={editorMosaic => (this.editorMosaic = editorMosaic)}
               initialNodes={
                 getDefaultEditorMosaicNode('resources-editor') ||
+                // $FlowFixMe[incompatible-type]
                 initialMosaicEditorNodes
               }
               onOpenedEditorsChanged={this.updateToolbar}

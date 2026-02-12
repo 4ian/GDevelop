@@ -153,6 +153,7 @@ const HomePageMenuBar = ({
                   }}
                   key={id}
                 >
+                  {/* $FlowFixMe[incompatible-type] */}
                   <IconButton
                     color="inherit"
                     disableRipple

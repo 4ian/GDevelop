@@ -933,11 +933,7 @@ storiesOf('UI Building Blocks/HelpButton', module)
 // $FlowFixMe[invalid-export]
 storiesOf('UI Building Blocks/HelpIcon', module)
   .addDecorator(paperDecorator)
-  .add('default (wiki path)', () => <HelpIcon helpPagePath="/test" />)
-  .add('absolute URL (custom help)', () => (
-    <HelpIcon helpPagePath="https://example.com/custom-help" />
-  ))
-  .add('small size', () => <HelpIcon helpPagePath="/test" size="small" />);
+  .add('default', () => <HelpIcon helpPagePath="/test" />);
 
 // $FlowFixMe[invalid-export]
 storiesOf('PropertiesEditor', module)
@@ -1107,6 +1103,7 @@ storiesOf('ParameterFields', module)
           }
           value={value}
           onChange={onChange}
+          // $FlowFixMe[incompatible-type]
           parameterRenderingService={ParameterRenderingService}
         />
       )}
@@ -1131,6 +1128,7 @@ storiesOf('ParameterFields', module)
           }
           value={value}
           onChange={onChange}
+          // $FlowFixMe[incompatible-type]
           parameterRenderingService={ParameterRenderingService}
         />
       )}
@@ -1153,6 +1151,7 @@ storiesOf('ParameterFields', module)
           }
           value={value}
           onChange={onChange}
+          // $FlowFixMe[incompatible-type]
           parameterRenderingService={ParameterRenderingService}
         />
       )}

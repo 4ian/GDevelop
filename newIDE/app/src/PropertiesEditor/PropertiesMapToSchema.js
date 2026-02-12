@@ -36,11 +36,14 @@ const createField = (
     value: boolean
   ) => void,
   defaultValue: string | null,
-  object: ?gdObject,
-  showcaseNonDefaultValues: boolean
+  getProperties: (instance: Instance) => any,
+  object: ?gdObject
 ): ?Field => {
-  const propertyName = property.getLabel();
+  const propertyDescription = property.getDescription();
   const getLabel = (instance: Instance) => {
+    const propertyName = getProperties(instance)
+      .get(name)
+      .getLabel();
     if (propertyName) return propertyName;
     return (
       name.charAt(0).toUpperCase() +
@@ -50,27 +53,17 @@ const createField = (
         .join(' ')
     );
   };
-  const propertyDescription = property.getDescription();
   const getDescription = () => propertyDescription;
-
-  const measurementUnit = property.getMeasurementUnit();
-  // TODO Pass this object in the schema instead of building an UI element here.
-  // It will allow to use these data to make a different component for the
-  // compact and regular UI.
-  const enumeratedMeasurementUnit = {
-    shortLabel: getMeasurementUnitShortLabel(measurementUnit),
-    label: measurementUnit.getLabel(),
-    description: measurementUnit.getDescription(),
-    elementsWithWords: measurementUnit.getElementsWithWords(),
-  };
   const getEndAdornment = (instance: Instance) => {
+    const property = getProperties(instance).get(name);
+    const measurementUnit = property.getMeasurementUnit();
     return {
-      label: enumeratedMeasurementUnit.shortLabel,
+      label: getMeasurementUnitShortLabel(measurementUnit),
       tooltipContent: (
         <MeasurementUnitDocumentation
-          label={enumeratedMeasurementUnit.label}
-          description={enumeratedMeasurementUnit.description}
-          elementsWithWords={enumeratedMeasurementUnit.elementsWithWords}
+          label={measurementUnit.getLabel()}
+          description={measurementUnit.getDescription()}
+          elementsWithWords={measurementUnit.getElementsWithWords()}
         />
       ),
     };
@@ -81,30 +74,16 @@ const createField = (
     ? 'advanced'
     : 'basic';
 
-  const getValueForString = (instance: Instance): string =>
-    getStringValue(instance, name);
-  const getValueForNumber = (instance: Instance): number =>
-    getNumberValue(instance, name);
-  const defaultValueNumber =
-    defaultValue !== null ? parseFloat(defaultValue) || 0 : null;
-  const isHighlightedForNumber = (instance: gdInitialInstance) => {
-    return (
-      showcaseNonDefaultValues &&
-      getValueForNumber(instance) !== defaultValueNumber
-    );
-  };
-  const isHighlightedForString = (instance: gdInitialInstance) => {
-    return (
-      showcaseNonDefaultValues && getValueForString(instance) !== defaultValue
-    );
-  };
-
   const valueType = property.getType().toLowerCase();
   if (valueType === 'number') {
+    const defaultValueNumber =
+      defaultValue !== null ? parseFloat(defaultValue) || 0 : null;
+    const getValue = (instance: Instance): number =>
+      getNumberValue(instance, name);
     const getEndAdornmentIcon =
       defaultValueNumber !== null
         ? (instance: gdInitialInstance) => {
-            return getValueForNumber(instance) === defaultValueNumber
+            return getValue(instance) === defaultValueNumber
               ? null
               : // $FlowFixMe[missing-local-annot]
                 className => <Restore className={className} />;
@@ -123,7 +102,7 @@ const createField = (
     return {
       name,
       valueType,
-      getValue: getValueForNumber,
+      getValue,
       setValue,
       defaultValue: defaultValueNumber,
       getLabel,
@@ -137,13 +116,12 @@ const createField = (
       getEndAdornmentIcon,
       onClickEndAdornment,
       visibility,
-      isHighlighted: isHighlightedForNumber,
     };
   } else if (valueType === 'string' || valueType === '') {
     return {
       name,
       valueType: 'string',
-      getValue: getValueForString,
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
         setStringValue(instance, name, newValue);
       },
@@ -152,25 +130,21 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
-      isHighlighted: isHighlightedForString,
     };
   } else if (valueType === 'boolean') {
-    const defaultValueBoolean = defaultValue ? defaultValue === 'true' : null;
-    const getValue = (instance: Instance): boolean =>
-      getBooleanValue(instance, name);
     return {
       name,
       valueType,
-      getValue,
+      getValue: (instance: Instance): boolean =>
+        getBooleanValue(instance, name),
       setValue: (instance: Instance, newValue: boolean) => {
         setBooleanValue(instance, name, newValue);
       },
-      defaultValue: defaultValueBoolean,
+      defaultValue: defaultValue ? defaultValue === 'true' : null,
       getLabel,
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
-      isHighlighted: isHighlightedForString,
     };
   } else if (valueType === 'choice' || valueType === 'numberwithchoices') {
     // Choice is a "string" (with a selector for the user in the UI)
@@ -193,37 +167,20 @@ const createField = (
       .toJSArray()
       .map(value => ({ value, label: value }));
 
-    return valueType === 'numberwithchoices'
-      ? // $FlowFixMe[incompatible-type]
-        {
-          name,
-          valueType: 'number',
-          getChoices: () => [...choices, ...deprecatedChoices],
-          getValue: getValueForNumber,
-          setValue: (instance: Instance, newValue: number) => {
-            setNumberValue(instance, name, newValue);
-          },
-          getLabel,
-          getDescription,
-          hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
-          visibility,
-          isHighlighted: isHighlightedForNumber,
-        }
-      : // $FlowFixMe[incompatible-type]
-        {
-          name,
-          valueType: 'string',
-          getChoices: () => [...choices, ...deprecatedChoices],
-          getValue: getValueForString,
-          setValue: (instance: Instance, newValue: string) => {
-            setStringValue(instance, name, newValue);
-          },
-          getLabel,
-          getDescription,
-          hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
-          visibility,
-          isHighlighted: isHighlightedForString,
-        };
+    // $FlowFixMe[incompatible-type]
+    return {
+      name,
+      valueType: 'string',
+      getChoices: () => [...choices, ...deprecatedChoices],
+      getValue: (instance: Instance): string => getStringValue(instance, name),
+      setValue: (instance: Instance, newValue: string) => {
+        setStringValue(instance, name, newValue);
+      },
+      getLabel,
+      getDescription,
+      hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
+      visibility,
+    };
   } else if (valueType === 'behavior') {
     const behaviorType =
       property.getExtraInfo().size() > 0 ? property.getExtraInfo().at(0) : '';
@@ -253,14 +210,13 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
-      isHighlighted: isHighlightedForString,
     };
   } else if (valueType === 'leaderboardid') {
     // LeaderboardId is a "string" (with a selector in the UI)
     return {
       name,
       valueType: 'leaderboardId',
-      getValue: getValueForString,
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
         setStringValue(instance, name, newValue);
       },
@@ -268,7 +224,6 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
-      isHighlighted: isHighlightedForString,
     };
   } else if (valueType === 'resource') {
     // Resource is a "string" (with a selector in the UI)
@@ -279,7 +234,7 @@ const createField = (
       name,
       valueType: 'resource',
       resourceKind: kind,
-      getValue: getValueForString,
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
         setStringValue(instance, name, newValue);
       },
@@ -287,13 +242,12 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
-      isHighlighted: isHighlightedForString,
     };
   } else if (valueType === 'color') {
     return {
       name,
       valueType: 'color',
-      getValue: getValueForString,
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
         setStringValue(instance, name, newValue);
       },
@@ -301,13 +255,12 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
-      isHighlighted: isHighlightedForString,
     };
   } else if (valueType === 'multilinestring') {
     return {
       name,
       valueType: 'multilinestring',
-      getValue: getValueForString,
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
         setStringValue(instance, name, newValue);
       },
@@ -315,7 +268,6 @@ const createField = (
       getDescription,
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
-      isHighlighted: isHighlightedForString,
     };
   } else if (valueType === 'objectanimationname') {
     // $FlowFixMe[incompatible-type]
@@ -342,14 +294,13 @@ const createField = (
       },
       name,
       valueType: 'string',
-      getValue: getValueForString,
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
         setStringValue(instance, name, newValue);
       },
       getLabel,
       getDescription,
       visibility,
-      isHighlighted: isHighlightedForString,
     };
   } else if (valueType === 'keyboardkey') {
     // $FlowFixMe[incompatible-type]
@@ -364,14 +315,13 @@ const createField = (
       },
       name,
       valueType: 'string',
-      getValue: getValueForString,
+      getValue: (instance: Instance): string => getStringValue(instance, name),
       setValue: (instance: Instance, newValue: string) => {
         setStringValue(instance, name, newValue);
       },
       getLabel,
       getDescription,
       visibility,
-      isHighlighted: isHighlightedForString,
     };
   } else {
     console.error(
@@ -487,18 +437,18 @@ type CommonProps = {|
     | gdPropertiesContainer
     | gdMapStringPropertyDescriptor
     | null,
+  getProperties: (instance: Instance) => any,
   object?: ?gdObject,
   visibility?: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick',
   quickCustomizationVisibilities?: gdQuickCustomizationVisibilitiesContainer,
-  showcaseNonDefaultValues?: boolean,
 |};
 
 export const effectPropertiesMapToSchema = ({
   defaultValueProperties,
+  getProperties,
   object,
   visibility = 'All',
   quickCustomizationVisibilities,
-  showcaseNonDefaultValues,
 }: {
   ...CommonProps,
   defaultValueProperties: gdMapStringPropertyDescriptor,
@@ -506,10 +456,10 @@ export const effectPropertiesMapToSchema = ({
   return adaptablePropertiesMapToSchema({
     properties: defaultValueProperties,
     defaultValueProperties,
+    getProperties,
     object,
     visibility,
     quickCustomizationVisibilities,
-    showcaseNonDefaultValues,
     getNumberValue: (instance: Instance, propertyName: string): number =>
       instance.hasDoubleParameter(propertyName)
         ? instance.getDoubleParameter(propertyName)
@@ -554,15 +504,13 @@ export const effectPropertiesMapToSchema = ({
 const propertiesMapToSchema = ({
   properties,
   defaultValueProperties,
-  getPropertyValue,
+  getProperties,
   onUpdateProperty,
   object,
   visibility = 'All',
   quickCustomizationVisibilities,
-  showcaseNonDefaultValues,
 }: {
   ...CommonProps,
-  getPropertyValue: (instance: Instance, propertyName: string) => string,
   properties: gdMapStringPropertyDescriptor,
   onUpdateProperty: (
     instance: Instance,
@@ -573,19 +521,30 @@ const propertiesMapToSchema = ({
   return adaptablePropertiesMapToSchema({
     properties,
     defaultValueProperties,
+    getProperties,
     object,
     visibility,
     quickCustomizationVisibilities,
-    showcaseNonDefaultValues,
     getNumberValue: (instance: Instance, propertyName: string): number => {
-      // Consider a missing value as 0 to avoid propagating NaN.
-      return parseFloat(getPropertyValue(instance, propertyName)) || 0;
+      return (
+        parseFloat(
+          getProperties(instance)
+            .get(propertyName)
+            .getValue()
+        ) || 0
+      ); // Consider a missing value as 0 to avoid propagating NaN.
     },
     getStringValue: (instance: Instance, propertyName: string): string => {
-      return getPropertyValue(instance, propertyName);
+      return getProperties(instance)
+        .get(propertyName)
+        .getValue();
     },
     getBooleanValue: (instance: Instance, propertyName: string): boolean => {
-      return getPropertyValue(instance, propertyName) === 'true';
+      return (
+        getProperties(instance)
+          .get(propertyName)
+          .getValue() === 'true'
+      );
     },
     setNumberValue: (instance: Instance, propertyName: string, value: number) =>
       onUpdateProperty(instance, propertyName, '' + value),
@@ -602,10 +561,10 @@ const propertiesMapToSchema = ({
 const adaptablePropertiesMapToSchema = ({
   properties,
   defaultValueProperties,
+  getProperties,
   object,
   visibility = 'All',
   quickCustomizationVisibilities,
-  showcaseNonDefaultValues,
   getNumberValue,
   getStringValue,
   getBooleanValue,
@@ -736,8 +695,8 @@ const adaptablePropertiesMapToSchema = ({
               setStringValue,
               setBooleanValue,
               rowPropertyDefaultValue,
-              object,
-              !!showcaseNonDefaultValues
+              getProperties,
+              object
             );
 
             if (field) {
@@ -772,8 +731,8 @@ const adaptablePropertiesMapToSchema = ({
             ? defaultValueProperties.get(name).getValue()
             : ''
           : null,
-        object,
-        !!showcaseNonDefaultValues
+        getProperties,
+        object
       );
     }
     if (field) {

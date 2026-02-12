@@ -487,6 +487,7 @@ const ResourceSelector: React.ComponentType<{
                 helperMarkdownText={props.helperMarkdownText}
                 hintText={props.hintText}
                 openOnFocus
+                // $FlowFixMe[incompatible-type]
                 dataSource={autoCompleteData}
                 value={resourceName}
                 onChange={onChangeResourceName}

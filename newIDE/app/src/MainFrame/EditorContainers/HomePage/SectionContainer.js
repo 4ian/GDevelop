@@ -167,6 +167,7 @@ const SectionContainer: React.ComponentType<{
                           <Chip label={chipText} style={styles.chip} />
                         </Line>
                       )}
+                      {/* $FlowFixMe[incompatible-type] */}
                       <Text size="title" noMargin style={styles.title}>
                         {title}
                       </Text>

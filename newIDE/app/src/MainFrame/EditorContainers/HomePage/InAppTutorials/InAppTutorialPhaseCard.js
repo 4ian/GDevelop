@@ -152,6 +152,7 @@ const InAppTutorialPhaseCard = ({
                     noMargin
                     color="primary"
                     align="left"
+                    // $FlowFixMe[incompatible-type]
                     style={getTextStyle(shouldTextBeDisabled)}
                   >
                     {i18n._(title)}
@@ -173,6 +174,7 @@ const InAppTutorialPhaseCard = ({
                             key={`key-point-${index}`}
                             size="body2"
                             noMargin
+                            // $FlowFixMe[incompatible-type]
                             style={getTextStyle(shouldTextBeDisabled)}
                             color="secondary"
                             displayAsListItem

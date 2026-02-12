@@ -165,7 +165,7 @@ export const CompactPropertiesEditorByVisibility = ({
   instances: Instances,
   preventWrap?: boolean,
   removeSpacers?: boolean,
-  customizeBasicSchema?: (Schema => Schema) | null,
+  customizeBasicSchema?: Schema => Schema,
   placeholder: React.Node,
   onRefreshAllFields: () => void,
 

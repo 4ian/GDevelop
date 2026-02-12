@@ -69,6 +69,7 @@ function InAppTutorialDialog({
           title={null} // Specific end dialog where the title is handled by the content.
           onApply={onApply}
           open
+          // $FlowFixMe[incompatible-type]
           actions={actions}
           maxWidth="sm"
           flexColumnBody

@@ -441,6 +441,7 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
                   onChange={onChange}
                   onRequestClose={onRequestClose}
                   onApply={onApply}
+                  // $FlowFixMe[incompatible-type]
                   dataSource={[
                     ...autocompletionVariableNames,
                     onOpenDialog

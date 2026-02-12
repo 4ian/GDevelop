@@ -2049,7 +2049,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               onKeyDown={this._keyboardShortcuts.onKeyDown}
               onKeyUp={this._keyboardShortcuts.onKeyUp}
               onDragOver={this._keyboardShortcuts.onDragOver}
-              onBlur={this._keyboardShortcuts.resetModifiers}
               ref={this._containerDiv}
               tabIndex={0}
             >

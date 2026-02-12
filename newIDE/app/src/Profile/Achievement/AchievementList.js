@@ -91,8 +91,10 @@ const AchievementList = ({ badges, achievements }: Props): React.Node => {
                       size="sub-title"
                       style={
                         achievementWithBadgeData.unlockedAt
-                          ? styles.unlockedAchievement
-                          : styles.lockedAchievement
+                          ? // $FlowFixMe[incompatible-type]
+                            styles.unlockedAchievement
+                          : // $FlowFixMe[incompatible-type]
+                            styles.lockedAchievement
                       }
                     >
                       {selectMessageByLocale(
@@ -105,8 +107,10 @@ const AchievementList = ({ badges, achievements }: Props): React.Node => {
                     noMargin
                     style={
                       achievementWithBadgeData.unlockedAt
-                        ? styles.unlockedAchievement
-                        : styles.lockedAchievement
+                        ? // $FlowFixMe[incompatible-type]
+                          styles.unlockedAchievement
+                        : // $FlowFixMe[incompatible-type]
+                          styles.lockedAchievement
                     }
                     size="body2"
                   >

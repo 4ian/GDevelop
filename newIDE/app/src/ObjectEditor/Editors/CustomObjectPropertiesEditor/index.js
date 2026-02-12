@@ -439,11 +439,7 @@ const CustomObjectPropertiesEditor = (props: Props): React.Node => {
         defaultValueProperties: customObjectEventsBasedObject
           ? customObjectEventsBasedObject.getPropertyDescriptors()
           : null,
-        getPropertyValue: (instance, name) =>
-          instance
-            .getProperties()
-            .get(name)
-            .getValue(),
+        getProperties: instance => instance.getProperties(),
         onUpdateProperty: (instance, name, value) => {
           instance.updateProperty(name, value);
         },

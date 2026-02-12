@@ -71,7 +71,6 @@ import ObjectEffectNameField from './ParameterFields/ObjectEffectNameField';
 import ObjectEffectParameterNameField from './ParameterFields/ObjectEffectParameterNameField';
 import ObjectPointNameField from './ParameterFields/ObjectPointNameField';
 import ObjectAnimationNameField from './ParameterFields/ObjectAnimationNameField';
-import ObjectSkinNameField from './ParameterFields/ObjectSkinNameField';
 import FunctionParameterNameField from './ParameterFields/FunctionParameterNameField';
 import ExternalLayoutNameField from './ParameterFields/ExternalLayoutNameField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
@@ -131,7 +130,6 @@ const components = {
   objectEffectParameterName: ObjectEffectParameterNameField,
   objectPointName: ObjectPointNameField,
   objectAnimationName: ObjectAnimationNameField,
-  objectSkinName: ObjectSkinNameField,
   functionParameterName: FunctionParameterNameField,
   externalLayoutName: ExternalLayoutNameField,
   leaderboardId: LeaderboardIdField,
@@ -200,7 +198,6 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   objectEffectParameterName: t`Object effect property name`,
   objectPointName: t`Object point name`,
   objectAnimationName: t`Object animation name`,
-  objectSkinName: t`Object skin name`,
   functionParameterName: t`Parameter name`,
   externalLayoutName: t`Name of the external layout`,
   identifier: t`Identifier`,

@@ -63,6 +63,7 @@ export const ProjectStructureItem = ({
   renderNestedItems,
 }: ProjectStructureItemProps): React.Node => {
   return (
+    // $FlowFixMe[incompatible-type]
     <ListItem
       id={id}
       open={open}
@@ -162,6 +163,7 @@ export const Item = ({
   );
 
   const label = editingName ? (
+    // $FlowFixMe[incompatible-type]
     <TextField
       id="rename-item-field"
       margin="none"

@@ -158,6 +158,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
         onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
         unsavedChanges={this.props.unsavedChanges}
         project={project}
+        // $FlowFixMe[incompatible-type]
         scope={scope}
         globalObjectsContainer={project.getObjects()}
         objectsContainer={layout.getObjects()}

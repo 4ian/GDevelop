@@ -359,8 +359,10 @@ const VariableRow = React.memo<VariableRowProps>(
                   >
                     <Line alignItems="center" noMargin expand>
                       {shouldWrap ? null : <Spacer />}
+                      {/* $FlowFixMe[incompatible-type] */}
                       <SimpleTextField
                         type="text"
+                        // $FlowFixMe[missing-local-annot]
                         ref={element => {
                           if (element) {
                             variableNameInputRefs.current[
@@ -431,6 +433,7 @@ const VariableRow = React.memo<VariableRowProps>(
                               {isInherited && !isTopLevel ? null : (
                                 <>
                                   <Spacer />
+                                  {/* $FlowFixMe[incompatible-type] */}
                                   <IconButton
                                     size="small"
                                     style={styles.inlineIcon}
@@ -460,7 +463,9 @@ const VariableRow = React.memo<VariableRowProps>(
                               )}
                             </Line>
                           ) : (
+                            // $FlowFixMe[incompatible-type]
                             <SimpleTextField
+                              // $FlowFixMe[missing-local-annot]
                               ref={element => {
                                 if (depth === 0 && element) {
                                   topLevelVariableValueInputRefs.current[
@@ -503,6 +508,7 @@ const VariableRow = React.memo<VariableRowProps>(
                         // and not for those who are in an inherited structure or array.
                         type === gd.Variable.String &&
                         !(isInherited && !isTopLevel) ? (
+                          // $FlowFixMe[incompatible-type]
                           <IconButton
                             size="small"
                             style={styles.inlineIcon}
@@ -522,6 +528,7 @@ const VariableRow = React.memo<VariableRowProps>(
                           </IconButton>
                         ) : null}
                         {isCollection && !isInherited ? (
+                          // $FlowFixMe[incompatible-type]
                           <IconButton
                             size="small"
                             style={styles.inlineIcon}
@@ -541,6 +548,7 @@ const VariableRow = React.memo<VariableRowProps>(
                           </IconButton>
                         ) : null}
                         {isCollection && isInherited && isTopLevel ? (
+                          // $FlowFixMe[incompatible-type]
                           <IconButton
                             size="small"
                             tooltip={t`Edit`}
@@ -560,6 +568,7 @@ const VariableRow = React.memo<VariableRowProps>(
                           </IconButton>
                         ) : null}
                         {overwritesInheritedVariable && isTopLevel ? (
+                          // $FlowFixMe[incompatible-type]
                           <IconButton
                             size="small"
                             tooltip={t`Reset`}

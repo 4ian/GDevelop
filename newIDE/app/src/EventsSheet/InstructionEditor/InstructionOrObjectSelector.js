@@ -787,6 +787,7 @@ const InstructionOrObjectSelector: React.ComponentType<{
                 getItemHeight={getTreeViewItemHeight}
                 getItemName={getTreeViewItemName}
                 shouldApplySearchToItem={shouldApplySearchToItem}
+                // $FlowFixMe[incompatible-type]
                 getItemDescription={getTreeViewItemDescription}
                 forceAllOpened={!!currentlyRunningInAppTutorial}
                 getItemId={getTreeViewItemId}
@@ -867,6 +868,7 @@ const InstructionOrObjectSelector: React.ComponentType<{
         >
           <AutoSizer style={styles.treeViewAutoSizer} disableWidth>
             {({ height }) => (
+              // $FlowFixMe[incompatible-type]
               <ReadOnlyTreeView
                 key="free-instructions"
                 ref={freeInstructionTreeViewRef}
@@ -875,6 +877,7 @@ const InstructionOrObjectSelector: React.ComponentType<{
                 getItemHeight={getTreeViewItemHeight}
                 getItemName={getTreeViewItemName}
                 shouldApplySearchToItem={() => false}
+                // $FlowFixMe[incompatible-type]
                 getItemDescription={getTreeViewItemDescription}
                 getItemId={getTreeViewItemId}
                 getItemHtmlId={getTreeViewItemHtmlId}

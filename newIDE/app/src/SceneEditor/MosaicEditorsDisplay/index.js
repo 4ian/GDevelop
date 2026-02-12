@@ -545,9 +545,11 @@ const MosaicEditorsDisplay: React.ComponentType<{
 
     return (
       <EditorMosaic
+        // $FlowFixMe[incompatible-type]
         editors={editors}
         centralNodeId="instances-editor"
         initialNodes={
+          // $FlowFixMe[incompatible-type]
           getDefaultEditorMosaicNode('scene-editor') || initialMosaicEditorNodes
         }
         isTransparent={gameEditorMode === 'embedded-game'}

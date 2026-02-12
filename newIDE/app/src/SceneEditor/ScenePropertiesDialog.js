@@ -165,11 +165,7 @@ const ScenePropertiesDialog = ({
         defaultValueProperties: behaviorMetadata
           ? behaviorMetadata.getSharedProperties()
           : null,
-        getPropertyValue: (sharedDataContent, name) =>
-          behaviorSharedData
-            .getProperties()
-            .get(name)
-            .getValue(),
+        getProperties: sharedDataContent => behaviorSharedData.getProperties(),
         onUpdateProperty: (sharedDataContent, name, value) => {
           behaviorSharedData.updateProperty(name, value);
         },
@@ -257,6 +253,7 @@ const ScenePropertiesDialog = ({
   return (
     <Dialog
       title={<Trans>{layout.getName()} properties</Trans>}
+      // $FlowFixMe[incompatible-type]
       actions={actions}
       secondaryActions={[
         <RaisedButton

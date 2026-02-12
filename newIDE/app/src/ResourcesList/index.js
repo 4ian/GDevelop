@@ -77,10 +77,11 @@ type Props = {|
   getResourceActionsSpecificToStorageProvider?: ?ResourcesActionsMenuBuilder,
 |};
 
-const ResourcesList: React.ComponentType<{
-  ...Props,
-  ref?: React.RefSetter<ResourcesListInterface>,
-}> = React.memo<Props, ResourcesListInterface>(
+const ResourcesList: React.ComponentType<Props> = React.memo<
+  Props,
+  // $FlowFixMe[incompatible-type]
+  ResourcesListInterface
+>(
   // $FlowFixMe[incompatible-type]
   // $FlowFixMe[incompatible-exact]
   React.forwardRef<Props, ResourcesListInterface>(

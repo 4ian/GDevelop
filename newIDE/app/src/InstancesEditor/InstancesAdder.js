@@ -6,14 +6,12 @@ import { type InstancesEditorSettings } from './InstancesEditorSettings';
 const gd: libGDevelop = global.gd;
 
 export const addSerializedInstances = ({
-  project,
   instancesContainer,
   copyReferential,
   serializedInstances,
   addInstancesInTheForeground = false,
   doesObjectExistInContext,
 }: {|
-  project: gdProject,
   instancesContainer: gdInitialInstancesContainer,
   copyReferential: [number, number],
   serializedInstances: Array<Object>,
@@ -31,12 +29,7 @@ export const addSerializedInstances = ({
   const newInstances = serializedInstances
     .map(serializedInstance => {
       const instance = new gd.InitialInstance();
-      unserializeFromJSObject(
-        instance,
-        serializedInstance,
-        'unserializeFrom',
-        project
-      );
+      unserializeFromJSObject(instance, serializedInstance);
       if (!doesObjectExistInContext(instance.getObjectName())) return null;
       instance.setX(instance.getX() - copyReferential[0]);
       instance.setY(instance.getY() - copyReferential[1]);
@@ -72,7 +65,6 @@ export const addSerializedInstances = ({
 };
 
 type Props = {|
-  project: gdProject,
   instances: gdInitialInstancesContainer,
   instancesEditorSettings: InstancesEditorSettings,
 |};
@@ -82,15 +74,13 @@ type Props = {|
  * which are real instances but can be deleted as long as they are not "committed".
  */
 export default class InstancesAdder {
-  _project: gdProject;
   _instances: gdInitialInstancesContainer;
   _temporaryInstances: Array<gdInitialInstance>;
   _instancesEditorSettings: InstancesEditorSettings;
   // $FlowFixMe[missing-local-annot]
   _zOrderFinder = (new gd.HighestZOrderFinder(): gdHighestZOrderFinder);
 
-  constructor({ project, instances, instancesEditorSettings }: Props) {
-    this._project = project;
+  constructor({ instances, instancesEditorSettings }: Props) {
     this._instances = instances;
     this._instancesEditorSettings = instancesEditorSettings;
     this._temporaryInstances = [];
@@ -114,7 +104,6 @@ export default class InstancesAdder {
     doesObjectExistInContext: string => boolean,
   |}): Array<gdInitialInstance> => {
     const instances = addSerializedInstances({
-      project: this._project,
       instancesContainer: this._instances,
       copyReferential,
       serializedInstances,

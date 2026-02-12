@@ -714,7 +714,6 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
 };
 
 // $FlowFixMe[incompatible-type]
-// $FlowFixMe[prop-missing]
 // $FlowFixMe[incompatible-exact]
 export default (React.forwardRef(ReadOnlyTreeView): React.ComponentType<{
   ...Props<any>,

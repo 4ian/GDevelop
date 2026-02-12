@@ -198,6 +198,7 @@ export const PublicGamePropertiesDialog = ({
   return (
     <Dialog
       title={publicGame.gameName}
+      // $FlowFixMe[incompatible-type]
       actions={actions}
       cannotBeDismissed={isLoading}
       onRequestClose={onClose}

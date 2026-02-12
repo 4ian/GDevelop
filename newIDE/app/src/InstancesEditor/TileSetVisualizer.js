@@ -561,17 +561,17 @@ const TileSetVisualizer = ({
             };
             // Preserve the previous selection kind (freehand/floodfill) or default to rectangle
             let newSelection: TileMapTileSelection;
-            const currentSelectionKind = tileMapTileSelection && tileMapTileSelection.kind;
             if (
-              currentSelectionKind === 'freehand' ||
-              currentSelectionKind === 'floodfill'
+              tileMapTileSelection &&
+              (tileMapTileSelection.kind === 'freehand' ||
+                tileMapTileSelection.kind === 'floodfill')
             ) {
-              newSelection = {
-                kind: currentSelectionKind,
-                coordinates: [topLeftCorner, bottomRightCorner],
+              newSelection = ({
+                kind: (tileMapTileSelection.kind: any),
+                coordinates: ([topLeftCorner, bottomRightCorner]: TileMapCoordinates[]),
                 flipHorizontally: shouldFlipHorizontally,
                 flipVertically: shouldFlipVertically,
-              };
+              }: TileMapTileSelection);
             } else {
               newSelection = {
                 kind: 'rectangle',
@@ -818,9 +818,12 @@ const TileSetVisualizer = ({
                     !!tileMapTileSelection &&
                     isTileMapPaintingSelection(tileMapTileSelection)
                   ) {
+                    const paintingSelection = tileMapTileSelection;
                     const selection: TileMapTileSelection = {
-                      ...tileMapTileSelection,
+                      kind: (paintingSelection.kind: any),
+                      coordinates: (paintingSelection.coordinates: TileMapCoordinates[]),
                       flipHorizontally: newShouldFlipHorizontally,
+                      flipVertically: paintingSelection.flipVertically,
                     };
                     onSelectTileMapTile(selection);
                   }
@@ -843,8 +846,11 @@ const TileSetVisualizer = ({
                     !!tileMapTileSelection &&
                     isTileMapPaintingSelection(tileMapTileSelection)
                   ) {
+                    const paintingSelection = tileMapTileSelection;
                     const selection: TileMapTileSelection = {
-                      ...tileMapTileSelection,
+                      kind: (paintingSelection.kind: any),
+                      coordinates: (paintingSelection.coordinates: TileMapCoordinates[]),
+                      flipHorizontally: paintingSelection.flipHorizontally,
                       flipVertically: newShouldFlipVertically,
                     };
                     onSelectTileMapTile(selection);

@@ -91,7 +91,7 @@ const MainPage = ({
   onOpenNewProjectSetupDialog,
   onSelectPrivateGameTemplateListingData,
   onSelectExampleShortHeader,
-}: Props) => {
+}: Props): React.Node => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const {
     palette: { type: paletteType },
@@ -131,6 +131,7 @@ const MainPage = ({
     description: React.Node,
     action: () => void,
     disabled?: boolean,
+    // $FlowFixMe[incompatible-type]
   }[] = [
     {
       title: <Trans>Documentation</Trans>,
@@ -206,6 +207,7 @@ const MainPage = ({
                         const courseListingData = listedCourses.find(
                           listedCourse => listedCourse.id === course.id
                         );
+                        // $FlowFixMe[incompatible-type]
                         return {
                           renderItem: () => (
                             <GridListTile key={course.id}>
@@ -222,7 +224,7 @@ const MainPage = ({
                           ),
                         };
                       })
-                    : new Array(6).fill(0).map((_, index) => ({
+                    : new Array<number>(6).fill(0).map((_, index) => ({
                         renderItem: () => (
                           <GridListTile key={`skeleton-course-${index}`}>
                             <CourseCard

@@ -4,7 +4,7 @@ import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import Grid from '@material-ui/core/Grid';
 import { I18n } from '@lingui/react';
-import { I18n as I18nType } from '@lingui/core';
+import type { I18n as I18nType } from '@lingui/core';
 import {
   getRecommendedMarketingPlan,
   listGameFeaturings,
@@ -123,7 +123,7 @@ const GameDashboard = ({
   onBack,
   disabled,
   initialWidgetToScrollTo,
-}: Props) => {
+}: Props): React.Node => {
   const grid = React.useRef<?HTMLDivElement>(null);
   const { isMobile } = useResponsiveWindowSize();
   const [widgetToScrollTo, setWidgetToScrollTo] = React.useState<?string>(
@@ -314,9 +314,11 @@ const GameDashboard = ({
         } else if (!lastWebBuildId) {
           // Game has no web build so far, do nothing.
         } else {
+          // $FlowFixMe[incompatible-type]
           publicWebBuildId = lastWebBuildId;
         }
       } else {
+        // $FlowFixMe[incompatible-type]
         publicWebBuildId = null;
       }
       updatedGame = await updateGame(
@@ -633,6 +635,7 @@ const GameDashboard = ({
               onApply={async properties => {
                 const updatedGame = await onUpdateGame(i18n, properties);
                 if (updatedGame) {
+                  // $FlowFixMe[incompatible-type]
                   updateProjectFromGameIfMatching(updatedGame, properties);
                 }
                 setGameDetailsDialogOpen(false);

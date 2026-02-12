@@ -162,6 +162,7 @@ export const optimizeTilesGridCoordinates = ({
       patchIndices.forEach(index => tileMapTilePatches.splice(index, 1));
     }
   }
+  // $FlowFixMe[incompatible-type]
   return newTileMapTilePatches;
 };
 
@@ -453,7 +454,7 @@ export const isTileSetBadlyConfigured = ({
   columnCount,
   tileSize,
   atlasImage,
-}: TileSet) => {
+}: TileSet): boolean => {
   return (
     !Number.isInteger(columnCount) ||
     columnCount <= 0 ||

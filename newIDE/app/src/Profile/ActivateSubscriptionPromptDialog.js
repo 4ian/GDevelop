@@ -21,7 +21,7 @@ const ActivateSubscriptionPromptDialog = ({
   bundleListingData,
   onActivateNow,
   onClose,
-}: Props) => {
+}: Props): null | React.Node => {
   // Get the subscription plan info from the first redemption code
   const planId =
     bundleListingData.includedRedemptionCodes &&

@@ -33,7 +33,7 @@ const PublicProfileDialog = ({
   onGameTemplateOpen,
   onGameOpen,
   onExampleOpen,
-}: Props) => {
+}: Props): React.Node => {
   const callbacks = React.useMemo(
     () => ({
       openAssetPack: onAssetPackOpen
@@ -70,7 +70,9 @@ const PublicProfileDialog = ({
 
   const onMessageReceived = React.useCallback(
     (data: GdGamesMessageEventData) => {
+      // $FlowFixMe[invalid-computed-prop]
       if (data.id && callbacks[data.id]) {
+        // $FlowFixMe[invalid-computed-prop]
         callbacks[data.id](data);
       }
     },

@@ -49,7 +49,8 @@ export type GameMetrics = {
   },
 };
 
-export const client = axios.create({
+// $FlowFixMe[cannot-resolve-name]
+export const client: Axios = axios.create({
   baseURL: GDevelopAnalyticsApi.baseUrl,
 });
 

@@ -45,7 +45,7 @@ const GameHeader = ({
   onEditGame,
   gameUrl,
   onPublishOnGdGames,
-}: Props) => {
+}: Props): React.Node => {
   useOnResize(useForceUpdate());
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

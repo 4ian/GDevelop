@@ -3,7 +3,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import { getAnnouncementContent } from '../AnnouncementFormatting';
 import { type Announcement } from '../../Utils/GDevelopServices/Announcement';
 
-// $FlowExpectedError
+// $FlowFixMe[incompatible-type]
 const makeFakeI18n = (): I18nType => ({
   _: message => message.id,
   language: 'en',

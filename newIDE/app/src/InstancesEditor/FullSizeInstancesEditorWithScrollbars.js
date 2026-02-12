@@ -35,7 +35,7 @@ type Props = {|
 
 const noop = () => {};
 
-const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
+const FullSizeInstancesEditorWithScrollbars = (props: Props): React.Node => {
   const { wrappedEditorRef, ...otherProps } = props;
   const { values } = React.useContext(PreferencesContext);
   const isMounted = useIsMounted();
@@ -210,6 +210,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
 
   // When the user releases the thumb, we need to stop listening to mouse move and up events.
   const makeMouseUpXThumbHandler = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     mouseMoveHandler =>
       function mouseUpHandler(e: MouseEvent) {
         isDragging.current = false;
@@ -225,6 +226,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
     [hideScrollbarsAfterDelay]
   );
   const makeMouseUpYThumbHandler = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     mouseMoveHandler =>
       function mouseUpHandler(e: MouseEvent) {
         isDragging.current = false;
@@ -419,11 +421,12 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
                     if (
                       // Flow says className is not present in ElementTarget but this piece
                       // of code cannot break.
-                      // $FlowFixMe
+                      // $FlowFixMe[incompatible-type]
+                      // $FlowFixMe[prop-missing]
                       relatedTarget.className &&
                       typeof relatedTarget.className === 'string' &&
                       // Hide only if the mouse is not leaving to go on one of the scrollbars' thumb.
-                      // $FlowFixMe
+                      // $FlowFixMe[incompatible-type]
                       !relatedTarget.className.includes(
                         'canvas-scrollbar-thumb'
                       )

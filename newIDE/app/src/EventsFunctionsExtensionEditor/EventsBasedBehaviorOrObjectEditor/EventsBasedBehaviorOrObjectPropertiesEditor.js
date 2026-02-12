@@ -94,8 +94,11 @@ const getValidatedPropertyName = (
 const getChoicesArray = (
   property: gdNamedPropertyDescriptor
 ): Array<Choice> => {
+  // $FlowFixMe[incompatible-exact]
   return mapVector(property.getChoices(), choice => ({
+    // $FlowFixMe[incompatible-use]
     value: choice.getValue(),
+    // $FlowFixMe[incompatible-use]
     label: choice.getLabel(),
   }));
 };
@@ -105,10 +108,14 @@ export type EventsBasedBehaviorPropertiesEditorInterface = {|
   getPropertyEditorRef: (propertyName: string) => React.ElementRef<any>,
 |};
 
-export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
-  Props,
-  EventsBasedBehaviorPropertiesEditorInterface
->(
+// $FlowFixMe[prop-missing]
+export const EventsBasedBehaviorPropertiesEditor: React.AbstractComponent<
+  {
+    ...Props,
+    +ref?: React.RefSetter<EventsBasedBehaviorPropertiesEditorInterface>,
+  },
+  React.RefSetter<EventsBasedBehaviorPropertiesEditorInterface>
+> = React.forwardRef<Props, EventsBasedBehaviorPropertiesEditorInterface>(
   (
     {
       project,
@@ -147,6 +154,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
         const property = properties.insertNew(newName, index);
         property.setType('Number');
         forceUpdate();
+        // $FlowFixMe[constant-condition]
         onPropertiesUpdated && onPropertiesUpdated();
         //setJustAddedPropertyName(newName);
       },
@@ -196,6 +204,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
       (property: gdNamedPropertyDescriptor, enable: boolean) => {
         property.setHidden(enable);
         forceUpdate();
+        // $FlowFixMe[constant-condition]
         onPropertiesUpdated && onPropertiesUpdated();
       },
       [forceUpdate, onPropertiesUpdated]
@@ -205,6 +214,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
       (property: gdNamedPropertyDescriptor, enable: boolean) => {
         property.setAdvanced(enable);
         forceUpdate();
+        // $FlowFixMe[constant-condition]
         onPropertiesUpdated && onPropertiesUpdated();
       },
       [forceUpdate, onPropertiesUpdated]
@@ -214,6 +224,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
       (property: gdNamedPropertyDescriptor, enable: boolean) => {
         property.setDeprecated(enable);
         forceUpdate();
+        // $FlowFixMe[constant-condition]
         onPropertiesUpdated && onPropertiesUpdated();
       },
       [forceUpdate, onPropertiesUpdated]
@@ -232,6 +243,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
             {properties.getCount() > 0 ? (
               <Column noMargin expand>
                 {mapVector(
+                  // $FlowFixMe[incompatible-exact]
                   properties.getAllPropertyFolderOrProperty(),
                   (
                     propertyFolderOrProperty: gdPropertyFolderOrProperty,
@@ -285,6 +297,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                       property.setName(validatedNewName);
 
                                       forceUpdate();
+                                      // $FlowFixMe[constant-condition]
                                       onPropertiesUpdated &&
                                         onPropertiesUpdated();
                                     }}
@@ -379,6 +392,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                     }
                                     forceUpdate();
                                     onPropertyTypeChanged(property.getName());
+                                    // $FlowFixMe[constant-condition]
                                     onPropertiesUpdated &&
                                       onPropertiesUpdated();
                                   }}
@@ -475,6 +489,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                         )
                                       );
                                       forceUpdate();
+                                      // $FlowFixMe[constant-condition]
                                       onPropertiesUpdated &&
                                         onPropertiesUpdated();
                                     }}
@@ -532,6 +547,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                     onChange={newValue => {
                                       property.setValue(newValue);
                                       forceUpdate();
+                                      // $FlowFixMe[constant-condition]
                                       onPropertiesUpdated &&
                                         onPropertiesUpdated();
                                     }}
@@ -557,6 +573,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                     onChange={(e, i, value) => {
                                       property.setValue(value);
                                       forceUpdate();
+                                      // $FlowFixMe[constant-condition]
                                       onPropertiesUpdated &&
                                         onPropertiesUpdated();
                                     }}
@@ -610,6 +627,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                         behaviorMetadata.getFullName()
                                       );
                                       forceUpdate();
+                                      // $FlowFixMe[constant-condition]
                                       onPropertiesUpdated &&
                                         onPropertiesUpdated();
                                     }}
@@ -630,6 +648,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                     onChange={color => {
                                       property.setValue(color);
                                       forceUpdate();
+                                      // $FlowFixMe[constant-condition]
                                       onPropertiesUpdated &&
                                         onPropertiesUpdated();
                                     }}
@@ -645,6 +664,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                     onChange={(e, i, value) => {
                                       setExtraInfoString(property, value);
                                       forceUpdate();
+                                      // $FlowFixMe[constant-condition]
                                       onPropertiesUpdated &&
                                         onPropertiesUpdated();
                                     }}
@@ -665,6 +685,7 @@ export const EventsBasedBehaviorPropertiesEditor = React.forwardRef<
                                     onChange={(e, i, value) => {
                                       property.setValue(value);
                                       forceUpdate();
+                                      // $FlowFixMe[constant-condition]
                                       onPropertiesUpdated &&
                                         onPropertiesUpdated();
                                     }}

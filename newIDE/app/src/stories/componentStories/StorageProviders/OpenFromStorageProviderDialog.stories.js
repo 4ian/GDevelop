@@ -12,7 +12,7 @@ export default {
   component: OpenFromStorageProviderDialogComponent,
 };
 
-export const OpenFromStorageProviderDialog = () => (
+export const OpenFromStorageProviderDialog = (): React.Node => (
   <OpenFromStorageProviderDialogComponent
     storageProviders={[LocalFileStorageProvider]}
     onChooseProvider={action('onChooseProvider')}

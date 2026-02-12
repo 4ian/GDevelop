@@ -53,12 +53,14 @@ export default class InstancesRenderer {
    * But, as only the last rendered container is used for interactions,
    * all layers are included in the last render call with an opacity of 0.
    */
+  // $FlowFixMe[value-as-type]
   pixiContainer: PIXI.Container;
 
   temporaryRectangle: Rectangle;
   instanceMeasurer: InstanceMeasurer;
 
-  _basicProfilingCounters = makeBasicProfilingCounters();
+  // $FlowFixMe[missing-local-annot]
+  _basicProfilingCounters = (makeBasicProfilingCounters(): BasicProfilingCounters);
 
   constructor({
     project,
@@ -179,11 +181,11 @@ export default class InstancesRenderer {
     };
   }
 
-  getPixiContainer() {
+  getPixiContainer(): any {
     return this.pixiContainer;
   }
 
-  getInstanceMeasurer() {
+  getInstanceMeasurer(): any {
     return this.instanceMeasurer;
   }
 
@@ -192,10 +194,14 @@ export default class InstancesRenderer {
   }
 
   render(
+    // $FlowFixMe[value-as-type]
     pixiRenderer: PIXI.Renderer,
+    // $FlowFixMe[value-as-type]
     threeRenderer: THREE.WebGLRenderer | null,
     viewPosition: ViewPosition,
+    // $FlowFixMe[value-as-type]
     uiPixiContainer: PIXI.Container,
+    // $FlowFixMe[value-as-type]
     backgroundPixiContainer: PIXI.Container
   ) {
     resetBasicProfilingCounters(this._basicProfilingCounters);
@@ -375,7 +381,7 @@ export default class InstancesRenderer {
     }
   }
 
-  getRendererOfInstance(layerName: string, instance: gdInitialInstance) {
+  getRendererOfInstance(layerName: string, instance: gdInitialInstance): any {
     if (!this.layersRenderers.hasOwnProperty(layerName)) {
       return null;
     }

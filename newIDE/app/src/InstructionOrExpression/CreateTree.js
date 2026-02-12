@@ -115,14 +115,14 @@ const doFindInTree = <T: Object>(
     if (!instructionOrGroup) return null;
 
     if (typeof instructionOrGroup.type === 'string') {
-      // $FlowFixMe - see above
+      // $FlowFixMe[incompatible-type] - see above
       const instructionMetadata: EnumeratedInstructionOrExpressionMetadata = instructionOrGroup;
 
       if (instructionMetadata.type === getInstructionType(instructionType)) {
         return [];
       }
     } else {
-      // $FlowFixMe - see above
+      // $FlowFixMe[incompatible-type] - see above
       const groupOfInstructionInformation: TreeNode<T> = instructionOrGroup;
       const searchResult = findInTree(
         groupOfInstructionInformation,

@@ -26,6 +26,7 @@ import { client as assetClient } from '../../../Utils/GDevelopServices/Asset';
 
 const WrappedHomePage = ({
   project,
+  // $FlowFixMe[incompatible-type]
   tutorialProgress = undefined,
   inAppTutorialsFetchingError = null,
   user,
@@ -34,7 +35,7 @@ const WrappedHomePage = ({
   tutorialProgress?: InAppTutorialUserProgress,
   inAppTutorialsFetchingError?: string | null,
   user: AuthenticatedUser,
-|}) => {
+|}): React.Node => {
   const assetApiMock = React.useMemo(() => {
     const mock = new MockAdapter(assetClient, {
       delayResponse: 250,
@@ -60,6 +61,7 @@ const WrappedHomePage = ({
   return (
     <FixedHeightFlexContainer height={fixedHeight}>
       <PreferencesContext.Provider
+        // $FlowFixMe[incompatible-type]
         value={{
           ...initialPreferences,
           getTutorialProgress: () => tutorialProgress,
@@ -150,14 +152,14 @@ export default {
   decorators: [GDevelopJsInitializerDecorator, inAppTutorialDecorator],
 };
 
-export const Connected = () => (
+export const Connected = (): React.Node => (
   <WrappedHomePage
     project={testProject.project}
     user={fakeSilverAuthenticatedUser}
   />
 );
 
-export const ConnectedWithInAppTutorialCompleted = () => (
+export const ConnectedWithInAppTutorialCompleted = (): React.Node => (
   <WrappedHomePage
     project={testProject.project}
     user={fakeSilverAuthenticatedUser}
@@ -173,7 +175,7 @@ export const ConnectedWithInAppTutorialCompleted = () => (
   />
 );
 
-export const NetworkError = () => {
+export const NetworkError = (): React.Node => {
   const tutorialApiMock = React.useMemo(() => {
     const mock = new MockAdapter(tutorialClient, {
       delayResponse: 250,

@@ -29,7 +29,7 @@ const gd: libGDevelop = global.gd;
 export const getVariableSourceOrSceneIcon = (
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   variableName: string
-) => {
+): any => {
   const variablesContainerSourceType = getVariableSourceFromIdentifier(
     variableName,
     projectScopedContainersAccessor.get()
@@ -79,6 +79,7 @@ export default class ForEachChildVariableEvent extends React.Component<
   _keyIteratorField: ?ParameterFieldInterface = null;
   _iterableField: ?ParameterFieldInterface = null;
 
+  // $FlowFixMe[missing-local-annot]
   state = {
     editingValueIteratorVariableName: false,
     editingKeyIteratorVariableName: false,
@@ -165,7 +166,7 @@ export default class ForEachChildVariableEvent extends React.Component<
   endEditing = () => {
     const { anchorEl } = this.state;
     // Put back the focus after closing the inline popover.
-    // $FlowFixMe
+    // $FlowFixMe[incompatible-type]
     if (anchorEl) anchorEl.focus();
 
     this.setState({
@@ -177,7 +178,7 @@ export default class ForEachChildVariableEvent extends React.Component<
     });
   };
 
-  render() {
+  render(): any {
     const forEachChildVariableEvent = gd.asForEachChildVariableEvent(
       this.props.event
     );

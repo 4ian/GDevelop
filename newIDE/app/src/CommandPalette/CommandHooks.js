@@ -52,7 +52,7 @@ export const UseCommandHook = (props: {|
   name: CommandName,
   enabled: boolean,
   command: SimpleCommand,
-|}) => {
+|}): null => {
   useCommand(props.name, props.enabled, props.command);
   return null;
 };
@@ -65,7 +65,7 @@ export const UseCommandWithOptionsHook = (props: {|
   name: CommandName,
   enabled: boolean,
   command: CommandWithOptions,
-|}) => {
+|}): null => {
   useCommandWithOptions(props.name, props.enabled, props.command);
   return null;
 };

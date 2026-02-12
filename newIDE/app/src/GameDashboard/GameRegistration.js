@@ -40,7 +40,7 @@ export const GameRegistration = ({
   hideLoader,
   onGameRegistered,
   customRegistrationMessage,
-}: GameRegistrationProps) => {
+}: GameRegistrationProps): null | React.Node | React.Node => {
   const {
     onOpenLoginDialog,
     onOpenCreateAccountDialog,

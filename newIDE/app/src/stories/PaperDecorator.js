@@ -15,6 +15,6 @@ export const getPaperDecorator = (
   </Paper>
 );
 
-const defaultPaperDecorator = getPaperDecorator('dark');
+const defaultPaperDecorator: StoryDecorator = getPaperDecorator('dark');
 
 export default defaultPaperDecorator;

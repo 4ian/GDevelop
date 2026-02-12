@@ -26,7 +26,7 @@ type Props = {|
   style?: {| height?: number, borderRadius?: number, width?: number |},
 |};
 
-function LinearProgress(props: Props) {
+function LinearProgress(props: Props): React.Node {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const classes = useStyles(props.color, gdevelopTheme);
 

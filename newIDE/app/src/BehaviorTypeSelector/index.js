@@ -25,15 +25,16 @@ export default class BehaviorTypeSelector extends React.Component<
   Props,
   State
 > {
+  // $FlowFixMe[missing-local-annot]
   state = {
-    behaviorMetadata: enumerateBehaviorsMetadata(
+    behaviorMetadata: (enumerateBehaviorsMetadata(
       this.props.project.getCurrentPlatform(),
       this.props.project,
       this.props.eventsFunctionsExtension
-    ),
+    ): Array<EnumeratedBehaviorMetadata>),
   };
 
-  render() {
+  render(): any {
     const { disabled, objectType, value, onChange, onFocus } = this.props;
     const { behaviorMetadata } = this.state;
 

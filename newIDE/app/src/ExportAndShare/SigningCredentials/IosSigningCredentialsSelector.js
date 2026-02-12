@@ -254,7 +254,7 @@ export const IosSigningCredentialsSelector = ({
   buildSigningOptions,
   onSelectBuildSigningOptions,
   disabled,
-}: Props) => {
+}: Props): React.Node => {
   const {
     signingCredentials,
     error,

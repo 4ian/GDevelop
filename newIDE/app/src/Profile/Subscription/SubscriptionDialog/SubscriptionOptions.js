@@ -119,13 +119,13 @@ const SubscriptionOptions = ({
   onClick,
   disabled,
 }: {|
-  subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSystems[],
+  subscriptionPlansWithPricingSystems: Array<SubscriptionPlanWithPricingSystems>,
   ownedPlanId: ?string,
   selectedPlanId: string,
   recommendedPlanId: ?string,
   onClick: string => void,
   disabled?: boolean,
-|}) => {
+|}): React.Node => {
   return (
     <I18n>
       {({ i18n }) => (

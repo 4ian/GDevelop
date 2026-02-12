@@ -56,7 +56,7 @@ type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
 |};
 
-const FlingGame = ({ selectInAppTutorial }: Props) => {
+const FlingGame = ({ selectInAppTutorial }: Props): React.Node => {
   const {
     inAppTutorialShortHeaders,
     inAppTutorialsFetchingError,
@@ -124,6 +124,7 @@ const FlingGame = ({ selectInAppTutorial }: Props) => {
         tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
         part: 0,
       }),
+      // $FlowFixMe[missing-local-annot]
       renderImage: props => <Unboxing {...props} />,
     },
     {
@@ -154,6 +155,7 @@ const FlingGame = ({ selectInAppTutorial }: Props) => {
         tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
         part: 1,
       }),
+      // $FlowFixMe[missing-local-annot]
       renderImage: props => <Building {...props} />,
     },
     {
@@ -184,6 +186,7 @@ const FlingGame = ({ selectInAppTutorial }: Props) => {
         tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
         part: 2,
       }),
+      // $FlowFixMe[missing-local-annot]
       renderImage: props => <Podium {...props} />,
     },
   ];

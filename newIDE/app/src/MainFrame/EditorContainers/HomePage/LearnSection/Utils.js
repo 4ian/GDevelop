@@ -24,46 +24,48 @@ export type LearnCategory =
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
-    title: <Trans>Make an entire game</Trans>,
-    description: <Trans>Make complete games step by step</Trans>,
+    title: (<Trans>Make an entire game</Trans>: React.Node),
+    description: (<Trans>Make complete games step by step</Trans>: React.Node),
   },
   'game-mechanic': {
-    title: <Trans>Specific game mechanics</Trans>,
-    description: (
+    title: (<Trans>Specific game mechanics</Trans>: React.Node),
+    description: ((
       <Trans>
         Find how to implement the most common game mechanics and more
       </Trans>
-    ),
+    ): React.Node),
   },
   'official-beginner': {
-    title: <Trans>Beginner course</Trans>,
-    description: <Trans>Learn the fundamental principles of GDevelop</Trans>,
+    title: (<Trans>Beginner course</Trans>: React.Node),
+    description: ((
+      <Trans>Learn the fundamental principles of GDevelop</Trans>
+    ): React.Node),
   },
   'official-intermediate': {
-    title: <Trans>Intermediate course</Trans>,
-    description: (
+    title: (<Trans>Intermediate course</Trans>: React.Node),
+    description: ((
       <Trans>Learn all the game-building mechanics of GDevelop</Trans>
-    ),
+    ): React.Node),
   },
   'official-advanced': {
-    title: <Trans>Advanced course</Trans>,
-    description: <Trans>The icing on the cake</Trans>,
+    title: (<Trans>Advanced course</Trans>: React.Node),
+    description: (<Trans>The icing on the cake</Trans>: React.Node),
   },
   'education-curriculum': {
-    title: <Trans>Education curriculum and resources</Trans>,
-    description: (
+    title: (<Trans>Education curriculum and resources</Trans>: React.Node),
+    description: ((
       <Trans>
         For teachers and educators having the GDevelop Education subscription.
         Ready to use resources for teaching.
       </Trans>
-    ),
+    ): React.Node),
   },
   course: {
-    title: <Trans>Loading</Trans>,
-    description: <Trans>Loading course...</Trans>,
+    title: (<Trans>Loading</Trans>: React.Node),
+    description: (<Trans>Loading course...</Trans>: React.Node),
   },
   recommendations: {
-    title: <Trans>Recommendations</Trans>,
+    title: (<Trans>Recommendations</Trans>: React.Node),
     description: null,
   },
 };
@@ -71,7 +73,7 @@ export const TUTORIAL_CATEGORY_TEXTS = {
 export const getColumnsFromWindowSize = (
   windowSize: WindowSizeType,
   isLandscape: boolean
-) => {
+): number => {
   switch (windowSize) {
     case 'small':
       return isLandscape ? 4 : 2;
@@ -100,7 +102,7 @@ export const getChipColorFromTutorialCategory = (
 export const getChipTextFromTutorialCategory = (
   category: TutorialCategory,
   i18n: I18nType
-) => {
+): any | null => {
   if (category === 'official-beginner') return i18n._(t`Beginner`);
   if (category === 'official-intermediate') return i18n._(t`Intermediate`);
   if (category === 'official-advanced') return i18n._(t`Advanced`);

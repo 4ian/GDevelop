@@ -45,7 +45,7 @@ const LocalFolderPicker = ({
   onChange,
   defaultPath,
   fullWidth,
-}: Props) => {
+}: Props): React.Node => {
   // Use an internal state to avoid validating the value when the user
   // is typing in the text field. This allows typing a "/" without the
   // formatting kicking in.

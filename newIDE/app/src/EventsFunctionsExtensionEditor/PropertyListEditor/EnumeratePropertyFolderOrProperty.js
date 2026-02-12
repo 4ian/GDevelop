@@ -4,7 +4,7 @@ import { mapFor } from '../../Utils/MapFor';
 
 export const getPropertyFolderOrPropertyUnifiedName = (
   propertyFolderOrProperty: gdPropertyFolderOrProperty
-) =>
+): string =>
   propertyFolderOrProperty.isFolder()
     ? propertyFolderOrProperty.getFolderName()
     : propertyFolderOrProperty.getProperty().getName();
@@ -47,8 +47,11 @@ export const enumeratePropertiesInFolder = (
   folder: gdPropertyFolderOrProperty
 ): gdNamedPropertyDescriptor[] => {
   if (!folder.isFolder()) return [];
+  // $FlowFixMe[missing-empty-array-annot]
   const result = [];
+  // $FlowFixMe[incompatible-type]
   recursivelyEnumeratePropertiesInFolder(folder, result);
+  // $FlowFixMe[incompatible-type]
   return result;
 };
 
@@ -56,8 +59,11 @@ export const enumerateFoldersInFolder = (
   folder: gdPropertyFolderOrProperty
 ): {| path: string, folder: gdPropertyFolderOrProperty |}[] => {
   if (!folder.isFolder()) return [];
+  // $FlowFixMe[missing-empty-array-annot]
   const result = [];
+  // $FlowFixMe[incompatible-type]
   recursivelyEnumerateFoldersInFolder(folder, '', result);
+  // $FlowFixMe[incompatible-type]
   return result;
 };
 
@@ -65,8 +71,11 @@ export const enumerateFoldersInContainer = (
   container: gdPropertiesContainer
 ): {| path: string, folder: gdPropertyFolderOrProperty |}[] => {
   const rootFolder = container.getRootFolder();
+  // $FlowFixMe[missing-empty-array-annot]
   const result = [];
+  // $FlowFixMe[incompatible-type]
   recursivelyEnumerateFoldersInFolder(rootFolder, '', result);
+  // $FlowFixMe[incompatible-type]
   return result;
 };
 

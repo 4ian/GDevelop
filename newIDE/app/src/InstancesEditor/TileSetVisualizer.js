@@ -758,7 +758,7 @@ const TileSetVisualizer = ({
       {showPaintingToolbar && (
         <>
           <Line justifyContent="space-between" noMargin>
-            <LineStackLayout alignItems="center" noMargin>
+            <LineStackLayout alignItems="left" noMargin>
               <IconButton
                 id="freehandBrush"
                 size="small"
@@ -879,6 +879,27 @@ const TileSetVisualizer = ({
                 <PointerFinger style={styles.icon} />
               </IconButton>
               <IconButton
+                id="eraseBrush"
+                size="small"
+                tooltip={t`Erase`}
+                selected={
+                  !!tileMapTileSelection &&
+                  tileMapTileSelection.kind === 'erase'
+                }
+                onClick={e => {
+                  if (
+                    !!tileMapTileSelection &&
+                    tileMapTileSelection.kind === 'erase'
+                  )
+                    onSelectTileMapTile(null);
+                  else onSelectTileMapTile({ kind: 'erase' });
+                }}
+              >
+                <Erase style={styles.icon} />
+              </IconButton>
+            </LineStackLayout>
+            <LineStackLayout alignItems="right" noMargin>
+              <IconButton
                 id="horizontalFlip"
                 size="small"
                 tooltip={t`Horizontal flip`}
@@ -939,24 +960,6 @@ const TileSetVisualizer = ({
                 <FlipVertical style={styles.icon} />
               </IconButton>
             </LineStackLayout>
-            <IconButton
-              id="eraseBrush"
-              size="small"
-              tooltip={t`Erase`}
-              selected={
-                !!tileMapTileSelection && tileMapTileSelection.kind === 'erase'
-              }
-              onClick={e => {
-                if (
-                  !!tileMapTileSelection &&
-                  tileMapTileSelection.kind === 'erase'
-                )
-                  onSelectTileMapTile(null);
-                else onSelectTileMapTile({ kind: 'erase' });
-              }}
-            >
-              <Erase style={styles.icon} />
-            </IconButton>
           </Line>
           <Spacer />
         </>

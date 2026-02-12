@@ -487,10 +487,8 @@ export type InAppTutorialOrchestratorInterface = {|
   getPreviewMessage: () => {| message: string, position: string |} | null,
 |};
 
-// $FlowFixMe[prop-missing]
-const InAppTutorialOrchestrator: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<InAppTutorialOrchestratorInterface> },
-  React.RefSetter<InAppTutorialOrchestratorInterface>
+const InAppTutorialOrchestrator: React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<InAppTutorialOrchestratorInterface> }
 > = React.forwardRef<Props, InAppTutorialOrchestratorInterface>(
   (
     {

@@ -98,10 +98,8 @@ const useStylesForIconButton = ({
  * Supports displaying a tooltip.
  */
 
-// $FlowFixMe[prop-missing]
-const IconButton: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<{}> },
-  React.RefSetter<{}>
+const IconButton: React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<{}> }
 > = React.forwardRef<Props, {||}>((props: Props, ref) => {
   const {
     selected,

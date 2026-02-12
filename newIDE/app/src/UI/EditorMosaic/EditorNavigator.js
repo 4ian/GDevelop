@@ -123,8 +123,6 @@ export default (React.forwardRef<Props, EditorNavigatorInterface>(
       </Column>
     );
   }
-  // $FlowFixMe[prop-missing]
-): React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<EditorNavigatorInterface> },
-  React.RefSetter<EditorNavigatorInterface>
+): React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<EditorNavigatorInterface> }
 >);

@@ -212,10 +212,8 @@ export type InstructionOrObjectSelectorInterface = {|
   reEnumerateInstructions: (i18n: I18nType) => void,
 |};
 
-// $FlowFixMe[prop-missing]
-const InstructionOrObjectSelector: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<InstructionOrObjectSelectorInterface> },
-  React.RefSetter<InstructionOrObjectSelectorInterface>
+const InstructionOrObjectSelector: React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<InstructionOrObjectSelectorInterface> }
 > = React.forwardRef<Props, InstructionOrObjectSelectorInterface>(
   (
     {

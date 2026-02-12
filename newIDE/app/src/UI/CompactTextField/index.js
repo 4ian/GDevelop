@@ -57,13 +57,11 @@ export type CompactTextFieldProps = {|
   onWheel?: WheelEvent => void,
 |};
 
-// $FlowFixMe[prop-missing]
-const CompactTextField: React.AbstractComponent<
+const CompactTextField: React.ComponentType<
   {
     ...CompactTextFieldProps,
     +ref?: React.RefSetter<CompactTextFieldInterface>,
-  },
-  React.RefSetter<CompactTextFieldInterface>
+  }
 > = React.forwardRef<CompactTextFieldProps, CompactTextFieldInterface>(
   (
     {

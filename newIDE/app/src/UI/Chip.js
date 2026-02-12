@@ -32,10 +32,8 @@ type ChipInterface = {|
   focus: () => void,
 |};
 
-// $FlowFixMe[prop-missing]
-const Chip: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<ChipInterface> },
-  React.RefSetter<ChipInterface>
+const Chip: React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<ChipInterface> }
 > = React.forwardRef<Props, ChipInterface>((props, ref) => {
   const chipRef = React.useRef<?HTMLDivElement>(null);
   const muiTheme = useTheme();

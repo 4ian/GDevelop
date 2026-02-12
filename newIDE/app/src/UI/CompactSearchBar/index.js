@@ -21,13 +21,11 @@ export type CompactSearchBarProps = {|
   placeholder?: MessageDescriptor,
 |};
 
-// $FlowFixMe[prop-missing]
-const CompactSearchBar: React.AbstractComponent<
+const CompactSearchBar: React.ComponentType<
   {
     ...CompactSearchBarProps,
     +ref?: React.RefSetter<CompactSearchBarInterface>,
-  },
-  React.RefSetter<CompactSearchBarInterface>
+  }
 > = React.forwardRef<CompactSearchBarProps, CompactSearchBarInterface>(
   ({ value, onChange, id, disabled, errored, placeholder }, ref) => {
     const idToUse = React.useRef<string>(id || makeTimestampedId());

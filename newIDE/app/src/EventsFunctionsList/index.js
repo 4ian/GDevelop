@@ -1446,10 +1446,8 @@ const MemoizedObjectsList = React.memo<Props, EventsFunctionsListInterface>(
   arePropsEqual
 );
 
-// $FlowFixMe[prop-missing]
-const EventsFunctionsListWithErrorBoundary: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<EventsFunctionsListInterface> },
-  React.RefSetter<EventsFunctionsListInterface>
+const EventsFunctionsListWithErrorBoundary: React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<EventsFunctionsListInterface> }
 > = React.forwardRef<Props, EventsFunctionsListInterface>((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Objects list</Trans>}

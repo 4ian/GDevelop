@@ -811,10 +811,8 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
   }
 );
 
-// $FlowFixMe[prop-missing]
-const LayersListWithErrorBoundary: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<LayersListInterface> },
-  React.RefSetter<LayersListInterface>
+const LayersListWithErrorBoundary: React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<LayersListInterface> }
 > = React.forwardRef<Props, LayersListInterface>((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Layers list</Trans>}

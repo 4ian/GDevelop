@@ -1393,10 +1393,8 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
   }
 );
 
-// $FlowFixMe[prop-missing]
-const PropertyListEditorWithErrorBoundary: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<PropertyListEditorInterface> },
-  React.RefSetter<PropertyListEditorInterface>
+const PropertyListEditorWithErrorBoundary: React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<PropertyListEditorInterface> }
 > = React.forwardRef<Props, PropertyListEditorInterface>((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Property list editor</Trans>}

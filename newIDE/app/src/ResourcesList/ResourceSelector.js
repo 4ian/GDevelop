@@ -66,10 +66,8 @@ type Props = {|
 
 export type ResourceSelectorInterface = {| focus: FieldFocusFunction |};
 
-// $FlowFixMe[prop-missing]
-const ResourceSelector: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<ResourceSelectorInterface> },
-  React.RefSetter<ResourceSelectorInterface>
+const ResourceSelector: React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<ResourceSelectorInterface> }
 > = React.forwardRef<Props, ResourceSelectorInterface>((props, ref) => {
   const {
     project,

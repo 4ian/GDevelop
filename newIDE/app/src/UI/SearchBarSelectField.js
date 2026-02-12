@@ -76,10 +76,8 @@ type Props = {|
  * A select field based on Material-UI select field.
  * To be used with `SelectOption`.
  */
-// $FlowFixMe[prop-missing]
-const SearchBarSelectField: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<SearchBarSelectFieldInterface> },
-  React.RefSetter<SearchBarSelectFieldInterface>
+const SearchBarSelectField: React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<SearchBarSelectFieldInterface> }
 > = React.forwardRef<Props, SearchBarSelectFieldInterface>((props, ref) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
   const focus = React.useCallback(

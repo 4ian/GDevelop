@@ -117,10 +117,8 @@ type AnimationListProps = {|
   onCreateMatchingSpriteCollisionMask: () => Promise<void>,
 |};
 
-// $FlowFixMe[prop-missing]
-const AnimationList: React.AbstractComponent<
-  { ...AnimationListProps, +ref?: React.RefSetter<AnimationListInterface> },
-  React.RefSetter<AnimationListInterface>
+const AnimationList: React.ComponentType<
+  { ...AnimationListProps, +ref?: React.RefSetter<AnimationListInterface> }
 > = React.forwardRef<AnimationListProps, AnimationListInterface>(
   (
     {

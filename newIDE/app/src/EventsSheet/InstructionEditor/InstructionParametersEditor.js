@@ -116,10 +116,8 @@ const isParameterVisible = (
   return true;
 };
 
-// $FlowFixMe[prop-missing]
-const InstructionParametersEditor: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<InstructionParametersEditorInterface> },
-  React.RefSetter<InstructionParametersEditorInterface>
+const InstructionParametersEditor: React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<InstructionParametersEditorInterface> }
 > = React.forwardRef<Props, InstructionParametersEditorInterface>(
   (
     {

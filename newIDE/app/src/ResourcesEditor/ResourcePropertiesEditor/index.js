@@ -44,10 +44,8 @@ const renderEmpty = () => {
   );
 };
 
-// $FlowFixMe[prop-missing]
-const ResourcePropertiesEditor: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<ResourcePropertiesEditorInterface> },
-  React.RefSetter<ResourcePropertiesEditorInterface>
+const ResourcePropertiesEditor: React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<ResourcePropertiesEditorInterface> }
 > = React.forwardRef<Props, ResourcePropertiesEditorInterface>(
   (
     {

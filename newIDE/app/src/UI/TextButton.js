@@ -31,10 +31,8 @@ type Props = {|
 /**
  * A "text" button based on Material-UI button.
  */
-// $FlowFixMe[prop-missing]
-const TextButton: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<ButtonInterface> },
-  React.RefSetter<ButtonInterface>
+const TextButton: React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<ButtonInterface> }
 > = React.forwardRef<Props, ButtonInterface>(
   (
     {

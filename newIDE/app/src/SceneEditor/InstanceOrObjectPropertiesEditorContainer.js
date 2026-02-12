@@ -90,13 +90,11 @@ export type InstanceOrObjectPropertiesEditorInterface = {|
   getEditorTitle: () => React.Node,
 |};
 
-// $FlowFixMe[prop-missing]
-export const InstanceOrObjectPropertiesEditorContainer: React.AbstractComponent<
+export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<
   {
     ...Props,
     +ref?: React.RefSetter<InstanceOrObjectPropertiesEditorInterface>,
-  },
-  React.RefSetter<InstanceOrObjectPropertiesEditorInterface>
+  }
 > = React.forwardRef<Props, InstanceOrObjectPropertiesEditorInterface>(
   (props, ref) => {
     const forceUpdate = useForceUpdate();

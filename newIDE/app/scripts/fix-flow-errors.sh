@@ -183,6 +183,8 @@ for root, dirs, files in os.walk(src_dir):
         original = content
 
         # Phase 1: Replace React.AbstractComponent<T1, T2> with React.ComponentType<T1>
+        # If T1 does not already include a ref prop, add ref?: React.RefSetter<T2>
+        # to the props so that callers can still pass refs.
         result = []
         pos = 0
         while pos < len(content):
@@ -193,7 +195,6 @@ for root, dirs, files in os.walk(src_dir):
 
             result.append(content[pos:idx])
             open_angle = idx + len('React.AbstractComponent')
-            # open_angle points to '<'
 
             # Parse type arguments with balanced bracket tracking
             i = open_angle + 1
@@ -223,7 +224,6 @@ for root, dirs, files in os.walk(src_dir):
                     if first_comma is None:
                         first_comma = i
                 elif ch == '/' and i + 1 < len(content) and content[i + 1] == '/':
-                    # Line comment - skip to end of line
                     while i < len(content) and content[i] != '\n':
                         i += 1
                     continue
@@ -239,52 +239,90 @@ for root, dirs, files in os.walk(src_dir):
             closing_angle = i  # points to '>'
 
             if angle_depth != 0:
-                # Couldn't find matching '>', copy as-is
                 result.append('React.AbstractComponent<')
                 pos = open_angle + 1
                 continue
 
             if first_comma is not None:
-                first_arg = content[open_angle + 1:first_comma]
-
-                # Check if the type annotation is single-line vs multi-line
+                first_arg_raw = content[open_angle + 1:first_comma]
                 type_text = content[idx:closing_angle + 1]
                 is_single_line = '\n' not in type_text
 
-                if is_single_line:
-                    replacement = 'React.ComponentType<' + first_arg.strip() + '>'
-                else:
-                    first_arg = first_arg.rstrip()
+                # Extract the second type arg (clean text, no comments)
+                second_section = content[first_comma + 1:closing_angle]
+                second_arg_clean = ''
+                for line in second_section.split('\n'):
+                    stripped = line.strip()
+                    if stripped and not stripped.startswith('//'):
+                        second_arg_clean = stripped
+                        break
 
-                    # Preserve non-prop-missing FlowFixMe from the second arg section
-                    second_section = content[first_comma + 1:closing_angle]
-                    preserved_comments = []
-                    for line in second_section.split('\n'):
-                        stripped = line.strip()
-                        if (stripped.startswith('// $FlowFixMe')
-                                and 'prop-missing' not in stripped):
-                            preserved_comments.append(line)
+                # Preserve non-prop-missing FlowFixMe from the second section
+                preserved_comments = []
+                for line in second_section.split('\n'):
+                    stripped = line.strip()
+                    if (stripped.startswith('// $FlowFixMe')
+                            and 'prop-missing' not in stripped):
+                        preserved_comments.append(line)
 
-                    # Find the indentation of the closing '>'
-                    line_start = content.rfind('\n', 0, closing_angle)
-                    if line_start == -1:
-                        closing_indent = ''
+                # Check if first_arg already contains a ref prop
+                has_ref = 'ref?' in first_arg_raw or 'ref:' in first_arg_raw
+
+                if not has_ref and second_arg_clean:
+                    # First arg doesn't include ref — add it.
+                    # The second arg is the instance type; wrap with RefSetter.
+                    fa = first_arg_raw.strip()
+                    ref_prop = 'ref?: React.RefSetter<' + second_arg_clean + '>'
+                    new_first_arg = '{ ...' + fa + ', ' + ref_prop + ' }'
+
+                    if is_single_line:
+                        replacement = 'React.ComponentType<' + new_first_arg + '>'
                     else:
-                        closing_line = content[line_start + 1:closing_angle]
-                        closing_indent = ''
-                        for ch in closing_line:
-                            if ch in (' ', '\t'):
-                                closing_indent += ch
-                            else:
+                        # Find the indentation used for the first arg
+                        first_arg_indent = '  '
+                        for line in first_arg_raw.split('\n'):
+                            stripped_line = line.lstrip()
+                            if stripped_line:
+                                first_arg_indent = line[:len(line) - len(stripped_line)]
                                 break
 
-                    replacement = 'React.ComponentType<' + first_arg
-                    for comment in preserved_comments:
-                        replacement += '\n' + comment
-                    replacement += '\n' + closing_indent + '>'
+                        line_start = content.rfind('\n', 0, closing_angle)
+                        closing_indent = ''
+                        if line_start != -1:
+                            closing_line = content[line_start + 1:closing_angle]
+                            for ch in closing_line:
+                                if ch in (' ', '\t'):
+                                    closing_indent += ch
+                                else:
+                                    break
+
+                        replacement = 'React.ComponentType<\n'
+                        replacement += first_arg_indent + new_first_arg
+                        for comment in preserved_comments:
+                            replacement += '\n' + comment
+                        replacement += '\n' + closing_indent + '>'
+                else:
+                    # First arg already has ref — just drop the second arg
+                    first_arg = first_arg_raw.rstrip()
+                    if is_single_line:
+                        replacement = 'React.ComponentType<' + first_arg.strip() + '>'
+                    else:
+                        line_start = content.rfind('\n', 0, closing_angle)
+                        closing_indent = ''
+                        if line_start != -1:
+                            closing_line = content[line_start + 1:closing_angle]
+                            for ch in closing_line:
+                                if ch in (' ', '\t'):
+                                    closing_indent += ch
+                                else:
+                                    break
+
+                        replacement = 'React.ComponentType<' + first_arg
+                        for comment in preserved_comments:
+                            replacement += '\n' + comment
+                        replacement += '\n' + closing_indent + '>'
                 result.append(replacement)
             else:
-                # Only one type arg, just replace the name
                 inner = content[open_angle + 1:closing_angle]
                 result.append('React.ComponentType<' + inner + '>')
 
@@ -300,7 +338,6 @@ for root, dirs, files in os.walk(src_dir):
             if ('$FlowFixMe[prop-missing]' in lines[i]
                     and lines[i].strip().startswith(
                         '// $FlowFixMe[prop-missing]')):
-                # Check if next non-empty line contains React.ComponentType<
                 j = i + 1
                 while j < len(lines) and lines[j].strip() == '':
                     j += 1

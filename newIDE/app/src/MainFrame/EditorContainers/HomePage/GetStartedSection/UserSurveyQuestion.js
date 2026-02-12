@@ -355,10 +355,8 @@ type Props = {|
   onChangeUserInputValue?: string => void,
 |};
 
-// $FlowFixMe[prop-missing]
-const UserSurveyQuestion: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<HTMLDivElement> },
-  React.RefSetter<HTMLDivElement>
+const UserSurveyQuestion: React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<HTMLDivElement> }
 > = React.forwardRef<Props, HTMLDivElement>(
   (
     {

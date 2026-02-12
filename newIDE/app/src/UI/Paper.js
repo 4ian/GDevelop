@@ -27,10 +27,8 @@ export const getBackgroundColor = (
     ? gdevelopTheme.paper.backgroundColor.medium
     : gdevelopTheme.paper.backgroundColor.light;
 
-// $FlowFixMe[prop-missing]
-const Paper: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<HTMLDivElement> },
-  React.RefSetter<HTMLDivElement>
+const Paper: React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<HTMLDivElement> }
 > = React.forwardRef<Props, HTMLDivElement>(
   ({ id, children, background, elevation, variant, style, square }, ref) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);

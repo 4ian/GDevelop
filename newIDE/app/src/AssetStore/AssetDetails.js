@@ -97,10 +97,8 @@ export type AssetDetailsInterface = {|
   scrollToPosition: (y: number) => void,
 |};
 
-// $FlowFixMe[prop-missing]
-export const AssetDetails: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<AssetDetailsInterface> },
-  React.RefSetter<AssetDetailsInterface>
+export const AssetDetails: React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<AssetDetailsInterface> }
 > = React.forwardRef<Props, AssetDetailsInterface>(
   (
     {

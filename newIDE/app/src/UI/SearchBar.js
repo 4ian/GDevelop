@@ -60,10 +60,8 @@ const noop = () => {};
  *
  * Customized to add optional menu button and chips corresponding to tags.
  */
-// $FlowFixMe[prop-missing]
-const SearchBar: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<SearchBarInterface> },
-  React.RefSetter<SearchBarInterface>
+const SearchBar: React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<SearchBarInterface> }
 > = React.forwardRef<Props, SearchBarInterface>(
   (
     {

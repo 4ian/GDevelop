@@ -45,10 +45,8 @@ const stopPropagation = e => e.stopPropagation();
  * A text field, inspired from Material UI, but lightweight
  * and faster to render (2 DOM elements, uncontrolled, pure CSS styling).
  */
-// $FlowFixMe[prop-missing]
-export const SimpleTextField: React.AbstractComponent<
-  SimpleTextFieldProps,
-  SimpleTextFieldInterface
+export const SimpleTextField: React.ComponentType<
+  { ...SimpleTextFieldProps, ref?: React.RefSetter<SimpleTextFieldInterface> }
   // $FlowFixMe[incompatible-type]
 > = React.memo<SimpleTextFieldProps, SimpleTextFieldInterface>(
   // $FlowFixMe[incompatible-type]

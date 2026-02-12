@@ -171,11 +171,9 @@ export default (React.forwardRef<ContextMenuWrapperProps, ContextMenuInterface>(
       </I18n>
     );
   }
-  // $FlowFixMe[prop-missing]
-): React.AbstractComponent<
+): React.ComponentType<
   {
     ...ContextMenuWrapperProps,
     +ref?: React.RefSetter<ContextMenuInterface>,
-  },
-  React.RefSetter<ContextMenuInterface>
+  }
 >);

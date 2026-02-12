@@ -609,10 +609,8 @@ export type VariablesListInterface = {|
   addVariable: () => void,
 |};
 
-// $FlowFixMe[prop-missing]
-const VariablesList: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<VariablesListInterface> },
-  React.RefSetter<VariablesListInterface>
+const VariablesList: React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<VariablesListInterface> }
 > = React.forwardRef<Props, VariablesListInterface>((props, ref) => {
   const historyRef = useRefWithInit(() =>
     getHistoryInitialState(props.variablesContainer, {

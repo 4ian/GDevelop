@@ -171,8 +171,6 @@ export type PreviewLauncherInterface = {
  * A PreviewLaunchComponent supports the props and has at least the functions exposed in PreviewLauncherInterface.
  * This is important as MainFrame is keeping ref to it to launch previews.
  */
-// $FlowFixMe[prop-missing]
-export type PreviewLauncherComponent = React.AbstractComponent<
-  PreviewLauncherProps,
-  PreviewLauncherInterface
+export type PreviewLauncherComponent = React.ComponentType<
+  { ...PreviewLauncherProps, ref?: React.RefSetter<PreviewLauncherInterface> }
 >;

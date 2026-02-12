@@ -189,10 +189,8 @@ type Props = {|
   onOpenProfile?: () => void,
 |};
 
-// $FlowFixMe[prop-missing]
-export const AssetsHome: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<AssetsHomeInterface> },
-  React.RefSetter<AssetsHomeInterface>
+export const AssetsHome: React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<AssetsHomeInterface> }
 > = React.forwardRef<Props, AssetsHomeInterface>(
   (
     {

@@ -36,10 +36,8 @@ type Props = {|
   isNotShownDuringInAppTutorial?: boolean,
 |};
 
-// $FlowFixMe[prop-missing]
-const SubscriptionChecker: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<SubscriptionCheckerInterface> },
-  React.RefSetter<SubscriptionCheckerInterface>
+const SubscriptionChecker: React.ComponentType<
+  { ...Props, +ref?: React.RefSetter<SubscriptionCheckerInterface> }
 > = React.forwardRef<Props, SubscriptionCheckerInterface>(
   (
     {

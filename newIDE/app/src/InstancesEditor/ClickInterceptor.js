@@ -156,7 +156,15 @@ class ClickInterceptor {
       tileMapTileSelection &&
       tileMapTileSelection.kind === 'freehand'
     ) {
-      // Freehand: push every point for continuous path.
+      const lastPoint =
+        pointerPathCoordinates[pointerPathCoordinates.length - 1];
+      if (
+        lastPoint &&
+        lastPoint.x === sceneCoordinates[0] &&
+        lastPoint.y === sceneCoordinates[1]
+      ) {
+        return;
+      }
       pointerPathCoordinates.push({
         x: sceneCoordinates[0],
         y: sceneCoordinates[1],

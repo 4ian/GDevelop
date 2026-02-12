@@ -1,6 +1,9 @@
 // @flow
 import { AffineTransformation } from './AffineTransformation';
-import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
+import {
+  type TileMapTileSelection,
+  isTileMapPaintingSelection,
+} from '../InstancesEditor/TileSetVisualizer';
 
 export type TileMapTilePatch = {|
   tileCoordinates?: {| x: number, y: number |},
@@ -191,10 +194,7 @@ const getTileCorrespondingToFlippingInstructions = ({
   tileMapTileSelection: TileMapTileSelection,
   tileCoordinates: {| x: number, y: number |},
 |}): {| x: number, y: number |} => {
-  if (
-    tileMapTileSelection.kind === 'rectangle' ||
-    tileMapTileSelection.kind === 'freehand'
-  ) {
+  if (isTileMapPaintingSelection(tileMapTileSelection)) {
     const selectionTopLeftCorner = tileMapTileSelection.coordinates[0];
     const selectionBottomRightCorner = tileMapTileSelection.coordinates[1];
     const selectionWidth =
@@ -248,10 +248,7 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
     const x = Math.floor(coordinatesInTileMapGrid[0] / tileSize);
     const y = Math.floor(coordinatesInTileMapGrid[1] / tileSize);
     let tileCoordinates;
-    if (
-      tileMapTileSelection.kind === 'rectangle' ||
-      tileMapTileSelection.kind === 'freehand'
-    ) {
+    if (isTileMapPaintingSelection(tileMapTileSelection)) {
       const topLeftCorner = tileMapTileSelection.coordinates[0];
       tileCoordinates = getTileCorrespondingToFlippingInstructions({
         tileMapTileSelection,
@@ -290,6 +287,7 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
       if (!seen.has(key)) {
         seen.add(key);
         tilesCoordinatesInTileMapGrid.push({
+          erase: false,
           tileCoordinates: getTileCorrespondingToFlippingInstructions({
             tileMapTileSelection,
             tileCoordinates: topLeftCorner,

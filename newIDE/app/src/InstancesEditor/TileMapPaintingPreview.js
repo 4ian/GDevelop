@@ -7,7 +7,10 @@ import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import ViewPosition from './ViewPosition';
 import RenderedInstance from '../ObjectsRendering/Renderers/RenderedInstance';
 import Rendered3DInstance from '../ObjectsRendering/Renderers/Rendered3DInstance';
-import { type TileMapTileSelection } from './TileSetVisualizer';
+import {
+  type TileMapTileSelection,
+  isTileMapPaintingSelection,
+} from './TileSetVisualizer';
 import { AffineTransformation } from '../Utils/AffineTransformation';
 import {
   getTileSet,
@@ -272,8 +275,7 @@ class TileMapPaintingPreview {
         texture = PixiResourcesLoader.getInvalidPIXITexture();
       } else {
         if (
-          (tileMapTileSelection.kind === 'rectangle' ||
-            tileMapTileSelection.kind === 'freehand') &&
+          isTileMapPaintingSelection(tileMapTileSelection) &&
           tileCoordinates
         ) {
           texture = this._getTextureInAtlas({
@@ -326,8 +328,7 @@ class TileMapPaintingPreview {
 
     if (
       isBadlyConfigured ||
-      tileMapTileSelection.kind === 'rectangle' ||
-      tileMapTileSelection.kind === 'freehand' ||
+      isTileMapPaintingSelection(tileMapTileSelection) ||
       tileMapTileSelection.kind === 'erase'
     ) {
       const container = this._getPreviewSprites({

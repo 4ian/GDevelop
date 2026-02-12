@@ -212,6 +212,11 @@ export type TileMapTileSelection =
       kind: 'erase',
     |};
 
+export const isTileMapPaintingSelection = (
+  selection: TileMapTileSelection
+): boolean %checks =>
+  selection.kind === 'rectangle' || selection.kind === 'freehand';
+
 type Props = {|
   project: gdProject,
   objectConfiguration: gdObjectConfiguration,
@@ -532,8 +537,7 @@ const TileSetVisualizer = ({
               : 'rectangle';
           const shouldRemoveSelection =
             tileMapTileSelection &&
-            (tileMapTileSelection.kind === 'rectangle' ||
-              tileMapTileSelection.kind === 'freehand') &&
+            isTileMapPaintingSelection(tileMapTileSelection) &&
             startX === x &&
             startY === y &&
             x <= tileMapTileSelection.coordinates[1].x &&
@@ -585,8 +589,7 @@ const TileSetVisualizer = ({
     () => {
       if (
         tileMapTileSelection &&
-        (tileMapTileSelection.kind === 'rectangle' ||
-          tileMapTileSelection.kind === 'freehand')
+        isTileMapPaintingSelection(tileMapTileSelection)
       ) {
         setLastSelection(tileMapTileSelection);
       }
@@ -706,7 +709,8 @@ const TileSetVisualizer = ({
                     onSelectTileMapTile({
                       kind: 'freehand',
                       coordinates:
-                        lastSelection && lastSelection.kind !== 'erase'
+                        lastSelection &&
+                        isTileMapPaintingSelection(lastSelection)
                           ? lastSelection.coordinates
                           : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
                       flipHorizontally: shouldFlipHorizontally,
@@ -738,7 +742,8 @@ const TileSetVisualizer = ({
                         : null) || {
                         kind: 'rectangle',
                         coordinates:
-                          lastSelection && lastSelection.kind !== 'erase'
+                          lastSelection &&
+                          isTileMapPaintingSelection(lastSelection)
                             ? lastSelection.coordinates
                             : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
                         flipHorizontally: shouldFlipHorizontally,
@@ -763,8 +768,7 @@ const TileSetVisualizer = ({
                   setShouldFlipHorizontally(newShouldFlipHorizontally);
                   if (
                     !!tileMapTileSelection &&
-                    (tileMapTileSelection.kind === 'rectangle' ||
-                      tileMapTileSelection.kind === 'freehand')
+                    isTileMapPaintingSelection(tileMapTileSelection)
                   ) {
                     onSelectTileMapTile({
                       ...tileMapTileSelection,
@@ -788,8 +792,7 @@ const TileSetVisualizer = ({
                   setShouldFlipVertically(newShouldFlipVertically);
                   if (
                     !!tileMapTileSelection &&
-                    (tileMapTileSelection.kind === 'rectangle' ||
-                      tileMapTileSelection.kind === 'freehand')
+                    isTileMapPaintingSelection(tileMapTileSelection)
                   ) {
                     onSelectTileMapTile({
                       ...tileMapTileSelection,
@@ -858,8 +861,7 @@ const TileSetVisualizer = ({
                 />
               )}
               {tileMapTileSelection &&
-                (tileMapTileSelection.kind === 'rectangle' ||
-                  tileMapTileSelection.kind === 'freehand') &&
+                isTileMapPaintingSelection(tileMapTileSelection) &&
                 displayedTileSize && (
                   <Tile
                     key={`selected-tile`}

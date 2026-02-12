@@ -213,8 +213,8 @@ export default class InstancesEditor extends Component<Props, State> {
     const { tileMapTileSelection } = this.props;
     const prevTileMapTileSelection = prevProps.tileMapTileSelection;
 
-    const isPickerActive = tileMapTileSelection?.kind === 'picker';
-    const wasPickerActive = prevTileMapTileSelection?.kind === 'picker';
+    const isPickerActive = tileMapTileSelection && tileMapTileSelection.kind === 'picker';
+    const wasPickerActive = prevTileMapTileSelection && prevTileMapTileSelection.kind === 'picker';
 
     if (isPickerActive && !wasPickerActive) {
       // Picker just activated, store the previous tool

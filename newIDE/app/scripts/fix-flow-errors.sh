@@ -84,7 +84,6 @@ find "$APP_DIR/src" -name "*.js" -type f -exec sed -i \
   -e 's/\bReact\$ElementRef\b/React.ElementRef/g' \
   -e 's/\bReact\$ElementConfig\b/React.ElementConfig/g' \
   -e 's/\bReact\$ComponentType\b/React.ComponentType/g' \
-  -e 's/\bReact\$AbstractComponent\b/React.AbstractComponent/g' \
   {} +
 
 # Fix $PropertyType -> indexed access type
@@ -159,6 +158,12 @@ echo "  Done."
 ###############################################################################
 echo ""
 echo "--- Step 4b: Fixing codemod artifacts ---"
+
+# 0. Remove stale FlowFixMe[prop-missing] comments that were previously added
+#    for invalid React.AbstractComponent output from older codemod runs.
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -0pi -e '
+  s/^[ \t]*\/\/ \$FlowFixMe\[prop-missing\]\n(?=(?:[ \t]*\/\/ \$FlowFixMe\[[^\]]+\]\n|[ \t]*\n)*[^\n]*React\.ComponentType<)//mg;
+' {} +
 
 # 1. Fix missing commas after ([]: Array<empty>) in object literals.
 #    The codemod turns "[]," into "([]: Array<empty>)" but loses the comma.

@@ -108,14 +108,10 @@ export type EventsBasedBehaviorPropertiesEditorInterface = {|
   getPropertyEditorRef: (propertyName: string) => React.ElementRef<any>,
 |};
 
-// $FlowFixMe[prop-missing]
-export const EventsBasedBehaviorPropertiesEditor: React.AbstractComponent<
-  {
-    ...Props,
-    +ref?: React.RefSetter<EventsBasedBehaviorPropertiesEditorInterface>,
-  },
-  React.RefSetter<EventsBasedBehaviorPropertiesEditorInterface>
-> = React.forwardRef<Props, EventsBasedBehaviorPropertiesEditorInterface>(
+export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<EventsBasedBehaviorPropertiesEditorInterface>,
+}> = React.forwardRef<Props, EventsBasedBehaviorPropertiesEditorInterface>(
   (
     {
       project,

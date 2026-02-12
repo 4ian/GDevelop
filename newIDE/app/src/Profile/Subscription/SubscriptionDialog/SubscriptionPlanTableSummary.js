@@ -97,6 +97,7 @@ const SubscriptionPlanTableSummary = ({
                     alignItems="center"
                     justifyContent="space-between"
                   >
+                    {/* $FlowFixMe[incompatible-type] */}
                     <Text style={styles.bulletText}>
                       {summarizedFeature.displayedFeatureName}
                     </Text>

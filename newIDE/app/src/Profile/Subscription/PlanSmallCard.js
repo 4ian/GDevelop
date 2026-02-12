@@ -408,6 +408,7 @@ const PlanSmallCard = ({
                           ) : (
                             <CheckCircle style={styles.bulletIcon} />
                           )}
+                          {/* $FlowFixMe[incompatible-type] */}
                           <Text style={styles.bulletText}>
                             {selectMessageByLocale(i18n, bulletPointByLocale)}
                           </Text>

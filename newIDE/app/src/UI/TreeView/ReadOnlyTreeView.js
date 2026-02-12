@@ -714,9 +714,8 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
 };
 
 // $FlowFixMe[incompatible-type]
-// $FlowFixMe[prop-missing]
 // $FlowFixMe[incompatible-exact]
-export default (React.forwardRef(ReadOnlyTreeView): React.AbstractComponent<
-  { ...Props<any>, +ref?: React.RefSetter<any> },
-  React.RefSetter<any>
->);
+export default (React.forwardRef(ReadOnlyTreeView): React.ComponentType<{
+  ...Props<any>,
+  +ref?: React.RefSetter<any>,
+}>);

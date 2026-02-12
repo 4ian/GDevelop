@@ -104,6 +104,7 @@ export default class GroupEvent extends React.Component<
         }`}
       >
         {this.state.editing ? (
+          // $FlowFixMe[incompatible-type]
           <TextField
             margin="none"
             ref={textField => (this._textField = textField)}

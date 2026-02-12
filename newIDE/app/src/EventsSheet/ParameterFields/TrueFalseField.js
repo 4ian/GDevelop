@@ -44,6 +44,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     return (
       <Column noMargin>
         <Line alignItems="center" justifyContent="space-between">
+          {/* $FlowFixMe[incompatible-type] */}
           <Text style={styles.description} displayInlineAsSpan>
             {description}
           </Text>
@@ -63,11 +64,10 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </Column>
     );
   }
-  // $FlowFixMe[prop-missing]
-): React.AbstractComponent<
-  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
-  React.RefSetter<ParameterFieldInterface>
->);
+): React.ComponentType<{
+  ...ParameterFieldProps,
+  +ref?: React.RefSetter<ParameterFieldInterface>,
+}>);
 
 export const renderInlineTrueFalse = ({
   value,

@@ -51,6 +51,7 @@ const CloudProjectRecoveryDialog = ({
       onApply={() => {
         onSaveAsMainVersion();
       }}
+      // $FlowFixMe[incompatible-type]
       actions={actions}
       title={
         <Trans>

@@ -270,6 +270,7 @@ export default class RepeatEvent extends React.Component<
               repeatEvent.setRepeatExpressionPlainString(text);
               this.props.onUpdate();
             }}
+            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             isInline
             ref={field => (this._field = field)}

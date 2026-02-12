@@ -39,6 +39,7 @@ export const renderObjectListItem = ({
 }: Props): React.Node => {
   const objectName: string = objectWithContext.object.getName();
   return (
+    // $FlowFixMe[incompatible-type]
     <ListItem
       id={id}
       data={data}

@@ -10,7 +10,8 @@ project cannot parse:
 
 This script rewrites those constructs while preserving runtime behavior and as much
 type information as possible:
-  - component(...) -> React.ComponentType<Props> (or React.AbstractComponent when needed)
+  - component(...) -> React.ComponentType<Props>
+  - React.AbstractComponent<Props, Instance> -> React.ComponentType<{...Props, ref?: React.RefSetter<Instance>}>
   - renders T -> T (with renders any/mixed/empty/Fragment normalized to React.Node)
   - expr as T -> (expr: T)
 
@@ -22,6 +23,7 @@ from __future__ import annotations
 import json
 import os
 import pathlib
+import re
 import subprocess
 import sys
 from typing import Any, Dict, List, Optional, Tuple
@@ -117,6 +119,180 @@ def _object_property_key_name(property_node: Dict[str, Any]) -> Optional[str]:
     return None
 
 
+def _object_type_has_ref_property(object_type_node: Dict[str, Any]) -> bool:
+    for prop in object_type_node.get("properties", []):
+        if not isinstance(prop, dict):
+            continue
+        if prop.get("type") != "ObjectTypeProperty":
+            continue
+        if _object_property_key_name(prop) == "ref":
+            return True
+    return False
+
+
+def _qualified_type_identifier_name(type_id_node: Any) -> Optional[str]:
+    if not isinstance(type_id_node, dict):
+        return None
+    node_type = type_id_node.get("type")
+    if node_type == "Identifier":
+        return type_id_node.get("name")
+    if node_type == "QualifiedTypeIdentifier":
+        left = _qualified_type_identifier_name(type_id_node.get("qualification"))
+        right = _qualified_type_identifier_name(type_id_node.get("id"))
+        if left and right:
+            return f"{left}.{right}"
+        return right
+    return None
+
+
+def _is_react_abstract_component_type(type_id_node: Any) -> bool:
+    type_name = _qualified_type_identifier_name(type_id_node)
+    return type_name in {"React.AbstractComponent", "React$AbstractComponent"}
+
+
+def _type_parameter_nodes(type_parameters_node: Any) -> List[Dict[str, Any]]:
+    if not isinstance(type_parameters_node, dict):
+        return []
+    params = type_parameters_node.get("params")
+    if not isinstance(params, list):
+        return []
+    return [param for param in params if isinstance(param, dict)]
+
+
+def _is_ref_setter_type(type_text: str) -> bool:
+    stripped = type_text.strip()
+    return stripped.startswith("React.RefSetter<") or stripped.startswith(
+        "React$RefSetter<"
+    )
+
+
+def _to_ref_setter_type(instance_type_text: str) -> str:
+    stripped = instance_type_text.strip()
+    if not stripped:
+        return "React.RefSetter<mixed>"
+    if _is_ref_setter_type(stripped):
+        return stripped.replace("React$RefSetter", "React.RefSetter")
+    return f"React.RefSetter<{stripped}>"
+
+
+def _props_text_has_ref_property(props_type_text: str) -> bool:
+    return (
+        re.search(r"(^|[,{]\s*)\+?ref\??\s*:", props_type_text, re.MULTILINE)
+        is not None
+    )
+
+
+def _append_ref_property_to_object_type(
+    props_type_text: str, ref_prop_type: str
+) -> str:
+    original = props_type_text
+    stripped = original.rstrip()
+    trailing_whitespace = original[len(stripped) :]
+
+    if stripped.startswith("{|") and stripped.endswith("|}"):
+        open_token, close_token = "{|", "|}"
+    elif stripped.startswith("{") and stripped.endswith("}"):
+        open_token, close_token = "{", "}"
+    else:
+        return f"{{ ...{props_type_text.strip()}, +ref?: {ref_prop_type} }}"
+
+    inner = stripped[len(open_token) : -len(close_token)]
+    if _props_text_has_ref_property(inner):
+        return props_type_text
+
+    is_multiline = "\n" in stripped
+    inner_content = inner.strip()
+    if not is_multiline:
+        if inner_content:
+            separator = "," if not inner_content.endswith(",") else ""
+            return (
+                f"{open_token} {inner_content}{separator} +ref?: {ref_prop_type} "
+                f"{close_token}{trailing_whitespace}"
+            )
+        return (
+            f"{open_token} +ref?: {ref_prop_type} "
+            f"{close_token}{trailing_whitespace}"
+        )
+
+    # Multiline object type: place the new property on its own line and keep
+    # existing indentation style if possible.
+    closing_indent_match = re.search(r"\n([ \t]*)\s*$", inner)
+    closing_indent = closing_indent_match.group(1) if closing_indent_match else ""
+    property_indent_match = re.search(r"\n([ \t]+)\S", inner)
+    property_indent = (
+        property_indent_match.group(1)
+        if property_indent_match
+        else f"{closing_indent}  "
+    )
+
+    inner_without_trailing_space = inner.rstrip()
+    if inner_content:
+        if not inner_without_trailing_space.endswith(","):
+            inner_without_trailing_space += ","
+        if not inner_without_trailing_space.endswith("\n"):
+            inner_without_trailing_space += "\n"
+        new_inner = (
+            f"{inner_without_trailing_space}"
+            f"{property_indent}+ref?: {ref_prop_type},\n"
+            f"{closing_indent}"
+        )
+    else:
+        new_inner = (
+            f"\n{property_indent}+ref?: {ref_prop_type},\n"
+            f"{closing_indent}"
+        )
+
+    return f"{open_token}{new_inner}{close_token}{trailing_whitespace}"
+
+
+def _with_optional_ref_property(
+    props_type_text: str,
+    props_type_node: Optional[Dict[str, Any]],
+    instance_type_text: Optional[str],
+) -> str:
+    if not instance_type_text:
+        return props_type_text
+    if _props_text_has_ref_property(props_type_text):
+        return props_type_text
+    ref_prop_type = _to_ref_setter_type(instance_type_text)
+    if props_type_node and props_type_node.get("type") == "ObjectTypeAnnotation":
+        if _object_type_has_ref_property(props_type_node):
+            return props_type_text
+        return _append_ref_property_to_object_type(props_type_text, ref_prop_type)
+    if props_type_text.strip() == "any":
+        return f"{{ +ref?: {ref_prop_type}, ... }}"
+    return f"{{ ...{props_type_text}, +ref?: {ref_prop_type} }}"
+
+
+def _abstract_component_to_component_type(
+    node: Dict[str, Any], content: bytes
+) -> Optional[str]:
+    if node.get("type") != "GenericTypeAnnotation":
+        return None
+    if not _is_react_abstract_component_type(node.get("id")):
+        return None
+
+    type_params = _type_parameter_nodes(node.get("typeParameters"))
+    if not type_params:
+        return "React.ComponentType<any>"
+
+    props_node = type_params[0]
+    props_type = (
+        _node_text(content, props_node).strip() if "range" in props_node else "any"
+    )
+    if not props_type:
+        props_type = "any"
+
+    instance_type = None
+    if len(type_params) >= 2:
+        instance_node = type_params[1]
+        if "range" in instance_node:
+            instance_type = _node_text(content, instance_node).strip()
+
+    props_type = _with_optional_ref_property(props_type, props_node, instance_type)
+    return f"React.ComponentType<{props_type}>"
+
+
 def _extract_ref_type_from_component(
     component_node: Dict[str, Any], content: bytes
 ) -> Optional[str]:
@@ -155,10 +331,12 @@ def _component_to_legacy_type(
     component_node: Dict[str, Any], content: bytes
 ) -> str:
     props_type = "any"
+    props_type_node: Optional[Dict[str, Any]] = None
     rest = component_node.get("rest")
     if isinstance(rest, dict):
         rest_type = rest.get("typeAnnotation")
         if isinstance(rest_type, dict) and "range" in rest_type:
+            props_type_node = rest_type
             extracted_props = _node_text(content, rest_type).strip()
             if extracted_props:
                 props_type = extracted_props
@@ -172,13 +350,16 @@ def _component_to_legacy_type(
         if isinstance(rendered, dict) and "range" in rendered:
             renders_type = _node_text(content, rendered).strip()
 
-    if ref_type:
-        return f"React.AbstractComponent<{props_type}, {ref_type}>"
+    ref_instance_type = ref_type
+    if not ref_instance_type and renders_type and not _is_render_node_like(renders_type):
+        # Non-React-node renders targets generally represent a component
+        # interface/instance type. In modern Flow this is represented with a
+        # `ref` prop typed with React.RefSetter<Instance>.
+        ref_instance_type = renders_type
 
-    # In component syntax, non-React-node render targets are generally used for
-    # forwarded refs/interfaces. Preserve this with AbstractComponent.
-    if renders_type and not _is_render_node_like(renders_type):
-        return f"React.AbstractComponent<{props_type}, {renders_type}>"
+    props_type = _with_optional_ref_property(
+        props_type, props_type_node, ref_instance_type
+    )
 
     return f"React.ComponentType<{props_type}>"
 
@@ -226,6 +407,12 @@ def _collect_component_and_renders_replacements(
             start, end = node["range"]
             replacements.append((start, end, _component_to_legacy_type(node, content)))
             return
+
+        if node_type == "GenericTypeAnnotation" and "range" in node:
+            replacement = _abstract_component_to_component_type(node, content)
+            if replacement:
+                start, end = node["range"]
+                replacements.append((start, end, replacement))
 
         if (
             node_type == "TypeOperator"
@@ -299,11 +486,65 @@ def _collect_as_replacements(
     return replacements
 
 
+def _remove_stale_prop_missing_fixmes(content: bytes) -> Tuple[bytes, int]:
+    try:
+        text = content.decode("utf-8")
+    except UnicodeDecodeError:
+        return content, 0
+
+    lines = text.splitlines(keepends=True)
+    keep_lines: List[str] = []
+    removed = 0
+
+    specific_fixme_re = re.compile(r"^\s*// \$FlowFixMe\[prop-missing\]\s*$")
+    any_fixme_re = re.compile(r"^\s*// \$FlowFixMe\[[^\]]+\]\s*$")
+
+    i = 0
+    while i < len(lines):
+        current_stripped = lines[i].strip()
+        if specific_fixme_re.match(current_stripped):
+            j = i + 1
+            inspected = 0
+            remove_current = False
+            while j < len(lines) and inspected < 8:
+                candidate = lines[j].strip()
+                inspected += 1
+                if not candidate:
+                    j += 1
+                    continue
+                if any_fixme_re.match(candidate):
+                    j += 1
+                    continue
+                if "React.ComponentType<" in lines[j]:
+                    remove_current = True
+                break
+            if remove_current:
+                removed += 1
+                i += 1
+                continue
+        keep_lines.append(lines[i])
+        i += 1
+
+    if removed == 0:
+        return content, 0
+    return "".join(keep_lines).encode("utf-8"), removed
+
+
 def _process_file(path: pathlib.Path) -> Tuple[bool, int]:
     original = path.read_bytes()
 
     # Quick pre-filter to avoid expensive AST parsing on unrelated files.
-    if b"component(" not in original and b"renders " not in original and b" as " not in original:
+    has_componenttype_prop_missing = (
+        b"$FlowFixMe[prop-missing]" in original and b"React.ComponentType<" in original
+    )
+    if (
+        b"component(" not in original
+        and b"renders " not in original
+        and b" as " not in original
+        and b"AbstractComponent" not in original
+        and b"React$AbstractComponent" not in original
+        and not has_componenttype_prop_missing
+    ):
         return False, 0
 
     try:
@@ -340,6 +581,9 @@ def _process_file(path: pathlib.Path) -> Tuple[bool, int]:
         total_replacements += applied
         if applied == 0:
             break
+
+    content, removed_fixmes = _remove_stale_prop_missing_fixmes(content)
+    total_replacements += removed_fixmes
 
     if content != original:
         path.write_bytes(content)

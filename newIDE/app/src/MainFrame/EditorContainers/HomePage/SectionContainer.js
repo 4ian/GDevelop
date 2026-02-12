@@ -73,11 +73,10 @@ type Props = {|
   showUrgentAnnouncements?: boolean,
 |};
 
-// $FlowFixMe[prop-missing]
-const SectionContainer: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<HTMLDivElement> },
-  React.RefSetter<HTMLDivElement>
-> = React.forwardRef<Props, HTMLDivElement>(
+const SectionContainer: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<HTMLDivElement>,
+}> = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       children,
@@ -168,6 +167,7 @@ const SectionContainer: React.AbstractComponent<
                           <Chip label={chipText} style={styles.chip} />
                         </Line>
                       )}
+                      {/* $FlowFixMe[incompatible-type] */}
                       <Text size="title" noMargin style={styles.title}>
                         {title}
                       </Text>

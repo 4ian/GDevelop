@@ -589,6 +589,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                       onChange={this._handleChange}
                       onBlur={this._handleBlurEvent}
                       ref={field => (this._field = field)}
+                      // $FlowFixMe[incompatible-type]
                       onFocus={this._handleFocus}
                       errorText={this.state.errorText}
                       onClick={() => this._enqueueValidation()}

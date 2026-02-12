@@ -114,11 +114,10 @@ const identifyAssetPackKind = ({
     : 'unknown';
 };
 
-// $FlowFixMe[prop-missing]
-export const AssetStore: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<AssetStoreInterface> },
-  React.RefSetter<AssetStoreInterface>
-> = React.forwardRef<Props, AssetStoreInterface>(
+export const AssetStore: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<AssetStoreInterface>,
+}> = React.forwardRef<Props, AssetStoreInterface>(
   (
     {
       onlyShowAssets,

@@ -150,6 +150,7 @@ export class CodeEditor extends React.Component<Props, State> {
           </Text>
           <RaisedButton
             label={<Trans>Retry</Trans>}
+            // $FlowFixMe[method-unbinding]
             onClick={this.loadMonacoEditor}
           />
         </React.Fragment>

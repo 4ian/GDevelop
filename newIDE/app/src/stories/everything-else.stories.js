@@ -1107,6 +1107,7 @@ storiesOf('ParameterFields', module)
           }
           value={value}
           onChange={onChange}
+          // $FlowFixMe[incompatible-type]
           parameterRenderingService={ParameterRenderingService}
         />
       )}
@@ -1131,6 +1132,7 @@ storiesOf('ParameterFields', module)
           }
           value={value}
           onChange={onChange}
+          // $FlowFixMe[incompatible-type]
           parameterRenderingService={ParameterRenderingService}
         />
       )}
@@ -1153,6 +1155,7 @@ storiesOf('ParameterFields', module)
           }
           value={value}
           onChange={onChange}
+          // $FlowFixMe[incompatible-type]
           parameterRenderingService={ParameterRenderingService}
         />
       )}

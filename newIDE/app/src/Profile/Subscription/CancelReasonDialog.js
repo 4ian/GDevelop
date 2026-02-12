@@ -156,6 +156,7 @@ const CancelReasonDialog = ({
       {({ i18n }) => (
         <Dialog
           title={null}
+          // $FlowFixMe[incompatible-type]
           actions={actions}
           // $FlowFixMe[incompatible-type]
           secondaryActions={secondaryActions}

@@ -218,6 +218,7 @@ const ResponsiveMediaGallery = ({
           )}
         </Measure>
         <Line justifyContent="center">
+          {/* $FlowFixMe[incompatible-type] */}
           <Text noMargin size="body2" style={styles.disabledText}>
             {currentlyViewedImageIndex + 1}/{mediaItems.length}
           </Text>

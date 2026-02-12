@@ -538,11 +538,6 @@ const TileSetVisualizer = ({
           }
           onSelectTileMapTile(newSelection);
         } else if (allowRectangleSelection) {
-          const currentKind =
-            tileMapTileSelection?.kind === 'freehand' ||
-            tileMapTileSelection?.kind === 'floodfill'
-              ? tileMapTileSelection.kind
-              : 'rectangle';
           const shouldRemoveSelection =
             tileMapTileSelection &&
             isTileMapPaintingSelection(tileMapTileSelection) &&
@@ -564,12 +559,27 @@ const TileSetVisualizer = ({
               x: Math.max(startX, x),
               y: Math.max(startY, y),
             };
-            const newSelection = {
-              kind: currentKind,
-              coordinates: [topLeftCorner, bottomRightCorner],
-              flipHorizontally: shouldFlipHorizontally,
-              flipVertically: shouldFlipVertically,
-            };
+            // Preserve the previous selection kind (freehand/floodfill) or default to rectangle
+            let newSelection: TileMapTileSelection;
+            const currentSelectionKind = tileMapTileSelection && tileMapTileSelection.kind;
+            if (
+              currentSelectionKind === 'freehand' ||
+              currentSelectionKind === 'floodfill'
+            ) {
+              newSelection = {
+                kind: currentSelectionKind,
+                coordinates: [topLeftCorner, bottomRightCorner],
+                flipHorizontally: shouldFlipHorizontally,
+                flipVertically: shouldFlipVertically,
+              };
+            } else {
+              newSelection = {
+                kind: 'rectangle',
+                coordinates: [topLeftCorner, bottomRightCorner],
+                flipHorizontally: shouldFlipHorizontally,
+                flipVertically: shouldFlipVertically,
+              };
+            }
             onSelectTileMapTile(newSelection);
           }
         }
@@ -745,7 +755,7 @@ const TileSetVisualizer = ({
                     onSelectTileMapTile(null);
                   else
                     onSelectTileMapTile(
-                      lastSelection?.kind === 'rectangle'
+                      lastSelection && lastSelection.kind === 'rectangle'
                         ? lastSelection
                         : {
                             kind: 'rectangle',
@@ -808,10 +818,11 @@ const TileSetVisualizer = ({
                     !!tileMapTileSelection &&
                     isTileMapPaintingSelection(tileMapTileSelection)
                   ) {
-                    onSelectTileMapTile({
+                    const selection: TileMapTileSelection = {
                       ...tileMapTileSelection,
                       flipHorizontally: newShouldFlipHorizontally,
-                    });
+                    };
+                    onSelectTileMapTile(selection);
                   }
                 }}
               >
@@ -832,10 +843,11 @@ const TileSetVisualizer = ({
                     !!tileMapTileSelection &&
                     isTileMapPaintingSelection(tileMapTileSelection)
                   ) {
-                    onSelectTileMapTile({
+                    const selection: TileMapTileSelection = {
                       ...tileMapTileSelection,
                       flipVertically: newShouldFlipVertically,
-                    });
+                    };
+                    onSelectTileMapTile(selection);
                   }
                 }}
               >

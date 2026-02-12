@@ -39,7 +39,10 @@ const HelpIcon = (props: PropsType): null | React.Node => {
 
   return (
     <IconButton
-      onClick={() => Window.openExternalURL(getHelpLink(helpPagePath))}
+      onClick={event => {
+        event.stopPropagation();
+        Window.openExternalURL(getHelpLink(helpPagePath));
+      }}
       disabled={props.disabled}
       style={props.style}
       size={props.size}

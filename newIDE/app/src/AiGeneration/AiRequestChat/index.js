@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
-// $FlowFixMe[import-type-as-value]
-import { I18n as I18nType } from '@lingui/core';
+import type { I18n as I18nType } from '@lingui/core';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
 import { Trans, t } from '@lingui/macro';

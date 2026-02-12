@@ -12,7 +12,6 @@ import { type Leaderboard } from '../../Utils/GDevelopServices/Play';
 import { hasValidSubscriptionPlan } from '../../Utils/GDevelopServices/Usage';
 
 export const checkIfHasTooManyLeaderboards = (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   leaderboards: ?Array<Leaderboard>
 ): ?(false | boolean) => {

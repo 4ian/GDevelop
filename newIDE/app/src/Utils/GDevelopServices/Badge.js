@@ -111,7 +111,6 @@ export const createOrEnsureBadgeForUser = async (
 export const addCreateBadgePreHookIfNotClaimed = <
   T: (...args: Array<any>) => any
 >(
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   achievementId: string,
   callback: T
@@ -146,7 +145,6 @@ export const getAchievements = async (): Promise<Array<Achievement>> => {
 };
 
 export const markBadgesAsSeen = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser
 ): Promise<?void> => {
   const {

@@ -74,7 +74,6 @@ type Props = {|
 |};
 
 type State = {|
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   loginDialogOpen: boolean,
   loginWithPurchaseClaimDialogOpen: boolean,
@@ -367,7 +366,6 @@ export default class AuthenticatedUserProvider extends React.Component<
     const { authentication } = this.props;
 
     this.setState(({ authenticatedUser }) => {
-      // $FlowFixMe[value-as-type]
       let newAuthenticatedUser: AuthenticatedUser = {
         ...authenticatedUser,
         loginState: 'loggingIn',
@@ -1170,7 +1168,6 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
-  // $FlowFixMe[value-as-type]
   _showLoginSnackbar = (authenticatedUser: AuthenticatedUser) => {
     const username = authenticatedUser.profile
       ? authenticatedUser.profile.username

@@ -224,8 +224,7 @@ const MainPage = ({
                           ),
                         };
                       })
-                    : // $FlowFixMe[underconstrained-implicit-instantiation]
-                      new Array(6).fill(0).map((_, index) => ({
+                    : new Array<number>(6).fill(0).map((_, index) => ({
                         renderItem: () => (
                           <GridListTile key={`skeleton-course-${index}`}>
                             <CourseCard

@@ -28,8 +28,7 @@ import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWin
 import { type Game } from '../../../../Utils/GDevelopServices/Game';
 
 const getRecentProjectFiles = (count: number) =>
-  // $FlowFixMe[underconstrained-implicit-instantiation]
-  new Array(count).fill(0).map((_, index) => ({
+  new Array<number>(count).fill(0).map((_, index) => ({
     fileMetadata: {
       fileIdentifier: `Users/me/Desktop/Gdevelop/project ${index}`,
       lastModifiedDate: Math.floor(Math.random() * 1656942410477) + 1,
@@ -38,8 +37,7 @@ const getRecentProjectFiles = (count: number) =>
   }));
 
 const getPartiallySavedRecentProjectFiles = (count: number) =>
-  // $FlowFixMe[underconstrained-implicit-instantiation]
-  new Array(count).fill(0).map((_, index) => ({
+  new Array<number>(count).fill(0).map((_, index) => ({
     fileMetadata: {
       fileIdentifier: `Users/Gdevelop/project ${index}`,
       lastModifiedDate:
@@ -63,7 +61,6 @@ const WrappedCreateSection = ({
   recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
   tutorialProgress?: InAppTutorialUserProgress,
   inAppTutorialsFetchingError?: string | null,
-  // $FlowFixMe[value-as-type]
   user: AuthenticatedUser,
   games?: ?Array<Game>,
 |}): React.Node => {

@@ -140,6 +140,43 @@ const SpineEditor = ({
     [project, spineResourceName, setSourceSelectOptions]
   );
 
+  const skinsSelectOptionsList = React.useMemo(
+    () => {
+      if (spineData.skeleton && spineData.skeleton.skins) {
+        return spineData.skeleton.skins.map(skin => skin.name);
+      } else {
+        // $FlowFixMe[missing-empty-array-annot]
+        return [];
+      }
+    },
+    [spineData.skeleton]
+  );
+
+  const skinName = spineConfiguration.getSkinName();
+
+  const changeSpineSkin = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
+    skinName => {
+      objectConfiguration.updateProperty('skinName', skinName);
+      if (onObjectUpdated) onObjectUpdated();
+      forceUpdate();
+    },
+    [objectConfiguration, onObjectUpdated, forceUpdate]
+  );
+
+  React.useEffect(
+    () => {
+      if (
+        skinsSelectOptionsList.length &&
+        (!skinName || !skinsSelectOptionsList.includes(skinName))
+      ) {
+        const defaultSkinObject = skinsSelectOptionsList[0] || '';
+        changeSpineSkin(defaultSkinObject);
+      }
+    },
+    [changeSpineSkin, skinName, skinsSelectOptionsList]
+  );
+
   const onChangeSpineResourceName = React.useCallback(
     () => {
       spineConfiguration.removeAllAnimations();
@@ -397,6 +434,35 @@ const SpineEditor = ({
           objectConfiguration={objectConfiguration}
           propertyName="scale"
         />
+        {skinsSelectOptionsList.length > 0 && (
+          <>
+            <Text size="block-title">
+              <Trans>Skins</Trans>
+            </Text>
+            <SelectField
+              id="skin-name-field"
+              value={skinName}
+              onChange={event => {
+                changeSpineSkin(event.target.value);
+              }}
+              margin="dense"
+              fullWidth
+              floatingLabelText={<Trans>Default skin</Trans>}
+              translatableHintText={t`Choose a skin`}
+            >
+              {skinsSelectOptionsList.map(skinName => {
+                return (
+                  <SelectOption
+                    key={skinName}
+                    value={skinName}
+                    label={skinName}
+                    shouldNotTranslate
+                  />
+                );
+              })}
+            </SelectField>
+          </>
+        )}
         {sourceSelectOptions.length && (
           <>
             <Text size="block-title">Animations</Text>

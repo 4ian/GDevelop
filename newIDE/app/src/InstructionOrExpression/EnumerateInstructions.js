@@ -585,10 +585,8 @@ export const enumerateObjectAndBehaviorsInstructions = (
       const freeBehaviorInstructions: Array<EnumeratedInstructionMetadata> = [];
       for (let i = 0; i < allExtensions.size(); ++i) {
         const extension = allExtensions.at(i);
-        // $FlowFixMe[method-unbinding]
-        freeBehaviorInstructions.push.apply(
-          freeBehaviorInstructions,
-          enumerateExtraBehaviorInstructions(
+        freeBehaviorInstructions.push(
+          ...enumerateExtraBehaviorInstructions(
             isCondition,
             extension,
             behaviorType,
@@ -651,10 +649,9 @@ export const enumerateFreeInstructions = (
   for (let i = 0; i < allExtensions.size(); ++i) {
     const extension = allExtensions.at(i);
 
-    // $FlowFixMe[method-unbinding]
-    allFreeInstructions.push.apply(
-      allFreeInstructions,
-      enumerateFreeInstructionsWithoutExtra(
+    // $FlowFixMe[incompatible-type]
+    allFreeInstructions.push(
+      ...enumerateFreeInstructionsWithoutExtra(
         isCondition,
         extension,
         {

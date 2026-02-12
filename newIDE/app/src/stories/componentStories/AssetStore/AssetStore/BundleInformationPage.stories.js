@@ -77,7 +77,6 @@ const BundleInformationPageStory = ({
   errorMessage,
 }: {
   bundleListingDataToDisplay: BundleListingData,
-  // $FlowFixMe[value-as-type]
   authenticatedUser?: AuthenticatedUser,
   receivedBundles?: Array<Bundle>,
   delayResponse?: number,

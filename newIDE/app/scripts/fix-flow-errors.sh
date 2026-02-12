@@ -155,6 +155,278 @@ python3 "$SCRIPT_DIR/fix-arrow-return-types.py"
 echo "  Done."
 
 ###############################################################################
+# STEP 4b: Fix codemod artifacts that cause parse errors or Flow issues
+###############################################################################
+echo ""
+echo "--- Step 4b: Fixing codemod artifacts ---"
+
+# 1. Fix missing commas after ([]: Array<empty>) in object literals.
+#    The codemod turns "[]," into "([]: Array<empty>)" but loses the comma.
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
+  s/\(\[\]: Array<empty>\)(\s*\/\/.*)$/([]: Array<empty>),$1/g;
+' {} +
+
+# 2. Fix "new Array(n)" -> "new Array<number>(n)" to avoid underconstrained type
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
+  s/new Array\(([^)]+)\)\.fill\(0\)/new Array<number>($1).fill(0)/g;
+' {} +
+
+# 3. Fix !== null comparisons on number types -> != null
+#    (Flow 0.299 is strict about comparing non-nullable numbers to null)
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
+  s/selectedCompletionIndex !== null/selectedCompletionIndex != null/g;
+' {} +
+
+# 5. Generic type params like new Set<any>(), new Map<any,any>(), React.createRef<any>()
+#    are NOT parseable by prettier 1.15 (it treats < as comparison operator).
+#    These will get FlowFixMe[underconstrained-implicit-instantiation] automatically.
+
+# 6. new Array(n) patterns beyond .fill(0) also can't use <any> with prettier 1.15.
+
+# 7. axios calls with type params - skip, prettier 1.15 mangles method<Type>() syntax.
+#    These will get FlowFixMe[underconstrained-implicit-instantiation] automatically.
+
+# 8. jest.fn() - leave as-is, prettier 1.15 can't parse jest.fn<any>()
+#    These will get FlowFixMe[underconstrained-implicit-instantiation] automatically.
+
+# 9. Fix method-unbinding for common patterns: .push.apply -> spread syntax
+#    Handles both single-line and multi-line push.apply patterns.
+python3 << 'PYEOF'
+import os, re
+
+src_dir = os.path.join(os.environ.get('APP_DIR', os.getcwd()), 'src')
+fixed = 0
+
+for root, dirs, files in os.walk(src_dir):
+    for fname in files:
+        if not fname.endswith('.js'):
+            continue
+        filepath = os.path.join(root, fname)
+        with open(filepath) as f:
+            content = f.read()
+        original = content
+        # Multi-line pattern: arr.push.apply(\n  arr,\n  items\n)
+        content = re.sub(
+            r'(\w+)\.push\.apply\(\s*\1\s*,\s*([^)]+?)\s*\)',
+            lambda m: f'{m.group(1)}.push(...{m.group(2).strip()})',
+            content,
+            flags=re.DOTALL)
+        if content != original:
+            with open(filepath, 'w') as f:
+                f.write(content)
+            fixed += 1
+
+print(f"  Converted {fixed} push.apply to spread syntax")
+PYEOF
+
+# 10. Fix import-type-as-value: convert value imports of type-only symbols to import type.
+#     I18n from @lingui/core is a type (interface) used only in type positions.
+find "$APP_DIR/src" -name "*.js" -type f -exec perl -pi -e '
+  s/^(\/\/ \$FlowFixMe\[import-type-as-value\]\n)?import \{ I18n as I18nType \} from/import type { I18n as I18nType } from/g;
+' {} +
+
+# Fix TreeViewItemContent import-type-as-value: these are interfaces (type-only)
+python3 << 'PYEOF'
+import os, re
+
+app_dir = os.environ.get('APP_DIR', os.getcwd())
+src_dir = os.path.join(app_dir, 'src')
+fixed = 0
+
+for root, dirs, files in os.walk(src_dir):
+    for fname in files:
+        if not fname.endswith('.js'):
+            continue
+        filepath = os.path.join(root, fname)
+        with open(filepath) as f:
+            content = f.read()
+        original = content
+
+        # Remove FlowFixMe[import-type-as-value] above import lines where
+        # we can safely convert to import type
+        lines = content.split('\n')
+        new_lines = []
+        i = 0
+        while i < len(lines):
+            line = lines[i]
+            # Skip FlowFixMe[import-type-as-value] if the next line is an import we'll fix
+            if '$FlowFixMe[import-type-as-value]' in line:
+                # Check if this is a standalone FlowFixMe comment line
+                stripped = line.lstrip()
+                if stripped.startswith('// $FlowFixMe[import-type-as-value]'):
+                    # Check if next line is an import statement
+                    if i + 1 < len(lines) and 'import' in lines[i + 1]:
+                        # Skip this FlowFixMe comment
+                        i += 1
+                        continue
+                    # Check if this is inside an import block (destructured import)
+                    # Look backwards for the import statement
+                    is_in_import = False
+                    for j in range(i - 1, max(i - 10, -1), -1):
+                        if 'import' in lines[j] and '{' in lines[j]:
+                            is_in_import = True
+                            break
+                        if '}' in lines[j] and 'from' in lines[j]:
+                            break
+                    if is_in_import:
+                        # Skip this FlowFixMe
+                        i += 1
+                        continue
+            new_lines.append(line)
+            i += 1
+
+        content = '\n'.join(new_lines)
+
+        # Convert import { I18n as I18nType } to import type
+        content = re.sub(
+            r"import \{ I18n as I18nType \} from '@lingui/core'",
+            "import type { I18n as I18nType } from '@lingui/core'",
+            content)
+
+        if content != original:
+            with open(filepath, 'w') as f:
+                f.write(content)
+            fixed += 1
+
+print(f"  Fixed {fixed} import-type-as-value issues")
+PYEOF
+
+# 4. Fix inline object return types on multi-line arrow function params
+#    that fix-arrow-return-types.py couldn't handle (nested parens in destructured args).
+#    Pattern: ): { ... } => { (where the object return type causes prettier parse error)
+python3 << 'PYEOF'
+import os, re, subprocess
+
+app_dir = os.environ.get('APP_DIR', os.getcwd())
+
+# Find files with prettier parse errors
+result = subprocess.run(
+    ['npx', 'prettier', '--list-different', 'src/!(locales)/**/*.js'],
+    capture_output=True, text=True, cwd=app_dir, timeout=120
+)
+all_output = result.stdout + '\n' + result.stderr
+error_files = set()
+for line in all_output.split('\n'):
+    m = re.match(r'\[error\]\s+(src/\S+\.js):\s+SyntaxError', line)
+    if m:
+        error_files.add(os.path.join(app_dir, m.group(1)))
+
+fixed = 0
+for filepath in error_files:
+    if not os.path.isfile(filepath):
+        continue
+    with open(filepath) as f:
+        content = f.read()
+    original = content
+
+    # Find ): { ... } => patterns (multi-line object return types)
+    # This regex works on the whole content to find the ): { ... } => pattern
+    # We need to use a balanced-brace approach
+    pos = 0
+    replacements = []
+    while True:
+        idx = content.find('):', pos)
+        if idx == -1:
+            break
+        # Check if followed by whitespace then {
+        rest = content[idx+2:].lstrip()
+        if not rest.startswith('{'):
+            pos = idx + 2
+            continue
+        brace_start = content.index('{', idx + 2)
+        # Find matching close brace
+        depth = 0
+        i = brace_start
+        while i < len(content):
+            if content[i] == '{':
+                depth += 1
+            elif content[i] == '}':
+                depth -= 1
+                if depth == 0:
+                    break
+            elif content[i] in ('"', "'", '`'):
+                q = content[i]
+                i += 1
+                while i < len(content) and content[i] != q:
+                    if content[i] == '\\':
+                        i += 1
+                    i += 1
+            i += 1
+        if depth != 0:
+            pos = idx + 2
+            continue
+        brace_end = i
+        # Check if followed by => (arrow)
+        after = content[brace_end+1:].lstrip()
+        if not after.startswith('=>'):
+            pos = idx + 2
+            continue
+        type_text = content[brace_start:brace_end+1]
+        if '\n' not in type_text:
+            pos = idx + 2
+            continue
+        # Find function name for type alias
+        line_start = content.rfind('\n', 0, idx)
+        if line_start == -1:
+            line_start = 0
+        # Find export const/let/var name = ... pattern
+        preceding = content[max(0, line_start-200):idx+2]
+        name_match = re.search(r'(?:const|let|var|function)\s+(\w+)', preceding)
+        name = name_match.group(1) if name_match else 'Func'
+        type_name = f'_{name[0].upper()}{name[1:]}ReturnType'
+        # Check if type alias already exists
+        if f'type {type_name}' in content:
+            pos = idx + 2
+            continue
+        replacements.append((brace_start, brace_end+1, type_name, type_text))
+        pos = brace_end + 1
+
+    if not replacements:
+        continue
+
+    # Apply in reverse
+    for brace_start, brace_end, type_name, type_text in reversed(replacements):
+        content = content[:brace_start] + type_name + content[brace_end:]
+
+    # Insert type declarations at the top (after imports)
+    insert_lines = []
+    for _, _, type_name, type_text in replacements:
+        insert_lines.append(f'type {type_name} = {type_text};\n')
+
+    # Find insertion point (after last import)
+    last_import = 0
+    for m in re.finditer(r'^(?:import\s|from\s)', content, re.MULTILINE):
+        eol = content.find('\n', m.start())
+        # Handle multi-line imports
+        if '{' in content[m.start():eol] and '}' not in content[m.start():eol]:
+            eol = content.find('}', eol)
+            eol = content.find('\n', eol)
+        # Handle from '...' on next line
+        next_line_start = eol + 1
+        if next_line_start < len(content):
+            next_stripped = content[next_line_start:].lstrip()
+            if next_stripped.startswith("from ") or next_stripped.startswith("} from "):
+                eol = content.find('\n', next_line_start)
+        if eol > last_import:
+            last_import = eol
+    if last_import > 0:
+        insert_pos = last_import + 1
+    else:
+        insert_pos = 0
+    insert_text = '\n' + ''.join(insert_lines) + '\n'
+    content = content[:insert_pos] + insert_text + content[insert_pos:]
+
+    if content != original:
+        with open(filepath, 'w') as f:
+            f.write(content)
+        fixed += 1
+
+print(f"  Fixed {fixed} additional arrow-return-type files")
+PYEOF
+
+echo "  Done."
+
+###############################################################################
 # STEP 5: Fix specific known issues
 ###############################################################################
 echo ""
@@ -292,6 +564,83 @@ if os.path.isfile(pgts_file):
             f.write(updated)
         fixed += 1
 
+# Fix ConditionsActionsColumns.js - renderActionsList type needs style prop
+cac_file = os.path.join(app_dir, 'src/EventsSheet/EventsTree/ConditionsActionsColumns.js')
+if os.path.isfile(cac_file):
+    with open(cac_file) as f:
+        content = f.read()
+    updated = content.replace(
+        'renderActionsList: ({ className: string }) => React.Node,',
+        'renderActionsList: ({ style?: Object, className: string }) => React.Node,')
+    if updated != content:
+        with open(cac_file, 'w') as f:
+            f.write(updated)
+        fixed += 1
+
+# Fix PreferencesContext.js - annotate missing params for signature-verification
+pref_file = os.path.join(app_dir, 'src/MainFrame/Preferences/PreferencesContext.js')
+if os.path.isfile(pref_file):
+    with open(pref_file) as f:
+        content = f.read()
+    updated = content
+    updated = updated.replace(
+        'getRecentProjectFiles: options => [],',
+        'getRecentProjectFiles: (options: any): any => [],')
+    updated = updated.replace(
+        'getEditorStateForProject: projectId => {},',
+        'getEditorStateForProject: (projectId: any): any => {},')
+    if updated != content:
+        with open(pref_file, 'w') as f:
+            f.write(updated)
+        fixed += 1
+
+# Fix ShortcutsList.js - annotate commandName parameter
+sc_file = os.path.join(app_dir, 'src/KeyboardShortcuts/ShortcutsList.js')
+if os.path.isfile(sc_file):
+    with open(sc_file) as f:
+        content = f.read()
+    updated = content.replace(
+        'areaWiseCommands[areaName].map(commandName =>',
+        'areaWiseCommands[areaName].map((commandName: string) =>')
+    if updated != content:
+        with open(sc_file, 'w') as f:
+            f.write(updated)
+        fixed += 1
+
+# Fix ProjectManager/index.js - useState(null) needs type param for ?gdLayout
+pm_file = os.path.join(app_dir, 'src/ProjectManager/index.js')
+if os.path.isfile(pm_file):
+    with open(pm_file) as f:
+        content = f.read()
+    updated = content
+    # Add type annotation to useState calls that should be ?gdLayout
+    updated = re.sub(
+        r'const \[editedPropertiesLayout, setEditedPropertiesLayout\] = React\.useState\(\s*\n\s*null\s*\n\s*\)',
+        'const [editedPropertiesLayout, setEditedPropertiesLayout] = React.useState<?gdLayout>(\n      null\n    )',
+        updated)
+    updated = re.sub(
+        r'const \[editedVariablesLayout, setEditedVariablesLayout\] = React\.useState\(\s*\n\s*null\s*\n\s*\)',
+        'const [editedVariablesLayout, setEditedVariablesLayout] = React.useState<?gdLayout>(\n      null\n    )',
+        updated)
+    if updated != content:
+        with open(pm_file, 'w') as f:
+            f.write(updated)
+        fixed += 1
+
+# Fix CollisionMasksPreview.js - use type cast for inexact/exact mismatch
+cmp_file = os.path.join(app_dir, 'src/ObjectEditor/Editors/SpriteEditor/CollisionMasksEditor/CollisionMasksPreview.js')
+if os.path.isfile(cmp_file):
+    with open(cmp_file) as f:
+        content = f.read()
+    # Cast polygons to any to bypass inexact/exact mismatch
+    updated = content.replace(
+        'mapVector(polygons,',
+        'mapVector((polygons: any),')
+    if updated != content:
+        with open(cmp_file, 'w') as f:
+            f.write(updated)
+        fixed += 1
+
 print(f"  Fixed {fixed} known annotate-exports signature gaps and type issues")
 PYEOF
 
@@ -417,7 +766,8 @@ echo "--- Step 10: Fixing eslint/FlowFixMe comment ordering ---"
 
 # When $FlowFixMe is inserted between eslint-disable-next-line and the code,
 # eslint-disable no longer applies (it targets the FlowFixMe comment instead).
-# Fix: convert eslint-disable-next-line to eslint-disable-line on the code line.
+# Fix: wrap the code with eslint-disable/eslint-enable block comments, so that
+# both the FlowFixMe suppression and the eslint suppression work correctly.
 python3 << 'PYEOF'
 import os, re
 
@@ -436,40 +786,65 @@ for root, dirs, files in os.walk(src_dir):
         new_lines = []
         i = 0
         while i < len(lines):
-            # Pattern: $FlowFixMe[...], then eslint-disable-next-line, then code
+            # Pattern: eslint-disable-next-line, then one or more $FlowFixMe[...], then code
             if (i + 2 < len(lines) and
-                '$FlowFixMe[' in lines[i] and
-                'eslint-disable-next-line' in lines[i + 1]):
-                m = re.search(r'eslint-disable-next-line\s+(.+)', lines[i + 1])
-                if m:
-                    rule = m.group(1).strip()
-                    new_lines.append(lines[i])  # Keep $FlowFixMe
-                    # Skip eslint-disable-next-line, add as inline on code line
-                    code_line = lines[i + 2].rstrip()
-                    if 'eslint-disable-line' not in code_line:
-                        code_line = code_line + f' // eslint-disable-line {rule}'
-                    new_lines.append(code_line + '\n')
-                    i += 3
-                    modified = True
-                    fixed += 1
-                    continue
-            # Pattern: eslint-disable-next-line, then $FlowFixMe[...], then code
-            elif (i + 2 < len(lines) and
                   'eslint-disable-next-line' in lines[i] and
                   '$FlowFixMe[' in lines[i + 1]):
                 m = re.search(r'eslint-disable-next-line\s+(.+)', lines[i])
                 if m:
                     rule = m.group(1).strip()
-                    new_lines.append(lines[i + 1])  # Keep $FlowFixMe
-                    # Skip eslint-disable-next-line, add as inline on code line
-                    code_line = lines[i + 2].rstrip()
-                    if 'eslint-disable-line' not in code_line:
-                        code_line = code_line + f' // eslint-disable-line {rule}'
-                    new_lines.append(code_line + '\n')
-                    i += 3
-                    modified = True
-                    fixed += 1
-                    continue
+                    # Collect all consecutive FlowFixMe lines
+                    fixme_lines = []
+                    j = i + 1
+                    while j < len(lines) and '$FlowFixMe[' in lines[j]:
+                        fixme_lines.append(lines[j])
+                        j += 1
+                    if j < len(lines):
+                        code_line = lines[j]
+                        indent = ''
+                        for ch in code_line:
+                            if ch in (' ', '\t'):
+                                indent += ch
+                            else:
+                                break
+                        # Use eslint-disable/enable block wrapping FlowFixMe + code
+                        new_lines.append(f'{indent}/* eslint-disable {rule} */\n')
+                        for fl in fixme_lines:
+                            new_lines.append(fl)
+                        new_lines.append(code_line)
+                        new_lines.append(f'{indent}/* eslint-enable {rule} */\n')
+                        i = j + 1
+                        modified = True
+                        fixed += 1
+                        continue
+            # Pattern: one or more $FlowFixMe[...], then eslint-disable-next-line, then code
+            elif (i + 2 < len(lines) and
+                '$FlowFixMe[' in lines[i] and
+                'eslint-disable-next-line' in lines[i + 1]):
+                # Find where the FlowFixMe block starts
+                fixme_start = i
+                # The eslint line is after one FlowFixMe; collect FlowFixMe after it too
+                m = re.search(r'eslint-disable-next-line\s+(.+)', lines[i + 1])
+                if m:
+                    rule = m.group(1).strip()
+                    j = i + 2
+                    # Code line is right after eslint-disable-next-line
+                    if j < len(lines):
+                        code_line = lines[j]
+                        indent = ''
+                        for ch in code_line:
+                            if ch in (' ', '\t'):
+                                indent += ch
+                            else:
+                                break
+                        new_lines.append(f'{indent}/* eslint-disable {rule} */\n')
+                        new_lines.append(lines[i])  # Keep $FlowFixMe
+                        new_lines.append(code_line)
+                        new_lines.append(f'{indent}/* eslint-enable {rule} */\n')
+                        i = j + 1
+                        modified = True
+                        fixed += 1
+                        continue
             
             new_lines.append(lines[i])
             i += 1
@@ -480,6 +855,14 @@ for root, dirs, files in os.walk(src_dir):
 
 print(f"  Fixed {fixed} eslint/FlowFixMe orderings")
 PYEOF
+
+###############################################################################
+# STEP 11: Final format after all fixes
+###############################################################################
+echo ""
+echo "--- Step 11: Final format pass ---"
+npm run format 2>&1 || true
+echo "  Done."
 
 echo ""
 echo "=== Flow Migration Fix Script Complete ==="

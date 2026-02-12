@@ -93,7 +93,6 @@ const zipAndPrepareProjectVersionForCommit = async ({
   cloudProjectId,
   options,
 }: {|
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   project: gdProject,
   cloudProjectId: string,
@@ -130,7 +129,6 @@ const commitProjectVersion = async ({
   cloudProjectId,
   options,
 }: {|
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   presignedUrl: string,
   zippedProject: Blob,
@@ -150,7 +148,6 @@ const commitProjectVersion = async ({
   return newVersion;
 };
 
-// $FlowFixMe[value-as-type]
 export const generateOnSaveProject = (
   authenticatedUser: AuthenticatedUser
 ): ((
@@ -241,7 +238,6 @@ export const generateOnSaveProject = (
   };
 };
 
-// $FlowFixMe[value-as-type]
 export const generateOnChangeProjectProperty = (
   authenticatedUser: AuthenticatedUser
 ): ((
@@ -306,7 +302,6 @@ export const generateOnChooseSaveProjectAsLocation = ({
   setDialog,
   closeDialog,
 }: {|
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   setDialog: (() => React.Node) => void,
   closeDialog: () => void,
@@ -370,7 +365,6 @@ export const generateOnChooseSaveProjectAsLocation = ({
 };
 
 export const generateOnSaveProjectAs = (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   setDialog: (() => React.Node) => void,
   closeDialog: () => void
@@ -493,7 +487,6 @@ export const renderNewProjectSaveAsLocationChooser = ({
   return null;
 };
 
-// $FlowFixMe[value-as-type]
 export const generateOnAutoSaveProject = (
   authenticatedUser: AuthenticatedUser
 ): ((project: gdProject, fileMetadata: FileMetadata) => Promise<void>) | void =>
@@ -514,7 +507,6 @@ export const generateOnAutoSaveProject = (
     : undefined;
 
 const canFileMetadataBeSafelySaved = async (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   fileMetadata: FileMetadata,
   options: ?SaveProjectOptions,

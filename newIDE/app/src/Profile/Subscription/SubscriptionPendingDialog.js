@@ -20,7 +20,6 @@ import { canBenefitFromDiscordRole } from '../../Utils/GDevelopServices/Usage';
 
 type Props = {|
   onClose: () => void,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   onSuccess: () => void,
   immediatelyShowSuccessMessage?: boolean,

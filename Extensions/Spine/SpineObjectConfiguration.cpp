@@ -21,7 +21,7 @@ using namespace std;
 SpineAnimation SpineObjectConfiguration::badAnimation;
 
 SpineObjectConfiguration::SpineObjectConfiguration()
-    : scale(1), spineResourceName("") {};
+    : scale(1), spineResourceName(""), skinName("") {};
 
 bool SpineObjectConfiguration::UpdateProperty(const gd::String &propertyName, const gd::String &newValue) {
   if (propertyName == "scale") {
@@ -30,6 +30,10 @@ bool SpineObjectConfiguration::UpdateProperty(const gd::String &propertyName, co
   }
   if (propertyName == "spineResourceName") {
     spineResourceName = newValue;
+    return true;
+  }
+  if (propertyName == "skinName") {
+    skinName = newValue;
     return true;
   }
 
@@ -51,6 +55,13 @@ SpineObjectConfiguration::GetProperties() const {
       .SetType("resource")
       .AddExtraInfo("spine")
       .SetLabel(_("Spine json"));
+
+  objectProperties["skinName"]
+      .SetValue(skinName)
+      .SetType("string")
+      .SetLabel(_("Skin"))
+      .SetGroup(_("Skins"))
+      .SetHidden();
 
   return objectProperties;
 }
@@ -82,6 +93,7 @@ void SpineObjectConfiguration::DoUnserializeFrom(gd::Project &project, const gd:
 
   scale = content.GetDoubleAttribute("scale");
   spineResourceName = content.GetStringAttribute("spineResourceName");
+  skinName = content.GetStringAttribute("skinName", "");
 
   RemoveAllAnimations();
   auto &animationsElement = content.GetChild("animations");
@@ -100,6 +112,7 @@ void SpineObjectConfiguration::DoSerializeTo(gd::SerializerElement &element) con
   auto &content = element.AddChild("content");
   content.SetAttribute("scale", scale);
   content.SetAttribute("spineResourceName", spineResourceName);
+  content.SetAttribute("skinName", skinName);
 
   auto &animationsElement = content.AddChild("animations");
   animationsElement.ConsiderAsArrayOf("animation");

@@ -315,9 +315,7 @@ const CollisionMasksPreview = (props: Props): React.MixedElement => {
   const renderPolygons = () => {
     return (
       <React.Fragment>
-        {/* $FlowFixMe[incompatible-exact] */}
-        {mapVector(polygons, (polygon, i) => {
-          // $FlowFixMe[incompatible-use]
+        {mapVector((polygons: any), (polygon, i) => {
           const vertices = polygon.getVertices();
           return (
             <polygon
@@ -337,9 +335,7 @@ const CollisionMasksPreview = (props: Props): React.MixedElement => {
           );
         })}
         {!hideControls &&
-          // $FlowFixMe[incompatible-exact]
-          mapVector(polygons, (polygon, polygonIndex) => {
-            // $FlowFixMe[incompatible-use]
+          mapVector((polygons: any), (polygon, polygonIndex) => {
             const vertices = polygon.getVertices();
             return mapVector(vertices, (vertex, vertexIndex) => (
               <circle

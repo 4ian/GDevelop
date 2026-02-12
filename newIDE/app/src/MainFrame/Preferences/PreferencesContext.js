@@ -447,7 +447,7 @@ export const initialPreferences = {
     name: EditorMosaicName,
     node: ?EditorMosaicNode
   ) => {},
-  getRecentProjectFiles: (options: any): Array<any> => [],
+  getRecentProjectFiles: (options: any): any => [],
   insertRecentProjectFile: () => {},
   removeRecentProjectFile: () => {},
   getAutoOpenMostRecentProject: (): boolean => true,
@@ -500,7 +500,6 @@ export const initialPreferences = {
   setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
 };
 
-// $FlowFixMe[incompatible-type]
 const PreferencesContext: React.Context<Preferences> = React.createContext<Preferences>(
   // $FlowFixMe[incompatible-type]
   initialPreferences

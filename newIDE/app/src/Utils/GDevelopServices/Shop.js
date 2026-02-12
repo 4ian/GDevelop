@@ -532,7 +532,6 @@ export const fetchTokenForPrivateGameTemplateAuthorizationIfNeeded = async ({
   authenticatedUser,
   allResourcePaths,
 }: {|
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   allResourcePaths: Array<string>,
 |}): Promise<?string> => {

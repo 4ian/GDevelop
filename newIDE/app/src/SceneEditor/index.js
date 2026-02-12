@@ -571,7 +571,12 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const justAddedInstances = changes.addedInstances.map(addedInstance => {
       const instance: gdInitialInstance = this.props.initialInstances.insertNewInitialInstance();
-      unserializeFromJSObject(instance, addedInstance);
+      unserializeFromJSObject(
+        instance,
+        addedInstance,
+        'unserializeFrom',
+        this.props.project
+      );
       return instance;
     });
     if (justAddedInstances.length) {
@@ -991,7 +996,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.instancesSelection.clearSelection();
     this.setState(
       {
-        history: undo(this.state.history, this.props.initialInstances),
+        history: undo(
+          this.state.history,
+          this.props.initialInstances,
+          this.props.project
+        ),
       },
       () => {
         // /!\ Force the instances editor to destroy and mount again the
@@ -1010,7 +1019,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.instancesSelection.clearSelection();
     this.setState(
       {
-        history: redo(this.state.history, this.props.initialInstances),
+        history: redo(
+          this.state.history,
+          this.props.initialInstances,
+          this.props.project
+        ),
       },
       () => {
         // /!\ Force the instances editor to destroy and mount again the
@@ -2422,6 +2435,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       .map(instance => serializeToJSObject(instance));
 
     const newInstances = addSerializedInstances({
+      project: this.props.project,
       instancesContainer: this.props.initialInstances,
       copyReferential: [-2 * MOVEMENT_BIG_DELTA, -2 * MOVEMENT_BIG_DELTA],
       serializedInstances: serializedSelection,
@@ -2458,6 +2472,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (x === null || y === null || instancesContent === null) return;
 
     const newInstances = addSerializedInstances({
+      project: this.props.project,
       instancesContainer: this.props.initialInstances,
       copyReferential: [x, y],
       serializedInstances: instancesContent,
@@ -2523,7 +2538,12 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     for (const serializedInstance of serializedSelection) {
       const instance = new gd.InitialInstance();
-      unserializeFromJSObject(instance, serializedInstance);
+      unserializeFromJSObject(
+        instance,
+        serializedInstance,
+        'unserializeFrom',
+        project
+      );
       newExternalLayout
         .getInitialInstances()
         .insertInitialInstance(instance)

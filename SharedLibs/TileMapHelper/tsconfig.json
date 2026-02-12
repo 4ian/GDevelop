@@ -12,7 +12,7 @@
     "types" : [
       "mocha",
       "expect.js",
-      "offscreencanvas"
+      "@types/offscreencanvas"
     ],
     "lib": ["DOM", "ES5", "ES6"],
     "esModuleInterop": false, 

@@ -149,7 +149,6 @@ export const getFieldValue = ({
     return mixedValueFallback;
   }
   let value = getValue(instances[0]);
-  // $FlowFixMe[invalid-compare]
   if (value === null) {
     value = defaultValue;
   }
@@ -403,12 +402,11 @@ const PropertiesEditor = ({
         />
       ));
 
-      // $FlowFixMe[invalid-compare]
       if (field.valueType === 'number') {
         const { setValue } = field;
         return (
           <SelectField
-            value={getFieldValue({ instances, field })}
+            value={'' + getFieldValue({ instances, field })}
             key={field.name}
             id={field.name}
             floatingLabelText={getFieldLabel({ instances, field })}
@@ -418,7 +416,7 @@ const PropertiesEditor = ({
               _onInstancesModified(instances);
             }}
             style={styles.field}
-            disabled={field.disabled}
+            disabled={getDisabled({ instances, field })}
           >
             {children}
           </SelectField>

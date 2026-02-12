@@ -179,8 +179,7 @@ function HorizontalDraggedNodeDropContainer({
   const { depth } = node;
   return (
     <>
-      {/* $FlowFixMe[underconstrained-implicit-instantiation] */}
-      {new Array(depth).fill(0).map((_, depthStep) => {
+      {new Array<number>(depth).fill(0).map((_, depthStep) => {
         // Skip so that it does not hinder dragging and so that we don't have to
         // worry about delaying the drop target activation.
         if (depthStep === draggedNode.depth) return null;

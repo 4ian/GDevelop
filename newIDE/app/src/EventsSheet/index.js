@@ -165,7 +165,6 @@ type Props = {|
 type ComponentProps = {|
   ...Props,
   windowSize: WindowSizeType,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   preferences: Preferences,
   tutorials: ?Array<Tutorial>,
@@ -2050,6 +2049,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               onKeyDown={this._keyboardShortcuts.onKeyDown}
               onKeyUp={this._keyboardShortcuts.onKeyUp}
               onDragOver={this._keyboardShortcuts.onDragOver}
+              onBlur={this._keyboardShortcuts.resetModifiers}
               ref={this._containerDiv}
               tabIndex={0}
             >
@@ -2383,7 +2383,6 @@ const EventsSheet = (props, ref) => {
   );
 };
 
-// $FlowFixMe[prop-missing]
 export default (React.forwardRef<Props, EventsSheetInterface>(
   EventsSheet
   // $FlowFixMe[prop-missing]

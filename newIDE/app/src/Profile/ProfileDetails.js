@@ -55,7 +55,6 @@ const CommunityLinksLines = ({
 );
 
 type Props = {|
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   onOpenChangeEmailDialog?: () => void,
   onOpenEditProfileDialog?: () => void,

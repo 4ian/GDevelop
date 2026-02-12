@@ -43,6 +43,72 @@ describe('MetadataDeclarationHelper', () => {
     project.delete();
   });
 
+  it('propagates helpUrl to action metadata', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const freeEventsFunctions = eventExtension.getEventsFunctions();
+    const eventFunction = freeEventsFunctions.insertNewEventsFunction(
+      'MyFunction',
+      0
+    );
+    eventFunction.setFunctionType(gd.EventsFunction.Action);
+    eventFunction.setHelpUrl('https://example.com/custom-help');
+
+    const metadataDeclarationHelper = new gd.MetadataDeclarationHelper();
+    metadataDeclarationHelper.generateFreeFunctionMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventFunction
+    );
+    metadataDeclarationHelper.delete();
+
+    expect(extension.getAllActions().has('MyFunction')).toBe(true);
+    const action = extension.getAllActions().get('MyFunction');
+    expect(action.getHelpPath()).toBe('https://example.com/custom-help');
+
+    extension.delete();
+    project.delete();
+  });
+
+  it('does not set helpPath when helpUrl is empty', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const freeEventsFunctions = eventExtension.getEventsFunctions();
+    const eventFunction = freeEventsFunctions.insertNewEventsFunction(
+      'MyFunction',
+      0
+    );
+    eventFunction.setFunctionType(gd.EventsFunction.Action);
+    // No helpUrl set (empty by default)
+
+    const metadataDeclarationHelper = new gd.MetadataDeclarationHelper();
+    metadataDeclarationHelper.generateFreeFunctionMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventFunction
+    );
+    metadataDeclarationHelper.delete();
+
+    expect(extension.getAllActions().has('MyFunction')).toBe(true);
+    const action = extension.getAllActions().get('MyFunction');
+    expect(action.getHelpPath()).toBe('');
+
+    extension.delete();
+    project.delete();
+  });
+
   it('can create metadata for free actions with an underscore and unicode characters', () => {
     const extension = new gd.PlatformExtension();
     const project = new gd.Project();
@@ -109,6 +175,78 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getFullName()).toBe('My function');
     expect(condition.getDescription()).toBe('My function description.');
     expect(condition.getSentence()).toBe('My function sentence');
+
+    extension.delete();
+    project.delete();
+  });
+
+  it('can create metadata for free actions with a help URL', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const freeEventsFunctions = eventExtension.getEventsFunctions();
+    const eventFunction = freeEventsFunctions.insertNewEventsFunction(
+      'MyFunction',
+      0
+    );
+    eventFunction.setFunctionType(gd.EventsFunction.Action);
+    eventFunction.setFullName('My function');
+    eventFunction.setDescription('My function description.');
+    eventFunction.setSentence('My function sentence');
+    eventFunction.setHelpUrl('https://example.com/help');
+
+    const metadataDeclarationHelper = new gd.MetadataDeclarationHelper();
+    metadataDeclarationHelper.generateFreeFunctionMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventFunction
+    );
+    metadataDeclarationHelper.delete();
+
+    expect(extension.getAllActions().has('MyFunction')).toBe(true);
+    const action = extension.getAllActions().get('MyFunction');
+    expect(action.getHelpPath()).toBe('https://example.com/help');
+
+    extension.delete();
+    project.delete();
+  });
+
+  it('does not set help path when help URL is empty', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const freeEventsFunctions = eventExtension.getEventsFunctions();
+    const eventFunction = freeEventsFunctions.insertNewEventsFunction(
+      'MyFunction',
+      0
+    );
+    eventFunction.setFunctionType(gd.EventsFunction.Action);
+    eventFunction.setFullName('My function');
+    eventFunction.setDescription('My function description.');
+    eventFunction.setSentence('My function sentence');
+    // Help URL is not set (empty by default)
+
+    const metadataDeclarationHelper = new gd.MetadataDeclarationHelper();
+    metadataDeclarationHelper.generateFreeFunctionMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventFunction
+    );
+    metadataDeclarationHelper.delete();
+
+    expect(extension.getAllActions().has('MyFunction')).toBe(true);
+    const action = extension.getAllActions().get('MyFunction');
+    expect(action.getHelpPath()).toBe('');
 
     extension.delete();
     project.delete();

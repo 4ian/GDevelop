@@ -20,7 +20,6 @@ const app = remote ? remote.app : null;
 export const generateGetResourceActions = ({
   authenticatedUser,
 }: {
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
 }): (ResourcesActionsProps => Array<{
   click: () => Promise<void>,

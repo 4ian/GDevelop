@@ -219,7 +219,6 @@ const PrivateGameTemplateInformationPageStory = ({
   errorMessage,
 }: {
   privateGameTemplateListingData: PrivateGameTemplateListingData,
-  // $FlowFixMe[value-as-type]
   authenticatedUser?: AuthenticatedUser,
   receivedGameTemplates?: Array<PrivateGameTemplate>,
   delayResponse?: number,

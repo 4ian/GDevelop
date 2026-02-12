@@ -240,7 +240,8 @@ namespace gdjs {
      */
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: ObjectData
+      objectData: ObjectData,
+      instanceData: InstanceData | undefined
     ) {
       this.name = objectData.name || '';
       this.type = objectData.type || '';
@@ -274,6 +275,15 @@ namespace gdjs {
           this._behaviors.push(behavior);
         }
         this._behaviorsTable.put(autoData.name, behavior);
+      }
+      if (instanceData && instanceData.behaviorOverridings) {
+        for (const behaviorOverriding of instanceData.behaviorOverridings) {
+          const behavior = this.getBehavior(behaviorOverriding.name);
+          if (!behavior) {
+            continue;
+          }
+          behavior.applyBehaviorOverriding(behaviorOverriding);
+        }
       }
       this._timers = new Hashtable();
     }
@@ -1839,6 +1849,13 @@ namespace gdjs {
     }
 
     /**
+     * @returns `true` when {@link getHitBoxesAround} is faster than {@link getHitBoxes}
+     */
+    isSpatiallyIndexed(): boolean {
+      return false;
+    }
+
+    /**
      * Update the hit boxes for the object.
      *
      * The default implementation set a basic bounding box based on the size (getWidth and
@@ -2291,11 +2308,9 @@ namespace gdjs {
         if (otherObject.id === this.id) {
           continue;
         }
-        let otherHitBoxesArray = otherObject.getHitBoxes();
-        let otherHitBoxes: Iterable<gdjs.Polygon> = otherHitBoxesArray;
-        if (otherHitBoxesArray.length > 4) {
-          // The other object has a lot of hit boxes.
-          // Try to reduce the amount of hitboxes to check.
+
+        let otherHitBoxes: Iterable<gdjs.Polygon>;
+        if (otherObject.isSpatiallyIndexed()) {
           if (!aabb) {
             aabb = this.getAABB();
           }
@@ -2305,6 +2320,8 @@ namespace gdjs {
             aabb.max[0],
             aabb.max[1]
           );
+        } else {
+          otherHitBoxes = otherObject.getHitBoxes();
         }
         for (const hitBox of hitBoxes) {
           for (const otherHitBox of otherHitBoxes) {

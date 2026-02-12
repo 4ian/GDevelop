@@ -11,7 +11,6 @@ import useForceUpdate from '../../Utils/UseForceUpdate';
 import { type Game } from '../../Utils/GDevelopServices/Game';
 
 type Props = {|
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   game: Game,
   open: boolean,

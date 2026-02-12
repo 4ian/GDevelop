@@ -183,7 +183,6 @@ export const installAnalyticsEvents = () => {
  * We can safely call it multiple times, as it will only send the user properties if they changed.
  */
 export const identifyUserForAnalytics = (
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser
 ) => {
   if (isDev) {

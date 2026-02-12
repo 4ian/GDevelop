@@ -7,7 +7,6 @@ import * as PIXI from 'pixi.js-legacy';
 /**
  * Create a renderer for an type of object displayed as an icon
  */
-// $FlowFixMe[cannot-resolve-name]
 export default function makeRenderer(
   iconPath: string
   // $FlowFixMe[cannot-resolve-name]

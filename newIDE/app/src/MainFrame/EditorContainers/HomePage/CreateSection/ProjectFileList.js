@@ -234,8 +234,7 @@ const ProjectFileList = ({
     <>
       {authenticatedUser.loginState === 'loggingIn' &&
       projectFiles.length === 0 ? ( // Only show skeleton on first load
-        // $FlowFixMe[underconstrained-implicit-instantiation]
-        new Array(3).fill(0).map((_, index) => (
+        new Array<number>(3).fill(0).map((_, index) => (
           <ListItem style={styles.listItem} key={`skeleton-${index}`}>
             <Line expand>
               <Column expand>

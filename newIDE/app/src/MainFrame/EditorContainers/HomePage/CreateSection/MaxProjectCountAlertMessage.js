@@ -14,7 +14,6 @@ type Props = {|
   margin?: 'dense',
 |};
 
-// $FlowFixMe[value-as-type]
 export const checkIfHasTooManyCloudProjects = (
   authenticatedUser: AuthenticatedUser
 ): boolean => {

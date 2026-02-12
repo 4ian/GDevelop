@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
-// $FlowFixMe[import-type-as-value]
-import { I18n as I18nType } from '@lingui/core';
+import type { I18n as I18nType } from '@lingui/core';
 import { useDebounce } from '../Utils/UseDebounce';
 import { useInterval } from '../Utils/UseInterval';
 import {
@@ -417,7 +416,6 @@ const useGiveTrivialBadgeWhenTutorialIsFinished = ({
   displayEndDialog,
   tutorial,
 }: {
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
   displayEndDialog: boolean,
   tutorial: InAppTutorial,

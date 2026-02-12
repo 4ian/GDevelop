@@ -1,0 +1,25 @@
+diff --git a/node_modules/monaco-editor/esm/vs/editor/contrib/clipboard/clipboard.js b/node_modules/monaco-editor/esm/vs/editor/contrib/clipboard/clipboard.js
+--- a/node_modules/monaco-editor/esm/vs/editor/contrib/clipboard/clipboard.js
++++ b/node_modules/monaco-editor/esm/vs/editor/contrib/clipboard/clipboard.js
+@@ -49,7 +49,20 @@
+     };
+     ExecCommandAction.prototype.run = function (accessor, editor) {
+         editor.focus();
+-        document.execCommand(this.browserCommand);
++        var result = document.execCommand(this.browserCommand);
++        // Fallback for Electron where document.execCommand('paste') fails
++        // in newer Chromium versions. Use Electron's clipboard API instead.
++        // See https://github.com/microsoft/monaco-editor/issues/4855
++        if (!result && this.browserCommand === 'paste') {
++            try {
++                var text = window.require('electron').clipboard.readText();
++                if (text) {
++                    editor.trigger('keyboard', 'type', { text: text });
++                }
++            } catch (e) {
++                // Not in Electron environment, ignore
++            }
++        }
+     };
+     return ExecCommandAction;
+ }(EditorAction));

@@ -32,7 +32,6 @@ type Options = {|
   project: gdProject,
   fileMetadata: FileMetadata,
   onProgress: (number, number) => void,
-  // $FlowFixMe[value-as-type]
   authenticatedUser: AuthenticatedUser,
 |};
 

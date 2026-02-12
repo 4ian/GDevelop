@@ -132,8 +132,7 @@ const TeamMemberProjectsView = ({
           <Column noMargin expand>
             {!fileMetadataAndStorageProviderNames ? (
               <List>
-                {/* $FlowFixMe[underconstrained-implicit-instantiation] */}
-                {new Array(5).fill(0).map((_, index) => (
+                {new Array<number>(5).fill(0).map((_, index) => (
                   <ListItem style={styles.listItem} key={`skeleton-${index}`}>
                     <Line expand>
                       <Column expand>

@@ -212,11 +212,7 @@ const getAutocompletionsForObjectExpressions = function(
         gd.PlatformExtension.getNamespaceSeparator() +
         autocompletion.completion;
     });
-    // $FlowFixMe[method-unbinding]
-    autocompletions.push.apply(
-      autocompletions,
-      behaviorExpressionAutocompletions
-    );
+    autocompletions.push(...behaviorExpressionAutocompletions);
   });
 
   return autocompletions;

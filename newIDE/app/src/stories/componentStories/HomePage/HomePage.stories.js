@@ -34,7 +34,6 @@ const WrappedHomePage = ({
   project: ?gdProject,
   tutorialProgress?: InAppTutorialUserProgress,
   inAppTutorialsFetchingError?: string | null,
-  // $FlowFixMe[value-as-type]
   user: AuthenticatedUser,
 |}): React.Node => {
   const assetApiMock = React.useMemo(() => {

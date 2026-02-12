@@ -46,32 +46,6 @@ const {
 } = require('./LocalGDJSDevelopmentWatcher');
 const { setupWatcher, disableWatcher } = require('./LocalFilesystemWatcher');
 
-const isMac = process.platform === 'darwin';
-
-/**
- * Ensures paste operations work in all web content (notably Monaco editor)
- * by intercepting Cmd/Ctrl+V before Electron's menu accelerators consume the
- * event, and explicitly calling webContents.paste().
- * See https://github.com/microsoft/monaco-editor/issues/4855
- *
- * This may be fixed in future monaco-editor versions, starting from 0.56.0 when it's released.
- */
-const setupPasteHandler = window => {
-  window.webContents.on('before-input-event', (event, input) => {
-    const isCmdOrCtrl = isMac ? input.meta === true : input.control === true;
-    const hasShift = input.shift === true;
-    const hasAlt = input.alt === true;
-    const isV = input.code === 'KeyV' || input.key === 'v';
-    const shouldPaste =
-      input.type === 'keyDown' && isCmdOrCtrl && !hasShift && !hasAlt && isV;
-
-    if (shouldPaste) {
-      window.webContents.paste();
-      event.preventDefault();
-    }
-  });
-};
-
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
 
@@ -233,9 +207,6 @@ function createNewWindow(windowArgs = args) {
 
   // Enable `@electron/remote` module for renderer process
   require('@electron/remote/main').enable(newWindow.webContents);
-
-  // Ensure paste works in web content (e.g., Monaco editor).
-  setupPasteHandler(newWindow);
 
   // Log process ID to verify separate renderer processes
   newWindow.webContents.once('did-finish-load', () => {
@@ -615,19 +586,25 @@ app.on('ready', function() {
     // app quits.
     log.info('Starting check for updates (with auto-download if any)');
     autoUpdater.autoDownload = true;
-    autoUpdater.checkForUpdatesAndNotify();
+    autoUpdater.checkForUpdatesAndNotify().catch(err => {
+      log.error('Error checking for updates:', err);
+    });
   });
 
   ipcMain.on('updates-check', event => {
     log.info('Starting check for updates (without auto-download)');
     autoUpdater.autoDownload = false;
-    autoUpdater.checkForUpdates();
+    autoUpdater.checkForUpdates().catch(err => {
+      log.error('Error checking for updates:', err);
+    });
   });
 
   function sendUpdateStatus(status) {
     log.info(status);
     mainWindows.forEach(window => {
-      window.webContents.send('update-status', status);
+      if (!window.isDestroyed()) {
+        window.webContents.send('update-status', status);
+      }
     });
   }
   autoUpdater.on('checking-for-update', () => {

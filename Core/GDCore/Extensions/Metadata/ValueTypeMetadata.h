@@ -230,6 +230,7 @@ class GD_CORE_API ValueTypeMetadata {
              parameterType == "objectEffectParameterName" ||
              parameterType == "objectPointName" ||
              parameterType == "objectAnimationName" ||
+             parameterType == "objectSkinName" ||
              parameterType == "functionParameterName" ||
              parameterType == "externalLayoutName" ||
              parameterType == "leaderboardId" ||
@@ -351,6 +352,7 @@ class GD_CORE_API ValueTypeMetadata {
   static const gd::String behaviorValueType;
   static const gd::String leaderboardIdValueType;
   static const gd::String objectAnimationNameValueType;
+  static const gd::String objectSkinNameValueType;
   static const gd::String keyboardKeyValueType;
 };
 

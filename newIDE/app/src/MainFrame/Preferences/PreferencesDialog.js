@@ -87,6 +87,7 @@ const PreferencesDialog = ({
     setAutomaticallyUseCreditsForAiRequests,
     setShowCreateSectionByDefault,
     setDisableNpmScriptConfirmation,
+    setUseBackgroundSerializerForSaving,
   } = React.useContext(PreferencesContext);
 
   const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
@@ -570,13 +571,41 @@ const PreferencesDialog = ({
                   t`Show experimental extensions in the list of extensions`
                 )}
               />
+              <LineStackLayout noMargin alignItems="center">
+                <Column noMargin expand>
+                  <Text noMargin>
+                    <Trans>Deprecated actions and conditions warning</Trans>
+                  </Text>
+                </Column>
+                <Column noMargin expand>
+                  <CompactSelectField
+                    value={values.showDeprecatedInstructionWarning}
+                    onChange={(value: string) => {
+                      if (
+                        value === 'no' ||
+                        value === 'icon' ||
+                        value === 'icon-and-deprecated-warning-text'
+                      ) {
+                        setShowDeprecatedInstructionWarning(value);
+                      }
+                    }}
+                  >
+                    <SelectOption value="no" label={t`No warning`} />
+                    <SelectOption value="icon" label={t`Icon only`} />
+                    <SelectOption
+                      value="icon-and-deprecated-warning-text"
+                      label={t`Icon and [DEPRECATED] text`}
+                    />
+                  </CompactSelectField>
+                </Column>
+              </LineStackLayout>
               <CompactToggleField
                 labelColor="primary"
                 hideTooltip
-                onCheck={setShowDeprecatedInstructionWarning}
-                checked={values.showDeprecatedInstructionWarning}
+                onCheck={setUseBackgroundSerializerForSaving}
+                checked={values.useBackgroundSerializerForSaving}
                 label={i18n._(
-                  t`Show a warning on deprecated actions and conditions`
+                  t`Use experimental background serializer for saving projects`
                 )}
               />
               {!!electron && (

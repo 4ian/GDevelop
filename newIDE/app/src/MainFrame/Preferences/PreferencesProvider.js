@@ -67,6 +67,12 @@ export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
       values.themeName = 'Blue Dark';
     }
 
+    if (typeof values.showDeprecatedInstructionWarning === 'boolean') {
+      values.showDeprecatedInstructionWarning = values.showDeprecatedInstructionWarning
+        ? 'icon'
+        : 'no';
+    }
+
     return values;
   } catch (e) {
     return null;
@@ -510,7 +516,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _setShowDeprecatedInstructionWarning(
-    showDeprecatedInstructionWarning: boolean
+    showDeprecatedInstructionWarning:
+      | 'no'
+      | 'icon'
+      | 'icon-and-deprecated-warning-text'
   ) {
     this.setState(
       state => ({
@@ -523,7 +532,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getShowDeprecatedInstructionWarning() {
+  _getShowDeprecatedInstructionWarning():
+    | 'no'
+    | 'icon'
+    | 'icon-and-deprecated-warning-text' {
     return this.state.values.showDeprecatedInstructionWarning;
   }
 

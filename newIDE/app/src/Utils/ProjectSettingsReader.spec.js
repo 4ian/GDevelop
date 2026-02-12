@@ -17,7 +17,7 @@ preferences:
   takeScreenshotOnPreview: false
   use3DEditor: true
   showBasicProfilingCounters: false
-  showDeprecatedInstructionWarning: true
+  showDeprecatedInstructionWarning: "icon"
   # String values
   themeName: "Dark"
   language: "en"
@@ -46,7 +46,7 @@ preferences:
         takeScreenshotOnPreview: false,
         use3DEditor: true,
         showBasicProfilingCounters: false,
-        showDeprecatedInstructionWarning: true,
+        showDeprecatedInstructionWarning: 'icon',
         themeName: 'Dark',
         language: 'en',
         newProjectsDefaultFolder: '/path/to/projects',
@@ -65,7 +65,7 @@ preferences:
         takeScreenshotOnPreview: false,
         use3DEditor: true,
         showBasicProfilingCounters: false,
-        showDeprecatedInstructionWarning: true,
+        showDeprecatedInstructionWarning: 'icon',
         themeName: 'Dark',
         language: 'en',
         newProjectsDefaultFolder: '/path/to/projects',
@@ -89,7 +89,7 @@ preferences:
         takeScreenshotOnPreview: false,
         use3DEditor: true,
         showBasicProfilingCounters: false,
-        showDeprecatedInstructionWarning: true,
+        showDeprecatedInstructionWarning: 'icon',
         themeName: 'Dark',
         language: 'en',
         newProjectsDefaultFolder: '/path/to/projects',

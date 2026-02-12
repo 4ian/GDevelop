@@ -66,6 +66,23 @@ export const filterAllowedPreferences = (parsedPreferences: {
   return filtered;
 };
 
+/** Normalize legacy boolean to enum for preferences that were changed from boolean to enum. */
+const normalizeDeprecatedInstructionWarning = (
+  value: boolean | string
+): 'no' | 'icon' | 'icon-and-deprecated-warning-text' => {
+  if (typeof value === 'boolean') {
+    return value ? 'icon' : 'no';
+  }
+  if (
+    value === 'no' ||
+    value === 'icon' ||
+    value === 'icon-and-deprecated-warning-text'
+  ) {
+    return value;
+  }
+  return 'no';
+};
+
 /**
  * Applies project-specific preferences from a gdevelop-settings.yaml file to the editor.
  */
@@ -75,6 +92,16 @@ export const applyProjectPreferences = (
 ): void => {
   if (rawPreferences) {
     const filtered = filterAllowedPreferences(rawPreferences);
+    if (
+      Object.prototype.hasOwnProperty.call(
+        filtered,
+        'showDeprecatedInstructionWarning'
+      )
+    ) {
+      filtered.showDeprecatedInstructionWarning = normalizeDeprecatedInstructionWarning(
+        filtered.showDeprecatedInstructionWarning
+      );
+    }
     preferences.setMultipleValues(filtered);
   }
 };

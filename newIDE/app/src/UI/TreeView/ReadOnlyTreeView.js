@@ -166,6 +166,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     arrowKeyNavigationProps,
   }: Props<Item>,
   ref: ReadOnlyTreeViewInterface<Item>
+  // $FlowFixMe[missing-local-annot]
 ) => {
   const selectedNodeIds = selectedItems.map(getItemId);
   const [isRendered, setIsRendered] = React.useState<boolean>(false);
@@ -174,6 +175,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
     initiallyOpenedNodeIds || []
   );
   const containerRef = React.useRef<?HTMLDivElement>(null);
+  // $FlowFixMe[value-as-type]
   const listRef = React.useRef<?VariableSizeList>(null);
   const [
     openedDuringSearchNodeIds,
@@ -184,6 +186,8 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
   const [animatedItemId, setAnimatedItemId] = React.useState<string>('');
 
   const isSearching = !!searchText;
+  // $FlowFixMe[recursive-definition]
+  // $FlowFixMe[definition-cycle]
   const flattenNode = React.useCallback(
     (
       item: Item,
@@ -196,6 +200,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
       const canHaveChildren = Array.isArray(children);
       const collapsed = !forceAllOpened && !openedNodeIds.includes(id);
       const openedDuringSearch = openedDuringSearchNodeIds.includes(id);
+      // $FlowFixMe[missing-empty-array-annot]
       let flattenedChildren = [];
       /*
        * Compute children nodes flattening if:
@@ -515,7 +520,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
   );
 
   React.useImperativeHandle(
-    // $FlowFixMe
+    // $FlowFixMe[incompatible-type]
     ref,
     () => ({
       forceUpdateList: forceUpdate,
@@ -588,6 +593,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
         ) {
           i += 1;
           if (i > flattenedData.length - 1) {
+            // $FlowFixMe[incompatible-type]
             newFocusedNode = null;
           }
           newFocusedNode = flattenedData[i];
@@ -605,6 +611,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
             (newFocusedNode.item.isRoot || newFocusedNode.item.isPlaceholder)
           ) {
             if (itemIndexInFlattenedData + delta > flattenedData.length - 1) {
+              // $FlowFixMe[incompatible-type]
               newFocusedNode = null;
             }
             delta += 1;
@@ -624,6 +631,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
             (newFocusedNode.item.isRoot || newFocusedNode.item.isPlaceholder)
           ) {
             if (itemIndexInFlattenedData + delta < 0) {
+              // $FlowFixMe[incompatible-type]
               newFocusedNode = null;
             }
             delta -= 1;
@@ -690,7 +698,7 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
         itemKey={index => flattenedData[index].id}
         // Flow does not seem to accept the generic used in VariableSizeList
         // can itself use a generic.
-        // $FlowFixMe
+        // $FlowFixMe[incompatible-type]
         itemData={itemData}
         ref={listRef}
         // Keep overscanCount relatively high so that:
@@ -705,5 +713,9 @@ const ReadOnlyTreeView = <Item: ItemBaseAttributes>(
   );
 };
 
-// $FlowFixMe
-export default React.forwardRef(ReadOnlyTreeView);
+// $FlowFixMe[incompatible-type]
+// $FlowFixMe[incompatible-exact]
+export default (React.forwardRef(ReadOnlyTreeView): React.ComponentType<{
+  ...Props<any>,
+  +ref?: React.RefSetter<any>,
+}>);

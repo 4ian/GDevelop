@@ -67,6 +67,7 @@ const initialMosaicEditorNodes = {
 };
 
 export default class ResourcesEditor extends React.Component<Props, State> {
+  // $FlowFixMe[missing-local-annot]
   static defaultProps = {
     setToolbar: () => {},
   };
@@ -74,7 +75,9 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   editorMosaic: ?EditorMosaicInterface = null;
   _propertiesEditor: ?ResourcePropertiesEditorInterface = null;
   _resourcesList: ?ResourcesListInterface = null;
+  // $FlowFixMe[missing-local-annot]
   resourcesLoader = ResourcesLoader;
+  // $FlowFixMe[missing-local-annot]
   state = {
     selectedResource: null,
   };
@@ -165,6 +168,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
     // The selectedResource might be *invalid* now if it was removed.
     // Be sure to drop the reference to it if that's the case.
+    // $FlowFixMe[incompatible-type]
     if (removedResourceNames.includes(selectedResourceName)) {
       this._onResourceSelected(null);
     }
@@ -197,6 +201,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
     // The selectedResource might be *invalid* now if it was removed.
     // Be sure to drop the reference to it if that's the case.
+    // $FlowFixMe[incompatible-type]
     if (removedResourceNames.includes(selectedResourceName)) {
       this._onResourceSelected(null);
     }
@@ -237,7 +242,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     this.refreshResourcesList();
   };
 
-  render() {
+  render(): any {
     const {
       project,
       onRenameResource,
@@ -298,11 +303,13 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         <PreferencesContext.Consumer>
           {({ getDefaultEditorMosaicNode, setDefaultEditorMosaicNode }) => (
             <EditorMosaic
+              // $FlowFixMe[incompatible-type]
               editors={editors}
               centralNodeId="resources-list"
               ref={editorMosaic => (this.editorMosaic = editorMosaic)}
               initialNodes={
                 getDefaultEditorMosaicNode('resources-editor') ||
+                // $FlowFixMe[incompatible-type]
                 initialMosaicEditorNodes
               }
               onOpenedEditorsChanged={this.updateToolbar}

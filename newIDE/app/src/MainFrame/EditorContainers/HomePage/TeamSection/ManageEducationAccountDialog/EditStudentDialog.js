@@ -28,7 +28,7 @@ export const EditStudentDialog = ({
   onClose,
   isSaving,
   error,
-}: Props) => {
+}: Props): React.Node => {
   const [changes, setChanges] = React.useState<EditUserChanges | null>(null);
 
   const [

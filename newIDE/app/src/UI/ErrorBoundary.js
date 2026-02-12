@@ -147,7 +147,7 @@ const errorHandler = (
   );
   sendErrorMessage(
     'Error caught by error boundary',
-    // $FlowFixMe - Flow does not infer string type possibilities from interpolation.
+    // $FlowFixMe[incompatible-type] - Flow does not infer string type possibilities from interpolation.
     `error-boundary_${scope}`,
     {
       error,
@@ -181,7 +181,7 @@ export const ErrorFallbackComponent = ({
   uniqueErrorId: string,
   onClose?: () => void,
   showOnTop?: boolean,
-|}) => {
+|}): React.Node => {
   const isCriticalError = error.stack && error.stack.includes('.wasm');
   return (
     <PlaceholderMessage showOnTop={showOnTop} data={{ errorBoundary: 'true' }}>
@@ -244,7 +244,7 @@ type Props = {|
   showOnTop?: boolean,
 |};
 
-const ErrorBoundary = (props: Props) => {
+const ErrorBoundary = (props: Props): React.Node => {
   const uniqueErrorIdRef = React.useRef(generateUUID());
   return (
     <ReactErrorBoundary

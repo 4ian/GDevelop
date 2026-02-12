@@ -21,7 +21,11 @@ export const fetchRelativeResourcesToFullUrls = async ({
   project,
   fileMetadata,
   onProgress,
-}: Options) => {
+}: Options):
+  | Promise<{ erroredResources: Array<empty> }>
+  | Promise<{
+      erroredResources: Array<{ error: any, resourceName: string }>,
+    }> => {
   const resourcesManager = project.getResourcesManager();
   const allResourceNames = resourcesManager.getAllResourceNames().toJSArray();
   const erroredResources = [];
@@ -56,6 +60,7 @@ export const fetchRelativeResourcesToFullUrls = async ({
       try {
         const resourceFullUrl = new URL(resource.getFile(), projectBaseUrl)
           .href;
+        // $FlowFixMe[underconstrained-implicit-instantiation]
         await axios.get(resourceFullUrl, {
           timeout: 3000,
         });

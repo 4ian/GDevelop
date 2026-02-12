@@ -138,6 +138,7 @@ export const processEditorFunctionCalls = async ({
         });
       }
 
+      // $FlowFixMe[invalid-compare]
       if (name === null) {
         results.push({
           status: 'finished',
@@ -150,6 +151,7 @@ export const processEditorFunctionCalls = async ({
         continue;
       }
 
+      // $FlowFixMe[invalid-compare]
       if (args === null) {
         results.push({
           status: 'finished',

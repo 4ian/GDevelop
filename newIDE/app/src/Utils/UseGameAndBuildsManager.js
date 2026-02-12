@@ -31,7 +31,12 @@ export const getDefaultRegisterGameProperties = ({
   projectName: ?string,
   projectAuthor: ?string,
   savedStatus: SavedStatus,
-|}) => ({
+|}): {
+  authorName: string,
+  gameId: string,
+  gameName: string,
+  savedStatus: SavedStatus,
+} => ({
   gameId: projectId,
   authorName: projectAuthor || 'Unspecified publisher',
   gameName: projectName || 'Untitled game',
@@ -162,6 +167,7 @@ export const useGameManager = ({
           await registerGame(
             getAuthorizationHeader,
             userId,
+            // $FlowFixMe[incompatible-type]
             getDefaultRegisterGameProperties({
               projectId: gameId,
               projectName: project.getName(),

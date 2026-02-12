@@ -372,12 +372,14 @@ export type UserCourseProgress = {|
 
 export type Environment = 'staging' | 'live';
 
-export const client = axios.create({
+// $FlowFixMe[cannot-resolve-name]
+export const client: Axios = axios.create({
   baseURL: GDevelopAssetApi.baseUrl,
 });
 
 // Separate client for fetching static JSON files from the CDN
-export const cdnClient = axios.create();
+// $FlowFixMe[cannot-resolve-name]
+export const cdnClient: Axios = axios.create();
 
 export const isAssetPackAudioOnly = (assetPack: PrivateAssetPack): boolean => {
   const contentKeys = Object.keys(assetPack.content);
@@ -745,9 +747,10 @@ export const listReceivedBundles = async (
   });
 };
 
-export const isPublicAssetResourceUrl = (url: string) =>
+export const isPublicAssetResourceUrl = (url: string): boolean =>
   url.startsWith(GDevelopPublicAssetResourcesStorageBaseUrl) ||
   url.startsWith(GDevelopPublicAssetResourcesStorageStagingBaseUrl);
+// $FlowFixMe[missing-local-annot]
 const escapeStringForRegExp = string =>
   string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 const resourceFilenameRegex = new RegExp(

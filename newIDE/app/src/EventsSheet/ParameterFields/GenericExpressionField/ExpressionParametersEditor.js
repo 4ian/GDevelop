@@ -26,7 +26,7 @@ type Props = {|
 
 export const hasNonCodeOnlyParameters = (
   expressionMetadata: gdExpressionMetadata
-) =>
+): boolean =>
   mapFor(0, expressionMetadata.getParametersCount(), i => {
     const parameterMetadata = expressionMetadata.getParameter(i);
     return !parameterMetadata.isCodeOnly();
@@ -42,7 +42,7 @@ const ExpressionParametersEditor = ({
   projectScopedContainersAccessor,
   parameterRenderingService,
   onChangeParameter,
-}: Props) => {
+}: Props): null | React.Node => {
   if (!parameterRenderingService) {
     console.error(
       'Missing parameterRenderingService for ExpressionParametersEditor'
@@ -55,6 +55,7 @@ const ExpressionParametersEditor = ({
   const parametersCount = expressionMetadata.getParametersCount();
   const expression = {
     getParametersCount: () => parametersCount,
+    // $FlowFixMe[missing-local-annot]
     getParameter: index => {
       return parameterValues[index] || '';
     },

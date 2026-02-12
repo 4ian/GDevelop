@@ -69,6 +69,7 @@ export type InstancesListInterface = {|
 type State = {|
   searchText: string,
   sortBy: string,
+  // $FlowFixMe[value-as-type]
   sortDirection: SortDirection,
 |};
 
@@ -80,6 +81,7 @@ type Props = {|
 |};
 
 class InstancesList extends Component<Props, State> {
+  // $FlowFixMe[missing-local-annot]
   state = {
     searchText: '',
     sortBy: '',
@@ -88,7 +90,9 @@ class InstancesList extends Component<Props, State> {
   renderedRows: Array<RenderedRowInfo> = [];
   instanceRowRenderer: ?typeof gd.InitialInstanceJSFunctor;
   table: ?typeof RVTable;
+  // $FlowFixMe[missing-local-annot]
   _searchBar = React.createRef<SearchBarInterface>();
+  // $FlowFixMe[missing-local-annot]
   _keyboardShortcuts = new KeyboardShortcuts({
     isActive: () => false,
     shortcutCallbacks: {},
@@ -134,10 +138,12 @@ class InstancesList extends Component<Props, State> {
     );
   };
 
+  // $FlowFixMe[missing-local-annot]
   _rowGetter = ({ index }: {| index: number |}) => {
     return this.renderedRows[index];
   };
 
+  // $FlowFixMe[missing-local-annot]
   _rowClassName = ({ index }: {| index: number |}) => {
     if (index < 0) {
       return 'tableHeaderRow';
@@ -154,6 +160,7 @@ class InstancesList extends Component<Props, State> {
     rowData: { instance },
   }: {
     rowData: RenderedRowInfo,
+    // $FlowFixMe[missing-local-annot]
   }) => {
     return (
       <IconButton
@@ -192,6 +199,7 @@ class InstancesList extends Component<Props, State> {
     sortDirection,
   }: {
     sortBy: string,
+    // $FlowFixMe[value-as-type]
     sortDirection: SortDirection,
   }) => {
     this.setState({ sortBy, sortDirection });
@@ -226,6 +234,7 @@ class InstancesList extends Component<Props, State> {
     );
   };
 
+  // $FlowFixMe[missing-local-annot]
   render() {
     const { searchText, sortBy, sortDirection } = this.state;
     const { instances } = this.props;
@@ -354,10 +363,10 @@ class InstancesList extends Component<Props, State> {
   }
 }
 
-const InstancesListWithErrorBoundary = React.forwardRef<
-  Props,
-  InstancesListInterface
->((props, ref) => {
+const InstancesListWithErrorBoundary: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<InstancesListInterface>,
+}> = React.forwardRef<Props, InstancesListInterface>((props, ref) => {
   const forceUpdate = useForceUpdate();
   React.useImperativeHandle(ref, () => ({
     forceUpdate,

@@ -36,7 +36,7 @@ type Props = {|
   badges: ?Array<Badge>,
 |};
 
-const UserAchievements = ({ achievements, badges }: Props) => {
+const UserAchievements = ({ achievements, badges }: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
 
   return (

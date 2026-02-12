@@ -15,7 +15,7 @@ const Form = ({
   name,
   children,
   fullWidth,
-}: Props) => {
+}: Props): React.MixedElement => {
   return (
     <form
       onSubmit={event => {

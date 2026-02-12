@@ -47,7 +47,7 @@ export const QuickCustomizationGameTiles = ({
   onSelectExampleShortHeader,
   quickCustomizationRecommendation,
   disabled,
-}: Props) => {
+}: Props): React.Node => {
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
   const { windowSize, isLandscape } = useResponsiveWindowSize();
   const columnsCount = getColumnsCount(windowSize, isLandscape);
@@ -106,7 +106,8 @@ export const QuickCustomizationGameTiles = ({
                   />
                 )
               )
-            : new Array(quickCustomizationRecommendation.list.length)
+            : // $FlowFixMe[underconstrained-implicit-instantiation]
+              new Array(quickCustomizationRecommendation.list.length)
                 .fill(0)
                 .map((_, index) => (
                   <ExampleTile

@@ -97,7 +97,10 @@ export type AssetDetailsInterface = {|
   scrollToPosition: (y: number) => void,
 |};
 
-export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
+export const AssetDetails: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<AssetDetailsInterface>,
+}> = React.forwardRef<Props, AssetDetailsInterface>(
   (
     {
       onTagSelection,
@@ -350,6 +353,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                           ({ name }) => name
                         )}
                         getImageResourceSource={(resourceName: string) => {
+                          // $FlowFixMe[invalid-computed-prop]
                           const resource = assetResources[resourceName];
                           return resource ? resource.file : '';
                         }}

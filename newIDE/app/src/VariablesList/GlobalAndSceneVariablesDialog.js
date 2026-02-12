@@ -28,7 +28,7 @@ const GlobalAndSceneVariablesDialog = ({
   initiallySelectedVariableName,
   shouldCreateInitiallySelectedVariable,
   isListLocked,
-}: Props) => {
+}: Props): React.Node => {
   const {
     project,
     layout,
@@ -118,6 +118,7 @@ const GlobalAndSceneVariablesDialog = ({
           <Trans>Extension variables</Trans>
         )
       }
+      // $FlowFixMe[incompatible-type]
       tabs={tabs}
       initiallyOpenTabId={
         isGlobalTabInitiallyOpen ? 'global-variables' : 'scene-variables'

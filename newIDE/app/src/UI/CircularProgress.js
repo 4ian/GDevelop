@@ -17,7 +17,7 @@ type Props = {|
   |},
 |};
 
-function CircularProgress(props: Props) {
+function CircularProgress(props: Props): React.Node {
   return (
     <MuiCircularProgress
       color="secondary"

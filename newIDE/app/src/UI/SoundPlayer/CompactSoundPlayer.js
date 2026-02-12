@@ -17,7 +17,7 @@ const CompactSoundPlayer = ({
   soundSrc,
   onSoundLoaded,
   onSoundError,
-}: Props) => {
+}: Props): null | React.Node => {
   const audioRef = React.useRef<?HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);

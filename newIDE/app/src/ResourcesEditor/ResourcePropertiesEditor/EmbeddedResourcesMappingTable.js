@@ -22,7 +22,9 @@ const styles = {
   },
 };
 
-export const EmbeddedResourcesMappingTable = ({ resources }: Props) => {
+export const EmbeddedResourcesMappingTable = ({
+  resources,
+}: Props): null | React.Node => {
   if (resources.length !== 1) return null;
 
   const resource = resources[0];
@@ -51,9 +53,11 @@ export const EmbeddedResourcesMappingTable = ({ resources }: Props) => {
 
             return (
               <TableRow key={embeddedFilePath}>
+                {/* $FlowFixMe[incompatible-type] */}
                 <TableRowColumn style={styles.tableCell}>
                   {embeddedFilePath}
                 </TableRowColumn>
+                {/* $FlowFixMe[incompatible-type] */}
                 <TableRowColumn style={styles.tableCell}>
                   {associatedResourceName}
                 </TableRowColumn>

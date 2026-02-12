@@ -46,6 +46,7 @@ const gd: libGDevelop = global.gd;
 
 const PARAMETERS_CLIPBOARD_KIND = 'Parameters';
 
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget(
   'events-function-parameter-list'
 );
@@ -63,7 +64,9 @@ const styles = {
   },
 };
 
-export const useParameterOverridingAlertDialog = () => {
+export const useParameterOverridingAlertDialog = (): ((
+  existingParameterNames: Array<string>
+) => Promise<boolean>) => {
   const { showConfirmation } = useAlertDialog();
   return async (existingParameterNames: Array<string>): Promise<boolean> => {
     return await showConfirmation({
@@ -154,7 +157,7 @@ export const EventsFunctionParametersEditor = ({
   onFunctionParameterWillBeRenamed,
   children,
   onFunctionParameterTypeChanged,
-}: Props) => {
+}: Props): React.Node => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
     justAddedParameterName,
@@ -212,6 +215,7 @@ export const EventsFunctionParametersEditor = ({
     ? 1
     : 0;
   const isParameterDisabled = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     index => {
       return (
         eventsFunction.getFunctionType() ===
@@ -328,6 +332,7 @@ export const EventsFunctionParametersEditor = ({
   );
 
   const pasteParameters = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     async propertyInsertionIndex => {
       const clipboardContent = Clipboard.get(PARAMETERS_CLIPBOARD_KIND);
       const parameterContents = SafeExtractor.extractArray(clipboardContent);
@@ -403,6 +408,7 @@ export const EventsFunctionParametersEditor = ({
         setJustAddedParameterName(existingNamedParameters[0].name);
       }
       if (firstAddedParameterName || shouldOverrideParameters) {
+        // $FlowFixMe[constant-condition]
         if (onParametersUpdated) onParametersUpdated();
       }
     },
@@ -473,6 +479,7 @@ export const EventsFunctionParametersEditor = ({
             oldIndex,
             newIndex,
             isDone => {
+              // $FlowFixMe[constant-condition]
               if (!isDone) return;
               parameters.moveParameter(oldIndex, newIndex);
               forceUpdate();
@@ -546,6 +553,7 @@ export const EventsFunctionParametersEditor = ({
   // so we even hide their description and type to avoid cluttering the interface.
   // Same thing for an object which has mandatory Object parameter.
   const typeShownFirstIndex = firstParameterIndex;
+  // $FlowFixMe[missing-local-annot]
   const isParameterTypeShown = index => {
     return index >= typeShownFirstIndex;
   };
@@ -559,6 +567,7 @@ export const EventsFunctionParametersEditor = ({
       : 0);
 
   const isParameterDescriptionShown = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     index => {
       return index >= labelShownFirstIndex;
     },
@@ -566,6 +575,7 @@ export const EventsFunctionParametersEditor = ({
   );
 
   const isParameterLongDescriptionShown = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     (parameter, index): boolean => {
       return (
         isParameterDescriptionShown(index) &&

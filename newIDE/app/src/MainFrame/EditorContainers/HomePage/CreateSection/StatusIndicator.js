@@ -6,7 +6,7 @@ type Props = {|
   status: 'success' | 'error' | 'warning',
 |};
 
-const StatusIndicator = ({ status }: Props) => {
+const StatusIndicator = ({ status }: Props): React.MixedElement => {
   const GDevelopTheme = React.useContext(GDevelopThemeContext);
 
   const color =

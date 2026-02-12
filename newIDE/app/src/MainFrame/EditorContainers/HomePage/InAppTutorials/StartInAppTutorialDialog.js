@@ -142,7 +142,7 @@ const StartInAppTutorialDialog = ({
   isProjectOpened,
   startTutorial,
   isProjectOpening,
-}: Props) => {
+}: Props): null | React.Node => {
   const { getInAppTutorialShortHeader } = React.useContext(
     InAppTutorialContext
   );
@@ -208,7 +208,9 @@ const StartInAppTutorialDialog = ({
         return (
           <Dialog
             title={title}
+            // $FlowFixMe[incompatible-type]
             actions={actions}
+            // $FlowFixMe[incompatible-type]
             secondaryActions={secondaryActions}
             open={open}
             onRequestClose={onClose}

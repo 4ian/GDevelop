@@ -9,11 +9,13 @@ const doubleClickDelay = 500; //ms
  * which is emitted when the object is double tapped in less than
  * 500ms (using touch or mouse) on the same position (with a small tolerance).
  */
+// $FlowFixMe[value-as-type]
 export const makeDoubleClickable = (pixiDisplayObject: PIXI.DisplayObject) => {
   let lastClickTime = 0;
   let lastClickGlobalX = 0;
   let lastClickGlobalY = 0;
 
+  // $FlowFixMe[value-as-type]
   const handleTap = (event: PIXI.InteractionEvent) => {
     const { x, y } = event.data.global;
     const currentTime = Date.now();

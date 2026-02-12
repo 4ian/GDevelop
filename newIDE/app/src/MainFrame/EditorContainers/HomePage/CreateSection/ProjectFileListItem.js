@@ -45,6 +45,7 @@ const PrettyBreakablePath = ({ path }: {| path: string |}) => {
     .filter(Boolean);
   if (separatorIndices.length === 0) return path;
 
+  // $FlowFixMe[missing-local-annot]
   return separatorIndices.reduce((acc, separatorIndex, listIndex) => {
     const nextSeparatorIndex = separatorIndices[listIndex + 1];
     return [
@@ -80,7 +81,7 @@ export const ProjectFileListItem = ({
   disabled,
   isLoading,
   onOpenContextMenu,
-}: ProjectFileListItemProps) => {
+}: ProjectFileListItemProps): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const storageProvider = getStorageProviderByInternalName(

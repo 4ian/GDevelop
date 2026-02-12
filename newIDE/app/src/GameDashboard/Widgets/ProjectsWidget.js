@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { I18n as I18nType } from '@lingui/core';
+import type { I18n as I18nType } from '@lingui/core';
 import { Trans } from '@lingui/macro';
 import { type Game } from '../../Utils/GDevelopServices/Game';
 import {
@@ -26,7 +26,7 @@ type Props = {|
   closeProject: () => Promise<void>,
 |};
 
-const ProjectsWidget = (props: Props) => {
+const ProjectsWidget = (props: Props): React.Node => {
   return (
     <DashboardWidget
       widgetSize={'full'}

@@ -88,7 +88,8 @@ type ListItemProps = {|
   disableAutoTranslate?: boolean,
   selected?: boolean,
   autoGenerateNestedIndicator?: boolean, // TODO: Rename?
-  renderNestedItems?: () => Array<React$Element<any> | null>,
+  // $FlowFixMe[prop-missing]
+  renderNestedItems?: () => Array<React.Element<any> | null>,
   isGreyed?: boolean,
   open?: boolean,
   initiallyOpen?: boolean,
@@ -132,7 +133,10 @@ const useStylesForGreyedListItem = makeStyles(theme => {
  *
  * Also used outside of a List by virtualized lists.
  */
-export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
+export const ListItem: React.ComponentType<{
+  ...ListItemProps,
+  +ref?: React.RefSetter<ListItemRefType>,
+}> = React.forwardRef<ListItemProps, ListItemRefType>(
   (props: ListItemProps, ref) => {
     const [isOpen, setIsOpen] = React.useState(!!props.initiallyOpen);
     const elementWithMenu = React.useRef<?ElementWithMenu>(null);
@@ -245,7 +249,8 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
           disabled={props.disabled}
           selected={props.selected}
           style={{
-            // $FlowFixMe - Flow is not happy about two spreads.
+            // $FlowFixMe[incompatible-type] - Flow is not happy about two spreads.
+            // $FlowFixMe[exponential-spread]
             ...noPaddingStyle,
             ...props.style,
           }}
@@ -301,7 +306,8 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
             onClick={onClickItem}
             disabled={props.disabled}
             style={{
-              // $FlowFixMe - Flow is not happy about two spreads.
+              // $FlowFixMe[incompatible-type] - Flow is not happy about two spreads.
+              // $FlowFixMe[exponential-spread]
               ...noPaddingStyle,
               ...props.style,
             }}
@@ -379,9 +385,10 @@ type ListProps = {|
 /**
  * List based on Material-UI List.
  */
-export const List = (props: ListProps) => {
+export const List = (props: ListProps): React.Node => {
   let listStyle = { ...props.style };
   if (props.useGap) {
+    // $FlowFixMe[incompatible-type]
     listStyle = { ...listStyle, ...styles.listWithGap };
   }
   return (

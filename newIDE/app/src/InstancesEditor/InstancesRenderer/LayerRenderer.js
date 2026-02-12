@@ -54,6 +54,7 @@ export default class LayerRenderer {
   viewBottomRight: [number, number];
 
   renderedInstances: { [number]: RenderedInstance | Rendered3DInstance } = {};
+  // $FlowFixMe[value-as-type]
   pixiContainer: PIXI.Container;
 
   /** Functor used to render an instance */
@@ -69,6 +70,7 @@ export default class LayerRenderer {
    * The render texture is then used for lighting (if it's a light layer)
    * or to be rendered in a 3D scene (for a 2D+3D layer).
    */
+  // $FlowFixMe[value-as-type]
   _renderTexture: PIXI.RenderTexture | null = null;
 
   // Width and height are tracked when a render texture is used.
@@ -76,20 +78,28 @@ export default class LayerRenderer {
   _oldHeight: number | null = null;
 
   // For a 3D (or 2D+3D) layer:
+  // $FlowFixMe[value-as-type]
   _threeGroup: THREE.Group | null = null;
+  // $FlowFixMe[value-as-type]
   _threeScene: THREE.Scene | null = null;
+  // $FlowFixMe[value-as-type]
   _threeCamera: THREE.PerspectiveCamera | null = null;
 
   // For a 2D+3D layer, the 2D rendering is done on the render texture
   // and then must be displayed on a plane in the 3D world:
+  // $FlowFixMe[value-as-type]
   _threePlaneTexture: THREE.Texture | null = null;
+  // $FlowFixMe[value-as-type]
   _threePlaneGeometry: THREE.PlaneGeometry | null = null;
+  // $FlowFixMe[value-as-type]
   _threePlaneMaterial: THREE.MeshBasicMaterial | null = null;
+  // $FlowFixMe[value-as-type]
   _threePlaneMesh: THREE.Mesh | null = null;
 
   _showObjectInstancesIn3D: boolean;
 
-  _basicProfilingCounters = makeBasicProfilingCounters();
+  // $FlowFixMe[missing-local-annot]
+  _basicProfilingCounters = (makeBasicProfilingCounters(): BasicProfilingCounters);
 
   constructor({
     project,
@@ -130,6 +140,7 @@ export default class LayerRenderer {
     onMoveInstanceEnd: void => void,
     onDownInstance: (gdInitialInstance, number, number) => void,
     onUpInstance: (gdInitialInstance, number, number) => void,
+    // $FlowFixMe[value-as-type]
     pixiRenderer: PIXI.Renderer,
     showObjectInstancesIn3D: boolean,
   }) {
@@ -159,10 +170,12 @@ export default class LayerRenderer {
 
     // Functor used to render an instance
     this.instancesRenderer = new gd.InitialInstanceJSFunctor();
-    // $FlowFixMe - invoke is not writable
+    // $FlowFixMe[incompatible-type] - invoke is not writable
+    // $FlowFixMe[cannot-write]
     this.instancesRenderer.invoke = instancePtr => {
-      // $FlowFixMe - wrapPointer is not exposed
+      // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
       const instance: gdInitialInstance = gd.wrapPointer(
+        // $FlowFixMe[incompatible-type]
         instancePtr,
         gd.InitialInstance
       );
@@ -174,6 +187,7 @@ export default class LayerRenderer {
         | null = this.getOrCreateRendererOfInstance(instance);
       if (!renderedInstance) return;
 
+      // $FlowFixMe[value-as-type]
       const pixiObject: PIXI.DisplayObject | null = renderedInstance.getPixiObject();
       if (pixiObject) {
         if (renderedInstance.isRenderedIn3D()) {
@@ -240,18 +254,21 @@ export default class LayerRenderer {
     }
   }
 
-  getPixiContainer() {
+  getPixiContainer(): any {
     return this.pixiContainer;
   }
 
+  // $FlowFixMe[value-as-type]
   getThreeScene(): THREE.Scene | null {
     return this._threeScene;
   }
 
+  // $FlowFixMe[value-as-type]
   getThreeCamera(): THREE.PerspectiveCamera | null {
     return this._threeCamera;
   }
 
+  // $FlowFixMe[value-as-type]
   getThreePlaneMesh(): THREE.Mesh | null {
     return this._threePlaneMesh;
   }
@@ -263,7 +280,7 @@ export default class LayerRenderer {
     return this.renderedInstances[instance.ptr];
   }
 
-  getUnrotatedInstanceLeft = (instance: gdInitialInstance) => {
+  getUnrotatedInstanceLeft = (instance: gdInitialInstance): any => {
     return (
       instance.getX() -
       (this.renderedInstances[instance.ptr]
@@ -272,7 +289,7 @@ export default class LayerRenderer {
     );
   };
 
-  getUnrotatedInstanceTop = (instance: gdInitialInstance) => {
+  getUnrotatedInstanceTop = (instance: gdInitialInstance): any => {
     return (
       instance.getY() -
       (this.renderedInstances[instance.ptr]
@@ -281,7 +298,7 @@ export default class LayerRenderer {
     );
   };
 
-  getUnrotatedInstanceZMin = (instance: gdInitialInstance) => {
+  getUnrotatedInstanceZMin = (instance: gdInitialInstance): any => {
     return (
       instance.getZ() -
       // 3D objects Z position is always the "Z min":
@@ -292,7 +309,7 @@ export default class LayerRenderer {
     );
   };
 
-  getUnrotatedInstanceSize = (instance: gdInitialInstance) => {
+  getUnrotatedInstanceSize = (instance: gdInitialInstance): any => {
     const renderedInstance = this.getOrCreateRendererOfInstance(instance);
     const hasCustomSize = instance.hasCustomSize();
     const hasCustomDepth = instance.hasCustomDepth();
@@ -373,7 +390,9 @@ export default class LayerRenderer {
       }
 
       if (centerX === undefined || centerY === undefined) {
+        // $FlowFixMe[incompatible-type]
         centerX = (rotatedRectangle[0][0] + rotatedRectangle[2][0]) / 2;
+        // $FlowFixMe[incompatible-type]
         centerY = (rotatedRectangle[0][1] + rotatedRectangle[2][1]) / 2;
       }
 
@@ -402,7 +421,7 @@ export default class LayerRenderer {
     return bounds;
   }
 
-  getOrCreateRendererOfInstance = (instance: gdInitialInstance) => {
+  getOrCreateRendererOfInstance = (instance: gdInitialInstance): any => {
     var renderedInstance = this.renderedInstances[instance.ptr];
     if (renderedInstance === undefined) {
       //No renderer associated yet, the instance must have been just created!...
@@ -448,6 +467,7 @@ export default class LayerRenderer {
       });
       renderedInstance._pixiObject.addEventListener(
         'mousedown',
+        // $FlowFixMe[value-as-type]
         (event: PIXI.InteractionEvent) => {
           if (event.data.originalEvent.button === 0) {
             const viewPoint = event.data.global;
@@ -461,6 +481,7 @@ export default class LayerRenderer {
       );
       renderedInstance._pixiObject.addEventListener(
         'mouseup',
+        // $FlowFixMe[value-as-type]
         (event: PIXI.InteractionEvent) => {
           if (event.data.originalEvent.button === 0) {
             const viewPoint = event.data.global;
@@ -549,7 +570,7 @@ export default class LayerRenderer {
    * The approach is a naive bounding box testing but save rendering time on large
    * levels (though this could be improved with spatial partitioning).
    */
-  _isInstanceVisible(instance: gdInitialInstance) {
+  _isInstanceVisible(instance: gdInitialInstance): any {
     const aabb = this.getInstanceAABB(instance, this._temporaryRectangle);
     if (
       aabb.left + aabb.width() < this.viewTopLeft[0] ||
@@ -586,7 +607,7 @@ export default class LayerRenderer {
 
     this._computeViewBounds();
     this.instances.iterateOverInstancesWithZOrdering(
-      // $FlowFixMe - gd.castObject is not supporting typings.
+      // $FlowFixMe[incompatible-type] - gd.castObject is not supporting typings.
       this.instancesRenderer,
       this.layer.getName()
     );
@@ -602,6 +623,7 @@ export default class LayerRenderer {
   /**
    * Create Three.js objects for 3D rendering of this layer.
    */
+  // $FlowFixMe[value-as-type]
   _setup3dRendering(pixiRenderer: PIXI.Renderer): void {
     if (this._threeScene || this._threeGroup || this._threeCamera) {
       throw new Error(
@@ -675,6 +697,7 @@ export default class LayerRenderer {
     const threePlaneGeometry = new THREE.PlaneGeometry(1, 1);
     this._threePlaneGeometry = threePlaneGeometry;
     // This disable the gamma correction done by THREE as PIXI is already doing it.
+    // $FlowFixMe[value-as-type]
     const noGammaCorrectionShader: THREE.ShaderMaterialParameters = {
       vertexShader: `
         varying vec2 vUv;
@@ -716,6 +739,7 @@ export default class LayerRenderer {
    * Can be used either for lighting or for rendering the layer in a texture
    * so it can then be consumed by Three.js to render it in 3D.
    */
+  // $FlowFixMe[value-as-type]
   _createPixiRenderTexture(pixiRenderer: PIXI.Renderer | null): void {
     if (!pixiRenderer || pixiRenderer.type !== PIXI.RENDERER_TYPE.WEBGL) {
       return;
@@ -746,6 +770,7 @@ export default class LayerRenderer {
    * Render the layer of the PixiJS RenderTexture, so that it can be then be
    * consumed by Three.js (for 2D+3D layers).
    */
+  // $FlowFixMe[value-as-type]
   renderOnPixiRenderTexture(pixiRenderer: PIXI.Renderer) {
     if (!this._renderTexture) {
       return;
@@ -784,7 +809,9 @@ export default class LayerRenderer {
    * as the PixiJS RenderTexture - so that the 2D rendering can be shown in the 3D world.
    */
   updateThreePlaneTextureFromPixiRenderTexture(
+    // $FlowFixMe[value-as-type]
     threeRenderer: THREE.WebGLRenderer,
+    // $FlowFixMe[value-as-type]
     pixiRenderer: PIXI.Renderer
   ): void {
     if (!this._threePlaneTexture || !this._renderTexture) {

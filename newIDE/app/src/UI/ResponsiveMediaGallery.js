@@ -82,7 +82,7 @@ const ResponsiveMediaGallery = ({
   mediaItems,
   altTextTemplate,
   horizontalOuterMarginToEatOnMobile,
-}: Props) => {
+}: Props): React.Node | React.MixedElement => {
   const [selectedMediaIndex, setSelectedMediaIndex] = React.useState<number>(0);
   const { isMobile } = useResponsiveWindowSize();
 
@@ -218,6 +218,7 @@ const ResponsiveMediaGallery = ({
           )}
         </Measure>
         <Line justifyContent="center">
+          {/* $FlowFixMe[incompatible-type] */}
           <Text noMargin size="body2" style={styles.disabledText}>
             {currentlyViewedImageIndex + 1}/{mediaItems.length}
           </Text>

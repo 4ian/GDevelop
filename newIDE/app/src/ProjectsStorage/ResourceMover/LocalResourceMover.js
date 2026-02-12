@@ -177,7 +177,7 @@ const movers: {
     );
     gd.ProjectResourcesCopier.copyAllResourcesTo(
       project,
-      // $FlowFixMe - fileSystem is a gdAbstractFileSystem, despite the assignIn.
+      // $FlowFixMe[incompatible-type] - fileSystem is a gdAbstractFileSystem, despite the assignIn.
       fileSystem,
       projectPath,
       true, // Update the project with the new resource paths
@@ -247,6 +247,7 @@ const LocalResourceMover = {
       movers[
         `${oldStorageProvider.internalName}=>${newStorageProvider.internalName}`
       ];
+    // $FlowFixMe[constant-condition]
     if (!mover)
       throw new Error(
         `Can't find a ResourceMover for ${oldStorageProvider.internalName} to ${

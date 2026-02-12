@@ -16,7 +16,7 @@ type Props = {|
 
 export const checkIfHasTooManyCloudProjects = (
   authenticatedUser: AuthenticatedUser
-) => {
+): boolean => {
   if (!authenticatedUser.authenticated) return false;
 
   const { limits, cloudProjects } = authenticatedUser;
@@ -29,7 +29,9 @@ export const checkIfHasTooManyCloudProjects = (
     : false;
 };
 
-export const MaxProjectCountAlertMessage = ({ margin }: Props) => {
+export const MaxProjectCountAlertMessage = ({
+  margin,
+}: Props): null | React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { limits, subscription } = authenticatedUser;
   if (!limits) return null;

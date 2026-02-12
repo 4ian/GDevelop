@@ -111,11 +111,13 @@ const getObjectsAndGroupsDataSource = ({
       : [...objects, { type: 'separator' }, ...groups];
 
   return excludedObjectOrGroupNames
-    ? fullList.filter(
-        //$FlowFixMe
+    ? // $FlowFixMe[incompatible-type]
+      fullList.filter(
+        //$FlowFixMe[incompatible-type]
         ({ value }) => !excludedObjectOrGroupNames.includes(value)
       )
-    : fullList;
+    : // $FlowFixMe[incompatible-type]
+      fullList;
 };
 
 export const checkHasRequiredBehaviors = ({
@@ -164,137 +166,138 @@ const getMissingBehaviors = ({
 
 export type ObjectSelectorInterface = {| focus: FieldFocusFunction |};
 
-const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
-  (props, ref) => {
-    const fieldRef = React.useRef<?SemiControlledAutoCompleteInterface>(null);
+const ObjectSelector: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<ObjectSelectorInterface>,
+}> = React.forwardRef<Props, ObjectSelectorInterface>((props, ref) => {
+  const fieldRef = React.useRef<?SemiControlledAutoCompleteInterface>(null);
 
-    const focus: FieldFocusFunction = options => {
-      if (fieldRef.current) fieldRef.current.focus(options);
-    };
-    const shouldAutofocusInput = useShouldAutofocusInput();
+  const focus: FieldFocusFunction = options => {
+    if (fieldRef.current) fieldRef.current.focus(options);
+  };
+  const shouldAutofocusInput = useShouldAutofocusInput();
 
-    React.useImperativeHandle(ref, () => ({ focus }));
+  React.useImperativeHandle(ref, () => ({ focus }));
 
-    const {
-      value,
-      onChange,
-      onChoose,
-      project,
-      projectScopedContainersAccessor,
-      allowedObjectType,
-      noGroups,
-      errorTextIfInvalid,
-      margin,
-      onRequestClose,
-      onApply,
-      id,
-      excludedObjectOrGroupNames,
-      hintText,
-      requiredCapabilitiesBehaviorTypes,
-      requiredVisibleBehaviorTypes,
-      disabled,
-      ...otherProps
-    } = props;
+  const {
+    value,
+    onChange,
+    onChoose,
+    project,
+    projectScopedContainersAccessor,
+    allowedObjectType,
+    noGroups,
+    errorTextIfInvalid,
+    margin,
+    onRequestClose,
+    onApply,
+    id,
+    excludedObjectOrGroupNames,
+    hintText,
+    requiredCapabilitiesBehaviorTypes,
+    requiredVisibleBehaviorTypes,
+    disabled,
+    ...otherProps
+  } = props;
 
-    const objectsContainersList = projectScopedContainersAccessor
-      .get()
-      .getObjectsContainersList();
+  const objectsContainersList = projectScopedContainersAccessor
+    .get()
+    .getObjectsContainersList();
 
-    const objectAndGroups = getObjectsAndGroupsDataSource({
-      project,
-      objectsContainersList,
-      noGroups,
-      allowedObjectType,
-      requiredCapabilitiesBehaviorTypes,
-      excludedObjectOrGroupNames,
-    });
+  const objectAndGroups = getObjectsAndGroupsDataSource({
+    project,
+    objectsContainersList,
+    noGroups,
+    allowedObjectType,
+    requiredCapabilitiesBehaviorTypes,
+    excludedObjectOrGroupNames,
+  });
 
-    const hasValidChoice =
-      objectAndGroups.filter(
-        choice => choice.text !== undefined && value === choice.text
-      ).length !== 0;
+  const hasValidChoice =
+    objectAndGroups.filter(
+      choice => choice.text !== undefined && value === choice.text
+    ).length !== 0;
 
-    const hasObjectWithRequiredCapability = checkHasRequiredBehaviors({
-      objectsContainersList,
-      objectName: value,
-      requiredBehaviorTypes: requiredCapabilitiesBehaviorTypes,
-    });
-    const missingVisibleBehaviors = getMissingBehaviors({
-      objectsContainersList,
-      objectName: value,
-      requiredBehaviorTypes: requiredVisibleBehaviorTypes,
-    });
-    const errorText = !hasObjectWithRequiredCapability ? (
-      <Trans>This object exists, but can't be used here.</Trans>
-    ) : missingVisibleBehaviors.length > 0 ? (
-      <Trans>
-        This object misses some behaviors:{' '}
-        {missingVisibleBehaviors
-          .map(
-            behaviorTypeName =>
-              gd.MetadataProvider.getBehaviorMetadata(
-                gd.JsPlatform.get(),
-                behaviorTypeName
-              ).getFullName() || behaviorTypeName
-          )
-          .join(', ')}
-      </Trans>
-    ) : !hasValidChoice ? (
-      errorTextIfInvalid
-    ) : (
-      undefined
-    );
+  const hasObjectWithRequiredCapability = checkHasRequiredBehaviors({
+    objectsContainersList,
+    objectName: value,
+    requiredBehaviorTypes: requiredCapabilitiesBehaviorTypes,
+  });
+  const missingVisibleBehaviors = getMissingBehaviors({
+    objectsContainersList,
+    objectName: value,
+    requiredBehaviorTypes: requiredVisibleBehaviorTypes,
+  });
+  const errorText = !hasObjectWithRequiredCapability ? (
+    <Trans>This object exists, but can't be used here.</Trans>
+  ) : missingVisibleBehaviors.length > 0 ? (
+    <Trans>
+      This object misses some behaviors:{' '}
+      {missingVisibleBehaviors
+        .map(
+          behaviorTypeName =>
+            gd.MetadataProvider.getBehaviorMetadata(
+              gd.JsPlatform.get(),
+              behaviorTypeName
+            ).getFullName() || behaviorTypeName
+        )
+        .join(', ')}
+    </Trans>
+  ) : !hasValidChoice ? (
+    errorTextIfInvalid
+  ) : (
+    undefined
+  );
 
-    return disabled ? null : shouldAutofocusInput ? (
-      <SemiControlledAutoComplete
-        margin={margin}
-        hintText={hintText || t`Choose an object`}
-        value={value}
-        onChange={onChange}
-        onChoose={onChoose}
-        onRequestClose={onRequestClose}
-        onApply={onApply}
-        dataSource={objectAndGroups}
-        errorText={errorText}
-        ref={fieldRef}
-        id={id}
-        {...otherProps}
-      />
-    ) : (
-      <I18n>
-        {({ i18n }) => (
-          <SelectField
-            margin={margin}
-            value={value}
-            onChange={(e, i, newValue) => {
-              onChange(newValue);
-              if (onChoose) onChoose(newValue);
-              if (onApply) onApply();
-            }}
-            translatableHintText={hintText || t`Choose an object`}
-            style={{ flex: otherProps.fullWidth ? 1 : undefined }}
-            errorText={errorText}
-            helperMarkdownText={otherProps.helperMarkdownText}
-            floatingLabelText={otherProps.floatingLabelText}
-            id={id}
-          >
-            {objectAndGroups.map((option, index) =>
-              option.type === 'separator' ? (
-                <optgroup key={`group-divider`} label={i18n._(t`Groups`)} />
-              ) : (
-                <SelectOption
-                  key={option.value}
-                  label={option.value}
-                  value={option.value}
-                  shouldNotTranslate
-                />
-              )
-            )}
-          </SelectField>
-        )}
-      </I18n>
-    );
-  }
-);
+  return disabled ? null : shouldAutofocusInput ? (
+    <SemiControlledAutoComplete
+      margin={margin}
+      hintText={hintText || t`Choose an object`}
+      value={value}
+      onChange={onChange}
+      onChoose={onChoose}
+      onRequestClose={onRequestClose}
+      onApply={onApply}
+      dataSource={objectAndGroups}
+      errorText={errorText}
+      ref={fieldRef}
+      id={id}
+      {...otherProps}
+    />
+  ) : (
+    <I18n>
+      {({ i18n }) => (
+        <SelectField
+          margin={margin}
+          value={value}
+          onChange={(e, i, newValue) => {
+            onChange(newValue);
+            if (onChoose) onChoose(newValue);
+            if (onApply) onApply();
+          }}
+          translatableHintText={hintText || t`Choose an object`}
+          style={{ flex: otherProps.fullWidth ? 1 : undefined }}
+          errorText={errorText}
+          helperMarkdownText={otherProps.helperMarkdownText}
+          floatingLabelText={otherProps.floatingLabelText}
+          id={id}
+        >
+          {objectAndGroups.map((option, index) =>
+            option.type === 'separator' ? (
+              <optgroup key={`group-divider`} label={i18n._(t`Groups`)} />
+            ) : (
+              <SelectOption
+                key={option.value}
+                label={option.value}
+                value={option.value}
+                shouldNotTranslate
+              />
+            )
+          )}
+        </SelectField>
+      )}
+    </I18n>
+  );
+});
 
 export default ObjectSelector;

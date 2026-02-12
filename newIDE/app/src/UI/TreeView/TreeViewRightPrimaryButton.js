@@ -14,10 +14,10 @@ export type TreeViewRightPrimaryButtonProps = {|
   onClick: ?(MouseEvent) => void | Promise<void>,
 |};
 
-export const TreeViewRightPrimaryButton = React.forwardRef<
-  TreeViewRightPrimaryButtonProps,
-  ButtonInterface
->(
+export const TreeViewRightPrimaryButton: React.ComponentType<{
+  ...TreeViewRightPrimaryButtonProps,
+  +ref?: React.RefSetter<ButtonInterface>,
+}> = React.forwardRef<TreeViewRightPrimaryButtonProps, ButtonInterface>(
   (
     { label, icon, disabled, ...otherProps }: TreeViewRightPrimaryButtonProps,
     ref

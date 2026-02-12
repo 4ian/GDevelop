@@ -25,7 +25,8 @@ const getRandomItem = (id: string) => (
   </GridListTile>
 );
 
-export const Default = () => {
+export const Default = (): React.Node => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const items = new Array(15).fill(null).map((_, index) => ({
     renderItem: () => getRandomItem(`item-${index}`),
   }));

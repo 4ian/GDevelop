@@ -25,7 +25,7 @@ const UserLine = ({
   level: ?Level,
   onDelete?: () => Promise<void> | void,
   disabled?: boolean,
-|}) => (
+|}): React.Node => (
   <I18n>
     {({ i18n }) => (
       <Line justifyContent="space-between">

@@ -46,6 +46,7 @@ export const useMultiplayerLobbyConfigurator = (): UseMultiplayerLobbyConfigurat
           await registerGame(
             getAuthorizationHeader,
             profile.id,
+            // $FlowFixMe[incompatible-type]
             getDefaultRegisterGameProperties({
               projectId: project.getProjectUuid(),
               projectName: project.getName(),

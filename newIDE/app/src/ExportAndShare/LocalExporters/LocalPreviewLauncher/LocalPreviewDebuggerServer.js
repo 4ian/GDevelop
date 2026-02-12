@@ -80,6 +80,7 @@ const removeServerListeners = () => {
  * communicating through events with it).
  */
 class LocalPreviewDebuggerServer {
+  // $FlowFixMe[missing-local-annot]
   startServer() {
     if (!ipcRenderer) return Promise.reject();
     if (debuggerServerState === 'started') return Promise.resolve();
@@ -236,18 +237,23 @@ class LocalPreviewDebuggerServer {
     });
     return promise;
   }
+  // $FlowFixMe[missing-local-annot]
   getServerState() {
     return debuggerServerState;
   }
+  // $FlowFixMe[missing-local-annot]
   getExistingDebuggerIds() {
     return getExistingDebuggerIds();
   }
+  // $FlowFixMe[missing-local-annot]
   getExistingEmbeddedGameFrameDebuggerIds() {
     return getExistingEmbeddedGameFrameDebuggerIds();
   }
+  // $FlowFixMe[missing-local-annot]
   getExistingPreviewDebuggerIds() {
     return getExistingPreviewDebuggerIds();
   }
+  // $FlowFixMe[missing-local-annot]
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks) {
     callbacksList.push(callbacks);
 

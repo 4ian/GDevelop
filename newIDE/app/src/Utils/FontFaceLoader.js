@@ -6,8 +6,12 @@ import { checkIfCredentialsRequired } from './CrossOrigin';
  * A simple wrapper around FontFace (if supported) or @font-face + FontFaceObserver
  * to load a font from an url and be notified when loading is done (or failed).
  */
-export const loadFontFace = (fontFamily: string, src: string) => {
-  // $FlowFixMe - FontFace not recognised by Flow.
+export const loadFontFace = (
+  fontFamily: string,
+  src: string
+): any | Promise<void> => {
+  // $FlowFixMe[incompatible-type] - FontFace not recognised by Flow.
+  // $FlowFixMe[cannot-resolve-name]
   if (typeof FontFace !== 'undefined') {
     return fetch(src, {
       credentials: checkIfCredentialsRequired(src)
@@ -32,9 +36,11 @@ export const loadFontFace = (fontFamily: string, src: string) => {
         return response.arrayBuffer();
       })
       .then(arrayBuffer => {
+        // $FlowFixMe[cannot-resolve-name]
         const fontFace = new FontFace(fontFamily, arrayBuffer, {});
 
-        // $FlowFixMe - FontFace not recognised by Flow.
+        // $FlowFixMe[incompatible-type] - FontFace not recognised by Flow.
+        // $FlowFixMe[prop-missing]
         document.fonts.add(fontFace);
       });
   } else {
@@ -54,7 +60,8 @@ export const loadFontFace = (fontFamily: string, src: string) => {
       )
     );
 
-    // $FlowFixMe
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[incompatible-use]
     document.head.appendChild(newStyle);
     return new FontFaceObserver(fontFamily, {}).load().catch(err => {
       console.warn(`Error while loading font ${fontFamily}`, err);

@@ -42,7 +42,7 @@ export const getSelectableBehavior = (
         );
 };
 
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function BehaviorField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
     const focus: FieldFocusFunction = options => {
@@ -191,4 +191,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-);
+): React.ComponentType<{
+  ...ParameterFieldProps,
+  +ref?: React.RefSetter<ParameterFieldInterface>,
+}>);

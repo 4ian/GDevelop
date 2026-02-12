@@ -37,7 +37,7 @@ const ObjectInstanceVariablesDialog = ({
   projectScopedContainersAccessor,
   onEditObjectVariables,
   isListLocked,
-}: Props) => {
+}: Props): React.Node => {
   const tabs = React.useMemo(
     () => {
       const objectName = objectInstance.getObjectName();
@@ -73,7 +73,8 @@ const ObjectInstanceVariablesDialog = ({
                   : [],
             },
           ]
-        : [];
+        : // $FlowFixMe[incompatible-type]
+          [];
     },
     [globalObjectsContainer, layout, objectInstance, objectsContainer, project]
   );
@@ -87,6 +88,7 @@ const ObjectInstanceVariablesDialog = ({
       onCancel={onCancel}
       onApply={onApply}
       title={<Trans>Instance variables</Trans>}
+      // $FlowFixMe[incompatible-type]
       tabs={tabs}
       initiallySelectedVariableName={initiallySelectedVariableName}
       helpPagePath={'/all-features/variables/instance-variables'}

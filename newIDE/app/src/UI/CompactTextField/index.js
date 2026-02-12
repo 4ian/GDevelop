@@ -57,10 +57,10 @@ export type CompactTextFieldProps = {|
   onWheel?: WheelEvent => void,
 |};
 
-const CompactTextField = React.forwardRef<
-  CompactTextFieldProps,
-  CompactTextFieldInterface
->(
+const CompactTextField: React.ComponentType<{
+  ...CompactTextFieldProps,
+  +ref?: React.RefSetter<CompactTextFieldInterface>,
+}> = React.forwardRef<CompactTextFieldProps, CompactTextFieldInterface>(
   (
     {
       type,
@@ -91,12 +91,14 @@ const CompactTextField = React.forwardRef<
     });
 
     const onBlurInput = React.useCallback(
+      // $FlowFixMe[missing-local-annot]
       event => {
         if (onBlur) onBlur(event);
       },
       [onBlur]
     );
     const onFocusInput = React.useCallback(
+      // $FlowFixMe[missing-local-annot]
       event => {
         if (onFocus) onFocus(event);
       },

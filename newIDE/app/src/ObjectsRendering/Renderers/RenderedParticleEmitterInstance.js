@@ -14,6 +14,7 @@ export default class RenderedParticleEmitterInstance extends RenderedInstance {
     project: gdProject,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
+    // $FlowFixMe[value-as-type]
     pixiContainer: PIXI.Container,
     pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {
@@ -37,7 +38,7 @@ export default class RenderedParticleEmitterInstance extends RenderedInstance {
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
-  ) {
+  ): any {
     return 'CppPlatform/Extensions/particleSystemicon.png';
   }
 
@@ -93,19 +94,19 @@ export default class RenderedParticleEmitterInstance extends RenderedInstance {
     this._pixiObject.endFill();
   }
 
-  getDefaultWidth() {
+  getDefaultWidth(): any {
     return 128;
   }
 
-  getDefaultHeight() {
+  getDefaultHeight(): any {
     return 128;
   }
 
-  getOriginX() {
+  getOriginX(): any {
     return 64;
   }
 
-  getOriginY() {
+  getOriginY(): any {
     return 64;
   }
 }

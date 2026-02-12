@@ -36,7 +36,7 @@ const SaveToStorageProviderDialog = ({
   onClose,
   storageProviders,
   onChooseProvider,
-}: Props) => {
+}: Props): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const { profile, cloudProjects } = authenticatedUser;

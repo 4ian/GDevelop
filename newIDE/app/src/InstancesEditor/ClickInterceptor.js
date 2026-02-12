@@ -154,10 +154,7 @@ class ClickInterceptor {
     const tileMapTileSelection = this.getTileMapTileSelection();
 
     // For floodfill, keep only a single coordinate (no drag path).
-    if (
-      tileMapTileSelection &&
-      tileMapTileSelection.kind === 'floodfill'
-    ) {
+    if (tileMapTileSelection && tileMapTileSelection.kind === 'floodfill') {
       pointerPathCoordinates[0] = {
         x: sceneCoordinates[0],
         y: sceneCoordinates[1],
@@ -165,10 +162,7 @@ class ClickInterceptor {
       return;
     }
 
-    if (
-      tileMapTileSelection &&
-      tileMapTileSelection.kind === 'freehand'
-    ) {
+    if (tileMapTileSelection && tileMapTileSelection.kind === 'freehand') {
       const lastPoint =
         pointerPathCoordinates[pointerPathCoordinates.length - 1];
       if (lastPoint) {

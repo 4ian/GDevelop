@@ -268,19 +268,13 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
   const tilesCoordinatesInTileMapGrid: TileMapTilePatch[] = [];
 
   // Freehand mode: each coordinate in the path maps to a single tile.
-  if (
-    tileMapTileSelection.kind === 'freehand' &&
-    coordinates.length >= 1
-  ) {
+  if (tileMapTileSelection.kind === 'freehand' && coordinates.length >= 1) {
     const seen = new Set<string>();
     const topLeftCorner = tileMapTileSelection.coordinates[0];
 
     coordinates.forEach(coord => {
       const gridPos = [0, 0];
-      sceneToTileMapTransformation.transform(
-        [coord.x, coord.y],
-        gridPos
-      );
+      sceneToTileMapTransformation.transform([coord.x, coord.y], gridPos);
       const x = Math.floor(gridPos[0] / tileSize);
       const y = Math.floor(gridPos[1] / tileSize);
       const key = `${x},${y}`;
@@ -306,10 +300,7 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
   if (tileMapTileSelection.kind === 'floodfill' && coordinates.length >= 2) {
     const lastCoord = coordinates[coordinates.length - 1];
     const gridPos = [0, 0];
-    sceneToTileMapTransformation.transform(
-      [lastCoord.x, lastCoord.y],
-      gridPos
-    );
+    sceneToTileMapTransformation.transform([lastCoord.x, lastCoord.y], gridPos);
     const x = Math.floor(gridPos[0] / tileSize);
     const y = Math.floor(gridPos[1] / tileSize);
     const topLeftCorner = tileMapTileSelection.coordinates[0];

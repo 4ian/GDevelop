@@ -222,7 +222,9 @@ export type TileMapTileSelection =
 export const isTileMapPaintingSelection = (
   selection: TileMapTileSelection
 ): boolean %checks =>
-  selection.kind === 'rectangle' || selection.kind === 'freehand' || selection.kind === 'floodfill';
+  selection.kind === 'rectangle' ||
+  selection.kind === 'freehand' ||
+  selection.kind === 'floodfill';
 
 type Props = {|
   project: gdProject,
@@ -568,7 +570,10 @@ const TileSetVisualizer = ({
             ) {
               newSelection = ({
                 kind: (tileMapTileSelection.kind: any),
-                coordinates: ([topLeftCorner, bottomRightCorner]: TileMapCoordinates[]),
+                coordinates: ([
+                  topLeftCorner,
+                  bottomRightCorner,
+                ]: TileMapCoordinates[]),
                 flipHorizontally: shouldFlipHorizontally,
                 flipVertically: shouldFlipVertically,
               }: TileMapTileSelection);

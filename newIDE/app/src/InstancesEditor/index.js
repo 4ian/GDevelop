@@ -618,10 +618,10 @@ export default class InstancesEditor extends Component<Props, State> {
     this.uiPixiContainer.addChild(this.windowMask.getPixiObject());
     this.uiPixiContainer.addChild(this.selectedInstances.getPixiContainer());
     this.uiPixiContainer.addChild(this.highlightedInstance.getPixiObject());
-    this.uiPixiContainer.addChild(this.statusBar.getPixiObject());
-    this.uiPixiContainer.addChild(this.profilerBar.getPixiObject());
     this.uiPixiContainer.addChild(this.tileMapPaintingPreview.getPixiObject());
     this.uiPixiContainer.addChild(this.clickInterceptor.getPixiObject());
+    this.uiPixiContainer.addChild(this.statusBar.getPixiObject());
+    this.uiPixiContainer.addChild(this.profilerBar.getPixiObject());
 
     this.background = new Background({
       width: this.props.width,

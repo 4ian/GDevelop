@@ -300,6 +300,32 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
     return tilesCoordinatesInTileMapGrid;
   }
 
+  // Floodfill mode: only a single coordinate is expected (handled by the
+  // coordinates.length === 1 case above). If we somehow get here with
+  // more coordinates, just use the last one.
+  if (tileMapTileSelection.kind === 'floodfill' && coordinates.length >= 2) {
+    const lastCoord = coordinates[coordinates.length - 1];
+    const gridPos = [0, 0];
+    sceneToTileMapTransformation.transform(
+      [lastCoord.x, lastCoord.y],
+      gridPos
+    );
+    const x = Math.floor(gridPos[0] / tileSize);
+    const y = Math.floor(gridPos[1] / tileSize);
+    const topLeftCorner = tileMapTileSelection.coordinates[0];
+    return [
+      {
+        erase: false,
+        tileCoordinates: getTileCorrespondingToFlippingInstructions({
+          tileMapTileSelection,
+          tileCoordinates: topLeftCorner,
+        }),
+        topLeftCorner: { x, y },
+        bottomRightCorner: { x, y },
+      },
+    ];
+  }
+
   if (coordinates.length === 2) {
     const firstPointCoordinatesInTileMap = [0, 0];
     sceneToTileMapTransformation.transform(

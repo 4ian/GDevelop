@@ -878,7 +878,90 @@ export default class InstancesEditor extends Component<Props, State> {
 
       let shouldTrimAfterOperations = false;
 
-      if (isTileMapPaintingSelection(tileMapTileSelection)) {
+      if (tileMapTileSelection.kind === 'floodfill') {
+        // Flood fill: get the single clicked grid coordinate.
+        if (tileMapGridCoordinates.length === 0) return;
+        const { topLeftCorner, tileCoordinates } = tileMapGridCoordinates[0];
+        if (!tileCoordinates) return;
+
+        const clickX = topLeftCorner.x;
+        const clickY = topLeftCorner.y;
+
+        const layer = editableTileMap.getTileLayer(0);
+        if (!layer) return;
+
+        // Only fill if the clicked tile is empty.
+        const clickedTileId = layer.getTileId(clickX, clickY);
+        if (clickedTileId !== undefined) return;
+
+        const tileId = getTileIdFromGridCoordinates({
+          columnCount: tileSet.columnCount,
+          ...tileCoordinates,
+        });
+        const tileDefinition = editableTileMap.getTileDefinition(tileId);
+        if (!tileDefinition) return;
+
+        // BFS flood fill over empty tiles (4-directional).
+        const dimX = editableTileMap.getDimensionX();
+        const dimY = editableTileMap.getDimensionY();
+        const visited = new Set<string>();
+        const queue: Array<{| x: number, y: number |}> = [];
+        const tilesToFill: Array<{| x: number, y: number |}> = [];
+
+        const toKey = (x: number, y: number): string => `${x},${y}`;
+
+        if (clickX >= 0 && clickX < dimX && clickY >= 0 && clickY < dimY) {
+          queue.push({ x: clickX, y: clickY });
+          visited.add(toKey(clickX, clickY));
+        }
+
+        while (queue.length > 0) {
+          const current = queue.shift();
+          tilesToFill.push(current);
+
+          const neighbors = [
+            { x: current.x - 1, y: current.y },
+            { x: current.x + 1, y: current.y },
+            { x: current.x, y: current.y - 1 },
+            { x: current.x, y: current.y + 1 },
+          ];
+
+          for (const neighbor of neighbors) {
+            if (
+              neighbor.x < 0 ||
+              neighbor.x >= dimX ||
+              neighbor.y < 0 ||
+              neighbor.y >= dimY
+            )
+              continue;
+            const nKey = toKey(neighbor.x, neighbor.y);
+            if (visited.has(nKey)) continue;
+            visited.add(nKey);
+
+            const neighborTileId = layer.getTileId(neighbor.x, neighbor.y);
+            if (neighborTileId === undefined) {
+              queue.push(neighbor);
+            }
+          }
+        }
+
+        // Apply the fill.
+        for (const tile of tilesToFill) {
+          editableTileMap.setTile(tile.x, tile.y, 0, tileId);
+          editableTileMap.flipTileOnX(
+            tile.x,
+            tile.y,
+            0,
+            tileMapTileSelection.flipHorizontally
+          );
+          editableTileMap.flipTileOnY(
+            tile.x,
+            tile.y,
+            0,
+            tileMapTileSelection.flipVertically
+          );
+        }
+      } else if (isTileMapPaintingSelection(tileMapTileSelection)) {
         shouldTrimAfterOperations = editableTileMap.isEmpty();
         // TODO: Optimize list execution to make sure the most important size changing operations are done first.
         let cumulatedUnshiftedRows = 0,

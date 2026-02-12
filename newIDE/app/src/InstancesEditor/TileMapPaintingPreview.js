@@ -162,6 +162,7 @@ class TileMapPaintingPreview {
     try {
       const texture = new PIXI.Texture(atlasTexture, rect);
       this.cache.set(cacheKey, texture);
+      return texture;
     } catch (error) {
       console.error(`Tile could not be extracted from atlas texture:`, error);
       return PixiResourcesLoader.getInvalidPIXITexture();

@@ -8,6 +8,7 @@ import { CorsAwareImage } from '../UI/CorsAwareImage';
 import ResourcesLoader from '../ResourcesLoader';
 import Erase from '../UI/CustomSvgIcons/Erase';
 import Brush from '../UI/CustomSvgIcons/Brush';
+import Coffee from '../UI/CustomSvgIcons/Coffee';
 import Maximize from '../UI/CustomSvgIcons/Maximize';
 import IconButton from '../UI/IconButton';
 import { LineStackLayout } from '../UI/Layout';
@@ -209,13 +210,19 @@ export type TileMapTileSelection =
       flipVertically: boolean,
     |}
   | {|
+      kind: 'floodfill',
+      coordinates: TileMapCoordinates[],
+      flipHorizontally: boolean,
+      flipVertically: boolean,
+    |}
+  | {|
       kind: 'erase',
     |};
 
 export const isTileMapPaintingSelection = (
   selection: TileMapTileSelection
 ): boolean %checks =>
-  selection.kind === 'rectangle' || selection.kind === 'freehand';
+  selection.kind === 'rectangle' || selection.kind === 'freehand' || selection.kind === 'floodfill';
 
 type Props = {|
   project: gdProject,
@@ -534,6 +541,8 @@ const TileSetVisualizer = ({
           const currentKind =
             tileMapTileSelection && tileMapTileSelection.kind === 'freehand'
               ? 'freehand'
+              : tileMapTileSelection && tileMapTileSelection.kind === 'floodfill'
+              ? 'floodfill'
               : 'rectangle';
           const shouldRemoveSelection =
             tileMapTileSelection &&
@@ -754,6 +763,36 @@ const TileSetVisualizer = ({
                 disabled={!isAtlasImageSet}
               >
                 <Maximize style={styles.icon} />
+              </IconButton>
+              <IconButton
+                id="fillBucket"
+                size="small"
+                tooltip={t`Fill bucket`}
+                selected={
+                  !!tileMapTileSelection &&
+                  tileMapTileSelection.kind === 'floodfill'
+                }
+                onClick={e => {
+                  if (
+                    !!tileMapTileSelection &&
+                    tileMapTileSelection.kind === 'floodfill'
+                  )
+                    onSelectTileMapTile(null);
+                  else
+                    onSelectTileMapTile({
+                      kind: 'floodfill',
+                      coordinates:
+                        lastSelection &&
+                        isTileMapPaintingSelection(lastSelection)
+                          ? lastSelection.coordinates
+                          : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
+                      flipHorizontally: shouldFlipHorizontally,
+                      flipVertically: shouldFlipVertically,
+                    });
+                }}
+                disabled={!isAtlasImageSet}
+              >
+                <Coffee style={styles.icon} />
               </IconButton>
               <IconButton
                 id="horizontalFlip"

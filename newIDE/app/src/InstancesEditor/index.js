@@ -900,9 +900,6 @@ export default class InstancesEditor extends Component<Props, State> {
         const tileDefinition = editableTileMap.getTileDefinition(newTileId);
         if (!tileDefinition) return;
 
-        // Don't fill if the source and target tiles are the same.
-        if (targetTileId === newTileId) return;
-
         // BFS flood fill over tiles matching the target tile (4-directional).
         const dimX = editableTileMap.getDimensionX();
         const dimY = editableTileMap.getDimensionY();

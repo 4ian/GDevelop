@@ -161,6 +161,7 @@ export type InAppTutorial = {|
 export const fetchInAppTutorialShortHeaders = async (): Promise<
   Array<InAppTutorialShortHeader>
 > => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(
     `${GDevelopAssetApi.baseUrl}/in-app-tutorial-short-header`
   );
@@ -173,6 +174,7 @@ export const fetchInAppTutorialShortHeaders = async (): Promise<
 export const fetchInAppTutorial = async (
   shortHeader: InAppTutorialShortHeader
 ): Promise<InAppTutorial> => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(shortHeader.contentUrl);
   return ensureObjectHasProperty({
     data: response.data,

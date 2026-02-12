@@ -57,6 +57,7 @@ const QuickBehaviorPropertiesEditor = ({
         instances={[behavior]}
         onInstancesModified={onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
+        // $FlowFixMe[incompatible-type]
         onRefreshAllFields={forceRecomputeSchema}
       />
     </Column>
@@ -107,7 +108,7 @@ type Props = {|
 export const QuickBehaviorsTweaker = ({
   project,
   resourceManagementProps,
-}: Props) => {
+}: Props): React.Node => {
   return (
     <ColumnStackLayout noMargin expand>
       <TipCard

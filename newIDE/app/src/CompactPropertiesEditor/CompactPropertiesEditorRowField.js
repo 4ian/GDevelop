@@ -24,7 +24,7 @@ type Props = {|
   field: React.Node,
 |};
 
-const CompactPropertiesEditorRowField = (props: Props) => {
+const CompactPropertiesEditorRowField = (props: Props): React.Node => {
   const title = !props.markdownDescription
     ? props.label
     : [
@@ -52,6 +52,7 @@ const CompactPropertiesEditorRowField = (props: Props) => {
             },
           }}
         >
+          {/* $FlowFixMe[incompatible-type] */}
           <Text noMargin style={styles.label}>
             {props.label}
           </Text>

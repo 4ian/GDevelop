@@ -17,7 +17,7 @@ const FixedHeightFlexContainer = ({
   height,
   alignItems,
   justifyContent,
-}: Props) => (
+}: Props): React.MixedElement => (
   <div style={{ ...style, height, alignItems, justifyContent }}>{children}</div>
 );
 

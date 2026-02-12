@@ -45,7 +45,7 @@ type State = {|
   draggedPointKind: ?PointKind,
 |};
 
-const PointsPreview = (props: Props) => {
+const PointsPreview = (props: Props): React.MixedElement => {
   const svgRef = React.useRef<React.ElementRef<'svg'> | null>(null);
   const [state, setState] = React.useState<State>({
     draggedPoint: null,
@@ -86,11 +86,14 @@ const PointsPreview = (props: Props) => {
     | null => {
     if (!svgRef.current) return null;
 
-    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
+    // $FlowFixMe[incompatible-type] Flow doesn't have SVG typings yet (@facebook/flow#4551)
+    // $FlowFixMe[prop-missing]
     const pointOnScreen = svgRef.current.createSVGPoint();
     pointOnScreen.x = event.clientX;
     pointOnScreen.y = event.clientY;
-    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
+    // $FlowFixMe[incompatible-type] Flow doesn't have SVG typings yet (@facebook/flow#4551)
+    // $FlowFixMe[prop-missing]
+    // $FlowFixMe[incompatible-use]
     const screenToSvgMatrix = svgRef.current.getScreenCTM().inverse();
     const pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
 
@@ -236,6 +239,7 @@ const PointsPreview = (props: Props) => {
         return renderPoint({
           x: point.getX() * imageZoomFactor,
           y: point.getY() * imageZoomFactor,
+          // $FlowFixMe[incompatible-type]
           kind: pointKindIdentifiers.ORIGIN,
           point,
         });
@@ -249,6 +253,7 @@ const PointsPreview = (props: Props) => {
           y:
             (automaticCenterPosition ? imageHeight / 2 : point.getY()) *
             imageZoomFactor,
+          // $FlowFixMe[incompatible-type]
           kind: pointKindIdentifiers.CENTER,
           point,
         });
@@ -257,6 +262,7 @@ const PointsPreview = (props: Props) => {
       return renderPoint({
         x: point.getX() * imageZoomFactor,
         y: point.getY() * imageZoomFactor,
+        // $FlowFixMe[incompatible-type]
         kind: pointKindIdentifiers.NORMAL,
         point,
       });
@@ -296,6 +302,8 @@ const PointsPreview = (props: Props) => {
 
   const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();
   const backgroundPointNames = [
+    // $FlowFixMe[incompatible-use]
+    // $FlowFixMe[incompatible-exact]
     ...mapVector(nonDefaultPoints, (point, i) => point.getName()),
     'Origin',
     'Center',

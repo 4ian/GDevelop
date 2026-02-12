@@ -49,7 +49,7 @@ export default function BottomButtons({
   DnDComponent,
   draggedNode,
   rootEventsList,
-}: Props) {
+}: Props): React.Node {
   const screenType = useScreenType();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const onDrop = () => {
@@ -98,6 +98,7 @@ export default function BottomButtons({
                           <Trans>Add a new event</Trans>
                         </button>
                       }
+                      // $FlowFixMe[incompatible-type]
                       buildMenuTemplate={makeMenuTemplateBuilderForEvents(
                         onAddEvent
                       )}
@@ -108,6 +109,7 @@ export default function BottomButtons({
                           <Trans>Add...</Trans>
                         </button>
                       }
+                      // $FlowFixMe[incompatible-type]
                       buildMenuTemplate={makeMenuTemplateBuilderForEvents(
                         onAddEvent
                       )}

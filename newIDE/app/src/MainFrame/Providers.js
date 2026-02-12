@@ -68,7 +68,7 @@ const Providers = ({
   makeEventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener,
-}: Props) => {
+}: Props): React.Node => {
   return (
     <DragAndDropContextProvider>
       <UnsavedChangesContextProvider>

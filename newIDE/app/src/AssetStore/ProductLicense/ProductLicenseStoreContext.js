@@ -15,7 +15,7 @@ type ProductLicenseStoreState = {|
   error: ?Error,
 |};
 
-export const ProductLicenseStoreContext = React.createContext<ProductLicenseStoreState>(
+export const ProductLicenseStoreContext: React.Context<ProductLicenseStoreState> = React.createContext<ProductLicenseStoreState>(
   {
     fetchProductLicenses: () => {},
     assetPackLicenses: null,
@@ -30,7 +30,7 @@ type ProductLicenseStoreStateProviderProps = {|
 
 export const ProductLicenseStoreStateProvider = ({
   children,
-}: ProductLicenseStoreStateProviderProps) => {
+}: ProductLicenseStoreStateProviderProps): React.MixedElement => {
   const [error, setError] = React.useState<?Error>(null);
   const [
     gameTemplateLicenses,
@@ -114,6 +114,7 @@ export const ProductLicenseStoreStateProvider = ({
   );
 
   return (
+    // $FlowFixMe[incompatible-type]
     <ProductLicenseStoreContext.Provider value={ProductLicenseStoreState}>
       {children}
     </ProductLicenseStoreContext.Provider>

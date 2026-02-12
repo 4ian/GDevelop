@@ -12,7 +12,7 @@ type Props = {|
   children: React.Node,
 |};
 
-const ElementHighlighterProvider = (props: Props) => {
+const ElementHighlighterProvider = (props: Props): React.Node => {
   const [
     shouldHighlightField,
     setShouldHighlightField,

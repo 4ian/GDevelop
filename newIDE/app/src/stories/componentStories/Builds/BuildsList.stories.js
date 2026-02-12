@@ -34,8 +34,9 @@ const buildArray = [
   completeWebBuild,
 ];
 
-export const DefaultBuildsList = () => (
+export const DefaultBuildsList = (): React.Node => (
   <BuildsList
+    // $FlowFixMe[incompatible-type]
     builds={buildArray}
     authenticatedUser={fakeSilverAuthenticatedUser}
     error={null}
@@ -46,7 +47,7 @@ export const DefaultBuildsList = () => (
   />
 );
 
-export const ErroredBuildsList = () => (
+export const ErroredBuildsList = (): React.Node => (
   <BuildsList
     builds={null}
     authenticatedUser={fakeSilverAuthenticatedUser}

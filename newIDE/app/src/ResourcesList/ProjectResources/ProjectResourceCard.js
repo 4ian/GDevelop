@@ -118,7 +118,7 @@ export const ProjectResourceCard = ({
   onChoose,
   size,
   isSelected,
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const resourceName = resource.getName();
 
@@ -156,6 +156,7 @@ export const ProjectResourceCard = ({
       >
         {renderResourcePreview()}
         <div style={styles.titleContainer}>
+          {/* $FlowFixMe[incompatible-type] */}
           <Text noMargin style={styles.title} color="inherit">
             {resourceName}
           </Text>

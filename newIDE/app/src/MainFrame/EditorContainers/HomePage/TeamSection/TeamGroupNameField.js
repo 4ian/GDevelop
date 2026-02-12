@@ -27,7 +27,7 @@ const TeamGroupNameField = ({
   onFinishEditingGroupName,
   allowDelete,
   onDeleteGroup,
-}: Props) => {
+}: Props): React.Node => {
   const [isDeleting, setIsDeleting] = React.useState<boolean>(false);
   const [isEditingName, setIsEditingName] = React.useState<boolean>(false);
 

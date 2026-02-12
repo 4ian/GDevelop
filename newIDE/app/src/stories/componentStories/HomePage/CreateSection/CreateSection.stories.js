@@ -28,7 +28,7 @@ import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWin
 import { type Game } from '../../../../Utils/GDevelopServices/Game';
 
 const getRecentProjectFiles = (count: number) =>
-  new Array(count).fill(0).map((_, index) => ({
+  new Array<number>(count).fill(0).map((_, index) => ({
     fileMetadata: {
       fileIdentifier: `Users/me/Desktop/Gdevelop/project ${index}`,
       lastModifiedDate: Math.floor(Math.random() * 1656942410477) + 1,
@@ -37,7 +37,7 @@ const getRecentProjectFiles = (count: number) =>
   }));
 
 const getPartiallySavedRecentProjectFiles = (count: number) =>
-  new Array(count).fill(0).map((_, index) => ({
+  new Array<number>(count).fill(0).map((_, index) => ({
     fileMetadata: {
       fileIdentifier: `Users/Gdevelop/project ${index}`,
       lastModifiedDate:
@@ -51,18 +51,19 @@ const getPartiallySavedRecentProjectFiles = (count: number) =>
 const WrappedCreateSection = ({
   project,
   recentProjectFiles,
+  // $FlowFixMe[incompatible-type]
   tutorialProgress = undefined,
   inAppTutorialsFetchingError = null,
   user,
   games = [],
 }: {|
   project: ?gdProject,
-  recentProjectFiles: FileMetadataAndStorageProviderName[],
+  recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
   tutorialProgress?: InAppTutorialUserProgress,
   inAppTutorialsFetchingError?: string | null,
   user: AuthenticatedUser,
   games?: ?Array<Game>,
-|}) => {
+|}): React.Node => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   // Adapt height for storybook to see the bottom menu on mobile.
   const fixedHeight = isMobile ? (isLandscape ? 400 : 850) : 1080;
@@ -71,6 +72,7 @@ const WrappedCreateSection = ({
       {({ i18n }) => (
         <FixedHeightFlexContainer height={fixedHeight}>
           <PreferencesContext.Provider
+            // $FlowFixMe[incompatible-type]
             value={{
               ...initialPreferences,
               getRecentProjectFiles: () => recentProjectFiles,
@@ -139,45 +141,50 @@ export default {
   decorators: [GDevelopJsInitializerDecorator, inAppTutorialDecorator],
 };
 
-export const CreateSectionLoading = () => (
+export const CreateSectionLoading = (): React.Node => (
   <WrappedCreateSection
     project={null}
+    // $FlowFixMe[incompatible-type]
     recentProjectFiles={getRecentProjectFiles(5)}
     user={fakeAuthenticatedUserLoggingIn}
     games={null}
   />
 );
-export const NoProjectOpened = () => (
+export const NoProjectOpened = (): React.Node => (
   <WrappedCreateSection
     project={null}
+    // $FlowFixMe[incompatible-type]
     recentProjectFiles={getRecentProjectFiles(5)}
     user={fakeSilverAuthenticatedUser}
   />
 );
-export const ProjectOpened = () => (
+export const ProjectOpened = (): React.Node => (
   <WrappedCreateSection
     project={testProject.project}
+    // $FlowFixMe[incompatible-type]
     recentProjectFiles={getRecentProjectFiles(5)}
     user={fakeSilverAuthenticatedUser}
   />
 );
-export const NoRecentFiles = () => (
+export const NoRecentFiles = (): React.Node => (
   <WrappedCreateSection
     project={testProject.project}
     recentProjectFiles={[]}
     user={fakeSilverAuthenticatedUser}
   />
 );
-export const LotOfRecentFiles = () => (
+export const LotOfRecentFiles = (): React.Node => (
   <WrappedCreateSection
     project={testProject.project}
+    // $FlowFixMe[incompatible-type]
     recentProjectFiles={getRecentProjectFiles(20)}
     user={fakeSilverAuthenticatedUser}
   />
 );
-export const SomeRecentFilesNotSavedYet = () => (
+export const SomeRecentFilesNotSavedYet = (): React.Node => (
   <WrappedCreateSection
     project={testProject.project}
+    // $FlowFixMe[incompatible-type]
     recentProjectFiles={getPartiallySavedRecentProjectFiles(20)}
     user={fakeSilverAuthenticatedUser}
   />

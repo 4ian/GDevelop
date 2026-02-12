@@ -30,7 +30,7 @@ const isCyrillic = (text: string) =>
   /[БГДЖЗИЙЛПФЦЧШЩЫЭЮЯбвгджзийклмнптфцчшщыэюя]/.test(text);
 const cyrillicToLatinMapping = require('./CyrillicToLatin.json');
 
-export const cleanUpGameSlug = (gameSlug: string) => {
+export const cleanUpGameSlug = (gameSlug: string): string => {
   let latinGameSlug = gameSlug;
   if (isCyrillic(gameSlug)) {
     latinGameSlug = gameSlug
@@ -49,6 +49,7 @@ export const cleanUpGameSlug = (gameSlug: string) => {
     .slice(0, GAME_SLUG_MAX_LENGTH);
   if (slug.length < GAME_SLUG_MIN_LENGTH) {
     slug = slug.concat(
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       new Array(GAME_SLUG_MIN_LENGTH - slug.length).fill('-').join('')
     );
   }
@@ -137,7 +138,7 @@ export function PublicGameProperties({
   onGameUpdated,
   onUpdatingGame,
   canBePublishedOnGdGames,
-}: Props) {
+}: Props): React.Node {
   const [categoryInput, setCategoryInput] = React.useState('');
   const { profile } = React.useContext(AuthenticatedUserContext);
 
@@ -407,6 +408,8 @@ export function PublicGameProperties({
               }
               onChange={(event, values) => {
                 setCategories(
+                  // $FlowFixMe[missing-local-annot]
+                  // $FlowFixMe[constant-condition]
                   values ? values.map(category => category.value) : []
                 );
                 setCategoryInput('');

@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => {
   };
 });
 
-const Slider = <T: number | [number, number]>(props: Props<T>) => {
+const Slider = <T: number | [number, number]>(props: Props<T>): any => {
   const classes = useStyles();
   return (
     <MuiSlider

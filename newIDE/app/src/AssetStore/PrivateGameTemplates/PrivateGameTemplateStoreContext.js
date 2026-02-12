@@ -21,7 +21,9 @@ import { PRIVATE_GAME_TEMPLATES_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTim
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 
 const defaultSearchText = '';
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const excludedTiers = new Set(); // No tiers for game templates.
+// $FlowFixMe[missing-empty-array-annot]
 const firstGameTemplateIds = [];
 
 const getPrivateGameTemplateListingDataSearchTerms = (
@@ -85,7 +87,7 @@ export const initialPrivateGameTemplateStoreState: PrivateGameTemplateStoreState
   },
 };
 
-export const PrivateGameTemplateStoreContext = React.createContext<PrivateGameTemplateStoreState>(
+export const PrivateGameTemplateStoreContext: React.Context<PrivateGameTemplateStoreState> = React.createContext<PrivateGameTemplateStoreState>(
   initialPrivateGameTemplateStoreState
 );
 
@@ -95,7 +97,7 @@ type PrivateGameTemplateStoreStateProviderProps = {|
 
 export const PrivateGameTemplateStoreStateProvider = ({
   children,
-}: PrivateGameTemplateStoreStateProviderProps) => {
+}: PrivateGameTemplateStoreStateProviderProps): React.MixedElement => {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const {
     searchText: shopSearchText,
@@ -155,6 +157,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
             fetchedPrivateGameTemplateListingDatas
           );
           const defaultTags = fetchedPrivateGameTemplateListingDatas.reduce(
+            // $FlowFixMe[missing-local-annot]
             (allCategories, privateGameTemplateListingData) => {
               return allCategories.concat(
                 privateGameTemplateListingData.categories.map(category =>
@@ -266,7 +269,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
       if (!privateGameTemplateListingDatas) {
         return null;
       }
-      const privateGameTemplateListingDatasById = {};
+      const privateGameTemplateListingDatasById: { [string]: any } = {};
       if (hidePremiumProducts) return privateGameTemplateListingDatasById;
       privateGameTemplateListingDatas.forEach(
         privateGameTemplateListingData => {
@@ -295,6 +298,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
     chosenCategory: filtersStateForExampleStore.chosenCategory,
     chosenFilters: filtersStateForExampleStore.chosenFilters,
     excludedTiers,
+    // $FlowFixMe[incompatible-type]
     defaultFirstSearchItemIds: firstGameTemplateIds,
     shuffleResults: false,
   });
@@ -351,6 +355,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
 
   return (
     <PrivateGameTemplateStoreContext.Provider
+      // $FlowFixMe[incompatible-type]
       value={PrivateGameTemplateStoreState}
     >
       {children}

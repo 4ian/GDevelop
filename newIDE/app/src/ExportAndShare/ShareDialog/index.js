@@ -245,7 +245,9 @@ const ShareDialog = ({
       maxWidth={'md'}
       minHeight={'lg'}
       title={<Trans>Share</Trans>}
+      // $FlowFixMe[incompatible-type]
       actions={mainActions}
+      // $FlowFixMe[incompatible-type]
       secondaryActions={secondaryActions}
       onRequestClose={onClose}
       open
@@ -311,7 +313,7 @@ const ShareDialog = ({
   );
 };
 
-const ShareDialogWithErrorBoundary = (props: Props) => (
+const ShareDialogWithErrorBoundary = (props: Props): React.Node => (
   <ErrorBoundary
     componentTitle={<Trans>Share dialog</Trans>}
     scope="export-and-share"

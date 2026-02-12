@@ -18,7 +18,8 @@ import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 export default {
   title: 'UI Building Blocks/TreeView',
   component: TreeView,
-  decorators: [getPaperDecorator('dark')],
+  // $FlowFixMe[cannot-resolve-name]
+  decorators: [(getPaperDecorator('dark'): StoryDecorator)],
 };
 
 type Node = {|
@@ -447,7 +448,7 @@ const nodes: Node[] = [
     id: 'root-22000',
   },
 ];
-export const Default = () => {
+export const Default = (): React.Node => {
   const [searchText, setSearchText] = React.useState<string>('');
   const [multiSelect, setMultiSelect] = React.useState<boolean>(true);
   const [selectedItems, setSelectedItems] = React.useState<Node[]>([]);
@@ -483,6 +484,7 @@ export const Default = () => {
             {({ height, width }) => (
               <Line expand>
                 <Column expand noMargin>
+                  {/* $FlowFixMe[incompatible-type] */}
                   <TreeView
                     multiSelect={multiSelect}
                     height={height}

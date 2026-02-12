@@ -27,7 +27,7 @@ const SimpleTileMapEditor = ({
   resourceManagementProps,
   projectScopedContainersAccessor,
   renderObjectNameField,
-}: EditorProps) => {
+}: EditorProps): React.Node => {
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
   const forceUpdate = useForceUpdate();
   const objectProperties = objectConfiguration.getProperties();
@@ -130,6 +130,7 @@ const SimpleTileMapEditor = ({
     [columnCount, objectConfiguration, forceUpdate, onObjectUpdated]
   );
 
+  // $FlowFixMe[missing-local-annot]
   const onScrollY = React.useCallback(deltaY => {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollBy(deltaY);
@@ -212,6 +213,7 @@ const SimpleTileMapEditor = ({
             <TileSetVisualizer
               project={project}
               objectConfiguration={objectConfiguration}
+              // $FlowFixMe[incompatible-type]
               tileMapTileSelection={tileMapTileSelection}
               onSelectTileMapTile={onChangeTilesWithHitBox}
               showPaintingToolbar={false}

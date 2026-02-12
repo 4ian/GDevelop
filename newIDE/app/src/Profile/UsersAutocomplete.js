@@ -34,7 +34,7 @@ export const UsersAutocomplete = ({
   floatingLabelText,
   helperText,
   disabled,
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const [users, setUsers] = React.useState<Array<AutocompleteOption>>([]);
   const [userInput, setUserInput] = useState('');
@@ -104,6 +104,7 @@ export const UsersAutocomplete = ({
           userIds
         );
         setUsers(
+          // $FlowFixMe[incompatible-type]
           userIds
             .map(userId => {
               const userPublicProfile: UserPublicProfile =
@@ -152,11 +153,13 @@ export const UsersAutocomplete = ({
       helperText={helperText}
       value={users}
       onChange={(event, values) => {
+        // $FlowFixMe[constant-condition]
         if (!values) return;
         // change users in state
         setUsers(values);
         // call top onChange on user ids
         onChange(
+          // $FlowFixMe[missing-local-annot]
           values.map(option => ({
             username: option.text,
             userId: option.value,
@@ -169,6 +172,7 @@ export const UsersAutocomplete = ({
         setUserInput(value);
       }}
       ref={autocompleteRef}
+      // $FlowFixMe[incompatible-type]
       dataSource={completionOwnUserProfile.concat(
         completionUserPublicProfiles
           .map((userPublicProfile: UserPublicProfile) => {

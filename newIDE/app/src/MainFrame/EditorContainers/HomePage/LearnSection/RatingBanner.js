@@ -15,7 +15,10 @@ type Props = {|
   disabled: boolean,
 |};
 
-export const RatingBanner = ({ onClick, disabled }: Props) => {
+export const RatingBanner = ({
+  onClick,
+  disabled,
+}: Props): React.MixedElement => {
   return (
     <div className={classes.container}>
       <ResponsiveLineStackLayout

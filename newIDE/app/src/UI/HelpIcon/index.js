@@ -33,7 +33,7 @@ type PropsType = {|
 /**
  * The icon that can be used in any dialog to open a help page
  */
-const HelpIcon = (props: PropsType) => {
+const HelpIcon = (props: PropsType): null | React.Node => {
   const { helpPagePath } = props;
   if (!helpPagePath) return null;
 

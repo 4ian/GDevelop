@@ -163,8 +163,11 @@ const getPropertySummary = (
     };
   }
   if (property.getChoices().size() > 0) {
+    // $FlowFixMe[incompatible-exact]
     propertySummary.choices = mapVector(property.getChoices(), choice => ({
+      // $FlowFixMe[incompatible-use]
       value: choice.getValue(),
+      // $FlowFixMe[incompatible-use]
       label: choice.getLabel(),
     }));
   }
@@ -202,7 +205,10 @@ const getPropertiesSummary = ({
       });
 
   if (propertiesContainer)
+    // $FlowFixMe[incompatible-exact]
     return mapVector(propertiesContainer, namedProperty => {
+      // $FlowFixMe[incompatible-use]
+      // $FlowFixMe[incompatible-type]
       return getPropertySummary(namedProperty.getName(), namedProperty);
     });
 
@@ -323,7 +329,8 @@ export const buildExtensionSummary = ({
         fullName: objectMetadata.getFullName(),
         description: objectMetadata.getDescription(),
         properties: eventsBasedObject
-          ? getPropertiesSummary({
+          ? // $FlowFixMe[incompatible-type]
+            getPropertiesSummary({
               propertiesContainer: eventsBasedObject.getPropertyDescriptors(),
             })
           : undefined,
@@ -359,9 +366,11 @@ export const buildExtensionSummary = ({
         name: behaviorMetadata.getName(),
         fullName: behaviorMetadata.getFullName(),
         description: behaviorMetadata.getDescription(),
+        // $FlowFixMe[incompatible-type]
         properties: getPropertiesSummary({
           propertiesMetadata: behaviorMetadata.getProperties(),
         }),
+        // $FlowFixMe[incompatible-type]
         sharedProperties: getPropertiesSummary({
           propertiesMetadata: behaviorMetadata.getSharedProperties(),
         }),
@@ -403,6 +412,7 @@ export const buildExtensionSummary = ({
         onlyWorkingFor2D: effectMetadata.isMarkedAsOnlyWorkingFor2D(),
         onlyWorkingFor3D: effectMetadata.isMarkedAsOnlyWorkingFor3D(),
         unique: effectMetadata.isMarkedAsUnique(),
+        // $FlowFixMe[incompatible-type]
         properties: getPropertiesSummary({
           propertiesMetadata: effectMetadata.getProperties(),
         }),

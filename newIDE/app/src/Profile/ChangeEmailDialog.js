@@ -17,6 +17,7 @@ import Form from '../UI/Form';
 import { emailRegex } from '../Utils/EmailUtils';
 
 type Props = {|
+  // $FlowFixMe[value-as-type]
   firebaseUser: FirebaseUser,
   onClose: () => void,
   onChangeEmail: (form: ChangeEmailForm) => Promise<void>,
@@ -30,7 +31,7 @@ const ChangeEmailDialog = ({
   firebaseUser,
   changeEmailInProgress,
   error,
-}: Props) => {
+}: Props): React.Node => {
   const [email, setEmail] = React.useState(firebaseUser.email);
   const [isEmailValid, setIsEmailValid] = React.useState<boolean>(true);
 

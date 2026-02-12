@@ -84,6 +84,7 @@ function parseMarkdownLinks({
     const label = match[1];
     const url = match[2];
     elements.push(
+      // $FlowFixMe[incompatible-type]
       renderLink({ children: label, node: { properties: { href: url } } })
     );
 
@@ -129,46 +130,50 @@ type Props = {|
 /**
  * Display a markdown text for a AI chat bubble.
  */
-export const ChatMarkdownText = React.memo<Props>((props: Props) => {
-  const { getConceptMetadataFromHref } = useGetConceptMetadata();
-  const renderChatLink = React.useMemo(
-    () => makeRenderChatLink({ getConceptMetadataFromHref }),
-    [getConceptMetadataFromHref]
-  );
-  const renderChatCodeBlockWithChatLinks = React.useMemo(
-    () => makeRenderChatCodeBlockWithChatLinks({ renderChatLink }),
-    [renderChatLink]
-  );
+export const ChatMarkdownText: React.ComponentType<Props> = React.memo<Props>(
+  (props: Props) => {
+    const { getConceptMetadataFromHref } = useGetConceptMetadata();
+    const renderChatLink = React.useMemo(
+      () => makeRenderChatLink({ getConceptMetadataFromHref }),
+      [getConceptMetadataFromHref]
+    );
+    const renderChatCodeBlockWithChatLinks = React.useMemo(
+      () => makeRenderChatCodeBlockWithChatLinks({ renderChatLink }),
+      [renderChatLink]
+    );
 
-  const markdownCustomComponents = React.useMemo(
-    () => ({
-      a: renderChatLink,
-      code: renderChatCodeBlockWithChatLinks,
-      img: ({ node, ...props }) => (
-        // eslint-disable-next-line jsx-a11y/alt-text
-        <img style={{ display: 'flex' }} {...props} />
-      ),
-    }),
-    [renderChatLink, renderChatCodeBlockWithChatLinks]
-  );
+    const markdownCustomComponents = React.useMemo(
+      () => ({
+        a: renderChatLink,
+        code: renderChatCodeBlockWithChatLinks,
+        // $FlowFixMe[missing-local-annot]
+        img: ({ node, ...props }) => (
+          // eslint-disable-next-line jsx-a11y/alt-text
+          <img style={{ display: 'flex' }} {...props} />
+        ),
+      }),
+      [renderChatLink, renderChatCodeBlockWithChatLinks]
+    );
 
-  const markdownElement = (
-    <I18n>
-      {({ i18n }) => (
-        <ReactMarkdown
-          components={markdownCustomComponents}
-          remarkPlugins={[remarkGfm]}
-        >
-          {props.source}
-        </ReactMarkdown>
-      )}
-    </I18n>
-  );
+    const markdownElement = (
+      <I18n>
+        {({ i18n }) => (
+          <ReactMarkdown
+            components={markdownCustomComponents}
+            remarkPlugins={[remarkGfm]}
+          >
+            {props.source}
+          </ReactMarkdown>
+        )}
+      </I18n>
+    );
 
-  const className = classNames({
-    'gd-markdown': true,
-    [classes.chatMarkdown]: true,
-  });
+    const className = classNames({
+      'gd-markdown': true,
+      // $FlowFixMe[invalid-computed-prop]
+      [classes.chatMarkdown]: true,
+    });
 
-  return <span className={className}>{markdownElement}</span>;
-});
+    return <span className={className}>{markdownElement}</span>;
+  }
+);

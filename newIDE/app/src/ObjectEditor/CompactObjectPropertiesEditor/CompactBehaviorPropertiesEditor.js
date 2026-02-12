@@ -70,7 +70,7 @@ export const CompactBehaviorPropertiesEditor = ({
   onOpenFullEditor: () => void,
   onBehaviorUpdated: () => void,
   resourceManagementProps: ResourceManagementProps,
-|}) => {
+|}): React.Node => {
   const fullEditorLabel = behaviorMetadata.getOpenFullEditorLabel();
 
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
@@ -112,6 +112,7 @@ export const CompactBehaviorPropertiesEditor = ({
             onOpenFullEditor,
           })
         }
+        // $FlowFixMe[incompatible-type]
         onRefreshAllFields={forceRecomputeSchema}
       />
     </ColumnStackLayout>

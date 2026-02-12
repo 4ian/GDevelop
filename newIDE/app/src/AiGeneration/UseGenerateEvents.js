@@ -14,7 +14,23 @@ import { prepareAiUserContent } from './PrepareAiUserContent';
 
 const gd: libGDevelop = global.gd;
 
-export const useGenerateEvents = ({ project }: {| project: ?gdProject |}) => {
+type _UseGenerateEventsReturnType = {
+  generateEvents: ({
+    eventsDescription: string,
+    existingEventsAsText: string,
+    existingEventsJson: string | null,
+    extensionNamesList: string,
+    objectsList: string,
+    placementHint: string,
+    relatedAiRequestId: string,
+    sceneName: string,
+  }) => Promise<EventsGenerationResult>,
+};
+export const useGenerateEvents = ({
+  project,
+}: {|
+  project: ?gdProject,
+|}): _UseGenerateEventsReturnType => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );

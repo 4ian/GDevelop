@@ -12,7 +12,7 @@ const urlUnsafeRe = /[|^%]/g;
 const replacement = '_';
 
 // Adapt from https://github.com/parshap/node-sanitize-filename.
-export function sanitizeFilename(input: string) {
+export function sanitizeFilename(input: string): string {
   return input
     .replace(illegalRe, replacement)
     .replace(urlReservedRe, replacement)

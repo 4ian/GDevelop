@@ -9,7 +9,10 @@ type Props = {|
   audioResourceSource: string,
 |};
 
-const AudioPreview = ({ resourceName, audioResourceSource }: Props) => {
+const AudioPreview = ({
+  resourceName,
+  audioResourceSource,
+}: Props): React.Node => {
   const [hasError, setHasError] = React.useState(false);
 
   const onSoundLoaded = React.useCallback(() => {
@@ -25,6 +28,7 @@ const AudioPreview = ({ resourceName, audioResourceSource }: Props) => {
   }
 
   return (
+    // $FlowFixMe[incompatible-type]
     <SoundPlayer
       soundSrc={audioResourceSource || null}
       onSoundLoaded={onSoundLoaded}

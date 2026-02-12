@@ -32,6 +32,7 @@ import BackgroundText from '../UI/BackgroundText';
 import { MarkdownText } from '../UI/MarkdownText';
 import ResponsiveDelimiter from './ResponsiveDelimiter';
 
+// $FlowFixMe[missing-local-annot]
 const getStyles = ({ verticalDesign }) => ({
   logInContainer: {
     width: '100%',
@@ -85,7 +86,7 @@ const CreateAccountForm = ({
   createAccountInProgress,
   error,
   onGoToLogin,
-}: Props) => {
+}: Props): React.Node => {
   const accountsExistsWithOtherCredentials = error
     ? error.code === 'auth/account-exists-with-different-credential'
     : false;

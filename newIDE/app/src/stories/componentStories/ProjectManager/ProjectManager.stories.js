@@ -43,7 +43,7 @@ const mainMenuCallbacks = {
   setElectronUpdateStatus: () => action('setElectronUpdateStatus'),
 };
 
-export const NoProjectOpen = () => {
+export const NoProjectOpen = (): React.Node => {
   const shortcutMap = useShortcutMap();
   return (
     <I18n>
@@ -107,6 +107,7 @@ export const NoProjectOpen = () => {
                     isApplicationTopLevelMenu: false,
                     hideAskAi: false,
                   }}
+                  // $FlowFixMe[incompatible-type]
                   mainMenuCallbacks={mainMenuCallbacks}
                 />
               </FixedWidthFlexContainer>
@@ -118,7 +119,7 @@ export const NoProjectOpen = () => {
   );
 };
 
-export const ProjectOpen = () => {
+export const ProjectOpen = (): React.Node => {
   const shortcutMap = useShortcutMap();
   return (
     <I18n>
@@ -182,6 +183,7 @@ export const ProjectOpen = () => {
                     isApplicationTopLevelMenu: false,
                     hideAskAi: false,
                   }}
+                  // $FlowFixMe[incompatible-type]
                   mainMenuCallbacks={mainMenuCallbacks}
                 />
               </FixedWidthFlexContainer>

@@ -51,21 +51,23 @@ const dialogContent = {
   ],
 };
 
-export const CheckpointDialog = () => {
+export const CheckpointDialog = (): React.Node => {
   return (
     <InAppTutorialDialog
       endTutorial={() => action('end tutorial')()}
       goToNextStep={() => action('go to next step')()}
+      // $FlowFixMe[incompatible-type]
       dialogContent={dialogContent}
     />
   );
 };
-export const EndDialog = () => {
+export const EndDialog = (): React.Node => {
   return (
     <InAppTutorialDialog
       isLastStep
       endTutorial={() => action('end tutorial')()}
       goToNextStep={() => action('go to next step')()}
+      // $FlowFixMe[incompatible-type]
       dialogContent={dialogContent}
     />
   );

@@ -104,7 +104,7 @@ const BundleInformationPage = ({
   noActions,
   fastCheckout,
   onCloseAfterPurchaseDone,
-}: Props) => {
+}: Props): React.Node => {
   const { windowSize, isLandscape, isMobile } = useResponsiveWindowSize();
   const { bundleListingDatas } = React.useContext(BundleStoreContext); // If archived, should use the one passed.
   const { privateGameTemplateListingDatas } = React.useContext(
@@ -260,6 +260,7 @@ const BundleInformationPage = ({
 
   const customSectionPaperStyle = {
     // $FlowIgnore
+    // $FlowFixMe[exponential-spread]
     ...(noPadding
       ? {
           padding: 0,

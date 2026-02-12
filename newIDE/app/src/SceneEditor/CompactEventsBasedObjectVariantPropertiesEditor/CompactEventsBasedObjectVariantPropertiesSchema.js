@@ -59,6 +59,7 @@ const getTitleRow = ({
 |}) => ({
   name: 'Variant',
   title: i18n._(t`Custom object variant`),
+  // $FlowFixMe[missing-local-annot]
   renderLeftIcon: className =>
     eventsBasedObject.isRenderedIn3D() ? (
       <Object3d className={className} style={styles.icon} />
@@ -254,6 +255,7 @@ export const makeSchema = ({
   getContentAABB: () => Rectangle | null,
   onEventsBasedObjectChildrenEdited: () => void,
 |}): Schema => {
+  // $FlowFixMe[incompatible-type]
   return [
     getTitleRow({ i18n, eventsBasedObject }),
     {

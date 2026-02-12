@@ -73,6 +73,7 @@ const fakeOutputWithDifferentUserRequest = [
 ];
 
 // Factory function to create AI request objects with different properties
+// $FlowFixMe[missing-local-annot]
 const createFakeAiRequest = ({
   id,
   status = 'ready',
@@ -132,7 +133,7 @@ const AskAIHistoryContentStoryTemplate = ({
   </FixedHeightFlexContainer>
 );
 
-export const Loading = () => (
+export const Loading = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{}}
     isLoading={true}
@@ -142,7 +143,7 @@ export const Loading = () => (
   />
 );
 
-export const Errored = () => (
+export const Errored = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{}}
     isLoading={false}
@@ -152,7 +153,7 @@ export const Errored = () => (
   />
 );
 
-export const Empty = () => (
+export const Empty = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{}}
     isLoading={false}
@@ -162,9 +163,10 @@ export const Empty = () => (
   />
 );
 
-export const SingleAiRequest = () => (
+export const SingleAiRequest = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
+      // $FlowFixMe[incompatible-type]
       'request-1': createFakeAiRequest({
         id: 'request-1',
         createdAt: '2024-03-15T10:30:00Z',
@@ -178,19 +180,22 @@ export const SingleAiRequest = () => (
   />
 );
 
-export const MultipleAiRequests = () => (
+export const MultipleAiRequests = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
+      // $FlowFixMe[incompatible-type]
       'request-1': createFakeAiRequest({
         id: 'request-1',
         createdAt: '2024-03-15T14:30:00Z',
         output: fakeOutputWithAiResponses,
       }),
+      // $FlowFixMe[incompatible-type]
       'request-2': createFakeAiRequest({
         id: 'request-2',
         createdAt: '2024-03-14T09:45:00Z',
         output: fakeOutputWithDifferentUserRequest,
       }),
+      // $FlowFixMe[incompatible-type]
       'request-3': createFakeAiRequest({
         id: 'request-3',
         createdAt: '2024-03-10T16:20:00Z',
@@ -203,14 +208,16 @@ export const MultipleAiRequests = () => (
   />
 );
 
-export const WithSelectedRequest = () => (
+export const WithSelectedRequest = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
+      // $FlowFixMe[incompatible-type]
       'request-1': createFakeAiRequest({
         id: 'request-1',
         createdAt: '2024-03-15T14:30:00Z',
         output: fakeOutputWithAiResponses,
       }),
+      // $FlowFixMe[incompatible-type]
       'request-2': createFakeAiRequest({
         id: 'request-2',
         createdAt: '2024-03-14T09:45:00Z',
@@ -224,14 +231,16 @@ export const WithSelectedRequest = () => (
   />
 );
 
-export const WithWorkingRequest = () => (
+export const WithWorkingRequest = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
+      // $FlowFixMe[incompatible-type]
       'request-1': createFakeAiRequest({
         id: 'request-1',
         status: 'working',
         createdAt: '2024-03-15T14:30:00Z',
       }),
+      // $FlowFixMe[incompatible-type]
       'request-2': createFakeAiRequest({
         id: 'request-2',
         createdAt: '2024-03-14T09:45:00Z',
@@ -245,15 +254,17 @@ export const WithWorkingRequest = () => (
   />
 );
 
-export const WithErroredRequest = () => (
+export const WithErroredRequest = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
+      // $FlowFixMe[incompatible-type]
       'request-1': createFakeAiRequest({
         id: 'request-1',
         status: 'error',
         createdAt: '2024-03-15T14:30:00Z',
         error: { code: 'internal-error', message: 'Some error happened' },
       }),
+      // $FlowFixMe[incompatible-type]
       'request-2': createFakeAiRequest({
         id: 'request-2',
         createdAt: '2024-03-14T09:45:00Z',
@@ -267,13 +278,15 @@ export const WithErroredRequest = () => (
   />
 );
 
-export const RefreshingRequests = () => (
+export const RefreshingRequests = (): React.Node => (
   <AskAIHistoryContentStoryTemplate
     aiRequests={{
+      // $FlowFixMe[incompatible-type]
       'request-1': createFakeAiRequest({
         id: 'request-1',
         createdAt: '2024-03-15T14:30:00Z',
       }),
+      // $FlowFixMe[incompatible-type]
       'request-2': createFakeAiRequest({
         id: 'request-2',
         createdAt: '2024-03-14T09:45:00Z',

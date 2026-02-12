@@ -34,6 +34,7 @@ const FunctionListItem = ({
   description: React.Node,
 |}) => {
   return (
+    // $FlowFixMe[incompatible-type]
     <ListItem
       leftIcon={icon}
       primaryText={name}
@@ -49,7 +50,7 @@ const FunctionListItem = ({
 export default function EventsBasedObjectSelectorDialog({
   onChoose,
   onCancel,
-}: Props) {
+}: Props): React.Node {
   return (
     <Dialog
       title={<Trans>Choose a new object type</Trans>}

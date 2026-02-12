@@ -42,7 +42,7 @@ export type OpenedDialogsCountCallback = ({
 let openedDialogsCountCallbacks: OpenedDialogsCountCallback[] = [];
 export const registerOpenedDialogsCountCallback = (
   callback: OpenedDialogsCountCallback
-) => {
+): (() => void) => {
   openedDialogsCountCallbacks.push(callback);
   callback({ openedDialogsCount }); // Ensure the callback is called with the current count.
 
@@ -527,7 +527,7 @@ const DialogWithoutWindowSizeProvider = ({
  * A enhanced material-ui Dialog that can have optional secondary actions
  * and no margins if required.
  */
-const Dialog = (props: DialogProps) => {
+const Dialog = (props: DialogProps): React.Node => {
   return (
     <TopLevelWindowSizeProvider>
       <DialogWithoutWindowSizeProvider {...props} />

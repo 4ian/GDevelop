@@ -15,7 +15,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => (
+export const Default = (): React.Node => (
   <EventsBasedBehaviorEditor
     project={testProject.project}
     eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
@@ -23,7 +23,7 @@ export const Default = () => (
   />
 );
 
-export const WithoutFunction = () => (
+export const WithoutFunction = (): React.Node => (
   <EventsBasedBehaviorEditor
     project={testProject.project}
     eventsFunctionsExtension={testProject.testEventsFunctionsExtension}

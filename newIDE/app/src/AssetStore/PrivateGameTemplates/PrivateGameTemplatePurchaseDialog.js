@@ -35,7 +35,7 @@ const PrivateGameTemplatePurchaseDialog = ({
   usageType,
   onClose,
   simulateAppStoreProduct,
-}: Props) => {
+}: Props): React.Node => {
   const {
     profile,
     onOpenLoginDialog,
@@ -352,6 +352,7 @@ const PrivateGameTemplatePurchaseDialog = ({
         maxWidth="sm"
         open
         onRequestClose={onClose}
+        // $FlowFixMe[incompatible-type]
         actions={dialogActions}
         onApply={purchaseSuccessful ? onClose : onWillPurchase}
         cannotBeDismissed // Prevent the user from continuing by clicking outside.

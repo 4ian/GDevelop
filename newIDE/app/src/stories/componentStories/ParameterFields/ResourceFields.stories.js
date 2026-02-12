@@ -19,7 +19,7 @@ import Model3DResourceField from '../../../EventsSheet/ParameterFields/Model3DRe
 import AtlasResourceField from '../../../EventsSheet/ParameterFields/AtlasResourceField';
 import SpineResourceField from '../../../EventsSheet/ParameterFields/SpineResourceField';
 
-export const AllResourceFields = () => (
+export const AllResourceFields = (): React.Node => (
   <Column expand>
     <Line expand>
       <ValueStateHolder
@@ -38,6 +38,7 @@ export const AllResourceFields = () => (
             }
             value={value}
             onChange={onChange}
+            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -61,6 +62,7 @@ export const AllResourceFields = () => (
             }
             value={value}
             onChange={onChange}
+            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -84,6 +86,7 @@ export const AllResourceFields = () => (
             }
             value={value}
             onChange={onChange}
+            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -107,6 +110,7 @@ export const AllResourceFields = () => (
             }
             value={value}
             onChange={onChange}
+            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -130,6 +134,7 @@ export const AllResourceFields = () => (
             }
             value={value}
             onChange={onChange}
+            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -153,6 +158,7 @@ export const AllResourceFields = () => (
             }
             value={value}
             onChange={onChange}
+            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -176,6 +182,7 @@ export const AllResourceFields = () => (
             }
             value={value}
             onChange={onChange}
+            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -199,6 +206,7 @@ export const AllResourceFields = () => (
             }
             value={value}
             onChange={onChange}
+            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -222,6 +230,7 @@ export const AllResourceFields = () => (
             }
             value={value}
             onChange={onChange}
+            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />
@@ -245,6 +254,7 @@ export const AllResourceFields = () => (
             }
             value={value}
             onChange={onChange}
+            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             resourceManagementProps={fakeResourceManagementProps}
           />

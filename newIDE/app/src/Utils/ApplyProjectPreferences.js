@@ -98,10 +98,9 @@ export const applyProjectPreferences = (
         'showDeprecatedInstructionWarning'
       )
     ) {
-      filtered.showDeprecatedInstructionWarning =
-        normalizeDeprecatedInstructionWarning(
-          filtered.showDeprecatedInstructionWarning
-        );
+      filtered.showDeprecatedInstructionWarning = normalizeDeprecatedInstructionWarning(
+        filtered.showDeprecatedInstructionWarning
+      );
     }
     preferences.setMultipleValues(filtered);
   }

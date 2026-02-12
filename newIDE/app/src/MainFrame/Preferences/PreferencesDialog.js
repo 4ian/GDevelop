@@ -580,9 +580,15 @@ const PreferencesDialog = ({
                 <Column noMargin expand>
                   <CompactSelectField
                     value={values.showDeprecatedInstructionWarning}
-                    onChange={(value: string) =>
-                      setShowDeprecatedInstructionWarning(value)
-                    }
+                    onChange={(value: string) => {
+                      if (
+                        value === 'no' ||
+                        value === 'icon' ||
+                        value === 'icon-and-deprecated-warning-text'
+                      ) {
+                        setShowDeprecatedInstructionWarning(value);
+                      }
+                    }}
                   >
                     <SelectOption value="no" label={t`No warning`} />
                     <SelectOption value="icon" label={t`Icon only`} />

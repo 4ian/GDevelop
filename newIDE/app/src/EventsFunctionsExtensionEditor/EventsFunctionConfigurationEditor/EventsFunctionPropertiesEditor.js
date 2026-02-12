@@ -617,9 +617,7 @@ export const EventsFunctionPropertiesEditor = ({
                   {eventsFunction.isDeprecated() && (
                     <SemiControlledTextField
                       commitOnBlur
-                      floatingLabelText={
-                        <Trans>Deprecation message</Trans>
-                      }
+                      floatingLabelText={<Trans>Deprecation message</Trans>}
                       translatableHintText={t`Example: Use "New Action Name" instead.`}
                       fullWidth
                       multiline

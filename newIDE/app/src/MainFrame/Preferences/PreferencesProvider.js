@@ -532,7 +532,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getShowDeprecatedInstructionWarning(): 'no' | 'icon' | 'icon-and-deprecated-warning-text' {
+  _getShowDeprecatedInstructionWarning():
+    | 'no'
+    | 'icon'
+    | 'icon-and-deprecated-warning-text' {
     return this.state.values.showDeprecatedInstructionWarning;
   }
 

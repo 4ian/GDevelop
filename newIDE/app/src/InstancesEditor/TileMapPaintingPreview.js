@@ -271,7 +271,11 @@ class TileMapPaintingPreview {
       if (isBadlyConfigured) {
         texture = PixiResourcesLoader.getInvalidPIXITexture();
       } else {
-        if (tileMapTileSelection.kind === 'rectangle' && tileCoordinates) {
+        if (
+          (tileMapTileSelection.kind === 'rectangle' ||
+            tileMapTileSelection.kind === 'freehand') &&
+          tileCoordinates
+        ) {
           texture = this._getTextureInAtlas({
             tileSet,
             ...tileCoordinates,
@@ -323,6 +327,7 @@ class TileMapPaintingPreview {
     if (
       isBadlyConfigured ||
       tileMapTileSelection.kind === 'rectangle' ||
+      tileMapTileSelection.kind === 'freehand' ||
       tileMapTileSelection.kind === 'erase'
     ) {
       const container = this._getPreviewSprites({

@@ -8,6 +8,7 @@ import { CorsAwareImage } from '../UI/CorsAwareImage';
 import ResourcesLoader from '../ResourcesLoader';
 import Erase from '../UI/CustomSvgIcons/Erase';
 import Brush from '../UI/CustomSvgIcons/Brush';
+import Maximize from '../UI/CustomSvgIcons/Maximize';
 import IconButton from '../UI/IconButton';
 import { LineStackLayout } from '../UI/Layout';
 import FlipHorizontal from '../UI/CustomSvgIcons/FlipHorizontal';
@@ -197,6 +198,12 @@ export type TileMapTileSelection =
     |}
   | {|
       kind: 'rectangle',
+      coordinates: TileMapCoordinates[],
+      flipHorizontally: boolean,
+      flipVertically: boolean,
+    |}
+  | {|
+      kind: 'freehand',
       coordinates: TileMapCoordinates[],
       flipHorizontally: boolean,
       flipVertically: boolean,
@@ -519,9 +526,14 @@ const TileSetVisualizer = ({
           }
           onSelectTileMapTile(newSelection);
         } else if (allowRectangleSelection) {
+          const currentKind =
+            tileMapTileSelection && tileMapTileSelection.kind === 'freehand'
+              ? 'freehand'
+              : 'rectangle';
           const shouldRemoveSelection =
             tileMapTileSelection &&
-            tileMapTileSelection.kind === 'rectangle' &&
+            (tileMapTileSelection.kind === 'rectangle' ||
+              tileMapTileSelection.kind === 'freehand') &&
             startX === x &&
             startY === y &&
             x <= tileMapTileSelection.coordinates[1].x &&
@@ -541,7 +553,7 @@ const TileSetVisualizer = ({
               y: Math.max(startY, y),
             };
             const newSelection = {
-              kind: 'rectangle',
+              kind: currentKind,
               coordinates: [topLeftCorner, bottomRightCorner],
               flipHorizontally: shouldFlipHorizontally,
               flipVertically: shouldFlipVertically,
@@ -571,7 +583,11 @@ const TileSetVisualizer = ({
 
   React.useEffect(
     () => {
-      if (tileMapTileSelection && tileMapTileSelection.kind === 'rectangle') {
+      if (
+        tileMapTileSelection &&
+        (tileMapTileSelection.kind === 'rectangle' ||
+          tileMapTileSelection.kind === 'freehand')
+      ) {
         setLastSelection(tileMapTileSelection);
       }
     },
@@ -673,9 +689,38 @@ const TileSetVisualizer = ({
           <Line justifyContent="space-between" noMargin>
             <LineStackLayout alignItems="center" noMargin>
               <IconButton
-                id="paintBrush"
+                id="freehandBrush"
                 size="small"
-                tooltip={t`Paint`}
+                tooltip={t`Freehand brush`}
+                selected={
+                  !!tileMapTileSelection &&
+                  tileMapTileSelection.kind === 'freehand'
+                }
+                onClick={e => {
+                  if (
+                    !!tileMapTileSelection &&
+                    tileMapTileSelection.kind === 'freehand'
+                  )
+                    onSelectTileMapTile(null);
+                  else
+                    onSelectTileMapTile({
+                      kind: 'freehand',
+                      coordinates:
+                        lastSelection && lastSelection.kind !== 'erase'
+                          ? lastSelection.coordinates
+                          : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
+                      flipHorizontally: shouldFlipHorizontally,
+                      flipVertically: shouldFlipVertically,
+                    });
+                }}
+                disabled={!isAtlasImageSet}
+              >
+                <Brush style={styles.icon} />
+              </IconButton>
+              <IconButton
+                id="rectanglePaint"
+                size="small"
+                tooltip={t`Rectangle paint`}
                 selected={
                   !!tileMapTileSelection &&
                   tileMapTileSelection.kind === 'rectangle'
@@ -688,9 +733,14 @@ const TileSetVisualizer = ({
                     onSelectTileMapTile(null);
                   else
                     onSelectTileMapTile(
-                      lastSelection || {
+                      (lastSelection && lastSelection.kind === 'rectangle'
+                        ? lastSelection
+                        : null) || {
                         kind: 'rectangle',
-                        coordinates: [{ x: 0, y: 0 }, { x: 0, y: 0 }],
+                        coordinates:
+                          lastSelection && lastSelection.kind !== 'erase'
+                            ? lastSelection.coordinates
+                            : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
                         flipHorizontally: shouldFlipHorizontally,
                         flipVertically: shouldFlipVertically,
                       }
@@ -698,7 +748,7 @@ const TileSetVisualizer = ({
                 }}
                 disabled={!isAtlasImageSet}
               >
-                <Brush style={styles.icon} />
+                <Maximize style={styles.icon} />
               </IconButton>
               <IconButton
                 id="horizontalFlip"
@@ -713,7 +763,8 @@ const TileSetVisualizer = ({
                   setShouldFlipHorizontally(newShouldFlipHorizontally);
                   if (
                     !!tileMapTileSelection &&
-                    tileMapTileSelection.kind === 'rectangle'
+                    (tileMapTileSelection.kind === 'rectangle' ||
+                      tileMapTileSelection.kind === 'freehand')
                   ) {
                     onSelectTileMapTile({
                       ...tileMapTileSelection,
@@ -737,7 +788,8 @@ const TileSetVisualizer = ({
                   setShouldFlipVertically(newShouldFlipVertically);
                   if (
                     !!tileMapTileSelection &&
-                    tileMapTileSelection.kind === 'rectangle'
+                    (tileMapTileSelection.kind === 'rectangle' ||
+                      tileMapTileSelection.kind === 'freehand')
                   ) {
                     onSelectTileMapTile({
                       ...tileMapTileSelection,
@@ -806,7 +858,8 @@ const TileSetVisualizer = ({
                 />
               )}
               {tileMapTileSelection &&
-                tileMapTileSelection.kind === 'rectangle' &&
+                (tileMapTileSelection.kind === 'rectangle' ||
+                  tileMapTileSelection.kind === 'freehand') &&
                 displayedTileSize && (
                   <Tile
                     key={`selected-tile`}

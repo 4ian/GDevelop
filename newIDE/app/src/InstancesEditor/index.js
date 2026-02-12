@@ -877,7 +877,10 @@ export default class InstancesEditor extends Component<Props, State> {
 
       let shouldTrimAfterOperations = false;
 
-      if (tileMapTileSelection.kind === 'rectangle') {
+      if (
+        tileMapTileSelection.kind === 'rectangle' ||
+        tileMapTileSelection.kind === 'freehand'
+      ) {
         shouldTrimAfterOperations = editableTileMap.isEmpty();
         // TODO: Optimize list execution to make sure the most important size changing operations are done first.
         let cumulatedUnshiftedRows = 0,

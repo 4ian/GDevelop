@@ -151,7 +151,17 @@ class ClickInterceptor {
       deviceY
     );
 
-    if (pointerPathCoordinates[1]) {
+    const tileMapTileSelection = this.getTileMapTileSelection();
+    if (
+      tileMapTileSelection &&
+      tileMapTileSelection.kind === 'freehand'
+    ) {
+      // Freehand: push every point for continuous path.
+      pointerPathCoordinates.push({
+        x: sceneCoordinates[0],
+        y: sceneCoordinates[1],
+      });
+    } else if (pointerPathCoordinates[1]) {
       pointerPathCoordinates[1] = {
         x: sceneCoordinates[0],
         y: sceneCoordinates[1],

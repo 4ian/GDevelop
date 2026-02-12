@@ -890,18 +890,20 @@ export default class InstancesEditor extends Component<Props, State> {
         const layer = editableTileMap.getTileLayer(0);
         if (!layer) return;
 
-        // Only fill if the clicked tile is empty.
-        const clickedTileId = layer.getTileId(clickX, clickY);
-        if (clickedTileId !== undefined) return;
+        // Get the tile ID of the clicked position (the tile being replaced).
+        const targetTileId = layer.getTileId(clickX, clickY);
 
-        const tileId = getTileIdFromGridCoordinates({
+        const newTileId = getTileIdFromGridCoordinates({
           columnCount: tileSet.columnCount,
           ...tileCoordinates,
         });
-        const tileDefinition = editableTileMap.getTileDefinition(tileId);
+        const tileDefinition = editableTileMap.getTileDefinition(newTileId);
         if (!tileDefinition) return;
 
-        // BFS flood fill over empty tiles (4-directional).
+        // Don't fill if the source and target tiles are the same.
+        if (targetTileId === newTileId) return;
+
+        // BFS flood fill over tiles matching the target tile (4-directional).
         const dimX = editableTileMap.getDimensionX();
         const dimY = editableTileMap.getDimensionY();
         const visited = new Set<string>();
@@ -939,7 +941,7 @@ export default class InstancesEditor extends Component<Props, State> {
             visited.add(nKey);
 
             const neighborTileId = layer.getTileId(neighbor.x, neighbor.y);
-            if (neighborTileId === undefined) {
+            if (neighborTileId === targetTileId) {
               queue.push(neighbor);
             }
           }
@@ -947,7 +949,7 @@ export default class InstancesEditor extends Component<Props, State> {
 
         // Apply the fill.
         for (const tile of tilesToFill) {
-          editableTileMap.setTile(tile.x, tile.y, 0, tileId);
+          editableTileMap.setTile(tile.x, tile.y, 0, newTileId);
           editableTileMap.flipTileOnX(
             tile.x,
             tile.y,

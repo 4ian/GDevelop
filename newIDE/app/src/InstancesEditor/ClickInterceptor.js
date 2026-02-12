@@ -171,17 +171,24 @@ class ClickInterceptor {
     ) {
       const lastPoint =
         pointerPathCoordinates[pointerPathCoordinates.length - 1];
-      if (
-        lastPoint &&
-        lastPoint.x === sceneCoordinates[0] &&
-        lastPoint.y === sceneCoordinates[1]
-      ) {
-        return;
+      if (lastPoint) {
+        // Prevent near-duplicate points within minimum distance
+        const MIN_DISTANCE = 2; // pixels
+        const dx = sceneCoordinates[0] - lastPoint.x;
+        const dy = sceneCoordinates[1] - lastPoint.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < MIN_DISTANCE) {
+          return;
+        }
       }
-      pointerPathCoordinates.push({
-        x: sceneCoordinates[0],
-        y: sceneCoordinates[1],
-      });
+      // Limit path points to prevent excessive memory usage
+      const MAX_PATH_POINTS = 10000;
+      if (pointerPathCoordinates.length < MAX_PATH_POINTS) {
+        pointerPathCoordinates.push({
+          x: sceneCoordinates[0],
+          y: sceneCoordinates[1],
+        });
+      }
     } else if (pointerPathCoordinates[1]) {
       pointerPathCoordinates[1] = {
         x: sceneCoordinates[0],

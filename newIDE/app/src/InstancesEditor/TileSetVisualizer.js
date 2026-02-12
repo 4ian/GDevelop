@@ -539,10 +539,9 @@ const TileSetVisualizer = ({
           onSelectTileMapTile(newSelection);
         } else if (allowRectangleSelection) {
           const currentKind =
-            tileMapTileSelection && tileMapTileSelection.kind === 'freehand'
-              ? 'freehand'
-              : tileMapTileSelection && tileMapTileSelection.kind === 'floodfill'
-              ? 'floodfill'
+            tileMapTileSelection?.kind === 'freehand' ||
+            tileMapTileSelection?.kind === 'floodfill'
+              ? tileMapTileSelection.kind
               : 'rectangle';
           const shouldRemoveSelection =
             tileMapTileSelection &&
@@ -746,18 +745,18 @@ const TileSetVisualizer = ({
                     onSelectTileMapTile(null);
                   else
                     onSelectTileMapTile(
-                      (lastSelection && lastSelection.kind === 'rectangle'
+                      lastSelection?.kind === 'rectangle'
                         ? lastSelection
-                        : null) || {
-                        kind: 'rectangle',
-                        coordinates:
-                          lastSelection &&
-                          isTileMapPaintingSelection(lastSelection)
-                            ? lastSelection.coordinates
-                            : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
-                        flipHorizontally: shouldFlipHorizontally,
-                        flipVertically: shouldFlipVertically,
-                      }
+                        : {
+                            kind: 'rectangle',
+                            coordinates:
+                              lastSelection &&
+                              isTileMapPaintingSelection(lastSelection)
+                                ? lastSelection.coordinates
+                                : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
+                            flipHorizontally: shouldFlipHorizontally,
+                            flipVertically: shouldFlipVertically,
+                          }
                     );
                 }}
                 disabled={!isAtlasImageSet}

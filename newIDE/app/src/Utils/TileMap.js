@@ -270,7 +270,7 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
   // Freehand mode: each coordinate in the path maps to a single tile.
   if (
     tileMapTileSelection.kind === 'freehand' &&
-    coordinates.length >= 2
+    coordinates.length >= 1
   ) {
     const seen = new Set<string>();
     const topLeftCorner = tileMapTileSelection.coordinates[0];

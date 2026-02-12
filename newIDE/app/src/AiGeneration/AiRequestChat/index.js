@@ -329,11 +329,10 @@ export type AiRequestChatInterface = {|
   resetUserInput: (aiRequestId: string | null) => void,
 |};
 
-// $FlowFixMe[prop-missing]
-export const AiRequestChat: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<AiRequestChatInterface> },
-  React.RefSetter<AiRequestChatInterface>
-> = React.forwardRef<Props, AiRequestChatInterface>(
+export const AiRequestChat: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<AiRequestChatInterface>,
+}> = React.forwardRef<Props, AiRequestChatInterface>(
   (
     {
       aiConfigurationPresetsWithAvailability,

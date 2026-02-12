@@ -297,6 +297,7 @@ const VersionHistory: React.ComponentType<Props> = React.memo<Props>(
         </I18n>
         <ContextMenu
           ref={contextMenuRef}
+          // $FlowFixMe[incompatible-type]
           buildMenuTemplate={buildVersionMenuTemplate}
         />
       </>

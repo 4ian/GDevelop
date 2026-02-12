@@ -47,14 +47,10 @@ export type EventsBasedBehaviorOrObjectEditorInterface = {|
   scrollToProperty: (propertyName: string, isSharedProperties: boolean) => void,
 |};
 
-// $FlowFixMe[prop-missing]
-export const EventsBasedBehaviorOrObjectEditor: React.AbstractComponent<
-  {
-    ...Props,
-    +ref?: React.RefSetter<EventsBasedBehaviorOrObjectEditorInterface>,
-  },
-  React.RefSetter<EventsBasedBehaviorOrObjectEditorInterface>
-> = React.forwardRef<Props, EventsBasedBehaviorOrObjectEditorInterface>(
+export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<EventsBasedBehaviorOrObjectEditorInterface>,
+}> = React.forwardRef<Props, EventsBasedBehaviorOrObjectEditorInterface>(
   (
     {
       eventsBasedBehavior,

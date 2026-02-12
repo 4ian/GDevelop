@@ -78,6 +78,7 @@ function ItemRow<Item>({
   );
 
   const label = editingName ? (
+    // $FlowFixMe[incompatible-type]
     <TextField
       id="rename-item-field"
       margin="none"

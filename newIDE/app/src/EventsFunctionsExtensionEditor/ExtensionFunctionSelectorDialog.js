@@ -46,6 +46,7 @@ const FunctionListItem = ({
   description: React.Node,
 |}) => {
   return (
+    // $FlowFixMe[incompatible-type]
     <ListItem
       leftIcon={icon}
       primaryText={name}

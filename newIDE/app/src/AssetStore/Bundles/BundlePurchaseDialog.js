@@ -462,6 +462,7 @@ const BundlePurchaseDialog = ({
         maxWidth="sm"
         open
         onRequestClose={onCloseDialog}
+        // $FlowFixMe[incompatible-type]
         actions={dialogActions}
         onApply={purchaseSuccessful ? onCloseDialog : onWillPurchase}
         flexColumnBody

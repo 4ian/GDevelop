@@ -405,8 +405,7 @@ export default (React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
       </I18n>
     );
   }
-  // $FlowFixMe[prop-missing]
-): React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<SemiControlledAutoCompleteInterface> },
-  React.RefSetter<SemiControlledAutoCompleteInterface>
->);
+): React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<SemiControlledAutoCompleteInterface>,
+}>);

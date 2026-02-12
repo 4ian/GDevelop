@@ -376,6 +376,7 @@ const CoursePage = ({
                         chapterIndex={index}
                         course={course}
                         // $FlowIgnore - Flow does not conclude this chapter can only be text-based.
+                        // $FlowFixMe[incompatible-type]
                         courseChapter={chapter}
                         onOpenTemplate={(templateId?: string) => {
                           onOpenTemplateFromCourseChapter(chapter, templateId);

@@ -472,6 +472,7 @@ function LeaderboardAppearanceDialog({
               floatingLabelText={<Trans>Score display</Trans>}
               onChange={(e, i, newValue) =>
                 // $FlowIgnore
+                // $FlowFixMe[incompatible-type]
                 setScoreType(newValue)
               }
               disabled={isLoading}

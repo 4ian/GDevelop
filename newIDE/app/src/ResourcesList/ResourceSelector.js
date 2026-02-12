@@ -66,11 +66,10 @@ type Props = {|
 
 export type ResourceSelectorInterface = {| focus: FieldFocusFunction |};
 
-// $FlowFixMe[prop-missing]
-const ResourceSelector: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<ResourceSelectorInterface> },
-  React.RefSetter<ResourceSelectorInterface>
-> = React.forwardRef<Props, ResourceSelectorInterface>((props, ref) => {
+const ResourceSelector: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<ResourceSelectorInterface>,
+}> = React.forwardRef<Props, ResourceSelectorInterface>((props, ref) => {
   const {
     project,
     projectScopedContainersAccessor,
@@ -488,6 +487,7 @@ const ResourceSelector: React.AbstractComponent<
                 helperMarkdownText={props.helperMarkdownText}
                 hintText={props.hintText}
                 openOnFocus
+                // $FlowFixMe[incompatible-type]
                 dataSource={autoCompleteData}
                 value={resourceName}
                 onChange={onChangeResourceName}

@@ -580,6 +580,7 @@ export const LeaderboardAdmin = ({
       avatar: <Tag />,
       text: isEditingName ? (
         <Line alignItems="center" expand noMargin>
+          {/* $FlowFixMe[incompatible-type] */}
           <TextField
             id="edit-name-field"
             ref={newNameTextFieldRef}

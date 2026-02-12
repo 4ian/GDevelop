@@ -61,11 +61,10 @@ export type SoundPlayerInterface = {|
   playPause: (forcePlay: boolean) => void,
 |};
 
-// $FlowFixMe[prop-missing]
-const SoundPlayer: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<SoundPlayerInterface> },
-  React.RefSetter<SoundPlayerInterface>
-> = React.forwardRef<Props, SoundPlayerInterface>(
+const SoundPlayer: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<SoundPlayerInterface>,
+}> = React.forwardRef<Props, SoundPlayerInterface>(
   (
     {
       soundSrc,

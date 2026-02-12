@@ -226,6 +226,7 @@ export class ExternalEventsEditorContainer extends React.Component<
             onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
             unsavedChanges={this.props.unsavedChanges}
             project={project}
+            // $FlowFixMe[incompatible-type]
             scope={scope}
             globalObjectsContainer={project.getObjects()}
             objectsContainer={layout.getObjects()}

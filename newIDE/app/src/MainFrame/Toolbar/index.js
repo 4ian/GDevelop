@@ -219,8 +219,7 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
       </Toolbar>
     );
   }
-  // $FlowFixMe[prop-missing]
-): React.AbstractComponent<
-  { ...MainFrameToolbarProps, +ref?: React.RefSetter<ToolbarInterface> },
-  React.RefSetter<ToolbarInterface>
->);
+): React.ComponentType<{
+  ...MainFrameToolbarProps,
+  +ref?: React.RefSetter<ToolbarInterface>,
+}>);

@@ -441,6 +441,7 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
                   onChange={onChange}
                   onRequestClose={onRequestClose}
                   onApply={onApply}
+                  // $FlowFixMe[incompatible-type]
                   dataSource={[
                     ...autocompletionVariableNames,
                     onOpenDialog
@@ -512,11 +513,10 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
       </I18n>
     );
   }
-  // $FlowFixMe[prop-missing]
-): React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<VariableFieldInterface> },
-  React.RefSetter<VariableFieldInterface>
->);
+): React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<VariableFieldInterface>,
+}>);
 
 export const renderVariableWithIcon = (
   {

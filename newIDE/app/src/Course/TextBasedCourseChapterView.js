@@ -54,11 +54,10 @@ type Props = {|
   onClickUnlock: () => void,
 |};
 
-// $FlowFixMe[prop-missing]
-const TextBasedCourseChapterView: React.AbstractComponent<
-  { ...Props, +ref?: React.RefSetter<HTMLDivElement> },
-  React.RefSetter<HTMLDivElement>
-> = React.forwardRef<Props, HTMLDivElement>(
+const TextBasedCourseChapterView: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<HTMLDivElement>,
+}> = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       chapterIndex,

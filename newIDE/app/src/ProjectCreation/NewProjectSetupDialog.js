@@ -615,6 +615,7 @@ const NewProjectSetupDialog = ({
           title={<Trans>Create a new game</Trans>}
           id="project-pre-creation-dialog"
           maxWidth="md"
+          // $FlowFixMe[incompatible-type]
           actions={[
             <FlatButton
               disabled={isLoading}

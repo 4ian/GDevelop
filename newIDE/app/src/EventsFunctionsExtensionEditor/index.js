@@ -1538,6 +1538,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 key={selectedEventsFunction.ptr}
                 ref={editor => (this.editor = editor)}
                 project={project}
+                // $FlowFixMe[incompatible-type]
                 scope={scope}
                 globalObjectsContainer={
                   selectedEventsBasedObject
@@ -1546,6 +1547,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 }
                 objectsContainer={this._objectsContainer}
                 projectScopedContainersAccessor={
+                  // $FlowFixMe[incompatible-type]
                   this._projectScopedContainersAccessor
                 }
                 events={selectedEventsFunction.getEvents()}
@@ -1755,6 +1757,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 ref={editorNavigator =>
                   (this._editorNavigator = editorNavigator)
                 }
+                // $FlowFixMe[incompatible-type]
                 editors={editors}
                 initialEditorName={'functions-list'}
                 transitions={{
@@ -1824,6 +1827,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 }) => (
                   <EditorMosaic
                     ref={editorMosaic => (this._editorMosaic = editorMosaic)}
+                    // $FlowFixMe[incompatible-type]
                     editors={editors}
                     centralNodeId="events-sheet"
                     onPersistNodes={node =>
@@ -1844,8 +1848,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       )
                         ? getDefaultEditorMosaicNode(
                             'events-functions-extension-editor'
+                            // $FlowFixMe[incompatible-type]
                           ) || getInitialMosaicEditorNodes()
                         : // Force the mosaic to reset to default.
+                          // $FlowFixMe[incompatible-type]
                           getInitialMosaicEditorNodes()
                     }
                   />

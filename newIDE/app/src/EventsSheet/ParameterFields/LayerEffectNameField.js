@@ -161,8 +161,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-  // $FlowFixMe[prop-missing]
-): React.AbstractComponent<
-  { ...ParameterFieldProps, +ref?: React.RefSetter<ParameterFieldInterface> },
-  React.RefSetter<ParameterFieldInterface>
->);
+): React.ComponentType<{
+  ...ParameterFieldProps,
+  +ref?: React.RefSetter<ParameterFieldInterface>,
+}>);

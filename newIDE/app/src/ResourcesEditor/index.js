@@ -303,11 +303,13 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         <PreferencesContext.Consumer>
           {({ getDefaultEditorMosaicNode, setDefaultEditorMosaicNode }) => (
             <EditorMosaic
+              // $FlowFixMe[incompatible-type]
               editors={editors}
               centralNodeId="resources-list"
               ref={editorMosaic => (this.editorMosaic = editorMosaic)}
               initialNodes={
                 getDefaultEditorMosaicNode('resources-editor') ||
+                // $FlowFixMe[incompatible-type]
                 initialMosaicEditorNodes
               }
               onOpenedEditorsChanged={this.updateToolbar}

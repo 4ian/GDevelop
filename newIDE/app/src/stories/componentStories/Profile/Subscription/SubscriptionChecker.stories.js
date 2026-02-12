@@ -54,6 +54,7 @@ export const NotAuthenticatedMandatoryMode = (): React.Node => {
     <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <RaisedButton label="Click here" onClick={onClick} primary />
       <SubscriptionChecker
+        // $FlowFixMe[incompatible-type]
         ref={checkerRef}
         title="Preview over wifi"
         id="Preview over wifi"
@@ -78,6 +79,7 @@ export const UserWithNoSubscription = (): React.Node => {
     >
       <RaisedButton label="Click here" onClick={onClick} primary />
       <SubscriptionChecker
+        // $FlowFixMe[incompatible-type]
         ref={checkerRef}
         title="Preview over wifi"
         id="Preview over wifi"
@@ -100,6 +102,7 @@ export const UserWithGoldSubscription = (): React.Node => {
     <AuthenticatedUserContext.Provider value={fakeGoldAuthenticatedUser}>
       <RaisedButton label="Click here" onClick={onClick} primary />
       <SubscriptionChecker
+        // $FlowFixMe[incompatible-type]
         ref={checkerRef}
         title="Preview over wifi"
         id="Preview over wifi"

@@ -187,6 +187,7 @@ export const FunctionCallRow: React.ComponentType<Props> = React.memo<Props>(
           <Text
             size="body-small"
             color="secondary"
+            // $FlowFixMe[incompatible-type]
             style={styles.functionCallText}
           >
             {text || <Trans>Working...</Trans>}

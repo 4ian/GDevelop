@@ -320,6 +320,7 @@ const FeedbackCard = ({
                 </ResponsiveLineStackLayout>
               )}
               <LargeSpacer />
+              {/* $FlowFixMe[incompatible-type] */}
               <Text style={styles.textComment} allowSelection>
                 {comment.text}
               </Text>

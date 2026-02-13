@@ -1893,6 +1893,8 @@ export class BaseEvent extends EmscriptenObject {
   unserializeFrom(project: Project, element: SerializerElement): void;
   getAiGeneratedEventId(): string;
   setAiGeneratedEventId(aiGeneratedEventId: string): void;
+  getEventBookmarkId(): string;
+  setEventBookmarkId(eventBookmarkId: string): void;
 }
 
 export class StandardEvent extends BaseEvent {

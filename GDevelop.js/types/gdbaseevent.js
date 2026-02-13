@@ -19,6 +19,8 @@ declare class gdBaseEvent extends gdBaseEvent {
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   getAiGeneratedEventId(): string;
   setAiGeneratedEventId(aiGeneratedEventId: string): void;
+  getEventBookmarkId(): string;
+  setEventBookmarkId(eventBookmarkId: string): void;
   delete(): void;
   ptr: number;
 };

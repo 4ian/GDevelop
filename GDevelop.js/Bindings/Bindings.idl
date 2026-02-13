@@ -2462,6 +2462,9 @@ interface BaseEvent {
 
     [Const, Ref] DOMString GetAiGeneratedEventId();
     void SetAiGeneratedEventId([Const] DOMString aiGeneratedEventId);
+
+    [Const, Ref] DOMString GetEventBookmarkId();
+    void SetEventBookmarkId([Const] DOMString eventBookmarkId);
 };
 
 interface StandardEvent {

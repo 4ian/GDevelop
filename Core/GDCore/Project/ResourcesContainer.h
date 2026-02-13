@@ -738,6 +738,16 @@ public:
   std::size_t GetResourcePosition(const gd::String &name) const;
 
   /**
+   * \brief Return a reference to the resource at the specified position.
+   */
+  Resource &GetResourceAt(std::size_t index);
+
+  /**
+   * \brief Return a reference to the resource at the specified position.
+   */
+  const Resource &GetResourceAt(std::size_t index) const;
+
+  /**
    * \brief Move a resource up in the list
    */
   bool MoveResourceUpInList(const gd::String &name);

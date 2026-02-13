@@ -19,12 +19,12 @@ export const scanEventsForBookmarks = (
   const bookmarks: Array<Bookmark> = [];
 
   const scanEventsList = (eventsList: gdEventsList) => {
-    // Safety check: ensure eventsList is valid and has the size method
-    if (!eventsList || typeof eventsList.size !== 'function') {
+    // Safety check: ensure eventsList is valid and has the getEventsCount method
+    if (!eventsList || typeof eventsList.getEventsCount !== 'function') {
       return;
     }
 
-    for (let i = 0; i < eventsList.size(); i++) {
+    for (let i = 0; i < eventsList.getEventsCount(); i++) {
       const event = eventsList.getEventAt(i);
 
       // Check if event has a bookmark ID
@@ -127,7 +127,7 @@ export const findEventByPtr = (
   events: gdEventsList,
   ptr: number
 ): ?gdBaseEvent => {
-  for (let i = 0; i < events.size(); i++) {
+  for (let i = 0; i < events.getEventsCount(); i++) {
     const event = events.getEventAt(i);
     if (event.ptr === ptr) return event;
 

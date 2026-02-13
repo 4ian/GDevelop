@@ -491,9 +491,17 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   _toggleBookmarksPanel = () => {
-    this.setState(prevState => ({
-      showBookmarksPanel: !prevState.showBookmarksPanel,
-    }));
+    this.setState(
+      prevState => ({
+        showBookmarksPanel: !prevState.showBookmarksPanel,
+      }),
+      () => {
+        // Refresh bookmarks when opening the panel
+        if (this.state.showBookmarksPanel) {
+          this._refreshBookmarks();
+        }
+      }
+    );
   };
 
   _addBookmark = () => {
@@ -509,7 +517,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
     // Set bookmark ID on the event
     const bookmarkId = uuidv4();
-
     event.setEventBookmarkId(bookmarkId);
 
     // Refresh bookmarks from events

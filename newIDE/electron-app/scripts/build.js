@@ -2,8 +2,16 @@ var shell = require('shelljs');
 var path = require('path');
 var args = require('minimist')(process.argv.slice(2));
 
-if (!shell.test('-f', './node_modules/.bin/electron-builder')) {
-  shell.echo('⚠️ Please run npm install in electron-app folder');
+const electronBuilderBin = path.join(
+  __dirname,
+  '..',
+  '..',
+  'node_modules',
+  '.bin',
+  'electron-builder'
+);
+if (!shell.test('-f', electronBuilderBin)) {
+  shell.echo('⚠️ Please run npm install in the newIDE folder');
   shell.exit(1);
 }
 
@@ -15,7 +23,7 @@ if (!args['skip-app-build']) {
   }
 }
 
-const electronBuilder = path.join('node_modules', '.bin', 'electron-builder');
+const electronBuilder = electronBuilderBin;
 let electronBuilderArguments = process.argv
   .slice(2)
   .filter(arg => arg !== '--skip-app-build');

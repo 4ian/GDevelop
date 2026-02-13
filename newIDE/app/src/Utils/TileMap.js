@@ -313,10 +313,26 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
     const selectionHeight =
       selectionBottomRightCorner.y - selectionTopLeftCorner.y + 1;
 
-    // Use a map to track the latest tile at each position
-    const tileMap = new Map<string, TileMapTilePatch>();
+    // Process only coordinates that haven't been processed yet.
+    // We use a cache attached to the coordinates array to track progress.
+    let processedCount = coordinates._processedCount || 0;
 
-    coordinates.forEach(coord => {
+    // If the array length decreased, it means the array was reset or reused.
+    // Clear the cache and start fresh.
+    if (processedCount > coordinates.length) {
+      processedCount = 0;
+      coordinates._processedCount = 0;
+      coordinates._cachedTileMap = null;
+    }
+
+    // Start with cached result if it exists, otherwise create new map
+    const tileMap = coordinates._cachedTileMap
+      ? new Map(coordinates._cachedTileMap)
+      : new Map<string, TileMapTilePatch>();
+
+    // Process only new coordinates since last call
+    for (let i = processedCount; i < coordinates.length; i++) {
+      const coord = coordinates[i];
       const gridPos = [0, 0];
       sceneToTileMapTransformation.transform([coord.x, coord.y], gridPos);
       const baseX = Math.floor(gridPos[0] / tileSize);
@@ -347,11 +363,13 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
           });
         }
       }
-    });
+    }
 
-    // Convert map to array
-    tilesCoordinatesInTileMapGrid.push(...tileMap.values());
-    return tilesCoordinatesInTileMapGrid;
+    // Update cache for next incremental call
+    coordinates._processedCount = coordinates.length;
+    coordinates._cachedTileMap = tileMap;
+
+    return [...tileMap.values()];
   }
 
   // Floodfill mode: only a single coordinate is expected (handled by the

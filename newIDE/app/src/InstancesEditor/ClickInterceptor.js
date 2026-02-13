@@ -174,8 +174,7 @@ class ClickInterceptor {
         const MIN_DISTANCE = 2; // pixels
         const dx = sceneCoordinates[0] - lastPoint.x;
         const dy = sceneCoordinates[1] - lastPoint.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance < MIN_DISTANCE) {
+       if (Math.abs(dx) < MIN_DISTANCE && Math.abs(dy) < MIN_DISTANCE) {
           return;
         }
       }

@@ -953,66 +953,49 @@ export default class InstancesEditor extends Component<Props, State> {
         });
         const tileDefinition = editableTileMap.getTileDefinition(newTileId);
         if (!tileDefinition) return;
+        if (targetTileId === newTileId) return;
 
         // BFS flood fill over tiles matching the target tile (4-directional).
         const dimX = editableTileMap.getDimensionX();
         const dimY = editableTileMap.getDimensionY();
-        const visited = new Set<string>();
         const queue: Array<{| x: number, y: number |}> = [];
-        const tilesToFill: Array<{| x: number, y: number |}> = [];
-
-        const toKey = (x: number, y: number): string => `${x},${y}`;
 
         if (clickX >= 0 && clickX < dimX && clickY >= 0 && clickY < dimY) {
           queue.push({ x: clickX, y: clickY });
-          visited.add(toKey(clickX, clickY));
         }
 
         while (queue.length > 0) {
           const current = queue.shift();
-          tilesToFill.push(current);
 
-          const neighbors = [
-            { x: current.x - 1, y: current.y },
-            { x: current.x + 1, y: current.y },
-            { x: current.x, y: current.y - 1 },
-            { x: current.x, y: current.y + 1 },
-          ];
+          if (
+            current.x < 0 ||
+            current.x >= dimX ||
+            current.y < 0 ||
+            current.y >= dimY
+          )
+            continue;
 
-          for (const neighbor of neighbors) {
-            if (
-              neighbor.x < 0 ||
-              neighbor.x >= dimX ||
-              neighbor.y < 0 ||
-              neighbor.y >= dimY
-            )
-              continue;
-            const nKey = toKey(neighbor.x, neighbor.y);
-            if (visited.has(nKey)) continue;
-            visited.add(nKey);
+          const currentTileId = layer.getTileId(current.x, current.y);
+          if (currentTileId !== targetTileId) continue;
 
-            const neighborTileId = layer.getTileId(neighbor.x, neighbor.y);
-            if (neighborTileId === targetTileId) {
-              queue.push(neighbor);
-            }
-          }
-        }
-
-        // Apply the fill.
-        for (const tile of tilesToFill) {
-          editableTileMap.setTile(tile.x, tile.y, 0, newTileId);
+          editableTileMap.setTile(current.x, current.y, 0, newTileId);
           editableTileMap.flipTileOnX(
-            tile.x,
-            tile.y,
+            current.x,
+            current.y,
             0,
             tileMapTileSelection.flipHorizontally
           );
           editableTileMap.flipTileOnY(
-            tile.x,
-            tile.y,
+            current.x,
+            current.y,
             0,
             tileMapTileSelection.flipVertically
           );
+
+          queue.push({ x: current.x - 1, y: current.y });
+          queue.push({ x: current.x + 1, y: current.y });
+          queue.push({ x: current.x, y: current.y - 1 });
+          queue.push({ x: current.x, y: current.y + 1 });
         }
       } else if (isTileMapPaintingSelection(tileMapTileSelection)) {
         shouldTrimAfterOperations = editableTileMap.isEmpty();

@@ -1935,6 +1935,19 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     }
   };
 
+  _onEventsSheetBlur = (event: SyntheticFocusEvent<HTMLDivElement>) => {
+    const nextFocusedElement = event.relatedTarget;
+    if (
+      nextFocusedElement instanceof HTMLElement &&
+      // If focus is moving to an element still inside the container, do nothing.
+      event.currentTarget.contains(nextFocusedElement)
+    ) {
+      return;
+    }
+
+    this._keyboardShortcuts.resetModifiers();
+  };
+
   render() {
     const {
       isActive,
@@ -2033,7 +2046,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               onKeyDown={this._keyboardShortcuts.onKeyDown}
               onKeyUp={this._keyboardShortcuts.onKeyUp}
               onDragOver={this._keyboardShortcuts.onDragOver}
-              onBlur={this._keyboardShortcuts.resetModifiers}
+              onBlur={this._onEventsSheetBlur}
               ref={this._containerDiv}
               tabIndex={0}
             >

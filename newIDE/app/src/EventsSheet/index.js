@@ -56,6 +56,7 @@ import {
   getLastSelectedTopMostOnlyEventContext,
   getSelectedTopMostOnlyEventContexts,
   getLastSelectedEventContext,
+  getSelectedEventContexts,
   getLastSelectedEventContextWhichCanHaveSubEvents,
   getLastSelectedInstructionContext,
   getLastSelectedInstructionEventContextWhichCanHaveSubEvents,
@@ -123,6 +124,13 @@ import LocalVariablesDialog from '../VariablesList/LocalVariablesDialog';
 import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariablesDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { useHighlightedAiGeneratedEvent } from './UseHighlightedAiGeneratedEvent';
+import BookmarksPanel from './Bookmarks/BookmarksPanel';
+import {
+  type Bookmark,
+  scanEventsForBookmarks,
+  findEventByPtr,
+} from './Bookmarks/BookmarksUtils';
+import { v4 as uuidv4 } from 'uuid';
 
 const gd: libGDevelop = global.gd;
 
@@ -215,6 +223,9 @@ type State = {|
   showSearchPanel: boolean,
   searchResults: ?Array<gdBaseEvent>,
   searchFocusOffset: ?number,
+
+  showBookmarksPanel: boolean,
+  bookmarks: Array<Bookmark>,
 
   layoutVariablesDialogOpen: boolean,
 
@@ -311,6 +322,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     searchResults: null,
     searchFocusOffset: null,
 
+    showBookmarksPanel: false,
+    bookmarks: [],
+
     layoutVariablesDialogOpen: false,
 
     allEventsMetadata: [],
@@ -334,6 +348,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
     );
+
+    // Load bookmarks from localStorage and scan events
+    // Load bookmarks by scanning events
+    this._refreshBookmarks();
   }
   componentWillUnmount() {
     unregisterOnResourceExternallyChangedCallback(
@@ -417,6 +435,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         onOpenSettings={this.props.onOpenSettings}
         settingsIcon={this.props.settingsIcon}
         onToggleSearchPanel={this._toggleSearchPanel}
+        onToggleBookmarksPanel={this._toggleBookmarksPanel}
         canMoveEventsIntoNewGroup={hasSomethingSelected(this.state.selection)}
         moveEventsIntoNewGroup={this.moveEventsIntoNewGroup}
         onOpenSceneVariables={this.editLayoutVariables}
@@ -463,6 +482,112 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _closeSearchPanel = () => {
     if (this._eventSearcher) this._eventSearcher.reset();
     this.setState({ showSearchPanel: false });
+  };
+
+  _refreshBookmarks = () => {
+    if (!this.props.events) return;
+    const bookmarks = scanEventsForBookmarks(this.props.events);
+    this.setState({ bookmarks });
+  };
+
+  _toggleBookmarksPanel = () => {
+    this.setState(prevState => ({
+      showBookmarksPanel: !prevState.showBookmarksPanel,
+    }));
+  };
+
+  _addBookmark = () => {
+    const selectedEvents = getSelectedEventContexts(this.state.selection);
+    if (selectedEvents.length === 0) return;
+
+    const eventContext = selectedEvents[selectedEvents.length - 1];
+    const { event } = eventContext;
+
+    // Check if already bookmarked
+    const existingBookmarkId = event.getEventBookmarkId();
+    if (existingBookmarkId && existingBookmarkId.length > 0) return;
+
+    // Set bookmark ID on the event
+    const bookmarkId = uuidv4();
+
+    event.setEventBookmarkId(bookmarkId);
+
+    // Refresh bookmarks from events
+    this._refreshBookmarks();
+
+    // Trigger unsaved changes
+    if (this.props.unsavedChanges) {
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    }
+  };
+
+  _removeBookmark = () => {
+    const selectedEvents = getSelectedEventContexts(this.state.selection);
+    if (selectedEvents.length === 0) return;
+
+    const eventContext = selectedEvents[selectedEvents.length - 1];
+    const { event } = eventContext;
+
+    // Clear bookmark ID from the event
+    event.setEventBookmarkId('');
+
+    // Refresh bookmarks from events
+    this._refreshBookmarks();
+
+    // Trigger unsaved changes
+    if (this.props.unsavedChanges) {
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    }
+  };
+
+  _isEventBookmarked = (): boolean => {
+    const selectedEvents = getSelectedEventContexts(this.state.selection);
+    if (selectedEvents.length === 0) return false;
+
+    const eventContext = selectedEvents[selectedEvents.length - 1];
+    const { event } = eventContext;
+
+    const bookmarkId = event.getEventBookmarkId();
+    return bookmarkId && bookmarkId.length > 0;
+  };
+
+  _navigateToBookmark = (bookmark: Bookmark) => {
+    const event = findEventByPtr(this.props.events, bookmark.eventPtr);
+
+    if (!event) {
+      // Event no longer exists - remove bookmark
+      this._deleteBookmark(bookmark.id);
+      return;
+    }
+
+    // Use existing navigation pattern
+    this._ensureUnfoldedAndScrollTo(() => event);
+  };
+
+  _deleteBookmark = (bookmarkId: string) => {
+    // Find the event with this bookmark ID and clear it
+    const bookmark = this.state.bookmarks.find(b => b.id === bookmarkId);
+    if (!bookmark) return;
+
+    const event = findEventByPtr(this.props.events, bookmark.eventPtr);
+    if (event) {
+      event.setEventBookmarkId('');
+
+      // Trigger unsaved changes
+      if (this.props.unsavedChanges) {
+        this.props.unsavedChanges.triggerUnsavedChanges();
+      }
+    }
+
+    // Refresh bookmarks from events
+    this._refreshBookmarks();
+  };
+
+  _renameBookmark = (bookmarkId: string, newName: string) => {
+    // Bookmark names are generated dynamically from event content.
+    // To change a bookmark name, the user should edit the event itself.
+    // This method is kept for future extensibility but currently does nothing.
+    console.warn('Bookmark renaming is not supported. Edit the event to change its description.');
   };
 
   addSubEvent = () => {
@@ -897,6 +1022,15 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       click: () =>
         this._replaceSelectedEventType('BuiltinCommonInstructions::Standard'),
       visible: this._selectionIsElseEvent(),
+    },
+    { type: 'separator' },
+    {
+      label: this._isEventBookmarked()
+        ? i18n._(t`Remove Bookmark`)
+        : i18n._(t`Add Bookmark`),
+      click: () =>
+        this._isEventBookmarked() ? this._removeBookmark() : this._addBookmark(),
+      visible: hasEventSelected(this.state.selection),
     },
     { type: 'separator' },
     {
@@ -2144,6 +2278,21 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                       this._ensureUnfoldedAndScrollTo(goToNextSearchResult)
                     }
                     searchFocusOffset={searchFocusOffset}
+                  />
+                </ErrorBoundary>
+              )}
+              {this.state.showBookmarksPanel && (
+                <ErrorBoundary
+                  componentTitle={<Trans>Bookmarks panel</Trans>}
+                  scope="scene-events-bookmarks"
+                  onClose={() => this.setState({ showBookmarksPanel: false })}
+                >
+                  <BookmarksPanel
+                    bookmarks={this.state.bookmarks}
+                    onNavigateToBookmark={this._navigateToBookmark}
+                    onDeleteBookmark={this._deleteBookmark}
+                    onRenameBookmark={this._renameBookmark}
+                    onClose={() => this.setState({ showBookmarksPanel: false })}
                   />
                 </ErrorBoundary>
               )}

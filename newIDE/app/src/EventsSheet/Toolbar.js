@@ -18,6 +18,7 @@ import ToolbarSearchIcon from '../UI/CustomSvgIcons/ToolbarSearch';
 import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
 import AddLocalVariableIcon from '../UI/CustomSvgIcons/LocalVariable';
+import Star from '@material-ui/icons/Star';
 
 type Props = {|
   onAddStandardEvent: () => void,
@@ -39,6 +40,7 @@ type Props = {|
   redo: () => void,
   canRedo: boolean,
   onToggleSearchPanel: () => void,
+  onToggleBookmarksPanel: () => void,
   onOpenSettings?: ?() => void,
   settingsIcon?: React.Node,
   moveEventsIntoNewGroup: () => void,
@@ -66,6 +68,7 @@ const Toolbar = React.memo<Props>(function Toolbar({
   redo,
   canRedo,
   onToggleSearchPanel,
+  onToggleBookmarksPanel,
   onOpenSettings,
   settingsIcon,
   moveEventsIntoNewGroup,
@@ -223,6 +226,15 @@ const Toolbar = React.memo<Props>(function Toolbar({
           acceleratorString={'CmdOrCtrl+F'}
         >
           <ToolbarSearchIcon />
+        </IconButton>
+
+        <IconButton
+          size="small"
+          color="default"
+          onClick={() => onToggleBookmarksPanel()}
+          tooltip={t`Bookmarks`}
+        >
+          <Star />
         </IconButton>
         {onOpenSettings && <ToolbarSeparator />}
         {onOpenSettings && (

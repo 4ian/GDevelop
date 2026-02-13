@@ -1,0 +1,38 @@
+{
+  "name": "@gdevelop/newide",
+  "private": true,
+  "workspaces": [
+    "app",
+    "electron-app",
+    "web-app"
+  ],
+  "engines": {
+    "yarn": "please-use-npm"
+  },
+  "scripts": {
+    "prepare": "cd .. && node newIDE/node_modules/husky/bin.js",
+    "postinstall": "npx patch-package --patch-dir app/patches && cd ../GDJS && npm install && cd ../newIDE && npm run import-resources -w app",
+    "start": "concurrently npm:start-* --kill-others",
+    "start-app": "npm run start -w app",
+    "start-electron": "wait-on http-get://localhost:3000 && npm run start -w electron-app",
+    "format": "npm run format --workspaces --if-present",
+    "check-format": "npm run check-format --workspaces --if-present"
+  },
+  "devDependencies": {
+    "adm-zip": "^0.5.10",
+    "axios": "1.13.5",
+    "concurrently": "^9.2.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "minimist": "1.2.5",
+    "patch-package": "^6.4.7",
+    "prettier": "1.15.3",
+    "semver": "7.0.0",
+    "shelljs": "0.8.4",
+    "wait-on": "^9.0.4"
+  },
+  "lint-staged": {
+    "app/src/!(locales)/**/*.js": "prettier --write",
+    "electron-app/**/*.js": "prettier --write"
+  }
+}

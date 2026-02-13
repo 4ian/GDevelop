@@ -7,18 +7,20 @@ It uses GDevelop [core C++ classes compiled to Javascript](https://github.com/4i
 
 ## 1) Installation 💻
 
-Make sure to have [Git](https://git-scm.com/) and [Node.js](https://nodejs.org) installed. [Yarn](https://yarnpkg.com) is optional.
+Make sure to have [Git](https://git-scm.com/) and [Node.js](https://nodejs.org) installed.
 
 ```bash
 git clone https://github.com/4ian/GDevelop.git
-cd GDevelop/newIDE/app
-npm install # or yarn
+cd GDevelop/newIDE
+npm install
 ```
+
+This is an npm workspaces monorepo. Running `npm install` at the `newIDE` root will install dependencies for all packages (`app`, `electron-app`, `web-app`).
 
 ## 2) Development 🤓
 
 ```bash
-npm start # or yarn start
+npm start
 ```
 
 This will open the app in your web browser.
@@ -38,15 +40,17 @@ cd newIDE/app && npm start # Be sure to have this running in another terminal, b
 
 # In a new terminal:
 cd newIDE/electron-app
-npm install # or yarn
-npm run start # or yarn start
+npm install
+npm run start
 ```
 
 ### Quick Install and Run
 
-There is a script file that automates cloning this repository, building the IDE and running it:
-
--   For Windows: You can download the batch script [here](https://raw.githubusercontent.com/4ian/GDevelop/master/scripts/gitCloneAndBuildGD.bat) and save it to where you want GDevelop to be cloned, then simply run it.
+```bash
+cd newIDE && npm install
+# In a new terminal:
+npm start
+```
 
 ### Development of UI components
 
@@ -54,7 +58,7 @@ You can run a [Storybook](https://github.com/storybooks/storybook) that is used 
 
 ```bash
 cd newIDE/app
-npm run storybook # or yarn storybook
+npm run storybook
 ```
 
 > ℹ️ When creating a Pull Request/pushing a commit, a CI will build the Storybook for you and host it temporarily to allow to test components directly from your browser. Navigate to `http://gdevelop-storybook.s3-website-us-east-1.amazonaws.com/YOUR_BRANCH/latest/index.html` to see it.
@@ -67,9 +71,9 @@ Unit tests, type checking and auto-formatting of the code can be launched with t
 
 ```bash
 cd newIDE/app
-npm run test # or yarn test
-npm run flow # or yarn flow
-npm run format # or yarn format
+npm run test
+npm run flow
+npm run format
 ```
 
 ### Theming
@@ -117,7 +121,7 @@ Once finished, you can download them (use `newIDE/app/scripts/download-all-build
 
 ```bash
 cd newIDE/web-app
-yarn deploy # or npm run deploy
+npm run deploy
 ```
 
 > Note: this will also upload the game engine (GDJS) and extension sources, needed by the IDE and purge the CloudFlare cache.
@@ -128,7 +132,7 @@ Extract translations from the editor, as well as GDevelop Core and extensions:
 
 ```bash
 cd newIDE/app
-yarn extract-all-translations # or npm run extract-all-translations
+npm run extract-all-translations
 ```
 
 This will create `ide-messages.pot` (in `newIDE/app/src/locales/en`) and `gdcore-gdcpp-gdjs-extensions-messages.pot` (in `scripts`). Upload both of them to [the GDevelop Crowdin project](https://crowdin.com/project/gdevelop).
@@ -136,7 +140,7 @@ This will create `ide-messages.pot` (in `newIDE/app/src/locales/en`) and `gdcore
 To update translations, build and download the translations from Crowdin. Extract everything in `newIDE/app/src/locales`. And run:
 
 ```bash
-yarn compile-translations # or npm run compile-translations
+npm run compile-translations
 ```
 
 ## 3) How to contribute? 😎

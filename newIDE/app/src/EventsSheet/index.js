@@ -2033,7 +2033,19 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               onKeyDown={this._keyboardShortcuts.onKeyDown}
               onKeyUp={this._keyboardShortcuts.onKeyUp}
               onDragOver={this._keyboardShortcuts.onDragOver}
-              onBlur={this._keyboardShortcuts.resetModifiers}
+              onBlur={event => {
+                // Only reset modifiers if focus is moving outside the container.
+                // When focus moves to a child (e.g., an instruction with tabIndex),
+                // we must keep modifier state so that Shift+click multi-selection works.
+                if (
+                  !event.currentTarget.contains(
+                    // $FlowFixMe - relatedTarget might not be a Node in Flow's definition.
+                    event.relatedTarget
+                  )
+                ) {
+                  this._keyboardShortcuts.resetModifiers();
+                }
+              }}
               ref={this._containerDiv}
               tabIndex={0}
             >

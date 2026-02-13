@@ -486,6 +486,7 @@ type Props = {|
     variantName: string
   ) => void,
   onExportAssets: () => void,
+  onImportAssets: () => void,
   onObjectCreated: (
     objects: Array<gdObject>,
     isTheFirstOfItsTypeInProject: boolean
@@ -537,6 +538,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onOpenEventBasedObjectEditor,
       onOpenEventBasedObjectVariantEditor,
       onExportAssets,
+      onImportAssets,
       onObjectCreated,
       onObjectEdited,
       onObjectFolderOrObjectWithContextSelected,
@@ -1238,6 +1240,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                   label: i18n._(t`Export as assets`),
                   click: () => onExportAssets(),
                 },
+                {
+                  label: i18n._(t`Import assets`),
+                  click: () => onImportAssets(),
+                },
               ]
             ),
             placeholder: new PlaceHolderTreeViewItem(
@@ -1258,13 +1264,14 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectTreeViewItemProps,
         objectFolderTreeViewItemProps,
         objectsRootFolder,
+        isEntirelyEmpty,
         isListLocked,
         addFolder,
         expandFolders,
         onAddNewObject,
         selectedObjectFolderOrObjectsWithContext,
         onExportAssets,
-        isEntirelyEmpty,
+        onImportAssets,
       ]
     );
 

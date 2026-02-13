@@ -502,6 +502,7 @@ export class ObjectFolderOrObject extends EmscriptenObject {
   getChildPosition(child: ObjectFolderOrObject): number;
   getParent(): ObjectFolderOrObject;
   insertNewFolder(name: string, newPosition: number): ObjectFolderOrObject;
+  getOrCreateFolderChild(name: string): ObjectFolderOrObject;
   moveObjectFolderOrObjectToAnotherFolder(objectFolderOrObject: ObjectFolderOrObject, newParentFolder: ObjectFolderOrObject, newPosition: number): void;
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: ObjectFolderOrObject): void;

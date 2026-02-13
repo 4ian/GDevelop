@@ -10,6 +10,7 @@ import LayerEditorDialog from '../LayersList/LayerEditorDialog';
 import ObjectInstanceVariablesDialog from '../VariablesList/ObjectInstanceVariablesDialog';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
 import ObjectExporterDialog from '../ObjectEditor/ObjectExporterDialog';
+import ObjectImporterDialog from '../ObjectEditor/ObjectImporterDialog';
 import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialog';
 import InstancesSelection from '../InstancesEditor/InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
@@ -260,6 +261,7 @@ type State = {|
   editedLayer: ?gdLayer,
   editedLayerInitialTab: 'properties' | 'effects',
   isAssetExporterDialogOpen: boolean,
+  isAssetImporterDialogOpen: boolean,
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?ObjectEditorTab,
   variablesEditedInstance: ?gdInitialInstance,
@@ -318,6 +320,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       editedLayer: null,
       editedLayerInitialTab: 'properties',
       isAssetExporterDialogOpen: false,
+      isAssetImporterDialogOpen: false,
       editedObjectWithContext: null,
       editedObjectInitialTab: 'properties',
       variablesEditedInstance: null,
@@ -895,6 +898,12 @@ export default class SceneEditor extends React.Component<Props, State> {
   openObjectExporterDialog = (open: boolean = true) => {
     this.setState({
       isAssetExporterDialogOpen: open,
+    });
+  };
+
+  openObjectImporterDialog = (open: boolean = true) => {
+    this.setState({
+      isAssetImporterDialogOpen: open,
     });
   };
 
@@ -2843,6 +2852,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                     tileMapTileSelection={this.state.tileMapTileSelection}
                     onSelectTileMapTile={this.onSelectTileMapTile}
                     onExportAssets={this.openObjectExporterDialog}
+                    onImportAssets={this.openObjectImporterDialog}
                     onDeleteObjects={this._onDeleteObjects}
                     getValidatedObjectOrGroupName={
                       this._getValidatedObjectOrGroupName
@@ -3052,6 +3062,25 @@ export default class SceneEditor extends React.Component<Props, State> {
                       project={project}
                       layout={layout}
                       onClose={() => this.openObjectExporterDialog(false)}
+                    />
+                  )}
+                  {this.state.isAssetImporterDialogOpen && layout && (
+                    <ObjectImporterDialog
+                      project={project}
+                      objectsContainer={this.props.objectsContainer}
+                      resourceManagementProps={resourceManagementProps}
+                      onEventsBasedObjectChildrenEdited={
+                        this.props.onEventsBasedObjectChildrenEdited
+                      }
+                      onClose={() => {
+                        this.openObjectImporterDialog(false);
+                        if (this.editorDisplay) {
+                          this.editorDisplay.forceUpdateObjectsList();
+                          this.props.onObjectListsModified({
+                            isNewObjectTypeUsed: true,
+                          });
+                        }
+                      }}
                     />
                   )}
                   {(this.state.editedGroup ||

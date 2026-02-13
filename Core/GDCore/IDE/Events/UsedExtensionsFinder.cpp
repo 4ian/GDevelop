@@ -48,6 +48,8 @@ const UsedExtensionsResult UsedExtensionsFinder::ScanEventsFunctionsExtension(
     gd::Project &project,
     const gd::EventsFunctionsExtension &eventsFunctionsExtension) {
   UsedExtensionsFinder worker(project);
+  gd::ProjectBrowserHelper::ExposeEventsFunctionsExtensionObjects(
+      eventsFunctionsExtension, worker);
   gd::ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents(
       project, eventsFunctionsExtension, worker);
   return worker.result;

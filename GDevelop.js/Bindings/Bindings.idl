@@ -478,6 +478,7 @@ interface ObjectFolderOrObject {
     unsigned long GetChildPosition([Const, Ref] ObjectFolderOrObject child);
     [Ref] ObjectFolderOrObject GetParent();
     [Ref] ObjectFolderOrObject InsertNewFolder([Const] DOMString name, unsigned long newPosition);
+    [Ref] ObjectFolderOrObject GetOrCreateFolderChild([Const] DOMString name);
     void MoveObjectFolderOrObjectToAnotherFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectFolderOrObject newParentFolder, unsigned long newPosition);
     void MoveChild(unsigned long oldIndex, unsigned long newIndex);
     void RemoveFolderChild([Const, Ref] ObjectFolderOrObject childToRemove);

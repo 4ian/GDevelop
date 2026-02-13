@@ -953,15 +953,16 @@ export default class InstancesEditor extends Component<Props, State> {
         });
         const tileDefinition = editableTileMap.getTileDefinition(newTileId);
         if (!tileDefinition) return;
-        if (targetTileId === newTileId) return;
 
         // BFS flood fill over tiles matching the target tile (4-directional).
         const dimX = editableTileMap.getDimensionX();
         const dimY = editableTileMap.getDimensionY();
         const queue: Array<{| x: number, y: number |}> = [];
+        const visited = new Set<string>();
 
         if (clickX >= 0 && clickX < dimX && clickY >= 0 && clickY < dimY) {
           queue.push({ x: clickX, y: clickY });
+          visited.add(`${clickX},${clickY}`);
         }
 
         while (queue.length > 0) {
@@ -992,10 +993,21 @@ export default class InstancesEditor extends Component<Props, State> {
             tileMapTileSelection.flipVertically
           );
 
-          queue.push({ x: current.x - 1, y: current.y });
-          queue.push({ x: current.x + 1, y: current.y });
-          queue.push({ x: current.x, y: current.y - 1 });
-          queue.push({ x: current.x, y: current.y + 1 });
+          // Add neighbors if not already visited
+          const neighbors = [
+            { x: current.x - 1, y: current.y },
+            { x: current.x + 1, y: current.y },
+            { x: current.x, y: current.y - 1 },
+            { x: current.x, y: current.y + 1 },
+          ];
+
+          for (const neighbor of neighbors) {
+            const key = `${neighbor.x},${neighbor.y}`;
+            if (!visited.has(key)) {
+              visited.add(key);
+              queue.push(neighbor);
+            }
+          }
         }
       } else if (isTileMapPaintingSelection(tileMapTileSelection)) {
         shouldTrimAfterOperations = editableTileMap.isEmpty();

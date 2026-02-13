@@ -8,13 +8,13 @@ import { CorsAwareImage } from '../UI/CorsAwareImage';
 import ResourcesLoader from '../ResourcesLoader';
 import Erase from '../UI/CustomSvgIcons/Erase';
 import Brush from '../UI/CustomSvgIcons/Brush';
-import Coffee from '../UI/CustomSvgIcons/Coffee';
-import Maximize from '../UI/CustomSvgIcons/Maximize';
+import Bucket from '../UI/CustomSvgIcons/Bucket';
+import Rectangle from '../UI/CustomSvgIcons/Rectangle';
 import IconButton from '../UI/IconButton';
 import { LineStackLayout } from '../UI/Layout';
 import FlipHorizontal from '../UI/CustomSvgIcons/FlipHorizontal';
 import FlipVertical from '../UI/CustomSvgIcons/FlipVertical';
-import PointerFinger from '../UI/CustomSvgIcons/PointerFinger';
+import Picker from '../UI/CustomSvgIcons/Picker';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { useLongTouch, type ClientCoordinates } from '../Utils/UseLongTouch';
 import Text from '../UI/Text';
@@ -821,7 +821,7 @@ const TileSetVisualizer = ({
                 }}
                 disabled={!isAtlasImageSet}
               >
-                <Maximize style={styles.icon} />
+                <Rectangle style={styles.icon} />
               </IconButton>
               <IconButton
                 id="fillBucket"
@@ -851,7 +851,7 @@ const TileSetVisualizer = ({
                 }}
                 disabled={!isAtlasImageSet}
               >
-                <Coffee style={styles.icon} />
+                <Bucket style={styles.icon} />
               </IconButton>
               <IconButton
                 id="tilePicker"
@@ -876,7 +876,7 @@ const TileSetVisualizer = ({
                 }}
                 disabled={!isAtlasImageSet}
               >
-                <PointerFinger style={styles.icon} />
+                <Picker style={styles.icon} />
               </IconButton>
               <IconButton
                 id="eraseBrush"

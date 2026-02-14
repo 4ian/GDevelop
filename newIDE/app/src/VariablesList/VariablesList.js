@@ -436,7 +436,7 @@ const VariableRow = React.memo<VariableRowProps>(
                                   noMargin
                                   color="inherit"
                                 >
-                                  <Trans>Index of the loop</Trans>
+                                  <Trans>Counter of the loop</Trans>
                                 </Text>
                               </span>
                             </Line>
@@ -640,7 +640,7 @@ const VariableRow = React.memo<VariableRowProps>(
                     ref={contextMenu}
                     buildMenuTemplate={i18n => [
                       {
-                        label: i18n._(t`Remove this index of the loop`),
+                        label: i18n._(t`Remove this counter of the loop`),
                         click: onRemoveLoopIndexVariable,
                       },
                     ]}

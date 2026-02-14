@@ -905,6 +905,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         this._replaceSelectedEventType('BuiltinCommonInstructions::Standard'),
       visible: this._selectionIsElseEvent(),
     },
+    {
+      label: i18n._(t`Remove the Loop Counter Variable`),
+      click: () => this._removeLoopIndexVariable(),
+      visible:
+        this._selectionIsLoopEvent() && this._selectionHasIndexVariable(),
+    },
     { type: 'separator' },
     {
       label: i18n._(t`Add`),
@@ -927,6 +933,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           ),
         },
         {
+          type: 'separator',
+        },
+        {
           label: i18n._(t`Local Variable`),
           click: () => this.addLocalVariable(),
           enabled: this._selectionCanHaveLocalVariables(),
@@ -935,16 +944,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           ),
         },
         {
-          label: i18n._(t`Add Loop Index Variable`),
+          label: i18n._(t`Loop Counter Variable`),
           click: () => this._addLoopIndexVariable(),
           visible:
             this._selectionIsLoopEvent() && !this._selectionHasIndexVariable(),
         },
         {
-          label: i18n._(t`Remove Loop Index Variable`),
-          click: () => this._removeLoopIndexVariable(),
-          visible:
-            this._selectionIsLoopEvent() && this._selectionHasIndexVariable(),
+          type: 'separator',
         },
         {
           label: i18n._(t`Comment`),

@@ -56,6 +56,12 @@ void WhileEvent::SerializeTo(SerializerElement& element) const {
   if (!events.IsEmpty())
     gd::EventsListSerialization::SerializeEventsTo(events,
                                                   element.AddChild("events"));
+  if (HasVariables()) {
+    variables.SerializeTo(element.AddChild("variables"));
+  }
+  if (!indexVariableName.empty()) {
+    element.AddChild("indexVariable").SetStringValue(indexVariableName);
+  }
 }
 
 void WhileEvent::UnserializeFrom(gd::Project& project,
@@ -75,6 +81,20 @@ void WhileEvent::UnserializeFrom(gd::Project& project,
   if (element.HasChild("events", "Events")) {
     gd::EventsListSerialization::UnserializeEventsFrom(
         project, events, element.GetChild("events", 0, "Events"));
+  }
+
+  variables.Clear();
+  if (element.HasChild("variables")) {
+    variables.UnserializeFrom(element.GetChild("variables"));
+  }
+
+  indexVariableName =
+      element.HasChild("indexVariable")
+          ? element.GetChild("indexVariable").GetStringValue()
+          : "";
+  if (!indexVariableName.empty() && !variables.Has(indexVariableName)) {
+    auto& variable = variables.InsertNew(indexVariableName, variables.Count());
+    variable.SetValue(0);
   }
 }
 

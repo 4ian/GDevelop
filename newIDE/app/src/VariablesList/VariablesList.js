@@ -84,6 +84,7 @@ import { MultilineVariableEditorDialog } from './MultilineVariableEditorDialog';
 import { MarkdownText } from '../UI/MarkdownText';
 import Paper from '../UI/Paper';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 
 const gd: libGDevelop = global.gd;
 
@@ -117,6 +118,9 @@ type PlaceholderProps =
 type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   variablesContainer: gdVariablesContainer,
+  indexVariableName?: string,
+  onRenameIndexVariable?: (newName: string) => void,
+  onRemoveIndexVariable?: () => void,
   areObjectVariables?: boolean,
   inheritedVariablesContainer?: gdVariablesContainer,
   initiallySelectedVariableName?: ?string,
@@ -179,6 +183,8 @@ type VariableRowProps = {|
   type: Variable_Type,
   typeErrorMessage: MessageDescriptor | null,
   onChangeType: (string, nodeId: string) => void,
+  isLoopIndexVariable: boolean,
+  onRemoveLoopIndexVariable: () => void,
   hasMixedValues: boolean,
   valueAsString: string | null,
   valueAsBool: boolean | null,
@@ -220,6 +226,8 @@ const VariableRow = React.memo<VariableRowProps>(
     isTopLevel,
     type,
     typeErrorMessage,
+    isLoopIndexVariable,
+    onRemoveLoopIndexVariable,
     onChangeType,
     hasMixedValues,
     valueAsString,
@@ -255,6 +263,7 @@ const VariableRow = React.memo<VariableRowProps>(
     const hasLineBreaks = valueAsString
       ? valueAsString.indexOf('\n') !== -1
       : false;
+    const contextMenu = React.useRef<?ContextMenuInterface>(null);
 
     const getContainerYPosition = React.useCallback(() => {
       if (containerRef.current) {
@@ -270,7 +279,7 @@ const VariableRow = React.memo<VariableRowProps>(
             draggedNodeId.current = nodeId;
             return {};
           }}
-          canDrag={() => !isInherited}
+          canDrag={() => !isInherited && !isLoopIndexVariable}
           canDrop={() => canDrop(nodeId)}
           drop={() => {
             dropNode(nodeId, whereToDrop);
@@ -307,6 +316,14 @@ const VariableRow = React.memo<VariableRowProps>(
                 onPointerUp={event => {
                   const shouldMultiSelect = event.metaKey || event.ctrlKey;
                   onSelect(shouldMultiSelect, nodeId);
+                }}
+                onContextMenu={event => {
+                  if (!isLoopIndexVariable) return;
+                  event.preventDefault();
+                  event.stopPropagation();
+                  if (contextMenu.current) {
+                    contextMenu.current.open(event.clientX, event.clientY);
+                  }
                 }}
               >
                 {isOver && whereToDrop === 'before' && (
@@ -386,7 +403,9 @@ const VariableRow = React.memo<VariableRowProps>(
                       <Line noMargin alignItems="center">
                         <Column noMargin>
                           <VariableTypeSelector
-                            variableType={type}
+                            variableType={
+                              isLoopIndexVariable ? gd.Variable.Number : type
+                            }
                             onChange={onChangeType}
                             nodeId={nodeId}
                             isHighlighted={isSelected}
@@ -395,11 +414,29 @@ const VariableRow = React.memo<VariableRowProps>(
                             }
                             id={`variable-${index}-type`}
                             errorMessage={typeErrorMessage}
-                            disabled={isTypeLocked}
+                            disabled={isTypeLocked || isLoopIndexVariable}
                           />
                         </Column>
                         <Column expand>
-                          {type === gd.Variable.Boolean ? (
+                          {isLoopIndexVariable ? (
+                            <Line noMargin alignItems="center">
+                              <span
+                                style={
+                                  isSelected
+                                    ? {
+                                        color:
+                                          gdevelopTheme.listItem
+                                            .selectedTextColor,
+                                      }
+                                    : undefined
+                                }
+                              >
+                                <Text displayInlineAsSpan noMargin color="inherit">
+                                  <Trans>Index of the loop</Trans>
+                                </Text>
+                              </span>
+                            </Line>
+                          ) : type === gd.Variable.Boolean ? (
                             <Line noMargin alignItems="center">
                               <span
                                 style={
@@ -594,6 +631,17 @@ const VariableRow = React.memo<VariableRowProps>(
                     }}
                   />
                 )}
+                {isLoopIndexVariable && (
+                  <ContextMenu
+                    ref={contextMenu}
+                    buildMenuTemplate={i18n => [
+                      {
+                        label: i18n._(t`Remove this index of the loop`),
+                        click: onRemoveLoopIndexVariable,
+                      },
+                    ]}
+                  />
+                )}
               </div>
             )
           }
@@ -640,6 +688,16 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const draggedNodeId = React.useRef<?string>(null);
     const forceUpdate = useForceUpdate();
+    const [currentIndexVariableName, setCurrentIndexVariableName] = React.useState(
+      props.indexVariableName || ''
+    );
+
+    React.useEffect(
+      () => {
+        setCurrentIndexVariableName(props.indexVariableName || '');
+      },
+      [props.indexVariableName]
+    );
 
     const [searchText, setSearchText] = React.useState<string>('');
     const { onComputeAllVariableNames, onSelectedVariableChange } = props;
@@ -969,6 +1027,12 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
         const parentVariable = getDirectParentVariable(lineage);
         if (!parentVariable) {
           props.variablesContainer.remove(name);
+          if (name === currentIndexVariableName) {
+            if (props.onRemoveIndexVariable) {
+              props.onRemoveIndexVariable();
+            }
+            setCurrentIndexVariableName('');
+          }
         } else {
           if (parentVariable.getType() === gd.Variable.Array) {
             parentVariable.removeAtIndex(parseInt(name, 10));
@@ -978,7 +1042,11 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
         }
         return true;
       },
-      [props.variablesContainer]
+      [
+        currentIndexVariableName,
+        props.onRemoveIndexVariable,
+        props.variablesContainer,
+      ]
     );
 
     const deleteNode = React.useCallback(
@@ -990,6 +1058,32 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
         }
       },
       [_onChange, forceUpdate, _deleteNode]
+    );
+
+    const removeLoopIndexVariable = React.useCallback(
+      (nodeId: string): void => {
+        if (!currentIndexVariableName) return;
+        const { name, depth } = getVariableContextFromNodeId(
+          nodeId,
+          props.variablesContainer
+        );
+        if (depth !== 0 || !name || name !== currentIndexVariableName) return;
+
+        const success = _deleteNode(nodeId);
+        if (!success) return;
+
+        _onChange();
+        setSelectedNodes([]);
+        forceUpdate();
+      },
+      [
+        currentIndexVariableName,
+        forceUpdate,
+        _deleteNode,
+        _onChange,
+        props.variablesContainer,
+        setSelectedNodes,
+      ]
     );
 
     const deleteSelection = React.useCallback(
@@ -1467,6 +1561,11 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
       }
       const parentType = parentVariable ? parentVariable.getType() : null;
       const isSelected = selectedNodes.includes(nodeId);
+      const isLoopIndexVariable =
+        !isInherited &&
+        isTopLevel &&
+        !!currentIndexVariableName &&
+        name === currentIndexVariableName;
       const overwritesInheritedVariable =
         isTopLevel &&
         !isInherited &&
@@ -1547,6 +1646,8 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
           isTopLevel={isTopLevel}
           type={type}
           typeErrorMessage={typeErrorMessage}
+          isLoopIndexVariable={isLoopIndexVariable}
+          onRemoveLoopIndexVariable={() => removeLoopIndexVariable(nodeId)}
           variablePointer={variablePointer}
           onChangeType={onChangeType}
           hasMixedValues={hasMixedValues}
@@ -1669,6 +1770,13 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
           parentVariable.renameChild(name, safeAndUniqueNewName);
         }
 
+        if (!parentVariable && name === currentIndexVariableName) {
+          setCurrentIndexVariableName(safeAndUniqueNewName);
+          if (props.onRenameIndexVariable) {
+            props.onRenameIndexVariable(safeAndUniqueNewName);
+          }
+        }
+
         _onChange();
         updateExpandedAndSelectedNodesFollowingNameChange(
           nodeId,
@@ -1680,7 +1788,9 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
         props.variablesContainer,
         props.areObjectVariables,
         props.projectScopedContainersAccessor,
+        currentIndexVariableName,
         _onChange,
+        props.onRenameIndexVariable,
         updateExpandedAndSelectedNodesFollowingNameChange,
         refocusNameField,
       ]

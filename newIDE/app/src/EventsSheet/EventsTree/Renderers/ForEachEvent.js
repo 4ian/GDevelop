@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import InstructionsList from '../InstructionsList';
+import VariableDeclarationsList from '../VariableDeclarationsList';
 import classNames from 'classnames';
 import {
   largeSelectedArea,
@@ -118,6 +119,19 @@ export default class ForEachEvent extends React.Component<
           [executableEventContainer]: true,
         })}
       >
+        <VariableDeclarationsList
+          variablesContainer={forEachEvent.getVariables()}
+          indexVariableName={forEachEvent.getIndexVariableName()}
+          onVariableDeclarationClick={this.props.onVariableDeclarationClick}
+          onVariableDeclarationDoubleClick={
+            this.props.onVariableDeclarationDoubleClick
+          }
+          className={'local-variables-container'}
+          disabled={this.props.disabled}
+          screenType={this.props.screenType}
+          windowSize={this.props.windowSize}
+          idPrefix={this.props.idPrefix}
+        />
         <div>
           <Trans>
             Repeat for each instance of

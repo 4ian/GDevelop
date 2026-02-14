@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import InstructionsList from '../InstructionsList';
+import VariableDeclarationsList from '../VariableDeclarationsList';
 import classNames from 'classnames';
 import {
   selectableArea,
@@ -209,6 +210,19 @@ export default class ForEachChildVariableEvent extends React.Component<
           [largeSelectedArea]: this.props.selected,
         })}
       >
+        <VariableDeclarationsList
+          variablesContainer={forEachChildVariableEvent.getVariables()}
+          indexVariableName={forEachChildVariableEvent.getIndexVariableName()}
+          onVariableDeclarationClick={this.props.onVariableDeclarationClick}
+          onVariableDeclarationDoubleClick={
+            this.props.onVariableDeclarationDoubleClick
+          }
+          className={'local-variables-container'}
+          disabled={this.props.disabled}
+          screenType={this.props.screenType}
+          windowSize={this.props.windowSize}
+          idPrefix={this.props.idPrefix}
+        />
         <div style={styles.eventLabel}>
           <Trans>
             <span

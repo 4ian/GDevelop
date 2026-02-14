@@ -9,6 +9,9 @@ type Props = {|
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   variablesContainer: gdVariablesContainer,
+  indexVariableName?: ?string,
+  onRenameIndexVariable?: (newName: string) => void,
+  onRemoveIndexVariable?: () => void,
   onApply: (selectedVariableName: string | null) => void,
   onCancel: () => void,
   initiallySelectedVariableName: string,
@@ -20,6 +23,9 @@ const LocalVariablesDialog = ({
   project,
   projectScopedContainersAccessor,
   variablesContainer,
+  indexVariableName,
+  onRenameIndexVariable,
+  onRemoveIndexVariable,
   open,
   onCancel,
   onApply,
@@ -34,9 +40,17 @@ const LocalVariablesDialog = ({
         label: '',
         variablesContainer,
         onComputeAllVariableNames: () => [],
+        indexVariableName: indexVariableName || '',
+        onRenameIndexVariable,
+        onRemoveIndexVariable,
       },
     ],
-    [variablesContainer]
+    [
+      variablesContainer,
+      indexVariableName,
+      onRenameIndexVariable,
+      onRemoveIndexVariable,
+    ]
   );
 
   return (

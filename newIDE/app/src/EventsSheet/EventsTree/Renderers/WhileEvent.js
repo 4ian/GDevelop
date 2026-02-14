@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import InstructionsList from '../InstructionsList';
+import VariableDeclarationsList from '../VariableDeclarationsList';
 import classNames from 'classnames';
 import {
   largeSelectedArea,
@@ -40,6 +41,19 @@ export default class WhileEvent extends React.Component<EventRendererProps, *> {
           [executableEventContainer]: true,
         })}
       >
+        <VariableDeclarationsList
+          variablesContainer={whileEvent.getVariables()}
+          indexVariableName={whileEvent.getIndexVariableName()}
+          onVariableDeclarationClick={this.props.onVariableDeclarationClick}
+          onVariableDeclarationDoubleClick={
+            this.props.onVariableDeclarationDoubleClick
+          }
+          className={'local-variables-container'}
+          disabled={this.props.disabled}
+          screenType={this.props.screenType}
+          windowSize={this.props.windowSize}
+          idPrefix={this.props.idPrefix}
+        />
         <div
           className={classNames({
             [disabledText]: this.props.disabled,

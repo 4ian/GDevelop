@@ -21,6 +21,7 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import newNameGenerator from '../Utils/NewNameGenerator';
 import {
   type HistoryState,
   type RevertableActionType,
@@ -127,6 +128,12 @@ import { useHighlightedAiGeneratedEvent } from './UseHighlightedAiGeneratedEvent
 const gd: libGDevelop = global.gd;
 
 const zoomLevel = { min: 1, max: 50 };
+const loopEventTypes = [
+  'BuiltinCommonInstructions::While',
+  'BuiltinCommonInstructions::Repeat',
+  'BuiltinCommonInstructions::ForEach',
+  'BuiltinCommonInstructions::ForEachChildVariable',
+];
 
 export type ChangeContext = {|
   events?: Array<EventContext>,
@@ -928,6 +935,18 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           ),
         },
         {
+          label: i18n._(t`Add Loop Index Variable`),
+          click: () => this._addLoopIndexVariable(),
+          visible:
+            this._selectionIsLoopEvent() && !this._selectionHasIndexVariable(),
+        },
+        {
+          label: i18n._(t`Remove Loop Index Variable`),
+          click: () => this._removeLoopIndexVariable(),
+          visible:
+            this._selectionIsLoopEvent() && this._selectionHasIndexVariable(),
+        },
+        {
           label: i18n._(t`Comment`),
           click: () => {
             this.addNewEvent('BuiltinCommonInstructions::Comment');
@@ -1035,6 +1054,92 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       !!eventContext &&
       eventContext.event.getType() === 'BuiltinCommonInstructions::Else'
     );
+  };
+
+  _asLoopEvent = (event: gdBaseEvent): any | null => {
+    const eventType = event.getType();
+    if (eventType === 'BuiltinCommonInstructions::While')
+      return gd.asWhileEvent(event);
+    if (eventType === 'BuiltinCommonInstructions::Repeat')
+      return gd.asRepeatEvent(event);
+    if (eventType === 'BuiltinCommonInstructions::ForEach')
+      return gd.asForEachEvent(event);
+    if (eventType === 'BuiltinCommonInstructions::ForEachChildVariable')
+      return gd.asForEachChildVariableEvent(event);
+    return null;
+  };
+
+  _getLastSelectedLoopEventContext = (): EventContext | null => {
+    const eventContext = getLastSelectedEventContext(this.state.selection);
+    if (!eventContext) return null;
+    if (!loopEventTypes.includes(eventContext.event.getType())) return null;
+    return eventContext;
+  };
+
+  _selectionIsLoopEvent = () => {
+    return !!this._getLastSelectedLoopEventContext();
+  };
+
+  _selectionHasIndexVariable = () => {
+    const eventContext = this._getLastSelectedLoopEventContext();
+    if (!eventContext) return false;
+    const loopEvent = this._asLoopEvent(eventContext.event);
+    return !!loopEvent && loopEvent.getIndexVariableName() !== '';
+  };
+
+  _addLoopIndexVariable = () => {
+    const eventContext = this._getLastSelectedLoopEventContext();
+    if (!eventContext) return;
+
+    const loopEvent = this._asLoopEvent(eventContext.event);
+    if (!loopEvent || loopEvent.getIndexVariableName() !== '') return;
+
+    const projectScopedContainersAccessor =
+      eventContext.projectScopedContainersAccessor;
+    const generatedName = newNameGenerator('LoopIndex', name =>
+      projectScopedContainersAccessor.get().getVariablesContainersList().has(name)
+    );
+
+    const variablesContainer = loopEvent.getVariables();
+    variablesContainer.insertNew(generatedName, variablesContainer.count()).setValue(0);
+    loopEvent.setIndexVariableName(generatedName);
+
+    if (this._eventsTree) {
+      this._eventsTree.forceEventsUpdate(() => {
+        const positions = this._getChangedEventRows([eventContext.event]);
+        this._saveChangesToHistory('EDIT', {
+          positionsBeforeAction: positions,
+          positionAfterAction: positions,
+        });
+      });
+    }
+  };
+
+  _removeLoopIndexVariable = () => {
+    const eventContext = this._getLastSelectedLoopEventContext();
+    if (!eventContext) return;
+
+    const loopEvent = this._asLoopEvent(eventContext.event);
+    if (!loopEvent) return;
+
+    const indexVariableName = loopEvent.getIndexVariableName();
+    if (!indexVariableName) return;
+
+    const variablesContainer = loopEvent.getVariables();
+    if (variablesContainer.has(indexVariableName)) {
+      variablesContainer.remove(indexVariableName);
+    }
+    loopEvent.setIndexVariableName('');
+
+    if (this._eventsTree) {
+      this._eventsTree.forceEventsUpdate(() => {
+        const positions = this._getChangedEventRows([eventContext.event]);
+        this._saveChangesToHistory('EDIT', {
+          positionsBeforeAction: positions,
+          positionAfterAction: positions,
+        });
+      });
+    }
   };
 
   _replaceSelectedEventType = (eventType: string) => {
@@ -2001,6 +2106,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       .editedParameter.eventContext
       ? this.state.editedParameter.eventContext.projectScopedContainersAccessor
       : projectScopedContainersAccessor;
+    const editedVariableLoopEvent =
+      this.state.editedVariable && this.state.editedVariable.eventContext
+        ? this._asLoopEvent(this.state.editedVariable.eventContext.event)
+        : null;
 
     // Memorize the last size of the container div, that is used to render the events tree.
     // When the events editor tab is hidden, the container div width/height are 0.
@@ -2295,6 +2404,25 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               this.state.editedVariable.shouldCreateVariable
             }
             isListLocked={false}
+            indexVariableName={
+              editedVariableLoopEvent
+                ? editedVariableLoopEvent.getIndexVariableName()
+                : ''
+            }
+            onRenameIndexVariable={
+              editedVariableLoopEvent
+                ? newName => {
+                    editedVariableLoopEvent.setIndexVariableName(newName);
+                  }
+                : undefined
+            }
+            onRemoveIndexVariable={
+              editedVariableLoopEvent
+                ? () => {
+                    editedVariableLoopEvent.setIndexVariableName('');
+                  }
+                : undefined
+            }
           />
         )}
         {this.state.layoutVariablesDialogOpen && (

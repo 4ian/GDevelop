@@ -108,6 +108,9 @@ ${actions}`,
   },
   'BuiltinCommonInstructions::While': ({ event, padding }) => {
     const whileEvent = gd.asWhileEvent(event);
+    const indexVarText = whileEvent.getIndexVariableName()
+      ? ` (loop index variable: \`${whileEvent.getIndexVariableName()}\`)`
+      : '';
     const whileConditions = renderInstructionsAsText({
       instructionsList: whileEvent.getWhileConditions(),
       padding: padding + ' ',
@@ -125,7 +128,7 @@ ${actions}`,
     });
 
     return {
-      content: `${padding}While these conditions are true:
+      content: `${padding}While these conditions are true${indexVarText}:
 ${whileConditions}
 ${padding}Then do:
 ${padding}Conditions:
@@ -136,6 +139,9 @@ ${actions}`,
   },
   'BuiltinCommonInstructions::Repeat': ({ event, padding }) => {
     const repeatEvent = gd.asRepeatEvent(event);
+    const indexVarText = repeatEvent.getIndexVariableName()
+      ? ` (loop index variable: \`${repeatEvent.getIndexVariableName()}\`)`
+      : '';
     const conditions = renderInstructionsAsText({
       instructionsList: repeatEvent.getConditions(),
       padding: padding + ' ',
@@ -150,7 +156,7 @@ ${actions}`,
     return {
       content: `${padding}Repeat \`${repeatEvent
         .getRepeatExpression()
-        .getPlainString()}\` times these:
+        .getPlainString()}\`${indexVarText} times these:
 ${padding}Conditions:
 ${conditions}
 ${padding}Actions:
@@ -159,6 +165,9 @@ ${actions}`,
   },
   'BuiltinCommonInstructions::ForEach': ({ event, padding }) => {
     const forEachEvent = gd.asForEachEvent(event);
+    const indexVarText = forEachEvent.getIndexVariableName()
+      ? ` (loop index variable: \`${forEachEvent.getIndexVariableName()}\`)`
+      : '';
     const conditions = renderInstructionsAsText({
       instructionsList: forEachEvent.getConditions(),
       padding: padding + ' ',
@@ -171,7 +180,7 @@ ${actions}`,
     });
 
     return {
-      content: `${padding}Repeat these separately for each instance of ${forEachEvent.getObjectToPick()}:
+      content: `${padding}Repeat these separately for each instance of ${forEachEvent.getObjectToPick()}${indexVarText}:
 ${padding}Conditions:
 ${conditions}
 ${padding}Actions:
@@ -180,6 +189,9 @@ ${actions}`,
   },
   'BuiltinCommonInstructions::ForEachChildVariable': ({ event, padding }) => {
     const forEachChildVariableEvent = gd.asForEachChildVariableEvent(event);
+    const indexVarText = forEachChildVariableEvent.getIndexVariableName()
+      ? ` (loop index variable: \`${forEachChildVariableEvent.getIndexVariableName()}\`)`
+      : '';
     const valueIteratorName = forEachChildVariableEvent.getValueIteratorVariableName();
     const keyIteratorName = forEachChildVariableEvent.getKeyIteratorVariableName();
     const iterableName = forEachChildVariableEvent.getIterableVariableName();
@@ -198,7 +210,7 @@ ${actions}`,
       content: `${padding}For each child in \`${iterableName ||
         '(no variable chosen yet)'}\`, store the child in variable \`${valueIteratorName ||
         '(ignored)'}\`, the child name in \`${keyIteratorName ||
-        '(ignored)'}\` and do:
+        '(ignored)'}\` and do${indexVarText}:
 ${padding}Conditions:
 ${padding}${conditions}
 ${padding}Actions:

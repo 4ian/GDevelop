@@ -14,7 +14,9 @@ using namespace std;
 namespace gd {
 
 ForEachEvent::ForEachEvent()
-    : BaseEvent(), objectsToPick("") {}
+    : BaseEvent(),
+      objectsToPick(""),
+      variables(gd::VariablesContainer::SourceType::Local) {}
 
 vector<gd::InstructionsList*> ForEachEvent::GetAllConditionsVectors() {
   vector<gd::InstructionsList*> allConditions;
@@ -77,6 +79,12 @@ void ForEachEvent::SerializeTo(SerializerElement& element) const {
   if (!events.IsEmpty())
     gd::EventsListSerialization::SerializeEventsTo(events,
                                                   element.AddChild("events"));
+  if (HasVariables()) {
+    variables.SerializeTo(element.AddChild("variables"));
+  }
+  if (!indexVariableName.empty()) {
+    element.AddChild("indexVariable").SetStringValue(indexVariableName);
+  }
 }
 
 void ForEachEvent::UnserializeFrom(gd::Project& project,
@@ -92,6 +100,20 @@ void ForEachEvent::UnserializeFrom(gd::Project& project,
   if (element.HasChild("events", "Events")) {
     gd::EventsListSerialization::UnserializeEventsFrom(
         project, events, element.GetChild("events", 0, "Events"));
+  }
+
+  variables.Clear();
+  if (element.HasChild("variables")) {
+    variables.UnserializeFrom(element.GetChild("variables"));
+  }
+
+  indexVariableName =
+      element.HasChild("indexVariable")
+          ? element.GetChild("indexVariable").GetStringValue()
+          : "";
+  if (!indexVariableName.empty() && !variables.Has(indexVariableName)) {
+    auto& variable = variables.InsertNew(indexVariableName, variables.Count());
+    variable.SetValue(0);
   }
 }
 

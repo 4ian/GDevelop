@@ -40,7 +40,8 @@ export default function VariableDeclarationsList({
       variablesContainer,
       variableName,
     };
-    const isLoopIndexVariable = !!indexVariableName && variableName === indexVariableName;
+    const isLoopIndexVariable =
+      !!indexVariableName && variableName === indexVariableName;
 
     return (
       <VariableDeclaration

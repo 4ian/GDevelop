@@ -800,6 +800,7 @@ describe('libGD.js - GDJS Loops Code Generation integration tests', function () 
         type: 'BuiltinCommonInstructions::Repeat',
         repeatExpression: '3',
         indexVariable: 'OuterIndex',
+        variables: [{ name: 'OuterIndex', type: 'number', value: 0 }],
         conditions: [],
         actions: [],
         events: [
@@ -807,6 +808,7 @@ describe('libGD.js - GDJS Loops Code Generation integration tests', function () 
             type: 'BuiltinCommonInstructions::Repeat',
             repeatExpression: '2',
             indexVariable: 'InnerIndex',
+            variables: [{ name: 'InnerIndex', type: 'number', value: 0 }],
             conditions: [],
             actions: [
               {
@@ -883,6 +885,7 @@ describe('libGD.js - GDJS Loops Code Generation integration tests', function () 
         type: 'BuiltinCommonInstructions::Repeat',
         repeatExpression: '2',
         indexVariable: 'I',
+        variables: [{ name: 'I', type: 'number', value: 0 }],
         conditions: [],
         actions: [],
         events: [
@@ -903,6 +906,7 @@ describe('libGD.js - GDJS Loops Code Generation integration tests', function () 
             type: 'BuiltinCommonInstructions::Repeat',
             repeatExpression: '2',
             indexVariable: 'J',
+            variables: [{ name: 'J', type: 'number', value: 0 }],
             conditions: [],
             actions: [],
             events: [

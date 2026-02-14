@@ -431,7 +431,11 @@ const VariableRow = React.memo<VariableRowProps>(
                                     : undefined
                                 }
                               >
-                                <Text displayInlineAsSpan noMargin color="inherit">
+                                <Text
+                                  displayInlineAsSpan
+                                  noMargin
+                                  color="inherit"
+                                >
                                   <Trans>Index of the loop</Trans>
                                 </Text>
                               </span>
@@ -688,9 +692,10 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const draggedNodeId = React.useRef<?string>(null);
     const forceUpdate = useForceUpdate();
-    const [currentIndexVariableName, setCurrentIndexVariableName] = React.useState(
-      props.indexVariableName || ''
-    );
+    const [
+      currentIndexVariableName,
+      setCurrentIndexVariableName,
+    ] = React.useState(props.indexVariableName || '');
 
     React.useEffect(
       () => {

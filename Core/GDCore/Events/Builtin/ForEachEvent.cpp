@@ -111,10 +111,6 @@ void ForEachEvent::UnserializeFrom(gd::Project& project,
       element.HasChild("indexVariable")
           ? element.GetChild("indexVariable").GetStringValue()
           : "";
-  if (!indexVariableName.empty() && !variables.Has(indexVariableName)) {
-    auto& variable = variables.InsertNew(indexVariableName, variables.Count());
-    variable.SetValue(0);
-  }
 }
 
 }  // namespace gd

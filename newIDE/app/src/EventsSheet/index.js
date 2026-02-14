@@ -1097,11 +1097,16 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     const projectScopedContainersAccessor =
       eventContext.projectScopedContainersAccessor;
     const generatedName = newNameGenerator('LoopIndex', name =>
-      projectScopedContainersAccessor.get().getVariablesContainersList().has(name)
+      projectScopedContainersAccessor
+        .get()
+        .getVariablesContainersList()
+        .has(name)
     );
 
     const variablesContainer = loopEvent.getVariables();
-    variablesContainer.insertNew(generatedName, variablesContainer.count()).setValue(0);
+    variablesContainer
+      .insertNew(generatedName, variablesContainer.count())
+      .setValue(0);
     loopEvent.setIndexVariableName(generatedName);
 
     if (this._eventsTree) {

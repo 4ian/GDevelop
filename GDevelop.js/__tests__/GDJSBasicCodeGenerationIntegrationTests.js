@@ -561,7 +561,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
             parameters: ['LocalCounter', '+', '1'],
           },
           {
-            type: { value: 'SetNumberVariable' },
+            type: { value: 'ModVarScene' },
             parameters: ['Counter', '+', 'LocalCounter'],
           },
         ],
@@ -595,7 +595,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         conditions: [],
         actions: [
           {
-            type: { value: 'SetNumberVariable' },
+            type: { value: 'ModVarScene' },
             parameters: ['Sum', '+', 'LoopIndex'],
           },
         ],
@@ -628,7 +628,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
             parameters: ['LocalValue', '+', '1'],
           },
           {
-            type: { value: 'SetNumberVariable' },
+            type: { value: 'ModVarScene' },
             parameters: ['Sum', '+', 'LocalValue'],
           },
         ],
@@ -657,7 +657,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         conditions: [],
         actions: [
           {
-            type: { value: 'SetNumberVariable' },
+            type: { value: 'ModVarScene' },
             parameters: ['Sum', '+', 'LoopIndex'],
           },
         ],
@@ -686,7 +686,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         conditions: [],
         actions: [
           {
-            type: { value: 'SetNumberVariable' },
+            type: { value: 'ModVarScene' },
             parameters: ['Counter', '+', 'MyObject.Variable(MyVariable) * Multiplier'],
           },
         ],
@@ -730,7 +730,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         conditions: [],
         actions: [
           {
-            type: { value: 'SetNumberVariable' },
+            type: { value: 'ModVarScene' },
             parameters: ['Sum', '+', 'LoopIndex'],
           },
         ],
@@ -786,7 +786,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         conditions: [],
         actions: [
           {
-            type: { value: 'SetNumberVariable' },
+            type: { value: 'ModVarScene' },
             parameters: ['Sum', '+', 'CurrentChild'],
           },
         ],
@@ -821,7 +821,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         conditions: [],
         actions: [
           {
-            type: { value: 'SetNumberVariable' },
+            type: { value: 'ModVarScene' },
             parameters: ['Sum', '+', 'LoopIndex'],
           },
         ],
@@ -871,11 +871,11 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         conditions: [],
         actions: [
           {
-            type: { value: 'SetNumberVariable' },
+            type: { value: 'ModVarScene' },
             parameters: ['ValueSum', '+', 'CurrentValue'],
           },
           {
-            type: { value: 'SetNumberVariable' },
+            type: { value: 'ModVarScene' },
             parameters: ['KeySum', '+', 'CurrentKey'],
           },
         ],
@@ -914,7 +914,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
             conditions: [],
             actions: [
               {
-                type: { value: 'SetNumberVariable' },
+                type: { value: 'ModVarScene' },
                 parameters: ['Sum', '+', 'OuterIndex * 10 + InnerIndex'],
               },
             ],
@@ -946,7 +946,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         conditions: [],
         actions: [
           {
-            type: { value: 'SetNumberVariable' },
+            type: { value: 'ModVarScene' },
             parameters: ['Sum', '+', 'LoopIndex'],
           },
         ],
@@ -958,7 +958,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
             conditions: [],
             actions: [
               {
-                type: { value: 'SetNumberVariable' },
+                type: { value: 'ModVarScene' },
                 parameters: ['Sum', '+', 'LoopIndex'],
               },
             ],
@@ -996,7 +996,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
             conditions: [],
             actions: [
               {
-                type: { value: 'SetNumberVariable' },
+                type: { value: 'ModVarScene' },
                 parameters: ['Sum', '+', 'I + InnerConstant'],
               },
             ],
@@ -1016,7 +1016,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
                 conditions: [],
                 actions: [
                   {
-                    type: { value: 'SetNumberVariable' },
+                    type: { value: 'ModVarScene' },
                     parameters: ['Sum', '+', 'I + J'],
                   },
                 ],

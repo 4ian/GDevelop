@@ -176,6 +176,9 @@ class Variable {
   }
 
   getAllChildrenArray() {
+    if (this._childrenArray.length > 0) {
+      return this._childrenArray;
+    }
     return Object.values(this._children);
   }
 
@@ -190,11 +193,20 @@ class Variable {
   castTo() {}
 
   isPrimitive() {
-    return this.getAllChildrenArray().length === 0;
+    return (
+      this._childrenArray.length === 0 &&
+      Object.keys(this._children).length === 0
+    );
   }
 
   getType() {
-    return this.isPrimitive() ? 'number' : 'structure';
+    if (this._childrenArray.length > 0) {
+      return 'array';
+    }
+    if (Object.keys(this._children).length > 0) {
+      return 'structure';
+    }
+    return 'number';
   }
 
   removeChild(childName) {

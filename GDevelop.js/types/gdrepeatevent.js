@@ -5,6 +5,8 @@ declare class gdRepeatEvent extends gdBaseEvent {
   getActions(): gdInstructionsList;
   setRepeatExpressionPlainString(expr: string): void;
   getRepeatExpression(): gdExpression;
+  getIndexVariableName(): string;
+  setIndexVariableName(name: string): void;
   delete(): void;
   ptr: number;
 };

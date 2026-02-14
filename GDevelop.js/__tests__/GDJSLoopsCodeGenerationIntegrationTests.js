@@ -479,6 +479,7 @@ describe('libGD.js - GDJS Loops Code Generation integration tests', function () 
             parameters: ['LoopIndex', '<', '4'],
           },
         ],
+        variables: [{ name: 'LoopIndex', type: 'number', value: 0 }],
         indexVariable: 'LoopIndex',
         conditions: [],
         actions: [
@@ -541,6 +542,7 @@ describe('libGD.js - GDJS Loops Code Generation integration tests', function () 
       {
         type: 'BuiltinCommonInstructions::Repeat',
         repeatExpression: '5',
+        variables: [{ name: 'LoopIndex', type: 'number', value: 0 }],
         indexVariable: 'LoopIndex',
         conditions: [],
         actions: [
@@ -618,6 +620,7 @@ describe('libGD.js - GDJS Loops Code Generation integration tests', function () 
       {
         type: 'BuiltinCommonInstructions::ForEach',
         object: 'MyObject',
+        variables: [{ name: 'LoopIndex', type: 'number', value: 0 }],
         indexVariable: 'LoopIndex',
         conditions: [],
         actions: [
@@ -709,6 +712,7 @@ describe('libGD.js - GDJS Loops Code Generation integration tests', function () 
         iterableVariableName: 'MyVariable',
         valueIteratorVariableName: '',
         keyIteratorVariableName: '',
+        variables: [{ name: 'LoopIndex', type: 'number', value: 0 }],
         indexVariable: 'LoopIndex',
         conditions: [],
         actions: [
@@ -834,6 +838,7 @@ describe('libGD.js - GDJS Loops Code Generation integration tests', function () 
       {
         type: 'BuiltinCommonInstructions::Repeat',
         repeatExpression: '3',
+        variables: [{ name: 'LoopIndex', type: 'number', value: 0 }],
         indexVariable: 'LoopIndex',
         conditions: [],
         actions: [
@@ -932,5 +937,365 @@ describe('libGD.js - GDJS Loops Code Generation integration tests', function () 
     expect(runtimeScene.getVariables().has('InnerConstant')).toBe(false);
     expect(runtimeScene.getVariables().has('I')).toBe(false);
     expect(runtimeScene.getVariables().has('J')).toBe(false);
+  });
+
+  it('can generate a "for each child variable" event with scene key and value iterators', function () {
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::ForEachChildVariable',
+        iterableVariableName: 'MyArray',
+        valueIteratorVariableName: 'child',
+        keyIteratorVariableName: 'ChildName',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['ValueSum', '+', 'Variable(child)'],
+          },
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['KeySum', '+', 'Variable(ChildName)'],
+          },
+        ],
+        events: [],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      { logCode: false }
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    const myArray = runtimeScene.getVariables().get('MyArray');
+    myArray.getChild('0').setNumber(2);
+    myArray.getChild('1').setNumber(4);
+    myArray.getChild('2').setNumber(6);
+
+    runCompiledEvents(gdjs, runtimeScene, []);
+
+    expect(runtimeScene.getVariables().get('ValueSum').getAsNumber()).toBe(12);
+    expect(runtimeScene.getVariables().get('KeySum').getAsNumber()).toBe(3);
+  });
+
+  it('can generate a "for each child variable" event with scene iterable and local value iterator', function () {
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::ForEachChildVariable',
+        iterableVariableName: 'MyArray',
+        valueIteratorVariableName: 'LocalChildValue',
+        keyIteratorVariableName: 'ChildName',
+        variables: [{ name: 'LocalChildValue', type: 'number', value: 0 }],
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['ValueSum', '+', 'LocalChildValue'],
+          },
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['KeySum', '+', 'Variable(ChildName)'],
+          },
+        ],
+        events: [],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      { logCode: false }
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    const myArray = runtimeScene.getVariables().get('MyArray');
+    myArray.getChild('0').setNumber(2);
+    myArray.getChild('1').setNumber(4);
+    myArray.getChild('2').setNumber(6);
+
+    runCompiledEvents(gdjs, runtimeScene, []);
+
+    expect(runtimeScene.getVariables().get('ValueSum').getAsNumber()).toBe(12);
+    expect(runtimeScene.getVariables().get('KeySum').getAsNumber()).toBe(3);
+    expect(runtimeScene.getVariables().has('LocalChildValue')).toBe(false);
+  });
+
+  it('can generate a "for each child variable" event with scene iterable and both local iterators', function () {
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::ForEachChildVariable',
+        iterableVariableName: 'MyArray',
+        valueIteratorVariableName: 'LocalChildValue',
+        keyIteratorVariableName: 'LocalChildName',
+        variables: [
+          { name: 'LocalChildName', type: 'string', value: '' },
+          { name: 'LocalChildValue', type: 'number', value: 0 },
+        ],
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['ValueSum', '+', 'LocalChildValue'],
+          },
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['KeySum', '+', 'LocalChildName'],
+          },
+        ],
+        events: [],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      { logCode: false }
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    const myArray = runtimeScene.getVariables().get('MyArray');
+    myArray.getChild('0').setNumber(2);
+    myArray.getChild('1').setNumber(4);
+    myArray.getChild('2').setNumber(6);
+
+    runCompiledEvents(gdjs, runtimeScene, []);
+
+    expect(runtimeScene.getVariables().get('ValueSum').getAsNumber()).toBe(12);
+    expect(runtimeScene.getVariables().get('KeySum').getAsNumber()).toBe(3);
+    expect(runtimeScene.getVariables().has('LocalChildValue')).toBe(false);
+    expect(runtimeScene.getVariables().has('LocalChildName')).toBe(false);
+  });
+
+  it('can generate a "for each child variable" event with local iterable declared in a parent event', function () {
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        variables: [
+          {
+            name: 'LocalUpperArray',
+            type: 'array',
+            children: [
+              { type: 'number', value: 9 },
+              { type: 'number', value: 10 },
+              { type: 'number', value: 11 },
+            ],
+          },
+        ],
+        conditions: [],
+        actions: [],
+        events: [
+          {
+            type: 'BuiltinCommonInstructions::ForEachChildVariable',
+            iterableVariableName: 'LocalUpperArray',
+            valueIteratorVariableName: 'LocalChildValue',
+            keyIteratorVariableName: 'LocalChildName',
+            variables: [
+              { name: 'LocalChildName', type: 'string', value: '' },
+              { name: 'LocalChildValue', type: 'number', value: 0 },
+            ],
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['ValueSum', '+', 'LocalChildValue'],
+              },
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['KeySum', '+', 'LocalChildName'],
+              },
+            ],
+            events: [],
+          },
+        ],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      { logCode: false }
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runCompiledEvents(gdjs, runtimeScene, []);
+
+    expect(runtimeScene.getVariables().get('ValueSum').getAsNumber()).toBe(30);
+    expect(runtimeScene.getVariables().get('KeySum').getAsNumber()).toBe(3);
+    expect(runtimeScene.getVariables().has('LocalUpperArray')).toBe(false);
+    expect(runtimeScene.getVariables().has('LocalChildValue')).toBe(false);
+    expect(runtimeScene.getVariables().has('LocalChildName')).toBe(false);
+  });
+
+  it('can iterate over a local array containing mixed types (number + structure) using ToJSON', function () {
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::ForEachChildVariable',
+        iterableVariableName: 'MixedArray',
+        valueIteratorVariableName: 'LocalChildValue',
+        keyIteratorVariableName: 'LocalChildName',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarSceneTxt' },
+            parameters: ['Content', '+', 'ToJSON(LocalChildValue)'],
+          },
+        ],
+        variables: [
+          { name: 'LocalChildName', type: 'string', value: '' },
+          {
+            name: 'MixedArray',
+            type: 'array',
+            children: [
+              { type: 'number', value: 9 },
+              {
+                type: 'structure',
+                children: [
+                  { name: 'a', type: 'number', value: 1 },
+                  { name: 'b', type: 'string', value: 'two' },
+                ],
+              },
+              { type: 'number', value: 11 },
+            ],
+          },
+          { name: 'LocalChildValue', type: 'number', value: 0 },
+        ],
+        events: [],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      { logCode: false }
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runtimeScene.getVariables().get('Content').setString('');
+
+    runCompiledEvents(gdjs, runtimeScene, []);
+
+    expect(runtimeScene.getVariables().get('Content').getAsString()).toBe(
+      '9{"a":1,"b":"two"}11'
+    );
+    expect(runtimeScene.getVariables().has('MixedArray')).toBe(false);
+    expect(runtimeScene.getVariables().has('LocalChildValue')).toBe(false);
+  });
+
+  it('can generate a Repeat event where a local index variable shadows a parent local variable', function () {
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        variables: [{ name: 'SomeLocalVariable', type: 'number', value: 50 }],
+        conditions: [],
+        actions: [],
+        events: [
+          {
+            type: 'BuiltinCommonInstructions::Repeat',
+            repeatExpression: '5',
+            indexVariable: 'SomeLocalVariable',
+            variables: [
+              { name: 'SomeLocalVariable', type: 'number', value: 0 },
+            ],
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['Sum', '+', 'SomeLocalVariable'],
+              },
+            ],
+            events: [],
+          },
+          // After the loop, read the parent's SomeLocalVariable (should still be 50).
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['ParentValue', '=', 'SomeLocalVariable'],
+              },
+            ],
+            events: [],
+          },
+        ],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runCompiledEvents(gdjs, runtimeScene, []);
+
+    // Inner loop: 0+1+2+3+4 = 10
+    expect(runtimeScene.getVariables().get('Sum').getAsNumber()).toBe(10);
+    // Parent's variable is unaffected by the inner loop's index.
+    expect(runtimeScene.getVariables().get('ParentValue').getAsNumber()).toBe(
+      50
+    );
+    expect(runtimeScene.getVariables().has('SomeLocalVariable')).toBe(false);
+  });
+
+  it('can generate nested While events with same-named local index variables', function () {
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        infiniteLoopWarning: true,
+        type: 'BuiltinCommonInstructions::While',
+        whileConditions: [
+          {
+            type: { value: 'NumberVariable' },
+            parameters: ['LoopIndex', '<', '3'],
+          },
+        ],
+        indexVariable: 'LoopIndex',
+        variables: [{ name: 'LoopIndex', type: 'number', value: 0 }],
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['OuterSum', '+', 'LoopIndex'],
+          },
+        ],
+        events: [
+          {
+            infiniteLoopWarning: true,
+            type: 'BuiltinCommonInstructions::While',
+            whileConditions: [
+              {
+                type: { value: 'NumberVariable' },
+                parameters: ['LoopIndex', '<', '3'],
+              },
+            ],
+            indexVariable: 'LoopIndex',
+            variables: [{ name: 'LoopIndex', type: 'number', value: 0 }],
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['InnerSum', '+', 'LoopIndex'],
+              },
+            ],
+            events: [],
+          },
+        ],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runCompiledEvents(gdjs, runtimeScene, []);
+
+    // Outer loop: 0+1+2 = 3
+    expect(runtimeScene.getVariables().get('OuterSum').getAsNumber()).toBe(3);
+    // Inner loop runs 3 times per outer iteration: 3*(0+1+2) = 9
+    expect(runtimeScene.getVariables().get('InnerSum').getAsNumber()).toBe(9);
+    expect(runtimeScene.getVariables().has('LoopIndex')).toBe(false);
   });
 });

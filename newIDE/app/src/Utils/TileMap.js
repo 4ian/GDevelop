@@ -2,7 +2,7 @@
 import { AffineTransformation } from './AffineTransformation';
 import {
   type TileMapTileSelection,
-  isTileMapPaintingSelection,
+  getTileMapPaintingSelection,
 } from '../InstancesEditor/TileSetVisualizer';
 
 export type TileMapTilePatch = {|
@@ -206,9 +206,10 @@ const getTileCorrespondingToFlippingInstructions = ({
   tileMapTileSelection: TileMapTileSelection,
   tileCoordinates: {| x: number, y: number |},
 |}): {| x: number, y: number |} => {
-  if (isTileMapPaintingSelection(tileMapTileSelection)) {
-    const selectionTopLeftCorner = tileMapTileSelection.coordinates[0];
-    const selectionBottomRightCorner = tileMapTileSelection.coordinates[1];
+  const paintingSelection = getTileMapPaintingSelection(tileMapTileSelection);
+  if (paintingSelection) {
+    const selectionTopLeftCorner = paintingSelection.coordinates[0];
+    const selectionBottomRightCorner = paintingSelection.coordinates[1];
     const selectionWidth =
       selectionBottomRightCorner.x - selectionTopLeftCorner.x + 1;
     const selectionHeight =
@@ -217,12 +218,12 @@ const getTileCorrespondingToFlippingInstructions = ({
     const deltaY = tileCoordinates.y - selectionTopLeftCorner.y;
     const newX =
       selectionTopLeftCorner.x +
-      (tileMapTileSelection.flipHorizontally
+      (paintingSelection.flipHorizontally
         ? selectionWidth - deltaX - 1
         : deltaX);
     const newY =
       selectionTopLeftCorner.y +
-      (tileMapTileSelection.flipVertically
+      (paintingSelection.flipVertically
         ? selectionHeight - deltaY - 1
         : deltaY);
     return { x: newX, y: newY };
@@ -296,10 +297,11 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
 
     // Single tile, rectangle, floodfill, or erase mode
     let tileCoordinates;
-    if (isTileMapPaintingSelection(tileMapTileSelection)) {
-      const topLeftCorner = tileMapTileSelection.coordinates[0];
+    const paintingSelection = getTileMapPaintingSelection(tileMapTileSelection);
+    if (paintingSelection) {
+      const topLeftCorner = paintingSelection.coordinates[0];
       tileCoordinates = getTileCorrespondingToFlippingInstructions({
-        tileMapTileSelection,
+        tileMapTileSelection: paintingSelection,
         tileCoordinates: topLeftCorner,
       });
     }

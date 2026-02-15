@@ -51,7 +51,7 @@ import {
   getGridCoordinatesFromTileId,
   createSelectionWithPreviousTool,
   type TileMapTileSelection,
-  isTileMapPaintingSelection,
+  getTileMapPaintingSelection,
 } from './TileSetVisualizer';
 import ClickInterceptor from './ClickInterceptor';
 import getObjectByName from '../Utils/GetObjectByName';
@@ -1009,7 +1009,11 @@ export default class InstancesEditor extends Component<Props, State> {
             }
           }
         }
-      } else if (isTileMapPaintingSelection(tileMapTileSelection)) {
+      } else if (getTileMapPaintingSelection(tileMapTileSelection)) {
+        const paintingSelection = getTileMapPaintingSelection(
+          tileMapTileSelection
+        );
+        if (!paintingSelection) return;
         shouldTrimAfterOperations = editableTileMap.isEmpty();
         // TODO: Optimize list execution to make sure the most important size changing operations are done first.
         let cumulatedUnshiftedRows = 0,
@@ -1074,13 +1078,13 @@ export default class InstancesEditor extends Component<Props, State> {
                   newX,
                   newY,
                   0,
-                  tileMapTileSelection.flipHorizontally
+                  paintingSelection.flipHorizontally
                 );
                 editableTileMap.flipTileOnY(
                   newX,
                   newY,
                   0,
-                  tileMapTileSelection.flipVertically
+                  paintingSelection.flipVertically
                 );
 
                 cumulatedUnshiftedRows += rowsToUnshift;

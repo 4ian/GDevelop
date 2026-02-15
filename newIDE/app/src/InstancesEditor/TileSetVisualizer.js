@@ -193,11 +193,7 @@ const Tile = ({
   );
 };
 
-export type TileMapTileSelection =
-  | {|
-      kind: 'multiple',
-      coordinates: TileMapCoordinates[],
-    |}
+export type TileMapPaintingSelection =
   | {|
       kind: 'rectangle',
       coordinates: TileMapCoordinates[],
@@ -215,7 +211,14 @@ export type TileMapTileSelection =
       coordinates: TileMapCoordinates[],
       flipHorizontally: boolean,
       flipVertically: boolean,
+    |};
+
+export type TileMapTileSelection =
+  | {|
+      kind: 'multiple',
+      coordinates: TileMapCoordinates[],
     |}
+  | TileMapPaintingSelection
   | {|
       kind: 'picker',
     |}
@@ -223,12 +226,23 @@ export type TileMapTileSelection =
       kind: 'erase',
     |};
 
+export const getTileMapPaintingSelection = (
+  selection: ?TileMapTileSelection
+): ?TileMapPaintingSelection => {
+  if (!selection) return null;
+  if (
+    selection.kind === 'rectangle' ||
+    selection.kind === 'freehand' ||
+    selection.kind === 'floodfill'
+  ) {
+    return selection;
+  }
+  return null;
+};
+
 export const isTileMapPaintingSelection = (
   selection: TileMapTileSelection
-): boolean %checks =>
-  selection.kind === 'rectangle' ||
-  selection.kind === 'freehand' ||
-  selection.kind === 'floodfill';
+): boolean => !!getTileMapPaintingSelection(selection);
 
 /**
  * Creates a tile selection with the picked tile coordinates,
@@ -240,17 +254,16 @@ export const createSelectionWithPreviousTool = (
   coordinates: TileMapCoordinates[],
   defaultFlips: {| horizontal: boolean, vertical: boolean |}
 ): TileMapTileSelection => {
+  const previousPaintingTool = getTileMapPaintingSelection(previousTool);
   const kind =
-    previousTool && isTileMapPaintingSelection(previousTool)
-      ? previousTool.kind
-      : 'rectangle';
+    previousPaintingTool ? previousPaintingTool.kind : 'rectangle';
   const flipHorizontally =
-    previousTool && isTileMapPaintingSelection(previousTool)
-      ? previousTool.flipHorizontally
+    previousPaintingTool
+      ? previousPaintingTool.flipHorizontally
       : defaultFlips.horizontal;
   const flipVertically =
-    previousTool && isTileMapPaintingSelection(previousTool)
-      ? previousTool.flipVertically
+    previousPaintingTool
+      ? previousPaintingTool.flipVertically
       : defaultFlips.vertical;
 
   return {
@@ -311,6 +324,10 @@ const TileSetVisualizer = ({
     setLastSelection,
   ] = React.useState<?TileMapTileSelection>(null);
   const previousToolRef = React.useRef<?TileMapTileSelection>(null);
+  const tileMapPaintingSelection = getTileMapPaintingSelection(
+    tileMapTileSelection
+  );
+  const lastPaintingSelection = getTileMapPaintingSelection(lastSelection);
   const tilesetContainerRef = React.useRef<?HTMLDivElement>(null);
   const tilesetAndTooltipContainerRef = React.useRef<?HTMLDivElement>(null);
   const [tooltipContent, setTooltipContent] = React.useState<?{|
@@ -655,14 +672,11 @@ const TileSetVisualizer = ({
 
   React.useEffect(
     () => {
-      if (
-        tileMapTileSelection &&
-        isTileMapPaintingSelection(tileMapTileSelection)
-      ) {
-        setLastSelection(tileMapTileSelection);
+      if (tileMapPaintingSelection) {
+        setLastSelection(tileMapPaintingSelection);
       }
     },
-    [tileMapTileSelection]
+    [tileMapPaintingSelection]
   );
 
   const onHoverAtlas = React.useCallback(
@@ -777,9 +791,8 @@ const TileSetVisualizer = ({
                     onSelectTileMapTile({
                       kind: 'freehand',
                       coordinates:
-                        lastSelection &&
-                        isTileMapPaintingSelection(lastSelection)
-                          ? lastSelection.coordinates
+                        lastPaintingSelection
+                          ? lastPaintingSelection.coordinates
                           : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
                       flipHorizontally: shouldFlipHorizontally,
                       flipVertically: shouldFlipVertically,
@@ -810,9 +823,8 @@ const TileSetVisualizer = ({
                         : {
                             kind: 'rectangle',
                             coordinates:
-                              lastSelection &&
-                              isTileMapPaintingSelection(lastSelection)
-                                ? lastSelection.coordinates
+                              lastPaintingSelection
+                                ? lastPaintingSelection.coordinates
                                 : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
                             flipHorizontally: shouldFlipHorizontally,
                             flipVertically: shouldFlipVertically,
@@ -841,9 +853,8 @@ const TileSetVisualizer = ({
                     onSelectTileMapTile({
                       kind: 'floodfill',
                       coordinates:
-                        lastSelection &&
-                        isTileMapPaintingSelection(lastSelection)
-                          ? lastSelection.coordinates
+                        lastPaintingSelection
+                          ? lastPaintingSelection.coordinates
                           : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
                       flipHorizontally: shouldFlipHorizontally,
                       flipVertically: shouldFlipVertically,
@@ -912,16 +923,14 @@ const TileSetVisualizer = ({
                 onClick={e => {
                   const newShouldFlipHorizontally = !shouldFlipHorizontally;
                   setShouldFlipHorizontally(newShouldFlipHorizontally);
-                  if (
-                    !!tileMapTileSelection &&
-                    isTileMapPaintingSelection(tileMapTileSelection)
-                  ) {
-                    const paintingSelection = tileMapTileSelection;
+                  if (tileMapPaintingSelection) {
                     const selection: TileMapTileSelection = {
-                      kind: (paintingSelection.kind: any),
-                      coordinates: (paintingSelection.coordinates: TileMapCoordinates[]),
+                      kind: (tileMapPaintingSelection.kind: any),
+                      coordinates: (
+                        tileMapPaintingSelection.coordinates: TileMapCoordinates[]
+                      ),
                       flipHorizontally: newShouldFlipHorizontally,
-                      flipVertically: paintingSelection.flipVertically,
+                      flipVertically: tileMapPaintingSelection.flipVertically,
                     };
                     onSelectTileMapTile(selection);
                   }
@@ -942,15 +951,13 @@ const TileSetVisualizer = ({
                 onClick={e => {
                   const newShouldFlipVertically = !shouldFlipVertically;
                   setShouldFlipVertically(newShouldFlipVertically);
-                  if (
-                    !!tileMapTileSelection &&
-                    isTileMapPaintingSelection(tileMapTileSelection)
-                  ) {
-                    const paintingSelection = tileMapTileSelection;
+                  if (tileMapPaintingSelection) {
                     const selection: TileMapTileSelection = {
-                      kind: (paintingSelection.kind: any),
-                      coordinates: (paintingSelection.coordinates: TileMapCoordinates[]),
-                      flipHorizontally: paintingSelection.flipHorizontally,
+                      kind: (tileMapPaintingSelection.kind: any),
+                      coordinates: (
+                        tileMapPaintingSelection.coordinates: TileMapCoordinates[]
+                      ),
+                      flipHorizontally: tileMapPaintingSelection.flipHorizontally,
                       flipVertically: newShouldFlipVertically,
                     };
                     onSelectTileMapTile(selection);
@@ -998,23 +1005,21 @@ const TileSetVisualizer = ({
                   y={hoveredTile.y}
                 />
               )}
-              {tileMapTileSelection &&
-                isTileMapPaintingSelection(tileMapTileSelection) &&
-                displayedTileSize && (
+              {tileMapPaintingSelection && displayedTileSize && (
                   <Tile
                     key={`selected-tile`}
                     highlighted
                     size={displayedTileSize}
-                    x={tileMapTileSelection.coordinates[0].x}
-                    y={tileMapTileSelection.coordinates[0].y}
+                    x={tileMapPaintingSelection.coordinates[0].x}
+                    y={tileMapPaintingSelection.coordinates[0].y}
                     width={
-                      tileMapTileSelection.coordinates[1].x -
-                      tileMapTileSelection.coordinates[0].x +
+                      tileMapPaintingSelection.coordinates[1].x -
+                      tileMapPaintingSelection.coordinates[0].x +
                       1
                     }
                     height={
-                      tileMapTileSelection.coordinates[1].y -
-                      tileMapTileSelection.coordinates[0].y +
+                      tileMapPaintingSelection.coordinates[1].y -
+                      tileMapPaintingSelection.coordinates[0].y +
                       1
                     }
                   />

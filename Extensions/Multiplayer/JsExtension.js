@@ -262,7 +262,7 @@ module.exports = {
         'CloseGameLobbies',
         _('Close Game Lobbies'),
         _(
-          'Close the game lobbies window.'
+          'Close the game lobbies window. Using this action is usually not required because the window is automatically closed when the game of a lobby starts or if the user cancels.'
         ),
         _('Close the game lobbies'),
         _('Lobbies'),

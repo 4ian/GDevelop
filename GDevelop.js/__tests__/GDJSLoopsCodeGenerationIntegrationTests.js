@@ -1302,4 +1302,209 @@ describe('libGD.js - GDJS Loops Code Generation integration tests', function () 
     expect(runtimeScene.getVariables().get('InnerSum').getAsNumber()).toBe(9);
     expect(runtimeScene.getVariables().has('LoopIndex')).toBe(false);
   });
+
+  it('can generate a stress test with deeply nested loops of all types, local variables, indexes and variable shadowing', function () {
+    // This test nests all four loop types (for-each-child, repeat, while,
+    // for-each-object) four levels deep, with local variables at every level,
+    // multiple loop index variables, and a variable "ShadowedIdx" that is
+    // shadowed at three different scopes.
+    //
+    // Scoping hierarchy:
+    //   Level 0 (Standard):            ShadowedIdx = 100
+    //   Level 1 (ForEachChildVariable): ChildValue, ChildKey, ChildLoopIdx, DataMap
+    //   Level 2 (Repeat):              RepeatIdx, ShadowedIdx = 0  (shadows L0)
+    //   Level 3 (While):               WhileIdx
+    //   Level 4 (ForEach object):      ShadowedIdx = loop index   (shadows L2)
+
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        // Level 0: Standard event declaring ShadowedIdx = 100
+        type: 'BuiltinCommonInstructions::Standard',
+        variables: [{ name: 'ShadowedIdx', type: 'number', value: 100 }],
+        conditions: [],
+        actions: [],
+        events: [
+          {
+            // Level 1: ForEachChildVariable over a local structure
+            type: 'BuiltinCommonInstructions::ForEachChildVariable',
+            iterableVariableName: 'DataMap',
+            valueIteratorVariableName: 'ChildValue',
+            keyIteratorVariableName: 'ChildKey',
+            loopIndexVariable: 'ChildLoopIdx',
+            variables: [
+              {
+                name: 'DataMap',
+                type: 'structure',
+                children: [
+                  { name: 'X', type: 'number', value: 10 },
+                  { name: 'Y', type: 'number', value: 20 },
+                ],
+              },
+              { name: 'ChildValue', type: 'number', value: 0 },
+              { name: 'ChildKey', type: 'string', value: '' },
+              { name: 'ChildLoopIdx', type: 'number', value: 0 },
+            ],
+            conditions: [],
+            actions: [],
+            events: [
+              {
+                // Level 2: Repeat 3 times, with local ShadowedIdx=0
+                // that shadows Level 0's ShadowedIdx=100.
+                type: 'BuiltinCommonInstructions::Repeat',
+                repeatExpression: '3',
+                loopIndexVariable: 'RepeatIdx',
+                variables: [
+                  { name: 'RepeatIdx', type: 'number', value: 0 },
+                  { name: 'ShadowedIdx', type: 'number', value: 0 },
+                ],
+                conditions: [],
+                actions: [],
+                events: [
+                  {
+                    // Level 3: While loop (WhileIdx < 2 → 2 iterations)
+                    infiniteLoopWarning: true,
+                    type: 'BuiltinCommonInstructions::While',
+                    whileConditions: [
+                      {
+                        type: { value: 'NumberVariable' },
+                        parameters: ['WhileIdx', '<', '2'],
+                      },
+                    ],
+                    loopIndexVariable: 'WhileIdx',
+                    variables: [{ name: 'WhileIdx', type: 'number', value: 0 }],
+                    conditions: [],
+                    actions: [],
+                    events: [
+                      {
+                        // Level 4: ForEach object whose loop index variable
+                        // is "ShadowedIdx", shadowing Level 2's ShadowedIdx.
+                        type: 'BuiltinCommonInstructions::ForEach',
+                        object: 'MyObject',
+                        loopIndexVariable: 'ShadowedIdx',
+                        variables: [
+                          {
+                            name: 'ShadowedIdx',
+                            type: 'number',
+                            value: 0,
+                          },
+                        ],
+                        conditions: [],
+                        actions: [
+                          {
+                            type: { value: 'ModVarScene' },
+                            parameters: [
+                              'Sum',
+                              '+',
+                              'ChildValue + RepeatIdx + WhileIdx + ShadowedIdx + MyObject.Variable(MyVar)',
+                            ],
+                          },
+                        ],
+                        events: [],
+                      },
+                    ],
+                  },
+                ],
+              },
+              // After repeat, still inside for-each-child: read indexes
+              // and verify shadowing restores to the correct scope.
+              {
+                type: 'BuiltinCommonInstructions::Standard',
+                conditions: [],
+                actions: [
+                  {
+                    // ChildLoopIdx should still be the for-each-child index.
+                    type: { value: 'ModVarScene' },
+                    parameters: ['ChildIdxSum', '+', 'ChildLoopIdx'],
+                  },
+                  {
+                    // ShadowedIdx here should be Level 0's value (100)
+                    // because Level 2's local is now out of scope.
+                    type: { value: 'ModVarScene' },
+                    parameters: ['ShadowAfterRepeat', '+', 'ShadowedIdx'],
+                  },
+                ],
+                events: [],
+              },
+            ],
+          },
+          // After for-each-child, inside Level 0 Standard:
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [
+              {
+                // ShadowedIdx should be Level 0's original value (100).
+                type: { value: 'ModVarScene' },
+                parameters: ['OriginalShadow', '=', 'ShadowedIdx'],
+              },
+            ],
+            events: [],
+          },
+        ],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      {
+        parameterTypes: { MyObject: 'object' },
+        logCode: false,
+      }
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+
+    // Create 2 objects with MyVar values 1 and 2.
+    const objectLists = new gdjs.Hashtable();
+    const myObjects = [];
+    objectLists.put('MyObject', myObjects);
+    for (let index = 1; index <= 2; index++) {
+      const myObject = runtimeScene.createObject('MyObject');
+      myObject.getVariables().get('MyVar').setNumber(index);
+      myObjects.push(myObject);
+    }
+
+    runCompiledEvents(gdjs, runtimeScene, [objectLists]);
+
+    // --- Verify Sum ---
+    // Total inner iterations:
+    //   2 (for-each-child: X,Y) × 3 (repeat) × 2 (while) × 2 (for-each-object) = 24
+    // Each addend appears in 24/(number of its distinct values) iterations:
+    //   ChildValue ∈ {10,20} → 12 each → 12*(10+20) = 360
+    //   RepeatIdx  ∈ {0,1,2} →  8 each →  8*(0+1+2) =  24
+    //   WhileIdx   ∈ {0,1}   → 12 each → 12*(0+1)   =  12
+    //   ShadowedIdx∈ {0,1}   → 12 each → 12*(0+1)   =  12
+    //   MyVar      ∈ {1,2}   → 12 each → 12*(1+2)   =  36
+    // Total Sum = 360 + 24 + 12 + 12 + 36 = 444
+    expect(runtimeScene.getVariables().get('Sum').getAsNumber()).toBe(444);
+
+    // --- Verify for-each-child loop index survives the inner loops ---
+    // Runs once per for-each-child iteration (2 iterations): 0 + 1 = 1
+    expect(runtimeScene.getVariables().get('ChildIdxSum').getAsNumber()).toBe(
+      1
+    );
+
+    // --- Verify variable shadowing restores correctly ---
+    // After the repeat exits, its local ShadowedIdx=0 is out of scope,
+    // so ShadowedIdx resolves to Level 0's value (100).
+    // Runs once per for-each-child iteration (2): 100 + 100 = 200
+    expect(
+      runtimeScene.getVariables().get('ShadowAfterRepeat').getAsNumber()
+    ).toBe(200);
+
+    // After the for-each-child exits, ShadowedIdx is still Level 0's 100.
+    expect(
+      runtimeScene.getVariables().get('OriginalShadow').getAsNumber()
+    ).toBe(100);
+
+    // --- Verify no local variable leaked to the scene ---
+    expect(runtimeScene.getVariables().has('ShadowedIdx')).toBe(false);
+    expect(runtimeScene.getVariables().has('DataMap')).toBe(false);
+    expect(runtimeScene.getVariables().has('ChildValue')).toBe(false);
+    expect(runtimeScene.getVariables().has('ChildKey')).toBe(false);
+    expect(runtimeScene.getVariables().has('ChildLoopIdx')).toBe(false);
+    expect(runtimeScene.getVariables().has('RepeatIdx')).toBe(false);
+    expect(runtimeScene.getVariables().has('WhileIdx')).toBe(false);
+  });
 });

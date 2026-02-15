@@ -69,10 +69,12 @@ const styles = {
     whiteSpace: 'normal',
     minWidth: 0,
   },
-  expandButton: {
-    padding: 4,
+  expandButtonContainer: {
     flexShrink: 0,
     marginLeft: 'auto',
+  },
+  expandButton: {
+    padding: 4,
   },
   typeLabel: {
     fontWeight: 'bold',
@@ -134,13 +136,15 @@ const InvalidParameterRow = ({
             {error.instructionSentence}
           </div>
           {couldBeTruncated && (
-            <IconButton
-              size="small"
-              style={styles.expandButton}
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
-              {isExpanded ? <ChevronArrowBottom /> : <ChevronArrowRight />}
-            </IconButton>
+            <div style={styles.expandButtonContainer}>
+              <IconButton
+                size="small"
+                style={styles.expandButton}
+                onClick={() => setIsExpanded(!isExpanded)}
+              >
+                {isExpanded ? <ChevronArrowBottom /> : <ChevronArrowRight />}
+              </IconButton>
+            </div>
           )}
         </div>
       </TableRowColumn>

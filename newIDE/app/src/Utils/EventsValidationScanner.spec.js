@@ -327,6 +327,7 @@ describe('EventsValidationScanner', () => {
           instructionSentence: 'Action 1',
           locationName: 'Scene1',
           locationType: 'scene',
+          eventPath: [0],
         },
         {
           type: 'missing-instruction',
@@ -335,6 +336,7 @@ describe('EventsValidationScanner', () => {
           instructionSentence: 'Condition 1',
           locationName: 'Scene1',
           locationType: 'scene',
+          eventPath: [1],
         },
         {
           type: 'missing-instruction',
@@ -343,14 +345,17 @@ describe('EventsValidationScanner', () => {
           instructionSentence: 'Action B',
           locationName: 'Scene2',
           locationType: 'scene',
+          eventPath: [0],
         },
       ];
 
       const grouped = groupValidationErrors(errors);
 
       expect(grouped.missingInstructions.size).toBe(2);
-      expect(grouped.missingInstructions.get('ExtA')?.length).toBe(2);
-      expect(grouped.missingInstructions.get('ExtB')?.length).toBe(1);
+      const extAErrors = grouped.missingInstructions.get('ExtA');
+      const extBErrors = grouped.missingInstructions.get('ExtB');
+      expect(extAErrors && extAErrors.length).toBe(2);
+      expect(extBErrors && extBErrors.length).toBe(1);
     });
 
     it('groups invalid parameters by location', () => {
@@ -364,6 +369,7 @@ describe('EventsValidationScanner', () => {
           parameterValue: '',
           locationName: 'Scene1',
           locationType: 'scene',
+          eventPath: [0],
         },
         {
           type: 'invalid-parameter',
@@ -374,6 +380,7 @@ describe('EventsValidationScanner', () => {
           parameterValue: '',
           locationName: 'Scene1',
           locationType: 'scene',
+          eventPath: [1],
         },
         {
           type: 'invalid-parameter',
@@ -384,16 +391,19 @@ describe('EventsValidationScanner', () => {
           parameterValue: '',
           locationName: 'Events1',
           locationType: 'external-events',
+          eventPath: [0],
         },
       ];
 
       const grouped = groupValidationErrors(errors);
 
       expect(grouped.invalidParameters.size).toBe(2);
-      expect(grouped.invalidParameters.get('scene: Scene1')?.length).toBe(2);
-      expect(
-        grouped.invalidParameters.get('external-events: Events1')?.length
-      ).toBe(1);
+      const sceneErrors = grouped.invalidParameters.get('scene: Scene1');
+      const extEventsErrors = grouped.invalidParameters.get(
+        'external-events: Events1'
+      );
+      expect(sceneErrors && sceneErrors.length).toBe(2);
+      expect(extEventsErrors && extEventsErrors.length).toBe(1);
     });
   });
 

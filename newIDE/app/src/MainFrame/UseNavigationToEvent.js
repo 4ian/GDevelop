@@ -48,6 +48,7 @@ export const useNavigationToEvent = ({
               editor.editorRef &&
               editor.editorRef.scrollToEventPath
             ) {
+              // $FlowFixMe - scrollToEventPath is checked above
               editor.editorRef.scrollToEventPath(eventPath);
               setPendingEventNavigation(null);
               return;

@@ -77,14 +77,15 @@ const createValidationWorker = (
 
   let currentEventPath: Array<number> = [];
 
+  // $FlowFixMe - overriding C++ method:
   worker.doVisitEvent = (event: gdBaseEvent) => {
-    // $FlowFixMe - ptr is a number identifying the C++ object
     const path = eventPtrToPathMap.get(event.ptr);
     if (path) {
       currentEventPath = path;
     }
   };
 
+  // $FlowFixMe - overriding C++ method:
   worker.doVisitInstruction = (
     instruction: gdInstruction,
     isCondition: boolean,

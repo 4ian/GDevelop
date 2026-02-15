@@ -15,11 +15,17 @@ type TableCellCommonProps = {|
     paddingRight?: number,
     textAlign?: string,
     wordBreak?: 'break-word',
+    verticalAlign?: string,
+    overflow?: string,
   |},
 |};
 
 type TableProps = {|
   children: React.Node, // Should be TableHeader, TableBody or TableFooter
+  style?: {|
+    tableLayout?: string,
+    width?: string | number,
+  |},
 |};
 
 /**

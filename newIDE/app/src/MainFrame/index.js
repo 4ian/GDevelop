@@ -4721,8 +4721,12 @@ const MainFrame = (props: Props) => {
     onCloseProject: async () => {
       askToCloseProject();
     },
-    onExportGame: () => openShareDialog('publish'),
-    onInviteCollaborators: () => openShareDialog('invite'),
+    onExportGame: () => {
+      openShareDialog('publish');
+    },
+    onInviteCollaborators: () => {
+      openShareDialog('invite');
+    },
     onOpenLayout: name => {
       openLayout(name);
     },
@@ -4823,8 +4827,12 @@ const MainFrame = (props: Props) => {
     onShowVersionHistory: openVersionHistoryPanel,
     onCloseProject: askToCloseProject,
     onCloseApp: closeApp,
-    onExportProject: () => openShareDialog('publish'),
-    onInviteCollaborators: () => openShareDialog('invite'),
+    onExportProject: () => {
+      openShareDialog('publish');
+    },
+    onInviteCollaborators: () => {
+      openShareDialog('invite');
+    },
     onCreateProject: () => setNewProjectSetupDialogOpen(true),
     onOpenProjectManager: () => openProjectManager(true),
     onOpenHomePage: openHomePage,
@@ -4867,7 +4875,9 @@ const MainFrame = (props: Props) => {
     saveProjectAsWithStorageProvider: saveProjectAsWithStorageProvider,
     onCheckoutVersion: onCheckoutVersion,
     getOrLoadProjectVersion: getOrLoadProjectVersion,
-    openShareDialog: openShareDialog,
+    openShareDialog: tab => {
+      openShareDialog(tab);
+    },
     launchDebuggerAndPreview: launchDebuggerAndPreview,
     launchNewPreview: launchNewPreview,
     launchNetworkPreview: launchNetworkPreview,
@@ -4965,7 +4975,9 @@ const MainFrame = (props: Props) => {
             sourceGameId: quickCustomizationDialogOpenedFromGameId || '',
             getIncludeFileHashs:
               eventsFunctionsExtensionsContext.getIncludeFileHashs,
-            onExport: () => openShareDialog('publish'),
+            onExport: () => {
+              openShareDialog('publish');
+            },
             onCaptureFinished,
           },
           (previewLauncher: ?PreviewLauncherInterface) => {
@@ -5026,7 +5038,9 @@ const MainFrame = (props: Props) => {
           onExtensionInstalled={onExtensionInstalled}
           onSceneAdded={onSceneAdded}
           onExternalLayoutAdded={onExternalLayoutAdded}
-          onShareProject={() => openShareDialog()}
+          onShareProject={() => {
+            openShareDialog();
+          }}
           isOpen={projectManagerOpen}
           hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
           resourceManagementProps={resourceManagementProps}

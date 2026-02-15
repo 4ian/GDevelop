@@ -9,7 +9,7 @@ import RenderedInstance from '../ObjectsRendering/Renderers/RenderedInstance';
 import Rendered3DInstance from '../ObjectsRendering/Renderers/Rendered3DInstance';
 import {
   type TileMapTileSelection,
-  isTileMapPaintingSelection,
+  getTileMapPaintingSelection,
 } from './TileSetVisualizer';
 import { AffineTransformation } from '../Utils/AffineTransformation';
 import {
@@ -265,6 +265,7 @@ class TileMapPaintingPreview {
       return null;
     }
     const container = new PIXI.Container();
+    const paintingSelection = getTileMapPaintingSelection(tileMapTileSelection);
     tilesCoordinatesInTileMapGrid.forEach(tilesCoordinates => {
       const {
         bottomRightCorner,
@@ -275,10 +276,7 @@ class TileMapPaintingPreview {
       if (isBadlyConfigured) {
         texture = PixiResourcesLoader.getInvalidPIXITexture();
       } else {
-        if (
-          isTileMapPaintingSelection(tileMapTileSelection) &&
-          tileCoordinates
-        ) {
+        if (paintingSelection && tileCoordinates) {
           texture = this._getTextureInAtlas({
             tileSet,
             ...tileCoordinates,
@@ -297,8 +295,12 @@ class TileMapPaintingPreview {
         texture,
         scaleX,
         scaleY,
-        flipHorizontally: tileMapTileSelection.flipHorizontally || false,
-        flipVertically: tileMapTileSelection.flipVertically || false,
+        flipHorizontally: paintingSelection
+          ? paintingSelection.flipHorizontally
+          : false,
+        flipVertically: paintingSelection
+          ? paintingSelection.flipVertically
+          : false,
         tileSize,
         angle: instance.getAngle(),
       });
@@ -326,10 +328,11 @@ class TileMapPaintingPreview {
     if (!object || object.getType() !== 'TileMap::SimpleTileMap') return;
     const tileSet = getTileSet(object);
     const isBadlyConfigured = isTileSetBadlyConfigured(tileSet);
+    const paintingSelection = getTileMapPaintingSelection(tileMapTileSelection);
 
     if (
       isBadlyConfigured ||
-      isTileMapPaintingSelection(tileMapTileSelection) ||
+      paintingSelection ||
       tileMapTileSelection.kind === 'erase'
     ) {
       const container = this._getPreviewSprites({

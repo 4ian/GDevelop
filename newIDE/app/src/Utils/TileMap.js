@@ -19,9 +19,21 @@ export type TileSet = {|
   atlasImage: string,
 |};
 
+type TileMapCoordinate = {| x: number, y: number |};
+
+type FreehandTileMapCacheEntry = {|
+  processedCount: number,
+  tileMap: Map<string, TileMapTilePatch>,
+|};
+
+const freehandTileMapCache: WeakMap<
+  Array<TileMapCoordinate>,
+  FreehandTileMapCacheEntry
+> = new WeakMap();
+
 const areSameCoordinates = (
-  tileA: {| x: number, y: number |},
-  tileB: {| x: number, y: number |}
+  tileA: TileMapCoordinate,
+  tileB: TileMapCoordinate
 ): boolean => tileA.x === tileB.x && tileA.y === tileB.y;
 
 /**
@@ -232,7 +244,7 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
   sceneToTileMapTransformation,
 }: {|
   tileMapTileSelection: TileMapTileSelection,
-  coordinates: Array<{| x: number, y: number |}>,
+  coordinates: Array<TileMapCoordinate>,
   tileSize: number,
   sceneToTileMapTransformation: AffineTransformation,
 |}): TileMapTilePatch[] => {
@@ -313,22 +325,18 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
     const selectionHeight =
       selectionBottomRightCorner.y - selectionTopLeftCorner.y + 1;
 
-    // Process only coordinates that haven't been processed yet.
-    // We use a cache attached to the coordinates array to track progress.
-    let processedCount = coordinates._processedCount || 0;
+    const cachedEntry = freehandTileMapCache.get(coordinates);
+    let processedCount = 0;
+    let tileMap = new Map<string, TileMapTilePatch>();
 
-    // If the array length decreased, it means the array was reset or reused.
-    // Clear the cache and start fresh.
-    if (processedCount > coordinates.length) {
-      processedCount = 0;
-      coordinates._processedCount = 0;
-      coordinates._cachedTileMap = null;
+    if (cachedEntry) {
+      // If the array length decreased, it means the array was reset or reused.
+      // Clear the cache and start fresh.
+      if (cachedEntry.processedCount <= coordinates.length) {
+        processedCount = cachedEntry.processedCount;
+        tileMap = new Map(cachedEntry.tileMap);
+      }
     }
-
-    // Start with cached result if it exists, otherwise create new map
-    const tileMap = coordinates._cachedTileMap
-      ? new Map(coordinates._cachedTileMap)
-      : new Map<string, TileMapTilePatch>();
 
     // Process only new coordinates since last call
     for (let i = processedCount; i < coordinates.length; i++) {
@@ -366,8 +374,10 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
     }
 
     // Update cache for next incremental call
-    coordinates._processedCount = coordinates.length;
-    coordinates._cachedTileMap = tileMap;
+    freehandTileMapCache.set(coordinates, {
+      processedCount: coordinates.length,
+      tileMap,
+    });
 
     return [...tileMap.values()];
   }

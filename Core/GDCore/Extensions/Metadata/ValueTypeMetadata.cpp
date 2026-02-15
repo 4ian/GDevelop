@@ -122,6 +122,7 @@ const gd::String ValueTypeMetadata::numberWithChoicesValueType = "numberWithChoi
 const gd::String ValueTypeMetadata::behaviorValueType = "behavior";
 const gd::String ValueTypeMetadata::leaderboardIdValueType = "leaderboardId";
 const gd::String ValueTypeMetadata::objectAnimationNameValueType = "objectAnimationName";
+const gd::String ValueTypeMetadata::objectSkinNameValueType = "objectSkinName";
 const gd::String ValueTypeMetadata::keyboardKeyValueType = "keyboardKey";
 
 const gd::String &ValueTypeMetadata::ConvertPropertyTypeToValueType(

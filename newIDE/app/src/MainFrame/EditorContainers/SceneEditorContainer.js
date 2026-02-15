@@ -101,7 +101,13 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
   }
 
   updateToolbar() {
-    if (this.editor) this.editor.updateToolbar();
+    if (this.editor) {
+      this.editor.updateToolbar();
+    } else {
+      // Clear the toolbar if the editor is not ready yet to avoid showing stale toolbar
+      // from the previous editor (e.g., HomePage when opening scene from home page)
+      this.props.setToolbar(null);
+    }
   }
 
   forceUpdateEditor() {

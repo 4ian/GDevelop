@@ -4,6 +4,8 @@ declare class gdWhileEvent extends gdBaseEvent {
   getConditions(): gdInstructionsList;
   getWhileConditions(): gdInstructionsList;
   getActions(): gdInstructionsList;
+  getLoopIndexVariableName(): string;
+  setLoopIndexVariableName(name: string): void;
   delete(): void;
   ptr: number;
 };

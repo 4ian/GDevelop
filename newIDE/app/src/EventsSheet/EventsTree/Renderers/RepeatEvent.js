@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import InstructionsList from '../InstructionsList';
+import VariableDeclarationsList from '../VariableDeclarationsList';
 import classNames from 'classnames';
 import {
   largeSelectedArea,
@@ -10,6 +11,7 @@ import {
   disabledText,
   instructionParameter,
   instructionInvalidParameter,
+  eventLabel,
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
 import ExpressionField from '../../ParameterFields/ExpressionField';
@@ -122,7 +124,20 @@ export default class RepeatEvent extends React.Component<
           [executableEventContainer]: true,
         })}
       >
-        <div>
+        <VariableDeclarationsList
+          variablesContainer={repeatEvent.getVariables()}
+          loopIndexVariableName={repeatEvent.getLoopIndexVariableName()}
+          onVariableDeclarationClick={this.props.onVariableDeclarationClick}
+          onVariableDeclarationDoubleClick={
+            this.props.onVariableDeclarationDoubleClick
+          }
+          className={'local-variables-container'}
+          disabled={this.props.disabled}
+          screenType={this.props.screenType}
+          windowSize={this.props.windowSize}
+          idPrefix={this.props.idPrefix}
+        />
+        <div className={eventLabel}>
           <span
             className={classNames({
               [selectableArea]: true,

@@ -1,6 +1,9 @@
 // @flow
 import { AffineTransformation } from './AffineTransformation';
-import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
+import {
+  type TileMapTileSelection,
+  getTileMapPaintingSelection,
+} from '../InstancesEditor/TileSetVisualizer';
 
 export type TileMapTilePatch = {|
   tileCoordinates?: {| x: number, y: number |},
@@ -16,9 +19,21 @@ export type TileSet = {|
   atlasImage: string,
 |};
 
+type TileMapCoordinate = {| x: number, y: number |};
+
+type FreehandTileMapCacheEntry = {|
+  processedCount: number,
+  tileMap: Map<string, TileMapTilePatch>,
+|};
+
+const freehandTileMapCache: WeakMap<
+  Array<TileMapCoordinate>,
+  FreehandTileMapCacheEntry
+> = new WeakMap();
+
 const areSameCoordinates = (
-  tileA: {| x: number, y: number |},
-  tileB: {| x: number, y: number |}
+  tileA: TileMapCoordinate,
+  tileB: TileMapCoordinate
 ): boolean => tileA.x === tileB.x && tileA.y === tileB.y;
 
 /**
@@ -191,9 +206,10 @@ const getTileCorrespondingToFlippingInstructions = ({
   tileMapTileSelection: TileMapTileSelection,
   tileCoordinates: {| x: number, y: number |},
 |}): {| x: number, y: number |} => {
-  if (tileMapTileSelection.kind === 'rectangle') {
-    const selectionTopLeftCorner = tileMapTileSelection.coordinates[0];
-    const selectionBottomRightCorner = tileMapTileSelection.coordinates[1];
+  const paintingSelection = getTileMapPaintingSelection(tileMapTileSelection);
+  if (paintingSelection) {
+    const selectionTopLeftCorner = paintingSelection.coordinates[0];
+    const selectionBottomRightCorner = paintingSelection.coordinates[1];
     const selectionWidth =
       selectionBottomRightCorner.x - selectionTopLeftCorner.x + 1;
     const selectionHeight =
@@ -202,12 +218,12 @@ const getTileCorrespondingToFlippingInstructions = ({
     const deltaY = tileCoordinates.y - selectionTopLeftCorner.y;
     const newX =
       selectionTopLeftCorner.x +
-      (tileMapTileSelection.flipHorizontally
+      (paintingSelection.flipHorizontally
         ? selectionWidth - deltaX - 1
         : deltaX);
     const newY =
       selectionTopLeftCorner.y +
-      (tileMapTileSelection.flipVertically
+      (paintingSelection.flipVertically
         ? selectionHeight - deltaY - 1
         : deltaY);
     return { x: newX, y: newY };
@@ -229,7 +245,7 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
   sceneToTileMapTransformation,
 }: {|
   tileMapTileSelection: TileMapTileSelection,
-  coordinates: Array<{| x: number, y: number |}>,
+  coordinates: Array<TileMapCoordinate>,
   tileSize: number,
   sceneToTileMapTransformation: AffineTransformation,
 |}): TileMapTilePatch[] => {
@@ -244,11 +260,48 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
     );
     const x = Math.floor(coordinatesInTileMapGrid[0] / tileSize);
     const y = Math.floor(coordinatesInTileMapGrid[1] / tileSize);
+
+    // For multi-tile brush selections, expand to show all tiles in the selection
+    if (
+      (tileMapTileSelection.kind === 'freehand' ||
+        tileMapTileSelection.kind === 'rectangle') &&
+      !isSelectionASingleTileRectangle(tileMapTileSelection)
+    ) {
+      const selectionTopLeftCorner = tileMapTileSelection.coordinates[0];
+      const selectionBottomRightCorner = tileMapTileSelection.coordinates[1];
+      const selectionWidth =
+        selectionBottomRightCorner.x - selectionTopLeftCorner.x + 1;
+      const selectionHeight =
+        selectionBottomRightCorner.y - selectionTopLeftCorner.y + 1;
+
+      const tilesCoordinatesInTileMapGrid: TileMapTilePatch[] = [];
+      for (let dx = 0; dx < selectionWidth; dx++) {
+        for (let dy = 0; dy < selectionHeight; dy++) {
+          const tileCoordinates = getTileCorrespondingToFlippingInstructions({
+            tileMapTileSelection,
+            tileCoordinates: {
+              x: selectionTopLeftCorner.x + dx,
+              y: selectionTopLeftCorner.y + dy,
+            },
+          });
+          tilesCoordinatesInTileMapGrid.push({
+            erase: false,
+            tileCoordinates,
+            topLeftCorner: { x: x + dx, y: y + dy },
+            bottomRightCorner: { x: x + dx, y: y + dy },
+          });
+        }
+      }
+      return tilesCoordinatesInTileMapGrid;
+    }
+
+    // Single tile, rectangle, floodfill, or erase mode
     let tileCoordinates;
-    if (tileMapTileSelection.kind === 'rectangle') {
-      const topLeftCorner = tileMapTileSelection.coordinates[0];
+    const paintingSelection = getTileMapPaintingSelection(tileMapTileSelection);
+    if (paintingSelection) {
+      const topLeftCorner = paintingSelection.coordinates[0];
       tileCoordinates = getTileCorrespondingToFlippingInstructions({
-        tileMapTileSelection,
+        tileMapTileSelection: paintingSelection,
         tileCoordinates: topLeftCorner,
       });
     }
@@ -263,6 +316,96 @@ export const getTilesGridCoordinatesFromPointerSceneCoordinates = ({
   }
 
   const tilesCoordinatesInTileMapGrid: TileMapTilePatch[] = [];
+
+  // Freehand mode: each coordinate in the path maps to the brush stamp.
+  if (tileMapTileSelection.kind === 'freehand' && coordinates.length >= 1) {
+    const selectionTopLeftCorner = tileMapTileSelection.coordinates[0];
+    const selectionBottomRightCorner = tileMapTileSelection.coordinates[1];
+
+    const selectionWidth =
+      selectionBottomRightCorner.x - selectionTopLeftCorner.x + 1;
+    const selectionHeight =
+      selectionBottomRightCorner.y - selectionTopLeftCorner.y + 1;
+
+    const cachedEntry = freehandTileMapCache.get(coordinates);
+    let processedCount = 0;
+    let tileMap = new Map<string, TileMapTilePatch>();
+
+    if (cachedEntry) {
+      // If the array length decreased, it means the array was reset or reused.
+      // Clear the cache and start fresh.
+      if (cachedEntry.processedCount <= coordinates.length) {
+        processedCount = cachedEntry.processedCount;
+        tileMap = new Map(cachedEntry.tileMap);
+      }
+    }
+
+    // Process only new coordinates since last call
+    for (let i = processedCount; i < coordinates.length; i++) {
+      const coord = coordinates[i];
+      const gridPos = [0, 0];
+      sceneToTileMapTransformation.transform([coord.x, coord.y], gridPos);
+      const baseX = Math.floor(gridPos[0] / tileSize);
+      const baseY = Math.floor(gridPos[1] / tileSize);
+
+      // Stamp all tiles in the brush pattern (single tile = 1x1 pattern)
+      for (let dx = 0; dx < selectionWidth; dx++) {
+        for (let dy = 0; dy < selectionHeight; dy++) {
+          const x = baseX + dx;
+          const y = baseY + dy;
+          const key = `${x},${y}`;
+          const tileCoordinates = getTileCorrespondingToFlippingInstructions({
+            tileMapTileSelection,
+            tileCoordinates: {
+              x: selectionTopLeftCorner.x + dx,
+              y: selectionTopLeftCorner.y + dy,
+            },
+          });
+          // Delete and re-add to move to end (painted on top)
+          if (tileMap.has(key)) {
+            tileMap.delete(key);
+          }
+          tileMap.set(key, {
+            erase: false,
+            tileCoordinates,
+            topLeftCorner: { x, y },
+            bottomRightCorner: { x, y },
+          });
+        }
+      }
+    }
+
+    // Update cache for next incremental call
+    freehandTileMapCache.set(coordinates, {
+      processedCount: coordinates.length,
+      tileMap,
+    });
+
+    return [...tileMap.values()];
+  }
+
+  // Floodfill mode: only a single coordinate is expected (handled by the
+  // coordinates.length === 1 case above). If we somehow get here with
+  // more coordinates, just use the last one.
+  if (tileMapTileSelection.kind === 'floodfill' && coordinates.length >= 2) {
+    const lastCoord = coordinates[coordinates.length - 1];
+    const gridPos = [0, 0];
+    sceneToTileMapTransformation.transform([lastCoord.x, lastCoord.y], gridPos);
+    const x = Math.floor(gridPos[0] / tileSize);
+    const y = Math.floor(gridPos[1] / tileSize);
+    const topLeftCorner = tileMapTileSelection.coordinates[0];
+    return [
+      {
+        erase: false,
+        tileCoordinates: getTileCorrespondingToFlippingInstructions({
+          tileMapTileSelection,
+          tileCoordinates: topLeftCorner,
+        }),
+        topLeftCorner: { x, y },
+        bottomRightCorner: { x, y },
+      },
+    ];
+  }
 
   if (coordinates.length === 2) {
     const firstPointCoordinatesInTileMap = [0, 0];

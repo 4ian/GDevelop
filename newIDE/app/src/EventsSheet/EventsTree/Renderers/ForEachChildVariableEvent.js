@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import InstructionsList from '../InstructionsList';
+import VariableDeclarationsList from '../VariableDeclarationsList';
 import classNames from 'classnames';
 import {
   selectableArea,
@@ -11,6 +12,7 @@ import {
   instructionParameter,
   nameAndIconContainer,
   icon,
+  eventLabel,
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
 import AnyVariableField from '../../ParameterFields/AnyVariableField';
@@ -56,10 +58,10 @@ const styles = {
     marginLeft: '3px',
     marginRight: '2px',
   },
-  eventLabel: {
-    marginLeft: '5px',
-    whiteSpace: 'normal',
-    wordWrap: 'break-word',
+  labelText: {
+    // Add an extra pixel so that it alignes with variables and other event labels
+    // (which are selectable areas, so has an extra pixel of border)
+    paddingLeft: '1px',
   },
 };
 
@@ -209,12 +211,26 @@ export default class ForEachChildVariableEvent extends React.Component<
           [largeSelectedArea]: this.props.selected,
         })}
       >
-        <div style={styles.eventLabel}>
+        <VariableDeclarationsList
+          variablesContainer={forEachChildVariableEvent.getVariables()}
+          loopIndexVariableName={forEachChildVariableEvent.getLoopIndexVariableName()}
+          onVariableDeclarationClick={this.props.onVariableDeclarationClick}
+          onVariableDeclarationDoubleClick={
+            this.props.onVariableDeclarationDoubleClick
+          }
+          className={'local-variables-container'}
+          disabled={this.props.disabled}
+          screenType={this.props.screenType}
+          windowSize={this.props.windowSize}
+          idPrefix={this.props.idPrefix}
+        />
+        <div className={eventLabel}>
           <Trans>
             <span
               className={classNames({
                 [disabledText]: this.props.disabled,
               })}
+              style={styles.labelText}
             >
               For every child in
               <span

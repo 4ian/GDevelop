@@ -473,24 +473,39 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   const evt2 = testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 1);
+  // Valid Else event (follows a Standard event)
   testLayout
     .getEvents()
-    .insertNewEvent(project, 'BuiltinCommonInstructions::ForEach', 2);
+    .insertNewEvent(project, 'BuiltinCommonInstructions::Else', 2);
   testLayout
     .getEvents()
-    .insertNewEvent(project, 'BuiltinCommonInstructions::While', 3);
+    .insertNewEvent(project, 'BuiltinCommonInstructions::ForEach', 3);
   testLayout
     .getEvents()
-    .insertNewEvent(project, 'BuiltinCommonInstructions::Repeat', 4);
+    .insertNewEvent(project, 'BuiltinCommonInstructions::While', 4);
+  testLayout
+    .getEvents()
+    .insertNewEvent(project, 'BuiltinCommonInstructions::Repeat', 5);
+  testLayout
+    .getEvents()
+    .insertNewEvent(
+      project,
+      'BuiltinCommonInstructions::ForEachChildVariable',
+      6
+    );
+  // Invalid Else event (follows a ForEachChildVariable, not a Standard event)
+  testLayout
+    .getEvents()
+    .insertNewEvent(project, 'BuiltinCommonInstructions::Else', 7);
   var evt6 = testLayout
     .getEvents()
-    .insertNewEvent(project, 'BuiltinCommonInstructions::Group', 5);
+    .insertNewEvent(project, 'BuiltinCommonInstructions::Group', 8);
   testLayout
     .getEvents()
-    .insertNewEvent(project, 'BuiltinCommonInstructions::Link', 6);
+    .insertNewEvent(project, 'BuiltinCommonInstructions::Link', 9);
   var evt8 = testLayout
     .getEvents()
-    .insertNewEvent(project, 'BuiltinCommonInstructions::JsCode', 7);
+    .insertNewEvent(project, 'BuiltinCommonInstructions::JsCode', 10);
   var evtWithInvalidParameters = testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);

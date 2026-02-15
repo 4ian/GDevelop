@@ -48,7 +48,10 @@ import TileMapPaintingPreview, {
 } from './TileMapPaintingPreview';
 import {
   getTileIdFromGridCoordinates,
+  getGridCoordinatesFromTileId,
+  createSelectionWithPreviousTool,
   type TileMapTileSelection,
+  getTileMapPaintingSelection,
 } from './TileSetVisualizer';
 import ClickInterceptor from './ClickInterceptor';
 import getObjectByName from '../Utils/GetObjectByName';
@@ -185,6 +188,7 @@ export default class InstancesEditor extends Component<Props, State> {
   contextMenuLongTouchTimeoutID: TimeoutID;
   hasCursorMovedSinceItIsDown = false;
   _showObjectInstancesIn3D: boolean = false;
+  _previousToolBeforePicker: ?TileMapTileSelection = null;
 
   state = {
     renderingError: null,
@@ -197,12 +201,29 @@ export default class InstancesEditor extends Component<Props, State> {
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps: Props) {
     // Initialize the PIXI renderer, if not already done.
     // This can happen if canvasArea was not rendered
     // just after the mount (depends on react-dnd versions?).
     if (this.canvasArea && !this.pixiRenderer) {
       this._initializeCanvasAndRenderer();
+    }
+
+    // Track previous tool before picker is activated
+    const { tileMapTileSelection } = this.props;
+    const prevTileMapTileSelection = prevProps.tileMapTileSelection;
+
+    const isPickerActive =
+      tileMapTileSelection && tileMapTileSelection.kind === 'picker';
+    const wasPickerActive =
+      prevTileMapTileSelection && prevTileMapTileSelection.kind === 'picker';
+
+    if (isPickerActive && !wasPickerActive) {
+      // Picker just activated, store the previous tool
+      this._previousToolBeforePicker = prevTileMapTileSelection;
+    } else if (!isPickerActive && wasPickerActive) {
+      // Picker just deactivated, clear the stored previous tool
+      this._previousToolBeforePicker = null;
     }
   }
 
@@ -599,10 +620,10 @@ export default class InstancesEditor extends Component<Props, State> {
     this.uiPixiContainer.addChild(this.windowMask.getPixiObject());
     this.uiPixiContainer.addChild(this.selectedInstances.getPixiContainer());
     this.uiPixiContainer.addChild(this.highlightedInstance.getPixiObject());
-    this.uiPixiContainer.addChild(this.statusBar.getPixiObject());
-    this.uiPixiContainer.addChild(this.profilerBar.getPixiObject());
     this.uiPixiContainer.addChild(this.tileMapPaintingPreview.getPixiObject());
     this.uiPixiContainer.addChild(this.clickInterceptor.getPixiObject());
+    this.uiPixiContainer.addChild(this.statusBar.getPixiObject());
+    this.uiPixiContainer.addChild(this.profilerBar.getPixiObject());
 
     this.background = new Background({
       width: this.props.width,
@@ -877,7 +898,122 @@ export default class InstancesEditor extends Component<Props, State> {
 
       let shouldTrimAfterOperations = false;
 
-      if (tileMapTileSelection.kind === 'rectangle') {
+      // Handle picker tool: select the tile that was clicked on the scene
+      if (tileMapTileSelection.kind === 'picker') {
+        if (tileMapGridCoordinates.length === 0) return;
+        const { topLeftCorner } = tileMapGridCoordinates[0];
+
+        const clickX = topLeftCorner.x;
+        const clickY = topLeftCorner.y;
+
+        const layer = editableTileMap.getTileLayer(0);
+        if (!layer) return;
+
+        // Get the tile ID at the clicked position
+        const tileId = layer.getTileId(clickX, clickY);
+
+        // If there's no tile at this position, do nothing
+        if (tileId === -1) return;
+
+        // Convert the tile ID to tileset grid coordinates
+        const tilesetCoordinates = getGridCoordinatesFromTileId({
+          id: tileId,
+          columnCount: tileSet.columnCount,
+        });
+
+        // Select this tile in the tileset and restore the previous tool
+        const newSelection = createSelectionWithPreviousTool(
+          this._previousToolBeforePicker,
+          [tilesetCoordinates, tilesetCoordinates],
+          { horizontal: false, vertical: false }
+        );
+        this.props.onSelectTileMapTile(newSelection);
+
+        return;
+      }
+
+      if (tileMapTileSelection.kind === 'floodfill') {
+        // Flood fill: get the single clicked grid coordinate.
+        if (tileMapGridCoordinates.length === 0) return;
+        const { topLeftCorner, tileCoordinates } = tileMapGridCoordinates[0];
+        if (!tileCoordinates) return;
+
+        const clickX = topLeftCorner.x;
+        const clickY = topLeftCorner.y;
+
+        const layer = editableTileMap.getTileLayer(0);
+        if (!layer) return;
+
+        // Get the tile ID of the clicked position (the tile being replaced).
+        const targetTileId = layer.getTileId(clickX, clickY);
+
+        const newTileId = getTileIdFromGridCoordinates({
+          columnCount: tileSet.columnCount,
+          ...tileCoordinates,
+        });
+        const tileDefinition = editableTileMap.getTileDefinition(newTileId);
+        if (!tileDefinition) return;
+
+        // BFS flood fill over tiles matching the target tile (4-directional).
+        const dimX = editableTileMap.getDimensionX();
+        const dimY = editableTileMap.getDimensionY();
+        const queue: Array<{| x: number, y: number |}> = [];
+        const visited = new Set<string>();
+
+        if (clickX >= 0 && clickX < dimX && clickY >= 0 && clickY < dimY) {
+          queue.push({ x: clickX, y: clickY });
+          visited.add(`${clickX},${clickY}`);
+        }
+
+        while (queue.length > 0) {
+          const current = queue.shift();
+
+          if (
+            current.x < 0 ||
+            current.x >= dimX ||
+            current.y < 0 ||
+            current.y >= dimY
+          )
+            continue;
+
+          const currentTileId = layer.getTileId(current.x, current.y);
+          if (currentTileId !== targetTileId) continue;
+
+          editableTileMap.setTile(current.x, current.y, 0, newTileId);
+          editableTileMap.flipTileOnX(
+            current.x,
+            current.y,
+            0,
+            tileMapTileSelection.flipHorizontally
+          );
+          editableTileMap.flipTileOnY(
+            current.x,
+            current.y,
+            0,
+            tileMapTileSelection.flipVertically
+          );
+
+          // Add neighbors if not already visited
+          const neighbors = [
+            { x: current.x - 1, y: current.y },
+            { x: current.x + 1, y: current.y },
+            { x: current.x, y: current.y - 1 },
+            { x: current.x, y: current.y + 1 },
+          ];
+
+          for (const neighbor of neighbors) {
+            const key = `${neighbor.x},${neighbor.y}`;
+            if (!visited.has(key)) {
+              visited.add(key);
+              queue.push(neighbor);
+            }
+          }
+        }
+      } else if (getTileMapPaintingSelection(tileMapTileSelection)) {
+        const paintingSelection = getTileMapPaintingSelection(
+          tileMapTileSelection
+        );
+        if (!paintingSelection) return;
         shouldTrimAfterOperations = editableTileMap.isEmpty();
         // TODO: Optimize list execution to make sure the most important size changing operations are done first.
         let cumulatedUnshiftedRows = 0,
@@ -942,13 +1078,13 @@ export default class InstancesEditor extends Component<Props, State> {
                   newX,
                   newY,
                   0,
-                  tileMapTileSelection.flipHorizontally
+                  paintingSelection.flipHorizontally
                 );
                 editableTileMap.flipTileOnY(
                   newX,
                   newY,
                   0,
-                  tileMapTileSelection.flipVertically
+                  paintingSelection.flipVertically
                 );
 
                 cumulatedUnshiftedRows += rowsToUnshift;

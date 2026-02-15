@@ -84,6 +84,24 @@ export enum ProjectDiagnostic_ErrorType {
   MismatchedObjectType = 3,
 }
 
+export enum ExpressionParserError_ErrorType {
+  SyntaxError = 0,
+  InvalidOperator = 1,
+  MismatchedType = 2,
+  UndeclaredVariable = 3,
+  UnknownIdentifier = 4,
+  BracketsNotAllowedForObjects = 5,
+  TooFewParameters = 6,
+  TooManyParameters = 7,
+  InvalidFunctionName = 8,
+  MalformedVariableParameter = 9,
+  MalformedObjectParameter = 10,
+  UnknownParameterType = 11,
+  MissingBehavior = 12,
+  VariableNameCollision = 13,
+  DeprecatedExpression = 14,
+}
+
 export enum ExpressionCompletionDescription_CompletionKind {
   Object = 0,
   BehaviorWithPrefix = 1,
@@ -1436,6 +1454,7 @@ export class InstructionMetadata extends AbstractFunctionMetadata {
   getParameters(): ParameterMetadataContainer;
   getUsageComplexity(): number;
   isHidden(): boolean;
+  getDeprecationMessage(): string;
   isPrivate(): boolean;
   isAsync(): boolean;
   isOptionallyAsync(): boolean;
@@ -1484,6 +1503,8 @@ export class ExpressionMetadata extends AbstractFunctionMetadata {
   getHelpPath(): string;
   isShown(): boolean;
   isPrivate(): boolean;
+  isDeprecated(): boolean;
+  getDeprecationMessage(): string;
   isRelevantForLayoutEvents(): boolean;
   isRelevantForFunctionEvents(): boolean;
   isRelevantForAsynchronousFunctionEvents(): boolean;
@@ -1892,6 +1913,8 @@ export class RepeatEvent extends BaseEvent {
   getActions(): InstructionsList;
   setRepeatExpressionPlainString(expr: string): void;
   getRepeatExpression(): Expression;
+  getLoopIndexVariableName(): string;
+  setLoopIndexVariableName(name: string): void;
 }
 
 export class WhileEvent extends BaseEvent {
@@ -1899,6 +1922,8 @@ export class WhileEvent extends BaseEvent {
   getConditions(): InstructionsList;
   getWhileConditions(): InstructionsList;
   getActions(): InstructionsList;
+  getLoopIndexVariableName(): string;
+  setLoopIndexVariableName(name: string): void;
 }
 
 export class ForEachEvent extends BaseEvent {
@@ -1907,6 +1932,8 @@ export class ForEachEvent extends BaseEvent {
   getObjectToPick(): string;
   getConditions(): InstructionsList;
   getActions(): InstructionsList;
+  getLoopIndexVariableName(): string;
+  setLoopIndexVariableName(name: string): void;
 }
 
 export class ForEachChildVariableEvent extends BaseEvent {
@@ -1919,6 +1946,8 @@ export class ForEachChildVariableEvent extends BaseEvent {
   setIterableVariableName(newName: string): void;
   setKeyIteratorVariableName(newName: string): void;
   setValueIteratorVariableName(newName: string): void;
+  getLoopIndexVariableName(): string;
+  setLoopIndexVariableName(name: string): void;
 }
 
 export class CommentEvent extends BaseEvent {
@@ -2099,8 +2128,15 @@ export class BehaviorParameterFiller extends EmscriptenObject {
   static fillBehaviorParameters(platform: Platform, projectScopedContainers: ProjectScopedContainers, instructionMetadata: InstructionMetadata, instruction: Instruction): boolean;
 }
 
+export class ParameterValidationResult extends EmscriptenObject {
+  isValid(): boolean;
+  hasDeprecationWarning(): boolean;
+}
+
 export class InstructionValidator extends EmscriptenObject {
+  static validateParameter(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number, value: string): ParameterValidationResult;
   static isParameterValid(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number, value: string): boolean;
+  static hasDeprecationWarnings(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number, value: string): boolean;
 }
 
 export class ObjectTools extends EmscriptenObject {
@@ -2217,6 +2253,7 @@ export class WholeProjectDiagnosticReport extends EmscriptenObject {
 }
 
 export class ExpressionParserError extends EmscriptenObject {
+  getType(): ExpressionParserError_ErrorType;
   getMessage(): string;
   getStartPosition(): number;
   getEndPosition(): number;
@@ -2306,6 +2343,12 @@ export class EventsFunction extends EmscriptenObject {
   isPrivate(): boolean;
   setAsync(isAsync: boolean): EventsFunction;
   isAsync(): boolean;
+  setHelpUrl(helpUrl: string): EventsFunction;
+  getHelpUrl(): string;
+  setDeprecated(isDeprecated: boolean): EventsFunction;
+  isDeprecated(): boolean;
+  setDeprecationMessage(message: string): EventsFunction;
+  getDeprecationMessage(): string;
   isAction(): boolean;
   isExpression(): boolean;
   isCondition(): boolean;
@@ -2856,6 +2899,7 @@ export class SpineObjectConfiguration extends ObjectConfiguration {
   moveAnimation(oldIndex: number, newIndex: number): void;
   getScale(): number;
   getSpineResourceName(): string;
+  getSkinName(): string;
 }
 
 export class Vector2f extends EmscriptenObject {

@@ -8,10 +8,13 @@ import { CorsAwareImage } from '../UI/CorsAwareImage';
 import ResourcesLoader from '../ResourcesLoader';
 import Erase from '../UI/CustomSvgIcons/Erase';
 import Brush from '../UI/CustomSvgIcons/Brush';
+import Bucket from '../UI/CustomSvgIcons/Bucket';
+import Rectangle from '../UI/CustomSvgIcons/Rectangle';
 import IconButton from '../UI/IconButton';
 import { LineStackLayout } from '../UI/Layout';
 import FlipHorizontal from '../UI/CustomSvgIcons/FlipHorizontal';
 import FlipVertical from '../UI/CustomSvgIcons/FlipVertical';
+import Picker from '../UI/CustomSvgIcons/Picker';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { useLongTouch, type ClientCoordinates } from '../Utils/UseLongTouch';
 import Text from '../UI/Text';
@@ -190,11 +193,7 @@ const Tile = ({
   );
 };
 
-export type TileMapTileSelection =
-  | {|
-      kind: 'multiple',
-      coordinates: TileMapCoordinates[],
-    |}
+export type TileMapPaintingSelection =
   | {|
       kind: 'rectangle',
       coordinates: TileMapCoordinates[],
@@ -202,8 +201,75 @@ export type TileMapTileSelection =
       flipVertically: boolean,
     |}
   | {|
+      kind: 'freehand',
+      coordinates: TileMapCoordinates[],
+      flipHorizontally: boolean,
+      flipVertically: boolean,
+    |}
+  | {|
+      kind: 'floodfill',
+      coordinates: TileMapCoordinates[],
+      flipHorizontally: boolean,
+      flipVertically: boolean,
+    |};
+
+export type TileMapTileSelection =
+  | {|
+      kind: 'multiple',
+      coordinates: TileMapCoordinates[],
+    |}
+  | TileMapPaintingSelection
+  | {|
+      kind: 'picker',
+    |}
+  | {|
       kind: 'erase',
     |};
+
+export const getTileMapPaintingSelection = (
+  selection: ?TileMapTileSelection
+): ?TileMapPaintingSelection => {
+  if (!selection) return null;
+  if (
+    selection.kind === 'rectangle' ||
+    selection.kind === 'freehand' ||
+    selection.kind === 'floodfill'
+  ) {
+    return selection;
+  }
+  return null;
+};
+
+export const isTileMapPaintingSelection = (
+  selection: TileMapTileSelection
+): boolean => !!getTileMapPaintingSelection(selection);
+
+/**
+ * Creates a tile selection with the picked tile coordinates,
+ * restoring the previous tool's settings if available.
+ * Falls back to rectangle tool with provided default flip settings.
+ */
+export const createSelectionWithPreviousTool = (
+  previousTool: ?TileMapTileSelection,
+  coordinates: TileMapCoordinates[],
+  defaultFlips: {| horizontal: boolean, vertical: boolean |}
+): TileMapTileSelection => {
+  const previousPaintingTool = getTileMapPaintingSelection(previousTool);
+  const kind = previousPaintingTool ? previousPaintingTool.kind : 'rectangle';
+  const flipHorizontally = previousPaintingTool
+    ? previousPaintingTool.flipHorizontally
+    : defaultFlips.horizontal;
+  const flipVertically = previousPaintingTool
+    ? previousPaintingTool.flipVertically
+    : defaultFlips.vertical;
+
+  return {
+    kind: (kind: any),
+    coordinates,
+    flipHorizontally,
+    flipVertically,
+  };
+};
 
 type Props = {|
   project: gdProject,
@@ -254,6 +320,11 @@ const TileSetVisualizer = ({
     lastSelection,
     setLastSelection,
   ] = React.useState<?TileMapTileSelection>(null);
+  const previousToolRef = React.useRef<?TileMapTileSelection>(null);
+  const tileMapPaintingSelection = getTileMapPaintingSelection(
+    tileMapTileSelection
+  );
+  const lastPaintingSelection = getTileMapPaintingSelection(lastSelection);
   const tilesetContainerRef = React.useRef<?HTMLDivElement>(null);
   const tilesetAndTooltipContainerRef = React.useRef<?HTMLDivElement>(null);
   const [tooltipContent, setTooltipContent] = React.useState<?{|
@@ -482,6 +553,28 @@ const TileSetVisualizer = ({
           rowCount,
           displayedTileSize,
         });
+
+        // Handle picker tool
+        if (
+          tileMapTileSelection &&
+          tileMapTileSelection.kind === 'picker' &&
+          startX === x &&
+          startY === y
+        ) {
+          // Select the clicked tile and restore the previous tool
+          const newSelection = createSelectionWithPreviousTool(
+            previousToolRef.current,
+            [{ x, y }, { x, y }],
+            {
+              horizontal: shouldFlipHorizontally,
+              vertical: shouldFlipVertically,
+            }
+          );
+          onSelectTileMapTile(newSelection);
+          previousToolRef.current = null;
+          return;
+        }
+
         if (allowMultipleSelection) {
           const newSelection =
             tileMapTileSelection && tileMapTileSelection.kind === 'multiple'
@@ -519,35 +612,40 @@ const TileSetVisualizer = ({
           }
           onSelectTileMapTile(newSelection);
         } else if (allowRectangleSelection) {
-          const shouldRemoveSelection =
+          // Update the selection to the clicked tile
+          const topLeftCorner = {
+            x: Math.min(startX, x),
+            y: Math.min(startY, y),
+          };
+          const bottomRightCorner = {
+            x: Math.max(startX, x),
+            y: Math.max(startY, y),
+          };
+          // Preserve the previous selection kind (freehand/floodfill) or default to rectangle
+          let newSelection: TileMapTileSelection;
+          if (
             tileMapTileSelection &&
-            tileMapTileSelection.kind === 'rectangle' &&
-            startX === x &&
-            startY === y &&
-            x <= tileMapTileSelection.coordinates[1].x &&
-            x >= tileMapTileSelection.coordinates[0].x &&
-            y <= tileMapTileSelection.coordinates[1].y &&
-            y >= tileMapTileSelection.coordinates[0].y;
-          if (shouldRemoveSelection) {
-            // Remove selection when user selects a single tile in the current tile selection.
-            onSelectTileMapTile(null);
+            (tileMapTileSelection.kind === 'freehand' ||
+              tileMapTileSelection.kind === 'floodfill')
+          ) {
+            newSelection = ({
+              kind: (tileMapTileSelection.kind: any),
+              coordinates: ([
+                topLeftCorner,
+                bottomRightCorner,
+              ]: TileMapCoordinates[]),
+              flipHorizontally: shouldFlipHorizontally,
+              flipVertically: shouldFlipVertically,
+            }: TileMapTileSelection);
           } else {
-            const topLeftCorner = {
-              x: Math.min(startX, x),
-              y: Math.min(startY, y),
-            };
-            const bottomRightCorner = {
-              x: Math.max(startX, x),
-              y: Math.max(startY, y),
-            };
-            const newSelection = {
+            newSelection = {
               kind: 'rectangle',
               coordinates: [topLeftCorner, bottomRightCorner],
               flipHorizontally: shouldFlipHorizontally,
               flipVertically: shouldFlipVertically,
             };
-            onSelectTileMapTile(newSelection);
           }
+          onSelectTileMapTile(newSelection);
         }
       } finally {
         startCoordinatesRef.current = null;
@@ -571,11 +669,11 @@ const TileSetVisualizer = ({
 
   React.useEffect(
     () => {
-      if (tileMapTileSelection && tileMapTileSelection.kind === 'rectangle') {
-        setLastSelection(tileMapTileSelection);
+      if (tileMapPaintingSelection) {
+        setLastSelection(tileMapPaintingSelection);
       }
     },
-    [tileMapTileSelection]
+    [tileMapPaintingSelection]
   );
 
   const onHoverAtlas = React.useCallback(
@@ -671,11 +769,39 @@ const TileSetVisualizer = ({
       {showPaintingToolbar && (
         <>
           <Line justifyContent="space-between" noMargin>
-            <LineStackLayout alignItems="center" noMargin>
+            <LineStackLayout alignItems="left" noMargin>
               <IconButton
-                id="paintBrush"
+                id="freehandBrush"
                 size="small"
-                tooltip={t`Paint`}
+                tooltip={t`Freehand brush`}
+                selected={
+                  !!tileMapTileSelection &&
+                  tileMapTileSelection.kind === 'freehand'
+                }
+                onClick={e => {
+                  if (
+                    !!tileMapTileSelection &&
+                    tileMapTileSelection.kind === 'freehand'
+                  )
+                    onSelectTileMapTile(null);
+                  else
+                    onSelectTileMapTile({
+                      kind: 'freehand',
+                      coordinates: lastPaintingSelection
+                        ? lastPaintingSelection.coordinates
+                        : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
+                      flipHorizontally: shouldFlipHorizontally,
+                      flipVertically: shouldFlipVertically,
+                    });
+                }}
+                disabled={!isAtlasImageSet}
+              >
+                <Brush style={styles.icon} />
+              </IconButton>
+              <IconButton
+                id="rectanglePaint"
+                size="small"
+                tooltip={t`Rectangle paint`}
                 selected={
                   !!tileMapTileSelection &&
                   tileMapTileSelection.kind === 'rectangle'
@@ -688,37 +814,117 @@ const TileSetVisualizer = ({
                     onSelectTileMapTile(null);
                   else
                     onSelectTileMapTile(
-                      lastSelection || {
-                        kind: 'rectangle',
-                        coordinates: [{ x: 0, y: 0 }, { x: 0, y: 0 }],
-                        flipHorizontally: shouldFlipHorizontally,
-                        flipVertically: shouldFlipVertically,
-                      }
+                      lastSelection && lastSelection.kind === 'rectangle'
+                        ? lastSelection
+                        : {
+                            kind: 'rectangle',
+                            coordinates: lastPaintingSelection
+                              ? lastPaintingSelection.coordinates
+                              : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
+                            flipHorizontally: shouldFlipHorizontally,
+                            flipVertically: shouldFlipVertically,
+                          }
                     );
                 }}
                 disabled={!isAtlasImageSet}
               >
-                <Brush style={styles.icon} />
+                <Rectangle style={styles.icon} />
               </IconButton>
+              <IconButton
+                id="fillBucket"
+                size="small"
+                tooltip={t`Fill bucket`}
+                selected={
+                  !!tileMapTileSelection &&
+                  tileMapTileSelection.kind === 'floodfill'
+                }
+                onClick={e => {
+                  if (
+                    !!tileMapTileSelection &&
+                    tileMapTileSelection.kind === 'floodfill'
+                  )
+                    onSelectTileMapTile(null);
+                  else
+                    onSelectTileMapTile({
+                      kind: 'floodfill',
+                      coordinates: lastPaintingSelection
+                        ? lastPaintingSelection.coordinates
+                        : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
+                      flipHorizontally: shouldFlipHorizontally,
+                      flipVertically: shouldFlipVertically,
+                    });
+                }}
+                disabled={!isAtlasImageSet}
+              >
+                <Bucket style={styles.icon} />
+              </IconButton>
+              <IconButton
+                id="tilePicker"
+                size="small"
+                tooltip={t`Tile picker`}
+                selected={
+                  !!tileMapTileSelection &&
+                  tileMapTileSelection.kind === 'picker'
+                }
+                onClick={e => {
+                  if (
+                    !!tileMapTileSelection &&
+                    tileMapTileSelection.kind === 'picker'
+                  ) {
+                    onSelectTileMapTile(null);
+                    previousToolRef.current = null;
+                  } else {
+                    // Store the current selection before switching to picker
+                    previousToolRef.current = tileMapTileSelection;
+                    onSelectTileMapTile({ kind: 'picker' });
+                  }
+                }}
+                disabled={!isAtlasImageSet}
+              >
+                <Picker style={styles.icon} />
+              </IconButton>
+              <IconButton
+                id="eraseBrush"
+                size="small"
+                tooltip={t`Erase`}
+                selected={
+                  !!tileMapTileSelection &&
+                  tileMapTileSelection.kind === 'erase'
+                }
+                onClick={e => {
+                  if (
+                    !!tileMapTileSelection &&
+                    tileMapTileSelection.kind === 'erase'
+                  )
+                    onSelectTileMapTile(null);
+                  else onSelectTileMapTile({ kind: 'erase' });
+                }}
+              >
+                <Erase style={styles.icon} />
+              </IconButton>
+            </LineStackLayout>
+            <LineStackLayout alignItems="right" noMargin>
               <IconButton
                 id="horizontalFlip"
                 size="small"
                 tooltip={t`Horizontal flip`}
                 selected={shouldFlipHorizontally}
                 disabled={
-                  !tileMapTileSelection || tileMapTileSelection.kind === 'erase'
+                  !tileMapTileSelection ||
+                  tileMapTileSelection.kind === 'erase' ||
+                  tileMapTileSelection.kind === 'picker'
                 }
                 onClick={e => {
                   const newShouldFlipHorizontally = !shouldFlipHorizontally;
                   setShouldFlipHorizontally(newShouldFlipHorizontally);
-                  if (
-                    !!tileMapTileSelection &&
-                    tileMapTileSelection.kind === 'rectangle'
-                  ) {
-                    onSelectTileMapTile({
-                      ...tileMapTileSelection,
+                  if (tileMapPaintingSelection) {
+                    const selection: TileMapTileSelection = {
+                      kind: (tileMapPaintingSelection.kind: any),
+                      coordinates: (tileMapPaintingSelection.coordinates: TileMapCoordinates[]),
                       flipHorizontally: newShouldFlipHorizontally,
-                    });
+                      flipVertically: tileMapPaintingSelection.flipVertically,
+                    };
+                    onSelectTileMapTile(selection);
                   }
                 }}
               >
@@ -730,43 +936,28 @@ const TileSetVisualizer = ({
                 tooltip={t`Vertical flip`}
                 selected={shouldFlipVertically}
                 disabled={
-                  !tileMapTileSelection || tileMapTileSelection.kind === 'erase'
+                  !tileMapTileSelection ||
+                  tileMapTileSelection.kind === 'erase' ||
+                  tileMapTileSelection.kind === 'picker'
                 }
                 onClick={e => {
                   const newShouldFlipVertically = !shouldFlipVertically;
                   setShouldFlipVertically(newShouldFlipVertically);
-                  if (
-                    !!tileMapTileSelection &&
-                    tileMapTileSelection.kind === 'rectangle'
-                  ) {
-                    onSelectTileMapTile({
-                      ...tileMapTileSelection,
+                  if (tileMapPaintingSelection) {
+                    const selection: TileMapTileSelection = {
+                      kind: (tileMapPaintingSelection.kind: any),
+                      coordinates: (tileMapPaintingSelection.coordinates: TileMapCoordinates[]),
+                      flipHorizontally:
+                        tileMapPaintingSelection.flipHorizontally,
                       flipVertically: newShouldFlipVertically,
-                    });
+                    };
+                    onSelectTileMapTile(selection);
                   }
                 }}
               >
                 <FlipVertical style={styles.icon} />
               </IconButton>
             </LineStackLayout>
-            <IconButton
-              id="eraseBrush"
-              size="small"
-              tooltip={t`Erase`}
-              selected={
-                !!tileMapTileSelection && tileMapTileSelection.kind === 'erase'
-              }
-              onClick={e => {
-                if (
-                  !!tileMapTileSelection &&
-                  tileMapTileSelection.kind === 'erase'
-                )
-                  onSelectTileMapTile(null);
-                else onSelectTileMapTile({ kind: 'erase' });
-              }}
-            >
-              <Erase style={styles.icon} />
-            </IconButton>
           </Line>
           <Spacer />
         </>
@@ -805,27 +996,25 @@ const TileSetVisualizer = ({
                   y={hoveredTile.y}
                 />
               )}
-              {tileMapTileSelection &&
-                tileMapTileSelection.kind === 'rectangle' &&
-                displayedTileSize && (
-                  <Tile
-                    key={`selected-tile`}
-                    highlighted
-                    size={displayedTileSize}
-                    x={tileMapTileSelection.coordinates[0].x}
-                    y={tileMapTileSelection.coordinates[0].y}
-                    width={
-                      tileMapTileSelection.coordinates[1].x -
-                      tileMapTileSelection.coordinates[0].x +
-                      1
-                    }
-                    height={
-                      tileMapTileSelection.coordinates[1].y -
-                      tileMapTileSelection.coordinates[0].y +
-                      1
-                    }
-                  />
-                )}
+              {tileMapPaintingSelection && displayedTileSize && (
+                <Tile
+                  key={`selected-tile`}
+                  highlighted
+                  size={displayedTileSize}
+                  x={tileMapPaintingSelection.coordinates[0].x}
+                  y={tileMapPaintingSelection.coordinates[0].y}
+                  width={
+                    tileMapPaintingSelection.coordinates[1].x -
+                    tileMapPaintingSelection.coordinates[0].x +
+                    1
+                  }
+                  height={
+                    tileMapPaintingSelection.coordinates[1].y -
+                    tileMapPaintingSelection.coordinates[0].y +
+                    1
+                  }
+                />
+              )}
               {tileMapTileSelection &&
                 tileMapTileSelection.kind === 'multiple' &&
                 displayedTileSize &&

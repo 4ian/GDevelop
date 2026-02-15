@@ -32,6 +32,7 @@ namespace gdjs {
     material: THREE.Material
   ): THREE.MeshBasicMaterial => {
     const basicMaterial = new THREE.MeshBasicMaterial();
+    basicMaterial.name = material.name;
     //@ts-ignore
     if (material.color) {
       //@ts-ignore

@@ -17,8 +17,11 @@ export const instructionParameter = 'instruction-parameter';
 export const instructionInvalidParameter = 'instruction-invalid-parameter';
 export const elseTextContainer = 'else-text-container';
 export const invalidElse = 'invalid-else';
+export const eventLabel = 'event-label';
 export const instructionMissingParameter = 'instruction-missing-parameter';
 export const instructionWarningParameter = 'instruction-warning-parameter';
+export const instructionDeprecatedParameter =
+  'instruction-deprecated-parameter';
 export const disabledText = 'disabled-text';
 
 export const background = 'background';

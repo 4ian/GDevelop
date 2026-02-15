@@ -1,3 +1,4 @@
+// @flow
 import { type SortableTreeNode } from './SortableEventsTree';
 
 export type MoveFunctionArguments = {
@@ -27,10 +28,11 @@ export const moveNodeAsSubEvent = ({
   targetNode,
   node,
 }: MoveFunctionArguments) => {
-  if (!targetNode.event || !node.event) return;
+  const event = node.event;
+  if (!targetNode.event || !event) return;
   moveEventToEventsList({
     targetEventsList: targetNode.event.getSubEvents(),
-    movingEvent: node.event,
+    movingEvent: event,
     initialEventsList: node.eventsList,
     toIndex: 0,
   });
@@ -104,5 +106,39 @@ export const getNodeAtPath = (
   return getNodeAtPath(
     path.slice(0, -1),
     treeData[path[path.length - 1]].children
+  );
+};
+
+/**
+ * Returns the index of the previous non-disabled, executable event
+ * in the list, or -1 if none is found.
+ */
+export const getPreviousExecutableEventIndex = (
+  eventsList: gdEventsList,
+  eventIndex: number
+): number => {
+  const startIndex = Math.min(eventIndex - 1, eventsList.getEventsCount() - 1);
+  for (let j = startIndex; j >= 0; j--) {
+    const previousEvent = eventsList.getEventAt(j);
+    if (!previousEvent.isDisabled() && previousEvent.isExecutable()) {
+      return j;
+    }
+  }
+  return -1;
+};
+
+export const isElseEventValid = (
+  eventsList: gdEventsList,
+  elseEventIndex: number
+): boolean => {
+  const previousIndex = getPreviousExecutableEventIndex(
+    eventsList,
+    elseEventIndex
+  );
+  if (previousIndex === -1) return false;
+  const previousEventType = eventsList.getEventAt(previousIndex).getType();
+  return (
+    previousEventType === 'BuiltinCommonInstructions::Standard' ||
+    previousEventType === 'BuiltinCommonInstructions::Else'
   );
 };

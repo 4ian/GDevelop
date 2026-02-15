@@ -209,7 +209,10 @@ export type PreferencesValues = {|
   showExperimentalExtensions: boolean,
   showCreateSectionByDefault: boolean,
   showInAppTutorialDeveloperMode: boolean,
-  showDeprecatedInstructionWarning: boolean,
+  showDeprecatedInstructionWarning:
+    | 'no'
+    | 'icon'
+    | 'icon-and-deprecated-warning-text',
   openDiagnosticReportAutomatically: boolean,
   blockPreviewAndExportOnDiagnosticErrors: boolean,
   use3DEditor: boolean,
@@ -312,8 +315,13 @@ export type Preferences = {|
   getOpenDiagnosticReportAutomatically: () => boolean,
   setBlockPreviewAndExportOnDiagnosticErrors: (enabled: boolean) => void,
   getBlockPreviewAndExportOnDiagnosticErrors: () => boolean,
-  setShowDeprecatedInstructionWarning: (enabled: boolean) => void,
-  getShowDeprecatedInstructionWarning: () => boolean,
+  setShowDeprecatedInstructionWarning: (
+    value: 'no' | 'icon' | 'icon-and-deprecated-warning-text'
+  ) => void,
+  getShowDeprecatedInstructionWarning: () =>
+    | 'no'
+    | 'icon'
+    | 'icon-and-deprecated-warning-text',
   setUse3DEditor: (enabled: boolean) => void,
   getUse3DEditor: () => boolean,
   setShowBasicProfilingCounters: (enabled: boolean) => void,
@@ -398,7 +406,7 @@ export const initialPreferences = {
     showInAppTutorialDeveloperMode: false,
     openDiagnosticReportAutomatically: true,
     blockPreviewAndExportOnDiagnosticErrors: false,
-    showDeprecatedInstructionWarning: false,
+    showDeprecatedInstructionWarning: 'no',
     use3DEditor: isWebGLSupported(),
     showBasicProfilingCounters: false,
     inAppTutorialsProgress: {},
@@ -472,12 +480,14 @@ export const initialPreferences = {
   setShowExperimentalExtensions: () => {},
   setShowCreateSectionByDefault: (enabled: boolean) => {},
   setShowInAppTutorialDeveloperMode: (enabled: boolean) => {},
-  setShowDeprecatedInstructionWarning: (enabled: boolean) => {},
+  setShowDeprecatedInstructionWarning: (
+    value: 'no' | 'icon' | 'icon-and-deprecated-warning-text'
+  ) => {},
   getOpenDiagnosticReportAutomatically: () => true,
   setOpenDiagnosticReportAutomatically: (enabled: boolean) => {},
   getBlockPreviewAndExportOnDiagnosticErrors: () => false,
   setBlockPreviewAndExportOnDiagnosticErrors: (enabled: boolean) => {},
-  getShowDeprecatedInstructionWarning: () => false,
+  getShowDeprecatedInstructionWarning: () => 'no',
   setUse3DEditor: (enabled: boolean) => {},
   getUse3DEditor: () => false,
   setShowBasicProfilingCounters: (enabled: boolean) => {},

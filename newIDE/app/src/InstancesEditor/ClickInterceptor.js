@@ -151,7 +151,42 @@ class ClickInterceptor {
       deviceY
     );
 
-    if (pointerPathCoordinates[1]) {
+    const tileMapTileSelection = this.getTileMapTileSelection();
+
+    // For floodfill and picker, keep only a single coordinate (no drag path).
+    if (
+      tileMapTileSelection &&
+      (tileMapTileSelection.kind === 'floodfill' ||
+        tileMapTileSelection.kind === 'picker')
+    ) {
+      pointerPathCoordinates[0] = {
+        x: sceneCoordinates[0],
+        y: sceneCoordinates[1],
+      };
+      return;
+    }
+
+    if (tileMapTileSelection && tileMapTileSelection.kind === 'freehand') {
+      const lastPoint =
+        pointerPathCoordinates[pointerPathCoordinates.length - 1];
+      if (lastPoint) {
+        // Prevent near-duplicate points within minimum distance
+        const MIN_DISTANCE = 2; // pixels
+        const dx = sceneCoordinates[0] - lastPoint.x;
+        const dy = sceneCoordinates[1] - lastPoint.y;
+        if (Math.abs(dx) < MIN_DISTANCE && Math.abs(dy) < MIN_DISTANCE) {
+          return;
+        }
+      }
+      // Limit path points to prevent excessive memory usage
+      const MAX_PATH_POINTS = 10000;
+      if (pointerPathCoordinates.length < MAX_PATH_POINTS) {
+        pointerPathCoordinates.push({
+          x: sceneCoordinates[0],
+          y: sceneCoordinates[1],
+        });
+      }
+    } else if (pointerPathCoordinates[1]) {
       pointerPathCoordinates[1] = {
         x: sceneCoordinates[0],
         y: sceneCoordinates[1],

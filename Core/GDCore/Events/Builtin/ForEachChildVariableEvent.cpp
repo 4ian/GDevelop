@@ -13,7 +13,11 @@ using namespace std;
 namespace gd {
 
 ForEachChildVariableEvent::ForEachChildVariableEvent()
-    : BaseEvent(), valueIteratorVariableName("child"), keyIteratorVariableName(""), iterableVariableName("") {}
+    : BaseEvent(),
+      valueIteratorVariableName("child"),
+      keyIteratorVariableName(""),
+      iterableVariableName(""),
+      variables(gd::VariablesContainer::SourceType::Local) {}
 
 vector<gd::InstructionsList*> ForEachChildVariableEvent::GetAllConditionsVectors() {
   vector<gd::InstructionsList*> allConditions;
@@ -88,6 +92,12 @@ void ForEachChildVariableEvent::SerializeTo(SerializerElement& element) const {
   if (!events.IsEmpty())
     gd::EventsListSerialization::SerializeEventsTo(events,
                                                   element.AddChild("events"));
+  if (HasVariables()) {
+    variables.SerializeTo(element.AddChild("variables"));
+  }
+  if (!loopIndexVariableName.empty()) {
+    element.AddChild("loopIndexVariable").SetStringValue(loopIndexVariableName);
+  }
 }
 
 void ForEachChildVariableEvent::UnserializeFrom(gd::Project& project,
@@ -105,6 +115,16 @@ void ForEachChildVariableEvent::UnserializeFrom(gd::Project& project,
     gd::EventsListSerialization::UnserializeEventsFrom(
         project, events, element.GetChild("events", 0, "Events"));
   }
+
+  variables.Clear();
+  if (element.HasChild("variables")) {
+    variables.UnserializeFrom(element.GetChild("variables"));
+  }
+
+  loopIndexVariableName =
+      element.HasChild("loopIndexVariable")
+          ? element.GetChild("loopIndexVariable").GetStringValue()
+          : "";
 }
 
 }  // namespace gd

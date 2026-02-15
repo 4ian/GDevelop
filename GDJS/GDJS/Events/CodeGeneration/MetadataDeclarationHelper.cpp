@@ -535,6 +535,9 @@ MetadataDeclarationHelper::DeclareExpressionMetadata(
     expressionAndCondition.AddCodeOnlyParameter("currentScene", "");
     DeclareEventsFunctionParameters(freeEventsFunctions, eventsFunction,
                                     expressionAndCondition, 0);
+    if (!eventsFunction.GetHelpUrl().empty()) {
+      expressionAndCondition.SetHelpPath(eventsFunction.GetHelpUrl());
+    }
     expressionAndConditions.push_back(expressionAndCondition);
     return expressionAndConditions.back();
   } else {
@@ -542,13 +545,13 @@ MetadataDeclarationHelper::DeclareExpressionMetadata(
         eventsFunction.GetExpressionType().IsNumber()
             ? extension.AddExpression(
                   eventsFunction.GetName(),
-                  GetFullName(eventsFunction),
+                  MetadataDeclarationHelper::GetFullName(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
                   eventsFunction.GetGroup(), GetExtensionIconUrl(extension))
             : extension.AddStrExpression(
                   eventsFunction.GetName(),
-                  GetFullName(eventsFunction),
+                  MetadataDeclarationHelper::GetFullName(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
                   eventsFunction.GetGroup(), GetExtensionIconUrl(extension));
@@ -556,6 +559,9 @@ MetadataDeclarationHelper::DeclareExpressionMetadata(
     expression.AddCodeOnlyParameter("currentScene", "");
     DeclareEventsFunctionParameters(freeEventsFunctions, eventsFunction,
                                     expression, 0);
+    if (!eventsFunction.GetHelpUrl().empty()) {
+      expression.SetHelpPath(eventsFunction.GetHelpUrl());
+    }
     return expression;
   }
 }
@@ -581,6 +587,9 @@ gd::InstructionMetadata &MetadataDeclarationHelper::DeclareInstructionMetadata(
     condition.AddCodeOnlyParameter("currentScene", "");
     DeclareEventsFunctionParameters(freeEventsFunctions, eventsFunction,
                                     condition, 0);
+    if (!eventsFunction.GetHelpUrl().empty()) {
+      condition.SetHelpPath(eventsFunction.GetHelpUrl());
+    }
     return condition;
   } else if (functionType == gd::EventsFunction::ActionWithOperator) {
     if (freeEventsFunctions.HasEventsFunctionNamed(
@@ -607,6 +616,9 @@ gd::InstructionMetadata &MetadataDeclarationHelper::DeclareInstructionMetadata(
       action.AddCodeOnlyParameter("currentScene", "");
       DeclareEventsFunctionParameters(freeEventsFunctions, eventsFunction,
                                       action, 0);
+      if (!eventsFunction.GetHelpUrl().empty()) {
+        action.SetHelpPath(eventsFunction.GetHelpUrl());
+      }
       return action;
     } else {
 
@@ -621,6 +633,9 @@ gd::InstructionMetadata &MetadataDeclarationHelper::DeclareInstructionMetadata(
       action.AddCodeOnlyParameter("currentScene", "");
       DeclareEventsFunctionParameters(freeEventsFunctions, eventsFunction,
                                       action, 0);
+      if (!eventsFunction.GetHelpUrl().empty()) {
+        action.SetHelpPath(eventsFunction.GetHelpUrl());
+      }
       return action;
     }
   } else {
@@ -634,6 +649,9 @@ gd::InstructionMetadata &MetadataDeclarationHelper::DeclareInstructionMetadata(
     action.AddCodeOnlyParameter("currentScene", "");
     DeclareEventsFunctionParameters(freeEventsFunctions, eventsFunction,
                                     action, 0);
+    if (!eventsFunction.GetHelpUrl().empty()) {
+      action.SetHelpPath(eventsFunction.GetHelpUrl());
+    }
     return action;
   }
 }
@@ -726,6 +744,9 @@ MetadataDeclarationHelper::DeclareBehaviorExpressionMetadata(
         GetExtensionIconUrl(extension));
     DeclareEventsFunctionParameters(eventsBasedBehavior.GetEventsFunctions(),
                                     eventsFunction, expressionAndCondition, 2);
+    if (!eventsFunction.GetHelpUrl().empty()) {
+      expressionAndCondition.SetHelpPath(eventsFunction.GetHelpUrl());
+    }
     expressionAndConditions.push_back(expressionAndCondition);
     return expressionAndConditions.back();
   } else {
@@ -733,7 +754,7 @@ MetadataDeclarationHelper::DeclareBehaviorExpressionMetadata(
         (eventsFunction.GetExpressionType().IsNumber())
             ? behaviorMetadata.AddExpression(
                   eventsFunction.GetName(),
-                  GetFullName(eventsFunction),
+                  MetadataDeclarationHelper::GetFullName(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
                   eventsFunction.GetGroup() ||
@@ -742,7 +763,7 @@ MetadataDeclarationHelper::DeclareBehaviorExpressionMetadata(
                   GetExtensionIconUrl(extension))
             : behaviorMetadata.AddStrExpression(
                   eventsFunction.GetName(),
-                  GetFullName(eventsFunction),
+                  MetadataDeclarationHelper::GetFullName(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
                   eventsFunction.GetGroup() ||
@@ -751,6 +772,9 @@ MetadataDeclarationHelper::DeclareBehaviorExpressionMetadata(
                   GetExtensionIconUrl(extension));
     DeclareEventsFunctionParameters(eventsBasedBehavior.GetEventsFunctions(),
                                     eventsFunction, expression, 2);
+    if (!eventsFunction.GetHelpUrl().empty()) {
+      expression.SetHelpPath(eventsFunction.GetHelpUrl());
+    }
     return expression;
   }
 }
@@ -779,6 +803,9 @@ MetadataDeclarationHelper::DeclareBehaviorInstructionMetadata(
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     DeclareEventsFunctionParameters(eventsBasedBehavior.GetEventsFunctions(),
                                     eventsFunction, condition, 2);
+    if (!eventsFunction.GetHelpUrl().empty()) {
+      condition.SetHelpPath(eventsFunction.GetHelpUrl());
+    }
     return condition;
   } else if (functionType == gd::EventsFunction::ActionWithOperator) {
     auto &eventsFunctionsContainer = eventsBasedBehavior.GetEventsFunctions();
@@ -804,6 +831,9 @@ MetadataDeclarationHelper::DeclareBehaviorInstructionMetadata(
 
       DeclareEventsFunctionParameters(eventsBasedBehavior.GetEventsFunctions(),
                                       eventsFunction, action, 2);
+      if (!eventsFunction.GetHelpUrl().empty()) {
+        action.SetHelpPath(eventsFunction.GetHelpUrl());
+      }
       return action;
     } else {
       auto &action = behaviorMetadata.AddScopedAction(
@@ -817,6 +847,9 @@ MetadataDeclarationHelper::DeclareBehaviorInstructionMetadata(
 
       DeclareEventsFunctionParameters(eventsBasedBehavior.GetEventsFunctions(),
                                       eventsFunction, action, 2);
+      if (!eventsFunction.GetHelpUrl().empty()) {
+        action.SetHelpPath(eventsFunction.GetHelpUrl());
+      }
       return action;
     }
   } else {
@@ -834,6 +867,9 @@ MetadataDeclarationHelper::DeclareBehaviorInstructionMetadata(
 
     DeclareEventsFunctionParameters(eventsBasedBehavior.GetEventsFunctions(),
                                     eventsFunction, action, 2);
+    if (!eventsFunction.GetHelpUrl().empty()) {
+      action.SetHelpPath(eventsFunction.GetHelpUrl());
+    }
     return action;
   }
 }
@@ -900,6 +936,9 @@ MetadataDeclarationHelper::DeclareObjectExpressionMetadata(
 
     DeclareEventsFunctionParameters(eventsBasedObject.GetEventsFunctions(),
                                     eventsFunction, expressionAndCondition, 1);
+    if (!eventsFunction.GetHelpUrl().empty()) {
+      expressionAndCondition.SetHelpPath(eventsFunction.GetHelpUrl());
+    }
     expressionAndConditions.push_back(expressionAndCondition);
     return expressionAndConditions.back();
   } else {
@@ -907,7 +946,7 @@ MetadataDeclarationHelper::DeclareObjectExpressionMetadata(
         (eventsFunction.GetExpressionType().IsNumber())
             ? objectMetadata.AddExpression(
                   eventsFunction.GetName(),
-                  GetFullName(eventsFunction),
+                  MetadataDeclarationHelper::GetFullName(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
                   eventsFunction.GetGroup() ||
@@ -916,7 +955,7 @@ MetadataDeclarationHelper::DeclareObjectExpressionMetadata(
                   GetExtensionIconUrl(extension))
             : objectMetadata.AddStrExpression(
                   eventsFunction.GetName(),
-                  GetFullName(eventsFunction),
+                  MetadataDeclarationHelper::GetFullName(eventsFunction),
                   eventsFunction.GetDescription() ||
                       GetFullName(eventsFunction),
                   eventsFunction.GetGroup() ||
@@ -926,6 +965,9 @@ MetadataDeclarationHelper::DeclareObjectExpressionMetadata(
 
     DeclareEventsFunctionParameters(eventsBasedObject.GetEventsFunctions(),
                                     eventsFunction, expression, 1);
+    if (!eventsFunction.GetHelpUrl().empty()) {
+      expression.SetHelpPath(eventsFunction.GetHelpUrl());
+    }
     return expression;
   }
 }
@@ -955,6 +997,9 @@ MetadataDeclarationHelper::DeclareObjectInstructionMetadata(
 
     DeclareEventsFunctionParameters(eventsBasedObject.GetEventsFunctions(),
                                     eventsFunction, condition, 1);
+    if (!eventsFunction.GetHelpUrl().empty()) {
+      condition.SetHelpPath(eventsFunction.GetHelpUrl());
+    }
     return condition;
   } else if (functionType == gd::EventsFunction::ActionWithOperator) {
     auto &eventsFunctionsContainer = eventsBasedObject.GetEventsFunctions();
@@ -979,6 +1024,9 @@ MetadataDeclarationHelper::DeclareObjectInstructionMetadata(
 
       DeclareEventsFunctionParameters(eventsBasedObject.GetEventsFunctions(),
                                       eventsFunction, action, 1);
+      if (!eventsFunction.GetHelpUrl().empty()) {
+        action.SetHelpPath(eventsFunction.GetHelpUrl());
+      }
       return action;
     } else {
       auto &action = objectMetadata.AddScopedAction(
@@ -991,6 +1039,9 @@ MetadataDeclarationHelper::DeclareObjectInstructionMetadata(
 
       DeclareEventsFunctionParameters(eventsBasedObject.GetEventsFunctions(),
                                       eventsFunction, action, 1);
+      if (!eventsFunction.GetHelpUrl().empty()) {
+        action.SetHelpPath(eventsFunction.GetHelpUrl());
+      }
       return action;
     }
   } else {
@@ -1008,6 +1059,9 @@ MetadataDeclarationHelper::DeclareObjectInstructionMetadata(
 
     DeclareEventsFunctionParameters(eventsBasedObject.GetEventsFunctions(),
                                     eventsFunction, action, 1);
+    if (!eventsFunction.GetHelpUrl().empty()) {
+      action.SetHelpPath(eventsFunction.GetHelpUrl());
+    }
     return action;
   }
 }
@@ -1557,6 +1611,12 @@ MetadataDeclarationHelper::GenerateFreeFunctionMetadata(
   if (eventsFunction.IsPrivate())
     instructionOrExpression.SetPrivate();
 
+  if (eventsFunction.IsDeprecated()) {
+    instructionOrExpression.SetHidden();
+    instructionOrExpression.SetDeprecationMessage(
+        eventsFunction.GetDeprecationMessage());
+  }
+
   return instructionOrExpression;
 };
 
@@ -1594,6 +1654,12 @@ gd::BehaviorMetadata &MetadataDeclarationHelper::GenerateBehaviorMetadata(
 
     if (eventsFunction.IsPrivate())
       instructionOrExpression.SetPrivate();
+
+    if (eventsFunction.IsDeprecated()) {
+      instructionOrExpression.SetHidden();
+      instructionOrExpression.SetDeprecationMessage(
+          eventsFunction.GetDeprecationMessage());
+    }
   }
 
   return behaviorMetadata;
@@ -1633,6 +1699,12 @@ gd::ObjectMetadata &MetadataDeclarationHelper::GenerateObjectMetadata(
 
     if (eventsFunction.IsPrivate())
       instructionOrExpression.SetPrivate();
+
+    if (eventsFunction.IsDeprecated()) {
+      instructionOrExpression.SetHidden();
+      instructionOrExpression.SetDeprecationMessage(
+          eventsFunction.GetDeprecationMessage());
+    }
   }
 
   UpdateCustomObjectDefaultBehaviors(project, objectMetadata);

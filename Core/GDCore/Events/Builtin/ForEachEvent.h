@@ -10,6 +10,7 @@
 
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
+#include "GDCore/Project/VariablesContainer.h"
 namespace gd {
 class Instruction;
 class Project;
@@ -36,6 +37,12 @@ class GD_CORE_API ForEachEvent : public gd::BaseEvent {
   virtual const gd::EventsList& GetSubEvents() const { return events; };
   virtual gd::EventsList& GetSubEvents() { return events; };
 
+  virtual bool CanHaveVariables() const { return true; }
+  virtual const gd::VariablesContainer& GetVariables() const {
+    return variables;
+  };
+  virtual gd::VariablesContainer& GetVariables() { return variables; };
+
   const gd::InstructionsList& GetConditions() const { return conditions; };
   gd::InstructionsList& GetConditions() { return conditions; };
 
@@ -48,6 +55,9 @@ class GD_CORE_API ForEachEvent : public gd::BaseEvent {
   void SetObjectToPick(gd::String objectsToPick_) {
     objectsToPick = gd::Expression(objectsToPick_);
   };
+
+  const gd::String& GetLoopIndexVariableName() const { return loopIndexVariableName; }
+  void SetLoopIndexVariableName(const gd::String& name) { loopIndexVariableName = name; }
 
   virtual std::vector<const gd::InstructionsList*> GetAllConditionsVectors()
       const;
@@ -69,6 +79,8 @@ class GD_CORE_API ForEachEvent : public gd::BaseEvent {
   gd::InstructionsList conditions;
   gd::InstructionsList actions;
   gd::EventsList events;
+  VariablesContainer variables;
+  gd::String loopIndexVariableName;
 };
 
 }  // namespace gd

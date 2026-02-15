@@ -3,7 +3,7 @@ name: Fast tests (not building GDevelop.js - can have false negatives)
 agent:
   machine:
     type: e1-standard-2
-    os_image: ubuntu2004
+    os_image: ubuntu2404
 auto_cancel:
   running:
     when: "true"
@@ -28,7 +28,7 @@ blocks:
               else
                 if can_use_cache; then
                   cd newIDE/app
-                  npm ci
+                  npm i
                   cd ../..
                   cache store "${NEWIDE_KEY}" newIDE/app/node_modules
                 else
@@ -48,7 +48,7 @@ blocks:
                 if can_use_cache; then
                   cd GDJS
                   git checkout package-lock.json # Ensure no changes was made by newIDE post-install tasks.
-                  npm ci
+                  npm i
                   cd ..
                   cache store "${GDJS_KEY}" GDJS/node_modules
                 else
@@ -67,7 +67,7 @@ blocks:
               else
                 if can_use_cache; then
                   cd GDJS/tests
-                  npm ci
+                  npm i
                   cd ../..
                   cache store "${GDJS_TESTS_KEY}" GDJS/tests/node_modules
                 else
@@ -94,13 +94,15 @@ blocks:
               GDJS_KEY="GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
 
               if can_use_cache; then
+                echo "Restoring caches..."
                 cache restore "${NEWIDE_KEY}"
                 cache restore "${GDJS_KEY}"
               else
                 echo "Fork PR: skipping cache restore"
-                (cd newIDE/app && npm ci)
-                (cd GDJS && git checkout package-lock.json && npm ci)
               fi
+
+              (cd newIDE/app && npm i)
+              (cd GDJS && git checkout package-lock.json && npm i)
             - cd newIDE/app
             - npm run postinstall
             - npm run flow
@@ -120,15 +122,17 @@ blocks:
               GDJS_TESTS_KEY="GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json)"
 
               if can_use_cache; then
+                echo "Restoring caches..."
                 cache restore "${NEWIDE_KEY}"
                 cache restore "${GDJS_KEY}"
                 cache restore "${GDJS_TESTS_KEY}"
               else
                 echo "Fork PR: skipping cache restore"
-                (cd newIDE/app && npm ci)
-                (cd GDJS && git checkout package-lock.json && npm ci)
-                (cd GDJS/tests && npm ci)
               fi
+
+              (cd newIDE/app && npm i)
+              (cd GDJS && git checkout package-lock.json && npm i)
+              (cd GDJS/tests && npm i)
             - cd GDJS
             - npm run check-types
             - npm run generate-doc
@@ -151,13 +155,15 @@ blocks:
               GDJS_KEY="GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
 
               if can_use_cache; then
+                echo "Restoring caches..."
                 cache restore "${NEWIDE_KEY}"
                 cache restore "${GDJS_KEY}"
               else
                 echo "Fork PR: skipping cache restore"
-                (cd newIDE/app && npm ci)
-                (cd GDJS && git checkout package-lock.json && npm ci)
               fi
+
+              (cd newIDE/app && npm i)
+              (cd GDJS && git checkout package-lock.json && npm i)
             - cd newIDE/app
             - npm run postinstall
             - npm run check-format
@@ -174,11 +180,13 @@ blocks:
               GDJS_KEY="GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
 
               if can_use_cache; then
+                echo "Restoring cache..."
                 cache restore "${GDJS_KEY}"
               else
                 echo "Fork PR: skipping cache restore"
-                (cd GDJS && git checkout package-lock.json && npm ci)
               fi
+
+              (cd GDJS && git checkout package-lock.json && npm i)
             - cd GDJS
             - npm run check-format
 
@@ -200,13 +208,15 @@ blocks:
               GDJS_KEY="GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
 
               if can_use_cache; then
+                echo "Restoring caches..."
                 cache restore "${NEWIDE_KEY}"
                 cache restore "${GDJS_KEY}"
               else
                 echo "Fork PR: skipping cache restore"
-                (cd newIDE/app && npm ci)
-                (cd GDJS && git checkout package-lock.json && npm ci)
               fi
+
+              (cd newIDE/app && npm i)
+              (cd GDJS && git checkout package-lock.json && npm i)
             - cd newIDE/app
             - npm run postinstall
             - npm run analyze-test-coverage
@@ -224,13 +234,16 @@ blocks:
               GDJS_TESTS_KEY="GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json)"
 
               if can_use_cache; then
+                echo "Restoring caches..."
                 cache restore "${GDJS_KEY}"
                 cache restore "${GDJS_TESTS_KEY}"
               else
                 echo "Fork PR: skipping cache restore"
-                (cd GDJS && git checkout package-lock.json && npm ci)
-                (cd GDJS/tests && npm ci)
               fi
+
+              (cd GDJS && git checkout package-lock.json && npm i)
+              (cd GDJS/tests && npm i)
             - cd GDJS
             - npm run build
-            - npm run test
+            - sudo apt-get install -y libegl1 libgl1-mesa-dri libgbm1 xvfb
+            - cd tests && xvfb-run --auto-servernum npm run test:chromeHeadlessNoSandbox

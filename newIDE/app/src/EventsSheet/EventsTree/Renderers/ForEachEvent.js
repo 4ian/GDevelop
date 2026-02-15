@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import InstructionsList from '../InstructionsList';
+import VariableDeclarationsList from '../VariableDeclarationsList';
 import classNames from 'classnames';
 import {
   largeSelectedArea,
@@ -10,6 +11,7 @@ import {
   instructionParameter,
   nameAndIconContainer,
   instructionInvalidParameter,
+  eventLabel,
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
 import ObjectField from '../../ParameterFields/ObjectField';
@@ -118,7 +120,20 @@ export default class ForEachEvent extends React.Component<
           [executableEventContainer]: true,
         })}
       >
-        <div>
+        <VariableDeclarationsList
+          variablesContainer={forEachEvent.getVariables()}
+          loopIndexVariableName={forEachEvent.getLoopIndexVariableName()}
+          onVariableDeclarationClick={this.props.onVariableDeclarationClick}
+          onVariableDeclarationDoubleClick={
+            this.props.onVariableDeclarationDoubleClick
+          }
+          className={'local-variables-container'}
+          disabled={this.props.disabled}
+          screenType={this.props.screenType}
+          windowSize={this.props.windowSize}
+          idPrefix={this.props.idPrefix}
+        />
+        <div className={eventLabel}>
           <Trans>
             Repeat for each instance of
             <span

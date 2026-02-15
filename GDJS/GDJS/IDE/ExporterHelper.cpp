@@ -1036,7 +1036,7 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
             .FindAndReplace(
                 "600 /*GDJS_WINDOW_HEIGHT*/",
                 gd::String::From<int>(project.GetGameResolutionHeight()))
-            .FindAndReplace("\"GDJS_GAME_NAME\"", jsonName);
+            .FindAndReplace("'GDJS_GAME_NAME'", jsonName);
 
     if (!fs.WriteToFile(exportDir + "/main.js", str)) {
       lastError = "Unable to write Electron main.js file.";

@@ -47,7 +47,11 @@ import getTutorial from '../../Hints/getTutorial';
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
 import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
 import { AutoScroll, DropContainer } from './DropContainer';
-import { isDescendant, type MoveFunctionArguments } from './helpers';
+import {
+  isDescendant,
+  isElseEventValid,
+  type MoveFunctionArguments,
+} from './helpers';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { useLongTouch } from '../../Utils/UseLongTouch';
@@ -828,19 +832,10 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
 
         eventPtrToRowIndex.current['' + event.ptr] = absoluteIndex;
 
-        let isValidElseEvent = false;
-        if (event.getType() === 'BuiltinCommonInstructions::Else') {
-          for (let j = i - 1; j >= 0; j--) {
-            const previousEvent = eventsList.getEventAt(j);
-            if (!previousEvent.isDisabled() && previousEvent.isExecutable()) {
-              const previousEventType = previousEvent.getType();
-              isValidElseEvent =
-                previousEventType === 'BuiltinCommonInstructions::Standard' ||
-                previousEventType === 'BuiltinCommonInstructions::Else';
-              break;
-            }
-          }
-        }
+        const isValidElseEvent =
+          event.getType() === 'BuiltinCommonInstructions::Else'
+            ? isElseEventValid(eventsList, i)
+            : false;
 
         const childrenTreeData = [];
         buildEventsTreeData(

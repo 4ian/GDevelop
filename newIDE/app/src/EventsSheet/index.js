@@ -21,6 +21,7 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import newNameGenerator from '../Utils/NewNameGenerator';
 import {
   type HistoryState,
   type RevertableActionType,
@@ -128,6 +129,12 @@ import { findEventByPath } from '../Utils/EventsValidationScanner';
 const gd: libGDevelop = global.gd;
 
 const zoomLevel = { min: 1, max: 50 };
+const loopEventTypes = [
+  'BuiltinCommonInstructions::While',
+  'BuiltinCommonInstructions::Repeat',
+  'BuiltinCommonInstructions::ForEach',
+  'BuiltinCommonInstructions::ForEachChildVariable',
+];
 
 export type ChangeContext = {|
   events?: Array<EventContext>,
@@ -928,6 +935,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         this._replaceSelectedEventType('BuiltinCommonInstructions::Standard'),
       visible: this._selectionIsElseEvent(),
     },
+    {
+      label: i18n._(t`Remove the Loop Counter Variable`),
+      click: () => this._removeLoopIndexVariable(),
+      visible:
+        this._selectionIsLoopEvent() && this._selectionHasIndexVariable(),
+    },
     { type: 'separator' },
     {
       label: i18n._(t`Add`),
@@ -950,12 +963,24 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           ),
         },
         {
+          type: 'separator',
+        },
+        {
           label: i18n._(t`Local Variable`),
           click: () => this.addLocalVariable(),
           enabled: this._selectionCanHaveLocalVariables(),
           accelerator: getShortcutDisplayName(
             this.props.shortcutMap['ADD_LOCAL_VARIABLE']
           ),
+        },
+        {
+          label: i18n._(t`Loop Counter Variable`),
+          click: () => this._addLoopIndexVariable(),
+          visible:
+            this._selectionIsLoopEvent() && !this._selectionHasIndexVariable(),
+        },
+        {
+          type: 'separator',
         },
         {
           label: i18n._(t`Comment`),
@@ -1065,6 +1090,97 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       !!eventContext &&
       eventContext.event.getType() === 'BuiltinCommonInstructions::Else'
     );
+  };
+
+  _asLoopEvent = (event: gdBaseEvent): any | null => {
+    const eventType = event.getType();
+    if (eventType === 'BuiltinCommonInstructions::While')
+      return gd.asWhileEvent(event);
+    if (eventType === 'BuiltinCommonInstructions::Repeat')
+      return gd.asRepeatEvent(event);
+    if (eventType === 'BuiltinCommonInstructions::ForEach')
+      return gd.asForEachEvent(event);
+    if (eventType === 'BuiltinCommonInstructions::ForEachChildVariable')
+      return gd.asForEachChildVariableEvent(event);
+    return null;
+  };
+
+  _getLastSelectedLoopEventContext = (): EventContext | null => {
+    const eventContext = getLastSelectedEventContext(this.state.selection);
+    if (!eventContext) return null;
+    if (!loopEventTypes.includes(eventContext.event.getType())) return null;
+    return eventContext;
+  };
+
+  _selectionIsLoopEvent = () => {
+    return !!this._getLastSelectedLoopEventContext();
+  };
+
+  _selectionHasIndexVariable = () => {
+    const eventContext = this._getLastSelectedLoopEventContext();
+    if (!eventContext) return false;
+    const loopEvent = this._asLoopEvent(eventContext.event);
+    return !!loopEvent && loopEvent.getLoopIndexVariableName() !== '';
+  };
+
+  _addLoopIndexVariable = () => {
+    const eventContext = this._getLastSelectedLoopEventContext();
+    if (!eventContext) return;
+
+    const loopEvent = this._asLoopEvent(eventContext.event);
+    if (!loopEvent || loopEvent.getLoopIndexVariableName() !== '') return;
+
+    const projectScopedContainersAccessor =
+      eventContext.projectScopedContainersAccessor;
+    const generatedName = newNameGenerator('LoopIndex', name =>
+      projectScopedContainersAccessor
+        .get()
+        .getVariablesContainersList()
+        .has(name)
+    );
+
+    const variablesContainer = loopEvent.getVariables();
+    variablesContainer
+      .insertNew(generatedName, variablesContainer.count())
+      .setValue(0);
+    loopEvent.setLoopIndexVariableName(generatedName);
+
+    if (this._eventsTree) {
+      this._eventsTree.forceEventsUpdate(() => {
+        const positions = this._getChangedEventRows([eventContext.event]);
+        this._saveChangesToHistory('EDIT', {
+          positionsBeforeAction: positions,
+          positionAfterAction: positions,
+        });
+      });
+    }
+  };
+
+  _removeLoopIndexVariable = () => {
+    const eventContext = this._getLastSelectedLoopEventContext();
+    if (!eventContext) return;
+
+    const loopEvent = this._asLoopEvent(eventContext.event);
+    if (!loopEvent) return;
+
+    const loopIndexVariableName = loopEvent.getLoopIndexVariableName();
+    if (!loopIndexVariableName) return;
+
+    const variablesContainer = loopEvent.getVariables();
+    if (variablesContainer.has(loopIndexVariableName)) {
+      variablesContainer.remove(loopIndexVariableName);
+    }
+    loopEvent.setLoopIndexVariableName('');
+
+    if (this._eventsTree) {
+      this._eventsTree.forceEventsUpdate(() => {
+        const positions = this._getChangedEventRows([eventContext.event]);
+        this._saveChangesToHistory('EDIT', {
+          positionsBeforeAction: positions,
+          positionAfterAction: positions,
+        });
+      });
+    }
   };
 
   _replaceSelectedEventType = (eventType: string) => {
@@ -1965,6 +2081,19 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     }
   };
 
+  _onEventsSheetBlur = (event: SyntheticFocusEvent<HTMLDivElement>) => {
+    const nextFocusedElement = event.relatedTarget;
+    if (
+      nextFocusedElement instanceof HTMLElement &&
+      // If focus is moving to an element still inside the container, do nothing.
+      event.currentTarget.contains(nextFocusedElement)
+    ) {
+      return;
+    }
+
+    this._keyboardShortcuts.resetModifiers();
+  };
+
   render() {
     const {
       isActive,
@@ -2018,6 +2147,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       .editedParameter.eventContext
       ? this.state.editedParameter.eventContext.projectScopedContainersAccessor
       : projectScopedContainersAccessor;
+    const editedVariableLoopEvent =
+      this.state.editedVariable && this.state.editedVariable.eventContext
+        ? this._asLoopEvent(this.state.editedVariable.eventContext.event)
+        : null;
 
     // Memorize the last size of the container div, that is used to render the events tree.
     // When the events editor tab is hidden, the container div width/height are 0.
@@ -2063,6 +2196,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               onKeyDown={this._keyboardShortcuts.onKeyDown}
               onKeyUp={this._keyboardShortcuts.onKeyUp}
               onDragOver={this._keyboardShortcuts.onDragOver}
+              onBlur={this._onEventsSheetBlur}
               ref={this._containerDiv}
               tabIndex={0}
             >
@@ -2317,6 +2451,25 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               this.state.editedVariable.shouldCreateVariable
             }
             isListLocked={false}
+            loopIndexVariableName={
+              editedVariableLoopEvent
+                ? editedVariableLoopEvent.getLoopIndexVariableName()
+                : ''
+            }
+            onRenameLoopIndexVariable={
+              editedVariableLoopEvent
+                ? newName => {
+                    editedVariableLoopEvent.setLoopIndexVariableName(newName);
+                  }
+                : undefined
+            }
+            onRemoveLoopIndexVariable={
+              editedVariableLoopEvent
+                ? () => {
+                    editedVariableLoopEvent.setLoopIndexVariableName('');
+                  }
+                : undefined
+            }
           />
         )}
         {this.state.layoutVariablesDialogOpen && (

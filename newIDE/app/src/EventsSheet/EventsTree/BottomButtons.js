@@ -54,6 +54,7 @@ export default function BottomButtons({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const onDrop = () => {
     draggedNode &&
+      draggedNode.event &&
       moveEventToEventsList({
         targetEventsList: rootEventsList,
         movingEvent: draggedNode.event,

@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import InstructionsList from '../InstructionsList';
+import VariableDeclarationsList from '../VariableDeclarationsList';
 import classNames from 'classnames';
 import {
   largeSelectedArea,
@@ -8,6 +9,7 @@ import {
   executableEventContainer,
   disabledText,
   conditionsContainer,
+  eventLabel,
 } from '../ClassNames';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
@@ -40,9 +42,23 @@ export default class WhileEvent extends React.Component<EventRendererProps, *> {
           [executableEventContainer]: true,
         })}
       >
+        <VariableDeclarationsList
+          variablesContainer={whileEvent.getVariables()}
+          loopIndexVariableName={whileEvent.getLoopIndexVariableName()}
+          onVariableDeclarationClick={this.props.onVariableDeclarationClick}
+          onVariableDeclarationDoubleClick={
+            this.props.onVariableDeclarationDoubleClick
+          }
+          className={'local-variables-container'}
+          disabled={this.props.disabled}
+          screenType={this.props.screenType}
+          windowSize={this.props.windowSize}
+          idPrefix={this.props.idPrefix}
+        />
         <div
           className={classNames({
             [disabledText]: this.props.disabled,
+            [eventLabel]: true,
           })}
         >
           <Trans>While these conditions are true:</Trans>
@@ -81,6 +97,7 @@ export default class WhileEvent extends React.Component<EventRendererProps, *> {
         <div
           className={classNames({
             [disabledText]: this.props.disabled,
+            [eventLabel]: true,
           })}
         >
           <Trans>Repeat these:</Trans>

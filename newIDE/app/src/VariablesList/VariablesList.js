@@ -118,9 +118,9 @@ type PlaceholderProps =
 type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   variablesContainer: gdVariablesContainer,
-  indexVariableName?: string,
-  onRenameIndexVariable?: (newName: string) => void,
-  onRemoveIndexVariable?: () => void,
+  loopIndexVariableName?: string,
+  onRenameLoopIndexVariable?: (newName: string) => void,
+  onRemoveLoopIndexVariable?: () => void,
   areObjectVariables?: boolean,
   inheritedVariablesContainer?: gdVariablesContainer,
   initiallySelectedVariableName?: ?string,
@@ -667,6 +667,16 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
       })
     );
 
+    const {
+      historyHandler,
+      onVariablesUpdated,
+      variablesContainer,
+      onRemoveLoopIndexVariable,
+      onRenameLoopIndexVariable,
+      areObjectVariables,
+      projectScopedContainersAccessor,
+    } = props;
+
     const [searchMatchingNodes, setSearchMatchingNodes] = React.useState<
       Array<string>
     >([]);
@@ -695,13 +705,13 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
     const [
       currentIndexVariableName,
       setCurrentIndexVariableName,
-    ] = React.useState(props.indexVariableName || '');
+    ] = React.useState(props.loopIndexVariableName || '');
 
     React.useEffect(
       () => {
-        setCurrentIndexVariableName(props.indexVariableName || '');
+        setCurrentIndexVariableName(props.loopIndexVariableName || '');
       },
-      [props.indexVariableName]
+      [props.loopIndexVariableName]
     );
 
     const [searchText, setSearchText] = React.useState<string>('');
@@ -805,7 +815,6 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
         })
       : [];
 
-    const { historyHandler, onVariablesUpdated, variablesContainer } = props;
     const _onChange = React.useCallback(
       () => {
         if (historyHandler) historyHandler.saveToHistory();
@@ -1026,15 +1035,15 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
         if (nodeId.startsWith(inheritedPrefix)) return false;
         const { name, lineage } = getVariableContextFromNodeId(
           nodeId,
-          props.variablesContainer
+          variablesContainer
         );
         if (!name) return false;
         const parentVariable = getDirectParentVariable(lineage);
         if (!parentVariable) {
-          props.variablesContainer.remove(name);
+          variablesContainer.remove(name);
           if (name === currentIndexVariableName) {
-            if (props.onRemoveIndexVariable) {
-              props.onRemoveIndexVariable();
+            if (onRemoveLoopIndexVariable) {
+              onRemoveLoopIndexVariable();
             }
             setCurrentIndexVariableName('');
           }
@@ -1047,11 +1056,7 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
         }
         return true;
       },
-      [
-        currentIndexVariableName,
-        props.onRemoveIndexVariable,
-        props.variablesContainer,
-      ]
+      [currentIndexVariableName, onRemoveLoopIndexVariable, variablesContainer]
     );
 
     const deleteNode = React.useCallback(
@@ -1731,7 +1736,7 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
 
         const { variable, lineage, name } = getVariableContextFromNodeId(
           nodeId,
-          props.variablesContainer
+          variablesContainer
         );
         if (name === null || !variable || newName === name) return;
 
@@ -1761,24 +1766,24 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
           tentativeNewName =>
             (parentVariable && parentVariable.hasChild(tentativeNewName)) ||
             (!parentVariable &&
-              (props.variablesContainer.has(tentativeNewName) ||
-                (!props.areObjectVariables &&
-                  props.projectScopedContainersAccessor
+              (variablesContainer.has(tentativeNewName) ||
+                (!areObjectVariables &&
+                  projectScopedContainersAccessor
                     .get()
                     .getObjectsContainersList()
                     .hasObjectOrGroupNamed(tentativeNewName))))
         );
 
         if (!parentVariable) {
-          props.variablesContainer.rename(name, safeAndUniqueNewName);
+          variablesContainer.rename(name, safeAndUniqueNewName);
         } else {
           parentVariable.renameChild(name, safeAndUniqueNewName);
         }
 
         if (!parentVariable && name === currentIndexVariableName) {
           setCurrentIndexVariableName(safeAndUniqueNewName);
-          if (props.onRenameIndexVariable) {
-            props.onRenameIndexVariable(safeAndUniqueNewName);
+          if (onRenameLoopIndexVariable) {
+            onRenameLoopIndexVariable(safeAndUniqueNewName);
           }
         }
 
@@ -1790,12 +1795,12 @@ const VariablesList = React.forwardRef<Props, VariablesListInterface>(
         refocusNameField({ identifier: variable.ptr, caretPosition });
       },
       [
-        props.variablesContainer,
-        props.areObjectVariables,
-        props.projectScopedContainersAccessor,
+        variablesContainer,
+        areObjectVariables,
+        projectScopedContainersAccessor,
         currentIndexVariableName,
         _onChange,
-        props.onRenameIndexVariable,
+        onRenameLoopIndexVariable,
         updateExpandedAndSelectedNodesFollowingNameChange,
         refocusNameField,
       ]

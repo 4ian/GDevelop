@@ -8,7 +8,7 @@ import { VariableDeclaration } from './VariableDeclaration';
 
 type Props = {|
   variablesContainer: gdVariablesContainer,
-  indexVariableName?: ?string,
+  loopIndexVariableName?: ?string,
   onVariableDeclarationClick: VariableDeclarationContext => void,
   onVariableDeclarationDoubleClick: VariableDeclarationContext => void,
   className?: string,
@@ -23,7 +23,7 @@ type Props = {|
 
 export default function VariableDeclarationsList({
   variablesContainer,
-  indexVariableName,
+  loopIndexVariableName,
   onVariableDeclarationClick,
   onVariableDeclarationDoubleClick,
   className,
@@ -41,7 +41,7 @@ export default function VariableDeclarationsList({
       variableName,
     };
     const isLoopIndexVariable =
-      !!indexVariableName && variableName === indexVariableName;
+      !!loopIndexVariableName && variableName === loopIndexVariableName;
 
     return (
       <VariableDeclaration

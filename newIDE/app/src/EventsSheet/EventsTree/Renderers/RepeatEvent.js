@@ -11,6 +11,7 @@ import {
   disabledText,
   instructionParameter,
   instructionInvalidParameter,
+  eventLabel,
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
 import ExpressionField from '../../ParameterFields/ExpressionField';
@@ -125,7 +126,7 @@ export default class RepeatEvent extends React.Component<
       >
         <VariableDeclarationsList
           variablesContainer={repeatEvent.getVariables()}
-          indexVariableName={repeatEvent.getIndexVariableName()}
+          loopIndexVariableName={repeatEvent.getLoopIndexVariableName()}
           onVariableDeclarationClick={this.props.onVariableDeclarationClick}
           onVariableDeclarationDoubleClick={
             this.props.onVariableDeclarationDoubleClick
@@ -136,7 +137,7 @@ export default class RepeatEvent extends React.Component<
           windowSize={this.props.windowSize}
           idPrefix={this.props.idPrefix}
         />
-        <div>
+        <div className={eventLabel}>
           <span
             className={classNames({
               [selectableArea]: true,

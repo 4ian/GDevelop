@@ -1090,7 +1090,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     const eventContext = this._getLastSelectedLoopEventContext();
     if (!eventContext) return false;
     const loopEvent = this._asLoopEvent(eventContext.event);
-    return !!loopEvent && loopEvent.getIndexVariableName() !== '';
+    return !!loopEvent && loopEvent.getLoopIndexVariableName() !== '';
   };
 
   _addLoopIndexVariable = () => {
@@ -1098,7 +1098,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (!eventContext) return;
 
     const loopEvent = this._asLoopEvent(eventContext.event);
-    if (!loopEvent || loopEvent.getIndexVariableName() !== '') return;
+    if (!loopEvent || loopEvent.getLoopIndexVariableName() !== '') return;
 
     const projectScopedContainersAccessor =
       eventContext.projectScopedContainersAccessor;
@@ -1113,7 +1113,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     variablesContainer
       .insertNew(generatedName, variablesContainer.count())
       .setValue(0);
-    loopEvent.setIndexVariableName(generatedName);
+    loopEvent.setLoopIndexVariableName(generatedName);
 
     if (this._eventsTree) {
       this._eventsTree.forceEventsUpdate(() => {
@@ -1133,14 +1133,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     const loopEvent = this._asLoopEvent(eventContext.event);
     if (!loopEvent) return;
 
-    const indexVariableName = loopEvent.getIndexVariableName();
-    if (!indexVariableName) return;
+    const loopIndexVariableName = loopEvent.getLoopIndexVariableName();
+    if (!loopIndexVariableName) return;
 
     const variablesContainer = loopEvent.getVariables();
-    if (variablesContainer.has(indexVariableName)) {
-      variablesContainer.remove(indexVariableName);
+    if (variablesContainer.has(loopIndexVariableName)) {
+      variablesContainer.remove(loopIndexVariableName);
     }
-    loopEvent.setIndexVariableName('');
+    loopEvent.setLoopIndexVariableName('');
 
     if (this._eventsTree) {
       this._eventsTree.forceEventsUpdate(() => {
@@ -2415,22 +2415,22 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               this.state.editedVariable.shouldCreateVariable
             }
             isListLocked={false}
-            indexVariableName={
+            loopIndexVariableName={
               editedVariableLoopEvent
-                ? editedVariableLoopEvent.getIndexVariableName()
+                ? editedVariableLoopEvent.getLoopIndexVariableName()
                 : ''
             }
-            onRenameIndexVariable={
+            onRenameLoopIndexVariable={
               editedVariableLoopEvent
                 ? newName => {
-                    editedVariableLoopEvent.setIndexVariableName(newName);
+                    editedVariableLoopEvent.setLoopIndexVariableName(newName);
                   }
                 : undefined
             }
-            onRemoveIndexVariable={
+            onRemoveLoopIndexVariable={
               editedVariableLoopEvent
                 ? () => {
-                    editedVariableLoopEvent.setIndexVariableName('');
+                    editedVariableLoopEvent.setLoopIndexVariableName('');
                   }
                 : undefined
             }

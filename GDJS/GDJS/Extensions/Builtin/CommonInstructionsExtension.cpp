@@ -444,13 +444,13 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               localVariablesInitializationCode);
         }
 
-        const bool hasIndexVariable = !event.GetIndexVariableName().empty();
+        const bool hasIndexVariable = !event.GetLoopIndexVariableName().empty();
         gd::String whileIndexVar;
         gd::String indexVariableAccessor;
         if (hasIndexVariable) {
           whileIndexVar = "whileIndex" + gd::String::From(context.GetContextDepth());
           indexVariableAccessor = codeGenerator.GenerateAnyOrSceneVariableGetter(
-              event.GetIndexVariableName(), context);
+              event.GetLoopIndexVariableName(), context);
         }
 
         // Prepare codes
@@ -559,13 +559,13 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         bool valueIteratorExists =
             !event.GetValueIteratorVariableName().empty();
         bool keyIteratorExists = !event.GetKeyIteratorVariableName().empty();
-        const bool hasIndexVariable = !event.GetIndexVariableName().empty();
+        const bool hasIndexVariable = !event.GetLoopIndexVariableName().empty();
         gd::String childIndexVar;
         gd::String indexVariableAccessor;
         if (hasIndexVariable) {
           childIndexVar = "childIndex" + gd::String::From(context.GetContextDepth());
           indexVariableAccessor = codeGenerator.GenerateAnyOrSceneVariableGetter(
-              event.GetIndexVariableName(), parentContext);
+              event.GetLoopIndexVariableName(), parentContext);
         }
 
         // clang-format off
@@ -738,11 +738,11 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             "repeatCount" + gd::String::From(context.GetContextDepth());
         gd::String repeatIndexVar =
             "repeatIndex" + gd::String::From(context.GetContextDepth());
-        const bool hasIndexVariable = !event.GetIndexVariableName().empty();
+        const bool hasIndexVariable = !event.GetLoopIndexVariableName().empty();
         gd::String indexVariableAccessor;
         if (hasIndexVariable) {
           indexVariableAccessor = codeGenerator.GenerateAnyOrSceneVariableGetter(
-              event.GetIndexVariableName(), context);
+              event.GetLoopIndexVariableName(), context);
         }
         outputCode += localVariablesInitializationCode;
         outputCode +=
@@ -836,11 +836,11 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             codeGenerator.GetCodeNamespaceAccessor() + "forEachObjects" +
             gd::String::From(context.GetContextDepth());
         codeGenerator.AddGlobalDeclaration(forEachObjectsList + " = [];\n");
-        const bool hasIndexVariable = !event.GetIndexVariableName().empty();
+        const bool hasIndexVariable = !event.GetLoopIndexVariableName().empty();
         gd::String indexVariableAccessor;
         if (hasIndexVariable) {
           indexVariableAccessor = codeGenerator.GenerateAnyOrSceneVariableGetter(
-              event.GetIndexVariableName(), context);
+              event.GetLoopIndexVariableName(), context);
         }
 
         outputCode += localVariablesInitializationCode;

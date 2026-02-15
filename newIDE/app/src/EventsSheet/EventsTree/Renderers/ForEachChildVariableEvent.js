@@ -12,6 +12,7 @@ import {
   instructionParameter,
   nameAndIconContainer,
   icon,
+  eventLabel,
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
 import AnyVariableField from '../../ParameterFields/AnyVariableField';
@@ -57,10 +58,10 @@ const styles = {
     marginLeft: '3px',
     marginRight: '2px',
   },
-  eventLabel: {
-    marginLeft: '5px',
-    whiteSpace: 'normal',
-    wordWrap: 'break-word',
+  labelText: {
+    // Add an extra pixel so that it alignes with variables and other event labels
+    // (which are selectable areas, so has an extra pixel of border)
+    paddingLeft: '1px',
   },
 };
 
@@ -212,7 +213,7 @@ export default class ForEachChildVariableEvent extends React.Component<
       >
         <VariableDeclarationsList
           variablesContainer={forEachChildVariableEvent.getVariables()}
-          indexVariableName={forEachChildVariableEvent.getIndexVariableName()}
+          loopIndexVariableName={forEachChildVariableEvent.getLoopIndexVariableName()}
           onVariableDeclarationClick={this.props.onVariableDeclarationClick}
           onVariableDeclarationDoubleClick={
             this.props.onVariableDeclarationDoubleClick
@@ -223,12 +224,13 @@ export default class ForEachChildVariableEvent extends React.Component<
           windowSize={this.props.windowSize}
           idPrefix={this.props.idPrefix}
         />
-        <div style={styles.eventLabel}>
+        <div className={eventLabel}>
           <Trans>
             <span
               className={classNames({
                 [disabledText]: this.props.disabled,
               })}
+              style={styles.labelText}
             >
               For every child in
               <span

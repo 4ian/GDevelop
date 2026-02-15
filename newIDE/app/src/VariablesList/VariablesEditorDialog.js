@@ -26,9 +26,9 @@ type TabProps = {
   label: React.Node,
   variablesContainer: gdVariablesContainer,
   inheritedVariablesContainer?: gdVariablesContainer,
-  indexVariableName?: string,
-  onRenameIndexVariable?: (newName: string) => void,
-  onRemoveIndexVariable?: () => void,
+  loopIndexVariableName?: string,
+  onRenameLoopIndexVariable?: (newName: string) => void,
+  onRemoveLoopIndexVariable?: () => void,
   emptyPlaceholderTitle?: React.Node,
   emptyPlaceholderDescription?: React.Node,
   /**
@@ -270,9 +270,9 @@ const VariablesEditorDialog = ({
           id,
           variablesContainer,
           inheritedVariablesContainer,
-          indexVariableName,
-          onRenameIndexVariable,
-          onRemoveIndexVariable,
+          loopIndexVariableName,
+          onRenameLoopIndexVariable,
+          onRemoveLoopIndexVariable,
           emptyPlaceholderTitle,
           emptyPlaceholderDescription,
           onComputeAllVariableNames,
@@ -304,9 +304,9 @@ const VariablesEditorDialog = ({
                   onVariablesUpdated={notifyOfChange}
                   onSelectedVariableChange={onSelectedVariableChange}
                   isListLocked={isListLocked}
-                  indexVariableName={indexVariableName}
-                  onRenameIndexVariable={onRenameIndexVariable}
-                  onRemoveIndexVariable={onRemoveIndexVariable}
+                  loopIndexVariableName={loopIndexVariableName}
+                  onRenameLoopIndexVariable={onRenameLoopIndexVariable}
+                  onRemoveLoopIndexVariable={onRemoveLoopIndexVariable}
                 />
               </Column>
             )

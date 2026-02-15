@@ -11,6 +11,7 @@ import {
   instructionParameter,
   nameAndIconContainer,
   instructionInvalidParameter,
+  eventLabel,
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
 import ObjectField from '../../ParameterFields/ObjectField';
@@ -121,7 +122,7 @@ export default class ForEachEvent extends React.Component<
       >
         <VariableDeclarationsList
           variablesContainer={forEachEvent.getVariables()}
-          indexVariableName={forEachEvent.getIndexVariableName()}
+          loopIndexVariableName={forEachEvent.getLoopIndexVariableName()}
           onVariableDeclarationClick={this.props.onVariableDeclarationClick}
           onVariableDeclarationDoubleClick={
             this.props.onVariableDeclarationDoubleClick
@@ -132,7 +133,7 @@ export default class ForEachEvent extends React.Component<
           windowSize={this.props.windowSize}
           idPrefix={this.props.idPrefix}
         />
-        <div>
+        <div className={eventLabel}>
           <Trans>
             Repeat for each instance of
             <span

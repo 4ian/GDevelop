@@ -61,8 +61,8 @@ class GD_CORE_API WhileEvent : public gd::BaseEvent {
 
   bool HasInfiniteLoopWarning() const { return infiniteLoopWarning; }
 
-  const gd::String& GetIndexVariableName() const { return indexVariableName; }
-  void SetIndexVariableName(const gd::String& name) { indexVariableName = name; }
+  const gd::String& GetLoopIndexVariableName() const { return loopIndexVariableName; }
+  void SetLoopIndexVariableName(const gd::String& name) { loopIndexVariableName = name; }
 
   virtual std::vector<gd::InstructionsList*> GetAllConditionsVectors();
   virtual std::vector<gd::InstructionsList*> GetAllActionsVectors();
@@ -85,7 +85,7 @@ class GD_CORE_API WhileEvent : public gd::BaseEvent {
                               ///< de/activate infinite loop warning when the
                               ///< user create the event
   gd::VariablesContainer variables;
-  gd::String indexVariableName;
+  gd::String loopIndexVariableName;
 
   int GetConditionsHeight() const;
   int GetActionsHeight() const;

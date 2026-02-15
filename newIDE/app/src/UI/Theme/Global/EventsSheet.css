@@ -101,8 +101,8 @@
 .gd-events-sheet .local-variables-container {
   background: var(--event-sheet-actions-background-color);
   color: var(--event-sheet-actions-color);
-  padding-left: 5px;
-  padding-right: 5px;
+  padding-left: 4px;
+  padding-right: 4px;
   /* Prevent container to growing outside its parent. We don't have a way to prevent an infinitely
      * small variables column, but responsive design should avoid the problem on small screens. */
   min-width: 0;
@@ -232,7 +232,7 @@
 }
 
 .gd-events-sheet .else-text-container {
-  padding-left: 1px;
+  padding-left: 5px;
 }
 
 .gd-events-sheet .invalid-else {
@@ -240,6 +240,12 @@
   color: var(--event-sheet-instruction-parameter-warning-color);
   opacity: 0.5;
   text-decoration: line-through;
+}
+
+.gd-events-sheet .event-label {
+  margin-left: 5px;
+  white-space: normal;
+  word-wrap: break-word;
 }
 
 /**

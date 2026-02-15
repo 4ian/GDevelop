@@ -93,8 +93,8 @@ class GD_CORE_API ForEachChildVariableEvent : public gd::BaseEvent {
    */
   void SetKeyIteratorVariableName(gd::String newName) { keyIteratorVariableName = newName; };
 
-  const gd::String& GetIndexVariableName() const { return indexVariableName; }
-  void SetIndexVariableName(const gd::String& name) { indexVariableName = name; }
+  const gd::String& GetLoopIndexVariableName() const { return loopIndexVariableName; }
+  void SetLoopIndexVariableName(const gd::String& name) { loopIndexVariableName = name; }
 
   virtual std::vector<const gd::InstructionsList*> GetAllConditionsVectors()
       const;
@@ -120,7 +120,7 @@ class GD_CORE_API ForEachChildVariableEvent : public gd::BaseEvent {
   gd::InstructionsList actions;
   gd::EventsList events;
   VariablesContainer variables;
-  gd::String indexVariableName;
+  gd::String loopIndexVariableName;
 };
 
 }  // namespace gd

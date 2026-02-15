@@ -50,8 +50,8 @@ class GD_CORE_API RepeatEvent : public gd::BaseEvent {
     repeatNumberExpression = gd::Expression(repeatNumberExpression_);
   };
 
-  const gd::String& GetIndexVariableName() const { return indexVariableName; }
-  void SetIndexVariableName(const gd::String& name) { indexVariableName = name; }
+  const gd::String& GetLoopIndexVariableName() const { return loopIndexVariableName; }
+  void SetLoopIndexVariableName(const gd::String& name) { loopIndexVariableName = name; }
 
   virtual std::vector<gd::InstructionsList*> GetAllConditionsVectors();
   virtual std::vector<gd::InstructionsList*> GetAllActionsVectors();
@@ -74,7 +74,7 @@ class GD_CORE_API RepeatEvent : public gd::BaseEvent {
   gd::InstructionsList actions;
   EventsList events;
   VariablesContainer variables;
-  gd::String indexVariableName;
+  gd::String loopIndexVariableName;
 
   bool repeatNumberExpressionSelected;
 };

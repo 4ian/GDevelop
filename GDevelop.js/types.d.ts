@@ -1913,8 +1913,8 @@ export class RepeatEvent extends BaseEvent {
   getActions(): InstructionsList;
   setRepeatExpressionPlainString(expr: string): void;
   getRepeatExpression(): Expression;
-  getIndexVariableName(): string;
-  setIndexVariableName(name: string): void;
+  getLoopIndexVariableName(): string;
+  setLoopIndexVariableName(name: string): void;
 }
 
 export class WhileEvent extends BaseEvent {
@@ -1922,8 +1922,8 @@ export class WhileEvent extends BaseEvent {
   getConditions(): InstructionsList;
   getWhileConditions(): InstructionsList;
   getActions(): InstructionsList;
-  getIndexVariableName(): string;
-  setIndexVariableName(name: string): void;
+  getLoopIndexVariableName(): string;
+  setLoopIndexVariableName(name: string): void;
 }
 
 export class ForEachEvent extends BaseEvent {
@@ -1932,8 +1932,8 @@ export class ForEachEvent extends BaseEvent {
   getObjectToPick(): string;
   getConditions(): InstructionsList;
   getActions(): InstructionsList;
-  getIndexVariableName(): string;
-  setIndexVariableName(name: string): void;
+  getLoopIndexVariableName(): string;
+  setLoopIndexVariableName(name: string): void;
 }
 
 export class ForEachChildVariableEvent extends BaseEvent {
@@ -1946,8 +1946,8 @@ export class ForEachChildVariableEvent extends BaseEvent {
   setIterableVariableName(newName: string): void;
   setKeyIteratorVariableName(newName: string): void;
   setValueIteratorVariableName(newName: string): void;
-  getIndexVariableName(): string;
-  setIndexVariableName(name: string): void;
+  getLoopIndexVariableName(): string;
+  setLoopIndexVariableName(name: string): void;
 }
 
 export class CommentEvent extends BaseEvent {

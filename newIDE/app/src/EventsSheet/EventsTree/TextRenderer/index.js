@@ -108,8 +108,8 @@ ${actions}`,
   },
   'BuiltinCommonInstructions::While': ({ event, padding }) => {
     const whileEvent = gd.asWhileEvent(event);
-    const indexVarText = whileEvent.getIndexVariableName()
-      ? ` (loop index variable: \`${whileEvent.getIndexVariableName()}\`)`
+    const indexVarText = whileEvent.getLoopIndexVariableName()
+      ? ` (loop index variable: \`${whileEvent.getLoopIndexVariableName()}\`)`
       : '';
     const whileConditions = renderInstructionsAsText({
       instructionsList: whileEvent.getWhileConditions(),
@@ -139,8 +139,8 @@ ${actions}`,
   },
   'BuiltinCommonInstructions::Repeat': ({ event, padding }) => {
     const repeatEvent = gd.asRepeatEvent(event);
-    const indexVarText = repeatEvent.getIndexVariableName()
-      ? ` (loop index variable: \`${repeatEvent.getIndexVariableName()}\`)`
+    const indexVarText = repeatEvent.getLoopIndexVariableName()
+      ? ` (loop index variable: \`${repeatEvent.getLoopIndexVariableName()}\`)`
       : '';
     const conditions = renderInstructionsAsText({
       instructionsList: repeatEvent.getConditions(),
@@ -165,8 +165,8 @@ ${actions}`,
   },
   'BuiltinCommonInstructions::ForEach': ({ event, padding }) => {
     const forEachEvent = gd.asForEachEvent(event);
-    const indexVarText = forEachEvent.getIndexVariableName()
-      ? ` (loop index variable: \`${forEachEvent.getIndexVariableName()}\`)`
+    const indexVarText = forEachEvent.getLoopIndexVariableName()
+      ? ` (loop index variable: \`${forEachEvent.getLoopIndexVariableName()}\`)`
       : '';
     const conditions = renderInstructionsAsText({
       instructionsList: forEachEvent.getConditions(),
@@ -189,8 +189,8 @@ ${actions}`,
   },
   'BuiltinCommonInstructions::ForEachChildVariable': ({ event, padding }) => {
     const forEachChildVariableEvent = gd.asForEachChildVariableEvent(event);
-    const indexVarText = forEachChildVariableEvent.getIndexVariableName()
-      ? ` (loop index variable: \`${forEachChildVariableEvent.getIndexVariableName()}\`)`
+    const indexVarText = forEachChildVariableEvent.getLoopIndexVariableName()
+      ? ` (loop index variable: \`${forEachChildVariableEvent.getLoopIndexVariableName()}\`)`
       : '';
     const valueIteratorName = forEachChildVariableEvent.getValueIteratorVariableName();
     const keyIteratorName = forEachChildVariableEvent.getKeyIteratorVariableName();

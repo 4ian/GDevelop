@@ -82,8 +82,8 @@ void ForEachEvent::SerializeTo(SerializerElement& element) const {
   if (HasVariables()) {
     variables.SerializeTo(element.AddChild("variables"));
   }
-  if (!indexVariableName.empty()) {
-    element.AddChild("indexVariable").SetStringValue(indexVariableName);
+  if (!loopIndexVariableName.empty()) {
+    element.AddChild("loopIndexVariable").SetStringValue(loopIndexVariableName);
   }
 }
 
@@ -107,9 +107,9 @@ void ForEachEvent::UnserializeFrom(gd::Project& project,
     variables.UnserializeFrom(element.GetChild("variables"));
   }
 
-  indexVariableName =
-      element.HasChild("indexVariable")
-          ? element.GetChild("indexVariable").GetStringValue()
+  loopIndexVariableName =
+      element.HasChild("loopIndexVariable")
+          ? element.GetChild("loopIndexVariable").GetStringValue()
           : "";
 }
 

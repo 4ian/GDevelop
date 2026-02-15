@@ -9,6 +9,7 @@ import {
   executableEventContainer,
   disabledText,
   conditionsContainer,
+  eventLabel,
 } from '../ClassNames';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
@@ -43,7 +44,7 @@ export default class WhileEvent extends React.Component<EventRendererProps, *> {
       >
         <VariableDeclarationsList
           variablesContainer={whileEvent.getVariables()}
-          indexVariableName={whileEvent.getIndexVariableName()}
+          loopIndexVariableName={whileEvent.getLoopIndexVariableName()}
           onVariableDeclarationClick={this.props.onVariableDeclarationClick}
           onVariableDeclarationDoubleClick={
             this.props.onVariableDeclarationDoubleClick
@@ -57,6 +58,7 @@ export default class WhileEvent extends React.Component<EventRendererProps, *> {
         <div
           className={classNames({
             [disabledText]: this.props.disabled,
+            [eventLabel]: true,
           })}
         >
           <Trans>While these conditions are true:</Trans>
@@ -95,6 +97,7 @@ export default class WhileEvent extends React.Component<EventRendererProps, *> {
         <div
           className={classNames({
             [disabledText]: this.props.disabled,
+            [eventLabel]: true,
           })}
         >
           <Trans>Repeat these:</Trans>

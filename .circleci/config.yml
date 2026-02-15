@@ -47,9 +47,9 @@ jobs:
       # GDevelop.js dependencies
       - restore_cache:
           keys:
-            - gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
+            - gd-macos-nodejs-dependencies-v2-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
             # fallback to using the latest cache if no exact match is found
-            - gd-macos-nodejs-dependencies-
+            - gd-macos-nodejs-dependencies-v2-
 
       - run:
           name: Install GDevelop.js dependencies
@@ -71,7 +71,7 @@ jobs:
             - newIDE/app/node_modules
             - GDevelop.js/node_modules
             - GDJS/node_modules
-          key: gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
+          key: gd-macos-nodejs-dependencies-v2-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
 
       # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       # Note: Code signing is done using CSC_LINK (see https://www.electron.build/code-signing).
@@ -141,9 +141,9 @@ jobs:
 
       - restore_cache:
           keys:
-            - gd-linux-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
+            - gd-linux-nodejs-dependencies-v2-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
             # fallback to using the latest cache if no exact match is found
-            - gd-linux-nodejs-dependencies-
+            - gd-linux-nodejs-dependencies-v2-
 
       # GDevelop IDE dependencies (using an exact version of GDevelop.js, built previously)
       - run:
@@ -156,7 +156,7 @@ jobs:
             - newIDE/app/node_modules
             - GDevelop.js/node_modules
             - GDJS/node_modules
-          key: gd-linux-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
+          key: gd-linux-nodejs-dependencies-v2-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
 
       # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       - run:
@@ -203,9 +203,9 @@ jobs:
       # GDevelop.js dependencies
       - restore_cache:
           keys:
-            - gdevelop.js-linux-nodejs-dependencies-{{ checksum "GDevelop.js/package-lock.json" }}
+            - gdevelop.js-linux-nodejs-dependencies-v2-{{ checksum "GDevelop.js/package-lock.json" }}
             # fallback to using the latest cache if no exact match is found
-            - gdevelop.js-linux-nodejs-dependencies-
+            - gdevelop.js-linux-nodejs-dependencies-v2-
 
       - run:
           name: Install GDevelop.js dependencies and build it
@@ -220,7 +220,7 @@ jobs:
       - save_cache:
           paths:
             - GDevelop.js/node_modules
-          key: gdevelop.js-linux-nodejs-dependencies-{{ checksum "GDevelop.js/package-lock.json" }}
+          key: gdevelop.js-linux-nodejs-dependencies-v2-{{ checksum "GDevelop.js/package-lock.json" }}
 
       # Upload artifacts (CircleCI)
       - store_artifacts:
@@ -262,9 +262,9 @@ jobs:
       # GDevelop.js dependencies
       - restore_cache:
           keys:
-            - gdevelop.js-linux-nodejs-dependencies-{{ checksum "GDevelop.js/package-lock.json" }}
+            - gdevelop.js-linux-nodejs-dependencies-v2-{{ checksum "GDevelop.js/package-lock.json" }}
             # fallback to using the latest cache if no exact match is found
-            - gdevelop.js-linux-nodejs-dependencies-
+            - gdevelop.js-linux-nodejs-dependencies-v2-
 
       - run:
           name: Install GDevelop.js dependencies and build it
@@ -364,8 +364,8 @@ jobs:
       - restore_cache:
           name: Restore node_modules cache
           keys:
-            - v1-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}-{{ checksum "GDJS/package-lock.json" }}
-            - v1-win-node-
+            - v2-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}-{{ checksum "GDJS/package-lock.json" }}
+            - v2-win-node-
 
       - run:
           name: Install dependencies
@@ -396,7 +396,7 @@ jobs:
 
       - save_cache:
           name: Save node_modules cache
-          key: v1-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}-{{ checksum "GDJS/package-lock.json" }}
+          key: v2-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}-{{ checksum "GDJS/package-lock.json" }}
           paths:
             - newIDE/app/node_modules
             - newIDE/electron-app/node_modules

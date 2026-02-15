@@ -22,7 +22,7 @@ blocks:
                 [ "${SEMAPHORE_GIT_PR_SLUG}" = "${SEMAPHORE_GIT_REPO_SLUG}" ]
               }
 
-              NEWIDE_KEY="newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)"
+              NEWIDE_KEY="newIDE-app-node_modules-v2-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)"
               if can_use_cache && cache has_key "${NEWIDE_KEY}"; then
                 echo "Cache hit: ${NEWIDE_KEY}"
               else
@@ -41,7 +41,7 @@ blocks:
                 [ "${SEMAPHORE_GIT_PR_SLUG}" = "${SEMAPHORE_GIT_REPO_SLUG}" ]
               }
 
-              GDJS_KEY="GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
+              GDJS_KEY="GDJS-node_modules-v2-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
               if can_use_cache && cache has_key "${GDJS_KEY}"; then
                 echo "Cache hit: ${GDJS_KEY}"
               else
@@ -61,7 +61,7 @@ blocks:
                 [ "${SEMAPHORE_GIT_PR_SLUG}" = "${SEMAPHORE_GIT_REPO_SLUG}" ]
               }
 
-              GDJS_TESTS_KEY="GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json)"
+              GDJS_TESTS_KEY="GDJS-tests-node_modules-v2-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json)"
               if can_use_cache && cache has_key "${GDJS_TESTS_KEY}"; then
                 echo "Cache hit: ${GDJS_TESTS_KEY}"
               else
@@ -90,8 +90,8 @@ blocks:
                 [ "${SEMAPHORE_GIT_PR_SLUG}" = "${SEMAPHORE_GIT_REPO_SLUG}" ]
               }
 
-              NEWIDE_KEY="newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)"
-              GDJS_KEY="GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
+              NEWIDE_KEY="newIDE-app-node_modules-v2-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)"
+              GDJS_KEY="GDJS-node_modules-v2-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
 
               if can_use_cache; then
                 echo "Restoring caches..."
@@ -117,9 +117,9 @@ blocks:
                 [ "${SEMAPHORE_GIT_PR_SLUG}" = "${SEMAPHORE_GIT_REPO_SLUG}" ]
               }
 
-              NEWIDE_KEY="newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)"
-              GDJS_KEY="GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
-              GDJS_TESTS_KEY="GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json)"
+              NEWIDE_KEY="newIDE-app-node_modules-v2-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)"
+              GDJS_KEY="GDJS-node_modules-v2-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
+              GDJS_TESTS_KEY="GDJS-tests-node_modules-v2-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json)"
 
               if can_use_cache; then
                 echo "Restoring caches..."
@@ -151,8 +151,8 @@ blocks:
                 [ "${SEMAPHORE_GIT_PR_SLUG}" = "${SEMAPHORE_GIT_REPO_SLUG}" ]
               }
 
-              NEWIDE_KEY="newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)"
-              GDJS_KEY="GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
+              NEWIDE_KEY="newIDE-app-node_modules-v2-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)"
+              GDJS_KEY="GDJS-node_modules-v2-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
 
               if can_use_cache; then
                 echo "Restoring caches..."
@@ -177,7 +177,7 @@ blocks:
                 [ "${SEMAPHORE_GIT_PR_SLUG}" = "${SEMAPHORE_GIT_REPO_SLUG}" ]
               }
 
-              GDJS_KEY="GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
+              GDJS_KEY="GDJS-node_modules-v2-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
 
               if can_use_cache; then
                 echo "Restoring cache..."
@@ -204,8 +204,8 @@ blocks:
                 [ "${SEMAPHORE_GIT_PR_SLUG}" = "${SEMAPHORE_GIT_REPO_SLUG}" ]
               }
 
-              NEWIDE_KEY="newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)"
-              GDJS_KEY="GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
+              NEWIDE_KEY="newIDE-app-node_modules-v2-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)"
+              GDJS_KEY="GDJS-node_modules-v2-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
 
               if can_use_cache; then
                 echo "Restoring caches..."
@@ -230,8 +230,8 @@ blocks:
                 [ "${SEMAPHORE_GIT_PR_SLUG}" = "${SEMAPHORE_GIT_REPO_SLUG}" ]
               }
 
-              GDJS_KEY="GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
-              GDJS_TESTS_KEY="GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json)"
+              GDJS_KEY="GDJS-node_modules-v2-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
+              GDJS_TESTS_KEY="GDJS-tests-node_modules-v2-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json)"
 
               if can_use_cache; then
                 echo "Restoring caches..."

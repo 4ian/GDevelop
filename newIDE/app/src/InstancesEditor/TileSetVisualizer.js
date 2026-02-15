@@ -255,16 +255,13 @@ export const createSelectionWithPreviousTool = (
   defaultFlips: {| horizontal: boolean, vertical: boolean |}
 ): TileMapTileSelection => {
   const previousPaintingTool = getTileMapPaintingSelection(previousTool);
-  const kind =
-    previousPaintingTool ? previousPaintingTool.kind : 'rectangle';
-  const flipHorizontally =
-    previousPaintingTool
-      ? previousPaintingTool.flipHorizontally
-      : defaultFlips.horizontal;
-  const flipVertically =
-    previousPaintingTool
-      ? previousPaintingTool.flipVertically
-      : defaultFlips.vertical;
+  const kind = previousPaintingTool ? previousPaintingTool.kind : 'rectangle';
+  const flipHorizontally = previousPaintingTool
+    ? previousPaintingTool.flipHorizontally
+    : defaultFlips.horizontal;
+  const flipVertically = previousPaintingTool
+    ? previousPaintingTool.flipVertically
+    : defaultFlips.vertical;
 
   return {
     kind: (kind: any),
@@ -790,10 +787,9 @@ const TileSetVisualizer = ({
                   else
                     onSelectTileMapTile({
                       kind: 'freehand',
-                      coordinates:
-                        lastPaintingSelection
-                          ? lastPaintingSelection.coordinates
-                          : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
+                      coordinates: lastPaintingSelection
+                        ? lastPaintingSelection.coordinates
+                        : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
                       flipHorizontally: shouldFlipHorizontally,
                       flipVertically: shouldFlipVertically,
                     });
@@ -822,10 +818,9 @@ const TileSetVisualizer = ({
                         ? lastSelection
                         : {
                             kind: 'rectangle',
-                            coordinates:
-                              lastPaintingSelection
-                                ? lastPaintingSelection.coordinates
-                                : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
+                            coordinates: lastPaintingSelection
+                              ? lastPaintingSelection.coordinates
+                              : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
                             flipHorizontally: shouldFlipHorizontally,
                             flipVertically: shouldFlipVertically,
                           }
@@ -852,10 +847,9 @@ const TileSetVisualizer = ({
                   else
                     onSelectTileMapTile({
                       kind: 'floodfill',
-                      coordinates:
-                        lastPaintingSelection
-                          ? lastPaintingSelection.coordinates
-                          : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
+                      coordinates: lastPaintingSelection
+                        ? lastPaintingSelection.coordinates
+                        : [{ x: 0, y: 0 }, { x: 0, y: 0 }],
                       flipHorizontally: shouldFlipHorizontally,
                       flipVertically: shouldFlipVertically,
                     });
@@ -926,9 +920,7 @@ const TileSetVisualizer = ({
                   if (tileMapPaintingSelection) {
                     const selection: TileMapTileSelection = {
                       kind: (tileMapPaintingSelection.kind: any),
-                      coordinates: (
-                        tileMapPaintingSelection.coordinates: TileMapCoordinates[]
-                      ),
+                      coordinates: (tileMapPaintingSelection.coordinates: TileMapCoordinates[]),
                       flipHorizontally: newShouldFlipHorizontally,
                       flipVertically: tileMapPaintingSelection.flipVertically,
                     };
@@ -954,10 +946,9 @@ const TileSetVisualizer = ({
                   if (tileMapPaintingSelection) {
                     const selection: TileMapTileSelection = {
                       kind: (tileMapPaintingSelection.kind: any),
-                      coordinates: (
-                        tileMapPaintingSelection.coordinates: TileMapCoordinates[]
-                      ),
-                      flipHorizontally: tileMapPaintingSelection.flipHorizontally,
+                      coordinates: (tileMapPaintingSelection.coordinates: TileMapCoordinates[]),
+                      flipHorizontally:
+                        tileMapPaintingSelection.flipHorizontally,
                       flipVertically: newShouldFlipVertically,
                     };
                     onSelectTileMapTile(selection);
@@ -1006,24 +997,24 @@ const TileSetVisualizer = ({
                 />
               )}
               {tileMapPaintingSelection && displayedTileSize && (
-                  <Tile
-                    key={`selected-tile`}
-                    highlighted
-                    size={displayedTileSize}
-                    x={tileMapPaintingSelection.coordinates[0].x}
-                    y={tileMapPaintingSelection.coordinates[0].y}
-                    width={
-                      tileMapPaintingSelection.coordinates[1].x -
-                      tileMapPaintingSelection.coordinates[0].x +
-                      1
-                    }
-                    height={
-                      tileMapPaintingSelection.coordinates[1].y -
-                      tileMapPaintingSelection.coordinates[0].y +
-                      1
-                    }
-                  />
-                )}
+                <Tile
+                  key={`selected-tile`}
+                  highlighted
+                  size={displayedTileSize}
+                  x={tileMapPaintingSelection.coordinates[0].x}
+                  y={tileMapPaintingSelection.coordinates[0].y}
+                  width={
+                    tileMapPaintingSelection.coordinates[1].x -
+                    tileMapPaintingSelection.coordinates[0].x +
+                    1
+                  }
+                  height={
+                    tileMapPaintingSelection.coordinates[1].y -
+                    tileMapPaintingSelection.coordinates[0].y +
+                    1
+                  }
+                />
+              )}
               {tileMapTileSelection &&
                 tileMapTileSelection.kind === 'multiple' &&
                 displayedTileSize &&

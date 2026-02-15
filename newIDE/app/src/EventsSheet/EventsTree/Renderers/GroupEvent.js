@@ -121,7 +121,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
             ref={inputField => (this._inputField = inputField)}
             type="text"
             value={groupEvent.getName()}
-            placeholder={t`<Enter group name>`}
+            placeholder="..."
             onBlur={this.endEditing}
             onChange={e => {
               groupEvent.setName(e.target.value);
@@ -132,7 +132,11 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
               color: textColor,
             }}
             onKeyDown={event => {
-              if (shouldCloseOrCancel(event) || shouldValidate(event) || shouldSubmit(event)) {
+              if (
+                shouldCloseOrCancel(event) ||
+                shouldValidate(event) ||
+                shouldSubmit(event)
+              ) {
                 this.endEditing();
               }
             }}

@@ -10,6 +10,7 @@ export type CommandName =
   | 'LAUNCH_NETWORK_PREVIEW'
   | 'HOT_RELOAD_PREVIEW'
   | 'LAUNCH_PREVIEW_WITH_DIAGNOSTIC_REPORT'
+  | 'OPEN_DIAGNOSTIC_REPORT'
   | 'OPEN_HOME_PAGE'
   | 'CREATE_NEW_PROJECT'
   | 'OPEN_PROJECT'
@@ -117,6 +118,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   LAUNCH_PREVIEW_WITH_DIAGNOSTIC_REPORT: {
     area: 'PROJECT',
     displayText: t`Launch preview with diagnostic report`,
+  },
+  OPEN_DIAGNOSTIC_REPORT: {
+    area: 'PROJECT',
+    displayText: t`Show diagnostic report`,
   },
   OPEN_HOME_PAGE: { area: 'IDE', displayText: t`Show Home` },
   CREATE_NEW_PROJECT: {

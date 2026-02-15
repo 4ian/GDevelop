@@ -63,6 +63,10 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     }
   }
 
+  scrollToEventPath(eventPath: Array<number>) {
+    if (this.editor) this.editor.scrollToEventPath(eventPath);
+  }
+
   forceUpdateEditor() {
     // No updates to be done.
   }

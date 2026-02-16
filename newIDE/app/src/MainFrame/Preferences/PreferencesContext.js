@@ -214,6 +214,7 @@ export type PreferencesValues = {|
     | 'icon'
     | 'icon-and-deprecated-warning-text',
   openDiagnosticReportAutomatically: boolean,
+  blockPreviewAndExportOnDiagnosticErrors: boolean,
   use3DEditor: boolean,
   showBasicProfilingCounters: boolean,
   inAppTutorialsProgress: InAppTutorialProgressDatabase,
@@ -312,6 +313,8 @@ export type Preferences = {|
   setShowInAppTutorialDeveloperMode: (enabled: boolean) => void,
   setOpenDiagnosticReportAutomatically: (enabled: boolean) => void,
   getOpenDiagnosticReportAutomatically: () => boolean,
+  setBlockPreviewAndExportOnDiagnosticErrors: (enabled: boolean) => void,
+  getBlockPreviewAndExportOnDiagnosticErrors: () => boolean,
   setShowDeprecatedInstructionWarning: (
     value: 'no' | 'icon' | 'icon-and-deprecated-warning-text'
   ) => void,
@@ -402,6 +405,7 @@ export const initialPreferences = {
     showCreateSectionByDefault: false,
     showInAppTutorialDeveloperMode: false,
     openDiagnosticReportAutomatically: true,
+    blockPreviewAndExportOnDiagnosticErrors: false,
     showDeprecatedInstructionWarning: 'no',
     use3DEditor: isWebGLSupported(),
     showBasicProfilingCounters: false,
@@ -481,6 +485,8 @@ export const initialPreferences = {
   ) => {},
   getOpenDiagnosticReportAutomatically: () => true,
   setOpenDiagnosticReportAutomatically: (enabled: boolean) => {},
+  getBlockPreviewAndExportOnDiagnosticErrors: () => false,
+  setBlockPreviewAndExportOnDiagnosticErrors: (enabled: boolean) => {},
   getShowDeprecatedInstructionWarning: () => 'no',
   setUse3DEditor: (enabled: boolean) => {},
   getUse3DEditor: () => false,

@@ -124,6 +124,7 @@ import LocalVariablesDialog from '../VariablesList/LocalVariablesDialog';
 import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariablesDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { useHighlightedAiGeneratedEvent } from './UseHighlightedAiGeneratedEvent';
+import { findEventByPath } from '../Utils/EventsValidationScanner';
 
 const gd: libGDevelop = global.gd;
 
@@ -222,6 +223,7 @@ type State = {|
   showSearchPanel: boolean,
   searchResults: ?Array<gdBaseEvent>,
   searchFocusOffset: ?number,
+  navigationHighlightEvent: ?gdBaseEvent,
 
   layoutVariablesDialogOpen: boolean,
 
@@ -317,6 +319,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     showSearchPanel: false,
     searchResults: null,
     searchFocusOffset: null,
+    navigationHighlightEvent: null,
 
     layoutVariablesDialogOpen: false,
 
@@ -389,6 +392,33 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         });
       }
     );
+  };
+
+  scrollToEventPath = (eventPath: Array<number>) => {
+    const eventsTree = this._eventsTree;
+    if (!eventsTree || eventPath.length === 0) return;
+
+    // Find the event at the path
+    const event = findEventByPath(this.props.events, eventPath);
+    if (!event) return;
+
+    // Unfold and scroll to the event
+    eventsTree.unfoldForEvent(event);
+
+    // Highlight the event like search results
+    this.setState({ navigationHighlightEvent: event });
+
+    setTimeout(() => {
+      const row = eventsTree.getEventRow(event);
+      if (row !== -1) {
+        eventsTree.scrollToRow(row);
+      }
+    }, 100 /* Give some time for the events sheet to render before scrolling */);
+
+    // Clear the highlight after a few seconds
+    setTimeout(() => {
+      this.setState({ navigationHighlightEvent: null });
+    }, 3000);
   };
 
   updateToolbar() {
@@ -2228,8 +2258,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   }}
                   onOpenExternalEvents={onOpenExternalEvents}
                   onOpenLayout={onOpenLayout}
-                  searchResults={eventsSearchResultEvents}
-                  searchFocusOffset={searchFocusOffset}
+                  searchResults={
+                    this.state.navigationHighlightEvent
+                      ? [this.state.navigationHighlightEvent]
+                      : eventsSearchResultEvents
+                  }
+                  searchFocusOffset={
+                    this.state.navigationHighlightEvent ? 0 : searchFocusOffset
+                  }
                   onEventMoved={this._onEventMoved}
                   onEndEditingEvent={this._onEndEditingStringEvent}
                   showObjectThumbnails={
@@ -2468,6 +2504,7 @@ export type EventsSheetInterface = {|
   updateToolbar: () => void,
   onResourceExternallyChanged: ({| identifier: string |}) => void,
   onEventsModifiedOutsideEditor: (changes: OutOfEditorChanges) => void,
+  scrollToEventPath: (eventPath: Array<number>) => void,
 |};
 
 // EventsSheet is a wrapper so that the component can use multiple
@@ -2477,6 +2514,7 @@ const EventsSheet = (props, ref) => {
     updateToolbar,
     onResourceExternallyChanged,
     onEventsModifiedOutsideEditor,
+    scrollToEventPath,
   }));
 
   const {
@@ -2495,6 +2533,9 @@ const EventsSheet = (props, ref) => {
   const onEventsModifiedOutsideEditor = (changes: OutOfEditorChanges) => {
     addNewAiGeneratedEventIds(changes.newOrChangedAiGeneratedEventIds);
     if (component.current) component.current.onEventsModifiedOutsideEditor();
+  };
+  const scrollToEventPath = (eventPath: Array<number>) => {
+    if (component.current) component.current.scrollToEventPath(eventPath);
   };
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);

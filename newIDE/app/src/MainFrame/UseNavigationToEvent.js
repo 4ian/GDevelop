@@ -46,9 +46,11 @@ export const useNavigationToEvent = ({
               editor.kind === editorKind &&
               editor.projectItemName === name &&
               editor.editorRef &&
+              // $FlowFixMe[method-unbinding]
               editor.editorRef.scrollToEventPath
             ) {
-              // $FlowFixMe - scrollToEventPath is checked above
+              // $FlowFixMe[incompatible-type] - scrollToEventPath is checked above
+              // $FlowFixMe[not-a-function]
               editor.editorRef.scrollToEventPath(eventPath);
               setPendingEventNavigation(null);
               return;

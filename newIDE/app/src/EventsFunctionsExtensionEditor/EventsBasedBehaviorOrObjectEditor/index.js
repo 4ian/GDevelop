@@ -47,10 +47,10 @@ export type EventsBasedBehaviorOrObjectEditorInterface = {|
   scrollToProperty: (propertyName: string, isSharedProperties: boolean) => void,
 |};
 
-export const EventsBasedBehaviorOrObjectEditor = React.forwardRef<
-  Props,
-  EventsBasedBehaviorOrObjectEditorInterface
->(
+export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<EventsBasedBehaviorOrObjectEditorInterface>,
+}> = React.forwardRef<Props, EventsBasedBehaviorOrObjectEditorInterface>(
   (
     {
       eventsBasedBehavior,
@@ -144,6 +144,7 @@ export const EventsBasedBehaviorOrObjectEditor = React.forwardRef<
         const property = properties.insertNew(newName, properties.getCount());
         property.setType('Number');
         forceUpdate();
+        // $FlowFixMe[constant-condition]
         onPropertiesUpdated && onPropertiesUpdated();
 
         // Scroll to the selected property.

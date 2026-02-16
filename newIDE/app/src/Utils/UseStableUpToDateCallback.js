@@ -23,6 +23,7 @@ export function useStableUpToDateCallback<ReturnType, ArgTypes>(
   // This function will never change, but will always call the latest
   // callback that was created in a render, so it's fine to call it even
   // from an asynchronous function.
+  // $FlowFixMe[missing-local-annot]
   const stableCallback = React.useCallback((...args) => {
     return callbackRef.current(...args);
   }, []);

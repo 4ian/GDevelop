@@ -20,12 +20,12 @@ type Props = {|
   color?: string,
 |};
 
-export const DragHandleIcon = (props: Props) => (
+export const DragHandleIcon = (props: Props): React.MixedElement => (
   <span style={props.disabled ? styles.disabledHandle : styles.handle}>
     <MUIDragHandleIcon htmlColor={props.color || styles.handleColor} />
   </span>
 );
 
-const DragHandle = SortableHandle(DragHandleIcon);
+const DragHandle: any = SortableHandle(DragHandleIcon);
 
 export default DragHandle;

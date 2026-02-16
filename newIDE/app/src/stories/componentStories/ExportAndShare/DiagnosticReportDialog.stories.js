@@ -16,7 +16,7 @@ export default {
  * Shows the diagnostic report dialog with no errors.
  * The dialog displays a message indicating no issues were found.
  */
-export const Empty = () => (
+export const Empty = (): React.Node => (
   <DiagnosticReportDialog
     project={testProject.project}
     wholeProjectDiagnosticReport={testProject.project.getWholeProjectDiagnosticReport()}
@@ -32,7 +32,7 @@ Empty.storyName = 'Empty (No errors)';
  * When errors are found, clicking on them will trigger navigation to the
  * corresponding event in the layout or external events sheet.
  */
-export const WithNavigationCallbacks = () => (
+export const WithNavigationCallbacks = (): React.Node => (
   <DiagnosticReportDialog
     project={testProject.project}
     wholeProjectDiagnosticReport={testProject.project.getWholeProjectDiagnosticReport()}

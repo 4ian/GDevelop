@@ -106,6 +106,7 @@ const InvalidParameterRow = ({
         backgroundColor,
       }}
     >
+      {/* $FlowFixMe[incompatible-type] */}
       <TableRowColumn style={styles.locationCell}>
         <div style={styles.locationText}>
           <Link href="#" onClick={() => navigateToError(error)}>
@@ -114,6 +115,7 @@ const InvalidParameterRow = ({
           </Link>
         </div>
       </TableRowColumn>
+      {/* $FlowFixMe[incompatible-type] */}
       <TableRowColumn style={styles.instructionCell}>
         <div style={styles.instructionContent}>
           <div
@@ -137,6 +139,7 @@ const InvalidParameterRow = ({
           </div>
           {couldBeTruncated && (
             <div style={styles.expandButtonContainer}>
+              {/* $FlowFixMe[incompatible-type] */}
               <IconButton
                 size="small"
                 style={styles.expandButton}
@@ -176,12 +179,15 @@ const InvalidParametersSection = ({
           in the events sheet). Click a location to navigate there.
         </Trans>
       </AlertMessage>
+      {/* $FlowFixMe[incompatible-type] */}
       <Table style={styles.table}>
         <TableHeader>
           <TableRow>
+            {/* $FlowFixMe[incompatible-type] */}
             <TableHeaderColumn style={styles.locationCell}>
               <Trans>Location</Trans>
             </TableHeaderColumn>
+            {/* $FlowFixMe[incompatible-type] */}
             <TableHeaderColumn style={styles.instructionCell}>
               <Trans>Instruction</Trans>
             </TableHeaderColumn>
@@ -220,6 +226,7 @@ type Props = {|
   ) => void,
 |};
 
+// $FlowFixMe[missing-local-annot]
 const addFor = (map, key, value) => {
   let set = map.get(key);
   if (!set) {
@@ -235,7 +242,7 @@ export default function DiagnosticReportDialog({
   onClose,
   onNavigateToLayoutEvent,
   onNavigateToExternalEventsEvent,
-}: Props) {
+}: Props): React.Node {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const preferences = React.useContext(PreferencesContext);
 
@@ -246,6 +253,7 @@ export default function DiagnosticReportDialog({
         return scanProjectForValidationErrors(project);
       } catch (error) {
         console.error('Error scanning project for validation errors:', error);
+        // $FlowFixMe[missing-empty-array-annot]
         return [];
       }
     },

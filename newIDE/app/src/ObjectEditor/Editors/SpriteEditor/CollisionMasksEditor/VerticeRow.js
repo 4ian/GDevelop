@@ -29,7 +29,7 @@ const VerticeRow = ({
   verticeY,
   parentVerticeId,
   ...props
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (
@@ -43,6 +43,7 @@ const VerticeRow = ({
       onPointerLeave={props.onPointerLeave}
       onClick={props.onClick}
     >
+      {/* $FlowFixMe[incompatible-type] */}
       <TableRowColumn style={styles.coordinateColumn}>
         <SemiControlledTextField
           margin="none"
@@ -64,6 +65,7 @@ const VerticeRow = ({
           }}
         />
       </TableRowColumn>
+      {/* $FlowFixMe[incompatible-type] */}
       <TableRowColumn style={styles.coordinateColumn}>
         <SemiControlledTextField
           margin="none"
@@ -85,6 +87,7 @@ const VerticeRow = ({
           }}
         />
       </TableRowColumn>
+      {/* $FlowFixMe[incompatible-type] */}
       <TableRowColumn style={styles.toolColumn}>
         {!!props.onRemove && (
           <IconButton

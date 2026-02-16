@@ -56,6 +56,7 @@ export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
         initialPreferences.values.hasOwnProperty(key) &&
         typeof values[key] === 'undefined'
       ) {
+        // $FlowFixMe[invalid-computed-prop]
         values[key] = initialPreferences.values[key];
       }
     }
@@ -79,7 +80,63 @@ export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
   }
 };
 
-export const getInitialPreferences = () => {
+export const getInitialPreferences = (): {
+  aiState: { aiRequestId: null },
+  autoDisplayChangelog: boolean,
+  autoDownloadUpdates: boolean,
+  autoOpenMostRecentProject: boolean,
+  automaticallyUseCreditsForAiRequests: boolean,
+  autosaveOnPreview: boolean,
+  backdropClickBehavior: string,
+  blockPreviewAndExportOnDiagnosticErrors: boolean,
+  codeEditorThemeName: string,
+  defaultEditorMosaicNodes: {},
+  disableNpmScriptConfirmation: boolean,
+  displaySaveReminder: { activated: boolean },
+  editorStateByProject: {},
+  eventsSheetCancelInlineParameter: string,
+  eventsSheetIndentScale: number,
+  eventsSheetShowObjectThumbnails: boolean,
+  eventsSheetUseAssignmentOperators: boolean,
+  eventsSheetZoomLevel: number,
+  fetchPlayerTokenForPreviewAutomatically: boolean,
+  gamesDashboardOrderBy: string,
+  hasProjectOpened: boolean,
+  hiddenAlertMessages: {},
+  hiddenAnnouncements: {},
+  hiddenAskAiStandAloneForms: {},
+  hiddenTutorialHints: {},
+  inAppTutorialsProgress: {},
+  isAlwaysOnTopInPreview: boolean,
+  isMenuBarHiddenInPreview: boolean,
+  language: string,
+  lastLaunchedVersion: void,
+  newFeaturesAcknowledgements: {},
+  newObjectDialogDefaultTab: any,
+  newProjectsDefaultFolder: any,
+  newProjectsDefaultStorageProviderName: string,
+  openDiagnosticReportAutomatically: boolean,
+  previewCrashReportUploadLevel: string,
+  projectLastUsedPaths: {},
+  recentProjectFiles: any,
+  resourcesImporationBehavior: string,
+  shareDialogDefaultTab: string,
+  showAiAskButtonInTitleBar: boolean,
+  showBasicProfilingCounters: boolean,
+  showCreateSectionByDefault: boolean,
+  showDeprecatedInstructionWarning: string,
+  showEffectParameterNames: boolean,
+  showExperimentalExtensions: boolean,
+  showInAppTutorialDeveloperMode: boolean,
+  takeScreenshotOnPreview: boolean,
+  themeName: any,
+  use3DEditor: any,
+  useBackgroundSerializerForSaving: boolean,
+  useGDJSDevelopmentWatcher: boolean,
+  useShortcutToClosePreviewWindow: boolean,
+  userShortcutMap: {},
+  watchProjectFolderFilesForLocalProjects: boolean,
+} => {
   let languageOrLocale = 'en';
   const browserLanguageOrLocale = getBrowserLanguageOrLocale();
   if (browserLanguageOrLocale)
@@ -95,136 +152,252 @@ const getPreferences = (): PreferencesValues => {
   const preferences =
     loadPreferencesFromLocalStorage() || getInitialPreferences();
   setLanguageInDOM(preferences.language);
+  // $FlowFixMe[incompatible-type]
   return preferences;
 };
 
 export default class PreferencesProvider extends React.Component<Props, State> {
+  // $FlowFixMe[missing-local-annot]
   state = {
-    values: getPreferences(),
-    setMultipleValues: this._setMultipleValues.bind(this),
-    setLanguage: this._setLanguage.bind(this),
-    setThemeName: this._setThemeName.bind(this),
-    setCodeEditorThemeName: this._setCodeEditorThemeName.bind(this),
-    setAutoDownloadUpdates: this._setAutoDownloadUpdates.bind(this),
-    checkUpdates: this._checkUpdates.bind(this),
-    setAutoDisplayChangelog: this._setAutoDisplayChangelog.bind(this),
-    showAlertMessage: this._showAlertMessage.bind(this),
-    showAllAlertMessages: this._showAllAlertMessages.bind(this),
-    showTutorialHint: this._showTutorialHint.bind(this),
-    showAllTutorialHints: this._showAllTutorialHints.bind(this),
-    showAnnouncement: this._showAnnouncement.bind(this),
-    showAllAnnouncements: this._showAllAnnouncements.bind(this),
-    showAskAiStandAloneForm: this._showAskAiStandAloneForm.bind(this),
-    showAllAskAiStandAloneForms: this._showAllAskAiStandAloneForms.bind(this),
-    verifyIfIsNewVersion: this._verifyIfIsNewVersion.bind(this),
-    setEventsSheetShowObjectThumbnails: this._setEventsSheetShowObjectThumbnails.bind(
+    values: (getPreferences(): PreferencesValues),
+    // $FlowFixMe[method-unbinding]
+    setMultipleValues: (this._setMultipleValues.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setLanguage: (this._setLanguage.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setThemeName: (this._setThemeName.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setCodeEditorThemeName: (this._setCodeEditorThemeName.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setAutoDownloadUpdates: (this._setAutoDownloadUpdates.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    checkUpdates: (this._checkUpdates.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setAutoDisplayChangelog: (this._setAutoDisplayChangelog.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    showAlertMessage: (this._showAlertMessage.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    showAllAlertMessages: (this._showAllAlertMessages.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    showTutorialHint: (this._showTutorialHint.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    showAllTutorialHints: (this._showAllTutorialHints.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    showAnnouncement: (this._showAnnouncement.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    showAllAnnouncements: (this._showAllAnnouncements.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    showAskAiStandAloneForm: (this._showAskAiStandAloneForm.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    showAllAskAiStandAloneForms: (this._showAllAskAiStandAloneForms.bind(
       this
-    ),
-    setAutosaveOnPreview: this._setAutosaveOnPreview.bind(this),
-    setUseGDJSDevelopmentWatcher: this._setUseGDJSDevelopmentWatcher.bind(this),
-    setEventsSheetUseAssignmentOperators: this._setEventsSheetUseAssignmentOperators.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    verifyIfIsNewVersion: (this._verifyIfIsNewVersion.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setEventsSheetShowObjectThumbnails: (this._setEventsSheetShowObjectThumbnails.bind(
       this
-    ),
-    setEventsSheetIndentScale: this._setEventsSheetIndentScale.bind(this),
-    setEventsSheetZoomLevel: this._setEventsSheetZoomLevel.bind(this),
-    setShowEffectParameterNames: this._setShowEffectParameterNames.bind(this),
-    getLastUsedPath: this._getLastUsedPath.bind(this),
-    setLastUsedPath: this._setLastUsedPath.bind(this),
-    getDefaultEditorMosaicNode: this._getDefaultEditorMosaicNode.bind(this),
-    setDefaultEditorMosaicNode: this._setDefaultEditorMosaicNode.bind(this),
-    getRecentProjectFiles: this._getRecentProjectFiles.bind(this),
-    insertRecentProjectFile: this._insertRecentProjectFile.bind(this),
-    removeRecentProjectFile: this._removeRecentProjectFile.bind(this),
-    getAutoOpenMostRecentProject: this._getAutoOpenMostRecentProject.bind(this),
-    setAutoOpenMostRecentProject: this._setAutoOpenMostRecentProject.bind(this),
-    hadProjectOpenedDuringLastSession: this._hadProjectOpenedDuringLastSession.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setAutosaveOnPreview: (this._setAutosaveOnPreview.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setUseGDJSDevelopmentWatcher: (this._setUseGDJSDevelopmentWatcher.bind(
       this
-    ),
-    setHasProjectOpened: this._setHasProjectOpened.bind(this),
-    setShortcutForCommand: this._setShortcutForCommand.bind(this),
-    resetShortcutsToDefault: this._resetShortcutsToDefault.bind(this),
-    getNewObjectDialogDefaultTab: this._getNewObjectDialogDefaultTab.bind(this),
-    setNewObjectDialogDefaultTab: this._setNewObjectDialogDefaultTab.bind(this),
-    getShareDialogDefaultTab: this._getShareDialogDefaultTab.bind(this),
-    setShareDialogDefaultTab: this._setShareDialogDefaultTab.bind(this),
-    getIsMenuBarHiddenInPreview: this._getIsMenuBarHiddenInPreview.bind(this),
-    setIsMenuBarHiddenInPreview: this._setIsMenuBarHiddenInPreview.bind(this),
-    setBackdropClickBehavior: this._setBackdropClickBehavior.bind(this),
-    setResourcesImporationBehavior: this._setResourcesImporationBehavior.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setEventsSheetUseAssignmentOperators: (this._setEventsSheetUseAssignmentOperators.bind(
       this
-    ),
-    getIsAlwaysOnTopInPreview: this._getIsAlwaysOnTopInPreview.bind(this),
-    setIsAlwaysOnTopInPreview: this._setIsAlwaysOnTopInPreview.bind(this),
-    setEventsSheetCancelInlineParameter: this._setEventsSheetCancelInlineParameter.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setEventsSheetIndentScale: (this._setEventsSheetIndentScale.bind(
       this
-    ),
-    setShowExperimentalExtensions: this._setShowCommunityExtensions.bind(this),
-    setShowCreateSectionByDefault: this._setShowCreateSectionByDefault.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setEventsSheetZoomLevel: (this._setEventsSheetZoomLevel.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setShowEffectParameterNames: (this._setShowEffectParameterNames.bind(
       this
-    ),
-    setShowInAppTutorialDeveloperMode: this._setShowInAppTutorialDeveloperMode.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    getLastUsedPath: (this._getLastUsedPath.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setLastUsedPath: (this._setLastUsedPath.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    getDefaultEditorMosaicNode: (this._getDefaultEditorMosaicNode.bind(
       this
-    ),
-    setOpenDiagnosticReportAutomatically: this._setOpenDiagnosticReportAutomatically.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setDefaultEditorMosaicNode: (this._setDefaultEditorMosaicNode.bind(
       this
-    ),
-    getOpenDiagnosticReportAutomatically: this._getOpenDiagnosticReportAutomatically.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    getRecentProjectFiles: (this._getRecentProjectFiles.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    insertRecentProjectFile: (this._insertRecentProjectFile.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    removeRecentProjectFile: (this._removeRecentProjectFile.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    getAutoOpenMostRecentProject: (this._getAutoOpenMostRecentProject.bind(
       this
-    ),
-    setBlockPreviewAndExportOnDiagnosticErrors: this._setBlockPreviewAndExportOnDiagnosticErrors.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setAutoOpenMostRecentProject: (this._setAutoOpenMostRecentProject.bind(
       this
-    ),
-    getBlockPreviewAndExportOnDiagnosticErrors: this._getBlockPreviewAndExportOnDiagnosticErrors.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    hadProjectOpenedDuringLastSession: (this._hadProjectOpenedDuringLastSession.bind(
       this
-    ),
-    setShowDeprecatedInstructionWarning: this._setShowDeprecatedInstructionWarning.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setHasProjectOpened: (this._setHasProjectOpened.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setShortcutForCommand: (this._setShortcutForCommand.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    resetShortcutsToDefault: (this._resetShortcutsToDefault.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    getNewObjectDialogDefaultTab: (this._getNewObjectDialogDefaultTab.bind(
       this
-    ),
-    getShowDeprecatedInstructionWarning: this._getShowDeprecatedInstructionWarning.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setNewObjectDialogDefaultTab: (this._setNewObjectDialogDefaultTab.bind(
       this
-    ),
-    setUse3DEditor: this._setUse3DEditor.bind(this),
-    getUse3DEditor: this._getUse3DEditor.bind(this),
-    setShowBasicProfilingCounters: this._setShowBasicProfilingCounters.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    getShareDialogDefaultTab: (this._getShareDialogDefaultTab.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setShareDialogDefaultTab: (this._setShareDialogDefaultTab.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    getIsMenuBarHiddenInPreview: (this._getIsMenuBarHiddenInPreview.bind(
       this
-    ),
-    setDisableNpmScriptConfirmation: this._setDisableNpmScriptConfirmation.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setIsMenuBarHiddenInPreview: (this._setIsMenuBarHiddenInPreview.bind(
       this
-    ),
-    saveTutorialProgress: this._saveTutorialProgress.bind(this),
-    getTutorialProgress: this._getTutorialProgress.bind(this),
-    setNewProjectsDefaultFolder: this._setNewProjectsDefaultFolder.bind(this),
-    setNewProjectsDefaultStorageProviderName: this._setNewProjectsDefaultStorageProviderName.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setBackdropClickBehavior: (this._setBackdropClickBehavior.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setResourcesImporationBehavior: (this._setResourcesImporationBehavior.bind(
       this
-    ),
-    setUseShortcutToClosePreviewWindow: this._setUseShortcutToClosePreviewWindow.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    getIsAlwaysOnTopInPreview: (this._getIsAlwaysOnTopInPreview.bind(
       this
-    ),
-    setWatchProjectFolderFilesForLocalProjects: this._setWatchProjectFolderFilesForLocalProjects.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setIsAlwaysOnTopInPreview: (this._setIsAlwaysOnTopInPreview.bind(
       this
-    ),
-    setNewFeaturesAcknowledgements: this._setNewFeaturesAcknowledgements.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setEventsSheetCancelInlineParameter: (this._setEventsSheetCancelInlineParameter.bind(
       this
-    ),
-    setDisplaySaveReminder: this._setDisplaySaveReminder.bind(this),
-    getEditorStateForProject: this._getEditorStateForProject.bind(this),
-    setEditorStateForProject: this._setEditorStateForProject.bind(this),
-    setFetchPlayerTokenForPreviewAutomatically: this._setFetchPlayerTokenForPreviewAutomatically.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setShowExperimentalExtensions: (this._setShowCommunityExtensions.bind(
       this
-    ),
-    setPreviewCrashReportUploadLevel: this._setPreviewCrashReportUploadLevel.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setShowCreateSectionByDefault: (this._setShowCreateSectionByDefault.bind(
       this
-    ),
-    setGamesDashboardOrderBy: this._setGamesDashboardOrderBy.bind(this),
-    setTakeScreenshotOnPreview: this._setTakeScreenshotOnPreview.bind(this),
-    setShowAiAskButtonInTitleBar: this._setShowAiAskButtonInTitleBar.bind(this),
-    setAiState: this._setAiState.bind(this),
-    setAutomaticallyUseCreditsForAiRequests: this._setAutomaticallyUseCreditsForAiRequests.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setShowInAppTutorialDeveloperMode: (this._setShowInAppTutorialDeveloperMode.bind(
       this
-    ),
-    setUseBackgroundSerializerForSaving: this._setUseBackgroundSerializerForSaving.bind(
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setOpenDiagnosticReportAutomatically: (this._setOpenDiagnosticReportAutomatically.bind(
       this
-    ),
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    getOpenDiagnosticReportAutomatically: (this._getOpenDiagnosticReportAutomatically.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setBlockPreviewAndExportOnDiagnosticErrors: (this._setBlockPreviewAndExportOnDiagnosticErrors.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    getBlockPreviewAndExportOnDiagnosticErrors: (this._getBlockPreviewAndExportOnDiagnosticErrors.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setShowDeprecatedInstructionWarning: (this._setShowDeprecatedInstructionWarning.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    getShowDeprecatedInstructionWarning: (this._getShowDeprecatedInstructionWarning.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setUse3DEditor: (this._setUse3DEditor.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    getUse3DEditor: (this._getUse3DEditor.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setShowBasicProfilingCounters: (this._setShowBasicProfilingCounters.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setDisableNpmScriptConfirmation: (this._setDisableNpmScriptConfirmation.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    saveTutorialProgress: (this._saveTutorialProgress.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    getTutorialProgress: (this._getTutorialProgress.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setNewProjectsDefaultFolder: (this._setNewProjectsDefaultFolder.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setNewProjectsDefaultStorageProviderName: (this._setNewProjectsDefaultStorageProviderName.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setUseShortcutToClosePreviewWindow: (this._setUseShortcutToClosePreviewWindow.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setWatchProjectFolderFilesForLocalProjects: (this._setWatchProjectFolderFilesForLocalProjects.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setNewFeaturesAcknowledgements: (this._setNewFeaturesAcknowledgements.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setDisplaySaveReminder: (this._setDisplaySaveReminder.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    getEditorStateForProject: (this._getEditorStateForProject.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setEditorStateForProject: (this._setEditorStateForProject.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setFetchPlayerTokenForPreviewAutomatically: (this._setFetchPlayerTokenForPreviewAutomatically.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setPreviewCrashReportUploadLevel: (this._setPreviewCrashReportUploadLevel.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setGamesDashboardOrderBy: (this._setGamesDashboardOrderBy.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setTakeScreenshotOnPreview: (this._setTakeScreenshotOnPreview.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setShowAiAskButtonInTitleBar: (this._setShowAiAskButtonInTitleBar.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setAiState: (this._setAiState.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setAutomaticallyUseCreditsForAiRequests: (this._setAutomaticallyUseCreditsForAiRequests.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setUseBackgroundSerializerForSaving: (this._setUseBackgroundSerializerForSaving.bind(
+      this
+    ): any),
   };
 
   componentDidMount() {
@@ -304,6 +477,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
               ...values.inAppTutorialsProgress,
               [tutorialId]: {
                 ...values.inAppTutorialsProgress[tutorialId],
+                // $FlowFixMe[incompatible-type]
                 [userIdKey]: tutorialProgress,
               },
             },
@@ -320,7 +494,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }: {|
     tutorialId: string,
     userId: ?string,
-  |}) {
+  |}): any {
     const userIdKey: string = userId || 'anonymous';
     const tutorialProgresses = this.state.values.inAppTutorialsProgress[
       tutorialId
@@ -517,7 +691,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getOpenDiagnosticReportAutomatically() {
+  _getOpenDiagnosticReportAutomatically(): any {
     return this.state.values.openDiagnosticReportAutomatically;
   }
 
@@ -535,7 +709,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getBlockPreviewAndExportOnDiagnosticErrors() {
+  _getBlockPreviewAndExportOnDiagnosticErrors(): any {
     return this.state.values.blockPreviewAndExportOnDiagnosticErrors;
   }
 
@@ -575,7 +749,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getUse3DEditor() {
+  _getUse3DEditor(): any {
     return this.state.values.use3DEditor;
   }
 
@@ -617,7 +791,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     }
   }
 
-  _verifyIfIsNewVersion() {
+  _verifyIfIsNewVersion(): any {
     const currentVersion = getIDEVersion();
     const { lastLaunchedVersion } = this.state.values;
     if (lastLaunchedVersion === currentVersion) {
@@ -652,7 +826,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           ...state.values,
           hiddenAlertMessages: {
             ...state.values.hiddenAlertMessages,
-            // $FlowFixMe - Flow won't typecheck this because of https://medium.com/flow-type/spreads-common-errors-fixes-9701012e9d58
+            // $FlowFixMe[incompatible-type] - Flow won't typecheck this because of https://medium.com/flow-type/spreads-common-errors-fixes-9701012e9d58
             [identifier]: !show,
           },
         },
@@ -754,7 +928,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _persistValuesToLocalStorage(preferences: Preferences) {
+  _persistValuesToLocalStorage(preferences: Preferences): any {
     try {
       localStorage.setItem(
         localStorageItem,
@@ -767,7 +941,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     return preferences;
   }
 
-  _getLastUsedPath(project: gdProject, kind: ResourceKind) {
+  _getLastUsedPath(project: gdProject, kind: ResourceKind): any {
     const projectPath = project.getProjectFile();
     const { values } = this.state;
     const projectPaths = values.projectLastUsedPaths[projectPath];
@@ -799,7 +973,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getDefaultEditorMosaicNode(name: EditorMosaicName) {
+  _getDefaultEditorMosaicNode(name: EditorMosaicName): any {
     return this.state.values.defaultEditorMosaicNodes[name] || null;
   }
 
@@ -810,7 +984,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           ...state.values,
           defaultEditorMosaicNodes: {
             ...state.values.defaultEditorMosaicNodes,
-            // $FlowFixMe - Flow errors on unions in computed properties
+            // $FlowFixMe[incompatible-type] - Flow errors on unions in computed properties
             [name]: node,
           },
         },
@@ -844,6 +1018,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     if (newRecentFile.storageProviderName === 'Cloud') return;
 
     let recentProjectFiles = this._getRecentProjectFiles();
+    // $FlowFixMe[missing-local-annot]
     const isNotNewRecentFile = recentFile =>
       recentFile.fileMetadata.fileIdentifier !==
       newRecentFile.fileMetadata.fileIdentifier;
@@ -854,6 +1029,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _removeRecentProjectFile(recentFile: FileMetadataAndStorageProviderName) {
+    // $FlowFixMe[missing-local-annot]
     const isNotRemovedRecentFile = recentFileItem =>
       recentFileItem.fileMetadata.fileIdentifier !==
       recentFile.fileMetadata.fileIdentifier;
@@ -862,7 +1038,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     ]);
   }
 
-  _getAutoOpenMostRecentProject() {
+  _getAutoOpenMostRecentProject(): any {
     return this.state.values.autoOpenMostRecentProject;
   }
 
@@ -878,7 +1054,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _hadProjectOpenedDuringLastSession() {
+  _hadProjectOpenedDuringLastSession(): any {
     return this.state.values.hasProjectOpened;
   }
 
@@ -919,7 +1095,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getNewObjectDialogDefaultTab() {
+  _getNewObjectDialogDefaultTab(): any {
     return this.state.values.newObjectDialogDefaultTab;
   }
 
@@ -934,7 +1110,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getShareDialogDefaultTab() {
+  _getShareDialogDefaultTab(): any {
     return this.state.values.shareDialogDefaultTab;
   }
 
@@ -947,7 +1123,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getIsMenuBarHiddenInPreview() {
+  _getIsMenuBarHiddenInPreview(): any {
     return this.state.values.isMenuBarHiddenInPreview;
   }
 
@@ -985,7 +1161,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getIsAlwaysOnTopInPreview() {
+  _getIsAlwaysOnTopInPreview(): any {
     return this.state.values.isAlwaysOnTopInPreview;
   }
 
@@ -1072,7 +1248,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getEditorStateForProject(projectId: string) {
+  _getEditorStateForProject(projectId: string): any {
     return this.state.values.editorStateByProject[projectId];
   }
 
@@ -1086,6 +1262,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           ...state.values,
           editorStateByProject: {
             ...state.values.editorStateByProject,
+            // $FlowFixMe[incompatible-type]
             [projectId]: editorState,
           },
         },
@@ -1181,7 +1358,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  render() {
+  render(): any {
     return (
       <PreferencesContext.Provider value={this.state}>
         {this.props.children}

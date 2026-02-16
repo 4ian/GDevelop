@@ -15,7 +15,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const ChangelogDialog = ({ open, onClose }: Props) => {
+const ChangelogDialog = ({ open, onClose }: Props): null | React.Node => {
   const forceUpdate = useForceUpdate();
   if (!open) {
     // Don't render anything, to avoid in particular sending useless requests.
@@ -37,6 +37,7 @@ const ChangelogDialog = ({ open, onClose }: Props) => {
   return (
     <Dialog
       title={<Trans>What's new in GDevelop?</Trans>}
+      // $FlowFixMe[incompatible-type]
       actions={actions}
       open={open}
       onRequestClose={onClose}

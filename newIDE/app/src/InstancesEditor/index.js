@@ -154,9 +154,12 @@ export default class InstancesEditor extends Component<Props, State> {
   lastContextMenuY = 0;
   lastCursorX: number | null = null;
   lastCursorY: number | null = null;
-  fpsLimiter = new FpsLimiter({ maxFps: 60, idleFps: 10 });
+  // $FlowFixMe[missing-local-annot]
+  fpsLimiter = (new FpsLimiter({ maxFps: 60, idleFps: 10 }): FpsLimiter);
   canvasArea: ?HTMLDivElement;
+  // $FlowFixMe[value-as-type]
   pixiRenderer: PIXI.Renderer;
+  // $FlowFixMe[value-as-type]
   threeRenderer: THREE.WebGLRenderer | null = null;
   keyboardShortcuts: KeyboardShortcuts;
   pinchHandler: PinchHandler;
@@ -174,8 +177,11 @@ export default class InstancesEditor extends Component<Props, State> {
   windowMask: WindowMask;
   statusBar: StatusBar;
   profilerBar: ProfilerBar;
+  // $FlowFixMe[value-as-type]
   uiPixiContainer: PIXI.Container;
+  // $FlowFixMe[value-as-type]
   backgroundPixiContainer: PIXI.Container;
+  // $FlowFixMe[value-as-type]
   backgroundArea: PIXI.Container;
   instancesRenderer: InstancesRenderer;
   viewPosition: ViewPosition;
@@ -190,6 +196,7 @@ export default class InstancesEditor extends Component<Props, State> {
   _showObjectInstancesIn3D: boolean = false;
   _previousToolBeforePicker: ?TileMapTileSelection = null;
 
+  // $FlowFixMe[missing-local-annot]
   state = {
     renderingError: null,
   };
@@ -373,6 +380,7 @@ export default class InstancesEditor extends Component<Props, State> {
     );
     this.backgroundArea.addEventListener(
       'rightclick',
+      // $FlowFixMe[value-as-type]
       (interactionEvent: PIXI.InteractionEvent) => {
         const {
           data: { originalEvent: event },
@@ -769,7 +777,7 @@ export default class InstancesEditor extends Component<Props, State> {
     );
   }
 
-  getTileMapTileSelection = () => {
+  getTileMapTileSelection = (): any => {
     return this.props.tileMapTileSelection;
   };
 
@@ -780,9 +788,9 @@ export default class InstancesEditor extends Component<Props, State> {
     return { color: isLocked ? 0xbc5753 : 0x6868e8, alpha: 1 };
   };
 
-  shouldDisplayClickableHandles = () => !this.props.tileMapTileSelection;
+  shouldDisplayClickableHandles = (): any => !this.props.tileMapTileSelection;
 
-  getZoomFactor = () => {
+  getZoomFactor = (): any => {
     return this.props.instancesEditorSettings.zoomFactor;
   };
 
@@ -854,10 +862,10 @@ export default class InstancesEditor extends Component<Props, State> {
     if (
       object.getType() === 'TileMap::SimpleTileMap' &&
       renderedInstance &&
-      // $FlowFixMe - We are confident the renderedInstance is an instance of RenderedSimpleTileMapInstance.
+      // $FlowFixMe[incompatible-type] - We are confident the renderedInstance is an instance of RenderedSimpleTileMapInstance.
       !!renderedInstance.getEditableTileMap
     ) {
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
       const editableTileMap = renderedInstance.getEditableTileMap();
       if (!editableTileMap) {
         console.error(
@@ -869,7 +877,7 @@ export default class InstancesEditor extends Component<Props, State> {
       const tileMapToSceneTransformation = new AffineTransformation();
       const scales = updateSceneToTileMapTransformation(
         selectedInstance,
-        // $FlowFixMe
+        // $FlowFixMe[incompatible-type]
         renderedInstance,
         sceneToTileMapTransformation,
         tileMapToSceneTransformation
@@ -969,25 +977,35 @@ export default class InstancesEditor extends Component<Props, State> {
           const current = queue.shift();
 
           if (
+            // $FlowFixMe[incompatible-use]
             current.x < 0 ||
+            // $FlowFixMe[incompatible-use]
             current.x >= dimX ||
+            // $FlowFixMe[incompatible-use]
             current.y < 0 ||
+            // $FlowFixMe[incompatible-use]
             current.y >= dimY
           )
             continue;
 
+          // $FlowFixMe[incompatible-use]
           const currentTileId = layer.getTileId(current.x, current.y);
           if (currentTileId !== targetTileId) continue;
 
+          // $FlowFixMe[incompatible-use]
           editableTileMap.setTile(current.x, current.y, 0, newTileId);
           editableTileMap.flipTileOnX(
+            // $FlowFixMe[incompatible-use]
             current.x,
+            // $FlowFixMe[incompatible-use]
             current.y,
             0,
             tileMapTileSelection.flipHorizontally
           );
           editableTileMap.flipTileOnY(
+            // $FlowFixMe[incompatible-use]
             current.x,
+            // $FlowFixMe[incompatible-use]
             current.y,
             0,
             tileMapTileSelection.flipVertically
@@ -995,9 +1013,13 @@ export default class InstancesEditor extends Component<Props, State> {
 
           // Add neighbors if not already visited
           const neighbors = [
+            // $FlowFixMe[incompatible-use]
             { x: current.x - 1, y: current.y },
+            // $FlowFixMe[incompatible-use]
             { x: current.x + 1, y: current.y },
+            // $FlowFixMe[incompatible-use]
             { x: current.x, y: current.y - 1 },
+            // $FlowFixMe[incompatible-use]
             { x: current.x, y: current.y + 1 },
           ];
 
@@ -1180,7 +1202,7 @@ export default class InstancesEditor extends Component<Props, State> {
     }
   };
 
-  getRendererOfInstance = (instance: gdInitialInstance) => {
+  getRendererOfInstance = (instance: gdInitialInstance): any => {
     return this.instancesRenderer.getRendererOfInstance(
       instance.getLayer(),
       instance
@@ -1235,11 +1257,12 @@ export default class InstancesEditor extends Component<Props, State> {
     }
   };
 
-  _getLayersLocks = () => {
+  _getLayersLocks = (): any => {
     const { layersContainer } = this.props;
     const layersLocks = {};
     for (let i = 0; i < layersContainer.getLayersCount(); i++) {
       const layer = layersContainer.getLayerAt(i);
+      // $FlowFixMe[prop-missing]
       layersLocks[layersContainer.getLayerAt(i).getName()] =
         !layer.getVisibility() || layer.isLocked();
     }
@@ -1535,9 +1558,10 @@ export default class InstancesEditor extends Component<Props, State> {
 
   // Debounce function to avoid storing history for each pixel move when user
   // keeps pressing an arrow key.
-  onInstancesMovedDebounced = debounce(this.props.onInstancesMoved, 50, {
+  // $FlowFixMe[missing-local-annot]
+  onInstancesMovedDebounced = (debounce(this.props.onInstancesMoved, 50, {
     trailing: true,
-  });
+  }): any);
 
   moveSelection = (x: number, y: number) => {
     this.fpsLimiter.notifyInteractionHappened();
@@ -1588,7 +1612,7 @@ export default class InstancesEditor extends Component<Props, State> {
     }
   }
 
-  getBoundingClientRect() {
+  getBoundingClientRect(): any {
     if (!this.canvasArea) return { left: 0, top: 0, right: 0, bottom: 0 };
     return this.canvasArea.getBoundingClientRect();
   }
@@ -1600,10 +1624,12 @@ export default class InstancesEditor extends Component<Props, State> {
     const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
     let contentAABB: Rectangle | null = null;
     const getInstanceRectangle = new gd.InitialInstanceJSFunctor();
-    // $FlowFixMe - invoke is not writable
+    // $FlowFixMe[incompatible-type] - invoke is not writable
+    // $FlowFixMe[cannot-write]
     getInstanceRectangle.invoke = instancePtr => {
-      // $FlowFixMe - wrapPointer is not exposed
+      // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
       const instance: gdInitialInstance = gd.wrapPointer(
+        // $FlowFixMe[incompatible-type]
         instancePtr,
         gd.InitialInstance
       );
@@ -1618,7 +1644,7 @@ export default class InstancesEditor extends Component<Props, State> {
         );
       }
     };
-    // $FlowFixMe - JSFunctor is incompatible with Functor
+    // $FlowFixMe[incompatible-type] - JSFunctor is incompatible with Functor
     initialInstances.iterateOverInstances(getInstanceRectangle);
     getInstanceRectangle.delete();
     return contentAABB;
@@ -1681,7 +1707,7 @@ export default class InstancesEditor extends Component<Props, State> {
     if (offset) this.scrollBy(offset[0], offset[1]);
   };
 
-  getLastContextMenuSceneCoordinates = () => {
+  getLastContextMenuSceneCoordinates = (): any => {
     return this.viewPosition.toSceneCoordinates(
       this.lastContextMenuX,
       this.lastContextMenuY
@@ -1696,7 +1722,7 @@ export default class InstancesEditor extends Component<Props, State> {
     );
   };
 
-  getCoordinatesToRenderTileMapPreview = () => {
+  getCoordinatesToRenderTileMapPreview = (): any => {
     const clickInterceptorPointerPathCoordinates = this.clickInterceptor.getPointerPathCoordinates();
     if (clickInterceptorPointerPathCoordinates) {
       return clickInterceptorPointerPathCoordinates;
@@ -1792,7 +1818,7 @@ export default class InstancesEditor extends Component<Props, State> {
       .getUnrotatedInstanceSize(initialInstance);
   };
 
-  render() {
+  render(): any {
     if (!this.props.project) return null;
 
     if (this.state.renderingError) {

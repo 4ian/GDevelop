@@ -349,6 +349,7 @@ describe('EventsValidationScanner', () => {
         },
       ];
 
+      // $FlowFixMe[incompatible-type]
       const grouped = groupValidationErrors(errors);
 
       expect(grouped.missingInstructions.size).toBe(2);
@@ -395,6 +396,7 @@ describe('EventsValidationScanner', () => {
         },
       ];
 
+      // $FlowFixMe[incompatible-type]
       const grouped = groupValidationErrors(errors);
 
       expect(grouped.invalidParameters.size).toBe(2);

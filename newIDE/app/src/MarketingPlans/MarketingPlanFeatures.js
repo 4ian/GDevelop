@@ -59,7 +59,7 @@ const MarketingPlanFeatures = ({
   onPurchase,
   isPlanActive,
   hideBorder,
-}: Props) => {
+}: Props): React.Node => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const {
@@ -143,6 +143,7 @@ const MarketingPlanFeatures = ({
                             color: gdevelopTheme.message.error,
                           }}
                         />
+                        {/* $FlowFixMe[incompatible-type] */}
                         <Text style={styles.bulletPointText}>{error}</Text>
                       </Line>
                     </Column>
@@ -160,6 +161,7 @@ const MarketingPlanFeatures = ({
                               : {}),
                           }}
                         />
+                        {/* $FlowFixMe[incompatible-type] */}
                         <Text style={styles.bulletPointText}>
                           {selectMessageByLocale(i18n, bulletPointByLocale)}
                         </Text>

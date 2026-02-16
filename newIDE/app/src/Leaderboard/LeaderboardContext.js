@@ -45,18 +45,19 @@ export const initialLeaderboardState = {
     goToPreviousPage: null,
     goToFirstPage: null,
   },
-  createLeaderboard: async () => null,
+  createLeaderboard: async (): Promise<null> => null,
   listLeaderboards: async () => {},
   selectLeaderboard: () => {},
   setDisplayOnlyBestEntry: () => {},
   updateLeaderboard: async () => {},
   resetLeaderboard: async () => {},
   deleteLeaderboard: async () => {},
-  deleteLeaderboardEntry: async entryId => {},
+  deleteLeaderboardEntry: async (entryId: any) => {},
   fetchLeaderboardEntries: async () => {},
 };
 
-const LeaderboardContext = React.createContext<LeaderboardState>(
+const LeaderboardContext: React.Context<LeaderboardState> = React.createContext<LeaderboardState>(
+  // $FlowFixMe[incompatible-type]
   initialLeaderboardState
 );
 

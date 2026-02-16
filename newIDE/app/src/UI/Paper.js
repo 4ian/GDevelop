@@ -20,14 +20,17 @@ type Props = {|
 export const getBackgroundColor = (
   gdevelopTheme: GDevelopTheme,
   backgroundColor: 'light' | 'medium' | 'dark'
-) =>
+): any =>
   backgroundColor === 'dark'
     ? gdevelopTheme.paper.backgroundColor.dark
     : backgroundColor === 'medium'
     ? gdevelopTheme.paper.backgroundColor.medium
     : gdevelopTheme.paper.backgroundColor.light;
 
-const Paper = React.forwardRef<Props, HTMLDivElement>(
+const Paper: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<HTMLDivElement>,
+}> = React.forwardRef<Props, HTMLDivElement>(
   ({ id, children, background, elevation, variant, style, square }, ref) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const backgroundColor = getBackgroundColor(gdevelopTheme, background);

@@ -171,6 +171,7 @@ class EventsBasedObjectTreeViewItem implements TreeViewItem {
             new LeafTreeViewItem(
               new EventsFunctionTreeViewItemContent(
                 functions.getEventsFunctionAt(i),
+                // $FlowFixMe[incompatible-type]
                 eventFunctionProps
               )
             )
@@ -215,6 +216,7 @@ class BehaviorTreeViewItem implements TreeViewItem {
             new LeafTreeViewItem(
               new EventsFunctionTreeViewItemContent(
                 eventsFunctionsContainer.getEventsFunctionAt(i),
+                // $FlowFixMe[incompatible-type]
                 eventFunctionProps
               )
             )
@@ -234,6 +236,7 @@ class LeafTreeViewItem implements TreeViewItem {
   }
 }
 
+// $FlowFixMe[incompatible-type]
 class PlaceHolderTreeViewItem implements TreeViewItem {
   isPlaceholder = true;
   content: TreeViewItemContent;
@@ -319,6 +322,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
 
   onClick(): void {}
 
+  // $FlowFixMe[missing-local-annot]
   buildMenuTemplate(i18n: I18nType, index: number) {
     return this.buildMenuTemplateFunction(i18n, index);
   }
@@ -425,6 +429,7 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
     this.onClickCallback();
   }
 
+  // $FlowFixMe[missing-local-annot]
   buildMenuTemplate(i18n: I18nType, index: number) {
     return this.buildMenuTemplateFunction(i18n, index);
   }
@@ -1061,6 +1066,7 @@ const EventsFunctionsList = React.forwardRef<
     );
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
+        // $FlowFixMe[incompatible-type]
         return [
           {
             isRoot: true,
@@ -1116,7 +1122,8 @@ const EventsFunctionsList = React.forwardRef<
                       i18n._(t`Start by adding a new object.`)
                     ),
                   ]
-                : objectTreeViewItems;
+                : // $FlowFixMe[incompatible-type]
+                  objectTreeViewItems;
             },
           },
           {
@@ -1138,7 +1145,8 @@ const EventsFunctionsList = React.forwardRef<
                       i18n._(t`Start by adding a new behavior.`)
                     ),
                   ]
-                : behaviorTreeViewItems;
+                : // $FlowFixMe[incompatible-type]
+                  behaviorTreeViewItems;
             },
           },
           {
@@ -1189,6 +1197,7 @@ const EventsFunctionsList = React.forwardRef<
                   new LeafTreeViewItem(
                     new EventsFunctionTreeViewItemContent(
                       freeEventsFunctions.getEventsFunctionAt(i),
+                      // $FlowFixMe[incompatible-type]
                       freeFunctionProps
                     )
                   )
@@ -1365,6 +1374,8 @@ const EventsFunctionsList = React.forwardRef<
               <div style={styles.autoSizerContainer}>
                 <AutoSizer style={styles.autoSizer} disableWidth>
                   {({ height }) => (
+                    // $FlowFixMe[incompatible-type]
+                    // $FlowFixMe[incompatible-exact]
                     <TreeView
                       key={listKey}
                       ref={treeViewRef}
@@ -1427,19 +1438,23 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.project === nextProps.project &&
   prevProps.eventsFunctionsExtension === nextProps.eventsFunctionsExtension;
 
+// $FlowFixMe[incompatible-type]
 const MemoizedObjectsList = React.memo<Props, EventsFunctionsListInterface>(
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-exact]
   EventsFunctionsList,
   arePropsEqual
 );
 
-const EventsFunctionsListWithErrorBoundary = React.forwardRef<
-  Props,
-  EventsFunctionsListInterface
->((props, ref) => (
+const EventsFunctionsListWithErrorBoundary: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<EventsFunctionsListInterface>,
+}> = React.forwardRef<Props, EventsFunctionsListInterface>((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Objects list</Trans>}
     scope="scene-editor-objects-list"
   >
+    {/* $FlowFixMe[incompatible-type] */}
     <MemoizedObjectsList ref={ref} {...props} />
   </ErrorBoundary>
 ));

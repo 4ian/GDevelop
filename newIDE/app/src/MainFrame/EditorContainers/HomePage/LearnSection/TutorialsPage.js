@@ -12,7 +12,7 @@ type Props = {|
   onSelectCategory: (category: LearnCategory) => void,
 |};
 
-const TutorialsPage = ({ onSelectCategory }: Props) => {
+const TutorialsPage = ({ onSelectCategory }: Props): React.Node => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const [
     selectedTutorial,

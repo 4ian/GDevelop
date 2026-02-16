@@ -27,15 +27,20 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const NoGamesOrProjects = () => {
+export const NoGamesOrProjects = (): React.Node => {
+  // $FlowFixMe[missing-empty-array-annot]
   const projectFiles = [];
 
+  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
+    // $FlowFixMe[incompatible-type]
     values: {
       ...initialPreferences.values,
+      // $FlowFixMe[incompatible-type]
       recentProjectFiles: projectFiles,
     },
+    // $FlowFixMe[incompatible-type]
     getRecentProjectFiles: () => projectFiles,
   };
 
@@ -74,7 +79,7 @@ export const NoGamesOrProjects = () => {
   );
 };
 
-export const WithOnlyGames = () => {
+export const WithOnlyGames = (): React.Node => {
   const projectFiles = [
     {
       ...fakeFileMetadataAndStorageProviderNameForLocalProject,
@@ -85,12 +90,16 @@ export const WithOnlyGames = () => {
     },
   ];
 
+  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
+    // $FlowFixMe[incompatible-type]
     values: {
       ...initialPreferences.values,
+      // $FlowFixMe[incompatible-type]
       recentProjectFiles: projectFiles,
     },
+    // $FlowFixMe[incompatible-type]
     getRecentProjectFiles: () => projectFiles,
   };
 
@@ -129,14 +138,16 @@ export const WithOnlyGames = () => {
   );
 };
 
-export const WithOnlyProjects = () => {
+export const WithOnlyProjects = (): React.Node => {
   const projectFiles = [
     fakeFileMetadataAndStorageProviderNameForCloudProject,
     fakeFileMetadataAndStorageProviderNameForLocalProject,
   ];
 
+  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
+    // $FlowFixMe[incompatible-type]
     values: {
       ...initialPreferences.values,
       recentProjectFiles: projectFiles,
@@ -179,7 +190,7 @@ export const WithOnlyProjects = () => {
   );
 };
 
-export const WithGamesAndProjects = () => {
+export const WithGamesAndProjects = (): React.Node => {
   const projectFiles = [
     fakeFileMetadataAndStorageProviderNameForCloudProject,
     fakeFileMetadataAndStorageProviderNameForLocalProject,
@@ -192,12 +203,16 @@ export const WithGamesAndProjects = () => {
     },
   ];
 
+  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
+    // $FlowFixMe[incompatible-type]
     values: {
       ...initialPreferences.values,
+      // $FlowFixMe[incompatible-type]
       recentProjectFiles: projectFiles,
     },
+    // $FlowFixMe[incompatible-type]
     getRecentProjectFiles: () => projectFiles,
   };
 

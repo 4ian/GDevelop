@@ -34,7 +34,7 @@ import LocalLoginProvider from './LoginProvider/LocalLoginProvider';
 
 const gd: libGDevelop = global.gd;
 
-export const create = (authentication: Authentication) => {
+export const create = (authentication: Authentication): React.Node => {
   Window.setUpContextMenu();
   const loginProvider = new LocalLoginProvider(authentication.auth);
   authentication.setLoginProvider(loginProvider);
@@ -47,7 +47,11 @@ export const create = (authentication: Authentication) => {
       authentication={authentication}
       disableCheckForUpdates={!!appArguments['disable-update-check']}
       makeEventsFunctionCodeWriter={makeLocalEventsFunctionCodeWriter}
+      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-exact]
       eventsFunctionsExtensionWriter={LocalEventsFunctionsExtensionWriter}
+      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[incompatible-exact]
       eventsFunctionsExtensionOpener={LocalEventsFunctionsExtensionOpener}
     >
       {({ i18n }) => (
@@ -77,6 +81,7 @@ export const create = (authentication: Authentication) => {
                 />
               )}
               renderPreviewLauncher={(props, ref) => (
+                // $FlowFixMe[incompatible-type]
                 <LocalPreviewLauncher {...props} ref={ref} />
               )}
               renderShareDialog={props => (

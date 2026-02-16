@@ -107,7 +107,7 @@ export const convertBlobToFiles = <
 >(
   itemResults: Array<ItemResult<Item>>,
   onError: (resourceName: string, error: Error) => void
-) =>
+): any =>
   itemResults
     .map(({ item, blob, error }) => {
       if (error || !blob) {
@@ -128,7 +128,7 @@ export const convertBlobToFiles = <
 export function convertBlobToDataURL(blob: Blob): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
-    // $FlowFixMe - it's guaranted for reader.result to be a string.
+    // $FlowFixMe[incompatible-type] - it's guaranted for reader.result to be a string.
     reader.onload = _e => resolve(reader.result);
     reader.onerror = _e => reject(reader.error);
     reader.onabort = _e => reject(new Error('Read aborted'));

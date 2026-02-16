@@ -51,7 +51,7 @@ const getOrientationAndWindowSizeFromDimensions = (
       ? 'large'
       : 'xlarge';
 
-  // $FlowFixMe - this is guaranteed to be a valid OrientationAndWindowSizeType.
+  // $FlowFixMe[incompatible-type] - this is guaranteed to be a valid OrientationAndWindowSizeType.
   return sizeType + '-' + orientation;
 };
 
@@ -136,7 +136,7 @@ type TopLevelWindowSizeProviderProps = {|
  */
 export const TopLevelWindowSizeProvider = ({
   children,
-}: TopLevelWindowSizeProviderProps) => {
+}: TopLevelWindowSizeProviderProps): React.MixedElement => {
   return (
     <WindowSizeContext.Provider value={null}>
       {children}
@@ -159,7 +159,7 @@ export const SpecificDimensionsWindowSizeProvider = ({
   children,
   innerWidth,
   innerHeight,
-}: SpecificDimensionsWindowSizeProviderProps) => {
+}: SpecificDimensionsWindowSizeProviderProps): React.MixedElement => {
   const windowSize = React.useMemo(
     () => {
       if (innerWidth === null || innerHeight === null) {
@@ -194,7 +194,8 @@ type ResponsiveWindowMeasurerProps = {|
  */
 export const ResponsiveWindowMeasurer = ({
   children,
-}: ResponsiveWindowMeasurerProps) => children(useResponsiveWindowSize());
+}: ResponsiveWindowMeasurerProps): React.Node =>
+  children(useResponsiveWindowSize());
 
 /**
  * Return the size of the window.

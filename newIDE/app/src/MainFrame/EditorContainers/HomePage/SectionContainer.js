@@ -73,7 +73,10 @@ type Props = {|
   showUrgentAnnouncements?: boolean,
 |};
 
-const SectionContainer = React.forwardRef<Props, HTMLDivElement>(
+const SectionContainer: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<HTMLDivElement>,
+}> = React.forwardRef<Props, HTMLDivElement>(
   (
     {
       children,
@@ -164,6 +167,7 @@ const SectionContainer = React.forwardRef<Props, HTMLDivElement>(
                           <Chip label={chipText} style={styles.chip} />
                         </Line>
                       )}
+                      {/* $FlowFixMe[incompatible-type] */}
                       <Text size="title" noMargin style={styles.title}>
                         {title}
                       </Text>
@@ -206,7 +210,7 @@ export const SectionRow = ({
 }: {
   children: React.Node,
   expand?: boolean,
-}) => (
+}): React.MixedElement => (
   <div
     style={{ ...styles.rowContainer, ...(expand ? { flex: 1 } : undefined) }}
   >

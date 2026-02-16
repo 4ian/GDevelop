@@ -31,7 +31,10 @@ type Props = {|
   onClose: () => void,
 |};
 
-export const PrivateTutorialViewDialog = ({ tutorial, onClose }: Props) => {
+export const PrivateTutorialViewDialog = ({
+  tutorial,
+  onClose,
+}: Props): React.Node => {
   const { limits, getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );

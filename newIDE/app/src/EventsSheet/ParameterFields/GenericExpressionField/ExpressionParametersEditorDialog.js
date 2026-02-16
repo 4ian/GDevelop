@@ -46,7 +46,7 @@ const ExpressionParametersEditorDialog = ({
   projectScopedContainersAccessor,
   expressionMetadata,
   parameterRenderingService,
-}: Props) => {
+}: Props): React.Node => {
   const [parameterValues, setParameterValues] = React.useState<Array<string>>(
     Array(expressionMetadata.getParametersCount()).fill('')
   );

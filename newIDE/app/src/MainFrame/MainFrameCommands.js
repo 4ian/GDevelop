@@ -27,6 +27,7 @@ const generateProjectItemOptions = <T: Item>(
   project: ?gdProject,
   enumerate: (project: gdProject) => Array<T>,
   onOpen: string => void
+  // $FlowFixMe[missing-local-annot]
 ) => {
   if (!project) return [];
   return enumerate(project).map(item => ({

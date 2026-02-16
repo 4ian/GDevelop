@@ -55,6 +55,7 @@ const removeExtensionFromFileName = (fileName: string) => {
   return dotIndex < 0 ? fileName : fileName.substring(0, dotIndex);
 };
 
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget(
   'sprite-animations-list'
 );
@@ -116,10 +117,10 @@ type AnimationListProps = {|
   onCreateMatchingSpriteCollisionMask: () => Promise<void>,
 |};
 
-const AnimationList = React.forwardRef<
-  AnimationListProps,
-  AnimationListInterface
->(
+const AnimationList: React.ComponentType<{
+  ...AnimationListProps,
+  +ref?: React.RefSetter<AnimationListInterface>,
+}> = React.forwardRef<AnimationListProps, AnimationListInterface>(
   (
     {
       animations,
@@ -146,6 +147,7 @@ const AnimationList = React.forwardRef<
     const { isMobile } = useResponsiveWindowSize();
     const { showConfirmation } = useAlertDialog();
     const animationsCount = animations.getAnimationsCount();
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     const animationsIndices = new Array(animationsCount)
       .fill(0)
       .map((_, index) => index);
@@ -413,6 +415,7 @@ const AnimationList = React.forwardRef<
     );
 
     const replaceDirection = React.useCallback(
+      // $FlowFixMe[missing-local-annot]
       (animationId, directionId, newDirection) => {
         animations
           .getAnimation(animationId)

@@ -164,14 +164,14 @@ export const createNewInstructionForEventsFunction = (
 /**
  * Validate that a function name is valid.
  */
-export const validateEventsFunctionName = (functionName: string) => {
+export const validateEventsFunctionName = (functionName: string): boolean => {
   return gd.Project.isNameSafe(functionName);
 };
 
 /**
  * Validate that an events functions extension name is valid.
  */
-export const validateExtensionName = (extensionName: string) => {
+export const validateExtensionName = (extensionName: string): boolean => {
   return gd.Project.isNameSafe(extensionName);
 };
 
@@ -181,7 +181,7 @@ export const validateExtensionName = (extensionName: string) => {
 export const validateExtensionNameUniqueness = (
   project: gdProject,
   extensionName: string
-) => {
+): boolean => {
   return !project.hasEventsFunctionsExtensionNamed(extensionName);
 };
 
@@ -192,7 +192,7 @@ export const validateEventsFunctionNameUniqueness = (
   project: gdProject,
   extensionName: string,
   eventsFunction: gdEventsFunction
-) => {
+): boolean => {
   if (project.hasEventsFunctionsExtensionNamed(extensionName)) {
     const eventsFunctionsExtension = project.getEventsFunctionsExtension(
       extensionName
@@ -214,7 +214,7 @@ export const canCreateEventsFunction = (
   project: gdProject,
   extensionName: string,
   eventsFunction: gdEventsFunction
-) => {
+): false | boolean => {
   return (
     extensionName !== '' &&
     validateExtensionName(extensionName) &&
@@ -235,6 +235,6 @@ export const canCreateEventsFunction = (
  */
 export const functionHasLotsOfParameters = (
   eventsFunction: gdEventsFunction
-) => {
+): boolean => {
   return eventsFunction.getParameters().getParametersCount() > 7;
 };

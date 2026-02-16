@@ -2,7 +2,7 @@
 
 export const getInsertionParentAndPositionFromSelection = (
   selectedObjectFolderOrObject: gdObjectFolderOrObject
-) => {
+): { folder: gdObjectFolderOrObject, position: number } => {
   const parentFolder = selectedObjectFolderOrObject.isFolder()
     ? selectedObjectFolderOrObject
     : selectedObjectFolderOrObject.getParent();

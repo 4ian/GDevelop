@@ -42,7 +42,7 @@ export const GdGamesFrame = ({
   path,
   onMessageReceived,
   supportedMessageIds,
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const paletteType = gdevelopTheme.palette.type;
 
@@ -66,7 +66,8 @@ export const GdGamesFrame = ({
             loadState.current = 'loaded';
             forceUpdate();
           } else {
-            // $FlowFixMe - Trust gd.games to send the right data shapes.
+            // $FlowFixMe[incompatible-type] - Trust gd.games to send the right data shapes.
+            // $FlowFixMe[incompatible-indexer]
             onMessageReceived(event.data);
           }
         }

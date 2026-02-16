@@ -47,7 +47,7 @@ const buildEventPtrToPathMap = (
   mapFor(0, eventsList.getEventsCount(), index => {
     const event = eventsList.getEventAt(index);
     const currentPath = [...parentPath, index];
-    // $FlowFixMe - ptr is a number identifying the C++ object
+    // $FlowFixMe[incompatible-type] - ptr is a number identifying the C++ object
     map.set(event.ptr, currentPath);
 
     if (event.canHaveSubEvents()) {
@@ -77,7 +77,8 @@ const createValidationWorker = (
 
   let currentEventPath: Array<number> = [];
 
-  // $FlowFixMe - overriding C++ method:
+  // $FlowFixMe[incompatible-type] - overriding C++ method:
+  // $FlowFixMe[cannot-write]
   worker.doVisitEvent = (event: gdBaseEvent) => {
     const path = eventPtrToPathMap.get(event.ptr);
     if (path) {
@@ -85,7 +86,8 @@ const createValidationWorker = (
     }
   };
 
-  // $FlowFixMe - overriding C++ method:
+  // $FlowFixMe[incompatible-type] - overriding C++ method:
+  // $FlowFixMe[cannot-write]
   worker.doVisitInstruction = (
     instruction: gdInstruction,
     isCondition: boolean,

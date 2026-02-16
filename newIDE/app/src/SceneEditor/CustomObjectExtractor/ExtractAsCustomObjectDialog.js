@@ -44,7 +44,7 @@ export default function ExtractAsCustomObjectDialog({
   selectedInstances,
   onApply,
   onCancel,
-}: Props) {
+}: Props): React.Node {
   const [extensionName, setExtensionName] = React.useState<string>('');
   const [isNewExtension, setNewExtension] = React.useState<boolean>(true);
   const [
@@ -133,7 +133,9 @@ export default function ExtractAsCustomObjectDialog({
       }
       const behaviorMetadatas = new Set<gdBehaviorMetadata>();
       for (const object of objects) {
+        // $FlowFixMe[incompatible-exact]
         mapVector(object.getAllBehaviorNames(), behaviorName => {
+          // $FlowFixMe[incompatible-type]
           const behavior = object.getBehavior(behaviorName);
 
           const platform = project.getCurrentPlatform();

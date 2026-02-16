@@ -29,8 +29,11 @@ const styles = {
   },
 };
 
-export default class WhileEvent extends React.Component<EventRendererProps, *> {
-  render() {
+export default class WhileEvent extends React.Component<
+  EventRendererProps,
+  any
+> {
+  render(): any {
     var whileEvent = gd.asWhileEvent(this.props.event);
 
     return (

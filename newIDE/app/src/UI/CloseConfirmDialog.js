@@ -15,7 +15,7 @@ type Props = {|
   hasUnsavedChanges: boolean,
 |};
 
-export default React.memo<Props>(function CloseConfirmDialog({
+export default (React.memo<Props>(function CloseConfirmDialog({
   shouldPrompt,
   i18n,
   language,
@@ -69,4 +69,4 @@ export default React.memo<Props>(function CloseConfirmDialog({
   );
 
   return null;
-});
+}): React.ComponentType<Props>);

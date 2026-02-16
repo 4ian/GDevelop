@@ -19,7 +19,7 @@ const AuthenticatedUserProfileDetails = ({
   onOpenEditProfileDialog,
   onOpenChangeEmailDialog,
   authenticatedUser,
-}: Props) => {
+}: Props): React.Node => {
   const profile = authenticatedUser.profile;
   const firebaseUser = authenticatedUser.firebaseUser;
   const openEmailVerificationDialog = React.useCallback(

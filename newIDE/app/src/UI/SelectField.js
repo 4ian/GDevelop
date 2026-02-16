@@ -11,8 +11,10 @@ import { makeStyles } from '@material-ui/core';
 import ChevronArrowBottom from './CustomSvgIcons/ChevronArrowBottom';
 
 const INVALID_VALUE = '';
+// $FlowFixMe[missing-local-annot]
 const stopPropagation = event => event.stopPropagation();
 
+// $FlowFixMe[missing-local-annot]
 const useSelectStyles = textAlign =>
   makeStyles({
     root: {
@@ -68,96 +70,101 @@ type Props = {|
  * A select field based on Material-UI select field.
  * To be used with `SelectOption`.
  */
-const SelectField = React.forwardRef<Props, SelectFieldInterface>(
-  (props, ref) => {
-    const inputRef = React.useRef<?HTMLInputElement>(null);
+const SelectField: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<SelectFieldInterface>,
+}> = React.forwardRef<Props, SelectFieldInterface>((props, ref) => {
+  const inputRef = React.useRef<?HTMLInputElement>(null);
 
-    const focus: FieldFocusFunction = options => {
-      if (inputRef.current) inputRef.current.focus();
-    };
+  const focus: FieldFocusFunction = options => {
+    if (inputRef.current) inputRef.current.focus();
+  };
 
-    React.useImperativeHandle(ref, () => ({
-      focus,
-    }));
-    const selectStyles = useSelectStyles(props.textAlign);
+  React.useImperativeHandle(ref, () => ({
+    focus,
+  }));
+  const selectStyles = useSelectStyles(props.textAlign);
 
-    const onChange = props.onChange || undefined;
+  const onChange = props.onChange || undefined;
 
-    // Dig into children props to see if the current value is valid or not.
-    let hasValidValue = true;
-    const childrenValues = React.Children.map(props.children, child => {
-      if (child === null || !child.props) return null;
+  // Dig into children props to see if the current value is valid or not.
+  let hasValidValue = true;
+  const childrenValues = React.Children.map(props.children, child => {
+    // $FlowFixMe[prop-missing]
+    // $FlowFixMe[incompatible-type]
+    if (child === null || !child.props) return null;
 
-      return child.props.value;
-    });
-    if (!childrenValues) {
-      console.error(
-        'SelectField has been passed no or invalid children. Only SelectOption and null are supported.'
-      );
-    } else {
-      hasValidValue =
-        childrenValues.filter(childValue => childValue === props.value)
-          .length !== 0;
-    }
-    const displayedValue = hasValidValue ? props.value : INVALID_VALUE;
-
-    const helperText = props.errorText ? (
-      props.errorText
-    ) : props.helperMarkdownText ? (
-      <MarkdownText source={props.helperMarkdownText} />
-    ) : null;
-
-    return (
-      <I18n>
-        {({ i18n }) => (
-          <TextField
-            id={props.id}
-            select
-            color="secondary"
-            {...computeTextFieldStyleProps(props)}
-            disabled={props.disabled}
-            fullWidth={props.fullWidth}
-            label={props.floatingLabelText}
-            helperText={helperText}
-            error={!!props.errorText}
-            value={displayedValue}
-            onClick={props.stopPropagationOnClick ? stopPropagation : undefined}
-            onChange={
-              onChange
-                ? event => {
-                    onChange(event, -1, event.target.value);
-                  }
-                : undefined
-            }
-            onFocus={props.onFocus}
-            InputProps={{
-              style: props.inputStyle,
-              disableUnderline: !!props.disableUnderline,
-            }}
-            InputLabelProps={{
-              shrink: true,
-            }}
-            SelectProps={{
-              native: true,
-              classes: selectStyles,
-              IconComponent: ChevronArrowBottom,
-            }}
-            style={props.style}
-            inputRef={inputRef}
-          >
-            {!hasValidValue ? (
-              <option value={INVALID_VALUE} disabled>
-                {props.translatableHintText
-                  ? i18n._(props.translatableHintText)
-                  : i18n._(t`Choose an option`)}
-              </option>
-            ) : null}
-            {props.children}
-          </TextField>
-        )}
-      </I18n>
+    // $FlowFixMe[incompatible-use]
+    return child.props.value;
+  });
+  if (!childrenValues) {
+    console.error(
+      'SelectField has been passed no or invalid children. Only SelectOption and null are supported.'
     );
+  } else {
+    hasValidValue =
+      childrenValues.filter(childValue => childValue === props.value).length !==
+      0;
   }
-);
+  const displayedValue = hasValidValue ? props.value : INVALID_VALUE;
+
+  const helperText = props.errorText ? (
+    props.errorText
+  ) : props.helperMarkdownText ? (
+    <MarkdownText source={props.helperMarkdownText} />
+  ) : null;
+
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <TextField
+          id={props.id}
+          select
+          color="secondary"
+          // $FlowFixMe[incompatible-type]
+          {...computeTextFieldStyleProps(props)}
+          disabled={props.disabled}
+          fullWidth={props.fullWidth}
+          label={props.floatingLabelText}
+          helperText={helperText}
+          error={!!props.errorText}
+          value={displayedValue}
+          onClick={props.stopPropagationOnClick ? stopPropagation : undefined}
+          onChange={
+            onChange
+              ? event => {
+                  onChange(event, -1, event.target.value);
+                }
+              : undefined
+          }
+          onFocus={props.onFocus}
+          InputProps={{
+            style: props.inputStyle,
+            disableUnderline: !!props.disableUnderline,
+          }}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          SelectProps={{
+            native: true,
+            classes: selectStyles,
+            IconComponent: ChevronArrowBottom,
+          }}
+          style={props.style}
+          inputRef={inputRef}
+        >
+          {!hasValidValue ? (
+            <option value={INVALID_VALUE} disabled>
+              {props.translatableHintText
+                ? i18n._(props.translatableHintText)
+                : i18n._(t`Choose an option`)}
+            </option>
+          ) : null}
+          {props.children}
+        </TextField>
+      )}
+    </I18n>
+  );
+});
 
 export default SelectField;

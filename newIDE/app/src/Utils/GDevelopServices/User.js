@@ -201,7 +201,8 @@ export type UserLeaderboard = {
   topUserCommentQualityRatings: UserLeaderboardEntry[],
 };
 
-export const client = axios.create({
+// $FlowFixMe[cannot-resolve-name]
+export const client: Axios = axios.create({
   baseURL: GDevelopUserApi.baseUrl,
 });
 
@@ -627,7 +628,7 @@ const tiktokUsernameFormattingErrorMessage = (
 );
 
 export const donateLinkConfig = {
-  getFormattingError: (value: string) =>
+  getFormattingError: (value: string): React.Node | void =>
     value && !simpleUrlRegex.test(value)
       ? profileLinkFormattingErrorMessage
       : undefined,
@@ -640,26 +641,28 @@ export const discordUsernameConfig = {
 
 export const communityLinksConfig = {
   personalWebsiteLink: {
-    icon: <Planet />,
-    getFormattingError: (value: string) =>
+    icon: (<Planet />: React.Node),
+    getFormattingError: (value: string): React.Node | void =>
       value && !simpleUrlRegex.test(value)
         ? profileLinkFormattingErrorMessage
         : undefined,
     maxLength: 150,
   },
   personalWebsite2Link: {
-    icon: <Planet />,
-    getFormattingError: (value: string) =>
+    icon: (<Planet />: React.Node),
+    getFormattingError: (value: string): React.Node | void =>
       value && !simpleUrlRegex.test(value)
         ? profileLinkFormattingErrorMessage
         : undefined,
     maxLength: 150,
   },
   githubUsername: {
-    icon: <GitHub style={{ width: 24, height: 24 }} />,
+    icon: (<GitHub style={{ width: 24, height: 24 }} />: React.Node),
     prefix: 'https://github.com/',
     maxLength: 39,
-    getMessageFromUpdate: (responseCode: string) => {
+    getMessageFromUpdate: (
+      responseCode: string
+    ): null | { message: any, title: any } => {
       if (
         responseCode === 'github-star/badge-given' ||
         responseCode === 'github-star/badge-already-given'
@@ -681,16 +684,18 @@ export const communityLinksConfig = {
       }
       return null;
     },
-    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string) =>
+    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string): any =>
       !hasBadge
         ? t`[Star the GDevelop repository](https://github.com/4ian/GDevelop) and add your GitHub username here to get ${rewardValueInCredits} free credits as a thank you!`
         : t`Thank you for supporting the GDevelop open-source community. Credits were added to your account as a thank you.`,
   },
   twitterUsername: {
-    icon: <Twitter />,
+    icon: (<Twitter />: React.Node),
     prefix: 'https://twitter.com/',
     maxLength: 15,
-    getMessageFromUpdate: (responseCode: string) => {
+    getMessageFromUpdate: (
+      responseCode: string
+    ): null | { message: any, title: any } => {
       if (
         responseCode === 'twitter-follow/badge-given' ||
         responseCode === 'twitter-follow/badge-already-given'
@@ -713,21 +718,23 @@ export const communityLinksConfig = {
 
       return null;
     },
-    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string) =>
+    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string): any =>
       !hasBadge
         ? t`[Follow GDevelop](https://twitter.com/GDevelopApp) and enter your Twitter username here to get ${rewardValueInCredits} free credits as a thank you!`
         : t`Thank you for supporting GDevelop. Credits were added to your account as a thank you.`,
   },
   facebookUsername: {
-    icon: <Facebook />,
+    icon: (<Facebook />: React.Node),
     prefix: 'https://facebook.com/',
     maxLength: 50,
   },
   youtubeUsername: {
-    icon: <YouTube />,
+    icon: (<YouTube />: React.Node),
     prefix: 'https://youtube.com/@',
     maxLength: 100,
-    getMessageFromUpdate: (responseCode: string) => {
+    getMessageFromUpdate: (
+      responseCode: string
+    ): null | { message: any, title: any } => {
       if (
         responseCode === 'youtube-subscription/badge-given' ||
         responseCode === 'youtube-subscription/badge-already-given'
@@ -752,20 +759,22 @@ export const communityLinksConfig = {
 
       return null;
     },
-    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string) =>
+    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string): any =>
       !hasBadge
         ? t`[Subscribe to GDevelop](https://youtube.com/@gdevelopapp) and enter your YouTube username here to get ${rewardValueInCredits} free credits as a thank you!`
         : t`Thank you for supporting GDevelop. Credits were added to your account as a thank you.`,
   },
   tiktokUsername: {
-    icon: <TikTok />,
+    icon: (<TikTok />: React.Node),
     prefix: 'https://tiktok.com/@',
-    getFormattingError: (value: string) =>
+    getFormattingError: (value: string): React.Node | void =>
       !tiktokUsernameEmptyOrNoAtRegex.test(value)
         ? tiktokUsernameFormattingErrorMessage
         : undefined,
     maxLength: 30,
-    getMessageFromUpdate: (responseCode: string) => {
+    getMessageFromUpdate: (
+      responseCode: string
+    ): null | { message: any, title: any } => {
       if (
         responseCode === 'tiktok-follow/badge-given' ||
         responseCode === 'tiktok-follow/badge-already-given'
@@ -788,29 +797,29 @@ export const communityLinksConfig = {
 
       return null;
     },
-    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string) =>
+    getRewardMessage: (hasBadge: boolean, rewardValueInCredits: string): any =>
       !hasBadge
         ? t`[Follow GDevelop](https://tiktok.com/@gdevelop) and enter your TikTok username here to get ${rewardValueInCredits} free credits as a thank you!`
         : t`Thank you for supporting GDevelop. Credits were added to your account as a thank you.`,
   },
   instagramUsername: {
-    icon: <Instagram />,
+    icon: (<Instagram />: React.Node),
     prefix: 'https://instagram.com/',
     maxLength: 30,
   },
   redditUsername: {
-    icon: <Reddit />,
+    icon: (<Reddit />: React.Node),
     prefix: 'https://reddit.com/user/',
     maxLength: 20,
   },
   snapchatUsername: {
-    icon: <Snapchat />,
+    icon: (<Snapchat />: React.Node),
     prefix: 'https://snapchat.com/add/',
     maxLength: 15,
   },
   discordServerLink: {
-    icon: <Discord />,
-    getFormattingError: (value: string) =>
+    icon: (<Discord />: React.Node),
+    getFormattingError: (value: string): React.Node | void =>
       value && !simpleDiscordUrlRegex.test(value)
         ? discordServerLinkFormattingErrorMessage
         : undefined,

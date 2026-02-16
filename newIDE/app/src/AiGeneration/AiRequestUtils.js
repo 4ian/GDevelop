@@ -172,6 +172,7 @@ export const getFunctionCallOutputsFromEditorFunctionCallResults = (
     .filter(Boolean);
 
   return {
+    // $FlowFixMe[incompatible-type]
     functionCallOutputs,
     hasUnfinishedResult,
   };

@@ -33,7 +33,7 @@ type TableProps = {|
  * See https://material-ui.com/components/tables/
  */
 export class Table extends React.Component<TableProps, {||}> {
-  render() {
+  render(): any {
     return <MUITable size="small" {...this.props} />;
   }
 }
@@ -46,7 +46,7 @@ type TableBodyProps = {|
  * A TableBody based on Material-UI TableBody.
  */
 export class TableBody extends React.Component<TableBodyProps, {||}> {
-  render() {
+  render(): any {
     return <MUITableBody {...this.props} />;
   }
 }
@@ -59,7 +59,7 @@ type TableHeaderProps = {|
  * A TableHeader based on Material-UI TableHead.
  */
 export class TableHeader extends React.Component<TableHeaderProps, {||}> {
-  render() {
+  render(): any {
     return <MUITableHead {...this.props} />;
   }
 }
@@ -76,7 +76,7 @@ export class TableHeaderColumn extends React.Component<
   TableHeaderColumnProps,
   {||}
 > {
-  render() {
+  render(): any {
     return <MUITableCell {...this.props} />;
   }
 }
@@ -95,7 +95,7 @@ type TableRowProps = {|
  * A TableRow based on Material-UI TableRow.
  */
 export class TableRow extends React.Component<TableRowProps, {||}> {
-  render() {
+  render(): any {
     return <MUITableRow {...this.props} />;
   }
 }
@@ -109,7 +109,7 @@ type TableRowColumnProps = {|
  * A TableRowColumn based on Material-UI TableRowColumn.
  */
 export class TableRowColumn extends React.Component<TableRowColumnProps, {||}> {
-  render() {
+  render(): any {
     return <MUITableCell {...this.props} />;
   }
 }

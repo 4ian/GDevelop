@@ -30,7 +30,7 @@ const CreditsUsageDialog = ({
   onConfirm,
   successMessage,
   closeAutomaticallyAfterSuccess,
-}: Props) => {
+}: Props): React.Node => {
   const [isPurchasing, setIsPurchasing] = React.useState(false);
   const [isPurchaseSuccessful, setIsPurchaseSuccessful] = React.useState(false);
   const { showAlert } = useAlertDialog();

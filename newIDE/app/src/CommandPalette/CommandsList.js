@@ -69,11 +69,11 @@ export type CommandName =
   | 'OPEN_PROFILE';
 
 export const commandAreas = {
-  GENERAL: t`General`,
-  IDE: t`IDE`,
-  PROJECT: t`Project`,
-  SCENE: t`Scene`,
-  EVENTS: t`Events`,
+  GENERAL: (t`General`: any),
+  IDE: (t`IDE`: any),
+  PROJECT: (t`Project`: any),
+  SCENE: (t`Scene`: any),
+  EVENTS: (t`Events`: any),
 };
 
 type CommandArea = $Keys<typeof commandAreas>;

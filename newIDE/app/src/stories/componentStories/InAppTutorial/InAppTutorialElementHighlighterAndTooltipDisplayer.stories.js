@@ -55,7 +55,7 @@ const elementIdToTooltip = {
   },
 };
 
-export const Default = () => {
+export const Default = (): React.Node => {
   const [listItemRef, setListItemRef] = React.useState<any>(null);
   const [
     elementToHighlight,
@@ -73,6 +73,7 @@ export const Default = () => {
     setElementToHighlightId,
   ] = React.useState<string>('#add-parameter-button');
 
+  // $FlowFixMe[missing-local-annot]
   const handleSelect = event => {
     const {
       target: { value },
@@ -205,6 +206,7 @@ export const Default = () => {
           <InAppTutorialElementHighlighter element={elementToHighlight} />
           <InAppTutorialTooltipDisplayer
             anchorElement={elementToHighlight}
+            // $FlowFixMe[invalid-computed-prop]
             tooltip={elementIdToTooltip[elementToHighlightId]}
             progress={28}
             endTutorial={() => action('end tutorial')()}

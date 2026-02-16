@@ -25,7 +25,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => {
+export const Default = (): React.Node => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -78,13 +78,15 @@ export const Default = () => {
   );
 };
 
-export const WithCommunityExtensions = () => {
+export const WithCommunityExtensions = (): React.Node => {
   const [
     showExperimentalExtensions,
     setShowExperimentalExtensions,
   ] = React.useState(true);
+  // $FlowFixMe[incompatible-type]
   const preferences: Preferences = {
     ...initialPreferences,
+    // $FlowFixMe[incompatible-type]
     values: { ...initialPreferences.values, showExperimentalExtensions },
     setShowExperimentalExtensions,
   };
@@ -143,7 +145,7 @@ export const WithCommunityExtensions = () => {
   );
 };
 
-export const WithServerSideErrors = () => {
+export const WithServerSideErrors = (): React.Node => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -181,7 +183,7 @@ export const WithServerSideErrors = () => {
   );
 };
 
-export const ShowingAnAlreadyInstalledExtension = () => {
+export const ShowingAnAlreadyInstalledExtension = (): React.Node => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -237,7 +239,7 @@ export const ShowingAnAlreadyInstalledExtension = () => {
   );
 };
 
-export const ExtensionBeingInstalled = () => {
+export const ExtensionBeingInstalled = (): React.Node => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,
@@ -290,7 +292,7 @@ export const ExtensionBeingInstalled = () => {
   );
 };
 
-export const OnlyWithBehaviors = () => {
+export const OnlyWithBehaviors = (): React.Node => {
   const extensionApiMock = React.useMemo(() => {
     const mock = new MockAdapter(extensionClient, {
       delayResponse: 250,

@@ -31,7 +31,7 @@ const styles = {
   unlockedAchievement: {},
 };
 
-const AchievementList = ({ badges, achievements }: Props) => {
+const AchievementList = ({ badges, achievements }: Props): React.Node => {
   const [
     achievementsWithBadgeData,
     setAchievementsWithBadgeData,
@@ -40,12 +40,15 @@ const AchievementList = ({ badges, achievements }: Props) => {
   React.useEffect(
     () => {
       const badgeByAchievementId = badges.reduce((acc, badge) => {
+        // $FlowFixMe[prop-missing]
         acc[badge.achievementId] = badge;
         return acc;
       }, {});
 
       const achievementsWithBadgeData = achievements.reduce(
+        // $FlowFixMe[missing-local-annot]
         (acc, achievement) => {
+          // $FlowFixMe[invalid-computed-prop]
           const badge = badgeByAchievementId[achievement.id];
           const hasBadge = !!badge;
           acc.push({
@@ -88,8 +91,10 @@ const AchievementList = ({ badges, achievements }: Props) => {
                       size="sub-title"
                       style={
                         achievementWithBadgeData.unlockedAt
-                          ? styles.unlockedAchievement
-                          : styles.lockedAchievement
+                          ? // $FlowFixMe[incompatible-type]
+                            styles.unlockedAchievement
+                          : // $FlowFixMe[incompatible-type]
+                            styles.lockedAchievement
                       }
                     >
                       {selectMessageByLocale(
@@ -102,8 +107,10 @@ const AchievementList = ({ badges, achievements }: Props) => {
                     noMargin
                     style={
                       achievementWithBadgeData.unlockedAt
-                        ? styles.unlockedAchievement
-                        : styles.lockedAchievement
+                        ? // $FlowFixMe[incompatible-type]
+                          styles.unlockedAchievement
+                        : // $FlowFixMe[incompatible-type]
+                          styles.lockedAchievement
                     }
                     size="body2"
                   >

@@ -78,7 +78,7 @@ const getVariableValueAsString = (variable: gdVariable, i18n: I18nType) => {
     : null;
 };
 
-export const VariableDeclaration = (props: Props) => {
+export const VariableDeclaration = (props: Props): React.Node => {
   const { variableName, variable, id, isLoopIndexVariable } = props;
   /**
    * Render the different parts of the text of the instruction.

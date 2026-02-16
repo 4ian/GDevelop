@@ -36,7 +36,10 @@ const addSearchParameterToUrl = (
  * On the contrary, if you're displaying a built-in GDevelop image, coming for example from the
  * "res/" folder (i.e: a GDevelop icon), you don't need this and can use `<img>` as usual.
  */
-export const CorsAwareImage = ({ src, ...props }: Props) => {
+export const CorsAwareImage = ({
+  src,
+  ...props
+}: Props): React.MixedElement => {
   const correctedSrc =
     // To avoid strange/hard to understand CORS issues, we add a dummy parameter.
     // By doing so, we force browser to consider this URL as different than the one traditionally

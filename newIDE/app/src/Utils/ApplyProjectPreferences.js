@@ -94,6 +94,7 @@ export const applyProjectPreferences = (
   if (rawPreferences) {
     const filtered = filterAllowedPreferences(rawPreferences);
     if (
+      // $FlowFixMe[method-unbinding]
       Object.prototype.hasOwnProperty.call(
         filtered,
         'showDeprecatedInstructionWarning'

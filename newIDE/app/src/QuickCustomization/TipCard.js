@@ -11,7 +11,7 @@ type Props = {|
   description: React.Node,
 |};
 
-const TipCard = ({ title, description }: Props) => {
+const TipCard = ({ title, description }: Props): React.Node => {
   return (
     <Column noMargin>
       <Paper background="light">

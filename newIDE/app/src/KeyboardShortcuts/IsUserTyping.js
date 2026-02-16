@@ -3,7 +3,7 @@
 /**
  * Checks if the user is currently typing text
  */
-const isUserTyping = () => {
+const isUserTyping = (): boolean => {
   const activeElement = document.activeElement;
   if (!activeElement) return false;
   // Check if focused element is part of a text entry HTML element

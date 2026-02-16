@@ -3,7 +3,7 @@ import { type UserAnswers } from './UserSurvey';
 const localStoreUserSurveyKey = 'gd-user-survey';
 const TEN_MINUTES = 10 * 60 * 1000;
 
-export const getRecentPersistedState = () => {
+export const getRecentPersistedState = (): any | null => {
   try {
     const serializedState = localStorage.getItem(localStoreUserSurveyKey);
     if (!serializedState) return null;
@@ -54,7 +54,7 @@ export const clearUserSurveyPersistedState = () => {
   }
 };
 
-export const hasStartedUserSurvey = () => {
+export const hasStartedUserSurvey = (): boolean | void => {
   try {
     return localStorage.hasOwnProperty(localStoreUserSurveyKey);
   } catch (error) {

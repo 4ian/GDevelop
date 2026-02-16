@@ -28,7 +28,7 @@ type Props = {|
   gameId: string,
 |};
 
-const MultiplayerAdmin = ({ gameId }: Props) => {
+const MultiplayerAdmin = ({ gameId }: Props): React.Node | React.Node => {
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [fetchingError, setFetchingError] = React.useState<React.Node>(null);
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
@@ -69,6 +69,7 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
 
   const maxPlayersSelectOptions = React.useMemo(
     () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       const options = new Array(maximumNumberOfPlayersAllowed - 1)
         .fill(0)
         .map((_, index) => (
@@ -100,6 +101,7 @@ const MultiplayerAdmin = ({ gameId }: Props) => {
 
   const minPlayersSelectOptions = React.useMemo(
     () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       const options = new Array(maxPlayersValue)
         .fill(0)
         .map((_, index) => (

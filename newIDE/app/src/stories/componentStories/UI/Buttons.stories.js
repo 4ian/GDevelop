@@ -43,7 +43,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => (
+export const Default = (): React.Node => (
   <ColumnStackLayout>
     <LineStackLayout noMargin>
       <Text size="block-title">Buttons:</Text>
@@ -361,12 +361,14 @@ export const Default = () => (
         label="Raised button with split menu"
         primary
         onClick={action('onClick')()}
+        // $FlowFixMe[incompatible-type]
         buildMenuTemplate={buildFakeMenuTemplate}
       />
       <FlatButtonWithSplitMenu
         label="Flat primary button"
         primary
         onClick={action('onClick')()}
+        // $FlowFixMe[incompatible-type]
         buildMenuTemplate={buildFakeMenuTemplate}
       />
     </LineStackLayout>
@@ -374,12 +376,14 @@ export const Default = () => (
       <FlatButtonWithSplitMenu
         label="Flat non primary button"
         onClick={action('onClick')()}
+        // $FlowFixMe[incompatible-type]
         buildMenuTemplate={buildFakeMenuTemplate}
       />
       <FlatButtonWithSplitMenu
         label="... and with icon"
         icon={<Edit />}
         onClick={action('onClick')()}
+        // $FlowFixMe[incompatible-type]
         buildMenuTemplate={buildFakeMenuTemplate}
       />
       <FlatButtonWithSplitMenu
@@ -387,6 +391,7 @@ export const Default = () => (
         icon={<Edit />}
         disabled
         onClick={action('onClick')()}
+        // $FlowFixMe[incompatible-type]
         buildMenuTemplate={buildFakeMenuTemplate}
       />
     </LineStackLayout>
@@ -394,12 +399,14 @@ export const Default = () => (
       <FlatButtonWithSplitMenu
         icon={<Edit />}
         onClick={action('onClick')()}
+        // $FlowFixMe[incompatible-type]
         buildMenuTemplate={buildFakeMenuTemplate}
       />
       <FlatButtonWithSplitMenu
         icon={<Edit />}
         disabled
         onClick={action('onClick')()}
+        // $FlowFixMe[incompatible-type]
         buildMenuTemplate={buildFakeMenuTemplate}
       />
     </LineStackLayout>
@@ -413,17 +420,20 @@ export const Default = () => (
       />
       <RaisedButtonWithMenu
         label="Button with menu"
+        // $FlowFixMe[incompatible-type]
         buildMenuTemplate={buildFakeMenuTemplate}
       />
       <RaisedButtonWithMenu
         label="... and with icon"
         icon={<Edit />}
+        // $FlowFixMe[incompatible-type]
         buildMenuTemplate={buildFakeMenuTemplate}
       />
       <RaisedButtonWithMenu
         label="... and disabled"
         icon={<Edit />}
         disabled
+        // $FlowFixMe[incompatible-type]
         buildMenuTemplate={buildFakeMenuTemplate}
       />
     </LineStackLayout>
@@ -437,6 +447,7 @@ export const Default = () => (
             <Filter />
           </IconButton>
         }
+        // $FlowFixMe[incompatible-type]
         buildMenuTemplate={buildFakeMenuTemplate}
       />
     </LineStackLayout>

@@ -82,7 +82,7 @@ export const StatefulCollapsibleSubPanel = ({
   titleIcon?: ?React.Node,
   title: string,
   titleBarButtons?: Array<TitleBarButton>,
-|}) => {
+|}): React.Node => {
   const [isFolded, setIsFolded] = React.useState(isInitiallyFolded);
 
   const toggleFolded = React.useCallback(
@@ -149,7 +149,7 @@ export const CompactInstancePropertiesEditor = ({
   onSelectTileMapTile,
   isVariableListLocked,
   canOverrideBehaviorProperties,
-}: Props) => {
+}: Props): null | React.Node => {
   const forceUpdate = useForceUpdate();
   const instance = instances[0];
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
@@ -163,6 +163,7 @@ export const CompactInstancePropertiesEditor = ({
    */
   const shouldDisplayVariablesList = instances.length === 1;
 
+  // $FlowFixMe[missing-local-annot]
   const onScrollY = React.useCallback(deltaY => {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollBy(deltaY);

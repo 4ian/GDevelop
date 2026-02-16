@@ -20,6 +20,7 @@ import { CorsAwareImage } from '../UI/CorsAwareImage';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { type ClaimedProductOptions } from './PurchaseClaimDialog';
 
+// $FlowFixMe[missing-local-annot]
 const getStyles = ({ isMobile }) => {
   return {
     formContainer: {
@@ -65,7 +66,7 @@ const LoginWithPurchaseClaimDialog = ({
   loginInProgress,
   error,
   claimedProductOptions: { productListingData: claimedProduct },
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -146,7 +147,9 @@ const LoginWithPurchaseClaimDialog = ({
     <Dialog
       title={null} // This dialog has a custom design to be more welcoming, the title is set in the content.
       id="login-dialog"
+      // $FlowFixMe[incompatible-type]
       actions={actions}
+      // $FlowFixMe[incompatible-type]
       secondaryActions={secondaryActions}
       cannotBeDismissed={loginInProgress}
       onRequestClose={onClose}

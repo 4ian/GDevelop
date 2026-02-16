@@ -60,7 +60,7 @@ const DirectionTools = ({
   resourceExternalEditors,
   onEditWith,
   onDirectionUpdated,
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const [previewOpen, setPreviewOpen] = React.useState(false);
   const currentTimeBetweenFrames = direction.getTimeBetweenFrames();
@@ -71,6 +71,7 @@ const DirectionTools = ({
   const hasNoSprites = direction.getSpritesCount() === 0;
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
+  // $FlowFixMe[missing-local-annot]
   const saveTimeBetweenFrames = newTimeBetweenFramesString => {
     if (!newTimeBetweenFramesString) return;
     const newTimeBetweenFrames = Math.max(

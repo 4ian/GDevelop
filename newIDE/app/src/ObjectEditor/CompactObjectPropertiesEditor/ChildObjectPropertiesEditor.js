@@ -27,7 +27,7 @@ export const ChildObjectPropertiesEditor = ({
   customObjectConfiguration,
   childObject,
   onEditObject,
-}: Props) => {
+}: Props): React.Node => {
   // Don't use a memo for this because metadata from custom objects are built
   // from event-based object when extensions are refreshed after an extension
   // installation.
@@ -44,6 +44,7 @@ export const ChildObjectPropertiesEditor = ({
   );
 
   const childObjectConfigurationAsGd = gd.castObject(
+    // $FlowFixMe[incompatible-exact]
     childObjectConfiguration,
     gd.ObjectConfiguration
   );
@@ -88,6 +89,7 @@ export const ChildObjectPropertiesEditor = ({
         onInstancesModified={() => {
           // TODO: undo/redo?
         }}
+        // $FlowFixMe[incompatible-type]
         onRefreshAllFields={forceRecomputeSchema}
         placeholder={<Trans>This object has no properties.</Trans>}
         customizeBasicSchema={schema =>

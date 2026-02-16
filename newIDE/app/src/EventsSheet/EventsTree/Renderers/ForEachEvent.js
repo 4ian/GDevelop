@@ -41,9 +41,11 @@ const styles = {
 
 export default class ForEachEvent extends React.Component<
   EventRendererProps,
+  // $FlowFixMe[unsupported-syntax]
   *
 > {
   _objectField: ?ParameterFieldInterface = null;
+  // $FlowFixMe[missing-local-annot]
   state = {
     editing: false,
     editingPreviousValue: null,
@@ -92,7 +94,7 @@ export default class ForEachEvent extends React.Component<
   endEditing = () => {
     const { anchorEl } = this.state;
     // Put back the focus after closing the inline popover.
-    // $FlowFixMe
+    // $FlowFixMe[incompatible-type]
     if (anchorEl) anchorEl.focus();
 
     this.setState({
@@ -102,7 +104,7 @@ export default class ForEachEvent extends React.Component<
     });
   };
 
-  render() {
+  render(): any {
     const forEachEvent = gd.asForEachEvent(this.props.event);
     const objectName = forEachEvent.getObjectToPick();
 

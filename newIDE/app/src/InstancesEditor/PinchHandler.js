@@ -1,7 +1,7 @@
 // @flow
 import ViewPosition from './ViewPosition';
 
-export const shouldBeHandledByPinch = (event: ?TouchEvent) => {
+export const shouldBeHandledByPinch = (event: ?TouchEvent): boolean => {
   if (!event) return false;
 
   const { targetTouches } = event;
@@ -52,6 +52,8 @@ const registerCanvasPinchDetector = ({
       return;
     }
     var now = new Date();
+    // $FlowFixMe[unsafe-arithmetic]
+    // $FlowFixMe[incompatible-use]
     var interval = now - lastPinch.p.date;
     if (interval < 12) {
       return;
@@ -60,9 +62,11 @@ const registerCanvasPinchDetector = ({
       x: (t[0].clientX + t[1].clientX) / 2,
       y: (t[0].clientY + t[1].clientY) / 2,
     };
+    // $FlowFixMe[incompatible-use]
     const scaleChange = distance / lastPinch.p.distance;
 
     onPinchMove(newCenter.x, newCenter.y, scaleChange);
+    // $FlowFixMe[incompatible-use]
     lastPinch.p = {
       distance: distance,
       date: now,

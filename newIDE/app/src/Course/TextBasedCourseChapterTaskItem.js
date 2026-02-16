@@ -45,7 +45,7 @@ const TextBasedCourseChapterTaskItem = ({
   task,
   isComplete,
   onComplete,
-}: Props) => {
+}: Props): React.Node => {
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -94,11 +94,13 @@ const TextBasedCourseChapterTaskItem = ({
               <Checkbox
                 checked={isComplete}
                 onCheck={() => onComplete(!isComplete)}
+                // $FlowFixMe[incompatible-type]
                 style={styles.checkbox}
               />
             </div>
             <ColumnStackLayout expand noMargin noOverflowParent>
               <TextBasedCourseChapterItems items={task.items} />
+              {/* $FlowFixMe[constant-condition] */}
               {isOpen && task.answer && (
                 <Accordion kind="answer" noMargin>
                   <AccordionHeader>

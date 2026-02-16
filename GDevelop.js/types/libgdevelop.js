@@ -16,7 +16,9 @@ declare class libGDevelop {
   getTypeOfBehaviorInObjectOrGroup(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): string;
   getBehaviorNamesInObjectOrGroup(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): gdVectorString;
 
+  // $FlowFixMe[cannot-resolve-name]
   removeFromVectorParameterMetadata(gdVectorParameterMetadata, index: number): void;
+  // $FlowFixMe[cannot-resolve-name]
   swapInVectorParameterMetadata(gdVectorParameterMetadata, oldIndex: number, newIndex: number): void;
 
   asStandardEvent(gdBaseEvent): gdStandardEvent;
@@ -36,6 +38,7 @@ declare class libGDevelop {
   asPanelSpriteConfiguration(gdObjectConfiguration): gdPanelSpriteObject;
   asTextObjectConfiguration(gdObjectConfiguration): gdTextObject;
   asShapePainterConfiguration(gdObjectConfiguration): gdShapePainterObject;
+  // $FlowFixMe[cannot-resolve-name]
   asAdMobConfiguration(gdObjectConfiguration): gdAdMobObject;
   asTextEntryConfiguration(gdObjectConfiguration): gdTextEntryObject;
   asParticleEmitterConfiguration(gdObjectConfiguration): gdParticleEmitterObject;
@@ -294,6 +297,7 @@ declare class libGDevelop {
   ParticleEmitterObject: Class<gdParticleEmitterObject>;
   LayoutCodeGenerator: Class<gdLayoutCodeGenerator>;
   BehaviorCodeGenerator: Class<gdBehaviorCodeGenerator>;
+  // $FlowFixMe[cannot-resolve-name]
   ObjectCodeGenerator: Class<gdObjectCodeGenerator>;
   EventsFunctionsExtensionCodeGenerator: Class<gdEventsFunctionsExtensionCodeGenerator>;
   PreviewExportOptions: Class<gdPreviewExportOptions>;

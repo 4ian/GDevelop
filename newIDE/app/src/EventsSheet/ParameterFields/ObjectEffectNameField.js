@@ -21,7 +21,7 @@ import Functions from '@material-ui/icons/Functions';
 import { Trans, t } from '@lingui/macro';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectEffectNameField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?GenericExpressionField | SelectFieldInterface>(
       null
@@ -73,12 +73,14 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         objectOrGroupName
       );
       if (group) {
-        const effectsNamesByObject: string[][] = mapVector(
+        const effectsNamesByObject: Array<Array<string>> = mapVector(
+          // $FlowFixMe[incompatible-exact]
           group.getAllObjectsNames(),
           objectName => {
             const object = getObjectByName(
               globalObjectsContainer,
               objectsContainer,
+              // $FlowFixMe[incompatible-type]
               objectName
             );
             if (!object) {
@@ -110,6 +112,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       setIsExpressionField(!isExpressionField);
     };
 
+    // $FlowFixMe[missing-local-annot]
     const onChangeSelectValue = (event, value) => {
       props.onChange(event.target.value);
     };
@@ -198,4 +201,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-);
+): React.ComponentType<{
+  ...ParameterFieldProps,
+  +ref?: React.RefSetter<ParameterFieldInterface>,
+}>);

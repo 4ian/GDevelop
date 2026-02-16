@@ -72,7 +72,6 @@ const ResourcePreview = (props: Props): null | React.Node => {
     case 'video':
       return <GenericIconPreview renderIcon={props => <Video {...props} />} />;
     case 'font':
-    // $FlowFixMe[invalid-compare]
     case 'bitmapFont':
       return (
         <GenericIconPreview renderIcon={props => <FontDownload {...props} />} />

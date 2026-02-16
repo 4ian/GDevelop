@@ -41,11 +41,15 @@ module.exports = {
             // Handle requests with query parameters by serving index.html
             // This ensures URLs like http://localhost:2929/?i=123 work correctly
             function handleQueryParams(req, res, next) {
-              const url = new URL(req.url, `http://${req.headers.host}`);
-              // If the request is for the root path with query parameters,
-              // rewrite to serve index.html while preserving the query string
-              if (url.pathname === '/' && url.search) {
-                req.url = '/index.html' + url.search;
+              try {
+                const url = new URL(req.url, `http://${req.headers.host}`);
+                // If the request is for the root path with query parameters,
+                // rewrite to serve index.html while preserving the query string
+                if (url.pathname === '/' && url.search) {
+                  req.url = '/index.html' + url.search;
+                }
+              } catch (e) {
+                // If URL parsing fails, leave req.url unchanged
               }
               next();
             },

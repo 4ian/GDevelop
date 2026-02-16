@@ -124,11 +124,7 @@ import {
 } from './MainMenu';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
-import {
-  getShortcutDisplayName,
-  useKeyboardShortcuts,
-  useShortcutMap,
-} from '../KeyboardShortcuts';
+import { useKeyboardShortcuts, useShortcutMap } from '../KeyboardShortcuts';
 import useMainFrameCommands from './MainFrameCommands';
 import {
   CommandPaletteWithAlgoliaSearch,
@@ -473,6 +469,10 @@ const MainFrame = (props: Props) => {
   const { setHasProjectOpened } = preferences;
   const { previewLoadingRef, setPreviewLoading } = usePreviewLoadingState();
   const shortcutMap = useShortcutMap();
+  const [
+    diagnosticReportDialogOpen,
+    setDiagnosticReportDialogOpen,
+  ] = React.useState<boolean>(false);
 
   /**
    * Checks for diagnostic errors in the project if blocking is enabled.
@@ -493,20 +493,22 @@ const MainFrame = (props: Props) => {
       try {
         const validationErrors = scanProjectForValidationErrors(project);
         if (validationErrors.length > 0) {
-          const shortcut = getShortcutDisplayName(
-            shortcutMap['OPEN_DIAGNOSTIC_REPORT']
-          );
-          await showAlert({
+          const openReport = await showConfirmation({
             title: t`Diagnostic errors found`,
             message:
               actionType === 'preview'
                 ? t`Your project has ${
                     validationErrors.length
-                  } diagnostic error(s). Please fix them before launching a preview. Press ${shortcut} to open the diagnostic report.`
+                  } diagnostic error(s). Please fix them before launching a preview.`
                 : t`Your project has ${
                     validationErrors.length
-                  } diagnostic error(s). Please fix them before exporting. Press ${shortcut} to open the diagnostic report.`,
+                  } diagnostic error(s). Please fix them before exporting.`,
+            dismissButtonLabel: t`Close`,
+            confirmButtonLabel: t`Open report`,
           });
+          if (openReport) {
+            setDiagnosticReportDialogOpen(true);
+          }
           return true;
         }
       } catch (error) {
@@ -515,7 +517,7 @@ const MainFrame = (props: Props) => {
 
       return false;
     },
-    [preferences, shortcutMap, showAlert]
+    [preferences, showConfirmation, setDiagnosticReportDialogOpen]
   );
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
@@ -585,10 +587,6 @@ const MainFrame = (props: Props) => {
   const [
     quitInAppTutorialDialogOpen,
     setQuitInAppTutorialDialogOpen,
-  ] = React.useState<boolean>(false);
-  const [
-    diagnosticReportDialogOpen,
-    setDiagnosticReportDialogOpen,
   ] = React.useState<boolean>(false);
   const { setPendingEventNavigation } = useNavigationToEvent({
     editorTabs: state.editorTabs,

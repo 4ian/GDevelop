@@ -22,6 +22,8 @@ export function getMuiOverrides({
   snackbarBackgroundColor,
   snackbarBorderColor,
   textDefaultColor,
+  tooltipBackgroundColor,
+  tooltipTextColor,
 }: {|
   tabTextColor: string,
   tabSelectedTextColor: string,
@@ -37,6 +39,8 @@ export function getMuiOverrides({
   snackbarBackgroundColor: string,
   snackbarBorderColor: string,
   textDefaultColor: string,
+  tooltipBackgroundColor: string,
+  tooltipTextColor: string,
 |}): any {
   return {
     MuiTypography: {
@@ -309,6 +313,23 @@ export function getMuiOverrides({
       },
       message: {
         color: textDefaultColor,
+      },
+    },
+    MuiTooltip: {
+      tooltip: {
+        backgroundColor: tooltipBackgroundColor,
+        color: tooltipTextColor,
+        // Ensure chips inside tooltips have good contrast
+        '& .MuiChip-root': {
+          color: tooltipTextColor,
+        },
+        '& .MuiChip-outlined': {
+          borderColor: tooltipTextColor,
+          color: tooltipTextColor,
+        },
+        '& .MuiChip-icon': {
+          color: tooltipTextColor,
+        },
       },
     },
   };
@@ -721,6 +742,8 @@ export function createGdevelopTheme({
         snackbarBackgroundColor: styles['ThemeSnackbarBackgroundColor'],
         snackbarBorderColor: styles['ThemeSnackbarBorderColor'],
         textDefaultColor: styles['ThemeTextDefaultColor'],
+        tooltipBackgroundColor: styles['ThemeTooltipBackgroundColor'],
+        tooltipTextColor: styles['ThemeTooltipTextColor'],
       }),
     },
   };

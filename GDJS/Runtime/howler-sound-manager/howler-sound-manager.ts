@@ -516,15 +516,6 @@ namespace gdjs {
 
     _resourceLoader: gdjs.ResourceLoader;
 
-    // Event listener references cleanup
-    private _onDocumentPause = () => {
-      this.pauseAllActiveSounds();
-    };
-
-    private _onDocumentResume = () => {
-      this.resumeAllActiveSounds();
-    };
-
     /**
      * @param resourceLoader The resources loader of the game.
      */
@@ -534,11 +525,23 @@ namespace gdjs {
       gdjs.registerRuntimeScenePostEventsCallback(
         this._clearCachedSpatialPosition.bind(this)
       );
-
-      document.addEventListener('deviceready', () => {
+      const that = this;
+      document.addEventListener('deviceready', function () {
         // pause/resume sounds in Cordova when the app is being paused/resumed
-        document.addEventListener('pause', this._onDocumentPause, false);
-        document.addEventListener('resume', this._onDocumentResume, false);
+        document.addEventListener(
+          'pause',
+          function () {
+            that.pauseAllActiveSounds();
+          },
+          false
+        );
+        document.addEventListener(
+          'resume',
+          function () {
+            that.resumeAllActiveSounds();
+          },
+          false
+        );
       });
     }
 
@@ -1258,8 +1261,6 @@ namespace gdjs {
      * Unloads all audio from memory, clear Howl cache and stop all audio.
      */
     dispose(): void {
-      document.removeEventListener('pause', this._onDocumentPause);
-      document.removeEventListener('resume', this._onDocumentResume);
       this.unloadAll();
     }
 

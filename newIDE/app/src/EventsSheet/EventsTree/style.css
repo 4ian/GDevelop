@@ -96,12 +96,15 @@
 }
 
 /**
- * Remove default style of multiline textfield (for comment events) to remove
- * the height change occurring when starting to edit the comment.
+ * Ensure group and comment event text fields match the display text style
  */
-.gd-events-sheet .rst__rowTitle .MuiInput-multiline,
-.gd-events-sheet .rst__rowTitle .MuiInputBase-input {
-    padding-bottom: 0;
+.gd-events-sheet .rst__rowTitle .MuiInputBase-input,
+.gd-events-sheet .rst__rowTitle .MuiInput-input {
+    padding: 0 !important;
+    padding-bottom: 0 !important;
+    line-height: 1.5em;
+    font-size: inherit;
+    height: auto;
 }
 
 /**

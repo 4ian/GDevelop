@@ -3,7 +3,6 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import classNames from 'classnames';
-import TextField, { type TextFieldInterface } from '../../../UI/TextField';
 import {
   largeSelectedArea,
   largeSelectableArea,
@@ -21,6 +20,19 @@ import { Trans } from '@lingui/macro';
 import { dataObjectToProps } from '../../../Utils/HTMLDataset';
 const gd: libGDevelop = global.gd;
 
+const titleTextStyle = {
+  width: '100%',
+  fontSize: '1.3em',
+  fontFamily: 'inherit',
+  padding: '0px 0 0px 0px',
+  margin: 0,
+  backgroundColor: 'transparent',
+  outline: 0,
+  border: '1px solid transparent',
+  boxSizing: 'border-box',
+  lineHeight: '1.5em',
+};
+
 const styles = {
   container: {
     height: '2.5em',
@@ -29,9 +41,11 @@ const styles = {
     padding: 5,
     overflow: 'hidden',
   },
-  title: {
-    fontSize: '1.3em',
-    width: '100%',
+  titleInput: titleTextStyle,
+  titleSpan: {
+    ...titleTextStyle,
+    display: 'flex',
+    alignItems: 'center',
   },
 };
 
@@ -40,33 +54,36 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
     editing: false,
     editingPreviousValue: null,
   };
-  _textField: ?TextFieldInterface = null;
+  _inputField: ?HTMLInputElement = null;
 
   edit = () => {
     if (this.state.editing) return;
     const groupEvent = gd.asGroupEvent(this.props.event);
-    if (!this.state.editingPreviousValue) {
-      this.setState({ editingPreviousValue: groupEvent.getName() });
-    }
     this.setState(
       {
         editing: true,
+        editingPreviousValue: groupEvent.getName(),
       },
       () => {
-        if (this._textField) this._textField.focus();
+        const inputField = this._inputField;
+        if (inputField) {
+          inputField.focus();
+          inputField.selectionStart = inputField.value.length;
+          inputField.selectionEnd = inputField.value.length;
+        }
       }
     );
   };
 
   endEditing = () => {
-    this.setState({
-      editing: false,
-    });
     const groupEvent = gd.asGroupEvent(this.props.event);
     if (groupEvent.getName() !== this.state.editingPreviousValue) {
       this.props.onEndEditingEvent();
-      this.setState({ editingPreviousValue: null });
     }
+    this.setState({
+      editing: false,
+      editingPreviousValue: null,
+    });
   };
 
   render() {
@@ -100,33 +117,30 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
         }`}
       >
         {this.state.editing ? (
-          <TextField
-            margin="none"
-            ref={textField => (this._textField = textField)}
+          <input
+            ref={inputField => (this._inputField = inputField)}
+            type="text"
             value={groupEvent.getName()}
-            translatableHintText={t`<Enter group name>`}
+            placeholder="..."
             onBlur={this.endEditing}
-            onChange={(e, text) => {
-              groupEvent.setName(text);
+            onChange={e => {
+              groupEvent.setName(e.target.value);
               this.forceUpdate();
             }}
-            style={styles.title}
-            inputStyle={{
+            style={{
+              ...styles.titleInput,
               color: textColor,
-              WebkitTextFillColor: textColor,
-            }}
-            fullWidth
-            onKeyUp={event => {
-              if (shouldCloseOrCancel(event)) {
-                this.endEditing();
-              }
             }}
             onKeyDown={event => {
-              if (shouldValidate(event) || shouldSubmit(event)) {
+              if (
+                shouldCloseOrCancel(event) ||
+                shouldValidate(event) ||
+                shouldSubmit(event)
+              ) {
                 this.endEditing();
               }
             }}
-            underlineShow={false}
+            spellCheck="false"
           />
         ) : (
           <span
@@ -134,7 +148,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
               [selectableArea]: true,
               [disabledText]: this.props.disabled,
             })}
-            style={{ ...styles.title, color: textColor }}
+            style={{ ...styles.titleSpan, color: textColor }}
             {...dataObjectToProps({ editableText: 'true' })}
           >
             {groupEvent.getName() ? (

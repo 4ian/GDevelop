@@ -302,6 +302,7 @@ declare class libGDevelop {
   EventsFunctionsExtensionCodeGenerator: Class<gdEventsFunctionsExtensionCodeGenerator>;
   PreviewExportOptions: Class<gdPreviewExportOptions>;
   ExportOptions: Class<gdExportOptions>;
+  // $FlowFixMe[cannot-resolve-name]
   Exporter: Class<gdExporter>;
   JsCodeEvent: Class<gdJsCodeEvent>;
   MetadataDeclarationHelper: Class<gdMetadataDeclarationHelper>;

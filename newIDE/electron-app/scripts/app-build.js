@@ -4,8 +4,16 @@ const path = require('path');
 const args = require('minimist')(process.argv.slice(2));
 
 // Sanity check electron-builder installation
-if (!shell.test('-f', './node_modules/.bin/electron-builder')) {
-  shell.echo('⚠️ Please run npm install in electron-app folder');
+const electronBuilderBin = path.join(
+  __dirname,
+  '..',
+  '..',
+  'node_modules',
+  '.bin',
+  'electron-builder'
+);
+if (!shell.test('-f', electronBuilderBin)) {
+  shell.echo('⚠️ Please run npm install in the newIDE folder');
   shell.exit(1);
 }
 

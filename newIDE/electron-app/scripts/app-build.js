@@ -3,17 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const args = require('minimist')(process.argv.slice(2));
 
-// Sanity check electron-builder installation
-const electronBuilderBin = path.join(
-  __dirname,
-  '..',
-  '..',
-  'node_modules',
-  '.bin',
-  'electron-builder'
-);
-if (!shell.test('-f', electronBuilderBin)) {
-  shell.echo('⚠️ Please run npm install in the newIDE folder');
+if (!shell.which('npx')) {
+  shell.echo('⚠️ npx is not available. Please install Node.js/npm.');
   shell.exit(1);
 }
 

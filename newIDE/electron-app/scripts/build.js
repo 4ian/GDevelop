@@ -1,17 +1,8 @@
 var shell = require('shelljs');
-var path = require('path');
 var args = require('minimist')(process.argv.slice(2));
 
-const electronBuilderBin = path.join(
-  __dirname,
-  '..',
-  '..',
-  'node_modules',
-  '.bin',
-  'electron-builder'
-);
-if (!shell.test('-f', electronBuilderBin)) {
-  shell.echo('⚠️ Please run npm install in the newIDE folder');
+if (!shell.which('npx')) {
+  shell.echo('⚠️ npx is not available. Please install Node.js/npm.');
   shell.exit(1);
 }
 
@@ -23,13 +14,12 @@ if (!args['skip-app-build']) {
   }
 }
 
-const electronBuilder = electronBuilderBin;
 let electronBuilderArguments = process.argv
   .slice(2)
   .filter(arg => arg !== '--skip-app-build');
 shell.exec(
   [
-    electronBuilder,
+    'npx electron-builder',
     '--config=electron-builder-config.js',
     electronBuilderArguments.join(' '),
   ].join(' '),

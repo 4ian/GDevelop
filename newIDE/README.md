@@ -44,14 +44,6 @@ npm install
 npm run start
 ```
 
-### Quick Install and Run
-
-```bash
-cd newIDE && npm install
-# In a new terminal:
-npm start
-```
-
 ### Development of UI components
 
 You can run a [Storybook](https://github.com/storybooks/storybook) that is used as a playground for rapid UI component development and testing:

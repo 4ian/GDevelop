@@ -28,14 +28,14 @@ export type ScrollBehaviorOptions = {|
 export type ScrollViewInterface = {|
   getScrollPosition: () => number,
   scrollTo: (
-    target: ?React$Component<any, any> | ?React.ElementRef<any>
+    target: ?React.Component<any, any> | ?React.ElementRef<any>
   ) => void,
   scrollToPosition: (number: number) => void,
   scrollBy: (deltaY: number) => void,
   scrollToBottom: (options?: ScrollBehaviorOptions) => void,
 |};
 
-export default React.forwardRef<Props, ScrollViewInterface>(
+export default (React.forwardRef<Props, ScrollViewInterface>(
   ({ id, data, children, autoHideScrollbar, style, onScroll }: Props, ref) => {
     const scrollView = React.useRef((null: ?HTMLDivElement));
     React.useImperativeHandle(ref, () => ({
@@ -53,7 +53,7 @@ export default React.forwardRef<Props, ScrollViewInterface>(
       /**
        * Scroll the view to the target component.
        */
-      scrollTo: (target: ?React$Component<any, any>) => {
+      scrollTo: (target: ?React.Component<any, any>) => {
         const scrollViewElement = scrollView.current;
         if (!scrollViewElement) return;
 
@@ -135,4 +135,7 @@ export default React.forwardRef<Props, ScrollViewInterface>(
       </div>
     );
   }
-);
+): React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<ScrollViewInterface>,
+}>);

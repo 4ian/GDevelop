@@ -33,7 +33,7 @@ export const QuickObjectReplacer = ({
   resourceManagementProps,
   onWillInstallExtension,
   onExtensionInstalled,
-}: Props) => {
+}: Props): React.Node => {
   const [selectedObjectToSwap, setSelectedObjectToSwap] = React.useState(null);
 
   return (
@@ -76,6 +76,7 @@ export const QuickObjectReplacer = ({
                           primary
                           label={<Trans>Replace</Trans>}
                           onClick={() => {
+                            // $FlowFixMe[incompatible-type]
                             setSelectedObjectToSwap({ object, layout });
                           }}
                         />
@@ -88,6 +89,7 @@ export const QuickObjectReplacer = ({
           </ColumnStackLayout>
         );
       })}
+      {/* $FlowFixMe[constant-condition] */}
       {selectedObjectToSwap && (
         <AssetSwappingDialog
           project={project}

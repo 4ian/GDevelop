@@ -68,10 +68,11 @@ const computeDefaultConfiguration = (
     );
   }
 
+  // $FlowFixMe[incompatible-type]
   return candidates[0];
 };
 
-const ProjectStorageProviders = (props: Props) => {
+const ProjectStorageProviders = (props: Props): React.Node => {
   const storageProviderOperations = React.useRef<?StorageProviderOperations>(
     null
   );

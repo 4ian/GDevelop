@@ -87,7 +87,7 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 
 const electron = optionalRequire('electron');
 
-export const getProjectManagerItemId = (identifier: string) =>
+export const getProjectManagerItemId = (identifier: string): string =>
   `project-manager-tab-${identifier}`;
 
 const gameSettingsRootFolderId = getProjectManagerItemId('game-settings');
@@ -95,12 +95,14 @@ const gamePropertiesItemId = getProjectManagerItemId('game-properties');
 const gameDashboardItemId = 'manage';
 const globalVariablesItemId = getProjectManagerItemId('global-variables');
 const gameResourcesItemId = getProjectManagerItemId('game-resources');
-export const scenesRootFolderId = getProjectManagerItemId('scenes');
-export const extensionsRootFolderId = getProjectManagerItemId('extensions');
-export const externalEventsRootFolderId = getProjectManagerItemId(
+export const scenesRootFolderId: string = getProjectManagerItemId('scenes');
+export const extensionsRootFolderId: string = getProjectManagerItemId(
+  'extensions'
+);
+export const externalEventsRootFolderId: string = getProjectManagerItemId(
   'external-events'
 );
-export const externalLayoutsRootFolderId = getProjectManagerItemId(
+export const externalLayoutsRootFolderId: string = getProjectManagerItemId(
   'external-layout'
 );
 
@@ -177,6 +179,7 @@ class LeafTreeViewItem implements TreeViewItem {
   }
 }
 
+// $FlowFixMe[incompatible-type]
 class PlaceHolderTreeViewItem implements TreeViewItem {
   isPlaceholder = true;
   content: TreeViewItemContent;
@@ -246,6 +249,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
 
   onClick(): void {}
 
+  // $FlowFixMe[missing-local-annot]
   buildMenuTemplate(i18n: I18nType, index: number) {
     return this.buildMenuTemplateFunction(i18n, index);
   }
@@ -336,6 +340,7 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
     this.onClickCallback();
   }
 
+  // $FlowFixMe[missing-local-annot]
   buildMenuTemplate(i18n: I18nType, index: number) {
     return this.buildMenuTemplateFunction(i18n, index);
   }
@@ -582,12 +587,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       setProjectVariablesEditorOpen(true);
     }, []);
 
-    const [editedPropertiesLayout, setEditedPropertiesLayout] = React.useState(
-      null
-    );
-    const [editedVariablesLayout, setEditedVariablesLayout] = React.useState(
-      null
-    );
+    const [
+      editedPropertiesLayout,
+      setEditedPropertiesLayout,
+    ] = React.useState<?gdLayout>(null);
+    const [
+      editedVariablesLayout,
+      setEditedVariablesLayout,
+    ] = React.useState<?gdLayout>(null);
     const onOpenLayoutProperties = React.useCallback((layout: ?gdLayout) => {
       setEditedPropertiesLayout(layout);
     }, []);
@@ -736,7 +743,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           onOpenEventsFunctionsExtension(name);
           return;
         }
+        // $FlowFixMe[incompatible-type]
         setOpenedExtensionShortHeader(extensionShortHeader);
+        // $FlowFixMe[incompatible-type]
         setOpenedExtensionName(name);
       },
       [translatedExtensionShortHeadersByName, onOpenEventsFunctionsExtension]
@@ -1305,6 +1314,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const [
       selectedMainMenuItemIndices,
       setSelectedMainMenuItemIndices,
+      // $FlowFixMe[missing-empty-array-annot]
     ] = React.useState([]);
     const isNavigatingInMainMenuItem = selectedMainMenuItemIndices.length > 0;
     const shouldHideMainMenu = isMacLike() && !!electron;
@@ -1370,6 +1380,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     >
                       <AutoSizer style={styles.autoSizer} disableWidth>
                         {({ height }) => (
+                          // $FlowFixMe[incompatible-type]
+                          // $FlowFixMe[incompatible-exact]
                           <TreeView
                             key={listKey}
                             ref={treeViewRef}
@@ -1426,6 +1438,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     projectScopedContainersAccessor && (
                       <ProjectPropertiesDialog
                         open
+                        // $FlowFixMe[incompatible-type]
                         initialTab={projectPropertiesDialogInitialTab}
                         project={project}
                         onClose={() => setProjectPropertiesDialogOpen(false)}
@@ -1541,15 +1554,18 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   // call forceUpdate.
   !nextProps.isOpen;
 
+// $FlowFixMe[incompatible-type]
 const MemoizedProjectManager = React.memo<Props, ProjectManagerInterface>(
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-exact]
   ProjectManager,
   arePropsEqual
 );
 
-const ProjectManagerWithErrorBoundary = React.forwardRef<
-  Props,
-  ProjectManagerInterface
->((props, outerRef) => {
+const ProjectManagerWithErrorBoundary: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<ProjectManagerInterface>,
+}> = React.forwardRef<Props, ProjectManagerInterface>((props, outerRef) => {
   const projectManagerRef = React.useRef<?ProjectManagerInterface>(null);
   const shouldAutofocusInput = useShouldAutofocusInput();
 
@@ -1570,10 +1586,13 @@ const ProjectManagerWithErrorBoundary = React.forwardRef<
       componentTitle={<Trans>Project manager</Trans>}
       scope="project-manager"
     >
+      {/* $FlowFixMe[incompatible-type] */}
       <MemoizedProjectManager
+        // $FlowFixMe[missing-local-annot]
         ref={ref => {
           projectManagerRef.current = ref;
           if (typeof outerRef === 'function') outerRef(ref);
+          // $FlowFixMe[incompatible-use]
           else if (outerRef !== null) outerRef.current = ref;
         }}
         {...props}

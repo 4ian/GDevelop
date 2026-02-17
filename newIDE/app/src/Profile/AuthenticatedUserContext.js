@@ -35,6 +35,7 @@ import { type ClaimedProductOptions } from './PurchaseClaimDialog';
 
 export type AuthenticatedUser = {|
   authenticated: boolean,
+  // $FlowFixMe[value-as-type]
   firebaseUser: ?FirebaseUser,
   profile: ?Profile,
   loginState: null | 'loggingIn' | 'done',
@@ -170,7 +171,8 @@ export const initialAuthenticatedUser = {
   onSendEmailVerification: async () => {},
   onOpenEmailVerificationDialog: () => {},
   onAcceptGameStatsEmail: async () => {},
-  getAuthorizationHeader: () => Promise.reject(new Error('Unimplemented')),
+  getAuthorizationHeader: (): Promise<> =>
+    Promise.reject(new Error('Unimplemented')),
   achievements: null,
 };
 
@@ -182,12 +184,12 @@ export const authenticatedUserLoggedOutAttributes = {
   // Use this loginState to make sure this is understood by the app as a user logged out, and not loading.
   loginState: 'done',
   badges: null,
-  cloudProjects: [], // Initialize to empty array to indicate that the loading is done.
+  cloudProjects: ([]: Array<empty>), // Initialize to empty array to indicate that the loading is done.
   cloudProjectsFetchingErrorLabel: null,
-  receivedAssetPacks: [], // Initialize to empty array to indicate that the loading is done.
-  receivedAssetShortHeaders: [], // Initialize to empty array to indicate that the loading is done.
-  receivedGameTemplates: [], // Initialize to empty array to indicate that the loading is done.
-  receivedBundles: [], // Initialize to empty array to indicate that the loading is done.
+  receivedAssetPacks: ([]: Array<empty>), // Initialize to empty array to indicate that the loading is done.
+  receivedAssetShortHeaders: ([]: Array<empty>), // Initialize to empty array to indicate that the loading is done.
+  receivedGameTemplates: ([]: Array<empty>), // Initialize to empty array to indicate that the loading is done.
+  receivedBundles: ([]: Array<empty>), // Initialize to empty array to indicate that the loading is done.
   subscription: null,
   subscriptionPricingSystem: null,
   userEarningsBalance: null,
@@ -195,7 +197,8 @@ export const authenticatedUserLoggedOutAttributes = {
   limits: null,
 };
 
-const AuthenticatedUserContext = React.createContext<AuthenticatedUser>(
+const AuthenticatedUserContext: React.Context<AuthenticatedUser> = React.createContext<AuthenticatedUser>(
+  // $FlowFixMe[incompatible-type]
   initialAuthenticatedUser
 );
 

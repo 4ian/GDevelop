@@ -1913,6 +1913,8 @@ export class RepeatEvent extends BaseEvent {
   getActions(): InstructionsList;
   setRepeatExpressionPlainString(expr: string): void;
   getRepeatExpression(): Expression;
+  getLoopIndexVariableName(): string;
+  setLoopIndexVariableName(name: string): void;
 }
 
 export class WhileEvent extends BaseEvent {
@@ -1920,6 +1922,8 @@ export class WhileEvent extends BaseEvent {
   getConditions(): InstructionsList;
   getWhileConditions(): InstructionsList;
   getActions(): InstructionsList;
+  getLoopIndexVariableName(): string;
+  setLoopIndexVariableName(name: string): void;
 }
 
 export class ForEachEvent extends BaseEvent {
@@ -1928,6 +1932,8 @@ export class ForEachEvent extends BaseEvent {
   getObjectToPick(): string;
   getConditions(): InstructionsList;
   getActions(): InstructionsList;
+  getLoopIndexVariableName(): string;
+  setLoopIndexVariableName(name: string): void;
 }
 
 export class ForEachChildVariableEvent extends BaseEvent {
@@ -1940,6 +1946,8 @@ export class ForEachChildVariableEvent extends BaseEvent {
   setIterableVariableName(newName: string): void;
   setKeyIteratorVariableName(newName: string): void;
   setValueIteratorVariableName(newName: string): void;
+  getLoopIndexVariableName(): string;
+  setLoopIndexVariableName(name: string): void;
 }
 
 export class CommentEvent extends BaseEvent {
@@ -2663,6 +2671,16 @@ export class EventsContextAnalyzer extends EmscriptenObject {
   constructor(platform: Platform);
   getEventsContext(): EventsContext;
   launch(events: EventsList, projectScopedContainers: ProjectScopedContainers): void;
+}
+
+export class ReadOnlyArbitraryEventsWorkerWithContext extends EmscriptenObject {
+  launch(events: EventsList, projectScopedContainers: ProjectScopedContainers): void;
+}
+
+export class ReadOnlyArbitraryEventsWorkerWithContextJS extends ReadOnlyArbitraryEventsWorkerWithContext {
+  constructor();
+  doVisitEvent(event: BaseEvent): void;
+  doVisitInstruction(instruction: Instruction, isCondition: boolean, projectScopedContainers: ProjectScopedContainers): void;
 }
 
 export class ArbitraryResourceWorker extends EmscriptenObject {}

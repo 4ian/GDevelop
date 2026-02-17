@@ -169,6 +169,7 @@ export const localOnlineCordovaIosExportPipeline: ExportPipeline<
     return getBuildFileUploadOptions().then(uploadOptions => {
       return uploadLocalFile(
         outputFile,
+        // $FlowFixMe[incompatible-type]
         uploadOptions,
         context.updateStepProgress
       ).then(() => uploadOptions.key);

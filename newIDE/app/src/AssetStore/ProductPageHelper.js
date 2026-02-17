@@ -61,6 +61,7 @@ export const getOtherProductsFromSameAuthorTiles = <
     return null;
   }
 
+  // $FlowFixMe[incompatible-type]
   return otherProductListingDatasFromSameCreator
     .filter(
       // Filter out the current product.
@@ -399,6 +400,7 @@ export const getProductsIncludedInBundleTiles = ({
     return null;
   }
 
+  // $FlowFixMe[incompatible-type]
   return productsIncludedInBundle
     .map(includedProductListingData => {
       const isProductOwned =
@@ -599,7 +601,7 @@ export const PurchaseProductButtons = <
   onClickBuyWithCredits?: () => void | Promise<void>,
   customLabel?: React.Node,
   fullWidth?: boolean,
-|}) => {
+|}): any => {
   const { authenticated } = React.useContext(AuthenticatedUserContext);
   const shouldUseOrSimulateAppStoreProduct =
     simulateAppStoreProduct || shouldUseAppStoreProduct();
@@ -701,7 +703,7 @@ export const OpenProductButton = <
   productListingData: T,
   onClick: () => void,
   label: React.Node,
-|}) => {
+|}): any => {
   if (
     productListingData.productType === 'GAME_TEMPLATE' &&
     productListingData.includedListableProductIds
@@ -764,6 +766,7 @@ export const getProductMediaItems = <
   if (product.previewSoundUrls) {
     uniqueMediaItems.push(
       ...product.previewSoundUrls.map(url => ({
+        // $FlowFixMe[incompatible-type]
         kind: 'audio',
         url,
       }))

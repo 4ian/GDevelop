@@ -9,6 +9,9 @@ type Props = {|
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   variablesContainer: gdVariablesContainer,
+  loopIndexVariableName?: ?string,
+  onRenameLoopIndexVariable?: (newName: string) => void,
+  onRemoveLoopIndexVariable?: () => void,
   onApply: (selectedVariableName: string | null) => void,
   onCancel: () => void,
   initiallySelectedVariableName: string,
@@ -20,23 +23,35 @@ const LocalVariablesDialog = ({
   project,
   projectScopedContainersAccessor,
   variablesContainer,
+  loopIndexVariableName,
+  onRenameLoopIndexVariable,
+  onRemoveLoopIndexVariable,
   open,
   onCancel,
   onApply,
   initiallySelectedVariableName,
   shouldCreateInitiallySelectedVariable,
   isListLocked,
-}: Props) => {
+}: Props): React.Node => {
   const tabs = React.useMemo(
     () => [
       {
         id: 'local-variables',
         label: '',
         variablesContainer,
+        // $FlowFixMe[missing-empty-array-annot]
         onComputeAllVariableNames: () => [],
+        loopIndexVariableName: loopIndexVariableName || '',
+        onRenameLoopIndexVariable,
+        onRemoveLoopIndexVariable,
       },
     ],
-    [variablesContainer]
+    [
+      variablesContainer,
+      loopIndexVariableName,
+      onRenameLoopIndexVariable,
+      onRemoveLoopIndexVariable,
+    ]
   );
 
   return (
@@ -47,6 +62,7 @@ const LocalVariablesDialog = ({
       onCancel={onCancel}
       onApply={onApply}
       title={<Trans>Local variables</Trans>}
+      // $FlowFixMe[incompatible-type]
       tabs={tabs}
       helpPagePath={'/all-features/variables/local-variables'}
       id="local-variables-dialog"

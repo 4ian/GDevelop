@@ -43,4 +43,4 @@ const themes: Array<CodeEditorTheme> = [
   RosePine,
 ];
 
-export const getAllThemes = () => themes;
+export const getAllThemes = (): Array<CodeEditorTheme> => themes;

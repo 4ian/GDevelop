@@ -21,7 +21,17 @@ const useCapturesManager = ({
 }: {
   project: ?gdProject,
   gamesList: GamesList,
-}) => {
+}): {
+  createCaptureOptionsForPreview: (
+    launchCaptureOptions: ?LaunchCaptureOptions
+  ) => Promise<CaptureOptions>,
+  getGameUnverifiedScreenshotUrls: (gameId: string) => Array<string>,
+  getHotReloadPreviewLaunchCaptureOptions: (
+    gameId: string
+  ) => LaunchCaptureOptions | void,
+  onCaptureFinished: (captureOptions: CaptureOptions) => Promise<void>,
+  onGameScreenshotsClaimed: () => void,
+} => {
   const [
     unverifiedGameScreenshots,
     setUnverifiedGameScreenshots,

@@ -158,6 +158,7 @@ class LeafTreeViewItem implements TreeViewItem {
   }
 }
 
+// $FlowFixMe[incompatible-type]
 class PlaceHolderTreeViewItem implements TreeViewItem {
   isPlaceholder = true;
   content: TreeViewItemContent;
@@ -206,6 +207,7 @@ const createTreeViewItem = ({
   }
 };
 
+// $FlowFixMe[incompatible-type]
 class ObjectFolderTreeViewItem implements TreeViewItem {
   isRoot: boolean;
   global: boolean;
@@ -277,6 +279,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     this.id = id;
     this.label = label;
     this.buildMenuTemplateFunction = (i18n: I18nType, index: number) =>
+      // $FlowFixMe[incompatible-type]
       [
         rightButton
           ? {
@@ -317,6 +320,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
 
   onClick(): void {}
 
+  // $FlowFixMe[missing-local-annot]
   buildMenuTemplate(i18n: I18nType, index: number) {
     return this.buildMenuTemplateFunction(i18n, index);
   }
@@ -610,7 +614,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           ? 'New' +
             (project.getEventsBasedObject(objectType).getDefaultName() ||
               project.getEventsBasedObject(objectType).getName())
-          : objectTypeToDefaultName[objectType] || 'NewObject';
+          : // $FlowFixMe[invalid-computed-prop]
+            objectTypeToDefaultName[objectType] || 'NewObject';
         const name = newNameGenerator(
           defaultName,
           name =>
@@ -683,6 +688,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         setNewObjectDialogOpen(null);
         // TODO Should it be called later?
+        // $FlowFixMe[constant-condition]
         if (onEditObject) {
           onEditObject(object);
           onObjectFolderOrObjectWithContextSelected(
@@ -813,7 +819,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // If all parents are open, return the objectFolderOrObject given as input.
         return getTreeViewItemIdFromObjectFolderOrObject(objectFolderOrObject);
       }
-      // $FlowFixMe - We are confident this TreeView item is in fact a ObjectFolderOrObjectWithContext
+      // $FlowFixMe[incompatible-type] - We are confident this TreeView item is in fact a ObjectFolderOrObjectWithContext
       return topToBottomAscendanceId[firstClosedFolderIndex];
     };
 
@@ -1242,7 +1248,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             objectFolderTreeViewItemProps,
           }),
         ].filter(Boolean);
-        // $FlowFixMe
+        // $FlowFixMe[incompatible-type]
         return treeViewItems;
       },
       [
@@ -1561,6 +1567,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               <div style={styles.autoSizerContainer}>
                 <AutoSizer style={styles.autoSizer} disableWidth>
                   {({ height }) => (
+                    // $FlowFixMe[incompatible-type]
+                    // $FlowFixMe[incompatible-exact]
                     <TreeView
                       key={listKey}
                       ref={treeViewRef}
@@ -1674,19 +1682,23 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.globalObjectsContainer === nextProps.globalObjectsContainer &&
   prevProps.objectsContainer === nextProps.objectsContainer;
 
+// $FlowFixMe[incompatible-type]
 const MemoizedObjectsList = React.memo<Props, ObjectsListInterface>(
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-exact]
   ObjectsList,
   arePropsEqual
 );
 
-const ObjectsListWithErrorBoundary = React.forwardRef<
-  Props,
-  ObjectsListInterface
->((props, ref) => (
+const ObjectsListWithErrorBoundary: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<ObjectsListInterface>,
+}> = React.forwardRef<Props, ObjectsListInterface>((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Objects list</Trans>}
     scope="scene-editor-objects-list"
   >
+    {/* $FlowFixMe[incompatible-type] */}
     <MemoizedObjectsList ref={ref} {...props} />
   </ErrorBoundary>
 ));

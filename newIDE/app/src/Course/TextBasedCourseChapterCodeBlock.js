@@ -369,7 +369,10 @@ const computeTokensByLine = (code: string): Token[][] => {
   return tokensByLine;
 };
 
-const TextBasedCourseChapterCodeBlock = ({ code, language }: Props) => {
+const TextBasedCourseChapterCodeBlock = ({
+  code,
+  language,
+}: Props): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const normalizedCode = React.useMemo(() => code.replace(/\t/g, '  '), [code]);
   const tokensByLine = React.useMemo(
@@ -379,6 +382,7 @@ const TextBasedCourseChapterCodeBlock = ({ code, language }: Props) => {
         language.toLowerCase() !== 'javascript' &&
         language.toLowerCase() !== 'js'
       ) {
+        // $FlowFixMe[incompatible-type]
         return normalizedCode
           .replace(/\r\n/g, '\n')
           .split('\n')
@@ -457,8 +461,10 @@ const TextBasedCourseChapterCodeBlock = ({ code, language }: Props) => {
                   key={`token-${lineIndex}-${tokenIndex}`}
                   style={{
                     color:
+                      // $FlowFixMe[incompatible-type]
                       (tokenStyleMap[token.type] || {}).color ||
                       tokenStyleMap.plain.color,
+                    // $FlowFixMe[incompatible-type]
                     fontStyle: (tokenStyleMap[token.type] || {}).fontStyle,
                     ...styles.token,
                   }}

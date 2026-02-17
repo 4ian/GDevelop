@@ -87,7 +87,7 @@ const styles = {
   },
 };
 
-export const getIndentWidth = (windowSize: WindowSizeType) =>
+export const getIndentWidth = (windowSize: WindowSizeType): number =>
   windowSize === 'small' ? smallIndentWidth : defaultIndentWidth;
 const getEventContainerStyle = (windowSize: WindowSizeType) =>
   windowSize === 'small'
@@ -268,6 +268,7 @@ const EventContainer = (props: EventsContainerProps) => {
   );
 };
 
+// $FlowFixMe[missing-local-annot]
 const SortableTree = ({ className, ...otherProps }) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
@@ -382,753 +383,765 @@ export type EventsTreeInterface = {|
 
 export type { SortableTreeNode };
 
+// $FlowFixMe[missing-local-annot]
 const getNodeKey = ({ treeIndex }) => treeIndex;
 
 /**
  * Display a tree of event. Builtin on react-sortable-tree so that event
  * can be drag'n'dropped and events rows are virtualized.
  */
-const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
-  (props, ref) => {
-    const forceUpdate = useForceUpdate();
+const EventsTree: React.ComponentType<{
+  ...EventsTreeProps,
+  +ref?: React.RefSetter<EventsTreeInterface>,
+}> = React.forwardRef<EventsTreeProps, EventsTreeInterface>((props, ref) => {
+  const forceUpdate = useForceUpdate();
 
-    const _list = React.useRef<?any>(null);
-    const eventsHeightsCache = React.useMemo(() => new EventHeightsCache(), []);
+  const _list = React.useRef<?any>(null);
+  const eventsHeightsCache = React.useMemo(() => new EventHeightsCache(), []);
 
-    const DragSourceAndDropTarget = React.useMemo(
-      () =>
-        makeDragSourceAndDropTarget<SortableTreeNode>(eventsSheetEventsDnDType),
-      []
-    );
-    const DropTarget = React.useMemo(
-      () => makeDropTarget<SortableTreeNode>(eventsSheetEventsDnDType),
-      []
-    );
-    const temporaryUnfoldedNodes = React.useRef<Array<SortableTreeNode>>([]);
-    const _hoverTimerId = React.useRef<?TimeoutID>(null);
+  const DragSourceAndDropTarget = React.useMemo(
+    () =>
+      makeDragSourceAndDropTarget<SortableTreeNode>(eventsSheetEventsDnDType),
+    []
+  );
+  const DropTarget = React.useMemo(
+    () => makeDropTarget<SortableTreeNode>(eventsSheetEventsDnDType),
+    []
+  );
+  const temporaryUnfoldedNodes = React.useRef<Array<SortableTreeNode>>([]);
+  const _hoverTimerId = React.useRef<?TimeoutID>(null);
 
-    const [draggedNode, setDraggedNode] = React.useState(null);
-    const [isScrolledTop, setIsScrolledTop] = React.useState(true);
-    const [isScrolledBottom, setIsScrolledBottom] = React.useState(false);
+  const [draggedNode, setDraggedNode] = React.useState(null);
+  const [isScrolledTop, setIsScrolledTop] = React.useState(true);
+  const [isScrolledBottom, setIsScrolledBottom] = React.useState(false);
 
-    // This is the data that will be displayed by the tree - reconstructed at each render
-    // (because events could have changed, some could have been deleted, so we can't keep
-    // any reference to them).
-    // Array is created now, so can be referenced by callbacks, and filled later.
-    const treeDataRoot = React.useRef<Array<SortableTreeNode>>([]);
+  // This is the data that will be displayed by the tree - reconstructed at each render
+  // (because events could have changed, some could have been deleted, so we can't keep
+  // any reference to them).
+  // Array is created now, so can be referenced by callbacks, and filled later.
+  const treeDataRoot = React.useRef<Array<SortableTreeNode>>([]);
 
-    React.useEffect(() => {
-      return () => {
-        if (_hoverTimerId.current) clearTimeout(_hoverTimerId.current);
-      };
-    }, []);
-
-    /**
-     * Should be called whenever an event height has changed
-     */
-    const onHeightsChanged = React.useCallback(
-      (cb: ?() => void) => {
-        if (_list.current) {
-          _list.current.recomputeRowHeights();
-        }
-        forceUpdate();
-
-        // Use a timeout so that the callback is called after the events
-        // have been re-rendered.
-        setTimeout(() => {
-          if (cb) cb();
-        });
-      },
-      [forceUpdate]
-    );
-    const forceEventsUpdate = onHeightsChanged;
-
-    React.useEffect(() => {
-      onHeightsChanged();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const scrollToRow = React.useCallback((row: number) => {
-      if (row === -1) return;
-      if (!_list.current) return;
-      _list.current.scrollToRow(row);
-    }, []);
-
-    /**
-     * Unfold events so that the given one is visible
-     */
-    const unfoldForEvent = React.useCallback(
-      (event: gdBaseEvent) => {
-        gd.EventsListUnfolder.unfoldWhenContaining(props.events, event);
-        forceEventsUpdate();
-      },
-      [forceEventsUpdate, props.events]
-    );
-
-    const foldAll = React.useCallback(
-      () => {
-        gd.EventsListUnfolder.foldAll(props.events);
-        forceEventsUpdate();
-      },
-      [forceEventsUpdate, props.events]
-    );
-
-    const unfoldToLevel = React.useCallback(
-      (level: number) => {
-        gd.EventsListUnfolder.unfoldToLevel(props.events, level);
-        forceEventsUpdate();
-      },
-      [forceEventsUpdate, props.events]
-    );
-
-    const tutorial = React.useMemo(
-      () => getTutorial(props.preferences, props.tutorials, 'the-events'),
-      [props.preferences, props.tutorials]
-    );
-
-    const _canDrag = React.useCallback((node: ?SortableTreeNode) => {
-      return !!node && !!node.event;
-    }, []);
-
-    const _canDrop = React.useCallback((hoveredNode: SortableTreeNode) => {
-      return true;
-    }, []);
-
-    const _restoreFoldedNodes = React.useCallback(
-      () => {
-        temporaryUnfoldedNodes.current.forEach(
-          node => node.event && node.event.setFolded(true)
-        );
-
-        temporaryUnfoldedNodes.current = [];
-        forceEventsUpdate();
-      },
-      [forceEventsUpdate]
-    );
-
-    const _onEndDrag = React.useCallback(
-      () => {
-        // This method is always called at the end of the drag, regardless of whether
-        // an event was actually dropped. It is also already called in `_onDrop` to update
-        // the event list and compute history. So if draggedNode is null, we want to avoid
-        // recomputing the event list.
-        if (draggedNode) {
-          setDraggedNode(null);
-          _restoreFoldedNodes();
-          forceEventsUpdate();
-        }
-      },
-      [draggedNode, _restoreFoldedNodes, forceEventsUpdate]
-    );
-
-    const eventPtrToRowIndex = React.useRef<{ [key: string]: number }>({});
-    const getEventRow = React.useCallback(
-      (searchedEvent: gdBaseEvent) => {
-        return eventPtrToRowIndex.current['' + searchedEvent.ptr] || -1;
-      },
-      [eventPtrToRowIndex]
-    );
-
-    const temporaryUnfoldNode = React.useCallback(
-      (isOverLazy: boolean, node: SortableTreeNode) => {
-        const { event } = node;
-        if (!event) return;
-
-        const isNodeTemporaryUnfolded = temporaryUnfoldedNodes.current.some(
-          foldedNode => node.key === foldedNode.key
-        );
-        if (isOverLazy) {
-          if (!_hoverTimerId.current && !node.expanded) {
-            if (!isNodeTemporaryUnfolded) {
-              _hoverTimerId.current = window.setTimeout(() => {
-                // $FlowFixMe - Per the condition above, we are confident that node.event is not null.
-                event.setFolded(false);
-                temporaryUnfoldedNodes.current.push(node);
-                forceEventsUpdate();
-              }, 1000);
-            }
-          }
-        } else {
-          if (_hoverTimerId.current) window.clearTimeout(_hoverTimerId.current);
-          _hoverTimerId.current = null;
-        }
-      },
-      [forceEventsUpdate]
-    );
-
-    const _getRowHeight = ({ node }: { node: ?SortableTreeNode }) => {
-      if (!node) {
-        return 0;
-      }
-      if (!node.event) {
-        return node.fixedHeight || 0;
-      }
-
-      const height = eventsHeightsCache.getEventHeight(node.event);
-      return height;
+  React.useEffect(() => {
+    return () => {
+      if (_hoverTimerId.current) clearTimeout(_hoverTimerId.current);
     };
+  }, []);
 
-    const {
-      project,
-      globalObjectsContainer,
-      objectsContainer,
-      showObjectThumbnails,
-    } = props;
-    const renderObjectThumbnail = React.useCallback(
-      (objectName: string) => {
-        if (!showObjectThumbnails) return null;
+  /**
+   * Should be called whenever an event height has changed
+   */
+  const onHeightsChanged = React.useCallback(
+    (cb: ?() => void) => {
+      if (_list.current) {
+        _list.current.recomputeRowHeights();
+      }
+      forceUpdate();
 
-        const object = getObjectByName(
-          globalObjectsContainer,
-          objectsContainer,
-          objectName
-        );
-        if (!object) return null;
+      // Use a timeout so that the callback is called after the events
+      // have been re-rendered.
+      setTimeout(() => {
+        if (cb) cb();
+      });
+    },
+    [forceUpdate]
+  );
+  const forceEventsUpdate = onHeightsChanged;
 
-        return (
-          <CorsAwareImage
-            className={classNames({
-              [icon]: true,
-            })}
-            alt=""
-            src={getThumbnail(project, object.getConfiguration())}
-          />
-        );
-      },
-      [project, globalObjectsContainer, objectsContainer, showObjectThumbnails]
-    );
+  React.useEffect(() => {
+    onHeightsChanged();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    const { onEventMoved } = props;
-    const _onDrop = React.useCallback(
-      (
-        moveFunction: MoveFunctionArguments => void,
-        currentNode: SortableTreeNode
-      ) => {
-        if (!draggedNode) return;
+  const scrollToRow = React.useCallback((row: number) => {
+    if (row === -1) return;
+    if (!_list.current) return;
+    _list.current.scrollToRow(row);
+  }, []);
 
-        moveFunction({
-          node: draggedNode,
-          targetNode: currentNode,
-        });
-        const { nodePath, event } = draggedNode;
-        _onEndDrag();
-        if (!event) {
-          console.warn('EventsSheet: No event found in dragged node.');
-          return;
-        }
-        const newRowIndex = getEventRow(event);
-        onEventMoved(nodePath[nodePath.length - 1], newRowIndex);
-      },
-      [draggedNode, _onEndDrag, onEventMoved, getEventRow]
-    );
+  /**
+   * Unfold events so that the given one is visible
+   */
+  const unfoldForEvent = React.useCallback(
+    (event: gdBaseEvent) => {
+      gd.EventsListUnfolder.unfoldWhenContaining(props.events, event);
+      forceEventsUpdate();
+    },
+    [forceEventsUpdate, props.events]
+  );
 
-    const _renderEvent = ({ node }: {| node: SortableTreeNode |}) => {
-      const { event, depth, disabled, isValidElseEvent } = node;
-      if (!event) return null;
+  const foldAll = React.useCallback(
+    () => {
+      gd.EventsListUnfolder.foldAll(props.events);
+      forceEventsUpdate();
+    },
+    [forceEventsUpdate, props.events]
+  );
 
-      const isDragged =
-        !!draggedNode &&
-        (isDescendant(draggedNode, node) || node.key === draggedNode.key);
-      return (
-        <DragSourceAndDropTarget
-          beginDrag={() => {
-            setDraggedNode(node);
-            return node;
-          }}
-          canDrag={() => _canDrag(node)}
-          canDrop={() => _canDrop(node)}
-          // Drop operations are handled by DropContainers.
-          drop={() => {
-            return;
-          }}
-          endDrag={_onEndDrag}
-        >
-          {({ connectDragSource, connectDropTarget, isOverLazy }) => {
-            temporaryUnfoldNode(isOverLazy, node);
+  const unfoldToLevel = React.useCallback(
+    (level: number) => {
+      gd.EventsListUnfolder.unfoldToLevel(props.events, level);
+      forceEventsUpdate();
+    },
+    [forceEventsUpdate, props.events]
+  );
 
-            const eventContext = {
-              eventsList: node.eventsList,
-              event: event,
-              indexInList: node.indexInList,
-              projectScopedContainersAccessor:
-                node.projectScopedContainersAccessor,
-            };
+  const tutorial = React.useMemo(
+    () => getTutorial(props.preferences, props.tutorials, 'the-events'),
+    [props.preferences, props.tutorials]
+  );
 
-            const dropTarget = (
-              <div
-                style={{
-                  opacity: isDragged ? 0.5 : 1,
-                  ...getEventContainerStyle(props.windowSize),
-                }}
-                {...dataObjectToProps({ rowIndex: node.rowIndex.toString() })}
-              >
-                <EventContainer
-                  project={props.project}
-                  scope={props.scope}
-                  globalObjectsContainer={props.globalObjectsContainer}
-                  objectsContainer={props.objectsContainer}
-                  projectScopedContainersAccessor={
-                    node.projectScopedContainersAccessor
-                  }
-                  event={event}
-                  key={event.ptr}
-                  eventsHeightsCache={eventsHeightsCache}
-                  selection={props.selection}
-                  leftIndentWidth={
-                    depth *
-                    (getIndentWidth(props.windowSize) * props.indentScale)
-                  }
-                  onUpdate={forceUpdate}
-                  onAddNewInstruction={instructionsListContext =>
-                    props.onAddNewInstruction(
-                      eventContext,
-                      instructionsListContext
-                    )
-                  }
-                  onPasteInstructions={instructionsListContext =>
-                    props.onPasteInstructions(
-                      eventContext,
-                      instructionsListContext
-                    )
-                  }
-                  onMoveToInstruction={instructionContext =>
-                    props.onMoveToInstruction(eventContext, instructionContext)
-                  }
-                  onMoveToInstructionsList={instructionContext =>
-                    props.onMoveToInstructionsList(
-                      eventContext,
-                      instructionContext
-                    )
-                  }
-                  onInstructionClick={instructionContext =>
-                    props.onInstructionClick(eventContext, instructionContext)
-                  }
-                  onInstructionDoubleClick={instructionContext =>
-                    props.onInstructionDoubleClick(
-                      eventContext,
-                      instructionContext
-                    )
-                  }
-                  onParameterClick={parameterContext =>
-                    props.onParameterClick(eventContext, parameterContext)
-                  }
-                  onVariableDeclarationClick={variableDeclarationContext =>
-                    props.onVariableDeclarationClick(
-                      eventContext,
-                      variableDeclarationContext
-                    )
-                  }
-                  onVariableDeclarationDoubleClick={variableDeclarationContext =>
-                    props.onVariableDeclarationDoubleClick(
-                      eventContext,
-                      variableDeclarationContext
-                    )
-                  }
-                  onEventClick={() =>
-                    props.onEventClick({
-                      eventsList: node.eventsList,
-                      event: event,
-                      indexInList: node.indexInList,
-                      projectScopedContainersAccessor:
-                        node.projectScopedContainersAccessor,
-                    })
-                  }
-                  onEndEditingEvent={() => props.onEndEditingEvent(event)}
-                  onEventContextMenu={(x, y) =>
-                    props.onEventContextMenu(x, y, {
-                      eventsList: node.eventsList,
-                      event: event,
-                      indexInList: node.indexInList,
-                      projectScopedContainersAccessor:
-                        node.projectScopedContainersAccessor,
-                    })
-                  }
-                  onInstructionContextMenu={(...args) =>
-                    props.onInstructionContextMenu(eventContext, ...args)
-                  }
-                  onAddInstructionContextMenu={(...args) =>
-                    props.onAddInstructionContextMenu(eventContext, ...args)
-                  }
-                  onOpenExternalEvents={props.onOpenExternalEvents}
-                  onOpenLayout={(name: string) => {
-                    props.onOpenLayout(name);
-                  }}
-                  disabled={
-                    disabled /* Use node.disabled (not event.disabled) as it is true if a parent event is disabled*/
-                  }
-                  renderObjectThumbnail={renderObjectThumbnail}
-                  screenType={props.screenType}
-                  eventsSheetWidth={props.eventsSheetWidth}
-                  eventsSheetHeight={props.eventsSheetHeight}
-                  connectDragSource={connectDragSource}
-                  windowSize={props.windowSize}
-                  idPrefix={`event-${node.relativeNodePath.join('-')}`}
-                  isValidElseEvent={isValidElseEvent}
-                  highlightedAiGeneratedEventIds={
-                    props.highlightedAiGeneratedEventIds
-                  }
-                />
-                {draggedNode && (
-                  <DropContainer
-                    node={node}
-                    draggedNode={draggedNode}
-                    draggedNodeHeight={_getRowHeight({
-                      node: draggedNode,
-                    })}
-                    DnDComponent={DropTarget}
-                    onDrop={_onDrop}
-                    activateTargets={!isDragged && !!draggedNode}
-                    windowSize={props.windowSize}
-                    indentScale={props.indentScale}
-                    getNodeAtPath={path => {
-                      const result = getNodeAtPath({
-                        path,
-                        treeData: treeDataRoot.current,
-                        getNodeKey,
-                      });
-                      if (!result)
-                        throw new Error(
-                          'Could not find node at path in events tree.'
-                        );
-                      return result.node;
-                    }}
-                  />
-                )}
-              </div>
-            );
+  const _canDrag = React.useCallback((node: ?SortableTreeNode) => {
+    return !!node && !!node.event;
+  }, []);
 
-            return isDragged ? dropTarget : connectDropTarget(dropTarget);
-          }}
-        </DragSourceAndDropTarget>
+  const _canDrop = React.useCallback((hoveredNode: SortableTreeNode) => {
+    return true;
+  }, []);
+
+  const _restoreFoldedNodes = React.useCallback(
+    () => {
+      temporaryUnfoldedNodes.current.forEach(
+        node => node.event && node.event.setFolded(true)
       );
-    };
 
-    const buildEventsTreeData = (
-      treeData: Array<SortableTreeNode>,
-      parentProjectScopedContainersAccessor: ProjectScopedContainersAccessor,
-      eventsList: gdEventsList,
-      flattenedList: Array<gdBaseEvent> = [],
-      depth: number = 0,
-      parentDisabled: boolean = false,
-      parentAbsolutePath: Array<number> = [],
-      parentRelativePath: ?Array<number> = null
+      temporaryUnfoldedNodes.current = [];
+      forceEventsUpdate();
+    },
+    [forceEventsUpdate]
+  );
+
+  const _onEndDrag = React.useCallback(
+    () => {
+      // This method is always called at the end of the drag, regardless of whether
+      // an event was actually dropped. It is also already called in `_onDrop` to update
+      // the event list and compute history. So if draggedNode is null, we want to avoid
+      // recomputing the event list.
+      // $FlowFixMe[constant-condition]
+      if (draggedNode) {
+        setDraggedNode(null);
+        _restoreFoldedNodes();
+        forceEventsUpdate();
+      }
+    },
+    [draggedNode, _restoreFoldedNodes, forceEventsUpdate]
+  );
+
+  const eventPtrToRowIndex = React.useRef<{ [key: string]: number }>({});
+  const getEventRow = React.useCallback(
+    (searchedEvent: gdBaseEvent) => {
+      return eventPtrToRowIndex.current['' + searchedEvent.ptr] || -1;
+    },
+    [eventPtrToRowIndex]
+  );
+
+  const temporaryUnfoldNode = React.useCallback(
+    (isOverLazy: boolean, node: SortableTreeNode) => {
+      const { event } = node;
+      if (!event) return;
+
+      const isNodeTemporaryUnfolded = temporaryUnfoldedNodes.current.some(
+        foldedNode => node.key === foldedNode.key
+      );
+      if (isOverLazy) {
+        if (!_hoverTimerId.current && !node.expanded) {
+          if (!isNodeTemporaryUnfolded) {
+            _hoverTimerId.current = window.setTimeout(() => {
+              // $FlowFixMe[incompatible-type] - Per the condition above, we are confident that node.event is not null.
+              event.setFolded(false);
+              temporaryUnfoldedNodes.current.push(node);
+              forceEventsUpdate();
+            }, 1000);
+          }
+        }
+      } else {
+        if (_hoverTimerId.current) window.clearTimeout(_hoverTimerId.current);
+        _hoverTimerId.current = null;
+      }
+    },
+    [forceEventsUpdate]
+  );
+
+  const _getRowHeight = ({ node }: { node: ?SortableTreeNode }) => {
+    if (!node) {
+      return 0;
+    }
+    if (!node.event) {
+      return node.fixedHeight || 0;
+    }
+
+    const height = eventsHeightsCache.getEventHeight(node.event);
+    return height;
+  };
+
+  const {
+    project,
+    globalObjectsContainer,
+    objectsContainer,
+    showObjectThumbnails,
+  } = props;
+  const renderObjectThumbnail = React.useCallback(
+    (objectName: string) => {
+      if (!showObjectThumbnails) return null;
+
+      const object = getObjectByName(
+        globalObjectsContainer,
+        objectsContainer,
+        objectName
+      );
+      if (!object) return null;
+
+      return (
+        <CorsAwareImage
+          className={classNames({
+            [icon]: true,
+          })}
+          alt=""
+          src={getThumbnail(project, object.getConfiguration())}
+        />
+      );
+    },
+    [project, globalObjectsContainer, objectsContainer, showObjectThumbnails]
+  );
+
+  const { onEventMoved } = props;
+  const _onDrop = React.useCallback(
+    (
+      moveFunction: MoveFunctionArguments => void,
+      currentNode: SortableTreeNode
     ) => {
-      treeData.length = 0;
-      mapFor(0, eventsList.getEventsCount(), i => {
-        const event = eventsList.getEventAt(i);
-        flattenedList.push(event);
+      // $FlowFixMe[constant-condition]
+      if (!draggedNode) return;
 
-        const disabled = parentDisabled || event.isDisabled();
-        const absoluteIndex = flattenedList.length - 1;
-        const currentAbsolutePath = parentAbsolutePath.concat(
-          flattenedList.length - 1
-        );
-        const currentRelativePath = [...(parentRelativePath || []), i];
-        const projectScopedContainersAccessor = event.canHaveVariables()
-          ? parentProjectScopedContainersAccessor.makeNewProjectScopedContainersWithLocalVariables(
-              event
-            )
-          : parentProjectScopedContainersAccessor;
-
-        eventPtrToRowIndex.current['' + event.ptr] = absoluteIndex;
-
-        const isValidElseEvent =
-          event.getType() === 'BuiltinCommonInstructions::Else'
-            ? isElseEventValid(eventsList, i)
-            : false;
-
-        const childrenTreeData = [];
-        buildEventsTreeData(
-          childrenTreeData,
-          projectScopedContainersAccessor,
-          event.getSubEvents(),
-          // flattenedList is a flat representation of events, one for each line.
-          // Hence it should not contain the folded events.
-          !event.isFolded() ? flattenedList : [],
-          depth + 1,
-          disabled,
-          currentAbsolutePath,
-          currentRelativePath
-        );
-
-        treeData.push({
-          title: _renderEvent,
-          event,
-          eventsList,
-          indexInList: i,
-          rowIndex: absoluteIndex,
-          expanded: !event.isFolded(),
-          disabled,
-          depth,
-          key: event.ptr,
-          isValidElseEvent,
-          children: childrenTreeData,
-          nodePath: currentAbsolutePath,
-          relativeNodePath: currentRelativePath,
-          projectScopedContainersAccessor,
-        });
+      moveFunction({
+        node: draggedNode,
+        targetNode: currentNode,
       });
+      const { nodePath, event } = draggedNode;
+      _onEndDrag();
+      if (!event) {
+        console.warn('EventsSheet: No event found in dragged node.');
+        return;
+      }
+      const newRowIndex = getEventRow(event);
+      onEventMoved(nodePath[nodePath.length - 1], newRowIndex);
+    },
+    [draggedNode, _onEndDrag, onEventMoved, getEventRow]
+  );
 
-      // Add the bottom buttons if we're at the root
-      const extraNodes: Array<SortableTreeNode> = [
-        depth === 0
-          ? {
-              title: () => (
-                <BottomButtons
-                  onAddEvent={(eventType: string) =>
-                    props.onAddNewEvent(eventType, props.events)
-                  }
-                  DnDComponent={DropTarget}
+  const _renderEvent = ({ node }: {| node: SortableTreeNode |}) => {
+    const { event, depth, disabled, isValidElseEvent } = node;
+    if (!event) return null;
+
+    const isDragged =
+      // $FlowFixMe[constant-condition]
+      !!draggedNode &&
+      // $FlowFixMe[invalid-compare]
+      (isDescendant(draggedNode, node) || node.key === draggedNode.key);
+    return (
+      <DragSourceAndDropTarget
+        beginDrag={() => {
+          // $FlowFixMe[incompatible-type]
+          setDraggedNode(node);
+          return node;
+        }}
+        canDrag={() => _canDrag(node)}
+        canDrop={() => _canDrop(node)}
+        // Drop operations are handled by DropContainers.
+        drop={() => {
+          return;
+        }}
+        endDrag={_onEndDrag}
+      >
+        {({ connectDragSource, connectDropTarget, isOverLazy }) => {
+          temporaryUnfoldNode(isOverLazy, node);
+
+          const eventContext = {
+            eventsList: node.eventsList,
+            event: event,
+            indexInList: node.indexInList,
+            projectScopedContainersAccessor:
+              node.projectScopedContainersAccessor,
+          };
+
+          const dropTarget = (
+            <div
+              style={{
+                opacity: isDragged ? 0.5 : 1,
+                ...getEventContainerStyle(props.windowSize),
+              }}
+              {...dataObjectToProps({ rowIndex: node.rowIndex.toString() })}
+            >
+              <EventContainer
+                project={props.project}
+                scope={props.scope}
+                globalObjectsContainer={props.globalObjectsContainer}
+                objectsContainer={props.objectsContainer}
+                projectScopedContainersAccessor={
+                  node.projectScopedContainersAccessor
+                }
+                event={event}
+                key={event.ptr}
+                eventsHeightsCache={eventsHeightsCache}
+                selection={props.selection}
+                leftIndentWidth={
+                  depth * (getIndentWidth(props.windowSize) * props.indentScale)
+                }
+                onUpdate={forceUpdate}
+                onAddNewInstruction={instructionsListContext =>
+                  props.onAddNewInstruction(
+                    eventContext,
+                    instructionsListContext
+                  )
+                }
+                onPasteInstructions={instructionsListContext =>
+                  props.onPasteInstructions(
+                    eventContext,
+                    instructionsListContext
+                  )
+                }
+                onMoveToInstruction={instructionContext =>
+                  props.onMoveToInstruction(eventContext, instructionContext)
+                }
+                onMoveToInstructionsList={instructionContext =>
+                  props.onMoveToInstructionsList(
+                    eventContext,
+                    instructionContext
+                  )
+                }
+                onInstructionClick={instructionContext =>
+                  props.onInstructionClick(eventContext, instructionContext)
+                }
+                onInstructionDoubleClick={instructionContext =>
+                  props.onInstructionDoubleClick(
+                    eventContext,
+                    instructionContext
+                  )
+                }
+                onParameterClick={parameterContext =>
+                  props.onParameterClick(eventContext, parameterContext)
+                }
+                onVariableDeclarationClick={variableDeclarationContext =>
+                  props.onVariableDeclarationClick(
+                    eventContext,
+                    variableDeclarationContext
+                  )
+                }
+                onVariableDeclarationDoubleClick={variableDeclarationContext =>
+                  props.onVariableDeclarationDoubleClick(
+                    eventContext,
+                    variableDeclarationContext
+                  )
+                }
+                onEventClick={() =>
+                  props.onEventClick({
+                    eventsList: node.eventsList,
+                    event: event,
+                    indexInList: node.indexInList,
+                    projectScopedContainersAccessor:
+                      node.projectScopedContainersAccessor,
+                  })
+                }
+                onEndEditingEvent={() => props.onEndEditingEvent(event)}
+                onEventContextMenu={(x, y) =>
+                  props.onEventContextMenu(x, y, {
+                    eventsList: node.eventsList,
+                    event: event,
+                    indexInList: node.indexInList,
+                    projectScopedContainersAccessor:
+                      node.projectScopedContainersAccessor,
+                  })
+                }
+                onInstructionContextMenu={(...args) =>
+                  props.onInstructionContextMenu(eventContext, ...args)
+                }
+                onAddInstructionContextMenu={(...args) =>
+                  props.onAddInstructionContextMenu(eventContext, ...args)
+                }
+                onOpenExternalEvents={props.onOpenExternalEvents}
+                onOpenLayout={(name: string) => {
+                  props.onOpenLayout(name);
+                }}
+                disabled={
+                  disabled /* Use node.disabled (not event.disabled) as it is true if a parent event is disabled*/
+                }
+                renderObjectThumbnail={renderObjectThumbnail}
+                screenType={props.screenType}
+                eventsSheetWidth={props.eventsSheetWidth}
+                eventsSheetHeight={props.eventsSheetHeight}
+                connectDragSource={connectDragSource}
+                windowSize={props.windowSize}
+                idPrefix={`event-${node.relativeNodePath.join('-')}`}
+                isValidElseEvent={isValidElseEvent}
+                highlightedAiGeneratedEventIds={
+                  props.highlightedAiGeneratedEventIds
+                }
+              />
+              {/* $FlowFixMe[constant-condition] */}
+              {draggedNode && (
+                <DropContainer
+                  node={node}
                   draggedNode={draggedNode}
-                  rootEventsList={eventsList}
+                  draggedNodeHeight={_getRowHeight({
+                    node: draggedNode,
+                  })}
+                  DnDComponent={DropTarget}
+                  onDrop={_onDrop}
+                  activateTargets={!isDragged && !!draggedNode}
+                  windowSize={props.windowSize}
+                  indentScale={props.indentScale}
+                  getNodeAtPath={path => {
+                    const result = getNodeAtPath({
+                      path,
+                      treeData: treeDataRoot.current,
+                      getNodeKey,
+                    });
+                    if (!result)
+                      throw new Error(
+                        'Could not find node at path in events tree.'
+                      );
+                    return result.node;
+                  }}
                 />
-              ),
-              event: null,
-              indexInList: eventsList.getEventsCount(),
-              disabled: false,
-              depth: 0,
-              fixedHeight: 40,
-              children: [],
-              eventsList,
-              rowIndex: flattenedList.length,
-              projectScopedContainersAccessor: parentProjectScopedContainersAccessor,
-              key: 'bottom-buttons',
-              isValidElseEvent: false,
-              // Unused, but still provided to make typing happy:
-              expanded: false,
-              nodePath: [flattenedList.length + 0],
-              relativeNodePath: [flattenedList.length + 0],
-            }
-          : null,
-        depth === 0 && eventsList.getEventsCount() !== 0 && tutorial
-          ? {
-              title: () => (
-                <Line justifyContent="center">
-                  <TutorialMessage tutorial={tutorial} />
-                </Line>
-              ),
-              event: null,
-              indexInList: eventsList.getEventsCount() + 1,
-              disabled: false,
-              depth: 0,
-              fixedHeight: 150,
-              children: [],
-              eventsList,
-              rowIndex: flattenedList.length + 1,
-              projectScopedContainersAccessor: parentProjectScopedContainersAccessor,
-              key: 'eventstree-tutorial-node',
-              isValidElseEvent: false,
-              // Unused, but still provided to make typing happy:
-              expanded: false,
-              nodePath: [flattenedList.length + 1],
-              relativeNodePath: [flattenedList.length + 1],
-            }
-          : null,
-        depth === 0 && eventsList.getEventsCount() === 0
-          ? {
-              title: () => (
-                <EmptyPlaceholder
-                  title={<Trans>Add your first event</Trans>}
-                  description={
-                    <Trans>Events define the rules of a game.</Trans>
-                  }
-                  actionLabel={<Trans>Add an event</Trans>}
-                  helpPagePath="/events"
-                  tutorialId="the-events"
-                  actionButtonId="add-event-button"
-                  onAction={() =>
-                    props.onAddNewEvent(
-                      'BuiltinCommonInstructions::Standard',
-                      props.events
-                    )
-                  }
-                />
-              ),
-              event: null,
-              indexInList: eventsList.getEventsCount() + 1,
-              disabled: false,
-              depth: 0,
-              fixedHeight: 300,
-              children: [],
-              eventsList,
-              rowIndex: flattenedList.length + 2,
-              projectScopedContainersAccessor: parentProjectScopedContainersAccessor,
-              key: 'empty-state',
-              isValidElseEvent: false,
-              // Unused, but still provided to make typing happy:
-              expanded: false,
-              nodePath: [flattenedList.length + 2],
-              relativeNodePath: [flattenedList.length + 2],
-            }
-          : null,
-      ].filter(Boolean);
+              )}
+            </div>
+          );
 
-      treeData.push(...extraNodes);
-    };
+          return isDragged ? dropTarget : connectDropTarget(dropTarget);
+        }}
+      </DragSourceAndDropTarget>
+    );
+  };
 
-    const getEventContextAtRowIndexes = (
-      rowIndexes: Array<number>
-    ): Array<EventContext> => {
-      // We use flatDataTree instead of treeDataRoot because we need the events contexts too.
-      const flatDataTree = getFlatDataFromTree({
-        treeData: treeDataRoot.current,
-        getNodeKey,
-        ignoreCollapsed: true,
+  const buildEventsTreeData = (
+    treeData: Array<SortableTreeNode>,
+    parentProjectScopedContainersAccessor: ProjectScopedContainersAccessor,
+    eventsList: gdEventsList,
+    flattenedList: Array<gdBaseEvent> = [],
+    depth: number = 0,
+    parentDisabled: boolean = false,
+    parentAbsolutePath: Array<number> = [],
+    parentRelativePath: ?Array<number> = null
+  ) => {
+    treeData.length = 0;
+    mapFor(0, eventsList.getEventsCount(), i => {
+      const event = eventsList.getEventAt(i);
+      flattenedList.push(event);
+
+      const disabled = parentDisabled || event.isDisabled();
+      const absoluteIndex = flattenedList.length - 1;
+      const currentAbsolutePath = parentAbsolutePath.concat(
+        flattenedList.length - 1
+      );
+      const currentRelativePath = [...(parentRelativePath || []), i];
+      const projectScopedContainersAccessor = event.canHaveVariables()
+        ? parentProjectScopedContainersAccessor.makeNewProjectScopedContainersWithLocalVariables(
+            event
+          )
+        : parentProjectScopedContainersAccessor;
+
+      eventPtrToRowIndex.current['' + event.ptr] = absoluteIndex;
+
+      const isValidElseEvent =
+        event.getType() === 'BuiltinCommonInstructions::Else'
+          ? isElseEventValid(eventsList, i)
+          : false;
+
+      // $FlowFixMe[missing-empty-array-annot]
+      const childrenTreeData = [];
+      buildEventsTreeData(
+        // $FlowFixMe[incompatible-type]
+        childrenTreeData,
+        projectScopedContainersAccessor,
+        event.getSubEvents(),
+        // flattenedList is a flat representation of events, one for each line.
+        // Hence it should not contain the folded events.
+        !event.isFolded() ? flattenedList : [],
+        depth + 1,
+        disabled,
+        currentAbsolutePath,
+        currentRelativePath
+      );
+
+      treeData.push({
+        title: _renderEvent,
+        event,
+        eventsList,
+        indexInList: i,
+        rowIndex: absoluteIndex,
+        expanded: !event.isFolded(),
+        disabled,
+        depth,
+        key: event.ptr,
+        isValidElseEvent,
+        children: childrenTreeData,
+        nodePath: currentAbsolutePath,
+        relativeNodePath: currentRelativePath,
+        projectScopedContainersAccessor,
       });
-      return rowIndexes
-        .map(rowIndex => {
-          if (!flatDataTree[rowIndex]) return null;
-          const {
-            node: {
+    });
+
+    // Add the bottom buttons if we're at the root
+    // $FlowFixMe[incompatible-type]
+    const extraNodes: Array<SortableTreeNode> = [
+      depth === 0
+        ? {
+            title: () => (
+              <BottomButtons
+                onAddEvent={(eventType: string) =>
+                  props.onAddNewEvent(eventType, props.events)
+                }
+                DnDComponent={DropTarget}
+                draggedNode={draggedNode}
+                rootEventsList={eventsList}
+              />
+            ),
+            event: null,
+            indexInList: eventsList.getEventsCount(),
+            disabled: false,
+            depth: 0,
+            fixedHeight: 40,
+            children: [],
+            eventsList,
+            rowIndex: flattenedList.length,
+            projectScopedContainersAccessor: parentProjectScopedContainersAccessor,
+            key: 'bottom-buttons',
+            isValidElseEvent: false,
+            // Unused, but still provided to make typing happy:
+            expanded: false,
+            nodePath: [flattenedList.length + 0],
+            relativeNodePath: [flattenedList.length + 0],
+          }
+        : null,
+      depth === 0 && eventsList.getEventsCount() !== 0 && tutorial
+        ? {
+            title: () => (
+              <Line justifyContent="center">
+                <TutorialMessage tutorial={tutorial} />
+              </Line>
+            ),
+            event: null,
+            indexInList: eventsList.getEventsCount() + 1,
+            disabled: false,
+            depth: 0,
+            fixedHeight: 150,
+            children: [],
+            eventsList,
+            rowIndex: flattenedList.length + 1,
+            projectScopedContainersAccessor: parentProjectScopedContainersAccessor,
+            key: 'eventstree-tutorial-node',
+            isValidElseEvent: false,
+            // Unused, but still provided to make typing happy:
+            expanded: false,
+            nodePath: [flattenedList.length + 1],
+            relativeNodePath: [flattenedList.length + 1],
+          }
+        : null,
+      depth === 0 && eventsList.getEventsCount() === 0
+        ? {
+            title: () => (
+              <EmptyPlaceholder
+                title={<Trans>Add your first event</Trans>}
+                description={<Trans>Events define the rules of a game.</Trans>}
+                actionLabel={<Trans>Add an event</Trans>}
+                helpPagePath="/events"
+                tutorialId="the-events"
+                actionButtonId="add-event-button"
+                onAction={() =>
+                  props.onAddNewEvent(
+                    'BuiltinCommonInstructions::Standard',
+                    props.events
+                  )
+                }
+              />
+            ),
+            event: null,
+            indexInList: eventsList.getEventsCount() + 1,
+            disabled: false,
+            depth: 0,
+            fixedHeight: 300,
+            children: [],
+            eventsList,
+            rowIndex: flattenedList.length + 2,
+            projectScopedContainersAccessor: parentProjectScopedContainersAccessor,
+            key: 'empty-state',
+            isValidElseEvent: false,
+            // Unused, but still provided to make typing happy:
+            expanded: false,
+            nodePath: [flattenedList.length + 2],
+            relativeNodePath: [flattenedList.length + 2],
+          }
+        : null,
+    ].filter(Boolean);
+
+    treeData.push(...extraNodes);
+  };
+
+  const getEventContextAtRowIndexes = (
+    rowIndexes: Array<number>
+  ): Array<EventContext> => {
+    // We use flatDataTree instead of treeDataRoot because we need the events contexts too.
+    const flatDataTree = getFlatDataFromTree({
+      treeData: treeDataRoot.current,
+      getNodeKey,
+      ignoreCollapsed: true,
+    });
+    return rowIndexes
+      .map(rowIndex => {
+        if (!flatDataTree[rowIndex]) return null;
+        const {
+          node: {
+            event,
+            eventsList,
+            indexInList,
+            projectScopedContainersAccessor,
+          },
+        } = flatDataTree[rowIndex];
+        return event
+          ? {
               event,
               eventsList,
               indexInList,
               projectScopedContainersAccessor,
-            },
-          } = flatDataTree[rowIndex];
-          return event
-            ? {
-                event,
-                eventsList,
-                indexInList,
-                projectScopedContainersAccessor,
-              }
-            : null;
-        })
-        .filter(Boolean);
-    };
+            }
+          : null;
+      })
+      .filter(Boolean);
+  };
 
-    React.useImperativeHandle(ref, () => ({
-      forceEventsUpdate,
-      foldAll,
-      unfoldToLevel,
-      getEventContextAtRowIndexes,
-      scrollToRow,
-      getEventRow,
-      unfoldForEvent,
-    }));
+  // $FlowFixMe[incompatible-type]
+  React.useImperativeHandle(ref, () => ({
+    forceEventsUpdate,
+    foldAll,
+    unfoldToLevel,
+    getEventContextAtRowIndexes,
+    scrollToRow,
+    getEventRow,
+    unfoldForEvent,
+  }));
 
-    const _onVisibilityToggle = React.useCallback(
-      ({ node }: {| node: SortableTreeNode |}) => {
-        const { event } = node;
-        if (!event) return;
+  const _onVisibilityToggle = React.useCallback(
+    ({ node }: {| node: SortableTreeNode |}) => {
+      const { event } = node;
+      if (!event) return;
 
-        event.setFolded(!event.isFolded());
-        forceEventsUpdate();
-      },
-      [forceEventsUpdate]
-    );
+      event.setFolded(!event.isFolded());
+      forceEventsUpdate();
+    },
+    [forceEventsUpdate]
+  );
 
-    const _isNodeHighlighted = React.useCallback(
-      ({
-        node,
-        searchQuery,
-      }: {
-        node: SortableTreeNode,
-        searchQuery: ?Array<gdBaseEvent>,
-      }) => {
-        const searchResults = searchQuery;
-        if (!searchResults) return false;
-        const { event } = node;
-        if (!event) return false;
+  const _isNodeHighlighted = React.useCallback(
+    ({
+      node,
+      searchQuery,
+    }: {
+      node: SortableTreeNode,
+      searchQuery: ?Array<gdBaseEvent>,
+    }) => {
+      const searchResults = searchQuery;
+      if (!searchResults) return false;
+      const { event } = node;
+      if (!event) return false;
 
-        return searchResults.some(highlightedEvent =>
-          gd.compare(highlightedEvent, event)
-        );
-      },
-      []
-    );
+      return searchResults.some(highlightedEvent =>
+        // $FlowFixMe[incompatible-exact]
+        gd.compare(highlightedEvent, event)
+      );
+    },
+    []
+  );
 
-    const _scrollUp = React.useCallback(() => {
-      _list.current && _list.current.container.scrollBy({ top: -5 });
-    }, []);
+  const _scrollUp = React.useCallback(() => {
+    _list.current && _list.current.container.scrollBy({ top: -5 });
+  }, []);
 
-    const _scrollDown = React.useCallback(() => {
-      _list.current && _list.current.container.scrollBy({ top: 5 });
-    }, []);
+  const _scrollDown = React.useCallback(() => {
+    _list.current && _list.current.container.scrollBy({ top: 5 });
+  }, []);
 
-    const zoomLevel = props.fontSize || 14;
+  const zoomLevel = props.fontSize || 14;
 
-    // Update treeDataRoot with the events tree. Done at each render as events
-    // could change at any time, so we can't keep stale data
-    // (we would risk pointing to deleted events in memory).
-    buildEventsTreeData(
-      treeDataRoot.current,
-      props.projectScopedContainersAccessor,
-      props.events
-    );
+  // Update treeDataRoot with the events tree. Done at each render as events
+  // could change at any time, so we can't keep stale data
+  // (we would risk pointing to deleted events in memory).
+  buildEventsTreeData(
+    treeDataRoot.current,
+    props.projectScopedContainersAccessor,
+    props.events
+  );
 
-    React.useLayoutEffect(() => {
-      // Recompute the row heights of the tree at each render, because there
-      // is no guarantee that events heights have not changed (resizing, change in event...).
-      if (_list.current) {
-        _list.current.recomputeRowHeights();
-      }
-    });
+  React.useLayoutEffect(() => {
+    // Recompute the row heights of the tree at each render, because there
+    // is no guarantee that events heights have not changed (resizing, change in event...).
+    if (_list.current) {
+      _list.current.recomputeRowHeights();
+    }
+  });
 
-    return (
-      <div
-        style={{
-          ...styles.container,
-          fontSize: `${zoomLevel}px`,
-          '--icon-size': `${Math.round(zoomLevel * 1.14)}px`,
-          '--instruction-missing-parameter-min-height': `${Math.round(
-            zoomLevel * 1.1
-          )}px`,
-          '--instruction-missing-parameter-min-width': `${Math.round(
-            zoomLevel * 3
-          )}px`,
+  return (
+    <div
+      style={{
+        ...styles.container,
+        fontSize: `${zoomLevel}px`,
+        '--icon-size': `${Math.round(zoomLevel * 1.14)}px`,
+        '--instruction-missing-parameter-min-height': `${Math.round(
+          zoomLevel * 1.1
+        )}px`,
+        '--instruction-missing-parameter-min-width': `${Math.round(
+          zoomLevel * 3
+        )}px`,
+      }}
+    >
+      {/* Disable for touchscreen because the dragged DOM node gets deleted, the */}
+      {/* touch events are lost and the dnd does not drop anymore (hypothesis). */}
+      {props.screenType !== 'touch' && (
+        <>
+          <AutoScroll
+            DnDComponent={DropTarget}
+            direction="top"
+            // $FlowFixMe[constant-condition]
+            activateTargets={!!draggedNode && !isScrolledTop}
+            onHover={_scrollUp}
+          />
+          <AutoScroll
+            DnDComponent={DropTarget}
+            direction="bottom"
+            // $FlowFixMe[constant-condition]
+            activateTargets={!!draggedNode && !isScrolledBottom}
+            onHover={_scrollDown}
+          />
+        </>
+      )}
+      <SortableTree
+        treeData={
+          // Pass a new array each time, otherwise the tree will not re-render.
+          [...treeDataRoot.current]
+        }
+        scaffoldBlockPxWidth={
+          getIndentWidth(props.windowSize) * props.indentScale
+        }
+        onVisibilityToggle={_onVisibilityToggle}
+        rowHeight={_getRowHeight}
+        searchMethod={_isNodeHighlighted}
+        searchQuery={props.searchResults}
+        searchFocusOffset={props.searchFocusOffset}
+        className={props.searchResults ? eventsTreeWithSearchResults : ''}
+        reactVirtualizedListProps={{
+          ref: list => {
+            _list.current = list;
+          },
+          onScroll: event => {
+            props.onScroll && props.onScroll();
+            setIsScrolledTop(event.scrollTop === 0);
+            setIsScrolledBottom(
+              event.clientHeight + event.scrollTop >= event.scrollHeight
+            );
+          },
+          scrollToAlignment: 'center',
         }}
-      >
-        {/* Disable for touchscreen because the dragged DOM node gets deleted, the */}
-        {/* touch events are lost and the dnd does not drop anymore (hypothesis). */}
-        {props.screenType !== 'touch' && (
-          <>
-            <AutoScroll
-              DnDComponent={DropTarget}
-              direction="top"
-              activateTargets={!!draggedNode && !isScrolledTop}
-              onHover={_scrollUp}
-            />
-            <AutoScroll
-              DnDComponent={DropTarget}
-              direction="bottom"
-              activateTargets={!!draggedNode && !isScrolledBottom}
-              onHover={_scrollDown}
-            />
-          </>
-        )}
-        <SortableTree
-          treeData={
-            // Pass a new array each time, otherwise the tree will not re-render.
-            [...treeDataRoot.current]
-          }
-          scaffoldBlockPxWidth={
-            getIndentWidth(props.windowSize) * props.indentScale
-          }
-          onVisibilityToggle={_onVisibilityToggle}
-          rowHeight={_getRowHeight}
-          searchMethod={_isNodeHighlighted}
-          searchQuery={props.searchResults}
-          searchFocusOffset={props.searchFocusOffset}
-          className={props.searchResults ? eventsTreeWithSearchResults : ''}
-          reactVirtualizedListProps={{
-            ref: list => {
-              _list.current = list;
-            },
-            onScroll: event => {
-              props.onScroll && props.onScroll();
-              setIsScrolledTop(event.scrollTop === 0);
-              setIsScrolledBottom(
-                event.clientHeight + event.scrollTop >= event.scrollHeight
-              );
-            },
-            scrollToAlignment: 'center',
-          }}
-        />
-      </div>
-    );
-  }
-);
+      />
+    </div>
+  );
+});
 
 export default EventsTree;

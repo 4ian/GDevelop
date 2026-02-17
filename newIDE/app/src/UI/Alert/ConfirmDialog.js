@@ -22,7 +22,7 @@ type Props = {|
   makeDismissButtonPrimary?: boolean,
 |};
 
-function ConfirmDialog(props: Props) {
+function ConfirmDialog(props: Props): React.Node {
   return (
     <I18n>
       {({ i18n }) => {
@@ -78,6 +78,7 @@ function ConfirmDialog(props: Props) {
             }
             title={i18n._(props.title)}
             open={props.open}
+            // $FlowFixMe[incompatible-type]
             actions={dialogActions}
             maxWidth={props.maxWidth || 'xs'}
             fullscreen="never-even-on-mobile"

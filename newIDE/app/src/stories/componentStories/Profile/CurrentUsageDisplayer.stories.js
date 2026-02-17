@@ -18,7 +18,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const WithSubscriptionLimitNotReached = () => (
+export const WithSubscriptionLimitNotReached = (): React.Node => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={{
@@ -35,7 +35,7 @@ export const WithSubscriptionLimitNotReached = () => (
   />
 );
 
-export const WithoutSubscriptionLimitNotReached = () => (
+export const WithoutSubscriptionLimitNotReached = (): React.Node => (
   <CurrentUsageDisplayer
     subscription={noSubscription}
     quota={{
@@ -52,7 +52,7 @@ export const WithoutSubscriptionLimitNotReached = () => (
   />
 );
 
-export const WithSubscriptionLimitNotReached30Days = () => (
+export const WithSubscriptionLimitNotReached30Days = (): React.Node => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={{
@@ -69,7 +69,7 @@ export const WithSubscriptionLimitNotReached30Days = () => (
   />
 );
 
-export const WithSubscription1BuildRemaining = () => (
+export const WithSubscription1BuildRemaining = (): React.Node => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={{
@@ -86,7 +86,7 @@ export const WithSubscription1BuildRemaining = () => (
   />
 );
 
-export const WithSubscription1BuildRemaining30Days = () => (
+export const WithSubscription1BuildRemaining30Days = (): React.Node => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={{
@@ -103,7 +103,7 @@ export const WithSubscription1BuildRemaining30Days = () => (
   />
 );
 
-export const WithSubscriptionRedemptionCode = () => (
+export const WithSubscriptionRedemptionCode = (): React.Node => (
   <CurrentUsageDisplayer
     subscription={silverSubscriptionWithRedemptionCode}
     quota={{
@@ -120,7 +120,7 @@ export const WithSubscriptionRedemptionCode = () => (
   />
 );
 
-export const WithSubscriptionExpiredRedemptionCode = () => (
+export const WithSubscriptionExpiredRedemptionCode = (): React.Node => (
   <CurrentUsageDisplayer
     subscription={silverSubscriptionWithExpiredRedemptionCode}
     quota={{
@@ -137,7 +137,7 @@ export const WithSubscriptionExpiredRedemptionCode = () => (
   />
 );
 
-export const WithSubscriptionLimitReached = () => (
+export const WithSubscriptionLimitReached = (): React.Node => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={limitsReached.quotas['cordova-build']}
@@ -149,7 +149,7 @@ export const WithSubscriptionLimitReached = () => (
   />
 );
 
-export const WithProSubscriptionLimitReached = () => (
+export const WithProSubscriptionLimitReached = (): React.Node => (
   <CurrentUsageDisplayer
     subscription={subscriptionForStartupUser}
     quota={limitsReached.quotas['cordova-build']}
@@ -161,7 +161,7 @@ export const WithProSubscriptionLimitReached = () => (
   />
 );
 
-export const WithoutSubscriptionLimitsReached = () => (
+export const WithoutSubscriptionLimitsReached = (): React.Node => (
   <CurrentUsageDisplayer
     subscription={noSubscription}
     quota={limitsReached.quotas['cordova-build']}

@@ -54,7 +54,7 @@ const InlineParameterEditor = ({
   parameterIndex,
   anchorEl,
   resourceManagementProps,
-}: Props) => {
+}: Props): null | React.Node => {
   const [
     parameterMetadata,
     setParameterMetadata,
@@ -151,6 +151,7 @@ const InlineParameterEditor = ({
   );
 
   if (
+    // $FlowFixMe[constant-condition]
     !ParameterComponent ||
     !open ||
     !instruction ||

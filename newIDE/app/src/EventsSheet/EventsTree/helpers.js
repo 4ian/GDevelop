@@ -69,14 +69,17 @@ export const moveNodeAbove = ({ targetNode, node }: MoveFunctionArguments) => {
 export const isDescendant = (
   olderNode: SortableTreeNode,
   childNode: SortableTreeNode
-) => {
+): boolean => {
   if (childNode.depth <= olderNode.depth) return false;
   const parentPath = olderNode.nodePath;
   const childPath = childNode.nodePath;
   return parentPath.every((pathValue, index) => pathValue === childPath[index]);
 };
 
-export const isSibling = (nodeA: SortableTreeNode, nodeB: SortableTreeNode) => {
+export const isSibling = (
+  nodeA: SortableTreeNode,
+  nodeB: SortableTreeNode
+): boolean => {
   if (nodeA.depth !== nodeB.depth) return false;
   const nodeAPath = nodeA.nodePath;
   const nodeBPath = nodeB.nodePath;
@@ -88,7 +91,7 @@ export const isSibling = (nodeA: SortableTreeNode, nodeB: SortableTreeNode) => {
 export const isJustBelow = (
   aboveNode: SortableTreeNode,
   belowNode: SortableTreeNode
-) => {
+): boolean => {
   const belowNodePath = belowNode.nodePath;
   const aboveNodePath = aboveNode.nodePath;
   if (belowNodePath[belowNodePath.length - 1] === 0) return false;
@@ -101,7 +104,7 @@ export const isJustBelow = (
 export const getNodeAtPath = (
   path: Array<number>,
   treeData: Array<SortableTreeNode>
-) => {
+): any | SortableTreeNode => {
   if (path.length === 1) return treeData[path[0]];
   return getNodeAtPath(
     path.slice(0, -1),

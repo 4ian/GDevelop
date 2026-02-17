@@ -176,6 +176,9 @@ class Variable {
   }
 
   getAllChildrenArray() {
+    if (this._childrenArray.length > 0) {
+      return this._childrenArray;
+    }
     return Object.values(this._children);
   }
 
@@ -187,14 +190,32 @@ class Variable {
     return !!this._children[childName];
   }
 
-  castTo() {}
+  castTo(newType) {
+    if (newType === 'string' || newType === 'number' || newType === 'boolean') {
+      this._children = {};
+      this._childrenArray = [];
+    } else if (newType === 'structure') {
+      this._childrenArray = [];
+    } else if (newType === 'array') {
+      this._children = {};
+    }
+  }
 
   isPrimitive() {
-    return this.getAllChildrenArray().length === 0;
+    return (
+      this._childrenArray.length === 0 &&
+      Object.keys(this._children).length === 0
+    );
   }
 
   getType() {
-    return this.isPrimitive() ? 'number' : 'structure';
+    if (this._childrenArray.length > 0) {
+      return 'array';
+    }
+    if (Object.keys(this._children).length > 0) {
+      return 'structure';
+    }
+    return 'number';
   }
 
   removeChild(childName) {
@@ -204,6 +225,43 @@ class Variable {
   clearChildren() {
     this._children = {};
     this._childrenArray = [];
+  }
+
+  /**
+   * Replaces all the children with a new map of children.
+   * @param {Object.<string, Variable>} newChildren
+   */
+  replaceChildren(newChildren) {
+    this._children = newChildren;
+    this._childrenArray = [];
+  }
+
+  /**
+   * Replaces all the children with a new array of children.
+   * @param {Variable[]} newChildren
+   */
+  replaceChildrenArray(newChildren) {
+    this._childrenArray = newChildren;
+    this._children = {};
+  }
+
+  /**
+   * Converts this variable into an equivalent JavaScript object.
+   * @returns {any}
+   */
+  toJSObject() {
+    if (this._childrenArray.length > 0) {
+      return this._childrenArray.map((child) => child.toJSObject());
+    }
+    if (Object.keys(this._children).length > 0) {
+      const obj = {};
+      for (const name in this._children) {
+        if (this._children.hasOwnProperty(name))
+          obj[name] = this._children[name].toJSObject();
+      }
+      return obj;
+    }
+    return this._value;
   }
 
   clone() {
@@ -303,7 +361,12 @@ class VariablesContainer {
             const childVariable = variable.getChild(childVariableData.name);
             setupVariableFromVariableData(childVariable, childVariableData);
           });
-          variable.setString(variableData.value);
+        } else if (variableData.type === 'array') {
+          variableData.children.forEach((childVariableData) => {
+            const childVariable = new Variable();
+            setupVariableFromVariableData(childVariable, childVariableData);
+            variable._pushVariable(childVariable);
+          });
         } else {
           throw new Error(
             'Unsupported variable type in GDJS Mock:',
@@ -965,6 +1028,10 @@ function makeMinimalGDJSMock(options) {
         runtimeScene: {
           wait: () => new FakeAsyncTask(),
           noop: () => {},
+        },
+        network: {
+          variableStructureToJSON: (variable) =>
+            JSON.stringify(variable.toJSObject()),
         },
         common: {
           resolveAsyncEventsFunction: ({ task }) => task.resolve(),

@@ -38,6 +38,21 @@ module.exports = {
           // be used - and the user can still reload manually on its browser.
           watch: [],
           middleware: [
+            // Handle requests with query parameters by serving index.html
+            // This ensures URLs like http://localhost:2929/?i=123 work correctly
+            function handleQueryParams(req, res, next) {
+              try {
+                const url = new URL(req.url, `http://${req.headers.host}`);
+                // If the request is for the root path with query parameters,
+                // rewrite to serve index.html while preserving the query string
+                if (url.pathname === '/' && url.search) {
+                  req.url = '/index.html' + url.search;
+                }
+              } catch (e) {
+                // If URL parsing fails, leave req.url unchanged
+              }
+              next();
+            },
             // Disable caching, as it can lead to older generated code being served
             // in case preview files are proxied through a CDN (see
             // https://github.com/4ian/GDevelop/pull/6553 for example)

@@ -108,9 +108,11 @@ const ImageCard = ({
           />
         </div>
         <div style={styles.titleContainer}>
+          {/* $FlowFixMe[incompatible-type] */}
           <Text noMargin style={styles.title} color="inherit">
             {resource.name}
           </Text>
+          {/* $FlowFixMe[incompatible-type] */}
           <Text noMargin style={styles.title} color="inherit" size="body2">
             {resource.license}
           </Text>
@@ -137,9 +139,11 @@ const GenericCard = ({
     <div style={{ ...styles.cardContainer, width: size, height: size }}>
       <Column>{children}</Column>
       <div style={styles.titleContainer}>
+        {/* $FlowFixMe[incompatible-type] */}
         <Text noMargin style={styles.title}>
           {resource.name}
         </Text>
+        {/* $FlowFixMe[incompatible-type] */}
         <Text noMargin style={styles.title} size="body2">
           {resource.license}
         </Text>
@@ -160,7 +164,7 @@ export const ResourceCard = ({
   onChoose,
   size,
   isSelected,
-}: Props) => {
+}: Props): null | React.MixedElement | React.Node => {
   const resourceKind = resource.type;
   const theme = React.useContext(GDevelopThemeContext);
 
@@ -183,8 +187,10 @@ export const ResourceCard = ({
           size={size}
           imageStyle={
             theme.palette.type === 'light'
-              ? styles.previewIconLightTheme
-              : styles.previewIconDarkTheme
+              ? // $FlowFixMe[incompatible-type]
+                styles.previewIconLightTheme
+              : // $FlowFixMe[incompatible-type]
+                styles.previewIconDarkTheme
           }
         />
       );

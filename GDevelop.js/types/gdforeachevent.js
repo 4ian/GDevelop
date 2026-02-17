@@ -5,6 +5,8 @@ declare class gdForEachEvent extends gdBaseEvent {
   getObjectToPick(): string;
   getConditions(): gdInstructionsList;
   getActions(): gdInstructionsList;
+  getLoopIndexVariableName(): string;
+  setLoopIndexVariableName(name: string): void;
   delete(): void;
   ptr: number;
 };

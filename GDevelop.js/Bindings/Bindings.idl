@@ -1496,7 +1496,7 @@ interface InitialInstance {
 
     boolean HasAnyOverriddenProperty([Const, Ref] gdObject obj);
     boolean HasAnyOverriddenPropertyForBehavior([Const, Ref] Behavior behavior);
-    
+
     boolean HasBehaviorOverridingNamed([Const] DOMString name);
     Behavior AddNewBehaviorOverriding([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
     [Ref] Behavior GetBehaviorOverriding([Const] DOMString name);
@@ -2487,6 +2487,8 @@ interface RepeatEvent {
     [Ref] InstructionsList GetActions();
     void SetRepeatExpressionPlainString([Const] DOMString expr);
     [Const, Ref] Expression GetRepeatExpression();
+    [Const, Ref] DOMString GetLoopIndexVariableName();
+    void SetLoopIndexVariableName([Const] DOMString name);
 };
 RepeatEvent implements BaseEvent;
 
@@ -2496,6 +2498,8 @@ interface WhileEvent {
     [Ref] InstructionsList GetConditions();
     [Ref] InstructionsList GetWhileConditions();
     [Ref] InstructionsList GetActions();
+    [Const, Ref] DOMString GetLoopIndexVariableName();
+    void SetLoopIndexVariableName([Const] DOMString name);
 };
 WhileEvent implements BaseEvent;
 
@@ -2506,6 +2510,8 @@ interface ForEachEvent {
     [Const, Ref] DOMString GetObjectToPick();
     [Ref] InstructionsList GetConditions();
     [Ref] InstructionsList GetActions();
+    [Const, Ref] DOMString GetLoopIndexVariableName();
+    void SetLoopIndexVariableName([Const] DOMString name);
 };
 ForEachEvent implements BaseEvent;
 
@@ -2521,6 +2527,8 @@ interface ForEachChildVariableEvent {
     void SetIterableVariableName([Const] DOMString newName);
     void SetKeyIteratorVariableName([Const] DOMString newName);
     void SetValueIteratorVariableName([Const] DOMString newName);
+    [Const, Ref] DOMString GetLoopIndexVariableName();
+    void SetLoopIndexVariableName([Const] DOMString name);
 };
 ForEachChildVariableEvent implements BaseEvent;
 
@@ -3633,6 +3641,21 @@ interface EventsContextAnalyzer {
     //Inherited from ArbitraryEventsWorkerWithContext
     void Launch([Ref] EventsList events, [Const, Ref] ProjectScopedContainers projectScopedContainers);
 };
+
+interface ReadOnlyArbitraryEventsWorkerWithContext {
+    void Launch([Const, Ref] EventsList events, [Const, Ref] ProjectScopedContainers projectScopedContainers);
+};
+[JSImplementation=ReadOnlyArbitraryEventsWorkerWithContext]
+interface ReadOnlyArbitraryEventsWorkerWithContextJS {
+    void ReadOnlyArbitraryEventsWorkerWithContextJS();
+
+    // Called for each event visited
+    void DoVisitEvent([Const, Ref] BaseEvent event);
+
+    // Called for each instruction visited, with the current scoped containers (includes local variables)
+    void DoVisitInstruction([Const, Ref] Instruction instruction, boolean isCondition, [Const, Ref] ProjectScopedContainers projectScopedContainers);
+};
+ReadOnlyArbitraryEventsWorkerWithContextJS implements ReadOnlyArbitraryEventsWorkerWithContext;
 
 interface ArbitraryResourceWorker {
 };

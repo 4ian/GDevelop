@@ -84,58 +84,60 @@ const getVariableTypeToString = () => {
   return variableTypeToString;
 };
 
-const VariableTypeSelector = React.memo<Props>((props: Props) => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const Icon = getVariableTypeToIcon()[props.variableType];
+const VariableTypeSelector: React.ComponentType<Props> = React.memo<Props>(
+  (props: Props) => {
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
+    const Icon = getVariableTypeToIcon()[props.variableType];
 
-  return (
-    <Line alignItems="center" noMargin>
-      {props.errorMessage ? (
-        <Tooltip title={props.errorMessage}>
-          <WarningIcon
+    return (
+      <Line alignItems="center" noMargin>
+        {props.errorMessage ? (
+          <Tooltip title={props.errorMessage}>
+            <WarningIcon
+              fontSize="small"
+              htmlColor={gdevelopTheme.message.warning}
+            />
+          </Tooltip>
+        ) : (
+          <Icon
             fontSize="small"
-            htmlColor={gdevelopTheme.message.warning}
-          />
-        </Tooltip>
-      ) : (
-        <Icon
-          fontSize="small"
-          htmlColor={
-            props.isHighlighted
-              ? gdevelopTheme.message.selectedTextColor
-              : undefined
-          }
-        />
-      )}
-      {!props.readOnlyWithIcon && (
-        <>
-          <Spacer />
-          <SelectField
-            value={props.variableType}
-            translatableHintText={t`Mixed`}
-            margin="none"
-            stopPropagationOnClick
-            onChange={event =>
-              props.onChange(
-                getVariableTypeToString()[event.target.value],
-                props.nodeId
-              )
+            htmlColor={
+              props.isHighlighted
+                ? gdevelopTheme.message.selectedTextColor
+                : undefined
             }
-            inputStyle={{
-              fontSize: 14,
-              color: props.isHighlighted
-                ? gdevelopTheme.listItem.selectedTextColor
-                : undefined,
-            }}
-            id={props.id}
-            disabled={props.disabled}
-          >
-            {getOptions()}
-          </SelectField>
-        </>
-      )}
-    </Line>
-  );
-});
+          />
+        )}
+        {!props.readOnlyWithIcon && (
+          <>
+            <Spacer />
+            <SelectField
+              value={props.variableType}
+              translatableHintText={t`Mixed`}
+              margin="none"
+              stopPropagationOnClick
+              onChange={event =>
+                props.onChange(
+                  getVariableTypeToString()[event.target.value],
+                  props.nodeId
+                )
+              }
+              inputStyle={{
+                fontSize: 14,
+                color: props.isHighlighted
+                  ? gdevelopTheme.listItem.selectedTextColor
+                  : undefined,
+              }}
+              id={props.id}
+              disabled={props.disabled}
+            >
+              {getOptions()}
+            </SelectField>
+          </>
+        )}
+      </Line>
+    );
+  }
+);
 
 export default VariableTypeSelector;

@@ -109,6 +109,7 @@ export const quicklyAnalyzeVariableName = (
   projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
   isObjectVariable: boolean = false
 ): VariableNameQuickAnalyzeResult => {
+  // $FlowFixMe[incompatible-type]
   if (!name) return VariableNameQuickAnalyzeResults.OK;
 
   for (let i = 0; i < name.length; ++i) {
@@ -118,8 +119,10 @@ export const quicklyAnalyzeVariableName = (
       // This probably starts an expression, so stop the analysis.
       break;
     } else if (character === ' ') {
+      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.WRONG_SPACE;
     } else if (character === '"') {
+      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.WRONG_QUOTE;
     } else if (
       character === '(' ||
@@ -128,6 +131,7 @@ export const quicklyAnalyzeVariableName = (
       character === '/' ||
       character === '*'
     ) {
+      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.WRONG_EXPRESSION;
     }
   }
@@ -140,10 +144,12 @@ export const quicklyAnalyzeVariableName = (
       variablesContainer.has(rootVariableName)
     )
   ) {
+    // $FlowFixMe[incompatible-type]
     return VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE;
   }
 
   if (!projectScopedContainersAccessor) {
+    // $FlowFixMe[incompatible-type]
     return VariableNameQuickAnalyzeResults.OK;
   }
   const projectScopedContainers = projectScopedContainersAccessor.get();
@@ -154,6 +160,7 @@ export const quicklyAnalyzeVariableName = (
       .getObjectsContainersList()
       .hasObjectOrGroupNamed(rootVariableName)
   ) {
+    // $FlowFixMe[incompatible-type]
     return VariableNameQuickAnalyzeResults.NAME_COLLISION_WITH_OBJECT;
   }
 
@@ -167,19 +174,22 @@ export const quicklyAnalyzeVariableName = (
     );
 
     if (variableSource === gd.VariablesContainer.Parameters) {
+      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.PARAMETER_WITH_CHILD;
     }
     if (variableSource === gd.VariablesContainer.Properties) {
+      // $FlowFixMe[incompatible-type]
       return VariableNameQuickAnalyzeResults.PROPERTY_WITH_CHILD;
     }
   }
 
+  // $FlowFixMe[incompatible-type]
   return VariableNameQuickAnalyzeResults.OK;
 };
 
 export const getVariableSourceIcon = (
   variableSourceType: VariablesContainer_SourceType
-) => {
+): any => {
   switch (variableSourceType) {
     case gd.VariablesContainer.Global:
     case gd.VariablesContainer.ExtensionGlobal:
@@ -200,7 +210,7 @@ export const getVariableSourceIcon = (
   }
 };
 
-export const getVariableTypeIcon = (variableType: Variable_Type) => {
+export const getVariableTypeIcon = (variableType: Variable_Type): any => {
   switch (variableType) {
     case gd.Variable.Number:
       return VariableNumberIcon;
@@ -217,7 +227,7 @@ export const getVariableTypeIcon = (variableType: Variable_Type) => {
   }
 };
 
-export default React.forwardRef<Props, VariableFieldInterface>(
+export default (React.forwardRef<Props, VariableFieldInterface>(
   function VariableField(props: Props, ref) {
     const {
       project,
@@ -431,6 +441,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
                   onChange={onChange}
                   onRequestClose={onRequestClose}
                   onApply={onApply}
+                  // $FlowFixMe[incompatible-type]
                   dataSource={[
                     ...autocompletionVariableNames,
                     onOpenDialog
@@ -502,7 +513,10 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       </I18n>
     );
   }
-);
+): React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<VariableFieldInterface>,
+}>);
 
 export const renderVariableWithIcon = (
   {
@@ -520,7 +534,7 @@ export const renderVariableWithIcon = (
     variableName: string,
     projectScopedContainers: gdProjectScopedContainers
   ) => VariablesContainer_SourceType
-) => {
+): React.MixedElement => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }

@@ -35,7 +35,7 @@ export const ReplacePromptDialog = ({
   leaderboardsToReplace,
   onClose,
   onTriggerReplace,
-}: ReplacePromptDialogProps) => {
+}: ReplacePromptDialogProps): React.Node => {
   const { authenticated, onOpenLoginDialog } = React.useContext(
     AuthenticatedUserContext
   );
@@ -113,7 +113,7 @@ export const LeaderboardReplacerProgressDialog = ({
   onRetry,
   onAbandon,
   progress,
-}: LeaderboardReplacerProgressDialogProps) => {
+}: LeaderboardReplacerProgressDialogProps): React.Node => {
   const hasErrors = erroredLeaderboards.length > 0;
 
   return (
@@ -216,7 +216,7 @@ export const replaceLeaderboardsInProject = async ({
   sourceGameId: string,
   leaderboardsToReplace: Array<string>,
   setProgress: (percent: number | ((percent: number) => number)) => void,
-|}) => {
+|}): Promise<{ leaderboardsWithErrors: Array<ErroredLeaderboard> }> => {
   const { getAuthorizationHeader, profile } = authenticatedUser;
   if (!leaderboardsToReplace || !project || !sourceGameId) {
     throw new Error('No leaderboards found in events sheet.');
@@ -240,6 +240,7 @@ export const replaceLeaderboardsInProject = async ({
     await registerGame(
       getAuthorizationHeader,
       profile.id,
+      // $FlowFixMe[incompatible-type]
       getDefaultRegisterGameProperties({
         projectId: project.getProjectUuid(),
         projectName: project.getName(),
@@ -269,6 +270,7 @@ export const replaceLeaderboardsInProject = async ({
           sourceLeaderboardId: leaderboardId,
         }
       );
+      // $FlowFixMe[prop-missing]
       replacedLeaderboardsMap[leaderboardId] = duplicatedLeaderboard.id;
       setProgress(previousProgress => previousProgress + progressStep);
       return null;
@@ -312,7 +314,7 @@ export const findLeaderboardsToReplaceInProject = ({
   project,
 }: {|
   project: gdProject,
-|}) => {
+|}): Array<string> => {
   const leaderboardIds = gd.WholeProjectRefactorer.findAllLeaderboardIds(
     project
   )
@@ -346,6 +348,7 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
     null
   );
 
+  // $FlowFixMe[recursive-definition]
   const ensureLeaderboardsAreReplaced = React.useCallback(
     async () => {
       if (!leaderboardsToReplace || !project || !sourceGameId) {

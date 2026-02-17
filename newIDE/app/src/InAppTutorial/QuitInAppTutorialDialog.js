@@ -22,7 +22,7 @@ const QuitInAppTutorialDialog = ({
   endTutorial,
   onClose,
   isSavingProject,
-}: Props) => {
+}: Props): React.Node => {
   const [hasUserInteracted, setHasUserInteracted] = React.useState<boolean>(
     false
   );

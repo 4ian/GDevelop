@@ -105,6 +105,7 @@ const AudioResourceListAndFilters = ({
   onSelectResource,
 }: ResourceListAndFiltersProps<ResourceV2>) => {
   const soundPlayerRef = React.useRef<?SoundPlayerInterface>(null);
+  // $FlowFixMe[value-as-type]
   const listRef = React.useRef<?List>(null);
   const shouldPlayAfterResourceSelectionRef = React.useRef<boolean>(false);
   const { getAuthorsDisplayLinks } = React.useContext(ResourceStoreContext);
@@ -166,9 +167,12 @@ const AudioResourceListAndFilters = ({
     subtitle = [];
     const authorsDisplayLinks = getAuthorsDisplayLinks(selectedResource);
     if (authorsDisplayLinks) {
+      // $FlowFixMe[incompatible-type]
       subtitle.push(authorsDisplayLinks);
+      // $FlowFixMe[incompatible-type]
       subtitle.push(' - ');
     }
+    // $FlowFixMe[incompatible-type]
     subtitle.push(selectedResource.license.replace(', click for details', ''));
   }
 
@@ -389,7 +393,7 @@ export const ResourceStore = ({
   onSelectResource,
   selectedResourceIndex,
   resourceKind,
-}: Props) => {
+}: Props): React.Node => {
   const {
     searchResults,
     fetchResourcesAndFilters,
@@ -476,6 +480,7 @@ export const ResourceStore = ({
           setIsFiltersPanelOpen={setIsFiltersPanelOpen}
           searchResults={
             // $FlowIgnore - search results should return results for audio resources only.
+            // $FlowFixMe[incompatible-type]
             searchResultsForResourceKind
           }
         />
@@ -489,6 +494,7 @@ export const ResourceStore = ({
           setIsFiltersPanelOpen={setIsFiltersPanelOpen}
           searchResults={
             // $FlowIgnore - search results should return results for font resources only.
+            // $FlowFixMe[incompatible-type]
             searchResultsForResourceKind
           }
         />
@@ -502,6 +508,7 @@ export const ResourceStore = ({
           setIsFiltersPanelOpen={() => {}}
           searchResults={
             // $FlowIgnore - search results should return results for svg resources only.
+            // $FlowFixMe[incompatible-type]
             searchResultsForResourceKind
           }
         />

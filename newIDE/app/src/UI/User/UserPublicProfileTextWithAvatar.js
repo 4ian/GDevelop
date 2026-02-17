@@ -19,7 +19,7 @@ export const UserPublicProfileTextWithAvatar = ({
   user,
   avatarSize,
   expand,
-}: Props) => {
+}: Props): React.Node => {
   const { openUserPublicProfile } = React.useContext(PublicProfileContext);
 
   return (

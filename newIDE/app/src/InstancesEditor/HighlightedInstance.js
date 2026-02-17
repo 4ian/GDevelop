@@ -10,8 +10,11 @@ export default class HighlightedInstance {
   isInstanceOf3DObject: gdInitialInstance => boolean;
   highlightedInstance: gdInitialInstance | null;
   isHighlightedInstanceOf3DObject: boolean;
+  // $FlowFixMe[value-as-type]
   highlightRectangle: PIXI.Container;
+  // $FlowFixMe[value-as-type]
   tooltipBackground: PIXI.Container;
+  // $FlowFixMe[value-as-type]
   tooltipText: PIXI.Container;
 
   constructor({
@@ -53,6 +56,7 @@ export default class HighlightedInstance {
     return this.highlightedInstance;
   }
 
+  // $FlowFixMe[value-as-type]
   getPixiObject(): PIXI.Container {
     return this.highlightRectangle;
   }

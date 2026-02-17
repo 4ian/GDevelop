@@ -118,6 +118,7 @@ export const getTabsToDisplay = ({
     );
   const displayTeachTab =
     !shouldHideClassroomTab(limits) && !isNativeMobileApp();
+  // $FlowFixMe[incompatible-type]
   const tabs: HomeTab[] = [
     'learn',
     'create',
@@ -140,7 +141,7 @@ export const HomePageMenu = ({
   activeTab,
   onOpenPreferences,
   onOpenAbout,
-}: Props) => {
+}: Props): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { limits } = React.useContext(AuthenticatedUserContext);
   const [

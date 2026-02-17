@@ -139,6 +139,7 @@ class LeafTreeViewItem implements TreeViewItem {
   }
 }
 
+// $FlowFixMe[incompatible-type]
 class PlaceHolderTreeViewItem implements TreeViewItem {
   isPlaceholder = true;
   content: TreeViewItemContent;
@@ -182,6 +183,7 @@ const createTreeViewItem = ({
   }
 };
 
+// $FlowFixMe[incompatible-type]
 class PropertyFolderTreeViewItem implements TreeViewItem {
   isRoot: boolean;
   isPlaceholder = false;
@@ -248,6 +250,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     this.id = id;
     this.label = label;
     this.buildMenuTemplateFunction = (i18n: I18nType, index: number) =>
+      // $FlowFixMe[incompatible-type]
       [
         rightButton
           ? {
@@ -288,6 +291,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
 
   onClick(): void {}
 
+  // $FlowFixMe[missing-local-annot]
   buildMenuTemplate(i18n: I18nType, index: number) {
     return this.buildMenuTemplateFunction(i18n, index);
   }
@@ -384,6 +388,7 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
     this.onClickCallback();
   }
 
+  // $FlowFixMe[missing-local-annot]
   buildMenuTemplate(i18n: I18nType, index: number) {
     return this.buildMenuTemplateFunction(i18n, index);
   }
@@ -457,7 +462,9 @@ const deleteItem = (item: TreeViewItem) => {
 const getTreeViewItemRightButton = (i18n: I18nType) => (item: TreeViewItem) =>
   item.content.getRightButton(i18n);
 
-export const usePropertyOverridingAlertDialog = () => {
+export const usePropertyOverridingAlertDialog = (): ((
+  existingPropertyNames: Array<string>
+) => Promise<boolean>) => {
   const { showConfirmation } = useAlertDialog();
   return async (existingPropertyNames: Array<string>): Promise<boolean> => {
     return await showConfirmation({
@@ -724,7 +731,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
           isSharedProperties
         );
       }
-      // $FlowFixMe - We are confident this TreeView item is in fact a PropertyFolderOrPropertyWithContext
+      // $FlowFixMe[incompatible-type] - We are confident this TreeView item is in fact a PropertyFolderOrPropertyWithContext
       return topToBottomAscendanceId[firstClosedFolderIndex];
     };
 
@@ -965,7 +972,8 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
           !propertiesTreeViewItemProps ||
           !propertyFolderTreeViewItemProps
           ? []
-          : [
+          : // $FlowFixMe[incompatible-type]
+            [
               new LeafTreeViewItem(
                 new ActionTreeViewItemContent(
                   configurationItemId,
@@ -1332,6 +1340,8 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
                 >
                   <AutoSizer style={styles.autoSizer} disableWidth>
                     {({ height }) => (
+                      // $FlowFixMe[incompatible-type]
+                      // $FlowFixMe[incompatible-exact]
                       <TreeView
                         key={listKey}
                         ref={treeViewRef}
@@ -1383,10 +1393,10 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
   }
 );
 
-const PropertyListEditorWithErrorBoundary = React.forwardRef<
-  Props,
-  PropertyListEditorInterface
->((props, ref) => (
+const PropertyListEditorWithErrorBoundary: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<PropertyListEditorInterface>,
+}> = React.forwardRef<Props, PropertyListEditorInterface>((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Property list editor</Trans>}
     scope="property-list-editor"

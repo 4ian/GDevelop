@@ -24,7 +24,7 @@ type Props = {|
   onSeeAllBuilds: () => void,
 |};
 
-const BuildsWidget = ({ builds, onSeeAllBuilds }: Props) => {
+const BuildsWidget = ({ builds, onSeeAllBuilds }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const pendingBuilds = builds
     ? builds.filter(build => build.status === 'pending')

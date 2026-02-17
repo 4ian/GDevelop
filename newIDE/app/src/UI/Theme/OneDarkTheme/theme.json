@@ -485,6 +485,20 @@
         }
       }
     },
+    "tooltip": {
+      "background": {
+        "color": {
+          "value": "#3E4452",
+          "comment": "Lighter background for good contrast in dark theme"
+        }
+      },
+      "text": {
+        "color": {
+          "value": "#FAFAFA",
+          "comment": "Light text for good contrast"
+        }
+      }
+    },
     "notification": {
       "badge-color": {
         "value": "#FF5E3B"

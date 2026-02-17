@@ -166,7 +166,7 @@ export const ResourceStoreFilterPanel = ({
   resourceKind,
 }: {
   resourceKind: 'audio' | 'font',
-}) => {
+}): React.Node => {
   const {
     audioFiltersState,
     fontFiltersState,
@@ -190,6 +190,7 @@ export const ResourceStoreFilterPanel = ({
               audioFiltersState.setAudioTypeFilter(
                 new AudioTypeResourceStoreSearchFilter(
                   // $FlowIgnore - We are confident the select only uses value from the options.
+                  // $FlowFixMe[incompatible-type]
                   newValue || null
                 )
               )
@@ -221,6 +222,7 @@ export const ResourceStoreFilterPanel = ({
             valueLabelFormat={value =>
               formatDuration(value, { noNullDuration: false })
             }
+            // $FlowFixMe[incompatible-type]
             marks={durationMarks}
           />
         </>
@@ -229,6 +231,7 @@ export const ResourceStoreFilterPanel = ({
         <MultipleChoiceWithClosableTagsFilter
           filterKey="AlphabetSupport"
           title={<Trans>Alphabet</Trans>}
+          // $FlowFixMe[incompatible-type]
           choices={languageChoices}
           onChange={newValues =>
             fontFiltersState.setAlphabetSupportFilter(
@@ -240,6 +243,7 @@ export const ResourceStoreFilterPanel = ({
           values={fontFiltersState.alphabetSupportFilter.alphabets.map(
             alphabet => ({
               value: alphabet,
+              // $FlowFixMe[invalid-computed-prop]
               label: languageNames[alphabet].languageNativeName,
             })
           )}

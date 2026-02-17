@@ -12,7 +12,7 @@ const useRefocusField = (fieldRefs: {|
       +focus: (?{| caretPosition: ?('end' | number) |}) => void,
     |},
   |},
-|}) => {
+|}): ((options: FocusOptions) => void) => {
   const fieldToFocus = React.useRef<FocusOptions | null>(null);
 
   const setFieldToFocus = React.useCallback((options: FocusOptions) => {

@@ -34,7 +34,8 @@ export const renderInstructionOrExpressionTree = <
   initiallyOpenedPath,
   getGroupIconSrc,
   parentGroupIconSrc,
-}: Props<T>): Array<React$Element<any> | null> => {
+}: // $FlowFixMe[prop-missing]
+Props<T>): Array<React.Element<any> | null> => {
   const [initiallyOpenedKey, ...restOfInitiallyOpenedPath] =
     initiallyOpenedPath || [];
 
@@ -44,12 +45,14 @@ export const renderInstructionOrExpressionTree = <
       // between instruction (leaf nodes) and group (nodes). We use
       // the "type" properties, but this will fail if a group is called "type"
       // (hence the flow errors, which are valid warnings)
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[prop-missing]
+      // $FlowFixMe[invalid-computed-prop]
       const instructionOrGroup = instructionTreeNode[key];
       if (!instructionOrGroup) return null;
 
       if (typeof instructionOrGroup.type === 'string') {
-        // $FlowFixMe - see above
+        // $FlowFixMe[incompatible-type] - see above
         const instructionMetadata: T = instructionOrGroup;
         const value = getInstructionListItemValue(instructionOrGroup.type);
         const selected = selectedValue === value;
@@ -77,7 +80,7 @@ export const renderInstructionOrExpressionTree = <
           />
         );
       } else {
-        // $FlowFixMe - see above
+        // $FlowFixMe[incompatible-type] - see above
         const groupOfInstructionInformation: InstructionOrExpressionTreeNode = instructionOrGroup;
         if (useSubheaders) {
           const iconSrc = getGroupIconSrc(key) || parentGroupIconSrc;

@@ -46,7 +46,7 @@ const DotBadge = ({
   invisible,
   overlap,
   color = 'secondary',
-}: Props) => {
+}: Props): React.Node => {
   const classes = useStyles(color);
   const colorForBadge =
     color === 'success' || color === 'neutral' ? undefined : color;

@@ -49,7 +49,7 @@ const OnlineGameLink = ({
   onGameUpdated,
   automaticallyPublishNewBuild,
   shouldShowShareDialog,
-}: OnlineGameLinkProps) => {
+}: OnlineGameLinkProps): null | React.Node => {
   const [isShareDialogOpen, setIsShareDialogOpen] = React.useState<boolean>(
     false
   );

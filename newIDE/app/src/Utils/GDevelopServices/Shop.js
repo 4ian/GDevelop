@@ -20,7 +20,8 @@ import {
   ensureIsString,
 } from '../DataValidator';
 
-export const client = axios.create({
+// $FlowFixMe[cannot-resolve-name]
+export const client: Axios = axios.create({
   baseURL: GDevelopShopApi.baseUrl,
 });
 
@@ -511,7 +512,7 @@ export const getStripeCheckoutUrl = ({
   priceName: string,
   userEmail?: string,
   password?: string,
-|}) => {
+|}): string => {
   const url = new URL(
     `${GDevelopShopApi.baseUrl}/purchase/action/redirect-to-stripe-checkout`
   );
@@ -624,6 +625,7 @@ export const canRedeemProduct = ({
     // Condition should look like `gdevelop_gold,gdevelop_startup`.
     const requiredPlanIds = redeemCondition.condition.split(',');
     if (subscription && !subscription.benefitsFromEducationPlan) {
+      // $FlowFixMe[incompatible-type]
       if (requiredPlanIds.includes(subscription.planId)) {
         return { canRedeem: true };
       } else {

@@ -162,7 +162,11 @@ type Props = {|
 export const computeTextFieldStyleProps = (props: {
   margin?: 'none' | 'dense',
   floatingLabelText?: React.Node,
-}) => {
+}): {
+  hiddenLabel: false | true | boolean,
+  margin: string,
+  variant: string,
+} => {
   return {
     // Use "filled" variant by default, unless `margin` is "none" (see 1. and 2.)
     variant: props.margin === 'none' ? 'standard' : 'filled',
@@ -186,8 +190,12 @@ export type TextFieldInterface = {|
 /**
  * A text field based on Material-UI text field.
  */
-const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
+const TextField: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<TextFieldInterface>,
+}> = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
+  // $FlowFixMe[value-as-type]
   const muiTextFieldRef = React.useRef<?MUITextField>(null);
   const [isPasswordVisible, setIsPasswordVisible] = React.useState<boolean>(
     false
@@ -243,6 +251,7 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
     return null;
   };
 
+  // $FlowFixMe[incompatible-type]
   React.useImperativeHandle(ref, () => ({
     focus,
     blur,
@@ -317,6 +326,7 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
           rows={props.rows}
           rowsMax={props.rowsMax}
           // Styling:
+          // $FlowFixMe[incompatible-type]
           {...computeTextFieldStyleProps(props)}
           fullWidth={props.fullWidth}
           InputProps={{

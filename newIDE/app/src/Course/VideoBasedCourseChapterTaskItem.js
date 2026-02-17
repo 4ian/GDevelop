@@ -30,7 +30,7 @@ const VideoBasedCourseChapterTaskItem = ({
   isOpen,
   isComplete,
   onComplete,
-}: Props) => {
+}: Props): React.Node => {
   const [isOpenIndividually, setIsOpenIndividually] = React.useState<boolean>(
     isOpen
   );

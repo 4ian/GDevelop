@@ -30,6 +30,7 @@ const findGDJS = () /*: Promise<{|gdjsRoot: string|}> */ => {
   const rootPath = path.join(appPath, pathToRoot);
 
   return new Promise((resolve, reject) => {
+    // $FlowFixMe[missing-local-annot]
     const onFound = gdjsRoot => resolve({ gdjsRoot });
     const onNotFound = () => reject(new Error('Could not find GDJS'));
 

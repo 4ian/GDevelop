@@ -35,6 +35,7 @@ type InstanceAddedOptions = {|
 |};
 
 export const onObjectAdded = (options: ObjectAddedOptions): ?InfoBarDetails => {
+  // $FlowFixMe[invalid-computed-prop]
   const additionalWork = objectType[options.object.getType()];
   if (additionalWork) {
     additionalWork.onObjectAdded(options);
@@ -55,6 +56,7 @@ export const onInstanceAdded = (
     objectName
   );
 
+  // $FlowFixMe[invalid-computed-prop]
   const additionalWork = object ? objectType[object.getType()] : null;
   if (additionalWork) {
     additionalWork.onInstanceAdded(options);

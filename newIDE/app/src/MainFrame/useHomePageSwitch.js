@@ -24,7 +24,7 @@ const useHomePageSwitch = ({
 }: {|
   openHomePage: () => void,
   closeDialogs: () => void,
-|}) => {
+|}): { navigateToRoute: any } => {
   const {
     navigateToRoute,
     removeRouteArguments,
@@ -37,6 +37,7 @@ const useHomePageSwitch = ({
       const initialDialog = routeArguments['initial-dialog'];
       if (!initialDialog) return;
 
+      // $FlowFixMe[incompatible-type]
       if (homePageRoutes.includes(initialDialog)) {
         closeDialogs();
         openHomePage();

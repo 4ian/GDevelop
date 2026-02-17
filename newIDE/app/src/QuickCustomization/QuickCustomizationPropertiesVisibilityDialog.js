@@ -32,7 +32,7 @@ export default function QuickCustomizationPropertiesVisibilityDialog({
   onClose,
   propertyNames,
   propertiesQuickCustomizationVisibilities,
-}: Props) {
+}: Props): React.Node {
   const forceUpdate = useForceUpdate();
 
   return (
@@ -75,6 +75,7 @@ export default function QuickCustomizationPropertiesVisibilityDialog({
                     gd.QuickCustomization.Visible,
                     gd.QuickCustomization.Hidden,
                     gd.QuickCustomization.Default,
+                    // $FlowFixMe[incompatible-type]
                   ].includes(newQuickCustomizationVisibility)
                 ) {
                   propertiesQuickCustomizationVisibilities.set(

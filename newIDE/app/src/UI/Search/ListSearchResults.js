@@ -41,7 +41,8 @@ export const ListSearchResults = <SearchItem>({
   renderSearchItem,
   error,
   onRetry,
-}: Props<SearchItem>) => {
+}: Props<SearchItem>): any => {
+  // $FlowFixMe[value-as-type]
   const grid = React.useRef<?Grid>(null);
 
   // Height of each item is initially unknown. When rendered, the items
@@ -49,21 +50,26 @@ export const ListSearchResults = <SearchItem>({
   const cachedHeightsForWidth = React.useRef(0);
   const cachedHeights = React.useRef({});
   const onItemHeightComputed = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     (searchItem, height) => {
       const uniqueId = getSearchItemUniqueId(searchItem);
+      // $FlowFixMe[invalid-computed-prop]
       if (cachedHeights.current[uniqueId] === height) return false;
 
+      // $FlowFixMe[prop-missing]
       cachedHeights.current[uniqueId] = height;
       return true;
     },
     [getSearchItemUniqueId]
   );
   const getRowHeight = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     ({ index }) => {
       if (!searchItems || !searchItems[index]) return ESTIMATED_ROW_HEIGHT;
 
       const searchItem = searchItems[index];
       return (
+        // $FlowFixMe[invalid-computed-prop]
         cachedHeights.current[getSearchItemUniqueId(searchItem)] ||
         ESTIMATED_ROW_HEIGHT
       );
@@ -73,6 +79,7 @@ export const ListSearchResults = <SearchItem>({
 
   // Render an item, and update the cached height when it's reported
   const renderRow = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     ({ key, rowIndex, style }) => {
       if (!searchItems) return null;
 

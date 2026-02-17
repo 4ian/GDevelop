@@ -29,7 +29,7 @@ const EventsBasedObjectScenePropertiesDialog = ({
   onClose,
   getContentAABB,
   onEventsBasedObjectChildrenEdited,
-}: Props) => {
+}: Props): React.Node => {
   const [areaMinX, setAreaMinX] = React.useState<number>(
     eventsBasedObjectVariant.getAreaMinX()
   );
@@ -128,6 +128,7 @@ const EventsBasedObjectScenePropertiesDialog = ({
           properties
         </Trans>
       }
+      // $FlowFixMe[incompatible-type]
       actions={actions}
       onRequestClose={onClose}
       onApply={onSubmit}

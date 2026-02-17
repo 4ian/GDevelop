@@ -6,6 +6,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 const isNativeMobileApp = false;
 
 // Copied from Utils/CrossOrigin.js
+// $FlowFixMe[missing-local-annot]
 const checkIfIsGDevelopCloudBucketUrl = url => {
   return (
     url.startsWith('https://project-resources.gdevelop.io/') ||
@@ -14,8 +15,10 @@ const checkIfIsGDevelopCloudBucketUrl = url => {
 };
 
 // Copied from Utils/CrossOrigin.js
+// $FlowFixMe[missing-local-annot]
 const checkIfCredentialsRequired = url => {
   // Any resource stored on the GDevelop Cloud buckets needs credentials
+  // $FlowFixMe[constant-condition]
   if (isNativeMobileApp) return false;
   if (checkIfIsGDevelopCloudBucketUrl(url)) return true;
 
@@ -24,6 +27,7 @@ const checkIfCredentialsRequired = url => {
 };
 
 // Copied from PixiResourcesLoader.js
+// $FlowFixMe[missing-local-annot]
 const removeMetalness = material => {
   if (material.metalness) {
     material.metalness = 0;
@@ -31,6 +35,7 @@ const removeMetalness = material => {
 };
 
 // Copied from PixiResourcesLoader.js
+// $FlowFixMe[missing-local-annot]
 const removeMetalnessFromMesh = node => {
   if (!node.material) {
     return;
@@ -59,7 +64,8 @@ let offscreenCanvas = null;
 
 // Set up the renderer when worker is initialized
 const initRenderer = () => {
-  // $FlowExpectedError - OffscreenCanvas is not in Flow types
+  // $FlowFixMe[incompatible-type] - OffscreenCanvas is not in Flow types
+  // $FlowFixMe[cannot-resolve-name]
   offscreenCanvas = new OffscreenCanvas(width, height);
 
   // Create renderer with offscreen canvas
@@ -76,6 +82,7 @@ const initRenderer = () => {
 };
 
 // Render a 3D model to the offscreen canvas and return the data URL
+// $FlowFixMe[missing-local-annot]
 const renderModel = async resourceUrl => {
   if (!renderer) {
     throw new Error('Renderer not initialized');

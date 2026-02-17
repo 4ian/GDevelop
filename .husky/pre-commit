@@ -1,2 +1,2 @@
-cd newIDE/app
+cd newIDE
 npx lint-staged

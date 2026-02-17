@@ -1,6 +1,6 @@
 var shell = require('shelljs');
 
-var source = '../node_modules/monaco-editor/min/vs';
+var source = '../../node_modules/monaco-editor/min/vs';
 
 var success = true;
 success &= !shell.mkdir('-p', '../public/external/monaco-editor-min').stderr;

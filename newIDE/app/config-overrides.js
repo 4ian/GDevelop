@@ -1,4 +1,5 @@
 // This file customizes webpack configuration for react-app-rewired.
+const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 
 module.exports = {
   webpack: function override(config, env) {
@@ -15,6 +16,10 @@ module.exports = {
     // A lot of packages we use in node_modules trigger source map warnings
     // but it is not a blocking issue, so we ignore them.
     config.ignoreWarnings = [/Failed to parse source map/];
+
+    config.resolve.plugins = config.resolve.plugins.filter(
+      (plugin) => !(plugin instanceof ModuleScopePlugin)
+    );
 
     return config;
   },

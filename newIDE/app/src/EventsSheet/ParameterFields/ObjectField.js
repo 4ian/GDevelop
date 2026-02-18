@@ -13,6 +13,7 @@ import {
 import { Trans } from '@lingui/macro';
 import { nameAndIconContainer } from '../EventsTree/ClassNames';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
+import { highlightSearchText } from '../../Utils/HighlightSearchText';
 
 const gd: libGDevelop = global.gd;
 
@@ -210,7 +211,8 @@ export const renderInlineObjectWithThumbnail = ({
   expressionIsValid,
   InvalidParameterValue,
   MissingParameterValue,
-}: ParameterInlineRendererProps): React.MixedElement => {
+  highlightedSearchText,
+}: ParameterInlineRendererProps): React.Node => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }
@@ -224,9 +226,11 @@ export const renderInlineObjectWithThumbnail = ({
     >
       {renderObjectThumbnail(value)}
       {expressionIsValid ? (
-        value
+        highlightSearchText(value, highlightedSearchText)
       ) : (
-        <InvalidParameterValue>{value}</InvalidParameterValue>
+        <InvalidParameterValue>
+          {highlightSearchText(value, highlightedSearchText)}
+        </InvalidParameterValue>
       )}
     </span>
   );

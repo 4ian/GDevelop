@@ -98,6 +98,24 @@ export class ExternalEventsEditorContainer extends React.Component<
     if (this.editor) this.editor.scrollToEventPath(eventPath);
   }
 
+  setGlobalSearchResults(
+    eventPaths: Array<Array<number>>,
+    focusedEventPath: ?Array<number>,
+    searchText?: string
+  ) {
+    if (this.editor) {
+      this.editor.setGlobalSearchResults(
+        eventPaths,
+        focusedEventPath,
+        searchText
+      );
+    }
+  }
+
+  clearGlobalSearchResults() {
+    if (this.editor) this.editor.clearGlobalSearchResults();
+  }
+
   forceUpdateEditor() {
     // No updates to be done.
   }
@@ -199,7 +217,10 @@ export class ExternalEventsEditorContainer extends React.Component<
     });
   };
 
-  onCreateEventsFunction = (extensionName: any, eventsFunction: any) => {
+  onCreateEventsFunction = (
+    extensionName: string,
+    eventsFunction: gdEventsFunction
+  ) => {
     this.props.onCreateEventsFunction(
       extensionName,
       eventsFunction,

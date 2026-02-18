@@ -111,7 +111,24 @@ export type RenderEditorContainerProps = {|
     gdEventsBasedObject,
     variantName: string
   ) => void,
+  onOpenEventsFunctionsExtension: (
+    extensionName: string,
+    initiallyFocusedFunctionName?: ?string,
+    initiallyFocusedBehaviorName?: ?string,
+    initiallyFocusedObjectName?: ?string
+  ) => void,
   openObjectEvents: (extensionName: string, objectName: string) => void,
+  onNavigateToEventFromGlobalSearch: ({|
+    locationType: 'layout' | 'external-events' | 'extension',
+    name: string,
+    eventPath: Array<number>,
+    highlightedEventPaths: Array<Array<number>>,
+    searchText: string,
+    extensionName?: string,
+    functionName?: string,
+    behaviorName?: string,
+    objectName?: string,
+  |}) => void,
   onOpenAskAi: (?OpenAskAiOptions) => void,
   onCloseAskAi: () => void,
 

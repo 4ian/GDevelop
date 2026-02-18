@@ -225,26 +225,53 @@ namespace gdjs {
       const _SPATIAL_HASH_MIN_OBJECTS = 32;
 
       /** Reusable spatial hash grid — avoids re-allocation each frame. */
-      let _collisionGrid: gdjs.SpatialHashGrid<gdjs.RuntimeObject> | null =
+      let _spatialHashGrid: gdjs.SpatialHashGrid<gdjs.RuntimeObject> | null =
         null;
 
       /** Reusable array for spatial hash query results. */
       const _spatialQueryResult: gdjs.RuntimeObject[] = [];
 
-      export const hitBoxesCollisionTest = function (
+      /**
+       * An improved version of {@link twoListsTest} that uses a spatial hash
+       * grid when the total object count exceeds {@link _SPATIAL_HASH_MIN_OBJECTS}.
+       *
+       * For small lists the behaviour is identical to `twoListsTest` (brute-force
+       * O(N×M) all-pairs).  For large lists the spatial hash reduces this to
+       * ~O(N+M) by only testing nearby pairs.
+       *
+       * **Self-collision note:** When `objectsLists1` and `objectsLists2`
+       * refer to the same list (e.g. "Enemies collide with Enemies"), every
+       * pair (A, B) will be considered from both directions (A vs B *and*
+       * B vs A).  The `pick` flag short-circuits the second test when
+       * `!inverted`, because both objects are already marked as picked.
+       * In the `inverted` path the `atLeastOneObject` flag is tracked
+       * per-obj1, which mirrors the existing semantics of `twoListsTest`.
+       *
+       * @param predicate The collision/distance/etc. test to run on each pair.
+       * @param objectsLists1 First set of object lists.
+       * @param objectsLists2 Second set of object lists.
+       * @param inverted When true, only list-1 objects are filtered (picks
+       *   objects that do *not* satisfy the predicate against any list-2 object).
+       * @param extraArg Extra argument forwarded to `predicate` (avoids closures).
+       */
+      export const twoListsTestWithSpatialHashing = function (
+        predicate: (
+          object1: gdjs.RuntimeObject,
+          object2: gdjs.RuntimeObject,
+          extraArg: any
+        ) => boolean,
         objectsLists1: ObjectsLists,
         objectsLists2: ObjectsLists,
         inverted: boolean,
-        instanceContainer: gdjs.RuntimeInstanceContainer,
-        ignoreTouchingEdges: boolean
+        extraArg: any
       ) {
         // 1. Flatten ObjectsLists into arrays-of-arrays (done once for all paths).
         const objects1Lists = gdjs.staticArray(
-          gdjs.evtTools.object.hitBoxesCollisionTest
+          gdjs.evtTools.object.twoListsTestWithSpatialHashing
         );
         objectsLists1.values(objects1Lists);
         const objects2Lists = gdjs.staticArray2(
-          gdjs.evtTools.object.hitBoxesCollisionTest
+          gdjs.evtTools.object.twoListsTestWithSpatialHashing
         );
         objectsLists2.values(objects2Lists);
 
@@ -275,7 +302,7 @@ namespace gdjs {
         if (totalObj1 + totalObj2 < _SPATIAL_HASH_MIN_OBJECTS) {
           // ── Brute-force path ─────────────────────────────────────────
           // Same O(N×M) all-pairs test as twoListsTest, inlined here to
-          // use the already-flattened arrays and avoid double-flatten.
+          // use the already-flattened arrays and avoid a double-flatten.
           for (let i = 0, leni = objects1Lists.length; i < leni; ++i) {
             const arr1 = objects1Lists[i];
             for (let k = 0, lenk = arr1.length; k < lenk; ++k) {
@@ -288,11 +315,7 @@ namespace gdjs {
                   }
                   if (
                     arr1[k].id !== arr2[l].id &&
-                    gdjs.RuntimeObject.collisionTest(
-                      arr1[k],
-                      arr2[l],
-                      ignoreTouchingEdges
-                    )
+                    predicate(arr1[k], arr2[l], extraArg)
                   ) {
                     if (!inverted) {
                       isTrue = true;
@@ -327,17 +350,17 @@ namespace gdjs {
           const cellSize = avgDim * 2 > 32 ? avgDim * 2 : 32;
 
           // Build (or reconfigure) the grid.
-          if (!_collisionGrid) {
-            _collisionGrid = new gdjs.SpatialHashGrid<gdjs.RuntimeObject>(
+          if (!_spatialHashGrid) {
+            _spatialHashGrid = new gdjs.SpatialHashGrid<gdjs.RuntimeObject>(
               cellSize
             );
           } else {
-            _collisionGrid.clear();
+            _spatialHashGrid.clear();
             if (
-              _collisionGrid.getCellSize() < cellSize - 0.01 ||
-              _collisionGrid.getCellSize() > cellSize + 0.01
+              _spatialHashGrid.getCellSize() < cellSize - 0.01 ||
+              _spatialHashGrid.getCellSize() > cellSize + 0.01
             ) {
-              _collisionGrid.setCellSize(cellSize);
+              _spatialHashGrid.setCellSize(cellSize);
             }
           }
 
@@ -347,7 +370,7 @@ namespace gdjs {
             for (let k = 0, lenk = arr.length; k < lenk; ++k) {
               const obj = arr[k];
               const aabb = obj.getAABB();
-              _collisionGrid.insert(
+              _spatialHashGrid.insert(
                 obj,
                 aabb.min[0],
                 aabb.min[1],
@@ -367,7 +390,7 @@ namespace gdjs {
               // Query the grid with obj1's AABB.
               const aabb1 = obj1.getAABB();
               _spatialQueryResult.length = 0;
-              _collisionGrid.queryToArray(
+              _spatialHashGrid.queryToArray(
                 aabb1.min[0],
                 aabb1.min[1],
                 aabb1.max[0],
@@ -391,13 +414,7 @@ namespace gdjs {
                   continue;
                 }
 
-                if (
-                  gdjs.RuntimeObject.collisionTest(
-                    obj1,
-                    obj2,
-                    ignoreTouchingEdges
-                  )
-                ) {
+                if (predicate(obj1, obj2, extraArg)) {
                   if (!inverted) {
                     isTrue = true;
                     obj1.pick = true;
@@ -442,6 +459,22 @@ namespace gdjs {
         }
 
         return isTrue;
+      };
+
+      export const hitBoxesCollisionTest = function (
+        objectsLists1: ObjectsLists,
+        objectsLists2: ObjectsLists,
+        inverted: boolean,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        ignoreTouchingEdges: boolean
+      ) {
+        return gdjs.evtTools.object.twoListsTestWithSpatialHashing(
+          gdjs.RuntimeObject.collisionTest,
+          objectsLists1,
+          objectsLists2,
+          inverted,
+          ignoreTouchingEdges
+        );
       };
 
       export const _distanceBetweenObjects = function (obj1, obj2, distance) {

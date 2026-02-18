@@ -11,6 +11,12 @@ namespace gdjs {
    * be queried by region to find potential overlapping candidates, avoiding
    * the O(N×M) cost of testing every pair.
    *
+   * **Important — duplicate results:** An item whose AABB spans multiple
+   * grid cells will be stored in each of those cells.  Consequently,
+   * {@link queryToArray} may return the same item more than once.  Callers
+   * are responsible for de-duplicating results if needed.  The collision
+   * pipeline in `objecttools.ts` handles this implicitly via `pick` flags.
+   *
    * @category Utils > Geometry
    */
   export class SpatialHashGrid<T> {
@@ -49,8 +55,36 @@ namespace gdjs {
     }
 
     /**
+     * Trim the internal array pool to at most `maxSize` entries.
+     *
+     * The pool grows as cells are cleared but is never shrunk automatically.
+     * Call this after a one-time spike (e.g. a scene with many temporary
+     * objects) to release memory that is no longer needed.
+     */
+    trimPool(maxSize: number): void {
+      if (this._pooledArrays.length > maxSize) {
+        this._pooledArrays.length = maxSize;
+      }
+    }
+
+    /**
+     * Convert a world coordinate to a cell index, correctly handling
+     * negative values (where `| 0` truncates toward zero instead of
+     * flooring).
+     */
+    private _toCell(v: number): number {
+      const c = v * this._invCellSize;
+      return c >= 0 ? c | 0 : Math.floor(c);
+    }
+
+    /**
      * Hash a 2D cell coordinate to a single integer key.
      * Uses multiplication with large primes + XOR to distribute evenly.
+     *
+     * Hash collisions are harmless: they only cause extra candidates to be
+     * returned by {@link queryToArray}, but every candidate is still
+     * validated by the full collision predicate, so correctness is
+     * unaffected.
      */
     private _hashKey(cellX: number, cellY: number): number {
       return ((cellX * 92837111) ^ (cellY * 689287499)) | 0;
@@ -82,11 +116,10 @@ namespace gdjs {
       maxX: number,
       maxY: number
     ): void {
-      const minCellX = (minX * this._invCellSize) | 0;
-      const minCellY = (minY * this._invCellSize) | 0;
-      // Use Math.floor for max to ensure negative coords round correctly.
-      const maxCellX = Math.floor(maxX * this._invCellSize) | 0;
-      const maxCellY = Math.floor(maxY * this._invCellSize) | 0;
+      const minCellX = this._toCell(minX);
+      const minCellY = this._toCell(minY);
+      const maxCellX = this._toCell(maxX);
+      const maxCellY = this._toCell(maxY);
 
       for (let cx = minCellX; cx <= maxCellX; cx++) {
         for (let cy = minCellY; cy <= maxCellY; cy++) {
@@ -115,10 +148,10 @@ namespace gdjs {
       maxY: number,
       result: T[]
     ): void {
-      const minCellX = (minX * this._invCellSize) | 0;
-      const minCellY = (minY * this._invCellSize) | 0;
-      const maxCellX = Math.floor(maxX * this._invCellSize) | 0;
-      const maxCellY = Math.floor(maxY * this._invCellSize) | 0;
+      const minCellX = this._toCell(minX);
+      const minCellY = this._toCell(minY);
+      const maxCellX = this._toCell(maxX);
+      const maxCellY = this._toCell(maxY);
 
       for (let cx = minCellX; cx <= maxCellX; cx++) {
         for (let cy = minCellY; cy <= maxCellY; cy++) {

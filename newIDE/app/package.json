@@ -82,6 +82,7 @@
     "react-measure": "2.3.0",
     "react-monaco-editor": "^0.18.0",
     "react-mosaic-component": "github:4ian/react-mosaic#v3.1.0",
+    "react-refresh": "^0.18.0",
     "react-share": "^4.4.0",
     "react-sortable-hoc": "1.5.0",
     "react-test-renderer": "16.14.0",

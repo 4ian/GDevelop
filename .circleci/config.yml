@@ -47,9 +47,9 @@ jobs:
       # GDevelop.js dependencies
       - restore_cache:
           keys:
-            - gd-macos-nodejs-dependencies-v2-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
+            - gd-macos-nodejs-dependencies-v3-{{ checksum "newIDE/package-lock.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
             # fallback to using the latest cache if no exact match is found
-            - gd-macos-nodejs-dependencies-v2-
+            - gd-macos-nodejs-dependencies-v3-
 
       - run:
           name: Install GDevelop.js dependencies
@@ -63,15 +63,14 @@ jobs:
       # GDevelop IDE dependencies (after building GDevelop.js to avoid downloading a pre-built version)
       - run:
           name: Install GDevelop IDE dependencies
-          command: cd newIDE/app && npm install && cd ../electron-app && npm install
+          command: cd newIDE && npm install
 
       - save_cache:
           paths:
-            - newIDE/electron-app/node_modules
-            - newIDE/app/node_modules
+            - newIDE/node_modules
             - GDevelop.js/node_modules
             - GDJS/node_modules
-          key: gd-macos-nodejs-dependencies-v2-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
+          key: gd-macos-nodejs-dependencies-v3-{{ checksum "newIDE/package-lock.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
 
       # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       # Note: Code signing is done using CSC_LINK (see https://www.electron.build/code-signing).
@@ -141,22 +140,21 @@ jobs:
 
       - restore_cache:
           keys:
-            - gd-linux-nodejs-dependencies-v2-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
+            - gd-linux-nodejs-dependencies-v3-{{ checksum "newIDE/package-lock.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
             # fallback to using the latest cache if no exact match is found
-            - gd-linux-nodejs-dependencies-v2-
+            - gd-linux-nodejs-dependencies-v3-
 
       # GDevelop IDE dependencies (using an exact version of GDevelop.js, built previously)
       - run:
           name: Install GDevelop IDE dependencies
-          command: export REQUIRES_EXACT_LIBGD_JS_VERSION=true && cd newIDE/app && npm install && cd ../electron-app && npm install
+          command: export REQUIRES_EXACT_LIBGD_JS_VERSION=true && cd newIDE && npm install
 
       - save_cache:
           paths:
-            - newIDE/electron-app/node_modules
-            - newIDE/app/node_modules
+            - newIDE/node_modules
             - GDevelop.js/node_modules
             - GDJS/node_modules
-          key: gd-linux-nodejs-dependencies-v2-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
+          key: gd-linux-nodejs-dependencies-v3-{{ checksum "newIDE/package-lock.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
 
       # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       - run:
@@ -364,42 +362,32 @@ jobs:
       - restore_cache:
           name: Restore node_modules cache
           keys:
-            - v2-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}-{{ checksum "GDJS/package-lock.json" }}
-            - v2-win-node-
+            - v3-win-node-{{ checksum "newIDE/package-lock.json" }}-{{ checksum "GDJS/package-lock.json" }}
+            - v3-win-node-
 
       - run:
           name: Install dependencies
           no_output_timeout: 25m
-          # Remove package-lock.json because they seems to cause the npm install to be stuck. We should try again after re-generating them.
           # Also install setuptools as something requires distutils in electron-app, and it was removed in Python 3.12.
           # setuptools will make distutils available again (but we should migrate our packages probably).
           command: |
             pip install setuptools
 
-            cd newIDE\app
+            cd newIDE
 
             npm -v
-
-            Remove-Item package-lock.json
 
             $Env:REQUIRES_EXACT_LIBGD_JS_VERSION = "true"
 
             npm install
 
-            cd ..\electron-app
-
-            Remove-Item package-lock.json
-
-            npm install
-
-            cd ..\..
+            cd ..
 
       - save_cache:
           name: Save node_modules cache
-          key: v2-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}-{{ checksum "GDJS/package-lock.json" }}
+          key: v3-win-node-{{ checksum "newIDE/package-lock.json" }}-{{ checksum "GDJS/package-lock.json" }}
           paths:
-            - newIDE/app/node_modules
-            - newIDE/electron-app/node_modules
+            - newIDE/node_modules
             - GDJS/node_modules
 
       - run:

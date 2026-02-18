@@ -120,7 +120,7 @@
     "format": "prettier --write \"src/!(locales)/**/*.js\"",
     "check-format": "prettier --list-different \"src/!(locales)/**/*.js\"",
     "test": "react-app-rewired test --env=node",
-    "flow": "flow",
+    "flow": "flow check ..",
     "check-script-types": "cd scripts && tsc",
     "storybook": "storybook dev -p 9009",
     "build-storybook": "storybook build -o build-storybook",

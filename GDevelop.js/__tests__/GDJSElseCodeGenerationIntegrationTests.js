@@ -232,7 +232,7 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
     ]);
     const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
       gd,
-      serializerElement,
+      serializerElement
     );
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
     runCompiledEvents(gdjs, runtimeScene, []);
@@ -526,7 +526,7 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
     const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
       gd,
       serializerElement,
-      { logCode: true }
+      { logCode: false }
     );
     console.log(runCompiledEvents.toString());
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
@@ -541,8 +541,7 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
     const serializerElement = gd.Serializer.fromJSObject([
       {
         type: 'BuiltinCommonInstructions::Standard',
-        conditions: [
-        ],
+        conditions: [],
         actions: [
           {
             type: { value: 'ModVarScene' },
@@ -579,7 +578,7 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
       gd,
       serializerElement,
       {
-        logCode: true,
+        logCode: false,
       }
     );
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
@@ -913,9 +912,7 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
     // Else-if condition passed (LocalInElse=42).
     expect(runtimeScene.getVariables().get('Result').getAsNumber()).toBe(2);
     // Sub-event of else-if also ran (LocalInElse=42 from parent scope).
-    expect(runtimeScene.getVariables().get('SubResult').getAsNumber()).toBe(
-      10
-    );
+    expect(runtimeScene.getVariables().get('SubResult').getAsNumber()).toBe(10);
   });
 
   it('stress test: combinations of standard, disabled, else, and repeat events', function () {
@@ -1158,10 +1155,7 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
       // Scenario 18: Repeat containing an if/else chain inside
       //   The inner else runs on each of the 3 iterations.
       // ---------------------------------------------------------------
-      repeat(3, [
-        stdFalse('S18_innerIf', 1),
-        elseEv('S18_innerElse', 1),
-      ]),
+      repeat(3, [stdFalse('S18_innerIf', 1), elseEv('S18_innerElse', 1)]),
 
       // ---------------------------------------------------------------
       // Scenario 19: Standard(true) → Else → Repeat → Else
@@ -1199,10 +1193,7 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
       // ---------------------------------------------------------------
       stdFalse('S22_if', 1),
       elseIfTrue('S22_elseif', 1, {
-        subEvents: [
-          stdFalse('S22_sub_if', 1),
-          elseEv('S22_sub_else', 1),
-        ],
+        subEvents: [stdFalse('S22_sub_if', 1), elseEv('S22_sub_else', 1)],
       }),
       elseEv('S22_else', 1),
 
@@ -1210,10 +1201,7 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
       // Scenario 23: Repeat containing if/else, followed by if/else outside
       //   Inner and outer chains are independent.
       // ---------------------------------------------------------------
-      repeat(2, [
-        stdTrue('S23_repIf', 1),
-        elseEv('S23_repElse', 1),
-      ]),
+      repeat(2, [stdTrue('S23_repIf', 1), elseEv('S23_repElse', 1)]),
       stdFalse('S23_if', 1),
       elseEv('S23_else', 1),
 
@@ -1255,10 +1243,7 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
       stdFalse('S27_if', 1),
       elseEv('S27_else', 1, {
         subEvents: [
-          repeat(2, [
-            stdFalse('S27_rep_if', 1),
-            elseEv('S27_rep_else', 1),
-          ]),
+          repeat(2, [stdFalse('S27_rep_if', 1), elseEv('S27_rep_else', 1)]),
           std('S27_after_rep', 1),
         ],
       }),

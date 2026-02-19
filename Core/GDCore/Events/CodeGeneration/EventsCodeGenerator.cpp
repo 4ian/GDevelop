@@ -1095,9 +1095,10 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
   for (std::size_t eId = 0; eId < events.size(); ++eId) {
     auto& event = events[eId];
 
-    // Disabled events are completely transparent: they generate no code and
-    // must not affect the else-chain state.
-    if (event.IsDisabled()) continue;
+    // Disabled and Comment events are completely transparent: they generate no
+    // code (and must not affect the else-chain state or context or anything else).
+    if (event.IsDisabled() || !event.IsExecutable())
+      continue;
 
     if (event.HasVariables()) {
       GetProjectScopedContainers().GetVariablesContainersList().Push(
@@ -1129,12 +1130,15 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
     const bool isElseEvent =
         event.GetType() == "BuiltinCommonInstructions::Else";
 
-    // Skip disabled events when looking for a following Else event.
+    // Skip transparent events (disabled, comments) when looking for a
+    // following Else event.
     bool hasFollowingElseEvent = false;
     for (std::size_t nextId = eId + 1; nextId < events.size(); ++nextId) {
-      if (events[nextId].IsDisabled()) continue;
+      auto& nextEvent = events[nextId];
+      if (nextEvent.IsDisabled() || !nextEvent.IsExecutable())
+        continue;
       hasFollowingElseEvent =
-          events[nextId].GetType() == "BuiltinCommonInstructions::Else";
+          nextEvent.GetType() == "BuiltinCommonInstructions::Else";
       break;
     }
 

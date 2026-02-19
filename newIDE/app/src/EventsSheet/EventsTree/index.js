@@ -873,6 +873,8 @@ const EventsTree: React.ComponentType<{
         depth,
         key: event.ptr,
         isValidElseEvent,
+        isDisabledEvent: event.isDisabled(),
+        isNonExecutableEvent: !event.isExecutable(),
         children: childrenTreeData,
         nodePath: currentAbsolutePath,
         relativeNodePath: currentRelativePath,
@@ -906,6 +908,8 @@ const EventsTree: React.ComponentType<{
             projectScopedContainersAccessor: parentProjectScopedContainersAccessor,
             key: 'bottom-buttons',
             isValidElseEvent: false,
+            isDisabledEvent: false,
+            isNonExecutableEvent: false,
             // Unused, but still provided to make typing happy:
             expanded: false,
             nodePath: [flattenedList.length + 0],
@@ -930,6 +934,8 @@ const EventsTree: React.ComponentType<{
             projectScopedContainersAccessor: parentProjectScopedContainersAccessor,
             key: 'eventstree-tutorial-node',
             isValidElseEvent: false,
+            isDisabledEvent: false,
+            isNonExecutableEvent: false,
             // Unused, but still provided to make typing happy:
             expanded: false,
             nodePath: [flattenedList.length + 1],
@@ -965,6 +971,8 @@ const EventsTree: React.ComponentType<{
             projectScopedContainersAccessor: parentProjectScopedContainersAccessor,
             key: 'empty-state',
             isValidElseEvent: false,
+            isDisabledEvent: false,
+            isNonExecutableEvent: false,
             // Unused, but still provided to make typing happy:
             expanded: false,
             nodePath: [flattenedList.length + 2],

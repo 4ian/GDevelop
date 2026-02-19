@@ -410,6 +410,7 @@ const ResourcesList: React.ComponentType<{
             </Column>
           </Line>
           <div
+            // $FlowFixMe[incompatible-type]
             ref={listContainerRef}
             style={styles.listContainer}
             tabIndex={0}

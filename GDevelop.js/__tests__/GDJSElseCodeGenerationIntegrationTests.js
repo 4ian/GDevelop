@@ -528,7 +528,7 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
       serializerElement,
       { logCode: false }
     );
-    console.log(runCompiledEvents.toString());
+
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
     runCompiledEvents(gdjs, runtimeScene, []);
     expect(runtimeScene.getVariables().get('Result').getAsNumber()).toBe(2);

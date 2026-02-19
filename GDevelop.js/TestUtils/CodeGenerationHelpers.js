@@ -64,9 +64,11 @@ function generateCompiledEventsForEventsFunctionWithContext(
     'runtimeScene',
     'functionArguments',
     // Expose some global variables that are expected by the generated code:
-    `Hashtable = gdjs.Hashtable;` +
-      '\n' +
+    `"use strict";\nlet Hashtable = gdjs.Hashtable;` +
+      '\nlet functionNamespace = gdjs.__testNamespace;\n' +
       code +
+      // Persist the namespace on gdjs so hot-reload tests can find it.
+      `;\ngdjs.__testNamespace = functionNamespace;` +
       // Return the function for it to be called (if arguments are passed).
       `;
     return functionArguments ?
@@ -83,7 +85,7 @@ const generatedEventsCodeToJSFunction = (code, gdjs, runtimeScene) => {
     'runtimeScene',
     'functionArguments',
     // Expose some global variables that are expected by the generated code:
-    `Hashtable = gdjs.Hashtable;` +
+    `"use strict";\nlet Hashtable = gdjs.Hashtable;\nlet functionNamespace;` +
       '\n' +
       code +
       // Return the function for it to be called (if arguments are passed).
@@ -146,7 +148,8 @@ function generateCompiledEventsForEventsBasedBehavior(
   // Create a function returning the generated behavior.
   const compiledBehavior = new Function(
     'gdjs',
-    `let behaviorNamespace = {};
+    `"use strict";
+     let behaviorNamespace = {};
      let Hashtable = gdjs.Hashtable;
      ${code}
      return behaviorNamespace.${eventsBasedBehavior.getName()};`
@@ -211,7 +214,8 @@ function generateCompiledEventsForEventsBasedObject(
   // Create a function returning the generated object.
   const compiledObject = new Function(
     'gdjs',
-    `let objectNamespace = {};
+    `"use strict";
+     let objectNamespace = {};
      const Hashtable = gdjs.Hashtable;
      ${code}
      return objectNamespace.${eventsBasedObject.getName()};`
@@ -449,7 +453,8 @@ function generateCompiledEventsForLayout(gd, project, layout, logCode = false) {
   const compiledFunction = new Function(
     'gdjs',
     'runtimeScene',
-    `const Hashtable = gdjs.Hashtable;
+    `"use strict";
+     const Hashtable = gdjs.Hashtable;
      ${code}
      return gdjs['${layout.getName()}Code'].func(runtimeScene);`
   );

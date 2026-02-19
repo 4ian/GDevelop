@@ -1215,4 +1215,96 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
     expect(v('S27_rep_else')).toBe(1);
     expect(v('S27_after_rep')).toBe(1);
   });
+
+  it('does not reference elseEventsChainSatisfied for a standalone Standard event', function () {
+    // A Standard event with a condition but NOT followed by an Else event
+    // should not set elseEventsChainSatisfied (the variable is never declared
+    // in that scope). This test relies on "use strict" in the test helpers to
+    // catch undeclared variable references.
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [
+          {
+            type: { value: 'VarScene' },
+            parameters: ['Counter', '=', '0'],
+          },
+        ],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Result', '=', '1'],
+          },
+        ],
+        events: [],
+      },
+    ]);
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement
+    );
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runCompiledEvents(gdjs, runtimeScene, []);
+    expect(runtimeScene.getVariables().get('Result').getAsNumber()).toBe(1);
+  });
+
+  it('does not reference elseEventsChainSatisfied in sub-events without else', function () {
+    // A Standard event followed by Else, where the Else has sub-events.
+    // The sub-events contain only Standard events (no Else). The sub-events
+    // should NOT reference elseEventsChainSatisfied.
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [
+          {
+            type: { value: 'VarScene' },
+            parameters: ['Counter', '=', '999'],
+          },
+        ],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Result', '=', '1'],
+          },
+        ],
+        events: [],
+      },
+      {
+        type: 'BuiltinCommonInstructions::Else',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Result', '=', '2'],
+          },
+        ],
+        events: [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [
+              {
+                type: { value: 'VarScene' },
+                parameters: ['Counter', '=', '0'],
+              },
+            ],
+            actions: [
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['SubResult', '=', '10'],
+              },
+            ],
+            events: [],
+          },
+        ],
+      },
+    ]);
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement
+    );
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runCompiledEvents(gdjs, runtimeScene, []);
+    expect(runtimeScene.getVariables().get('Result').getAsNumber()).toBe(2);
+    expect(runtimeScene.getVariables().get('SubResult').getAsNumber()).toBe(10);
+  });
 });

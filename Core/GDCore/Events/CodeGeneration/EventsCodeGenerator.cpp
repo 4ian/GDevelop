@@ -1124,11 +1124,13 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
     const bool isElseEvent =
         event.GetType() == "BuiltinCommonInstructions::Else";
 
-    gd::String eventCoreCode = event.GenerateEventCode(*this, context);
-
     const bool hasFollowingElseEvent =
         eId + 1 < events.size() &&
         events[eId + 1].GetType() == "BuiltinCommonInstructions::Else";
+
+    context.SetFollowedByElseEvent(hasFollowingElseEvent);
+
+    gd::String eventCoreCode = event.GenerateEventCode(*this, context);
 
     if (isElseEvent) {
       hasAnyElseEvent = true;

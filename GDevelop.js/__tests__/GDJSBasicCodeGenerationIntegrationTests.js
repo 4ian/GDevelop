@@ -490,7 +490,9 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const runCompiledEvents = generateCompiledEventsForEventsFunction(
       gd,
       project,
-      eventsFunction
+      eventsFunction,
+      true,
+      true /* Exceptionally no strict and no namespace to simulate hot reload */
     );
 
     const { gdjs, runtimeScene, mocks } = makeMinimalGDJSMock();
@@ -511,7 +513,9 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const runHotReloadedCompiledEvents = generateCompiledEventsForEventsFunction(
       gd,
       project,
-      eventsFunction
+      eventsFunction,
+      true,
+      true /* Exceptionally no strict and no namespace to simulate hot reload */
     );
     runHotReloadedCompiledEvents(
       gdjs,

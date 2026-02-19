@@ -10,16 +10,19 @@ function generateCompiledEventsForEventsFunction(
   gd,
   project,
   eventsFunction,
-  logCode = false
+  logCode = false,
+  exceptionallyNoStrictAndNoNamespace = false
 ) {
   const extension = new gd.EventsFunctionsExtension();
-  const runCompiledEventsFunction = generateCompiledEventsForEventsFunctionWithContext(
-    gd,
-    project,
-    extension,
-    eventsFunction,
-    logCode
-  );
+  const runCompiledEventsFunction =
+    generateCompiledEventsForEventsFunctionWithContext(
+      gd,
+      project,
+      extension,
+      eventsFunction,
+      logCode,
+      exceptionallyNoStrictAndNoNamespace
+    );
   extension.delete();
   return runCompiledEventsFunction;
 }
@@ -37,41 +40,48 @@ function generateCompiledEventsForEventsFunctionWithContext(
   project,
   extension,
   eventsFunction,
-  logCode = false
+  logCode = false,
+  exceptionallyNoStrictAndNoNamespace = false
 ) {
   const namespace = 'functionNamespace';
-  const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
-    project
-  );
+  const eventsFunctionsExtensionCodeGenerator =
+    new gd.EventsFunctionsExtensionCodeGenerator(project);
 
   const includeFiles = new gd.SetString();
-  const code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
-    extension,
-    eventsFunction,
-    namespace,
-    includeFiles,
-    true
-  );
+  const code =
+    eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+      extension,
+      eventsFunction,
+      namespace,
+      includeFiles,
+      true
+    );
 
   eventsFunctionsExtensionCodeGenerator.delete();
   includeFiles.delete();
 
-  if (logCode) console.log(code);
+  const fullCode =
+    (!exceptionallyNoStrictAndNoNamespace ? '"use strict";\n' : '') +
+    // Expose some global variables that are expected by the generated code:
+    `const Hashtable = gdjs.Hashtable;\n` +
+    (!exceptionallyNoStrictAndNoNamespace
+      ? `let functionNamespace = { registeredGdjsCallbacks: [] };\n`
+      : '') +
+    code +
+    // Return the function for it to be called (if arguments are passed).
+    `;
+return functionArguments ?
+  functionNamespace.func.apply(functionNamespace.func, [runtimeScene, ...functionArguments, runtimeScene]) :
+  null;`;
+
+  if (logCode) console.log(fullCode);
 
   // Create a "real" JavaScript function with the generated code.
   const runCompiledEventsFunction = new Function(
     'gdjs',
     'runtimeScene',
     'functionArguments',
-    // Expose some global variables that are expected by the generated code:
-    `Hashtable = gdjs.Hashtable;` +
-      '\n' +
-      code +
-      // Return the function for it to be called (if arguments are passed).
-      `;
-    return functionArguments ?
-      functionNamespace.func.apply(functionNamespace.func, [runtimeScene, ...functionArguments, runtimeScene]) :
-      null;`
+    fullCode
   );
 
   return runCompiledEventsFunction;
@@ -82,8 +92,10 @@ const generatedEventsCodeToJSFunction = (code, gdjs, runtimeScene) => {
     'gdjs',
     'runtimeScene',
     'functionArguments',
-    // Expose some global variables that are expected by the generated code:
-    `Hashtable = gdjs.Hashtable;` +
+    '"use strict";\n' +
+      // Expose some global variables that are expected by the generated code:
+      `const Hashtable = gdjs.Hashtable;` +
+      `let functionNamespace = { registeredGdjsCallbacks: [] };` +
       '\n' +
       code +
       // Return the function for it to be called (if arguments are passed).
@@ -95,13 +107,13 @@ const generatedEventsCodeToJSFunction = (code, gdjs, runtimeScene) => {
 };
 
 /**
- * @param {*} gd 
- * @param {gdProject} project 
- * @param {gdEventsFunctionsExtension} eventsFunctionsExtension 
- * @param {gdEventsBasedBehavior} eventsBasedBehavior 
- * @param {*} gdjs 
- * @param {{logCode: boolean}} options 
- * @returns 
+ * @param {*} gd
+ * @param {gdProject} project
+ * @param {gdEventsFunctionsExtension} eventsFunctionsExtension
+ * @param {gdEventsBasedBehavior} eventsBasedBehavior
+ * @param {*} gdjs
+ * @param {{logCode: boolean}} options
+ * @returns
  */
 function generateCompiledEventsForEventsBasedBehavior(
   gd,
@@ -160,13 +172,13 @@ function generateCompiledEventsForEventsBasedBehavior(
 }
 
 /**
- * @param {*} gd 
- * @param {gdProject} project 
- * @param {gdEventsFunctionsExtension} eventsFunctionsExtension 
- * @param {gdEventsBasedObject} eventsBasedObject 
- * @param {*} gdjs 
- * @param {{logCode: boolean}} options 
- * @returns 
+ * @param {*} gd
+ * @param {gdProject} project
+ * @param {gdEventsFunctionsExtension} eventsFunctionsExtension
+ * @param {gdEventsBasedObject} eventsBasedObject
+ * @param {*} gdjs
+ * @param {{logCode: boolean}} options
+ * @returns
  */
 function generateCompiledEventsForEventsBasedObject(
   gd,
@@ -262,54 +274,50 @@ function generateCompiledEventsForSerializedEventsBasedExtension(
     objects: {},
   };
 
-  const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
-    project
-  );
+  const eventsFunctionsExtensionCodeGenerator =
+    new gd.EventsFunctionsExtensionCodeGenerator(project);
   const freeEventsFunctions = extension.getEventsFunctions();
   for (let i = 0; i < freeEventsFunctions.getEventsFunctionsCount(); i++) {
     const eventsFunction = freeEventsFunctions.getEventsFunctionAt(i);
-    generatedExtensionModule.freeFunctions[
-      eventsFunction.getName()
-    ] = generatedEventsCodeToJSFunction(
-      eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
-        extension,
-        eventsFunction,
-        codeNamespace,
-        includeFiles,
-        true
-      ),
-      gdjs,
-      runtimeScene
-    );
+    generatedExtensionModule.freeFunctions[eventsFunction.getName()] =
+      generatedEventsCodeToJSFunction(
+        eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+          extension,
+          eventsFunction,
+          codeNamespace,
+          includeFiles,
+          true
+        ),
+        gdjs,
+        runtimeScene
+      );
   }
   eventsFunctionsExtensionCodeGenerator.delete();
 
   const behaviorsList = extension.getEventsBasedBehaviors();
   for (let i = 0; i < behaviorsList.getCount(); i++) {
     const behavior = behaviorsList.getAt(i);
-    generatedExtensionModule.behaviors[
-      behavior.getName()
-    ] = generateCompiledEventsForEventsBasedBehavior(
-      gd,
-      project,
-      extension,
-      behavior,
-      gdjs
-    );
+    generatedExtensionModule.behaviors[behavior.getName()] =
+      generateCompiledEventsForEventsBasedBehavior(
+        gd,
+        project,
+        extension,
+        behavior,
+        gdjs
+      );
   }
 
   const objectsLists = extension.getEventsBasedObjects();
   for (let i = 0; i < objectsLists.getCount(); i++) {
     const obj = objectsLists.getAt(i);
-    generatedExtensionModule.objects[
-      obj.getName()
-    ] = generateCompiledEventsForEventsBasedObject(
-      gd,
-      project,
-      extension,
-      obj,
-      gdjs
-    );
+    generatedExtensionModule.objects[obj.getName()] =
+      generateCompiledEventsForEventsBasedObject(
+        gd,
+        project,
+        extension,
+        obj,
+        gdjs
+      );
   }
 
   includeFiles.delete();

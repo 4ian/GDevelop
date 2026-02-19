@@ -168,7 +168,9 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         outputCode += "{\n";
         outputCode += actionsDeclarationsCode;
         outputCode += actionsCode;
-        outputCode += chainSatisfiedVariable + " = true;\n";
+        if (context.IsFollowedByElseEvent()) {
+          outputCode += chainSatisfiedVariable + " = true;\n";
+        }
         outputCode += "}\n";
 
         if (event_.HasVariables()) {

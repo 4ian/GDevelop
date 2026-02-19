@@ -11,6 +11,97 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
     gd = await initializeGDevelopJs();
   });
 
+  it('generates valid code for Standard events not in an else chain', function () {
+    // A Standard event with a condition, not followed by any Else event.
+    // The generated code must not reference elseEventsChainSatisfied,
+    // which would be an undeclared variable in strict mode.
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [
+          {
+            type: { value: 'VarScene' },
+            parameters: ['Counter', '=', '0'],
+          },
+        ],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Result', '=', '1'],
+          },
+        ],
+        events: [],
+      },
+    ]);
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement
+    );
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runCompiledEvents(gdjs, runtimeScene, []);
+    expect(runtimeScene.getVariables().get('Result').getAsNumber()).toBe(1);
+  });
+
+  it('generates valid code for Standard events not in an else chain with sub-events containing an else chain', function () {
+    // A Standard event (not followed by Else) whose sub-events contain
+    // an if/else chain. The parent event must not reference the
+    // elseEventsChainSatisfied variable.
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [
+          {
+            type: { value: 'VarScene' },
+            parameters: ['Counter', '=', '0'],
+          },
+        ],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Result', '=', '1'],
+          },
+        ],
+        events: [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [
+              {
+                type: { value: 'VarScene' },
+                parameters: ['Counter', '=', '999'],
+              },
+            ],
+            actions: [
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['SubResult', '=', '1'],
+              },
+            ],
+            events: [],
+          },
+          {
+            type: 'BuiltinCommonInstructions::Else',
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['SubResult', '=', '2'],
+              },
+            ],
+            events: [],
+          },
+        ],
+      },
+    ]);
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement
+    );
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runCompiledEvents(gdjs, runtimeScene, []);
+    expect(runtimeScene.getVariables().get('Result').getAsNumber()).toBe(1);
+    expect(runtimeScene.getVariables().get('SubResult').getAsNumber()).toBe(2);
+  });
+
   it('can generate a simple Else event (pure else)', function () {
     // Standard event with a false condition, followed by Else.
     // The Else branch should run since the Standard condition fails.

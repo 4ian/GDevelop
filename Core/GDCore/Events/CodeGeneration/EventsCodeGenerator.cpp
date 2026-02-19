@@ -1094,6 +1094,11 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
   bool elseChainCanContinue = false;
   for (std::size_t eId = 0; eId < events.size(); ++eId) {
     auto& event = events[eId];
+
+    // Disabled events are completely transparent: they generate no code and
+    // must not affect the else-chain state.
+    if (event.IsDisabled()) continue;
+
     if (event.HasVariables()) {
       GetProjectScopedContainers().GetVariablesContainersList().Push(
           event.GetVariables());
@@ -1124,9 +1129,14 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
     const bool isElseEvent =
         event.GetType() == "BuiltinCommonInstructions::Else";
 
-    const bool hasFollowingElseEvent =
-        eId + 1 < events.size() &&
-        events[eId + 1].GetType() == "BuiltinCommonInstructions::Else";
+    // Skip disabled events when looking for a following Else event.
+    bool hasFollowingElseEvent = false;
+    for (std::size_t nextId = eId + 1; nextId < events.size(); ++nextId) {
+      if (events[nextId].IsDisabled()) continue;
+      hasFollowingElseEvent =
+          events[nextId].GetType() == "BuiltinCommonInstructions::Else";
+      break;
+    }
 
     context.SetFollowedByElseEvent(hasFollowingElseEvent);
 

@@ -256,6 +256,20 @@ class GD_CORE_API EventsCodeGenerationContext {
   bool IsAsyncCallback() const { return parent != nullptr && parent->asyncDepth != asyncDepth; }
 
   /**
+   * \brief Set whether this event is followed by an Else event in the events
+   * list, meaning it is part of an if/else chain.
+   */
+  void SetFollowedByElseEvent(bool followed) {
+    followedByElseEvent = followed;
+  }
+
+  /**
+   * \brief Returns true if this event is followed by an Else event, meaning
+   * it is part of an if/else chain and should set the chain satisfied variable.
+   */
+  bool IsFollowedByElseEvent() const { return followedByElseEvent; }
+
+  /**
    * \brief Returns true if the given object is already going to be declared
    * in this context (either as a traditional objects list, or an empty one).
    */
@@ -319,6 +333,9 @@ class GD_CORE_API EventsCodeGenerationContext {
   EventsCodeGenerationContext* nearestAsyncParent =
       nullptr;  ///< The nearest parent context that is an async callback
                 ///< context.
+  bool followedByElseEvent =
+      false;  ///< If true, this event is followed by an Else event
+              ///< and should set the chain satisfied variable.
   bool reuseExplicitlyForbidden =
       false;  ///< If set to true, forbid children contexts
               ///< to reuse this one without inheriting.

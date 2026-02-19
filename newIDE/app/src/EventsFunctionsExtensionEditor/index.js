@@ -276,6 +276,32 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
   };
 
+  setGlobalSearchResults = (
+    eventPaths: Array<Array<number>>,
+    focusedEventPath: ?Array<number>,
+    searchText?: string
+  ) => {
+    if (this.editor) {
+      this.editor.setGlobalSearchResults(
+        eventPaths,
+        focusedEventPath,
+        searchText
+      );
+    }
+  };
+
+  clearGlobalSearchResults = () => {
+    if (this.editor) {
+      this.editor.clearGlobalSearchResults();
+    }
+  };
+
+  scrollToEventPath = (eventPath: Array<number>) => {
+    if (this.editor) {
+      this.editor.scrollToEventPath(eventPath);
+    }
+  };
+
   selectEventsFunctionByName = (
     functionName: string,
     behaviorName: ?string,

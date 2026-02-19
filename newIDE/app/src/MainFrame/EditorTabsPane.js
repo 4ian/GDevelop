@@ -184,6 +184,12 @@ export type EditorTabsPaneCommonProps = {|
     eventsBasedObject: gdEventsBasedObject,
     variantName: string
   ) => void,
+  onOpenEventsFunctionsExtension: (
+    extensionName: string,
+    initiallyFocusedFunctionName?: ?string,
+    initiallyFocusedBehaviorName?: ?string,
+    initiallyFocusedObjectName?: ?string
+  ) => void,
   onRenamedEventsBasedObject: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     oldName: string,
@@ -194,6 +200,18 @@ export type EditorTabsPaneCommonProps = {|
     name: string
   ) => void,
   openObjectEvents: (extensionName: string, objectName: string) => void,
+  onNavigateToEventFromGlobalSearch: ({|
+    locationType: 'layout' | 'external-events' | 'extension',
+    name: string,
+    eventPath: Array<number>,
+    highlightedEventPaths: Array<Array<number>>,
+    searchText: string,
+    extensionName?: string,
+    functionName?: string,
+    behaviorName?: string,
+    objectName?: string,
+  |}) => void,
+  onGlobalSearchWillClose: () => void,
   canOpen: boolean,
   openOpenFromStorageProviderDialog: () => void,
   openFromFileMetadataWithStorageProvider: (
@@ -341,9 +359,12 @@ const EditorTabsPane: React.ComponentType<{
     onCreateEventsFunction,
     openInstructionOrExpression,
     onOpenCustomObjectEditor,
+    onOpenEventsFunctionsExtension,
     onRenamedEventsBasedObject,
     onDeletedEventsBasedObject,
     openObjectEvents,
+    onNavigateToEventFromGlobalSearch,
+    onGlobalSearchWillClose,
     canOpen,
     openOpenFromStorageProviderDialog,
     openFromFileMetadataWithStorageProvider,
@@ -578,16 +599,38 @@ const EditorTabsPane: React.ComponentType<{
               onCloseTab={(editorTab: EditorTab) => {
                 // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
                 onEditorTabClosing();
+                if (editorTab.kind === 'global-search') {
+                  onGlobalSearchWillClose();
+                }
                 onCloseEditorTab(editorTab);
               }}
               onCloseOtherTabs={(editorTab: EditorTab) => {
                 // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
                 onEditorTabClosing();
+                if (
+                  paneEditorTabs.some(
+                    paneEditorTab =>
+                      paneEditorTab.kind === 'global-search' &&
+                      paneEditorTab !== editorTab &&
+                      paneEditorTab.closable
+                  )
+                ) {
+                  onGlobalSearchWillClose();
+                }
                 onCloseOtherEditorTabs(editorTab);
               }}
               onCloseAll={() => {
                 // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
                 onEditorTabClosing();
+                if (
+                  paneEditorTabs.some(
+                    paneEditorTab =>
+                      paneEditorTab.kind === 'global-search' &&
+                      paneEditorTab.closable
+                  )
+                ) {
+                  onGlobalSearchWillClose();
+                }
                 onCloseAllEditorTabs();
               }}
               onTabActivated={onEditorTabActivated}
@@ -610,7 +653,7 @@ const EditorTabsPane: React.ComponentType<{
         ref={toolbarRef}
         hidden={tabsTitleBarAndEditorToolbarHidden}
         showProjectButtons={
-          !['start page', 'debugger', 'ask-ai', null].includes(
+          !['start page', 'debugger', 'ask-ai', 'global-search', null].includes(
             currentTab ? currentTab.key : null
           )
         }
@@ -708,9 +751,11 @@ const EditorTabsPane: React.ComponentType<{
                       onCreateEventsFunction,
                       openInstructionOrExpression,
                       onOpenCustomObjectEditor: onOpenCustomObjectEditor,
+                      onOpenEventsFunctionsExtension,
                       onRenamedEventsBasedObject: onRenamedEventsBasedObject,
                       onDeletedEventsBasedObject: onDeletedEventsBasedObject,
                       openObjectEvents,
+                      onNavigateToEventFromGlobalSearch,
                       unsavedChanges: unsavedChanges,
                       canOpen,
                       onChooseProject: () =>

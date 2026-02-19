@@ -55,4 +55,5 @@ export type EventRendererProps = {
 
   idPrefix: string,
   isValidElseEvent?: boolean,
+  highlightedSearchText?: ?string,
 };

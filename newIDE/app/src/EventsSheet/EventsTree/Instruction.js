@@ -47,6 +47,7 @@ import { enumerateParametersUsableInExpressions } from '../ParameterFields/Enume
 import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
 import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
 import Warning from '../../UI/CustomSvgIcons/Warning';
+import { highlightSearchText } from '../../Utils/HighlightSearchText';
 
 const gd: libGDevelop = global.gd;
 
@@ -109,6 +110,7 @@ type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
 
   id: string,
+  highlightedSearchText?: ?string,
 |};
 
 const shouldNotBeValidated = ({
@@ -288,7 +290,12 @@ const Instruction = (props: Props): React.Node => {
               metadata.isHidden()
                 ? '[DEPRECATED] '
                 : '';
-            return <span key={i}>{deprecatedPrefix + value}</span>;
+            return (
+              <span key={i}>
+                {deprecatedPrefix}
+                {highlightSearchText(value, props.highlightedSearchText)}
+              </span>
+            );
           }
 
           const parameterMetadata = metadata.getParameter(parameterIndex);
@@ -403,6 +410,7 @@ const Instruction = (props: Props): React.Node => {
                 useAssignmentOperators,
                 projectScopedContainersAccessor:
                   props.projectScopedContainersAccessor,
+                highlightedSearchText: props.highlightedSearchText,
               })}
             </span>
           );
@@ -462,7 +470,16 @@ const Instruction = (props: Props): React.Node => {
                   instruction.getType()
                 );
 
-            const smallIconFilename = metadata.getSmallIconFilename();
+            if (gd.MetadataProvider.isBadInstructionMetadata(metadata)) {
+              return (
+                <InstructionMissing
+                  instructionType={instruction.getType()}
+                  isCondition={isCondition}
+                />
+              );
+            }
+
+            const smallIconFilename = metadata.getSmallIconFilename() || '';
             // The instruction itself can be dragged and is a target for
             // another instruction to be dropped. It's IMPORTANT NOT to have
             // the subinstructions list inside the connectDropTarget/connectDragSource
@@ -634,6 +651,7 @@ const Instruction = (props: Props): React.Node => {
                       props.projectScopedContainersAccessor
                     }
                     idPrefix={props.id}
+                    highlightedSearchText={props.highlightedSearchText}
                   />
                 )}
               </React.Fragment>

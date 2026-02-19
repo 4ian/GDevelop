@@ -4,7 +4,7 @@ import { type EditorTabsState } from './EditorTabs/EditorTabsHandler';
 
 export type EventNavigationTarget = {|
   name: string,
-  locationType: 'layout' | 'external-events',
+  locationType: 'layout' | 'external-events' | 'extension',
   eventPath: Array<number>,
 |};
 
@@ -37,7 +37,11 @@ export const useNavigationToEvent = ({
       const timeoutId = setTimeout(() => {
         const { name, locationType, eventPath } = pendingEventNavigation;
         const editorKind =
-          locationType === 'layout' ? 'layout events' : 'external events';
+          locationType === 'layout'
+            ? 'layout events'
+            : locationType === 'external-events'
+            ? 'external events'
+            : 'events functions extension';
 
         for (const paneIdentifier in editorTabs.panes) {
           const pane = editorTabs.panes[paneIdentifier];

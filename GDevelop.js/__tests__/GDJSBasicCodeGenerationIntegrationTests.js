@@ -491,8 +491,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
       gd,
       project,
       eventsFunction,
-      true,
-      true /* Exceptionally no strict and no namespace to simulate hot reload */
+      { exceptionallyPersistNamespaceOnGdjs: true }
     );
 
     const { gdjs, runtimeScene, mocks } = makeMinimalGDJSMock();
@@ -514,8 +513,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
       gd,
       project,
       eventsFunction,
-      true,
-      true /* Exceptionally no strict and no namespace to simulate hot reload */
+      { exceptionallyPersistNamespaceOnGdjs: true }
     );
     runHotReloadedCompiledEvents(
       gdjs,

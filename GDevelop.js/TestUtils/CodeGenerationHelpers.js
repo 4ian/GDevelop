@@ -10,8 +10,7 @@ function generateCompiledEventsForEventsFunction(
   gd,
   project,
   eventsFunction,
-  logCode = false,
-  exceptionallyNoStrictAndNoNamespace = false
+  options = {},
 ) {
   const extension = new gd.EventsFunctionsExtension();
   const runCompiledEventsFunction =
@@ -20,8 +19,7 @@ function generateCompiledEventsForEventsFunction(
       project,
       extension,
       eventsFunction,
-      logCode,
-      exceptionallyNoStrictAndNoNamespace
+      options
     );
   extension.delete();
   return runCompiledEventsFunction;
@@ -40,10 +38,10 @@ function generateCompiledEventsForEventsFunctionWithContext(
   project,
   extension,
   eventsFunction,
-  logCode = false,
-  exceptionallyNoStrictAndNoNamespace = false
+  options = {}
 ) {
   const namespace = 'functionNamespace';
+  const { exceptionallyPersistNamespaceOnGdjs } = options;
   const eventsFunctionsExtensionCodeGenerator =
     new gd.EventsFunctionsExtensionCodeGenerator(project);
 
@@ -61,20 +59,24 @@ function generateCompiledEventsForEventsFunctionWithContext(
   includeFiles.delete();
 
   const fullCode =
-    (!exceptionallyNoStrictAndNoNamespace ? '"use strict";\n' : '') +
+    '"use strict";\n' +
     // Expose some global variables that are expected by the generated code:
     `const Hashtable = gdjs.Hashtable;\n` +
-    (!exceptionallyNoStrictAndNoNamespace
-      ? `let functionNamespace = { registeredGdjsCallbacks: [] };\n`
-      : '') +
+    (exceptionallyPersistNamespaceOnGdjs
+      ? `let functionNamespace = gdjs.__persistingTestFunctionNamespace || { registeredGdjsCallbacks: [] };\n`
+      : `let functionNamespace = { registeredGdjsCallbacks: [] };\n`) +
     code +
+    // Persist the namespace on gdjs so hot-reload tests can find it.
+    (exceptionallyPersistNamespaceOnGdjs
+      ? `;\ngdjs.__persistingTestFunctionNamespace = functionNamespace;`
+      : '') +
     // Return the function for it to be called (if arguments are passed).
     `;
 return functionArguments ?
   functionNamespace.func.apply(functionNamespace.func, [runtimeScene, ...functionArguments, runtimeScene]) :
   null;`;
 
-  if (logCode) console.log(fullCode);
+  if (options.logCode) console.log(fullCode);
 
   // Create a "real" JavaScript function with the generated code.
   const runCompiledEventsFunction = new Function(
@@ -158,7 +160,8 @@ function generateCompiledEventsForEventsBasedBehavior(
   // Create a function returning the generated behavior.
   const compiledBehavior = new Function(
     'gdjs',
-    `let behaviorNamespace = {};
+    `"use strict";
+     let behaviorNamespace = {};
      let Hashtable = gdjs.Hashtable;
      ${code}
      return behaviorNamespace.${eventsBasedBehavior.getName()};`
@@ -223,7 +226,8 @@ function generateCompiledEventsForEventsBasedObject(
   // Create a function returning the generated object.
   const compiledObject = new Function(
     'gdjs',
-    `let objectNamespace = {};
+    `"use strict";
+     let objectNamespace = {};
      const Hashtable = gdjs.Hashtable;
      ${code}
      return objectNamespace.${eventsBasedObject.getName()};`
@@ -369,7 +373,9 @@ function generateCompiledEventsFromSerializedEvents(
     gd,
     project,
     eventsFunction,
-    configuration && configuration.logCode
+    {
+      logCode: configuration && configuration.logCode,
+    }
   );
 
   eventsFunction.delete();
@@ -457,7 +463,8 @@ function generateCompiledEventsForLayout(gd, project, layout, logCode = false) {
   const compiledFunction = new Function(
     'gdjs',
     'runtimeScene',
-    `const Hashtable = gdjs.Hashtable;
+    `"use strict";
+     const Hashtable = gdjs.Hashtable;
      ${code}
      return gdjs['${layout.getName()}Code'].func(runtimeScene);`
   );

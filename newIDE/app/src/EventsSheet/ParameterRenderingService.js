@@ -208,11 +208,12 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
 
 const ParameterRenderingService = {
   components,
-  getParameterComponent: (rawType: string) => {
+  getParameterComponent: (rawType: string): any => {
     const fieldType = gd.ParameterMetadata.isObject(rawType)
       ? 'object'
       : rawType;
 
+    // $FlowFixMe[invalid-computed-prop]
     if (components.hasOwnProperty(fieldType)) return components[fieldType];
     else return components.default;
   },

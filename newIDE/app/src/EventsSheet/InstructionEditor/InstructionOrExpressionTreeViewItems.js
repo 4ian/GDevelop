@@ -4,8 +4,10 @@ import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { type EnumeratedInstructionMetadata } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { type InstructionOrExpressionTreeNode } from '../../InstructionOrExpression/CreateTree';
 
-export const getInstructionGroupId = (groupName: string, parentId?: ?string) =>
-  `${parentId ? `${parentId}-` : ''}instruction-group-${groupName}`;
+export const getInstructionGroupId = (
+  groupName: string,
+  parentId?: ?string
+): string => `${parentId ? `${parentId}-` : ''}instruction-group-${groupName}`;
 
 export interface TreeViewItemContent {
   applySearch: boolean;
@@ -25,6 +27,7 @@ export interface TreeViewItem {
   getChildren(): ?Array<TreeViewItem>;
 }
 
+// $FlowFixMe[incompatible-type]
 export class LeafTreeViewItem implements TreeViewItem {
   content: TreeViewItemContent;
   displayAsPrimaryButton: boolean;
@@ -58,15 +61,16 @@ export const createFreeInstructionTreeViewItem = ({
       // between instruction (leaf nodes) and group (nodes). We use
       // the "type" properties, but this will fail if a group is called "type"
       // (hence the flow errors, which are valid warnings)
-      // $FlowFixMe
+      // $FlowFixMe[incompatible-type]
       if (typeof subInstructionOrGroup.type === 'string') {
-        // $FlowFixMe - see above
+        // $FlowFixMe[incompatible-type] - see above
+        // $FlowFixMe[incompatible-indexer]
         const instructionMetadata: EnumeratedInstructionMetadata = subInstructionOrGroup;
         return new LeafTreeViewItem(
           new InstructionTreeViewItemContent(instructionMetadata)
         );
       }
-      // $FlowFixMe - see above
+      // $FlowFixMe[incompatible-type] - see above
       const groupOfInstructionInformation: InstructionOrExpressionTreeNode = subInstructionOrGroup;
       const parentGroupIconSrc =
         freeInstructionProps.getGroupIconSrc(categoryName) ||
@@ -96,6 +100,7 @@ export const createFreeInstructionTreeViewItem = ({
   );
 };
 
+// $FlowFixMe[incompatible-type]
 export class InstructionCategoryTreeViewItem implements TreeViewItem {
   content: TreeViewItemContent;
   children: TreeViewItem[];
@@ -110,6 +115,7 @@ export class InstructionCategoryTreeViewItem implements TreeViewItem {
     return this.children;
   }
 }
+// $FlowFixMe[incompatible-type]
 export class InstructionGroupTreeViewItem implements TreeViewItem {
   content: TreeViewItemContent;
   children: TreeViewItem[];
@@ -137,26 +143,26 @@ export class InstructionGroupTreeViewItemContent
     this.props = props;
   }
 
-  getName() {
+  getName(): any {
     return this.name;
   }
   getDescription(): string | null {
     return null;
   }
 
-  getId() {
+  getId(): any {
     return getInstructionGroupId(this.name, this.props.parentId);
   }
 
-  getHtmlId() {
+  getHtmlId(): any {
     return null;
   }
-  getDataSet() {
+  getDataSet(): any {
     return {
       group: this.name,
     };
   }
-  getThumbnail() {
+  getThumbnail(): any {
     return !this.props.parentId
       ? 'NONE'
       : this.props.getGroupIconSrc(this.name) || this.props.parentGroupIconSrc;
@@ -169,26 +175,26 @@ export class InstructionTreeViewItemContent implements TreeViewItemContent {
   constructor(instructionMetadata: EnumeratedInstructionMetadata) {
     this.instructionMetadata = instructionMetadata;
   }
-  getInstructionMetadata() {
+  getInstructionMetadata(): any {
     return this.instructionMetadata;
   }
-  getName() {
+  getName(): any {
     return this.instructionMetadata.displayedName;
   }
   getDescription(): string | null {
     return null;
   }
 
-  getId() {
+  getId(): any {
     return `instruction-item-${this.instructionMetadata.type.replace(
       /:/g,
       '-'
     )}`;
   }
-  getHtmlId() {
+  getHtmlId(): any {
     return this.getId();
   }
-  getDataSet() {
+  getDataSet(): any {
     return {
       instructionType: this.instructionMetadata.type.replace(/:/g, '-'),
       object: this.instructionMetadata.scope.objectMetadata
@@ -199,7 +205,7 @@ export class InstructionTreeViewItemContent implements TreeViewItemContent {
         : undefined,
     };
   }
-  getThumbnail() {
+  getThumbnail(): any {
     return this.instructionMetadata.iconFilename;
   }
 }
@@ -214,23 +220,23 @@ export class MoreResultsTreeViewItemContent implements TreeViewItemContent {
     this.onClick = onClick;
   }
 
-  getName() {
+  getName(): any {
     return this.name;
   }
   getDescription(): string | null {
     return null;
   }
 
-  getId() {
+  getId(): any {
     return `more-instructions`;
   }
-  getHtmlId() {
+  getHtmlId(): any {
     return null;
   }
-  getDataSet() {
+  getDataSet(): any {
     return {};
   }
-  getThumbnail() {
+  getThumbnail(): any {
     return null;
   }
 }

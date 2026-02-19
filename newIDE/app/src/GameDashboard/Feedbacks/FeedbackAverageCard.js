@@ -21,7 +21,7 @@ type Props = {|
   feedbacks: Array<Comment>,
 |};
 
-const FeedbackAverageCard = ({ feedbacks }: Props) => {
+const FeedbackAverageCard = ({ feedbacks }: Props): null | React.Node => {
   if (feedbacks.length === 0) return null;
 
   const ratings = feedbacks.map(feedback => feedback.ratings).filter(Boolean);

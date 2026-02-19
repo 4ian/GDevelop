@@ -7,7 +7,7 @@ type Props = {| children: React.Node |};
 /**
  * Displayed when a parameter uses a deprecated expression
  */
-const DeprecatedParameterValue = ({ children }: Props) => (
+const DeprecatedParameterValue = ({ children }: Props): React.MixedElement => (
   <span className={instructionDeprecatedParameter}>{children}</span>
 );
 

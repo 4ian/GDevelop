@@ -437,6 +437,22 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         context.InheritsFrom(parentContext);
         context.ForbidReuse();
 
+        gd::String localVariablesInitializationCode = "";
+        if (event_.HasVariables()) {
+          GenerateLocalVariablesInitializationCode(
+              event_.GetVariables(), codeGenerator,
+              localVariablesInitializationCode);
+        }
+
+        const bool hasIndexVariable = !event.GetLoopIndexVariableName().empty();
+        gd::String whileIndexVar;
+        gd::String indexVariableAccessor;
+        if (hasIndexVariable) {
+          whileIndexVar = "whileIndex" + gd::String::From(context.GetContextDepth());
+          indexVariableAccessor = codeGenerator.GenerateAnyOrSceneVariableGetter(
+              event.GetLoopIndexVariableName(), context);
+        }
+
         // Prepare codes
         gd::String whileConditionsStr =
             codeGenerator.GenerateConditionsListCode(event.GetWhileConditions(),
@@ -458,9 +474,17 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         // Write final code
         gd::String whileBoolean =
             codeGenerator.GenerateBooleanFullName("stopDoWhile", context);
+        outputCode += localVariablesInitializationCode;
+        if (hasIndexVariable) {
+          outputCode += "let " + whileIndexVar + " = 0;\n";
+        }
         outputCode += "let " + whileBoolean + " = false;\n";
         outputCode += "do {\n";
         outputCode += codeGenerator.GenerateObjectsDeclarationCode(context);
+        if (hasIndexVariable) {
+          outputCode +=
+              indexVariableAccessor + ".setNumber(" + whileIndexVar + ");\n";
+        }
         outputCode += whileConditionsStr;
         outputCode += "if (" + whileIfPredicate + ") {\n";
         outputCode += conditionsCode;
@@ -474,8 +498,15 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         outputCode += "} //Subevents end.\n";
         outputCode += "}\n";
         outputCode += "} else " + whileBoolean + " = true; \n";
+        if (hasIndexVariable) {
+          outputCode += whileIndexVar + "++;\n";
+        }
 
         outputCode += "} while (!" + whileBoolean + ");\n";
+        if (event_.HasVariables()) {
+          outputCode += codeGenerator.GenerateLocalVariablesStackAccessor() +
+                        ".pop();\n";
+        }
 
         return outputCode;
       });
@@ -493,6 +524,13 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::EventsCodeGenerationContext context;
         context.InheritsFrom(parentContext);
         context.ForbidReuse();
+
+        gd::String localVariablesInitializationCode = "";
+        if (event_.HasVariables()) {
+          GenerateLocalVariablesInitializationCode(
+              event_.GetVariables(), codeGenerator,
+              localVariablesInitializationCode);
+        }
 
         gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(
             event.GetConditions(), context);
@@ -521,8 +559,21 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         bool valueIteratorExists =
             !event.GetValueIteratorVariableName().empty();
         bool keyIteratorExists = !event.GetKeyIteratorVariableName().empty();
+        const bool hasIndexVariable = !event.GetLoopIndexVariableName().empty();
+        gd::String childIndexVar;
+        gd::String indexVariableAccessor;
+        if (hasIndexVariable) {
+          childIndexVar = "childIndex" + gd::String::From(context.GetContextDepth());
+          indexVariableAccessor = codeGenerator.GenerateAnyOrSceneVariableGetter(
+              event.GetLoopIndexVariableName(), parentContext);
+        }
 
         // clang-format off
+        outputCode += localVariablesInitializationCode;
+        if (hasIndexVariable) {
+          outputCode += "let " + childIndexVar + " = 0;\n";
+        }
+
         // Define references to variables (if they exist)
         if (keyIteratorExists)
           outputCode +=
@@ -569,6 +620,11 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             "        // Arrays are passed by reference like JS objects\n"
             "        $VALUE_ITERATOR_REFERENCE.replaceChildrenArray($STRUCTURE_CHILD_VARIABLE.getAllChildrenArray());\n"
             "    } else console.warn(\"Cannot identify type: \", type);\n";
+
+        if (hasIndexVariable)
+          outputCode += "    " + indexVariableAccessor + ".setNumber(" +
+                        childIndexVar + ");\n"
+                        "    " + childIndexVar + "++;\n";
         // clang-format on
 
         // Now do the rest of standard event code generation
@@ -619,6 +675,11 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                                   iteratorReferenceVariableName);
         }
 
+        if (event_.HasVariables()) {
+          outputCode += codeGenerator.GenerateLocalVariablesStackAccessor() +
+                        ".pop();\n";
+        }
+
         return outputCode
             .FindAndReplace("$ITERATOR_KEY", iteratorKeyVariableName)
             .FindAndReplace("$STRUCTURE_CHILD_VARIABLE",
@@ -649,6 +710,13 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         context.InheritsFrom(parentContext);
         context.ForbidReuse();
 
+        gd::String localVariablesInitializationCode = "";
+        if (event_.HasVariables()) {
+          GenerateLocalVariablesInitializationCode(
+              event_.GetVariables(), codeGenerator,
+              localVariablesInitializationCode);
+        }
+
         // Prepare conditions/actions codes
         gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(
             event.GetConditions(), context);
@@ -670,11 +738,22 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             "repeatCount" + gd::String::From(context.GetContextDepth());
         gd::String repeatIndexVar =
             "repeatIndex" + gd::String::From(context.GetContextDepth());
+        const bool hasIndexVariable = !event.GetLoopIndexVariableName().empty();
+        gd::String indexVariableAccessor;
+        if (hasIndexVariable) {
+          indexVariableAccessor = codeGenerator.GenerateAnyOrSceneVariableGetter(
+              event.GetLoopIndexVariableName(), context);
+        }
+        outputCode += localVariablesInitializationCode;
         outputCode +=
             "const " + repeatCountVar + " = " + repeatCountCode + ";\n";
         outputCode += "for (let " + repeatIndexVar + " = 0;" + repeatIndexVar +
                       " < " + repeatCountVar + ";++" + repeatIndexVar + ") {\n";
         outputCode += objectDeclaration;
+        if (hasIndexVariable) {
+          outputCode +=
+              indexVariableAccessor + ".setNumber(" + repeatIndexVar + ");\n";
+        }
         outputCode += conditionsCode;
         outputCode += "if (" + ifPredicate + ")\n";
         outputCode += "{\n";
@@ -687,6 +766,11 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         outputCode += "}\n";
 
         outputCode += "}\n";
+
+        if (event_.HasVariables()) {
+          outputCode += codeGenerator.GenerateLocalVariablesStackAccessor() +
+                        ".pop();\n";
+        }
 
         return outputCode;
       });
@@ -712,6 +796,13 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         context.InheritsFrom(parentContext);
         context.ForbidReuse(); // TODO: This may not be necessary (to be
                                // investigated/heavily tested).
+
+        gd::String localVariablesInitializationCode = "";
+        if (event_.HasVariables()) {
+          GenerateLocalVariablesInitializationCode(
+              event_.GetVariables(), codeGenerator,
+              localVariablesInitializationCode);
+        }
 
         for (unsigned int i = 0; i < realObjects.size(); ++i)
           context.EmptyObjectsListNeeded(realObjects[i]);
@@ -745,6 +836,14 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             codeGenerator.GetCodeNamespaceAccessor() + "forEachObjects" +
             gd::String::From(context.GetContextDepth());
         codeGenerator.AddGlobalDeclaration(forEachObjectsList + " = [];\n");
+        const bool hasIndexVariable = !event.GetLoopIndexVariableName().empty();
+        gd::String indexVariableAccessor;
+        if (hasIndexVariable) {
+          indexVariableAccessor = codeGenerator.GenerateAnyOrSceneVariableGetter(
+              event.GetLoopIndexVariableName(), context);
+        }
+
+        outputCode += localVariablesInitializationCode;
 
         if (realObjects.size() !=
             1) //(We write a slightly more simple ( and optimized ) output code
@@ -832,6 +931,11 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
           }
         }
 
+        if (hasIndexVariable) {
+          outputCode +=
+              indexVariableAccessor + ".setNumber(" + forEachIndexVar + ");\n";
+        }
+
         outputCode += conditionsCode;
         outputCode += "if (" + ifPredicate + ") {\n";
         outputCode += actionsCode;
@@ -843,6 +947,11 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         outputCode += "}\n";
 
         outputCode += "}\n"; // End of for loop
+
+        if (event_.HasVariables()) {
+          outputCode += codeGenerator.GenerateLocalVariablesStackAccessor() +
+                        ".pop();\n";
+        }
 
         return outputCode;
       });

@@ -43,10 +43,12 @@ type Props<Item> = {|
 export default class SortableVirtualizedItemList<Item> extends React.Component<
   Props<Item>
 > {
+  // $FlowFixMe[value-as-type]
   _list: ?List;
-  DragSourceAndDropTarget = makeDragSourceAndDropTarget<Item>(
+  // $FlowFixMe[missing-local-annot]
+  DragSourceAndDropTarget = (makeDragSourceAndDropTarget<Item>(
     this.props.reactDndType
-  );
+  ): any);
 
   forceUpdateGrid() {
     if (this._list) this._list.forceUpdateGrid();
@@ -62,7 +64,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     }
   }
 
-  _renderItemRow(item: Item, index: number, isMobile: boolean) {
+  _renderItemRow(item: Item, index: number, isMobile: boolean): any {
     const {
       selectedItems,
       getItemThumbnail,
@@ -107,7 +109,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     );
   }
 
-  render() {
+  render(): any {
     const {
       height,
       width,
@@ -224,7 +226,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                                 ? getItemThumbnail(item)
                                 : undefined,
                           };
-                          // $FlowFixMe
+                          // $FlowFixMe[incompatible-type]
                           return draggedItem;
                         }}
                         canDrag={() => canDrag}

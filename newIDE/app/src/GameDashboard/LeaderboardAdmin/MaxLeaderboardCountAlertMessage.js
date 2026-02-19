@@ -14,7 +14,7 @@ import { hasValidSubscriptionPlan } from '../../Utils/GDevelopServices/Usage';
 export const checkIfHasTooManyLeaderboards = (
   authenticatedUser: AuthenticatedUser,
   leaderboards: ?Array<Leaderboard>
-) => {
+): ?(false | boolean) => {
   if (!authenticatedUser.authenticated) return false;
 
   const { limits } = authenticatedUser;
@@ -32,7 +32,7 @@ export const checkIfHasTooManyLeaderboards = (
   );
 };
 
-const MaxLeaderboardCountAlertMessage = () => {
+const MaxLeaderboardCountAlertMessage = (): null | React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { limits, subscription } = authenticatedUser;
   if (!limits) return null;

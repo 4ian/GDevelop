@@ -105,7 +105,7 @@ const top = (stack: string[]): string | typeof undefined =>
  * https://github.com/poteat/shunting-yard-typescript
  * https://blog.kallisti.net.nz/2008/02/extension-to-the-shunting-yard-algorithm-to-allow-variable-numbers-of-arguments-to-functions/
  */
-export function shuntingYard(tokens: string[]) {
+export function shuntingYard(tokens: string[]): Array<string> {
   const output: string[] = [];
   const operatorStack: string[] = [];
 
@@ -114,6 +114,7 @@ export function shuntingYard(tokens: string[]) {
       operatorStack.push(token);
     } else if (token === ',') {
       while (operatorStack.length > 0 && top(operatorStack) !== '(') {
+        // $FlowFixMe[incompatible-type]
         output.push(operatorStack.pop());
       }
       if (operatorStack.length === 0) {
@@ -126,12 +127,15 @@ export function shuntingYard(tokens: string[]) {
         top(operatorStack) !== undefined &&
         top(operatorStack) !== '(' &&
         // $FlowIgnore - cannot be undefined.
+        // $FlowFixMe[incompatible-type]
         (operators[top(operatorStack)].precedence > operators[o1].precedence ||
           (operators[o1].precedence ===
             // $FlowIgnore - cannot be undefined.
+            // $FlowFixMe[incompatible-type]
             operators[top(operatorStack)].precedence &&
             operators[o1].associativity === 'left'))
       ) {
+        // $FlowFixMe[incompatible-type]
         output.push(operatorStack.pop()); // o2
       }
       operatorStack.push(o1);
@@ -139,6 +143,7 @@ export function shuntingYard(tokens: string[]) {
       operatorStack.push(token);
     } else if (token === ')') {
       while (operatorStack.length > 0 && top(operatorStack) !== '(') {
+        // $FlowFixMe[incompatible-type]
         output.push(operatorStack.pop());
       }
       if (operatorStack.length > 0 && top(operatorStack) === '(') {
@@ -147,7 +152,9 @@ export function shuntingYard(tokens: string[]) {
         throw new Error('Parentheses mismatch');
       }
       // $FlowIgnore - cannot be undefined.
+      // $FlowFixMe[incompatible-type]
       if (functions[top(operatorStack)] !== undefined) {
+        // $FlowFixMe[incompatible-type]
         output.push(operatorStack.pop());
       }
     } else {
@@ -161,6 +168,7 @@ export function shuntingYard(tokens: string[]) {
     if (operator === '(') {
       throw new Error('Parentheses mismatch');
     } else {
+      // $FlowFixMe[incompatible-type]
       output.push(operatorStack.pop());
     }
   }
@@ -176,10 +184,11 @@ export function shuntingYard(tokens: string[]) {
  * https://en.wikipedia.org/wiki/Reverse_Polish_notation
  * https://github.com/poteat/shunting-yard-typescript
  */
-export function evalReversePolishNotation(tokens: string[]) {
+export function evalReversePolishNotation(tokens: string[]): number {
   const stack: string[] = [];
 
   // $FlowIgnore
+  // $FlowFixMe[incompatible-type]
   const ops: { [key: string]: MathFunction | Operator } = {
     ...operators,
     ...functions,
@@ -193,6 +202,7 @@ export function evalReversePolishNotation(tokens: string[]) {
       for (let i = 0; i < op.arity; i++) {
         parameters.push(stack.pop());
       }
+      // $FlowFixMe[incompatible-type]
       stack.push(op.func(...parameters.reverse()));
     } else {
       stack.push(token);
@@ -213,7 +223,7 @@ export function evalReversePolishNotation(tokens: string[]) {
  *
  * https://gist.github.com/tchayen/44c28e8d4230b3b05e9f
  */
-export function tokenize(expression: string) {
+export function tokenize(expression: string): Array<string> {
   // "1  +" => "1 +"
   const expr = expression.replace(/\s+/g, ' ');
 
@@ -269,6 +279,7 @@ export function tokenize(expression: string) {
       if (
         operatorsKeys.includes(c) &&
         !numberParsingStarted &&
+        // $FlowFixMe[incompatible-type]
         operatorsKeys.includes(lastToken)
       ) {
         // $FlowIgnore - cannot be undefined.
@@ -302,7 +313,7 @@ export function tokenize(expression: string) {
   return tokens;
 }
 
-export function calculate(expression: string) {
+export function calculate(expression: string): number {
   const tokens = tokenize(expression);
   const rpn = shuntingYard(tokens);
   return evalReversePolishNotation(rpn);

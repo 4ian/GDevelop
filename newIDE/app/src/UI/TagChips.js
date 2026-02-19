@@ -24,8 +24,13 @@ type Props = {|
   onRemove: string => void,
 |};
 
-const TagChips = ({ tags, tagsWithLabel, onRemove }: Props) => {
+const TagChips = ({
+  tags,
+  tagsWithLabel,
+  onRemove,
+}: Props): null | React.MixedElement => {
   const [focusedTag, setFocusedTag] = React.useState<?string>(null);
+  // $FlowFixMe[missing-empty-array-annot]
   const tagsRefs = React.useRef([]);
 
   const getChipStyle = React.useCallback(
@@ -39,6 +44,7 @@ const TagChips = ({ tags, tagsWithLabel, onRemove }: Props) => {
     [focusedTag]
   );
 
+  // $FlowFixMe[missing-local-annot]
   const handleDeleteTag = (tag: string) => event => {
     if (!tags) return;
     const deletedTagIndex = tags.indexOf(tag);
@@ -56,6 +62,7 @@ const TagChips = ({ tags, tagsWithLabel, onRemove }: Props) => {
     onRemove(tag);
   };
 
+  // $FlowFixMe[missing-local-annot]
   const handleDeleteTagWithLabel = (tagValue: string) => event => {
     if (!tagsWithLabel) return;
     const deletedTagIndex = tagsWithLabel.findIndex(
@@ -82,6 +89,7 @@ const TagChips = ({ tags, tagsWithLabel, onRemove }: Props) => {
     <div style={styles.chipContainer}>
       {tags &&
         tags.map((tag, index) => {
+          // $FlowFixMe[underconstrained-implicit-instantiation]
           const newRef = React.createRef();
           tagsRefs.current[index] = newRef;
           return (
@@ -99,6 +107,7 @@ const TagChips = ({ tags, tagsWithLabel, onRemove }: Props) => {
         })}
       {tagsWithLabel &&
         tagsWithLabel.map((tag, index) => {
+          // $FlowFixMe[underconstrained-implicit-instantiation]
           const newRef = React.createRef();
           tagsRefs.current[index] = newRef;
           return (

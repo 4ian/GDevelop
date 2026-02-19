@@ -58,11 +58,11 @@ type TabContentContainerProps = {|
  * 2) shouldComponentUpdate is used to avoid updating the content of a tab that is not selected.
  */
 export class TabContentContainer extends React.Component<TabContentContainerProps> {
-  shouldComponentUpdate(nextProps: TabContentContainerProps) {
+  shouldComponentUpdate(nextProps: TabContentContainerProps): any {
     return this.props.active || nextProps.active;
   }
 
-  render() {
+  render(): any {
     const { children, active } = this.props;
     return (
       <div
@@ -83,7 +83,10 @@ type ClosableTabsProps = {|
   renderTabs: ({| containerWidth: number |}) => React.Node,
 |};
 
-export const ClosableTabs = ({ hideLabels, renderTabs }: ClosableTabsProps) => {
+export const ClosableTabs = ({
+  hideLabels,
+  renderTabs,
+}: ClosableTabsProps): React.MixedElement => {
   const forceUpdate = useForceUpdate();
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const tabItemContainerStyle = {
@@ -159,7 +162,7 @@ export function ClosableTab({
   onActivated,
   onHover,
   maxWidth,
-}: ClosableTabProps) {
+}: ClosableTabProps): React.Node {
   React.useEffect(
     () => {
       if (active) {
@@ -184,6 +187,7 @@ export function ClosableTab({
     [maxWidth]
   );
 
+  // $FlowFixMe[missing-local-annot]
   const openContextMenu = event => {
     event.stopPropagation();
     if (contextMenu.current) {
@@ -192,6 +196,7 @@ export function ClosableTab({
   };
 
   const closeOnMiddleClick = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     event => {
       if (event.nativeEvent && event.nativeEvent.button === 1) {
         onClose();

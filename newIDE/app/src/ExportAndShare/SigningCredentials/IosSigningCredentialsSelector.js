@@ -254,7 +254,7 @@ export const IosSigningCredentialsSelector = ({
   buildSigningOptions,
   onSelectBuildSigningOptions,
   disabled,
-}: Props) => {
+}: Props): React.Node => {
   const {
     signingCredentials,
     error,
@@ -359,6 +359,7 @@ export const IosSigningCredentialsSelector = ({
         {appleCertificateSigningCredentials &&
         appleCertificateSigningCredentials.length > 0 ? (
           <FlatButton
+            // $FlowFixMe[incompatible-type]
             style={styles.button}
             label={<Trans>Add or edit</Trans>}
             onClick={() => setIsSigningCredentialsDialogOpen(true)}
@@ -367,6 +368,7 @@ export const IosSigningCredentialsSelector = ({
         ) : (
           <RaisedButton
             primary
+            // $FlowFixMe[incompatible-type]
             style={styles.raisedButton}
             label={<Trans>Add new</Trans>}
             onClick={() => setIsSigningCredentialsDialogOpen(true)}

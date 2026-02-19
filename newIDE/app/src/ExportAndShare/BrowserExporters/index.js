@@ -17,28 +17,34 @@ import { onlineCordovaIosExporter } from '../GenericExporters/OnlineCordovaIosEx
 import { onlineElectronExporter } from '../GenericExporters/OnlineElectronExport';
 import { electronExporter } from '../GenericExporters/ElectronExport';
 
+// $FlowFixMe[incompatible-type]
 export const browserOnlineWebExporter: Exporter = {
   ...onlineWebExporter,
   exportPipeline: browserOnlineWebExportPipeline,
 };
 
 export const browserAutomatedExporters: Array<Exporter> = [
+  // $FlowFixMe[incompatible-type]
   {
     ...html5Exporter,
     exportPipeline: browserHTML5ExportPipeline,
   },
+  // $FlowFixMe[incompatible-type]
   {
     ...onlineCordovaExporter,
     exportPipeline: browserOnlineCordovaExportPipeline,
   },
+  // $FlowFixMe[incompatible-type]
   {
     ...onlineCordovaIosExporter,
     exportPipeline: browserOnlineCordovaIosExportPipeline,
   },
+  // $FlowFixMe[incompatible-type]
   {
     ...onlineElectronExporter,
     exportPipeline: browserOnlineElectronExportPipeline,
   },
+  // $FlowFixMe[incompatible-type]
   {
     ...facebookInstantGamesExporter,
     exportPipeline: browserFacebookInstantGamesExportPipeline,
@@ -46,14 +52,17 @@ export const browserAutomatedExporters: Array<Exporter> = [
 ];
 
 export const browserManualExporters: Array<Exporter> = [
+  // $FlowFixMe[incompatible-type]
   {
     ...html5Exporter,
     exportPipeline: browserHTML5ExportPipeline,
   },
+  // $FlowFixMe[incompatible-type]
   {
     ...cordovaExporter,
     exportPipeline: browserCordovaExportPipeline,
   },
+  // $FlowFixMe[incompatible-type]
   {
     ...electronExporter,
     exportPipeline: browserElectronExportPipeline,

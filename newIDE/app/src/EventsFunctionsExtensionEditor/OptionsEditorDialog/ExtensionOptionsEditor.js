@@ -28,6 +28,7 @@ import { ResourceStoreContext } from '../../AssetStore/ResourceStore/ResourceSto
 
 const downloadSvgAsBase64 = async (url: string): Promise<string> => {
   try {
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     const response = await axios.get(url, { responseType: 'arraybuffer' });
 
     const image = btoa(
@@ -111,7 +112,7 @@ export const ExtensionOptionsEditor = ({
   eventsFunctionsExtension,
   onLoadChange,
   isLoading,
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const [resourceStoreOpen, setResourceStoreOpen] = React.useState(false);
   const isMounted = useIsMounted();

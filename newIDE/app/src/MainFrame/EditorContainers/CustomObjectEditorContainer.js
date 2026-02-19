@@ -48,7 +48,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     return this.props.project;
   }
 
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     if (!this.props.isActive && nextProps.isActive) {
       this._setPreviewedLayout();
     }
@@ -64,6 +64,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
       this._setPreviewedLayout();
     }
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
+      // $FlowFixMe[method-unbinding]
       this.onResourceExternallyChanged.bind(this)
     );
   }
@@ -274,7 +275,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
     );
   }
 
-  render() {
+  render(): any {
     const { project, isActive } = this.props;
     if (!project) return null;
 
@@ -377,4 +378,4 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
 
 export const renderCustomObjectEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-) => <CustomObjectEditorContainer {...props} />;
+): React.Node => <CustomObjectEditorContainer {...props} />;

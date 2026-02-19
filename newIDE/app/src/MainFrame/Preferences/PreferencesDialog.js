@@ -73,6 +73,7 @@ const PreferencesDialog = ({
     setShowExperimentalExtensions,
     setShowInAppTutorialDeveloperMode,
     setOpenDiagnosticReportAutomatically,
+    setBlockPreviewAndExportOnDiagnosticErrors,
     setShowDeprecatedInstructionWarning,
     setUse3DEditor,
     setShowBasicProfilingCounters,
@@ -447,6 +448,15 @@ const PreferencesDialog = ({
               <CompactToggleField
                 labelColor="primary"
                 hideTooltip
+                onCheck={setBlockPreviewAndExportOnDiagnosticErrors}
+                checked={values.blockPreviewAndExportOnDiagnosticErrors}
+                label={i18n._(
+                  t`Block preview and export when diagnostic errors are found`
+                )}
+              />
+              <CompactToggleField
+                labelColor="primary"
+                hideTooltip
                 onCheck={check =>
                   setPreviewCrashReportUploadLevel(
                     check ? 'exclude-javascript-code-events' : 'none'
@@ -700,7 +710,7 @@ const PreferencesDialog = ({
   );
 };
 
-const PreferencesDialogWithErrorBoundary = (props: Props) => (
+const PreferencesDialogWithErrorBoundary = (props: Props): React.Node => (
   <ErrorBoundary
     componentTitle={<Trans>Preferences</Trans>}
     scope="preferences"

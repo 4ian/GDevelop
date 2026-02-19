@@ -8,7 +8,14 @@ import {
   type ShowYesNoCancelDialogOptions,
 } from './AlertContext';
 
-const useAlertDialog = () => {
+const useAlertDialog = (): {
+  showAlert: (options: ShowAlertDialogOptions) => Promise<void>,
+  showConfirmation: (options: ShowConfirmDialogOptions) => Promise<boolean>,
+  showDeleteConfirmation: (
+    options: ShowConfirmDeleteDialogOptions
+  ) => Promise<boolean>,
+  showYesNoCancel: (options: ShowYesNoCancelDialogOptions) => Promise<boolean>,
+} => {
   const {
     showAlertDialog,
     showConfirmDialog,

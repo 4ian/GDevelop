@@ -12,7 +12,7 @@ type Props = {|
 export const MultilineVariableEditorDialog = ({
   initialValue,
   onClose,
-}: Props) => {
+}: Props): React.Node => {
   const [value, setValue] = React.useState(initialValue);
 
   return (

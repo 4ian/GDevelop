@@ -31,6 +31,7 @@ export const useFilters = (): FiltersState => {
       } else {
         // Remove the filters that are not included in the category,
         // as it would make no sense (not displayed, and everything would be filtered out).
+        // $FlowFixMe[underconstrained-implicit-instantiation]
         const newChosenFilters = new Set();
         for (const tag of chosenFilters.keys()) {
           if (newChosenCategory.node.allChildrenTags.includes(tag)) {

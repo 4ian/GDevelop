@@ -67,7 +67,7 @@ export const LoadingScreenEditor = ({
   project,
   resourceManagementProps,
   projectScopedContainersAccessor,
-}: Props) => {
+}: Props): React.Node => {
   const subscriptionChecker = React.useRef<?SubscriptionCheckerInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const forceUpdate = useForceUpdate();

@@ -34,6 +34,7 @@ const allowedPreferenceKeys: $ReadOnlyArray<
   'showInAppTutorialDeveloperMode',
   'showDeprecatedInstructionWarning',
   'openDiagnosticReportAutomatically',
+  'blockPreviewAndExportOnDiagnosticErrors',
   'use3DEditor',
   'showBasicProfilingCounters',
   'newProjectsDefaultFolder',
@@ -93,6 +94,7 @@ export const applyProjectPreferences = (
   if (rawPreferences) {
     const filtered = filterAllowedPreferences(rawPreferences);
     if (
+      // $FlowFixMe[method-unbinding]
       Object.prototype.hasOwnProperty.call(
         filtered,
         'showDeprecatedInstructionWarning'

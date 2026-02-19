@@ -9,7 +9,7 @@ import AlertDialog from '../../UI/Alert/AlertDialog';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { Column, LargeSpacer } from '../../UI/Grid';
 
-export const Default = () => {
+export const Default = (): React.Node => {
   const {
     showAlert,
     showConfirmation,
@@ -30,8 +30,10 @@ export const Default = () => {
       title: t`Warning`,
       message: t`Do you want to refactor your project?`,
     });
+    // $FlowFixMe[invalid-compare]
     if (answer === 0) {
       action('Yes')();
+      // $FlowFixMe[invalid-compare]
     } else if (answer === 1) {
       action('No')();
     } else {

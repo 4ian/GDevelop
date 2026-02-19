@@ -142,7 +142,7 @@ export const CompactLayerPropertiesEditor = ({
   onEditLayerEffects,
   onLayersModified,
   onEffectAdded,
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const [isPropertiesFoldedOrDefault, setIsPropertiesFolded] = React.useState<
     boolean | null
@@ -221,6 +221,7 @@ export const CompactLayerPropertiesEditor = ({
                     schema={layerPropertiesSchema}
                     instances={[layer]}
                     onInstancesModified={onLayersModified}
+                    // $FlowFixMe[incompatible-type]
                     onRefreshAllFields={forceRecomputeSchema}
                   />
                 </ColumnStackLayout>

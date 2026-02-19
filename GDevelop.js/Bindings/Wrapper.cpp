@@ -371,6 +371,42 @@ class AbstractFileSystemJS : public AbstractFileSystem {
   virtual ~AbstractFileSystemJS(){};
 };
 
+/**
+ * \brief Manual binding of gd::ReadOnlyArbitraryEventsWorkerWithContext to allow
+ * overriding DoVisitEvent and DoVisitInstruction from JavaScript.
+ */
+class ReadOnlyArbitraryEventsWorkerWithContextJS : public ReadOnlyArbitraryEventsWorkerWithContext {
+ public:
+  ReadOnlyArbitraryEventsWorkerWithContextJS(){};
+  virtual ~ReadOnlyArbitraryEventsWorkerWithContextJS(){};
+
+  virtual void DoVisitEvent(const gd::BaseEvent &event) {
+    EM_ASM(
+        {
+          var self = Module['getCache'](Module['ReadOnlyArbitraryEventsWorkerWithContextJS'])[$0];
+          if (!self.hasOwnProperty('doVisitEvent'))
+            throw 'a JSImplementation must implement all functions, you forgot ReadOnlyArbitraryEventsWorkerWithContextJS::doVisitEvent.';
+          self.doVisitEvent(wrapPointer($1, Module['BaseEvent']));
+        },
+        (int)this,
+        (int)&event);
+  }
+
+  virtual void DoVisitInstruction(const gd::Instruction &instruction, bool isCondition) {
+    EM_ASM(
+        {
+          var self = Module['getCache'](Module['ReadOnlyArbitraryEventsWorkerWithContextJS'])[$0];
+          if (!self.hasOwnProperty('doVisitInstruction'))
+            throw 'a JSImplementation must implement all functions, you forgot ReadOnlyArbitraryEventsWorkerWithContextJS::doVisitInstruction.';
+          self.doVisitInstruction(wrapPointer($1, Module['Instruction']), !!$2, wrapPointer($3, Module['ProjectScopedContainers']));
+        },
+        (int)this,
+        (int)&instruction,
+        isCondition,
+        (int)&GetProjectScopedContainers());
+  }
+};
+
 class InitialInstanceJSFunctorWrapper : public gd::InitialInstanceFunctor {
  public:
   InitialInstanceJSFunctorWrapper(){};

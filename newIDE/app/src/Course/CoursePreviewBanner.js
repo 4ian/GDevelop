@@ -123,6 +123,7 @@ const ChapterTile = ({
       <Spacer />
       <Line noMargin>
         <Text color="secondary" noMargin>
+          {/* $FlowFixMe[invalid-computed-prop] */}
           {rankLabel[chapterIndex + 1]}
         </Text>
         &nbsp;
@@ -159,7 +160,7 @@ const CoursePreviewBanner = ({
   getCourseCompletion,
   getCourseChapterCompletion,
   onDisplayCourse,
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { achievements, badges } = React.useContext(AuthenticatedUserContext);
   const { isMobile, isLandscape, windowSize } = useResponsiveWindowSize();
@@ -170,30 +171,33 @@ const CoursePreviewBanner = ({
     () => {
       const courseChapters = course ? getCourseChapters(course.id) : null;
       if (!course || !courseChapters) {
-        return new Array(numberOfTilesToDisplay).fill(0).map((_, index) => {
-          return (
-            <React.Fragment key={`skeleton-${index}`}>
-              {index > 0 &&
-                (isMobile && !isLandscape ? (
-                  <Column noMargin>
-                    <Divider orientation="horizontal" />
-                  </Column>
-                ) : (
-                  <Line noMargin>
-                    <Divider orientation="vertical" />
-                  </Line>
-                ))}
-              {index > 0 && <Spacer />}
-              <Column expand>
-                <Skeleton height={40} />
-                <Skeleton height={20} />
-                <Skeleton height={60} />
-                <LargeSpacer />
-              </Column>
-            </React.Fragment>
-          );
-        });
+        return new Array<number>(numberOfTilesToDisplay)
+          .fill(0)
+          .map((_, index) => {
+            return (
+              <React.Fragment key={`skeleton-${index}`}>
+                {index > 0 &&
+                  (isMobile && !isLandscape ? (
+                    <Column noMargin>
+                      <Divider orientation="horizontal" />
+                    </Column>
+                  ) : (
+                    <Line noMargin>
+                      <Divider orientation="vertical" />
+                    </Line>
+                  ))}
+                {index > 0 && <Spacer />}
+                <Column expand>
+                  <Skeleton height={40} />
+                  <Skeleton height={20} />
+                  <Skeleton height={60} />
+                  <LargeSpacer />
+                </Column>
+              </React.Fragment>
+            );
+          });
       }
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       const completionByChapter = new Array(course.chaptersTargetCount)
         .fill(0)
         .map((_, index) => {
@@ -226,34 +230,36 @@ const CoursePreviewBanner = ({
         )
       );
 
-      return new Array(numberOfTilesToDisplay).fill(0).map((_, index) => {
-        const chapterIndex = startChapterIndex + index;
-        if (chapterIndex >= course.chaptersTargetCount) return null;
+      return new Array<number>(numberOfTilesToDisplay)
+        .fill(0)
+        .map((_, index) => {
+          const chapterIndex = startChapterIndex + index;
+          if (chapterIndex >= course.chaptersTargetCount) return null;
 
-        const chapter = courseChapters[chapterIndex];
-        return (
-          <React.Fragment key={`chapter-${chapterIndex}`}>
-            {index > 0 &&
-              (isMobile && !isLandscape ? (
-                <Column noMargin>
-                  <Divider orientation="horizontal" />
-                </Column>
-              ) : (
-                <Line noMargin>
-                  <Divider orientation="vertical" />
-                </Line>
-              ))}
-            {index > 0 && <Spacer />}
-            <ChapterTile
-              course={course}
-              chapter={chapter}
-              chapterIndex={chapterIndex}
-              gdevelopTheme={gdevelopTheme}
-              isComplete={completionByChapter[chapterIndex]}
-            />
-          </React.Fragment>
-        );
-      });
+          const chapter = courseChapters[chapterIndex];
+          return (
+            <React.Fragment key={`chapter-${chapterIndex}`}>
+              {index > 0 &&
+                (isMobile && !isLandscape ? (
+                  <Column noMargin>
+                    <Divider orientation="horizontal" />
+                  </Column>
+                ) : (
+                  <Line noMargin>
+                    <Divider orientation="vertical" />
+                  </Line>
+                ))}
+              {index > 0 && <Spacer />}
+              <ChapterTile
+                course={course}
+                chapter={chapter}
+                chapterIndex={chapterIndex}
+                gdevelopTheme={gdevelopTheme}
+                isComplete={completionByChapter[chapterIndex]}
+              />
+            </React.Fragment>
+          );
+        });
     },
     [
       course,
@@ -276,6 +282,7 @@ const CoursePreviewBanner = ({
           <LinearProgress
             value={courseCompletion.percentage * 100}
             variant="determinate"
+            // $FlowFixMe[incompatible-type]
             style={styles.progress}
             color="success"
           />

@@ -126,7 +126,7 @@ export const Default = ({
   simulateNativeMobileApp: boolean,
   userState: string,
   pricingSystem: string,
-|}) => {
+|}): React.Node => {
   const authenticatedUser = loading
     ? fakeAuthenticatedUserLoggingIn
     : getUserFromState(userState);
@@ -135,6 +135,7 @@ export const Default = ({
     authenticatedUser.subscription.redemptionCode = null;
     authenticatedUser.subscription.redemptionCodeValidUntil = null;
     // $FlowIgnore
+    // $FlowFixMe[incompatible-type]
     authenticatedUser.subscriptionPricingSystem = null;
 
     if (pricingSystem === 'redeemed') {
@@ -210,6 +211,7 @@ export const Default = ({
 
   return (
     <AlertProvider>
+      {/* $FlowFixMe[incompatible-type] */}
       <AuthenticatedUserContext.Provider value={authenticatedUser}>
         <SubscriptionProvider>
           <SubscriptionDetails

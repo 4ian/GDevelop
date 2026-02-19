@@ -38,7 +38,7 @@ export default function EventsBasedBehaviorEditor({
   eventsBasedBehavior,
   unsavedChanges,
   onConfigurationUpdated,
-}: Props) {
+}: Props): React.Node {
   const forceUpdate = useForceUpdate();
 
   const onChange = React.useCallback(
@@ -150,7 +150,7 @@ export default function EventsBasedBehaviorEditor({
               }
               value={eventsBasedBehavior.getQuickCustomizationVisibility()}
               onChange={(e, i, valueString: string) => {
-                // $FlowFixMe
+                // $FlowFixMe[incompatible-type]
                 const value: QuickCustomization_Visibility = valueString;
                 eventsBasedBehavior.setQuickCustomizationVisibility(value);
                 onChange();

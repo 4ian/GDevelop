@@ -36,11 +36,17 @@ export const separator = '$.$';
 export const removeInheritedPrefix = (str: string): string =>
   str.slice(inheritedPrefix.length, str.length);
 
-export const getDirectParentVariable = (lineage: VariableLineage) =>
+export const getDirectParentVariable = (
+  lineage: VariableLineage
+): gdVariable | null =>
   lineage[lineage.length - 1] ? lineage[lineage.length - 1].variable : null;
-export const getDirectParentNodeId = (lineage: VariableLineage) =>
+export const getDirectParentNodeId = (
+  lineage: VariableLineage
+): string | null =>
   lineage[lineage.length - 1] ? lineage[lineage.length - 1].nodeId : null;
-export const getOldestAncestryVariable = (lineage: VariableLineage) =>
+export const getOldestAncestryVariable = (
+  lineage: VariableLineage
+): { name: string, nodeId: string, variable: gdVariable } | null =>
   lineage.length ? lineage[0] : null;
 
 export const isAnAncestryOf = (
@@ -84,6 +90,7 @@ export const getVariableContextFromNodeId = (
   let currentVariable = null;
   let currentVariableName = null;
   let lineage = [];
+  // $FlowFixMe[invalid-declaration]
   let name = null;
   let depth = -1;
 
@@ -103,6 +110,7 @@ export const getVariableContextFromNodeId = (
         if (index >= parentVariable.getChildrenCount()) {
           return { variable: null, lineage, depth, name };
         }
+        // $FlowFixMe[definition-cycle]
         currentVariable = parentVariable.getAtIndex(index);
       } else {
         if (!parentVariable.hasChild(currentVariableName)) {
@@ -140,6 +148,7 @@ export const getVariablePathFromNodeId = (
     variablesContainer
   );
   const variablePath = variableContext.lineage.map(variable => variable.name);
+  // $FlowFixMe[incompatible-type]
   variablePath.push(variableContext.name);
   return variablePath.join('.');
 };
@@ -167,7 +176,7 @@ export const updateListOfNodesFollowingChangeName = (
   list: string[],
   oldNodeId: string,
   newName: string
-) => {
+): Array<string> => {
   const newList: Array<string> = [...list];
   const indexOfRenamedNode = newList.indexOf(oldNodeId);
   const indicesOfChildrenOfRenamedNode = newList.map((otherNodeId, index) => {

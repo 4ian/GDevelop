@@ -35,6 +35,7 @@ import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorW
 
 const gd: libGDevelop = global.gd;
 
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget(
   'model3d-animations-list'
 );
@@ -66,7 +67,7 @@ const removeTrailingZeroes = (value: string) => {
   return value;
 };
 
-export const hasLight = (layout: ?gd.Layout) => {
+export const hasLight = (layout: ?gd.Layout): boolean => {
   if (!layout) {
     return true;
   }
@@ -107,7 +108,7 @@ const Model3DEditor = ({
   resourceManagementProps,
   projectScopedContainersAccessor,
   renderObjectNameField,
-}: EditorProps) => {
+}: EditorProps): React.Node => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
 
   const [
@@ -152,6 +153,7 @@ const Model3DEditor = ({
     [objectConfiguration, forceUpdate]
   );
 
+  // $FlowFixMe[value-as-type]
   const [gltf, setGltf] = React.useState<GLTF | null>(null);
   const loadGltf = React.useCallback(
     async (modelResourceName: string) => {
@@ -167,6 +169,7 @@ const Model3DEditor = ({
     loadGltf(properties.get('modelResourceName').getValue());
   }
 
+  // $FlowFixMe[value-as-type]
   const model3D = React.useMemo<THREE.Object3D | null>(
     () => {
       if (!gltf) {
@@ -185,6 +188,7 @@ const Model3DEditor = ({
     properties.get('originLocation').getValue()
   );
   const onOriginLocationChange = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     (event, index: number, newValue: string) => {
       onChangeProperty('originLocation', newValue);
       setOriginLocation(newValue);
@@ -379,6 +383,7 @@ const Model3DEditor = ({
   );
 
   const removeAnimation = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     animationIndex => {
       setNameErrors({});
 
@@ -407,6 +412,7 @@ const Model3DEditor = ({
   );
 
   const changeAnimationName = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     (animationIndex, newName) => {
       const currentName = model3DConfiguration
         .getAnimation(animationIndex)

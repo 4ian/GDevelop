@@ -19,7 +19,7 @@ export default {
   decorators: [alertDecorator, paperDecorator],
 };
 
-export const Loading = () => {
+export const Loading = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <SigningCredentialsDialog
@@ -33,7 +33,7 @@ export const Loading = () => {
   );
 };
 
-export const Errored = () => {
+export const Errored = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <SigningCredentialsDialog
@@ -47,7 +47,7 @@ export const Errored = () => {
   );
 };
 
-export const Empty = () => {
+export const Empty = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <SigningCredentialsDialog
@@ -61,7 +61,7 @@ export const Empty = () => {
   );
 };
 
-export const WithSigningCredentials = () => {
+export const WithSigningCredentials = (): React.Node => {
   return (
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <SigningCredentialsDialog

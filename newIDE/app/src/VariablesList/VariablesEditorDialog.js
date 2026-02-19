@@ -26,6 +26,9 @@ type TabProps = {
   label: React.Node,
   variablesContainer: gdVariablesContainer,
   inheritedVariablesContainer?: gdVariablesContainer,
+  loopIndexVariableName?: string,
+  onRenameLoopIndexVariable?: (newName: string) => void,
+  onRemoveLoopIndexVariable?: () => void,
   emptyPlaceholderTitle?: React.Node,
   emptyPlaceholderDescription?: React.Node,
   /**
@@ -75,7 +78,7 @@ const VariablesEditorDialog = ({
   objectName,
   initialInstances,
   isListLocked,
-}: Props) => {
+}: Props): React.Node => {
   const serializableObjects = React.useMemo(
     () =>
       new Map(
@@ -109,6 +112,8 @@ const VariablesEditorDialog = ({
     shouldCreateVariable.current = false;
     const tabIndex = Math.max(
       0,
+      // $FlowFixMe[missing-local-annot]
+      // $FlowFixMe[incompatible-exact]
       tabs.indexOf(({ id }) => id === initiallyOpenTabId)
     );
     const { variablesContainer, inheritedVariablesContainer } = tabs[tabIndex];
@@ -267,6 +272,9 @@ const VariablesEditorDialog = ({
           id,
           variablesContainer,
           inheritedVariablesContainer,
+          loopIndexVariableName,
+          onRenameLoopIndexVariable,
+          onRemoveLoopIndexVariable,
           emptyPlaceholderTitle,
           emptyPlaceholderDescription,
           onComputeAllVariableNames,
@@ -298,6 +306,9 @@ const VariablesEditorDialog = ({
                   onVariablesUpdated={notifyOfChange}
                   onSelectedVariableChange={onSelectedVariableChange}
                   isListLocked={isListLocked}
+                  loopIndexVariableName={loopIndexVariableName}
+                  onRenameLoopIndexVariable={onRenameLoopIndexVariable}
+                  onRemoveLoopIndexVariable={onRemoveLoopIndexVariable}
                 />
               </Column>
             )

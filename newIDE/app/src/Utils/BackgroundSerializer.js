@@ -26,7 +26,8 @@ const getOrCreateBackgroundSerializerWorker = (): Worker => {
     return serializerWorker;
   }
 
-  // $FlowExpectedError - worker-loader types aren't recognized by Flow
+  // $FlowFixMe[incompatible-type] - worker-loader types aren't recognized by Flow
+  // $FlowFixMe[invalid-constructor]
   serializerWorker = new BackgroundSerializerWorker();
 
   // Set up message handler
@@ -85,6 +86,7 @@ export async function serializeInBackground(
   const binaryPtr = gd.BinarySerializer.createBinarySnapshot(serializedElement);
   const binarySize = gd.BinarySerializer.getLastBinarySnapshotSize();
   serializedElement.delete();
+  // $FlowFixMe[incompatible-type]
   serializedElement = null;
 
   if (!binaryPtr) {

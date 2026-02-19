@@ -61,7 +61,9 @@ type Props = {|
   onCommentUpdated: (comment: Comment) => void,
 |};
 
-export const getRatings = (ratings: ?GameRatings) => {
+export const getRatings = (
+  ratings: ?GameRatings
+): ?Array<{ key: string, label: React.Node, value: number }> => {
   if (!ratings) return null;
   if (ratings.version === 1) {
     return [
@@ -90,7 +92,7 @@ const FeedbackCard = ({
   buildProperties,
   authenticatedUser,
   onCommentUpdated,
-}: Props) => {
+}: Props): React.Node => {
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const ratings = getRatings(comment.ratings);
   const theme = React.useContext(GDevelopThemeContext);
@@ -318,6 +320,7 @@ const FeedbackCard = ({
                 </ResponsiveLineStackLayout>
               )}
               <LargeSpacer />
+              {/* $FlowFixMe[incompatible-type] */}
               <Text style={styles.textComment} allowSelection>
                 {comment.text}
               </Text>

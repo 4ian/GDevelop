@@ -22,7 +22,7 @@ const AuthorizedAssetImage = ({
   onError,
   onLoad,
   hideLoader,
-}: Props) => {
+}: Props): React.Node => {
   const [authorizedUrl, setAuthorizedUrl] = React.useState(null);
   const [isImageLoaded, setIsImageLoaded] = React.useState(false);
   const { authorizationToken, updateAuthorizationToken } = React.useContext(
@@ -40,6 +40,7 @@ const AuthorizedAssetImage = ({
       if (!authorizationToken) {
         updateAuthorizationToken();
       } else {
+        // $FlowFixMe[incompatible-type]
         setAuthorizedUrl(createProductAuthorizedUrl(url, authorizationToken));
       }
     },

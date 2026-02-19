@@ -102,7 +102,14 @@ export const prepareAiUserContent = async ({
   simplifiedProjectJson: string | null,
   projectSpecificExtensionsSummaryJson: string | null,
   eventsJson?: string | null,
-|}) => {
+|}): Promise<{
+  eventsJson: null | string,
+  eventsJsonUserRelativeKey: null | string,
+  gameProjectJson: null | string,
+  gameProjectJsonUserRelativeKey: null | string,
+  projectSpecificExtensionsSummaryJson: null | string,
+  projectSpecificExtensionsSummaryJsonUserRelativeKey: null | string,
+}> => {
   // Hash the contents, if provided, to then upload it only once (as long as the hash stays
   // the same, no need to re-upload it for a while).
   // If the content is not provided, no hash is computed because there is no content to upload.
@@ -173,6 +180,7 @@ export const prepareAiUserContent = async ({
     await Promise.all([
       gameProjectJsonSignedUrl
         ? retryIfFailed({ times: 3 }, () =>
+            // $FlowFixMe[underconstrained-implicit-instantiation]
             axios.put(gameProjectJsonSignedUrl, simplifiedProjectJson, {
               headers: {
                 'Content-Type': 'application/json',
@@ -189,6 +197,7 @@ export const prepareAiUserContent = async ({
         : null,
       projectSpecificExtensionsSummaryJsonSignedUrl
         ? retryIfFailed({ times: 3 }, () =>
+            // $FlowFixMe[underconstrained-implicit-instantiation]
             axios.put(
               projectSpecificExtensionsSummaryJsonSignedUrl,
               projectSpecificExtensionsSummaryJson,
@@ -213,6 +222,7 @@ export const prepareAiUserContent = async ({
         : null,
       eventsJsonSignedUrl
         ? retryIfFailed({ times: 3 }, () =>
+            // $FlowFixMe[underconstrained-implicit-instantiation]
             axios.put(eventsJsonSignedUrl, eventsJson, {
               headers: {
                 'Content-Type': 'application/json',

@@ -34,7 +34,11 @@ const highlightedDeprecatedText = {
   borderBottom: '3px solid rgba(255, 152, 0, 0.7)',
 };
 
-const BackgroundHighlighting = ({ value, style, highlights }: Props) => {
+const BackgroundHighlighting = ({
+  value,
+  style,
+  highlights,
+}: Props): React.MixedElement => {
   const sortedHighlights = highlights
     .slice()
     .sort((highlight1, highlight2) => highlight1.begin - highlight2.begin);

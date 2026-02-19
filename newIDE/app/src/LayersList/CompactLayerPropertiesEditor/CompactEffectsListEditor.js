@@ -216,7 +216,7 @@ export const CompactEffectsListEditor = ({
   onEffectAdded,
   layerRenderingType,
   target,
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const [isEffectsFolded, setEffectsFolded] = React.useState(false);
 

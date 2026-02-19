@@ -69,35 +69,38 @@ const editors = {
   },
 };
 
-const BottomToolbar = React.memo<Props>((props: Props) => {
-  return (
-    <Paper background="medium" square style={styles.container}>
-      <Toolbar height={toolbarHeight} paddingBottom={toolbarPaddingBottom}>
-        <ToolbarGroup spaceOut>
-          {Object.keys(editors).map(editorId => {
-            const { icon, buttonId } = editors[editorId];
-            const isSelected = props.selectedEditorId === editorId;
-            return (
-              <IconButton
-                color="default"
-                key={editorId}
-                disableRipple
-                disableFocusRipple
-                style={styles.iconButton}
-                id={buttonId}
-                onClick={() => {
-                  props.onSelectEditor(editorId);
-                }}
-                selected={isSelected}
-              >
-                <span style={styles.buttonLabel}>{icon}</span>
-              </IconButton>
-            );
-          })}
-        </ToolbarGroup>
-      </Toolbar>
-    </Paper>
-  );
-});
+const BottomToolbar: React.ComponentType<Props> = React.memo<Props>(
+  (props: Props) => {
+    return (
+      <Paper background="medium" square style={styles.container}>
+        <Toolbar height={toolbarHeight} paddingBottom={toolbarPaddingBottom}>
+          <ToolbarGroup spaceOut>
+            {Object.keys(editors).map(editorId => {
+              const { icon, buttonId } = editors[editorId];
+              const isSelected = props.selectedEditorId === editorId;
+              return (
+                // $FlowFixMe[incompatible-type]
+                <IconButton
+                  color="default"
+                  key={editorId}
+                  disableRipple
+                  disableFocusRipple
+                  style={styles.iconButton}
+                  id={buttonId}
+                  onClick={() => {
+                    props.onSelectEditor(editorId);
+                  }}
+                  selected={isSelected}
+                >
+                  <span style={styles.buttonLabel}>{icon}</span>
+                </IconButton>
+              );
+            })}
+          </ToolbarGroup>
+        </Toolbar>
+      </Paper>
+    );
+  }
+);
 
 export default BottomToolbar;

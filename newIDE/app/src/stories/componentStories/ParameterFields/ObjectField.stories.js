@@ -16,7 +16,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => (
+export const Default = (): React.Node => (
   <ValueStateHolder
     initialValue={'MySpriteObject'}
     render={(value, onChange) => (
@@ -35,7 +35,7 @@ export const Default = () => (
   />
 );
 
-export const NonExistingObject = () => (
+export const NonExistingObject = (): React.Node => (
   <ValueStateHolder
     initialValue={'ThisObjectDoesNotExist'}
     render={(value, onChange) => (
@@ -55,7 +55,7 @@ export const NonExistingObject = () => (
 );
 NonExistingObject.storyName = 'Error: non existing object';
 
-export const WrongObjectType = () => {
+export const WrongObjectType = (): React.Node => {
   const instructionMetadata = gd.MetadataProvider.getConditionMetadata(
     gd.JsPlatform.get(),
     'AnimationEnded'
@@ -94,7 +94,7 @@ export const WrongObjectType = () => {
 };
 WrongObjectType.storyName = 'Error: wrong object type';
 
-export const WithRequiredBehavior = () => {
+export const WithRequiredBehavior = (): React.Node => {
   const instructionMetadata = gd.MetadataProvider.getActionMetadata(
     gd.JsPlatform.get(),
     'EffectCapability::EffectBehavior::EnableEffect'

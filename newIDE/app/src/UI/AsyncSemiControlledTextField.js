@@ -35,7 +35,7 @@ const AsyncSemiControlledTextField = ({
   emptyErrorText,
   onCancel,
   ...textFieldProps
-}: Props) => {
+}: Props): React.Node => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [internalErrorText, setInternalErrorText] = React.useState<?React.Node>(
     null
@@ -64,6 +64,7 @@ const AsyncSemiControlledTextField = ({
   };
 
   const onChangeValue = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     (e, _value) => {
       if (errorText) {
         setInternalErrorText(null);

@@ -4,6 +4,8 @@ import { isElseEventValid, getPreviousExecutableEventIndex } from '../helpers';
 
 const gd: libGDevelop = global.gd;
 
+// $FlowFixMe[recursive-definition]
+// $FlowFixMe[definition-cycle]
 const renderInstructionsAsText = ({
   instructionsList,
   padding,
@@ -108,6 +110,9 @@ ${actions}`,
   },
   'BuiltinCommonInstructions::While': ({ event, padding }) => {
     const whileEvent = gd.asWhileEvent(event);
+    const indexVarText = whileEvent.getLoopIndexVariableName()
+      ? ` (loop index variable: \`${whileEvent.getLoopIndexVariableName()}\`)`
+      : '';
     const whileConditions = renderInstructionsAsText({
       instructionsList: whileEvent.getWhileConditions(),
       padding: padding + ' ',
@@ -125,7 +130,7 @@ ${actions}`,
     });
 
     return {
-      content: `${padding}While these conditions are true:
+      content: `${padding}While these conditions are true${indexVarText}:
 ${whileConditions}
 ${padding}Then do:
 ${padding}Conditions:
@@ -136,6 +141,9 @@ ${actions}`,
   },
   'BuiltinCommonInstructions::Repeat': ({ event, padding }) => {
     const repeatEvent = gd.asRepeatEvent(event);
+    const indexVarText = repeatEvent.getLoopIndexVariableName()
+      ? ` (loop index variable: \`${repeatEvent.getLoopIndexVariableName()}\`)`
+      : '';
     const conditions = renderInstructionsAsText({
       instructionsList: repeatEvent.getConditions(),
       padding: padding + ' ',
@@ -150,7 +158,7 @@ ${actions}`,
     return {
       content: `${padding}Repeat \`${repeatEvent
         .getRepeatExpression()
-        .getPlainString()}\` times these:
+        .getPlainString()}\`${indexVarText} times these:
 ${padding}Conditions:
 ${conditions}
 ${padding}Actions:
@@ -159,6 +167,9 @@ ${actions}`,
   },
   'BuiltinCommonInstructions::ForEach': ({ event, padding }) => {
     const forEachEvent = gd.asForEachEvent(event);
+    const indexVarText = forEachEvent.getLoopIndexVariableName()
+      ? ` (loop index variable: \`${forEachEvent.getLoopIndexVariableName()}\`)`
+      : '';
     const conditions = renderInstructionsAsText({
       instructionsList: forEachEvent.getConditions(),
       padding: padding + ' ',
@@ -171,7 +182,7 @@ ${actions}`,
     });
 
     return {
-      content: `${padding}Repeat these separately for each instance of ${forEachEvent.getObjectToPick()}:
+      content: `${padding}Repeat these separately for each instance of ${forEachEvent.getObjectToPick()}${indexVarText}:
 ${padding}Conditions:
 ${conditions}
 ${padding}Actions:
@@ -180,6 +191,9 @@ ${actions}`,
   },
   'BuiltinCommonInstructions::ForEachChildVariable': ({ event, padding }) => {
     const forEachChildVariableEvent = gd.asForEachChildVariableEvent(event);
+    const indexVarText = forEachChildVariableEvent.getLoopIndexVariableName()
+      ? ` (loop index variable: \`${forEachChildVariableEvent.getLoopIndexVariableName()}\`)`
+      : '';
     const valueIteratorName = forEachChildVariableEvent.getValueIteratorVariableName();
     const keyIteratorName = forEachChildVariableEvent.getKeyIteratorVariableName();
     const iterableName = forEachChildVariableEvent.getIterableVariableName();
@@ -198,7 +212,7 @@ ${actions}`,
       content: `${padding}For each child in \`${iterableName ||
         '(no variable chosen yet)'}\`, store the child in variable \`${valueIteratorName ||
         '(ignored)'}\`, the child name in \`${keyIteratorName ||
-        '(ignored)'}\` and do:
+        '(ignored)'}\` and do${indexVarText}:
 ${padding}Conditions:
 ${padding}${conditions}
 ${padding}Actions:
@@ -241,6 +255,7 @@ ${padding}${actions}`,
   },
 };
 
+// $FlowFixMe[recursive-definition]
 const convertVariableToJsObject = (variable: gdVariable) => {
   if (variable.getType() === gd.Variable.String) {
     return variable.getString();
@@ -252,6 +267,7 @@ const convertVariableToJsObject = (variable: gdVariable) => {
     const childrenNames = variable.getAllChildrenNames().toJSArray();
     const object = {};
     childrenNames.forEach(childName => {
+      // $FlowFixMe[prop-missing]
       object[childName] = convertVariableToJsObject(
         variable.getChild(childName)
       );
@@ -259,6 +275,7 @@ const convertVariableToJsObject = (variable: gdVariable) => {
     return object;
   } else if (variable.getType() === gd.Variable.Array) {
     const children = variable.getAllChildrenArray();
+    // $FlowFixMe[incompatible-exact]
     return mapVector(children, child => convertVariableToJsObject(child));
   }
 
@@ -306,6 +323,7 @@ const renderEventAsText = ({
       : '';
 
   const textRenderer = eventsTextRenderers[event.getType()];
+  // $FlowFixMe[constant-condition]
   if (!textRenderer) {
     return `${padding}(This event is unknown/unsupported - ignored)`;
   }
@@ -405,12 +423,14 @@ export const renderNonTranslatedEventsAsText = ({
   eventsList,
 }: {
   eventsList: gdEventsList,
-}) => {
+}): string | 'Error while rendering events as text.' => {
   // Temporarily override the getTranslation function to return the original
   // string, so that events are always rendered in English.
-  // $FlowFixMe
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[prop-missing]
   const previousGetTranslation = gd.getTranslation;
-  // $FlowFixMe
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[prop-missing]
   gd.getTranslation = (str: string) => str;
 
   let text = '';
@@ -424,7 +444,8 @@ export const renderNonTranslatedEventsAsText = ({
     console.error('Error while rendering events as text:', error);
     text = 'Error while rendering events as text.';
   } finally {
-    // $FlowFixMe
+    // $FlowFixMe[incompatible-type]
+    // $FlowFixMe[prop-missing]
     gd.getTranslation = previousGetTranslation;
   }
 

@@ -53,11 +53,12 @@ export class ExternalEventsEditorContainer extends React.Component<
   editor: ?EventsSheetInterface;
   resourceExternallyChangedCallbackId: ?string;
 
+  // $FlowFixMe[missing-local-annot]
   state = {
     externalPropertiesDialogOpen: false,
   };
 
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     // We stop updates when the component is inactive.
     // If it's active, was active or becoming active again we let update propagate.
     // Especially important to note that when becoming inactive, a "last" update is allowed.
@@ -91,6 +92,10 @@ export class ExternalEventsEditorContainer extends React.Component<
       // from the previous editor (e.g., HomePage)
       this.props.setToolbar(null);
     }
+  }
+
+  scrollToEventPath(eventPath: Array<number>) {
+    if (this.editor) this.editor.scrollToEventPath(eventPath);
   }
 
   forceUpdateEditor() {
@@ -194,7 +199,7 @@ export class ExternalEventsEditorContainer extends React.Component<
     });
   };
 
-  onCreateEventsFunction = (extensionName, eventsFunction) => {
+  onCreateEventsFunction = (extensionName: any, eventsFunction: any) => {
     this.props.onCreateEventsFunction(
       extensionName,
       eventsFunction,
@@ -202,7 +207,7 @@ export class ExternalEventsEditorContainer extends React.Component<
     );
   };
 
-  render() {
+  render(): any {
     const { project, projectItemName } = this.props;
     const externalEvents = this.getExternalEvents();
     const layout = this.getLayout();
@@ -231,10 +236,12 @@ export class ExternalEventsEditorContainer extends React.Component<
             onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
             unsavedChanges={this.props.unsavedChanges}
             project={project}
+            // $FlowFixMe[incompatible-type]
             scope={scope}
             globalObjectsContainer={project.getObjects()}
             objectsContainer={layout.getObjects()}
             projectScopedContainersAccessor={
+              // $FlowFixMe[incompatible-type]
               new ProjectScopedContainersAccessor(scope)
             }
             events={externalEvents.getEvents()}
@@ -296,4 +303,4 @@ export class ExternalEventsEditorContainer extends React.Component<
 
 export const renderExternalEventsEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-) => <ExternalEventsEditorContainer {...props} />;
+): React.Node => <ExternalEventsEditorContainer {...props} />;

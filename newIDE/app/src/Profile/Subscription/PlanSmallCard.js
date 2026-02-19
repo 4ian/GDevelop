@@ -27,7 +27,7 @@ import GDevelopGLogo from '../../UI/CustomSvgIcons/GDevelopGLogo';
 export const formatPriceWithCurrency = (
   amountInCents: number,
   currency: string
-) => {
+): string => {
   if (currency === 'USD') {
     return `$${amountInCents / 100}`;
   }
@@ -297,7 +297,7 @@ const PlanSmallCard = ({
   isPending,
   hidePrice = false,
   background,
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { isMobile } = useResponsiveWindowSize();
 
@@ -366,6 +366,7 @@ const PlanSmallCard = ({
                       <Text noMargin color="primary">
                         <Trans>Redeemed</Trans>
                       </Text>
+                      {/* $FlowFixMe[constant-condition] */}
                       {!!redemptionCodeExpirationDate && (
                         <Tooltip
                           title={
@@ -407,6 +408,7 @@ const PlanSmallCard = ({
                           ) : (
                             <CheckCircle style={styles.bulletIcon} />
                           )}
+                          {/* $FlowFixMe[incompatible-type] */}
                           <Text style={styles.bulletText}>
                             {selectMessageByLocale(i18n, bulletPointByLocale)}
                           </Text>

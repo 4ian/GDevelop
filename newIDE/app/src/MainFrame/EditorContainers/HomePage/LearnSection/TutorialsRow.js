@@ -44,7 +44,7 @@ export const TutorialsRow = ({
   onSelectCategory,
   onSelectTutorial,
   getColumnsFromWindowSize,
-}: TutorialsRowProps) => {
+}: TutorialsRowProps): React.Node => {
   const {
     tutorials,
     error: tutorialLoadingError,
@@ -115,6 +115,7 @@ export const TutorialsRow = ({
         <ImageTileRow
           title={title}
           description={description}
+          // $FlowFixMe[incompatible-type]
           items={getItems(i18n)}
           isLoading={!tutorials}
           onShowAll={() => onSelectCategory(category)}

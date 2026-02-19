@@ -69,7 +69,7 @@ const ProjectResourcesChooser = ({
   onResourcesSelected,
   resourceKind,
   multiSelection,
-}: Props) => {
+}: Props): React.Node => {
   const [searchText, setSearchText] = React.useState<string>('');
 
   const searchResults = React.useMemo(

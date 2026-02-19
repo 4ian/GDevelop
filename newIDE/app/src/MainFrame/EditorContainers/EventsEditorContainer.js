@@ -20,7 +20,7 @@ import {
 export class EventsEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?EventsSheetInterface;
 
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     // We stop updates when the component is inactive.
     // If it's active, was active or becoming active again we let update propagate.
     // Especially important to note that when becoming inactive, a "last" update is allowed.
@@ -61,6 +61,10 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
       // from the previous editor (e.g., HomePage)
       this.props.setToolbar(null);
     }
+  }
+
+  scrollToEventPath(eventPath: Array<number>) {
+    if (this.editor) this.editor.scrollToEventPath(eventPath);
   }
 
   forceUpdateEditor() {
@@ -128,7 +132,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     });
   };
 
-  onCreateEventsFunction = (extensionName, eventsFunction) => {
+  onCreateEventsFunction = (extensionName: any, eventsFunction: any) => {
     this.props.onCreateEventsFunction(
       extensionName,
       eventsFunction,
@@ -136,7 +140,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     );
   };
 
-  render() {
+  render(): any {
     const { project, projectItemName } = this.props;
     const layout = this.getLayout();
     if (!layout || !project) {
@@ -149,6 +153,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
       layout,
     };
     const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+      // $FlowFixMe[incompatible-type]
       scope
     );
 
@@ -163,6 +168,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
         onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
         unsavedChanges={this.props.unsavedChanges}
         project={project}
+        // $FlowFixMe[incompatible-type]
         scope={scope}
         globalObjectsContainer={project.getObjects()}
         objectsContainer={layout.getObjects()}
@@ -180,4 +186,4 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
 
 export const renderEventsEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-) => <EventsEditorContainer {...props} />;
+): React.Node => <EventsEditorContainer {...props} />;

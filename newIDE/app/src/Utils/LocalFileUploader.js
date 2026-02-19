@@ -6,6 +6,7 @@ const fs = optionalRequire('fs');
 const readLocalFileToArrayBuffer = async (
   filePath: string
 ): Promise<ArrayBuffer> => {
+  // $FlowFixMe[cannot-resolve-name]
   const buffer: Buffer = await new Promise((resolve, reject) => {
     fs.readFile(filePath, function(err, buffer) {
       if (err) {

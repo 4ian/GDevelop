@@ -15,6 +15,7 @@ namespace gd {
 RepeatEvent::RepeatEvent()
     : BaseEvent(),
       repeatNumberExpression(""),
+      variables(gd::VariablesContainer::SourceType::Local),
       repeatNumberExpressionSelected(false) {}
 
 vector<gd::InstructionsList*> RepeatEvent::GetAllConditionsVectors() {
@@ -79,6 +80,12 @@ void RepeatEvent::SerializeTo(SerializerElement& element) const {
   if (!events.IsEmpty())
     gd::EventsListSerialization::SerializeEventsTo(events,
                                                   element.AddChild("events"));
+  if (HasVariables()) {
+    variables.SerializeTo(element.AddChild("variables"));
+  }
+  if (!loopIndexVariableName.empty()) {
+    element.AddChild("loopIndexVariable").SetStringValue(loopIndexVariableName);
+  }
 }
 
 void RepeatEvent::UnserializeFrom(gd::Project& project,
@@ -97,6 +104,16 @@ void RepeatEvent::UnserializeFrom(gd::Project& project,
     gd::EventsListSerialization::UnserializeEventsFrom(
         project, events, element.GetChild("events", 0, "Events"));
   }
+
+  variables.Clear();
+  if (element.HasChild("variables")) {
+    variables.UnserializeFrom(element.GetChild("variables"));
+  }
+
+  loopIndexVariableName =
+      element.HasChild("loopIndexVariable")
+          ? element.GetChild("loopIndexVariable").GetStringValue()
+          : "";
 }
 
 }  // namespace gd

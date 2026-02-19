@@ -15,7 +15,7 @@ import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 
 const gd: libGDevelop = global.gd;
 
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectSkinNameField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?(
       | GenericExpressionField
@@ -97,6 +97,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [project, objectName, globalObjectsContainer, objectsContainer]
     );
 
+    // $FlowFixMe[missing-local-annot]
     const onChangeSelectValue = (event, value) => {
       props.onChange(event.target.value);
     };
@@ -140,4 +141,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </SelectField>
     );
   }
-);
+): React.ComponentType<{
+  ...ParameterFieldProps,
+  +ref?: React.RefSetter<ParameterFieldInterface>,
+}>);

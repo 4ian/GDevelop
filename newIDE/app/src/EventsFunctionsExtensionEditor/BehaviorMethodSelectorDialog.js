@@ -46,6 +46,7 @@ const MethodListItem = ({
   description: React.Node,
 |}) => {
   return (
+    // $FlowFixMe[incompatible-type]
     <ListItem
       leftIcon={icon}
       primaryText={name}
@@ -67,7 +68,7 @@ export default function BehaviorMethodSelectorDialog({
   eventsBasedBehavior,
   onChoose,
   onCancel,
-}: Props) {
+}: Props): React.Node {
   const eventsFunctions = eventsBasedBehavior.getEventsFunctions();
   const [showAdvanced, setShowAdvanced] = React.useState(false);
 

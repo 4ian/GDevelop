@@ -62,6 +62,7 @@ const makeMoveUrlResourcesToCloudFilesIfPrivateOptions = (
   project,
   fileMetadata: { fileIdentifier: 'fake-cloud-project-id' },
   authenticatedUser: fakeSilverAuthenticatedUser,
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   onProgress: jest.fn(),
 });
 
@@ -129,6 +130,7 @@ describe('CloudResourceFetcher', () => {
     ]);
 
     const options = makeMoveUrlResourcesToCloudFilesIfPrivateOptions(project);
+    // $FlowFixMe[incompatible-type]
     await moveUrlResourcesToCloudFilesIfPrivate(options);
 
     expect(downloadUrlsToBlobs).toHaveBeenCalledWith({

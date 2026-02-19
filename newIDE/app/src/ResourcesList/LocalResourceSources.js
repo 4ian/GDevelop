@@ -48,6 +48,7 @@ const ResourceStoreChooser = ({
       onSelectResource={onSelectResource}
       resourceKind={
         // $FlowIgnore - Flow does not understand the check above restricts the resource kind.
+        // $FlowFixMe[incompatible-type]
         resourceKind
       }
     />
@@ -74,6 +75,7 @@ const localResourceSources: Array<ResourceSource> = [
         if (options.multiSelection) properties.push('multiSelections');
 
         const projectPath = path.dirname(project.getProjectFile());
+        // $FlowFixMe[incompatible-type]
         const latestPath = getLastUsedPath(project, kind) || projectPath;
 
         const browserWindow = remote.getCurrentWindow();
@@ -88,6 +90,7 @@ const localResourceSources: Array<ResourceSource> = [
         if (!filePaths || !filePaths.length) return [];
 
         const lastUsedPath = path.parse(filePaths[0]).dir;
+        // $FlowFixMe[incompatible-type]
         setLastUsedPath(project, kind, lastUsedPath);
 
         let hasFilesOutsideProjectFolder = filePaths.some(
@@ -106,6 +109,7 @@ const localResourceSources: Array<ResourceSource> = [
             const embeddedResourseParser =
               embeddedResourcesParsers[initialEmbeddedResource.resourceKind];
 
+            // $FlowFixMe[constant-condition]
             if (!embeddedResourseParser) continue;
 
             const { fullPath } = initialEmbeddedResource;
@@ -121,6 +125,7 @@ const localResourceSources: Array<ResourceSource> = [
             }
           }
         };
+        // $FlowFixMe[constant-condition]
         if (parseEmbeddedResources) {
           for (const filePath of filePaths) {
             const embeddedResources = await parseEmbeddedResources(
@@ -216,7 +221,9 @@ const localResourceSources: Array<ResourceSource> = [
         onlyForStorageProvider: 'LocalFile',
         shouldCreateResource: true,
         shouldGuessAnimationsFromName: true,
+        // $FlowFixMe[incompatible-type]
         kind,
+        // $FlowFixMe[incompatible-type]
         selectResourcesHeadless: selectLocalFileResources,
         renderComponent: (props: ResourceSourceComponentProps) => (
           <Line justifyContent="center">
@@ -243,6 +250,7 @@ const localResourceSources: Array<ResourceSource> = [
                 });
 
                 props.onChooseResources({
+                  // $FlowFixMe[incompatible-type]
                   selectedResources,
                   selectedSourceName: sourceName,
                 });
@@ -255,6 +263,7 @@ const localResourceSources: Array<ResourceSource> = [
   ),
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => {
     const sourceName = `upload-${kind}`;
+    // $FlowFixMe[incompatible-type]
     return {
       name: sourceName,
       displayName: t`File(s) from your device`,
@@ -288,6 +297,7 @@ const localResourceSources: Array<ResourceSource> = [
       );
       if (!source) return null;
       const sourceName = 'resource-store-' + kind;
+      // $FlowFixMe[incompatible-type]
       return {
         name: sourceName,
         displayName: t`Choose from asset store`,
@@ -338,6 +348,7 @@ const localResourceSources: Array<ResourceSource> = [
     .filter(Boolean),
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => {
     const sourceName = `project-resources-${kind}`;
+    // $FlowFixMe[incompatible-type]
     return {
       name: sourceName,
       displayName: t`Project resources`,
@@ -350,6 +361,7 @@ const localResourceSources: Array<ResourceSource> = [
         <ProjectResourcesChooser
           project={props.project}
           onResourcesSelected={props.onResourcesSelected}
+          // $FlowFixMe[incompatible-type]
           resourceKind={kind}
           key={`project-resources-${kind}`}
           multiSelection={props.options.multiSelection}

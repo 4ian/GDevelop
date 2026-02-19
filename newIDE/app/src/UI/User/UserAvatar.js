@@ -16,7 +16,10 @@ const styles = {
 
 type Props = {| iconUrl: string, isPremium: boolean |};
 
-export default function UserAvatar({ iconUrl, isPremium }: Props) {
+export default function UserAvatar({
+  iconUrl,
+  isPremium,
+}: Props): React.MixedElement | React.Node {
   return isPremium ? (
     <div className={classes.premiumContainer}>
       <Avatar src={iconUrl} style={styles.premiumAvatar} />

@@ -4,8 +4,10 @@ import jsSHA from './Crypto/sha512';
 const digestWithSha512TruncatedTo256 = (
   arrayBuffer: ArrayBuffer
 ): Promise<string> => {
-  // $FlowFixMe - Flow does not know about crypto API
+  // $FlowFixMe[incompatible-type] - Flow does not know about crypto API
+  // $FlowFixMe[cannot-resolve-name]
   if (crypto && crypto.subtle) {
+    // $FlowFixMe[cannot-resolve-name]
     crypto.subtle.digest('SHA-512', arrayBuffer).then(hashBuffer => {
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const hashHexString = hashArray
@@ -35,7 +37,8 @@ export const getFileSha512TruncatedTo256 = async (
 
     fileReader.onload = function(event) {
       const arrayBuffer: string | ArrayBuffer | null = event.target
-        ? // $FlowFixMe - using the type inferred by TypeScript.
+        ? // $FlowFixMe[incompatible-type] - using the type inferred by TypeScript.
+          // $FlowFixMe[prop-missing]
           event.target.result
         : null;
       if (arrayBuffer instanceof ArrayBuffer) {

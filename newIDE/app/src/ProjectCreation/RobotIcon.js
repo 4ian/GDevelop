@@ -4,6 +4,7 @@ import RobotFace from '../UI/CustomSvgIcons/RobotFace';
 import { makeStyles } from '@material-ui/core';
 import RobotFaceSad from '../UI/CustomSvgIcons/RobotFaceSad';
 
+// $FlowFixMe[missing-local-annot]
 const useClasses = (rotating, size) =>
   makeStyles(theme => ({
     container: {
@@ -46,7 +47,11 @@ const useClasses = (rotating, size) =>
 
 type Props = {| rotating?: boolean, size?: number, sad?: boolean |};
 
-export default function RobotIcon({ rotating, size, sad }: Props) {
+export default function RobotIcon({
+  rotating,
+  size,
+  sad,
+}: Props): React.MixedElement {
   const sizeOrDefaultSize = size || 34;
 
   const classes = useClasses(rotating, sizeOrDefaultSize);

@@ -39,7 +39,7 @@ const ObjectGroupEditor = ({
   onObjectAdded,
   onObjectRemoved,
   isObjectListLocked,
-}: Props) => {
+}: Props): React.Node => {
   const [objectName, setObjectName] = React.useState<string>('');
 
   const addObject = React.useCallback(
@@ -60,7 +60,10 @@ const ObjectGroupEditor = ({
         .get()
         .getObjectsContainersList()
         .getTypeOfObject(objectName);
+      // $FlowFixMe[invalid-compare]
+      // $FlowFixMe[incompatible-type]
       if (type === undefined || objectType === type) type = objectType;
+      // $FlowFixMe[incompatible-type]
       else type = '';
     });
 

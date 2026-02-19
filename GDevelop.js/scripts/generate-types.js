@@ -331,7 +331,9 @@ type CustomObjectConfiguration_EdgeAnchor = 0 | 1 | 2 | 3 | 4`
         '  getTypeOfBehaviorInObjectOrGroup(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): string;',
         '  getBehaviorNamesInObjectOrGroup(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): gdVectorString;',
         '',
+        '  // $FlowFixMe[cannot-resolve-name]',
         '  removeFromVectorParameterMetadata(gdVectorParameterMetadata, index: number): void;',
+        '  // $FlowFixMe[cannot-resolve-name]',
         '  swapInVectorParameterMetadata(gdVectorParameterMetadata, oldIndex: number, newIndex: number): void;',
         '',
         `  asStandardEvent(gdBaseEvent): gdStandardEvent;`,
@@ -351,6 +353,7 @@ type CustomObjectConfiguration_EdgeAnchor = 0 | 1 | 2 | 3 | 4`
         `  asPanelSpriteConfiguration(gdObjectConfiguration): gdPanelSpriteObject;`,
         `  asTextObjectConfiguration(gdObjectConfiguration): gdTextObject;`,
         `  asShapePainterConfiguration(gdObjectConfiguration): gdShapePainterObject;`,
+        `  // $FlowFixMe[cannot-resolve-name]`,
         `  asAdMobConfiguration(gdObjectConfiguration): gdAdMobObject;`,
         `  asTextEntryConfiguration(gdObjectConfiguration): gdTextEntryObject;`,
         `  asParticleEmitterConfiguration(gdObjectConfiguration): gdParticleEmitterObject;`,
@@ -448,6 +451,37 @@ type CustomObjectConfiguration_EdgeAnchor = 0 | 1 | 2 | 3 | 4`
       'declare class gdAbstractFileSystemJS extends gdAbstractFileSystem {',
       'types/gdabstractfilesystemjs.js'
     );
+    // Add $FlowFixMe comments to suppress Flow errors for methods with
+    // incompatible types (overriding parent class methods) or unresolvable names.
+    ['getProperties', 'updateProperty', 'initializeContent'].forEach(
+      (method) => {
+        shell.sed(
+          '-i',
+          new RegExp(`  ${method}\\(`),
+          `  // $FlowFixMe[incompatible-type]\n  ${method}(`,
+          'types/gdbehaviorjsimplementation.js'
+        );
+        shell.sed(
+          '-i',
+          new RegExp(`  ${method}\\(`),
+          `  // $FlowFixMe[incompatible-type]\n  ${method}(`,
+          'types/gdbehaviorshareddatajsimplementation.js'
+        );
+      }
+    );
+    shell.sed(
+      '-i',
+      /  ObjectCodeGenerator:/,
+      '  // $FlowFixMe[cannot-resolve-name]\n  ObjectCodeGenerator:',
+      'types/libgdevelop.js'
+    );
+    shell.sed(
+      '-i',
+      /  Exporter:/,
+      '  // $FlowFixMe[cannot-resolve-name]\n  Exporter:',
+      'types/libgdevelop.js'
+    );
+
     [
       'BaseEvent',
       'StandardEvent',
@@ -487,13 +521,13 @@ type CustomObjectConfiguration_EdgeAnchor = 0 | 1 | 2 | 3 | 4`
     shell.sed(
       '-i',
       /setKind\(kind: string\): void/,
-      "setKind(kind: 'image' | 'audio' | 'font' | 'video' | 'json' | 'tilemap' | 'tileset' | 'model3D' | 'atlas' | 'spine'): void",
+      "setKind(kind: 'image' | 'audio' | 'font' | 'video' | 'json' | 'tilemap' | 'tileset' | 'model3D' | 'atlas' | 'spine' | 'bitmapFont'): void",
       'types/gdresource.js'
     );
     shell.sed(
       '-i',
       /getKind\(\): string/,
-      "getKind(): 'image' | 'audio' | 'font' | 'video' | 'json' | 'tilemap' | 'tileset' | 'model3D' | 'atlas' | 'spine'",
+      "getKind(): 'image' | 'audio' | 'font' | 'video' | 'json' | 'tilemap' | 'tileset' | 'model3D' | 'atlas' | 'spine' | 'bitmapFont'",
       'types/gdresource.js'
     );
 

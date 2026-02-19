@@ -26,7 +26,7 @@ import Functions from '@material-ui/icons/Functions';
 
 const gd: libGDevelop = global.gd;
 
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectEffectParameterNameField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?GenericExpressionField | SelectFieldInterface>(
       null
@@ -96,11 +96,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           // If the instruction targets a group, we check that the effect behind
           // the effect name on every object of the group is of the same type.
           const effectTypes: Array<string | null> = mapVector(
+            // $FlowFixMe[incompatible-exact]
             group.getAllObjectsNames(),
             objectName => {
               const object = getObjectByName(
                 globalObjectsContainer,
                 objectsContainer,
+                // $FlowFixMe[incompatible-type]
                 objectName
               );
               if (!object) {
@@ -155,6 +157,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       setIsExpressionField(!isExpressionField);
     };
 
+    // $FlowFixMe[missing-local-annot]
     const onChangeSelectValue = (event, value) => {
       props.onChange(event.target.value);
     };
@@ -247,4 +250,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-);
+): React.ComponentType<{
+  ...ParameterFieldProps,
+  +ref?: React.RefSetter<ParameterFieldInterface>,
+}>);

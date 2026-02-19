@@ -192,6 +192,7 @@ import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
 import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
+import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
 import useSaveReminder from './UseSaveReminder';
 import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
 import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
@@ -212,6 +213,7 @@ import {
   isEditorHotReloadNeeded,
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import useHomePageSwitch from './useHomePageSwitch';
+import { useNavigationToEvent } from './UseNavigationToEvent';
 import RobotIcon from '../ProjectCreation/RobotIcon';
 import PublicProfileContext from '../Profile/PublicProfileContext';
 import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
@@ -355,6 +357,7 @@ export type Props = {|
   renderPreviewLauncher?: (
     props: PreviewLauncherProps,
     ref: (previewLauncher: ?PreviewLauncherInterface) => void
+    // $FlowFixMe[prop-missing]
   ) => React.Element<PreviewLauncherComponent>,
   onEditObject?: gdObject => void,
   storageProviders: Array<StorageProvider>,
@@ -379,7 +382,7 @@ export type Props = {|
   i18n: I18n,
 |};
 
-const MainFrame = (props: Props) => {
+const MainFrame = (props: Props): React.MixedElement => {
   const [state, setState]: [
     State,
     ((State => State) | State) => Promise<State>,
@@ -466,6 +469,57 @@ const MainFrame = (props: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
   const { previewLoadingRef, setPreviewLoading } = usePreviewLoadingState();
+  const shortcutMap = useShortcutMap();
+  const [
+    diagnosticReportDialogOpen,
+    setDiagnosticReportDialogOpen,
+  ] = React.useState<boolean>(false);
+
+  /**
+   * Checks for diagnostic errors in the project if blocking is enabled.
+   * Returns true if there are errors and the action should be blocked.
+   */
+  const checkDiagnosticErrorsAndIfShouldBlock = React.useCallback(
+    async (
+      project: ?gdProject,
+      actionType: 'preview' | 'export'
+    ): Promise<boolean> => {
+      if (
+        !project ||
+        !preferences.getBlockPreviewAndExportOnDiagnosticErrors()
+      ) {
+        return false;
+      }
+
+      try {
+        const validationErrors = scanProjectForValidationErrors(project);
+        if (validationErrors.length > 0) {
+          const openReport = await showConfirmation({
+            title: t`Diagnostic errors found`,
+            message:
+              actionType === 'preview'
+                ? t`Your project has ${
+                    validationErrors.length
+                  } diagnostic error(s). Please fix them before launching a preview.`
+                : t`Your project has ${
+                    validationErrors.length
+                  } diagnostic error(s). Please fix them before exporting.`,
+            dismissButtonLabel: t`Close`,
+            confirmButtonLabel: t`Open report`,
+          });
+          if (openReport) {
+            setDiagnosticReportDialogOpen(true);
+          }
+          return true;
+        }
+      } catch (error) {
+        console.error('Error scanning project for validation errors:', error);
+      }
+
+      return false;
+    },
+    [preferences, showConfirmation, setDiagnosticReportDialogOpen]
+  );
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
@@ -535,10 +589,9 @@ const MainFrame = (props: Props) => {
     quitInAppTutorialDialogOpen,
     setQuitInAppTutorialDialogOpen,
   ] = React.useState<boolean>(false);
-  const [
-    diagnosticReportDialogOpen,
-    setDiagnosticReportDialogOpen,
-  ] = React.useState<boolean>(false);
+  const { setPendingEventNavigation } = useNavigationToEvent({
+    editorTabs: state.editorTabs,
+  });
   const [
     fileMetadataOpeningProgress,
     setFileMetadataOpeningProgress,
@@ -751,6 +804,7 @@ const MainFrame = (props: Props) => {
   );
 
   const setEditorTabs = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     newEditorTabs => {
       setState(state => ({
         ...state,
@@ -769,6 +823,7 @@ const MainFrame = (props: Props) => {
       : null,
     editorTabs: state.editorTabs,
     setEditorTabs: setEditorTabs,
+    // $FlowFixMe[incompatible-type]
     getEditorOpeningOptions,
   });
 
@@ -807,13 +862,19 @@ const MainFrame = (props: Props) => {
   );
 
   const openShareDialog = React.useCallback(
-    (initialTab?: ShareTab) => {
+    async (initialTab?: ShareTab) => {
+      if (
+        await checkDiagnosticErrorsAndIfShouldBlock(currentProject, 'export')
+      ) {
+        return;
+      }
+
       notifyPreviewOrExportWillStart(state.editorTabs);
 
       setShareDialogInitialTab(initialTab || null);
       setShareDialogOpen(true);
     },
-    [state.editorTabs]
+    [state.editorTabs, currentProject, checkDiagnosticErrorsAndIfShouldBlock]
   );
 
   const closeShareDialog = React.useCallback(
@@ -912,6 +973,7 @@ const MainFrame = (props: Props) => {
             );
             newEditorTabs = openEditorTab(
               newEditorTabs,
+              // $FlowFixMe[incompatible-type]
               getEditorOpeningOptions({
                 kind: 'ask-ai',
                 name: '',
@@ -924,6 +986,7 @@ const MainFrame = (props: Props) => {
 
         newEditorTabs = openEditorTab(
           newEditorTabs,
+          // $FlowFixMe[incompatible-type]
           getEditorOpeningOptions({
             kind: 'ask-ai',
             name: '',
@@ -1040,7 +1103,8 @@ const MainFrame = (props: Props) => {
   const loadFromProject = React.useCallback(
     async (project: gdProject, fileMetadata: ?FileMetadata): Promise<State> => {
       let updatedFileMetadata: ?FileMetadata = fileMetadata
-        ? updateFileMetadataWithOpenedProject(fileMetadata, project)
+        ? // $FlowFixMe[incompatible-type]
+          updateFileMetadataWithOpenedProject(fileMetadata, project)
         : null;
 
       if (updatedFileMetadata) {
@@ -1354,6 +1418,7 @@ const MainFrame = (props: Props) => {
       // it can have been updated in the meantime (gameId, project name, etc...).
       // Use the ref here to be sure to have the latest file metadata.
       if (currentFileMetadataRef.current) {
+        // $FlowFixMe[incompatible-type]
         const newFileMetadata: FileMetadata = updateFileMetadataWithOpenedProject(
           currentFileMetadataRef.current,
           project
@@ -2113,6 +2178,7 @@ const MainFrame = (props: Props) => {
     );
   };
 
+  // $FlowFixMe[missing-local-annot]
   const setPreviewOverride = ({
     isPreviewOverriden,
     overridenPreviewLayoutName,
@@ -2182,6 +2248,12 @@ const MainFrame = (props: Props) => {
     }: LaunchPreviewOptions) => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
+
+      if (
+        await checkDiagnosticErrorsAndIfShouldBlock(currentProject, 'preview')
+      ) {
+        return;
+      }
 
       console.info(
         `Launching a new ${
@@ -2400,6 +2472,7 @@ const MainFrame = (props: Props) => {
       inGameEditorSettings,
       previewLoadingRef,
       setPreviewLoading,
+      checkDiagnosticErrorsAndIfShouldBlock,
     ]
   );
 
@@ -2410,6 +2483,7 @@ const MainFrame = (props: Props) => {
   );
 
   const launchNewPreview = React.useCallback(
+    // $FlowFixMe[missing-local-annot]
     async options => {
       const launchCaptureOptions =
         currentProject && !hasNonEditionPreviewsRunning
@@ -2587,10 +2661,12 @@ const MainFrame = (props: Props) => {
       });
 
       const tabsWithSceneEditor = openSceneEditor
-        ? openEditorTab(editorTabs, sceneEditorOptions)
+        ? // $FlowFixMe[incompatible-type]
+          openEditorTab(editorTabs, sceneEditorOptions)
         : editorTabs;
       return openEventsEditor
-        ? openEditorTab(tabsWithSceneEditor, eventsEditorOptions)
+        ? // $FlowFixMe[incompatible-type]
+          openEditorTab(tabsWithSceneEditor, eventsEditorOptions)
         : tabsWithSceneEditor;
     },
     [getEditorOpeningOptions]
@@ -2636,6 +2712,7 @@ const MainFrame = (props: Props) => {
         ...state,
         editorTabs: openEditorTab(
           state.editorTabs,
+          // $FlowFixMe[incompatible-type]
           getEditorOpeningOptions({ kind: 'external events', name })
         ),
       }));
@@ -2649,6 +2726,7 @@ const MainFrame = (props: Props) => {
         ...state,
         editorTabs: openEditorTab(
           state.editorTabs,
+          // $FlowFixMe[incompatible-type]
           getEditorOpeningOptions({ kind: 'external layout', name })
         ),
       }));
@@ -2665,6 +2743,7 @@ const MainFrame = (props: Props) => {
     ) => {
       setState(state => ({
         ...state,
+        // $FlowFixMe[incompatible-type]
         editorTabs: openEditorTab(state.editorTabs, {
           ...getEditorOpeningOptions({
             kind: 'events functions extension',
@@ -2688,6 +2767,7 @@ const MainFrame = (props: Props) => {
         ...state,
         editorTabs: openEditorTab(
           state.editorTabs,
+          // $FlowFixMe[incompatible-type]
           getEditorOpeningOptions({ kind: 'resources', name: '' })
         ),
       }));
@@ -2701,6 +2781,7 @@ const MainFrame = (props: Props) => {
         ...state,
         editorTabs: openEditorTab(
           state.editorTabs,
+          // $FlowFixMe[incompatible-type]
           getEditorOpeningOptions({ kind: 'start page', name: '' })
         ),
       }));
@@ -2730,6 +2811,7 @@ const MainFrame = (props: Props) => {
         ...state,
         editorTabs: openEditorTab(
           state.editorTabs,
+          // $FlowFixMe[incompatible-type]
           getEditorOpeningOptions({ kind: 'debugger', name: '' })
         ),
       }));
@@ -2849,6 +2931,7 @@ const MainFrame = (props: Props) => {
         // Open a new editor for the extension and the given function
         setState(state => ({
           ...state,
+          // $FlowFixMe[incompatible-type]
           editorTabs: openEditorTab(state.editorTabs, {
             ...getEditorOpeningOptions({
               kind: 'custom object',
@@ -2882,6 +2965,7 @@ const MainFrame = (props: Props) => {
       setState(state => ({
         ...state,
         editorTabs: openEditorTab(
+          // $FlowFixMe[incompatible-type]
           openEditorTab(state.editorTabs, {
             ...getEditorOpeningOptions({
               kind: 'events functions extension',
@@ -2894,6 +2978,7 @@ const MainFrame = (props: Props) => {
               initiallyFocusedObjectName: eventsBasedObject.getName(),
             },
           }),
+          // $FlowFixMe[incompatible-type]
           {
             ...getEditorOpeningOptions({
               kind: 'custom object',
@@ -4217,6 +4302,7 @@ const MainFrame = (props: Props) => {
         newFileMetadata = { ...newFileMetadata, ...fileMetadataNewAttributes };
       }
     }
+    // $FlowFixMe[incompatible-type]
     await setState(state => ({
       ...state,
       currentFileMetadata: newFileMetadata,
@@ -4501,6 +4587,7 @@ const MainFrame = (props: Props) => {
   );
 
   /** (Stable) callback to launch the fetching of the resources of the project. */
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const onFetchNewlyAddedResources = useStableUpToDateCallback(
     fetchNewlyAddedResources
   );
@@ -4644,6 +4731,7 @@ const MainFrame = (props: Props) => {
     onLaunchDebugPreview: launchDebuggerAndPreview,
     onLaunchNetworkPreview: launchNetworkPreview,
     onLaunchPreviewWithDiagnosticReport: launchPreviewWithDiagnosticReport,
+    onOpenDiagnosticReport: () => setDiagnosticReportDialogOpen(true),
     onOpenHomePage: openHomePage,
     onCreateProject: () => setNewProjectSetupDialogOpen(true),
     onOpenProject: () => openOpenFromStorageProviderDialog(),
@@ -4653,8 +4741,12 @@ const MainFrame = (props: Props) => {
     onCloseProject: async () => {
       askToCloseProject();
     },
-    onExportGame: () => openShareDialog('publish'),
-    onInviteCollaborators: () => openShareDialog('invite'),
+    onExportGame: () => {
+      openShareDialog('publish');
+    },
+    onInviteCollaborators: () => {
+      openShareDialog('invite');
+    },
     onOpenLayout: name => {
       openLayout(name);
     },
@@ -4737,7 +4829,6 @@ const MainFrame = (props: Props) => {
     previewLoading === 'hot-reload-for-in-game-edition';
   const showLoaderImmediately =
     isProjectOpening || isLoadingProject || previewLoading === 'preview';
-  const shortcutMap = useShortcutMap();
 
   const buildMainMenuProps = {
     i18n: i18n,
@@ -4756,8 +4847,12 @@ const MainFrame = (props: Props) => {
     onShowVersionHistory: openVersionHistoryPanel,
     onCloseProject: askToCloseProject,
     onCloseApp: closeApp,
-    onExportProject: () => openShareDialog('publish'),
-    onInviteCollaborators: () => openShareDialog('invite'),
+    onExportProject: () => {
+      openShareDialog('publish');
+    },
+    onInviteCollaborators: () => {
+      openShareDialog('invite');
+    },
     onCreateProject: () => setNewProjectSetupDialogOpen(true),
     onOpenProjectManager: () => openProjectManager(true),
     onOpenHomePage: openHomePage,
@@ -4800,7 +4895,9 @@ const MainFrame = (props: Props) => {
     saveProjectAsWithStorageProvider: saveProjectAsWithStorageProvider,
     onCheckoutVersion: onCheckoutVersion,
     getOrLoadProjectVersion: getOrLoadProjectVersion,
-    openShareDialog: openShareDialog,
+    openShareDialog: tab => {
+      openShareDialog(tab);
+    },
     launchDebuggerAndPreview: launchDebuggerAndPreview,
     launchNewPreview: launchNewPreview,
     launchNetworkPreview: launchNetworkPreview,
@@ -4812,6 +4909,7 @@ const MainFrame = (props: Props) => {
     onOpenAskAi: openAskAi,
     onCloseAskAi: closeAskAi,
     getStorageProvider: getStorageProvider,
+    // $FlowFixMe[incompatible-type]
     setPreviewedLayout: setPreviewedLayout,
     openExternalEvents: openExternalEvents,
     openLayout: openLayout,
@@ -4898,7 +4996,9 @@ const MainFrame = (props: Props) => {
             sourceGameId: quickCustomizationDialogOpenedFromGameId || '',
             getIncludeFileHashs:
               eventsFunctionsExtensionsContext.getIncludeFileHashs,
-            onExport: () => openShareDialog('publish'),
+            onExport: () => {
+              openShareDialog('publish');
+            },
             onCaptureFinished,
           },
           (previewLauncher: ?PreviewLauncherInterface) => {
@@ -4959,7 +5059,9 @@ const MainFrame = (props: Props) => {
           onExtensionInstalled={onExtensionInstalled}
           onSceneAdded={onSceneAdded}
           onExternalLayoutAdded={onExternalLayoutAdded}
-          onShareProject={() => openShareDialog()}
+          onShareProject={() => {
+            openShareDialog();
+          }}
           isOpen={projectManagerOpen}
           hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
           resourceManagementProps={resourceManagementProps}
@@ -4968,6 +5070,7 @@ const MainFrame = (props: Props) => {
           onOpenHomePage={openHomePage}
           toggleProjectManager={toggleProjectManager}
           mainMenuCallbacks={mainMenuCallbacks}
+          // $FlowFixMe[incompatible-type]
           buildMainMenuProps={buildMainMenuProps}
         />
       </ProjectManagerDrawer>
@@ -5265,8 +5368,29 @@ const MainFrame = (props: Props) => {
       )}
       {diagnosticReportDialogOpen && currentProject && (
         <DiagnosticReportDialog
+          project={currentProject}
           wholeProjectDiagnosticReport={currentProject.getWholeProjectDiagnosticReport()}
           onClose={() => setDiagnosticReportDialogOpen(false)}
+          onNavigateToLayoutEvent={(layoutName, eventPath) => {
+            setPendingEventNavigation({
+              name: layoutName,
+              locationType: 'layout',
+              eventPath,
+            });
+            openLayout(layoutName, {
+              openEventsEditor: true,
+              openSceneEditor: false,
+              focusWhenOpened: 'events',
+            });
+          }}
+          onNavigateToExternalEventsEvent={(externalEventsName, eventPath) => {
+            setPendingEventNavigation({
+              name: externalEventsName,
+              locationType: 'external-events',
+              eventPath,
+            });
+            openExternalEvents(externalEventsName);
+          }}
         />
       )}
       {standaloneDialogOpen && (

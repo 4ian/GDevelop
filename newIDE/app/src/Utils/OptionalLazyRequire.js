@@ -8,7 +8,7 @@ import optionalRequire from './OptionalRequire';
  * This means that this module will only be available when running on Electron or Node.js.
  * When running without Electron or Node.js, `null` will be returned.
  */
-export default function optionalLazyRequire(moduleName: string) {
+export default function optionalLazyRequire(moduleName: string): () => ?any {
   let moduleLoaded = false;
   let module = undefined;
   return (): ?any => {

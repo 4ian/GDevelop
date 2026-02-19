@@ -10,7 +10,8 @@ function generateCompiledEventsForEventsFunction(
   gd,
   project,
   eventsFunction,
-  logCode = false
+  logCode = false,
+  options = {}
 ) {
   const extension = new gd.EventsFunctionsExtension();
   const runCompiledEventsFunction = generateCompiledEventsForEventsFunctionWithContext(
@@ -18,7 +19,8 @@ function generateCompiledEventsForEventsFunction(
     project,
     extension,
     eventsFunction,
-    logCode
+    logCode,
+    options
   );
   extension.delete();
   return runCompiledEventsFunction;
@@ -37,7 +39,8 @@ function generateCompiledEventsForEventsFunctionWithContext(
   project,
   extension,
   eventsFunction,
-  logCode = false
+  logCode = false,
+  options = {}
 ) {
   const namespace = 'functionNamespace';
   const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
@@ -58,13 +61,16 @@ function generateCompiledEventsForEventsFunctionWithContext(
 
   if (logCode) console.log(code);
 
+  const useStrict = options && options.useStrict === true;
+  const strictDirective = useStrict ? '"use strict";\n' : '';
+
   // Create a "real" JavaScript function with the generated code.
   const runCompiledEventsFunction = new Function(
     'gdjs',
     'runtimeScene',
     'functionArguments',
     // Expose some global variables that are expected by the generated code:
-    `Hashtable = gdjs.Hashtable;` +
+    `${strictDirective}const Hashtable = gdjs.Hashtable;` +
       '\n' +
       code +
       // Return the function for it to be called (if arguments are passed).
@@ -77,13 +83,20 @@ function generateCompiledEventsForEventsFunctionWithContext(
   return runCompiledEventsFunction;
 }
 
-const generatedEventsCodeToJSFunction = (code, gdjs, runtimeScene) => {
+const generatedEventsCodeToJSFunction = (
+  code,
+  gdjs,
+  runtimeScene,
+  options = {}
+) => {
+  const useStrict = options && options.useStrict === true;
+  const strictDirective = useStrict ? '"use strict";\n' : '';
   const func = new Function(
     'gdjs',
     'runtimeScene',
     'functionArguments',
     // Expose some global variables that are expected by the generated code:
-    `Hashtable = gdjs.Hashtable;` +
+    `${strictDirective}const Hashtable = gdjs.Hashtable;` +
       '\n' +
       code +
       // Return the function for it to be called (if arguments are passed).
@@ -322,7 +335,7 @@ function generateCompiledEventsForSerializedEventsBasedExtension(
  * Helper to create compiled events from serialized events, creating a project and the events function.
  * @param {*} gd
  * @param {gdSerializerElement} eventsSerializerElement
- * @param {{parameterTypes: {[name: string]: string}, groups: {[name: string]: string[]}, logCode: boolean}?} configuration
+ * @param {{parameterTypes: {[name: string]: string}, groups: {[name: string]: string[]}, logCode: boolean, useStrict: boolean}?} configuration
  * @returns
  */
 function generateCompiledEventsFromSerializedEvents(
@@ -361,7 +374,8 @@ function generateCompiledEventsFromSerializedEvents(
     gd,
     project,
     eventsFunction,
-    configuration && configuration.logCode
+    configuration && configuration.logCode,
+    { useStrict: configuration && configuration.useStrict }
   );
 
   eventsFunction.delete();
@@ -375,7 +389,7 @@ function generateCompiledEventsFromSerializedEvents(
  * @param {*} gd
  * @param {gdEventsFunctionExtension} extension
  * @param {gdSerializerElement} eventsSerializerElement
- * @param {{parameterTypes: {[name: string]: string}, groups: {[name: string]: string[]}, logCode: boolean}?} configuration
+ * @param {{parameterTypes: {[name: string]: string}, groups: {[name: string]: string[]}, logCode: boolean, useStrict: boolean}?} configuration
  * @returns
  */
 function generateCompiledEventsFunctionFromSerializedEvents(
@@ -416,7 +430,8 @@ function generateCompiledEventsFunctionFromSerializedEvents(
     project,
     extension,
     eventsFunction,
-    configuration && configuration.logCode
+    configuration && configuration.logCode,
+    { useStrict: configuration && configuration.useStrict }
   );
 
   eventsFunction.delete();

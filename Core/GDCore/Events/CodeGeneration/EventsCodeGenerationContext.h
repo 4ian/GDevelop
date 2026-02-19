@@ -250,6 +250,18 @@ class GD_CORE_API EventsCodeGenerationContext {
   bool IsInsideAsync() const { return asyncDepth != 0; };
 
   /**
+   * Mark whether the current event belongs to an if/else chain.
+   */
+  void SetIsInsideElseEventsChain(bool insideElseEventsChain_) {
+    insideElseEventsChain = insideElseEventsChain_;
+  };
+
+  /**
+   * Return true if the current event belongs to an if/else chain.
+   */
+  bool IsInsideElseEventsChain() const { return insideElseEventsChain; }
+
+  /**
    * Returns true if the code currently being generated is an asynchronous
    * callback (but not a child of an asynchronous callback).
    */
@@ -322,6 +334,8 @@ class GD_CORE_API EventsCodeGenerationContext {
   bool reuseExplicitlyForbidden =
       false;  ///< If set to true, forbid children contexts
               ///< to reuse this one without inheriting.
+  bool insideElseEventsChain =
+      false;  ///< If true, current event belongs to an if/else chain.
 };
 
 }  // namespace gd

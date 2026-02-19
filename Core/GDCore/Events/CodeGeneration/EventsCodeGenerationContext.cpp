@@ -37,6 +37,7 @@ void EventsCodeGenerationContext::InheritsFrom(
 
   nearestAsyncParent = parent_.IsAsyncCallback() ? &parent_ : parent_.nearestAsyncParent;
   asyncDepth = parent_.asyncDepth;
+  insideElseEventsChain = parent_.insideElseEventsChain;
   depthOfLastUse = parent_.depthOfLastUse;
   customConditionDepth = parent_.customConditionDepth;
   contextDepth = parent_.GetContextDepth() + 1;

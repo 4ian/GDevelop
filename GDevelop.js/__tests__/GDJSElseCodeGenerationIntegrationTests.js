@@ -2,13 +2,49 @@ const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.j
 const { makeMinimalGDJSMock } = require('../TestUtils/GDJSMocks.js');
 const {
   generateCompiledEventsForEventsFunction,
-  generateCompiledEventsFromSerializedEvents,
+  generateCompiledEventsFromSerializedEvents:
+    generateCompiledEventsFromSerializedEventsWithoutStrictMode,
 } = require('../TestUtils/CodeGenerationHelpers.js');
 
 describe('libGD.js - GDJS "Else" Code Generation integration tests', function () {
   let gd = null;
   beforeAll(async () => {
     gd = await initializeGDevelopJs();
+  });
+
+  const generateCompiledEventsFromSerializedEvents = (
+    gd,
+    eventsSerializerElement,
+    configuration = {}
+  ) =>
+    generateCompiledEventsFromSerializedEventsWithoutStrictMode(
+      gd,
+      eventsSerializerElement,
+      { ...configuration, useStrict: true }
+    );
+
+  it('does not assign elseEventsChainSatisfied for standalone Standard events', function () {
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Result', '=', '1'],
+          },
+        ],
+        events: [],
+      },
+    ]);
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement
+    );
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    expect(() => runCompiledEvents(gdjs, runtimeScene, [])).not.toThrow();
+    expect(runtimeScene.getVariables().has('Result')).toBe(true);
+    expect(runtimeScene.getVariables().get('Result').getAsNumber()).toBe(1);
   });
 
   it('can generate a simple Else event (pure else)', function () {

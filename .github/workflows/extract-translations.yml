@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: 16
           cache: "npm"
-          cache-dependency-path: "newIDE/app/package-lock.json"
+          cache-dependency-path: "newIDE/package-lock.json"
 
       - name: Install gettext
         run: sudo apt update && sudo apt install gettext -y

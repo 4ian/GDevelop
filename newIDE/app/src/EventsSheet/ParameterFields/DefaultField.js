@@ -9,6 +9,7 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
+import { highlightSearchText } from '../../Utils/HighlightSearchText';
 
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function DefaultField(props: ParameterFieldProps, ref) {
@@ -53,15 +54,28 @@ export const renderInlineDefaultField = ({
   InvalidParameterValue,
   DeprecatedParameterValue,
   MissingParameterValue,
-}: ParameterInlineRendererProps): string | React.MixedElement => {
+  highlightedSearchText,
+  highlightedSearchMatchCase,
+}: ParameterInlineRendererProps): string | React.Node => {
+  const spanProps = highlightedSearchText
+    ? { matchCase: highlightedSearchMatchCase }
+    : undefined;
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }
   if (!expressionIsValid) {
-    return <InvalidParameterValue>{value}</InvalidParameterValue>;
+    return (
+      <InvalidParameterValue>
+        {highlightSearchText(value, highlightedSearchText, spanProps)}
+      </InvalidParameterValue>
+    );
   }
   if (hasDeprecationWarning) {
-    return <DeprecatedParameterValue>{value}</DeprecatedParameterValue>;
+    return (
+      <DeprecatedParameterValue>
+        {highlightSearchText(value, highlightedSearchText, spanProps)}
+      </DeprecatedParameterValue>
+    );
   }
-  return value;
+  return highlightSearchText(value, highlightedSearchText, spanProps);
 };

@@ -48,6 +48,34 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     }
   }
 
+  setGlobalSearchResults(
+    eventPaths: Array<Array<number>>,
+    focusedEventPath: ?Array<number>,
+    searchText?: string,
+    matchCase?: boolean
+  ) {
+    if (this.editor) {
+      this.editor.setGlobalSearchResults(
+        eventPaths,
+        focusedEventPath,
+        searchText,
+        matchCase
+      );
+    }
+  }
+
+  clearGlobalSearchResults() {
+    if (this.editor) {
+      this.editor.clearGlobalSearchResults();
+    }
+  }
+
+  scrollToEventPath(eventPath: Array<number>) {
+    if (this.editor) {
+      this.editor.scrollToEventPath(eventPath);
+    }
+  }
+
   forceUpdateEditor() {
     // No updates to be done.
   }

@@ -11,6 +11,156 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
     gd = await initializeGDevelopJs();
   });
 
+  it('generates valid code for Standard events not in an else chain', function () {
+    // A Standard event with a condition, not followed by any Else event.
+    // The generated code must not reference elseEventsChainSatisfied,
+    // which would be an undeclared variable in strict mode.
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [
+          {
+            type: { value: 'VarScene' },
+            parameters: ['Counter', '=', '0'],
+          },
+        ],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Result', '=', '1'],
+          },
+        ],
+        events: [],
+      },
+    ]);
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement
+    );
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runCompiledEvents(gdjs, runtimeScene, []);
+    expect(runtimeScene.getVariables().get('Result').getAsNumber()).toBe(1);
+  });
+
+  it('generates valid code for Standard events not in an else chain with sub-events containing an else chain', function () {
+    // A Standard event (not followed by Else) whose sub-events contain
+    // an if/else chain. The parent event must not reference the
+    // elseEventsChainSatisfied variable.
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [
+          {
+            type: { value: 'VarScene' },
+            parameters: ['Counter', '=', '0'],
+          },
+        ],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Result', '=', '1'],
+          },
+        ],
+        events: [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [
+              {
+                type: { value: 'VarScene' },
+                parameters: ['Counter', '=', '999'],
+              },
+            ],
+            actions: [
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['SubResult', '=', '1'],
+              },
+            ],
+            events: [],
+          },
+          {
+            type: 'BuiltinCommonInstructions::Else',
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['SubResult', '=', '2'],
+              },
+            ],
+            events: [],
+          },
+        ],
+      },
+    ]);
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement
+    );
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runCompiledEvents(gdjs, runtimeScene, []);
+    expect(runtimeScene.getVariables().get('Result').getAsNumber()).toBe(1);
+    expect(runtimeScene.getVariables().get('SubResult').getAsNumber()).toBe(2);
+  });
+
+  it('generates valid code for Else having standard events in sub-events without else', function () {
+    // A Standard event followed by Else, where the Else has sub-events.
+    // The sub-events contain only Standard events (no Else).
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [
+          {
+            type: { value: 'VarScene' },
+            parameters: ['Counter', '=', '999'],
+          },
+        ],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Result', '=', '1'],
+          },
+        ],
+        events: [],
+      },
+      {
+        type: 'BuiltinCommonInstructions::Else',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Result', '=', '2'],
+          },
+        ],
+        events: [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [
+              {
+                type: { value: 'VarScene' },
+                parameters: ['Counter', '=', '0'],
+              },
+            ],
+            actions: [
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['SubResult', '=', '10'],
+              },
+            ],
+            events: [],
+          },
+        ],
+      },
+    ]);
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement
+    );
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runCompiledEvents(gdjs, runtimeScene, []);
+    expect(runtimeScene.getVariables().get('Result').getAsNumber()).toBe(2);
+    expect(runtimeScene.getVariables().get('SubResult').getAsNumber()).toBe(10);
+  });
+
   it('can generate a simple Else event (pure else)', function () {
     // Standard event with a false condition, followed by Else.
     // The Else branch should run since the Standard condition fails.
@@ -375,11 +525,65 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
     ]);
     const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
       gd,
-      serializerElement
+      serializerElement,
+      { logCode: false }
     );
+
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
     runCompiledEvents(gdjs, runtimeScene, []);
     expect(runtimeScene.getVariables().get('Result').getAsNumber()).toBe(2);
+  });
+
+  it('does not run Else event when Standard event has true conditions and next Standard is disabled', function () {
+    // Standard(true) → Disabled Standard → Else.
+    // The disabled Standard is removed, so the chain becomes Standard(true) → Else.
+    // The Else branch should not run.
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Result', '=', '1'],
+          },
+        ],
+        events: [],
+      },
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        disabled: true,
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Result', '=', '99'],
+          },
+        ],
+        events: [],
+      },
+      {
+        type: 'BuiltinCommonInstructions::Else',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Result', '=', '2'],
+          },
+        ],
+        events: [],
+      },
+    ]);
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      {
+        logCode: false,
+      }
+    );
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runCompiledEvents(gdjs, runtimeScene, []);
+    expect(runtimeScene.getVariables().get('Result').getAsNumber()).toBe(1);
   });
 
   it('can generate three nested levels of Else if/else chains with surrounding events', function () {
@@ -708,9 +912,7 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
     // Else-if condition passed (LocalInElse=42).
     expect(runtimeScene.getVariables().get('Result').getAsNumber()).toBe(2);
     // Sub-event of else-if also ran (LocalInElse=42 from parent scope).
-    expect(runtimeScene.getVariables().get('SubResult').getAsNumber()).toBe(
-      10
-    );
+    expect(runtimeScene.getVariables().get('SubResult').getAsNumber()).toBe(10);
   });
 
   it('stress test: combinations of standard, disabled, else, and repeat events', function () {
@@ -953,10 +1155,7 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
       // Scenario 18: Repeat containing an if/else chain inside
       //   The inner else runs on each of the 3 iterations.
       // ---------------------------------------------------------------
-      repeat(3, [
-        stdFalse('S18_innerIf', 1),
-        elseEv('S18_innerElse', 1),
-      ]),
+      repeat(3, [stdFalse('S18_innerIf', 1), elseEv('S18_innerElse', 1)]),
 
       // ---------------------------------------------------------------
       // Scenario 19: Standard(true) → Else → Repeat → Else
@@ -994,10 +1193,7 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
       // ---------------------------------------------------------------
       stdFalse('S22_if', 1),
       elseIfTrue('S22_elseif', 1, {
-        subEvents: [
-          stdFalse('S22_sub_if', 1),
-          elseEv('S22_sub_else', 1),
-        ],
+        subEvents: [stdFalse('S22_sub_if', 1), elseEv('S22_sub_else', 1)],
       }),
       elseEv('S22_else', 1),
 
@@ -1005,10 +1201,7 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
       // Scenario 23: Repeat containing if/else, followed by if/else outside
       //   Inner and outer chains are independent.
       // ---------------------------------------------------------------
-      repeat(2, [
-        stdTrue('S23_repIf', 1),
-        elseEv('S23_repElse', 1),
-      ]),
+      repeat(2, [stdTrue('S23_repIf', 1), elseEv('S23_repElse', 1)]),
       stdFalse('S23_if', 1),
       elseEv('S23_else', 1),
 
@@ -1050,10 +1243,7 @@ describe('libGD.js - GDJS "Else" Code Generation integration tests', function ()
       stdFalse('S27_if', 1),
       elseEv('S27_else', 1, {
         subEvents: [
-          repeat(2, [
-            stdFalse('S27_rep_if', 1),
-            elseEv('S27_rep_else', 1),
-          ]),
+          repeat(2, [stdFalse('S27_rep_if', 1), elseEv('S27_rep_else', 1)]),
           std('S27_after_rep', 1),
         ],
       }),

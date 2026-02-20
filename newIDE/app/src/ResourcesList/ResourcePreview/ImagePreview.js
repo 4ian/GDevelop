@@ -486,12 +486,11 @@ const ImagePreview = ({
   const containerLoaded = !!containerWidth && !!containerHeight;
   const imageLoaded = !!imageWidth && !!imageHeight && !errored;
 
-  // We display the elements only when the image is loaded and
-  // the zoom is applied to avoid a shift in the image.
+  // We display the elements only when both the container and image are loaded
+  // to avoid a shift in the image.
   // We use "visibility": "hidden" instead of "display": "none"
   // so that the image takes the space of the container whilst being hidden.
-  // TODO: handle a proper loader.
-  const visibility = containerLoaded ? undefined : 'hidden';
+  const visibility = containerLoaded && imageLoaded ? undefined : 'hidden';
 
   const forcedCursor = shouldMoveView ? 'grab' : null;
   const forcedCursorStyle = forcedCursor

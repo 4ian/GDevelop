@@ -737,7 +737,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         },
       ],
       {
-        logCode: true,
+        logCode: false,
       }
     );
     expect(runtimeScene.getVariables().has('Counter')).toBe(true);
@@ -787,7 +787,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         },
       ],
       {
-        logCode: true,
+        logCode: false,
       }
     );
     expect(runtimeScene.getVariables().has('Counter')).toBe(true);
@@ -882,7 +882,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         },
       ],
       {
-        logCode: true,
+        logCode: false,
       }
     );
     expect(runtimeScene.getVariables().has('Counter')).toBe(true);

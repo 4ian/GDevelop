@@ -25,6 +25,8 @@ export type SortableTreeNode = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   key: number | string,
   isValidElseEvent: boolean,
+  isDisabledEvent: boolean,
+  isNonExecutableEvent: boolean,
   fixedHeight?: ?number,
 |};
 
@@ -263,6 +265,7 @@ const TreeRow = ({
     // Some nodes are not linked to the "parent" node by a horizontal branch connector.
     const drawHorizontal =
       !(node.isValidElseEvent && isNodeDepth) &&
+      !((node.isDisabledEvent || node.isNonExecutableEvent) && isNodeDepth) &&
       !(
         node.key === 'bottom-buttons' || node.key === 'eventstree-tutorial-node'
       );

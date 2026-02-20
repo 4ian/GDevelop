@@ -1,5 +1,7 @@
 // @flow
 
+import { getInitialPreferences } from '../MainFrame/Preferences/PreferencesProvider';
+
 jest.mock('../locales/LocalesMetadata', () => [
   {
     languageCode: 'pt_PT',
@@ -40,9 +42,6 @@ jest.mock('./Language', () => {
     getBrowserLanguageOrLocale: () => mockGetBrowserLanguageOrLocale(),
   };
 });
-
-import { getBrowserLanguageOrLocale } from './Language';
-import { getInitialPreferences } from '../MainFrame/Preferences/PreferencesProvider';
 
 describe('PreferencesProvider', () => {
   describe('getInitialPreferences', () => {

@@ -141,6 +141,8 @@ type EventsContainerProps = {|
   idPrefix: string,
   highlightedAiGeneratedEventIds: Set<string>,
   isValidElseEvent: boolean,
+  highlightedSearchText: ?string,
+  highlightedSearchMatchCase?: boolean,
 |};
 
 /**
@@ -260,6 +262,8 @@ const EventContainer = (props: EventsContainerProps) => {
               windowSize={props.windowSize}
               idPrefix={props.idPrefix}
               isValidElseEvent={props.isValidElseEvent}
+              highlightedSearchText={props.highlightedSearchText}
+              highlightedSearchMatchCase={props.highlightedSearchMatchCase}
             />
           </div>
         </div>
@@ -351,6 +355,8 @@ type EventsTreeProps = {|
 
   searchResults: ?Array<gdBaseEvent>,
   searchFocusOffset: ?number,
+  highlightedSearchText: ?string,
+  highlightedSearchMatchCase?: boolean,
 
   onEventMoved: (previousRowIndex: number, nextRowIndex: number) => void,
   onEndEditingEvent: (event: gdBaseEvent) => void,
@@ -772,6 +778,8 @@ const EventsTree: React.ComponentType<{
                 windowSize={props.windowSize}
                 idPrefix={`event-${node.relativeNodePath.join('-')}`}
                 isValidElseEvent={isValidElseEvent}
+                highlightedSearchText={props.highlightedSearchText}
+                highlightedSearchMatchCase={props.highlightedSearchMatchCase}
                 highlightedAiGeneratedEventIds={
                   props.highlightedAiGeneratedEventIds
                 }

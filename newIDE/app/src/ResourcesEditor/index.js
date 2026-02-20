@@ -291,12 +291,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   };
 
   render(): any {
-    const {
-      project,
-      onRenameResource,
-      resourceManagementProps,
-      fileMetadata,
-    } = this.props;
+    const { project, resourceManagementProps, fileMetadata } = this.props;
     const { selectedResource } = this.state;
     const resourcesActionsMenuBuilder = resourceManagementProps.getStorageProviderResourceOperations();
 

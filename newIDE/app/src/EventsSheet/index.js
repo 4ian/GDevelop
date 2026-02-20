@@ -221,6 +221,10 @@ type State = {|
   textEditedEvent: ?gdBaseEvent,
 
   showSearchPanel: boolean,
+  globalSearchResults: ?Array<gdBaseEvent>,
+  globalSearchFocusOffset: ?number,
+  globalSearchText: ?string,
+  globalSearchMatchCase: boolean,
   searchResults: ?Array<gdBaseEvent>,
   searchFocusOffset: ?number,
   navigationHighlightEvent: ?gdBaseEvent,
@@ -321,6 +325,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     serializedEventsToExtract: null,
 
     showSearchPanel: false,
+    globalSearchResults: null,
+    globalSearchFocusOffset: null,
+    globalSearchText: null,
+    globalSearchMatchCase: false,
     searchResults: null,
     searchFocusOffset: null,
     navigationHighlightEvent: null,
@@ -425,6 +433,66 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     }, 3000);
   };
 
+  setGlobalSearchResults = (
+    eventPaths: Array<Array<number>>,
+    focusedEventPath: ?Array<number>,
+    searchText?: ?string,
+    matchCase?: boolean
+  ) => {
+    const eventsTree = this._eventsTree;
+    const eventsByPtr = new Map<number, gdBaseEvent>();
+    eventPaths.forEach(path => {
+      const event = findEventByPath(this.props.events, path);
+      if (event) {
+        // $FlowFixMe[prop-missing] - ptr is a numeric identifier for the C++ object.
+        eventsByPtr.set(event.ptr, event);
+      }
+    });
+    const resultEvents = [...eventsByPtr.values()];
+
+    let globalSearchFocusOffset = null;
+    if (focusedEventPath) {
+      const focusedEvent = findEventByPath(this.props.events, focusedEventPath);
+      if (focusedEvent) {
+        const focusedEventIndex = resultEvents.findIndex(event =>
+          // $FlowFixMe[incompatible-exact]
+          gd.compare(event, focusedEvent)
+        );
+        globalSearchFocusOffset =
+          focusedEventIndex === -1 ? null : focusedEventIndex;
+      }
+    }
+
+    this.setState(
+      {
+        globalSearchResults: resultEvents,
+        globalSearchFocusOffset,
+        globalSearchText: searchText || null,
+        globalSearchMatchCase: matchCase ?? false,
+        navigationHighlightEvent: null,
+      },
+      () => {
+        if (!eventsTree || globalSearchFocusOffset === null) return;
+        const focusedEvent = resultEvents[globalSearchFocusOffset];
+        if (!focusedEvent) return;
+        eventsTree.unfoldForEvent(focusedEvent);
+        const row = eventsTree.getEventRow(focusedEvent);
+        if (row !== -1) {
+          eventsTree.scrollToRow(row);
+        }
+      }
+    );
+  };
+
+  clearGlobalSearchResults = () => {
+    this.setState({
+      globalSearchResults: null,
+      globalSearchFocusOffset: null,
+      globalSearchText: null,
+      globalSearchMatchCase: false,
+    });
+  };
+
   updateToolbar() {
     if (!this.props.setToolbar) return;
 
@@ -488,6 +556,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         const show = !state.showSearchPanel;
         if (!show) {
           if (this._eventSearcher) this._eventSearcher.reset();
+        } else {
+          this.clearGlobalSearchResults();
         }
 
         return {
@@ -2275,12 +2345,17 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   onOpenExternalEvents={onOpenExternalEvents}
                   onOpenLayout={onOpenLayout}
                   searchResults={
-                    this.state.navigationHighlightEvent
+                    this.state.globalSearchResults ||
+                    (this.state.navigationHighlightEvent
                       ? [this.state.navigationHighlightEvent]
-                      : eventsSearchResultEvents
+                      : eventsSearchResultEvents)
                   }
                   searchFocusOffset={
-                    this.state.navigationHighlightEvent ? 0 : searchFocusOffset
+                    this.state.globalSearchFocusOffset !== null
+                      ? this.state.globalSearchFocusOffset
+                      : this.state.navigationHighlightEvent
+                      ? 0
+                      : searchFocusOffset
                   }
                   onEventMoved={this._onEventMoved}
                   onEndEditingEvent={this._onEndEditingStringEvent}
@@ -2294,6 +2369,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   fontSize={preferences.values.eventsSheetZoomLevel}
                   preferences={preferences}
                   tutorials={tutorials}
+                  highlightedSearchText={this.state.globalSearchText}
+                  highlightedSearchMatchCase={this.state.globalSearchMatchCase}
                   highlightedAiGeneratedEventIds={
                     highlightedAiGeneratedEventIds
                   }
@@ -2521,6 +2598,13 @@ export type EventsSheetInterface = {|
   onResourceExternallyChanged: ({| identifier: string |}) => void,
   onEventsModifiedOutsideEditor: (changes: OutOfEditorChanges) => void,
   scrollToEventPath: (eventPath: Array<number>) => void,
+  setGlobalSearchResults: (
+    eventPaths: Array<Array<number>>,
+    focusedEventPath: ?Array<number>,
+    searchText?: ?string,
+    matchCase?: boolean
+  ) => void,
+  clearGlobalSearchResults: () => void,
 |};
 
 // EventsSheet is a wrapper so that the component can use multiple
@@ -2532,6 +2616,8 @@ const EventsSheet = (props, ref) => {
     onResourceExternallyChanged,
     onEventsModifiedOutsideEditor,
     scrollToEventPath,
+    setGlobalSearchResults,
+    clearGlobalSearchResults,
   }));
 
   const {
@@ -2553,6 +2639,23 @@ const EventsSheet = (props, ref) => {
   };
   const scrollToEventPath = (eventPath: Array<number>) => {
     if (component.current) component.current.scrollToEventPath(eventPath);
+  };
+  const setGlobalSearchResults = (
+    eventPaths: Array<Array<number>>,
+    focusedEventPath: ?Array<number>,
+    searchText?: ?string,
+    matchCase?: boolean
+  ) => {
+    if (component.current)
+      component.current.setGlobalSearchResults(
+        eventPaths,
+        focusedEventPath,
+        searchText,
+        matchCase
+      );
+  };
+  const clearGlobalSearchResults = () => {
+    if (component.current) component.current.clearGlobalSearchResults();
   };
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);

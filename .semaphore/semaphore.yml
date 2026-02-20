@@ -190,6 +190,37 @@ blocks:
             - cd GDJS
             - npm run check-format
 
+  - name: Linting
+    dependencies:
+      - Install
+    task:
+      jobs:
+        - name: newIDE linting
+          commands:
+            - checkout
+            - |-
+              can_use_cache() {
+                [ "${SEMAPHORE_GIT_REF_TYPE}" != "pull-request" ] || \
+                [ "${SEMAPHORE_GIT_PR_SLUG}" = "${SEMAPHORE_GIT_REPO_SLUG}" ]
+              }
+
+              NEWIDE_KEY="newIDE-app-node_modules-v2-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)"
+              GDJS_KEY="GDJS-node_modules-v2-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)"
+
+              if can_use_cache; then
+                echo "Restoring caches..."
+                cache restore "${NEWIDE_KEY}"
+                cache restore "${GDJS_KEY}"
+              else
+                echo "Fork PR: skipping cache restore"
+              fi
+
+              (cd newIDE/app && npm i)
+              (cd GDJS && git checkout package-lock.json && npm i)
+            - cd newIDE/app
+            - npm run postinstall
+            - npm run lint
+
   - name: Tests
     dependencies:
       - Install

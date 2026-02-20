@@ -126,6 +126,7 @@
     "build": "npm run import-resources && react-app-rewired build",
     "format": "prettier --write \"src/!(locales)/**/*.js\"",
     "check-format": "prettier --list-different \"src/!(locales)/**/*.js\"",
+    "lint": "eslint src/ --max-warnings=0",
     "test": "react-app-rewired test --env=node",
     "flow": "flow",
     "check-script-types": "cd scripts && tsc",

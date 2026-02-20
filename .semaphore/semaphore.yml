@@ -213,7 +213,7 @@ blocks:
                 echo "Fork PR: skipping cache restore"
               fi
 
-              (cd newIDE/app && npm i)
+              (cd newIDE && npm i)
               (cd GDJS && git checkout package-lock.json && npm i)
             - cd newIDE/app
             - npm run postinstall

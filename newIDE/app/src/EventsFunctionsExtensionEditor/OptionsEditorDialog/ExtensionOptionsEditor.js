@@ -23,6 +23,8 @@ import {
 import { useIsMounted } from '../../Utils/UseIsMounted';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { UsersAutocomplete } from '../../Profile/UsersAutocomplete';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 import { ResourceStoreContext } from '../../AssetStore/ResourceStore/ResourceStoreContext';
 
@@ -317,6 +319,20 @@ export const ExtensionOptionsEditor = ({
               },
             ]}
           />
+          <SelectField
+            floatingLabelText={<Trans>Dimension</Trans>}
+            value={eventsFunctionsExtension.getDimension()}
+            onChange={(e, i, value) => {
+              eventsFunctionsExtension.setDimension(value);
+              forceUpdate();
+            }}
+            fullWidth
+          >
+            <SelectOption value="" label={t`Not applicable`} />
+            <SelectOption value="2D" label="2D" />
+            <SelectOption value="3D" label="3D" />
+            <SelectOption value="2D/3D" label="2D/3D" />
+          </SelectField>
           <SemiControlledTextField
             floatingLabelText={<Trans>Tags (comma separated)</Trans>}
             value={eventsFunctionsExtension

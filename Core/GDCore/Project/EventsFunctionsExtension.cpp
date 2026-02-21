@@ -38,6 +38,7 @@ void EventsFunctionsExtension::Init(const gd::EventsFunctionsExtension& other) {
   extensionNamespace = other.extensionNamespace;
   shortDescription = other.shortDescription;
   description = other.description;
+  dimension = other.dimension;
   name = other.name;
   fullName = other.fullName;
   category = other.category;
@@ -59,6 +60,7 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element, bool isEx
   element.SetAttribute("version", version);
   element.SetAttribute("extensionNamespace", extensionNamespace);
   element.SetAttribute("shortDescription", shortDescription);
+  element.SetAttribute("dimension", dimension);
   element.AddChild("description").SetMultilineStringValue(description);
   element.SetAttribute("name", name);
   element.SetAttribute("fullName", fullName);
@@ -133,6 +135,7 @@ void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
   version = element.GetStringAttribute("version");
   extensionNamespace = element.GetStringAttribute("extensionNamespace");
   shortDescription = element.GetStringAttribute("shortDescription");
+  dimension = element.GetStringAttribute("dimension");
   description = element.GetChild("description").GetMultilineStringValue();
   name = element.GetStringAttribute("name");
   fullName = element.GetStringAttribute("fullName");

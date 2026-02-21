@@ -40,6 +40,11 @@ void MetadataDeclarationHelper::DeclareExtension(
       .SetExtensionHelpPath(eventsFunctionsExtension.GetHelpPath())
       .SetIconUrl(eventsFunctionsExtension.GetIconUrl());
 
+  if (!eventsFunctionsExtension.GetShortDescription().empty())
+    extension.SetShortDescription(eventsFunctionsExtension.GetShortDescription());
+  if (!eventsFunctionsExtension.GetDimension().empty())
+    extension.SetDimension(eventsFunctionsExtension.GetDimension());
+
   for(auto tag : eventsFunctionsExtension.GetTags()) {
     extension.AddTag(tag);
   }

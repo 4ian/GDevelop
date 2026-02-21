@@ -2286,6 +2286,10 @@ interface PlatformExtension {
     [Ref] PlatformExtension SetExtensionHelpPath([Const] DOMString helpPath);
     [Ref] PlatformExtension SetIconUrl([Const] DOMString iconUrl);
     [Ref] PlatformExtension SetCategory([Const] DOMString category);
+    [Ref] PlatformExtension SetShortDescription([Const] DOMString shortDescription);
+    [Const, Ref] DOMString GetShortDescription();
+    [Ref] PlatformExtension SetDimension([Const] DOMString dimension);
+    [Const, Ref] DOMString GetDimension();
     [Ref] InstructionOrExpressionGroupMetadata AddInstructionOrExpressionGroupMetadata([Const] DOMString name);
     void MarkAsDeprecated();
 
@@ -3517,6 +3521,8 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetShortDescription();
     [Ref] EventsFunctionsExtension SetDescription([Const] DOMString description);
     [Const, Ref] DOMString GetDescription();
+    [Ref] EventsFunctionsExtension SetDimension([Const] DOMString dimension);
+    [Const, Ref] DOMString GetDimension();
     [Ref] EventsFunctionsExtension SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
     [Ref] EventsFunctionsExtension SetFullName([Const] DOMString fullName);

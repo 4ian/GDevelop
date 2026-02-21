@@ -21,6 +21,10 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                                "This is the old, deprecated physics engine. Prefer to use the Physics Engine 2.0.",
                                "Florian Rival",
                                "Open source (MIT License)")
+      .SetShortDescription(
+          _("Deprecated 2D physics engine behavior with bodies, forces, "
+            "collisions, and joints."))
+      .SetDimension("2D")
       .SetCategory("Movement")
       .SetExtensionHelpPath("/behaviors/physics");
   extension.AddInstructionOrExpressionGroupMetadata(("Physics Engine (deprecated)"))

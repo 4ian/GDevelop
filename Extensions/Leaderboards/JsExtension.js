@@ -27,6 +27,9 @@ module.exports = {
         'Florian Rival',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        _('Submit and read leaderboard scores, rankings, and player entries from your game.')
+      )
       .setExtensionHelpPath('/all-features/leaderboards')
       .setCategory('Players')
       .addInstructionOrExpressionGroupMetadata(_('Leaderboards'))

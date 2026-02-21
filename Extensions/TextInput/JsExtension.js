@@ -25,6 +25,10 @@ module.exports = {
         'Florian Rival',
         'MIT'
       )
+      .setShortDescription(
+        _('2D text input field object with placeholder, style, focus, and value actions.')
+      )
+      .setDimension('2D')
       .setCategory('User interface');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Text Input'))

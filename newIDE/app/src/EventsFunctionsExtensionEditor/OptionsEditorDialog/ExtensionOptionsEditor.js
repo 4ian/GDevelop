@@ -11,6 +11,8 @@ import { ColumnStackLayout, TextFieldWithButtonLayout } from '../../UI/Layout';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import RaisedButton from '../../UI/RaisedButton';
 import FlatButton from '../../UI/FlatButton';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
 import { ResourceStore } from '../../AssetStore/ResourceStore';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 
@@ -221,6 +223,23 @@ export const ExtensionOptionsEditor = ({
             rows={2}
             rowsMax={2}
           />
+          <SelectField
+            floatingLabelText={<Trans>Dimension</Trans>}
+            value={eventsFunctionsExtension.getDimension()}
+            onChange={(e, i, value) => {
+              eventsFunctionsExtension.setDimension(value);
+              forceUpdate();
+            }}
+            helperText={i18n._(
+              t`Choose 2D/3D when clearly applicable, otherwise keep Not applicable.`
+            )}
+            fullWidth
+          >
+            <SelectOption value="" label={t`Not applicable`} />
+            <SelectOption value="2D" label="2D" />
+            <SelectOption value="3D" label="3D" />
+            <SelectOption value="2D/3D" label="2D/3D" />
+          </SelectField>
           <TextField
             floatingLabelText={<Trans>Description (markdown supported)</Trans>}
             value={eventsFunctionsExtension.getDescription()}

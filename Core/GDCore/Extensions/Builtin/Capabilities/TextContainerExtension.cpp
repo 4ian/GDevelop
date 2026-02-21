@@ -22,6 +22,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTextContainerExtension(
                                _("Allows an object to contain a text, usually shown on screen, that can be modified."),
                                "Florian Rival",
                                "Open source (MIT License)")
+      .SetShortDescription(
+          _("Read, compare, and set object text through shared text-container "
+            "behavior."))
       .SetExtensionHelpPath("/objects");
   extension.AddInstructionOrExpressionGroupMetadata(_("Objects containing a text"))
       .SetIcon("res/conditions/text24_black.png");

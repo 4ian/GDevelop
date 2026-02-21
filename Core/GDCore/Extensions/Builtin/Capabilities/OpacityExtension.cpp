@@ -23,6 +23,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsOpacityExtension(
                                  "check the opacity of an object (0-255)."),
                                "Florian Rival",
                                "Open source (MIT License)")
+      .SetShortDescription(
+          _("Set, compare, and read object opacity (0-255) through shared "
+            "opacity behavior."))
       .SetExtensionHelpPath("/objects");
   extension.AddInstructionOrExpressionGroupMetadata(_("Objects with opacity"))
       .SetIcon("res/actions/opacity24.png");

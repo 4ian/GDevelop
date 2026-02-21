@@ -23,6 +23,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                                  "some indicators, menu buttons, dialogues..."),
                                "Florian Rival and Victor Levasseur",
                                "Open source (MIT License)")
+      .SetShortDescription(
+          _("2D text object with styling, alignment, effects, scalable size, "
+            "and dynamic content actions."))
+      .SetDimension("2D")
       .SetCategory("Text")
       .SetExtensionHelpPath("/objects/text");
   extension.AddInstructionOrExpressionGroupMetadata(_("Text object"))

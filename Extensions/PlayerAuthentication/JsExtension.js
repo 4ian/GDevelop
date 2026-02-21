@@ -25,6 +25,9 @@ module.exports = {
         'Florian Rival',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        _('Authenticate players, handle profiles, and access player identity in published games.')
+      )
       .setExtensionHelpPath('/all-features/player-authentication')
       .setCategory('Players');
     extension

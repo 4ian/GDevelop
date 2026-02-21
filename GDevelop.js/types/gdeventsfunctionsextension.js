@@ -7,6 +7,8 @@ declare class gdEventsFunctionsExtension {
   getVersion(): string;
   setShortDescription(shortDescription: string): gdEventsFunctionsExtension;
   getShortDescription(): string;
+  setDimension(dimension: string): gdEventsFunctionsExtension;
+  getDimension(): string;
   setDescription(description: string): gdEventsFunctionsExtension;
   getDescription(): string;
   setName(name: string): gdEventsFunctionsExtension;

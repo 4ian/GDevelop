@@ -3302,6 +3302,9 @@ describe('libGD.js', function () {
           'Author of test extension',
           'License of test extension'
         );
+        extension.setShortDescription(
+          'Test extension metadata for object boolean expression-condition-action declaration coverage.'
+        );
         const fakeObject = new gd.ObjectJsImplementation();
         const objectMetadata = extension.addObject(
           'FakeObject',
@@ -3377,6 +3380,9 @@ describe('libGD.js', function () {
           'Description of test extension',
           'Author of test extension',
           'License of test extension'
+        );
+        extension.setShortDescription(
+          'Test extension metadata for behavior boolean expression-condition-action declaration coverage.'
         );
         const dummyBehavior = new gd.BehaviorJsImplementation();
         dummyBehavior.initializeContent = function (behaviorContent) {};
@@ -4023,6 +4029,9 @@ describe('libGD.js', function () {
           'Author of test extension',
           'License of test extension'
         )
+        .setShortDescription(
+          'Test extension metadata for unit tests covering platform extension APIs.'
+        )
         .setExtensionHelpPath('/path/to/extension/help');
       return extension;
     };
@@ -4198,6 +4207,9 @@ describe('libGD.js', function () {
         'Description of test extension',
         'Author of test extension',
         'License of test extension'
+      );
+      extension.setShortDescription(
+        'Minimal extension metadata used to test platform extension add/remove lifecycle.'
       );
 
       gd.JsPlatform.get().addNewExtension(extension);

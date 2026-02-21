@@ -21,6 +21,9 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
             "from/to a GDevelop variable."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription(
+          _("Named inventories with item counts, equip states, limits, and "
+            "variable save/load support."))
       .SetExtensionHelpPath("/all-features/inventory")
       .SetCategory("Game mechanic");
   extension.AddInstructionOrExpressionGroupMetadata(_("Inventories"))

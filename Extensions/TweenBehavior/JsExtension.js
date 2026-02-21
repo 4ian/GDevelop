@@ -65,6 +65,9 @@ module.exports = {
         'Matthias Meike, Florian Rival',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        _('Animate object properties and variables over time using easing functions and tweens.')
+      )
       .setCategory('Visual effect')
       .setTags('tween, interpolation, smooth')
       .setExtensionHelpPath('/behaviors/tween');

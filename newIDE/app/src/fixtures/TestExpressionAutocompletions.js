@@ -12,6 +12,9 @@ const makeNewFakeExtension = (gd: libGDevelop) => {
     'The extension author',
     'MIT'
   );
+  extension.setShortDescription(
+    'Fake extension metadata used to test expression autocompletion and enumerated expressions.'
+  );
   return extension;
 };
 

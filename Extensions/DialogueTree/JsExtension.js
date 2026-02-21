@@ -25,6 +25,9 @@ module.exports = {
         'Todor Imreorov',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        _('Yarn Spinner dialogue trees with branching choices, tags, variables, and node control.')
+      )
       .setExtensionHelpPath('/all-features/dialogue-tree')
       .setCategory('Game mechanic');
     extension

@@ -26,6 +26,9 @@ module.exports = {
         'Matthias Meike',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        _('Trigger mobile device vibrations with duration/pattern controls via native runtime integration.')
+      )
       .setExtensionHelpPath('/all-features/device-vibration')
       .setCategory('User interface');
     extension

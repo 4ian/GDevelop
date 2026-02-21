@@ -22,6 +22,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
           "Also contains expressions to read the screen size.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription(
+          _("Fullscreen, window mode, resolution scaling, and screen "
+            "size/window state expressions."))
       .SetCategory("User interface")
       .SetExtensionHelpPath("/all-features/window");
   extension

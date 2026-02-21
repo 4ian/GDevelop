@@ -22,6 +22,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
             "for most elements of a 2D game."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription(
+          _("2D animated sprite object with animations, points, collisions, "
+            "effects, and transform controls."))
+      .SetDimension("2D")
       .SetExtensionHelpPath("/objects/sprite");
   extension.AddInstructionOrExpressionGroupMetadata(_("Sprite"))
       .SetIcon("CppPlatform/Extensions/spriteicon.png");

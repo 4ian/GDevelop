@@ -20,6 +20,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
           "stored on the device and erased when the game is uninstalled.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription(
+          _("Persistent storage read/write for numbers/text/variables, with "
+            "load/unload and existence checks."))
       .SetExtensionHelpPath("/all-features/storage")
       .SetCategory("Advanced");
   extension.AddInstructionOrExpressionGroupMetadata(_("Storage"))

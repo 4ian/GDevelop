@@ -25,6 +25,9 @@ module.exports = {
         'Matthias Meike',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        _('Capture game screenshots and save PNG files on supported desktop/native platforms.')
+      )
       .setExtensionHelpPath('/all-features/screenshot')
       .setCategory('Advanced');
     extension

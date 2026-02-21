@@ -1531,6 +1531,10 @@ module.exports = {
         'Todor Imreorov',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        _('2D tilemap objects from tilesets/Tiled with collisions, layers, and tile queries.')
+      )
+      .setDimension('2D')
       .setCategory('Advanced')
       .setExtensionHelpPath('/objects/tilemap');
 

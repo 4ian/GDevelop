@@ -26,6 +26,10 @@ void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
           "the 3D particle emitter instead.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription(
+          _("2D particle emitter object for smoke, fire, sparks, and visual "
+            "effects."))
+      .SetDimension("2D")
       .SetCategory("Visual effect")
       .SetExtensionHelpPath("/objects/particles_emitter");
   extension.AddInstructionOrExpressionGroupMetadata(_("Particle system"))

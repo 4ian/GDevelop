@@ -29,6 +29,10 @@ module.exports = {
         'Florian Rival, Franco Maciel',
         'MIT'
       )
+      .setShortDescription(
+        _('2D rigid-body physics behavior with gravity, forces, collisions, joints, and body types.')
+      )
+      .setDimension('2D')
       .setExtensionHelpPath('/behaviors/physics2')
       .setCategory('Movement')
       .setTags('physics, gravity, obstacle, collision');

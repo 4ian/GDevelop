@@ -20,6 +20,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
             "a URL on the device browser."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription(
+          _("HTTP requests, API communication, file download/upload, and URL "
+            "opening actions."))
       .SetExtensionHelpPath("/all-features/network")
       .SetCategory("Network");
   extension.AddInstructionOrExpressionGroupMetadata(_("Network"))

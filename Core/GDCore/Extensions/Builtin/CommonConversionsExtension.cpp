@@ -21,6 +21,9 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
           "JSON string.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription(
+          _("Convert numbers, strings, angles, and variables to/from JSON and "
+            "text."))
       .SetExtensionHelpPath("/all-features/common-conversions");
   extension.AddInstructionOrExpressionGroupMetadata(_("Conversion"))
       .SetIcon("res/conditions/toujours24_black.png");

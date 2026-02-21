@@ -27,6 +27,10 @@ module.exports = {
         'Florian Rival',
         'MIT'
       )
+      .setShortDescription(
+        _('3D engine features: 3D objects, camera-compatible behaviors, and common 3D actions/expressions.')
+      )
+      .setDimension('3D')
       .setCategory('General');
     extension
       .addInstructionOrExpressionGroupMetadata(_('3D'))

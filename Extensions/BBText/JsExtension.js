@@ -27,6 +27,10 @@ module.exports = {
         'Todor Imreorov',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        _('2D rich-text object supporting BBCode styles, colors, shadows, and inline formatting.')
+      )
+      .setDimension('2D')
       .setExtensionHelpPath('/objects/bbtext')
       .setCategory('Text');
     extension

@@ -29,6 +29,10 @@ module.exports = {
         'Florian Rival',
         'MIT'
       )
+      .setShortDescription(
+        _('3D rigid-body physics behavior with gravity, forces, collisions, joints, and body types.')
+      )
+      .setDimension('3D')
       .setExtensionHelpPath('/behaviors/physics3d')
       .setCategory('Movement')
       .setTags('physics, gravity, obstacle, collision');

@@ -26,6 +26,10 @@ module.exports = {
         'Harsimran Virk',
         'MIT'
       )
+      .setShortDescription(
+        _('2D light objects plus obstacle behavior for shadow-casting and atmosphere effects.')
+      )
+      .setDimension('2D')
       .setCategory('Visual effect')
       .setTags('light');
 

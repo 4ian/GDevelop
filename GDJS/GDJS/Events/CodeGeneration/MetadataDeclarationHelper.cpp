@@ -37,6 +37,8 @@ void MetadataDeclarationHelper::DeclareExtension(
       .SetExtensionInformation(eventsFunctionsExtension.GetName(), fullName,
                                eventsFunctionsExtension.GetDescription(),
                                eventsFunctionsExtension.GetAuthor(), "")
+      .SetShortDescription(eventsFunctionsExtension.GetShortDescription())
+      .SetDimension(eventsFunctionsExtension.GetDimension())
       .SetExtensionHelpPath(eventsFunctionsExtension.GetHelpPath())
       .SetIconUrl(eventsFunctionsExtension.GetIconUrl());
 

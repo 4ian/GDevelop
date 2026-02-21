@@ -31,6 +31,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "speed, etc...)."
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription(
+          _("Layer cameras: move/zoom/rotate, viewport, visibility, effects, "
+            "ambient light, and per-layer time scale."))
+      .SetDimension("2D/3D")
       .SetCategory("Camera")
       .SetExtensionHelpPath("/interface/scene-editor/layers-and-cameras");
   extension.AddInstructionOrExpressionGroupMetadata(_("Layers and cameras"))

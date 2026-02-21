@@ -1796,6 +1796,8 @@ export class EventMetadata extends EmscriptenObject {
 export class PlatformExtension extends EmscriptenObject {
   constructor();
   setExtensionInformation(name: string, fullname: string, description: string, author: string, license: string): PlatformExtension;
+  setShortDescription(shortDescription: string): PlatformExtension;
+  setDimension(dimension: string): PlatformExtension;
   setExtensionHelpPath(helpPath: string): PlatformExtension;
   setIconUrl(iconUrl: string): PlatformExtension;
   setCategory(category: string): PlatformExtension;
@@ -1818,6 +1820,8 @@ export class PlatformExtension extends EmscriptenObject {
   getName(): string;
   getCategory(): string;
   getDescription(): string;
+  getShortDescription(): string;
+  getDimension(): string;
   getAuthor(): string;
   getLicense(): string;
   getHelpPath(): string;
@@ -2568,6 +2572,8 @@ export class EventsFunctionsExtension extends EmscriptenObject {
   getVersion(): string;
   setShortDescription(shortDescription: string): EventsFunctionsExtension;
   getShortDescription(): string;
+  setDimension(dimension: string): EventsFunctionsExtension;
+  getDimension(): string;
   setDescription(description: string): EventsFunctionsExtension;
   getDescription(): string;
   setName(name: string): EventsFunctionsExtension;

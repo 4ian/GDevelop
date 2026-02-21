@@ -21,6 +21,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "inventory or the result of a web request.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription(
+          _("Global, scene, object variables with structures/arrays, "
+            "comparisons, assignment, and serialization helpers."))
       .SetExtensionHelpPath("/all-features/variables");
   extension.AddInstructionOrExpressionGroupMetadata(_("Variables"))
       .SetIcon("res/conditions/var24.png");

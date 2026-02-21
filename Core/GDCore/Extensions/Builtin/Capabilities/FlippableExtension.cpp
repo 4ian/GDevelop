@@ -22,6 +22,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFlippableExtension(
                                _("Actions/conditions for objects which can be flipped horizontally or vertically."),
                                "Florian Rival",
                                "Open source (MIT License)")
+      .SetShortDescription(
+          _("Flip object visuals horizontally or vertically through shared "
+            "flippable behavior actions/conditions."))
       .SetExtensionHelpPath("/objects");
   extension.AddInstructionOrExpressionGroupMetadata(_("Effects"))
       .SetIcon("res/actions/effect_black.svg");

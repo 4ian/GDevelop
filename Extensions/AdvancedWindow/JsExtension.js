@@ -27,6 +27,9 @@ module.exports = {
         'Arthur Pacaud (arthuro555)',
         'MIT'
       )
+      .setShortDescription(
+        _('Advanced desktop window controls: focus, resize, position, title, and window state.')
+      )
       .setCategory('User interface');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Advanced window management'))

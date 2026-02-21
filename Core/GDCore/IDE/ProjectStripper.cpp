@@ -40,6 +40,7 @@ void GD_CORE_API ProjectStripper::StripProjectForExport(gd::Project &project) {
     auto &extension = project.GetEventsFunctionsExtension(extensionIndex);
     extension.SetFullName("");
     extension.SetShortDescription("");
+    extension.SetDimension("");
     extension.SetDescription("");
     extension.SetHelpPath("");
     extension.SetIconUrl("");

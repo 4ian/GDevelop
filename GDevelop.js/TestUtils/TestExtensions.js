@@ -19,6 +19,9 @@ module.exports = {
           'Florian Rival',
           'MIT'
         )
+        .setShortDescription(
+          'Fake AdMob extension for tests with properties, dependency metadata, and interstitial action.'
+        )
         .setExtensionHelpPath('/all-features/admob');
 
       extension
@@ -81,6 +84,9 @@ module.exports = {
         '',
         'MIT'
       );
+      extension.setShortDescription(
+        'Fake object metadata for tests, intentionally missing effect capability support.'
+      );
       const fakeObject = new gd.ObjectJsImplementation();
 
       fakeObject.updateProperty = function (
@@ -134,6 +140,9 @@ module.exports = {
         'Fake object with an async action',
         '',
         'MIT'
+      );
+      extension.setShortDescription(
+        'Fake object extension for tests with scoped async and optionally async object actions.'
       );
       const fakeObject = new gd.ObjectJsImplementation();
 
@@ -216,6 +225,9 @@ module.exports = {
         '',
         'MIT'
       );
+      extension.setShortDescription(
+        'Fake extension declaring optionally asynchronous scene action for async-events code generation tests.'
+      );
 
       extension
         .addAction(
@@ -245,6 +257,9 @@ module.exports = {
         'Fake behavior with shared data',
         '',
         'MIT'
+      );
+      extension.setShortDescription(
+        'Fake behavior extension for tests with shared data properties and runtime include files.'
       );
       // Declare a behavior with shared data between the behaviors
       // In addition to the usual behavior:

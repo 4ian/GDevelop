@@ -27,6 +27,10 @@ module.exports = {
         'Aurélien Vivet',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        _('2D bitmap text object using bitmap fonts for fast stylized text rendering.')
+      )
+      .setDimension('2D')
       .setExtensionHelpPath('/objects/bitmap_text')
       .setCategory('Text');
     extension

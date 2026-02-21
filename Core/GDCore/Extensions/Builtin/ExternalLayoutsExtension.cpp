@@ -19,6 +19,9 @@ BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(
                                "external layouts.",
                                "Florian Rival",
                                "Open source (MIT License)")
+      .SetShortDescription(
+          _("Instantiate external layout objects at runtime with position, "
+            "z-order, and layer controls."))
       .SetExtensionHelpPath("/interface/scene-editor/external-layouts")
       .SetCategory("Advanced");
   extension.AddInstructionOrExpressionGroupMetadata(_("External layouts"))

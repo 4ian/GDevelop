@@ -23,6 +23,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsScalableExtension(
                                  "check the scale of an object (default: 1)."),
                                "Florian Rival",
                                "Open source (MIT License)")
+      .SetShortDescription(
+          _("Set and compare object scale globally or per-axis using scalable "
+            "behavior."))
       .SetExtensionHelpPath("/objects");
   extension.AddInstructionOrExpressionGroupMetadata(_("Scalable objects"))
       .SetIcon("res/actions/scale24_black.png");

@@ -28,6 +28,9 @@ module.exports = {
         'Arthur Pacaud (arthuro555)',
         'MIT'
       )
+      .setShortDescription(
+        _('Firebase services integration: auth, firestore/database, storage, analytics, and cloud functions.')
+      )
       .setExtensionHelpPath('/all-features/firebase')
       .setCategory('Network');
     extension

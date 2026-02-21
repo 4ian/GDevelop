@@ -26,6 +26,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
           "separately in different events.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription(
+          _("Mouse/touch conditions and expressions: buttons, wheel, "
+            "cursor/touch positions, and multitouch events."))
       .SetExtensionHelpPath("/all-features/mouse-touch")
       .SetCategory("Input");
   extension.AddInstructionOrExpressionGroupMetadata(_("Mouse and touch"))

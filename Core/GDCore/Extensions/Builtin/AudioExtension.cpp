@@ -19,6 +19,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
             "files. They can be either long music or short sound effects."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription(
+          _("Play sounds/music, control channels, pitch/volume/offset, fades, "
+            "and preload/unload audio."))
       .SetExtensionHelpPath("/all-features/audio")
       .SetCategory("Audio");
   extension.AddInstructionOrExpressionGroupMetadata(_("Sounds and music"))

@@ -27,6 +27,9 @@ module.exports = {
         'Florian Rival',
         'MIT'
       )
+      .setShortDescription(
+        _('Show AdMob banners, app-open, interstitial, rewarded, and consent-aware ad flows.')
+      )
       .setExtensionHelpPath('/all-features/admob')
       .setCategory('Ads');
     extension

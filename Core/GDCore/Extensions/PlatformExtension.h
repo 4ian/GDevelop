@@ -119,6 +119,23 @@ class GD_CORE_API PlatformExtension {
   }
 
   /**
+   * \brief Set a concise extension summary, optimized for search/AI indexing.
+   */
+  PlatformExtension& SetShortDescription(const gd::String& shortDescription_) {
+    shortDescription = shortDescription_;
+    return *this;
+  }
+
+  /**
+   * \brief Set the spatial dimension the extension applies to ("2D", "3D",
+   * "2D/3D", or empty if not applicable).
+   */
+  PlatformExtension& SetDimension(const gd::String& dimension_) {
+    dimension = dimension_;
+    return *this;
+  }
+
+  /**
    * \brief Set the path to the help, relative to the GDevelop documentation
    * root. For example, "/all-features/collisions" for
    * "https://wiki.gdevelop.io/gdevelop5/all-features/collisions".
@@ -397,6 +414,16 @@ class GD_CORE_API PlatformExtension {
    * \brief Return a description of the extension
    */
   const gd::String& GetDescription() const { return informations; }
+
+  /**
+   * \brief Return a concise extension summary.
+   */
+  const gd::String& GetShortDescription() const { return shortDescription; }
+
+  /**
+   * \brief Return the spatial dimension this extension applies to.
+   */
+  const gd::String& GetDimension() const { return dimension; }
 
   /**
    * \brief Return the name of the extension developer
@@ -699,6 +726,8 @@ static gd::String GetVariantFullType(const gd::String& extensionName,
                   ///< actions/conditions/expressions/objects/behavior/event.
   gd::String fullname;      ///< Name displayed to users in the editor.
   gd::String informations;  ///< Description displayed to users in the editor.
+  gd::String shortDescription;  ///< Concise extension summary.
+  gd::String dimension;  ///< "2D", "3D", "2D/3D", or empty.
   gd::String category;
   gd::String author;   ///< Author displayed to users in the editor.
   gd::String license;  ///< License name displayed to users in the editor.

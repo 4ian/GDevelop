@@ -27,6 +27,10 @@ module.exports = {
         'Arthur Pacaud (arthuro555)',
         'MIT'
       )
+      .setShortDescription(
+        _('Position sounds in 3D space with listener-relative spatial attenuation and panning.')
+      )
+      .setDimension('3D')
       .setCategory('Audio');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Spatial sound'))

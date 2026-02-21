@@ -25,6 +25,9 @@ module.exports = {
         'Arthur Pacaud (arthuro555)',
         'MIT'
       )
+      .setShortDescription(
+        _('Steamworks integration: achievements, cloud saves, stats, overlays, leaderboards, and user/account data.')
+      )
       .setCategory('Third-party');
 
     extension

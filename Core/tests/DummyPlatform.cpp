@@ -172,6 +172,8 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
   commonInstructionsExtension->SetExtensionInformation(
       "BuiltinCommonInstructions", "instruction extension", "", "", "");
+  commonInstructionsExtension->SetShortDescription(
+      "Test common instructions extension registering core event types for unit tests.");
   commonInstructionsExtension->AddEvent("Standard", "Standard event", "", "", "", std::make_shared<gd::StandardEvent>());
   commonInstructionsExtension->AddEvent("Else", "Else event", "", "", "", std::make_shared<gd::ElseEvent>());
   commonInstructionsExtension->AddEvent("ForEachChildVariable", "For each child variable event", "", "", "", std::make_shared<gd::ForEachChildVariableEvent>());
@@ -183,6 +185,10 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
   // Create the base object. All objects "inherits" from it.
   baseObjectExtension->SetExtensionInformation(
       "BuiltinObject", "Base Object dummy extension", "", "", "");
+  baseObjectExtension
+      ->SetShortDescription(
+          "Test base object extension with generic object-variable actions and base expressions.")
+      .SetDimension("2D/3D");
   auto& baseObject = baseObjectExtension->AddObject<gd::ObjectConfiguration>(
       "", "Dummy Base Object", "Dummy Base Object", "");
 
@@ -244,7 +250,10 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       ->SetExtensionInformation("ResizableCapability",
                                _("Resizable capability"),
                                _("Change the object dimensions."),
-                               "", "");
+                               "", "")
+      .SetShortDescription(
+          "Hidden test capability behavior exposing object resizing support metadata.")
+      .SetDimension("2D/3D");
   gd::BehaviorMetadata& aut = extension->AddBehavior(
       "ResizableBehavior",
       _("Resizable capability"),
@@ -263,7 +272,10 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       ->SetExtensionInformation("ScalableCapability",
                                _("Scalable capability"),
                                _("Change the object scale."),
-                               "", "");
+                               "", "")
+      .SetShortDescription(
+          "Hidden test capability behavior exposing object scaling support metadata.")
+      .SetDimension("2D/3D");
   gd::BehaviorMetadata& aut = extension->AddBehavior(
       "ScalableBehavior",
       _("Scalable capability"),
@@ -282,7 +294,10 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       ->SetExtensionInformation("FlippableCapability",
                                _("Flippable capability"),
                                _("Flip objects."),
-                               "", "");
+                               "", "")
+      .SetShortDescription(
+          "Hidden test capability behavior exposing object flipping support metadata.")
+      .SetDimension("2D/3D");
   gd::BehaviorMetadata& aut = extension->AddBehavior(
       "FlippableBehavior",
       _("Flippable capability"),
@@ -301,7 +316,10 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       ->SetExtensionInformation("EffectCapability",
                                _("Effect capability"),
                                _("Apply visual effects to objects."),
-                               "", "");
+                               "", "")
+      .SetShortDescription(
+          "Hidden test capability behavior exposing object visual-effect support metadata.")
+      .SetDimension("2D/3D");
   gd::BehaviorMetadata& aut = extension->AddBehavior(
       "EffectBehavior",
       _("Effect capability"),
@@ -320,6 +338,8 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
   extension->SetExtensionInformation(
       "BuiltinVariables", "My testing extension for variables", "", "", "");
+  extension->SetShortDescription(
+      "Test variables extension without namespace for switchable variable instruction coverage.");
 
   extension
       ->AddCondition("NumberVariable",
@@ -418,6 +438,8 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
   extension->SetExtensionInformation(
       "MyExtension", "My testing extension", "", "", "");
+  extension->SetShortDescription(
+      "Comprehensive test extension with actions, expressions, objects, behaviors, effects, and default behaviors.");
 
   extension
       ->AddAction("DoSomething",

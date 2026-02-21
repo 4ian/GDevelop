@@ -26,6 +26,10 @@ module.exports = {
         'Vladyslav Pohorielov',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        _('2D Spine skeletal animation object using atlas/json assets with animation/state controls.')
+      )
+      .setDimension('2D')
       .setExtensionHelpPath('/objects/spine')
       .setCategory('Advanced');
 

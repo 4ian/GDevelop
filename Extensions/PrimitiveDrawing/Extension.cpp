@@ -19,6 +19,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
             "on the screen using events."),
           "Florian Rival and Aurélien Vivet",
           "Open source (MIT License)")
+      .SetShortDescription(
+          _("2D shape painter object drawing primitives via events with "
+            "fill/outline settings."))
+      .SetDimension("2D")
       .SetExtensionHelpPath("/objects/shape_painter")
       .SetCategory("Advanced");
   extension.AddInstructionOrExpressionGroupMetadata(_("Shape painter"))

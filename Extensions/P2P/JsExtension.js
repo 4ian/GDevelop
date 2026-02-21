@@ -25,6 +25,9 @@ module.exports = {
         'Arthur Pacaud (arthuro555)',
         'MIT'
       )
+      .setShortDescription(
+        _('Peer-to-peer networking over WebRTC with events, messaging, IDs, and connection management.')
+      )
       .setExtensionHelpPath('/all-features/p2p')
       .setCategory('Network');
     extension

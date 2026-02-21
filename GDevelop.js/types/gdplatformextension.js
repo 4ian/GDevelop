@@ -2,6 +2,8 @@
 declare class gdPlatformExtension {
   constructor(): void;
   setExtensionInformation(name: string, fullname: string, description: string, author: string, license: string): gdPlatformExtension;
+  setShortDescription(shortDescription: string): gdPlatformExtension;
+  setDimension(dimension: string): gdPlatformExtension;
   setExtensionHelpPath(helpPath: string): gdPlatformExtension;
   setIconUrl(iconUrl: string): gdPlatformExtension;
   setCategory(category: string): gdPlatformExtension;
@@ -24,6 +26,8 @@ declare class gdPlatformExtension {
   getName(): string;
   getCategory(): string;
   getDescription(): string;
+  getShortDescription(): string;
+  getDimension(): string;
   getAuthor(): string;
   getLicense(): string;
   getHelpPath(): string;

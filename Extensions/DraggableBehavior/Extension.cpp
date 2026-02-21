@@ -20,6 +20,10 @@ void DeclareDraggableBehaviorExtension(gd::PlatformExtension& extension) {
             "or disable the behavior when needed."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription(
+          _("Drag objects with mouse/touch, with optional enable/disable "
+            "controls."))
+      .SetDimension("2D")
       .SetCategory("User interface")
       .SetTags("drag")
       .SetExtensionHelpPath("/behaviors/draggable");

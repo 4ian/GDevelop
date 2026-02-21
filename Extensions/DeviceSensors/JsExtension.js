@@ -25,6 +25,9 @@ module.exports = {
         'Matthias Meike',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        _('Read mobile orientation/motion sensors and expose accelerometer/gyroscope values in events.')
+      )
       .setExtensionHelpPath('/all-features/device-sensors')
       .setCategory('Input');
     extension

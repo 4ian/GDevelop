@@ -25,6 +25,9 @@ module.exports = {
         'Various contributors from PixiJS, PixiJS filters and GDevelop',
         'MIT'
       )
+      .setShortDescription(
+        _('Collection of visual effects and filters for layers/objects with configurable parameters.')
+      )
       .setCategory('Visual effect')
       .setExtensionHelpPath('/interface/scene-editor/layer-effects');
 

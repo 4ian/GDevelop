@@ -27,6 +27,9 @@ module.exports = {
         'Matthias Meike',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        _('Native desktop filesystem actions for files/directories: read, write, copy, move, and metadata.')
+      )
       .setExtensionHelpPath('/all-features/filesystem')
       .setCategory('Advanced');
     extension

@@ -23,6 +23,10 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
           "corners as well as the filling.",
           "Victor Levasseur and Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription(
+          _("2D 9-patch panel sprite with resizable borders, "
+            "tiling/stretching, tint, and opacity."))
+      .SetDimension("2D")
       .SetExtensionHelpPath("/objects/panel_sprite");
   extension
       .AddInstructionOrExpressionGroupMetadata(

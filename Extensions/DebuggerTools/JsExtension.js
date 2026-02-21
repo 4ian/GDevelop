@@ -27,6 +27,9 @@ module.exports = {
         'Arthur Pacaud (arthuro555), Aurélien Vivet (Bouh)',
         'MIT'
       )
+      .setShortDescription(
+        _('Control debugger from game: pause execution, draw debug visuals, and log messages.')
+      )
       .setCategory('Advanced');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Debugger Tools'))

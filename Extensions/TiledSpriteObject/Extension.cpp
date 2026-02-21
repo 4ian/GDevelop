@@ -23,6 +23,10 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
           "Sprite objects.",
           "Victor Levasseur and Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription(
+          _("2D tiled sprite object repeating textures over large areas for "
+            "performant backgrounds."))
+      .SetDimension("2D")
       .SetExtensionHelpPath("/objects/tiled_sprite");
   extension.AddInstructionOrExpressionGroupMetadata(_("Tiled Sprite Object"))
       .SetIcon("CppPlatform/Extensions/TiledSpriteIcon.png");

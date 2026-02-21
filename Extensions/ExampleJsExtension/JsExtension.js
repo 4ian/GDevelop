@@ -23,6 +23,8 @@ module.exports = {
       _('An example of a declaration of an extension'),
       'Florian Rival',
       'MIT'
+    ).setShortDescription(
+      _('Template extension demonstrating properties, actions, conditions, expressions, and object/behavior declarations.')
     );
     extension
       .addInstructionOrExpressionGroupMetadata(_('My Dummy Extension'))

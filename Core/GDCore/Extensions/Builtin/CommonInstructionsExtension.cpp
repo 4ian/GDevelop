@@ -30,6 +30,9 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
           "express the game logic and rules.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription(
+          _("Core events, logical conditions, loops, trigger-once, "
+            "comparisons, and event flow controls."))
       .SetCategory("Advanced")
       .SetExtensionHelpPath("/all-features/advanced-conditions");
   extension

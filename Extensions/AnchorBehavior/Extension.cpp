@@ -17,6 +17,10 @@ void DeclareAnchorBehaviorExtension(gd::PlatformExtension& extension) {
                                _("Anchor objects to the window's bounds."),
                                "Victor Levasseur",
                                "Open source (MIT License)")
+      .SetShortDescription(
+          _("Anchor objects to screen edges/corners for responsive 2D user "
+            "interfaces."))
+      .SetDimension("2D")
       .SetCategory("User interface")
       .SetTags("anchor, ui, layout")
       .SetExtensionHelpPath("/behaviors/anchor");

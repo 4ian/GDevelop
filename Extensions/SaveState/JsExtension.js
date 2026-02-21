@@ -27,6 +27,9 @@ module.exports = {
         'Neyl Mahfouf',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        _('Save/load complete game state with configurable object/variable profiles and exclusions.')
+      )
       .setExtensionHelpPath('/all-features/save-state')
       .setCategory('Game mechanic')
       .addInstructionOrExpressionGroupMetadata(_('Save State (experimental)'))

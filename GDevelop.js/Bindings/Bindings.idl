@@ -2283,6 +2283,8 @@ interface PlatformExtension {
                                 [Const] DOMString description,
                                 [Const] DOMString author,
                                 [Const] DOMString license);
+    [Ref] PlatformExtension SetShortDescription([Const] DOMString shortDescription);
+    [Ref] PlatformExtension SetDimension([Const] DOMString dimension);
     [Ref] PlatformExtension SetExtensionHelpPath([Const] DOMString helpPath);
     [Ref] PlatformExtension SetIconUrl([Const] DOMString iconUrl);
     [Ref] PlatformExtension SetCategory([Const] DOMString category);
@@ -2364,6 +2366,8 @@ interface PlatformExtension {
     [Const, Ref] DOMString GetName();
     [Const, Ref] DOMString GetCategory();
     [Const, Ref] DOMString GetDescription();
+    [Const, Ref] DOMString GetShortDescription();
+    [Const, Ref] DOMString GetDimension();
     [Const, Ref] DOMString GetAuthor();
     [Const, Ref] DOMString GetLicense();
     [Const, Ref] DOMString GetHelpPath();
@@ -3515,6 +3519,8 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetVersion();
     [Ref] EventsFunctionsExtension SetShortDescription([Const] DOMString shortDescription);
     [Const, Ref] DOMString GetShortDescription();
+    [Ref] EventsFunctionsExtension SetDimension([Const] DOMString dimension);
+    [Const, Ref] DOMString GetDimension();
     [Ref] EventsFunctionsExtension SetDescription([Const] DOMString description);
     [Const, Ref] DOMString GetDescription();
     [Ref] EventsFunctionsExtension SetName([Const] DOMString name);

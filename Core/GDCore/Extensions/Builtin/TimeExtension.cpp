@@ -23,6 +23,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
           "the last frame or timer elapsed time.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription(
+          _("Scene timers, delays, elapsed time, time scale, and frame delta "
+            "expressions."))
       .SetExtensionHelpPath("/all-features/timers-and-time");
   extension.AddInstructionOrExpressionGroupMetadata(_("Timers and time"))
       .SetIcon("res/conditions/timer24.png");

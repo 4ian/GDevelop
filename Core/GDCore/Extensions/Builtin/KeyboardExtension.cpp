@@ -22,6 +22,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
             "scratch."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription(
+          _("Keyboard key state conditions and latest pressed key "
+            "expression."))
       .SetExtensionHelpPath("/all-features/keyboard")
       .SetCategory("Input");
   extension.AddInstructionOrExpressionGroupMetadata(_("Keyboard"))

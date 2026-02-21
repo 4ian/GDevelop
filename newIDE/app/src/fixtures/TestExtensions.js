@@ -23,6 +23,11 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       '',
       'MIT'
     );
+    extension
+      .setShortDescription(
+        'Fake 2D/3D effects metadata for editor tests, covering parameters and compatibility flags.'
+      )
+      .setDimension('2D/3D');
 
     const sepiaEffect = extension
       .addEffect('FakeSepia')
@@ -162,6 +167,9 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       '',
       'MIT'
     );
+    extension.setShortDescription(
+      'Fake behavior extension for tests with editable string and boolean properties.'
+    );
     const fakeBehavior = new gd.BehaviorJsImplementation();
     // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
     // $FlowFixMe[cannot-write]
@@ -249,6 +257,11 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       '',
       'MIT'
     );
+    extension
+      .setShortDescription(
+        'Fake text-object behavior metadata for tests, restricted to TextObject::Text.'
+      )
+      .setDimension('2D');
     const fakeBehavior = new gd.BehaviorJsImplementation();
     // $FlowFixMe[incompatible-type] - ignore Flow warning as we're creating a behavior
     // $FlowFixMe[cannot-write]
@@ -294,6 +307,9 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       'Fake object not supporting the "effect" capability',
       '',
       'MIT'
+    );
+    extension.setShortDescription(
+      'Fake object metadata for tests, intentionally missing effect capability support.'
     );
     const fakeObject = new gd.ObjectJsImplementation();
 
@@ -351,6 +367,11 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       '',
       'MIT'
     );
+    extension
+      .setShortDescription(
+        'Fake event-based panel-sprite button object used by extension editor tests.'
+      )
+      .setDimension('2D');
     extension.addObject(
       'PanelSpriteButton',
       'PanelSpriteButton',
@@ -371,6 +392,10 @@ export const makeTestExtensions = (gd: libGDevelop) => {
         '',
         'MIT'
       )
+      .setShortDescription(
+        'Fake 3D extension for tests with a simple rendered cube object.'
+      )
+      .setDimension('3D')
       .setCategory('General');
     extension
       .addInstructionOrExpressionGroupMetadata('3D')
@@ -417,6 +442,10 @@ export const makeTestExtensions = (gd: libGDevelop) => {
         '',
         'MIT'
       )
+      .setShortDescription(
+        'Fake text input object metadata for tests, including initial value and placeholder properties.'
+      )
+      .setDimension('2D')
       .setCategory('User interface');
     extension
       .addInstructionOrExpressionGroupMetadata('Text Input')

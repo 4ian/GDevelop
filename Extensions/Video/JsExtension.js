@@ -28,6 +28,10 @@ module.exports = {
         'Aurélien Vivet',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        _('2D video object playback with controls for source, volume, looping, and timing.')
+      )
+      .setDimension('2D')
       .setCategory('User interface')
       .setExtensionHelpPath('/objects/video');
     extension

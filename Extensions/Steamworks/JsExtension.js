@@ -25,7 +25,9 @@ module.exports = {
         'Arthur Pacaud (arthuro555)',
         'MIT'
       )
-      .setShortDescription('Steam integration: achievements, leaderboards, lobby, workshop, overlay, app ownership.')
+      .setShortDescription(
+        'Steam integration: achievements, leaderboards, lobby, workshop, overlay, app ownership.'
+      )
       .setCategory('Third-party');
 
     extension

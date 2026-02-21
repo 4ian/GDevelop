@@ -26,7 +26,9 @@ module.exports = {
         'Harsimran Virk',
         'MIT'
       )
-      .setShortDescription('2D light objects with configurable radius, color, and optional texture. Obstacle behavior blocks light.')
+      .setShortDescription(
+        '2D light objects with configurable radius, color, and optional texture. Obstacle behavior blocks light.'
+      )
       .setDimension('2D')
       .setCategory('Visual effect')
       .setTags('light');

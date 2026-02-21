@@ -26,7 +26,9 @@ module.exports = {
         'Matthias Meike',
         'Open source (MIT License)'
       )
-      .setShortDescription('Trigger vibrations on mobile devices with configurable duration and patterns.')
+      .setShortDescription(
+        'Trigger vibrations on mobile devices with configurable duration and patterns.'
+      )
       .setExtensionHelpPath('/all-features/device-vibration')
       .setCategory('User interface');
     extension

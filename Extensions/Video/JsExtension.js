@@ -28,7 +28,9 @@ module.exports = {
         'Aurélien Vivet',
         'Open source (MIT License)'
       )
-      .setShortDescription('Video object: play/pause/loop MPEG4 videos on screen. Volume, playback speed, opacity control.')
+      .setShortDescription(
+        'Video object: play/pause/loop MPEG4 videos on screen. Volume, playback speed, opacity control.'
+      )
       .setCategory('User interface')
       .setExtensionHelpPath('/objects/video');
     extension

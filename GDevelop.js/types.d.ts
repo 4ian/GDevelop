@@ -1799,6 +1799,10 @@ export class PlatformExtension extends EmscriptenObject {
   setExtensionHelpPath(helpPath: string): PlatformExtension;
   setIconUrl(iconUrl: string): PlatformExtension;
   setCategory(category: string): PlatformExtension;
+  setShortDescription(shortDescription: string): PlatformExtension;
+  getShortDescription(): string;
+  setDimension(dimension: string): PlatformExtension;
+  getDimension(): string;
   addInstructionOrExpressionGroupMetadata(name: string): InstructionOrExpressionGroupMetadata;
   markAsDeprecated(): void;
   getTags(): VectorString;
@@ -2570,6 +2574,8 @@ export class EventsFunctionsExtension extends EmscriptenObject {
   getShortDescription(): string;
   setDescription(description: string): EventsFunctionsExtension;
   getDescription(): string;
+  setDimension(dimension: string): EventsFunctionsExtension;
+  getDimension(): string;
   setName(name: string): EventsFunctionsExtension;
   getName(): string;
   setFullName(fullName: string): EventsFunctionsExtension;

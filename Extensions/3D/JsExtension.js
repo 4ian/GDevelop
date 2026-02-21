@@ -27,7 +27,9 @@ module.exports = {
         'Florian Rival',
         'MIT'
       )
-      .setShortDescription('3D objects (box, model), 3D camera, Z position/rotation/size. Base 3D capability for all objects.')
+      .setShortDescription(
+        '3D objects (box, model), 3D camera, Z position/rotation/size. Base 3D capability for all objects.'
+      )
       .setDimension('3D')
       .setCategory('General');
     extension

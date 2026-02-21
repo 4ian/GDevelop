@@ -27,7 +27,9 @@ module.exports = {
         'Aurélien Vivet',
         'Open source (MIT License)'
       )
-      .setShortDescription('Text rendered from bitmap font images. High performance, full character aesthetic control.')
+      .setShortDescription(
+        'Text rendered from bitmap font images. High performance, full character aesthetic control.'
+      )
       .setDimension('2D')
       .setExtensionHelpPath('/objects/bitmap_text')
       .setCategory('Text');

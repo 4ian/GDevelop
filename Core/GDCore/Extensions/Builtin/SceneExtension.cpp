@@ -23,6 +23,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
             "game, set background color, or disable input when focus is lost."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("Change/pause/stop scenes, check scene start, preload assets, get scene name, quit game.")
       .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
   extension.AddInstructionOrExpressionGroupMetadata(_("Scene"))
       .SetIcon("res/conditions/depart24.png");

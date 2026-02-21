@@ -23,6 +23,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetCategory("User interface")
+      .SetShortDescription("Game window title, size, fullscreen, resolution, adaptive scaling, screen dimensions.")
       .SetExtensionHelpPath("/all-features/window");
   extension
       .AddInstructionOrExpressionGroupMetadata(_("Game window and resolution"))

@@ -27,6 +27,7 @@ module.exports = {
         'Arthur Pacaud (arthuro555), Aurélien Vivet (Bouh)',
         'MIT'
       )
+      .setShortDescription('Enable 2D debug draw, log messages to debugger console, pause execution.')
       .setCategory('Advanced');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Debugger Tools'))

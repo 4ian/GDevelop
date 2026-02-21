@@ -29,6 +29,8 @@ module.exports = {
         'Florian Rival',
         'MIT'
       )
+      .setShortDescription('3D physics: gravity, forces, collisions, joints. Static/dynamic/kinematic bodies. Mass, damping.')
+      .setDimension('3D')
       .setExtensionHelpPath('/behaviors/physics3d')
       .setCategory('Movement')
       .setTags('physics, gravity, obstacle, collision');

@@ -27,6 +27,8 @@ module.exports = {
         'Arthur Pacaud (arthuro555)',
         'MIT'
       )
+      .setShortDescription('Position sounds in 3D space. Stereo panning simulates spatial audio around the listener.')
+      .setDimension('3D')
       .setCategory('Audio');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Spatial sound'))

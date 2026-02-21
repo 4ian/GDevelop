@@ -23,7 +23,8 @@ module.exports = {
       _('An example of a declaration of an extension'),
       'Florian Rival',
       'MIT'
-    );
+    )
+      .setShortDescription('Example/dummy extension for testing extension declaration patterns.');
     extension
       .addInstructionOrExpressionGroupMetadata(_('My Dummy Extension'))
       .setIcon('CppPlatform/Extensions/topdownmovementicon.png');

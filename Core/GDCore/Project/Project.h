@@ -25,6 +25,7 @@ class Layout;
 class ExternalEvents;
 class ResourcesContainer;
 class ExternalLayout;
+class CinematicSequence;
 class EventsFunctionsExtension;
 class EventsBasedObject;
 class EventsBasedBehavior;
@@ -821,6 +822,82 @@ class GD_CORE_API Project {
    */
   void RemoveExternalLayout(const gd::String& name);
 
+  ///@}
+
+  /** \name Cinematic sequence management
+   * Members functions related to cinematic sequence management.
+   */
+  ///@{
+
+  /**
+   * Return true if cinematic sequence called "name" exists.
+   */
+  bool HasCinematicSequenceNamed(const gd::String& name) const;
+
+  /**
+   * Return a reference to the cinematic sequence called "name".
+   */
+  CinematicSequence& GetCinematicSequence(const gd::String& name);
+
+  /**
+   * Return a reference to the cinematic sequence called "name".
+   */
+  const CinematicSequence& GetCinematicSequence(const gd::String& name) const;
+
+  /**
+   * Return a reference to the cinematic sequence at position "index" in the
+   * cinematic sequence list
+   */
+  CinematicSequence& GetCinematicSequence(std::size_t index);
+
+  /**
+   * Return a reference to the cinematic sequence at position "index" in the
+   * cinematic sequence list
+   */
+  const CinematicSequence& GetCinematicSequence(std::size_t index) const;
+
+  /**
+   * Return the position of the cinematic sequence called "name" in the 
+   * cinematic sequence list
+   */
+  std::size_t GetCinematicSequencePosition(const gd::String& name) const;
+
+  /**
+   * Change the position of the specified cinematic sequence.
+   */
+  void MoveCinematicSequence(std::size_t oldIndex, std::size_t newIndex);
+
+  /**
+   * \brief Swap the specified cinematic sequences.
+   *
+   * Do nothing if indexes are not correct.
+   */
+  void SwapCinematicSequences(std::size_t first, std::size_t second);
+
+  /**
+   * Return the number of cinematic sequences.
+   */
+  std::size_t GetCinematicSequencesCount() const;
+
+  /**
+   * \brief Adds a new empty cinematic sequence called "name" at the specified
+   * position in the list.
+   */
+  gd::CinematicSequence& InsertNewCinematicSequence(const gd::String& name,
+                                                    std::size_t position);
+
+  /**
+   * \brief Adds a new cinematic sequence constructed from the sequence passed
+   * as parameter.
+   */
+  gd::CinematicSequence& InsertCinematicSequence(
+      const CinematicSequence& cinematicSequence, std::size_t position);
+
+  /**
+   * \brief Delete cinematic sequence named "name".
+   */
+  void RemoveCinematicSequence(const gd::String& name);
+
   /**
    * Set the first layout of the project.
    */
@@ -1128,6 +1205,8 @@ class GD_CORE_API Project {
   gd::ObjectsContainer objectsContainer;
   std::vector<std::unique_ptr<gd::ExternalLayout> >
       externalLayouts;  ///< List of all externals layouts
+  std::vector<std::unique_ptr<gd::CinematicSequence> >
+      cinematicSequences; ///< List of all cinematic sequences
   std::vector<std::unique_ptr<gd::EventsFunctionsExtension> >
       eventsFunctionsExtensions;
   gd::ResourcesContainer

@@ -29,7 +29,7 @@ module.exports = {
         'Florian Rival, Franco Maciel',
         'MIT'
       )
-      .setShortDescription('2D physics: gravity, forces, collisions, joints. Static/dynamic/kinematic bodies. Mass, damping.')
+      .setShortDescription('2D rigid-body physics behavior: gravity, forces, collisions, joints. Static/dynamic/kinematic bodies. Mass, damping.')
       .setDimension('2D')
       .setExtensionHelpPath('/behaviors/physics2')
       .setCategory('Movement')

@@ -2,19 +2,19 @@
   "theme": {
     "primary": {
       "dark": {
-        "value": "#693BFF",
+        "value": "#8760F2",
         "comment": "Palette/Purple/60"
       },
       "color": {
-        "value": "#9d7fff",
+        "value": "#CBBDFF",
         "comment": "Palette/Purple/50"
       },
       "light": {
-        "value": "#9d7fff",
+        "value": "#DFD3FF",
         "comment": "Palette/Purple/40"
       },
       "text-contrast-color": {
-        "value": "#1F1F1F",
+        "value": "#1A1A1A",
         "comment": "Palette/Grey/00"
       }
     },
@@ -189,11 +189,11 @@
     "icon-button": {
       "selected": {
         "color": {
-          "value": "#1F1F1F",
+          "value": "#1A1A1A",
           "comment": "Palette/Grey/100"
         },
         "background-color": {
-          "value": "#9d7fff",
+          "value": "#CBBDFF",
           "comment:": "Palette/Purple/20"
         }
       }
@@ -204,7 +204,7 @@
         "comment": "Palette/Purple/10"
       },
       "hover-color": {
-        "value": "#9d7fff",
+        "value": "#DFD3FF",
         "comment": "Palette/Purple/20"
       }
     },
@@ -225,7 +225,7 @@
           "comment": "Palette/Purple/10"
         },
         "track-color": {
-          "value": "#9d7fff",
+          "value": "#DFD3FF",
           "comment": "Palette/Purple/40"
         }
       },
@@ -571,7 +571,7 @@
           "comment": "Palette/Purple/10"
         },
         "caret-color": {
-          "value": "#9d7fff",
+          "value": "#DFD3FF",
           "comment": "Palette/Purple/20"
         }
       },
@@ -626,7 +626,7 @@
           "comment": "Palette/Purple/50"
         },
         "background-color": {
-          "value": "#9d7fff",
+          "value": "#DFD3FF",
           "comment": "Palette/Purple/30"
         }
       },
@@ -828,7 +828,7 @@
       },
       "selectable-link": {
         "color": {
-          "value": "#9d7fff"
+          "value": "#DFD3FF"
         }
       }
     }
@@ -851,10 +851,10 @@
     "play-button": {
       "primary": {
         "border-color": {
-          "value": "#9d7fff"
+          "value": "#DFD3FF"
         },
         "background-color": {
-          "value": "#9d7fff"
+          "value": "#DFD3FF"
         },
         "color": {
           "value": "#2d2d2d"
@@ -870,7 +870,7 @@
       },
       "secondary": {
         "border-color": {
-          "value": "#9d7fff"
+          "value": "#DFD3FF"
         },
         "background-color": {
           "value": "#1F1F1F"
@@ -883,7 +883,7 @@
             "value": "#606066"
           },
           "border-color": {
-            "value": "#9d7fff"
+            "value": "#DFD3FF"
           }
         }
       }

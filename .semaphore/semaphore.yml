@@ -216,7 +216,6 @@ blocks:
               (cd newIDE && npm i)
               (cd GDJS && git checkout package-lock.json && npm i)
             - cd newIDE/app
-            - npm run postinstall
             - npm run lint
 
   - name: Tests

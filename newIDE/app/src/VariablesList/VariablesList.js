@@ -948,6 +948,7 @@ const VariablesList: React.ComponentType<{
         const name = hasName ? nameOrIndex : null;
 
         if (pasteAtTopLevel) {
+          if (props.isListLocked) return;
           if (!name) return;
           const { name: newName } = insertInVariablesContainer(
             props.variablesContainer,
@@ -974,6 +975,7 @@ const VariablesList: React.ComponentType<{
             targetVariableLineage
           );
           if (!targetParentVariable) {
+            if (props.isListLocked) return;
             if (!name) return;
             const { name: newName } = insertInVariablesContainer(
               props.variablesContainer,
@@ -1029,6 +1031,7 @@ const VariablesList: React.ComponentType<{
     [
       _onChange,
       props.inheritedVariablesContainer,
+      props.isListLocked,
       props.variablesContainer,
       selectedNodes,
       setSelectedNodes,
@@ -1103,13 +1106,27 @@ const VariablesList: React.ComponentType<{
 
   const deleteSelection = React.useCallback(
     () => {
+      const nodesToDelete = selectedNodes
+        .filter(
+          // An inherited variable can never be deleted:
+          nodeId => !nodeId.startsWith(inheritedPrefix)
+        )
+        .filter(nodeId => {
+          // If the list is locked, only allow deleting children of overriden variables:
+          if (props.isListLocked) {
+            return nodeId.includes(separator);
+          }
+          return true;
+        });
+      if (nodesToDelete.length === 0) return;
+
       // Take advantage of the node ids notation to sort them in
       // descending lexicographical order, so we delete from "last"
       // to "first". In the case of arrays, this avoids to change
       // the index of the variables while deleting them, which would
       // result in the wrong variables to be deleted if multiple of them
       // are removed.
-      const deleteSuccesses = selectedNodes
+      const deleteSuccesses = nodesToDelete
         .sort()
         .reverse()
         .map(_deleteNode);
@@ -1118,7 +1135,13 @@ const VariablesList: React.ComponentType<{
         setSelectedNodes([]);
       }
     },
-    [selectedNodes, _deleteNode, _onChange, setSelectedNodes]
+    [
+      selectedNodes,
+      _deleteNode,
+      _onChange,
+      setSelectedNodes,
+      props.isListLocked,
+    ]
   );
 
   const updateExpandedAndSelectedNodesFollowingNameChange = React.useCallback(
@@ -1980,7 +2003,6 @@ const VariablesList: React.ComponentType<{
     addVariable,
   }));
 
-  // TODO Allow to past child-variables of existing object variables even when the variable list is locked.
   const toolbar = (
     <VariablesListToolbar
       isNarrow={isNarrow}
@@ -1989,11 +2011,29 @@ const VariablesList: React.ComponentType<{
       onPaste={pasteClipboardContent}
       onDelete={deleteSelection}
       canCopy={selectedNodes.length > 0}
-      canPaste={Clipboard.has(CLIPBOARD_KIND) && !props.isListLocked}
+      canPaste={
+        Clipboard.has(CLIPBOARD_KIND) &&
+        (!props.isListLocked ||
+          // If the list is locked, only allow pasting in the children of overriden variables:
+          (selectedNodes.length > 0 &&
+            selectedNodes.every(
+              nodeId => !nodeId.startsWith(inheritedPrefix)
+            ) &&
+            selectedNodes.every(nodeId => {
+              return nodeId.includes(separator);
+            })))
+      }
       canDelete={
-        !props.isListLocked &&
         selectedNodes.length > 0 &&
-        selectedNodes.every(nodeId => !nodeId.startsWith(inheritedPrefix))
+        // An inherited variable can never be deleted:
+        selectedNodes.every(nodeId => !nodeId.startsWith(inheritedPrefix)) &&
+        // If the list is locked, only allow deleting children of overriden variables:
+        selectedNodes.every(nodeId => {
+          if (props.isListLocked) {
+            return nodeId.includes(separator);
+          }
+          return true;
+        })
       }
       canAdd={!props.isListLocked}
       onUndo={_undo}

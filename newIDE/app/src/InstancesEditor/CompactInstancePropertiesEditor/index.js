@@ -17,7 +17,6 @@ import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import VariablesList, {
   type HistoryHandler,
-  type VariablesListInterface,
 } from '../../VariablesList/VariablesList';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import useForceUpdate from '../../Utils/UseForceUpdate';
@@ -30,7 +29,6 @@ import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/E
 import TileSetVisualizer, {
   type TileMapTileSelection,
 } from '../TileSetVisualizer';
-import Add from '../../UI/CustomSvgIcons/Add';
 import {
   TopLevelCollapsibleSection,
   CollapsibleSubPanel,
@@ -125,7 +123,6 @@ type Props = {|
   historyHandler?: HistoryHandler,
   tileMapTileSelection: ?TileMapTileSelection,
   onSelectTileMapTile: (?TileMapTileSelection) => void,
-  isVariableListLocked: boolean,
   canOverrideBehaviorProperties: boolean,
 |};
 
@@ -147,12 +144,10 @@ export const CompactInstancePropertiesEditor = ({
   projectScopedContainersAccessor,
   tileMapTileSelection,
   onSelectTileMapTile,
-  isVariableListLocked,
   canOverrideBehaviorProperties,
 }: Props): null | React.Node => {
   const forceUpdate = useForceUpdate();
   const instance = instances[0];
-  const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
   /**
@@ -480,23 +475,10 @@ export const CompactInstancePropertiesEditor = ({
                     >
                       <ShareExternal style={styles.icon} />
                     </IconButton>
-                    {isVariableListLocked ? null : (
-                      <IconButton
-                        size="small"
-                        onClick={
-                          variablesListRef.current
-                            ? variablesListRef.current.addVariable
-                            : undefined
-                        }
-                      >
-                        <Add style={styles.icon} />
-                      </IconButton>
-                    )}
                   </Line>
                 </Line>
               </Column>
               <VariablesList
-                ref={variablesListRef}
                 projectScopedContainersAccessor={
                   projectScopedContainersAccessor
                 }
@@ -520,7 +502,7 @@ export const CompactInstancePropertiesEditor = ({
                 compactEmptyPlaceholderText={
                   <Trans>There are no variables on this instance.</Trans>
                 }
-                isListLocked={isVariableListLocked}
+                isListLocked={true}
               />
             </>
           ) : null}

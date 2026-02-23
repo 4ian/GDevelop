@@ -9,6 +9,7 @@ import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow'
 import { t } from '@lingui/macro';
 
 export type CompactSearchBarInterface = {|
+  focus: () => void,
   blur: () => void,
 |};
 
@@ -27,6 +28,16 @@ const CompactSearchBar: React.ComponentType<{
 }> = React.forwardRef<CompactSearchBarProps, CompactSearchBarInterface>(
   ({ value, onChange, id, disabled, errored, placeholder }, ref) => {
     const idToUse = React.useRef<string>(id || makeTimestampedId());
+    const inputRef = React.useRef<HTMLInputElement | null>(null);
+
+    React.useImperativeHandle(ref, () => ({
+      focus: () => {
+        if (inputRef.current) inputRef.current.focus();
+      },
+      blur: () => {
+        if (inputRef.current) inputRef.current.blur();
+      },
+    }));
 
     return (
       <I18n>
@@ -47,6 +58,7 @@ const CompactSearchBar: React.ComponentType<{
                 <Search className={classes.searchIcon} />
               </div>
               <input
+                ref={inputRef}
                 id={idToUse.current}
                 type={'text'}
                 disabled={disabled}

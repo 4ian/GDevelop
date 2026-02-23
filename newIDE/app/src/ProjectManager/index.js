@@ -5,7 +5,9 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import SearchBar, { type SearchBarInterface } from '../UI/SearchBar';
+import CompactSearchBar, {
+  type CompactSearchBarInterface,
+} from '../UI/CompactSearchBar';
 import GlobalVariablesDialog from '../VariablesList/GlobalVariablesDialog';
 import ProjectPropertiesDialog from './ProjectPropertiesDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -615,7 +617,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     ] = React.useState(null);
     const [openedExtensionName, setOpenedExtensionName] = React.useState(null);
 
-    const searchBarRef = React.useRef<?SearchBarInterface>(null);
+    const searchBarRef = React.useRef<?CompactSearchBarInterface>(null);
 
     React.useImperativeHandle(ref, () => ({
       forceUpdateList: () => {
@@ -1355,10 +1357,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
             {!isNavigatingInMainMenuItem && project && (
               <Line noMargin>
                 <Column expand>
-                  <SearchBar
+                  <CompactSearchBar
                     ref={searchBarRef}
                     value={searchText}
-                    onRequestSearch={() => {}}
                     onChange={setSearchText}
                     placeholder={t`Search in project`}
                   />

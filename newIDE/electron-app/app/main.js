@@ -581,9 +581,14 @@ app.on('ready', function() {
     closeAllConnections(windowId);
   });
 
-  ipcMain.on('updates-check-and-download', event => {
+  // Track whether the current update check was triggered explicitly by the user,
+  // so that errors are only surfaced to the user for manual checks.
+  let isExplicitUpdateCheck = false;
+
+  ipcMain.on('updates-check-and-download', (event, { explicit } = {}) => {
     // This will immediately download an update, then install when the
     // app quits.
+    isExplicitUpdateCheck = !!explicit;
     log.info('Starting check for updates (with auto-download if any)');
     autoUpdater.autoDownload = true;
     autoUpdater.checkForUpdatesAndNotify().catch(err => {
@@ -591,12 +596,17 @@ app.on('ready', function() {
     });
   });
 
-  ipcMain.on('updates-check', event => {
+  ipcMain.on('updates-check', (event, { explicit } = {}) => {
+    isExplicitUpdateCheck = !!explicit;
     log.info('Starting check for updates (without auto-download)');
     autoUpdater.autoDownload = false;
     autoUpdater.checkForUpdates().catch(err => {
       log.error('Error checking for updates:', err);
     });
+  });
+
+  ipcMain.on('updates-install-and-quit', () => {
+    autoUpdater.quitAndInstall();
   });
 
   function sendUpdateStatus(status) {
@@ -617,6 +627,7 @@ app.on('ready', function() {
     sendUpdateStatus({
       message: 'Update available.',
       status: 'update-available',
+      info,
     });
   });
   autoUpdater.on('update-not-available', info => {
@@ -626,11 +637,15 @@ app.on('ready', function() {
     });
   });
   autoUpdater.on('error', err => {
-    sendUpdateStatus({
-      message: 'Error in auto-updater. ' + err,
-      status: 'error',
-      err,
-    });
+    if (isExplicitUpdateCheck) {
+      sendUpdateStatus({
+        message: 'Error in auto-updater. ' + err,
+        status: 'error',
+        err,
+      });
+    } else {
+      log.error('Background update check failed:', err);
+    }
   });
   autoUpdater.on('download-progress', progressObj => {
     let logMessage = 'Download speed: ' + progressObj.bytesPerSecond;

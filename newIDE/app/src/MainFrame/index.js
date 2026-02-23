@@ -82,6 +82,7 @@ import {
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor';
 import { type JsExtensionsLoader } from '../JsExtensionsLoader';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import optionalRequire from '../Utils/OptionalRequire';
 import {
   getElectronUpdateNotificationTitle,
   getElectronUpdateNotificationBody,
@@ -232,6 +233,8 @@ import StandaloneDialog from './StandAloneDialog';
 import { useInGameEditorSettings } from '../EmbeddedGame/InGameEditorSettings';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { useAutomatedRegularInGameEditorRestart } from '../EmbeddedGame/UseAutomatedRegularInGameEditorRestart';
+const electron = optionalRequire('electron');
+const ipcRendererForUpdates = electron ? electron.ipcRenderer : null;
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -4370,15 +4373,36 @@ const MainFrame = (props: Props): React.MixedElement => {
   const setElectronUpdateStatus = (updateStatus: ElectronUpdateStatus) => {
     setState(state => ({ ...state, updateStatus }));
 
-    // TODO: use i18n to translate title and body in notification.
-    // Also, find a way to use preferences to know if user deactivated auto-update.
-    const notificationTitle = getElectronUpdateNotificationTitle(updateStatus);
-    const notificationBody = getElectronUpdateNotificationBody(updateStatus);
-    if (notificationTitle) {
-      const notification = new window.Notification(notificationTitle, {
-        body: notificationBody,
-      });
-      notification.onclick = () => openAboutDialog(true);
+    if (updateStatus.status === 'update-downloaded') {
+      // Update is ready: offer a one-click restart instead of a generic notification.
+      const version =
+        updateStatus.info && updateStatus.info.version
+          ? ` (${updateStatus.info.version})`
+          : '';
+      const restartNotification = new window.Notification(
+        i18n._(t`GDevelop update ready${version}`),
+        { body: i18n._(t`Click to restart and install the update now.`) }
+      );
+      restartNotification.onclick = () => {
+        if (ipcRendererForUpdates)
+          ipcRendererForUpdates.send('updates-install-and-quit');
+      };
+    } else {
+      const notificationTitle = getElectronUpdateNotificationTitle(
+        updateStatus,
+        i18n
+      );
+      const notificationBody = getElectronUpdateNotificationBody(
+        updateStatus,
+        i18n,
+        preferences.values.autoDownloadUpdates
+      );
+      if (notificationTitle) {
+        const notification = new window.Notification(notificationTitle, {
+          body: notificationBody,
+        });
+        notification.onclick = () => openAboutDialog(true);
+      }
     }
   };
 

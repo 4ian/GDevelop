@@ -869,11 +869,6 @@ const VariablesList: React.ComponentType<{
       ? props.historyHandler.canRedo()
       : canRedo(historyRef.current);
 
-  const keyboardShortcuts = new KeyboardShortcuts({
-    isActive: () => true,
-    shortcutCallbacks: { onUndo: _undo, onRedo: _redo },
-  });
-
   const copySelection = React.useCallback(
     () => {
       Clipboard.set(
@@ -1143,6 +1138,26 @@ const VariablesList: React.ComponentType<{
       props.isListLocked,
     ]
   );
+
+  const cutSelection = React.useCallback(
+    () => {
+      copySelection();
+      deleteSelection();
+    },
+    [copySelection, deleteSelection]
+  );
+
+  const keyboardShortcuts = new KeyboardShortcuts({
+    isActive: () => true,
+    shortcutCallbacks: {
+      onCopy: copySelection,
+      onCut: cutSelection,
+      onPaste: pasteClipboardContent,
+      onDelete: deleteSelection,
+      onUndo: _undo,
+      onRedo: _redo,
+    },
+  });
 
   const updateExpandedAndSelectedNodesFollowingNameChange = React.useCallback(
     (oldNodeId: string, newName: string) => {

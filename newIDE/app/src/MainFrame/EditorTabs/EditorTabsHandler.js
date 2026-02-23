@@ -6,6 +6,9 @@ import { DebuggerEditorContainer } from '../EditorContainers/DebuggerEditorConta
 import { EventsFunctionsExtensionEditorContainer } from '../EditorContainers/EventsFunctionsExtensionEditorContainer';
 import { ExternalEventsEditorContainer } from '../EditorContainers/ExternalEventsEditorContainer';
 import { ExternalLayoutEditorContainer } from '../EditorContainers/ExternalLayoutEditorContainer';
+
+import { ExternalLayoutEditorContainer } from '../EditorContainers/ExternalLayoutEditorContainer';
+import { CinematicSequenceEditorContainer } from '../EditorContainers/CinematicSequenceEditorContainer';
 import { ResourcesEditorContainer } from '../EditorContainers/ResourcesEditorContainer';
 import { SceneEditorContainer } from '../EditorContainers/SceneEditorContainer';
 import { type HomePageEditorInterface } from '../EditorContainers/HomePage';
@@ -24,6 +27,7 @@ type EditorRef =
   | EventsFunctionsExtensionEditorContainer
   | ExternalEventsEditorContainer
   | ExternalLayoutEditorContainer
+  | CinematicSequenceEditorContainer
   | ResourcesEditorContainer
   | SceneEditorContainer
   | HomePageEditorInterface
@@ -46,62 +50,62 @@ export type EditorKind =
 export type EditorTab = {|
   /** The kind of editor. */
   kind: EditorKind,
-  /** The function to render the tab editor. */
-  renderEditorContainer: RenderEditorContainerPropsWithRef => React.Node,
-  /** A reference to the editor. */
-  editorRef: ?EditorRef,
-  /** The label shown on the tab. */
-  label?: string,
-  icon?: React.Node,
-  renderCustomIcon: ?(brightness: number) => React.Node,
-  /** the html dataset object to set on the tab button. */
-  tabOptions?: TabOptions,
-  /** The name of the layout/external layout/external events/extension. */
-  projectItemName: ?string,
-  /** A unique key for the tab. */
-  key: string,
-  /** Extra props to pass to editors. */
-  extraEditorProps: ?EditorContainerExtraProps,
-  /** If set to false, the tab can't be closed. */
-  closable: boolean,
+    /** The function to render the tab editor. */
+    renderEditorContainer: RenderEditorContainerPropsWithRef => React.Node,
+      /** A reference to the editor. */
+      editorRef: ?EditorRef,
+        /** The label shown on the tab. */
+        label ?: string,
+        icon ?: React.Node,
+        renderCustomIcon: ?(brightness: number) => React.Node,
+          /** the html dataset object to set on the tab button. */
+          tabOptions ?: TabOptions,
+          /** The name of the layout/external layout/external events/extension. */
+          projectItemName: ?string,
+            /** A unique key for the tab. */
+            key: string,
+              /** Extra props to pass to editors. */
+              extraEditorProps: ?EditorContainerExtraProps,
+                /** If set to false, the tab can't be closed. */
+                closable: boolean,
 |};
 
 export type EditorTabsState = {|
   panes: {
-    [paneIdentifier: string]: {|
-      editors: Array<EditorTab>,
+  [paneIdentifier: string]: {|
+    editors: Array < EditorTab >,
       currentTab: number,
     |},
-  },
+},
 |};
 
 type EditorTabPersistedState = {|
   /** The name of the layout/external layout/external events/extension. */
   projectItemName: ?string,
-  /** The editor kind. */
-  editorKind: EditorKind,
+    /** The editor kind. */
+    editorKind: EditorKind,
 |};
 
 export type EditorTabsPersistedState = {|
-  editors: Array<EditorTabPersistedState>,
-  currentTab: number,
+  editors: Array < EditorTabPersistedState >,
+    currentTab: number,
 |};
 
 export type EditorOpeningOptions = {|
   kind: EditorKind,
-  paneIdentifier: string,
-  label?: string,
-  icon?: React.Node,
-  renderCustomIcon?: ?(brightness: number) => React.Node,
-  projectItemName: ?string,
-  tabOptions?: TabOptions,
-  renderEditorContainer: (
-    props: RenderEditorContainerPropsWithRef
-  ) => React.Node,
-  key: string,
-  extraEditorProps?: EditorContainerExtraProps,
-  dontFocusTab?: boolean,
-  closable?: boolean,
+    paneIdentifier: string,
+      label ?: string,
+      icon ?: React.Node,
+      renderCustomIcon ?: ? (brightness: number) => React.Node,
+      projectItemName: ?string,
+        tabOptions ?: TabOptions,
+        renderEditorContainer: (
+          props: RenderEditorContainerPropsWithRef
+        ) => React.Node,
+          key: string,
+            extraEditorProps ?: EditorContainerExtraProps,
+            dontFocusTab ?: boolean,
+            closable ?: boolean,
 |};
 
 export const getEditorTabsInitialState = (): EditorTabsState => {
@@ -329,6 +333,7 @@ export const saveUiSettings = (state: EditorTabsState) => {
         editorTab.editorRef &&
         (editorTab.editorRef instanceof SceneEditorContainer ||
           editorTab.editorRef instanceof ExternalLayoutEditorContainer ||
+          editorTab.editorRef instanceof CinematicSequenceEditorContainer ||
           editorTab.editorRef instanceof CustomObjectEditorContainer)
       ) {
         editorTab.editorRef.saveUiSettings();
@@ -373,6 +378,7 @@ export const closeLayoutTabs = (
       editor instanceof EventsEditorContainer ||
       editor instanceof ExternalEventsEditorContainer ||
       editor instanceof ExternalLayoutEditorContainer ||
+      editor instanceof CinematicSequenceEditorContainer ||
       editor instanceof SceneEditorContainer
     ) {
       const editorLayout = editor.getLayout();
@@ -398,6 +404,13 @@ export const closeExternalLayoutTabs = (
       return (
         !editor.getExternalLayout() ||
         editor.getExternalLayout() !== externalLayout
+      );
+    }
+
+    if (editor instanceof CinematicSequenceEditorContainer) {
+      return (
+        !editor.getCinematicSequence() ||
+        editor.getCinematicSequence() !== externalLayout
       );
     }
 
@@ -443,7 +456,7 @@ export const closeEventsFunctionsExtensionTabs = (
       return (
         !editor.getEventsFunctionsExtensionName() ||
         editor.getEventsFunctionsExtensionName() !==
-          eventsFunctionsExtensionName
+        eventsFunctionsExtensionName
       );
     }
     return true;
@@ -465,7 +478,7 @@ export const closeCustomObjectTab = (
       return (
         (!editor.getEventsFunctionsExtensionName() ||
           editor.getEventsFunctionsExtensionName() !==
-            eventsFunctionsExtensionName) &&
+          eventsFunctionsExtensionName) &&
         (!editor.getEventsBasedObjectName() ||
           editor.getEventsBasedObjectName() !== eventsBasedObjectName)
       );
@@ -490,7 +503,7 @@ export const closeEventsBasedObjectVariantTab = (
       return (
         (!editor.getEventsFunctionsExtensionName() ||
           editor.getEventsFunctionsExtensionName() !==
-            eventsFunctionsExtensionName) &&
+          eventsFunctionsExtensionName) &&
         (!editor.getEventsBasedObjectName() ||
           editor.getEventsBasedObjectName() !== eventsBasedObjectName) &&
         (!editor.getVariantName() ||
@@ -505,7 +518,7 @@ export const getEventsFunctionsExtensionEditor = (
   state: EditorTabsState,
   eventsFunctionsExtension: gdEventsFunctionsExtension
 ): ?{|
-  editor: EventsFunctionsExtensionEditorContainer,
+editor: EventsFunctionsExtensionEditorContainer,
   paneIdentifier: string,
   tabIndex: number,
 |} => {
@@ -531,7 +544,7 @@ export const getCustomObjectEditor = (
   eventsBasedObject: gdEventsBasedObject,
   variantName: string
 ): ?{|
-  editor: CustomObjectEditorContainer,
+editor: CustomObjectEditorContainer,
   paneIdentifier: string,
   tabIndex: number,
 |} => {

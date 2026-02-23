@@ -644,6 +644,16 @@ interface Project {
     void RemoveExternalLayout([Const] DOMString name);
     unsigned long GetExternalLayoutPosition([Const] DOMString name);
 
+    boolean HasCinematicSequenceNamed([Const] DOMString name);
+    [Ref] CinematicSequence GetCinematicSequence([Const] DOMString name);
+    [Ref] CinematicSequence GetCinematicSequenceAt(unsigned long index);
+    void MoveCinematicSequence(unsigned long oldIndex, unsigned long newIndex);
+    void SwapCinematicSequences(unsigned long first, unsigned long second);
+    unsigned long GetCinematicSequencesCount();
+    [Ref] CinematicSequence InsertNewCinematicSequence([Const] DOMString name, unsigned long position);
+    void RemoveCinematicSequence([Const] DOMString name);
+    unsigned long GetCinematicSequencePosition([Const] DOMString name);
+
     boolean HasEventsFunctionsExtensionNamed([Const] DOMString name);
     [Ref] EventsFunctionsExtension GetEventsFunctionsExtension([Const] DOMString name);
     [Ref] EventsFunctionsExtension GetEventsFunctionsExtensionAt(unsigned long index);

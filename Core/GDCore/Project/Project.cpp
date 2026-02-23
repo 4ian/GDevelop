@@ -25,6 +25,7 @@
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
+#include "GDCore/Project/CinematicSequence.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectConfiguration.h"
@@ -568,6 +569,116 @@ void Project::RemoveExternalLayout(const gd::String& name) {
   if (externalLayout == externalLayouts.end()) return;
 
   externalLayouts.erase(externalLayout);
+}
+
+void Project::MoveCinematicSequence(std::size_t oldIndex, std::size_t newIndex) {
+  if (oldIndex >= cinematicSequences.size() || newIndex >= cinematicSequences.size())
+    return;
+
+  std::unique_ptr<gd::CinematicSequence> cinematicSequence =
+      std::move(cinematicSequences[oldIndex]);
+  cinematicSequences.erase(cinematicSequences.begin() + oldIndex);
+  cinematicSequences.insert(cinematicSequences.begin() + newIndex,
+                         std::move(cinematicSequence));
+};
+
+void Project::MoveEventsFunctionsExtension(std::size_t oldIndex,
+                                           std::size_t newIndex) {
+  if (oldIndex >= eventsFunctionsExtensions.size() ||
+      newIndex >= eventsFunctionsExtensions.size())
+    return;
+
+  std::unique_ptr<gd::EventsFunctionsExtension> eventsFunctionsExtension =
+      std::move(eventsFunctionsExtensions[oldIndex]);
+  eventsFunctionsExtensions.erase(eventsFunctionsExtensions.begin() + oldIndex);
+  eventsFunctionsExtensions.insert(eventsFunctionsExtensions.begin() + newIndex,
+                                   std::move(eventsFunctionsExtension));
+};
+
+void Project::SwapExternalEvents(std::size_t first, std::size_t second) {
+  if (first >= externalEvents.size() || second >= externalEvents.size()) return;
+
+  std::iter_swap(externalEvents.begin() + first,
+                 externalEvents.begin() + second);
+}
+
+void Project::SwapCinematicSequences(std::size_t first, std::size_t second) {
+  if (first >= cinematicSequences.size() || second >= cinematicSequences.size())
+    return;
+
+  std::iter_swap(cinematicSequences.begin() + first,
+                 cinematicSequences.begin() + second);
+}
+bool Project::HasCinematicSequenceNamed(const gd::String& name) const {
+  return (find_if(cinematicSequences.begin(),
+                  cinematicSequences.end(),
+                  [&name](const std::unique_ptr<gd::CinematicSequence>& cinematicSequence) {
+                    return cinematicSequence->GetName() == name;
+                  }) != cinematicSequences.end());
+}
+gd::CinematicSequence& Project::GetCinematicSequence(const gd::String& name) {
+  return *(*find_if(cinematicSequences.begin(),
+                    cinematicSequences.end(),
+                    [&name](const std::unique_ptr<gd::CinematicSequence>& cinematicSequence) {
+                      return cinematicSequence->GetName() == name;
+                    }));
+}
+const gd::CinematicSequence& Project::GetCinematicSequence(
+    const gd::String& name) const {
+  return *(*find_if(cinematicSequences.begin(),
+                    cinematicSequences.end(),
+                    [&name](const std::unique_ptr<gd::CinematicSequence>& cinematicSequence) {
+                      return cinematicSequence->GetName() == name;
+                    }));
+}
+gd::CinematicSequence& Project::GetCinematicSequence(std::size_t index) {
+  return *cinematicSequences[index];
+}
+const gd::CinematicSequence& Project::GetCinematicSequence(std::size_t index) const {
+  return *cinematicSequences[index];
+}
+std::size_t Project::GetCinematicSequencePosition(const gd::String& name) const {
+  for (std::size_t i = 0; i < cinematicSequences.size(); ++i) {
+    if (cinematicSequences[i]->GetName() == name) return i;
+  }
+  return gd::String::npos;
+}
+
+std::size_t Project::GetCinematicSequencesCount() const {
+  return cinematicSequences.size();
+}
+
+gd::CinematicSequence& Project::InsertNewCinematicSequence(const gd::String& name,
+                                                     std::size_t position) {
+  gd::CinematicSequence& newlyInsertedCinematicSequence = *(*(cinematicSequences.emplace(
+      position < cinematicSequences.size() ? cinematicSequences.begin() + position
+                                        : cinematicSequences.end(),
+      new gd::CinematicSequence())));
+
+  newlyInsertedCinematicSequence.SetName(name);
+  return newlyInsertedCinematicSequence;
+}
+
+gd::CinematicSequence& Project::InsertCinematicSequence(
+    const gd::CinematicSequence& layout, std::size_t position) {
+  gd::CinematicSequence& newlyInsertedCinematicSequence = *(*(cinematicSequences.emplace(
+      position < cinematicSequences.size() ? cinematicSequences.begin() + position
+                                        : cinematicSequences.end(),
+      new gd::CinematicSequence(layout))));
+
+  return newlyInsertedCinematicSequence;
+}
+
+void Project::RemoveCinematicSequence(const gd::String& name) {
+  std::vector<std::unique_ptr<gd::CinematicSequence> >::iterator cinematicSequence =
+      find_if(cinematicSequences.begin(),
+              cinematicSequences.end(),
+              [&name](const std::unique_ptr<gd::CinematicSequence>& cinematicSequence) {
+                return cinematicSequence->GetName() == name;
+              });
+  if (cinematicSequence == cinematicSequences.end()) return;
+
+  cinematicSequences.erase(cinematicSequence);
 }
 
 void Project::SwapEventsFunctionsExtensions(std::size_t first,
@@ -1216,6 +1327,317 @@ void Project::SerializeTo(SerializerElement& element) const {
   for (std::size_t i = 0; i < externalLayouts.size(); ++i)
     externalLayouts[i]->SerializeTo(
         externalLayoutsElement.AddChild("externalLayout"));
+
+  SerializerElement& cinematicSequencesElement =
+      element.GetChild("cinematicSequences", 0, "CinematicSequences");
+  cinematicSequencesElement.ConsiderAsArrayOf("cinematicSequence", "CinematicSequence");
+  for (std::size_t i = 0; i < cinematicSequencesElement.GetChildrenCount(); ++i) {
+    const SerializerElement& cinematicSequenceElement =
+        cinematicSequencesElement.GetChild(i);
+
+    gd::CinematicSequence& newCinematicSequence =
+        InsertNewCinematicSequence("", GetCinematicSequencesCount());
+    newCinematicSequence.UnserializeFrom(*this, cinematicSequenceElement);
+  }
+}
+
+void Project::UnserializeAndInsertExtensionsFrom(
+  const gd::SerializerElement &eventsFunctionsExtensionsElement) {
+  eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
+      "eventsFunctionsExtension");
+
+  std::map<gd::String, size_t> extensionNameToElementIndex;
+  std::map<gd::String, gd::SerializerElement> objectTypeToVariantsElement;
+
+  // First, only unserialize behaviors and objects names.
+  // As event based objects can contains custom behaviors and custom objects,
+  // this allows them to reference EventBasedBehavior and EventBasedObject
+  // respectively.
+  for (std::size_t i = 0;
+       i < eventsFunctionsExtensionsElement.GetChildrenCount();
+       ++i) {
+    const SerializerElement& eventsFunctionsExtensionElement =
+        eventsFunctionsExtensionsElement.GetChild(i);
+    const gd::String& name = eventsFunctionsExtensionElement.GetStringAttribute("name");
+    extensionNameToElementIndex[name] = i;
+
+    gd::EventsFunctionsExtension& eventsFunctionsExtension =
+        HasEventsFunctionsExtensionNamed(name)
+            ? GetEventsFunctionsExtension(name)
+            : InsertNewEventsFunctionsExtension(
+                  name, GetEventsFunctionsExtensionsCount());
+
+    // Backup the events-based object variants
+    for (auto &eventsBasedObject :
+         eventsFunctionsExtension.GetEventsBasedObjects().GetInternalVector()) {
+      gd::SerializerElement variantsElement;
+      eventsBasedObject->GetVariants().SerializeVariantsTo(variantsElement);
+      objectTypeToVariantsElement[gd::PlatformExtension::GetObjectFullType(
+          name, eventsBasedObject->GetName())] = variantsElement;
+    }
+
+    eventsFunctionsExtension.UnserializeExtensionDeclarationFrom(
+        *this, eventsFunctionsExtensionElement);
+  }
+
+  // Then unserialize functions, behaviors and objects content.
+  for (gd::String &extensionName :
+       GetUnserializingOrderExtensionNames(eventsFunctionsExtensionsElement)) {
+
+    size_t extensionIndex = GetEventsFunctionsExtensionPosition(extensionName);
+    if (extensionIndex == gd::String::npos) {
+      // Should never happen because the extension was added in the first pass.
+      gd::LogError("Can't find extension " + extensionName + " in the list of extensions in second pass of unserialization.");
+      continue;
+    }
+    auto& partiallyLoadedExtension = eventsFunctionsExtensions.at(extensionIndex);
+
+    if (extensionNameToElementIndex.find(extensionName) == extensionNameToElementIndex.end()) {
+      // Should never happen because the extension element is present.
+      gd::LogError("Can't find extension element to unserialize for " + extensionName + " in second pass of unserialization.");
+      continue;
+    }
+    size_t elementIndex = extensionNameToElementIndex[extensionName];
+    const SerializerElement &eventsFunctionsExtensionElement =
+        eventsFunctionsExtensionsElement.GetChild(elementIndex);
+
+    partiallyLoadedExtension
+        ->UnserializeExtensionImplementationFrom(
+            *this, eventsFunctionsExtensionElement);
+
+    for (auto &pair : objectTypeToVariantsElement) {
+      auto &objectType = pair.first;
+      auto &variantsElement = pair.second;
+
+      auto &eventsBasedObject = GetEventsBasedObject(objectType);
+      eventsBasedObject.GetVariants().UnserializeVariantsFrom(*this,
+                                                              variantsElement);
+    }
+  }
+}
+
+std::vector<gd::String> Project::GetUnserializingOrderExtensionNames(
+    const gd::SerializerElement &eventsFunctionsExtensionsElement) {
+  eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
+      "eventsFunctionsExtension");
+
+  // Some extension have custom objects, which have child objects coming from other extension.
+  // These child objects must be loaded completely before the parent custom obejct can be unserialized.
+  // This implies: an order on the extension unserialization (and no cycles).
+
+  // At the beginning, everything is yet to be loaded.
+  std::map<gd::String, size_t> extensionNameToElementIndex;
+  std::vector<gd::String> remainingExtensionNames(
+      eventsFunctionsExtensionsElement.GetChildrenCount());
+  for (std::size_t i = 0; i < eventsFunctionsExtensionsElement.GetChildrenCount(); ++i) {
+    const SerializerElement& eventsFunctionsExtensionElement =
+        eventsFunctionsExtensionsElement.GetChild(i);
+    const gd::String& name = eventsFunctionsExtensionElement.GetStringAttribute("name");
+
+    remainingExtensionNames[i] = name;
+    extensionNameToElementIndex[name] = i;
+  }
+
+  // Helper allowing to find if an extension has an object that depends on
+  // at least one other object from another extension that is not loaded yet.
+  auto isDependentFromRemainingExtensions =
+      [&remainingExtensionNames](
+          const gd::SerializerElement &eventsFunctionsExtensionElement) {
+        auto &eventsBasedObjectsElement =
+            eventsFunctionsExtensionElement.GetChild("eventsBasedObjects");
+        eventsBasedObjectsElement.ConsiderAsArrayOf("eventsBasedObject");
+        for (std::size_t eventsBasedObjectsIndex = 0;
+             eventsBasedObjectsIndex <
+             eventsBasedObjectsElement.GetChildrenCount();
+             ++eventsBasedObjectsIndex) {
+          auto &objectsElement =
+              eventsBasedObjectsElement.GetChild(eventsBasedObjectsIndex)
+                  .GetChild("objects");
+          objectsElement.ConsiderAsArrayOf("object");
+
+          for (std::size_t objectIndex = 0;
+               objectIndex < objectsElement.GetChildrenCount(); ++objectIndex) {
+            const gd::String &objectType =
+                objectsElement.GetChild(objectIndex).GetStringAttribute("type");
+
+            gd::String extensionName =
+                eventsFunctionsExtensionElement.GetStringAttribute("name");
+            gd::String usedExtensionName =
+                gd::PlatformExtension::GetExtensionFromFullObjectType(objectType);
+
+            if (usedExtensionName != extensionName &&
+                std::find(remainingExtensionNames.begin(),
+                          remainingExtensionNames.end(),
+                          usedExtensionName) != remainingExtensionNames.end()) {
+              return true;
+            }
+          }
+        }
+        return false;
+      };
+
+  // Find the order of loading so that the extensions are loaded when all the other
+  // extensions they depend on are already loaded.
+  std::vector<gd::String> loadOrderExtensionNames;
+  bool foundAnyExtension = true;
+  while (foundAnyExtension) {
+    foundAnyExtension = false;
+    for (std::size_t i = 0; i < remainingExtensionNames.size(); ++i) {
+      auto extensionName = remainingExtensionNames[i];
+
+      size_t elementIndex = extensionNameToElementIndex[extensionName];
+      const SerializerElement &eventsFunctionsExtensionElement =
+          eventsFunctionsExtensionsElement.GetChild(elementIndex);
+
+      if (!isDependentFromRemainingExtensions(
+              eventsFunctionsExtensionElement)) {
+        loadOrderExtensionNames.push_back(extensionName);
+        remainingExtensionNames.erase(remainingExtensionNames.begin() + i);
+        i--;
+        foundAnyExtension = true;
+      }
+    }
+  }
+  return loadOrderExtensionNames;
+}
+
+void Project::SerializeTo(SerializerElement& element) const {
+  SerializerElement& versionElement = element.AddChild("gdVersion");
+  versionElement.SetAttribute("major", gd::VersionWrapper::Major());
+  versionElement.SetAttribute("minor", gd::VersionWrapper::Minor());
+  versionElement.SetAttribute("build", gd::VersionWrapper::Build());
+  versionElement.SetAttribute("revision", gd::VersionWrapper::Revision());
+
+  SerializerElement& propElement = element.AddChild("properties");
+  propElement.AddChild("name").SetValue(GetName());
+  propElement.AddChild("description").SetValue(GetDescription());
+  propElement.SetAttribute("version", GetVersion());
+  propElement.AddChild("author").SetValue(GetAuthor());
+  propElement.AddChild("windowWidth").SetValue(GetGameResolutionWidth());
+  propElement.AddChild("windowHeight").SetValue(GetGameResolutionHeight());
+  propElement.AddChild("latestCompilationDirectory")
+      .SetValue(GetLastCompilationDirectory());
+  propElement.AddChild("maxFPS").SetValue(GetMaximumFPS());
+  propElement.AddChild("minFPS").SetValue(GetMinimumFPS());
+  propElement.AddChild("verticalSync")
+      .SetValue(IsVerticalSynchronizationEnabledByDefault());
+  propElement.SetAttribute("scaleMode", scaleMode);
+  propElement.SetAttribute("pixelsRounding", pixelsRounding);
+  propElement.SetAttribute("adaptGameResolutionAtRuntime",
+                           adaptGameResolutionAtRuntime);
+  propElement.SetAttribute("sizeOnStartupMode", sizeOnStartupMode);
+  propElement.SetAttribute("antialiasingMode", antialiasingMode);
+  propElement.SetAttribute("antialisingEnabledOnMobile",
+                           isAntialisingEnabledOnMobile);
+  propElement.SetAttribute("projectUuid", projectUuid);
+  propElement.SetAttribute("folderProject", folderProject);
+  propElement.SetAttribute("packageName", packageName);
+  propElement.SetAttribute("templateSlug", templateSlug);
+  propElement.SetAttribute("orientation", orientation);
+  if (areEffectsHiddenInEditor) {
+    propElement.SetBoolAttribute("areEffectsHiddenInEditor",
+                                 areEffectsHiddenInEditor);
+  }
+  platformSpecificAssets.SerializeTo(
+      propElement.AddChild("platformSpecificAssets"));
+  loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));
+  watermark.SerializeTo(propElement.AddChild("watermark"));
+
+  auto& authorIdsElement = propElement.AddChild("authorIds");
+  authorIdsElement.ConsiderAsArray();
+  for (const auto& authorId : authorIds) {
+    authorIdsElement.AddChild("").SetStringValue(authorId);
+  }
+  auto& authorUsernamesElement = propElement.AddChild("authorUsernames");
+  authorUsernamesElement.ConsiderAsArray();
+  for (const auto& authorUsername : authorUsernames) {
+    authorUsernamesElement.AddChild("").SetStringValue(authorUsername);
+  }
+
+  auto& categoriesElement = propElement.AddChild("categories");
+  categoriesElement.ConsiderAsArray();
+  for (const auto& category : categories) {
+    categoriesElement.AddChild("").SetStringValue(category);
+  }
+
+  auto& playableDevicesElement = propElement.AddChild("playableDevices");
+  playableDevicesElement.ConsiderAsArray();
+  if (isPlayableWithKeyboard) {
+    playableDevicesElement.AddChild("").SetStringValue("keyboard");
+  }
+  if (isPlayableWithGamepad) {
+    playableDevicesElement.AddChild("").SetStringValue("gamepad");
+  }
+  if (isPlayableWithMobile) {
+    playableDevicesElement.AddChild("").SetStringValue("mobile");
+  }
+
+  // Compatibility with GD <= 5.0.0-beta101
+  if (useDeprecatedZeroAsDefaultZOrder) {
+    propElement.SetAttribute("useDeprecatedZeroAsDefaultZOrder", true);
+  }
+  // end of compatibility code
+
+  extensionProperties.SerializeTo(propElement.AddChild("extensionProperties"));
+  
+  playableDevicesElement.AddChild("").SetStringValue("mobile");
+
+  SerializerElement& platformsElement = propElement.AddChild("platforms");
+  platformsElement.ConsiderAsArrayOf("platform");
+  for (std::size_t i = 0; i < platforms.size(); ++i) {
+    if (platforms[i] == NULL) {
+      std::cout << "ERROR: The project has a platform which is NULL.";
+      continue;
+    }
+
+    platformsElement.AddChild("platform")
+        .SetAttribute("name", platforms[i]->GetName());
+  }
+  if (currentPlatform != NULL)
+    propElement.AddChild("currentPlatform")
+        .SetValue(currentPlatform->GetName());
+  else
+    std::cout << "ERROR: The project current platform is NULL.";
+
+  if (sceneResourcesPreloading != "at-startup") {
+    propElement.SetAttribute("sceneResourcesPreloading", sceneResourcesPreloading);
+  }
+  if (sceneResourcesUnloading != "never") {
+    propElement.SetAttribute("sceneResourcesUnloading", sceneResourcesUnloading);
+  }
+
+  resourcesContainer.SerializeTo(element.AddChild("resources"));
+  objectsContainer.SerializeObjectsTo(element.AddChild("objects"));
+  objectsContainer.SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
+  objectsContainer.GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
+  GetVariables().SerializeTo(element.AddChild("variables"));
+
+  element.SetAttribute("firstLayout", firstLayout);
+  gd::SerializerElement& layoutsElement = element.AddChild("layouts");
+  layoutsElement.ConsiderAsArrayOf("layout");
+  for (std::size_t i = 0; i < GetLayoutsCount(); i++)
+    GetLayout(i).SerializeTo(layoutsElement.AddChild("layout"));
+
+  SerializerElement& externalEventsElement = element.AddChild("externalEvents");
+  externalEventsElement.ConsiderAsArrayOf("externalEvents");
+  for (std::size_t i = 0; i < GetExternalEventsCount(); ++i)
+    GetExternalEvents(i).SerializeTo(
+        externalEventsElement.AddChild("externalEvents"));
+
+  SerializerElement& eventsFunctionsExtensionsElement =
+      element.AddChild("eventsFunctionsExtensions");
+  eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
+      "eventsFunctionsExtension");
+  for (std::size_t i = 0; i < eventsFunctionsExtensions.size(); ++i)
+    eventsFunctionsExtensions[i]->SerializeTo(
+        eventsFunctionsExtensionsElement.AddChild("eventsFunctionsExtension"));
+
+  SerializerElement& cinematicSequencesElement =
+      element.AddChild("cinematicSequences");
+  cinematicSequencesElement.ConsiderAsArrayOf("cinematicSequence");
+  for (std::size_t i = 0; i < cinematicSequences.size(); ++i)
+    cinematicSequences[i]->SerializeTo(
+        cinematicSequencesElement.AddChild("cinematicSequence"));
 }
 
 bool Project::IsNameSafe(const gd::String& name) {
@@ -1321,6 +1743,7 @@ void Project::Init(const gd::Project& game) {
   externalEvents = gd::Clone(game.externalEvents);
 
   externalLayouts = gd::Clone(game.externalLayouts);
+  cinematicSequences = gd::Clone(game.cinematicSequences);
   eventsFunctionsExtensions = gd::Clone(game.eventsFunctionsExtensions);
 
   variables = game.GetVariables();

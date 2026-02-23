@@ -6,7 +6,7 @@
         "comment": "Palette/Purple/60"
       },
       "color": {
-        "value": "#CBBDFF",
+        "value": "#BCA4FF",
         "comment": "Palette/Purple/50"
       },
       "light": {
@@ -193,7 +193,7 @@
           "comment": "Palette/Grey/100"
         },
         "background-color": {
-          "value": "#CBBDFF",
+          "value": "#BCA4FF",
           "comment:": "Palette/Purple/20"
         }
       }

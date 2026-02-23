@@ -261,6 +261,7 @@ class InstancesList extends Component<Props, State> {
                       searchText,
                     })
                   }
+                  onRequestSearch={this._selectFirstInstance}
                   placeholder={t`Search instances`}
                 />
               </Column>

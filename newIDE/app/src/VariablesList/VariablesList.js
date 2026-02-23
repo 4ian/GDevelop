@@ -869,11 +869,6 @@ const VariablesList: React.ComponentType<{
       ? props.historyHandler.canRedo()
       : canRedo(historyRef.current);
 
-  const keyboardShortcuts = new KeyboardShortcuts({
-    isActive: () => true,
-    shortcutCallbacks: { onUndo: _undo, onRedo: _redo },
-  });
-
   const copySelection = React.useCallback(
     () => {
       Clipboard.set(
@@ -1143,6 +1138,56 @@ const VariablesList: React.ComponentType<{
       props.isListLocked,
     ]
   );
+
+  const canCopySelection = selectedNodes.length > 0;
+  const canPasteSelection =
+    Clipboard.has(CLIPBOARD_KIND) &&
+    (!props.isListLocked ||
+      // If the list is locked, only allow pasting in the children of overriden variables:
+      (selectedNodes.length > 0 &&
+        selectedNodes.every(nodeId => !nodeId.startsWith(inheritedPrefix)) &&
+        selectedNodes.every(nodeId => {
+          return nodeId.includes(separator);
+        })));
+  const canDeleteSelection =
+    selectedNodes.length > 0 &&
+    // An inherited variable can never be deleted:
+    selectedNodes.every(nodeId => !nodeId.startsWith(inheritedPrefix)) &&
+    // If the list is locked, only allow deleting children of overriden variables:
+    selectedNodes.every(nodeId => {
+      if (props.isListLocked) {
+        return nodeId.includes(separator);
+      }
+      return true;
+    });
+
+  const cutSelection = React.useCallback(
+    () => {
+      if (!canDeleteSelection) return;
+
+      copySelection();
+      deleteSelection();
+    },
+    [canDeleteSelection, copySelection, deleteSelection]
+  );
+
+  const keyboardShortcuts = new KeyboardShortcuts({
+    isActive: () => true,
+    shortcutCallbacks: {
+      onUndo: _undo,
+      onRedo: _redo,
+      onDelete: () => {
+        if (canDeleteSelection) deleteSelection();
+      },
+      onCopy: () => {
+        if (canCopySelection) copySelection();
+      },
+      onCut: cutSelection,
+      onPaste: () => {
+        if (canPasteSelection) pasteClipboardContent();
+      },
+    },
+  });
 
   const updateExpandedAndSelectedNodesFollowingNameChange = React.useCallback(
     (oldNodeId: string, newName: string) => {
@@ -2010,31 +2055,9 @@ const VariablesList: React.ComponentType<{
       onCopy={copySelection}
       onPaste={pasteClipboardContent}
       onDelete={deleteSelection}
-      canCopy={selectedNodes.length > 0}
-      canPaste={
-        Clipboard.has(CLIPBOARD_KIND) &&
-        (!props.isListLocked ||
-          // If the list is locked, only allow pasting in the children of overriden variables:
-          (selectedNodes.length > 0 &&
-            selectedNodes.every(
-              nodeId => !nodeId.startsWith(inheritedPrefix)
-            ) &&
-            selectedNodes.every(nodeId => {
-              return nodeId.includes(separator);
-            })))
-      }
-      canDelete={
-        selectedNodes.length > 0 &&
-        // An inherited variable can never be deleted:
-        selectedNodes.every(nodeId => !nodeId.startsWith(inheritedPrefix)) &&
-        // If the list is locked, only allow deleting children of overriden variables:
-        selectedNodes.every(nodeId => {
-          if (props.isListLocked) {
-            return nodeId.includes(separator);
-          }
-          return true;
-        })
-      }
+      canCopy={canCopySelection}
+      canPaste={canPasteSelection}
+      canDelete={canDeleteSelection}
       canAdd={!props.isListLocked}
       onUndo={_undo}
       onRedo={_redo}

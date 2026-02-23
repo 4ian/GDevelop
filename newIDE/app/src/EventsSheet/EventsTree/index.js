@@ -346,6 +346,7 @@ type EventsTreeProps = {|
 
   searchResults: ?Array<gdBaseEvent>,
   searchFocusOffset: ?number,
+  bookmarkFocusId: ?string,
 
   onEventMoved: (previousRowIndex: number, nextRowIndex: number) => void,
   onEndEditingEvent: (event: gdBaseEvent) => void,
@@ -1116,7 +1117,12 @@ const EventsTree = React.forwardRef<EventsTreeProps, EventsTreeInterface>(
           searchMethod={_isNodeHighlighted}
           searchQuery={props.searchResults}
           searchFocusOffset={props.searchFocusOffset}
-          className={props.searchResults ? eventsTreeWithSearchResults : ''}
+          bookmarkFocusId={props.bookmarkFocusId}
+          className={
+            props.searchResults || props.bookmarkFocusId
+              ? eventsTreeWithSearchResults
+              : ''
+          }
           reactVirtualizedListProps={{
             ref: list => {
               _list.current = list;

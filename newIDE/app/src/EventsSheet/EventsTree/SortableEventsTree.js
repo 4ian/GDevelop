@@ -42,6 +42,7 @@ type RowItemData = {
   onVisibilityToggle: ({| node: SortableTreeNode |}) => void,
   scaffoldBlockPxWidth: number,
   searchFocusOffset: ?number,
+  bookmarkFocusId: ?string,
 };
 
 type Props = {|
@@ -57,6 +58,7 @@ type Props = {|
   }) => boolean,
   searchQuery?: any,
   searchFocusOffset?: ?number,
+  bookmarkFocusId?: ?string,
   className?: string,
   reactVirtualizedListProps?: {
     ref?: (list: {
@@ -244,6 +246,7 @@ const TreeRow = ({
     onVisibilityToggle,
     scaffoldBlockPxWidth,
     searchFocusOffset,
+    bookmarkFocusId,
   } = data;
 
   const entry = flatData[index];
@@ -254,6 +257,8 @@ const TreeRow = ({
   const isSearchMatch = matchIndexSet.has(index);
   const isSearchFocus =
     searchFocusOffset != null && matchIndexes[searchFocusOffset] === index;
+  const isBookmarkFocus =
+    bookmarkFocusId != null && node.event && node.event.getEventBookmarkId() === bookmarkFocusId;
 
   const scaffold = lowerSiblingCounts.map((lowerSiblingCount, i) => {
     const isNodeDepth = i === depth - 1;
@@ -327,8 +332,8 @@ const TreeRow = ({
           <div
             className={classNames(
               'rst__row',
-              isSearchMatch && 'rst__rowSearchMatch',
-              isSearchFocus && 'rst__rowSearchFocus'
+              (isSearchMatch || isBookmarkFocus) && 'rst__rowSearchMatch',
+              (isSearchFocus) && 'rst__rowSearchFocus'
             )}
           >
             <div className="rst__rowContents">
@@ -353,6 +358,7 @@ const SortableEventsTree = ({
   searchMethod,
   searchQuery,
   searchFocusOffset,
+  bookmarkFocusId,
   className,
   reactVirtualizedListProps,
 }: Props) => {
@@ -431,6 +437,7 @@ const SortableEventsTree = ({
       onVisibilityToggle,
       scaffoldBlockPxWidth,
       searchFocusOffset,
+      bookmarkFocusId,
     }),
     [
       flatData,
@@ -439,6 +446,7 @@ const SortableEventsTree = ({
       onVisibilityToggle,
       scaffoldBlockPxWidth,
       searchFocusOffset,
+      bookmarkFocusId,
     ]
   );
 

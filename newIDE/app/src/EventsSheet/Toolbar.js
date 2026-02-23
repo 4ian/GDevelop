@@ -18,7 +18,7 @@ import ToolbarSearchIcon from '../UI/CustomSvgIcons/ToolbarSearch';
 import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
 import AddLocalVariableIcon from '../UI/CustomSvgIcons/LocalVariable';
-import Star from '@material-ui/icons/Star';
+import StarBorder from '@material-ui/icons/StarBorder';
 
 type Props = {|
   onAddStandardEvent: () => void,
@@ -234,7 +234,7 @@ const Toolbar = React.memo<Props>(function Toolbar({
           onClick={() => onToggleBookmarksPanel()}
           tooltip={t`Bookmarks`}
         >
-          <Star />
+          <StarBorder />
         </IconButton>
         {onOpenSettings && <ToolbarSeparator />}
         {onOpenSettings && (

@@ -8,6 +8,7 @@ export type Bookmark = {|
   eventType: string,
   id: string,
   timestamp: number,
+  color?: ?string,
 |};
 
 /**
@@ -36,6 +37,7 @@ export const scanEventsForBookmarks = (
           eventType: event.getType(),
           id: bookmarkId,
           timestamp: Date.now(), // We don't persist timestamp, so use current time
+          color: getEventColor(event),
         };
         bookmarks.push(bookmark);
       }
@@ -50,6 +52,35 @@ export const scanEventsForBookmarks = (
 
   scanEventsList(events);
   return bookmarks;
+};
+
+/**
+ * Extract color from an event if it's a Group or Comment
+ */
+export const getEventColor = (event: gdBaseEvent): ?string => {
+  const eventType = event.getType();
+
+  // For group events, get the color (format: "R;G;B")
+  if (eventType === 'BuiltinCommonInstructions::Group') {
+    const groupEvent = gd.asGroupEvent(event);
+    const r = groupEvent.getBackgroundColorR();
+    const g = groupEvent.getBackgroundColorG();
+    const b = groupEvent.getBackgroundColorB();
+    // Return in format "R;G;B" for consistency
+    return `${r};${g};${b}`;
+  }
+
+  // For comment events, get the background color (format: "R;G;B")
+  if (eventType === 'BuiltinCommonInstructions::Comment') {
+    const commentEvent = gd.asCommentEvent(event);
+    const r = commentEvent.getBackgroundColorRed();
+    const g = commentEvent.getBackgroundColorGreen();
+    const b = commentEvent.getBackgroundColorBlue();
+    // Return in format "R;G;B" for consistency
+    return `${r};${g};${b}`;
+  }
+
+  return null;
 };
 
 /**
@@ -135,6 +166,36 @@ export const findEventByPtr = (
     if (event.canHaveSubEvents && event.canHaveSubEvents()) {
       const subEvents = event.getSubEvents();
       const found = findEventByPtr(subEvents, ptr);
+      if (found) return found;
+    }
+  }
+
+  return null;
+};
+
+/**
+ * Recursively search for an event by its pointer and return it with its parent list and index
+ */
+export type EventLocation = {|
+  event: gdBaseEvent,
+  eventsList: gdEventsList,
+  indexInList: number,
+|};
+
+export const findEventLocationByPtr = (
+  events: gdEventsList,
+  ptr: number
+): ?EventLocation => {
+  for (let i = 0; i < events.getEventsCount(); i++) {
+    const event = events.getEventAt(i);
+    if (event.ptr === ptr) {
+      return { event, eventsList: events, indexInList: i };
+    }
+
+    // Recursively search sub-events
+    if (event.canHaveSubEvents && event.canHaveSubEvents()) {
+      const subEvents = event.getSubEvents();
+      const found = findEventLocationByPtr(subEvents, ptr);
       if (found) return found;
     }
   }

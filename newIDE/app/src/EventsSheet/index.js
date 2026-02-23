@@ -129,6 +129,7 @@ import {
   type Bookmark,
   scanEventsForBookmarks,
   findEventByPtr,
+  findEventLocationByPtr,
 } from './Bookmarks/BookmarksUtils';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -226,6 +227,7 @@ type State = {|
 
   showBookmarksPanel: boolean,
   bookmarks: Array<Bookmark>,
+  bookmarkFocusId: ?string,
 
   layoutVariablesDialogOpen: boolean,
 
@@ -324,6 +326,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
     showBookmarksPanel: false,
     bookmarks: [],
+    bookmarkFocusId: null,
 
     layoutVariablesDialogOpen: false,
 
@@ -559,16 +562,27 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   _navigateToBookmark = (bookmark: Bookmark) => {
-    const event = findEventByPtr(this.props.events, bookmark.eventPtr);
+    const eventLocation = findEventLocationByPtr(this.props.events, bookmark.eventPtr);
 
-    if (!event) {
+    if (!eventLocation) {
       // Event no longer exists - remove bookmark
       this._deleteBookmark(bookmark.id);
       return;
     }
 
-    // Use existing navigation pattern
+    const { event, eventsList, indexInList } = eventLocation;
+
+    // Scroll to and unfold the event
     this._ensureUnfoldedAndScrollTo(() => event);
+
+    // Select the event
+    const eventContext = {
+      eventsList,
+      event,
+      indexInList,
+      projectScopedContainersAccessor: this.props.projectScopedContainersAccessor,
+    };
+    this.selectEvent(eventContext);
   };
 
   _deleteBookmark = (bookmarkId: string) => {
@@ -595,6 +609,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // To change a bookmark name, the user should edit the event itself.
     // This method is kept for future extensibility but currently does nothing.
     console.warn('Bookmark renaming is not supported. Edit the event to change its description.');
+  };
+
+  _focusBookmark = (bookmark: Bookmark) => {
+    this.setState({ bookmarkFocusId: bookmark.id });
   };
 
   addSubEvent = () => {
@@ -2238,6 +2256,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   onOpenLayout={onOpenLayout}
                   searchResults={eventsSearchResultEvents}
                   searchFocusOffset={searchFocusOffset}
+                  bookmarkFocusId={this.state.bookmarkFocusId}
                   onEventMoved={this._onEventMoved}
                   onEndEditingEvent={this._onEndEditingStringEvent}
                   showObjectThumbnails={
@@ -2288,21 +2307,21 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   />
                 </ErrorBoundary>
               )}
-              {this.state.showBookmarksPanel && (
-                <ErrorBoundary
-                  componentTitle={<Trans>Bookmarks panel</Trans>}
-                  scope="scene-events-bookmarks"
+              <ErrorBoundary
+                componentTitle={<Trans>Bookmarks panel</Trans>}
+                scope="scene-events-bookmarks"
+                onClose={() => this.setState({ showBookmarksPanel: false })}
+              >
+                <BookmarksPanel
+                  isOpen={this.state.showBookmarksPanel}
+                  bookmarks={this.state.bookmarks}
+                  onNavigateToBookmark={this._navigateToBookmark}
+                  onDeleteBookmark={this._deleteBookmark}
+                  onRenameBookmark={this._renameBookmark}
+                  onFocusBookmark={this._focusBookmark}
                   onClose={() => this.setState({ showBookmarksPanel: false })}
-                >
-                  <BookmarksPanel
-                    bookmarks={this.state.bookmarks}
-                    onNavigateToBookmark={this._navigateToBookmark}
-                    onDeleteBookmark={this._deleteBookmark}
-                    onRenameBookmark={this._renameBookmark}
-                    onClose={() => this.setState({ showBookmarksPanel: false })}
-                  />
-                </ErrorBoundary>
-              )}
+                />
+              </ErrorBoundary>
               <InlineParameterEditor
                 open={this.state.inlineEditing}
                 anchorEl={this.state.inlineEditingAnchorEl}

@@ -13,7 +13,7 @@ import TextButton from '../UI/TextButton';
 import { t, Trans } from '@lingui/macro';
 import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
 import AssetsList from './AssetsList';
-import CompactSearchBar from '../UI/CompactSearchBar';
+import SearchBar from '../UI/SearchBar';
 import { type ObjectShortHeader } from '../Utils/GDevelopServices/Extension';
 import { ObjectStoreContext, type ObjectCategory } from './ObjectStoreContext';
 import { ListSearchResults } from '../UI/Search/ListSearchResults';
@@ -260,11 +260,13 @@ export default function NewObjectFromScratch({
             </SearchBarSelectField>
             <Line expand noMargin>
               <Column expand noMargin>
-                <CompactSearchBar
+                <SearchBar
                   id="object-type-search-bar"
                   value={searchText}
                   onChange={setSearchText}
+                  onRequestSearch={() => {}}
                   placeholder={t`Search objects`}
+                  autoFocus="desktop"
                 />
               </Column>
               <ElementWithMenu

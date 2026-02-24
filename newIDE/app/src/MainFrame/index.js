@@ -4375,12 +4375,11 @@ const MainFrame = (props: Props): React.MixedElement => {
 
     if (updateStatus.status === 'update-downloaded') {
       // Update is ready: offer a one-click restart instead of a generic notification.
-      const version =
-        updateStatus.info && updateStatus.info.version
-          ? ` (${updateStatus.info.version})`
-          : '';
+      const version = updateStatus.info && updateStatus.info.version;
       const restartNotification = new window.Notification(
-        i18n._(t`GDevelop update ready${version}`),
+        version
+          ? i18n._(t`GDevelop update ready (${version})`)
+          : i18n._(t`GDevelop update ready`),
         { body: i18n._(t`Click to restart and install the update now.`) }
       );
       restartNotification.onclick = () => {

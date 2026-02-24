@@ -611,6 +611,452 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
     expect(runtimeScene.getVariables().has('Multiplier')).toBe(false);
   });
 
+  // ---- ForEach orderBy/limit object picking context tests ----
+
+  it('orderBy correctly resolves an unpicked object referenced in the expression', function () {
+    // orderBy uses "Modifier.Variable(Factor) * Coins.Variable(Score)".
+    // Coins is iterated (one at a time in sortContext).
+    // Modifier is NOT picked by any condition or for-each, so all instances
+    // are available; the expression uses the first instance's Factor value.
+    // With Factor=-1, the sort is effectively reversed, proving Modifier is used.
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::ForEach',
+        object: 'Coins',
+        orderBy: 'Modifier.Variable(Factor) * Coins.Variable(Score)',
+        order: 'asc',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarSceneTxt' },
+            parameters: [
+              'Trace',
+              '+',
+              'ToString(Coins.Variable(Score)) + ";"',
+            ],
+          },
+        ],
+        events: [],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      {
+        parameterTypes: { Coins: 'object', Modifier: 'object' },
+        logCode: false,
+      }
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+
+    const coinsLists = new gdjs.Hashtable();
+    const coins = [];
+    coinsLists.put('Coins', coins);
+    [30, 10, 20].forEach(v => {
+      const o = runtimeScene.createObject('Coins');
+      o.getVariables().get('Score').setNumber(v);
+      coins.push(o);
+    });
+
+    // Modifier with Factor=-1 (single unpicked instance)
+    const modLists = new gdjs.Hashtable();
+    const mods = [];
+    modLists.put('Modifier', mods);
+    const mod = runtimeScene.createObject('Modifier');
+    mod.getVariables().get('Factor').setNumber(-1);
+    mods.push(mod);
+
+    runtimeScene.getVariables().get('Trace').setString('');
+
+    runCompiledEvents(gdjs, runtimeScene, [coinsLists, modLists]);
+
+    // Sort keys: -1*30=-30, -1*10=-10, -1*20=-20
+    // Asc: -30, -20, -10 → Coins 30, 20, 10 (reversed from normal ascending)
+    expect(runtimeScene.getVariables().get('Trace').getAsString()).toBe(
+      '30;20;10;'
+    );
+  });
+
+  it('nested for-each orderBy correctly accesses the parent-iterated object', function () {
+    // Outer: ForEach Player ordered by Priority asc
+    // Inner: ForEach Coins ordered by "Player.Variable(Sign) * Coins.Variable(Score)" asc
+    // Player is picked by the outer for-each (single instance per iteration).
+    // Player(Sign=1) → Coins in normal ascending order.
+    // Player(Sign=-1) → Coins in reversed order.
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::ForEach',
+        object: 'Player',
+        orderBy: 'Player.Variable(Priority)',
+        order: 'asc',
+        conditions: [],
+        actions: [],
+        events: [
+          {
+            type: 'BuiltinCommonInstructions::ForEach',
+            object: 'Coins',
+            orderBy: 'Player.Variable(Sign) * Coins.Variable(Score)',
+            order: 'asc',
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'ModVarSceneTxt' },
+                parameters: [
+                  'Trace',
+                  '+',
+                  'ToString(Player.Variable(Priority)) + ":" + ToString(Coins.Variable(Score)) + ";"',
+                ],
+              },
+            ],
+            events: [],
+          },
+        ],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      {
+        parameterTypes: { Player: 'object', Coins: 'object' },
+        logCode: false,
+      }
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+
+    const playerLists = new gdjs.Hashtable();
+    const players = [];
+    playerLists.put('Player', players);
+    // Priority=2, Sign=-1
+    const p1 = runtimeScene.createObject('Player');
+    p1.getVariables().get('Priority').setNumber(2);
+    p1.getVariables().get('Sign').setNumber(-1);
+    players.push(p1);
+    // Priority=1, Sign=1
+    const p2 = runtimeScene.createObject('Player');
+    p2.getVariables().get('Priority').setNumber(1);
+    p2.getVariables().get('Sign').setNumber(1);
+    players.push(p2);
+
+    const coinsLists = new gdjs.Hashtable();
+    const coinsList = [];
+    coinsLists.put('Coins', coinsList);
+    [30, 10, 20].forEach(v => {
+      const o = runtimeScene.createObject('Coins');
+      o.getVariables().get('Score').setNumber(v);
+      coinsList.push(o);
+    });
+
+    runtimeScene.getVariables().get('Trace').setString('');
+
+    runCompiledEvents(gdjs, runtimeScene, [playerLists, coinsLists]);
+
+    // Outer: Players sorted by Priority asc → P2(1,Sign=1), P1(2,Sign=-1)
+    // For P2(Sign=1):  keys 1*30=30, 1*10=10, 1*20=20 → asc: 10,20,30
+    // For P1(Sign=-1): keys -30, -10, -20 → asc: -30,-20,-10 → Coins 30,20,10
+    expect(runtimeScene.getVariables().get('Trace').getAsString()).toBe(
+      '1:10;1:20;1:30;2:30;2:20;2:10;'
+    );
+  });
+
+  it('limit expression correctly resolves an unpicked object', function () {
+    // ForEach Coins ordered by Score asc, limit = Config.Variable(Max).
+    // Config is NOT picked, so all instances are available and the expression
+    // uses the first instance's Max value.
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::ForEach',
+        object: 'Coins',
+        orderBy: 'Coins.Variable(Score)',
+        order: 'asc',
+        limit: 'Config.Variable(Max)',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarSceneTxt' },
+            parameters: [
+              'Trace',
+              '+',
+              'ToString(Coins.Variable(Score)) + ";"',
+            ],
+          },
+        ],
+        events: [],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      {
+        parameterTypes: { Coins: 'object', Config: 'object' },
+        logCode: false,
+      }
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+
+    const coinsLists = new gdjs.Hashtable();
+    const coins = [];
+    coinsLists.put('Coins', coins);
+    [50, 10, 30, 20].forEach(v => {
+      const o = runtimeScene.createObject('Coins');
+      o.getVariables().get('Score').setNumber(v);
+      coins.push(o);
+    });
+
+    // Config with Max=2 (single unpicked instance)
+    const configLists = new gdjs.Hashtable();
+    const configs = [];
+    configLists.put('Config', configs);
+    const cfg = runtimeScene.createObject('Config');
+    cfg.getVariables().get('Max').setNumber(2);
+    configs.push(cfg);
+
+    runtimeScene.getVariables().get('Trace').setString('');
+
+    runCompiledEvents(gdjs, runtimeScene, [coinsLists, configLists]);
+
+    // Sorted asc: 10, 20, 30, 50; limit Config.Max=2 → 10, 20
+    expect(runtimeScene.getVariables().get('Trace').getAsString()).toBe(
+      '10;20;'
+    );
+  });
+
+  it('limit expression correctly resolves a parent-picked object, varying per iteration', function () {
+    // Outer: ForEach Player ordered by Priority asc
+    // Inner: ForEach Coins ordered by Score asc, limit = Player.Variable(MaxCoins)
+    // Player is picked by the outer for-each, so each iteration uses a
+    // different limit value.
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::ForEach',
+        object: 'Player',
+        orderBy: 'Player.Variable(Priority)',
+        order: 'asc',
+        conditions: [],
+        actions: [],
+        events: [
+          {
+            type: 'BuiltinCommonInstructions::ForEach',
+            object: 'Coins',
+            orderBy: 'Coins.Variable(Score)',
+            order: 'asc',
+            limit: 'Player.Variable(MaxCoins)',
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'ModVarSceneTxt' },
+                parameters: [
+                  'Trace',
+                  '+',
+                  'ToString(Player.Variable(Priority)) + ":" + ToString(Coins.Variable(Score)) + ";"',
+                ],
+              },
+            ],
+            events: [],
+          },
+        ],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      {
+        parameterTypes: { Player: 'object', Coins: 'object' },
+        logCode: false,
+      }
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+
+    const playerLists = new gdjs.Hashtable();
+    const players = [];
+    playerLists.put('Player', players);
+    // Priority=2, MaxCoins=3
+    const pa = runtimeScene.createObject('Player');
+    pa.getVariables().get('Priority').setNumber(2);
+    pa.getVariables().get('MaxCoins').setNumber(3);
+    players.push(pa);
+    // Priority=1, MaxCoins=1
+    const pb = runtimeScene.createObject('Player');
+    pb.getVariables().get('Priority').setNumber(1);
+    pb.getVariables().get('MaxCoins').setNumber(1);
+    players.push(pb);
+
+    const coinsLists = new gdjs.Hashtable();
+    const coins = [];
+    coinsLists.put('Coins', coins);
+    [50, 10, 30, 20].forEach(v => {
+      const o = runtimeScene.createObject('Coins');
+      o.getVariables().get('Score').setNumber(v);
+      coins.push(o);
+    });
+
+    runtimeScene.getVariables().get('Trace').setString('');
+
+    runCompiledEvents(gdjs, runtimeScene, [playerLists, coinsLists]);
+
+    // Outer: Players sorted by Priority asc → PB(1,MaxCoins=1), PA(2,MaxCoins=3)
+    // For PB(MaxCoins=1): Coins asc: 10,20,30,50; limit 1 → [10]
+    // For PA(MaxCoins=3): Coins asc: 10,20,30,50; limit 3 → [10,20,30]
+    expect(runtimeScene.getVariables().get('Trace').getAsString()).toBe(
+      '1:10;2:10;2:20;2:30;'
+    );
+  });
+
+  it('condition-filtered objects are correctly used in nested for-each with orderBy', function () {
+    // Outer: ForEach Coins ordered by Score asc, limit 2
+    //   Standard event with condition: Diamond.Variable(Active) = 1 (filters Diamonds)
+    //     Inner: ForEach Diamond ordered by Priority asc
+    //       trace Coins.Score + ":" + Diamond.Priority
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::ForEach',
+        object: 'Coins',
+        orderBy: 'Coins.Variable(Score)',
+        order: 'asc',
+        limit: '2',
+        conditions: [],
+        actions: [],
+        events: [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [
+              {
+                type: { value: 'VarObjet' },
+                parameters: ['Diamond', 'Active', '=', '1'],
+              },
+            ],
+            actions: [],
+            events: [
+              {
+                type: 'BuiltinCommonInstructions::ForEach',
+                object: 'Diamond',
+                orderBy: 'Diamond.Variable(Priority)',
+                order: 'asc',
+                conditions: [],
+                actions: [
+                  {
+                    type: { value: 'ModVarSceneTxt' },
+                    parameters: [
+                      'Trace',
+                      '+',
+                      'ToString(Coins.Variable(Score)) + ":" + ToString(Diamond.Variable(Priority)) + ";"',
+                    ],
+                  },
+                ],
+                events: [],
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      {
+        parameterTypes: { Coins: 'object', Diamond: 'object' },
+        logCode: false,
+      }
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+
+    const coinsLists = new gdjs.Hashtable();
+    const coins = [];
+    coinsLists.put('Coins', coins);
+    [30, 10, 20].forEach(v => {
+      const o = runtimeScene.createObject('Coins');
+      o.getVariables().get('Score').setNumber(v);
+      coins.push(o);
+    });
+
+    // Diamond: Priority=3/Active=1, Priority=1/Active=0, Priority=2/Active=1
+    const diamondLists = new gdjs.Hashtable();
+    const diamonds = [];
+    diamondLists.put('Diamond', diamonds);
+    [[3, 1], [1, 0], [2, 1]].forEach(([prio, active]) => {
+      const o = runtimeScene.createObject('Diamond');
+      o.getVariables().get('Priority').setNumber(prio);
+      o.getVariables().get('Active').setNumber(active);
+      diamonds.push(o);
+    });
+
+    runtimeScene.getVariables().get('Trace').setString('');
+
+    runCompiledEvents(gdjs, runtimeScene, [coinsLists, diamondLists]);
+
+    // Outer: Coins sorted asc: 10, 20, 30; limit 2 → Coins 10, 20
+    // Condition picks Diamonds with Active=1: Priority=3, Priority=2
+    // Inner: Diamonds sorted asc by Priority → 2, 3
+    // For Coins(10): "10:2;10:3;"
+    // For Coins(20): "20:2;20:3;"
+    expect(runtimeScene.getVariables().get('Trace').getAsString()).toBe(
+      '10:2;10:3;20:2;20:3;'
+    );
+  });
+
+  it('limit of 0 does not truncate when orderBy is set', function () {
+    // The codegen checks "if (limit > 0 && list.length > limit)",
+    // so a limit of 0 should NOT truncate the list.
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::ForEach',
+        object: 'MyObject',
+        orderBy: 'MyObject.Variable(Score)',
+        order: 'asc',
+        limit: '0',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarSceneTxt' },
+            parameters: [
+              'Trace',
+              '+',
+              'ToString(MyObject.Variable(Score)) + ";"',
+            ],
+          },
+        ],
+        events: [],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      {
+        parameterTypes: { MyObject: 'object' },
+        logCode: false,
+      }
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    const objectLists = new gdjs.Hashtable();
+    const myObjects = [];
+    objectLists.put('MyObject', myObjects);
+    [50, 10, 30, 20].forEach(v => {
+      const o = runtimeScene.createObject('MyObject');
+      o.getVariables().get('Score').setNumber(v);
+      myObjects.push(o);
+    });
+
+    runtimeScene.getVariables().get('Trace').setString('');
+
+    runCompiledEvents(gdjs, runtimeScene, [objectLists]);
+
+    // Limit 0 → no truncation, all objects iterated in sorted order
+    expect(runtimeScene.getVariables().get('Trace').getAsString()).toBe(
+      '10;20;30;50;'
+    );
+  });
+
   // ---- 3 nested ForEach with orderBy on a group then on objects of this group ----
 
   it('can generate 3 nested "for each" with orderBy on a group then on objects of that group', function () {

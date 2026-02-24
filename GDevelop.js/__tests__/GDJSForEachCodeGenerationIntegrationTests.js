@@ -161,8 +161,7 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
     // Outer: ForEach on ObjectA ordered by ObjectA.Variable(Priority) asc
     // Middle: ForEach on ObjectB ordered by ObjectB.Variable(Priority) desc
     // Inner: ForEach on ObjectC (no orderBy)
-    // Action: Use positional encoding to verify order:
-    //   Accumulate ObjectA.Priority * 10000 + ObjectB.Priority * 100 + ObjectC.Priority
+    // Action: Build a string trace to verify exact iteration order.
     const serializerElement = gd.Serializer.fromJSObject([
       {
         type: 'BuiltinCommonInstructions::ForEach',
@@ -186,11 +185,11 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
                 conditions: [],
                 actions: [
                   {
-                    type: { value: 'ModVarScene' },
+                    type: { value: 'ModVarSceneTxt' },
                     parameters: [
-                      'Sum',
+                      'Trace',
                       '+',
-                      'ObjectA.Variable(Priority) * 10000 + ObjectB.Variable(Priority) * 100 + ObjectC.Variable(Priority)',
+                      'ToString(ObjectA.Variable(Priority)) + "," + ToString(ObjectB.Variable(Priority)) + "," + ToString(ObjectC.Variable(Priority)) + ";"',
                     ],
                   },
                 ],
@@ -247,6 +246,8 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
       objCs.push(o);
     });
 
+    runtimeScene.getVariables().get('Trace').setString('');
+
     runCompiledEvents(gdjs, runtimeScene, [
       objectALists,
       objectBLists,
@@ -255,15 +256,9 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
 
     // A sorted asc (10,20,30), B sorted desc (15,5), C unordered (1)
     // Iterations: (10,15,1), (10,5,1), (20,15,1), (20,5,1), (30,15,1), (30,5,1)
-    // Sum = 101501 + 100501 + 201501 + 200501 + 301501 + 300501
-    const expected =
-      10 * 10000 + 15 * 100 + 1 +
-      (10 * 10000 + 5 * 100 + 1) +
-      (20 * 10000 + 15 * 100 + 1) +
-      (20 * 10000 + 5 * 100 + 1) +
-      (30 * 10000 + 15 * 100 + 1) +
-      (30 * 10000 + 5 * 100 + 1);
-    expect(runtimeScene.getVariables().get('Sum').getAsNumber()).toBe(expected);
+    expect(runtimeScene.getVariables().get('Trace').getAsString()).toBe(
+      '10,15,1;10,5,1;20,15,1;20,5,1;30,15,1;30,5,1;'
+    );
   });
 
   // ---- ForEach with orderBy and limit (1, 2, none) for asc and desc ----
@@ -279,8 +274,8 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
         conditions: [],
         actions: [
           {
-            type: { value: 'ModVarScene' },
-            parameters: ['PickedScore', '=', 'MyObject.Variable(Score)'],
+            type: { value: 'ModVarSceneTxt' },
+            parameters: ['Trace', '+', 'ToString(MyObject.Variable(Score)) + ";"'],
           },
         ],
         events: [],
@@ -306,11 +301,13 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
       myObjects.push(o);
     });
 
+    runtimeScene.getVariables().get('Trace').setString('');
+
     runCompiledEvents(gdjs, runtimeScene, [objectLists]);
 
     // Ascending + limit 1 → picks the object with lowest Score = 10
-    expect(runtimeScene.getVariables().get('PickedScore').getAsNumber()).toBe(
-      10
+    expect(runtimeScene.getVariables().get('Trace').getAsString()).toBe(
+      '10;'
     );
   });
 
@@ -325,8 +322,8 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
         conditions: [],
         actions: [
           {
-            type: { value: 'ModVarScene' },
-            parameters: ['PickedScore', '=', 'MyObject.Variable(Score)'],
+            type: { value: 'ModVarSceneTxt' },
+            parameters: ['Trace', '+', 'ToString(MyObject.Variable(Score)) + ";"'],
           },
         ],
         events: [],
@@ -352,11 +349,13 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
       myObjects.push(o);
     });
 
+    runtimeScene.getVariables().get('Trace').setString('');
+
     runCompiledEvents(gdjs, runtimeScene, [objectLists]);
 
     // Descending + limit 1 → picks the object with highest Score = 50
-    expect(runtimeScene.getVariables().get('PickedScore').getAsNumber()).toBe(
-      50
+    expect(runtimeScene.getVariables().get('Trace').getAsString()).toBe(
+      '50;'
     );
   });
 
@@ -371,8 +370,8 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
         conditions: [],
         actions: [
           {
-            type: { value: 'ModVarScene' },
-            parameters: ['Sum', '+', 'MyObject.Variable(Score)'],
+            type: { value: 'ModVarSceneTxt' },
+            parameters: ['Trace', '+', 'ToString(MyObject.Variable(Score)) + ";"'],
           },
         ],
         events: [],
@@ -398,10 +397,14 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
       myObjects.push(o);
     });
 
+    runtimeScene.getVariables().get('Trace').setString('');
+
     runCompiledEvents(gdjs, runtimeScene, [objectLists]);
 
-    // Ascending + limit 2 → picks 10 + 20 = 30
-    expect(runtimeScene.getVariables().get('Sum').getAsNumber()).toBe(30);
+    // Ascending + limit 2 → picks 10, then 20
+    expect(runtimeScene.getVariables().get('Trace').getAsString()).toBe(
+      '10;20;'
+    );
   });
 
   it('can generate a "for each" with orderBy descending and limit 2', function () {
@@ -415,8 +418,8 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
         conditions: [],
         actions: [
           {
-            type: { value: 'ModVarScene' },
-            parameters: ['Sum', '+', 'MyObject.Variable(Score)'],
+            type: { value: 'ModVarSceneTxt' },
+            parameters: ['Trace', '+', 'ToString(MyObject.Variable(Score)) + ";"'],
           },
         ],
         events: [],
@@ -442,36 +445,28 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
       myObjects.push(o);
     });
 
+    runtimeScene.getVariables().get('Trace').setString('');
+
     runCompiledEvents(gdjs, runtimeScene, [objectLists]);
 
-    // Descending + limit 2 → picks 50 + 30 = 80
-    expect(runtimeScene.getVariables().get('Sum').getAsNumber()).toBe(80);
+    // Descending + limit 2 → picks 50, then 30
+    expect(runtimeScene.getVariables().get('Trace').getAsString()).toBe(
+      '50;30;'
+    );
   });
 
   it('can generate a "for each" with orderBy ascending and no limit', function () {
-    // Verify ordering by using positional encoding:
-    // Multiply each Score by 10^position to check exact iteration order.
     const serializerElement = gd.Serializer.fromJSObject([
       {
         type: 'BuiltinCommonInstructions::ForEach',
         object: 'MyObject',
         orderBy: 'MyObject.Variable(Score)',
         order: 'asc',
-        variables: [{ name: 'Position', type: 'number', value: 0 }],
-        loopIndexVariable: 'Position',
         conditions: [],
         actions: [
           {
-            type: { value: 'ModVarScene' },
-            parameters: ['Sum', '+', 'MyObject.Variable(Score)'],
-          },
-          {
-            type: { value: 'ModVarScene' },
-            parameters: [
-              'OrderCheck',
-              '+',
-              'MyObject.Variable(Score) * pow(10, Position)',
-            ],
+            type: { value: 'ModVarSceneTxt' },
+            parameters: ['Trace', '+', 'ToString(MyObject.Variable(Score)) + ";"'],
           },
         ],
         events: [],
@@ -497,15 +492,13 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
       myObjects.push(o);
     });
 
+    runtimeScene.getVariables().get('Trace').setString('');
+
     runCompiledEvents(gdjs, runtimeScene, [objectLists]);
 
-    // Ascending, no limit → sum of all scores
-    expect(runtimeScene.getVariables().get('Sum').getAsNumber()).toBe(
-      10 + 20 + 30 + 50
-    );
-    // OrderCheck: 10*10^0 + 20*10^1 + 30*10^2 + 50*10^3 = 10 + 200 + 3000 + 50000 = 53210
-    expect(runtimeScene.getVariables().get('OrderCheck').getAsNumber()).toBe(
-      53210
+    // Ascending, no limit → iterates all scores in order: 10, 20, 30, 50
+    expect(runtimeScene.getVariables().get('Trace').getAsString()).toBe(
+      '10;20;30;50;'
     );
   });
 
@@ -516,21 +509,11 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
         object: 'MyObject',
         orderBy: 'MyObject.Variable(Score)',
         order: 'desc',
-        variables: [{ name: 'Position', type: 'number', value: 0 }],
-        loopIndexVariable: 'Position',
         conditions: [],
         actions: [
           {
-            type: { value: 'ModVarScene' },
-            parameters: ['Sum', '+', 'MyObject.Variable(Score)'],
-          },
-          {
-            type: { value: 'ModVarScene' },
-            parameters: [
-              'OrderCheck',
-              '+',
-              'MyObject.Variable(Score) * pow(10, Position)',
-            ],
+            type: { value: 'ModVarSceneTxt' },
+            parameters: ['Trace', '+', 'ToString(MyObject.Variable(Score)) + ";"'],
           },
         ],
         events: [],
@@ -556,15 +539,13 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
       myObjects.push(o);
     });
 
+    runtimeScene.getVariables().get('Trace').setString('');
+
     runCompiledEvents(gdjs, runtimeScene, [objectLists]);
 
-    // Descending, no limit → sum of all scores
-    expect(runtimeScene.getVariables().get('Sum').getAsNumber()).toBe(
-      10 + 20 + 30 + 50
-    );
-    // OrderCheck: 50*10^0 + 30*10^1 + 20*10^2 + 10*10^3 = 50 + 300 + 2000 + 10000 = 12350
-    expect(runtimeScene.getVariables().get('OrderCheck').getAsNumber()).toBe(
-      12350
+    // Descending, no limit → iterates all scores in order: 50, 30, 20, 10
+    expect(runtimeScene.getVariables().get('Trace').getAsString()).toBe(
+      '50;30;20;10;'
     );
   });
 
@@ -585,11 +566,11 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
         conditions: [],
         actions: [
           {
-            type: { value: 'ModVarScene' },
+            type: { value: 'ModVarSceneTxt' },
             parameters: [
-              'Sum',
+              'Trace',
               '+',
-              'MyObject.Variable(Score) * Multiplier + LoopIndex',
+              'ToString(MyObject.Variable(Score)) + "*" + ToString(Multiplier) + "+" + ToString(LoopIndex) + ";"',
             ],
           },
         ],
@@ -616,12 +597,16 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
       myObjects.push(o);
     });
 
+    runtimeScene.getVariables().get('Trace').setString('');
+
     runCompiledEvents(gdjs, runtimeScene, [objectLists]);
 
     // Objects sorted asc by Score: 10, 20, 30
-    // Loop indices: 0, 1, 2
-    // Sum = (10*10 + 0) + (20*10 + 1) + (30*10 + 2) = 100 + 201 + 302 = 603
-    expect(runtimeScene.getVariables().get('Sum').getAsNumber()).toBe(603);
+    // Loop indices: 0, 1, 2. Multiplier is always 10.
+    // Trace = "10*10+0;20*10+1;30*10+2;"
+    expect(runtimeScene.getVariables().get('Trace').getAsString()).toBe(
+      '10*10+0;20*10+1;30*10+2;'
+    );
     expect(runtimeScene.getVariables().has('LoopIndex')).toBe(false);
     expect(runtimeScene.getVariables().has('Multiplier')).toBe(false);
   });
@@ -629,16 +614,10 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
   // ---- 3 nested ForEach with orderBy on a group then on objects of this group ----
 
   it('can generate 3 nested "for each" with orderBy on a group then on objects of that group', function () {
-    // ForEach on AllObjects (group: ObjX, ObjY) ordered by score asc
-    //   Action: accumulate the score of each picked object from the group
-    //   Sub-event with condition: check if the picked object is ObjX
-    //     ForEach on same group AllObjects ordered by score desc
-    //       Action: accumulate into a second variable
-    //       Sub-event: ForEach on ObjY (different object type, always available)
-    //         Action: accumulate into a third variable
-
-    // Simpler test: outer ForEach on group ordered asc, middle ForEach on group
-    // ordered desc, inner ForEach on third object.
+    // Outer: ForEach on AllObjects (group: ObjX, ObjY) ordered by Score asc
+    // Middle: ForEach on IndependentObj ordered by Val desc
+    // Inner: ForEach on ThirdObj ordered by V asc
+    // Each level appends to its own string trace to verify exact ordering.
     const serializerElement = gd.Serializer.fromJSObject([
       {
         type: 'BuiltinCommonInstructions::ForEach',
@@ -648,16 +627,15 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
         conditions: [],
         actions: [
           {
-            type: { value: 'ModVarScene' },
+            type: { value: 'ModVarSceneTxt' },
             parameters: [
-              'OuterSum',
+              'OuterTrace',
               '+',
-              'AllObjects.Variable(Score)',
+              'ToString(AllObjects.Variable(Score)) + ";"',
             ],
           },
         ],
         events: [
-          // Inner ForEach on IndependentObj (not in the group, so always fully available)
           {
             type: 'BuiltinCommonInstructions::ForEach',
             object: 'IndependentObj',
@@ -666,11 +644,11 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
             conditions: [],
             actions: [
               {
-                type: { value: 'ModVarScene' },
+                type: { value: 'ModVarSceneTxt' },
                 parameters: [
-                  'InnerSum',
+                  'InnerTrace',
                   '+',
-                  'AllObjects.Variable(Score) + IndependentObj.Variable(Val)',
+                  'ToString(AllObjects.Variable(Score)) + "+" + ToString(IndependentObj.Variable(Val)) + ";"',
                 ],
               },
             ],
@@ -683,11 +661,11 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
                 conditions: [],
                 actions: [
                   {
-                    type: { value: 'ModVarScene' },
+                    type: { value: 'ModVarSceneTxt' },
                     parameters: [
-                      'DeepSum',
+                      'DeepTrace',
                       '+',
-                      'ThirdObj.Variable(V)',
+                      'ToString(AllObjects.Variable(Score)) + "+" + ToString(IndependentObj.Variable(Val)) + "+" + ToString(ThirdObj.Variable(V)) + ";"',
                     ],
                   },
                 ],
@@ -753,30 +731,27 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
       thirdObjs.push(o);
     });
 
+    runtimeScene.getVariables().get('OuterTrace').setString('');
+    runtimeScene.getVariables().get('InnerTrace').setString('');
+    runtimeScene.getVariables().get('DeepTrace').setString('');
+
     runCompiledEvents(gdjs, runtimeScene, [objXLists, objYLists, indepLists, thirdLists]);
 
     // Outer ForEach: AllObjects (group) sorted asc by Score:
     // ObjX(5), ObjX(15), ObjY(100), ObjY(200)
-    // OuterSum = 5 + 15 + 100 + 200 = 320
-    expect(
-      runtimeScene.getVariables().get('OuterSum').getAsNumber()
-    ).toBe(320);
-
-    // Inner ForEach on IndependentObj desc (2000, 1000):
-    // For each of the 4 outer iterations × 2 inner iterations:
-    // InnerSum += AllObjects.Score + IndependentObj.Val
-    // = 4 outer × 2 inner = 8 iterations
-    // Score contributions: each outer score appears 2 times: 2*(5+15+100+200) = 640
-    // Val contributions: each Val appears 4 times: 4*(2000+1000) = 12000
-    // InnerSum = 640 + 12000 = 12640
-    expect(runtimeScene.getVariables().get('InnerSum').getAsNumber()).toBe(
-      12640
+    expect(runtimeScene.getVariables().get('OuterTrace').getAsString()).toBe(
+      '5;15;100;200;'
     );
 
-    // DeepSum: for each of 8 middle iterations × 1 ThirdObj iteration:
-    // DeepSum += 7, so 8 * 7 = 56
-    expect(runtimeScene.getVariables().get('DeepSum').getAsNumber()).toBe(
-      56
+    // Middle ForEach on IndependentObj desc (2000, 1000) for each outer:
+    // 4 outer × 2 inner = 8 iterations
+    expect(runtimeScene.getVariables().get('InnerTrace').getAsString()).toBe(
+      '5+2000;5+1000;15+2000;15+1000;100+2000;100+1000;200+2000;200+1000;'
+    );
+
+    // Deep ForEach on ThirdObj asc (7) for each of 8 middle iterations:
+    expect(runtimeScene.getVariables().get('DeepTrace').getAsString()).toBe(
+      '5+2000+7;5+1000+7;15+2000+7;15+1000+7;100+2000+7;100+1000+7;200+2000+7;200+1000+7;'
     );
   });
 });

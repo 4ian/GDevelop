@@ -1035,6 +1035,7 @@ function makeMinimalGDJSMock(options) {
         },
         common: {
           resolveAsyncEventsFunction: ({ task }) => task.resolve(),
+          toString: (num) => '' + num,
         },
       },
       registerBehavior: (behaviorTypeName, Ctor) => {

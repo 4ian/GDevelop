@@ -124,7 +124,7 @@ import LocalVariablesDialog from '../VariablesList/LocalVariablesDialog';
 import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariablesDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { useHighlightedAiGeneratedEvent } from './UseHighlightedAiGeneratedEvent';
-import BookmarksPanel from './Bookmarks/BookmarksPanel';
+import BookmarksPanel from './Bookmarks';
 import {
   type Bookmark,
   scanEventsForBookmarks,
@@ -401,6 +401,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           positionsBeforeAction: [],
           positionAfterAction: [],
         });
+        // Refresh bookmarks since events were modified externally
+        this._refreshBookmarks();
       }
     );
   };
@@ -489,8 +491,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   _refreshBookmarks = () => {
     if (!this.props.events) return;
-    const bookmarks = scanEventsForBookmarks(this.props.events);
-    this.setState({ bookmarks });
+    try {
+      const bookmarks = scanEventsForBookmarks(this.props.events);
+      this.setState({ bookmarks });
+    } catch (err) {
+      console.error('Error refreshing bookmarks:', err);
+    }
   };
 
   _toggleBookmarksPanel = () => {
@@ -507,46 +513,25 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
   };
 
-  _addBookmark = () => {
-    const selectedEvents = getSelectedEventContexts(this.state.selection);
-    if (selectedEvents.length === 0) return;
+  _toggleBookmark = () => {
+    try {
+      const selectedEvents = getSelectedEventContexts(this.state.selection);
+      if (selectedEvents.length === 0) return;
 
-    const eventContext = selectedEvents[selectedEvents.length - 1];
-    const { event } = eventContext;
+      const eventContext = selectedEvents[selectedEvents.length - 1];
+      const { event } = eventContext;
 
-    // Check if already bookmarked
-    const existingBookmarkId = event.getEventBookmarkId();
-    if (existingBookmarkId && existingBookmarkId.length > 0) return;
+      const bookmarkId = event.getEventBookmarkId && event.getEventBookmarkId();
+      const isBookmarked = bookmarkId && bookmarkId.length > 0;
 
-    // Set bookmark ID on the event
-    const bookmarkId = uuidv4();
-    event.setEventBookmarkId(bookmarkId);
+      event.setEventBookmarkId(isBookmarked ? '' : uuidv4());
 
-    // Refresh bookmarks from events
-    this._refreshBookmarks();
-
-    // Trigger unsaved changes
-    if (this.props.unsavedChanges) {
-      this.props.unsavedChanges.triggerUnsavedChanges();
-    }
-  };
-
-  _removeBookmark = () => {
-    const selectedEvents = getSelectedEventContexts(this.state.selection);
-    if (selectedEvents.length === 0) return;
-
-    const eventContext = selectedEvents[selectedEvents.length - 1];
-    const { event } = eventContext;
-
-    // Clear bookmark ID from the event
-    event.setEventBookmarkId('');
-
-    // Refresh bookmarks from events
-    this._refreshBookmarks();
-
-    // Trigger unsaved changes
-    if (this.props.unsavedChanges) {
-      this.props.unsavedChanges.triggerUnsavedChanges();
+      this._refreshBookmarks();
+      if (this.props.unsavedChanges) {
+        this.props.unsavedChanges.triggerUnsavedChanges();
+      }
+    } catch (err) {
+      console.error('Error toggling bookmark:', err);
     }
   };
 
@@ -555,14 +540,15 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (selectedEvents.length === 0) return false;
 
     const eventContext = selectedEvents[selectedEvents.length - 1];
-    const { event } = eventContext;
-
-    const bookmarkId = event.getEventBookmarkId();
-    return bookmarkId && bookmarkId.length > 0;
+    const bookmarkId = eventContext.event.getEventBookmarkId?.();
+    return !!bookmarkId && bookmarkId.length > 0;
   };
 
   _navigateToBookmark = (bookmark: Bookmark) => {
-    const eventLocation = findEventLocationByPtr(this.props.events, bookmark.eventPtr);
+    const eventLocation = findEventLocationByPtr(
+      this.props.events,
+      bookmark.eventPtr
+    );
 
     if (!eventLocation) {
       // Event no longer exists - remove bookmark
@@ -576,13 +562,15 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     this._ensureUnfoldedAndScrollTo(() => event);
 
     // Select the event
-    const eventContext = {
+    this.selectEvent({
       eventsList,
       event,
       indexInList,
       projectScopedContainersAccessor: this.props.projectScopedContainersAccessor,
-    };
-    this.selectEvent(eventContext);
+    });
+
+    // Focus the bookmark for visual highlight
+    this.setState({ bookmarkFocusId: bookmark.id });
   };
 
   _deleteBookmark = (bookmarkId: string) => {
@@ -592,27 +580,19 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
     const event = findEventByPtr(this.props.events, bookmark.eventPtr);
     if (event) {
-      event.setEventBookmarkId('');
-
-      // Trigger unsaved changes
-      if (this.props.unsavedChanges) {
-        this.props.unsavedChanges.triggerUnsavedChanges();
+      try {
+        event.setEventBookmarkId('');
+        if (this.props.unsavedChanges) {
+          this.props.unsavedChanges.triggerUnsavedChanges();
+        }
+      } catch (err) {
+        console.error('Error removing bookmark from event:', err);
       }
+    } else {
+      console.warn('Bookmarked event no longer exists');
     }
 
-    // Refresh bookmarks from events
     this._refreshBookmarks();
-  };
-
-  _renameBookmark = (bookmarkId: string, newName: string) => {
-    // Bookmark names are generated dynamically from event content.
-    // To change a bookmark name, the user should edit the event itself.
-    // This method is kept for future extensibility but currently does nothing.
-    console.warn('Bookmark renaming is not supported. Edit the event to change its description.');
-  };
-
-  _focusBookmark = (bookmark: Bookmark) => {
-    this.setState({ bookmarkFocusId: bookmark.id });
   };
 
   addSubEvent = () => {
@@ -793,6 +773,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         positionsBeforeAction: positions,
         positionAfterAction: positions,
       });
+      // Refresh bookmarks in case the event color was changed
+      this._refreshBookmarks();
     }
     this.setState({
       textEditedEvent: null,
@@ -921,6 +903,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             positionsBeforeAction: positions,
             positionAfterAction: positions,
           });
+          // Refresh bookmarks in case the event was a group/comment with color change
+          this._refreshBookmarks();
         }
       }
     );
@@ -1004,181 +988,186 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (this._eventsTree) this._eventsTree.unfoldToLevel(level);
   };
 
-  _buildEventContextMenu = (i18n: I18nType) => [
-    {
-      label: i18n._(t`Edit`),
-      click: () => this.openEventTextDialog(),
-      visible:
-        filterEditableWithEventTextDialog(
-          getSelectedEvents(this.state.selection)
-        ).length > 0,
-    },
-    {
-      label: i18n._(t`Copy`),
-      click: () => this.copySelection(),
-      accelerator: 'CmdOrCtrl+C',
-    },
-    {
-      label: i18n._(t`Cut`),
-      click: () => this.cutSelection(),
-      accelerator: 'CmdOrCtrl+X',
-    },
-    {
-      label: i18n._(t`Paste`),
-      click: () => this.pasteEvents(),
-      enabled: hasClipboardEvents(),
-      accelerator: 'CmdOrCtrl+V',
-    },
-    {
-      label: i18n._(t`Delete`),
-      click: () => this.deleteSelection(),
-      accelerator: 'Delete',
-    },
-    {
-      label: i18n._(t`Toggle Disabled`),
-      click: () => this.toggleDisabled(),
-      enabled: this._selectionCanToggleDisabled(),
-      accelerator: getShortcutDisplayName(
-        this.props.shortcutMap['TOGGLE_EVENT_DISABLED'] || 'KeyD'
-      ),
-    },
-    {
-      label: i18n._(t`Remove the Else`),
-      click: () =>
-        this._replaceSelectedEventType('BuiltinCommonInstructions::Standard'),
-      visible: this._selectionIsElseEvent(),
-    },
-    { type: 'separator' },
-    {
-      label: this._isEventBookmarked()
-        ? i18n._(t`Remove Bookmark`)
-        : i18n._(t`Add Bookmark`),
-      click: () =>
-        this._isEventBookmarked() ? this._removeBookmark() : this._addBookmark(),
-      visible: hasEventSelected(this.state.selection),
-    },
-    { type: 'separator' },
-    {
-      label: i18n._(t`Add`),
-      submenu: [
-        {
-          label: i18n._(t`New Event Below`),
-          click: () => {
-            this.addNewEvent('BuiltinCommonInstructions::Standard');
-          },
-          accelerator: getShortcutDisplayName(
-            this.props.shortcutMap['ADD_STANDARD_EVENT']
-          ),
-        },
-        {
-          label: i18n._(t`Sub Event`),
-          click: () => this.addSubEvent(),
-          enabled: this._selectionCanHaveSubEvents(),
-          accelerator: getShortcutDisplayName(
-            this.props.shortcutMap['ADD_SUBEVENT']
-          ),
-        },
-        {
-          label: i18n._(t`Local Variable`),
-          click: () => this.addLocalVariable(),
-          enabled: this._selectionCanHaveLocalVariables(),
-          accelerator: getShortcutDisplayName(
-            this.props.shortcutMap['ADD_LOCAL_VARIABLE']
-          ),
-        },
-        {
-          label: i18n._(t`Comment`),
-          click: () => {
-            this.addNewEvent('BuiltinCommonInstructions::Comment');
-          },
-          accelerator: getShortcutDisplayName(
-            this.props.shortcutMap['ADD_COMMENT_EVENT']
-          ),
-        },
-        ...this.state.allEventsMetadata
-          .filter(
-            metadata =>
-              metadata.type !== 'BuiltinCommonInstructions::Standard' &&
-              metadata.type !== 'BuiltinCommonInstructions::Comment'
-          )
-          .map(metadata => ({
-            label: metadata.fullName,
+  _buildEventContextMenu = (i18n: I18nType) => {
+    const isEventBookmarked = this._isEventBookmarked();
+
+    return [
+      {
+        label: i18n._(t`Edit`),
+        click: () => this.openEventTextDialog(),
+        visible:
+          filterEditableWithEventTextDialog(
+            getSelectedEvents(this.state.selection)
+          ).length > 0,
+      },
+      {
+        label: i18n._(t`Copy`),
+        click: () => this.copySelection(),
+        accelerator: 'CmdOrCtrl+C',
+      },
+      {
+        label: i18n._(t`Cut`),
+        click: () => this.cutSelection(),
+        accelerator: 'CmdOrCtrl+X',
+      },
+      {
+        label: i18n._(t`Paste`),
+        click: () => this.pasteEvents(),
+        enabled: hasClipboardEvents(),
+        accelerator: 'CmdOrCtrl+V',
+      },
+      {
+        label: i18n._(t`Delete`),
+        click: () => this.deleteSelection(),
+        accelerator: 'Delete',
+      },
+      {
+        label: i18n._(t`Toggle Disabled`),
+        click: () => this.toggleDisabled(),
+        enabled: this._selectionCanToggleDisabled(),
+        accelerator: getShortcutDisplayName(
+          this.props.shortcutMap['TOGGLE_EVENT_DISABLED'] || 'KeyD'
+        ),
+      },
+      {
+        label: i18n._(t`Remove the Else`),
+        click: () =>
+          this._replaceSelectedEventType('BuiltinCommonInstructions::Standard'),
+        visible: this._selectionIsElseEvent(),
+      },
+      { type: 'separator' },
+      {
+        label: isEventBookmarked
+          ? i18n._(t`Remove Bookmark`)
+          : i18n._(t`Add Bookmark`),
+        click: () => this._toggleBookmark(),
+        visible: hasEventSelected(this.state.selection),
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Add`),
+        submenu: [
+          {
+            label: i18n._(t`New Event Below`),
             click: () => {
-              this.addNewEvent(metadata.type);
+              this.addNewEvent('BuiltinCommonInstructions::Standard');
             },
-          })),
-      ],
-    },
-    {
-      label: i18n._(t`Replace`),
-      submenu: [
-        {
-          label: i18n._(t`Make it a Else for the previous event`),
-          click: () =>
-            this._replaceSelectedEventType('BuiltinCommonInstructions::Else'),
-          enabled: this._selectionIsStandardEvent(),
-        },
-        { type: 'separator' },
-        {
-          label: i18n._(t`Extract Events to a Function`),
-          click: () => this.extractEventsToFunction(),
-        },
-        {
-          label: i18n._(t`Move Events into a Group`),
-          click: () => this.moveEventsIntoNewGroup(),
-          accelerator: getShortcutDisplayName(
-            this.props.shortcutMap['MOVE_EVENTS_IN_NEW_GROUP']
-          ),
-        },
-        { type: 'separator' },
-        {
-          label: i18n._(t`Analyze Objects Used in this Event`),
-          click: this._openEventsContextAnalyzer,
-        },
-      ],
-    },
-    { type: 'separator' },
-    {
-      label: i18n._(t`Events Sheet`),
-      submenu: [
-        {
-          label: i18n._(t`Zoom In`),
-          click: () => this.onZoomEvent('IN')(),
-          accelerator: 'CmdOrCtrl+=',
-          enabled:
-            this.props.preferences.values.eventsSheetZoomLevel < zoomLevel.max,
-        },
-        {
-          label: i18n._(t`Zoom Out`),
-          click: () => this.onZoomEvent('OUT')(),
-          accelerator: 'CmdOrCtrl+-',
-          enabled:
-            this.props.preferences.values.eventsSheetZoomLevel > zoomLevel.min,
-        },
-        { type: 'separator' },
-        {
-          label: i18n._(t`Collapse All`),
-          click: this.collapseAll,
-        },
-        {
-          label: i18n._(t`Expand All to Level`),
-          submenu: [
-            {
-              label: i18n._(t`All`),
-              click: () => this.expandToLevel(-1),
+            accelerator: getShortcutDisplayName(
+              this.props.shortcutMap['ADD_STANDARD_EVENT']
+            ),
+          },
+          {
+            label: i18n._(t`Sub Event`),
+            click: () => this.addSubEvent(),
+            enabled: this._selectionCanHaveSubEvents(),
+            accelerator: getShortcutDisplayName(
+              this.props.shortcutMap['ADD_SUBEVENT']
+            ),
+          },
+          {
+            label: i18n._(t`Local Variable`),
+            click: () => this.addLocalVariable(),
+            enabled: this._selectionCanHaveLocalVariables(),
+            accelerator: getShortcutDisplayName(
+              this.props.shortcutMap['ADD_LOCAL_VARIABLE']
+            ),
+          },
+          {
+            label: i18n._(t`Comment`),
+            click: () => {
+              this.addNewEvent('BuiltinCommonInstructions::Comment');
             },
-            { type: 'separator' },
-            ...[0, 1, 2, 3, 4, 5, 6, 7, 8].map(index => {
-              return {
-                label: i18n._(t`Level ${index + 1}`),
-                click: () => this.expandToLevel(index),
-              };
-            }),
-          ],
-        },
-      ],
-    },
-  ];
+            accelerator: getShortcutDisplayName(
+              this.props.shortcutMap['ADD_COMMENT_EVENT']
+            ),
+          },
+          ...this.state.allEventsMetadata
+            .filter(
+              metadata =>
+                metadata.type !== 'BuiltinCommonInstructions::Standard' &&
+                metadata.type !== 'BuiltinCommonInstructions::Comment'
+            )
+            .map(metadata => ({
+              label: metadata.fullName,
+              click: () => {
+                this.addNewEvent(metadata.type);
+              },
+            })),
+        ],
+      },
+      {
+        label: i18n._(t`Replace`),
+        submenu: [
+          {
+            label: i18n._(t`Make it a Else for the previous event`),
+            click: () =>
+              this._replaceSelectedEventType('BuiltinCommonInstructions::Else'),
+            enabled: this._selectionIsStandardEvent(),
+          },
+          { type: 'separator' },
+          {
+            label: i18n._(t`Extract Events to a Function`),
+            click: () => this.extractEventsToFunction(),
+          },
+          {
+            label: i18n._(t`Move Events into a Group`),
+            click: () => this.moveEventsIntoNewGroup(),
+            accelerator: getShortcutDisplayName(
+              this.props.shortcutMap['MOVE_EVENTS_IN_NEW_GROUP']
+            ),
+          },
+          { type: 'separator' },
+          {
+            label: i18n._(t`Analyze Objects Used in this Event`),
+            click: this._openEventsContextAnalyzer,
+          },
+        ],
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Events Sheet`),
+        submenu: [
+          {
+            label: i18n._(t`Zoom In`),
+            click: () => this.onZoomEvent('IN')(),
+            accelerator: 'CmdOrCtrl+=',
+            enabled:
+              this.props.preferences.values.eventsSheetZoomLevel <
+              zoomLevel.max,
+          },
+          {
+            label: i18n._(t`Zoom Out`),
+            click: () => this.onZoomEvent('OUT')(),
+            accelerator: 'CmdOrCtrl+-',
+            enabled:
+              this.props.preferences.values.eventsSheetZoomLevel >
+              zoomLevel.min,
+          },
+          { type: 'separator' },
+          {
+            label: i18n._(t`Collapse All`),
+            click: this.collapseAll,
+          },
+          {
+            label: i18n._(t`Expand All to Level`),
+            submenu: [
+              {
+                label: i18n._(t`All`),
+                click: () => this.expandToLevel(-1),
+              },
+              { type: 'separator' },
+              ...[0, 1, 2, 3, 4, 5, 6, 7, 8].map(index => {
+                return {
+                  label: i18n._(t`Level ${index + 1}`),
+                  click: () => this.expandToLevel(index),
+                };
+              }),
+            ],
+          },
+        ],
+      },
+    ];
+  };
 
   _selectionIsStandardEvent = () => {
     const eventContext = getLastSelectedEventContext(this.state.selection);
@@ -1629,6 +1618,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       positionsBeforeAction: eventRowIndex,
       positionAfterAction: eventRowIndex,
     });
+    // Refresh bookmarks in case the event content changed
+    this._refreshBookmarks();
   };
 
   _getChangedEventRows = (events: Array<gdBaseEvent>) => {
@@ -1719,6 +1710,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             }, 70);
           }
           this.updateToolbar();
+          // Refresh bookmarks in case events were added/deleted/changed
+          this._refreshBookmarks();
         }
       );
     });
@@ -1778,6 +1771,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             }, 70);
           }
           this.updateToolbar();
+          // Refresh bookmarks in case events were added/deleted/changed
+          this._refreshBookmarks();
         }
       );
     });
@@ -2317,8 +2312,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   bookmarks={this.state.bookmarks}
                   onNavigateToBookmark={this._navigateToBookmark}
                   onDeleteBookmark={this._deleteBookmark}
-                  onRenameBookmark={this._renameBookmark}
-                  onFocusBookmark={this._focusBookmark}
                   onClose={() => this.setState({ showBookmarksPanel: false })}
                 />
               </ErrorBoundary>

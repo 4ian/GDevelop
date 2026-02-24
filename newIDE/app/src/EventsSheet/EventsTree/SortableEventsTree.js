@@ -259,6 +259,7 @@ const TreeRow = ({
     searchFocusOffset != null && matchIndexes[searchFocusOffset] === index;
   const isBookmarkFocus =
     bookmarkFocusId != null && node.event && node.event.getEventBookmarkId() === bookmarkFocusId;
+  const isFocused = isSearchFocus || isBookmarkFocus;
 
   const scaffold = lowerSiblingCounts.map((lowerSiblingCount, i) => {
     const isNodeDepth = i === depth - 1;
@@ -333,7 +334,7 @@ const TreeRow = ({
             className={classNames(
               'rst__row',
               (isSearchMatch || isBookmarkFocus) && 'rst__rowSearchMatch',
-              (isSearchFocus) && 'rst__rowSearchFocus'
+              isFocused && 'rst__rowSearchFocus'
             )}
           >
             <div className="rst__rowContents">

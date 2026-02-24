@@ -15,84 +15,49 @@ import EmptyMessage from '../../UI/EmptyMessage';
 import ScrollView from '../../UI/ScrollView';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import './BookmarksPanel.css';
 
 type Props = {|
   bookmarks: Array<Bookmark>,
   onNavigateToBookmark: (bookmark: Bookmark) => void,
   onDeleteBookmark: (bookmarkId: string) => void,
-  onRenameBookmark: (bookmarkId: string, newName: string) => void,
-  onFocusBookmark?: ?(bookmark: Bookmark) => void,
   onClose: () => void,
   isOpen: boolean,
 |};
-
-const DRAWER_WIDTH = 280;
-const BOTTOM_PANEL_HEIGHT = 300;
-
-const getDrawerContainerStyle = (isMobile: boolean, isOpen: boolean) => ({
-  position: isMobile ? 'fixed' : 'absolute',
-  ...(isMobile
-    ? {
-        bottom: 0,
-        left: 0,
-        right: 0,
-        width: '100%',
-        height: BOTTOM_PANEL_HEIGHT,
-        transform: isOpen ? 'translateY(0)' : `translateY(${BOTTOM_PANEL_HEIGHT}px)`,
-        boxShadow: '0 -4px 12px rgba(0,0,0,0.2)',
-      }
-    : {
-        top: 0,
-        right: 0,
-        height: '100%',
-        width: DRAWER_WIDTH,
-        transform: isOpen ? 'translateX(0%)' : 'translateX(100%)',
-        boxShadow: '-4px 0 12px rgba(0,0,0,0.2)',
-      }),
-  zIndex: 10,
-  transition: 'transform 0.3s ease-in-out',
-  display: 'flex',
-  flexDirection: 'column',
-  pointerEvents: 'auto',
-});
-
-const styles = {
-  backgroundWrapper: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    overflow: 'hidden',
-  },
-  emptyContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    padding: '20px',
-  },
-};
 
 const BookmarksPanel = ({
   bookmarks,
   onNavigateToBookmark,
   onDeleteBookmark,
-  onRenameBookmark,
-  onFocusBookmark,
   onClose,
   isOpen,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { isMobile } = useResponsiveWindowSize();
 
+  // Handle keyboard shortcuts
+  React.useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   return (
     <div
-      style={getDrawerContainerStyle(isMobile, isOpen)}
+      className={`bookmarksPanelContainer ${isMobile ? 'mobile' : 'desktop'} ${isOpen ? 'open' : ''}`}
     >
       <Background  noExpand>
         <Line noMargin>
           <Column expand>
             <LineStackLayout noMargin alignItems="center">
-              <StarBorder style={{ marginRight: 8 }} />
+              <StarBorder className="starIcon" />
               <Text size="block-title">
                 <Trans>Bookmarks</Trans>
               </Text>
@@ -104,49 +69,37 @@ const BookmarksPanel = ({
         </Line>
         <Background  expand>
           {bookmarks.length === 0 ? (
-            <div style={styles.emptyContainer}>
+            <div className="emptyContainer">
               <EmptyMessage>
                 <Trans>
-                  No bookmarks yet. Right-click on an event to add it as bookmark.
+                  No bookmarks yet. Right-click on an event and select "Add Bookmark" to bookmark it.
                 </Trans>
               </EmptyMessage>
             </div>
           ) : (
             <ScrollView>
               <ColumnStackLayout noMargin>
-                {bookmarks.map(bookmark => {
-                  const rgbColor = bookmark.color
-                    ? `rgb(${bookmark.color.replace(/;/g, ',')})`
-                    : null;
-
-                  return (
+                {bookmarks.map(bookmark => (
                     <div
                       key={bookmark.id}
+                      className="bookmarkItem"
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '8px 4px',
-                        borderBottom: `1px solid ${gdevelopTheme.toolbar.separatorColor}`,
-                        borderLeft: rgbColor ? `3px solid ${rgbColor}` : 'none',
-                        paddingLeft: rgbColor ? '5px' : '4px',
-                        gap: '4px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
+                        borderBottomColor: gdevelopTheme.toolbar.separatorColor,
+                        borderLeft: bookmark.borderLeftColor ? '3px solid' : 'none',
+                        paddingLeft: bookmark.borderLeftColor ? '5px' : '4px',
+                        ...(bookmark.borderLeftColor && {
+                          borderLeftColor: bookmark.borderLeftColor,
+                        }),
                       }}
                     >
                       <IconButton
                         size="small"
-                        onClick={() => {
-                          onNavigateToBookmark(bookmark);
-                          if (onFocusBookmark) {
-                            onFocusBookmark(bookmark);
-                          }
-                        }}
+                        onClick={() => onNavigateToBookmark(bookmark)}
                         tooltip={t`Go to event`}
                       >
                         <ShareExternal />
                       </IconButton>
-                      <Text noMargin style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <Text noMargin className="bookmarkItemName">
                         {bookmark.name}
                       </Text>
                       <IconButton
@@ -157,8 +110,8 @@ const BookmarksPanel = ({
                         <Delete />
                       </IconButton>
                     </div>
-                  );
-                })}
+                  )
+                )}
               </ColumnStackLayout>
             </ScrollView>
           )}

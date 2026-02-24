@@ -19,11 +19,12 @@ import ObjectField from '../../ParameterFields/ObjectField';
 import ExpressionField from '../../ParameterFields/ExpressionField';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
+import forEachClasses from './ForEachEvent.module.css';
 import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import { type ParameterFieldInterface } from '../../ParameterFields/ParameterFieldCommons';
 import ParameterRenderingService from '../../ParameterRenderingService';
-import Cross from '../../../UI/CustomSvgIcons/Cross';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -45,48 +46,31 @@ const styles = {
     marginLeft: '3px',
     marginRight: '2px',
   },
-  inlineSelect: {
-    // Styled to look like inline text with a subtle grey arrow hint.
-    appearance: 'none',
-    WebkitAppearance: 'none',
-    MozAppearance: 'none',
-    background: 'none',
-    border: 'none',
-    borderBottom: '1px dashed currentColor',
-    fontSize: 'inherit',
-    fontFamily: 'inherit',
-    color: 'inherit',
-    padding: '0 14px 0 0',
-    // Grey chevron as background image on the right
-    backgroundImage:
-      "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E\")",
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'right 2px center',
-    backgroundSize: '8px 5px',
-  },
-  limitPopoverContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-    padding: '0 4px',
-    minWidth: '200px',
-  },
-  removeLimitButton: {
-    cursor: 'pointer',
-    background: 'none',
-    border: 'none',
-    padding: '4px',
-    display: 'flex',
-    alignItems: 'center',
-    color: 'inherit',
-    opacity: 0.6,
-    flexShrink: 0,
-  },
-  removeLimitIcon: {
-    width: 16,
-    height: 16,
-  },
 };
+
+const InlineSelect = ({
+  value,
+  onChange,
+  children,
+}: {|
+  value: string,
+  onChange: (value: string) => void,
+  children: React.Node,
+|}) => (
+  <span className={forEachClasses.inlineSelectContainer}>
+    <select
+      className={classNames(selectableArea, forEachClasses.inlineSelect)}
+      value={value}
+      onChange={e => onChange(e.currentTarget.value)}
+      tabIndex={0}
+    >
+      {children}
+    </select>
+    <div className={forEachClasses.arrowContainer}>
+      <span className={forEachClasses.arrow} />
+    </div>
+  </span>
+);
 
 export default class ForEachEvent extends React.Component<
   EventRendererProps,
@@ -324,111 +308,122 @@ export default class ForEachEvent extends React.Component<
             </span>
           </Trans>{' '}
           {/* Inline select for "ordered by" vs "(any order)" */}
-          <select
-            className={selectableArea}
-            style={styles.inlineSelect}
+          <InlineSelect
             value={hasOrderBy ? 'orderBy' : 'any'}
-            onChange={e => {
-              if (e.target.value === 'any') {
+            onChange={value => {
+              if (value === 'any') {
                 forEachEvent.setOrderBy('');
                 forEachEvent.setLimit('');
                 this.props.onUpdate();
                 this.forceUpdate();
               } else {
-                forEachEvent.setOrderBy('0');
+                forEachEvent.setOrderBy(
+                  objectNameIsValid ? `${objectName}.XXX` : '0'
+                );
                 forEachEvent.setOrder('asc');
                 this.props.onUpdate();
                 this.forceUpdate();
               }
             }}
-            tabIndex={0}
           >
             <option value="any">{'(any order)'}</option>
             <option value="orderBy">{'ordered by'}</option>
-          </select>
+          </InlineSelect>
           {hasOrderBy && (
-            <span>
-              {/* Clickable orderBy expression */}
-              <span
-                className={classNames({
-                  [selectableArea]: true,
-                  [instructionParameter]: true,
-                  number: true,
-                })}
-                style={styles.orderByContainer}
-                onClick={this.editOrderBy}
-                onKeyPress={event => {
-                  if (shouldActivate(event)) {
-                    this.editOrderBy(event);
-                  }
-                }}
-                tabIndex={0}
-              >
-                {isOrderByValid ? (
-                  orderBy
-                ) : (
+            <I18n>
+              {({ i18n }) => (
+                <span>
+                  {/* Clickable orderBy expression */}
                   <span
                     className={classNames({
-                      [instructionInvalidParameter]: true,
+                      [selectableArea]: true,
+                      [instructionParameter]: true,
+                      number: true,
                     })}
+                    style={styles.orderByContainer}
+                    onClick={this.editOrderBy}
+                    onKeyPress={event => {
+                      if (shouldActivate(event)) {
+                        this.editOrderBy(event);
+                      }
+                    }}
+                    tabIndex={0}
+                    title={i18n._(
+                      t`Expression used to sort instances before iterating. It will be evaluated for each instance.`
+                    )}
                   >
-                    {orderBy}
-                  </span>
-                )}
-              </span>
-              ({/* Inline select for ascending/descending */}
-              <select
-                className={selectableArea}
-                style={styles.inlineSelect}
-                value={order}
-                onChange={e => {
-                  forEachEvent.setOrder(e.target.value);
-                  this.props.onUpdate();
-                  this.forceUpdate();
-                }}
-                tabIndex={0}
-              >
-                <option value="asc">{'ascending'}</option>
-                <option value="desc">{'descending'}</option>
-              </select>
-              ,{' '}
-              <span>
-                {limit ? <Trans>limit:</Trans> : ''}
-                {limit ? ' ' : ''}
-                <span
-                  className={classNames({
-                    [selectableArea]: true,
-                    [instructionParameter]: true,
-                    number: true,
-                    [disabledText]: this.props.disabled,
-                  })}
-                  onClick={this.editLimit}
-                  onKeyPress={event => {
-                    if (shouldActivate(event)) {
-                      this.editLimit(event);
-                    }
-                  }}
-                  tabIndex={0}
-                >
-                  {limit ? (
-                    isLimitValid ? (
-                      limit
+                    {isOrderByValid ? (
+                      orderBy
                     ) : (
                       <span
                         className={classNames({
                           [instructionInvalidParameter]: true,
                         })}
                       >
-                        {limit}
+                        {orderBy}
                       </span>
-                    )
-                  ) : (
-                    <Trans>no limit</Trans>
-                  )}
+                    )}
+                  </span>
+                  ({/* Inline select for ascending/descending */}
+                  <InlineSelect
+                    value={order}
+                    onChange={value => {
+                      forEachEvent.setOrder(value);
+                      this.props.onUpdate();
+                      this.forceUpdate();
+                    }}
+                  >
+                    <option value="asc">{'ascending'}</option>
+                    <option value="desc">{'descending'}</option>
+                  </InlineSelect>
+                  ,{' '}
+                  <span
+                    className={classNames({
+                      [selectableArea]: true,
+                      [instructionParameter]: true,
+                      number: true,
+                      [disabledText]: this.props.disabled,
+                    })}
+                    onClick={this.editLimit}
+                    onKeyPress={event => {
+                      if (shouldActivate(event)) {
+                        this.editLimit(event);
+                      }
+                    }}
+                    tabIndex={0}
+                    title={
+                      limit
+                        ? i18n._(
+                            t`This event will be repeated only for the first instances, up to this limit.`
+                          )
+                        : i18n._(
+                            t`This event will be repeated for all instances.`
+                          )
+                    }
+                  >
+                    {limit ? (
+                      <>
+                        <Trans>limit:</Trans>{' '}
+                        {isLimitValid ? (
+                          limit
+                        ) : (
+                          <span
+                            className={classNames({
+                              [instructionInvalidParameter]: true,
+                            })}
+                          >
+                            {limit}
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <Trans>no limit</Trans>
+                    )}
+                  </span>
+                  )
                 </span>
-              </span>
-              )
-            </span>
+              )}
+            </I18n>
           )}
           <Trans>:</Trans>
         </div>
@@ -554,7 +549,6 @@ export default class ForEachEvent extends React.Component<
               this.props.onUpdate();
               this.forceUpdate();
             }}
-            // $FlowFixMe[incompatible-type]
             parameterRenderingService={ParameterRenderingService}
             isInline
             ref={field => (this._orderByField = field)}
@@ -567,39 +561,24 @@ export default class ForEachEvent extends React.Component<
           onRequestClose={this.endEditingLimit}
           onApply={this.endEditingLimit}
         >
-          <div style={styles.limitPopoverContainer}>
-            <ExpressionField
-              project={this.props.project}
-              scope={this.props.scope}
-              globalObjectsContainer={this.props.globalObjectsContainer}
-              objectsContainer={this.props.objectsContainer}
-              projectScopedContainersAccessor={
-                this.props.projectScopedContainersAccessor
-              }
-              value={limit}
-              onChange={text => {
-                forEachEvent.setLimit(text);
-                this.props.onUpdate();
-                this.forceUpdate();
-              }}
-              // $FlowFixMe[incompatible-type]
-              parameterRenderingService={ParameterRenderingService}
-              isInline
-              ref={field => (this._limitField = field)}
-            />
-            <button
-              style={styles.removeLimitButton}
-              onClick={() => {
-                forEachEvent.setLimit('');
-                this.props.onUpdate();
-                this.endEditingLimit();
-                this.forceUpdate();
-              }}
-              title="Remove limit"
-            >
-              <Cross style={styles.removeLimitIcon} />
-            </button>
-          </div>
+          <ExpressionField
+            project={this.props.project}
+            scope={this.props.scope}
+            globalObjectsContainer={this.props.globalObjectsContainer}
+            objectsContainer={this.props.objectsContainer}
+            projectScopedContainersAccessor={
+              this.props.projectScopedContainersAccessor
+            }
+            value={limit}
+            onChange={text => {
+              forEachEvent.setLimit(text);
+              this.props.onUpdate();
+              this.forceUpdate();
+            }}
+            parameterRenderingService={ParameterRenderingService}
+            isInline
+            ref={field => (this._limitField = field)}
+          />
         </InlinePopover>
       </div>
     );

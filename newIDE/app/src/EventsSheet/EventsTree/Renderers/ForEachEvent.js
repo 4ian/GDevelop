@@ -11,14 +11,17 @@ import {
   instructionParameter,
   nameAndIconContainer,
   instructionInvalidParameter,
+  disabledText,
   eventLabel,
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
 import ObjectField from '../../ParameterFields/ObjectField';
+import ExpressionField from '../../ParameterFields/ExpressionField';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
 import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import { type ParameterFieldInterface } from '../../ParameterFields/ParameterFieldCommons';
+import ParameterRenderingService from '../../ParameterRenderingService';
 import { Trans } from '@lingui/macro';
 const gd: libGDevelop = global.gd;
 
@@ -37,6 +40,37 @@ const styles = {
     marginLeft: '3px',
     marginRight: '2px',
   },
+  orderByContainer: {
+    marginLeft: '3px',
+    marginRight: '2px',
+  },
+  orderConfigContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+    padding: '4px',
+    minWidth: '300px',
+  },
+  orderConfigRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
+  orderSelect: {
+    padding: '2px 4px',
+    fontSize: 'inherit',
+    fontFamily: 'inherit',
+  },
+  linkButton: {
+    cursor: 'pointer',
+    textDecoration: 'underline',
+    fontSize: 'inherit',
+    fontFamily: 'inherit',
+    background: 'none',
+    border: 'none',
+    padding: '2px 4px',
+    color: 'inherit',
+  },
 };
 
 export default class ForEachEvent extends React.Component<
@@ -45,14 +79,18 @@ export default class ForEachEvent extends React.Component<
   *
 > {
   _objectField: ?ParameterFieldInterface = null;
+  _orderByField: ?ParameterFieldInterface = null;
+  _limitField: ?ParameterFieldInterface = null;
   // $FlowFixMe[missing-local-annot]
   state = {
-    editing: false,
-    editingPreviousValue: null,
-    anchorEl: null,
+    editingObject: false,
+    editingObjectPreviousValue: null,
+    objectAnchorEl: null,
+    editingOrder: false,
+    orderAnchorEl: null,
   };
 
-  edit = (domEvent: any) => {
+  editObject = (domEvent: any) => {
     const forEachEvent = gd.asForEachEvent(this.props.event);
     const objectName = forEachEvent.getObjectToPick();
 
@@ -65,9 +103,9 @@ export default class ForEachEvent extends React.Component<
       () =>
         this.setState(
           {
-            editing: true,
-            editingPreviousValue: objectName,
-            anchorEl,
+            editingObject: true,
+            editingObjectPreviousValue: objectName,
+            objectAnchorEl: anchorEl,
           },
           () => {
             // Give a bit of time for the popover to mount itself
@@ -80,33 +118,76 @@ export default class ForEachEvent extends React.Component<
     );
   };
 
-  cancelEditing = () => {
-    this.endEditing();
+  cancelEditingObject = () => {
+    this.endEditingObject();
 
     const forEachEvent = gd.asForEachEvent(this.props.event);
-    const { editingPreviousValue } = this.state;
-    if (editingPreviousValue != null) {
-      forEachEvent.setObjectToPick(editingPreviousValue);
+    const { editingObjectPreviousValue } = this.state;
+    if (editingObjectPreviousValue != null) {
+      forEachEvent.setObjectToPick(editingObjectPreviousValue);
       this.forceUpdate();
     }
   };
 
-  endEditing = () => {
-    const { anchorEl } = this.state;
+  endEditingObject = () => {
+    const { objectAnchorEl } = this.state;
     // Put back the focus after closing the inline popover.
     // $FlowFixMe[incompatible-type]
-    if (anchorEl) anchorEl.focus();
+    if (objectAnchorEl) objectAnchorEl.focus();
 
     this.setState({
-      editing: false,
-      editingPreviousValue: null,
-      anchorEl: null,
+      editingObject: false,
+      editingObjectPreviousValue: null,
+      objectAnchorEl: null,
     });
+  };
+
+  editOrder = (domEvent: any) => {
+    const anchorEl = domEvent.currentTarget;
+    setTimeout(
+      () =>
+        this.setState({
+          editingOrder: true,
+          orderAnchorEl: anchorEl,
+        }),
+      10
+    );
+  };
+
+  endEditingOrder = () => {
+    const { orderAnchorEl } = this.state;
+    // $FlowFixMe[incompatible-type]
+    if (orderAnchorEl) orderAnchorEl.focus();
+
+    this.setState({
+      editingOrder: false,
+      orderAnchorEl: null,
+    });
+  };
+
+  _switchToOrderedBy = () => {
+    const forEachEvent = gd.asForEachEvent(this.props.event);
+    forEachEvent.setOrderBy('0');
+    forEachEvent.setOrder('asc');
+    this.props.onUpdate();
+    this.forceUpdate();
+  };
+
+  _switchToAnyOrder = () => {
+    const forEachEvent = gd.asForEachEvent(this.props.event);
+    forEachEvent.setOrderBy('');
+    forEachEvent.setLimit('');
+    this.props.onUpdate();
+    this.forceUpdate();
   };
 
   render(): any {
     const forEachEvent = gd.asForEachEvent(this.props.event);
     const objectName = forEachEvent.getObjectToPick();
+    const orderBy = forEachEvent.getOrderBy();
+    const order = forEachEvent.getOrder();
+    const limit = forEachEvent.getLimit();
+    const hasOrderBy = !!orderBy;
 
     const objectNameIsValid = this.props.projectScopedContainersAccessor
       .get()
@@ -146,10 +227,10 @@ export default class ForEachEvent extends React.Component<
                 object: true,
               })}
               style={styles.objectContainer}
-              onClick={this.edit}
+              onClick={this.editObject}
               onKeyPress={event => {
                 if (shouldActivate(event)) {
-                  this.edit(event);
+                  this.editObject(event);
                 }
               }}
               tabIndex={0}
@@ -175,8 +256,71 @@ export default class ForEachEvent extends React.Component<
                 </span>
               )}
             </span>
-            :
           </Trans>
+          {hasOrderBy ? (
+            <span>
+              <Trans>
+                {' ordered by '}
+                <span
+                  className={classNames({
+                    [selectableArea]: true,
+                    [instructionParameter]: true,
+                    number: true,
+                  })}
+                  style={styles.orderByContainer}
+                  onClick={this.editOrder}
+                  onKeyPress={event => {
+                    if (shouldActivate(event)) {
+                      this.editOrder(event);
+                    }
+                  }}
+                  tabIndex={0}
+                >
+                  {orderBy}
+                </span>
+                {' (' + (order === 'desc' ? 'descending' : 'ascending') + ')'}
+              </Trans>
+              {limit ? (
+                <span>
+                  <Trans>{' limit: '}</Trans>
+                  <span
+                    className={classNames({
+                      [selectableArea]: true,
+                      [instructionParameter]: true,
+                      number: true,
+                    })}
+                    onClick={this.editOrder}
+                    onKeyPress={event => {
+                      if (shouldActivate(event)) {
+                        this.editOrder(event);
+                      }
+                    }}
+                    tabIndex={0}
+                  >
+                    {limit}
+                  </span>
+                </span>
+              ) : null}
+            </span>
+          ) : (
+            <span
+              className={classNames({
+                [selectableArea]: true,
+                [disabledText]: this.props.disabled,
+              })}
+              style={styles.orderByContainer}
+              onClick={this.editOrder}
+              onKeyPress={event => {
+                if (shouldActivate(event)) {
+                  this.editOrder(event);
+                }
+              }}
+              tabIndex={0}
+            >
+              <Trans>(any order)</Trans>
+            </span>
+          )}
+          <Trans>:</Trans>
         </div>
         <ConditionsActionsColumns
           leftIndentWidth={this.props.leftIndentWidth}
@@ -254,10 +398,10 @@ export default class ForEachEvent extends React.Component<
           )}
         />
         <InlinePopover
-          open={this.state.editing}
-          anchorEl={this.state.anchorEl}
-          onRequestClose={this.cancelEditing}
-          onApply={this.endEditing}
+          open={this.state.editingObject}
+          anchorEl={this.state.objectAnchorEl}
+          onRequestClose={this.cancelEditingObject}
+          onApply={this.endEditingObject}
         >
           <ObjectField
             project={this.props.project}
@@ -273,10 +417,142 @@ export default class ForEachEvent extends React.Component<
               this.props.onUpdate();
             }}
             isInline
-            onRequestClose={this.cancelEditing}
-            onApply={this.endEditing}
+            onRequestClose={this.cancelEditingObject}
+            onApply={this.endEditingObject}
             ref={objectField => (this._objectField = objectField)}
           />
+        </InlinePopover>
+        <InlinePopover
+          open={this.state.editingOrder}
+          anchorEl={this.state.orderAnchorEl}
+          onRequestClose={this.endEditingOrder}
+          onApply={this.endEditingOrder}
+        >
+          <div style={styles.orderConfigContainer}>
+            <div style={styles.orderConfigRow}>
+              <span>
+                <Trans>Order:</Trans>
+              </span>
+              <select
+                style={styles.orderSelect}
+                value={hasOrderBy ? 'orderBy' : 'any'}
+                onChange={e => {
+                  if (e.target.value === 'any') {
+                    this._switchToAnyOrder();
+                  } else {
+                    this._switchToOrderedBy();
+                  }
+                }}
+              >
+                <option value="any">
+                  {'(any order)'}
+                </option>
+                <option value="orderBy">
+                  {'ordered by'}
+                </option>
+              </select>
+            </div>
+            {hasOrderBy && (
+              <React.Fragment>
+                <div style={styles.orderConfigRow}>
+                  <span>
+                    <Trans>Expression:</Trans>
+                  </span>
+                  <ExpressionField
+                    project={this.props.project}
+                    scope={this.props.scope}
+                    globalObjectsContainer={this.props.globalObjectsContainer}
+                    objectsContainer={this.props.objectsContainer}
+                    projectScopedContainersAccessor={
+                      this.props.projectScopedContainersAccessor
+                    }
+                    value={orderBy}
+                    onChange={text => {
+                      forEachEvent.setOrderBy(text);
+                      this.props.onUpdate();
+                      this.forceUpdate();
+                    }}
+                    // $FlowFixMe[incompatible-type]
+                    parameterRenderingService={ParameterRenderingService}
+                    isInline
+                    ref={field => (this._orderByField = field)}
+                  />
+                </div>
+                <div style={styles.orderConfigRow}>
+                  <span>
+                    <Trans>Direction:</Trans>
+                  </span>
+                  <select
+                    style={styles.orderSelect}
+                    value={order}
+                    onChange={e => {
+                      forEachEvent.setOrder(e.target.value);
+                      this.props.onUpdate();
+                      this.forceUpdate();
+                    }}
+                  >
+                    <option value="asc">
+                      {'ascending'}
+                    </option>
+                    <option value="desc">
+                      {'descending'}
+                    </option>
+                  </select>
+                </div>
+                <div style={styles.orderConfigRow}>
+                  <span>
+                    <Trans>Limit:</Trans>
+                  </span>
+                  {limit ? (
+                    <React.Fragment>
+                      <ExpressionField
+                        project={this.props.project}
+                        scope={this.props.scope}
+                        globalObjectsContainer={
+                          this.props.globalObjectsContainer
+                        }
+                        objectsContainer={this.props.objectsContainer}
+                        projectScopedContainersAccessor={
+                          this.props.projectScopedContainersAccessor
+                        }
+                        value={limit}
+                        onChange={text => {
+                          forEachEvent.setLimit(text);
+                          this.props.onUpdate();
+                          this.forceUpdate();
+                        }}
+                        // $FlowFixMe[incompatible-type]
+                        parameterRenderingService={ParameterRenderingService}
+                        isInline
+                        ref={field => (this._limitField = field)}
+                      />
+                      <button
+                        style={styles.linkButton}
+                        onClick={() => {
+                          forEachEvent.setLimit('');
+                          this.props.onUpdate();
+                          this.forceUpdate();
+                        }}
+                      >
+                        <Trans>Remove limit</Trans>
+                      </button>
+                    </React.Fragment>
+                  ) : (
+                    <button
+                      style={styles.linkButton}
+                      onClick={() => {
+                        forEachEvent.setLimit('1');
+                        this.props.onUpdate();
+                        this.forceUpdate();
+                      }}
+                    >
+                      <Trans>Add a limit</Trans>
+                    </button>
+                  )}
+                </div>
+              </React.Fragment>
+            )}
+          </div>
         </InlinePopover>
       </div>
     );

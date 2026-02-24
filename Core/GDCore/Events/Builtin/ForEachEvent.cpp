@@ -16,6 +16,9 @@ namespace gd {
 ForEachEvent::ForEachEvent()
     : BaseEvent(),
       objectsToPick(""),
+      orderBy(""),
+      order("asc"),
+      limit(""),
       variables(gd::VariablesContainer::SourceType::Local) {}
 
 vector<gd::InstructionsList*> ForEachEvent::GetAllConditionsVectors() {
@@ -85,6 +88,13 @@ void ForEachEvent::SerializeTo(SerializerElement& element) const {
   if (!loopIndexVariableName.empty()) {
     element.AddChild("loopIndexVariable").SetStringValue(loopIndexVariableName);
   }
+  if (!orderBy.GetPlainString().empty()) {
+    element.AddChild("orderBy").SetValue(orderBy.GetPlainString());
+    element.AddChild("order").SetStringValue(order);
+    if (!limit.GetPlainString().empty()) {
+      element.AddChild("limit").SetValue(limit.GetPlainString());
+    }
+  }
 }
 
 void ForEachEvent::UnserializeFrom(gd::Project& project,
@@ -111,6 +121,16 @@ void ForEachEvent::UnserializeFrom(gd::Project& project,
       element.HasChild("loopIndexVariable")
           ? element.GetChild("loopIndexVariable").GetStringValue()
           : "";
+
+  orderBy = element.HasChild("orderBy")
+                ? gd::Expression(element.GetChild("orderBy").GetValue().GetString())
+                : gd::Expression("");
+  order = element.HasChild("order")
+              ? element.GetChild("order").GetStringValue()
+              : "asc";
+  limit = element.HasChild("limit")
+              ? gd::Expression(element.GetChild("limit").GetValue().GetString())
+              : gd::Expression("");
 }
 
 }  // namespace gd

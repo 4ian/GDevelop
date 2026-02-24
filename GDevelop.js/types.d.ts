@@ -1940,6 +1940,12 @@ export class ForEachEvent extends BaseEvent {
   getActions(): InstructionsList;
   getLoopIndexVariableName(): string;
   setLoopIndexVariableName(name: string): void;
+  getOrderBy(): string;
+  setOrderBy(orderBy: string): void;
+  getOrder(): string;
+  setOrder(order: string): void;
+  getLimit(): string;
+  setLimit(limit: string): void;
 }
 
 export class ForEachChildVariableEvent extends BaseEvent {

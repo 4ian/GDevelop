@@ -7,6 +7,12 @@ declare class gdForEachEvent extends gdBaseEvent {
   getActions(): gdInstructionsList;
   getLoopIndexVariableName(): string;
   setLoopIndexVariableName(name: string): void;
+  getOrderBy(): string;
+  setOrderBy(orderBy: string): void;
+  getOrder(): string;
+  setOrder(order: string): void;
+  getLimit(): string;
+  setLimit(limit: string): void;
   delete(): void;
   ptr: number;
 };

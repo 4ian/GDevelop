@@ -19,6 +19,7 @@ type Props = {|
   /** Sometimes required on Safari */
   noFullHeight?: boolean,
   noExpand?: boolean,
+  expand?: boolean,
 |};
 
 /**
@@ -32,7 +33,7 @@ const Background = (props: Props) => (
       ...styles.container,
       height: props.noFullHeight ? undefined : '100%',
       width: props.width ? props.width : undefined,
-      flex: props.noExpand ? undefined : 1,
+      flex: props.noExpand || props.expand === false ? undefined : 1,
       ...(props.maxWidth ? styles.maxWidth : undefined),
     }}
     background="dark"

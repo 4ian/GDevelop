@@ -540,8 +540,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (selectedEvents.length === 0) return false;
 
     const eventContext = selectedEvents[selectedEvents.length - 1];
-    const bookmarkId = eventContext.event.getEventBookmarkId?.();
-    return !!bookmarkId && bookmarkId.length > 0;
+    const bookmarkId = eventContext.event.getEventBookmarkId && eventContext.event.getEventBookmarkId();
+    return bookmarkId && bookmarkId.length > 0;
   };
 
   _navigateToBookmark = (bookmark: Bookmark) => {

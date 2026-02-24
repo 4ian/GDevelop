@@ -68,6 +68,7 @@ export const DefaultMediumScreenScopeInLayout = () => (
           onOpenLayout={action('open layout')}
           searchResults={null}
           searchFocusOffset={null}
+          bookmarkFocusId={null}
           onEventMoved={() => {}}
           showObjectThumbnails={true}
           screenType={'normal'}
@@ -124,6 +125,7 @@ export const DefaultSmallScreenScopeInLayout = () => (
           onOpenLayout={action('open layout')}
           searchResults={null}
           searchFocusOffset={null}
+          bookmarkFocusId={null}
           onEventMoved={() => {}}
           showObjectThumbnails={true}
           screenType={'normal'}
@@ -177,6 +179,7 @@ export const DefaultMediumScreenScopeNotInLayout = () => (
           onOpenLayout={action('open layout')}
           searchResults={null}
           searchFocusOffset={null}
+          bookmarkFocusId={null}
           onEventMoved={() => {}}
           showObjectThumbnails={true}
           screenType={'normal'}
@@ -233,6 +236,7 @@ export const EmptySmallScreenScopeInALayout = () => (
           onOpenLayout={action('open layout')}
           searchResults={null}
           searchFocusOffset={null}
+          bookmarkFocusId={null}
           onEventMoved={() => {}}
           showObjectThumbnails={true}
           screenType={'normal'}

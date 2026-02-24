@@ -56,6 +56,7 @@ type ErrorBoundaryScope =
   | 'scene-events'
   | 'scene-events-search'
   | 'scene-events-instruction-editor'
+  | 'scene-events-bookmarks'
   | 'debugger'
   | 'resources'
   | 'extension-editor'

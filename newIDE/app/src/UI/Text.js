@@ -64,6 +64,7 @@ type Props = {|
     fontVariantNumeric?: 'tabular-nums',
   |},
   tooltip?: string,
+  className?: string,
 |};
 
 type Interface = {||};

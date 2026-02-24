@@ -56,21 +56,40 @@ const InlineSelect = ({
   value: string,
   onChange: (value: string) => void,
   children: React.Node,
-|}) => (
-  <span className={forEachClasses.inlineSelectContainer}>
-    <select
-      className={classNames(selectableArea, forEachClasses.inlineSelect)}
-      value={value}
-      onChange={e => onChange(e.currentTarget.value)}
-      tabIndex={0}
-    >
-      {children}
-    </select>
-    <div className={forEachClasses.arrowContainer}>
-      <span className={forEachClasses.arrow} />
-    </div>
-  </span>
-);
+|}) => {
+  const selectRef = React.useRef<?HTMLSelectElement>(null);
+  const [displayedText, setDisplayedText] = React.useState('');
+
+  React.useLayoutEffect(
+    () => {
+      const select = selectRef.current;
+      if (select && select.selectedOptions[0]) {
+        setDisplayedText(select.selectedOptions[0].text);
+      }
+    },
+    [value]
+  );
+
+  return (
+    <span className={forEachClasses.inlineSelectContainer}>
+      <span className={forEachClasses.inlineSelectSizer} aria-hidden="true">
+        {displayedText}
+      </span>
+      <select
+        ref={selectRef}
+        className={classNames(selectableArea, forEachClasses.inlineSelect)}
+        value={value}
+        onChange={e => onChange(e.currentTarget.value)}
+        tabIndex={0}
+      >
+        {children}
+      </select>
+      <div className={forEachClasses.arrowContainer}>
+        <span className={forEachClasses.arrow} />
+      </div>
+    </span>
+  );
+};
 
 export default class ForEachEvent extends React.Component<
   EventRendererProps,
@@ -308,27 +327,90 @@ export default class ForEachEvent extends React.Component<
             </span>
           </Trans>{' '}
           {/* Inline select for "ordered by" vs "(any order)" */}
-          <InlineSelect
-            value={hasOrderBy ? 'orderBy' : 'any'}
-            onChange={value => {
-              if (value === 'any') {
-                forEachEvent.setOrderBy('');
-                forEachEvent.setLimit('');
-                this.props.onUpdate();
-                this.forceUpdate();
-              } else {
-                forEachEvent.setOrderBy(
-                  objectNameIsValid ? `${objectName}.XXX` : '0'
+          {(() => {
+            const objectPrefix = objectName || '<Object>';
+            const objectsContainersList = this.props.projectScopedContainersAccessor
+              .get()
+              .getObjectsContainersList();
+
+            const behaviorExamples = [];
+            if (objectNameIsValid) {
+              const behaviorNames = objectsContainersList
+                .getBehaviorsOfObject(objectName, true)
+                .toJSArray();
+              for (const behaviorName of behaviorNames) {
+                const behaviorType = objectsContainersList.getTypeOfBehaviorInObjectOrGroup(
+                  objectName,
+                  behaviorName,
+                  true
                 );
-                forEachEvent.setOrder('asc');
-                this.props.onUpdate();
-                this.forceUpdate();
+                if (behaviorType === 'Health::Health') {
+                  behaviorExamples.push({
+                    label: 'order by highest health',
+                    expression: `${objectPrefix}.${behaviorName}::Health()`,
+                  });
+                } else if (behaviorType === 'FireBullet::FireBullet') {
+                  behaviorExamples.push({
+                    label: 'order by highest ammo',
+                    expression: `${objectPrefix}.${behaviorName}::AmmoQuantity()`,
+                  });
+                } else if (behaviorType === 'Physics2::Physics2Behavior') {
+                  behaviorExamples.push({
+                    label: 'order by physics speed',
+                    expression: `${objectPrefix}.${behaviorName}::LinearVelocity()`,
+                  });
+                } else if (behaviorType === 'Physics3D::Physics3DBehavior') {
+                  behaviorExamples.push({
+                    label: 'order by physics speed',
+                    expression: `${objectPrefix}.${behaviorName}::LinearVelocityLength()`,
+                  });
+                }
               }
-            }}
-          >
-            <option value="any">{'(any order)'}</option>
-            <option value="orderBy">{'ordered by'}</option>
-          </InlineSelect>
+            }
+
+            return (
+              <InlineSelect
+                value={hasOrderBy ? 'orderBy' : 'any'}
+                onChange={value => {
+                  if (value === 'any') {
+                    forEachEvent.setOrderBy('');
+                    forEachEvent.setLimit('');
+                    this.props.onUpdate();
+                    this.forceUpdate();
+                  } else if (value === 'orderBy') {
+                    forEachEvent.setOrderBy(
+                      objectNameIsValid ? `${objectName}.XXX` : '0'
+                    );
+                    forEachEvent.setOrder('asc');
+                    this.props.onUpdate();
+                    this.forceUpdate();
+                  } else {
+                    // An example was selected: use its expression.
+                    forEachEvent.setOrderBy(value);
+                    forEachEvent.setOrder('desc');
+                    this.props.onUpdate();
+                    this.forceUpdate();
+                  }
+                }}
+              >
+                <option value="any">{'(any order)'}</option>
+                <option value="orderBy">{'ordered by'}</option>
+                <optgroup label="Examples">
+                  <option value={`${objectPrefix}.Variable(MyVariable)`}>
+                    {'order by highest variable'}
+                  </option>
+                  <option value={`${objectPrefix}.Distance(OtherObject)`}>
+                    {'order by distance to another object'}
+                  </option>
+                  {behaviorExamples.map(({ label, expression }) => (
+                    <option key={expression} value={expression}>
+                      {label}
+                    </option>
+                  ))}
+                </optgroup>
+              </InlineSelect>
+            );
+          })()}
           {hasOrderBy && (
             <I18n>
               {({ i18n }) => (

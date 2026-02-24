@@ -2520,10 +2520,12 @@ interface ForEachEvent {
     void SetLoopIndexVariableName([Const] DOMString name);
     [Const, Ref] DOMString GetOrderBy();
     void SetOrderBy([Const] DOMString orderBy);
+    [Const, Ref] Expression GetOrderByExpression();
     [Const, Ref] DOMString GetOrder();
     void SetOrder([Const] DOMString order);
     [Const, Ref] DOMString GetLimit();
     void SetLimit([Const] DOMString limit);
+    [Const, Ref] Expression GetLimitExpression();
 };
 ForEachEvent implements BaseEvent;
 

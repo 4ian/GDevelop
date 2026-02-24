@@ -65,6 +65,7 @@ class GD_CORE_API ForEachEvent : public gd::BaseEvent {
   void SetOrderBy(gd::String orderBy_) {
     orderBy = gd::Expression(orderBy_);
   };
+  const gd::Expression& GetOrderByExpression() const { return orderBy; };
 
   const gd::String& GetOrder() const { return order; }
   void SetOrder(const gd::String& order_) { order = order_; }
@@ -75,6 +76,7 @@ class GD_CORE_API ForEachEvent : public gd::BaseEvent {
   void SetLimit(gd::String limit_) {
     limit = gd::Expression(limit_);
   };
+  const gd::Expression& GetLimitExpression() const { return limit; };
 
   virtual std::vector<const gd::InstructionsList*> GetAllConditionsVectors()
       const;

@@ -53,7 +53,6 @@ const styles = {
     background: 'none',
     border: 'none',
     borderBottom: '1px dashed currentColor',
-    cursor: 'pointer',
     fontSize: 'inherit',
     fontFamily: 'inherit',
     color: 'inherit',
@@ -223,10 +222,38 @@ export default class ForEachEvent extends React.Component<
   render(): any {
     const forEachEvent = gd.asForEachEvent(this.props.event);
     const objectName = forEachEvent.getObjectToPick();
-    const orderBy = forEachEvent.getOrderBy();
+    const orderByExpression = forEachEvent.getOrderByExpression();
+    const orderBy = orderByExpression.getPlainString();
     const order = forEachEvent.getOrder();
-    const limit = forEachEvent.getLimit();
+    const limitExpression = forEachEvent.getLimitExpression();
+    const limit = limitExpression.getPlainString();
     const hasOrderBy = !!orderBy;
+
+    let isOrderByValid = true;
+    if (hasOrderBy) {
+      const orderByValidator = new gd.ExpressionValidator(
+        gd.JsPlatform.get(),
+        this.props.projectScopedContainersAccessor.get(),
+        'number',
+        ''
+      );
+      orderByExpression.getRootNode().visit(orderByValidator);
+      isOrderByValid = orderByValidator.getAllErrors().size() === 0;
+      orderByValidator.delete();
+    }
+
+    let isLimitValid = true;
+    if (limit) {
+      const limitValidator = new gd.ExpressionValidator(
+        gd.JsPlatform.get(),
+        this.props.projectScopedContainersAccessor.get(),
+        'number',
+        ''
+      );
+      limitExpression.getRootNode().visit(limitValidator);
+      isLimitValid = limitValidator.getAllErrors().size() === 0;
+      limitValidator.delete();
+    }
 
     const objectNameIsValid = this.props.projectScopedContainersAccessor
       .get()
@@ -298,6 +325,7 @@ export default class ForEachEvent extends React.Component<
           </Trans>{' '}
           {/* Inline select for "ordered by" vs "(any order)" */}
           <select
+            className={selectableArea}
             style={styles.inlineSelect}
             value={hasOrderBy ? 'orderBy' : 'any'}
             onChange={e => {
@@ -336,10 +364,21 @@ export default class ForEachEvent extends React.Component<
                 }}
                 tabIndex={0}
               >
-                {orderBy}
+                {isOrderByValid ? (
+                  orderBy
+                ) : (
+                  <span
+                    className={classNames({
+                      [instructionInvalidParameter]: true,
+                    })}
+                  >
+                    {orderBy}
+                  </span>
+                )}
               </span>
               ({/* Inline select for ascending/descending */}
               <select
+                className={selectableArea}
                 style={styles.inlineSelect}
                 value={order}
                 onChange={e => {
@@ -371,7 +410,21 @@ export default class ForEachEvent extends React.Component<
                   }}
                   tabIndex={0}
                 >
-                  {limit || <Trans>no limit</Trans>}
+                  {limit ? (
+                    isLimitValid ? (
+                      limit
+                    ) : (
+                      <span
+                        className={classNames({
+                          [instructionInvalidParameter]: true,
+                        })}
+                      >
+                        {limit}
+                      </span>
+                    )
+                  ) : (
+                    <Trans>no limit</Trans>
+                  )}
                 </span>
               </span>
               )

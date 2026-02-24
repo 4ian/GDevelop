@@ -39,9 +39,14 @@ vector<pair<gd::Expression*, gd::ParameterMetadata> >
     ForEachEvent::GetAllExpressionsWithMetadata() {
   vector<pair<gd::Expression*, gd::ParameterMetadata> >
       allExpressionsWithMetadata;
-  auto metadata = gd::ParameterMetadata().SetType("object");
+  auto objectMetadata = gd::ParameterMetadata().SetType("object");
   allExpressionsWithMetadata.push_back(
-      std::make_pair(&objectsToPick, metadata));
+      std::make_pair(&objectsToPick, objectMetadata));
+  auto numberMetadata = gd::ParameterMetadata().SetType("number");
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&orderBy, numberMetadata));
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&limit, numberMetadata));
 
   return allExpressionsWithMetadata;
 }
@@ -65,9 +70,14 @@ vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
     ForEachEvent::GetAllExpressionsWithMetadata() const {
   vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
       allExpressionsWithMetadata;
-  auto metadata = gd::ParameterMetadata().SetType("object");
+  auto objectMetadata = gd::ParameterMetadata().SetType("object");
   allExpressionsWithMetadata.push_back(
-      std::make_pair(&objectsToPick, metadata));
+      std::make_pair(&objectsToPick, objectMetadata));
+  auto numberMetadata = gd::ParameterMetadata().SetType("number");
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&orderBy, numberMetadata));
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&limit, numberMetadata));
 
   return allExpressionsWithMetadata;
 }

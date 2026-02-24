@@ -58,7 +58,6 @@ const styles = {
     fontFamily: 'inherit',
     color: 'inherit',
     padding: '0 14px 0 0',
-    margin: '0 2px',
     // Grey chevron as background image on the right
     backgroundImage:
       "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E\")",
@@ -296,8 +295,7 @@ export default class ForEachEvent extends React.Component<
                 </span>
               )}
             </span>
-          </Trans>
-          {' '}
+          </Trans>{' '}
           {/* Inline select for "ordered by" vs "(any order)" */}
           <select
             style={styles.inlineSelect}
@@ -317,12 +315,8 @@ export default class ForEachEvent extends React.Component<
             }}
             tabIndex={0}
           >
-            <option value="any">
-              {'(any order)'}
-            </option>
-            <option value="orderBy">
-              {'ordered by'}
-            </option>
+            <option value="any">{'(any order)'}</option>
+            <option value="orderBy">{'ordered by'}</option>
           </select>
           {hasOrderBy && (
             <span>
@@ -344,8 +338,7 @@ export default class ForEachEvent extends React.Component<
               >
                 {orderBy}
               </span>
-              {' ('}
-              {/* Inline select for ascending/descending */}
+              ({/* Inline select for ascending/descending */}
               <select
                 style={styles.inlineSelect}
                 value={order}
@@ -356,38 +349,18 @@ export default class ForEachEvent extends React.Component<
                 }}
                 tabIndex={0}
               >
-                <option value="asc">
-                  {'ascending'}
-                </option>
-                <option value="desc">
-                  {'descending'}
-                </option>
+                <option value="asc">{'ascending'}</option>
+                <option value="desc">{'descending'}</option>
               </select>
-              {', '}
-              {limit ? (
-                <span>
-                  <Trans>{'limit: '}</Trans>
-                  <span
-                    className={classNames({
-                      [selectableArea]: true,
-                      [instructionParameter]: true,
-                      number: true,
-                    })}
-                    onClick={this.editLimit}
-                    onKeyPress={event => {
-                      if (shouldActivate(event)) {
-                        this.editLimit(event);
-                      }
-                    }}
-                    tabIndex={0}
-                  >
-                    {limit}
-                  </span>
-                </span>
-              ) : (
+              ,{' '}
+              <span>
+                {limit ? <Trans>limit:</Trans> : ''}
+                {limit ? ' ' : ''}
                 <span
                   className={classNames({
                     [selectableArea]: true,
+                    [instructionParameter]: true,
+                    number: true,
                     [disabledText]: this.props.disabled,
                   })}
                   onClick={this.editLimit}
@@ -397,12 +370,11 @@ export default class ForEachEvent extends React.Component<
                     }
                   }}
                   tabIndex={0}
-                  style={{ cursor: 'pointer' }}
                 >
-                  <Trans>no limit</Trans>
+                  {limit || <Trans>no limit</Trans>}
                 </span>
-              )}
-              {')'}
+              </span>
+              )
             </span>
           )}
           <Trans>:</Trans>

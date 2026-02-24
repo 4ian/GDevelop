@@ -1003,9 +1003,9 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
     );
   });
 
-  it('limit of 0 does not truncate when orderBy is set', function () {
-    // The codegen checks "if (limit > 0 && list.length > limit)",
-    // so a limit of 0 should NOT truncate the list.
+  it('limit of 0 results in zero iterations when orderBy is set', function () {
+    // A limit of 0 means "iterate 0 objects" — no iterations should happen.
+    // Only an empty/unspecified limit means "no limit".
     const serializerElement = gd.Serializer.fromJSObject([
       {
         type: 'BuiltinCommonInstructions::ForEach',
@@ -1051,7 +1051,58 @@ describe('libGD.js - GDJS ForEach Code Generation integration tests', function (
 
     runCompiledEvents(gdjs, runtimeScene, [objectLists]);
 
-    // Limit 0 → no truncation, all objects iterated in sorted order
+    // Limit 0 → zero iterations, trace stays empty
+    expect(runtimeScene.getVariables().get('Trace').getAsString()).toBe('');
+  });
+
+  it('negative limit does not truncate when orderBy is set', function () {
+    // A negative limit is treated as "no limit" (all objects iterated).
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::ForEach',
+        object: 'MyObject',
+        orderBy: 'MyObject.Variable(Score)',
+        order: 'asc',
+        limit: '-1',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarSceneTxt' },
+            parameters: [
+              'Trace',
+              '+',
+              'ToString(MyObject.Variable(Score)) + ";"',
+            ],
+          },
+        ],
+        events: [],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      {
+        parameterTypes: { MyObject: 'object' },
+        logCode: false,
+      }
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    const objectLists = new gdjs.Hashtable();
+    const myObjects = [];
+    objectLists.put('MyObject', myObjects);
+    [50, 10, 30, 20].forEach(v => {
+      const o = runtimeScene.createObject('MyObject');
+      o.getVariables().get('Score').setNumber(v);
+      myObjects.push(o);
+    });
+
+    runtimeScene.getVariables().get('Trace').setString('');
+
+    runCompiledEvents(gdjs, runtimeScene, [objectLists]);
+
+    // Negative limit → no truncation, all objects iterated in sorted order
     expect(runtimeScene.getVariables().get('Trace').getAsString()).toBe(
       '10;20;30;50;'
     );

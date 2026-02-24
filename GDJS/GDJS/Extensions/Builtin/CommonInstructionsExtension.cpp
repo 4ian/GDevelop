@@ -991,7 +991,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                     codeGenerator, parentContext, "number",
                     gd::Expression(event.GetLimit()));
             outputCode += forEachLimitVar + " = " + limitCode + ";\n";
-            outputCode += "if (" + forEachLimitVar + " > 0 && " +
+            outputCode += "if (" + forEachLimitVar + " >= 0 && " +
                           forEachSortedList + ".length > " + forEachLimitVar +
                           ") " + forEachSortedList + ".length = " +
                           forEachLimitVar + ";\n";

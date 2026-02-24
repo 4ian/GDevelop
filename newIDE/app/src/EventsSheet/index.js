@@ -950,15 +950,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       label: i18n._(t`Add Ordering`),
       click: () => this._addOrdering(),
       visible:
-        this._selectionIsForEachEvent() &&
-        !this._selectionForEachHasOrderBy(),
+        this._selectionIsForEachEvent() && !this._selectionForEachHasOrderBy(),
     },
     {
       label: i18n._(t`Remove Ordering`),
       click: () => this._removeOrdering(),
       visible:
-        this._selectionIsForEachEvent() &&
-        this._selectionForEachHasOrderBy(),
+        this._selectionIsForEachEvent() && this._selectionForEachHasOrderBy(),
     },
     { type: 'separator' },
     {
@@ -1160,9 +1158,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _selectionForEachHasOrderBy = (): boolean => {
     const eventContext = getLastSelectedEventContext(this.state.selection);
     if (!eventContext) return false;
-    if (
-      eventContext.event.getType() !== 'BuiltinCommonInstructions::ForEach'
-    )
+    if (eventContext.event.getType() !== 'BuiltinCommonInstructions::ForEach')
       return false;
     const forEachEvent = gd.asForEachEvent(eventContext.event);
     return !!forEachEvent.getOrderBy();
@@ -1171,9 +1167,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _addOrdering = () => {
     const eventContext = getLastSelectedEventContext(this.state.selection);
     if (!eventContext) return;
-    if (
-      eventContext.event.getType() !== 'BuiltinCommonInstructions::ForEach'
-    )
+    if (eventContext.event.getType() !== 'BuiltinCommonInstructions::ForEach')
       return;
 
     const forEachEvent = gd.asForEachEvent(eventContext.event);
@@ -1194,9 +1188,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _removeOrdering = () => {
     const eventContext = getLastSelectedEventContext(this.state.selection);
     if (!eventContext) return;
-    if (
-      eventContext.event.getType() !== 'BuiltinCommonInstructions::ForEach'
-    )
+    if (eventContext.event.getType() !== 'BuiltinCommonInstructions::ForEach')
       return;
 
     const forEachEvent = gd.asForEachEvent(eventContext.event);

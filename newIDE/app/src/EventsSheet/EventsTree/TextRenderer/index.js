@@ -174,7 +174,9 @@ ${actions}`,
     const order = forEachEvent.getOrder();
     const limit = forEachEvent.getLimit();
     const orderText = orderBy
-      ? ` ordered by \`${orderBy}\` (${order === 'desc' ? 'descending' : 'ascending'})${limit ? ` limit: \`${limit}\`` : ''}`
+      ? ` ordered by \`${orderBy}\` (${
+          order === 'desc' ? 'descending' : 'ascending'
+        })${limit ? ` limit: \`${limit}\`` : ''}`
       : '';
     const conditions = renderInstructionsAsText({
       instructionsList: forEachEvent.getConditions(),

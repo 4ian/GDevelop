@@ -258,7 +258,9 @@ const TreeRow = ({
   const isSearchFocus =
     searchFocusOffset != null && matchIndexes[searchFocusOffset] === index;
   const isBookmarkFocus =
-    bookmarkFocusId != null && node.event && node.event.getEventBookmarkId() === bookmarkFocusId;
+    bookmarkFocusId != null &&
+    node.event &&
+    node.event.getEventBookmarkId() === bookmarkFocusId;
   const isFocused = isSearchFocus || isBookmarkFocus;
 
   const scaffold = lowerSiblingCounts.map((lowerSiblingCount, i) => {

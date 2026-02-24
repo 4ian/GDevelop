@@ -36,24 +36,29 @@ const BookmarksPanel = ({
   const { isMobile } = useResponsiveWindowSize();
 
   // Handle keyboard shortcuts
-  React.useEffect(() => {
-    if (!isOpen) return;
+  React.useEffect(
+    () => {
+      if (!isOpen) return;
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
-    };
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+          onClose();
+        }
+      };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    },
+    [isOpen, onClose]
+  );
 
   return (
     <div
-      className={`bookmarksPanelContainer ${isMobile ? 'mobile' : 'desktop'} ${isOpen ? 'open' : ''}`}
+      className={`bookmarksPanelContainer ${isMobile ? 'mobile' : 'desktop'} ${
+        isOpen ? 'open' : ''
+      }`}
     >
-      <Background  noExpand>
+      <Background noExpand>
         <Line noMargin>
           <Column expand>
             <LineStackLayout noMargin alignItems="center">
@@ -67,12 +72,13 @@ const BookmarksPanel = ({
             <Cross />
           </IconButton>
         </Line>
-        <Background  expand>
+        <Background expand>
           {bookmarks.length === 0 ? (
             <div className="emptyContainer">
               <EmptyMessage>
                 <Trans>
-                  No bookmarks yet. Right-click on an event and select "Add Bookmark" to bookmark it.
+                  No bookmarks yet. Right-click on an event and select "Add
+                  Bookmark" to bookmark it.
                 </Trans>
               </EmptyMessage>
             </div>
@@ -80,38 +86,39 @@ const BookmarksPanel = ({
             <ScrollView>
               <ColumnStackLayout noMargin>
                 {bookmarks.map(bookmark => (
-                    <div
-                      key={bookmark.id}
-                      className="bookmarkItem"
-                      style={{
-                        borderBottomColor: gdevelopTheme.toolbar.separatorColor,
-                        borderLeft: bookmark.borderLeftColor ? '3px solid' : 'none',
-                        paddingLeft: bookmark.borderLeftColor ? '5px' : '4px',
-                        ...(bookmark.borderLeftColor && {
-                          borderLeftColor: bookmark.borderLeftColor,
-                        }),
-                      }}
+                  <div
+                    key={bookmark.id}
+                    className="bookmarkItem"
+                    style={{
+                      borderBottomColor: gdevelopTheme.toolbar.separatorColor,
+                      borderLeft: bookmark.borderLeftColor
+                        ? '3px solid'
+                        : 'none',
+                      paddingLeft: bookmark.borderLeftColor ? '5px' : '4px',
+                      ...(bookmark.borderLeftColor && {
+                        borderLeftColor: bookmark.borderLeftColor,
+                      }),
+                    }}
+                  >
+                    <IconButton
+                      size="small"
+                      onClick={() => onNavigateToBookmark(bookmark)}
+                      tooltip={t`Go to event`}
                     >
-                      <IconButton
-                        size="small"
-                        onClick={() => onNavigateToBookmark(bookmark)}
-                        tooltip={t`Go to event`}
-                      >
-                        <ShareExternal />
-                      </IconButton>
-                      <Text noMargin className="bookmarkItemName">
-                        {bookmark.name}
-                      </Text>
-                      <IconButton
-                        size="small"
-                        onClick={() => onDeleteBookmark(bookmark.id)}
-                        tooltip={t`Delete bookmark`}
-                      >
-                        <Delete />
-                      </IconButton>
-                    </div>
-                  )
-                )}
+                      <ShareExternal />
+                    </IconButton>
+                    <Text noMargin className="bookmarkItemName">
+                      {bookmark.name}
+                    </Text>
+                    <IconButton
+                      size="small"
+                      onClick={() => onDeleteBookmark(bookmark.id)}
+                      tooltip={t`Delete bookmark`}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </div>
+                ))}
               </ColumnStackLayout>
             </ScrollView>
           )}

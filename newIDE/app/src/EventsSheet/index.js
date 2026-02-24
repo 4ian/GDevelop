@@ -566,7 +566,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       eventsList,
       event,
       indexInList,
-      projectScopedContainersAccessor: this.props.projectScopedContainersAccessor,
+      projectScopedContainersAccessor: this.props
+        .projectScopedContainersAccessor,
     });
 
     // Focus the bookmark for visual highlight

@@ -45,6 +45,7 @@ export type MainMenuCallbacks = {|
   onOpenProjectManager: (open?: boolean) => void,
   onOpenHomePage: () => void,
   onOpenDebugger: () => void,
+  onOpenGlobalSearch: () => void,
   onOpenAbout: (open?: boolean) => void,
   onOpenPreferences: (open?: boolean) => void,
   onOpenLanguage: (open?: boolean) => void,
@@ -72,6 +73,7 @@ export type MainMenuEvent =
   | 'main-menu-open-project-manager'
   | 'main-menu-open-home-page'
   | 'main-menu-open-debugger'
+  | 'main-menu-open-global-search'
   | 'main-menu-open-about'
   | 'main-menu-open-preferences'
   | 'main-menu-open-language'
@@ -97,6 +99,7 @@ const getMainMenuEventCallback = (
     'main-menu-open-project-manager': callbacks.onOpenProjectManager,
     'main-menu-open-home-page': callbacks.onOpenHomePage,
     'main-menu-open-debugger': callbacks.onOpenDebugger,
+    'main-menu-open-global-search': callbacks.onOpenGlobalSearch,
     'main-menu-open-about': callbacks.onOpenAbout,
     'main-menu-open-preferences': callbacks.onOpenPreferences,
     'main-menu-open-language': callbacks.onOpenLanguage,
@@ -236,6 +239,11 @@ export const buildMainMenuDeclarativeTemplate = ({
         onClickSendEvent: 'main-menu-open-debugger',
         enabled: !!project,
       },
+      {
+        label: i18n._(t`Global search`),
+        onClickSendEvent: 'main-menu-open-global-search',
+        enabled: !!project,
+      },
       // Some Electron specific menu items, not shown in the web-app.
       ...(!!electron
         ? [
@@ -354,10 +362,15 @@ export const buildMainMenuDeclarativeTemplate = ({
 
   // Structure of the menu. Some electron specific menus are not even shown
   // on the web-app, because they would not work and make sense at all.
+  // View (with Global search, Debugger, etc.) is shown in top menu and in drawer when project is open.
   const template: Array<MenuDeclarativeItemTemplate> = [
     fileTemplate,
     ...(!!electron && isApplicationTopLevelMenu ? [editTemplate] : []),
-    ...(!!electron && isApplicationTopLevelMenu ? [viewTemplate] : []),
+    ...(!!electron && isApplicationTopLevelMenu
+      ? [viewTemplate]
+      : project
+      ? [viewTemplate]
+      : []),
     ...(!!electron && isApplicationTopLevelMenu ? [windowTemplate] : []),
     helpTemplate,
   ];

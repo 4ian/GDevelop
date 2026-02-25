@@ -17,7 +17,7 @@ import IconButton from '../../UI/IconButton';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import { type ObjectEditorTab } from '../../ObjectEditor/ObjectEditorDialog';
-import { CompactBehaviorPropertiesEditor } from './CompactBehaviorPropertiesEditor';
+import CompactBehaviorsEditorService from './CompactBehaviorsEditorService';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import Paper from '../../UI/Paper';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
@@ -745,14 +745,15 @@ export const CompactObjectPropertiesEditor = ({
                     gd.JsPlatform.get(),
                     behaviorTypeName
                   );
-
                   const iconUrl = behaviorMetadata.getIconFilename();
-
+                  const CompactBehaviorComponent = CompactBehaviorsEditorService.getEditor(
+                    behaviorTypeName
+                  );
                   return (
                     <CollapsibleSubPanel
                       key={behavior.ptr}
                       renderContent={() => (
-                        <CompactBehaviorPropertiesEditor
+                        <CompactBehaviorComponent
                           project={project}
                           behaviorMetadata={behaviorMetadata}
                           behavior={behavior}

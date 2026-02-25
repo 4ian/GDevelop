@@ -3,7 +3,6 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import { type BehaviorEditorProps } from './BehaviorEditorProps.flow';
-import { Column } from '../../UI/Grid';
 import BehaviorPropertiesEditor from './BehaviorPropertiesEditor';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Button from '@material-ui/core/Button';
@@ -21,8 +20,6 @@ import VerticalProportionalFillIcon from '../../UI/CustomSvgIcons/VerticalSizePe
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { ColumnStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
-
-const gd: libGDevelop = global.gd;
 
 type BasicAnchor =
   | 'None'
@@ -94,6 +91,22 @@ const getBasicAnchor = (
   return 'Advanced';
 };
 
+export const getBasicHorizontalAnchor = (
+  properties: gdMapStringPropertyDescriptor
+): BasicAnchor =>
+  getBasicAnchor(
+    getAnchorProperty(properties, 'leftEdgeAnchor'),
+    getAnchorProperty(properties, 'rightEdgeAnchor')
+  );
+
+export const getBasicVerticalAnchor = (
+  properties: gdMapStringPropertyDescriptor
+): BasicAnchor =>
+  getBasicAnchor(
+    getAnchorProperty(properties, 'topEdgeAnchor'),
+    getAnchorProperty(properties, 'bottomEdgeAnchor')
+  );
+
 type AnchorMapping = Array<{|
   basicAnchor: BasicAnchor,
   minEdge: string,
@@ -134,6 +147,7 @@ const AnchorButtonGroup = ({
   anchorMapping,
   renderIcon,
   forceUpdate,
+  size,
 }: {|
   behavior: gdBehavior,
   basicAnchor: BasicAnchor,
@@ -146,14 +160,15 @@ const AnchorButtonGroup = ({
   |}>,
   renderIcon: (basicAnchor: string) => React.Node,
   forceUpdate: () => void,
+  size?: 'small' | 'medium' | 'large' | void,
 |}): React.Node => {
   return (
-    <ButtonGroup size="large">
+    <ButtonGroup size={size}>
       {anchorMapping.map(item => (
         <Button
           key={item.basicAnchor}
           variant={basicAnchor === item.basicAnchor ? 'contained' : 'outlined'}
-          color={basicAnchor === item.basicAnchor ? 'secondary' : 'default'}
+          color="secondary"
           onClick={() => {
             behavior.updateProperty(minEdgePropertyName, item.minEdge);
             behavior.updateProperty(maxEdgePropertyName, item.maxEdge);
@@ -164,6 +179,88 @@ const AnchorButtonGroup = ({
         </Button>
       ))}
     </ButtonGroup>
+  );
+};
+
+export const HorizontalAnchorButtonGroup = ({
+  behavior,
+  basicAnchor,
+  forceUpdate,
+  size,
+}: {|
+  behavior: gdBehavior,
+  basicAnchor: BasicAnchor,
+  forceUpdate: () => void,
+  size?: 'small' | 'medium' | 'large' | void,
+|}): React.Node => {
+  return (
+    <AnchorButtonGroup
+      behavior={behavior}
+      basicAnchor={basicAnchor}
+      minEdgePropertyName="leftEdgeAnchor"
+      maxEdgePropertyName="rightEdgeAnchor"
+      anchorMapping={horizontalAnchorMapping}
+      renderIcon={basicAnchor => {
+        switch (basicAnchor) {
+          case 'MinEdge':
+            return <LeftAlignmentIcon />;
+          case 'Center':
+            return <CenterAlignmentIcon />;
+          case 'MaxEdge':
+            return <RightAlignmentIcon />;
+          case 'FixedFill':
+            return <FillIcon />;
+          case 'ProportionalFill':
+            return <ProportionalFillIcon />;
+          case 'None':
+          default:
+            return <Cross />;
+        }
+      }}
+      forceUpdate={forceUpdate}
+      size={size}
+    />
+  );
+};
+
+export const VerticalAnchorButtonGroup = ({
+  behavior,
+  basicAnchor,
+  forceUpdate,
+  size,
+}: {|
+  behavior: gdBehavior,
+  basicAnchor: BasicAnchor,
+  forceUpdate: () => void,
+  size?: 'small' | 'medium' | 'large' | void,
+|}): React.Node => {
+  return (
+    <AnchorButtonGroup
+      behavior={behavior}
+      basicAnchor={basicAnchor}
+      minEdgePropertyName="topEdgeAnchor"
+      maxEdgePropertyName="bottomEdgeAnchor"
+      anchorMapping={verticalAnchorMapping}
+      renderIcon={basicAnchor => {
+        switch (basicAnchor) {
+          case 'MinEdge':
+            return <TopAlignmentIcon />;
+          case 'Center':
+            return <CenterVerticalAlignmentIcon />;
+          case 'MaxEdge':
+            return <BottomAlignmentIcon />;
+          case 'FixedFill':
+            return <VerticalFillIcon />;
+          case 'ProportionalFill':
+            return <VerticalProportionalFillIcon />;
+          case 'None':
+          default:
+            return <Cross />;
+        }
+      }}
+      forceUpdate={forceUpdate}
+      size={size}
+    />
   );
 };
 
@@ -180,13 +277,8 @@ const AnchorBehaviorEditor = ({
   const forceUpdate = useForceUpdate();
 
   const properties = behavior.getProperties();
-  const leftEdgeAnchor = getAnchorProperty(properties, 'leftEdgeAnchor');
-  const rightEdgeAnchor = getAnchorProperty(properties, 'rightEdgeAnchor');
-  const horizontalBasicAnchor = getBasicAnchor(leftEdgeAnchor, rightEdgeAnchor);
-
-  const topEdgeAnchor = getAnchorProperty(properties, 'topEdgeAnchor');
-  const bottomEdgeAnchor = getAnchorProperty(properties, 'bottomEdgeAnchor');
-  const verticalBasicAnchor = getBasicAnchor(topEdgeAnchor, bottomEdgeAnchor);
+  const horizontalBasicAnchor = getBasicHorizontalAnchor(properties);
+  const verticalBasicAnchor = getBasicVerticalAnchor(properties);
 
   const _onBehaviorUpdated = React.useCallback(
     () => {
@@ -201,57 +293,19 @@ const AnchorBehaviorEditor = ({
       <Text size="sub-title">
         <Trans>Horizontal anchor</Trans>
       </Text>
-      <AnchorButtonGroup
+      <HorizontalAnchorButtonGroup
         behavior={behavior}
         basicAnchor={horizontalBasicAnchor}
-        minEdgePropertyName="leftEdgeAnchor"
-        maxEdgePropertyName="rightEdgeAnchor"
-        anchorMapping={horizontalAnchorMapping}
-        renderIcon={basicAnchor => {
-          switch (basicAnchor) {
-            case 'MinEdge':
-              return <LeftAlignmentIcon />;
-            case 'Center':
-              return <CenterAlignmentIcon />;
-            case 'MaxEdge':
-              return <RightAlignmentIcon />;
-            case 'FixedFill':
-              return <FillIcon />;
-            case 'ProportionalFill':
-              return <ProportionalFillIcon />;
-            case 'None':
-            default:
-              return <Cross />;
-          }
-        }}
+        size="large"
         forceUpdate={forceUpdate}
       />
       <Text size="sub-title">
         <Trans>Vertical anchor</Trans>
       </Text>
-      <AnchorButtonGroup
+      <VerticalAnchorButtonGroup
         behavior={behavior}
         basicAnchor={verticalBasicAnchor}
-        minEdgePropertyName="topEdgeAnchor"
-        maxEdgePropertyName="bottomEdgeAnchor"
-        anchorMapping={verticalAnchorMapping}
-        renderIcon={basicAnchor => {
-          switch (basicAnchor) {
-            case 'MinEdge':
-              return <TopAlignmentIcon />;
-            case 'Center':
-              return <CenterVerticalAlignmentIcon />;
-            case 'MaxEdge':
-              return <BottomAlignmentIcon />;
-            case 'FixedFill':
-              return <VerticalFillIcon />;
-            case 'ProportionalFill':
-              return <VerticalProportionalFillIcon />;
-            case 'None':
-            default:
-              return <Cross />;
-          }
-        }}
+        size="large"
         forceUpdate={forceUpdate}
       />
       <BehaviorPropertiesEditor

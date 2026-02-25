@@ -3,10 +3,13 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import { type CompactBehaviorPropertiesEditorProps } from './CompactBehaviorPropertiesEditorProps.flow';
-import { CompactBehaviorPropertiesEditor } from './CompactBehaviorPropertiesEditor';
+import {
+  CompactBehaviorPropertiesEditor,
+  getPropertyValue,
+  updateProperty,
+} from './CompactBehaviorPropertiesEditor';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { ColumnStackLayout } from '../../UI/Layout';
-import Text from '../../UI/Text';
 import {
   HorizontalAnchorButtonGroup,
   VerticalAnchorButtonGroup,
@@ -26,11 +29,13 @@ const CompactAnchorBehaviorEditor = ({
   resourceManagementProps,
 }: CompactBehaviorPropertiesEditorProps): React.Node => {
   const forceUpdate = useForceUpdate();
-
-  const properties = behavior.getProperties();
-  const horizontalBasicAnchor = getBasicHorizontalAnchor(properties);
-  const verticalBasicAnchor = getBasicVerticalAnchor(properties);
-
+  const _getPropertyValue = (propertyName: string) =>
+    getPropertyValue(behavior, propertyName, initialInstance);
+  const _updateProperty = (propertyName: string, value: string) => {
+    updateProperty(project, behavior, propertyName, value, initialInstance);
+    forceUpdate();
+    onBehaviorUpdated();
+  };
   const _onBehaviorUpdated = React.useCallback(
     () => {
       forceUpdate();
@@ -39,19 +44,20 @@ const CompactAnchorBehaviorEditor = ({
     [forceUpdate, onBehaviorUpdated]
   );
 
+  const horizontalBasicAnchor = getBasicHorizontalAnchor(_getPropertyValue);
+  const verticalBasicAnchor = getBasicVerticalAnchor(_getPropertyValue);
+
   return (
     <ColumnStackLayout expand>
       <HorizontalAnchorButtonGroup
-        behavior={behavior}
         basicAnchor={horizontalBasicAnchor}
         size="small"
-        forceUpdate={forceUpdate}
+        onUpdateProperty={_updateProperty}
       />
       <VerticalAnchorButtonGroup
-        behavior={behavior}
         basicAnchor={verticalBasicAnchor}
         size="small"
-        forceUpdate={forceUpdate}
+        onUpdateProperty={_updateProperty}
       />
       <CompactBehaviorPropertiesEditor
         project={project}
@@ -66,7 +72,7 @@ const CompactAnchorBehaviorEditor = ({
         isAdvancedSectionInitiallyUncollapsed={
           horizontalBasicAnchor === 'Advanced' ||
           verticalBasicAnchor === 'Advanced' ||
-          properties.get('relativeToOriginalWindowSize').getValue() === 'false'
+          _getPropertyValue('relativeToOriginalWindowSize') === 'false'
         }
       />
     </ColumnStackLayout>

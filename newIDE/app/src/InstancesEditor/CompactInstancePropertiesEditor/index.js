@@ -36,12 +36,12 @@ import {
 } from '../../ObjectEditor/CompactObjectPropertiesEditor';
 import { ColumnStackLayout } from '../../UI/Layout';
 import Link from '../../UI/Link';
-import { CompactBehaviorPropertiesEditor } from '../../ObjectEditor/CompactObjectPropertiesEditor/CompactBehaviorPropertiesEditor';
 import { IconContainer } from '../../UI/IconContainer';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import EmptyMessage from '../../UI/EmptyMessage';
+import CompactBehaviorsEditorService from '../../ObjectEditor/CompactObjectPropertiesEditor/CompactBehaviorsEditorService';
 
 const gd: libGDevelop = global.gd;
 
@@ -386,9 +386,10 @@ export const CompactInstancePropertiesEditor = ({
                     )
                       ? instance.getBehaviorOverriding(behaviorName)
                       : null;
-
                     const iconUrl = behaviorMetadata.getIconFilename();
-
+                    const CompactBehaviorComponent = CompactBehaviorsEditorService.getEditor(
+                      behaviorTypeName
+                    );
                     return (
                       <StatefulCollapsibleSubPanel
                         key={behavior.ptr}
@@ -406,7 +407,7 @@ export const CompactInstancePropertiesEditor = ({
                                 </Column>
                               )
                             : () => (
-                                <CompactBehaviorPropertiesEditor
+                                <CompactBehaviorComponent
                                   project={project}
                                   behaviorMetadata={behaviorMetadata}
                                   behavior={behavior}

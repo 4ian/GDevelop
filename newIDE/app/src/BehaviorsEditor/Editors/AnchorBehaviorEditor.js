@@ -20,6 +20,10 @@ import VerticalProportionalFillIcon from '../../UI/CustomSvgIcons/VerticalSizePe
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { ColumnStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
+import {
+  getPropertyValue,
+  updateProperty,
+} from '../../ObjectEditor/CompactObjectPropertiesEditor/CompactBehaviorPropertiesEditor';
 
 type BasicAnchor =
   | 'None'
@@ -38,13 +42,10 @@ type AdvancedAnchor =
   | 'None';
 
 const getAnchorProperty = (
-  properties: gdMapStringPropertyDescriptor,
+  getPropertyValue: (propertyName: string) => string,
   name: string
 ): AdvancedAnchor => {
-  if (!properties.has(name)) {
-    return 'None';
-  }
-  const anchor = properties.get(name).getValue();
+  const anchor = getPropertyValue(name);
   if (anchor === 'WindowLeft' || anchor === 'WindowTop') {
     return 'MinEdge';
   }
@@ -92,19 +93,19 @@ const getBasicAnchor = (
 };
 
 export const getBasicHorizontalAnchor = (
-  properties: gdMapStringPropertyDescriptor
+  getPropertyValue: (propertyName: string) => string
 ): BasicAnchor =>
   getBasicAnchor(
-    getAnchorProperty(properties, 'leftEdgeAnchor'),
-    getAnchorProperty(properties, 'rightEdgeAnchor')
+    getAnchorProperty(getPropertyValue, 'leftEdgeAnchor'),
+    getAnchorProperty(getPropertyValue, 'rightEdgeAnchor')
   );
 
 export const getBasicVerticalAnchor = (
-  properties: gdMapStringPropertyDescriptor
+  getPropertyValue: (propertyName: string) => string
 ): BasicAnchor =>
   getBasicAnchor(
-    getAnchorProperty(properties, 'topEdgeAnchor'),
-    getAnchorProperty(properties, 'bottomEdgeAnchor')
+    getAnchorProperty(getPropertyValue, 'topEdgeAnchor'),
+    getAnchorProperty(getPropertyValue, 'bottomEdgeAnchor')
   );
 
 type AnchorMapping = Array<{|
@@ -140,16 +141,14 @@ const verticalAnchorMapping: AnchorMapping = [
 ];
 
 const AnchorButtonGroup = ({
-  behavior,
   basicAnchor,
   minEdgePropertyName,
   maxEdgePropertyName,
   anchorMapping,
   renderIcon,
-  forceUpdate,
+  onUpdateProperty,
   size,
 }: {|
-  behavior: gdBehavior,
   basicAnchor: BasicAnchor,
   minEdgePropertyName: string,
   maxEdgePropertyName: string,
@@ -159,7 +158,7 @@ const AnchorButtonGroup = ({
     maxEdge: string,
   |}>,
   renderIcon: (basicAnchor: string) => React.Node,
-  forceUpdate: () => void,
+  onUpdateProperty: (propertyName: string, value: string) => void,
   size?: 'small' | 'medium' | 'large' | void,
 |}): React.Node => {
   return (
@@ -170,9 +169,8 @@ const AnchorButtonGroup = ({
           variant={basicAnchor === item.basicAnchor ? 'contained' : 'outlined'}
           color="secondary"
           onClick={() => {
-            behavior.updateProperty(minEdgePropertyName, item.minEdge);
-            behavior.updateProperty(maxEdgePropertyName, item.maxEdge);
-            forceUpdate();
+            onUpdateProperty(minEdgePropertyName, item.minEdge);
+            onUpdateProperty(maxEdgePropertyName, item.maxEdge);
           }}
         >
           {renderIcon(item.basicAnchor)}
@@ -183,19 +181,16 @@ const AnchorButtonGroup = ({
 };
 
 export const HorizontalAnchorButtonGroup = ({
-  behavior,
   basicAnchor,
-  forceUpdate,
+  onUpdateProperty,
   size,
 }: {|
-  behavior: gdBehavior,
   basicAnchor: BasicAnchor,
-  forceUpdate: () => void,
+  onUpdateProperty: (propertyName: string, value: string) => void,
   size?: 'small' | 'medium' | 'large' | void,
 |}): React.Node => {
   return (
     <AnchorButtonGroup
-      behavior={behavior}
       basicAnchor={basicAnchor}
       minEdgePropertyName="leftEdgeAnchor"
       maxEdgePropertyName="rightEdgeAnchor"
@@ -217,26 +212,23 @@ export const HorizontalAnchorButtonGroup = ({
             return <Cross />;
         }
       }}
-      forceUpdate={forceUpdate}
+      onUpdateProperty={onUpdateProperty}
       size={size}
     />
   );
 };
 
 export const VerticalAnchorButtonGroup = ({
-  behavior,
   basicAnchor,
-  forceUpdate,
+  onUpdateProperty,
   size,
 }: {|
-  behavior: gdBehavior,
   basicAnchor: BasicAnchor,
-  forceUpdate: () => void,
+  onUpdateProperty: (propertyName: string, value: string) => void,
   size?: 'small' | 'medium' | 'large' | void,
 |}): React.Node => {
   return (
     <AnchorButtonGroup
-      behavior={behavior}
       basicAnchor={basicAnchor}
       minEdgePropertyName="topEdgeAnchor"
       maxEdgePropertyName="bottomEdgeAnchor"
@@ -258,7 +250,7 @@ export const VerticalAnchorButtonGroup = ({
             return <Cross />;
         }
       }}
-      forceUpdate={forceUpdate}
+      onUpdateProperty={onUpdateProperty}
       size={size}
     />
   );
@@ -275,11 +267,18 @@ const AnchorBehaviorEditor = ({
   projectScopedContainersAccessor,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
-
-  const properties = behavior.getProperties();
-  const horizontalBasicAnchor = getBasicHorizontalAnchor(properties);
-  const verticalBasicAnchor = getBasicVerticalAnchor(properties);
-
+  const _getPropertyValue = React.useCallback(
+    (propertyName: string) => getPropertyValue(behavior, propertyName, null),
+    [behavior]
+  );
+  const _updateProperty = React.useCallback(
+    (propertyName: string, value: string) => {
+      updateProperty(project, behavior, propertyName, value, null);
+      forceUpdate();
+      onBehaviorUpdated();
+    },
+    [behavior, forceUpdate, onBehaviorUpdated, project]
+  );
   const _onBehaviorUpdated = React.useCallback(
     () => {
       forceUpdate();
@@ -288,25 +287,26 @@ const AnchorBehaviorEditor = ({
     [forceUpdate, onBehaviorUpdated]
   );
 
+  const horizontalBasicAnchor = getBasicHorizontalAnchor(_getPropertyValue);
+  const verticalBasicAnchor = getBasicVerticalAnchor(_getPropertyValue);
+
   return (
     <ColumnStackLayout expand>
       <Text size="sub-title">
         <Trans>Horizontal anchor</Trans>
       </Text>
       <HorizontalAnchorButtonGroup
-        behavior={behavior}
         basicAnchor={horizontalBasicAnchor}
         size="large"
-        forceUpdate={forceUpdate}
+        onUpdateProperty={_updateProperty}
       />
       <Text size="sub-title">
         <Trans>Vertical anchor</Trans>
       </Text>
       <VerticalAnchorButtonGroup
-        behavior={behavior}
         basicAnchor={verticalBasicAnchor}
         size="large"
-        forceUpdate={forceUpdate}
+        onUpdateProperty={_updateProperty}
       />
       <BehaviorPropertiesEditor
         project={project}
@@ -318,7 +318,7 @@ const AnchorBehaviorEditor = ({
         isAdvancedSectionInitiallyUncollapsed={
           horizontalBasicAnchor === 'Advanced' ||
           verticalBasicAnchor === 'Advanced' ||
-          properties.get('relativeToOriginalWindowSize').getValue() === 'false'
+          _getPropertyValue('relativeToOriginalWindowSize') === 'false'
         }
       />
     </ColumnStackLayout>

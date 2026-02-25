@@ -28,6 +28,7 @@ export type CommandName =
   | 'OPEN_PLATFORM_SPECIFIC_ASSETS_DIALOG'
   | 'OPEN_PROJECT_RESOURCES'
   | 'OPEN_SEARCH_EXTENSIONS_DIALOG'
+  | 'OPEN_GLOBAL_SEARCH'
   | 'OPEN_LAYOUT'
   | 'OPEN_EXTERNAL_EVENTS'
   | 'OPEN_EXTERNAL_LAYOUT'
@@ -197,6 +198,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   OPEN_SEARCH_EXTENSIONS_DIALOG: {
     area: 'PROJECT',
     displayText: t`Search/import extensions`,
+  },
+  OPEN_GLOBAL_SEARCH: {
+    area: 'IDE',
+    displayText: t`Global search (search in project)`,
   },
 
   // Tab-opening commands

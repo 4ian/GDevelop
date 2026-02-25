@@ -328,7 +328,6 @@ export default class ForEachEvent extends React.Component<
                   )}
                 </span>
               </Trans>{' '}
-              {/* Inline select for "ordered by" vs "(any order)" */}
               {(() => {
                 const objectPrefix = objectName || '<Object>';
                 const objectsContainersList = this.props.projectScopedContainersAccessor
@@ -397,8 +396,8 @@ export default class ForEachEvent extends React.Component<
                       }
                     }}
                   >
-                    <option value="any">{'(any order)'}</option>
-                    <option value="orderBy">{'ordered by'}</option>
+                    <option value="any">{i18n._(t`(any order)`)}</option>
+                    <option value="orderBy">{i18n._(t`ordered by`)}</option>
                     <optgroup label="Examples">
                       <option value={`${objectPrefix}.SomeVariable`}>
                         {i18n._(t`order by highest variable`)}
@@ -417,7 +416,6 @@ export default class ForEachEvent extends React.Component<
               })()}
               {hasOrderBy && (
                 <span>
-                  {/* Clickable orderBy expression */}
                   <span
                     className={classNames({
                       [selectableArea]: true,
@@ -448,7 +446,7 @@ export default class ForEachEvent extends React.Component<
                       </span>
                     )}
                   </span>
-                  ({/* Inline select for ascending/descending */}
+                  (
                   <InlineSelect
                     value={order}
                     onChange={value => {
@@ -457,8 +455,8 @@ export default class ForEachEvent extends React.Component<
                       this.forceUpdate();
                     }}
                   >
-                    <option value="asc">{'ascending'}</option>
-                    <option value="desc">{'descending'}</option>
+                    <option value="asc">{i18n._(t`ascending`)}</option>
+                    <option value="desc">{i18n._(t`descending`)}</option>
                   </InlineSelect>
                   ,{' '}
                   <span
@@ -584,7 +582,7 @@ export default class ForEachEvent extends React.Component<
                 />
               )}
             />
-            {/* Popover for editing the object */}
+
             <InlinePopover
               open={this.state.editingObject}
               anchorEl={this.state.objectAnchorEl}
@@ -610,7 +608,7 @@ export default class ForEachEvent extends React.Component<
                 ref={objectField => (this._objectField = objectField)}
               />
             </InlinePopover>
-            {/* Popover for editing the orderBy expression */}
+
             <InlinePopover
               open={this.state.editingOrderBy}
               anchorEl={this.state.orderByAnchorEl}
@@ -636,7 +634,7 @@ export default class ForEachEvent extends React.Component<
                 ref={field => (this._orderByField = field)}
               />
             </InlinePopover>
-            {/* Popover for editing the limit expression */}
+
             <InlinePopover
               open={this.state.editingLimit}
               anchorEl={this.state.limitAnchorEl}

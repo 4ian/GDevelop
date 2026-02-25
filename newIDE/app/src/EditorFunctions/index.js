@@ -39,6 +39,7 @@ import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { swapAsset } from '../AssetStore/AssetSwapper';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 import { getObjectFolderOrObjectWithContextFromObjectName } from '../SceneEditor/ObjectFolderOrObjectsSelection';
+import { getObjectSizeAndOriginInfo } from './Utils';
 
 const gd: libGDevelop = global.gd;
 
@@ -119,6 +120,11 @@ export type EditorFunctionGenericOutput = {|
 
   // Used when new resources are added by a function call:
   newlyAddedResources?: Array<SingleResourceSearchAndInstallResult>,
+
+  // Size/origin/center info for newly created objects, keyed by object name:
+  newObjectDefaultSize?: {
+    [string]: {| size: string, origin: string, center: string |},
+  },
 |};
 
 export type EventsGenerationResult =
@@ -729,52 +735,9 @@ const createOrReplaceObject: EditorFunction = {
         )
         .filter(Boolean);
 
-      const parts = [
-        `It has the following properties: ${propertyShortTexts.join(', ')}.`,
-      ];
-
-      if (
-        object.getType() === 'TiledSpriteObject::TiledSprite' ||
-        object.getType() === 'PanelSpriteObject::PanelSprite'
-      ) {
-        parts.push(
-          `The origin point (the anchor used to position the object in the scene, i.e. what X/Y coordinates refer to) is at X=0, Y=0 (top-left corner of the object). The center point (used as the pivot for rotation and scaling) is always the center of the object (width / 2, height / 2).`
-        );
-      } else if (object.getType() === 'Sprite') {
-        const spriteConfiguration = gd.asSpriteConfiguration(
-          objectConfiguration
-        );
-        const animations = spriteConfiguration.getAnimations();
-        if (
-          animations.getAnimationsCount() > 0 &&
-          animations.getAnimation(0).getDirectionsCount() > 0 &&
-          animations
-            .getAnimation(0)
-            .getDirection(0)
-            .getSpritesCount() > 0
-        ) {
-          const sprite = animations
-            .getAnimation(0)
-            .getDirection(0)
-            .getSprite(0);
-          const origin = sprite.getOrigin();
-          parts.push(
-            `The origin point (the anchor used to position the object in the scene, i.e. what X/Y coordinates refer to) is at X=${origin.getX()}, Y=${origin.getY()} (in pixels, relative to the top-left corner of the sprite image).`
-          );
-          if (sprite.isDefaultCenterPoint()) {
-            parts.push(
-              `The center point (used as the pivot for rotation and scaling) is the default: the center of the image.`
-            );
-          } else {
-            const center = sprite.getCenter();
-            parts.push(
-              `The center point (used as the pivot for rotation and scaling) is at X=${center.getX()}, Y=${center.getY()} (in pixels, relative to the top-left corner of the sprite image).`
-            );
-          }
-        }
-      }
-
-      return parts.join(' ');
+      return `It has the following properties: ${propertyShortTexts.join(
+        ', '
+      )}.`;
     };
 
     // Check if target object already exists.
@@ -832,18 +795,21 @@ const createOrReplaceObject: EditorFunction = {
 
       // First try to search and install an object from the asset store.
       try {
-        const { status, message, createdObjects } = await searchAndInstallAsset(
-          {
-            objectsContainer: targetObjectsContainer,
-            objectName: targetObjectName,
-            objectType: object_type,
-            searchTerms: search_terms || '',
-            description: description || '',
-            twoDimensionalViewKind: two_dimensional_view_kind || '',
-            relatedAiRequestId,
-            ...getRelatedAiRequestLastMessages(),
-          }
-        );
+        const {
+          status,
+          message,
+          createdObjects,
+          assetShortHeader,
+        } = await searchAndInstallAsset({
+          objectsContainer: targetObjectsContainer,
+          objectName: targetObjectName,
+          objectType: object_type,
+          searchTerms: search_terms || '',
+          description: description || '',
+          twoDimensionalViewKind: two_dimensional_view_kind || '',
+          relatedAiRequestId,
+          ...getRelatedAiRequestLastMessages(),
+        });
 
         if (status === 'error') {
           return makeGenericFailure(
@@ -867,12 +833,24 @@ const createOrReplaceObject: EditorFunction = {
 
           if (createdObjects.length === 1) {
             const object = createdObjects[0];
-            return makeGenericSuccess(
-              [
+            const sizeAndOriginInfo = getObjectSizeAndOriginInfo(
+              object,
+              project,
+              assetShortHeader
+            );
+            const result: EditorFunctionGenericOutput = {
+              success: true,
+              message: [
                 `Created (from the asset store) object "${object.getName()}" of type "${object.getType()}" in scene "${scene_name}".`,
                 getPropertiesText(object),
-              ].join(' ')
-            );
+              ].join(' '),
+            };
+            if (sizeAndOriginInfo) {
+              result.newObjectDefaultSize = {
+                [object.getName()]: sizeAndOriginInfo,
+              };
+            }
+            return result;
           }
 
           return makeGenericSuccess(
@@ -939,12 +917,24 @@ const createOrReplaceObject: EditorFunction = {
         isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
       });
 
-      return makeGenericSuccess(
-        [
+      const sizeAndOriginInfo = getObjectSizeAndOriginInfo(
+        object,
+        project,
+        null
+      );
+      const result: EditorFunctionGenericOutput = {
+        success: true,
+        message: [
           `Created a new object (from scratch) called "${targetObjectName}" of type "${object_type}" in scene "${scene_name}".`,
           getPropertiesText(object),
-        ].join(' ')
-      );
+        ].join(' '),
+      };
+      if (sizeAndOriginInfo) {
+        result.newObjectDefaultSize = {
+          [targetObjectName]: sizeAndOriginInfo,
+        };
+      }
+      return result;
     };
 
     const replaceExistingObject = async () => {

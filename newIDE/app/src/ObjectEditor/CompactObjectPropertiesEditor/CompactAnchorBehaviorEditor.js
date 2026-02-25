@@ -1,6 +1,4 @@
 // @flow
-import { Trans } from '@lingui/macro';
-
 import * as React from 'react';
 import { type CompactBehaviorPropertiesEditorProps } from './CompactBehaviorPropertiesEditorProps.flow';
 import {
@@ -51,12 +49,12 @@ const CompactAnchorBehaviorEditor = ({
     <ColumnStackLayout expand>
       <HorizontalAnchorButtonGroup
         basicAnchor={horizontalBasicAnchor}
-        size="small"
+        expand
         onUpdateProperty={_updateProperty}
       />
       <VerticalAnchorButtonGroup
         basicAnchor={verticalBasicAnchor}
-        size="small"
+        expand
         onUpdateProperty={_updateProperty}
       />
       <CompactBehaviorPropertiesEditor

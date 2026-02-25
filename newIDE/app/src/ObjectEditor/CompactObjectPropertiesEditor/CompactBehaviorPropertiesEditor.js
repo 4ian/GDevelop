@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { Trans } from '@lingui/macro';
 import {

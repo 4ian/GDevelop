@@ -136,6 +136,19 @@ const getImageCoordinatesFromPointerEvent = (
   }
 
   const bounds = divContainer.getBoundingClientRect();
+
+  // Ignore pointer events on the scrollbar area. getBoundingClientRect includes
+  // scrollbars, but clientWidth/clientHeight exclude them, so any click beyond
+  // clientWidth or clientHeight is on a scrollbar, not on the tile content.
+  const relativeX = event.clientX - bounds.left;
+  const relativeY = event.clientY - bounds.top;
+  if (
+    relativeX >= divContainer.clientWidth ||
+    relativeY >= divContainer.clientHeight
+  ) {
+    return;
+  }
+
   const mouseXWithoutScrollLeft = event.clientX - bounds.left + 1;
   const mouseX = mouseXWithoutScrollLeft + divContainer.scrollLeft;
   const mouseY = event.clientY - bounds.top + 1;

@@ -83,12 +83,21 @@ export const getObjectSizeAndOriginInfo = (
     const maxX = eventsBasedObject.getAreaMaxX();
     const minY = eventsBasedObject.getAreaMinY();
     const maxY = eventsBasedObject.getAreaMaxY();
+    const isRenderedIn3D = eventsBasedObject.isRenderedIn3D();
+    const minZ = isRenderedIn3D ? eventsBasedObject.getAreaMinZ() : 0;
+    const maxZ = isRenderedIn3D ? eventsBasedObject.getAreaMaxZ() : 0;
     const width = maxX - minX;
     const height = maxY - minY;
+    const depth = maxZ - minZ;
+
+    const origin = `${-minX};${-minY}${isRenderedIn3D ? `;${-minZ}` : ''}`;
+    const center = `${width / 2};${height / 2}${
+      isRenderedIn3D ? `;${depth / 2}` : ''
+    }`;
     return {
-      size: `${width}x${height}`,
-      origin: '0;0',
-      center: `${(minX + maxX) / 2};${(minY + maxY) / 2}`,
+      size: `${width}x${height}${isRenderedIn3D ? `x${depth}` : ''}`,
+      origin,
+      center,
     };
   }
 

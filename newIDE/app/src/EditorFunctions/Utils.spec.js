@@ -180,15 +180,15 @@ describe('getObjectSizeAndOriginInfo', () => {
       });
     });
 
-    it('handles a non-centered area (minX/minY not at 0)', () => {
+    it('handles a non 0;0 origin based on area min bounds', () => {
       const extension = project.insertNewEventsFunctionsExtension('MyExt2', 0);
       const eventsBasedObject = extension
         .getEventsBasedObjects()
         .insertNew('MyOffsetObject', 0);
-      eventsBasedObject.setAreaMinX(-50);
-      eventsBasedObject.setAreaMaxX(50);
-      eventsBasedObject.setAreaMinY(-30);
-      eventsBasedObject.setAreaMaxY(30);
+      eventsBasedObject.setAreaMinX(-10);
+      eventsBasedObject.setAreaMaxX(90);
+      eventsBasedObject.setAreaMinY(-20);
+      eventsBasedObject.setAreaMaxY(40);
 
       const objects = project.getObjects();
       const object = objects.insertNewObject(
@@ -200,8 +200,36 @@ describe('getObjectSizeAndOriginInfo', () => {
 
       expect(getObjectSizeAndOriginInfo(object, project, null)).toEqual({
         size: '100x60',
-        origin: '0;0',
-        center: '0;0', // midpoint of (-50+50)/2 ; (-30+30)/2
+        origin: '10;20',
+        center: '50;30',
+      });
+    });
+
+    it('handles 3D events-based objects with Z bounds included in size/origin/center', () => {
+      const extension = project.insertNewEventsFunctionsExtension('MyExt3', 0);
+      const eventsBasedObject = extension
+        .getEventsBasedObjects()
+        .insertNew('My3DObject', 0);
+      eventsBasedObject.setAreaMinX(-10);
+      eventsBasedObject.setAreaMaxX(90);
+      eventsBasedObject.setAreaMinY(-20);
+      eventsBasedObject.setAreaMaxY(40);
+      eventsBasedObject.setAreaMinZ(-5);
+      eventsBasedObject.setAreaMaxZ(25);
+      eventsBasedObject.markAsRenderedIn3D(true);
+
+      const objects = project.getObjects();
+      const object = objects.insertNewObject(
+        project,
+        'MyExt3::My3DObject',
+        'My3DObjectInstance',
+        objects.getObjectsCount()
+      );
+
+      expect(getObjectSizeAndOriginInfo(object, project, null)).toEqual({
+        size: '100x60x30',
+        origin: '10;20;5',
+        center: '50;30;15',
       });
     });
   });

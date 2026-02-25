@@ -400,7 +400,7 @@ export default class ForEachEvent extends React.Component<
                     <option value="any">{'(any order)'}</option>
                     <option value="orderBy">{'ordered by'}</option>
                     <optgroup label="Examples">
-                      <option value={`${objectPrefix}.Variable(MyVariable)`}>
+                      <option value={`${objectPrefix}.SomeVariable`}>
                         {i18n._(t`order by highest variable`)}
                       </option>
                       <option value={`${objectPrefix}.Distance(OtherObject)`}>

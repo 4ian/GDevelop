@@ -261,6 +261,11 @@ const AnchorBehaviorEditor = ({
         onBehaviorUpdated={_onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
         projectScopedContainersAccessor={projectScopedContainersAccessor}
+        isAdvancedSectionInitiallyUncollapsed={
+          horizontalBasicAnchor === 'Advanced' ||
+          verticalBasicAnchor === 'Advanced' ||
+          properties.get('relativeToOriginalWindowSize').getValue() === 'false'
+        }
       />
     </ColumnStackLayout>
   );

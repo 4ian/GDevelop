@@ -729,10 +729,52 @@ const createOrReplaceObject: EditorFunction = {
         )
         .filter(Boolean);
 
-      const propertiesText = `It has the following properties: ${propertyShortTexts.join(
-        ', '
-      )}.`;
-      return propertiesText;
+      const parts = [
+        `It has the following properties: ${propertyShortTexts.join(', ')}.`,
+      ];
+
+      if (
+        object.getType() === 'TiledSpriteObject::TiledSprite' ||
+        object.getType() === 'PanelSpriteObject::PanelSprite'
+      ) {
+        parts.push(
+          `The origin point (the anchor used to position the object in the scene, i.e. what X/Y coordinates refer to) is at X=0, Y=0 (top-left corner of the object). The center point (used as the pivot for rotation and scaling) is always the center of the object (width / 2, height / 2).`
+        );
+      } else if (object.getType() === 'Sprite') {
+        const spriteConfiguration = gd.asSpriteConfiguration(
+          objectConfiguration
+        );
+        const animations = spriteConfiguration.getAnimations();
+        if (
+          animations.getAnimationsCount() > 0 &&
+          animations.getAnimation(0).getDirectionsCount() > 0 &&
+          animations
+            .getAnimation(0)
+            .getDirection(0)
+            .getSpritesCount() > 0
+        ) {
+          const sprite = animations
+            .getAnimation(0)
+            .getDirection(0)
+            .getSprite(0);
+          const origin = sprite.getOrigin();
+          parts.push(
+            `The origin point (the anchor used to position the object in the scene, i.e. what X/Y coordinates refer to) is at X=${origin.getX()}, Y=${origin.getY()} (in pixels, relative to the top-left corner of the sprite image).`
+          );
+          if (sprite.isDefaultCenterPoint()) {
+            parts.push(
+              `The center point (used as the pivot for rotation and scaling) is the default: the center of the image.`
+            );
+          } else {
+            const center = sprite.getCenter();
+            parts.push(
+              `The center point (used as the pivot for rotation and scaling) is at X=${center.getX()}, Y=${center.getY()} (in pixels, relative to the top-left corner of the sprite image).`
+            );
+          }
+        }
+      }
+
+      return parts.join(' ');
     };
 
     // Check if target object already exists.

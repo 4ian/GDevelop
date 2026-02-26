@@ -2769,168 +2769,173 @@ export default class SceneEditor extends React.Component<Props, State> {
       : false;
 
     return (
-      <ResponsiveWindowMeasurer>
-        {({ isMobile }) => {
-          const EditorsDisplay = isMobile
-            ? SwipeableDrawerEditorsDisplay
-            : MosaicEditorsDisplay;
-          return (
-            <div
-              style={styles.container}
-              id="scene-editor"
-              data-active={isActive ? 'true' : undefined}
-            >
-              <UseSceneEditorCommands
-                project={project}
-                layersContainer={this.props.layersContainer}
-                globalObjectsContainer={this.props.globalObjectsContainer}
-                objectsContainer={this.props.objectsContainer}
-                onEditObject={this.editObject}
-                onEditObjectVariables={object => {
-                  this.editObject(object, 'variables');
-                }}
-                onOpenSceneProperties={this.openSceneProperties}
-                onEditObjectGroup={this._editObjectGroup}
-                onEditLayerEffects={this.editLayerEffects}
-                onEditLayer={this.editLayer}
-              />
-              <EditorsDisplay
-                ref={ref => (this.editorDisplay = ref)}
-                gameEditorMode={this.props.gameEditorMode}
-                onRestartInGameEditor={this.props.onRestartInGameEditor}
-                showRestartInGameEditorAfterErrorButton={
-                  this.props.showRestartInGameEditorAfterErrorButton
-                }
-                project={project}
-                layout={layout}
-                eventsFunctionsExtension={eventsFunctionsExtension}
-                eventsBasedObject={eventsBasedObject}
-                eventsBasedObjectVariant={eventsBasedObjectVariant}
-                layersContainer={this.props.layersContainer}
-                globalObjectsContainer={this.props.globalObjectsContainer}
-                objectsContainer={this.props.objectsContainer}
-                projectScopedContainersAccessor={
-                  projectScopedContainersAccessor
-                }
-                initialInstances={initialInstances}
-                instancesSelection={this.instancesSelection}
-                onSelectInstances={this._onSelectInstances}
-                onInstancesModified={this._onInstancesModified}
-                onAddObjectInstance={this.addInstanceOnTheScene}
-                chosenLayer={this.state.chosenLayer}
-                onChooseLayer={this._onChooseLayer}
-                selectedLayer={this.state.selectedLayer}
-                onSelectLayer={this._onSelectLayer}
-                editLayer={this.editLayer}
-                editLayerEffects={this.editLayerEffects}
-                editInstanceVariables={this.editInstanceVariables}
-                editObjectByName={this.editObjectByName}
-                editObjectInPropertiesPanel={this.editObjectInPropertiesPanel}
-                selectedObjectFolderOrObjectsWithContext={
-                  selectedObjectFolderOrObjectsWithContext
-                }
-                onLayerRenamed={this._onLayerRenamed}
-                onLayersModified={() => this._onLayersModified(false)}
-                onBackgroundColorChanged={this._sendSetBackgroundColor}
-                onLayersVisibilityInEditorChanged={
-                  this._onLayersVisibilityInEditorChanged
-                }
-                onRemoveLayer={this._onRemoveLayer}
-                tileMapTileSelection={this.state.tileMapTileSelection}
-                onSelectTileMapTile={this.onSelectTileMapTile}
-                onExportAssets={this.openObjectExporterDialog}
-                onDeleteObjects={this._onDeleteObjects}
-                getValidatedObjectOrGroupName={
-                  this._getValidatedObjectOrGroupName
-                }
-                onCreateObjectGroup={this._createObjectGroup}
-                onEditObjectGroup={this._editObjectGroup}
-                onDeleteObjectGroup={this._onDeleteObjectGroup}
-                onRenameObjectGroup={this._onRenameObjectGroup}
-                canObjectOrGroupBeGlobal={this.canObjectOrGroupBeGlobal}
-                updateBehaviorsSharedData={this.updateBehaviorsSharedData}
-                onEditObject={this.editObject}
-                onOpenEventBasedObjectEditor={
-                  this.props.onOpenEventBasedObjectEditor
-                }
-                onOpenEventBasedObjectVariantEditor={
-                  this.props.onOpenEventBasedObjectVariantEditor
-                }
-                onDeleteEventsBasedObjectVariant={
-                  this.props.onDeleteEventsBasedObjectVariant
-                }
-                onRenameObjectFolderOrObjectWithContextFinish={
-                  this._onRenameObjectFolderOrObjectWithContextFinish
-                }
-                onObjectCreated={this._onObjectCreated}
-                onObjectEdited={this._onObjectEdited}
-                onObjectsModified={this._onObjectsModified}
-                onEffectAdded={this.props.onEffectAdded}
-                onObjectFolderOrObjectWithContextSelected={
-                  this._onObjectFolderOrObjectWithContextSelected
-                }
-                onSetAsGlobalObject={this._onSetAsGlobalObject}
-                historyHandler={{
-                  undo: this.undo,
-                  redo: this.redo,
-                  canUndo: () => canUndo(this.state.history),
-                  canRedo: () => canRedo(this.state.history),
-                  saveToHistory: () =>
-                    this.setState({
-                      history: saveToHistory(
-                        this.state.history,
-                        this.props.initialInstances
-                      ),
-                    }),
-                }}
-                instancesEditorShortcutsCallbacks={{
-                  onCopy: () =>
-                    this.copySelection({ useLastCursorPosition: true }),
-                  onCut: () =>
-                    this.cutSelection({ useLastCursorPosition: true }),
-                  onPaste: () => this.paste({ useLastCursorPosition: true }),
-                  onDuplicate: () =>
-                    this.duplicateSelection({ useLastCursorPosition: true }),
-                  onDelete: this.deleteSelection,
-                  onUndo: this.undo,
-                  onRedo: this.redo,
-                  onZoomOut: this.zoomOut,
-                  onZoomIn: this.zoomIn,
-                  onShift1: this.zoomToFitSelection,
-                  onShift2: this.zoomToInitialPosition,
-                  onShift3: this.zoomToFitContent,
-                }}
-                onInstancesAdded={this._onInstancesAddedAndSendToEditor3D}
-                onInstancesSelected={this._onInstancesSelected}
-                onInstanceDoubleClicked={this._onInstanceDoubleClicked}
-                onInstancesMoved={this._onInstancesMovedAndSendToEditor3D}
-                onInstancesResized={this._onInstancesResized}
-                onInstancesRotated={this._onInstancesRotated}
-                isInstanceOf3DObject={this.isInstanceOf3DObject}
-                onSelectAllInstancesOfObjectInLayout={
-                  this.onSelectAllInstancesOfObjectInLayout
-                }
-                instancesEditorSettings={this.state.instancesEditorSettings}
-                onInstancesEditorSettingsMutated={
-                  this._onInstancesEditorSettingsMutated
-                }
-                onContextMenu={this._onContextMenu}
-                resourceManagementProps={this.props.resourceManagementProps}
-                hotReloadPreviewButtonProps={
-                  this.props.hotReloadPreviewButtonProps
-                }
-                isActive={isActive}
-                onOpenedEditorsChanged={this.updateToolbar}
-                lastSelectionType={this.state.lastSelectionType}
-                onWillInstallExtension={this.props.onWillInstallExtension}
-                onExtensionInstalled={this.props.onExtensionInstalled}
-                editorViewPosition2D={this.editorViewPosition2D}
-                onEventsBasedObjectChildrenEdited={
-                  this.props.onEventsBasedObjectChildrenEdited
-                }
-              />
-              <I18n>
-                {({ i18n }) => (
+      <I18n>
+        {({ i18n }) => (
+          <ResponsiveWindowMeasurer>
+            {({ isMobile }) => {
+              const EditorsDisplay = isMobile
+                ? SwipeableDrawerEditorsDisplay
+                : MosaicEditorsDisplay;
+              return (
+                <div
+                  style={styles.container}
+                  id="scene-editor"
+                  data-active={isActive ? 'true' : undefined}
+                >
+                  <UseSceneEditorCommands
+                    project={project}
+                    layersContainer={this.props.layersContainer}
+                    globalObjectsContainer={this.props.globalObjectsContainer}
+                    objectsContainer={this.props.objectsContainer}
+                    onEditObject={this.editObject}
+                    onEditObjectVariables={object => {
+                      this.editObject(object, 'variables');
+                    }}
+                    onOpenSceneProperties={this.openSceneProperties}
+                    onEditObjectGroup={this._editObjectGroup}
+                    onEditLayerEffects={this.editLayerEffects}
+                    onEditLayer={this.editLayer}
+                  />
+                  <EditorsDisplay
+                    ref={ref => (this.editorDisplay = ref)}
+                    gameEditorMode={this.props.gameEditorMode}
+                    onRestartInGameEditor={this.props.onRestartInGameEditor}
+                    showRestartInGameEditorAfterErrorButton={
+                      this.props.showRestartInGameEditorAfterErrorButton
+                    }
+                    project={project}
+                    layout={layout}
+                    eventsFunctionsExtension={eventsFunctionsExtension}
+                    eventsBasedObject={eventsBasedObject}
+                    eventsBasedObjectVariant={eventsBasedObjectVariant}
+                    layersContainer={this.props.layersContainer}
+                    globalObjectsContainer={this.props.globalObjectsContainer}
+                    objectsContainer={this.props.objectsContainer}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
+                    initialInstances={initialInstances}
+                    instancesSelection={this.instancesSelection}
+                    onSelectInstances={this._onSelectInstances}
+                    onInstancesModified={this._onInstancesModified}
+                    onAddObjectInstance={this.addInstanceOnTheScene}
+                    chosenLayer={this.state.chosenLayer}
+                    onChooseLayer={this._onChooseLayer}
+                    selectedLayer={this.state.selectedLayer}
+                    onSelectLayer={this._onSelectLayer}
+                    editLayer={this.editLayer}
+                    editLayerEffects={this.editLayerEffects}
+                    editInstanceVariables={this.editInstanceVariables}
+                    editObjectByName={this.editObjectByName}
+                    editObjectInPropertiesPanel={
+                      this.editObjectInPropertiesPanel
+                    }
+                    selectedObjectFolderOrObjectsWithContext={
+                      selectedObjectFolderOrObjectsWithContext
+                    }
+                    onLayerRenamed={this._onLayerRenamed}
+                    onLayersModified={() => this._onLayersModified(false)}
+                    onBackgroundColorChanged={this._sendSetBackgroundColor}
+                    onLayersVisibilityInEditorChanged={
+                      this._onLayersVisibilityInEditorChanged
+                    }
+                    onRemoveLayer={this._onRemoveLayer}
+                    tileMapTileSelection={this.state.tileMapTileSelection}
+                    onSelectTileMapTile={this.onSelectTileMapTile}
+                    onExportAssets={this.openObjectExporterDialog}
+                    onDeleteObjects={this._onDeleteObjects}
+                    getValidatedObjectOrGroupName={
+                      this._getValidatedObjectOrGroupName
+                    }
+                    onCreateObjectGroup={this._createObjectGroup}
+                    onEditObjectGroup={this._editObjectGroup}
+                    onDeleteObjectGroup={this._onDeleteObjectGroup}
+                    onRenameObjectGroup={this._onRenameObjectGroup}
+                    canObjectOrGroupBeGlobal={this.canObjectOrGroupBeGlobal}
+                    updateBehaviorsSharedData={this.updateBehaviorsSharedData}
+                    onEditObject={this.editObject}
+                    onOpenEventBasedObjectEditor={
+                      this.props.onOpenEventBasedObjectEditor
+                    }
+                    onOpenEventBasedObjectVariantEditor={
+                      this.props.onOpenEventBasedObjectVariantEditor
+                    }
+                    onDeleteEventsBasedObjectVariant={
+                      this.props.onDeleteEventsBasedObjectVariant
+                    }
+                    onRenameObjectFolderOrObjectWithContextFinish={
+                      this._onRenameObjectFolderOrObjectWithContextFinish
+                    }
+                    onObjectCreated={this._onObjectCreated}
+                    onObjectEdited={this._onObjectEdited}
+                    onObjectsModified={this._onObjectsModified}
+                    onEffectAdded={this.props.onEffectAdded}
+                    onObjectFolderOrObjectWithContextSelected={
+                      this._onObjectFolderOrObjectWithContextSelected
+                    }
+                    onSetAsGlobalObject={this._onSetAsGlobalObject}
+                    historyHandler={{
+                      undo: this.undo,
+                      redo: this.redo,
+                      canUndo: () => canUndo(this.state.history),
+                      canRedo: () => canRedo(this.state.history),
+                      saveToHistory: () =>
+                        this.setState({
+                          history: saveToHistory(
+                            this.state.history,
+                            this.props.initialInstances
+                          ),
+                        }),
+                    }}
+                    instancesEditorShortcutsCallbacks={{
+                      onCopy: () =>
+                        this.copySelection({ useLastCursorPosition: true }),
+                      onCut: () =>
+                        this.cutSelection({ useLastCursorPosition: true }),
+                      onPaste: () =>
+                        this.paste({ useLastCursorPosition: true }),
+                      onDuplicate: () =>
+                        this.duplicateSelection({
+                          useLastCursorPosition: true,
+                        }),
+                      onDelete: this.deleteSelection,
+                      onUndo: this.undo,
+                      onRedo: this.redo,
+                      onZoomOut: this.zoomOut,
+                      onZoomIn: this.zoomIn,
+                      onShift1: this.zoomToFitSelection,
+                      onShift2: this.zoomToInitialPosition,
+                      onShift3: this.zoomToFitContent,
+                    }}
+                    onInstancesAdded={this._onInstancesAddedAndSendToEditor3D}
+                    onInstancesSelected={this._onInstancesSelected}
+                    onInstanceDoubleClicked={this._onInstanceDoubleClicked}
+                    onInstancesMoved={this._onInstancesMovedAndSendToEditor3D}
+                    onInstancesResized={this._onInstancesResized}
+                    onInstancesRotated={this._onInstancesRotated}
+                    isInstanceOf3DObject={this.isInstanceOf3DObject}
+                    onSelectAllInstancesOfObjectInLayout={
+                      this.onSelectAllInstancesOfObjectInLayout
+                    }
+                    instancesEditorSettings={this.state.instancesEditorSettings}
+                    onInstancesEditorSettingsMutated={
+                      this._onInstancesEditorSettingsMutated
+                    }
+                    onContextMenu={this._onContextMenu}
+                    resourceManagementProps={this.props.resourceManagementProps}
+                    hotReloadPreviewButtonProps={
+                      this.props.hotReloadPreviewButtonProps
+                    }
+                    isActive={isActive}
+                    onOpenedEditorsChanged={this.updateToolbar}
+                    lastSelectionType={this.state.lastSelectionType}
+                    onWillInstallExtension={this.props.onWillInstallExtension}
+                    onExtensionInstalled={this.props.onExtensionInstalled}
+                    editorViewPosition2D={this.editorViewPosition2D}
+                    onEventsBasedObjectChildrenEdited={
+                      this.props.onEventsBasedObjectChildrenEdited
+                    }
+                  />
                   <React.Fragment>
                     {editedObjectWithContext && (
                       <ObjectEditorDialog
@@ -3042,205 +3047,218 @@ export default class SceneEditor extends React.Component<Props, State> {
                       />
                     )}
                   </React.Fragment>
-                )}
-              </I18n>
-              {this.state.isAssetExporterDialogOpen && layout && (
-                <ObjectExporterDialog
-                  project={project}
-                  layout={layout}
-                  onClose={() => this.openObjectExporterDialog(false)}
-                />
-              )}
-              {(this.state.editedGroup || this.state.isCreatingNewGroup) && (
-                <ObjectGroupEditorDialog
-                  project={project}
-                  projectScopedContainersAccessor={
-                    projectScopedContainersAccessor
-                  }
-                  group={this.state.editedGroup}
-                  objectsContainer={this.props.objectsContainer}
-                  globalObjectsContainer={this.props.globalObjectsContainer}
-                  initialInstances={this.props.initialInstances}
-                  onCancel={this._closeObjectGroupEditorDialog}
-                  onApply={this._closeObjectGroupEditorDialog}
-                  onObjectGroupAdded={(objectGroup: gdObjectGroup) => {
-                    if (this.editorDisplay) {
-                      this.editorDisplay.scrollObjectGroupsListToObjectGroup(
-                        objectGroup
-                      );
-                    }
-                    // TODO Set the `global` attribute correctly.
-                    this.props.onObjectGroupEdited({
-                      group: objectGroup,
-                      global: false,
-                    });
-                  }}
-                  initialTab={'objects'}
-                  onComputeAllVariableNames={() => {
-                    const { editedGroup } = this.state;
-                    if (!editedGroup) return [];
-                    if (!layout) return [];
-
-                    return EventsRootVariablesFinder.findAllObjectVariables(
-                      project.getCurrentPlatform(),
-                      project,
-                      layout, // TODO: Handle this for custom objects?
-                      editedGroup.getName()
-                    );
-                  }}
-                  isVariableListLocked={isCustomVariant}
-                  isObjectListLocked={isCustomVariant}
-                />
-              )}
-              {this.state.setupGridOpen && (
-                <SetupGridDialog
-                  instancesEditorSettings={this.state.instancesEditorSettings}
-                  onChangeInstancesEditorSettings={
-                    this.setInstancesEditorSettings
-                  }
-                  onCancel={() => this.openSetupGrid(false)}
-                  onApply={() => this.openSetupGrid(false)}
-                />
-              )}
-              {!!this.state.variablesEditedInstance &&
-                !!variablesEditedAssociatedObject && (
-                  <ObjectInstanceVariablesDialog
-                    project={project}
-                    layout={layout}
-                    objectsContainer={this.props.objectsContainer}
-                    globalObjectsContainer={this.props.globalObjectsContainer}
-                    projectScopedContainersAccessor={
-                      projectScopedContainersAccessor
-                    }
-                    objectInstance={this.state.variablesEditedInstance}
-                    open
-                    onCancel={() => this.editInstanceVariables(null)}
-                    onApply={() => this.editInstanceVariables(null)}
-                    onEditObjectVariables={() => {
-                      this.editObject(
-                        variablesEditedAssociatedObject,
-                        'variables'
-                      );
-                      this.editInstanceVariables(null);
-                    }}
-                    hotReloadPreviewButtonProps={
-                      this.props.hotReloadPreviewButtonProps
-                    }
-                    isListLocked={true}
-                  />
-                )}
-              {!!this.state.layerRemoved &&
-                this.state.onCloseLayerRemoveDialog && (
-                  <LayerRemoveDialog
-                    open
-                    project={project}
-                    layout={layout}
-                    layersContainer={this.props.layersContainer}
-                    initialInstances={initialInstances}
-                    layerRemoved={this.state.layerRemoved}
-                    onClose={this.state.onCloseLayerRemoveDialog}
-                  />
-                )}
-              {!!this.state.editedLayer && (
-                <LayerEditorDialog
-                  project={project}
-                  resourceManagementProps={this.props.resourceManagementProps}
-                  projectScopedContainersAccessor={
-                    this.props.projectScopedContainersAccessor
-                  }
-                  layout={layout}
-                  eventsFunctionsExtension={eventsFunctionsExtension}
-                  eventsBasedObject={eventsBasedObject}
-                  layer={this.state.editedLayer}
-                  initialInstances={initialInstances}
-                  initialTab={this.state.editedLayerInitialTab}
-                  onApply={(hasAnyEffectBeenAdded: boolean) => {
-                    this._onLayersModified(hasAnyEffectBeenAdded);
-                    this.setState({
-                      editedLayer: null,
-                    });
-                  }}
-                  onCancel={() =>
-                    this.setState({
-                      editedLayer: null,
-                    })
-                  }
-                  hotReloadPreviewButtonProps={
-                    this.props.hotReloadPreviewButtonProps
-                  }
-                />
-              )}
-              {this.state.scenePropertiesDialogOpen && layout && (
-                <ScenePropertiesDialog
-                  open
-                  project={project}
-                  layout={layout}
-                  onClose={() => this.openSceneProperties(false)}
-                  onApply={() => this.openSceneProperties(false)}
-                  onEditVariables={() => this.editLayoutVariables(true)}
-                  onOpenMoreSettings={this.props.onOpenMoreSettings}
-                  resourceManagementProps={this.props.resourceManagementProps}
-                  projectScopedContainersAccessor={
-                    this.props.projectScopedContainersAccessor
-                  }
-                  onBackgroundColorChanged={this._sendSetBackgroundColor}
-                />
-              )}
-              {this.state.scenePropertiesDialogOpen &&
-                eventsBasedObject &&
-                eventsBasedObjectVariant && (
-                  <EventsBasedObjectScenePropertiesDialog
-                    project={project}
-                    eventsBasedObject={eventsBasedObject}
-                    eventsBasedObjectVariant={eventsBasedObjectVariant}
-                    onClose={() => this.openSceneProperties(false)}
-                    onApply={() => {
-                      this.openSceneProperties(false);
-
-                      const { previewDebuggerServer } = this.props;
-                      if (previewDebuggerServer) {
-                        previewDebuggerServer
-                          .getExistingEmbeddedGameFrameDebuggerIds()
-                          .forEach(debuggerId => {
-                            previewDebuggerServer.sendMessage(debuggerId, {
-                              command: 'updateInnerArea',
-                              payload: {
-                                areaMinX: eventsBasedObjectVariant.getAreaMinX(),
-                                areaMinY: eventsBasedObjectVariant.getAreaMinY(),
-                                areaMinZ: eventsBasedObjectVariant.getAreaMinZ(),
-                                areaMaxX: eventsBasedObjectVariant.getAreaMaxX(),
-                                areaMaxY: eventsBasedObjectVariant.getAreaMaxY(),
-                                areaMaxZ: eventsBasedObjectVariant.getAreaMaxZ(),
-                              },
-                            });
-                          });
+                  {this.state.isAssetExporterDialogOpen && layout && (
+                    <ObjectExporterDialog
+                      project={project}
+                      layout={layout}
+                      onClose={() => this.openObjectExporterDialog(false)}
+                    />
+                  )}
+                  {(this.state.editedGroup ||
+                    this.state.isCreatingNewGroup) && (
+                    <ObjectGroupEditorDialog
+                      project={project}
+                      projectScopedContainersAccessor={
+                        projectScopedContainersAccessor
                       }
-                    }}
-                    getContentAABB={
-                      this.editorDisplay
-                        ? this.editorDisplay.instancesHandlers.getContentAABB
-                        : () => null
-                    }
-                    onEventsBasedObjectChildrenEdited={
-                      this.props.onEventsBasedObjectChildrenEdited
-                    }
-                  />
-                )}
-              {!!this.state.layoutVariablesDialogOpen && layout && (
-                <SceneVariablesDialog
-                  open
-                  project={project}
-                  layout={layout}
-                  onApply={() => this.editLayoutVariables(false)}
-                  onCancel={() => this.editLayoutVariables(false)}
-                  hotReloadPreviewButtonProps={
-                    this.props.hotReloadPreviewButtonProps
-                  }
-                  isListLocked={false}
-                />
-              )}
-              <I18n>
-                {({ i18n }) => (
+                      group={this.state.editedGroup}
+                      objectsContainer={this.props.objectsContainer}
+                      globalObjectsContainer={this.props.globalObjectsContainer}
+                      initialInstances={this.props.initialInstances}
+                      onCancel={this._closeObjectGroupEditorDialog}
+                      onApply={this._closeObjectGroupEditorDialog}
+                      onObjectGroupAdded={(objectGroup: gdObjectGroup) => {
+                        if (this.editorDisplay) {
+                          this.editorDisplay.scrollObjectGroupsListToObjectGroup(
+                            objectGroup
+                          );
+                        }
+                        // TODO Set the `global` attribute correctly.
+                        this.props.onObjectGroupEdited({
+                          group: objectGroup,
+                          global: false,
+                        });
+                      }}
+                      initialTab={'objects'}
+                      onComputeAllVariableNames={() => {
+                        const { editedGroup } = this.state;
+                        if (!editedGroup) return [];
+                        if (!layout) return [];
+
+                        return EventsRootVariablesFinder.findAllObjectVariables(
+                          project.getCurrentPlatform(),
+                          project,
+                          layout, // TODO: Handle this for custom objects?
+                          editedGroup.getName()
+                        );
+                      }}
+                      isVariableListLocked={isCustomVariant}
+                      isObjectListLocked={isCustomVariant}
+                      getValidatedObjectOrGroupName={(newName, global) =>
+                        this._getValidatedObjectOrGroupName(
+                          newName,
+                          global,
+                          i18n
+                        )
+                      }
+                    />
+                  )}
+                  {this.state.setupGridOpen && (
+                    <SetupGridDialog
+                      instancesEditorSettings={
+                        this.state.instancesEditorSettings
+                      }
+                      onChangeInstancesEditorSettings={
+                        this.setInstancesEditorSettings
+                      }
+                      onCancel={() => this.openSetupGrid(false)}
+                      onApply={() => this.openSetupGrid(false)}
+                    />
+                  )}
+                  {!!this.state.variablesEditedInstance &&
+                    !!variablesEditedAssociatedObject && (
+                      <ObjectInstanceVariablesDialog
+                        project={project}
+                        layout={layout}
+                        objectsContainer={this.props.objectsContainer}
+                        globalObjectsContainer={
+                          this.props.globalObjectsContainer
+                        }
+                        projectScopedContainersAccessor={
+                          projectScopedContainersAccessor
+                        }
+                        objectInstance={this.state.variablesEditedInstance}
+                        open
+                        onCancel={() => this.editInstanceVariables(null)}
+                        onApply={() => this.editInstanceVariables(null)}
+                        onEditObjectVariables={() => {
+                          this.editObject(
+                            variablesEditedAssociatedObject,
+                            'variables'
+                          );
+                          this.editInstanceVariables(null);
+                        }}
+                        hotReloadPreviewButtonProps={
+                          this.props.hotReloadPreviewButtonProps
+                        }
+                        isListLocked={true}
+                      />
+                    )}
+                  {!!this.state.layerRemoved &&
+                    this.state.onCloseLayerRemoveDialog && (
+                      <LayerRemoveDialog
+                        open
+                        project={project}
+                        layout={layout}
+                        layersContainer={this.props.layersContainer}
+                        initialInstances={initialInstances}
+                        layerRemoved={this.state.layerRemoved}
+                        onClose={this.state.onCloseLayerRemoveDialog}
+                      />
+                    )}
+                  {!!this.state.editedLayer && (
+                    <LayerEditorDialog
+                      project={project}
+                      resourceManagementProps={
+                        this.props.resourceManagementProps
+                      }
+                      projectScopedContainersAccessor={
+                        this.props.projectScopedContainersAccessor
+                      }
+                      layout={layout}
+                      eventsFunctionsExtension={eventsFunctionsExtension}
+                      eventsBasedObject={eventsBasedObject}
+                      layer={this.state.editedLayer}
+                      initialInstances={initialInstances}
+                      initialTab={this.state.editedLayerInitialTab}
+                      onApply={(hasAnyEffectBeenAdded: boolean) => {
+                        this._onLayersModified(hasAnyEffectBeenAdded);
+                        this.setState({
+                          editedLayer: null,
+                        });
+                      }}
+                      onCancel={() =>
+                        this.setState({
+                          editedLayer: null,
+                        })
+                      }
+                      hotReloadPreviewButtonProps={
+                        this.props.hotReloadPreviewButtonProps
+                      }
+                    />
+                  )}
+                  {this.state.scenePropertiesDialogOpen && layout && (
+                    <ScenePropertiesDialog
+                      open
+                      project={project}
+                      layout={layout}
+                      onClose={() => this.openSceneProperties(false)}
+                      onApply={() => this.openSceneProperties(false)}
+                      onEditVariables={() => this.editLayoutVariables(true)}
+                      onOpenMoreSettings={this.props.onOpenMoreSettings}
+                      resourceManagementProps={
+                        this.props.resourceManagementProps
+                      }
+                      projectScopedContainersAccessor={
+                        this.props.projectScopedContainersAccessor
+                      }
+                      onBackgroundColorChanged={this._sendSetBackgroundColor}
+                    />
+                  )}
+                  {this.state.scenePropertiesDialogOpen &&
+                    eventsBasedObject &&
+                    eventsBasedObjectVariant && (
+                      <EventsBasedObjectScenePropertiesDialog
+                        project={project}
+                        eventsBasedObject={eventsBasedObject}
+                        eventsBasedObjectVariant={eventsBasedObjectVariant}
+                        onClose={() => this.openSceneProperties(false)}
+                        onApply={() => {
+                          this.openSceneProperties(false);
+
+                          const { previewDebuggerServer } = this.props;
+                          if (previewDebuggerServer) {
+                            previewDebuggerServer
+                              .getExistingEmbeddedGameFrameDebuggerIds()
+                              .forEach(debuggerId => {
+                                previewDebuggerServer.sendMessage(debuggerId, {
+                                  command: 'updateInnerArea',
+                                  payload: {
+                                    areaMinX: eventsBasedObjectVariant.getAreaMinX(),
+                                    areaMinY: eventsBasedObjectVariant.getAreaMinY(),
+                                    areaMinZ: eventsBasedObjectVariant.getAreaMinZ(),
+                                    areaMaxX: eventsBasedObjectVariant.getAreaMaxX(),
+                                    areaMaxY: eventsBasedObjectVariant.getAreaMaxY(),
+                                    areaMaxZ: eventsBasedObjectVariant.getAreaMaxZ(),
+                                  },
+                                });
+                              });
+                          }
+                        }}
+                        getContentAABB={
+                          this.editorDisplay
+                            ? this.editorDisplay.instancesHandlers
+                                .getContentAABB
+                            : () => null
+                        }
+                        onEventsBasedObjectChildrenEdited={
+                          this.props.onEventsBasedObjectChildrenEdited
+                        }
+                      />
+                    )}
+                  {!!this.state.layoutVariablesDialogOpen && layout && (
+                    <SceneVariablesDialog
+                      open
+                      project={project}
+                      layout={layout}
+                      onApply={() => this.editLayoutVariables(false)}
+                      onCancel={() => this.editLayoutVariables(false)}
+                      hotReloadPreviewButtonProps={
+                        this.props.hotReloadPreviewButtonProps
+                      }
+                      isListLocked={false}
+                    />
+                  )}
                   <React.Fragment>
                     {this.state.extractAsExternalLayoutDialogOpen && layout && (
                       <ExtractAsExternalLayoutDialog
@@ -3288,18 +3306,19 @@ export default class SceneEditor extends React.Component<Props, State> {
                       buildMenuTemplate={this.buildContextMenu}
                     />
                   </React.Fragment>
-                )}
-              </I18n>
-              <InfoBar
-                message={infoBarMessage}
-                duration={7000}
-                visible={!!infoBarMessage}
-                hide={() => this.onInstanceAddedOnInvisibleLayer(null)}
-              />
-            </div>
-          );
-        }}
-      </ResponsiveWindowMeasurer>
+                  )}
+                  <InfoBar
+                    message={infoBarMessage}
+                    duration={7000}
+                    visible={!!infoBarMessage}
+                    hide={() => this.onInstanceAddedOnInvisibleLayer(null)}
+                  />
+                </div>
+              );
+            }}
+          </ResponsiveWindowMeasurer>
+        )}
+      </I18n>
     );
   }
 }

@@ -624,8 +624,9 @@ namespace gdjs {
   }
 
   class ObjectMover {
-    editor: InGameEditor;
-    _changeHappened = false;
+    private editor: InGameEditor;
+    private _changeHappened = false;
+    private startTime = 0;
 
     constructor(editor: InGameEditor) {
       this.editor = editor;
@@ -649,6 +650,7 @@ namespace gdjs {
     startMove() {
       this._changeHappened = false;
       this._objectInitialPositions.clear();
+      this.startTime = Date.now();
     }
 
     endMove(): boolean {
@@ -672,6 +674,10 @@ namespace gdjs {
         scaleZ: float;
       }
     ) {
+      if (Date.now() - this.startTime < 200) {
+        // Avoid miss-clicks gizmo dragging point to change object positions.
+        return;
+      }
       selectedObjects.forEach((object) => {
         if (this.editor.isInstanceLocked(object)) {
           return;
@@ -2419,8 +2425,11 @@ namespace gdjs {
         // Update the rotation snap.
         const inputManager = this._runtimeGame.getInputManager();
         const shouldSnap =
-          this._transformControlsMode === 'rotate' && isAltPressed(inputManager);
-        const rotationSnap = shouldSnap ? gdjs.toRad(ROTATION_SNAP_DEGREES) : null;
+          this._transformControlsMode === 'rotate' &&
+          isAltPressed(inputManager);
+        const rotationSnap = shouldSnap
+          ? gdjs.toRad(ROTATION_SNAP_DEGREES)
+          : null;
 
         threeTransformControls.setRotationSnap(rotationSnap);
 

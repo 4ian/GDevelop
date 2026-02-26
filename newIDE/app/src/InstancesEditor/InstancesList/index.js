@@ -45,6 +45,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
+    minWidth: 0,
   },
   tableContainer: {
     flex: 1,
@@ -253,7 +254,7 @@ class InstancesList extends Component<Props, State> {
         {gdevelopTheme => (
           <div style={styles.container}>
             <Line>
-              <Column expand>
+              <Column expand noOverflowParent>
                 <CompactSearchBar
                   value={searchText}
                   onChange={searchText =>

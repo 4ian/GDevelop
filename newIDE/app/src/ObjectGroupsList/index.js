@@ -629,7 +629,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     return (
       <Background>
         <Line>
-          <Column expand>
+          <Column expand noOverflowParent>
             <CompactSearchBar
               value={searchText}
               onChange={setSearchText}

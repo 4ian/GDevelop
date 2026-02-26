@@ -1547,7 +1547,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     return (
       <Background maxWidth>
         <LineStackLayout>
-          <Column expand>
+          <Column expand noOverflowParent>
             <CompactSearchBar
               value={searchText}
               onChange={setSearchText}

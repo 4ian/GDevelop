@@ -3306,7 +3306,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                       buildMenuTemplate={this.buildContextMenu}
                     />
                   </React.Fragment>
-                  )}
                   <InfoBar
                     message={infoBarMessage}
                     duration={7000}

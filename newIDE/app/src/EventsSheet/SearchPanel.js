@@ -31,6 +31,8 @@ import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 import Cross from '../UI/CustomSvgIcons/Cross';
 import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 
+type SearchTypeTab = 'search-and-replace' | 'search-in-event-sentences';
+
 type Props = {|
   onSearchInEvents: SearchInEventsInputs => void,
   onReplaceInEvents: ReplaceInEventsInputs => void,
@@ -40,6 +42,9 @@ type Props = {|
   onGoToPreviousSearchResult: () => ?gdBaseEvent,
   onGoToNextSearchResult: () => ?gdBaseEvent,
   searchFocusOffset: ?number,
+  initialSearchText?: string,
+  initialMatchCase?: boolean,
+  initialTab?: SearchTypeTab,
 |};
 
 export type SearchPanelInterface = {|
@@ -58,6 +63,9 @@ const SearchPanel = (
     onGoToPreviousSearchResult,
     onGoToNextSearchResult,
     searchFocusOffset,
+    initialSearchText,
+    initialMatchCase,
+    initialTab,
   }: Props,
   // $FlowFixMe[missing-local-annot]
   ref
@@ -84,9 +92,9 @@ const SearchPanel = (
   const [searchResultsDirty, setSearchResultsDirty] = React.useState<boolean>(
     false
   );
-  const [currentTab, setCurrentTab] = React.useState<
-    'search-and-replace' | 'search-in-event-sentences'
-  >('search-and-replace');
+  const [currentTab, setCurrentTab] = React.useState<SearchTypeTab>(
+    'search-and-replace'
+  );
 
   const isSearchOngoing = React.useCallback(
     (): boolean => {
@@ -134,6 +142,23 @@ const SearchPanel = (
     [currentTab, focusSearchField, shouldAutofocusInput]
   );
   React.useEffect(markSearchResultsDirty, [currentTab, markSearchResultsDirty]);
+
+  // Sync external search state (e.g. from global search) into the panel
+  React.useEffect(
+    () => {
+      if (initialSearchText !== undefined) {
+        setSearchText(initialSearchText);
+        setSearchResultsDirty(false); // Results already shown, Next/Prev work immediately
+      }
+      if (initialMatchCase !== undefined) {
+        setMatchCase(initialMatchCase);
+      }
+      if (initialTab !== undefined) {
+        setCurrentTab(initialTab);
+      }
+    },
+    [initialSearchText, initialMatchCase, initialTab]
+  );
 
   const launchSearch = () => {
     onSearchInEvents({

@@ -85,6 +85,7 @@ import PreferencesContext, {
 import EventsFunctionExtractorDialog from './EventsFunctionExtractor/EventsFunctionExtractorDialog';
 import { createNewInstructionForEventsFunction } from './EventsFunctionExtractor';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope';
+import type { EventPath } from '../Types/EventPath';
 import {
   pasteEventsFromClipboardInSelection,
   copySelectionToClipboard,
@@ -221,8 +222,14 @@ type State = {|
   textEditedEvent: ?gdBaseEvent,
 
   showSearchPanel: boolean,
-  searchResults: ?Array<gdBaseEvent>,
-  searchFocusOffset: ?number,
+  searchHighlight: ?{|
+    results: Array<gdBaseEvent>,
+    focusOffset: number,
+    text: string,
+    matchCase: boolean,
+  |},
+  localSearchText: string,
+  localSearchMatchCase: boolean,
   navigationHighlightEvent: ?gdBaseEvent,
 
   layoutVariablesDialogOpen: boolean,
@@ -321,8 +328,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     serializedEventsToExtract: null,
 
     showSearchPanel: false,
-    searchResults: null,
-    searchFocusOffset: null,
+    searchHighlight: null,
+    localSearchText: '',
+    localSearchMatchCase: false,
     navigationHighlightEvent: null,
 
     layoutVariablesDialogOpen: false,
@@ -398,7 +406,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
   };
 
-  scrollToEventPath = (eventPath: Array<number>) => {
+  scrollToEventPath = (eventPath: EventPath) => {
     const eventsTree = this._eventsTree;
     if (!eventsTree || eventPath.length === 0) return;
 
@@ -423,6 +431,69 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     setTimeout(() => {
       this.setState({ navigationHighlightEvent: null });
     }, 3000);
+  };
+
+  setGlobalSearchResults = (
+    eventPaths: Array<EventPath>,
+    focusedEventPath: EventPath,
+    searchText: string,
+    matchCase: boolean
+  ) => {
+    const eventsTree = this._eventsTree;
+    const eventsByPtr = new Map<number, gdBaseEvent>();
+    eventPaths.forEach(path => {
+      const event = findEventByPath(this.props.events, path);
+      if (event) {
+        // $FlowFixMe[prop-missing] - ptr is a numeric identifier for the C++ object.
+        eventsByPtr.set(event.ptr, event);
+      }
+    });
+    const resultEvents = [...eventsByPtr.values()];
+
+    let focusOffset = 0;
+    if (focusedEventPath) {
+      const focusedEvent = findEventByPath(this.props.events, focusedEventPath);
+      if (focusedEvent) {
+        const focusedEventIndex = resultEvents.findIndex(event =>
+          // $FlowFixMe[incompatible-exact]
+          gd.compare(event, focusedEvent)
+        );
+        focusOffset = focusedEventIndex === -1 ? 0 : focusedEventIndex;
+      }
+    }
+
+    const searchHighlight = {
+      results: resultEvents,
+      focusOffset,
+      text: searchText || '',
+      matchCase,
+    };
+
+    this.setState(
+      {
+        searchHighlight,
+        navigationHighlightEvent: null,
+        showSearchPanel: true,
+        localSearchText: searchText || '',
+        localSearchMatchCase: matchCase,
+      },
+      () => {
+        if (!eventsTree) return;
+        const focusedEvent = resultEvents[focusOffset];
+        if (!focusedEvent) return;
+        eventsTree.unfoldForEvent(focusedEvent);
+        const row = eventsTree.getEventRow(focusedEvent);
+        if (row !== -1) {
+          eventsTree.scrollToRow(row);
+        }
+      }
+    );
+  };
+
+  clearGlobalSearchResults = () => {
+    this.setState({
+      searchHighlight: null,
+    });
   };
 
   updateToolbar() {
@@ -488,6 +559,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         const show = !state.showSearchPanel;
         if (!show) {
           if (this._eventSearcher) this._eventSearcher.reset();
+        } else {
+          this.clearGlobalSearchResults();
         }
 
         return {
@@ -504,7 +577,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   _closeSearchPanel = () => {
     if (this._eventSearcher) this._eventSearcher.reset();
-    this.setState({ showSearchPanel: false });
+    this.setState({
+      showSearchPanel: false,
+      localSearchText: '',
+      localSearchMatchCase: false,
+      searchHighlight: null,
+    });
   };
 
   addSubEvent = () => {
@@ -2009,6 +2087,33 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     }
   };
 
+  _goToNextFromGlobalSearch = (): ?gdBaseEvent => {
+    const { searchHighlight } = this.state;
+    if (!searchHighlight || !searchHighlight.results.length) return null;
+    const results = searchHighlight.results;
+    const newOffset = (searchHighlight.focusOffset + 1) % results.length;
+    const event = results[newOffset];
+    this.setState({
+      searchHighlight: { ...searchHighlight, focusOffset: newOffset },
+    });
+    return event;
+  };
+
+  _goToPreviousFromGlobalSearch = (): ?gdBaseEvent => {
+    const { searchHighlight } = this.state;
+    if (!searchHighlight || !searchHighlight.results.length) return null;
+    const results = searchHighlight.results;
+    const newOffset =
+      searchHighlight.focusOffset <= 0
+        ? results.length - 1
+        : searchHighlight.focusOffset - 1;
+    const event = results[newOffset];
+    this.setState({
+      searchHighlight: { ...searchHighlight, focusOffset: newOffset },
+    });
+    return event;
+  };
+
   _replaceInEvents = (
     doReplaceInEvents: (
       inputs: ReplaceInEventsInputs,
@@ -2034,6 +2139,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     doSearchInEvents: (inputs: SearchInEventsInputs, cb: () => void) => void,
     inputs: SearchInEventsInputs
   ) => {
+    this.setState({
+      localSearchText: inputs.searchText || '',
+      localSearchMatchCase: inputs.matchCase,
+      searchHighlight: null, // Switch from global to local search
+    });
     doSearchInEvents(inputs, () => {
       this.forceUpdate(() => {
         if (this._eventsTree) this._eventsTree.forceEventsUpdate();
@@ -2281,199 +2391,266 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             replaceInEvents,
             goToPreviousSearchResult,
             goToNextSearchResult,
-          }) => (
-            <div
-              id="events-editor"
-              data-active={isActive ? 'true' : undefined}
-              className="gd-events-sheet"
-              style={styles.container}
-              onKeyDown={this._keyboardShortcuts.onKeyDown}
-              onKeyUp={this._keyboardShortcuts.onKeyUp}
-              onDragOver={this._keyboardShortcuts.onDragOver}
-              onBlur={this._onEventsSheetBlur}
-              ref={this._containerDiv}
-              tabIndex={0}
-            >
-              {isFunctionOnlyCallingItself && (
-                <Line>
-                  <Column expand>
-                    <AlertMessage kind="warning">
-                      <Trans>
-                        This function calls itself (it is "recursive"). Ensure
-                        this is expected and there is a proper condition to stop
-                        it if necessary.
-                      </Trans>
-                    </AlertMessage>
-                  </Column>
-                </Line>
-              )}
-              {this._containerDivLastKnownSize && (
-                <EventsTree
-                  ref={eventsTree => (this._eventsTree = eventsTree)}
-                  key={events.ptr}
-                  indentScale={preferences.values.eventsSheetIndentScale}
-                  onScroll={this._ensureFocused}
-                  events={events}
+          }) => {
+            const hasLocalSearchResults =
+              eventsSearchResultEvents &&
+              eventsSearchResultEvents.length > 0 &&
+              this.state.localSearchText;
+            const effectiveSearchHighlight = this.state.searchHighlight
+              ? this.state.searchHighlight
+              : hasLocalSearchResults
+              ? {
+                  results: eventsSearchResultEvents,
+                  focusOffset: searchFocusOffset ?? 0,
+                  text: this.state.localSearchText,
+                  matchCase: this.state.localSearchMatchCase,
+                }
+              : this.state.navigationHighlightEvent
+              ? {
+                  results: [this.state.navigationHighlightEvent],
+                  focusOffset: 0,
+                  text: '',
+                  matchCase: false,
+                }
+              : null;
+
+            return (
+              <div
+                id="events-editor"
+                data-active={isActive ? 'true' : undefined}
+                className="gd-events-sheet"
+                style={styles.container}
+                onKeyDown={this._keyboardShortcuts.onKeyDown}
+                onKeyUp={this._keyboardShortcuts.onKeyUp}
+                onDragOver={this._keyboardShortcuts.onDragOver}
+                onBlur={this._onEventsSheetBlur}
+                ref={this._containerDiv}
+                tabIndex={0}
+              >
+                {isFunctionOnlyCallingItself && (
+                  <Line>
+                    <Column expand>
+                      <AlertMessage kind="warning">
+                        <Trans>
+                          This function calls itself (it is "recursive"). Ensure
+                          this is expected and there is a proper condition to
+                          stop it if necessary.
+                        </Trans>
+                      </AlertMessage>
+                    </Column>
+                  </Line>
+                )}
+                {this._containerDivLastKnownSize && (
+                  <EventsTree
+                    ref={eventsTree => (this._eventsTree = eventsTree)}
+                    key={events.ptr}
+                    indentScale={preferences.values.eventsSheetIndentScale}
+                    onScroll={this._ensureFocused}
+                    events={events}
+                    project={project}
+                    scope={scope}
+                    globalObjectsContainer={globalObjectsContainer}
+                    objectsContainer={objectsContainer}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
+                    selection={this.state.selection}
+                    onInstructionClick={this.selectInstruction}
+                    onInstructionDoubleClick={this.openInstructionEditor}
+                    onInstructionContextMenu={this.openInstructionContextMenu}
+                    onAddInstructionContextMenu={
+                      this.openAddInstructionContextMenu
+                    }
+                    onAddNewInstruction={this.openInstructionEditor}
+                    onPasteInstructions={
+                      this.pasteInstructionsInInstructionsList
+                    }
+                    onMoveToInstruction={this.moveSelectionToInstruction}
+                    onMoveToInstructionsList={
+                      this.moveSelectionToInstructionsList
+                    }
+                    onParameterClick={this.openParameterEditor}
+                    onVariableDeclarationClick={() => {
+                      // Nothing to do.
+                    }}
+                    onVariableDeclarationDoubleClick={this.openVariablesEditor}
+                    onEventClick={this.selectEvent}
+                    onEventContextMenu={this.openEventContextMenu}
+                    onAddNewEvent={(
+                      eventType: string,
+                      eventsList: gdEventsList
+                    ) => {
+                      this.addNewEvent(eventType, {
+                        eventsList,
+                        indexInList: eventsList.getEventsCount(),
+                      });
+                    }}
+                    onOpenExternalEvents={onOpenExternalEvents}
+                    onOpenLayout={onOpenLayout}
+                    searchResults={
+                      effectiveSearchHighlight
+                        ? effectiveSearchHighlight.results
+                        : null
+                    }
+                    searchFocusOffset={
+                      effectiveSearchHighlight
+                        ? effectiveSearchHighlight.focusOffset
+                        : null
+                    }
+                    onEventMoved={this._onEventMoved}
+                    onEndEditingEvent={this._onEndEditingStringEvent}
+                    showObjectThumbnails={
+                      preferences.values.eventsSheetShowObjectThumbnails
+                    }
+                    screenType={screenType}
+                    windowSize={windowSize}
+                    eventsSheetWidth={this._containerDivLastKnownSize.width}
+                    eventsSheetHeight={this._containerDivLastKnownSize.height}
+                    fontSize={preferences.values.eventsSheetZoomLevel}
+                    preferences={preferences}
+                    tutorials={tutorials}
+                    highlightedSearchText={
+                      effectiveSearchHighlight
+                        ? effectiveSearchHighlight.text || null
+                        : null
+                    }
+                    highlightedSearchMatchCase={
+                      effectiveSearchHighlight
+                        ? effectiveSearchHighlight.matchCase
+                        : false
+                    }
+                    highlightedAiGeneratedEventIds={
+                      highlightedAiGeneratedEventIds
+                    }
+                  />
+                )}
+                {this.state.showSearchPanel && (
+                  <ErrorBoundary
+                    componentTitle={<Trans>Search panel</Trans>}
+                    scope="scene-events-search"
+                    onClose={() => this._closeSearchPanel()}
+                  >
+                    <SearchPanel
+                      ref={searchPanel => (this._searchPanel = searchPanel)}
+                      onSearchInEvents={inputs =>
+                        this._searchInEvents(searchInEvents, inputs)
+                      }
+                      onReplaceInEvents={inputs => {
+                        this._replaceInEvents(replaceInEvents, inputs);
+                      }}
+                      resultsCount={
+                        this.state.searchHighlight
+                          ? this.state.searchHighlight.results.length
+                          : eventsSearchResultEvents
+                          ? eventsSearchResultEvents.length
+                          : null
+                      }
+                      hasEventSelected={hasEventSelected(this.state.selection)}
+                      onGoToPreviousSearchResult={() =>
+                        this._ensureUnfoldedAndScrollTo(
+                          this.state.searchHighlight
+                            ? this._goToPreviousFromGlobalSearch
+                            : goToPreviousSearchResult
+                        )
+                      }
+                      onCloseSearchPanel={() => {
+                        this._closeSearchPanel();
+                      }}
+                      onGoToNextSearchResult={() =>
+                        this._ensureUnfoldedAndScrollTo(
+                          this.state.searchHighlight
+                            ? this._goToNextFromGlobalSearch
+                            : goToNextSearchResult
+                        )
+                      }
+                      searchFocusOffset={
+                        this.state.searchHighlight
+                          ? this.state.searchHighlight.focusOffset
+                          : searchFocusOffset
+                      }
+                      initialSearchText={
+                        this.state.searchHighlight
+                          ? this.state.searchHighlight.text || undefined
+                          : undefined
+                      }
+                      initialMatchCase={
+                        this.state.searchHighlight
+                          ? this.state.searchHighlight.matchCase
+                          : undefined
+                      }
+                      initialTab={
+                        this.state.searchHighlight
+                          ? 'search-in-event-sentences'
+                          : undefined
+                      }
+                    />
+                  </ErrorBoundary>
+                )}
+                <InlineParameterEditor
+                  open={this.state.inlineEditing}
+                  anchorEl={this.state.inlineEditingAnchorEl}
+                  onRequestClose={() => {
+                    this.closeParameterEditor(
+                      /*shouldCancel=*/ preferences.values
+                        .eventsSheetCancelInlineParameter === 'cancel'
+                    );
+                  }}
+                  onApply={() => {
+                    this.closeParameterEditor(/*shouldCancel=*/ false);
+                  }}
                   project={project}
                   scope={scope}
                   globalObjectsContainer={globalObjectsContainer}
                   objectsContainer={objectsContainer}
                   projectScopedContainersAccessor={
-                    projectScopedContainersAccessor
+                    editedParameterProjectScopedContainersAccessor
                   }
-                  selection={this.state.selection}
-                  onInstructionClick={this.selectInstruction}
-                  onInstructionDoubleClick={this.openInstructionEditor}
-                  onInstructionContextMenu={this.openInstructionContextMenu}
-                  onAddInstructionContextMenu={
-                    this.openAddInstructionContextMenu
-                  }
-                  onAddNewInstruction={this.openInstructionEditor}
-                  onPasteInstructions={this.pasteInstructionsInInstructionsList}
-                  onMoveToInstruction={this.moveSelectionToInstruction}
-                  onMoveToInstructionsList={
-                    this.moveSelectionToInstructionsList
-                  }
-                  onParameterClick={this.openParameterEditor}
-                  onVariableDeclarationClick={() => {
-                    // Nothing to do.
+                  isCondition={this.state.editedParameter.isCondition}
+                  instruction={this.state.editedParameter.instruction}
+                  parameterIndex={this.state.editedParameter.parameterIndex}
+                  onChange={value => {
+                    const {
+                      instruction,
+                      parameterIndex,
+                    } = this.state.editedParameter;
+                    if (!instruction || !this.state.inlineEditing) {
+                      // Unlikely to ever happen, but maybe a component could
+                      // fire the "onChange" while the inline editor was just
+                      // dismissed.
+                      return;
+                    }
+                    instruction.setParameter(parameterIndex, value);
+
+                    gd.VariableInstructionSwitcher.switchBetweenUnifiedInstructionIfNeeded(
+                      project.getCurrentPlatform(),
+                      editedParameterProjectScopedContainersAccessor.get(),
+                      instruction
+                    );
+
+                    // Ask the component to re-render, so that the new parameter
+                    // set for the instruction in the state
+                    // is taken into account for the InlineParameterEditor.
+                    this.forceUpdate();
+                    if (this._searchPanel)
+                      this._searchPanel.markSearchResultsDirty();
                   }}
-                  onVariableDeclarationDoubleClick={this.openVariablesEditor}
-                  onEventClick={this.selectEvent}
-                  onEventContextMenu={this.openEventContextMenu}
-                  onAddNewEvent={(
-                    eventType: string,
-                    eventsList: gdEventsList
-                  ) => {
-                    this.addNewEvent(eventType, {
-                      eventsList,
-                      indexInList: eventsList.getEventsCount(),
-                    });
-                  }}
-                  onOpenExternalEvents={onOpenExternalEvents}
-                  onOpenLayout={onOpenLayout}
-                  searchResults={
-                    this.state.navigationHighlightEvent
-                      ? [this.state.navigationHighlightEvent]
-                      : eventsSearchResultEvents
-                  }
-                  searchFocusOffset={
-                    this.state.navigationHighlightEvent ? 0 : searchFocusOffset
-                  }
-                  onEventMoved={this._onEventMoved}
-                  onEndEditingEvent={this._onEndEditingStringEvent}
-                  showObjectThumbnails={
-                    preferences.values.eventsSheetShowObjectThumbnails
-                  }
-                  screenType={screenType}
-                  windowSize={windowSize}
-                  eventsSheetWidth={this._containerDivLastKnownSize.width}
-                  eventsSheetHeight={this._containerDivLastKnownSize.height}
-                  fontSize={preferences.values.eventsSheetZoomLevel}
-                  preferences={preferences}
-                  tutorials={tutorials}
-                  highlightedAiGeneratedEventIds={
-                    highlightedAiGeneratedEventIds
-                  }
+                  resourceManagementProps={resourceManagementProps}
                 />
-              )}
-              {this.state.showSearchPanel && (
-                <ErrorBoundary
-                  componentTitle={<Trans>Search panel</Trans>}
-                  scope="scene-events-search"
-                  onClose={() => this._closeSearchPanel()}
-                >
-                  <SearchPanel
-                    ref={searchPanel => (this._searchPanel = searchPanel)}
-                    onSearchInEvents={inputs =>
-                      this._searchInEvents(searchInEvents, inputs)
-                    }
-                    onReplaceInEvents={inputs => {
-                      this._replaceInEvents(replaceInEvents, inputs);
-                    }}
-                    resultsCount={
-                      eventsSearchResultEvents
-                        ? eventsSearchResultEvents.length
-                        : null
-                    }
-                    hasEventSelected={hasEventSelected(this.state.selection)}
-                    onGoToPreviousSearchResult={() =>
-                      this._ensureUnfoldedAndScrollTo(goToPreviousSearchResult)
-                    }
-                    onCloseSearchPanel={() => {
-                      this._closeSearchPanel();
-                    }}
-                    onGoToNextSearchResult={() =>
-                      this._ensureUnfoldedAndScrollTo(goToNextSearchResult)
-                    }
-                    searchFocusOffset={searchFocusOffset}
-                  />
-                </ErrorBoundary>
-              )}
-              <InlineParameterEditor
-                open={this.state.inlineEditing}
-                anchorEl={this.state.inlineEditingAnchorEl}
-                onRequestClose={() => {
-                  this.closeParameterEditor(
-                    /*shouldCancel=*/ preferences.values
-                      .eventsSheetCancelInlineParameter === 'cancel'
-                  );
-                }}
-                onApply={() => {
-                  this.closeParameterEditor(/*shouldCancel=*/ false);
-                }}
-                project={project}
-                scope={scope}
-                globalObjectsContainer={globalObjectsContainer}
-                objectsContainer={objectsContainer}
-                projectScopedContainersAccessor={
-                  editedParameterProjectScopedContainersAccessor
-                }
-                isCondition={this.state.editedParameter.isCondition}
-                instruction={this.state.editedParameter.instruction}
-                parameterIndex={this.state.editedParameter.parameterIndex}
-                onChange={value => {
-                  const {
-                    instruction,
-                    parameterIndex,
-                  } = this.state.editedParameter;
-                  if (!instruction || !this.state.inlineEditing) {
-                    // Unlikely to ever happen, but maybe a component could
-                    // fire the "onChange" while the inline editor was just
-                    // dismissed.
-                    return;
+                <ContextMenu
+                  ref={eventContextMenu =>
+                    (this.eventContextMenu = eventContextMenu)
                   }
-                  instruction.setParameter(parameterIndex, value);
-
-                  gd.VariableInstructionSwitcher.switchBetweenUnifiedInstructionIfNeeded(
-                    project.getCurrentPlatform(),
-                    editedParameterProjectScopedContainersAccessor.get(),
-                    instruction
-                  );
-
-                  // Ask the component to re-render, so that the new parameter
-                  // set for the instruction in the state
-                  // is taken into account for the InlineParameterEditor.
-                  this.forceUpdate();
-                  if (this._searchPanel)
-                    this._searchPanel.markSearchResultsDirty();
-                }}
-                resourceManagementProps={resourceManagementProps}
-              />
-              <ContextMenu
-                ref={eventContextMenu =>
-                  (this.eventContextMenu = eventContextMenu)
-                }
-                buildMenuTemplate={this._buildEventContextMenu}
-              />
-              <ContextMenu
-                ref={instructionContextMenu =>
-                  (this.instructionContextMenu = instructionContextMenu)
-                }
-                buildMenuTemplate={this._buildInstructionContextMenu}
-              />
-            </div>
-          )}
+                  buildMenuTemplate={this._buildEventContextMenu}
+                />
+                <ContextMenu
+                  ref={instructionContextMenu =>
+                    (this.instructionContextMenu = instructionContextMenu)
+                  }
+                  buildMenuTemplate={this._buildInstructionContextMenu}
+                />
+              </div>
+            );
+          }}
         </EventsSearcher>
         {this._renderInstructionEditorDialog()}
         {this.state.analyzedEventsContextResult && (
@@ -2598,7 +2775,14 @@ export type EventsSheetInterface = {|
   updateToolbar: () => void,
   onResourceExternallyChanged: ({| identifier: string |}) => void,
   onEventsModifiedOutsideEditor: (changes: OutOfEditorChanges) => void,
-  scrollToEventPath: (eventPath: Array<number>) => void,
+  scrollToEventPath: (eventPath: EventPath) => void,
+  setGlobalSearchResults: (
+    eventPaths: Array<EventPath>,
+    focusedEventPath: EventPath,
+    searchText: string,
+    matchCase: boolean
+  ) => void,
+  clearGlobalSearchResults: () => void,
 |};
 
 // EventsSheet is a wrapper so that the component can use multiple
@@ -2610,6 +2794,8 @@ const EventsSheet = (props, ref) => {
     onResourceExternallyChanged,
     onEventsModifiedOutsideEditor,
     scrollToEventPath,
+    setGlobalSearchResults,
+    clearGlobalSearchResults,
   }));
 
   const {
@@ -2629,8 +2815,25 @@ const EventsSheet = (props, ref) => {
     addNewAiGeneratedEventIds(changes.newOrChangedAiGeneratedEventIds);
     if (component.current) component.current.onEventsModifiedOutsideEditor();
   };
-  const scrollToEventPath = (eventPath: Array<number>) => {
+  const scrollToEventPath = (eventPath: EventPath) => {
     if (component.current) component.current.scrollToEventPath(eventPath);
+  };
+  const setGlobalSearchResults = (
+    eventPaths: Array<EventPath>,
+    focusedEventPath: EventPath,
+    searchText: string,
+    matchCase: boolean
+  ) => {
+    if (component.current)
+      component.current.setGlobalSearchResults(
+        eventPaths,
+        focusedEventPath,
+        searchText,
+        matchCase
+      );
+  };
+  const clearGlobalSearchResults = () => {
+    if (component.current) component.current.clearGlobalSearchResults();
   };
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);

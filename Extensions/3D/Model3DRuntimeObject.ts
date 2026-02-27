@@ -3,8 +3,8 @@ namespace gdjs {
 
   type Model3DObjectNetworkSyncDataType = {
     mt: number;
-    op: FloatPoint3D | null;
-    cp: FloatPoint3D | null;
+    op: LocationPoint | null;
+    cp: LocationPoint | null;
     anis: Model3DAnimation[];
     ai: integer;
     ass: float;
@@ -38,6 +38,7 @@ namespace gdjs {
       centerLocation:
         | 'ModelOrigin'
         | 'ObjectCenter'
+        | 'CenteredOnZ'
         | 'BottomCenterZ'
         | 'BottomCenterY';
       animations: Model3DAnimation[];
@@ -47,12 +48,14 @@ namespace gdjs {
     };
   }
 
-  type FloatPoint3D = [float, float, float];
+  type LocationPoint = [float | null, float | null, float | null];
 
-  const getPointForLocation = (location: string): FloatPoint3D | null => {
+  const getPointForLocation = (location: string): LocationPoint => {
     switch (location) {
       case 'ModelOrigin':
-        return null;
+        return [null, null, null];
+      case 'CenteredOnZ':
+        return [null, null, 0.5];
       case 'ObjectCenter':
         return [0.5, 0.5, 0.5];
       case 'BottomCenterZ':
@@ -62,7 +65,7 @@ namespace gdjs {
       case 'TopLeft':
         return [0, 0, 0];
       default:
-        return null;
+        return [null, null, null];
     }
   };
 
@@ -90,7 +93,7 @@ namespace gdjs {
      * configuration.
      * @see gdjs.Model3DRuntimeObject3DRenderer.getOriginPoint
      */
-    _originPoint: FloatPoint3D | null;
+    _originPoint: LocationPoint;
     /**
      * The local point of the model that is used as rotation center.
      *
@@ -101,7 +104,7 @@ namespace gdjs {
      * configuration.
      * @see gdjs.Model3DRuntimeObject3DRenderer.getCenterPoint
      */
-    _centerPoint: FloatPoint3D | null;
+    _centerPoint: LocationPoint;
 
     _animations: Model3DAnimation[];
     _currentAnimationIndex: integer = 0;
@@ -275,10 +278,10 @@ namespace gdjs {
         this._materialType = networkSyncData.mt;
       }
       if (networkSyncData.op !== undefined) {
-        this._originPoint = networkSyncData.op;
+        this._originPoint = networkSyncData.op || [null, null, null];
       }
       if (networkSyncData.cp !== undefined) {
-        this._centerPoint = networkSyncData.cp;
+        this._centerPoint = networkSyncData.cp || [null, null, null];
       }
       if (networkSyncData.anis !== undefined) {
         this._animations = networkSyncData.anis;

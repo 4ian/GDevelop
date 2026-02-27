@@ -143,8 +143,8 @@ export const getHighlightedCells = (rect: GridRect | null): Set<string> => {
   const cells = new Set<string>();
   if (!rect) return cells;
 
-  for (let col = rect.minCol; col <= rect.maxCol; col++) {
-    for (let row = rect.minRow; row <= rect.maxRow; row++) {
+  for (let col: number = rect.minCol; col <= rect.maxCol; col++) {
+    for (let row: number = rect.minRow; row <= rect.maxRow; row++) {
       cells.add(`${col},${row}`);
     }
   }

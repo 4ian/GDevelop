@@ -175,6 +175,14 @@ export const allAlertMessages: Array<{
  * type and add a setter into `Preferences` type. Then, update the
  * preference dialog.
  */
+export type EditorStateForProject = {|
+  editorTabs: EditorTabsPersistedState | null,
+  propertiesPanelScroll: { [string]: number },
+|};
+
+// $FlowFixMe[deprecated-utility]
+export type EditorStateForProjectUpdate = $Shape<EditorStateForProject>;
+
 export type PreferencesValues = {|
   language: string,
   autoDownloadUpdates: boolean,
@@ -226,7 +234,7 @@ export type PreferencesValues = {|
     [featureId: string]: {| dates: [number] |},
   },
   displaySaveReminder: {| activated: boolean |}, // Store as object in case we need to add options.
-  editorStateByProject: { [string]: { editorTabs: EditorTabsPersistedState } },
+  editorStateByProject: { [string]: EditorStateForProject },
   fetchPlayerTokenForPreviewAutomatically: boolean,
   previewCrashReportUploadLevel: string,
   gamesDashboardOrderBy: GamesDashboardOrderBy,
@@ -346,10 +354,10 @@ export type Preferences = {|
   setDisplaySaveReminder: ({| activated: boolean |}) => void,
   getEditorStateForProject: (
     projectId: string
-  ) => ?{| editorTabs: EditorTabsPersistedState |},
+  ) => ?EditorStateForProject,
   setEditorStateForProject: (
     projectId: string,
-    editorState?: {| editorTabs: EditorTabsPersistedState |}
+    editorState: EditorStateForProjectUpdate | null
   ) => void,
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => void,
   setPreviewCrashReportUploadLevel: (level: string) => void,

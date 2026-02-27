@@ -115,6 +115,7 @@ export const extractAsCustomObject = ({
           'unserializeFrom',
           project
         );
+        childObject.resetPersistentUuid();
       }
     }
     newEventsBasedObject.markAsRenderedIn3D(!!isRenderedIn3D);

@@ -147,6 +147,13 @@ Object& Object::ResetPersistentUuid() {
   return *this;
 }
 
+const gd::String& Object::GetPersistentUuid() const {
+  if (persistentUuid.empty()) {
+    persistentUuid = UUID::MakeUuid4();
+  }
+  return persistentUuid;
+}
+
 Object& Object::ClearPersistentUuid() {
   persistentUuid = "";
   objectVariables.ClearPersistentUuid();

@@ -789,6 +789,7 @@ export class gdObject extends EmscriptenObject {
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
   resetPersistentUuid(): gdObject;
+  getPersistentUuid(): string;
   clearPersistentUuid(): gdObject;
 }
 

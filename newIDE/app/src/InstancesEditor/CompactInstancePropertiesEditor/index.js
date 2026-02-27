@@ -40,6 +40,7 @@ import { IconContainer } from '../../UI/IconContainer';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
+import { usePersistedScrollPosition } from '../../Utils/UsePersistedScrollPosition';
 import EmptyMessage from '../../UI/EmptyMessage';
 import CompactBehaviorsEditorService from '../../ObjectEditor/CompactObjectPropertiesEditor/CompactBehaviorsEditorService';
 
@@ -164,6 +165,31 @@ export const CompactInstancePropertiesEditor = ({
       scrollViewRef.current.scrollBy(deltaY);
     }
   }, []);
+
+  const scrollKey = instances
+    .map((instance: gdInitialInstance) => '' + instance.ptr)
+    .join(';');
+
+  const selectedObjectForScroll = React.useMemo(() => {
+    if (!instances.length) return null;
+
+    return getObjectByName(
+      globalObjectsContainer,
+      objectsContainer,
+      instances[0].getObjectName()
+    );
+  }, [globalObjectsContainer, instances, objectsContainer]);
+
+  const persistedScrollId = selectedObjectForScroll
+    ? selectedObjectForScroll.getPersistentUuid()
+    : null;
+
+  const onScroll = usePersistedScrollPosition({
+    project,
+    scrollViewRef,
+    scrollKey,
+    persistedScrollId,
+  });
 
   const { object, instanceSchema, allVisibleBehaviors } = React.useMemo<{|
     object?: gdObject,
@@ -313,9 +339,8 @@ export const CompactInstancePropertiesEditor = ({
         ref={scrollViewRef}
         autoHideScrollbar
         style={styles.scrollView}
-        key={instances
-          .map((instance: gdInitialInstance) => '' + instance.ptr)
-          .join(';')}
+        key={scrollKey}
+        onScroll={onScroll}
       >
         <Column expand noMargin id="instance-properties-editor">
           <Column>

@@ -202,6 +202,12 @@
     opacity: 0.6;
 }
 
+.gd-events-sheet .global-search-text-match {
+    background-color: rgba(252, 100, 33, 0.25);
+    border-radius: 2px;
+    padding: 0 1px;
+}
+
 /**
  * Icon (variable, object icon...)
  */

@@ -7,6 +7,7 @@ import {
 } from '../Utils/GDevelopServices/Generation';
 import { mapFor } from '../Utils/MapFor';
 import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
+import type { EventPath } from '../Types/EventPath';
 
 const gd: libGDevelop = global.gd;
 
@@ -17,8 +18,8 @@ const gd: libGDevelop = global.gd;
 const findEventPathByAiGeneratedEventId = (
   eventsList: gdEventsList,
   targetId: string,
-  currentPath: Array<number> = []
-): Array<number> | null => {
+  currentPath: EventPath = []
+): EventPath | null => {
   for (let i = 0; i < eventsList.getEventsCount(); i++) {
     const event = eventsList.getEventAt(i);
     const eventPath = [...currentPath, i];
@@ -46,7 +47,7 @@ const findEventPathByAiGeneratedEventId = (
  * Parses an event path string (e.g., "event-0.1.2") into an array of 0-based indices (e.g., [0, 1, 2]).
  * Throws an error for invalid formats or non-positive indices.
  */
-const parseEventPath = (pathString: string): Array<number> => {
+const parseEventPath = (pathString: string): EventPath => {
   const originalPathString = pathString;
   if (!pathString.startsWith('event-')) {
     // Fallback for paths that might not have the "event-" prefix, like "1.2.3"
@@ -94,7 +95,7 @@ const parseEventPath = (pathString: string): Array<number> => {
  */
 const getParentListAndIndex = (
   rootEventsList: gdEventsList,
-  path: Array<number>,
+  path: EventPath,
   operationTypeForErrorMessage: 'access' | 'insertion'
 ): { parentList: gdEventsList, eventIndexInParentList: number } => {
   if (path.length === 0) {
@@ -156,7 +157,7 @@ const getParentListAndIndex = (
  */
 const getEventByPath = (
   rootEventsList: gdEventsList,
-  path: Array<number>
+  path: EventPath
 ): gdBaseEvent => {
   const { parentList, eventIndexInParentList } = getParentListAndIndex(
     rootEventsList,
@@ -178,7 +179,7 @@ type EventOperationType =
   | 'replaceAllConditions';
 type EventOperation = {|
   type: EventOperationType,
-  path: Array<number>,
+  path: EventPath,
   eventsToInsert?: gdEventsList,
 |};
 
@@ -244,8 +245,8 @@ const getEventWhileConditions = (
 };
 
 const comparePathsReverseLexicographically = (
-  p1: Array<number>,
-  p2: Array<number>
+  p1: EventPath,
+  p2: EventPath
 ): number => {
   const maxLength = Math.max(p1.length, p2.length);
   for (let i = 0; i < maxLength; i++) {
@@ -267,7 +268,7 @@ export const applyEventsChanges = (
 
   eventOperationsInput.forEach(change => {
     const { operationName, operationTargetEvent, generatedEvents } = change;
-    let parsedPath: Array<number> | null = null;
+    let parsedPath: EventPath | null = null;
     let localEventsToInsert: gdEventsList | null = null;
 
     try {

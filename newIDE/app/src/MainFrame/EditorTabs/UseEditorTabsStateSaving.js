@@ -36,7 +36,8 @@ const projectHasItem = ({
   kind: EditorKind,
   name: string,
 |}) => {
-  if (['debugger', 'start page', 'resources'].includes(kind)) return true;
+  if (['debugger', 'start page', 'resources', 'global-search'].includes(kind))
+    return true;
   switch (kind) {
     case 'events functions extension':
       return project.hasEventsFunctionsExtensionNamed(name);

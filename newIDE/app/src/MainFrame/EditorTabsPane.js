@@ -29,6 +29,7 @@ import {
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
+  type NavigateToEventFromGlobalSearchParams,
 } from './EditorContainers/BaseEditor';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
@@ -184,6 +185,12 @@ export type EditorTabsPaneCommonProps = {|
     eventsBasedObject: gdEventsBasedObject,
     variantName: string
   ) => void,
+  onOpenEventsFunctionsExtension: (
+    extensionName: string,
+    initiallyFocusedFunctionName?: ?string,
+    initiallyFocusedBehaviorName?: ?string,
+    initiallyFocusedObjectName?: ?string
+  ) => void,
   onRenamedEventsBasedObject: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     oldName: string,
@@ -194,6 +201,10 @@ export type EditorTabsPaneCommonProps = {|
     name: string
   ) => void,
   openObjectEvents: (extensionName: string, objectName: string) => void,
+  onNavigateToEventFromGlobalSearch: (
+    params: NavigateToEventFromGlobalSearchParams
+  ) => void,
+  onEditorTabClosing: (editorTab: EditorTab) => void,
   canOpen: boolean,
   openOpenFromStorageProviderDialog: () => void,
   openFromFileMetadataWithStorageProvider: (
@@ -341,9 +352,12 @@ const EditorTabsPane: React.ComponentType<{
     onCreateEventsFunction,
     openInstructionOrExpression,
     onOpenCustomObjectEditor,
+    onOpenEventsFunctionsExtension,
     onRenamedEventsBasedObject,
     onDeletedEventsBasedObject,
     openObjectEvents,
+    onNavigateToEventFromGlobalSearch,
+    onEditorTabClosing,
     canOpen,
     openOpenFromStorageProviderDialog,
     openFromFileMetadataWithStorageProvider,
@@ -569,25 +583,33 @@ const EditorTabsPane: React.ComponentType<{
           displayMenuIcon={paneIdentifier === 'center'}
           hidden={tabsTitleBarAndEditorToolbarHidden}
           toggleProjectManager={toggleProjectManager}
-          renderTabs={(onEditorTabHovered, onEditorTabClosing) => (
+          renderTabs={(onEditorTabHovered, clearTooltipOnTabClose) => (
             <DraggableEditorTabs
               hideLabels={false}
               editors={paneEditorTabs}
               currentTab={currentTab}
               onClickTab={onChangeEditorTab}
               onCloseTab={(editorTab: EditorTab) => {
-                // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
-                onEditorTabClosing();
+                clearTooltipOnTabClose();
+                onEditorTabClosing(editorTab);
                 onCloseEditorTab(editorTab);
               }}
               onCloseOtherTabs={(editorTab: EditorTab) => {
-                // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
-                onEditorTabClosing();
+                clearTooltipOnTabClose();
+                paneEditorTabs.forEach(paneEditorTab => {
+                  if (paneEditorTab !== editorTab && paneEditorTab.closable) {
+                    onEditorTabClosing(paneEditorTab);
+                  }
+                });
                 onCloseOtherEditorTabs(editorTab);
               }}
               onCloseAll={() => {
-                // Call onEditorTabClosing before to ensure any tooltip is removed before the tab is closed.
-                onEditorTabClosing();
+                clearTooltipOnTabClose();
+                paneEditorTabs.forEach(paneEditorTab => {
+                  if (paneEditorTab.closable) {
+                    onEditorTabClosing(paneEditorTab);
+                  }
+                });
                 onCloseAllEditorTabs();
               }}
               onTabActivated={onEditorTabActivated}
@@ -610,7 +632,7 @@ const EditorTabsPane: React.ComponentType<{
         ref={toolbarRef}
         hidden={tabsTitleBarAndEditorToolbarHidden}
         showProjectButtons={
-          !['start page', 'debugger', 'ask-ai', null].includes(
+          !['start page', 'debugger', 'ask-ai', 'global-search', null].includes(
             currentTab ? currentTab.key : null
           )
         }
@@ -708,9 +730,11 @@ const EditorTabsPane: React.ComponentType<{
                       onCreateEventsFunction,
                       openInstructionOrExpression,
                       onOpenCustomObjectEditor: onOpenCustomObjectEditor,
+                      onOpenEventsFunctionsExtension,
                       onRenamedEventsBasedObject: onRenamedEventsBasedObject,
                       onDeletedEventsBasedObject: onDeletedEventsBasedObject,
                       openObjectEvents,
+                      onNavigateToEventFromGlobalSearch,
                       unsavedChanges: unsavedChanges,
                       canOpen,
                       onChooseProject: () =>

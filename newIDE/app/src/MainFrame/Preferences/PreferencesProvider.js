@@ -12,6 +12,7 @@ import {
   type PreferencesValues,
   type EditorMosaicName,
   type ProjectSpecificPreferencesValues,
+  type PersistedEditorState,
 } from './PreferencesContext';
 import type {
   ResourceKind,
@@ -21,7 +22,6 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
-import { type EditorTabsPersistedState } from '../EditorTabs/EditorTabsHandler';
 import {
   getBrowserLanguageOrLocale,
   setLanguageInDOM,
@@ -1254,7 +1254,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setEditorStateForProject(
     projectId: string,
-    editorState?: {| editorTabs: EditorTabsPersistedState |}
+    // $FlowFixMe[deprecated-utility]
+    editorStateUpdate: $Shape<PersistedEditorState>
   ) {
     this.setState(
       state => ({
@@ -1262,8 +1263,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
           ...state.values,
           editorStateByProject: {
             ...state.values.editorStateByProject,
-            // $FlowFixMe[incompatible-type]
-            [projectId]: editorState,
+            [projectId]: {
+              ...state.values.editorStateByProject[projectId],
+              ...editorStateUpdate,
+            },
           },
         },
       }),

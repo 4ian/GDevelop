@@ -16,6 +16,9 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { CompactLayerPropertiesEditor } from '../LayersList/CompactLayerPropertiesEditor';
 import { CompactEventsBasedObjectVariantPropertiesEditor } from '../SceneEditor/CompactEventsBasedObjectVariantPropertiesEditor';
 import Rectangle from '../Utils/Rectangle';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+
+const SCROLL_SAVE_DELAY = 500;
 
 export const styles = {
   paper: {
@@ -96,16 +99,10 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
 }> = React.forwardRef<Props, InstanceOrObjectPropertiesEditorInterface>(
   (props, ref) => {
     const forceUpdate = useForceUpdate();
-    // $FlowFixMe[incompatible-type]
-    React.useImperativeHandle(ref, () => ({
-      forceUpdate,
-      getEditorTitle: () =>
-        lastSelectionType === 'instance' ? (
-          <Trans>Instance properties</Trans>
-        ) : (
-          <Trans>Object properties</Trans>
-        ),
-    }));
+    const {
+      setEditorStateForProject,
+      getEditorStateForProject,
+    } = React.useContext(PreferencesContext);
 
     const {
       project,
@@ -158,8 +155,105 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
       globalObjectsContainer,
     } = props;
 
+    // $FlowFixMe[incompatible-type]
+    React.useImperativeHandle(ref, () => ({
+      forceUpdate,
+      getEditorTitle: () =>
+        lastSelectionType === 'instance' ? (
+          <Trans>Instance properties</Trans>
+        ) : (
+          <Trans>Object properties</Trans>
+        ),
+    }));
+
+    // Scroll position save/restore for properties panel.
+    const scrollContainerRef = React.useRef<?HTMLDivElement>(null);
+    const saveTimeoutRef = React.useRef<?TimeoutID>(null);
+
+    const uniqueId =
+      instances.length > 0 && lastSelectionType === 'instance'
+        ? instances[0].getPersistentUuid()
+        : objects.length > 0 && lastSelectionType === 'object'
+        ? objects[0].getPersistentUuid()
+        : null;
+    const projectId = project.getProjectUuid();
+
+    // Find the first scrollable child element (the ScrollView div).
+    const findScrollableChild = React.useCallback(
+      (container: ?HTMLDivElement): ?HTMLElement => {
+        if (!container) return null;
+        const children = container.getElementsByTagName('*');
+        for (let i = 0; i < children.length; i++) {
+          const el = children[i];
+          if (
+            el instanceof HTMLElement &&
+            (el.style.overflowY === 'auto' || el.style.overflowY === 'scroll')
+          ) {
+            return el;
+          }
+        }
+        return null;
+      },
+      []
+    );
+
+    // Set up scroll listener and restore scroll position when entity changes.
+    React.useLayoutEffect(
+      () => {
+        if (!uniqueId) return;
+
+        const scrollable = findScrollableChild(scrollContainerRef.current);
+        if (!scrollable) return;
+
+        // Restore saved scroll position.
+        const editorState = getEditorStateForProject(projectId);
+        const savedScroll =
+          editorState &&
+          editorState.propertiesPanelScroll &&
+          editorState.propertiesPanelScroll[uniqueId];
+        if (savedScroll != null) {
+          scrollable.scrollTop = savedScroll;
+        }
+
+        // Save scroll position on scroll events.
+        const handleScroll = () => {
+          if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+          saveTimeoutRef.current = setTimeout(() => {
+            const currentEditorState = getEditorStateForProject(projectId);
+            const currentScrolls =
+              (currentEditorState &&
+                currentEditorState.propertiesPanelScroll) ||
+              {};
+            setEditorStateForProject(projectId, {
+              propertiesPanelScroll: {
+                ...currentScrolls,
+                [uniqueId]: scrollable.scrollTop,
+              },
+            });
+          }, SCROLL_SAVE_DELAY);
+        };
+
+        scrollable.addEventListener('scroll', handleScroll);
+        return () => {
+          scrollable.removeEventListener('scroll', handleScroll);
+          if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+        };
+      },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [uniqueId]
+    );
+
     return (
       <Paper background="dark" square style={styles.paper}>
+        <div
+          ref={scrollContainerRef}
+          style={{
+            display: 'flex',
+            flex: 1,
+            minWidth: 0,
+            flexDirection: 'column',
+          }}
+        >
         {!!instances.length && lastSelectionType === 'instance' ? (
           <CompactInstancePropertiesEditor
             instances={instances}
@@ -241,6 +335,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             </Trans>
           </EmptyMessage>
         )}
+        </div>
       </Paper>
     );
   }

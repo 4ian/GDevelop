@@ -20,6 +20,7 @@ declare class gdObject {
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   resetPersistentUuid(): gdObject;
+  getPersistentUuid(): string;
   clearPersistentUuid(): gdObject;
   delete(): void;
   ptr: number;

@@ -1084,6 +1084,7 @@ const createOrReplaceObject: EditorFunction = {
         project
       );
       newObject.setName(targetObjectName); // Unserialization has overwritten the name.
+      newObject.resetPersistentUuid();
 
       // Update behaviors shared data for the scene where the object was duplicated.
       if (target_object_scope === 'global') {

@@ -912,6 +912,7 @@ interface gdObject {
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
     [Ref] gdObject ResetPersistentUuid();
+    [Const, Ref] DOMString GetPersistentUuid();
     [Ref] gdObject ClearPersistentUuid();
 };
 

@@ -170,6 +170,11 @@ export const allAlertMessages: Array<{
   },
 ];
 
+export type PersistedEditorState = {
+  editorTabs?: EditorTabsPersistedState,
+  propertiesPanelScroll?: { [string]: number },
+};
+
 /**
  * All the preferences of GDevelop. To add a new preference, add it into this
  * type and add a setter into `Preferences` type. Then, update the
@@ -226,7 +231,7 @@ export type PreferencesValues = {|
     [featureId: string]: {| dates: [number] |},
   },
   displaySaveReminder: {| activated: boolean |}, // Store as object in case we need to add options.
-  editorStateByProject: { [string]: { editorTabs: EditorTabsPersistedState } },
+  editorStateByProject: { [string]: PersistedEditorState },
   fetchPlayerTokenForPreviewAutomatically: boolean,
   previewCrashReportUploadLevel: string,
   gamesDashboardOrderBy: GamesDashboardOrderBy,
@@ -344,12 +349,11 @@ export type Preferences = {|
     [featureId: string]: {| dates: [number] |},
   }) => void,
   setDisplaySaveReminder: ({| activated: boolean |}) => void,
-  getEditorStateForProject: (
-    projectId: string
-  ) => ?{| editorTabs: EditorTabsPersistedState |},
+  getEditorStateForProject: (projectId: string) => ?PersistedEditorState,
   setEditorStateForProject: (
     projectId: string,
-    editorState?: {| editorTabs: EditorTabsPersistedState |}
+    // $FlowFixMe[deprecated-utility]
+    editorStateUpdate: $Shape<PersistedEditorState>
   ) => void,
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => void,
   setPreviewCrashReportUploadLevel: (level: string) => void,

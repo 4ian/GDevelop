@@ -1281,14 +1281,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
             ...editorState,
           };
 
-          if (
-            mergedEditorState.editorTabs === null &&
-            Object.keys(mergedEditorState.propertiesPanelScroll).length === 0
-          ) {
-            delete nextEditorStateByProject[projectId];
-          } else {
-            nextEditorStateByProject[projectId] = mergedEditorState;
-          }
+          nextEditorStateByProject[projectId] = mergedEditorState;
         }
 
         return {

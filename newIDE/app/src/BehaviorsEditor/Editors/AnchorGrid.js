@@ -5,6 +5,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import LinkIcon from '../../UI/CustomSvgIcons/Link';
 import UnlinkIcon from '../../UI/CustomSvgIcons/Unlink';
 import {
+  type GridRect,
   propertiesToGridSelection,
   getEndpointCells,
   handleCellClick,
@@ -56,7 +57,7 @@ const AnchorGrid = ({
   }
 
   const applyGridRect = React.useCallback(
-    (rect, proportional) => {
+    (rect: GridRect | null, proportional: boolean) => {
       const properties = gridSelectionToProperties(rect, proportional);
       onUpdateProperty('leftEdgeAnchor', properties.leftEdgeAnchor);
       onUpdateProperty('rightEdgeAnchor', properties.rightEdgeAnchor);

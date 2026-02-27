@@ -8,12 +8,8 @@ import {
 } from './CompactBehaviorPropertiesEditor';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { ColumnStackLayout } from '../../UI/Layout';
-import {
-  HorizontalAnchorButtonGroup,
-  VerticalAnchorButtonGroup,
-  getBasicHorizontalAnchor,
-  getBasicVerticalAnchor,
-} from '../../BehaviorsEditor/Editors/AnchorBehaviorEditor';
+import AnchorGrid from '../../BehaviorsEditor/Editors/AnchorGrid';
+import { propertiesToGridSelection } from '../../BehaviorsEditor/Editors/AnchorGridMapping';
 
 const CompactAnchorBehaviorEditor = ({
   project,
@@ -42,19 +38,17 @@ const CompactAnchorBehaviorEditor = ({
     [forceUpdate, onBehaviorUpdated]
   );
 
-  const horizontalBasicAnchor = getBasicHorizontalAnchor(_getPropertyValue);
-  const verticalBasicAnchor = getBasicVerticalAnchor(_getPropertyValue);
+  const gridSelection = propertiesToGridSelection(
+    _getPropertyValue('leftEdgeAnchor'),
+    _getPropertyValue('rightEdgeAnchor'),
+    _getPropertyValue('topEdgeAnchor'),
+    _getPropertyValue('bottomEdgeAnchor')
+  );
 
   return (
     <ColumnStackLayout expand>
-      <HorizontalAnchorButtonGroup
-        basicAnchor={horizontalBasicAnchor}
-        expand
-        onUpdateProperty={_updateProperty}
-      />
-      <VerticalAnchorButtonGroup
-        basicAnchor={verticalBasicAnchor}
-        expand
+      <AnchorGrid
+        getPropertyValue={_getPropertyValue}
         onUpdateProperty={_updateProperty}
       />
       <CompactBehaviorPropertiesEditor
@@ -68,8 +62,7 @@ const CompactAnchorBehaviorEditor = ({
         onBehaviorUpdated={_onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
         isAdvancedSectionInitiallyUncollapsed={
-          horizontalBasicAnchor === 'Advanced' ||
-          verticalBasicAnchor === 'Advanced' ||
+          gridSelection.isAdvanced ||
           _getPropertyValue('relativeToOriginalWindowSize') === 'false'
         }
       />

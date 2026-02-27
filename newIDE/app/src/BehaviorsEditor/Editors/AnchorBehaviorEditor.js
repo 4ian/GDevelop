@@ -17,7 +17,6 @@ import VerticalFillIcon from '../../UI/CustomSvgIcons/VerticalSize';
 import VerticalProportionalFillIcon from '../../UI/CustomSvgIcons/VerticalSizePercent';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { ColumnStackLayout } from '../../UI/Layout';
-import { Line } from '../../UI/Grid';
 import Text from '../../UI/Text';
 import {
   getPropertyValue,
@@ -26,6 +25,8 @@ import {
 import CompactToggleButtons, {
   type CompactToggleButton,
 } from '../../UI/CompactToggleButtons';
+import AnchorGrid from './AnchorGrid';
+import { propertiesToGridSelection } from './AnchorGridMapping';
 
 type BasicAnchor =
   | 'None'
@@ -324,29 +325,22 @@ const AnchorBehaviorEditor = ({
     [forceUpdate, onBehaviorUpdated]
   );
 
-  const horizontalBasicAnchor = getBasicHorizontalAnchor(_getPropertyValue);
-  const verticalBasicAnchor = getBasicVerticalAnchor(_getPropertyValue);
+  const gridSelection = propertiesToGridSelection(
+    _getPropertyValue('leftEdgeAnchor'),
+    _getPropertyValue('rightEdgeAnchor'),
+    _getPropertyValue('topEdgeAnchor'),
+    _getPropertyValue('bottomEdgeAnchor')
+  );
 
   return (
     <ColumnStackLayout expand>
       <Text size="sub-title">
-        <Trans>Horizontal anchor</Trans>
+        <Trans>Alignment</Trans>
       </Text>
-      <Line noMargin>
-        <HorizontalAnchorButtonGroup
-          basicAnchor={horizontalBasicAnchor}
-          onUpdateProperty={_updateProperty}
-        />
-      </Line>
-      <Text size="sub-title">
-        <Trans>Vertical anchor</Trans>
-      </Text>
-      <Line noMargin>
-        <VerticalAnchorButtonGroup
-          basicAnchor={verticalBasicAnchor}
-          onUpdateProperty={_updateProperty}
-        />
-      </Line>
+      <AnchorGrid
+        getPropertyValue={_getPropertyValue}
+        onUpdateProperty={_updateProperty}
+      />
       <BehaviorPropertiesEditor
         project={project}
         object={object}
@@ -355,8 +349,7 @@ const AnchorBehaviorEditor = ({
         resourceManagementProps={resourceManagementProps}
         projectScopedContainersAccessor={projectScopedContainersAccessor}
         isAdvancedSectionInitiallyUncollapsed={
-          horizontalBasicAnchor === 'Advanced' ||
-          verticalBasicAnchor === 'Advanced' ||
+          gridSelection.isAdvanced ||
           _getPropertyValue('relativeToOriginalWindowSize') === 'false'
         }
       />

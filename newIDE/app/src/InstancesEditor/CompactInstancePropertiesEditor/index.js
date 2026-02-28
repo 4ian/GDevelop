@@ -170,25 +170,29 @@ export const CompactInstancePropertiesEditor = ({
     .map((instance: gdInitialInstance) => '' + instance.ptr)
     .join(';');
 
-  const persistedScrollId = React.useMemo(() => {
-    if (!instances.length) return null;
+  const persistedScrollId = React.useMemo(
+    () => {
+      if (!instances.length || !scrollKey) return null;
 
-    const selectedObjectForScroll = getObjectByName(
-      globalObjectsContainer,
-      objectsContainer,
-      instances[0].getObjectName()
-    );
+      const selectedObjectForScroll = getObjectByName(
+        globalObjectsContainer,
+        objectsContainer,
+        instances[0].getObjectName()
+      );
 
-    return selectedObjectForScroll
-      ? selectedObjectForScroll.getPersistentUuid()
-      : null;
-  }, [globalObjectsContainer, instances, objectsContainer]);
+      return selectedObjectForScroll
+        ? selectedObjectForScroll.getPersistentUuid()
+        : null;
+    },
+    [globalObjectsContainer, instances, scrollKey, objectsContainer]
+  );
 
   const onScroll = usePersistedScrollPosition({
     project,
     scrollViewRef,
     scrollKey,
     persistedScrollId,
+    persistedScrollType: 'instances-of-object',
   });
 
   const { object, instanceSchema, allVisibleBehaviors } = React.useMemo<{|

@@ -790,7 +790,6 @@ export class gdObject extends EmscriptenObject {
   unserializeFrom(project: Project, element: SerializerElement): void;
   resetPersistentUuid(): gdObject;
   getPersistentUuid(): string;
-  clearPersistentUuid(): gdObject;
 }
 
 export class UniquePtrObject extends EmscriptenObject {

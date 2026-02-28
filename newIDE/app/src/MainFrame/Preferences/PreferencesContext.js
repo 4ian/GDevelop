@@ -177,7 +177,7 @@ export const allAlertMessages: Array<{
  */
 export type EditorStateForProject = {|
   editorTabs: EditorTabsPersistedState | null,
-  propertiesPanelScroll: { [string]: number },
+  propertiesPanelScroll: { [string]: { [string]: number } },
 |};
 
 // $FlowFixMe[deprecated-utility]
@@ -352,9 +352,7 @@ export type Preferences = {|
     [featureId: string]: {| dates: [number] |},
   }) => void,
   setDisplaySaveReminder: ({| activated: boolean |}) => void,
-  getEditorStateForProject: (
-    projectId: string
-  ) => ?EditorStateForProject,
+  getEditorStateForProject: (projectId: string) => ?EditorStateForProject,
   setEditorStateForProject: (
     projectId: string,
     editorState: EditorStateForProjectUpdate | null

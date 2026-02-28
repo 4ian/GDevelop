@@ -21,7 +21,6 @@ declare class gdObject {
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   resetPersistentUuid(): gdObject;
   getPersistentUuid(): string;
-  clearPersistentUuid(): gdObject;
   delete(): void;
   ptr: number;
 };

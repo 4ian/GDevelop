@@ -184,7 +184,7 @@ const useEditorTabsStateSaving = ({
       newEditorTabs = changeCurrentTab(
         newEditorTabs,
         'center',
-        shouldOpenSavedCurrentTab
+        shouldOpenSavedCurrentTab && editorState.editorTabs
           ? editorState.editorTabs.currentTab
           : newEditorTabs.panes.center.editors.length >= 1
           ? 1

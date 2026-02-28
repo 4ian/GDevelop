@@ -154,11 +154,4 @@ const gd::String& Object::GetPersistentUuid() const {
   return persistentUuid;
 }
 
-Object& Object::ClearPersistentUuid() {
-  persistentUuid = "";
-  objectVariables.ClearPersistentUuid();
-
-  return *this;
-}
-
 }  // namespace gd

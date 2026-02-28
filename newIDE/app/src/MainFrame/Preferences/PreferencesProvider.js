@@ -1254,7 +1254,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     if (!editorState) return null;
 
     return {
-      editorTabs: editorState.editorTabs == null ? null : editorState.editorTabs,
+      editorTabs:
+        editorState.editorTabs == null ? null : editorState.editorTabs,
       propertiesPanelScroll: editorState.propertiesPanelScroll || {},
     };
   }
@@ -1272,7 +1273,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         if (editorState === null) {
           delete nextEditorStateByProject[projectId];
         } else {
-          const previousEditorState = state.values.editorStateByProject[projectId] || {
+          const previousEditorState = state.values.editorStateByProject[
+            projectId
+          ] || {
             editorTabs: null,
             propertiesPanelScroll: {},
           };

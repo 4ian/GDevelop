@@ -484,7 +484,9 @@ export const CompactObjectPropertiesEditor = ({
 
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
-  const scrollKey = objects.map((instance: gdObject) => '' + instance.ptr).join(';');
+  const scrollKey = objects
+    .map((instance: gdObject) => '' + instance.ptr)
+    .join(';');
 
   const persistedScrollId = object.getPersistentUuid();
 
@@ -493,6 +495,7 @@ export const CompactObjectPropertiesEditor = ({
     scrollViewRef,
     scrollKey,
     persistedScrollId,
+    persistedScrollType: 'object',
   });
 
   const propertiesSchema = React.useMemo(

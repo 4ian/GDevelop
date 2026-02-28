@@ -11,6 +11,7 @@ import Copy from '../UI/CustomSvgIcons/Copy';
 import Paste from '../UI/CustomSvgIcons/Paste';
 
 import { Column, Line, Spacer } from '../UI/Grid';
+import { LineStackLayout } from '../UI/Layout';
 import FlatButton from '../UI/FlatButton';
 import SearchBar from '../UI/SearchBar';
 import CompactSearchBar from '../UI/CompactSearchBar';
@@ -88,7 +89,7 @@ const VariablesListToolbar: React.ComponentType<Props> = React.memo<Props>(
 
     const buttonsToDisplay = buttons.filter(button => button.display);
     return (
-      <Line justifyContent="space-between" alignItems="center">
+      <LineStackLayout justifyContent="space-between" alignItems="center">
         <Column noMargin>
           <Line noMargin>
             {buttonsToDisplay.map(
@@ -119,7 +120,7 @@ const VariablesListToolbar: React.ComponentType<Props> = React.memo<Props>(
             )}
           </Line>
         </Column>
-        <Column expand noOverflowParent>
+        <Column expand noOverflowParent noMargin>
           {props.isCompact ? (
             <CompactSearchBar
               value={props.searchText}
@@ -135,29 +136,29 @@ const VariablesListToolbar: React.ComponentType<Props> = React.memo<Props>(
             />
           )}
         </Column>
-        <Column noMargin>
-          {props.isCompact ? null : props.isNarrow ? (
-            <IconButton
-              key="add-variable"
-              tooltip={t`Add variable`}
-              onClick={props.onAdd}
-              size="small"
-              disabled={!props.canAdd}
-            >
-              <Add style={props.iconStyle} />
-            </IconButton>
-          ) : (
-            <FlatButton
-              primary
-              key="add-variable"
-              onClick={props.onAdd}
-              label={<Trans>Add variable</Trans>}
-              leftIcon={<Add />}
-              disabled={!props.canAdd}
-            />
-          )}
-        </Column>
-      </Line>
+        {props.isCompact || !props.canAdd ? null : (
+          <Column noMargin>
+            {props.isNarrow ? (
+              <IconButton
+                key="add-variable"
+                tooltip={t`Add variable`}
+                onClick={props.onAdd}
+                size="small"
+              >
+                <Add style={props.iconStyle} />
+              </IconButton>
+            ) : (
+              <FlatButton
+                primary
+                key="add-variable"
+                onClick={props.onAdd}
+                label={<Trans>Add variable</Trans>}
+                leftIcon={<Add />}
+              />
+            )}
+          </Column>
+        )}
+      </LineStackLayout>
     );
   }
 );

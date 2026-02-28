@@ -28,6 +28,8 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
           "associated \"mapper\" behaviors.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("Platformer engine: jump, run on platforms, grab edges, custom gravity. Platform/jumpthru/ladder objects.")
+      .SetDimension("2D")
       .SetCategory("Movement")
       .SetTags("platformer, platform, character, jump, obstacle, collision")
       .SetExtensionHelpPath("/behaviors/platformer");

@@ -27,6 +27,9 @@ module.exports = {
         'Florian Rival',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        'Submit scores to leaderboards, display rankings. Anonymous or authenticated player entries.'
+      )
       .setExtensionHelpPath('/all-features/leaderboards')
       .setCategory('Players')
       .addInstructionOrExpressionGroupMetadata(_('Leaderboards'))

@@ -170,6 +170,14 @@ ${actions}`,
     const indexVarText = forEachEvent.getLoopIndexVariableName()
       ? ` (loop index variable: \`${forEachEvent.getLoopIndexVariableName()}\`)`
       : '';
+    const orderBy = forEachEvent.getOrderBy();
+    const order = forEachEvent.getOrder();
+    const limit = forEachEvent.getLimit();
+    const orderText = orderBy
+      ? ` ordered by \`${orderBy}\` (${
+          order === 'desc' ? 'descending' : 'ascending'
+        })${limit ? ` limit: \`${limit}\`` : ''}`
+      : '';
     const conditions = renderInstructionsAsText({
       instructionsList: forEachEvent.getConditions(),
       padding: padding + ' ',
@@ -182,7 +190,7 @@ ${actions}`,
     });
 
     return {
-      content: `${padding}Repeat these separately for each instance of ${forEachEvent.getObjectToPick()}${indexVarText}:
+      content: `${padding}Repeat these separately for each instance of ${forEachEvent.getObjectToPick()}${orderText}${indexVarText}:
 ${padding}Conditions:
 ${conditions}
 ${padding}Actions:

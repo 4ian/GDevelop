@@ -6,6 +6,7 @@ const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
+    minWidth: 0,
   },
   maxWidth: {
     maxWidth: '100%',

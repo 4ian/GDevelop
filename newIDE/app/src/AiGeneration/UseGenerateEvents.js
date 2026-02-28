@@ -66,71 +66,84 @@ export const useGenerateEvents = ({
         simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(project)
       );
 
-      const preparedAiUserContent = await prepareAiUserContent({
-        getAuthorizationHeader,
-        userId: profile.id,
-        simplifiedProjectJson,
-        projectSpecificExtensionsSummaryJson,
-        eventsJson: existingEventsJson,
-      });
-
-      const createResult = await retryIfFailed({ times: 2 }, () =>
-        createAiGeneratedEvent(getAuthorizationHeader, {
+      try {
+        const preparedAiUserContent = await prepareAiUserContent({
+          getAuthorizationHeader,
           userId: profile.id,
-          gameProjectJsonUserRelativeKey:
-            preparedAiUserContent.gameProjectJsonUserRelativeKey,
-          gameProjectJson: preparedAiUserContent.gameProjectJson,
-          projectSpecificExtensionsSummaryJsonUserRelativeKey:
-            preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
-          projectSpecificExtensionsSummaryJson:
-            preparedAiUserContent.projectSpecificExtensionsSummaryJson,
-          existingEventsJsonUserRelativeKey:
-            preparedAiUserContent.eventsJsonUserRelativeKey,
-          existingEventsJson: preparedAiUserContent.eventsJson,
-          sceneName,
-          eventsDescription,
-          extensionNamesList,
-          objectsList,
-          existingEventsAsText,
-          placementHint,
-          relatedAiRequestId,
-        })
-      );
+          simplifiedProjectJson,
+          projectSpecificExtensionsSummaryJson,
+          eventsJson: existingEventsJson,
+        });
 
-      if (!createResult.creationSucceeded) {
-        return {
-          generationCompleted: false,
-          errorMessage: createResult.errorMessage,
-        };
-      }
+        const createResult = await retryIfFailed(
+          { times: 3, backoff: { initialDelay: 200, factor: 2 } },
+          () =>
+            createAiGeneratedEvent(getAuthorizationHeader, {
+              userId: profile.id,
+              gameProjectJsonUserRelativeKey:
+                preparedAiUserContent.gameProjectJsonUserRelativeKey,
+              gameProjectJson: preparedAiUserContent.gameProjectJson,
+              projectSpecificExtensionsSummaryJsonUserRelativeKey:
+                preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
+              projectSpecificExtensionsSummaryJson:
+                preparedAiUserContent.projectSpecificExtensionsSummaryJson,
+              existingEventsJsonUserRelativeKey:
+                preparedAiUserContent.eventsJsonUserRelativeKey,
+              existingEventsJson: preparedAiUserContent.eventsJson,
+              sceneName,
+              eventsDescription,
+              extensionNamesList,
+              objectsList,
+              existingEventsAsText,
+              placementHint,
+              relatedAiRequestId,
+            })
+        );
 
-      let remainingAttempts = 50;
-      let aiGeneratedEvent = createResult.aiGeneratedEvent;
-      while (aiGeneratedEvent.status === 'working') {
-        remainingAttempts--;
-        await delay(1000);
-
-        try {
-          aiGeneratedEvent = await getAiGeneratedEvent(getAuthorizationHeader, {
-            userId: profile.id,
-            aiGeneratedEventId: aiGeneratedEvent.id,
-          });
-        } catch (error) {
-          console.warn(
-            'Error while checking status of AI generated event - continuing...',
-            error
-          );
-        }
-        if (remainingAttempts <= 0) {
+        if (!createResult.creationSucceeded) {
           return {
             generationCompleted: false,
-            errorMessage:
-              'Event generation started but failed to complete in time.',
+            errorMessage: createResult.errorMessage,
           };
         }
-      }
 
-      return { generationCompleted: true, aiGeneratedEvent };
+        let remainingAttempts = 50;
+        let aiGeneratedEvent = createResult.aiGeneratedEvent;
+        while (aiGeneratedEvent.status === 'working') {
+          remainingAttempts--;
+          await delay(1000);
+
+          try {
+            aiGeneratedEvent = await getAiGeneratedEvent(
+              getAuthorizationHeader,
+              {
+                userId: profile.id,
+                aiGeneratedEventId: aiGeneratedEvent.id,
+              }
+            );
+          } catch (error) {
+            console.warn(
+              'Error while checking status of AI generated event - continuing...',
+              error
+            );
+          }
+          if (remainingAttempts <= 0) {
+            return {
+              generationCompleted: false,
+              errorMessage:
+                'Event generation started but failed to complete in time.',
+            };
+          }
+        }
+
+        return { generationCompleted: true, aiGeneratedEvent };
+      } catch (error) {
+        console.error('Error while launching events generation:', error);
+        return {
+          generationCompleted: false,
+          errorMessage: error.message,
+        };
+      }
     },
     [getAuthorizationHeader, project, profile]
   );

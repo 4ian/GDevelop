@@ -382,8 +382,6 @@ const createField = (
 };
 
 const propertyKeywordCouples: Array<Array<string>> = [
-  ['X', 'Y', 'Z'],
-  ['Width', 'Height', 'Depth'],
   ['Top', 'Bottom'],
   ['Left', 'Right'],
   ['Front', 'Back'],
@@ -394,6 +392,7 @@ const propertyKeywordCouples: Array<Array<string>> = [
   ['Horizontal', 'Vertical'],
   ['Acceleration', 'Deceleration'],
   ['Duration', 'Easing'],
+  ['Delay', 'Duration'],
   ['EffectName', 'EffectProperty'],
   ['Gravity', 'MaxFallingSpeed'],
   ['JumpSpeed', 'JumpSustainTime'],
@@ -405,6 +404,9 @@ const propertyKeywordCouples: Array<Array<string>> = [
   ['1', '2'],
   ['3', '4'],
   ['5', '6'],
+  // Make triples low priority because side panels are tight.
+  ['X', 'Y', 'Z'],
+  ['Width', 'Height', 'Depth'],
 ];
 
 // $FlowFixMe[missing-local-annot]
@@ -683,22 +685,23 @@ const adaptablePropertiesMapToSchema = ({
               rowPropertyNames.push(rowPropertyName);
             }
           }
-        }
-        const uncapitalizeKeyword = uncapitalize(keyword);
-        if (name.startsWith(uncapitalizeKeyword)) {
-          const rowAllPropertyNames = propertyKeywords.map(otherKeyword =>
-            name.replace(uncapitalizeKeyword, uncapitalize(otherKeyword))
-          );
-          for (const rowPropertyName of rowAllPropertyNames) {
-            if (
-              isPropertyVisible({
-                properties,
-                name: rowPropertyName,
-                visibility,
-                quickCustomizationVisibilities,
-              })
-            ) {
-              rowPropertyNames.push(rowPropertyName);
+        } else {
+          const uncapitalizeKeyword = uncapitalize(keyword);
+          if (name.startsWith(uncapitalizeKeyword)) {
+            const rowAllPropertyNames = propertyKeywords.map(otherKeyword =>
+              name.replace(uncapitalizeKeyword, uncapitalize(otherKeyword))
+            );
+            for (const rowPropertyName of rowAllPropertyNames) {
+              if (
+                isPropertyVisible({
+                  properties,
+                  name: rowPropertyName,
+                  visibility,
+                  quickCustomizationVisibilities,
+                })
+              ) {
+                rowPropertyNames.push(rowPropertyName);
+              }
             }
           }
         }
@@ -753,6 +756,8 @@ const adaptablePropertiesMapToSchema = ({
             rowPropertyNames.forEach(propertyName => {
               alreadyHandledProperties.add(propertyName);
             });
+            // Don't try to match this property with anything else.
+            break;
           }
         }
       }

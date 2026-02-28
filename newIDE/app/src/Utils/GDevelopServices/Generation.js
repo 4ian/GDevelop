@@ -215,6 +215,9 @@ export type AssetSearch = {
     objectType: string,
     description: string | null,
     twoDimensionalViewKind: string | null,
+    relatedAiRequestId: string | null,
+    lastUserMessage: string | null,
+    lastAssistantMessages: string[],
   },
   status: 'completed' | 'failed',
   results: Array<{
@@ -751,12 +754,18 @@ export const createAssetSearch = async (
     description,
     objectType,
     twoDimensionalViewKind,
+    relatedAiRequestId,
+    lastUserMessage,
+    lastAssistantMessages,
   }: {|
     userId: string,
     searchTerms: string,
     description: string,
     objectType: string,
     twoDimensionalViewKind: string,
+    relatedAiRequestId?: string | null,
+    lastUserMessage?: string | null,
+    lastAssistantMessages?: string[],
   |}
 ): Promise<AssetSearch> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -768,6 +777,9 @@ export const createAssetSearch = async (
       description,
       objectType,
       twoDimensionalViewKind,
+      relatedAiRequestId,
+      lastUserMessage,
+      lastAssistantMessages,
     },
     {
       params: {

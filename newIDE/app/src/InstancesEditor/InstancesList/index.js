@@ -10,7 +10,7 @@ import {
 import IconButton from '../../UI/IconButton';
 import KeyboardShortcuts from '../../UI/KeyboardShortcuts';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import SearchBar, { type SearchBarInterface } from '../../UI/SearchBar';
+import CompactSearchBar from '../../UI/CompactSearchBar';
 import RemoveCircle from '../../UI/CustomSvgIcons/RemoveCircle';
 import Lock from '../../UI/CustomSvgIcons/Lock';
 import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
@@ -45,6 +45,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
+    minWidth: 0,
   },
   tableContainer: {
     flex: 1,
@@ -90,8 +91,6 @@ class InstancesList extends Component<Props, State> {
   renderedRows: Array<RenderedRowInfo> = [];
   instanceRowRenderer: ?typeof gd.InitialInstanceJSFunctor;
   table: ?typeof RVTable;
-  // $FlowFixMe[missing-local-annot]
-  _searchBar = React.createRef<SearchBarInterface>();
   // $FlowFixMe[missing-local-annot]
   _keyboardShortcuts = new KeyboardShortcuts({
     isActive: () => false,
@@ -255,8 +254,8 @@ class InstancesList extends Component<Props, State> {
         {gdevelopTheme => (
           <div style={styles.container}>
             <Line>
-              <Column expand>
-                <SearchBar
+              <Column expand noOverflowParent>
+                <CompactSearchBar
                   value={searchText}
                   onChange={searchText =>
                     this.setState({
@@ -264,9 +263,7 @@ class InstancesList extends Component<Props, State> {
                     })
                   }
                   onRequestSearch={this._selectFirstInstance}
-                  ref={this._searchBar}
                   placeholder={t`Search instances`}
-                  autoFocus="desktop"
                 />
               </Column>
             </Line>

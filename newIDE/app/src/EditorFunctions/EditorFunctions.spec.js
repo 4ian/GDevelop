@@ -28,6 +28,11 @@ describe('editorFunctions', () => {
       onOpenLayout: jest.fn(),
       onCreateProject: jest.fn(),
     },
+    relatedAiRequestId: 'fake-ai-request-id',
+    getRelatedAiRequestLastMessages: () => ({
+      lastUserMessage: null,
+      lastAssistantMessages: [],
+    }),
     generateEvents: jest.fn(),
     onInstancesModifiedOutsideEditor: jest.fn(),
     onObjectGroupsModifiedOutsideEditor: jest.fn(),
@@ -929,7 +934,7 @@ describe('editorFunctions', () => {
             resultMessage: 'Successfully added explosion events.',
             changes: [
               {
-                operationName: 'add',
+                operationName: 'insert_at_end',
                 operationTargetEvent: null,
                 isEventsJsonValid: true,
                 generatedEvents: JSON.stringify([

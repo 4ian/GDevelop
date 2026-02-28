@@ -27,6 +27,9 @@ module.exports = {
         'Florian Rival',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        'Online multiplayer lobbies, object sync, variable sync, player ownership. Up to 8 players.'
+      )
       .setExtensionHelpPath('/all-features/multiplayer')
       .setCategory('Players');
     extension

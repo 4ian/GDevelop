@@ -6,7 +6,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import Background from '../UI/Background';
-import SearchBar from '../UI/SearchBar';
+import CompactSearchBar from '../UI/CompactSearchBar';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { enumerateGroups } from '../ObjectsList/EnumerateObjects';
 import {
@@ -629,10 +629,9 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     return (
       <Background>
         <Line>
-          <Column expand>
-            <SearchBar
+          <Column expand noOverflowParent>
+            <CompactSearchBar
               value={searchText}
-              onRequestSearch={() => {}}
               onChange={setSearchText}
               placeholder={t`Search object groups`}
             />

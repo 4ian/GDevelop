@@ -20,6 +20,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Common features that can be used for all objects in GDevelop."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("Base object: position, angle, size, visibility, layer, z-order, distance, collision, variables, timers, effects.")
       .SetExtensionHelpPath("/objects/base_object/events");
   extension.AddInstructionOrExpressionGroupMetadata(_("Collision"))
       .SetIcon("res/conditions/collision24.png");

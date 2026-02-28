@@ -792,6 +792,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         for (unsigned int i = 0; i < realObjects.size(); ++i)
           parentContext.ObjectsListNeeded(realObjects[i]);
 
+        const bool hasOrderBy = !event.GetOrderBy().empty();
+
         // Context is "reset" each time the event is repeated (i.e. objects are
         // picked again)
         gd::EventsCodeGenerationContext context;
@@ -808,6 +810,25 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         for (unsigned int i = 0; i < realObjects.size(); ++i)
           context.EmptyObjectsListNeeded(realObjects[i]);
+
+        // When orderBy is set, we also need a sorting context to generate the
+        // expression code for evaluating the orderBy expression on each object.
+        gd::String orderByExpressionCode;
+        gd::String sortObjectDeclaration;
+        if (hasOrderBy) {
+          gd::EventsCodeGenerationContext sortContext;
+          sortContext.InheritsFrom(parentContext);
+          sortContext.ForbidReuse();
+          for (unsigned int i = 0; i < realObjects.size(); ++i)
+            sortContext.EmptyObjectsListNeeded(realObjects[i]);
+
+          orderByExpressionCode =
+              gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator, sortContext, "number",
+                  gd::Expression(event.GetOrderBy()));
+          sortObjectDeclaration =
+              codeGenerator.GenerateObjectsDeclarationCode(sortContext) + "\n";
+        }
 
         // Prepare conditions/actions codes
         gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(
@@ -845,12 +866,29 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               event.GetLoopIndexVariableName(), context);
         }
 
+        // Declare additional variables for the orderBy sorting phase
+        gd::String forEachSortedList;
+        gd::String forEachSortKeysList;
+        gd::String forEachLimitVar;
+        if (hasOrderBy) {
+          forEachSortedList =
+              codeGenerator.GetCodeNamespaceAccessor() + "forEachSorted" +
+              gd::String::From(context.GetContextDepth());
+          codeGenerator.AddGlobalDeclaration(forEachSortedList + " = [];\n");
+          forEachSortKeysList =
+              codeGenerator.GetCodeNamespaceAccessor() + "forEachSortKeys" +
+              gd::String::From(context.GetContextDepth());
+          codeGenerator.AddGlobalDeclaration(forEachSortKeysList + " = [];\n");
+          forEachLimitVar =
+              codeGenerator.GetCodeNamespaceAccessor() + "forEachLimit" +
+              gd::String::From(context.GetContextDepth());
+          codeGenerator.AddGlobalDeclaration(forEachLimitVar + " = 0;\n");
+        }
+
         outputCode += localVariablesInitializationCode;
 
-        if (realObjects.size() !=
-            1) //(We write a slightly more simple ( and optimized ) output code
-               // when only one object list is used.)
-        {
+        // --- Build the combined objects list ---
+        if (realObjects.size() != 1) {
           outputCode += forEachTotalCountVar + " = 0;\n";
           outputCode += forEachObjectsList + ".length = 0;\n";
           for (unsigned int i = 0; i < realObjects.size(); ++i) {
@@ -873,66 +911,196 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
           }
         }
 
-        // Write final code :
+        if (hasOrderBy) {
+          // --- OrderBy sorting phase ---
+          // Build a combined list (always use forEachObjectsList for sorting)
+          if (realObjects.size() == 1) {
+            // For single object: copy to the combined list for uniform handling
+            outputCode += forEachObjectsList + ".length = 0;\n";
+            outputCode +=
+                forEachObjectsList + ".push.apply(" + forEachObjectsList +
+                "," +
+                codeGenerator.GetObjectListName(realObjects[0], parentContext) +
+                ");\n";
+            outputCode += forEachTotalCountVar + " = " + forEachObjectsList +
+                          ".length;\n";
+          }
 
-        // For loop declaration
-        if (realObjects.size() ==
-            1) // We write a slightly more simple ( and optimized ) output code
-               // when only one object list is used.
+          // Evaluate the orderBy expression for each object and store in sort keys
+          outputCode += forEachSortKeysList + ".length = 0;\n";
           outputCode +=
               "for (" + forEachIndexVar + " = 0;" + forEachIndexVar + " < " +
-              codeGenerator.GetObjectListName(realObjects[0], parentContext) +
-              ".length;++" + forEachIndexVar + ") {\n";
-        else
-          outputCode += "for (" + forEachIndexVar + " = 0;" + forEachIndexVar +
-                        " < " + forEachTotalCountVar + ";++" + forEachIndexVar +
-                        ") {\n";
+              forEachTotalCountVar + ";++" + forEachIndexVar + ") {\n";
 
-        // Empty object lists declaration
-        outputCode += objectDeclaration;
-
-        // Pick one object
-        if (realObjects.size() == 1) {
-          // We write a slightly more simple ( and optimized ) output code
-          // when only one object list is used.
-          gd::String temporary = codeGenerator.GetCodeNamespaceAccessor() +
-                                 "forEachTemporary" +
-                                 gd::String::From(context.GetContextDepth());
-          codeGenerator.AddGlobalDeclaration(temporary + " = null;\n");
-          outputCode +=
-              temporary + " = " +
-              codeGenerator.GetObjectListName(realObjects[0], parentContext) +
-              "[" + forEachIndexVar + "];\n";
-
-          outputCode +=
-              codeGenerator.GetObjectListName(realObjects[0], context) +
-              ".push(" + temporary + ");\n";
-        } else {
-          // Generate the code to pick only one object in the lists
+          // Pick one object for evaluation
+          outputCode += sortObjectDeclaration;
           for (unsigned int i = 0; i < realObjects.size(); ++i) {
-            gd::String count;
-            for (unsigned int j = 0; j <= i; ++j) {
-              gd::String forEachCountVar =
-                  codeGenerator.GetCodeNamespaceAccessor() + "forEachCount" +
-                  gd::String::From(j) + "_" +
-                  gd::String::From(context.GetContextDepth());
-
-              if (j != 0)
-                count += "+";
-              count += forEachCountVar;
+            if (realObjects.size() == 1) {
+              outputCode +=
+                  codeGenerator.GetObjectListName(realObjects[0], context) +
+                  ".push(" + forEachObjectsList + "[" + forEachIndexVar +
+                  "]);\n";
+            } else {
+              gd::String count;
+              for (unsigned int j = 0; j <= i; ++j) {
+                gd::String forEachCountVar =
+                    codeGenerator.GetCodeNamespaceAccessor() + "forEachCount" +
+                    gd::String::From(j) + "_" +
+                    gd::String::From(context.GetContextDepth());
+                if (j != 0)
+                  count += "+";
+                count += forEachCountVar;
+              }
+              if (i != 0)
+                outputCode += "else ";
+              outputCode +=
+                  "if (" + forEachIndexVar + " < " + count + ") {\n";
+              outputCode +=
+                  "    " +
+                  codeGenerator.GetObjectListName(realObjects[i], context) +
+                  ".push(" + forEachObjectsList + "[" + forEachIndexVar +
+                  "]);\n";
+              outputCode += "}\n";
             }
+          }
 
-            if (i != 0)
-              outputCode += "else ";
-            outputCode += "if (" + forEachIndexVar + " < " + count + ") {\n";
+          outputCode += forEachSortKeysList + ".push(" +
+                        orderByExpressionCode + ");\n";
+          outputCode += "}\n"; // End of sort key evaluation loop
+
+          // Build sorted indices and sort them
+          outputCode += forEachSortedList + ".length = 0;\n";
+          outputCode += "for (" + forEachIndexVar + " = 0;" +
+                        forEachIndexVar + " < " + forEachTotalCountVar + ";++" +
+                        forEachIndexVar + ") " + forEachSortedList + ".push(" +
+                        forEachIndexVar + ");\n";
+
+          gd::String isDesc =
+              event.GetOrder() == "desc" ? "true" : "false";
+          outputCode +=
+              forEachSortedList + ".sort(function(a, b) { return " + isDesc +
+              " ? " + forEachSortKeysList + "[b] - " + forEachSortKeysList +
+              "[a] : " + forEachSortKeysList + "[a] - " +
+              forEachSortKeysList + "[b]; });\n";
+
+          // Apply limit
+          const bool hasLimit = !event.GetLimit().empty();
+          if (hasLimit) {
+            gd::String limitCode =
+                gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                    codeGenerator, parentContext, "number",
+                    gd::Expression(event.GetLimit()));
+            outputCode += forEachLimitVar + " = " + limitCode + ";\n";
+            outputCode += "if (" + forEachLimitVar + " >= 0 && " +
+                          forEachSortedList + ".length > " + forEachLimitVar +
+                          ") " + forEachSortedList + ".length = " +
+                          forEachLimitVar + ";\n";
+          }
+
+          // Iterate through sorted indices
+          outputCode +=
+              "for (" + forEachIndexVar + " = 0;" + forEachIndexVar + " < " +
+              forEachSortedList + ".length;++" + forEachIndexVar + ") {\n";
+
+          // Empty object lists and pick the right object
+          outputCode += objectDeclaration;
+          for (unsigned int i = 0; i < realObjects.size(); ++i) {
+            if (realObjects.size() == 1) {
+              gd::String temporary =
+                  codeGenerator.GetCodeNamespaceAccessor() +
+                  "forEachTemporary" +
+                  gd::String::From(context.GetContextDepth());
+              codeGenerator.AddGlobalDeclaration(temporary + " = null;\n");
+              outputCode +=
+                  temporary + " = " + forEachObjectsList + "[" +
+                  forEachSortedList + "[" + forEachIndexVar + "]];\n";
+              outputCode +=
+                  codeGenerator.GetObjectListName(realObjects[0], context) +
+                  ".push(" + temporary + ");\n";
+            } else {
+              gd::String count;
+              for (unsigned int j = 0; j <= i; ++j) {
+                gd::String forEachCountVar =
+                    codeGenerator.GetCodeNamespaceAccessor() + "forEachCount" +
+                    gd::String::From(j) + "_" +
+                    gd::String::From(context.GetContextDepth());
+                if (j != 0)
+                  count += "+";
+                count += forEachCountVar;
+              }
+              if (i != 0)
+                outputCode += "else ";
+              outputCode += "if (" + forEachSortedList + "[" + forEachIndexVar +
+                            "] < " + count + ") {\n";
+              outputCode +=
+                  "    " +
+                  codeGenerator.GetObjectListName(realObjects[i], context) +
+                  ".push(" + forEachObjectsList + "[" + forEachSortedList +
+                  "[" + forEachIndexVar + "]]);\n";
+              outputCode += "}\n";
+            }
+          }
+        } else {
+          // --- Standard (no orderBy) path ---
+
+          // For loop declaration
+          if (realObjects.size() == 1)
             outputCode +=
-                "    " +
-                codeGenerator.GetObjectListName(realObjects[i], context) +
-                ".push(" + forEachObjectsList + "[" + forEachIndexVar + "]);\n";
-            outputCode += "}\n";
+                "for (" + forEachIndexVar + " = 0;" + forEachIndexVar + " < " +
+                codeGenerator.GetObjectListName(realObjects[0], parentContext) +
+                ".length;++" + forEachIndexVar + ") {\n";
+          else
+            outputCode +=
+                "for (" + forEachIndexVar + " = 0;" + forEachIndexVar + " < " +
+                forEachTotalCountVar + ";++" + forEachIndexVar + ") {\n";
+
+          // Empty object lists declaration
+          outputCode += objectDeclaration;
+
+          // Pick one object
+          if (realObjects.size() == 1) {
+            gd::String temporary =
+                codeGenerator.GetCodeNamespaceAccessor() +
+                "forEachTemporary" +
+                gd::String::From(context.GetContextDepth());
+            codeGenerator.AddGlobalDeclaration(temporary + " = null;\n");
+            outputCode +=
+                temporary + " = " +
+                codeGenerator.GetObjectListName(realObjects[0], parentContext) +
+                "[" + forEachIndexVar + "];\n";
+
+            outputCode +=
+                codeGenerator.GetObjectListName(realObjects[0], context) +
+                ".push(" + temporary + ");\n";
+          } else {
+            for (unsigned int i = 0; i < realObjects.size(); ++i) {
+              gd::String count;
+              for (unsigned int j = 0; j <= i; ++j) {
+                gd::String forEachCountVar =
+                    codeGenerator.GetCodeNamespaceAccessor() + "forEachCount" +
+                    gd::String::From(j) + "_" +
+                    gd::String::From(context.GetContextDepth());
+
+                if (j != 0)
+                  count += "+";
+                count += forEachCountVar;
+              }
+
+              if (i != 0)
+                outputCode += "else ";
+              outputCode +=
+                  "if (" + forEachIndexVar + " < " + count + ") {\n";
+              outputCode +=
+                  "    " +
+                  codeGenerator.GetObjectListName(realObjects[i], context) +
+                  ".push(" + forEachObjectsList + "[" + forEachIndexVar +
+                  "]);\n";
+              outputCode += "}\n";
+            }
           }
         }
 
+        // --- Common iteration body (both ordered and unordered) ---
         if (hasIndexVariable) {
           outputCode +=
               indexVariableAccessor + ".setNumber(" + forEachIndexVar + ");\n";

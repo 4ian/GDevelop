@@ -19,6 +19,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
             "on the screen using events."),
           "Florian Rival and Aurélien Vivet",
           "Open source (MIT License)")
+      .SetShortDescription("Draw 2D shapes (rectangles, circles, lines, bezier, polygons) with fill/outline via events.")
+      .SetDimension("2D")
       .SetExtensionHelpPath("/objects/shape_painter")
       .SetCategory("Advanced");
   extension.AddInstructionOrExpressionGroupMetadata(_("Shape painter"))

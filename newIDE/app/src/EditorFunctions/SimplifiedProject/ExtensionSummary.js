@@ -90,6 +90,8 @@ export type ExtensionSummary = {|
   extensionName: string,
   extensionFullName: string,
   description: string,
+  shortDescription: string,
+  dimension: string,
   freeActions: Array<InstructionSummary>,
   freeConditions: Array<InstructionSummary>,
   freeExpressions: Array<ExpressionSummary>,
@@ -425,6 +427,8 @@ export const buildExtensionSummary = ({
     extensionName: extension.getName(),
     extensionFullName: extension.getFullName(),
     description: extension.getDescription(),
+    shortDescription: extension.getShortDescription(),
+    dimension: extension.getDimension(),
     freeActions: generateInstructionsSummaries({
       instructionsMetadata: extension.getAllActions(),
     }),

@@ -1531,6 +1531,10 @@ module.exports = {
         'Todor Imreorov',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        'Tile-based map object for RPG, platformers, strategy. Built-in editor. External Tiled/LDtk support.'
+      )
+      .setDimension('2D')
       .setCategory('Advanced')
       .setExtensionHelpPath('/objects/tilemap');
 

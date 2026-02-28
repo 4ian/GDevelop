@@ -25,6 +25,9 @@ module.exports = {
         'Matthias Meike',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        'Capture screenshots of the running game as PNG images.'
+      )
       .setExtensionHelpPath('/all-features/screenshot')
       .setCategory('Advanced');
     extension

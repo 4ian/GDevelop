@@ -946,6 +946,18 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       visible:
         this._selectionIsLoopEvent() && this._selectionHasIndexVariable(),
     },
+    {
+      label: i18n._(t`Add Ordering`),
+      click: () => this._addOrdering(),
+      visible:
+        this._selectionIsForEachEvent() && !this._selectionForEachHasOrderBy(),
+    },
+    {
+      label: i18n._(t`Remove Ordering`),
+      click: () => this._removeOrdering(),
+      visible:
+        this._selectionIsForEachEvent() && this._selectionForEachHasOrderBy(),
+    },
     { type: 'separator' },
     {
       label: i18n._(t`Add`),
@@ -983,6 +995,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           click: () => this._addLoopIndexVariable(),
           visible:
             this._selectionIsLoopEvent() && !this._selectionHasIndexVariable(),
+        },
+        {
+          label: i18n._(t`Ordering`),
+          click: () => this._addOrdering(),
+          visible:
+            this._selectionIsForEachEvent() &&
+            !this._selectionForEachHasOrderBy(),
         },
         {
           type: 'separator',
@@ -1126,6 +1145,65 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (!eventContext) return false;
     const loopEvent = this._asLoopEvent(eventContext.event);
     return !!loopEvent && loopEvent.getLoopIndexVariableName() !== '';
+  };
+
+  _selectionIsForEachEvent = (): boolean => {
+    const eventContext = getLastSelectedEventContext(this.state.selection);
+    if (!eventContext) return false;
+    return (
+      eventContext.event.getType() === 'BuiltinCommonInstructions::ForEach'
+    );
+  };
+
+  _selectionForEachHasOrderBy = (): boolean => {
+    const eventContext = getLastSelectedEventContext(this.state.selection);
+    if (!eventContext) return false;
+    if (eventContext.event.getType() !== 'BuiltinCommonInstructions::ForEach')
+      return false;
+    const forEachEvent = gd.asForEachEvent(eventContext.event);
+    return !!forEachEvent.getOrderBy();
+  };
+
+  _addOrdering = () => {
+    const eventContext = getLastSelectedEventContext(this.state.selection);
+    if (!eventContext) return;
+    if (eventContext.event.getType() !== 'BuiltinCommonInstructions::ForEach')
+      return;
+
+    const forEachEvent = gd.asForEachEvent(eventContext.event);
+    forEachEvent.setOrderBy('0');
+    forEachEvent.setOrder('asc');
+
+    if (this._eventsTree) {
+      this._eventsTree.forceEventsUpdate(() => {
+        const positions = this._getChangedEventRows([eventContext.event]);
+        this._saveChangesToHistory('EDIT', {
+          positionsBeforeAction: positions,
+          positionAfterAction: positions,
+        });
+      });
+    }
+  };
+
+  _removeOrdering = () => {
+    const eventContext = getLastSelectedEventContext(this.state.selection);
+    if (!eventContext) return;
+    if (eventContext.event.getType() !== 'BuiltinCommonInstructions::ForEach')
+      return;
+
+    const forEachEvent = gd.asForEachEvent(eventContext.event);
+    forEachEvent.setOrderBy('');
+    forEachEvent.setLimit('');
+
+    if (this._eventsTree) {
+      this._eventsTree.forceEventsUpdate(() => {
+        const positions = this._getChangedEventRows([eventContext.event]);
+        this._saveChangesToHistory('EDIT', {
+          positionsBeforeAction: positions,
+          positionAfterAction: positions,
+        });
+      });
+    }
   };
 
   _addLoopIndexVariable = () => {

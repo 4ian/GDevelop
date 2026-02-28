@@ -26,6 +26,7 @@ import {
   getFunctionCallNameByCallId,
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
+  getLastMessagesFromAiRequestOutput,
 } from './AiRequestUtils';
 import { useEnsureExtensionInstalled } from './UseEnsureExtensionInstalled';
 import { useGenerateEvents } from './UseGenerateEvents';
@@ -186,12 +187,10 @@ export const useProcessFunctionCalls = ({
           call_id: functionCall.call_id,
         })),
         ignore: !!options && !!options.ignore,
-        generateEvents: async options => {
-          return await generateEvents({
-            ...options,
-            relatedAiRequestId: selectedAiRequest.id,
-          });
-        },
+        relatedAiRequestId: selectedAiRequest.id,
+        getRelatedAiRequestLastMessages: () =>
+          getLastMessagesFromAiRequestOutput(selectedAiRequest.output),
+        generateEvents,
         onSceneEventsModifiedOutsideEditor,
         onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor,

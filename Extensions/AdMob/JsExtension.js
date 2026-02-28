@@ -27,6 +27,9 @@ module.exports = {
         'Florian Rival',
         'MIT'
       )
+      .setShortDescription(
+        'AdMob ads: banners, interstitials, rewarded video, app open. Configure test/production ad units.'
+      )
       .setExtensionHelpPath('/all-features/admob')
       .setCategory('Ads');
     extension

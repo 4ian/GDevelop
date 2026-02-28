@@ -502,6 +502,7 @@ export class ObjectFolderOrObject extends EmscriptenObject {
   getChildPosition(child: ObjectFolderOrObject): number;
   getParent(): ObjectFolderOrObject;
   insertNewFolder(name: string, newPosition: number): ObjectFolderOrObject;
+  getOrCreateFolderChild(name: string): ObjectFolderOrObject;
   moveObjectFolderOrObjectToAnotherFolder(objectFolderOrObject: ObjectFolderOrObject, newParentFolder: ObjectFolderOrObject, newPosition: number): void;
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: ObjectFolderOrObject): void;
@@ -788,7 +789,7 @@ export class gdObject extends EmscriptenObject {
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
   resetPersistentUuid(): gdObject;
-  clearPersistentUuid(): gdObject;
+  getPersistentUuid(): string;
 }
 
 export class UniquePtrObject extends EmscriptenObject {
@@ -1799,6 +1800,10 @@ export class PlatformExtension extends EmscriptenObject {
   setExtensionHelpPath(helpPath: string): PlatformExtension;
   setIconUrl(iconUrl: string): PlatformExtension;
   setCategory(category: string): PlatformExtension;
+  setShortDescription(shortDescription: string): PlatformExtension;
+  getShortDescription(): string;
+  setDimension(dimension: string): PlatformExtension;
+  getDimension(): string;
   addInstructionOrExpressionGroupMetadata(name: string): InstructionOrExpressionGroupMetadata;
   markAsDeprecated(): void;
   getTags(): VectorString;
@@ -1936,6 +1941,14 @@ export class ForEachEvent extends BaseEvent {
   getActions(): InstructionsList;
   getLoopIndexVariableName(): string;
   setLoopIndexVariableName(name: string): void;
+  getOrderBy(): string;
+  setOrderBy(orderBy: string): void;
+  getOrderByExpression(): Expression;
+  getOrder(): string;
+  setOrder(order: string): void;
+  getLimit(): string;
+  setLimit(limit: string): void;
+  getLimitExpression(): Expression;
 }
 
 export class ForEachChildVariableEvent extends BaseEvent {
@@ -2570,6 +2583,8 @@ export class EventsFunctionsExtension extends EmscriptenObject {
   getShortDescription(): string;
   setDescription(description: string): EventsFunctionsExtension;
   getDescription(): string;
+  setDimension(dimension: string): EventsFunctionsExtension;
+  getDimension(): string;
   setName(name: string): EventsFunctionsExtension;
   getName(): string;
   setFullName(fullName: string): EventsFunctionsExtension;

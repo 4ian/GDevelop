@@ -27,6 +27,9 @@ module.exports = {
         'Matthias Meike',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        'Read/write/delete files and directories. Desktop only (Windows, Linux, macOS).'
+      )
       .setExtensionHelpPath('/all-features/filesystem')
       .setCategory('Advanced');
     extension

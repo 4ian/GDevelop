@@ -1,10 +1,12 @@
 // @flow
 import {
   type AiRequest,
+  type AiRequestMessage,
   type AiRequestMessageAssistantFunctionCall,
   type AiRequestFunctionCallOutput,
 } from '../Utils/GDevelopServices/Generation';
 import { type EditorFunctionCallResult } from '../EditorFunctions/EditorFunctionCallRunner';
+import { type RelatedAiRequestLastMessages } from '../EditorFunctions';
 
 export const getFunctionCallToFunctionCallOutputMap = ({
   aiRequest,
@@ -175,5 +177,45 @@ export const getFunctionCallOutputsFromEditorFunctionCallResults = (
     // $FlowFixMe[incompatible-type]
     functionCallOutputs,
     hasUnfinishedResult,
+  };
+};
+
+/**
+ * Extract the last user message and last assistant messages from an AI request's
+ * output, to provide context for enhanced LLM reranking (e.g., asset search).
+ *
+ * Collects up to 5 assistant `output_text` messages from the end of the conversation,
+ * stopping when the last user message is reached.
+ */
+export const getLastMessagesFromAiRequestOutput = (
+  output: Array<AiRequestMessage>
+): RelatedAiRequestLastMessages => {
+  let lastUserMessage: string | null = null;
+  const lastAssistantMessages: string[] = [];
+
+  for (let i = output.length - 1; i >= 0; i--) {
+    const message = output[i];
+    if (message.type === 'message' && message.role === 'user') {
+      const textContent = message.content.find(c => c.type === 'user_request');
+      if (textContent) {
+        lastUserMessage = textContent.text;
+      }
+      break;
+    }
+    if (message.type === 'message' && message.role === 'assistant') {
+      for (const content of message.content) {
+        if (
+          content.type === 'output_text' &&
+          lastAssistantMessages.length < 5
+        ) {
+          lastAssistantMessages.push(content.text);
+        }
+      }
+    }
+  }
+
+  return {
+    lastUserMessage,
+    lastAssistantMessages,
   };
 };

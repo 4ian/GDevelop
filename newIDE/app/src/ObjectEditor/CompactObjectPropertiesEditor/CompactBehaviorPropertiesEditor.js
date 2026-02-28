@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { Trans } from '@lingui/macro';
 import {
@@ -11,6 +10,7 @@ import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
+import { type CompactBehaviorPropertiesEditorProps } from './CompactBehaviorPropertiesEditorProps.flow';
 
 export const styles = {
   icon: {
@@ -54,6 +54,65 @@ export const getSchemaWithOpenFullEditorButton = ({
   return schema;
 };
 
+export const getPropertyValue = (
+  behavior: gdBehavior,
+  propertyName: string,
+  initialInstance: gdInitialInstance | null
+): string => {
+  const behaviorName = behavior.getName();
+  if (
+    initialInstance &&
+    initialInstance.hasBehaviorOverridingNamed(behaviorName) &&
+    initialInstance
+      .getBehaviorOverriding(behaviorName)
+      .hasPropertyValue(propertyName)
+  ) {
+    const behaviorOverriding = initialInstance.getBehaviorOverriding(
+      behaviorName
+    );
+    return behaviorOverriding
+      .getProperties()
+      .get(propertyName)
+      .getValue();
+  }
+  return behavior
+    .getProperties()
+    .get(propertyName)
+    .getValue();
+};
+
+export const updateProperty = (
+  project: gdProject,
+  behavior: gdBehavior,
+  propertyName: string,
+  value: string,
+  initialInstance: gdInitialInstance | null
+): void => {
+  if (initialInstance) {
+    const behaviorName = behavior.getName();
+    const behaviorOverriding = initialInstance.hasBehaviorOverridingNamed(
+      behaviorName
+    )
+      ? initialInstance.getBehaviorOverriding(behaviorName)
+      : initialInstance.addNewBehaviorOverriding(
+          project,
+          behavior.getTypeName(),
+          behaviorName
+        );
+    const behaviorProperties = behavior.getProperties();
+    const inheritedValue = behaviorProperties.has(propertyName)
+      ? behaviorProperties.get(propertyName).getValue()
+      : null;
+    if (inheritedValue === value) {
+      behaviorOverriding.removeProperty(propertyName);
+    } else {
+      behaviorOverriding.updateProperty(propertyName, value);
+    }
+  } else {
+    behavior.updateProperty(propertyName, value);
+  }
+};
+
 export const CompactBehaviorPropertiesEditor = ({
   project,
   behaviorMetadata,
@@ -64,17 +123,7 @@ export const CompactBehaviorPropertiesEditor = ({
   onOpenFullEditor,
   onBehaviorUpdated,
   resourceManagementProps,
-}: {|
-  project: gdProject,
-  behaviorMetadata: gdBehaviorMetadata,
-  behavior: gdBehavior,
-  object: gdObject,
-  behaviorOverriding: gdBehavior | null,
-  initialInstance: gdInitialInstance | null,
-  onOpenFullEditor?: () => void,
-  onBehaviorUpdated: () => void,
-  resourceManagementProps: ResourceManagementProps,
-|}): React.Node => {
+}: CompactBehaviorPropertiesEditorProps): React.Node => {
   const fullEditorLabel = behaviorMetadata.getOpenFullEditorLabel();
 
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
@@ -89,48 +138,16 @@ export const CompactBehaviorPropertiesEditor = ({
         return propertiesMapToSchema({
           properties: behaviorProperties,
           defaultValueProperties: behaviorProperties,
-          getPropertyValue: (instance, propertyName) => {
-            const behaviorName = behavior.getName();
-            if (
-              initialInstance.hasBehaviorOverridingNamed(behaviorName) &&
+          getPropertyValue: (instance, propertyName) =>
+            getPropertyValue(behavior, propertyName, initialInstance),
+          onUpdateProperty: (instance, propertyName, value) =>
+            updateProperty(
+              project,
+              behavior,
+              propertyName,
+              value,
               initialInstance
-                .getBehaviorOverriding(behaviorName)
-                .hasPropertyValue(propertyName)
-            ) {
-              const behaviorOverriding = initialInstance.getBehaviorOverriding(
-                behaviorName
-              );
-              return behaviorOverriding
-                .getProperties()
-                .get(propertyName)
-                .getValue();
-            }
-            return behavior
-              .getProperties()
-              .get(propertyName)
-              .getValue();
-          },
-          onUpdateProperty: (instance, name, value) => {
-            const behaviorName = behavior.getName();
-            const behaviorOverriding = initialInstance.hasBehaviorOverridingNamed(
-              behaviorName
-            )
-              ? initialInstance.getBehaviorOverriding(behaviorName)
-              : initialInstance.addNewBehaviorOverriding(
-                  project,
-                  behavior.getTypeName(),
-                  behaviorName
-                );
-            const behaviorProperties = behavior.getProperties();
-            const inheritedValue = behaviorProperties.has(name)
-              ? behaviorProperties.get(name).getValue()
-              : null;
-            if (inheritedValue === value) {
-              behaviorOverriding.removeProperty(name);
-            } else {
-              behaviorOverriding.updateProperty(name, value);
-            }
-          },
+            ),
           object,
           visibility: 'All',
           showcaseNonDefaultValues: true,

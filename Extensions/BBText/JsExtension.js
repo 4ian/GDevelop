@@ -27,6 +27,10 @@ module.exports = {
         'Todor Imreorov',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        'Rich text with BBCode markup: bold, italic, colors, sizes, shadows in a single object.'
+      )
+      .setDimension('2D')
       .setExtensionHelpPath('/objects/bbtext')
       .setCategory('Text');
     extension

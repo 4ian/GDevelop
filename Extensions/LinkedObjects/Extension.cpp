@@ -23,6 +23,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
           "that is more efficient than using variables.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("Link objects together to retrieve associated objects efficiently. Useful for equipment, connections.")
       .SetExtensionHelpPath("/all-features/linked-objects")
       .SetCategory("Advanced");
   extension.AddInstructionOrExpressionGroupMetadata(_("Linked objects"))

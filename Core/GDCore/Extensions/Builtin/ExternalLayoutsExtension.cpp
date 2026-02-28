@@ -19,6 +19,7 @@ BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(
                                "external layouts.",
                                "Florian Rival",
                                "Open source (MIT License)")
+      .SetShortDescription("Create objects from an external layout to reuse level sections or UI templates.")
       .SetExtensionHelpPath("/interface/scene-editor/external-layouts")
       .SetCategory("Advanced");
   extension.AddInstructionOrExpressionGroupMetadata(_("External layouts"))

@@ -59,6 +59,7 @@ gd::PlatformExtension *CreateGDJSPrimitiveDrawingExtension();
 gd::PlatformExtension *CreateGDJSTextEntryObjectExtension();
 gd::PlatformExtension *CreateGDJSInventoryExtension();
 gd::PlatformExtension *CreateGDJSLinkedObjectsExtension();
+gd::PlatformExtension *CreateGDJSMapExtension();
 gd::PlatformExtension *CreateGDJSSticker3DBehaviorExtension();
 gd::PlatformExtension *CreateGDJSSystemInfoExtension();
 gd::PlatformExtension *CreateGDJSShopifyExtension();
@@ -180,6 +181,9 @@ void JsPlatform::ReloadBuiltinExtensions() {
   std::cout.flush();
   AddExtension(std::shared_ptr<gd::PlatformExtension>(
       CreateGDJSLinkedObjectsExtension()));
+  std::cout.flush();
+  AddExtension(std::shared_ptr<gd::PlatformExtension>(
+      CreateGDJSMapExtension()));
   std::cout.flush();
   AddExtension(std::shared_ptr<gd::PlatformExtension>(
       CreateGDJSSticker3DBehaviorExtension()));

@@ -11,6 +11,7 @@ import RenderedParticleEmitterInstance from './Renderers/RenderedParticleEmitter
 import RenderedCustomObjectInstance from './Renderers/RenderedCustomObjectInstance';
 import LegacyRenderedCustomObjectInstance from './Renderers/LegacyRenderedCustomObjectInstance';
 import RenderedSprite3DInstance from './Renderers/RenderedSprite3DInstance';
+import RenderedMapInstance from './Renderers/RenderedMapInstance';
 import PixiResourcesLoader from './PixiResourcesLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import RenderedInstance from './Renderers/RenderedInstance';
@@ -51,6 +52,7 @@ const ObjectsRenderingService = {
     'PrimitiveDrawing::Drawer': RenderedShapePainterInstance,
     'TextEntryObject::TextEntry': RenderedTextEntryInstance,
     'ParticleSystem::ParticleEmitter': RenderedParticleEmitterInstance,
+    'Map::Map': RenderedMapInstance,
   },
   renderers3D: {},
   // $FlowFixMe[missing-this-annot]

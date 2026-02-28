@@ -60,6 +60,7 @@ type Props = {|
   searchQuery?: any,
   searchFocusOffset?: ?number,
   className?: string,
+  measurementTrigger: number,
   reactVirtualizedListProps?: {
     ref?: (list: {
       scrollToRow: (row: number) => void,
@@ -348,6 +349,79 @@ const TreeRow = ({
   );
 };
 
+// -- Measurement container --
+
+/**
+ * Renders ALL events in a hidden container so that their heights can be
+ * measured by each EventContainer's useLayoutEffect (which stores the
+ * height in EventHeightsCache). This component is rendered INSTEAD of
+ * the VariableSizeList when heights need to be (re-)measured.
+ *
+ * Because the switch from measurement to display mode happens inside
+ * useLayoutEffect (synchronous, before the browser paints), the user
+ * never sees the measurement render.
+ */
+const MeasurementContainer = ({
+  flatData,
+  width,
+  height,
+  scaffoldBlockPxWidth,
+  onMeasurementComplete,
+}: {
+  flatData: Array<FlatDataEntry>,
+  width: number,
+  height: number,
+  scaffoldBlockPxWidth: number,
+  onMeasurementComplete: () => void,
+}) => {
+  // After all children (EventContainers) have run their useLayoutEffects
+  // and stored their heights in EventHeightsCache, signal completion.
+  // React fires children's useLayoutEffects before parents', so the cache
+  // is fully populated when this fires.
+  React.useLayoutEffect(() => {
+    onMeasurementComplete();
+  });
+
+  return (
+    <div
+      style={{
+        width,
+        height,
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width,
+          visibility: 'hidden',
+          pointerEvents: 'none',
+        }}
+      >
+        {flatData.map((entry, _index) => {
+          const { node, lowerSiblingCounts } = entry;
+          const depth = lowerSiblingCounts.length;
+          return (
+            <div
+              key={String(node.key)}
+              style={{
+                paddingLeft: scaffoldBlockPxWidth * depth,
+                boxSizing: 'border-box',
+                width: '100%',
+              }}
+            >
+              {node.title({ node })}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 // -- Main component --
 
 const SortableEventsTree = ({
@@ -359,6 +433,7 @@ const SortableEventsTree = ({
   searchQuery,
   searchFocusOffset,
   className,
+  measurementTrigger,
   reactVirtualizedListProps,
 }: Props): React.MixedElement => {
   // $FlowFixMe[value-as-type]
@@ -384,6 +459,81 @@ const SortableEventsTree = ({
     [flatData, searchMethod, searchQuery]
   );
 
+  // -- Measurement state --
+  // Track what has been measured so we know when to re-measure.
+  // We re-measure when:
+  // 1. measurementTrigger changes (undo/redo, fold/unfold, external changes)
+  // 2. Container width changes (resize)
+  const lastMeasuredTriggerRef = React.useRef(-1);
+  const lastMeasuredWidthRef = React.useRef(0);
+  const [isMeasuring, setIsMeasuring] = React.useState(true);
+
+  // Save scroll position for restoration after measurement.
+  // We track the index of the top-visible event so we can scroll back
+  // to the same event even if heights changed (e.g., after resize).
+  const savedScrollEventIndexRef = React.useRef(0);
+
+  // Detect when measurement is needed by checking trigger and width
+  const currentWidthRef = React.useRef(0);
+  const needsMeasurement = React.useCallback(
+    (width: number): boolean => {
+      return (
+        measurementTrigger !== lastMeasuredTriggerRef.current ||
+        width !== lastMeasuredWidthRef.current
+      );
+    },
+    [measurementTrigger]
+  );
+
+  // When measurementTrigger changes, enter measurement mode
+  React.useEffect(
+    () => {
+      if (measurementTrigger !== lastMeasuredTriggerRef.current) {
+        // Save the index of the top visible event before measurement
+        if (outerRef.current && listRef.current) {
+          const scrollTop = outerRef.current.scrollTop;
+          let cumHeight = 0;
+          for (let i = 0; i < flatData.length; i++) {
+            const entry = flatData[i];
+            const h = Math.max(
+              1,
+              rowHeight({ node: entry ? entry.node : null })
+            );
+            if (cumHeight + h > scrollTop) {
+              savedScrollEventIndexRef.current = i;
+              break;
+            }
+            cumHeight += h;
+          }
+        }
+        setIsMeasuring(true);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [measurementTrigger]
+  );
+
+  const onMeasurementComplete = React.useCallback(
+    () => {
+      lastMeasuredTriggerRef.current = measurementTrigger;
+      lastMeasuredWidthRef.current = currentWidthRef.current;
+      setIsMeasuring(false);
+    },
+    [measurementTrigger]
+  );
+
+  // After switching from measurement to display mode, restore scroll position.
+  React.useLayoutEffect(() => {
+    if (!isMeasuring && listRef.current) {
+      const savedIndex = savedScrollEventIndexRef.current;
+      if (savedIndex > 0) {
+        listRef.current.scrollToItem(savedIndex, 'start');
+      }
+    }
+  }, [isMeasuring]);
+
+  // Expose the imperative handle for the parent (EventsTree) to control
+  // scrolling and height recomputation.
   React.useEffect(
     () => {
       if (!reactVirtualizedListProps || !reactVirtualizedListProps.ref) return;
@@ -401,7 +551,7 @@ const SortableEventsTree = ({
         container: outerRef.current,
       });
     },
-    [alignment, reactVirtualizedListProps, flatData.length]
+    [alignment, reactVirtualizedListProps, flatData.length, isMeasuring]
   );
 
   const itemSize = React.useCallback(
@@ -457,22 +607,42 @@ const SortableEventsTree = ({
   return (
     <div className={className}>
       <AutoSizer>
-        {({ width, height }) => (
-          <VariableSizeList
-            ref={listRef}
-            outerRef={outerRef}
-            className="rst__virtualScrollOverride"
-            height={height}
-            width={width}
-            itemCount={flatData.length}
-            itemSize={itemSize}
-            itemData={itemData}
-            itemKey={itemKey}
-            onScroll={handleScroll}
-          >
-            {TreeRow}
-          </VariableSizeList>
-        )}
+        {({ width, height }) => {
+          currentWidthRef.current = width;
+
+          // Check if width changed since last measurement
+          const widthChanged = width !== lastMeasuredWidthRef.current;
+          const showMeasurement = isMeasuring || widthChanged;
+
+          if (showMeasurement) {
+            return (
+              <MeasurementContainer
+                flatData={flatData}
+                width={width}
+                height={height}
+                scaffoldBlockPxWidth={scaffoldBlockPxWidth}
+                onMeasurementComplete={onMeasurementComplete}
+              />
+            );
+          }
+
+          return (
+            <VariableSizeList
+              ref={listRef}
+              outerRef={outerRef}
+              className="rst__virtualScrollOverride"
+              height={height}
+              width={width}
+              itemCount={flatData.length}
+              itemSize={itemSize}
+              itemData={itemData}
+              itemKey={itemKey}
+              onScroll={handleScroll}
+            >
+              {TreeRow}
+            </VariableSizeList>
+          );
+        }}
       </AutoSizer>
     </div>
   );

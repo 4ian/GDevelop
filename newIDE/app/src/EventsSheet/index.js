@@ -276,6 +276,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       onRedo: () => this.redo(),
       onZoomIn: (event: KeyboardEvent) => this.onZoomEvent('IN')(event),
       onZoomOut: (event: KeyboardEvent) => this.onZoomEvent('OUT')(event),
+      onMoveSelectionUp: () => this._moveEventSelection(-1),
+      onMoveSelectionDown: () => this._moveEventSelection(1),
     },
   }): KeyboardShortcuts);
 
@@ -423,6 +425,47 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     setTimeout(() => {
       this.setState({ navigationHighlightEvent: null });
     }, 3000);
+  };
+
+  /**
+   * Move the event selection up or down by `delta` rows.
+   * delta = -1 means move up, delta = +1 means move down.
+   */
+  _moveEventSelection = (delta: number) => {
+    const eventsTree = this._eventsTree;
+    if (!eventsTree) return;
+
+    const lastSelected = getLastSelectedEventContext(this.state.selection);
+    let targetRow: number;
+
+    if (lastSelected) {
+      const currentRow = eventsTree.getEventRow(lastSelected.event);
+      if (currentRow === -1) return;
+      targetRow = currentRow + delta;
+    } else {
+      // Nothing selected: select the first (down) or last visible event.
+      targetRow = delta > 0 ? 0 : -1;
+      if (targetRow === -1) return; // Can't go up from nothing
+    }
+
+    // Get the event context at the target row.
+    const eventContexts = eventsTree.getEventContextAtRowIndexes([targetRow]);
+    if (eventContexts.length === 0) return; // Out of bounds
+
+    const eventContext = eventContexts[0];
+    this.setState(
+      {
+        selection: selectEvent(
+          getInitialSelection(),
+          eventContext,
+          /* multiSelect */ false
+        ),
+      },
+      () => {
+        this.updateToolbar();
+        eventsTree.scrollToRow(targetRow);
+      }
+    );
   };
 
   updateToolbar() {
@@ -1781,16 +1824,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           const row = positions.positionsBeforeAction[0];
 
           if (row !== undefined) {
-            // Whether it is an ADD, EDIT or DELETE, scroll to the place where it was done.
+            // Scroll to where the action was done. Heights are now accurate
+            // because forceEventsUpdate triggers a full measurement pass
+            // (all events are pre-rendered to capture their heights before
+            // the virtualized list is shown).
             eventsTree.scrollToRow(row);
-            // Hack: because of the virtualization and the undo/redo, we lose the heights of events
-            // (at least some, because they are different objects in memory).
-            // While they are recomputed when rendered, scroll again to be sure we don't end
-            // up at the very beginning (if everything was recomputed from 0) or at
-            // an offset too large.
-            setTimeout(() => {
-              eventsTree.scrollToRow(row);
-            }, 70);
           }
           this.updateToolbar();
         }
@@ -1843,16 +1881,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           const row = positions.positionsBeforeAction[0];
 
           if (row !== undefined) {
-            // Whether it was an ADD, EDIT or DELETE, scroll to the place where it will happen.
+            // Scroll to where the action was done. Heights are now accurate
+            // because forceEventsUpdate triggers a full measurement pass.
             eventsTree.scrollToRow(row);
-            // Hack: because of the virtualization and the undo/redo, we lose the heights of events
-            // (at least some, because they are different objects in memory).
-            // While they are recomputed when rendered, scroll again to be sure we don't end
-            // up at the very beginning (if everything was recomputed from 0) or at
-            // an offset too large.
-            setTimeout(() => {
-              eventsTree.scrollToRow(row);
-            }, 70);
           }
           this.updateToolbar();
         }

@@ -415,6 +415,12 @@ const EventsTree: React.ComponentType<{
   const [isScrolledTop, setIsScrolledTop] = React.useState(true);
   const [isScrolledBottom, setIsScrolledBottom] = React.useState(false);
 
+  // Measurement trigger: incremented whenever a full height re-measurement
+  // is needed (undo/redo, fold/unfold, zoom, external changes, mount).
+  // SortableEventsTree uses this to decide when to enter measurement mode
+  // (pre-render ALL events hidden to capture accurate heights).
+  const [measurementTrigger, setMeasurementTrigger] = React.useState(0);
+
   // This is the data that will be displayed by the tree - reconstructed at each render
   // (because events could have changed, some could have been deleted, so we can't keep
   // any reference to them).
@@ -428,29 +434,26 @@ const EventsTree: React.ComponentType<{
   }, []);
 
   /**
-   * Should be called whenever an event height has changed
+   * Should be called whenever events change significantly (undo/redo,
+   * fold/unfold, zoom, external modification, etc.).
+   * Triggers a full height re-measurement of all events before the
+   * virtualized list is shown, ensuring scroll positions are always accurate.
    */
-  const onHeightsChanged = React.useCallback(
+  const forceEventsUpdate = React.useCallback(
     (cb: ?() => void) => {
-      if (_list.current) {
-        _list.current.recomputeRowHeights();
-      }
+      // Increment the measurement trigger so SortableEventsTree enters
+      // measurement mode (pre-renders ALL events to capture heights).
+      setMeasurementTrigger(v => v + 1);
       forceUpdate();
 
       // Use a timeout so that the callback is called after the events
-      // have been re-rendered.
+      // have been re-rendered (measurement + display mode switch).
       setTimeout(() => {
         if (cb) cb();
       });
     },
     [forceUpdate]
   );
-  const forceEventsUpdate = onHeightsChanged;
-
-  React.useEffect(() => {
-    onHeightsChanged();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const scrollToRow = React.useCallback((row: number) => {
     if (row === -1) return;
@@ -1079,8 +1082,11 @@ const EventsTree: React.ComponentType<{
   );
 
   React.useLayoutEffect(() => {
-    // Recompute the row heights of the tree at each render, because there
-    // is no guarantee that events heights have not changed (resizing, change in event...).
+    // Recompute the row heights of the virtualized list after each render.
+    // This handles incremental height changes (e.g., editing a single event's
+    // parameter causes its height to change). Full re-measurement (after
+    // undo/redo, resize, etc.) is handled by SortableEventsTree's measurement
+    // mode, triggered via measurementTrigger.
     if (_list.current) {
       _list.current.recomputeRowHeights();
     }
@@ -1134,6 +1140,7 @@ const EventsTree: React.ComponentType<{
         searchQuery={props.searchResults}
         searchFocusOffset={props.searchFocusOffset}
         className={props.searchResults ? eventsTreeWithSearchResults : ''}
+        measurementTrigger={measurementTrigger}
         reactVirtualizedListProps={{
           ref: list => {
             _list.current = list;

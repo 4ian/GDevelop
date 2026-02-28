@@ -50,6 +50,8 @@ type ShortcutCallbacks = {|
   onShift3?: () => void | Promise<void>,
   onToggleGrabbingTool?: (isEnabled: boolean) => void | Promise<void>,
   onRename?: () => void | Promise<void>,
+  onMoveSelectionUp?: () => void | Promise<void>,
+  onMoveSelectionDown?: () => void | Promise<void>,
 |};
 
 type ConstructorArgs = {|
@@ -268,6 +270,8 @@ export default class KeyboardShortcuts {
       onShift2,
       onShift3,
       onRename,
+      onMoveSelectionUp,
+      onMoveSelectionDown,
     } = this._shortcutCallbacks;
 
     if (onMove) {
@@ -283,6 +287,15 @@ export default class KeyboardShortcuts {
       } else if (evt.which === RIGHT_KEY) {
         evt.preventDefault();
         this._shiftPressed ? onMove(5, 0) : onMove(1, 0);
+      }
+    } else {
+      // Arrow-key navigation for event selection (e.g., in the events sheet).
+      if (onMoveSelectionUp && evt.which === UP_KEY) {
+        evt.preventDefault();
+        onMoveSelectionUp();
+      } else if (onMoveSelectionDown && evt.which === DOWN_KEY) {
+        evt.preventDefault();
+        onMoveSelectionDown();
       }
     }
     if (onDelete && (evt.which === BACKSPACE_KEY || evt.which === DELETE_KEY)) {

@@ -8,7 +8,7 @@ import VariablesList, {
 } from '../../VariablesList/VariablesList';
 import { type ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import ErrorBoundary from '../../UI/ErrorBoundary';
-import ScrollView from '../../UI/ScrollView';
+import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { Column, Line, Spacer, marginsSize } from '../../UI/Grid';
 import { Separator } from '../../CompactPropertiesEditor';
 import Text from '../../UI/Text';
@@ -35,6 +35,7 @@ import { useManageObjectBehaviors } from '../../BehaviorsEditor';
 import Object3d from '../../UI/CustomSvgIcons/Object3d';
 import Object2d from '../../UI/CustomSvgIcons/Object2d';
 import { mapFor } from '../../Utils/MapFor';
+import { usePersistedScrollPosition } from '../../Utils/UsePersistedScrollPosition';
 import CompactSelectField from '../../UI/CompactSelectField';
 import SelectOption from '../../UI/SelectOption';
 import { ChildObjectPropertiesEditor } from './ChildObjectPropertiesEditor';
@@ -482,6 +483,20 @@ export const CompactObjectPropertiesEditor = ({
   );
 
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
+  const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
+  const scrollKey = objects
+    .map((instance: gdObject) => '' + instance.ptr)
+    .join(';');
+
+  const persistedScrollId = object.getPersistentUuid();
+
+  const onScroll = usePersistedScrollPosition({
+    project,
+    scrollViewRef,
+    scrollKey,
+    persistedScrollId,
+    persistedScrollType: 'object',
+  });
 
   const propertiesSchema = React.useMemo(
     () => {
@@ -523,9 +538,11 @@ export const CompactObjectPropertiesEditor = ({
       scope="scene-editor-object-properties"
     >
       <ScrollView
+        ref={scrollViewRef}
         autoHideScrollbar
         style={styles.scrollView}
-        key={objects.map((instance: gdObject) => '' + instance.ptr).join(';')}
+        key={scrollKey}
+        onScroll={onScroll}
       >
         <Column expand noMargin id="object-properties-editor" noOverflowParent>
           <ColumnStackLayout expand noOverflowParent>

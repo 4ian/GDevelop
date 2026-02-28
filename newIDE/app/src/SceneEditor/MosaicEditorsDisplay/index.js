@@ -477,6 +477,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                   props.onOpenEventBasedObjectVariantEditor
                 }
                 onExportAssets={props.onExportAssets}
+                onImportAssets={props.onImportAssets}
                 onDeleteObjects={(objectWithContext, cb) =>
                   props.onDeleteObjects(i18n, objectWithContext, cb)
                 }

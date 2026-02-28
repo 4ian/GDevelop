@@ -12,6 +12,7 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/Project/AssetResourcePathCleaner.h"
 #include "GDCore/IDE/Project/ResourcesInUseHelper.h"
 #include "GDCore/IDE/Project/ResourcesRenamer.h"
@@ -114,23 +115,30 @@ void ObjectAssetSerializer::SerializeTo(
     resourceElement.SetAttribute("name", resource.GetName());
   }
 
-  std::unordered_set<gd::String> usedExtensionNames;
-  usedExtensionNames.insert(extensionName);
-  for (auto &usedVariantIdentifier : alreadyUsedVariantIdentifiers) {
-    usedExtensionNames.insert(PlatformExtension::GetExtensionFromFullObjectType(
-        usedVariantIdentifier));
-  }
   SerializerElement &requiredExtensionsElement =
       objectAssetElement.AddChild("requiredExtensions");
   requiredExtensionsElement.ConsiderAsArrayOf("requiredExtension");
-  for (auto &usedExtensionName : usedExtensionNames) {
-    if (project.HasEventsFunctionsExtensionNamed(usedExtensionName)) {
-      auto &extension = project.GetEventsFunctionsExtension(usedExtensionName);
-      SerializerElement &requiredExtensionElement =
-          requiredExtensionsElement.AddChild("requiredExtension");
-      requiredExtensionElement.SetAttribute("extensionName", usedExtensionName);
-      requiredExtensionElement.SetAttribute("extensionVersion",
-                                            extension.GetVersion());
+  if (project.HasEventsFunctionsExtensionNamed(extensionName)) {
+    auto &eventsFunctionsExtension =
+        project.GetEventsFunctionsExtension(extensionName);
+    auto &usedExtensionsResult =
+        gd::UsedExtensionsFinder::ScanEventsFunctionsExtension(
+            project, eventsFunctionsExtension);
+    auto usedExtensionNames = usedExtensionsResult.GetUsedExtensions();
+    // The extension may not use any of its own instructions.
+    usedExtensionNames.insert(extensionName);
+
+    for (auto &usedExtensionName : usedExtensionNames) {
+      if (project.HasEventsFunctionsExtensionNamed(usedExtensionName)) {
+        auto &extension =
+            project.GetEventsFunctionsExtension(usedExtensionName);
+        SerializerElement &requiredExtensionElement =
+            requiredExtensionsElement.AddChild("requiredExtension");
+        requiredExtensionElement.SetAttribute("extensionName",
+                                              usedExtensionName);
+        requiredExtensionElement.SetAttribute("extensionVersion",
+                                              extension.GetVersion());
+      }
     }
   }
 

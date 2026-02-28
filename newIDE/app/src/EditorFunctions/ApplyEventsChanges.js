@@ -262,8 +262,9 @@ export const applyEventsChanges = (
   sceneEvents: gdEventsList,
   eventOperationsInput: Array<AiGeneratedEventChange>,
   aiGeneratedEventId: string
-): void => {
+): {| applied: number, errors: Array<string> |} => {
   const operations: Array<EventOperation> = [];
+  const errors: Array<string> = [];
 
   eventOperationsInput.forEach(change => {
     const { operationName, operationTargetEvent, generatedEvents } = change;
@@ -271,6 +272,40 @@ export const applyEventsChanges = (
     let localEventsToInsert: gdEventsList | null = null;
 
     try {
+      // Check for comma-separated targets
+      if (operationTargetEvent && operationTargetEvent.includes(',')) {
+        if (operationName !== 'delete_event') {
+          errors.push(
+            `Operation "${operationName}" does not support multiple comma separated events as target.`
+          );
+          return;
+        }
+
+        // Handle comma-separated delete targets
+        const targets = operationTargetEvent
+          .split(',')
+          .map(t => t.trim())
+          .filter(t => t.length > 0);
+        for (const target of targets) {
+          let targetPath = findEventPathByAiGeneratedEventId(
+            sceneEvents,
+            target
+          );
+          if (!targetPath) {
+            try {
+              targetPath = parseEventPath(target);
+            } catch (pathParseError) {
+              errors.push(
+                `Could not find event with aiGeneratedEventId "${target}" and could not parse as path. Skipping deletion of "${target}".`
+              );
+              continue;
+            }
+          }
+          operations.push({ type: 'delete', path: targetPath });
+        }
+        return;
+      }
+
       if (operationTargetEvent) {
         // First search for an event with the exact aiGeneratedEventId.
         parsedPath = findEventPathByAiGeneratedEventId(
@@ -283,7 +318,7 @@ export const applyEventsChanges = (
           try {
             parsedPath = parseEventPath(operationTargetEvent);
           } catch (pathParseError) {
-            console.warn(
+            errors.push(
               `Could not find event with aiGeneratedEventId "${operationTargetEvent}" and could not parse as path. Skipping operation "${operationName}".`
             );
             return;
@@ -291,7 +326,7 @@ export const applyEventsChanges = (
         }
       } else if (operationName !== 'insert_at_end') {
         // Path is generally required, except for 'insert_at_end'.
-        console.warn(
+        errors.push(
           `Skipping operation "${operationName}" due to missing operationTargetEvent path.`
         );
         return;
@@ -307,7 +342,7 @@ export const applyEventsChanges = (
           project
         );
         if (localEventsToInsert.isEmpty()) {
-          console.warn(
+          errors.push(
             `Generated events for operation "${operationName}" (path: ${operationTargetEvent ||
               'N/A'}) are empty. Insertion might not add any events.`
           );
@@ -324,7 +359,7 @@ export const applyEventsChanges = (
         case 'insert_and_replace_event':
         case 'replace_entire_event_and_sub_events':
           if (!parsedPath) {
-            console.warn(
+            errors.push(
               `Skipping "${operationName}" due to missing or invalid path.`
             );
             if (localEventsToInsert) localEventsToInsert.delete();
@@ -341,7 +376,7 @@ export const applyEventsChanges = (
           break;
         case 'replace_event_but_keep_existing_sub_events':
           if (!parsedPath) {
-            console.warn(
+            errors.push(
               `Skipping "replace_event_but_keep_existing_sub_events" due to missing or invalid path.`
             );
             if (localEventsToInsert) localEventsToInsert.delete();
@@ -355,7 +390,7 @@ export const applyEventsChanges = (
           break;
         case 'insert_before_event':
           if (!parsedPath) {
-            console.warn(
+            errors.push(
               `Skipping "insert_before_event" due to missing or invalid path.`
             );
             if (localEventsToInsert) localEventsToInsert.delete();
@@ -369,7 +404,7 @@ export const applyEventsChanges = (
           break;
         case 'insert_after_event':
           if (!parsedPath) {
-            console.warn(
+            errors.push(
               `Skipping "insert_after_event" due to missing or invalid path.`
             );
             if (localEventsToInsert) localEventsToInsert.delete();
@@ -386,7 +421,7 @@ export const applyEventsChanges = (
           break;
         case 'insert_as_sub_event':
           if (!parsedPath) {
-            console.warn(
+            errors.push(
               `Skipping "insert_as_sub_event" due to missing or invalid path.`
             );
             if (localEventsToInsert) localEventsToInsert.delete();
@@ -400,7 +435,7 @@ export const applyEventsChanges = (
           break;
         case 'insert_actions_conditions_at_end':
           if (!parsedPath) {
-            console.warn(
+            errors.push(
               `Skipping "insert_actions_conditions_at_end" due to missing or invalid path.`
             );
             if (localEventsToInsert) localEventsToInsert.delete();
@@ -414,7 +449,7 @@ export const applyEventsChanges = (
           break;
         case 'insert_actions_conditions_at_start':
           if (!parsedPath) {
-            console.warn(
+            errors.push(
               `Skipping "insert_actions_conditions_at_start" due to missing or invalid path.`
             );
             if (localEventsToInsert) localEventsToInsert.delete();
@@ -428,7 +463,7 @@ export const applyEventsChanges = (
           break;
         case 'replace_all_actions':
           if (!parsedPath) {
-            console.warn(
+            errors.push(
               `Skipping "replace_all_actions" due to missing or invalid path.`
             );
             if (localEventsToInsert) localEventsToInsert.delete();
@@ -442,7 +477,7 @@ export const applyEventsChanges = (
           break;
         case 'replace_all_conditions':
           if (!parsedPath) {
-            console.warn(
+            errors.push(
               `Skipping "replace_all_conditions" due to missing or invalid path.`
             );
             if (localEventsToInsert) localEventsToInsert.delete();
@@ -456,7 +491,7 @@ export const applyEventsChanges = (
           break;
         case 'delete_event':
           if (!parsedPath) {
-            console.warn(
+            errors.push(
               `Skipping "delete_event" due to missing or invalid path.`
             );
             // No localEventsToInsert expected or created for delete_event.
@@ -480,14 +515,14 @@ export const applyEventsChanges = (
           });
           break;
         default:
-          console.warn(
+          errors.push(
             `Unknown operationName: "${operationName}". Skipping operation.`
           );
           // Clean up localEventsToInsert if it was created for an unknown operation
           if (localEventsToInsert) localEventsToInsert.delete();
       }
     } catch (e) {
-      console.warn(
+      errors.push(
         `Error processing event change (operation: "${operationName}", path: "${operationTargetEvent ||
           'N/A'}"): ${e.message}. Skipping this change.`
       );
@@ -509,6 +544,7 @@ export const applyEventsChanges = (
     return 0;
   });
 
+  let applied = 0;
   operations.forEach(op => {
     const pathForLog = op.path.join('.');
     try {
@@ -520,6 +556,7 @@ export const applyEventsChanges = (
         );
         // Check already done by getParentListAndIndex for 'access'
         parentList.removeEventAt(eventIndexInParentList);
+        applied++;
       } else if (op.type === 'insert') {
         const {
           parentList,
@@ -539,8 +576,9 @@ export const applyEventsChanges = (
             op.eventsToInsert.getEventsCount(),
             insertionIndex
           );
+          applied++;
         } else {
-          console.warn(
+          errors.push(
             `Insert operation for path [${pathForLog}] skipped: no events to insert or events list is empty.`
           );
         }
@@ -548,7 +586,7 @@ export const applyEventsChanges = (
         // op.path is the path to the PARENT event
         const parentEvent = getEventByPath(sceneEvents, op.path);
         if (!parentEvent.canHaveSubEvents()) {
-          console.warn(
+          errors.push(
             `Cannot insert sub-events: Event at path [${pathForLog}] does not support sub-events. Skipping.`
           );
           return;
@@ -563,8 +601,9 @@ export const applyEventsChanges = (
             op.eventsToInsert.getEventsCount(),
             subEventsList.getEventsCount() // Insert at the end of sub-events
           );
+          applied++;
         } else {
-          console.warn(
+          errors.push(
             `InsertAsSub operation for parent path [${pathForLog}] skipped: no events to insert or events list is empty.`
           );
         }
@@ -623,6 +662,7 @@ export const applyEventsChanges = (
         if (existingSubEvents) {
           existingSubEvents.delete();
         }
+        applied++;
       } else if (op.type === 'insertActionsConditionsAtEnd') {
         // Copy actions/conditions from generated event(s) to target event at end
         const targetEvent = getEventByPath(sceneEvents, op.path);
@@ -665,6 +705,7 @@ export const applyEventsChanges = (
             }
           }
         }
+        applied++;
       } else if (op.type === 'insertActionsConditionsAtStart') {
         // Copy actions/conditions from generated event(s) to target event at start
         const targetEvent = getEventByPath(sceneEvents, op.path);
@@ -696,6 +737,7 @@ export const applyEventsChanges = (
             }
           }
         }
+        applied++;
       } else if (op.type === 'replaceAllActions') {
         // Clear target event actions and replace with generated event(s) actions
         const targetEvent = getEventByPath(sceneEvents, op.path);
@@ -717,6 +759,7 @@ export const applyEventsChanges = (
             }
           }
         }
+        applied++;
       } else if (op.type === 'replaceAllConditions') {
         // Clear target event conditions and replace with generated event(s) conditions
         const targetEvent = getEventByPath(sceneEvents, op.path);
@@ -759,13 +802,13 @@ export const applyEventsChanges = (
             }
           }
         }
+        applied++;
       }
     } catch (error) {
-      console.error(
+      errors.push(
         `Error applying event operation type ${
           op.type
-        } for path [${pathForLog}]:`,
-        error
+        } for path [${pathForLog}]: ${error.message}`
       );
     } finally {
       // Clean up the gd.EventsList associated with this operation, if any.
@@ -774,6 +817,8 @@ export const applyEventsChanges = (
       }
     }
   });
+
+  return { applied, errors };
 };
 
 export const addUndeclaredVariables = ({

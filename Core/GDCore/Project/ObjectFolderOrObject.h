@@ -151,6 +151,13 @@ class GD_CORE_API ObjectFolderOrObject {
    */
   ObjectFolderOrObject& InsertNewFolder(const gd::String& newFolderName,
                                         std::size_t position);
+
+  /**
+   * \brief Return a folder with the given name and create it if it didn't
+   * exist.
+   */
+  ObjectFolderOrObject &GetOrCreateFolderChild(const gd::String &name);
+
   /**
    * \brief Returns true if the instance is a descendant of the given instance
    * of ObjectFolderOrObject.

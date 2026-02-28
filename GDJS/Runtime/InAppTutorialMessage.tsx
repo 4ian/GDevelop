@@ -148,8 +148,8 @@ namespace gdjs {
       const topOrMiddleOrBottom = position.toLowerCase().includes('top')
         ? 'top'
         : position.toLowerCase().includes('middle')
-        ? 'middle'
-        : 'bottom';
+          ? 'middle'
+          : 'bottom';
 
       const containerPositionStyle: AbsolutePositionStyle = {};
       const messageContainerPositionStyle: AbsolutePositionStyle = {};
@@ -200,10 +200,8 @@ namespace gdjs {
       const messageContent = document.createElement('div');
       messageContent.innerHTML = nmd(message);
 
-      const {
-        containerPositionStyle,
-        messageContainerPositionStyle,
-      } = _getPositioningStyle(position);
+      const { containerPositionStyle, messageContainerPositionStyle } =
+        _getPositioningStyle(position);
 
       _loadFonts();
       _loadStyleSheet();

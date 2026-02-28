@@ -272,6 +272,10 @@ describe('SimplifiedProject', () => {
               Object {
                 "behaviors": Array [
                   Object {
+                    "behaviorName": "Anchor",
+                    "behaviorType": "AnchorBehavior::AnchorBehavior",
+                  },
+                  Object {
                     "behaviorName": "Animation",
                     "behaviorType": "AnimatableCapability::AnimatableBehavior",
                   },
@@ -441,6 +445,10 @@ describe('SimplifiedProject', () => {
               },
               Object {
                 "behaviors": Array [
+                  Object {
+                    "behaviorName": "Anchor",
+                    "behaviorType": "AnchorBehavior::AnchorBehavior",
+                  },
                   Object {
                     "behaviorName": "Animation",
                     "behaviorType": "AnimatableCapability::AnimatableBehavior",

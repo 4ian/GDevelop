@@ -14,6 +14,7 @@ declare class gdObjectFolderOrObject {
   getChildPosition(child: gdObjectFolderOrObject): number;
   getParent(): gdObjectFolderOrObject;
   insertNewFolder(name: string, newPosition: number): gdObjectFolderOrObject;
+  getOrCreateFolderChild(name: string): gdObjectFolderOrObject;
   moveObjectFolderOrObjectToAnotherFolder(objectFolderOrObject: gdObjectFolderOrObject, newParentFolder: gdObjectFolderOrObject, newPosition: number): void;
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: gdObjectFolderOrObject): void;

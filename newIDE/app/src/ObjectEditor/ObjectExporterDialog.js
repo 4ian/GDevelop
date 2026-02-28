@@ -26,6 +26,9 @@ import {
   type TextFileDescriptor,
 } from '../Utils/BrowserArchiver';
 import ResourcesLoader from '../ResourcesLoader';
+import { type ExtensionDependency } from '../Utils/GDevelopServices/Extension';
+import { serializeToJSObject } from '../Utils/Serializer';
+import { getIDEVersion } from '../Version';
 
 const excludedObjectType = [
   'BBText::BBText',
@@ -164,6 +167,7 @@ const zipAssets = async (
   const textFiles: Array<TextFileDescriptor> = [];
 
   try {
+    const allRequiredExtensionNames = new Set<string>();
     await Promise.all(
       enumeratedObjects.map(async ({ object, path }) => {
         const usedResourceNames: Array<string> = [];
@@ -191,13 +195,39 @@ const zipAssets = async (
           blobFiles.set(resourceFile, { filePath: resourceFile, blob });
         }
 
+        const requiredExtensions: Array<ExtensionDependency> =
+          serializedObject.objectAssets[0].requiredExtensions || [];
+        for (const { extensionName } of requiredExtensions) {
+          allRequiredExtensionNames.add(extensionName);
+        }
+
         textFiles.push({
           text: JSON.stringify(serializedObject, null, 2),
           filePath: 'objects/' + path + object.getName() + '.asset.json',
         });
       })
     );
-
+    for (const extensionName of allRequiredExtensionNames) {
+      allRequiredExtensionNames.add(extensionName);
+      if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
+        continue;
+      }
+      const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+        extensionName
+      );
+      const serializedExtension = serializeToJSObject(
+        eventsFunctionsExtension,
+        'serializeToExternal'
+      );
+      textFiles.push({
+        text: JSON.stringify(serializedExtension, null, 2),
+        filePath: 'extensions/' + extensionName + '.json',
+      });
+    }
+    textFiles.push({
+      text: JSON.stringify({ gdevelopVersion: getIDEVersion() }, null, 2),
+      filePath: 'Metadata.json',
+    });
     const zippedAssetsBlob = await archiveFiles({
       textFiles,
       blobFiles: [...blobFiles.values()],

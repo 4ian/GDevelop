@@ -210,6 +210,17 @@ public:
 
   /**
    * \brief Call the specified worker on all ObjectContainers of the
+   * events-functions extension.
+   *
+   * This should be the preferred way to traverse all the objects of an
+   * events-functions extension.
+   */
+  static void ExposeEventsFunctionsExtensionObjects(
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+      gd::ArbitraryObjectsWorker &worker);
+
+  /**
+   * \brief Call the specified worker on all ObjectContainers of the
    * events-based object variant.
    *
    * This should be the preferred way to traverse all the objects of an

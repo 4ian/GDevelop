@@ -13,7 +13,6 @@ import Model3DEditor from './Editors/Model3DEditor';
 import SpineEditor from './Editors/SpineEditor';
 import SimpleTileMapEditor from './Editors/SimpleTileMapEditor';
 import MapEditor from './Editors/MapEditor';
-import Light3DEditor from './Editors/Light3DEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -154,21 +153,6 @@ const ObjectsEditorService = {
       ): gdObjectJsImplementation =>
         gd.asObjectJsImplementation(objectConfiguration),
       helpPagePath: '/objects/3d-model',
-    },
-    'Light3D::Light3D': {
-      component: Light3DEditor,
-      createNewObject: (
-        objectConfiguration: gdObjectConfiguration
-      ): gdObjectConfiguration =>
-        gd
-          .asObjectJsImplementation(objectConfiguration)
-          .clone()
-          .release(),
-      castToObjectType: (
-        objectConfiguration: gdObjectConfiguration
-      ): gdObjectJsImplementation =>
-        gd.asObjectJsImplementation(objectConfiguration),
-      helpPagePath: '/objects/light3d',
     },
     'Map::Map': {
       component: MapEditor,

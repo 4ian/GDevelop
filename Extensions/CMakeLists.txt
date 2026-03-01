@@ -14,7 +14,6 @@ set(
 	DestroyOutsideBehavior
 	DraggableBehavior
 	Inventory
-	Light3D
 	LinkedObjects
 	Map
 	Sticker3DBehavior

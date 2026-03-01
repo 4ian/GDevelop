@@ -1939,6 +1939,241 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('setColor');
 
+    // PointLight3D Object - Professional 3D Light with Editor Visualization
+    {
+      const PointLight3DObject = new gd.ObjectJsImplementation();
+      PointLight3DObject.updateProperty = function (propertyName, newValue) {
+        const objectContent = this.content;
+
+        if (propertyName === 'color') {
+          objectContent.color = newValue;
+          return true;
+        }
+
+        if (propertyName === 'intensity') {
+          objectContent.intensity = parseFloat(newValue);
+          return true;
+        }
+
+        if (propertyName === 'distance') {
+          objectContent.distance = parseFloat(newValue);
+          return true;
+        }
+
+        if (propertyName === 'decay') {
+          objectContent.decay = parseFloat(newValue);
+          return true;
+        }
+
+        if (propertyName === 'castShadow') {
+          objectContent.castShadow = newValue === '1' || newValue === 'true';
+          return true;
+        }
+
+        if (propertyName === 'shadowMapSize') {
+          objectContent.shadowMapSize = parseFloat(newValue);
+          return true;
+        }
+
+        return false;
+      };
+
+      PointLight3DObject.getProperties = function () {
+        const objectProperties = new gd.MapStringPropertyDescriptor();
+        const objectContent = this.content;
+
+        // Color
+        objectProperties
+          .getOrCreate('color')
+          .setValue(objectContent.color || '255;255;255')
+          .setType('Color')
+          .setLabel(_('Color'))
+          .setGroup(_('Appearance'));
+
+        // Intensity
+        objectProperties
+          .getOrCreate('intensity')
+          .setValue((objectContent.intensity !== undefined ? objectContent.intensity : 1).toString())
+          .setType('number')
+          .setLabel(_('Intensity'))
+          .setGroup(_('Appearance'));
+
+        // Distance (Range)
+        objectProperties
+          .getOrCreate('distance')
+          .setValue((objectContent.distance !== undefined ? objectContent.distance : 100).toString())
+          .setType('number')
+          .setLabel(_('Range (Distance)'))
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setGroup(_('Appearance'));
+
+        // Decay
+        objectProperties
+          .getOrCreate('decay')
+          .setValue((objectContent.decay !== undefined ? objectContent.decay : 2).toString())
+          .setType('number')
+          .setLabel(_('Decay'))
+          .setGroup(_('Appearance'))
+          .setAdvanced(true);
+
+        // Cast Shadow
+        objectProperties
+          .getOrCreate('castShadow')
+          .setValue(objectContent.castShadow ? 'true' : 'false')
+          .setType('boolean')
+          .setLabel(_('Cast Shadow'))
+          .setGroup(_('Shadows'));
+
+        // Shadow Map Size
+        objectProperties
+          .getOrCreate('shadowMapSize')
+          .setValue((objectContent.shadowMapSize !== undefined ? objectContent.shadowMapSize : 1024).toString())
+          .setType('number')
+          .setLabel(_('Shadow Map Size'))
+          .setGroup(_('Shadows'))
+          .setAdvanced(true);
+
+        return objectProperties;
+      };
+
+      PointLight3DObject.content = {
+        color: '255;255;255',
+        intensity: 1,
+        distance: 100,
+        decay: 2,
+        castShadow: false,
+        shadowMapSize: 1024,
+      };
+
+      PointLight3DObject.updateInitialInstanceProperty = function (
+        instance,
+        propertyName,
+        newValue
+      ) {
+        return false;
+      };
+
+      PointLight3DObject.getInitialInstanceProperties = function (instance) {
+        const instanceProperties = new gd.MapStringPropertyDescriptor();
+        return instanceProperties;
+      };
+
+      const pointLightObject = extension
+        .addObject(
+          'PointLight3DObject',
+          _('3D Point Light'),
+          _('A professional 3D point light that illuminates the scene. Visible in the editor with range visualization.'),
+          'JsPlatform/Extensions/3d_box.svg',
+          PointLight3DObject
+        )
+        .setCategory('Lighting')
+        .markAsRenderedIn3D()
+        .addDefaultBehavior('Scene3D::Base3DBehavior')
+        .setIncludeFile('Extensions/3D/A_RuntimeObject3D.js')
+        .addIncludeFile('Extensions/3D/A_RuntimeObject3DRenderer.js')
+        .addIncludeFile('Extensions/3D/PointLight3DRuntimeObject.js')
+        .addIncludeFile('Extensions/3D/PointLight3DRuntimeObjectRenderer.js');
+
+      // Color
+      pointLightObject
+        .addAction(
+          'SetColor',
+          _('Color'),
+          _('Change the color of the light'),
+          _('Change color of _PARAM0_ to _PARAM1_'),
+          _('Appearance'),
+          'res/actions/color24.png',
+          'res/actions/color.png'
+        )
+        .addParameter('object', _('3D Point Light'), 'PointLight3DObject', false)
+        .addParameter('color', _('Color'))
+        .setFunctionName('setColor');
+
+      // Intensity
+      pointLightObject
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Intensity',
+          _('Intensity'),
+          _('the intensity'),
+          _('the intensity'),
+          _('Appearance'),
+          'res/actions/light.png'
+        )
+        .addParameter('object', _('3D Point Light'), 'PointLight3DObject', false)
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions());
+
+      // Distance
+      pointLightObject
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Distance',
+          _('Range (Distance)'),
+          _('the range'),
+          _('the range'),
+          _('Appearance'),
+          'res/actions/light.png'
+        )
+        .addParameter('object', _('3D Point Light'), 'PointLight3DObject', false)
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions());
+
+      // Decay
+      pointLightObject
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Decay',
+          _('Decay'),
+          _('the decay'),
+          _('the decay'),
+          _('Appearance'),
+          'res/actions/light.png'
+        )
+        .addParameter('object', _('3D Point Light'), 'PointLight3DObject', false)
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions());
+
+      pointLightObject
+        .addScopedAction(
+          'SetCastShadow',
+          _('Cast shadow'),
+          _('Enable or disable shadow casting'),
+          _('Cast shadow from _PARAM0_: _PARAM1_'),
+          _('Shadows'),
+          'res/actions/shadow.png',
+          'res/actions/shadow.png'
+        )
+        .addParameter('object', _('3D Point Light'), 'PointLight3DObject', false)
+        .addParameter('yesorno', _('Cast shadow'), '', true)
+        .setDefaultValue('yes')
+        .setFunctionName('setCastShadow');
+
+      pointLightObject
+        .addScopedCondition(
+          'IsCastingShadow',
+          _('Is casting shadow'),
+          _('Check if the light is casting shadows'),
+          _('Light _PARAM0_ is casting shadow'),
+          _('Shadows'),
+          'res/conditions/shadow.png',
+          'res/conditions/shadow.png'
+        )
+        .addParameter('object', _('3D Point Light'), 'PointLight3DObject', false)
+        .setFunctionName('isCastingShadow');
+
+      // Shadow Map Size
+      pointLightObject
+        .addExpressionAndConditionAndAction(
+          'number',
+          'ShadowMapSize',
+          _('Shadow map size'),
+          _('the shadow map size'),
+          _('the shadow map size'),
+          _('Shadows'),
+          'res/actions/shadow.png'
+        )
+        .addParameter('object', _('3D Point Light'), 'PointLight3DObject', false)
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions());
+    }
+
     extension
       .addExpressionAndConditionAndAction(
         'number',
@@ -3308,6 +3543,379 @@ module.exports = {
     objectsRenderingService.registerInstance3DRenderer(
       'Scene3D::Cube3DObject',
       RenderedCube3DObject3DInstance
+    );
+
+    // PointLight3D Renderers - Professional Visualization
+    class RenderedPointLight3D2DInstance extends RenderedInstance {
+      /** @type {number} */
+      _defaultWidth = 32;
+      /** @type {number} */
+      _defaultHeight = 32;
+
+      constructor(
+        project,
+        instance,
+        associatedObjectConfiguration,
+        pixiContainer,
+        pixiResourcesLoader
+      ) {
+        super(
+          project,
+          instance,
+          associatedObjectConfiguration,
+          pixiContainer,
+          pixiResourcesLoader
+        );
+
+        this._pixiObject = new PIXI.Graphics();
+        this._pixiContainer.addChild(this._pixiObject);
+      }
+
+      onRemovedFromScene() {
+        super.onRemovedFromScene();
+        this._pixiObject.destroy({ children: true });
+      }
+
+      static getThumbnail(project, resourcesLoader, objectConfiguration) {
+        return 'JsPlatform/Extensions/3d_box.svg';
+      }
+
+      update() {
+        const width = 32;
+        const height = 32;
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
+        const color = object.content.color || '255;255;255';
+        const [r, g, b] = color.split(';').map((v) => parseInt(v));
+        const colorHex = (r << 16) | (g << 8) | b;
+
+        this._pixiObject.clear();
+        // Draw light bulb icon
+        this._pixiObject.beginFill(colorHex);
+        this._pixiObject.lineStyle(2, 0xffaa00, 1);
+        this._pixiObject.drawCircle(0, 0, 12);
+        this._pixiObject.endFill();
+
+        // Draw rays
+        for (let i = 0; i < 8; i++) {
+          const angle = (i / 8) * Math.PI * 2;
+          this._pixiObject.lineStyle(2, colorHex, 0.8);
+          this._pixiObject.moveTo(Math.cos(angle) * 14, Math.sin(angle) * 14);
+          this._pixiObject.lineTo(Math.cos(angle) * 20, Math.sin(angle) * 20);
+        }
+
+        this._pixiObject.position.x = this._instance.getX() + width / 2;
+        this._pixiObject.position.y = this._instance.getY() + height / 2;
+      }
+
+      getDefaultWidth() {
+        return this._defaultWidth;
+      }
+
+      getDefaultHeight() {
+        return this._defaultHeight;
+      }
+
+      getCenterX() {
+        return 16;
+      }
+
+      getCenterY() {
+        return 16;
+      }
+    }
+
+    class RenderedPointLight3D3DInstance extends Rendered3DInstance {
+      _defaultWidth = 32;
+      _defaultHeight = 32;
+      _defaultDepth = 32;
+
+      /** @type {THREE.Group | null} */
+      _helperGroup = null;
+      /** @type {THREE.Sprite | null} */
+      _iconSprite = null;
+      /** @type {THREE.LineSegments | null} */
+      _rangeMesh = null;
+      /** @type {THREE.Object3D | null} */
+      _directionArrow = null;
+
+      constructor(
+        project,
+        instance,
+        associatedObjectConfiguration,
+        pixiContainer,
+        threeGroup,
+        pixiResourcesLoader
+      ) {
+        super(
+          project,
+          instance,
+          associatedObjectConfiguration,
+          pixiContainer,
+          threeGroup,
+          pixiResourcesLoader
+        );
+
+        // Create PIXI placeholder
+        this._pixiObject = new PIXI.Graphics();
+        this._pixiContainer.addChild(this._pixiObject);
+
+        // Create helper group
+        this._helperGroup = new THREE.Group();
+        this._threeGroup.add(this._helperGroup);
+
+        // Create billboard icon
+        this._createBillboardIcon();
+
+        // Create range visualization
+        this._createRangeVisualization();
+      }
+
+      _createBillboardIcon() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Clear canvas
+        ctx.clearRect(0, 0, 64, 64);
+
+        // Draw light bulb circle
+        ctx.beginPath();
+        ctx.arc(32, 32, 18, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffff00';
+        ctx.fill();
+        ctx.strokeStyle = '#ffaa00';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Draw light rays
+        for (let i = 0; i < 8; i++) {
+          const angle = (i / 8) * Math.PI * 2;
+          ctx.beginPath();
+          ctx.moveTo(
+            32 + Math.cos(angle) * 22,
+            32 + Math.sin(angle) * 22
+          );
+          ctx.lineTo(
+            32 + Math.cos(angle) * 30,
+            32 + Math.sin(angle) * 30
+          );
+          ctx.strokeStyle = '#ffaa00';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+        }
+
+        const texture = new THREE.CanvasTexture(canvas);
+        const material = new THREE.SpriteMaterial({
+          map: texture,
+          transparent: true,
+          opacity: 0.9,
+          depthTest: false,
+          depthWrite: false,
+        });
+
+        this._iconSprite = new THREE.Sprite(material);
+        this._iconSprite.scale.set(32, 32, 1);
+        this._iconSprite.renderOrder = 999;
+        this._helperGroup.add(this._iconSprite);
+      }
+
+      _createRangeVisualization() {
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
+        const lightType = object.content.lightType || 'Point';
+        const color = object.content.color || '255;255;255';
+        const [r, g, b] = color.split(';').map((v) => parseInt(v) / 255);
+
+        if (lightType === 'Point') {
+          // Create sphere wireframe for Point Light
+          const geometry = new THREE.SphereGeometry(1, 32, 16);
+          const wireframe = new THREE.WireframeGeometry(geometry);
+
+          this._rangeMesh = new THREE.LineSegments(
+            wireframe,
+            new THREE.LineBasicMaterial({
+              color: new THREE.Color(r, g, b),
+              transparent: true,
+              opacity: 0.3,
+              depthTest: false,
+              depthWrite: false,
+            })
+          );
+          this._rangeMesh.renderOrder = 998;
+        } else {
+          // Create cone wireframe for Spot Light
+          // We'll use a custom geometry for the cone
+          const coneGeometry = new THREE.ConeGeometry(1, 1, 32, 1, true);
+          const wireframe = new THREE.WireframeGeometry(coneGeometry);
+
+          this._rangeMesh = new THREE.LineSegments(
+            wireframe,
+            new THREE.LineBasicMaterial({
+              color: new THREE.Color(r, g, b),
+              transparent: true,
+              opacity: 0.3,
+              depthTest: false,
+              depthWrite: false,
+            })
+          );
+          // Align cone to point along -Z axis
+          this._rangeMesh.rotation.x = -Math.PI / 2;
+          this._rangeMesh.renderOrder = 998;
+
+          // Add direction arrow
+          const arrowGeometry = new THREE.ConeGeometry(0.1, 0.4, 16);
+          const arrowMaterial = new THREE.MeshBasicMaterial({
+            color: new THREE.Color(r, g, b),
+            transparent: true,
+            opacity: 0.6,
+            depthTest: false,
+            depthWrite: false,
+          });
+          this._directionArrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
+          this._directionArrow.rotation.x = -Math.PI / 2;
+          this._directionArrow.position.z = -0.6;
+          this._directionArrow.renderOrder = 997;
+          this._helperGroup.add(this._directionArrow);
+        }
+
+        this._helperGroup.add(this._rangeMesh);
+      }
+
+      _updateHelperColor(color) {
+        const [r, g, b] = color.split(';').map((v) => parseInt(v) / 255);
+        const threeColor = new THREE.Color(r, g, b);
+
+        if (this._iconSprite) {
+          this._iconSprite.material.color = threeColor;
+        }
+
+        if (this._rangeMesh) {
+          this._rangeMesh.material.color = threeColor;
+        }
+
+        if (this._directionArrow) {
+          this._directionArrow.material.color = threeColor;
+        }
+      }
+
+      _updateRangeScale(distance, angle, lightType) {
+        if (!this._rangeMesh) return;
+
+        if (lightType === 'Spot') {
+          const angleRad = (angle * Math.PI) / 180;
+          const height = distance;
+          const radius = Math.tan(angleRad / 2) * height;
+          this._rangeMesh.scale.set(radius, height, radius);
+
+          // Update arrow position
+          if (this._directionArrow) {
+            this._directionArrow.position.z = -height * 0.6;
+          }
+        } else {
+          // Point light - uniform sphere
+          this._rangeMesh.scale.set(distance, distance, distance);
+        }
+      }
+
+      updatePixiObject() {
+        const width = 32;
+        const height = 32;
+
+        this._pixiObject.clear();
+        this._pixiObject.beginFill(0x999999, 0.2);
+        this._pixiObject.lineStyle(1, 0xffd900, 0);
+        this._pixiObject.drawRect(-width / 2, -height / 2, width, height);
+        this._pixiObject.endFill();
+
+        this._pixiObject.position.x = this._instance.getX() + width / 2;
+        this._pixiObject.position.y = this._instance.getY() + height / 2;
+      }
+
+      update() {
+        this.updatePixiObject();
+
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
+
+        const lightType = object.content.lightType || 'Point';
+        const color = object.content.color || '255;255;255';
+        const distance =
+          object.content.distance !== undefined ? object.content.distance : 100;
+        const angle = object.content.angle !== undefined ? object.content.angle : 60;
+        const showHelper =
+          object.content.showHelper !== undefined
+            ? object.content.showHelper
+            : true;
+
+        // Update position
+        this._helperGroup.position.set(
+          this._instance.getX(),
+          this._instance.getY(),
+          this._instance.getZ()
+        );
+
+        // Update rotation for spot lights
+        if (lightType === 'Spot') {
+          this._helperGroup.rotation.set(
+            RenderedInstance.toRad(this._instance.getRotationX()),
+            RenderedInstance.toRad(this._instance.getRotationY()),
+            RenderedInstance.toRad(this._instance.getAngle())
+          );
+        } else {
+          // Point lights don't rotate
+          this._helperGroup.rotation.set(0, 0, 0);
+        }
+
+        // Update visibility
+        this._helperGroup.visible = showHelper;
+
+        // Update color
+        this._updateHelperColor(color);
+
+        // Update range scale
+        this._updateRangeScale(distance, angle, lightType);
+      }
+
+      getDefaultWidth() {
+        return this._defaultWidth;
+      }
+
+      getDefaultHeight() {
+        return this._defaultHeight;
+      }
+
+      getDefaultDepth() {
+        return this._defaultDepth;
+      }
+
+      getCenterX() {
+        return 16;
+      }
+
+      getCenterY() {
+        return 16;
+      }
+
+      getCenterZ() {
+        return 16;
+      }
+    }
+
+    objectsRenderingService.registerInstanceRenderer(
+      'Scene3D::PointLight3DObject',
+      RenderedPointLight3D2DInstance
+    );
+    objectsRenderingService.registerInstance3DRenderer(
+      'Scene3D::PointLight3DObject',
+      RenderedPointLight3D3DInstance
     );
 
     const epsilon = 1 / (1 << 16);

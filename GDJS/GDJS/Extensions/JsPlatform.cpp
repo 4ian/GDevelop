@@ -66,7 +66,6 @@ gd::PlatformExtension *CreateGDJSShopifyExtension();
 gd::PlatformExtension *CreateGDJSPathfindingBehaviorExtension();
 gd::PlatformExtension *CreateGDJSPhysicsBehaviorExtension();
 gd::PlatformExtension *CreateGDJSParticleSystemExtension();
-gd::PlatformExtension *CreateGDJSLight3DExtension();
 }
 #endif
 
@@ -200,9 +199,6 @@ void JsPlatform::ReloadBuiltinExtensions() {
   std::cout.flush();
   AddExtension(std::shared_ptr<gd::PlatformExtension>(
       CreateGDJSPhysicsBehaviorExtension()));
-  std::cout.flush();
-  AddExtension(std::shared_ptr<gd::PlatformExtension>(
-      CreateGDJSLight3DExtension()));
   std::cout.flush();
 #endif
   std::cout << "done." << std::endl;

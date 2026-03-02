@@ -1724,8 +1724,7 @@ module.exports = {
         propertyName === 'castShadow' ||
         propertyName === 'guardrailsEnabled'
       ) {
-        objectContent[propertyName] =
-          newValue === '1' || newValue === 'true';
+        objectContent[propertyName] = newValue === '1' || newValue === 'true';
         return true;
       }
 
@@ -2091,7 +2090,9 @@ module.exports = {
       .useStandardParameters(
         'boolean',
         gd.ParameterOptions.makeNewOptions().setDescription(
-          _('If enabled, this light is managed by the nearest-lights limit system.')
+          _(
+            'If enabled, this light is managed by the nearest-lights limit system.'
+          )
         )
       )
       .setFunctionName('setGuardrailsEnabled')
@@ -2861,7 +2862,10 @@ module.exports = {
         this._pixiObject.angle = this._instance.getAngle();
 
         const distance = Math.max(0, Number(object.content.distance || 0));
-        const angle = Math.max(1, Math.min(89, Number(object.content.angle || 45)));
+        const angle = Math.max(
+          1,
+          Math.min(89, Number(object.content.angle || 45))
+        );
         const previewDistance = Math.max(
           20,
           Math.min(220, distance > 0 ? distance * 0.25 : 120)
@@ -3012,14 +3016,24 @@ module.exports = {
           RenderedInstance.toRad(this._instance.getAngle())
         );
 
-        const angle = Math.max(1, Math.min(89, Number(object.content.angle || 45)));
+        const angle = Math.max(
+          1,
+          Math.min(89, Number(object.content.angle || 45))
+        );
         const distance = Math.max(0, Number(object.content.distance || 0));
-        const coneRadiusScale = Math.max(0.25, Math.tan(RenderedInstance.toRad(angle / 2)));
+        const coneRadiusScale = Math.max(
+          0.25,
+          Math.tan(RenderedInstance.toRad(angle / 2))
+        );
         const coneLengthScale = Math.max(
           0.7,
           Math.min(2.4, distance > 0 ? distance / 320 : 1.2)
         );
-        this._coneMesh.scale.set(coneRadiusScale, coneLengthScale, coneRadiusScale);
+        this._coneMesh.scale.set(
+          coneRadiusScale,
+          coneLengthScale,
+          coneRadiusScale
+        );
 
         const color = objectsRenderingService.rgbOrHexToHexNumber(
           object.content.color || '255;255;255'

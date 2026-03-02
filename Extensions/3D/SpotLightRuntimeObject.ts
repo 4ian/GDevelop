@@ -39,9 +39,8 @@ namespace gdjs {
   const getOrCreateGuardrailsState = (
     runtimeScene: gdjs.RuntimeScene
   ): SpotLightGuardrailsState => {
-    const existingState = spotLightGuardrailsStateByRuntimeScene.get(
-      runtimeScene
-    );
+    const existingState =
+      spotLightGuardrailsStateByRuntimeScene.get(runtimeScene);
     if (existingState) {
       return existingState;
     }
@@ -149,7 +148,9 @@ namespace gdjs {
           const layer = runtimeScene.getLayer(layerName);
           const cameraX = layer.getCameraX();
           const cameraY = layer.getCameraY();
-          const cameraZ = layer.getCameraZ(layer.getInitialCamera3DFieldOfView());
+          const cameraZ = layer.getCameraZ(
+            layer.getInitialCamera3DFieldOfView()
+          );
 
           lights.sort(
             (firstLight, secondLight) =>
@@ -157,7 +158,10 @@ namespace gdjs {
               secondLight.getDistanceToCameraSquared(cameraX, cameraY, cameraZ)
           );
 
-          const maxActiveLights = getMaxActiveSpotLights(runtimeScene, layerName);
+          const maxActiveLights = getMaxActiveSpotLights(
+            runtimeScene,
+            layerName
+          );
 
           for (let index = 0; index < lights.length; index++) {
             lights[index].setGuardrailActive(index < maxActiveLights);
@@ -237,7 +241,8 @@ namespace gdjs {
       super(instanceContainer, objectData, instanceData);
 
       const objectContent = objectData.content;
-      this._enabled = objectContent.enabled === undefined ? true : !!objectContent.enabled;
+      this._enabled =
+        objectContent.enabled === undefined ? true : !!objectContent.enabled;
       this._color = objectContent.color || '255;255;255';
       this._intensity = Math.max(
         0,
@@ -252,19 +257,34 @@ namespace gdjs {
       );
       this._penumbra = Math.max(
         0,
-        Math.min(1, objectContent.penumbra !== undefined ? objectContent.penumbra : 0.1)
+        Math.min(
+          1,
+          objectContent.penumbra !== undefined ? objectContent.penumbra : 0.1
+        )
       );
-      this._decay = Math.max(0, objectContent.decay !== undefined ? objectContent.decay : 2);
+      this._decay = Math.max(
+        0,
+        objectContent.decay !== undefined ? objectContent.decay : 2
+      );
       this._castShadow = !!objectContent.castShadow;
-      this._shadowQuality = clampShadowQuality(objectContent.shadowQuality || 'medium');
-      this._shadowBias = objectContent.shadowBias !== undefined ? objectContent.shadowBias : 0.001;
+      this._shadowQuality = clampShadowQuality(
+        objectContent.shadowQuality || 'medium'
+      );
+      this._shadowBias =
+        objectContent.shadowBias !== undefined
+          ? objectContent.shadowBias
+          : 0.001;
       this._shadowNormalBias = Math.max(
         0,
-        objectContent.shadowNormalBias !== undefined ? objectContent.shadowNormalBias : 0.02
+        objectContent.shadowNormalBias !== undefined
+          ? objectContent.shadowNormalBias
+          : 0.02
       );
       this._shadowRadius = Math.max(
         0,
-        objectContent.shadowRadius !== undefined ? objectContent.shadowRadius : 1.5
+        objectContent.shadowRadius !== undefined
+          ? objectContent.shadowRadius
+          : 1.5
       );
       this._shadowNear = Math.max(
         0.01,
@@ -303,7 +323,9 @@ namespace gdjs {
       this._renderer.setPenumbra(this._penumbra);
       this._renderer.setDecay(this._decay);
       this._renderer.setCastShadow(this._castShadow);
-      this._renderer.setShadowMapSize(shadowQualityToMapSize(this._shadowQuality));
+      this._renderer.setShadowMapSize(
+        shadowQualityToMapSize(this._shadowQuality)
+      );
       this._renderer.setShadowBias(this._shadowBias);
       this._renderer.setShadowNormalBias(this._shadowNormalBias);
       this._renderer.setShadowRadius(this._shadowRadius);
@@ -322,22 +344,48 @@ namespace gdjs {
       super.updateFromObjectData(oldObjectData, newObjectData);
 
       const objectContent = newObjectData.content;
-      this.setEnabled(objectContent.enabled === undefined ? true : !!objectContent.enabled);
+      this.setEnabled(
+        objectContent.enabled === undefined ? true : !!objectContent.enabled
+      );
       this.setColor(objectContent.color || '255;255;255');
-      this.setIntensity(objectContent.intensity !== undefined ? objectContent.intensity : 1);
-      this.setDistance(objectContent.distance !== undefined ? objectContent.distance : 600);
-      this.setConeAngle(objectContent.angle !== undefined ? objectContent.angle : 45);
-      this.setPenumbra(objectContent.penumbra !== undefined ? objectContent.penumbra : 0.1);
-      this.setDecay(objectContent.decay !== undefined ? objectContent.decay : 2);
+      this.setIntensity(
+        objectContent.intensity !== undefined ? objectContent.intensity : 1
+      );
+      this.setDistance(
+        objectContent.distance !== undefined ? objectContent.distance : 600
+      );
+      this.setConeAngle(
+        objectContent.angle !== undefined ? objectContent.angle : 45
+      );
+      this.setPenumbra(
+        objectContent.penumbra !== undefined ? objectContent.penumbra : 0.1
+      );
+      this.setDecay(
+        objectContent.decay !== undefined ? objectContent.decay : 2
+      );
       this.setCastShadow(!!objectContent.castShadow);
       this.setShadowQuality(objectContent.shadowQuality || 'medium');
-      this.setShadowBias(objectContent.shadowBias !== undefined ? objectContent.shadowBias : 0.001);
-      this.setShadowNormalBias(
-        objectContent.shadowNormalBias !== undefined ? objectContent.shadowNormalBias : 0.02
+      this.setShadowBias(
+        objectContent.shadowBias !== undefined
+          ? objectContent.shadowBias
+          : 0.001
       );
-      this.setShadowRadius(objectContent.shadowRadius !== undefined ? objectContent.shadowRadius : 1.5);
-      this.setShadowNear(objectContent.shadowNear !== undefined ? objectContent.shadowNear : 1);
-      this.setShadowFar(objectContent.shadowFar !== undefined ? objectContent.shadowFar : 2000);
+      this.setShadowNormalBias(
+        objectContent.shadowNormalBias !== undefined
+          ? objectContent.shadowNormalBias
+          : 0.02
+      );
+      this.setShadowRadius(
+        objectContent.shadowRadius !== undefined
+          ? objectContent.shadowRadius
+          : 1.5
+      );
+      this.setShadowNear(
+        objectContent.shadowNear !== undefined ? objectContent.shadowNear : 1
+      );
+      this.setShadowFar(
+        objectContent.shadowFar !== undefined ? objectContent.shadowFar : 2000
+      );
       this.setGuardrailsEnabled(
         objectContent.guardrailsEnabled === undefined
           ? true
@@ -398,7 +446,8 @@ namespace gdjs {
       if (networkSyncData.a !== undefined) this.setConeAngle(networkSyncData.a);
       if (networkSyncData.p !== undefined) this.setPenumbra(networkSyncData.p);
       if (networkSyncData.dc !== undefined) this.setDecay(networkSyncData.dc);
-      if (networkSyncData.cs !== undefined) this.setCastShadow(networkSyncData.cs);
+      if (networkSyncData.cs !== undefined)
+        this.setCastShadow(networkSyncData.cs);
       if (networkSyncData.sq !== undefined)
         this.setShadowQuality(networkSyncData.sq);
       if (networkSyncData.sb !== undefined)
@@ -427,7 +476,9 @@ namespace gdjs {
     }
 
     isActiveAfterGuardrails(): boolean {
-      return this._enabled && (!this._guardrailsEnabled || this._guardrailActive);
+      return (
+        this._enabled && (!this._guardrailsEnabled || this._guardrailActive)
+      );
     }
 
     setColor(color: string): void {
@@ -495,7 +546,9 @@ namespace gdjs {
 
     setShadowQuality(shadowQuality: string): void {
       this._shadowQuality = clampShadowQuality(shadowQuality);
-      this._renderer.setShadowMapSize(shadowQualityToMapSize(this._shadowQuality));
+      this._renderer.setShadowMapSize(
+        shadowQualityToMapSize(this._shadowQuality)
+      );
     }
 
     getShadowQuality(): 'low' | 'medium' | 'high' {
@@ -601,7 +654,14 @@ namespace gdjs {
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       const threeGroup = new THREE.Group();
-      const spotLight = new THREE.SpotLight(0xffffff, 1, 600, gdjs.toRad(45), 0.1, 2);
+      const spotLight = new THREE.SpotLight(
+        0xffffff,
+        1,
+        600,
+        gdjs.toRad(45),
+        0.1,
+        2
+      );
       spotLight.position.set(0, 0, 0);
       spotLight.target.position.set(0, 0, -1);
       threeGroup.add(spotLight);
@@ -644,7 +704,9 @@ namespace gdjs {
 
     private _updateLightVisibility(): void {
       this._spotLight.visible =
-        !this._object.isHidden() && this._runtimeEnabled && this._guardrailActive;
+        !this._object.isHidden() &&
+        this._runtimeEnabled &&
+        this._guardrailActive;
     }
 
     private _sanitizeShadowMapSize(size: number): integer {
@@ -659,7 +721,10 @@ namespace gdjs {
       }
       this._shadowMapDirty = false;
 
-      this._spotLight.shadow.mapSize.set(this._shadowMapSize, this._shadowMapSize);
+      this._spotLight.shadow.mapSize.set(
+        this._shadowMapSize,
+        this._shadowMapSize
+      );
       this._spotLight.shadow.map?.dispose();
       this._spotLight.shadow.map = null;
       this._spotLight.shadow.needsUpdate = true;
@@ -673,7 +738,8 @@ namespace gdjs {
 
       const safeNear = Math.max(0.01, this._shadowNear);
       const safeFar = Math.max(safeNear + 1, this._shadowFar);
-      const shadowCamera = this._spotLight.shadow.camera as THREE.PerspectiveCamera;
+      const shadowCamera = this._spotLight.shadow
+        .camera as THREE.PerspectiveCamera;
       shadowCamera.near = safeNear;
       shadowCamera.far = safeFar;
       shadowCamera.fov = Math.max(

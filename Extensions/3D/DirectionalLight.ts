@@ -1,4 +1,12 @@
 namespace gdjs {
+  const getShadowManager = (): any => {
+    const scene3dAny = (gdjs as any).scene3d;
+    if (!scene3dAny || !scene3dAny.shadows) {
+      return null;
+    }
+    return scene3dAny.shadows;
+  };
+
   interface DirectionalLightFilterNetworkSyncData {
     i: number;
     c: number;
@@ -21,14 +29,14 @@ namespace gdjs {
           private _top: string = 'Z+';
           private _elevation: float = 45;
           private _rotation: float = 0;
-          private _shadowMapSize: float = 1024;
-          private _minimumShadowBias: float = 0;
+          private _isCastingShadow: boolean = false;
           private _distanceFromCamera: float = 1500;
           private _frustumSize: float = 4000;
+          private _directionalLightBaseBias: float = -0.0002;
+          private _directionalLightNormalBias: float = 0.02;
 
           private _isEnabled: boolean = false;
           private _light: THREE.DirectionalLight;
-          private _shadowMapDirty = true;
           private _shadowCameraDirty = true;
           private _shadowCameraHelper: THREE.CameraHelper | null;
 
@@ -46,35 +54,32 @@ namespace gdjs {
             this._light.shadow.camera.updateProjectionMatrix();
           }
 
-          private _updateShadowCamera(): void {
-            if (!this._shadowCameraDirty) {
+          private _applyShadowSettings(target: EffectsTarget): void {
+            const shadowManager = getShadowManager();
+            const runtimeLayer =
+              target.getRuntimeLayer && target.getRuntimeLayer
+                ? target.getRuntimeLayer()
+                : null;
+            if (
+              shadowManager &&
+              typeof shadowManager.applyDirectionalLightShadow === 'function'
+            ) {
+              shadowManager.applyDirectionalLightShadow(
+                runtimeLayer,
+                this._light,
+                {
+                  castShadow: this._isCastingShadow,
+                  frustumSize: this._frustumSize,
+                  distanceFromCamera: this._distanceFromCamera,
+                  forceUpdate: this._shadowCameraDirty,
+                  baseBias: this._directionalLightBaseBias,
+                  normalBias: this._directionalLightNormalBias,
+                }
+              );
+              this._shadowCameraDirty = false;
               return;
             }
-            this._shadowCameraDirty = false;
-
-            this._light.shadow.camera.near = 1;
-            this._light.shadow.camera.far = this._distanceFromCamera + 10000;
-            this._light.shadow.camera.right = this._frustumSize / 2;
-            this._light.shadow.camera.left = -this._frustumSize / 2;
-            this._light.shadow.camera.top = this._frustumSize / 2;
-            this._light.shadow.camera.bottom = -this._frustumSize / 2;
-          }
-
-          private _updateShadowMapSize(): void {
-            if (!this._shadowMapDirty) {
-              return;
-            }
-            this._shadowMapDirty = false;
-
-            this._light.shadow.mapSize.set(
-              this._shadowMapSize,
-              this._shadowMapSize
-            );
-
-            // Force the recreation of the shadow map texture:
-            this._light.shadow.map?.dispose();
-            this._light.shadow.map = null;
-            this._light.shadow.needsUpdate = true;
+            this._light.castShadow = false;
           }
 
           isEnabled(target: EffectsTarget): boolean {
@@ -124,18 +129,10 @@ namespace gdjs {
             return true;
           }
           updatePreRender(target: gdjs.EffectsTarget): any {
-            // Apply any update to the camera or shadow map size.
-            this._updateShadowCamera();
-            this._updateShadowMapSize();
-
-            // Avoid shadow acne due to depth buffer precision.
-            const biasMultiplier =
-              this._shadowMapSize < 1024
-                ? 2
-                : this._shadowMapSize < 2048
-                  ? 1.25
-                  : 1;
-            this._light.shadow.bias = -this._minimumShadowBias * biasMultiplier;
+            if (!this._isEnabled) {
+              return;
+            }
+            this._applyShadowSettings(target);
 
             // Apply update to the light position and its target.
             // By doing this, the shadows are "following" the GDevelop camera.
@@ -196,10 +193,14 @@ namespace gdjs {
               this._rotation = value;
             } else if (parameterName === 'distanceFromCamera') {
               this._distanceFromCamera = value;
+              this._shadowCameraDirty = true;
             } else if (parameterName === 'frustumSize') {
               this._frustumSize = value;
-            } else if (parameterName === 'minimumShadowBias') {
-              this._minimumShadowBias = value;
+              this._shadowCameraDirty = true;
+            } else if (parameterName === 'directionalLightBaseBias') {
+              this._directionalLightBaseBias = value;
+            } else if (parameterName === 'directionalLightNormalBias') {
+              this._directionalLightNormalBias = value;
             }
           }
           getDoubleParameter(parameterName: string): number {
@@ -213,8 +214,10 @@ namespace gdjs {
               return this._distanceFromCamera;
             } else if (parameterName === 'frustumSize') {
               return this._frustumSize;
-            } else if (parameterName === 'minimumShadowBias') {
-              return this._minimumShadowBias;
+            } else if (parameterName === 'directionalLightBaseBias') {
+              return this._directionalLightBaseBias;
+            } else if (parameterName === 'directionalLightNormalBias') {
+              return this._directionalLightNormalBias;
             }
             return 0;
           }
@@ -226,20 +229,7 @@ namespace gdjs {
             }
             if (parameterName === 'top') {
               this._top = value;
-            }
-            if (parameterName === 'shadowQuality') {
-              if (value === 'low' && this._shadowMapSize !== 512) {
-                this._shadowMapSize = 512;
-                this._shadowMapDirty = true;
-              }
-              if (value === 'medium' && this._shadowMapSize !== 1024) {
-                this._shadowMapSize = 1024;
-                this._shadowMapDirty = true;
-              }
-              if (value === 'high' && this._shadowMapSize !== 2048) {
-                this._shadowMapSize = 2048;
-                this._shadowMapDirty = true;
-              }
+              this._shadowCameraDirty = true;
             }
           }
           updateColorParameter(parameterName: string, value: number): void {
@@ -255,7 +245,8 @@ namespace gdjs {
           }
           updateBooleanParameter(parameterName: string, value: boolean): void {
             if (parameterName === 'isCastingShadow') {
-              this._light.castShadow = value;
+              this._isCastingShadow = value;
+              this._shadowCameraDirty = true;
             }
           }
           getNetworkSyncData(): DirectionalLightFilterNetworkSyncData {

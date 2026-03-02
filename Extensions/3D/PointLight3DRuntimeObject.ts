@@ -1,4 +1,24 @@
 namespace gdjs {
+  const pointLightAllowedShadowMapSizes = [256, 512, 1024, 2048, 4096];
+  const sanitizePointLightShadowMapSize = (rawSize: number): number => {
+    if (!Number.isFinite(rawSize)) {
+      return 1024;
+    }
+    const roundedSize = Math.round(rawSize);
+    const clampedSize = Math.max(256, Math.min(4096, roundedSize));
+    let nearestSize = pointLightAllowedShadowMapSizes[0];
+    let nearestDistance = Math.abs(clampedSize - nearestSize);
+    for (let index = 1; index < pointLightAllowedShadowMapSizes.length; index++) {
+      const candidateSize = pointLightAllowedShadowMapSizes[index];
+      const candidateDistance = Math.abs(clampedSize - candidateSize);
+      if (candidateDistance < nearestDistance) {
+        nearestSize = candidateSize;
+        nearestDistance = candidateDistance;
+      }
+    }
+    return nearestSize;
+  };
+
   /**
    * Base parameters for {@link gdjs.PointLight3DRuntimeObject}
    * @category Objects > 3D Point Light
@@ -53,12 +73,17 @@ namespace gdjs {
       this._distance = content.distance !== undefined ? content.distance : 100;
       this._decay = content.decay !== undefined ? content.decay : 2;
       this._castShadow = content.castShadow || false;
-      this._shadowMapSize = content.shadowMapSize !== undefined ? content.shadowMapSize : 1024;
+      this._shadowMapSize = sanitizePointLightShadowMapSize(
+        content.shadowMapSize !== undefined ? content.shadowMapSize : 1024
+      );
 
       this._renderer = new gdjs.PointLight3DRuntimeObjectRenderer(
         this,
         instanceContainer
       );
+      this.registerDestroyCallback(() => {
+        this._renderer.dispose();
+      });
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -155,8 +180,9 @@ namespace gdjs {
      * Set the shadow map size.
      */
     setShadowMapSize(shadowMapSize: number): void {
-      if (this._shadowMapSize === shadowMapSize) return;
-      this._shadowMapSize = shadowMapSize;
+      const sanitizedShadowMapSize = sanitizePointLightShadowMapSize(shadowMapSize);
+      if (this._shadowMapSize === sanitizedShadowMapSize) return;
+      this._shadowMapSize = sanitizedShadowMapSize;
       this._renderer.updateShadowMapSize();
     }
 

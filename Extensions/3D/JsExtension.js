@@ -2049,6 +2049,7 @@ module.exports = {
           .setType('number')
           .setLabel(_('Shadow Map Size'))
           .setGroup(_('Shadows'))
+          .setDescription(_('Power of two recommended (256, 512, 1024, 2048, 4096).'))
           .setAdvanced(true);
 
         return objectProperties;
@@ -2089,6 +2090,7 @@ module.exports = {
         .addDefaultBehavior('Scene3D::Base3DBehavior')
         .setIncludeFile('Extensions/3D/A_RuntimeObject3D.js')
         .addIncludeFile('Extensions/3D/A_RuntimeObject3DRenderer.js')
+        .addIncludeFile('Extensions/3D/ShadowSettings.js')
         .addIncludeFile('Extensions/3D/PointLight3DRuntimeObject.js')
         .addIncludeFile('Extensions/3D/PointLight3DRuntimeObjectRenderer.js');
 
@@ -2474,6 +2476,7 @@ module.exports = {
         )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/ShadowSettings.js')
         .addIncludeFile('Extensions/3D/DirectionalLight.js');
       const properties = effect.getProperties();
       properties
@@ -2516,27 +2519,6 @@ module.exports = {
         .setType('boolean')
         .setGroup(_('Shadows'));
       properties
-        .getOrCreate('shadowQuality')
-        .setValue('medium')
-        .addChoice('low', _('Low quality'))
-        .addChoice('medium', _('Medium quality'))
-        .addChoice('high', _('High quality'))
-        .setLabel(_('Shadow quality'))
-        .setType('choice')
-        .setGroup(_('Shadows'));
-      properties
-        .getOrCreate('minimumShadowBias')
-        .setValue('0')
-        .setLabel(_('Shadow bias'))
-        .setDescription(
-          _(
-            'Use this to avoid "shadow acne" due to depth buffer precision. Choose a value small enough like 0.001 to avoid creating distance between shadows and objects but not too small to avoid shadow glitches on low/medium quality. This value is used for high quality, and multiplied by 1.25 for medium quality and 2 for low quality.'
-          )
-        )
-        .setType('number')
-        .setGroup(_('Shadows'))
-        .setAdvanced(true);
-      properties
         .getOrCreate('frustumSize')
         .setValue('4000')
         .setLabel(_('Shadow frustum size'))
@@ -2551,6 +2533,108 @@ module.exports = {
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('directionalLightBaseBias')
+        .setValue('-0.0002')
+        .setLabel(_('Directional light bias'))
+        .setDescription(
+          _(
+            'Base bias for Directional Light shadows. Negative values can reduce acne, too much may detach shadows.'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('directionalLightNormalBias')
+        .setValue('0.02')
+        .setLabel(_('Directional light normal bias'))
+        .setDescription(_('Extra normal bias applied to Directional Light shadows.'))
+        .setType('number')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+    }
+    {
+      const effect = extension
+        .addEffect('ShadowSettings')
+        .setFullName(_('Shadow'))
+        .setDescription(
+          _(
+            'Centralized 3D shadow configuration applied to all shadow-casting lights on the scene.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/ShadowSettings.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('enabled')
+        .setValue('true')
+        .setLabel(_('Enable shadows'))
+        .setType('boolean')
+        .setGroup(_('Global'));
+      properties
+        .getOrCreate('shadowMapType')
+        .setValue('pcfSoft')
+        .addChoice('pcfSoft', _('Soft PCF (recommended default)'))
+        .addChoice('pcf', _('PCF (radius controlled)'))
+        .addChoice('basic', _('Basic (hard, fastest)'))
+        .setLabel(_('Shadow map type'))
+        .setDescription(
+          _(
+            'Selecting a type automatically applies recommended anti-acne tuning values for this type.'
+          )
+        )
+        .setType('choice')
+        .setGroup(_('Global'));
+      properties
+        .getOrCreate('autoUpdate')
+        .setValue('true')
+        .setLabel(_('Auto update shadows'))
+        .setType('boolean')
+        .setGroup(_('Global'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('directionalShadowQuality')
+        .setValue('medium')
+        .addChoice('low', _('Low quality'))
+        .addChoice('medium', _('Medium quality'))
+        .addChoice('high', _('High quality'))
+        .setLabel(_('Directional shadow quality'))
+        .setType('choice')
+        .setGroup(_('Directional light'));
+      properties
+        .getOrCreate('pointLightBaseBias')
+        .setValue('-0.006')
+        .setLabel(_('Point light bias'))
+        .setDescription(
+          _(
+            'Base bias for 3D Point Light objects. Increase absolute value to reduce acne, but too much can detach shadows.'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Point light'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('pointLightNormalBias')
+        .setValue('0.04')
+        .setLabel(_('Point light normal bias'))
+        .setDescription(_('Extra bias along normals to reduce shadow acne.'))
+        .setType('number')
+        .setGroup(_('Point light'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('pointLightRadius')
+        .setValue('1')
+        .setLabel(_('Point light shadow radius'))
+        .setDescription(
+          _(
+            'Softness radius for Point Light shadows. Mainly effective when shadow map type is PCF.'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Point light'))
         .setAdvanced(true);
     }
     {
@@ -3566,9 +3650,9 @@ module.exports = {
     // PointLight3D Renderers - Professional Visualization
     class RenderedPointLight3D2DInstance extends RenderedInstance {
       /** @type {number} */
-      _defaultWidth = 32;
+      _defaultWidth = 48;
       /** @type {number} */
-      _defaultHeight = 32;
+      _defaultHeight = 48;
 
       constructor(
         project,
@@ -3599,8 +3683,8 @@ module.exports = {
       }
 
       update() {
-        const width = 32;
-        const height = 32;
+        const width = 48;
+        const height = 48;
         const object = gd.castObject(
           this._associatedObjectConfiguration,
           gd.ObjectJsImplementation
@@ -3610,19 +3694,20 @@ module.exports = {
         const colorHex = (r << 16) | (g << 8) | b;
 
         this._pixiObject.clear();
-        // Draw light bulb icon
-        this._pixiObject.beginFill(colorHex);
+        // Draw light helper icon with a larger clickable area.
+        this._pixiObject.beginFill(colorHex, 0.95);
         this._pixiObject.lineStyle(2, 0xffaa00, 1);
-        this._pixiObject.drawCircle(0, 0, 12);
+        this._pixiObject.drawCircle(0, 0, 16);
         this._pixiObject.endFill();
 
         // Draw rays
         for (let i = 0; i < 8; i++) {
           const angle = (i / 8) * Math.PI * 2;
           this._pixiObject.lineStyle(2, colorHex, 0.8);
-          this._pixiObject.moveTo(Math.cos(angle) * 14, Math.sin(angle) * 14);
-          this._pixiObject.lineTo(Math.cos(angle) * 20, Math.sin(angle) * 20);
+          this._pixiObject.moveTo(Math.cos(angle) * 18, Math.sin(angle) * 18);
+          this._pixiObject.lineTo(Math.cos(angle) * 26, Math.sin(angle) * 26);
         }
+        this._pixiObject.hitArea = new PIXI.Circle(0, 0, 24);
 
         this._pixiObject.position.x = this._instance.getX() + width / 2;
         this._pixiObject.position.y = this._instance.getY() + height / 2;
@@ -3637,21 +3722,25 @@ module.exports = {
       }
 
       getCenterX() {
-        return 16;
+        return 24;
       }
 
       getCenterY() {
-        return 16;
+        return 24;
       }
     }
 
     class RenderedPointLight3D3DInstance extends Rendered3DInstance {
-      _defaultWidth = 32;
-      _defaultHeight = 32;
-      _defaultDepth = 32;
+      _defaultWidth = 48;
+      _defaultHeight = 48;
+      _defaultDepth = 48;
 
       /** @type {THREE.Group | null} */
       _helperGroup = null;
+      /** @type {THREE.Mesh | null} */
+      _coreSphere = null;
+      /** @type {THREE.Mesh | null} */
+      _coreGlow = null;
       /** @type {THREE.Sprite | null} */
       _iconSprite = null;
       /** @type {THREE.LineSegments | null} */
@@ -3680,13 +3769,46 @@ module.exports = {
 
         // Create helper group
         this._helperGroup = new THREE.Group();
+        this._threeObject = this._helperGroup;
         this._threeGroup.add(this._helperGroup);
+
+        // Create solid sphere helper used for selection/manipulation.
+        this._createSelectionSphere();
 
         // Create billboard icon
         this._createBillboardIcon();
 
         // Create range visualization
         this._createRangeVisualization();
+      }
+
+      _createSelectionSphere() {
+        const coreGeometry = new THREE.SphereGeometry(8, 20, 12);
+        const coreMaterial = new THREE.MeshStandardMaterial({
+          color: 0xfff4a8,
+          emissive: 0xffd84d,
+          emissiveIntensity: 1.1,
+          roughness: 0.2,
+          metalness: 0,
+          transparent: true,
+          opacity: 0.98,
+          depthWrite: false,
+        });
+        this._coreSphere = new THREE.Mesh(coreGeometry, coreMaterial);
+        this._coreSphere.renderOrder = 999;
+        this._helperGroup.add(this._coreSphere);
+
+        const glowGeometry = new THREE.SphereGeometry(12, 18, 10);
+        const glowMaterial = new THREE.MeshBasicMaterial({
+          color: 0xffe066,
+          transparent: true,
+          opacity: 0.22,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+        });
+        this._coreGlow = new THREE.Mesh(glowGeometry, glowMaterial);
+        this._coreGlow.renderOrder = 998;
+        this._helperGroup.add(this._coreGlow);
       }
 
       _createBillboardIcon() {
@@ -3734,7 +3856,7 @@ module.exports = {
         });
 
         this._iconSprite = new THREE.Sprite(material);
-        this._iconSprite.scale.set(32, 32, 1);
+        this._iconSprite.scale.set(22, 22, 1);
         this._iconSprite.renderOrder = 999;
         this._helperGroup.add(this._iconSprite);
       }
@@ -3773,6 +3895,15 @@ module.exports = {
           this._iconSprite.material.color = threeColor;
         }
 
+        if (this._coreSphere) {
+          this._coreSphere.material.color = threeColor;
+          this._coreSphere.material.emissive = threeColor;
+        }
+
+        if (this._coreGlow) {
+          this._coreGlow.material.color = threeColor;
+        }
+
         if (this._rangeMesh) {
           this._rangeMesh.material.color = threeColor;
         }
@@ -3795,6 +3926,7 @@ module.exports = {
         this._pixiObject.lineStyle(1, 0xffd900, 0);
         this._pixiObject.drawRect(-width / 2, -height / 2, width, height);
         this._pixiObject.endFill();
+        this._pixiObject.hitArea = new PIXI.Circle(0, 0, 24);
 
         this._pixiObject.position.x = this._instance.getX() + width / 2;
         this._pixiObject.position.y = this._instance.getY() + height / 2;
@@ -3849,15 +3981,15 @@ module.exports = {
       }
 
       getCenterX() {
-        return 16;
+        return 24;
       }
 
       getCenterY() {
-        return 16;
+        return 24;
       }
 
       getCenterZ() {
-        return 16;
+        return 24;
       }
     }
 

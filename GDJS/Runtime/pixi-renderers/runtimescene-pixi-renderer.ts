@@ -164,6 +164,16 @@ namespace gdjs {
             const threeEffectComposer =
               runtimeLayerRenderer.getThreeEffectComposer();
 
+            const shadowManager = (gdjs as any).scene3d
+              ? (gdjs as any).scene3d.shadows
+              : null;
+            if (
+              shadowManager &&
+              typeof shadowManager.applyToThreeRenderer === 'function'
+            ) {
+              shadowManager.applyToThreeRenderer(runtimeLayer, threeRenderer);
+            }
+
             // Render the 3D objects of this layer.
             if (threeScene && threeCamera && threeEffectComposer) {
               // TODO (3D) - optimization: do this at the beginning for all layers that are 2d+3d?
@@ -351,6 +361,16 @@ namespace gdjs {
         const threeScene = runtimeLayerRenderer.getThreeScene();
         const threeCamera = runtimeLayerRenderer.getThreeCamera();
         if (!threeScene || !threeCamera) continue;
+
+        const shadowManager = (gdjs as any).scene3d
+          ? (gdjs as any).scene3d.shadows
+          : null;
+        if (
+          shadowManager &&
+          typeof shadowManager.applyToThreeRenderer === 'function'
+        ) {
+          shadowManager.applyToThreeRenderer(runtimeLayer, threeRenderer);
+        }
 
         if (isFirstRender) {
           // Render the background color.

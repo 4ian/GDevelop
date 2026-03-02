@@ -30,9 +30,17 @@ const getNewProjectSourceFromUrl = (projectUrl: string): NewProjectSource => {
 };
 
 export const addDefaultLightToLayer = (layer: gdLayer): void => {
+  const shadow = layer.getEffects().insertNewEffect('3D Shadow', 0);
+  shadow.setEffectType('Scene3D::ShadowSettings');
+  shadow.setBooleanParameter('enabled', true);
+  shadow.setStringParameter('shadowMapType', 'pcfSoft');
+  shadow.setStringParameter('directionalShadowQuality', 'medium');
+  shadow.setBooleanParameter('autoUpdate', true);
+  shadow.setDoubleParameter('vsmBlurSamples', 8);
+
   const directionalLight = layer
     .getEffects()
-    .insertNewEffect('3D Sun Light', 0);
+    .insertNewEffect('3D Sun Light', 1);
   directionalLight.setEffectType('Scene3D::DirectionalLight');
   directionalLight.setStringParameter('color', '255;255;255');
   directionalLight.setDoubleParameter('intensity', 0.75);
@@ -40,14 +48,12 @@ export const addDefaultLightToLayer = (layer: gdLayer): void => {
   directionalLight.setDoubleParameter('elevation', 40);
   directionalLight.setDoubleParameter('rotation', 300);
   directionalLight.setBooleanParameter('isCastingShadow', true);
-  directionalLight.setStringParameter('shadowQuality', 'medium');
-  directionalLight.setDoubleParameter('minimumShadowBias', 0);
   directionalLight.setDoubleParameter('distanceFromCamera', 1500);
   directionalLight.setDoubleParameter('frustumSize', 4000);
 
   const ambientLight = layer
     .getEffects()
-    .insertNewEffect('3D Ambient Hemisphere Light', 0);
+    .insertNewEffect('3D Ambient Hemisphere Light', 2);
   ambientLight.setEffectType('Scene3D::HemisphereLight');
   ambientLight.setStringParameter('skyColor', '255;255;255');
   ambientLight.setStringParameter('groundColor', '127;127;127');

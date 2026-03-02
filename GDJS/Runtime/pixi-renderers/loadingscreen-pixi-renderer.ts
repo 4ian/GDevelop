@@ -58,15 +58,17 @@ namespace gdjs {
         return;
       }
 
-      const backgroundTexture = imageManager.getOrLoadPIXITexture(
-        loadingScreenData.backgroundImageResourceName
-      );
-      if (backgroundTexture !== imageManager.getInvalidPIXITexture()) {
-        this._backgroundSprite = PIXI.Sprite.from(backgroundTexture);
-        this._backgroundSprite.alpha = 0;
-        this._backgroundSprite.anchor.x = 0.5;
-        this._backgroundSprite.anchor.y = 0.5;
-        this._loadingScreenContainer.addChild(this._backgroundSprite);
+      if (loadingScreenData.backgroundImageResourceName) {
+        const backgroundTexture = imageManager.getOrLoadPIXITexture(
+          loadingScreenData.backgroundImageResourceName
+        );
+        if (backgroundTexture !== imageManager.getInvalidPIXITexture()) {
+          this._backgroundSprite = PIXI.Sprite.from(backgroundTexture);
+          this._backgroundSprite.alpha = 0;
+          this._backgroundSprite.anchor.x = 0.5;
+          this._backgroundSprite.anchor.y = 0.5;
+          this._loadingScreenContainer.addChild(this._backgroundSprite);
+        }
       }
 
       if (loadingScreenData.showGDevelopSplash && isFirstScene) {

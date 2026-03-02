@@ -33,6 +33,8 @@ namespace gdjs {
   };
 
   let transparentMaterial: THREE.MeshBasicMaterial;
+  let colorOnlyBasicMaterial: THREE.MeshBasicMaterial;
+  let colorOnlyStandardMaterial: THREE.MeshStandardMaterial;
   const getTransparentMaterial = () => {
     if (!transparentMaterial)
       transparentMaterial = new THREE.MeshBasicMaterial({
@@ -45,6 +47,26 @@ namespace gdjs {
 
     return transparentMaterial;
   };
+  const getColorOnlyBasicMaterial = () => {
+    if (!colorOnlyBasicMaterial) {
+      colorOnlyBasicMaterial = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        vertexColors: true,
+      });
+    }
+    return colorOnlyBasicMaterial;
+  };
+  const getColorOnlyStandardMaterial = () => {
+    if (!colorOnlyStandardMaterial) {
+      colorOnlyStandardMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        metalness: 0,
+        roughness: 1,
+        vertexColors: true,
+      });
+    }
+    return colorOnlyStandardMaterial;
+  };
 
   const getFaceMaterial = (
     runtimeObject: gdjs.Cube3DRuntimeObject,
@@ -53,11 +75,19 @@ namespace gdjs {
     if (!runtimeObject.isFaceAtIndexVisible(faceIndex))
       return getTransparentMaterial();
 
+    const faceResourceName = runtimeObject.getFaceAtIndexResourceName(faceIndex);
+    if (!faceResourceName) {
+      return runtimeObject._materialType ===
+        gdjs.Cube3DRuntimeObject.MaterialType.Basic
+        ? getColorOnlyBasicMaterial()
+        : getColorOnlyStandardMaterial();
+    }
+
     return runtimeObject
       .getInstanceContainer()
       .getGame()
       .getImageManager()
-      .getThreeMaterial(runtimeObject.getFaceAtIndexResourceName(faceIndex), {
+      .getThreeMaterial(faceResourceName, {
         useTransparentTexture: runtimeObject.shouldUseTransparentTexture(),
         forceBasicMaterial:
           runtimeObject._materialType ===

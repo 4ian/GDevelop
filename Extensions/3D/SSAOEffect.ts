@@ -260,11 +260,15 @@ namespace gdjs {
             threeRenderer.getDrawingBufferSize(this._renderSize);
             const width = Math.max(
               1,
-              Math.round((this._renderSize.x || target.getWidth()) * this._captureScale)
+              Math.round(
+                (this._renderSize.x || target.getWidth()) * this._captureScale
+              )
             );
             const height = Math.max(
               1,
-              Math.round((this._renderSize.y || target.getHeight()) * this._captureScale)
+              Math.round(
+                (this._renderSize.y || target.getHeight()) * this._captureScale
+              )
             );
             if (
               this._sceneRenderTarget.width !== width ||
@@ -403,10 +407,7 @@ namespace gdjs {
             } else if (parameterName === 'bias') {
               this._bias = Math.max(0, value);
             } else if (parameterName === 'samples') {
-              this._samples = Math.max(
-                4,
-                Math.min(32, Math.round(value))
-              );
+              this._samples = Math.max(4, Math.min(32, Math.round(value)));
             }
           }
           getDoubleParameter(parameterName: string): number {

@@ -279,12 +279,15 @@
 
             this.shaderPass.uniforms.rimIntensity.value = this._intensity;
             this.shaderPass.uniforms.rimOuterWrap.value = this._outerWrap;
-            this.shaderPass.uniforms.shadowStrength.value = this._shadowStrength;
+            this.shaderPass.uniforms.shadowStrength.value =
+              this._shadowStrength;
             this.shaderPass.uniforms.rimColor.value.setHex(this._colorHex);
             this.shaderPass.enabled = this._effectEnabled;
           }
 
-          private _getShadowLights(scene: THREE.Scene): Array<THREE.DirectionalLight> {
+          private _getShadowLights(
+            scene: THREE.Scene
+          ): Array<THREE.DirectionalLight> {
             const lights: Array<THREE.DirectionalLight> = [];
             scene.traverse((object3D) => {
               if (lights.length >= 3) {
@@ -309,15 +312,12 @@
             const lights = this._getShadowLights(scene);
             for (let i = 0; i < 3; i++) {
               const light = lights[i];
-              const shadowTextureUniform = this.shaderPass.uniforms[
-                `shadowMap${i}`
-              ];
-              const shadowMatrixUniform = this.shaderPass.uniforms[
-                `shadowMatrix${i}`
-              ];
-              const shadowEnabledUniform = this.shaderPass.uniforms[
-                `shadowEnabled${i}`
-              ];
+              const shadowTextureUniform =
+                this.shaderPass.uniforms[`shadowMap${i}`];
+              const shadowMatrixUniform =
+                this.shaderPass.uniforms[`shadowMatrix${i}`];
+              const shadowEnabledUniform =
+                this.shaderPass.uniforms[`shadowEnabled${i}`];
 
               if (!light || !light.shadow || !light.shadow.map) {
                 shadowTextureUniform.value = null;
@@ -452,7 +452,8 @@
             this._updateFogUniforms(threeScene);
 
             this.shaderPass.enabled = true;
-            this.shaderPass.uniforms.tSceneColor.value = sharedCapture.colorTexture;
+            this.shaderPass.uniforms.tSceneColor.value =
+              sharedCapture.colorTexture;
             this.shaderPass.uniforms.tDepth.value = sharedCapture.depthTexture;
             this.shaderPass.uniforms.resolution.value.set(
               sharedCapture.width,
@@ -472,7 +473,8 @@
             );
             this.shaderPass.uniforms.rimIntensity.value = this._intensity;
             this.shaderPass.uniforms.rimOuterWrap.value = this._outerWrap;
-            this.shaderPass.uniforms.shadowStrength.value = this._shadowStrength;
+            this.shaderPass.uniforms.shadowStrength.value =
+              this._shadowStrength;
             this.shaderPass.uniforms.rimColor.value.setHex(this._colorHex);
           }
 
@@ -544,7 +546,8 @@
 
             this.shaderPass.uniforms.rimIntensity.value = this._intensity;
             this.shaderPass.uniforms.rimOuterWrap.value = this._outerWrap;
-            this.shaderPass.uniforms.shadowStrength.value = this._shadowStrength;
+            this.shaderPass.uniforms.shadowStrength.value =
+              this._shadowStrength;
             this.shaderPass.uniforms.rimColor.value.setHex(this._colorHex);
             this.shaderPass.enabled = this._effectEnabled;
           }

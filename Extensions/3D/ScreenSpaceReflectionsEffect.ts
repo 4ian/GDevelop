@@ -340,11 +340,15 @@ namespace gdjs {
             threeRenderer.getDrawingBufferSize(this._renderSize);
             const width = Math.max(
               1,
-              Math.round((this._renderSize.x || target.getWidth()) * this._captureScale)
+              Math.round(
+                (this._renderSize.x || target.getWidth()) * this._captureScale
+              )
             );
             const height = Math.max(
               1,
-              Math.round((this._renderSize.y || target.getHeight()) * this._captureScale)
+              Math.round(
+                (this._renderSize.y || target.getHeight()) * this._captureScale
+              )
             );
             if (
               this._sceneRenderTarget.width !== width ||

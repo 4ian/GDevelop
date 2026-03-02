@@ -292,7 +292,8 @@ namespace gdjs {
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'focusDistance') {
               this._focusDistance = Math.max(0, value);
-              this.shaderPass.uniforms.focusDistance.value = this._focusDistance;
+              this.shaderPass.uniforms.focusDistance.value =
+                this._focusDistance;
             } else if (parameterName === 'focusRange') {
               this._focusRange = Math.max(0.0001, value);
               this.shaderPass.uniforms.focusRange.value = this._focusRange;
@@ -332,7 +333,9 @@ namespace gdjs {
               e: this._effectEnabled,
             };
           }
-          updateFromNetworkSyncData(syncData: DepthOfFieldNetworkSyncData): void {
+          updateFromNetworkSyncData(
+            syncData: DepthOfFieldNetworkSyncData
+          ): void {
             this._focusDistance = syncData.fd;
             this._focusRange = syncData.fr;
             this._maxBlur = syncData.mb;

@@ -224,11 +224,15 @@ namespace gdjs {
     threeRenderer.getDrawingBufferSize(state.renderSize);
     const width = Math.max(
       1,
-      Math.round((state.renderSize.x || target.getWidth()) * quality.captureScale)
+      Math.round(
+        (state.renderSize.x || target.getWidth()) * quality.captureScale
+      )
     );
     const height = Math.max(
       1,
-      Math.round((state.renderSize.y || target.getHeight()) * quality.captureScale)
+      Math.round(
+        (state.renderSize.y || target.getHeight()) * quality.captureScale
+      )
     );
 
     if (renderTarget.width !== width || renderTarget.height !== height) {
@@ -309,9 +313,7 @@ namespace gdjs {
       return;
     }
 
-    const currentSignature = detectedPasses
-      .map((entry) => entry.id)
-      .join('|');
+    const currentSignature = detectedPasses.map((entry) => entry.id).join('|');
     if (state.lastPassOrderSignature === currentSignature) {
       return;
     }

@@ -2360,7 +2360,9 @@ module.exports = {
         .setLabel(_('Thickness'))
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setDescription(_('Depth tolerance to detect reflection hits reliably.'));
+        .setDescription(
+          _('Depth tolerance to detect reflection hits reliably.')
+        );
     }
     {
       const effect = extension
@@ -2576,7 +2578,9 @@ module.exports = {
         .setLabel(_('Focus range'))
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setDescription(_('How gradually blur increases around focus distance.'));
+        .setDescription(
+          _('How gradually blur increases around focus distance.')
+        );
       properties
         .getOrCreate('maxBlur')
         .setValue('6')

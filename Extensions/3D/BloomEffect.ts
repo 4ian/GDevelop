@@ -25,6 +25,7 @@ namespace gdjs {
               0,
               0
             );
+            gdjs.markScene3DPostProcessingPass(this.shaderPass, 'BLOOM');
             this._isEnabled = false;
           }
 
@@ -57,7 +58,13 @@ namespace gdjs {
             this._isEnabled = false;
             return true;
           }
-          updatePreRender(target: gdjs.EffectsTarget): any {}
+          updatePreRender(target: gdjs.EffectsTarget): any {
+            if (!(target instanceof gdjs.Layer)) {
+              return;
+            }
+            this.shaderPass.enabled =
+              gdjs.isScene3DPostProcessingEnabled(target);
+          }
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'strength') {
               this.shaderPass.strength = value;

@@ -2053,6 +2053,48 @@ module.exports = {
     }
     {
       const effect = extension
+        .addEffect('RimLight')
+        .setFullName(_('Rim light'))
+        .setDescription(
+          _(
+            'Screen-space rim shading pass using depth, camera view and existing scene capture. Includes fog fade and shadow-map suppression.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/PostProcessingSharedResources.js')
+        .addIncludeFile('Extensions/3D/RimLight.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('enabled')
+        .setValue('true')
+        .setLabel(_('Enabled'))
+        .setType('boolean');
+      properties
+        .getOrCreate('color')
+        .setValue('255;255;255')
+        .setLabel(_('Rim color'))
+        .setType('color');
+      properties
+        .getOrCreate('intensity')
+        .setValue('0.8')
+        .setLabel(_('Intensity'))
+        .setDescription(_('Strength of the rim contribution near silhouettes.'))
+        .setType('number');
+      properties
+        .getOrCreate('outerWrap')
+        .setValue('0.18')
+        .setLabel(_('Outer wrap'))
+        .setDescription(
+          _(
+            'Ambient wrap amount for the 45 to 90 degree rim zone away from silhouette.'
+          )
+        )
+        .setType('number')
+        .setAdvanced(true);
+    }
+    {
+      const effect = extension
         .addEffect('HemisphereLight')
         .setFullName(_('Hemisphere light'))
         .setDescription(
@@ -2186,11 +2228,77 @@ module.exports = {
     }
     {
       const effect = extension
+        .addEffect('ToneMapping')
+        .setFullName(_('Tone mapping'))
+        .setDescription(
+          _(
+            'Configure renderer tone mapping for a cinematic and physically based 3D look.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/ToneMappingEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('enabled')
+        .setValue('true')
+        .setLabel(_('Enabled'))
+        .setType('boolean');
+      properties
+        .getOrCreate('mode')
+        .setValue('ACESFilmic')
+        .addChoice('ACESFilmic', _('ACES Filmic'))
+        .addChoice('Reinhard', _('Reinhard'))
+        .addChoice('Cineon', _('Cineon'))
+        .addChoice('Linear', _('Linear'))
+        .setLabel(_('Mode'))
+        .setType('choice')
+        .setDescription(
+          _(
+            'ACESFilmic for cinematic look, Reinhard for softer highlights, Cineon for film look, Linear for no tone mapping.'
+          )
+        );
+      properties
+        .getOrCreate('exposure')
+        .setValue('1.0')
+        .setLabel(_('Exposure'))
+        .setType('number')
+        .setDescription(_('Brightness multiplier applied by tone mapping.'));
+    }
+    {
+      const effect = extension
+        .addEffect('PostProcessingStack')
+        .setFullName(_('Post-processing stack'))
+        .setDescription(
+          _(
+            'Master controller for 3D post-processing: captures scene/depth once, auto-orders effects, and applies shared quality.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/PostProcessingSharedResources.js')
+        .addIncludeFile('Extensions/3D/PostProcessingStackEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('enabled')
+        .setValue('true')
+        .setLabel(_('Enabled'))
+        .setType('boolean');
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .setLabel(_('Quality mode'))
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
+    }
+    {
+      const effect = extension
         .addEffect('Bloom')
         .setFullName(_('Bloom'))
         .setDescription(_('Apply a bloom effect.'))
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/PostProcessingSharedResources.js')
         .addIncludeFile('Extensions/3D/BloomEffect.js');
       const properties = effect.getProperties();
       properties
@@ -2211,6 +2319,270 @@ module.exports = {
         .setLabel(_('Threshold'))
         .setType('number')
         .setDescription(_('Between 0 and 1'));
+    }
+    {
+      const effect = extension
+        .addEffect('ScreenSpaceReflections')
+        .setFullName(_('Screen-space reflections'))
+        .setDescription(
+          _(
+            'Render approximate screen-space reflections for visible surfaces in 3D.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/PostProcessingSharedResources.js')
+        .addIncludeFile('Extensions/3D/ScreenSpaceReflectionsEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('enabled')
+        .setValue('true')
+        .setLabel(_('Enabled'))
+        .setType('boolean');
+      properties
+        .getOrCreate('intensity')
+        .setValue('0.75')
+        .setLabel(_('Intensity'))
+        .setType('number')
+        .setDescription(_('Overall strength of reflected light.'));
+      properties
+        .getOrCreate('maxDistance')
+        .setValue('420')
+        .setLabel(_('Max distance'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setDescription(
+          _('Maximum reflection tracing distance (balanced for performance).')
+        );
+      properties
+        .getOrCreate('thickness')
+        .setValue('4')
+        .setLabel(_('Thickness'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setDescription(_('Depth tolerance to detect reflection hits reliably.'));
+    }
+    {
+      const effect = extension
+        .addEffect('ChromaticAberration')
+        .setFullName(_('Chromatic aberration'))
+        .setDescription(
+          _(
+            'Lens-like RGB channel separation that gets stronger toward screen edges.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/PostProcessingSharedResources.js')
+        .addIncludeFile('Extensions/3D/ChromaticAberrationEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('enabled')
+        .setValue('true')
+        .setLabel(_('Enabled'))
+        .setType('boolean');
+      properties
+        .getOrCreate('intensity')
+        .setValue('0.005')
+        .setLabel(_('Intensity'))
+        .setType('number')
+        .setDescription(
+          _('How far red/blue channels split from the center direction.')
+        );
+      properties
+        .getOrCreate('radialScale')
+        .setValue('1.0')
+        .setLabel(_('Radial scale'))
+        .setType('number')
+        .setDescription(
+          _('How strongly the effect ramps from center to edges.')
+        );
+    }
+    {
+      const effect = extension
+        .addEffect('ColorGrading')
+        .setFullName(_('Color grading'))
+        .setDescription(
+          _(
+            'Apply cinematic color grading in screen space: temperature, tint, saturation, contrast, and brightness.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/PostProcessingSharedResources.js')
+        .addIncludeFile('Extensions/3D/ColorGradingEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('enabled')
+        .setValue('true')
+        .setLabel(_('Enabled'))
+        .setType('boolean');
+      properties
+        .getOrCreate('temperature')
+        .setValue('-0.3')
+        .setLabel(_('Temperature'))
+        .setType('number')
+        .setDescription(
+          _(
+            'Negative = cool blue, positive = warm orange. Default tuned for cold horror mood.'
+          )
+        );
+      properties
+        .getOrCreate('tint')
+        .setValue('-0.1')
+        .setLabel(_('Tint'))
+        .setType('number')
+        .setDescription(_('Negative = greener, positive = magenta.'));
+      properties
+        .getOrCreate('saturation')
+        .setValue('0.8')
+        .setLabel(_('Saturation'))
+        .setType('number')
+        .setDescription(_('0 = grayscale, 1 = normal, >1 = oversaturated.'));
+      properties
+        .getOrCreate('contrast')
+        .setValue('1.2')
+        .setLabel(_('Contrast'))
+        .setType('number')
+        .setDescription(_('1 = neutral, >1 = stronger contrast.'));
+      properties
+        .getOrCreate('brightness')
+        .setValue('0.95')
+        .setLabel(_('Brightness'))
+        .setType('number')
+        .setDescription(_('1 = neutral, <1 darker, >1 brighter.'));
+    }
+    {
+      const effect = extension
+        .addEffect('SSAO')
+        .setFullName(_('Ambient occlusion (SSAO)'))
+        .setDescription(
+          _(
+            'Screen-space ambient occlusion that darkens corners, crevices and contact areas using depth.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/PostProcessingSharedResources.js')
+        .addIncludeFile('Extensions/3D/SSAOEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('enabled')
+        .setValue('true')
+        .setLabel(_('Enabled'))
+        .setType('boolean');
+      properties
+        .getOrCreate('radius')
+        .setValue('60')
+        .setLabel(_('Radius'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setDescription(_('Sampling radius in view space.'));
+      properties
+        .getOrCreate('intensity')
+        .setValue('0.9')
+        .setLabel(_('Intensity'))
+        .setType('number')
+        .setDescription(_('How strong occlusion darkening is.'));
+      properties
+        .getOrCreate('bias')
+        .setValue('0.6')
+        .setLabel(_('Bias'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setDescription(_('Prevents self-occlusion artifacts.'));
+      properties
+        .getOrCreate('samples')
+        .setValue('16')
+        .setLabel(_('Samples'))
+        .setType('number')
+        .setDescription(
+          _('Quality/performance control (higher = better, slower).')
+        );
+    }
+    {
+      const effect = extension
+        .addEffect('VolumetricFog')
+        .setFullName(_('Volumetric fog'))
+        .setDescription(
+          _(
+            'Simulate volumetric light scattering by ray-marching fog in screen space around scene lights.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/PostProcessingSharedResources.js')
+        .addIncludeFile('Extensions/3D/VolumetricFogEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('enabled')
+        .setValue('true')
+        .setLabel(_('Enabled'))
+        .setType('boolean');
+      properties
+        .getOrCreate('fogColor')
+        .setValue('200;220;255')
+        .setLabel(_('Fog color'))
+        .setType('color');
+      properties
+        .getOrCreate('density')
+        .setValue('0.012')
+        .setLabel(_('Density'))
+        .setType('number')
+        .setDescription(_('Base fog density in the volume.'));
+      properties
+        .getOrCreate('lightScatter')
+        .setValue('1')
+        .setLabel(_('Light scatter'))
+        .setType('number')
+        .setDescription(_('How much fog glows near PointLight and SpotLight.'));
+      properties
+        .getOrCreate('maxDistance')
+        .setValue('1200')
+        .setLabel(_('Max distance'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setDescription(_('Maximum distance for volumetric ray marching.'));
+    }
+    {
+      const effect = extension
+        .addEffect('DepthOfField')
+        .setFullName(_('Depth of field'))
+        .setDescription(
+          _(
+            'Blur pixels based on distance from the focus plane using depth-aware gaussian blur.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/PostProcessingSharedResources.js')
+        .addIncludeFile('Extensions/3D/DepthOfFieldEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('enabled')
+        .setValue('true')
+        .setLabel(_('Enabled'))
+        .setType('boolean');
+      properties
+        .getOrCreate('focusDistance')
+        .setValue('400')
+        .setLabel(_('Focus distance'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setDescription(_('Distance from the camera that remains sharp.'));
+      properties
+        .getOrCreate('focusRange')
+        .setValue('250')
+        .setLabel(_('Focus range'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setDescription(_('How gradually blur increases around focus distance.'));
+      properties
+        .getOrCreate('maxBlur')
+        .setValue('6')
+        .setLabel(_('Max blur'))
+        .setType('number')
+        .setDescription(_('Maximum blur radius strength.'));
     }
     {
       const effect = extension

@@ -43,7 +43,7 @@
   background-color: var(--theme-text-field-disabled-color);
   align-self: stretch;
   width: 1px;
-  margin: 0 1px;
+  margin: 0;
 }
 
 /* svg tag is needed to be first priority compared to Material UI Custom SVG icon classes*/

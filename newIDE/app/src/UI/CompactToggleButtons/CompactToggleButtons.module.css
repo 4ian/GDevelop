@@ -20,7 +20,7 @@
   justify-content: center;
   flex: 1;
   min-width: 0px;
-  margin: 3px;
+  padding: 3px;
   border: 0;
 }
 
@@ -41,7 +41,7 @@
 
 .separator {
   background-color: var(--theme-text-field-disabled-color);
-  height: 15px;
+  align-self: stretch;
   width: 1px;
   margin: 0 1px;
 }

@@ -5,6 +5,7 @@ namespace gdjs {
    */
   export class PointLight3DRuntimeObjectRenderer extends gdjs.RuntimeObject3DRenderer {
     private _light: THREE.PointLight | null = null;
+    private static readonly _infiniteLightShadowFar = 5000;
 
     constructor(
       object: gdjs.PointLight3DRuntimeObject,
@@ -40,20 +41,24 @@ namespace gdjs {
         const shadowMapSize = object.getShadowMapSize();
         pointLight.shadow.mapSize.width = shadowMapSize;
         pointLight.shadow.mapSize.height = shadowMapSize;
-        
+
         // Shadow camera setup for point light
         pointLight.shadow.camera.near = 0.1;
-        pointLight.shadow.camera.far = Math.max(distance * 2, 100);
-        
+        pointLight.shadow.camera.far =
+          distance <= 0
+            ? PointLight3DRuntimeObjectRenderer._infiniteLightShadowFar
+            : Math.max(distance * 2, 100);
+        pointLight.shadow.camera.updateProjectionMatrix();
+
         // CRITICAL FIX: Shadow bias to prevent shadow acne
         // Point lights need higher bias values than directional lights
         // Adjust bias based on shadow map size (smaller maps need higher bias)
         const biasMultiplier = shadowMapSize < 1024 ? 2 : shadowMapSize < 2048 ? 1.5 : 1;
         pointLight.shadow.bias = -0.005 * biasMultiplier;
-        
+
         // Add shadow radius for softer shadows (reduces pixelation artifacts)
         pointLight.shadow.radius = 2;
-        
+
         // Ensure shadow map is updated
         pointLight.shadow.needsUpdate = true;
       }
@@ -90,7 +95,11 @@ namespace gdjs {
 
       // Update shadow camera far plane when distance changes
       if (this._light.castShadow) {
-        this._light.shadow.camera.far = Math.max(object.getDistance() * 2, 100);
+        const distance = object.getDistance();
+        this._light.shadow.camera.far =
+          distance <= 0
+            ? PointLight3DRuntimeObjectRenderer._infiniteLightShadowFar
+            : Math.max(distance * 2, 100);
         this._light.shadow.camera.updateProjectionMatrix();
       }
     }

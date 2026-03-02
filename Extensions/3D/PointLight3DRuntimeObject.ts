@@ -261,7 +261,17 @@ namespace gdjs {
      * @internal
      */
     getThreeColor(): THREE.Color {
-      const [r, g, b] = this._color.split(';').map((v) => parseInt(v) / 255);
+      const [rawR = '255', rawG = '255', rawB = '255'] = this._color.split(';');
+      const toChannel = (value: string): number => {
+        const channel = parseInt(value, 10);
+        if (!Number.isFinite(channel)) return 1;
+        if (channel <= 0) return 0;
+        if (channel >= 255) return 1;
+        return channel / 255;
+      };
+      const r = toChannel(rawR);
+      const g = toChannel(rawG);
+      const b = toChannel(rawB);
       return new THREE.Color(r, g, b);
     }
   }

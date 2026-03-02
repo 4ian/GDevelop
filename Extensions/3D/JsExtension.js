@@ -1942,6 +1942,10 @@ module.exports = {
     // PointLight3D Object - Professional 3D Light with Editor Visualization
     {
       const PointLight3DObject = new gd.ObjectJsImplementation();
+      const parseValidNumber = (rawValue, fallbackValue) => {
+        const value = parseFloat(rawValue);
+        return Number.isFinite(value) ? value : fallbackValue;
+      };
       PointLight3DObject.updateProperty = function (propertyName, newValue) {
         const objectContent = this.content;
 
@@ -1951,17 +1955,26 @@ module.exports = {
         }
 
         if (propertyName === 'intensity') {
-          objectContent.intensity = parseFloat(newValue);
+          objectContent.intensity = parseValidNumber(
+            newValue,
+            objectContent.intensity !== undefined ? objectContent.intensity : 1
+          );
           return true;
         }
 
         if (propertyName === 'distance') {
-          objectContent.distance = parseFloat(newValue);
+          objectContent.distance = parseValidNumber(
+            newValue,
+            objectContent.distance !== undefined ? objectContent.distance : 100
+          );
           return true;
         }
 
         if (propertyName === 'decay') {
-          objectContent.decay = parseFloat(newValue);
+          objectContent.decay = parseValidNumber(
+            newValue,
+            objectContent.decay !== undefined ? objectContent.decay : 2
+          );
           return true;
         }
 
@@ -1971,7 +1984,12 @@ module.exports = {
         }
 
         if (propertyName === 'shadowMapSize') {
-          objectContent.shadowMapSize = parseFloat(newValue);
+          objectContent.shadowMapSize = parseValidNumber(
+            newValue,
+            objectContent.shadowMapSize !== undefined
+              ? objectContent.shadowMapSize
+              : 1024
+          );
           return true;
         }
 
@@ -3638,8 +3656,6 @@ module.exports = {
       _iconSprite = null;
       /** @type {THREE.LineSegments | null} */
       _rangeMesh = null;
-      /** @type {THREE.Object3D | null} */
-      _directionArrow = null;
 
       constructor(
         project,
@@ -3728,61 +3744,23 @@ module.exports = {
           this._associatedObjectConfiguration,
           gd.ObjectJsImplementation
         );
-        const lightType = object.content.lightType || 'Point';
         const color = object.content.color || '255;255;255';
         const [r, g, b] = color.split(';').map((v) => parseInt(v) / 255);
 
-        if (lightType === 'Point') {
-          // Create sphere wireframe for Point Light
-          const geometry = new THREE.SphereGeometry(1, 32, 16);
-          const wireframe = new THREE.WireframeGeometry(geometry);
-
-          this._rangeMesh = new THREE.LineSegments(
-            wireframe,
-            new THREE.LineBasicMaterial({
-              color: new THREE.Color(r, g, b),
-              transparent: true,
-              opacity: 0.3,
-              depthTest: false,
-              depthWrite: false,
-            })
-          );
-          this._rangeMesh.renderOrder = 998;
-        } else {
-          // Create cone wireframe for Spot Light
-          // We'll use a custom geometry for the cone
-          const coneGeometry = new THREE.ConeGeometry(1, 1, 32, 1, true);
-          const wireframe = new THREE.WireframeGeometry(coneGeometry);
-
-          this._rangeMesh = new THREE.LineSegments(
-            wireframe,
-            new THREE.LineBasicMaterial({
-              color: new THREE.Color(r, g, b),
-              transparent: true,
-              opacity: 0.3,
-              depthTest: false,
-              depthWrite: false,
-            })
-          );
-          // Align cone to point along -Z axis
-          this._rangeMesh.rotation.x = -Math.PI / 2;
-          this._rangeMesh.renderOrder = 998;
-
-          // Add direction arrow
-          const arrowGeometry = new THREE.ConeGeometry(0.1, 0.4, 16);
-          const arrowMaterial = new THREE.MeshBasicMaterial({
+        // Point light visualization: sphere wireframe with configurable range.
+        const geometry = new THREE.SphereGeometry(1, 32, 16);
+        const wireframe = new THREE.WireframeGeometry(geometry);
+        this._rangeMesh = new THREE.LineSegments(
+          wireframe,
+          new THREE.LineBasicMaterial({
             color: new THREE.Color(r, g, b),
             transparent: true,
-            opacity: 0.6,
+            opacity: 0.3,
             depthTest: false,
             depthWrite: false,
-          });
-          this._directionArrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
-          this._directionArrow.rotation.x = -Math.PI / 2;
-          this._directionArrow.position.z = -0.6;
-          this._directionArrow.renderOrder = 997;
-          this._helperGroup.add(this._directionArrow);
-        }
+          })
+        );
+        this._rangeMesh.renderOrder = 998;
 
         this._helperGroup.add(this._rangeMesh);
       }
@@ -3799,28 +3777,13 @@ module.exports = {
           this._rangeMesh.material.color = threeColor;
         }
 
-        if (this._directionArrow) {
-          this._directionArrow.material.color = threeColor;
-        }
       }
 
-      _updateRangeScale(distance, angle, lightType) {
+      _updateRangeScale(distance) {
         if (!this._rangeMesh) return;
 
-        if (lightType === 'Spot') {
-          const angleRad = (angle * Math.PI) / 180;
-          const height = distance;
-          const radius = Math.tan(angleRad / 2) * height;
-          this._rangeMesh.scale.set(radius, height, radius);
-
-          // Update arrow position
-          if (this._directionArrow) {
-            this._directionArrow.position.z = -height * 0.6;
-          }
-        } else {
-          // Point light - uniform sphere
-          this._rangeMesh.scale.set(distance, distance, distance);
-        }
+        // Point light range visualization: uniform sphere.
+        this._rangeMesh.scale.set(distance, distance, distance);
       }
 
       updatePixiObject() {
@@ -3845,11 +3808,9 @@ module.exports = {
           gd.ObjectJsImplementation
         );
 
-        const lightType = object.content.lightType || 'Point';
         const color = object.content.color || '255;255;255';
         const distance =
           object.content.distance !== undefined ? object.content.distance : 100;
-        const angle = object.content.angle !== undefined ? object.content.angle : 60;
         const showHelper =
           object.content.showHelper !== undefined
             ? object.content.showHelper
@@ -3862,17 +3823,8 @@ module.exports = {
           this._instance.getZ()
         );
 
-        // Update rotation for spot lights
-        if (lightType === 'Spot') {
-          this._helperGroup.rotation.set(
-            RenderedInstance.toRad(this._instance.getRotationX()),
-            RenderedInstance.toRad(this._instance.getRotationY()),
-            RenderedInstance.toRad(this._instance.getAngle())
-          );
-        } else {
-          // Point lights don't rotate
-          this._helperGroup.rotation.set(0, 0, 0);
-        }
+        // Point lights don't have direction.
+        this._helperGroup.rotation.set(0, 0, 0);
 
         // Update visibility
         this._helperGroup.visible = showHelper;
@@ -3881,7 +3833,7 @@ module.exports = {
         this._updateHelperColor(color);
 
         // Update range scale
-        this._updateRangeScale(distance, angle, lightType);
+        this._updateRangeScale(distance);
       }
 
       getDefaultWidth() {

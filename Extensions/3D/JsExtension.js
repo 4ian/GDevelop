@@ -384,13 +384,18 @@ module.exports = {
         behaviorProperties
           .getOrCreate('offDuration')
           .setValue(
-            behaviorContent.getChild('offDuration').getDoubleValue().toString(10)
+            behaviorContent
+              .getChild('offDuration')
+              .getDoubleValue()
+              .toString(10)
           )
           .setType('Number')
           .setLabel(_('Off duration (seconds)'));
         behaviorProperties
           .getOrCreate('targetLayerName')
-          .setValue(behaviorContent.getChild('targetLayerName').getStringValue())
+          .setValue(
+            behaviorContent.getChild('targetLayerName').getStringValue()
+          )
           .setType('String')
           .setLabel(_('Target layer name (optional)'))
           .setDescription(
@@ -2411,9 +2416,7 @@ module.exports = {
         .setValue('0.02')
         .setLabel(_('Shadow normal bias'))
         .setDescription(
-          _(
-            'Offset along normals to reduce acne on sloped/curved surfaces.'
-          )
+          _('Offset along normals to reduce acne on sloped/curved surfaces.')
         )
         .setType('number')
         .setGroup(_('Shadows'))
@@ -2480,9 +2483,7 @@ module.exports = {
         .setValue('2000')
         .setLabel(_('Max shadow distance'))
         .setDescription(
-          _(
-            'Maximum world distance covered by cascaded directional shadows.'
-          )
+          _('Maximum world distance covered by cascaded directional shadows.')
         )
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())

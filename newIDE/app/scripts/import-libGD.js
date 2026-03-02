@@ -102,12 +102,37 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
     );
   };
 
+  const validateDownloadedLibGdJs = baseUrl => {
+    const libGdJsPath = path.join(__dirname, '..', 'public', 'libGD.js');
+    const libGdWasmPath = path.join(__dirname, '..', 'public', 'libGD.wasm');
+
+    if (!shell.test('-f', libGdJsPath) || !shell.test('-f', libGdWasmPath)) {
+      shell.echo(
+        `âš ï¸ Downloaded libGD.js is incomplete (baseUrl=${baseUrl}), trying another source.`
+      );
+      throw new Error('Incomplete libGD.js download');
+    }
+
+    const syntaxCheckResult = shell.exec(`node --check "${libGdJsPath}"`, {
+      silent: true,
+    });
+    if (syntaxCheckResult.code !== 0) {
+      shell.echo(
+        `âš ï¸ Downloaded libGD.js is not valid JavaScript (baseUrl=${baseUrl}), trying another source.`
+      );
+      throw new Error('Invalid libGD.js JavaScript syntax');
+    }
+  };
+
   const downloadLibGdJs = baseUrl =>
     Promise.all([
       downloadLocalFile(baseUrl + '/libGD.js', '../public/libGD.js'),
       downloadLocalFile(baseUrl + '/libGD.wasm', '../public/libGD.wasm'),
     ]).then(
-      responses => {},
+      responses => {
+        validateDownloadedLibGdJs(baseUrl);
+        return responses;
+      },
       error => {
         if (error.statusCode === 403) {
           shell.echo(

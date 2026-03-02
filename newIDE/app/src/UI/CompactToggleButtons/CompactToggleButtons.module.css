@@ -10,7 +10,7 @@
 }
 
 .compactToggleButton {
-  border-radius: 4px;
+  border-radius: 0;
   color: var(--theme-text-default-color);
   background-color: var(--theme-text-field-default-background-color);
   transition: box-shadow 0.1s;
@@ -20,7 +20,7 @@
   justify-content: center;
   flex: 1;
   min-width: 0px;
-  margin: 3px;
+  padding: 3px;
   border: 0;
 }
 
@@ -41,7 +41,7 @@
 
 .separator {
   background-color: var(--theme-text-field-disabled-color);
-  height: 15px;
+  align-self: stretch;
   width: 1px;
   margin: 0 1px;
 }
@@ -51,6 +51,14 @@ svg.icon {
   font-size: 20px;
   color: var(--theme-text-default-color);
   transition: color 0.1s linear;
+}
+
+.compactToggleButton.first {
+  border-radius: 4px 0 0 4px;
+}
+
+.compactToggleButton.last {
+  border-radius: 0 4px 4px 0;
 }
 
 .compactToggleButton.active {

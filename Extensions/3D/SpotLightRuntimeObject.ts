@@ -639,7 +639,6 @@ namespace gdjs {
   }
 
   export class SpotLightRuntimeObjectRenderer extends gdjs.RuntimeObject3DRenderer {
-    private _object: gdjs.SpotLightRuntimeObject;
     private _spotLight: THREE.SpotLight;
     private _shadowMapSize: integer;
     private _shadowMapDirty: boolean;
@@ -669,7 +668,6 @@ namespace gdjs {
 
       super(runtimeObject, instanceContainer, threeGroup);
 
-      this._object = runtimeObject;
       this._spotLight = spotLight;
       this._shadowMapSize = 1024;
       this._shadowMapDirty = true;

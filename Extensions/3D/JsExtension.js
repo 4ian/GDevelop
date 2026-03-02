@@ -2119,7 +2119,6 @@ module.exports = {
 
     extension
       .addExpression(
-        'number',
         'MaxActiveSpotLights',
         _('Max active 3D spot lights'),
         _('the maximum number of active 3D spot lights on the layer'),

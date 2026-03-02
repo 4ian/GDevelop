@@ -1,6 +1,7 @@
 const shell = require('shelljs');
 const { downloadLocalFile } = require('./lib/DownloadLocalFile');
 const path = require('path');
+const fs = require('fs');
 
 const sourceDirectory = '../../../Binaries/embuild/GDevelop.js';
 const destinationTestDirectory = '../node_modules/libGD.js-for-tests-only';
@@ -49,11 +50,17 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
     let branch = (branchShellString.stdout || '').trim();
     if (branch === 'HEAD') {
       // We're in detached HEAD. Try to read the branch from the CI environment variables.
-      if (process.env.APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH) {
+      if (process.env.SEMAPHORE_GIT_BRANCH) {
+        branch = process.env.SEMAPHORE_GIT_BRANCH;
+      } else if (process.env.APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH) {
         branch = process.env.APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH;
       } else if (process.env.APPVEYOR_REPO_BRANCH) {
         branch = process.env.APPVEYOR_REPO_BRANCH;
       }
+    }
+
+    if (branch === 'HEAD') {
+      branch = '';
     }
 
     if (!branch) {
@@ -85,7 +92,7 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
       }
 
       resolve(
-        downloadLibGdJs(
+        downloadLibGdJsWithRetries(
           `https://s3.amazonaws.com/gdevelop-gdevelop.js/${branch}/commit/${hash}`
         )
       );
@@ -97,10 +104,13 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
       `ℹ️ Trying to download libGD.js from ${branchName}, latest build.`
     );
 
-    return downloadLibGdJs(
+    return downloadLibGdJsWithRetries(
       `https://s3.amazonaws.com/gdevelop-gdevelop.js/${branchName}/latest`
     );
   };
+
+  const MIN_LIBGD_JS_SIZE_BYTES = 1024 * 1024;
+  const MIN_LIBGD_WASM_SIZE_BYTES = 1024 * 1024;
 
   const validateDownloadedLibGdJs = baseUrl => {
     const libGdJsPath = path.join(__dirname, '..', 'public', 'libGD.js');
@@ -108,9 +118,21 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
 
     if (!shell.test('-f', libGdJsPath) || !shell.test('-f', libGdWasmPath)) {
       shell.echo(
-        `âš ï¸ Downloaded libGD.js is incomplete (baseUrl=${baseUrl}), trying another source.`
+        `Warning: Downloaded libGD.js is incomplete (baseUrl=${baseUrl}), trying another source.`
       );
       throw new Error('Incomplete libGD.js download');
+    }
+
+    const libGdJsSize = fs.statSync(libGdJsPath).size;
+    const libGdWasmSize = fs.statSync(libGdWasmPath).size;
+    if (
+      libGdJsSize < MIN_LIBGD_JS_SIZE_BYTES ||
+      libGdWasmSize < MIN_LIBGD_WASM_SIZE_BYTES
+    ) {
+      shell.echo(
+        `Warning: Downloaded libGD.js assets are unexpectedly small (baseUrl=${baseUrl}), trying another source.`
+      );
+      throw new Error('Incomplete libGD.js download (unexpected file size)');
     }
 
     const syntaxCheckResult = shell.exec(`node --check "${libGdJsPath}"`, {
@@ -118,7 +140,7 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
     });
     if (syntaxCheckResult.code !== 0) {
       shell.echo(
-        `âš ï¸ Downloaded libGD.js is not valid JavaScript (baseUrl=${baseUrl}), trying another source.`
+        `Warning: Downloaded libGD.js is not valid JavaScript (baseUrl=${baseUrl}), trying another source.`
       );
       throw new Error('Invalid libGD.js JavaScript syntax');
     }
@@ -157,6 +179,27 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
         throw error;
       }
     );
+
+  const wait = milliseconds =>
+    new Promise(resolve => {
+      setTimeout(resolve, milliseconds);
+    });
+
+  const downloadLibGdJsWithRetries = (baseUrl, maxAttempts = 3) => {
+    let attempt = 1;
+    const download = () =>
+      downloadLibGdJs(baseUrl).catch(error => {
+        if (attempt >= maxAttempts) {
+          throw error;
+        }
+        attempt += 1;
+        shell.echo(
+          `Warning: Retrying libGD.js download from ${baseUrl} (attempt ${attempt}/${maxAttempts}).`
+        );
+        return wait(attempt * 1000).then(download);
+      });
+    return download();
+  };
 
   const onLibGdJsDownloaded = response => {
     shell.echo('✅ libGD.js downloaded and stored in public/libGD.js');

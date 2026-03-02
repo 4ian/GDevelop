@@ -679,7 +679,7 @@ app.on('ready', function() {
               'start',
               'cmd.exe',
               '/k',
-              `cd ${projectPath} && ${npmCommand}`,
+              `cd /d ${projectPath} && ${npmCommand}`,
             ],
             {
               detached: true,

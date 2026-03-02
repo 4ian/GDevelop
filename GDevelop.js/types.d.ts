@@ -178,6 +178,11 @@ export class VectorPropertyFolderOrProperty extends EmscriptenObject {
   at(index: number): PropertyFolderOrProperty;
 }
 
+export class VectorFunctionFolderOrFunction extends EmscriptenObject {
+  size(): number;
+  at(index: number): FunctionFolderOrFunction;
+}
+
 export class VectorScreenshot extends EmscriptenObject {
   size(): number;
   at(index: number): Screenshot;
@@ -2377,6 +2382,28 @@ export class EventsFunction extends EmscriptenObject {
   unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
+export class FunctionFolderOrFunction extends EmscriptenObject {
+  constructor();
+  isFolder(): boolean;
+  isRootFolder(): boolean;
+  getFunction(): EventsFunction;
+  getFolderName(): string;
+  setFolderName(name: string): void;
+  hasFunctionNamed(name: string): boolean;
+  getFunctionNamed(name: string): FunctionFolderOrFunction;
+  getChildrenCount(): number;
+  getChildAt(pos: number): FunctionFolderOrFunction;
+  getFunctionChild(name: string): FunctionFolderOrFunction;
+  getOrCreateChildFolder(name: string): FunctionFolderOrFunction;
+  getChildPosition(child: FunctionFolderOrFunction): number;
+  getParent(): FunctionFolderOrFunction;
+  insertNewFolder(name: string, newPosition: number): FunctionFolderOrFunction;
+  moveFunctionFolderOrFunctionToAnotherFolder(functionFolderOrFunction: FunctionFolderOrFunction, newParentFolder: FunctionFolderOrFunction, newPosition: number): void;
+  moveChild(oldIndex: number, newIndex: number): void;
+  removeFolderChild(childToRemove: FunctionFolderOrFunction): void;
+  isADescendantOf(otherFunctionFolderOrFunction: FunctionFolderOrFunction): boolean;
+}
+
 export class EventsFunctionsContainer extends EmscriptenObject {
   insertNewEventsFunction(name: string, pos: number): EventsFunction;
   insertEventsFunction(eventsFunction: EventsFunction, pos: number): EventsFunction;
@@ -2387,6 +2414,10 @@ export class EventsFunctionsContainer extends EmscriptenObject {
   moveEventsFunction(oldIndex: number, newIndex: number): void;
   getEventsFunctionsCount(): number;
   getEventsFunctionPosition(eventsFunction: EventsFunction): number;
+  insertNewFunctionInFolder(name: string, folder: FunctionFolderOrFunction, pos: number): EventsFunction;
+  getRootFolder(): FunctionFolderOrFunction;
+  getAllFunctionFolderOrFunction(): VectorFunctionFolderOrFunction;
+  addMissingFunctionsInRootFolder(): void;
 }
 
 export class AbstractEventsBasedEntity extends EmscriptenObject {

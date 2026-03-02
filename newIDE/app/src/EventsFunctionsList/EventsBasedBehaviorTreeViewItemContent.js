@@ -66,6 +66,7 @@ export type EventsBasedBehaviorProps = {|
     itemContent: ?TreeViewItemContent,
     eventsBasedBehavior: ?gdEventsBasedBehavior,
     eventsBasedObject: ?gdEventsBasedObject,
+    parentFolder: gdFunctionFolderOrFunction,
     index: number,
   |}) => void,
   eventsBasedBehaviorsList: gdEventsBasedBehaviorsList,
@@ -395,6 +396,9 @@ export class EventsBasedBehaviorTreeViewItemContent
       itemContent: this,
       eventsBasedBehavior: this.eventsBasedBehavior,
       eventsBasedObject: null,
+      parentFolder: this.eventsBasedBehavior
+        .getEventsFunctions()
+        .getRootFolder(),
       index,
     });
   }

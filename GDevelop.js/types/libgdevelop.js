@@ -57,6 +57,7 @@ declare class libGDevelop {
   VectorVariable: Class<gdVectorVariable>;
   VectorObjectFolderOrObject: Class<gdVectorObjectFolderOrObject>;
   VectorPropertyFolderOrProperty: Class<gdVectorPropertyFolderOrProperty>;
+  VectorFunctionFolderOrFunction: Class<gdVectorFunctionFolderOrFunction>;
   VectorScreenshot: Class<gdVectorScreenshot>;
   MapStringString: Class<gdMapStringString>;
   MapStringBoolean: Class<gdMapStringBoolean>;
@@ -240,6 +241,7 @@ declare class libGDevelop {
   ExpressionParser2: Class<gdExpressionParser2>;
   EventsFunction_FunctionType: Class<EventsFunction_FunctionType>;
   EventsFunction: Class<gdEventsFunction>;
+  FunctionFolderOrFunction: Class<gdFunctionFolderOrFunction>;
   EventsFunctionsContainer_FunctionOwner: Class<EventsFunctionsContainer_FunctionOwner>;
   EventsFunctionsContainer: Class<gdEventsFunctionsContainer>;
   AbstractEventsBasedEntity: Class<gdAbstractEventsBasedEntity>;

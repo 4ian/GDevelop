@@ -252,6 +252,366 @@ module.exports = {
     }
 
     {
+      const behavior = new gd.BehaviorJsImplementation();
+
+      behavior.updateProperty = function (
+        behaviorContent,
+        propertyName,
+        newValue
+      ) {
+        if (!behaviorContent.hasChild(propertyName)) {
+          if (propertyName === 'enabled') {
+            behaviorContent.addChild(propertyName).setBoolValue(true);
+          } else if (
+            propertyName === 'targetLayerName' ||
+            propertyName === 'targetEffectName'
+          ) {
+            behaviorContent.addChild(propertyName).setStringValue('');
+          } else {
+            behaviorContent.addChild(propertyName).setDoubleValue(0);
+          }
+        }
+
+        if (propertyName === 'enabled') {
+          behaviorContent
+            .getChild('enabled')
+            .setBoolValue(newValue === '1' || newValue === 'true');
+          return true;
+        }
+
+        if (
+          propertyName === 'baseIntensity' ||
+          propertyName === 'flickerSpeed' ||
+          propertyName === 'flickerStrength' ||
+          propertyName === 'failChance' ||
+          propertyName === 'offDuration'
+        ) {
+          const value = parseFloat(newValue);
+          if (value !== value) {
+            return false;
+          }
+          behaviorContent
+            .getChild(propertyName)
+            .setDoubleValue(Math.max(0, value));
+          return true;
+        }
+
+        if (
+          propertyName === 'targetLayerName' ||
+          propertyName === 'targetEffectName'
+        ) {
+          behaviorContent.getChild(propertyName).setStringValue(newValue);
+          return true;
+        }
+
+        return false;
+      };
+
+      behavior.getProperties = function (behaviorContent) {
+        const behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+        if (!behaviorContent.hasChild('enabled')) {
+          behaviorContent.addChild('enabled').setBoolValue(true);
+        }
+        if (!behaviorContent.hasChild('baseIntensity')) {
+          behaviorContent.addChild('baseIntensity').setDoubleValue(1.0);
+        }
+        if (!behaviorContent.hasChild('flickerSpeed')) {
+          behaviorContent.addChild('flickerSpeed').setDoubleValue(10.0);
+        }
+        if (!behaviorContent.hasChild('flickerStrength')) {
+          behaviorContent.addChild('flickerStrength').setDoubleValue(0.4);
+        }
+        if (!behaviorContent.hasChild('failChance')) {
+          behaviorContent.addChild('failChance').setDoubleValue(0.02);
+        }
+        if (!behaviorContent.hasChild('offDuration')) {
+          behaviorContent.addChild('offDuration').setDoubleValue(0.1);
+        }
+        if (!behaviorContent.hasChild('targetLayerName')) {
+          behaviorContent.addChild('targetLayerName').setStringValue('');
+        }
+        if (!behaviorContent.hasChild('targetEffectName')) {
+          behaviorContent.addChild('targetEffectName').setStringValue('');
+        }
+
+        behaviorProperties
+          .getOrCreate('enabled')
+          .setValue(
+            behaviorContent.getChild('enabled').getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setType('Boolean')
+          .setLabel(_('Enabled'));
+        behaviorProperties
+          .getOrCreate('baseIntensity')
+          .setValue(
+            behaviorContent
+              .getChild('baseIntensity')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setType('Number')
+          .setLabel(_('Base intensity'));
+        behaviorProperties
+          .getOrCreate('flickerSpeed')
+          .setValue(
+            behaviorContent
+              .getChild('flickerSpeed')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setType('Number')
+          .setLabel(_('Flicker speed'));
+        behaviorProperties
+          .getOrCreate('flickerStrength')
+          .setValue(
+            behaviorContent
+              .getChild('flickerStrength')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setType('Number')
+          .setLabel(_('Flicker strength'));
+        behaviorProperties
+          .getOrCreate('failChance')
+          .setValue(
+            behaviorContent.getChild('failChance').getDoubleValue().toString(10)
+          )
+          .setType('Number')
+          .setLabel(_('Failure chance (per second)'));
+        behaviorProperties
+          .getOrCreate('offDuration')
+          .setValue(
+            behaviorContent.getChild('offDuration').getDoubleValue().toString(10)
+          )
+          .setType('Number')
+          .setLabel(_('Off duration (seconds)'));
+        behaviorProperties
+          .getOrCreate('targetLayerName')
+          .setValue(behaviorContent.getChild('targetLayerName').getStringValue())
+          .setType('String')
+          .setLabel(_('Target layer name (optional)'))
+          .setDescription(
+            _(
+              'Optional explicit layer containing the SpotLight/PointLight effect. Leave empty to use the object layer.'
+            )
+          )
+          .setGroup(_('Advanced'))
+          .setAdvanced(true);
+        behaviorProperties
+          .getOrCreate('targetEffectName')
+          .setValue(
+            behaviorContent.getChild('targetEffectName').getStringValue()
+          )
+          .setType('String')
+          .setLabel(_('Target effect name (optional)'))
+          .setDescription(
+            _(
+              'Optional explicit effect name. Recommended when multiple 3D light effects exist on the same layer.'
+            )
+          )
+          .setGroup(_('Advanced'))
+          .setAdvanced(true);
+
+        return behaviorProperties;
+      };
+
+      behavior.initializeContent = function (behaviorContent) {
+        behaviorContent.addChild('enabled').setBoolValue(true);
+        behaviorContent.addChild('baseIntensity').setDoubleValue(1.0);
+        behaviorContent.addChild('flickerSpeed').setDoubleValue(10.0);
+        behaviorContent.addChild('flickerStrength').setDoubleValue(0.4);
+        behaviorContent.addChild('failChance').setDoubleValue(0.02);
+        behaviorContent.addChild('offDuration').setDoubleValue(0.1);
+        behaviorContent.addChild('targetLayerName').setStringValue('');
+        behaviorContent.addChild('targetEffectName').setStringValue('');
+      };
+
+      const flickeringLight = extension
+        .addBehavior(
+          'FlickeringLight',
+          _('Flickering 3D light'),
+          'FlickeringLight',
+          _(
+            'Randomly flickers Scene3D Point Light and Spot Light effects by updating their intensity every frame.'
+          ),
+          '',
+          'res/conditions/3d_box.svg',
+          'FlickeringLight',
+          // @ts-ignore
+          behavior,
+          new gd.BehaviorsSharedData()
+        )
+        .setIncludeFile('Extensions/3D/FlickeringLightBehavior.js');
+
+      flickeringLight
+        .addScopedAction(
+          'SetEnabled',
+          _('Enable/disable flickering'),
+          _('Enable or disable the light flicker simulation.'),
+          _('Set flickering of _PARAM0_ to _PARAM2_'),
+          _('Flickering light'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'FlickeringLight')
+        .addParameter('yesorno', _('Enabled'))
+        .setFunctionName('setEnabled');
+
+      flickeringLight
+        .addScopedCondition(
+          'IsEnabled',
+          _('Flickering enabled'),
+          _('Check if the flickering logic is enabled.'),
+          _('Flickering is enabled for _PARAM0_'),
+          _('Flickering light'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'FlickeringLight')
+        .setFunctionName('isEnabled');
+
+      flickeringLight
+        .addScopedAction(
+          'SetTargetLayerName',
+          _('Set target layer'),
+          _('Set the layer where the SpotLight/PointLight effect is searched.'),
+          _('Set flickering target layer of _PARAM0_ to _PARAM2_'),
+          _('Flickering light'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'FlickeringLight')
+        .addParameter('layer', _('Layer'), '', true)
+        .setFunctionName('setTargetLayerName');
+
+      flickeringLight
+        .addScopedAction(
+          'SetTargetEffectName',
+          _('Set target effect'),
+          _('Set the exact SpotLight/PointLight effect name to control.'),
+          _('Set flickering target effect of _PARAM0_ to _PARAM2_'),
+          _('Flickering light'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'FlickeringLight')
+        .addParameter('layerEffectName', _('Light effect name'))
+        .setFunctionName('setTargetEffectName');
+
+      flickeringLight
+        .addExpressionAndConditionAndAction(
+          'number',
+          'BaseIntensity',
+          _('Base intensity'),
+          _('the base light intensity'),
+          _('the base intensity'),
+          _('Flickering light'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'FlickeringLight')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Base intensity used when flicker offset is 0.')
+          )
+        )
+        .setFunctionName('setBaseIntensity')
+        .setGetter('getBaseIntensity');
+
+      flickeringLight
+        .addExpressionAndConditionAndAction(
+          'number',
+          'FlickerSpeed',
+          _('Flicker speed'),
+          _('the flickering speed'),
+          _('the flicker speed'),
+          _('Flickering light'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'FlickeringLight')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('How fast the flicker oscillates.')
+          )
+        )
+        .setFunctionName('setFlickerSpeed')
+        .setGetter('getFlickerSpeed');
+
+      flickeringLight
+        .addExpressionAndConditionAndAction(
+          'number',
+          'FlickerStrength',
+          _('Flicker strength'),
+          _('the flicker strength'),
+          _('the flicker strength'),
+          _('Flickering light'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'FlickeringLight')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('How much intensity can vary around the base value.')
+          )
+        )
+        .setFunctionName('setFlickerStrength')
+        .setGetter('getFlickerStrength');
+
+      flickeringLight
+        .addExpressionAndConditionAndAction(
+          'number',
+          'FailChance',
+          _('Failure chance'),
+          _('the failure chance per second'),
+          _('the failure chance per second'),
+          _('Flickering light'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'FlickeringLight')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Probability per second for a complete temporary blackout.')
+          )
+        )
+        .setFunctionName('setFailChance')
+        .setGetter('getFailChance');
+
+      flickeringLight
+        .addExpressionAndConditionAndAction(
+          'number',
+          'OffDuration',
+          _('Off duration'),
+          _('the off duration in seconds'),
+          _('the off duration'),
+          _('Flickering light'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'FlickeringLight')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('How long the light stays off when a failure occurs (seconds).')
+          )
+        )
+        .setFunctionName('setOffDuration')
+        .setGetter('getOffDuration');
+    }
+
+    {
       const object = extension
         .addObject(
           'Model3DObject',
@@ -2023,6 +2383,18 @@ module.exports = {
         .setType('choice')
         .setGroup(_('Shadows'));
       properties
+        .getOrCreate('shadowMapSize')
+        .setValue('1024')
+        .setLabel(_('Shadow map size (base)'))
+        .setDescription(
+          _(
+            'Base map size used by cascaded shadows. Recommended values: 512, 1024, 2048, or 4096 (high-end GPUs).'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Shadows'));
+      properties
         .getOrCreate('minimumShadowBias')
         .setValue('0')
         .setLabel(_('Shadow bias'))
@@ -2035,11 +2407,109 @@ module.exports = {
         .setGroup(_('Shadows'))
         .setAdvanced(true);
       properties
+        .getOrCreate('shadowNormalBias')
+        .setValue('0.02')
+        .setLabel(_('Shadow normal bias'))
+        .setDescription(
+          _(
+            'Offset along normals to reduce acne on sloped/curved surfaces.'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('shadowRadius')
+        .setValue('2')
+        .setLabel(_('Shadow softness'))
+        .setDescription(
+          _(
+            'Softness radius for filtered shadow edges (higher = softer, may blur details).'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('shadowStabilization')
+        .setValue('true')
+        .setLabel(_('Shadow stabilization'))
+        .setDescription(
+          _(
+            'Snap shadow tracking to a stable grid to reduce shimmering while the camera moves.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('shadowFollowCamera')
+        .setValue('false')
+        .setLabel(_('Shadows follow camera'))
+        .setDescription(
+          _(
+            'If disabled, directional shadow cascades stay fixed in world space (no shadow movement with the player).'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('shadowStabilizationStep')
+        .setValue('0')
+        .setLabel(_('Stabilization step'))
+        .setDescription(
+          _(
+            'Pixel step used for shadow stabilization. 0 = automatic texel-based step.'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
         .getOrCreate('frustumSize')
         .setValue('4000')
         .setLabel(_('Shadow frustum size'))
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('maxShadowDistance')
+        .setValue('2000')
+        .setLabel(_('Max shadow distance'))
+        .setDescription(
+          _(
+            'Maximum world distance covered by cascaded directional shadows.'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('cascadeSplitLambda')
+        .setValue('0.7')
+        .setLabel(_('Cascade split lambda'))
+        .setDescription(
+          _(
+            'Blend between logarithmic and uniform cascade split distribution (0 to 1).'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('shadowFollowLead')
+        .setValue('0.45')
+        .setLabel(_('Shadow follow lead'))
+        .setDescription(
+          _(
+            'Predictive follow amount for the shadow anchor so shadows keep up with fast player movement.'
+          )
+        )
+        .setType('number')
         .setGroup(_('Shadows'))
         .setAdvanced(true);
       properties
@@ -2144,6 +2614,16 @@ module.exports = {
         .setType('resource')
         .addExtraInfo('image')
         .setLabel(_('Back face (Z-)'));
+      properties
+        .getOrCreate('environmentIntensity')
+        .setValue('1.0')
+        .setLabel(_('Environment intensity'))
+        .setType('number')
+        .setDescription(
+          _(
+            'Intensity multiplier used when this skybox drives scene environment lighting.'
+          )
+        );
     }
     {
       const effect = extension

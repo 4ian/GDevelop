@@ -1,166 +1,327 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import Tooltip from '@material-ui/core/Tooltip';
-import LinkIcon from '../../UI/CustomSvgIcons/Link';
-import UnlinkIcon from '../../UI/CustomSvgIcons/Unlink';
+import LeftAlignmentIcon from '../../UI/CustomSvgIcons/LeftAlignment';
+import CenterAlignmentIcon from '../../UI/CustomSvgIcons/CenterAlignment';
+import RightAlignmentIcon from '../../UI/CustomSvgIcons/RightAlignment';
+import FillIcon from '../../UI/CustomSvgIcons/HorizontalSize';
+import ProportionalFillIcon from '../../UI/CustomSvgIcons/HorizontalSizePercent';
+import TopAlignmentIcon from '../../UI/CustomSvgIcons/TopAlignment';
+import CenterVerticalAlignmentIcon from '../../UI/CustomSvgIcons/CenterVerticalAlignment';
+import BottomAlignmentIcon from '../../UI/CustomSvgIcons/BottomAlignment';
+import VerticalFillIcon from '../../UI/CustomSvgIcons/VerticalSize';
+import VerticalProportionalFillIcon from '../../UI/CustomSvgIcons/VerticalSizePercent';
+import LetterV from '../../UI/CustomSvgIcons/LetterV';
+import LetterH from '../../UI/CustomSvgIcons/LetterH';
+import CompactTextField from '../../UI/CompactTextField';
+import CompactToggleButtons, {
+  type CompactToggleButton,
+} from '../../UI/CompactToggleButtons';
 import {
-  type GridRect,
-  propertiesToGridSelection,
-  getEndpointCells,
-  handleCellClick,
-  gridSelectionToProperties,
-} from './AnchorGridMapping';
+  type BasicAnchor,
+  type AnchorMapping,
+  getBasicHorizontalAnchor,
+  getBasicVerticalAnchor,
+  horizontalAnchorMapping,
+  verticalAnchorMapping,
+} from './AnchorBehaviorEditor';
 import styles from './AnchorGrid.module.css';
 
 type Props = {|
   getPropertyValue: (propertyName: string) => string,
   onUpdateProperty: (propertyName: string, value: string) => void,
+  initialInstance: gdInitialInstance | null,
 |};
 
-const gridPositions: Array<{| col: 0 | 1 | 2, row: 0 | 1 | 2 |}> = [
-  { col: 0, row: 0 },
-  { col: 1, row: 0 },
-  { col: 2, row: 0 },
-  { col: 0, row: 1 },
-  { col: 1, row: 1 },
-  { col: 2, row: 1 },
-  { col: 0, row: 2 },
-  { col: 1, row: 2 },
-  { col: 2, row: 2 },
-];
+const getAnchorDisplayText = (
+  basicAnchor: BasicAnchor,
+  axis: 'horizontal' | 'vertical'
+): string => {
+  switch (basicAnchor) {
+    case 'MinEdge':
+      return axis === 'horizontal' ? 'Left' : 'Bottom';
+    case 'Center':
+      return 'Center';
+    case 'MaxEdge':
+      return axis === 'horizontal' ? 'Right' : 'Top';
+    case 'FixedFill':
+      return 'Fill';
+    case 'ProportionalFill':
+      return 'Proportional';
+    case 'Advanced':
+      return 'Advanced';
+    default:
+      return '';
+  }
+};
+
+const makeButtons = (
+  currentBasicAnchor: BasicAnchor,
+  targetAnchors: Array<BasicAnchor>,
+  mapping: AnchorMapping,
+  minEdgeProperty: string,
+  maxEdgeProperty: string,
+  onUpdateProperty: (propertyName: string, value: string) => void,
+  renderIcon: (basicAnchor: BasicAnchor, className?: string) => React.Node,
+  renderTooltip: (basicAnchor: BasicAnchor) => React.Node
+): Array<CompactToggleButton> => {
+  return targetAnchors.map(target => {
+    const entry = mapping.find(m => m.basicAnchor === target);
+    const noneEntry = mapping.find(m => m.basicAnchor === 'None');
+    return {
+      id: target,
+      renderIcon: (className?: string) => renderIcon(target, className),
+      tooltip: renderTooltip(target),
+      isActive: currentBasicAnchor === target,
+      onClick: () => {
+        if (currentBasicAnchor === target) {
+          if (noneEntry) {
+            onUpdateProperty(minEdgeProperty, noneEntry.minEdge);
+            onUpdateProperty(maxEdgeProperty, noneEntry.maxEdge);
+          }
+        } else if (entry) {
+          onUpdateProperty(minEdgeProperty, entry.minEdge);
+          onUpdateProperty(maxEdgeProperty, entry.maxEdge);
+        }
+      },
+    };
+  });
+};
+
+const clearAnchor = (
+  mapping: AnchorMapping,
+  minEdgeProperty: string,
+  maxEdgeProperty: string,
+  onUpdateProperty: (propertyName: string, value: string) => void
+) => {
+  const noneEntry = mapping.find(m => m.basicAnchor === 'None');
+  if (noneEntry) {
+    onUpdateProperty(minEdgeProperty, noneEntry.minEdge);
+    onUpdateProperty(maxEdgeProperty, noneEntry.maxEdge);
+  }
+};
 
 const AnchorGrid = ({
   getPropertyValue,
   onUpdateProperty,
+  initialInstance,
 }: Props): React.Node => {
-  // Read the current anchor properties and convert to grid state
-  const leftEdgeAnchor = getPropertyValue('leftEdgeAnchor');
-  const rightEdgeAnchor = getPropertyValue('rightEdgeAnchor');
-  const topEdgeAnchor = getPropertyValue('topEdgeAnchor');
-  const bottomEdgeAnchor = getPropertyValue('bottomEdgeAnchor');
+  const verticalAnchor = getBasicVerticalAnchor(getPropertyValue);
+  const horizontalAnchor = getBasicHorizontalAnchor(getPropertyValue);
 
-  const gridSelection = propertiesToGridSelection(
-    leftEdgeAnchor,
-    rightEdgeAnchor,
-    topEdgeAnchor,
-    bottomEdgeAnchor
-  );
+  // Vertical axis
+  const vIsNone = verticalAnchor === 'None';
+  const vDisplayValue = vIsNone
+    ? initialInstance
+      ? String(Math.round(initialInstance.getY()))
+      : ''
+    : getAnchorDisplayText(verticalAnchor, 'vertical');
+  const vPlaceholder = vIsNone && !initialInstance ? 'None' : undefined;
 
-  const endpointCells = getEndpointCells(gridSelection.rect);
-
-  // Store the last non-proportional rect so we can restore it when
-  // the user toggles proportional mode off.
-  const lastNonProportionalRect = React.useRef(gridSelection.rect);
-  if (!gridSelection.proportional && gridSelection.rect) {
-    lastNonProportionalRect.current = gridSelection.rect;
-  }
-
-  const applyGridRect = React.useCallback(
-    (rect: GridRect | null, proportional: boolean) => {
-      const properties = gridSelectionToProperties(rect, proportional);
-      onUpdateProperty('leftEdgeAnchor', properties.leftEdgeAnchor);
-      onUpdateProperty('rightEdgeAnchor', properties.rightEdgeAnchor);
-      onUpdateProperty('topEdgeAnchor', properties.topEdgeAnchor);
-      onUpdateProperty('bottomEdgeAnchor', properties.bottomEdgeAnchor);
-    },
-    [onUpdateProperty]
-  );
-
-  const onCellClick = React.useCallback(
-    (col: 0 | 1 | 2, row: 0 | 1 | 2) => {
-      // If proportional is on, turn it off and select this cell
-      if (gridSelection.proportional) {
-        const newRect = { minCol: col, maxCol: col, minRow: row, maxRow: row };
-        applyGridRect(newRect, false);
-        return;
-      }
-
-      const newRect = handleCellClick(gridSelection.rect, col, row);
-      applyGridRect(newRect, false);
-    },
-    [gridSelection, applyGridRect]
-  );
-
-  const onToggleProportional = React.useCallback(
-    () => {
-      if (gridSelection.proportional) {
-        // Turn off proportional → restore last non-proportional rect
-        applyGridRect(lastNonProportionalRect.current, false);
-      } else {
-        // Turn on proportional
-        applyGridRect(gridSelection.rect, true);
+  const vPositionButtons = makeButtons(
+    verticalAnchor,
+    ['MinEdge', 'Center', 'MaxEdge'],
+    verticalAnchorMapping,
+    'topEdgeAnchor',
+    'bottomEdgeAnchor',
+    onUpdateProperty,
+    (basicAnchor, className) => {
+      switch (basicAnchor) {
+        case 'MinEdge':
+          return <BottomAlignmentIcon className={className} />;
+        case 'Center':
+          return <CenterVerticalAlignmentIcon className={className} />;
+        case 'MaxEdge':
+          return <TopAlignmentIcon className={className} />;
+        default:
+          return null;
       }
     },
-    [gridSelection, applyGridRect]
+    basicAnchor => {
+      switch (basicAnchor) {
+        case 'MinEdge':
+          return <Trans>Bottom</Trans>;
+        case 'Center':
+          return <Trans>Center</Trans>;
+        case 'MaxEdge':
+          return <Trans>Top</Trans>;
+        default:
+          return '';
+      }
+    }
   );
 
-  const rect = gridSelection.rect;
-  const hasRange =
-    rect && (rect.minCol !== rect.maxCol || rect.minRow !== rect.maxRow);
+  const vFillButtons = makeButtons(
+    verticalAnchor,
+    ['FixedFill', 'ProportionalFill'],
+    verticalAnchorMapping,
+    'topEdgeAnchor',
+    'bottomEdgeAnchor',
+    onUpdateProperty,
+    (basicAnchor, className) => {
+      switch (basicAnchor) {
+        case 'FixedFill':
+          return <VerticalFillIcon className={className} />;
+        case 'ProportionalFill':
+          return <VerticalProportionalFillIcon className={className} />;
+        default:
+          return null;
+      }
+    },
+    basicAnchor => {
+      switch (basicAnchor) {
+        case 'FixedFill':
+          return <Trans>Fill</Trans>;
+        case 'ProportionalFill':
+          return <Trans>Fill proportionally</Trans>;
+        default:
+          return '';
+      }
+    }
+  );
+
+  // Horizontal axis
+  const hIsNone = horizontalAnchor === 'None';
+  const hDisplayValue = hIsNone
+    ? initialInstance
+      ? String(Math.round(initialInstance.getX()))
+      : ''
+    : getAnchorDisplayText(horizontalAnchor, 'horizontal');
+  const hPlaceholder = hIsNone && !initialInstance ? 'None' : undefined;
+
+  const hPositionButtons = makeButtons(
+    horizontalAnchor,
+    ['MinEdge', 'Center', 'MaxEdge'],
+    horizontalAnchorMapping,
+    'leftEdgeAnchor',
+    'rightEdgeAnchor',
+    onUpdateProperty,
+    (basicAnchor, className) => {
+      switch (basicAnchor) {
+        case 'MinEdge':
+          return <LeftAlignmentIcon className={className} />;
+        case 'Center':
+          return <CenterAlignmentIcon className={className} />;
+        case 'MaxEdge':
+          return <RightAlignmentIcon className={className} />;
+        default:
+          return null;
+      }
+    },
+    basicAnchor => {
+      switch (basicAnchor) {
+        case 'MinEdge':
+          return <Trans>Left</Trans>;
+        case 'Center':
+          return <Trans>Center</Trans>;
+        case 'MaxEdge':
+          return <Trans>Right</Trans>;
+        default:
+          return '';
+      }
+    }
+  );
+
+  const hFillButtons = makeButtons(
+    horizontalAnchor,
+    ['FixedFill', 'ProportionalFill'],
+    horizontalAnchorMapping,
+    'leftEdgeAnchor',
+    'rightEdgeAnchor',
+    onUpdateProperty,
+    (basicAnchor, className) => {
+      switch (basicAnchor) {
+        case 'FixedFill':
+          return <FillIcon className={className} />;
+        case 'ProportionalFill':
+          return <ProportionalFillIcon className={className} />;
+        default:
+          return null;
+      }
+    },
+    basicAnchor => {
+      switch (basicAnchor) {
+        case 'FixedFill':
+          return <Trans>Fill</Trans>;
+        case 'ProportionalFill':
+          return <Trans>Fill proportionally</Trans>;
+        default:
+          return '';
+      }
+    }
+  );
 
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.grid}>
-        {rect && hasRange && (
-          <div
-            className={styles.selectionOverlay}
-            style={{
-              gridColumn: `${rect.minCol + 1} / ${rect.maxCol + 2}`,
-              gridRow: `${rect.minRow + 1} / ${rect.maxRow + 2}`,
-            }}
-          />
-        )}
-        {gridPositions.map(({ col, row }) => {
-          const key = `${col},${row}`;
-          const isEndpoint = endpointCells.has(key);
-          const isInRange =
-            hasRange &&
-            rect &&
-            col >= rect.minCol &&
-            col <= rect.maxCol &&
-            row >= rect.minRow &&
-            row <= rect.maxRow;
-          return (
-            <button
-              key={key}
-              className={`${styles.cell}${
-                isEndpoint && !hasRange ? ` ${styles.endpoint}` : ''
-              }${isInRange ? ` ${styles.inRange}` : ''}`}
-              style={{
-                gridColumn: col + 1,
-                gridRow: row + 1,
-              }}
-              onClick={() => onCellClick(col, row)}
-            >
-              {isEndpoint && <div className={styles.innerSquare} />}
-            </button>
-          );
-        })}
-      </div>
-      <div className={styles.linkButton}>
-        <Tooltip
-          title={
-            gridSelection.proportional ? (
-              <Trans>Disable proportional resize</Trans>
-            ) : (
-              <Trans>Enable proportional resize</Trans>
-            )
+    <div className={styles.container}>
+      <div className={styles.axisGroup}>
+        <CompactTextField
+          value={vDisplayValue}
+          onChange={() => {}}
+          disabled={!vIsNone}
+          placeholder={vPlaceholder}
+          renderLeftIcon={className => <LetterV className={className} />}
+          leftIconTooltip={<Trans>Vertical</Trans>}
+          onFocus={
+            !vIsNone
+              ? () =>
+                  clearAnchor(
+                    verticalAnchorMapping,
+                    'topEdgeAnchor',
+                    'bottomEdgeAnchor',
+                    onUpdateProperty
+                  )
+              : undefined
           }
-        >
-          <button
-            className={`${styles.linkToggle}${
-              gridSelection.proportional ? ` ${styles.active}` : ''
-            }`}
-            onClick={onToggleProportional}
-          >
-            {gridSelection.proportional ? (
-              <LinkIcon className={styles.linkIcon} />
-            ) : (
-              <UnlinkIcon className={styles.linkIcon} />
-            )}
-          </button>
-        </Tooltip>
+        />
+        <div className={styles.buttonGroups}>
+          <CompactToggleButtons
+            id="vertical-position"
+            buttons={vPositionButtons}
+            noSeparator
+            expand
+          />
+          <CompactToggleButtons
+            id="vertical-fill"
+            buttons={vFillButtons}
+            noSeparator
+            expand
+          />
+        </div>
+      </div>
+      <div className={styles.axisGroup}>
+        <CompactTextField
+          value={hDisplayValue}
+          onChange={() => {}}
+          disabled={!hIsNone}
+          placeholder={hPlaceholder}
+          renderLeftIcon={className => <LetterH className={className} />}
+          leftIconTooltip={<Trans>Horizontal</Trans>}
+          onFocus={
+            !hIsNone
+              ? () =>
+                  clearAnchor(
+                    horizontalAnchorMapping,
+                    'leftEdgeAnchor',
+                    'rightEdgeAnchor',
+                    onUpdateProperty
+                  )
+              : undefined
+          }
+        />
+        <div className={styles.buttonGroups}>
+          <CompactToggleButtons
+            id="horizontal-position"
+            buttons={hPositionButtons}
+            noSeparator
+            expand
+          />
+          <CompactToggleButtons
+            id="horizontal-fill"
+            buttons={hFillButtons}
+            noSeparator
+            expand
+          />
+        </div>
       </div>
     </div>
   );

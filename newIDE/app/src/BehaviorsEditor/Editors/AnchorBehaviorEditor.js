@@ -4,17 +4,6 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type BehaviorEditorProps } from './BehaviorEditorProps.flow';
 import BehaviorPropertiesEditor from './BehaviorPropertiesEditor';
-import SmallCrossIcon from '../../UI/CustomSvgIcons/SmallCross';
-import LeftAlignmentIcon from '../../UI/CustomSvgIcons/LeftAlignment';
-import CenterAlignmentIcon from '../../UI/CustomSvgIcons/CenterAlignment';
-import RightAlignmentIcon from '../../UI/CustomSvgIcons/RightAlignment';
-import FillIcon from '../../UI/CustomSvgIcons/HorizontalSize';
-import ProportionalFillIcon from '../../UI/CustomSvgIcons/HorizontalSizePercent';
-import TopAlignmentIcon from '../../UI/CustomSvgIcons/TopAlignment';
-import CenterVerticalAlignmentIcon from '../../UI/CustomSvgIcons/CenterVerticalAlignment';
-import BottomAlignmentIcon from '../../UI/CustomSvgIcons/BottomAlignment';
-import VerticalFillIcon from '../../UI/CustomSvgIcons/VerticalSize';
-import VerticalProportionalFillIcon from '../../UI/CustomSvgIcons/VerticalSizePercent';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { ColumnStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
@@ -22,13 +11,9 @@ import {
   getPropertyValue,
   updateProperty,
 } from '../../ObjectEditor/CompactObjectPropertiesEditor/CompactBehaviorPropertiesEditor';
-import CompactToggleButtons, {
-  type CompactToggleButton,
-} from '../../UI/CompactToggleButtons';
 import AnchorGrid from './AnchorGrid';
-import { propertiesToGridSelection } from './AnchorGridMapping';
 
-type BasicAnchor =
+export type BasicAnchor =
   | 'None'
   | 'ProportionalFill'
   | 'FixedFill'
@@ -111,13 +96,13 @@ export const getBasicVerticalAnchor = (
     getAnchorProperty(getPropertyValue, 'bottomEdgeAnchor')
   );
 
-type AnchorMapping = Array<{|
+export type AnchorMapping = Array<{|
   basicAnchor: BasicAnchor,
   minEdge: string,
   maxEdge: string,
 |}>;
 
-const horizontalAnchorMapping: AnchorMapping = [
+export const horizontalAnchorMapping: AnchorMapping = [
   { basicAnchor: 'None', minEdge: 'None', maxEdge: 'None' },
   { basicAnchor: 'MinEdge', minEdge: 'WindowLeft', maxEdge: 'WindowLeft' },
   { basicAnchor: 'Center', minEdge: 'WindowCenter', maxEdge: 'WindowCenter' },
@@ -130,7 +115,7 @@ const horizontalAnchorMapping: AnchorMapping = [
   },
 ];
 
-const verticalAnchorMapping: AnchorMapping = [
+export const verticalAnchorMapping: AnchorMapping = [
   { basicAnchor: 'None', minEdge: 'None', maxEdge: 'None' },
   { basicAnchor: 'MinEdge', minEdge: 'WindowTop', maxEdge: 'WindowTop' },
   { basicAnchor: 'Center', minEdge: 'WindowCenter', maxEdge: 'WindowCenter' },
@@ -142,157 +127,6 @@ const verticalAnchorMapping: AnchorMapping = [
     maxEdge: 'Proportional',
   },
 ];
-
-const AnchorButtonGroup = ({
-  id,
-  basicAnchor,
-  minEdgePropertyName,
-  maxEdgePropertyName,
-  anchorMapping,
-  renderIcon,
-  renderTooltip,
-  onUpdateProperty,
-  expand,
-}: {|
-  id: string,
-  basicAnchor: BasicAnchor,
-  minEdgePropertyName: string,
-  maxEdgePropertyName: string,
-  anchorMapping: Array<{|
-    basicAnchor: BasicAnchor,
-    minEdge: string,
-    maxEdge: string,
-  |}>,
-  renderIcon: (basicAnchor: string, className?: string) => React.Node,
-  renderTooltip: (basicAnchor: string) => React.Node,
-  onUpdateProperty: (propertyName: string, value: string) => void,
-  expand?: boolean,
-|}): React.Node => {
-  const buttons: Array<CompactToggleButton> = anchorMapping.map(item => ({
-    id: item.basicAnchor,
-    renderIcon: (className?: string) => renderIcon(item.basicAnchor, className),
-    tooltip: renderTooltip(item.basicAnchor),
-    isActive: basicAnchor === item.basicAnchor,
-    onClick: () => {
-      onUpdateProperty(minEdgePropertyName, item.minEdge);
-      onUpdateProperty(maxEdgePropertyName, item.maxEdge);
-    },
-  }));
-
-  return <CompactToggleButtons id={id} buttons={buttons} expand={false} />;
-};
-
-export const HorizontalAnchorButtonGroup = ({
-  basicAnchor,
-  onUpdateProperty,
-  expand,
-}: {|
-  basicAnchor: BasicAnchor,
-  onUpdateProperty: (propertyName: string, value: string) => void,
-  expand?: boolean,
-|}): React.Node => {
-  return (
-    <AnchorButtonGroup
-      id="horizontal-anchor"
-      basicAnchor={basicAnchor}
-      minEdgePropertyName="leftEdgeAnchor"
-      maxEdgePropertyName="rightEdgeAnchor"
-      anchorMapping={horizontalAnchorMapping}
-      renderIcon={(basicAnchor, className) => {
-        switch (basicAnchor) {
-          case 'MinEdge':
-            return <LeftAlignmentIcon class={className} />;
-          case 'Center':
-            return <CenterAlignmentIcon class={className} />;
-          case 'MaxEdge':
-            return <RightAlignmentIcon class={className} />;
-          case 'FixedFill':
-            return <FillIcon class={className} />;
-          case 'ProportionalFill':
-            return <ProportionalFillIcon class={className} />;
-          case 'None':
-          default:
-            return <SmallCrossIcon class={className} />;
-        }
-      }}
-      renderTooltip={basicAnchor => {
-        switch (basicAnchor) {
-          case 'MinEdge':
-            return <Trans>Left</Trans>;
-          case 'Center':
-            return <Trans>Center</Trans>;
-          case 'MaxEdge':
-            return <Trans>Right</Trans>;
-          case 'FixedFill':
-            return <Trans>Fill</Trans>;
-          case 'ProportionalFill':
-            return <Trans>Fill proportionally</Trans>;
-          case 'None':
-          default:
-            return <Trans>None</Trans>;
-        }
-      }}
-      onUpdateProperty={onUpdateProperty}
-      expand={expand}
-    />
-  );
-};
-
-export const VerticalAnchorButtonGroup = ({
-  basicAnchor,
-  onUpdateProperty,
-  expand,
-}: {|
-  basicAnchor: BasicAnchor,
-  onUpdateProperty: (propertyName: string, value: string) => void,
-  expand?: boolean,
-|}): React.Node => {
-  return (
-    <AnchorButtonGroup
-      id="vertical-anchor"
-      basicAnchor={basicAnchor}
-      minEdgePropertyName="topEdgeAnchor"
-      maxEdgePropertyName="bottomEdgeAnchor"
-      anchorMapping={verticalAnchorMapping}
-      renderIcon={(basicAnchor, className) => {
-        switch (basicAnchor) {
-          case 'MinEdge':
-            return <TopAlignmentIcon class={className} />;
-          case 'Center':
-            return <CenterVerticalAlignmentIcon class={className} />;
-          case 'MaxEdge':
-            return <BottomAlignmentIcon class={className} />;
-          case 'FixedFill':
-            return <VerticalFillIcon class={className} />;
-          case 'ProportionalFill':
-            return <VerticalProportionalFillIcon class={className} />;
-          case 'None':
-          default:
-            return <SmallCrossIcon class={className} />;
-        }
-      }}
-      renderTooltip={basicAnchor => {
-        switch (basicAnchor) {
-          case 'MinEdge':
-            return <Trans>Top</Trans>;
-          case 'Center':
-            return <Trans>Center</Trans>;
-          case 'MaxEdge':
-            return <Trans>Bottom</Trans>;
-          case 'FixedFill':
-            return <Trans>Fill</Trans>;
-          case 'ProportionalFill':
-            return <Trans>Fill proportionally</Trans>;
-          case 'None':
-          default:
-            return <Trans>None</Trans>;
-        }
-      }}
-      onUpdateProperty={onUpdateProperty}
-      expand={expand}
-    />
-  );
-};
 
 type Props = BehaviorEditorProps;
 
@@ -325,12 +159,9 @@ const AnchorBehaviorEditor = ({
     [forceUpdate, onBehaviorUpdated]
   );
 
-  const gridSelection = propertiesToGridSelection(
-    _getPropertyValue('leftEdgeAnchor'),
-    _getPropertyValue('rightEdgeAnchor'),
-    _getPropertyValue('topEdgeAnchor'),
-    _getPropertyValue('bottomEdgeAnchor')
-  );
+  const isAdvanced =
+    getBasicHorizontalAnchor(_getPropertyValue) === 'Advanced' ||
+    getBasicVerticalAnchor(_getPropertyValue) === 'Advanced';
 
   return (
     <ColumnStackLayout expand>
@@ -340,6 +171,7 @@ const AnchorBehaviorEditor = ({
       <AnchorGrid
         getPropertyValue={_getPropertyValue}
         onUpdateProperty={_updateProperty}
+        initialInstance={null}
       />
       <BehaviorPropertiesEditor
         project={project}
@@ -349,7 +181,7 @@ const AnchorBehaviorEditor = ({
         resourceManagementProps={resourceManagementProps}
         projectScopedContainersAccessor={projectScopedContainersAccessor}
         isAdvancedSectionInitiallyUncollapsed={
-          gridSelection.isAdvanced ||
+          isAdvanced ||
           _getPropertyValue('relativeToOriginalWindowSize') === 'false'
         }
       />

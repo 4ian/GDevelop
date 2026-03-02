@@ -1,103 +1,21 @@
-.wrapper {
+.container {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.axisGroup {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
+.buttonGroups {
+  display: flex;
+  align-items: center;
   gap: 4px;
-  background-color: transparent;
-  border-radius: 4px;
-  padding: 0;
+}
+
+.buttonGroups > * {
   flex: 1;
-}
-
-.cell {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1;
-  min-width: 24px;
-  min-height: 24px;
-  border: 0;
-  border-radius: 8px;
-  background-color: var(--theme-text-field-default-background-color);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: none;
-  z-index: 1;
-}
-
-.cell:hover {
-  background-color: var(--theme-text-field-disabled-color);
-}
-
-/* Single-cell endpoint (no range): purple background on the cell itself */
-.cell.endpoint {
-  background-color: rgba(149, 128, 205, 0.4);
-}
-
-/* Cells inside a range selection: transparent so the overlay behind shows */
-.cell.inRange {
-  background-color: transparent;
-}
-
-.cell.inRange:hover {
-  background-color: rgba(149, 128, 205, 0.15);
-}
-
-/* Continuous overlay that spans across cells and gaps for range selections.
-   Uses grid-column/grid-row to cover the selected area as one solid block. */
-.selectionOverlay {
-  background-color: rgba(149, 128, 205, 0.4);
-  border-radius: 3px;
-  z-index: 0;
-}
-
-/* The inner square shown on endpoint cells — uses absolute positioning
-   with equal inset on all sides so it stays a perfect square. */
-.innerSquare {
-  position: absolute;
-  inset: 16px;
-  border-radius: 3px;
-  background-color: var(--theme-icon-button-selected-background-color);
-  transition: none;
-}
-
-.linkButton {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.linkToggle {
-  width: 32px;
-  height: 32px;
-  border: 0;
-  border-radius: 4px;
-  background-color: var(--theme-text-field-default-background-color);
-  color: var(--theme-text-default-color);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: none;
-}
-
-.linkToggle:hover {
-  background-color: var(--theme-text-field-disabled-color);
-}
-
-.linkToggle.active {
-  background-color: var(--theme-icon-button-selected-background-color);
-  color: var(--theme-icon-button-selected-color);
-}
-
-svg.linkIcon {
-  font-size: 20px;
 }

@@ -11,6 +11,7 @@ import EventsIcon from '../UI/CustomSvgIcons/Events';
 import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
 import ExternalLayoutIcon from '../UI/CustomSvgIcons/ExternalLayout';
 import ExtensionIcon from '../UI/CustomSvgIcons/Extension';
+import SearchIcon from '../UI/CustomSvgIcons/Search';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
 import AboutDialog from './AboutDialog';
@@ -58,6 +59,7 @@ import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
 import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
+import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
 import {
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
@@ -232,6 +234,8 @@ import StandaloneDialog from './StandAloneDialog';
 import { useInGameEditorSettings } from '../EmbeddedGame/InGameEditorSettings';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { useAutomatedRegularInGameEditorRestart } from '../EmbeddedGame/UseAutomatedRegularInGameEditorRestart';
+import type { EventPath } from '../Types/EventPath';
+import type { EditorTab } from './EditorTabs/EditorTabsHandler';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -249,6 +253,7 @@ const editorKindToRenderer: {
   'custom object': renderCustomObjectEditorContainer,
   'start page': renderHomePageContainer,
   resources: renderResourcesEditorContainer,
+  'global-search': renderGlobalEventsSearchEditorContainer,
   'ask-ai': renderAskAiEditorContainer,
 };
 
@@ -704,6 +709,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       const label =
         kind === 'resources'
           ? i18n._(t`Resources`)
+          : kind === 'global-search'
+          ? i18n._(t`Global search`)
           : kind === 'ask-ai'
           ? i18n._(t`Ask AI`)
           : kind === 'start page'
@@ -753,6 +760,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           <DebuggerIcon />
         ) : kind === 'resources' ? (
           <ProjectResourcesIcon />
+        ) : kind === 'global-search' ? (
+          <SearchIcon />
         ) : kind === 'layout' ? (
           <SceneIcon />
         ) : kind === 'layout events' ? (
@@ -803,6 +812,40 @@ const MainFrame = (props: Props): React.MixedElement => {
     [i18n, props.storageProviders]
   );
 
+  const hasGlobalSearchTab = React.useCallback(
+    (editorTabs: EditorTabsState) => {
+      for (const paneIdentifier in editorTabs.panes) {
+        const pane = editorTabs.panes[paneIdentifier];
+        if (pane.editors.some(editor => editor.kind === 'global-search')) {
+          return true;
+        }
+      }
+      return false;
+    },
+    []
+  );
+
+  const clearGlobalSearchHighlightsInEditorTabs = React.useCallback(
+    (editorTabs: EditorTabsState) => {
+      for (const paneIdentifier in editorTabs.panes) {
+        const pane = editorTabs.panes[paneIdentifier];
+        for (const editor of pane.editors) {
+          const editorRef: any = editor.editorRef;
+          if (
+            (editor.kind === 'layout events' ||
+              editor.kind === 'external events' ||
+              editor.kind === 'events functions extension') &&
+            editorRef &&
+            editorRef.clearGlobalSearchResults
+          ) {
+            editorRef.clearGlobalSearchResults();
+          }
+        }
+      }
+    },
+    []
+  );
+
   const setEditorTabs = React.useCallback(
     // $FlowFixMe[missing-local-annot]
     newEditorTabs => {
@@ -812,6 +855,41 @@ const MainFrame = (props: Props): React.MixedElement => {
       }));
     },
     [setState]
+  );
+
+  const previousEditorTabs = React.useRef<EditorTabsState>(state.editorTabs);
+  const globalSearchRetryTimeoutIdRef = React.useRef<?TimeoutID>(null);
+
+  const clearGlobalSearchRetryTimeoutId = React.useCallback(() => {
+    if (globalSearchRetryTimeoutIdRef.current) {
+      clearTimeout(globalSearchRetryTimeoutIdRef.current);
+      globalSearchRetryTimeoutIdRef.current = null;
+    }
+  }, []);
+
+  React.useEffect(
+    () => {
+      const hadGlobalSearchTab = hasGlobalSearchTab(previousEditorTabs.current);
+      const hasGlobalSearchTabNow = hasGlobalSearchTab(state.editorTabs);
+
+      if (hadGlobalSearchTab && !hasGlobalSearchTabNow) {
+        clearGlobalSearchHighlightsInEditorTabs(previousEditorTabs.current);
+      }
+
+      previousEditorTabs.current = state.editorTabs;
+    },
+    [
+      state.editorTabs,
+      hasGlobalSearchTab,
+      clearGlobalSearchHighlightsInEditorTabs,
+    ]
+  );
+
+  React.useEffect(
+    () => () => {
+      clearGlobalSearchRetryTimeoutId();
+    },
+    [clearGlobalSearchRetryTimeoutId]
   );
 
   const {
@@ -2773,6 +2851,194 @@ const MainFrame = (props: Props): React.MixedElement => {
       }));
     },
     [getEditorOpeningOptions, setState]
+  );
+
+  const openGlobalSearch = React.useCallback(
+    () => {
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          // $FlowFixMe[incompatible-type]
+          getEditorOpeningOptions({ kind: 'global-search', name: '' })
+        ),
+      }));
+    },
+    [getEditorOpeningOptions, setState]
+  );
+
+  const onEditorTabClosing = React.useCallback(
+    (editorTab: EditorTab) => {
+      if (editorTab.kind === 'global-search') {
+        clearGlobalSearchHighlightsInEditorTabs(state.editorTabs);
+      }
+    },
+    [clearGlobalSearchHighlightsInEditorTabs, state.editorTabs]
+  );
+
+  const openSearchedEditor = React.useCallback(
+    ({
+      locationType,
+      name,
+      extensionName,
+      functionName,
+      behaviorName,
+      objectName,
+    }: {|
+      locationType: 'layout' | 'external-events' | 'extension',
+      name: string,
+      extensionName?: string,
+      functionName?: string,
+      behaviorName?: string,
+      objectName?: string,
+    |}): void => {
+      const openTypeDic: { [typeof locationType]: () => void } = {
+        layout: () =>
+          openLayout(name, {
+            openEventsEditor: true,
+            openSceneEditor: false,
+            focusWhenOpened: 'events',
+          }),
+        'external-events': () => openExternalEvents(name),
+        extension: () =>
+          openEventsFunctionsExtension(
+            extensionName || name,
+            functionName,
+            behaviorName,
+            objectName
+          ),
+      };
+
+      return openTypeDic[locationType]();
+    },
+    [openEventsFunctionsExtension, openExternalEvents, openLayout]
+  );
+
+  const navigateToEventFromGlobalSearch = React.useCallback(
+    ({
+      locationType,
+      name,
+      eventPath,
+      highlightedEventPaths,
+      searchText,
+      matchCase,
+      extensionName,
+      functionName,
+      behaviorName,
+      objectName,
+    }: {|
+      locationType: 'layout' | 'external-events' | 'extension',
+      name: string,
+      eventPath: EventPath,
+      highlightedEventPaths: Array<EventPath>,
+      searchText: string,
+      matchCase?: boolean,
+      extensionName?: string,
+      functionName?: string,
+      behaviorName?: string,
+      objectName?: string,
+    |}) => {
+      clearGlobalSearchRetryTimeoutId();
+      clearGlobalSearchHighlightsInEditorTabs(state.editorTabs);
+      setPendingEventNavigation({
+        name,
+        locationType,
+        eventPath,
+      });
+
+      openSearchedEditor({
+        locationType,
+        name,
+        extensionName,
+        functionName,
+        behaviorName,
+        objectName,
+      });
+
+      const EDITOR_MOUNT_INITIAL_DELAY_MS = 100;
+      const EDITOR_MOUNT_RETRY_INTERVAL_MS = 100;
+      const EDITOR_MOUNT_MAX_ATTEMPTS = 25; // ~2.5s total
+
+      const editorKind =
+        locationType === 'layout'
+          ? 'layout events'
+          : locationType === 'external-events'
+          ? 'external events'
+          : 'events functions extension';
+
+      const tryApplyGlobalSearchResults = (attempt: number) => {
+        setState(latestState => {
+          for (const paneIdentifier in latestState.editorTabs.panes) {
+            const pane = latestState.editorTabs.panes[paneIdentifier];
+            for (const editor of pane.editors) {
+              const editorRef: any = editor.editorRef;
+              if (
+                editor.kind === editorKind &&
+                editor.projectItemName === name &&
+                editorRef &&
+                editorRef.setGlobalSearchResults
+              ) {
+                const applySearchResults = () => {
+                  editorRef.setGlobalSearchResults(
+                    highlightedEventPaths,
+                    eventPath,
+                    searchText,
+                    matchCase
+                  );
+                };
+                // For extensions: ensure we're on the correct function before
+                // setting search results. openEditorTab only focuses an
+                // already-open tab and does not reapply extraEditorProps.
+                if (
+                  locationType === 'extension' &&
+                  functionName &&
+                  editorRef.selectEventsFunctionByName
+                ) {
+                  editorRef.selectEventsFunctionByName(
+                    functionName,
+                    behaviorName || null,
+                    objectName || null
+                  );
+                  // Defer so React can re-render with the new function's events
+                  requestAnimationFrame(() => {
+                    requestAnimationFrame(applySearchResults);
+                  });
+                } else {
+                  applySearchResults();
+                }
+                globalSearchRetryTimeoutIdRef.current = null;
+                return latestState;
+              }
+            }
+          }
+
+          if (attempt < EDITOR_MOUNT_MAX_ATTEMPTS) {
+            globalSearchRetryTimeoutIdRef.current = setTimeout(
+              () => tryApplyGlobalSearchResults(attempt + 1),
+              attempt === 0
+                ? EDITOR_MOUNT_INITIAL_DELAY_MS
+                : EDITOR_MOUNT_RETRY_INTERVAL_MS
+            );
+          } else {
+            globalSearchRetryTimeoutIdRef.current = null;
+          }
+          return latestState;
+        });
+      };
+
+      globalSearchRetryTimeoutIdRef.current = setTimeout(
+        () => tryApplyGlobalSearchResults(0),
+        EDITOR_MOUNT_INITIAL_DELAY_MS
+      );
+    },
+    [
+      clearGlobalSearchRetryTimeoutId,
+      clearGlobalSearchHighlightsInEditorTabs,
+      state.editorTabs,
+      setPendingEventNavigation,
+      openSearchedEditor,
+      setState,
+    ]
   );
 
   const openHomePage = React.useCallback(
@@ -4756,6 +5022,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenCommandPalette: openCommandPalette,
     onOpenProfile: onOpenProfileDialog,
     onRestartInGameEditor,
+    onOpenGlobalSearch: openGlobalSearch,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -4857,6 +5124,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenProjectManager: () => openProjectManager(true),
     onOpenHomePage: openHomePage,
     onOpenDebugger: openDebugger,
+    onOpenGlobalSearch: openGlobalSearch,
     onOpenAbout: () => openAboutDialog(true),
     onOpenPreferences: () => openPreferencesDialog(true),
     onOpenLanguage: () => openLanguageDialog(true),
@@ -4921,9 +5189,12 @@ const MainFrame = (props: Props): React.MixedElement => {
     onCreateEventsFunction: onCreateEventsFunction,
     openInstructionOrExpression: openInstructionOrExpression,
     onOpenCustomObjectEditor: openCustomObjectEditor,
+    onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onRenamedEventsBasedObject: onRenamedEventsBasedObject,
     onDeletedEventsBasedObject: onDeletedEventsBasedObject,
     openObjectEvents: openObjectEvents,
+    onNavigateToEventFromGlobalSearch: navigateToEventFromGlobalSearch,
+    onEditorTabClosing: onEditorTabClosing,
     canOpen: !!props.storageProviders.filter(
       ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
     ).length,

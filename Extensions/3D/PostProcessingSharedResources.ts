@@ -6,6 +6,7 @@ namespace gdjs {
     ssaoSamples: number;
     ssrSteps: number;
     fogSteps: number;
+    dofSamples: number;
     dofBlurScale: number;
   }
 
@@ -27,6 +28,7 @@ namespace gdjs {
     hasStackController: boolean;
     stackEnabled: boolean;
     lastPassOrderSignature: string;
+    effectQualityOverrides: Record<string, Scene3DPostProcessingQualityMode>;
   }
 
   const qualityProfiles: {
@@ -34,25 +36,34 @@ namespace gdjs {
   } = {
     low: {
       captureScale: 0.5,
-      ssaoSamples: 6,
-      ssrSteps: 12,
-      fogSteps: 18,
+      ssaoSamples: 4,
+      ssrSteps: 10,
+      fogSteps: 14,
+      dofSamples: 4,
       dofBlurScale: 0.65,
     },
     medium: {
-      captureScale: 0.67,
-      ssaoSamples: 12,
-      ssrSteps: 20,
-      fogSteps: 30,
-      dofBlurScale: 0.9,
+      // Medium defaults to half-resolution to keep effects usable on mid-range GPUs.
+      captureScale: 0.5,
+      ssaoSamples: 4,
+      ssrSteps: 14,
+      fogSteps: 20,
+      dofSamples: 4,
+      dofBlurScale: 0.85,
     },
     high: {
-      captureScale: 0.85,
-      ssaoSamples: 20,
-      ssrSteps: 28,
-      fogSteps: 44,
+      captureScale: 0.75,
+      ssaoSamples: 8,
+      ssrSteps: 24,
+      fogSteps: 34,
+      dofSamples: 8,
       dofBlurScale: 1.05,
     },
+  };
+  const qualityRank: Record<Scene3DPostProcessingQualityMode, number> = {
+    low: 0,
+    medium: 1,
+    high: 2,
   };
 
   const managedPassOrder: string[] = [
@@ -80,6 +91,12 @@ namespace gdjs {
       return normalized;
     }
     return 'medium';
+  };
+  const getHigherQualityMode = (
+    first: Scene3DPostProcessingQualityMode,
+    second: Scene3DPostProcessingQualityMode
+  ): Scene3DPostProcessingQualityMode => {
+    return qualityRank[first] >= qualityRank[second] ? first : second;
   };
 
   const getLayerRendererKey = (target: gdjs.Layer): object | null => {
@@ -114,6 +131,7 @@ namespace gdjs {
       hasStackController: false,
       stackEnabled: true,
       lastPassOrderSignature: '',
+      effectQualityOverrides: {},
     };
   };
 
@@ -173,6 +191,37 @@ namespace gdjs {
     state.qualityMode = normalizeQualityMode(qualityMode);
   };
 
+  export const setScene3DPostProcessingEffectQualityMode = function (
+    target: gdjs.Layer,
+    effectId: string,
+    qualityMode: string
+  ): void {
+    const state = getOrCreateSharedState(target);
+    if (!state) {
+      return;
+    }
+
+    if (!effectId) {
+      return;
+    }
+
+    state.effectQualityOverrides[effectId] = normalizeQualityMode(qualityMode);
+  };
+
+  export const clearScene3DPostProcessingEffectQualityMode = function (
+    target: gdjs.Layer,
+    effectId: string
+  ): void {
+    const state = getOrCreateSharedState(target);
+    if (!state) {
+      return;
+    }
+    if (!effectId) {
+      return;
+    }
+    delete state.effectQualityOverrides[effectId];
+  };
+
   export const clearScene3DPostProcessingStackConfig = function (
     target: gdjs.Layer
   ): void {
@@ -185,6 +234,7 @@ namespace gdjs {
     state.stackEnabled = true;
     state.qualityMode = 'medium';
     state.lastPassOrderSignature = '';
+    state.effectQualityOverrides = {};
   };
 
   export const isScene3DPostProcessingEnabled = function (
@@ -197,6 +247,22 @@ namespace gdjs {
     return !state.hasStackController || state.stackEnabled;
   };
 
+  const getEffectiveScene3DQualityMode = (
+    state: Scene3DSharedPostProcessingState
+  ): Scene3DPostProcessingQualityMode => {
+    let mode = state.qualityMode;
+    for (const effectId in state.effectQualityOverrides) {
+      mode = getHigherQualityMode(mode, state.effectQualityOverrides[effectId]);
+    }
+    return mode;
+  };
+
+  export const getScene3DPostProcessingQualityProfileForMode = function (
+    qualityMode: string
+  ): Scene3DPostProcessingQualityProfile {
+    return qualityProfiles[normalizeQualityMode(qualityMode)];
+  };
+
   export const getScene3DPostProcessingQualityProfile = function (
     target: gdjs.Layer
   ): Scene3DPostProcessingQualityProfile {
@@ -204,7 +270,7 @@ namespace gdjs {
     if (!state) {
       return qualityProfiles.medium;
     }
-    return qualityProfiles[state.qualityMode];
+    return qualityProfiles[getEffectiveScene3DQualityMode(state)];
   };
 
   export const captureScene3DSharedTextures = function (

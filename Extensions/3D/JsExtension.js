@@ -252,6 +252,457 @@ module.exports = {
     }
 
     {
+      const behavior = new gd.BehaviorJsImplementation();
+
+      behavior.updateProperty = function (
+        behaviorContent,
+        propertyName,
+        newValue
+      ) {
+        if (!behaviorContent.hasChild(propertyName)) {
+          if (propertyName === 'enabled') {
+            behaviorContent.addChild(propertyName).setBoolValue(true);
+          } else if (
+            propertyName === 'targetLayerName' ||
+            propertyName === 'targetEffectName'
+          ) {
+            behaviorContent.addChild(propertyName).setStringValue('');
+          } else {
+            behaviorContent.addChild(propertyName).setDoubleValue(0);
+          }
+        }
+
+        if (propertyName === 'enabled') {
+          behaviorContent
+            .getChild('enabled')
+            .setBoolValue(newValue === '1' || newValue === 'true');
+          return true;
+        }
+
+        if (
+          propertyName === 'baseIntensity' ||
+          propertyName === 'flickerSpeed' ||
+          propertyName === 'flickerStrength' ||
+          propertyName === 'failChance' ||
+          propertyName === 'offDuration'
+        ) {
+          const value = parseFloat(newValue);
+          if (value !== value) {
+            return false;
+          }
+          behaviorContent
+            .getChild(propertyName)
+            .setDoubleValue(Math.max(0, value));
+          return true;
+        }
+
+        if (
+          propertyName === 'targetLayerName' ||
+          propertyName === 'targetEffectName'
+        ) {
+          behaviorContent.getChild(propertyName).setStringValue(newValue);
+          return true;
+        }
+
+        return false;
+      };
+
+      behavior.getProperties = function (behaviorContent) {
+        const behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+        if (!behaviorContent.hasChild('enabled')) {
+          behaviorContent.addChild('enabled').setBoolValue(true);
+        }
+        if (!behaviorContent.hasChild('baseIntensity')) {
+          behaviorContent.addChild('baseIntensity').setDoubleValue(1.0);
+        }
+        if (!behaviorContent.hasChild('flickerSpeed')) {
+          behaviorContent.addChild('flickerSpeed').setDoubleValue(10.0);
+        }
+        if (!behaviorContent.hasChild('flickerStrength')) {
+          behaviorContent.addChild('flickerStrength').setDoubleValue(0.4);
+        }
+        if (!behaviorContent.hasChild('failChance')) {
+          behaviorContent.addChild('failChance').setDoubleValue(0.02);
+        }
+        if (!behaviorContent.hasChild('offDuration')) {
+          behaviorContent.addChild('offDuration').setDoubleValue(0.1);
+        }
+        if (!behaviorContent.hasChild('targetLayerName')) {
+          behaviorContent.addChild('targetLayerName').setStringValue('');
+        }
+        if (!behaviorContent.hasChild('targetEffectName')) {
+          behaviorContent.addChild('targetEffectName').setStringValue('');
+        }
+
+        behaviorProperties
+          .getOrCreate('enabled')
+          .setValue(
+            behaviorContent.getChild('enabled').getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setType('Boolean')
+          .setLabel(_('Enabled'));
+        behaviorProperties
+          .getOrCreate('baseIntensity')
+          .setValue(
+            behaviorContent
+              .getChild('baseIntensity')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setType('Number')
+          .setLabel(_('Base intensity'));
+        behaviorProperties
+          .getOrCreate('flickerSpeed')
+          .setValue(
+            behaviorContent
+              .getChild('flickerSpeed')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setType('Number')
+          .setLabel(_('Flicker speed'));
+        behaviorProperties
+          .getOrCreate('flickerStrength')
+          .setValue(
+            behaviorContent
+              .getChild('flickerStrength')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setType('Number')
+          .setLabel(_('Flicker strength'));
+        behaviorProperties
+          .getOrCreate('failChance')
+          .setValue(
+            behaviorContent.getChild('failChance').getDoubleValue().toString(10)
+          )
+          .setType('Number')
+          .setLabel(_('Failure chance (per second)'));
+        behaviorProperties
+          .getOrCreate('offDuration')
+          .setValue(
+            behaviorContent.getChild('offDuration').getDoubleValue().toString(10)
+          )
+          .setType('Number')
+          .setLabel(_('Off duration (seconds)'));
+        behaviorProperties
+          .getOrCreate('targetLayerName')
+          .setValue(behaviorContent.getChild('targetLayerName').getStringValue())
+          .setType('String')
+          .setLabel(_('Target layer name (optional)'))
+          .setDescription(
+            _(
+              'Optional explicit layer containing the SpotLight/PointLight effect. Leave empty to use the object layer.'
+            )
+          )
+          .setGroup(_('Advanced'))
+          .setAdvanced(true);
+        behaviorProperties
+          .getOrCreate('targetEffectName')
+          .setValue(
+            behaviorContent.getChild('targetEffectName').getStringValue()
+          )
+          .setType('String')
+          .setLabel(_('Target effect name (optional)'))
+          .setDescription(
+            _(
+              'Optional explicit effect name. Recommended when multiple 3D light effects exist on the same layer.'
+            )
+          )
+          .setGroup(_('Advanced'))
+          .setAdvanced(true);
+
+        return behaviorProperties;
+      };
+
+      behavior.initializeContent = function (behaviorContent) {
+        behaviorContent.addChild('enabled').setBoolValue(true);
+        behaviorContent.addChild('baseIntensity').setDoubleValue(1.0);
+        behaviorContent.addChild('flickerSpeed').setDoubleValue(10.0);
+        behaviorContent.addChild('flickerStrength').setDoubleValue(0.4);
+        behaviorContent.addChild('failChance').setDoubleValue(0.02);
+        behaviorContent.addChild('offDuration').setDoubleValue(0.1);
+        behaviorContent.addChild('targetLayerName').setStringValue('');
+        behaviorContent.addChild('targetEffectName').setStringValue('');
+      };
+
+      const flickeringLight = extension
+        .addBehavior(
+          'FlickeringLight',
+          _('Flickering 3D light'),
+          'FlickeringLight',
+          _(
+            'Randomly flickers Scene3D Point Light and Spot Light effects by updating their intensity every frame.'
+          ),
+          '',
+          'res/conditions/3d_box.svg',
+          'FlickeringLight',
+          // @ts-ignore
+          behavior,
+          new gd.BehaviorsSharedData()
+        )
+        .setIncludeFile('Extensions/3D/FlickeringLightBehavior.js');
+
+      flickeringLight
+        .addScopedAction(
+          'SetEnabled',
+          _('Enable/disable flickering'),
+          _('Enable or disable the light flicker simulation.'),
+          _('Set flickering of _PARAM0_ to _PARAM2_'),
+          _('Flickering light'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'FlickeringLight')
+        .addParameter('yesorno', _('Enabled'))
+        .setFunctionName('setEnabled');
+
+      flickeringLight
+        .addScopedCondition(
+          'IsEnabled',
+          _('Flickering enabled'),
+          _('Check if the flickering logic is enabled.'),
+          _('Flickering is enabled for _PARAM0_'),
+          _('Flickering light'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'FlickeringLight')
+        .setFunctionName('isEnabled');
+
+      flickeringLight
+        .addScopedAction(
+          'SetTargetLayerName',
+          _('Set target layer'),
+          _('Set the layer where the SpotLight/PointLight effect is searched.'),
+          _('Set flickering target layer of _PARAM0_ to _PARAM2_'),
+          _('Flickering light'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'FlickeringLight')
+        .addParameter('layer', _('Layer'), '', true)
+        .setFunctionName('setTargetLayerName');
+
+      flickeringLight
+        .addScopedAction(
+          'SetTargetEffectName',
+          _('Set target effect'),
+          _('Set the exact SpotLight/PointLight effect name to control.'),
+          _('Set flickering target effect of _PARAM0_ to _PARAM2_'),
+          _('Flickering light'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'FlickeringLight')
+        .addParameter('layerEffectName', _('Light effect name'))
+        .setFunctionName('setTargetEffectName');
+
+      flickeringLight
+        .addExpressionAndConditionAndAction(
+          'number',
+          'BaseIntensity',
+          _('Base intensity'),
+          _('the base light intensity'),
+          _('the base intensity'),
+          _('Flickering light'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'FlickeringLight')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Base intensity used when flicker offset is 0.')
+          )
+        )
+        .setFunctionName('setBaseIntensity')
+        .setGetter('getBaseIntensity');
+
+      flickeringLight
+        .addExpressionAndConditionAndAction(
+          'number',
+          'FlickerSpeed',
+          _('Flicker speed'),
+          _('the flickering speed'),
+          _('the flicker speed'),
+          _('Flickering light'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'FlickeringLight')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('How fast the flicker oscillates.')
+          )
+        )
+        .setFunctionName('setFlickerSpeed')
+        .setGetter('getFlickerSpeed');
+
+      flickeringLight
+        .addExpressionAndConditionAndAction(
+          'number',
+          'FlickerStrength',
+          _('Flicker strength'),
+          _('the flicker strength'),
+          _('the flicker strength'),
+          _('Flickering light'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'FlickeringLight')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('How much intensity can vary around the base value.')
+          )
+        )
+        .setFunctionName('setFlickerStrength')
+        .setGetter('getFlickerStrength');
+
+      flickeringLight
+        .addExpressionAndConditionAndAction(
+          'number',
+          'FailChance',
+          _('Failure chance'),
+          _('the failure chance per second'),
+          _('the failure chance per second'),
+          _('Flickering light'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'FlickeringLight')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Probability per second for a complete temporary blackout.')
+          )
+        )
+        .setFunctionName('setFailChance')
+        .setGetter('getFailChance');
+
+      flickeringLight
+        .addExpressionAndConditionAndAction(
+          'number',
+          'OffDuration',
+          _('Off duration'),
+          _('the off duration in seconds'),
+          _('the off duration'),
+          _('Flickering light'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'FlickeringLight')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('How long the light stays off when a failure occurs (seconds).')
+          )
+        )
+        .setFunctionName('setOffDuration')
+        .setGetter('getOffDuration');
+    }
+
+    {
+      const behavior = new gd.BehaviorJsImplementation();
+
+      behavior.updateProperty = function (
+        behaviorContent,
+        propertyName,
+        newValue
+      ) {
+        if (!behaviorContent.hasChild('enabled')) {
+          behaviorContent.addChild('enabled').setBoolValue(true);
+        }
+
+        if (propertyName === 'enabled') {
+          behaviorContent
+            .getChild('enabled')
+            .setBoolValue(newValue === '1' || newValue === 'true');
+          return true;
+        }
+
+        return false;
+      };
+
+      behavior.getProperties = function (behaviorContent) {
+        const behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+        if (!behaviorContent.hasChild('enabled')) {
+          behaviorContent.addChild('enabled').setBoolValue(true);
+        }
+
+        behaviorProperties
+          .getOrCreate('enabled')
+          .setValue(
+            behaviorContent.getChild('enabled').getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setType('Boolean')
+          .setLabel(_('Enabled'));
+
+        return behaviorProperties;
+      };
+
+      behavior.initializeContent = function (behaviorContent) {
+        behaviorContent.addChild('enabled').setBoolValue(true);
+      };
+
+      const ssrExclude = extension
+        .addBehavior(
+          'SSRExclude',
+          _('SSR exclude'),
+          'SSRExclude',
+          _('Exclude this 3D object from Scene3D screen-space reflections.'),
+          '',
+          'res/conditions/3d_box.svg',
+          'SSRExclude',
+          // @ts-ignore
+          behavior,
+          new gd.BehaviorsSharedData()
+        )
+        .setIncludeFile('Extensions/3D/SSRExcludeBehavior.js');
+
+      ssrExclude
+        .addScopedAction(
+          'SetEnabled',
+          _('Enable/disable SSR exclusion'),
+          _('Enable or disable exclusion of this object from SSR.'),
+          _('Set SSR exclusion of _PARAM0_ to _PARAM2_'),
+          _('SSR exclusion'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'SSRExclude')
+        .addParameter('yesorno', _('Enabled'))
+        .setFunctionName('setEnabled');
+
+      ssrExclude
+        .addScopedCondition(
+          'IsEnabled',
+          _('SSR exclusion enabled'),
+          _('Check if SSR exclusion is enabled for this object.'),
+          _('SSR exclusion is enabled for _PARAM0_'),
+          _('SSR exclusion'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'SSRExclude')
+        .setFunctionName('isEnabled');
+    }
+
+    {
       const object = extension
         .addObject(
           'Model3DObject',
@@ -1957,7 +2408,7 @@ module.exports = {
         .setType('color');
       properties
         .getOrCreate('intensity')
-        .setValue('0.75')
+        .setValue('0.25')
         .setLabel(_('Intensity'))
         .setType('number');
     }
@@ -2023,6 +2474,18 @@ module.exports = {
         .setType('choice')
         .setGroup(_('Shadows'));
       properties
+        .getOrCreate('shadowMapSize')
+        .setValue('1024')
+        .setLabel(_('Shadow map size (base)'))
+        .setDescription(
+          _(
+            'Base map size used by cascaded shadows. Recommended values: 512, 1024, 2048, or 4096 (high-end GPUs).'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Shadows'));
+      properties
         .getOrCreate('minimumShadowBias')
         .setValue('0')
         .setLabel(_('Shadow bias'))
@@ -2035,11 +2498,109 @@ module.exports = {
         .setGroup(_('Shadows'))
         .setAdvanced(true);
       properties
+        .getOrCreate('shadowNormalBias')
+        .setValue('0.02')
+        .setLabel(_('Shadow normal bias'))
+        .setDescription(
+          _(
+            'Offset along normals to reduce acne on sloped/curved surfaces.'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('shadowRadius')
+        .setValue('2')
+        .setLabel(_('Shadow softness'))
+        .setDescription(
+          _(
+            'Softness radius for filtered shadow edges (higher = softer, may blur details).'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('shadowStabilization')
+        .setValue('true')
+        .setLabel(_('Shadow stabilization'))
+        .setDescription(
+          _(
+            'Snap shadow tracking to a stable grid to reduce shimmering while the camera moves.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('shadowFollowCamera')
+        .setValue('false')
+        .setLabel(_('Shadows follow camera'))
+        .setDescription(
+          _(
+            'If disabled, directional shadow cascades stay fixed in world space (no shadow movement with the player).'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('shadowStabilizationStep')
+        .setValue('0')
+        .setLabel(_('Stabilization step'))
+        .setDescription(
+          _(
+            'Pixel step used for shadow stabilization. 0 = automatic texel-based step.'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
         .getOrCreate('frustumSize')
         .setValue('4000')
         .setLabel(_('Shadow frustum size'))
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('maxShadowDistance')
+        .setValue('2000')
+        .setLabel(_('Max shadow distance'))
+        .setDescription(
+          _(
+            'Maximum world distance covered by cascaded directional shadows.'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('cascadeSplitLambda')
+        .setValue('0.7')
+        .setLabel(_('Cascade split lambda'))
+        .setDescription(
+          _(
+            'Blend between logarithmic and uniform cascade split distribution (0 to 1).'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('shadowFollowLead')
+        .setValue('0.45')
+        .setLabel(_('Shadow follow lead'))
+        .setDescription(
+          _(
+            'Predictive follow amount for the shadow anchor so shadows keep up with fast player movement.'
+          )
+        )
+        .setType('number')
         .setGroup(_('Shadows'))
         .setAdvanced(true);
       properties
@@ -2057,12 +2618,11 @@ module.exports = {
         .setFullName(_('Rim light'))
         .setDescription(
           _(
-            'Screen-space rim shading pass using depth, camera view and existing scene capture. Includes fog fade and shadow-map suppression.'
+            'Injects Fresnel-based rim lighting directly into 3D mesh materials via shader compilation. Rim direction is updated every frame from the active camera position.'
           )
         )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
-        .addIncludeFile('Extensions/3D/PostProcessingSharedResources.js')
         .addIncludeFile('Extensions/3D/RimLight.js');
       const properties = effect.getProperties();
       properties
@@ -2092,6 +2652,40 @@ module.exports = {
         )
         .setType('number')
         .setAdvanced(true);
+      properties
+        .getOrCreate('power')
+        .setValue('2.2')
+        .setLabel(_('Rim power'))
+        .setDescription(
+          _(
+            'Controls rim falloff near silhouette. Higher values make a tighter, sharper rim.'
+          )
+        )
+        .setType('number')
+        .setAdvanced(true);
+      properties
+        .getOrCreate('fresnel0')
+        .setValue('0.04')
+        .setLabel(_('Fresnel F0'))
+        .setDescription(
+          _(
+            'Base reflectance used by Schlick Fresnel. Typical non-metal values are around 0.02 to 0.08.'
+          )
+        )
+        .setType('number')
+        .setAdvanced(true);
+      properties
+        .getOrCreate('debugForceMaxRim')
+        .setValue('false')
+        .setLabel(_('Debug: force max rim'))
+        .setDescription(
+          _(
+            'For debugging shader injection: force full rim contribution on patched materials regardless of view angle.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Debug'))
+        .setAdvanced(true);
     }
     {
       const effect = extension
@@ -2118,7 +2712,7 @@ module.exports = {
         .setType('color');
       properties
         .getOrCreate('intensity')
-        .setValue('0.5')
+        .setValue('0.35')
         .setLabel(_('Intensity'))
         .setType('number');
       properties
@@ -2144,6 +2738,485 @@ module.exports = {
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
         .setGroup(_('Orientation'));
+    }
+    {
+      const effect = extension
+        .addEffect('PointLight')
+        .setFullName(_('Point light'))
+        .setDescription(
+          _(
+            'A light that emits in all directions from a position, like a light bulb. Can cast shadows.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/PointLight.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('color')
+        .setValue('255;255;255')
+        .setLabel(_('Light color'))
+        .setType('color');
+      properties
+        .getOrCreate('intensity')
+        .setValue('1')
+        .setLabel(_('Intensity'))
+        .setType('number');
+      properties
+        .getOrCreate('top')
+        .setValue('Z+')
+        .setLabel(_('3D world top'))
+        .setType('choice')
+        .addExtraInfo('Z+')
+        .addExtraInfo('Y-')
+        .setGroup(_('Position'));
+      properties
+        .getOrCreate('positionX')
+        .setValue('0')
+        .setLabel(_('X position'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Position'));
+      properties
+        .getOrCreate('positionY')
+        .setValue('0')
+        .setLabel(_('Y position'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Position'));
+      properties
+        .getOrCreate('positionZ')
+        .setValue('500')
+        .setLabel(_('Z position (height)'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Position'));
+      properties
+        .getOrCreate('attachedObject')
+        .setValue('')
+        .setLabel(_('Attached object name'))
+        .setDescription(
+          _(
+            'Object name to follow. Leave empty to use the manual position values.'
+          )
+        )
+        .setType('string')
+        .setGroup(_('Attachment'));
+      properties
+        .getOrCreate('attachedOffsetX')
+        .setValue('0')
+        .setLabel(_('Attached offset X'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Attachment'));
+      properties
+        .getOrCreate('attachedOffsetY')
+        .setValue('0')
+        .setLabel(_('Attached offset Y'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Attachment'));
+      properties
+        .getOrCreate('attachedOffsetZ')
+        .setValue('0')
+        .setLabel(_('Attached offset Z'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Attachment'));
+      properties
+        .getOrCreate('rotateOffsetsWithObjectAngle')
+        .setValue('false')
+        .setLabel(_('Rotate offsets with object angle'))
+        .setDescription(
+          _(
+            'Rotate X/Y offsets using the attached object angle, useful for placing the light in a hand.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Attachment'));
+      properties
+        .getOrCreate('distance')
+        .setValue('0')
+        .setLabel(_('Maximum distance'))
+        .setDescription(
+          _(
+            'Maximum range of the light. 0 means unlimited range.'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Attenuation'));
+      properties
+        .getOrCreate('decay')
+        .setValue('2')
+        .setLabel(_('Decay'))
+        .setDescription(
+          _(
+            'How quickly the light dims with distance. 2 is physically correct. 0 means no decay.'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Attenuation'));
+      properties
+        .getOrCreate('isCastingShadow')
+        .setValue('false')
+        .setLabel(_('Shadow casting'))
+        .setType('boolean')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowQuality')
+        .setValue('medium')
+        .addChoice('low', _('Low quality'))
+        .addChoice('medium', _('Medium quality'))
+        .addChoice('high', _('High quality'))
+        .setLabel(_('Shadow quality'))
+        .setType('choice')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowBias')
+        .setValue('0.001')
+        .setLabel(_('Shadow bias'))
+        .setDescription(
+          _('Small offset to prevent shadow artifacts (acne). Default: 0.001.')
+        )
+        .setType('number')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowNormalBias')
+        .setValue('0.02')
+        .setLabel(_('Shadow normal bias'))
+        .setDescription(
+          _('Offset along object normals to prevent acne on curved surfaces. Default: 0.02.')
+        )
+        .setType('number')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowRadius')
+        .setValue('1.5')
+        .setLabel(_('Shadow softness'))
+        .setDescription(
+          _('Softness radius for point-light shadow filtering.')
+        )
+        .setType('number')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowNear')
+        .setValue('1')
+        .setLabel(_('Shadow near'))
+        .setDescription(_('Minimum distance for shadows to be cast.'))
+        .setType('number')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowFar')
+        .setValue('10000')
+        .setLabel(_('Shadow far'))
+        .setDescription(_('Maximum distance for shadows to be cast.'))
+        .setType('number')
+        .setGroup(_('Shadows'));
+    }
+    {
+      const effect = extension
+        .addEffect('SpotLight')
+        .setFullName(_('Spot light'))
+        .setDescription(
+          _(
+            'A light that emits a cone-shaped beam from a position toward a target, like a flashlight or a stage spotlight. Can cast shadows.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/SpotLight.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('color')
+        .setValue('255;255;255')
+        .setLabel(_('Light color'))
+        .setType('color');
+      properties
+        .getOrCreate('intensity')
+        .setValue('1')
+        .setLabel(_('Intensity'))
+        .setType('number');
+      properties
+        .getOrCreate('top')
+        .setValue('Z+')
+        .setLabel(_('3D world top'))
+        .setType('choice')
+        .addExtraInfo('Z+')
+        .addExtraInfo('Y-')
+        .setGroup(_('Light position'));
+      properties
+        .getOrCreate('positionX')
+        .setValue('0')
+        .setLabel(_('X position'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Light position'));
+      properties
+        .getOrCreate('positionY')
+        .setValue('0')
+        .setLabel(_('Y position'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Light position'));
+      properties
+        .getOrCreate('positionZ')
+        .setValue('500')
+        .setLabel(_('Z position (height)'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Light position'));
+      properties
+        .getOrCreate('attachedObject')
+        .setValue('')
+        .setLabel(_('Attached object name'))
+        .setDescription(
+          _(
+            'Object name to follow for the light position. Leave empty to use manual values.'
+          )
+        )
+        .setType('string')
+        .setGroup(_('Attachment'));
+      properties
+        .getOrCreate('attachedOffsetX')
+        .setValue('0')
+        .setLabel(_('Attached offset X'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Attachment'));
+      properties
+        .getOrCreate('attachedOffsetY')
+        .setValue('0')
+        .setLabel(_('Attached offset Y'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Attachment'));
+      properties
+        .getOrCreate('attachedOffsetZ')
+        .setValue('0')
+        .setLabel(_('Attached offset Z'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Attachment'));
+      properties
+        .getOrCreate('targetX')
+        .setValue('0')
+        .setLabel(_('Target X position'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Target position'));
+      properties
+        .getOrCreate('targetY')
+        .setValue('0')
+        .setLabel(_('Target Y position'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Target position'));
+      properties
+        .getOrCreate('targetZ')
+        .setValue('0')
+        .setLabel(_('Target Z position'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Target position'));
+      properties
+        .getOrCreate('targetAttachedObject')
+        .setValue('')
+        .setLabel(_('Target attached object name'))
+        .setDescription(
+          _(
+            'Object name to follow for the target position. Leave empty to use manual target values.'
+          )
+        )
+        .setType('string')
+        .setGroup(_('Target attachment'));
+      properties
+        .getOrCreate('targetAttachedOffsetX')
+        .setValue('0')
+        .setLabel(_('Target attached offset X'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Target attachment'));
+      properties
+        .getOrCreate('targetAttachedOffsetY')
+        .setValue('0')
+        .setLabel(_('Target attached offset Y'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Target attachment'));
+      properties
+        .getOrCreate('targetAttachedOffsetZ')
+        .setValue('0')
+        .setLabel(_('Target attached offset Z'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Target attachment'));
+      properties
+        .getOrCreate('rotateOffsetsWithObjectAngle')
+        .setValue('false')
+        .setLabel(_('Rotate offsets with object angle'))
+        .setDescription(
+          _(
+            'Rotate X/Y offsets using the attached object angle, useful for flashlight-like behavior.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Attachment'));
+      properties
+        .getOrCreate('physicsBounceEnabled')
+        .setValue('false')
+        .setLabel(_('Physics bounce (Jolt)'))
+        .setDescription(
+          _(
+            'Enable one-bounce reflected light using a raycast on Physics3D/Jolt bodies.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Physics bounce'));
+      properties
+        .getOrCreate('physicsBounceIntensityScale')
+        .setValue('0.35')
+        .setLabel(_('Bounce intensity scale'))
+        .setDescription(
+          _(
+            'Intensity multiplier for the bounced light (0 disables bounced intensity).'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Physics bounce'));
+      properties
+        .getOrCreate('physicsBounceDistance')
+        .setValue('600')
+        .setLabel(_('Bounce distance'))
+        .setDescription(
+          _('Maximum distance of the bounced light beam (in pixels).')
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Physics bounce'));
+      properties
+        .getOrCreate('physicsBounceOriginOffset')
+        .setValue('2')
+        .setLabel(_('Bounce origin offset'))
+        .setDescription(
+          _(
+            'Small offset from the hit point along the surface normal to avoid self-intersection artifacts.'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Physics bounce'));
+      properties
+        .getOrCreate('physicsBounceCastShadow')
+        .setValue('false')
+        .setLabel(_('Bounce casts shadows'))
+        .setDescription(
+          _('Enable shadows for the bounced light (higher performance cost).')
+        )
+        .setType('boolean')
+        .setGroup(_('Physics bounce'));
+      properties
+        .getOrCreate('angle')
+        .setValue('45')
+        .setLabel(_('Cone angle'))
+        .setDescription(
+          _(
+            'Maximum angle of the light cone in degrees. A smaller value creates a narrower beam.'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+        .setGroup(_('Cone'));
+      properties
+        .getOrCreate('penumbra')
+        .setValue('0.1')
+        .setLabel(_('Penumbra'))
+        .setDescription(
+          _(
+            'Percentage of the cone that is attenuated due to penumbra. 0 means sharp edges, 1 means fully soft edges.'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Cone'));
+      properties
+        .getOrCreate('distance')
+        .setValue('0')
+        .setLabel(_('Maximum distance'))
+        .setDescription(
+          _(
+            'Maximum range of the light. 0 means unlimited range.'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Attenuation'));
+      properties
+        .getOrCreate('decay')
+        .setValue('2')
+        .setLabel(_('Decay'))
+        .setDescription(
+          _(
+            'How quickly the light dims with distance. 2 is physically correct. 0 means no decay.'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Attenuation'));
+      properties
+        .getOrCreate('isCastingShadow')
+        .setValue('false')
+        .setLabel(_('Shadow casting'))
+        .setType('boolean')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowQuality')
+        .setValue('medium')
+        .addChoice('low', _('Low quality'))
+        .addChoice('medium', _('Medium quality'))
+        .addChoice('high', _('High quality'))
+        .setLabel(_('Shadow quality'))
+        .setType('choice')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowBias')
+        .setValue('0.001')
+        .setLabel(_('Shadow bias'))
+        .setDescription(
+          _('Small offset to prevent shadow artifacts (acne). Default: 0.001.')
+        )
+        .setType('number')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowNormalBias')
+        .setValue('0.02')
+        .setLabel(_('Shadow normal bias'))
+        .setDescription(
+          _('Offset along normals to reduce acne on curved surfaces.')
+        )
+        .setType('number')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowRadius')
+        .setValue('1.5')
+        .setLabel(_('Shadow softness'))
+        .setDescription(
+          _('Softness radius for spot-light shadow filtering.')
+        )
+        .setType('number')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowNear')
+        .setValue('1')
+        .setLabel(_('Shadow near'))
+        .setDescription(_('Minimum distance for shadows to be cast.'))
+        .setType('number')
+        .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowFar')
+        .setValue('10000')
+        .setLabel(_('Shadow far'))
+        .setDescription(_('Maximum distance for shadows to be cast.'))
+        .setType('number')
+        .setGroup(_('Shadows'));
     }
     {
       const effect = extension
@@ -2186,6 +3259,16 @@ module.exports = {
         .setType('resource')
         .addExtraInfo('image')
         .setLabel(_('Back face (Z-)'));
+      properties
+        .getOrCreate('environmentIntensity')
+        .setValue('1.0')
+        .setLabel(_('Environment intensity'))
+        .setType('number')
+        .setDescription(
+          _(
+            'Intensity multiplier used when this skybox drives scene environment lighting.'
+          )
+        );
     }
     {
       const effect = extension
@@ -2319,6 +3402,12 @@ module.exports = {
         .setLabel(_('Threshold'))
         .setType('number')
         .setDescription(_('Between 0 and 1'));
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .setLabel(_('Quality mode'))
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension
@@ -2351,18 +3440,20 @@ module.exports = {
         .setLabel(_('Max distance'))
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setDescription(
-          _('Maximum reflection tracing distance (balanced for performance).')
-        );
+        .setDescription(_('Maximum reflection tracing distance (balanced for performance).'));
       properties
         .getOrCreate('thickness')
         .setValue('4')
         .setLabel(_('Thickness'))
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setDescription(
-          _('Depth tolerance to detect reflection hits reliably.')
-        );
+        .setDescription(_('Depth tolerance to detect reflection hits reliably.'));
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .setLabel(_('Quality mode'))
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension
@@ -2495,12 +3586,16 @@ module.exports = {
         .setDescription(_('Prevents self-occlusion artifacts.'));
       properties
         .getOrCreate('samples')
-        .setValue('16')
+        .setValue('4')
         .setLabel(_('Samples'))
         .setType('number')
-        .setDescription(
-          _('Quality/performance control (higher = better, slower).')
-        );
+        .setDescription(_('Quality/performance control (higher = better, slower).'));
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .setLabel(_('Quality mode'))
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension
@@ -2545,6 +3640,12 @@ module.exports = {
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setDescription(_('Maximum distance for volumetric ray marching.'));
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .setLabel(_('Quality mode'))
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension
@@ -2578,15 +3679,25 @@ module.exports = {
         .setLabel(_('Focus range'))
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setDescription(
-          _('How gradually blur increases around focus distance.')
-        );
+        .setDescription(_('How gradually blur increases around focus distance.'));
       properties
         .getOrCreate('maxBlur')
         .setValue('6')
         .setLabel(_('Max blur'))
         .setType('number')
         .setDescription(_('Maximum blur radius strength.'));
+      properties
+        .getOrCreate('samples')
+        .setValue('4')
+        .setLabel(_('Samples'))
+        .setType('number')
+        .setDescription(_('Blur taps around each pixel (higher = smoother, slower).'));
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .setLabel(_('Quality mode'))
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension

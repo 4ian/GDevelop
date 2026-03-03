@@ -8,6 +8,8 @@ namespace gdjs {
   }
 
   const ssrExcludeUserDataKey = '__gdScene3dSsrExclude';
+  const pbrManagedMaterialUserDataKey = '__gdScene3dPbrMaterial';
+  const pbrMaterialRoughnessUserDataKey = '__gdScene3dPbrRoughness';
 
   const screenSpaceReflectionsShader = {
     uniforms: {
@@ -15,6 +17,7 @@ namespace gdjs {
       tSceneColor: { value: null },
       tDepth: { value: null },
       tSSRExcludeMask: { value: null },
+      tRoughness: { value: null },
       resolution: { value: new THREE.Vector2(1, 1) },
       intensity: { value: 0.75 },
       maxDistance: { value: 420.0 },
@@ -38,6 +41,7 @@ namespace gdjs {
       uniform sampler2D tSceneColor;
       uniform sampler2D tDepth;
       uniform sampler2D tSSRExcludeMask;
+      uniform sampler2D tRoughness;
       uniform vec2 resolution;
       uniform float intensity;
       uniform float maxDistance;
@@ -101,6 +105,14 @@ namespace gdjs {
       float estimateRoughness(vec3 normal, vec3 viewPos) {
         float facing = clamp(dot(normal, -normalize(viewPos)), 0.0, 1.0);
         return clamp(1.0 - facing * facing, 0.08, 0.8);
+      }
+
+      float sampleSceneRoughness(vec2 uv, vec3 normal, vec3 viewPos) {
+        vec4 roughnessSample = texture2D(tRoughness, uv);
+        if (roughnessSample.a > 0.5) {
+          return clamp(roughnessSample.r, 0.0, 1.0);
+        }
+        return estimateRoughness(normal, viewPos);
       }
 
       vec3 sampleReflectionColor(vec2 uv, float roughness) {
@@ -299,7 +311,7 @@ namespace gdjs {
         vec3 normal = reconstructNormal(vUv, depth);
         vec3 reflectedDir = normalize(reflect(normalize(viewPos), normal));
 
-        float roughness = estimateRoughness(normal, viewPos);
+        float roughness = sampleSceneRoughness(vUv, normal, viewPos);
         vec4 hit = traceReflection(viewPos, reflectedDir, roughness);
         vec3 reflectionColor = hit.rgb;
         float rayDistance = hit.a;
@@ -369,6 +381,13 @@ namespace gdjs {
           _excludeMaskFallbackTexture: THREE.DataTexture;
           _excludeMaskPreviousViewport: THREE.Vector4;
           _excludeMaskPreviousScissor: THREE.Vector4;
+          _roughnessRenderTarget: THREE.WebGLRenderTarget | null;
+          _roughnessFallbackTexture: THREE.DataTexture;
+          _roughnessMaterialCache: Map<string, THREE.MeshBasicMaterial>;
+          _roughnessSkipMaterial: THREE.MeshBasicMaterial;
+          _roughnessPreviousViewport: THREE.Vector4;
+          _roughnessPreviousScissor: THREE.Vector4;
+          _roughnessPreviousClearColor: THREE.Color;
 
           constructor() {
             this.shaderPass = new THREE_ADDONS.ShaderPass(
@@ -415,6 +434,35 @@ namespace gdjs {
               this._excludeMaskFallbackTexture;
             this._excludeMaskPreviousViewport = new THREE.Vector4();
             this._excludeMaskPreviousScissor = new THREE.Vector4();
+
+            this._roughnessRenderTarget = null;
+            const roughnessFallbackPixel = new Uint8Array([0, 0, 0, 0]);
+            this._roughnessFallbackTexture = new THREE.DataTexture(
+              roughnessFallbackPixel,
+              1,
+              1
+            );
+            this._roughnessFallbackTexture.needsUpdate = true;
+            this._roughnessFallbackTexture.generateMipmaps = false;
+            this._roughnessFallbackTexture.minFilter = THREE.NearestFilter;
+            this._roughnessFallbackTexture.magFilter = THREE.NearestFilter;
+            this.shaderPass.uniforms.tRoughness.value =
+              this._roughnessFallbackTexture;
+
+            this._roughnessMaterialCache = new Map();
+            this._roughnessSkipMaterial = new THREE.MeshBasicMaterial({
+              color: 0x000000,
+              toneMapped: false,
+            });
+            this._roughnessSkipMaterial.transparent = true;
+            this._roughnessSkipMaterial.opacity = 0;
+            this._roughnessSkipMaterial.depthTest = false;
+            this._roughnessSkipMaterial.depthWrite = false;
+            this._roughnessSkipMaterial.colorWrite = false;
+
+            this._roughnessPreviousViewport = new THREE.Vector4();
+            this._roughnessPreviousScissor = new THREE.Vector4();
+            this._roughnessPreviousClearColor = new THREE.Color(0, 0, 0);
           }
 
           isEnabled(target: EffectsTarget): boolean {
@@ -447,7 +495,10 @@ namespace gdjs {
             gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'SSR');
             this.shaderPass.uniforms.tSSRExcludeMask.value =
               this._excludeMaskFallbackTexture;
+            this.shaderPass.uniforms.tRoughness.value =
+              this._roughnessFallbackTexture;
             this._disposeSSRExcludeMaskResources();
+            this._disposeSSRoughnessResources();
             this._isEnabled = false;
             return true;
           }
@@ -601,6 +652,255 @@ namespace gdjs {
             }
           }
 
+          private _isPBRManagedMaterial(
+            material: THREE.Material
+          ): material is THREE.MeshStandardMaterial | THREE.MeshPhysicalMaterial {
+            const typedMaterial = material as THREE.Material & {
+              isMeshStandardMaterial?: boolean;
+              isMeshPhysicalMaterial?: boolean;
+              userData?: Record<string, unknown>;
+            };
+            if (
+              !typedMaterial.isMeshStandardMaterial &&
+              !typedMaterial.isMeshPhysicalMaterial
+            ) {
+              return false;
+            }
+            const userData = typedMaterial.userData as
+              | Record<string, unknown>
+              | undefined;
+            return !!(userData && userData[pbrManagedMaterialUserDataKey]);
+          }
+
+          private _getPBRMaterialRoughness(
+            material: THREE.MeshStandardMaterial | THREE.MeshPhysicalMaterial
+          ): number {
+            const userData = material.userData as
+              | Record<string, unknown>
+              | undefined;
+            const roughnessFromBehavior = userData
+              ? userData[pbrMaterialRoughnessUserDataKey]
+              : undefined;
+            const resolvedRoughness =
+              typeof roughnessFromBehavior === 'number'
+                ? roughnessFromBehavior
+                : material.roughness;
+            return Math.max(
+              0,
+              Math.min(1, Number.isFinite(resolvedRoughness) ? resolvedRoughness : 0.5)
+            );
+          }
+
+          private _sceneHasPBRManagedMeshes(scene: THREE.Scene): boolean {
+            let hasManagedMesh = false;
+            scene.traverse((object3D) => {
+              if (hasManagedMesh) {
+                return;
+              }
+              const mesh = object3D as THREE.Mesh;
+              if (!mesh || !mesh.isMesh || !mesh.visible || !mesh.material) {
+                return;
+              }
+              const materials = Array.isArray(mesh.material)
+                ? mesh.material
+                : [mesh.material];
+              for (let i = 0; i < materials.length; i++) {
+                if (this._isPBRManagedMaterial(materials[i])) {
+                  hasManagedMesh = true;
+                  return;
+                }
+              }
+            });
+            return hasManagedMesh;
+          }
+
+          private _ensureSSRoughnessTarget(
+            width: number,
+            height: number,
+            outputColorSpace: THREE.ColorSpace
+          ): THREE.WebGLRenderTarget {
+            if (!this._roughnessRenderTarget) {
+              this._roughnessRenderTarget = new THREE.WebGLRenderTarget(1, 1, {
+                minFilter: THREE.LinearFilter,
+                magFilter: THREE.LinearFilter,
+                format: THREE.RGBAFormat,
+                depthBuffer: true,
+                stencilBuffer: false,
+              });
+              this._roughnessRenderTarget.texture.generateMipmaps = false;
+            }
+
+            if (
+              this._roughnessRenderTarget.width !== width ||
+              this._roughnessRenderTarget.height !== height
+            ) {
+              this._roughnessRenderTarget.setSize(width, height);
+            }
+            this._roughnessRenderTarget.texture.colorSpace = outputColorSpace;
+            return this._roughnessRenderTarget;
+          }
+
+          private _getOrCreateRoughnessRenderMaterial(
+            sourceMaterial: THREE.MeshStandardMaterial | THREE.MeshPhysicalMaterial
+          ): THREE.MeshBasicMaterial {
+            const roughnessStep = Math.round(
+              this._getPBRMaterialRoughness(sourceMaterial) * 255
+            );
+            const sourceAny = sourceMaterial as any;
+            const materialKey = [
+              roughnessStep,
+              sourceMaterial.side,
+              sourceAny.skinning ? 1 : 0,
+              sourceAny.morphTargets ? 1 : 0,
+              sourceAny.morphNormals ? 1 : 0,
+            ].join('|');
+
+            const existingMaterial =
+              this._roughnessMaterialCache.get(materialKey);
+            if (existingMaterial) {
+              return existingMaterial;
+            }
+
+            const roughnessValue = roughnessStep / 255;
+            const roughnessMaterial = new THREE.MeshBasicMaterial({
+              color: new THREE.Color(
+                roughnessValue,
+                roughnessValue,
+                roughnessValue
+              ),
+              toneMapped: false,
+              side: sourceMaterial.side,
+            });
+            roughnessMaterial.depthTest = true;
+            roughnessMaterial.depthWrite = true;
+            roughnessMaterial.transparent = false;
+            (roughnessMaterial as any).skinning = !!sourceAny.skinning;
+            (roughnessMaterial as any).morphTargets = !!sourceAny.morphTargets;
+            (roughnessMaterial as any).morphNormals = !!sourceAny.morphNormals;
+            roughnessMaterial.needsUpdate = true;
+
+            this._roughnessMaterialCache.set(materialKey, roughnessMaterial);
+            return roughnessMaterial;
+          }
+
+          private _captureSSRoughnessTexture(
+            threeRenderer: THREE.WebGLRenderer,
+            threeScene: THREE.Scene,
+            threeCamera: THREE.Camera,
+            width: number,
+            height: number
+          ): THREE.Texture {
+            const renderTarget = this._ensureSSRoughnessTarget(
+              width,
+              height,
+              threeRenderer.outputColorSpace
+            );
+
+            const previousRenderTarget = threeRenderer.getRenderTarget();
+            const previousAutoClear = threeRenderer.autoClear;
+            const previousScissorTest = threeRenderer.getScissorTest();
+            const previousXrEnabled = threeRenderer.xr.enabled;
+            const previousClearAlpha = threeRenderer.getClearAlpha();
+            threeRenderer.getViewport(this._roughnessPreviousViewport);
+            threeRenderer.getScissor(this._roughnessPreviousScissor);
+            threeRenderer.getClearColor(this._roughnessPreviousClearColor);
+
+            const hiddenMeshes: Array<{ mesh: THREE.Mesh; visible: boolean }> = [];
+            const materialOverrides: Array<{
+              mesh: THREE.Mesh;
+              material: THREE.Material | THREE.Material[];
+            }> = [];
+
+            try {
+              threeRenderer.xr.enabled = false;
+              threeRenderer.autoClear = true;
+              threeRenderer.setRenderTarget(renderTarget);
+              threeRenderer.setViewport(0, 0, width, height);
+              threeRenderer.setScissor(0, 0, width, height);
+              threeRenderer.setScissorTest(false);
+              threeRenderer.setClearColor(0x000000, 0);
+              threeRenderer.clear(true, true, true);
+
+              threeScene.traverse((object3D) => {
+                const mesh = object3D as THREE.Mesh;
+                if (!mesh || !mesh.isMesh || !mesh.material) {
+                  return;
+                }
+
+                const sourceMaterials = Array.isArray(mesh.material)
+                  ? mesh.material
+                  : [mesh.material];
+                let hasManagedMaterial = false;
+                const replacementMaterials: THREE.Material[] = sourceMaterials.map(
+                  (sourceMaterial) => {
+                    if (
+                      sourceMaterial &&
+                      this._isPBRManagedMaterial(sourceMaterial)
+                    ) {
+                      hasManagedMaterial = true;
+                      return this._getOrCreateRoughnessRenderMaterial(
+                        sourceMaterial
+                      );
+                    }
+                    return this._roughnessSkipMaterial;
+                  }
+                );
+
+                if (!hasManagedMaterial) {
+                  hiddenMeshes.push({
+                    mesh,
+                    visible: mesh.visible,
+                  });
+                  mesh.visible = false;
+                  return;
+                }
+
+                materialOverrides.push({
+                  mesh,
+                  material: mesh.material as THREE.Material | THREE.Material[],
+                });
+                mesh.material = Array.isArray(mesh.material)
+                  ? replacementMaterials
+                  : replacementMaterials[0];
+              });
+
+              threeRenderer.render(threeScene, threeCamera);
+            } finally {
+              for (let i = 0; i < materialOverrides.length; i++) {
+                const override = materialOverrides[i];
+                override.mesh.material = override.material;
+              }
+              for (let i = 0; i < hiddenMeshes.length; i++) {
+                hiddenMeshes[i].mesh.visible = hiddenMeshes[i].visible;
+              }
+
+              threeRenderer.setRenderTarget(previousRenderTarget);
+              threeRenderer.setViewport(this._roughnessPreviousViewport);
+              threeRenderer.setScissor(this._roughnessPreviousScissor);
+              threeRenderer.setScissorTest(previousScissorTest);
+              threeRenderer.setClearColor(
+                this._roughnessPreviousClearColor,
+                previousClearAlpha
+              );
+              threeRenderer.autoClear = previousAutoClear;
+              threeRenderer.xr.enabled = previousXrEnabled;
+            }
+
+            return renderTarget.texture;
+          }
+
+          private _disposeSSRoughnessResources(): void {
+            if (this._roughnessRenderTarget) {
+              this._roughnessRenderTarget.dispose();
+              this._roughnessRenderTarget = null;
+            }
+
+            for (const material of this._roughnessMaterialCache.values()) {
+              material.dispose();
+            }
+            this._roughnessMaterialCache.clear();
+          }
+
           updatePreRender(target: gdjs.EffectsTarget): any {
             if (!this._isEnabled) {
               return;
@@ -612,6 +912,7 @@ namespace gdjs {
               this.shaderPass.enabled = false;
               gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'SSR');
               this._disposeSSRExcludeMaskResources();
+              this._disposeSSRoughnessResources();
               return;
             }
 
@@ -633,6 +934,7 @@ namespace gdjs {
               this.shaderPass.enabled = false;
               gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'SSR');
               this._disposeSSRExcludeMaskResources();
+              this._disposeSSRoughnessResources();
               return;
             }
             gdjs.setScene3DPostProcessingEffectQualityMode(
@@ -665,6 +967,19 @@ namespace gdjs {
               this._disposeSSRExcludeMaskResources();
             }
 
+            let ssrRoughnessTexture: THREE.Texture = this._roughnessFallbackTexture;
+            if (this._sceneHasPBRManagedMeshes(threeScene)) {
+              ssrRoughnessTexture = this._captureSSRoughnessTexture(
+                threeRenderer,
+                threeScene,
+                threeCamera,
+                sharedCapture.width,
+                sharedCapture.height
+              );
+            } else {
+              this._disposeSSRoughnessResources();
+            }
+
             threeCamera.updateMatrixWorld();
             threeCamera.updateProjectionMatrix();
             threeCamera.projectionMatrixInverse
@@ -679,6 +994,7 @@ namespace gdjs {
               sharedCapture.colorTexture;
             this.shaderPass.uniforms.tDepth.value = sharedCapture.depthTexture;
             this.shaderPass.uniforms.tSSRExcludeMask.value = ssrExcludeMaskTexture;
+            this.shaderPass.uniforms.tRoughness.value = ssrRoughnessTexture;
             this.shaderPass.uniforms.cameraProjectionMatrix.value.copy(
               threeCamera.projectionMatrix
             );

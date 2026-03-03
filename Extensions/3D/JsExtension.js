@@ -703,6 +703,367 @@ module.exports = {
     }
 
     {
+      const behavior = new gd.BehaviorJsImplementation();
+
+      const ensurePBRMaterialDefaults = function (behaviorContent) {
+        if (!behaviorContent.hasChild('metalness')) {
+          behaviorContent.addChild('metalness').setDoubleValue(0.0);
+        }
+        if (!behaviorContent.hasChild('roughness')) {
+          behaviorContent.addChild('roughness').setDoubleValue(0.5);
+        }
+        if (!behaviorContent.hasChild('envMapIntensity')) {
+          behaviorContent.addChild('envMapIntensity').setDoubleValue(1.0);
+        }
+        if (!behaviorContent.hasChild('emissiveColor')) {
+          behaviorContent.addChild('emissiveColor').setStringValue('0;0;0');
+        }
+        if (!behaviorContent.hasChild('emissiveIntensity')) {
+          behaviorContent.addChild('emissiveIntensity').setDoubleValue(0.0);
+        }
+        if (!behaviorContent.hasChild('normalScale')) {
+          behaviorContent.addChild('normalScale').setDoubleValue(1.0);
+        }
+        if (!behaviorContent.hasChild('normalMapAsset')) {
+          behaviorContent.addChild('normalMapAsset').setStringValue('');
+        }
+        if (!behaviorContent.hasChild('aoMapAsset')) {
+          behaviorContent.addChild('aoMapAsset').setStringValue('');
+        }
+        if (!behaviorContent.hasChild('aoMapIntensity')) {
+          behaviorContent.addChild('aoMapIntensity').setDoubleValue(1.0);
+        }
+        if (!behaviorContent.hasChild('map')) {
+          behaviorContent.addChild('map').setStringValue('');
+        }
+      };
+
+      const clampValue = function (value, min, max) {
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue)) {
+          return min;
+        }
+        return Math.max(min, Math.min(max, numericValue));
+      };
+
+      behavior.updateProperty = function (
+        behaviorContent,
+        propertyName,
+        newValue
+      ) {
+        ensurePBRMaterialDefaults(behaviorContent);
+
+        if (propertyName === 'metalness') {
+          behaviorContent
+            .getChild('metalness')
+            .setDoubleValue(clampValue(newValue, 0, 1));
+          return true;
+        }
+        if (propertyName === 'roughness') {
+          behaviorContent
+            .getChild('roughness')
+            .setDoubleValue(clampValue(newValue, 0, 1));
+          return true;
+        }
+        if (propertyName === 'envMapIntensity') {
+          behaviorContent
+            .getChild('envMapIntensity')
+            .setDoubleValue(clampValue(newValue, 0, 4));
+          return true;
+        }
+        if (propertyName === 'emissiveColor') {
+          behaviorContent.getChild('emissiveColor').setStringValue(newValue);
+          return true;
+        }
+        if (propertyName === 'emissiveIntensity') {
+          behaviorContent
+            .getChild('emissiveIntensity')
+            .setDoubleValue(clampValue(newValue, 0, 4));
+          return true;
+        }
+        if (propertyName === 'normalScale') {
+          behaviorContent
+            .getChild('normalScale')
+            .setDoubleValue(clampValue(newValue, 0, 2));
+          return true;
+        }
+        if (propertyName === 'normalMapAsset') {
+          behaviorContent.getChild('normalMapAsset').setStringValue(newValue);
+          return true;
+        }
+        if (propertyName === 'aoMapAsset') {
+          behaviorContent.getChild('aoMapAsset').setStringValue(newValue);
+          return true;
+        }
+        if (propertyName === 'aoMapIntensity') {
+          behaviorContent
+            .getChild('aoMapIntensity')
+            .setDoubleValue(clampValue(newValue, 0, 1));
+          return true;
+        }
+        if (propertyName === 'map') {
+          behaviorContent.getChild('map').setStringValue(newValue);
+          return true;
+        }
+
+        return false;
+      };
+
+      behavior.getProperties = function (behaviorContent) {
+        const behaviorProperties = new gd.MapStringPropertyDescriptor();
+        ensurePBRMaterialDefaults(behaviorContent);
+
+        behaviorProperties
+          .getOrCreate('metalness')
+          .setValue(behaviorContent.getChild('metalness').getDoubleValue().toString())
+          .setType('number')
+          .setLabel(_('Metalness'));
+        behaviorProperties
+          .getOrCreate('roughness')
+          .setValue(behaviorContent.getChild('roughness').getDoubleValue().toString())
+          .setType('number')
+          .setLabel(_('Roughness'));
+        behaviorProperties
+          .getOrCreate('envMapIntensity')
+          .setValue(
+            behaviorContent.getChild('envMapIntensity').getDoubleValue().toString()
+          )
+          .setType('number')
+          .setLabel(_('Environment intensity'));
+        behaviorProperties
+          .getOrCreate('emissiveColor')
+          .setValue(behaviorContent.getChild('emissiveColor').getStringValue())
+          .setType('color')
+          .setLabel(_('Emissive color'));
+        behaviorProperties
+          .getOrCreate('emissiveIntensity')
+          .setValue(
+            behaviorContent.getChild('emissiveIntensity').getDoubleValue().toString()
+          )
+          .setType('number')
+          .setLabel(_('Emissive intensity'));
+        behaviorProperties
+          .getOrCreate('normalScale')
+          .setValue(behaviorContent.getChild('normalScale').getDoubleValue().toString())
+          .setType('number')
+          .setLabel(_('Normal scale'));
+        behaviorProperties
+          .getOrCreate('normalMapAsset')
+          .setValue(behaviorContent.getChild('normalMapAsset').getStringValue())
+          .setType('resource')
+          .addExtraInfo('image')
+          .setLabel(_('Normal map'));
+        behaviorProperties
+          .getOrCreate('aoMapAsset')
+          .setValue(behaviorContent.getChild('aoMapAsset').getStringValue())
+          .setType('resource')
+          .addExtraInfo('image')
+          .setLabel(_('AO map'));
+        behaviorProperties
+          .getOrCreate('aoMapIntensity')
+          .setValue(
+            behaviorContent.getChild('aoMapIntensity').getDoubleValue().toString()
+          )
+          .setType('number')
+          .setLabel(_('AO intensity'));
+        behaviorProperties
+          .getOrCreate('map')
+          .setValue(behaviorContent.getChild('map').getStringValue())
+          .setType('resource')
+          .addExtraInfo('image')
+          .setLabel(_('Albedo map'));
+
+        return behaviorProperties;
+      };
+
+      behavior.initializeContent = function (behaviorContent) {
+        behaviorContent.addChild('metalness').setDoubleValue(0.0);
+        behaviorContent.addChild('roughness').setDoubleValue(0.5);
+        behaviorContent.addChild('envMapIntensity').setDoubleValue(1.0);
+        behaviorContent.addChild('emissiveColor').setStringValue('0;0;0');
+        behaviorContent.addChild('emissiveIntensity').setDoubleValue(0.0);
+        behaviorContent.addChild('normalScale').setDoubleValue(1.0);
+        behaviorContent.addChild('normalMapAsset').setStringValue('');
+        behaviorContent.addChild('aoMapAsset').setStringValue('');
+        behaviorContent.addChild('aoMapIntensity').setDoubleValue(1.0);
+        behaviorContent.addChild('map').setStringValue('');
+      };
+
+      const pbrMaterial = extension
+        .addBehavior(
+          'PBRMaterial',
+          _('PBR material'),
+          'PBRMaterial',
+          _(
+            'Control physically based material parameters for 3D meshes using MeshStandardMaterial and MeshPhysicalMaterial.'
+          ),
+          '',
+          'res/conditions/3d_box.svg',
+          'PBRMaterial',
+          // @ts-ignore
+          behavior,
+          new gd.BehaviorsSharedData()
+        )
+        .setIncludeFile('Extensions/3D/PBRMaterialBehavior.js');
+
+      pbrMaterial
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Metalness',
+          _('Metalness'),
+          _('the metalness'),
+          _('the metalness'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setMetalness')
+        .setGetter('getMetalness');
+
+      pbrMaterial
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Roughness',
+          _('Roughness'),
+          _('the roughness'),
+          _('the roughness'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setRoughness')
+        .setGetter('getRoughness');
+
+      pbrMaterial
+        .addExpressionAndConditionAndAction(
+          'number',
+          'EnvironmentIntensity',
+          _('Environment intensity'),
+          _('the environment map intensity'),
+          _('the environment intensity'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setEnvMapIntensity')
+        .setGetter('getEnvMapIntensity');
+
+      pbrMaterial
+        .addExpressionAndConditionAndAction(
+          'number',
+          'EmissiveIntensity',
+          _('Emissive intensity'),
+          _('the emissive intensity'),
+          _('the emissive intensity'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setEmissiveIntensity')
+        .setGetter('getEmissiveIntensity');
+
+      pbrMaterial
+        .addExpressionAndConditionAndAction(
+          'number',
+          'NormalScale',
+          _('Normal scale'),
+          _('the normal map scale'),
+          _('the normal scale'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setNormalScale')
+        .setGetter('getNormalScale');
+
+      pbrMaterial
+        .addExpressionAndConditionAndAction(
+          'number',
+          'AOMapIntensity',
+          _('AO map intensity'),
+          _('the AO map intensity'),
+          _('the AO map intensity'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setAOMapIntensity')
+        .setGetter('getAOMapIntensity');
+
+      pbrMaterial
+        .addScopedAction(
+          'SetEmissiveColor',
+          _('Set emissive color'),
+          _('Set the emissive color used by PBR materials on this object.'),
+          _('Set emissive color of _PARAM0_ to _PARAM2_'),
+          _('PBR material'),
+          'res/actions/color24.png',
+          'res/actions/color.png'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .addParameter('color', _('Emissive color'))
+        .setFunctionName('setEmissiveColor');
+
+      pbrMaterial
+        .addScopedAction(
+          'SetNormalMapAsset',
+          _('Set normal map'),
+          _('Set the normal map resource used by PBR materials on this object.'),
+          _('Set normal map of _PARAM0_ to _PARAM2_'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .addParameter('imageResource', _('Normal map'), '', true)
+        .setFunctionName('setNormalMapAsset');
+
+      pbrMaterial
+        .addScopedAction(
+          'SetAOMapAsset',
+          _('Set AO map'),
+          _('Set the AO map resource used by PBR materials on this object.'),
+          _('Set AO map of _PARAM0_ to _PARAM2_'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .addParameter('imageResource', _('AO map'), '', true)
+        .setFunctionName('setAOMapAsset');
+
+      pbrMaterial
+        .addScopedAction(
+          'SetMap',
+          _('Set albedo map'),
+          _('Set the albedo (base color) map resource used by PBR materials on this object.'),
+          _('Set albedo map of _PARAM0_ to _PARAM2_'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .addParameter('imageResource', _('Albedo map'), '', true)
+        .setFunctionName('setMap');
+    }
+
+    {
       const object = extension
         .addObject(
           'Model3DObject',

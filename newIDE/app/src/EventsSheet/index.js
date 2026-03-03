@@ -1937,15 +1937,65 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   moveEventsIntoNewGroup = () => {
-    const eventsList = new gd.EventsList();
+    // Only move the top-most events, as the other will be contained inside.
+    const selectedContexts = getSelectedTopMostOnlyEventContexts(
+      this.state.selection
+    );
+    if (selectedContexts.length === 0) return;
 
-    // Only copy the top-most events, as the other will be contained inside.
-    getSelectedTopMostOnlyEventContexts(this.state.selection).forEach(
-      ({ event }) => eventsList.insertEvent(event, eventsList.getEventsCount())
+    const { project } = this.props;
+
+    // Get positions before mutation for history.
+    const positions = this._getChangedEventRows(
+      selectedContexts.map(ctx => ctx.event)
     );
 
-    this._replaceSelectionByGroupOfEvents(eventsList);
-    eventsList.delete();
+    // Determine where to insert the Group (at the last selected event's position).
+    const lastContext = selectedContexts[selectedContexts.length - 1];
+
+    // Create the Group event.
+    const newEvent = lastContext.eventsList.insertNewEvent(
+      project,
+      'BuiltinCommonInstructions::Group',
+      lastContext.indexInList
+    );
+    const groupEvent = gd.asGroupEvent(newEvent);
+    groupEvent.setName('Grouped events');
+    groupEvent.setFolded(true);
+
+    const groupSubEvents = groupEvent.getSubEvents();
+
+    // Move each selected event into the Group's sub-events.
+    // Using moveEventToAnotherEventsList transfers the shared_ptr ownership
+    // directly, avoiding cloning and the associated risk of accessing freed
+    // event objects through stale references.
+    selectedContexts.forEach(({ event, eventsList: sourceList }) => {
+      sourceList.moveEventToAnotherEventsList(
+        event,
+        groupSubEvents,
+        groupSubEvents.getEventsCount()
+      );
+    });
+
+    // /!\ Events were changed, so any reference to an existing event can now
+    // be invalid. Make sure to immediately trigger a forced update before
+    // any re-render that could use a deleted/invalid event.
+    if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+
+    this.setState(
+      {
+        selection: clearSelection(),
+        inlineEditing: false,
+        inlineEditingAnchorEl: null,
+      },
+      () => {
+        this._saveChangesToHistory('EDIT', {
+          positionsBeforeAction: positions,
+          positionAfterAction: positions,
+        });
+        this._ensureFocused();
+      }
+    );
   };
 
   _replaceSelectionByEventsFunction = (
@@ -1972,30 +2022,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
     standardEvt.getActions().push_back(action);
     action.delete();
-
-    this.deleteSelection({ deleteInstructions: false });
-  };
-
-  _replaceSelectionByGroupOfEvents = (eventsList: gdEventsList) => {
-    const eventContext = getLastSelectedTopMostOnlyEventContext(
-      this.state.selection
-    );
-    if (!eventContext) return;
-
-    const { project } = this.props;
-
-    const newEvent = eventContext.eventsList.insertNewEvent(
-      project,
-      'BuiltinCommonInstructions::Group',
-      eventContext.indexInList
-    );
-    const groupEvent = gd.asGroupEvent(newEvent);
-
-    groupEvent.setName('Grouped events');
-    groupEvent.setFolded(true);
-    groupEvent
-      .getSubEvents()
-      .insertEvents(eventsList, 0, eventsList.getEventsCount(), 0);
 
     this.deleteSelection({ deleteInstructions: false });
   };

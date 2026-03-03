@@ -13,6 +13,7 @@ import VerticalFillIcon from '../../UI/CustomSvgIcons/VerticalSize';
 import VerticalProportionalFillIcon from '../../UI/CustomSvgIcons/VerticalSizePercent';
 import LetterV from '../../UI/CustomSvgIcons/LetterV';
 import LetterH from '../../UI/CustomSvgIcons/LetterH';
+import Restore from '../../UI/CustomSvgIcons/Restore';
 import CompactTextField from '../../UI/CompactTextField';
 import CompactToggleButtons, {
   type CompactToggleButton,
@@ -37,17 +38,18 @@ const getAnchorDisplayText = (
   basicAnchor: BasicAnchor,
   axis: 'horizontal' | 'vertical'
 ): string => {
+  const axisLabel = axis === 'horizontal' ? 'horizontally' : 'vertically';
   switch (basicAnchor) {
     case 'MinEdge':
-      return axis === 'horizontal' ? 'Left' : 'Bottom';
+      return axis === 'horizontal' ? 'Left horizontally' : 'Bottom vertically';
     case 'Center':
-      return 'Center';
+      return `Center ${axisLabel}`;
     case 'MaxEdge':
-      return axis === 'horizontal' ? 'Right' : 'Top';
+      return axis === 'horizontal' ? 'Right horizontally' : 'Top vertically';
     case 'FixedFill':
-      return 'Fill';
+      return `Fill ${axisLabel}`;
     case 'ProportionalFill':
-      return 'Proportional';
+      return `Proportional ${axisLabel}`;
     case 'Advanced':
       return 'Advanced';
     default:
@@ -75,11 +77,11 @@ const makeButtons = (
       isActive: currentBasicAnchor === target,
       onClick: () => {
         if (currentBasicAnchor === target) {
-          if (noneEntry) {
-            onUpdateProperty(minEdgeProperty, noneEntry.minEdge);
-            onUpdateProperty(maxEdgeProperty, noneEntry.maxEdge);
-          }
-        } else if (entry) {
+          // Already active: do nothing. User must use the Restore
+          // button in the text field to reset to None.
+          return;
+        }
+        if (entry) {
           onUpdateProperty(minEdgeProperty, entry.minEdge);
           onUpdateProperty(maxEdgeProperty, entry.maxEdge);
         }
@@ -257,11 +259,15 @@ const AnchorGrid = ({
         <CompactTextField
           value={vDisplayValue}
           onChange={() => {}}
-          disabled={!vIsNone}
           placeholder={vPlaceholder}
           renderLeftIcon={className => <LetterV className={className} />}
           leftIconTooltip={<Trans>Vertical</Trans>}
-          onFocus={
+          renderEndAdornmentOnHover={
+            !vIsNone
+              ? className => <Restore className={className} />
+              : undefined
+          }
+          onClickEndAdornment={
             !vIsNone
               ? () =>
                   clearAnchor(
@@ -292,11 +298,15 @@ const AnchorGrid = ({
         <CompactTextField
           value={hDisplayValue}
           onChange={() => {}}
-          disabled={!hIsNone}
           placeholder={hPlaceholder}
           renderLeftIcon={className => <LetterH className={className} />}
           leftIconTooltip={<Trans>Horizontal</Trans>}
-          onFocus={
+          renderEndAdornmentOnHover={
+            !hIsNone
+              ? className => <Restore className={className} />
+              : undefined
+          }
+          onClickEndAdornment={
             !hIsNone
               ? () =>
                   clearAnchor(

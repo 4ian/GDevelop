@@ -35,7 +35,7 @@ export const Default = (): React.Node => {
         object={spriteObjectWithBehaviors}
         behaviorMetadata={behaviorMetadata}
         behaviorOverriding={null}
-        initialInstance={null}
+        initialInstance={testProject.testLayoutInstance1}
         onOpenFullEditor={action('onOpenFullEditor')}
         onBehaviorUpdated={action('onBehaviorUpdated')}
         resourceManagementProps={fakeResourceManagementProps}

@@ -13,6 +13,8 @@ import type { GlobalSearchGroup } from '../../../Utils/EventsGlobalSearchScanner
 import { getGroupIcon } from './utils';
 import { styles } from './styles';
 import { SearchMatchRowList } from './SearchMatchRowList';
+import { LineStackLayout } from '../../../UI/Layout';
+import { textEllipsisStyle } from '../../../UI/TextEllipsis';
 
 export type GroupItemProps = { group: GlobalSearchGroup };
 
@@ -45,25 +47,23 @@ export const GroupItem: React.ComponentType<GroupItemProps> = React.memo(
             />,
           ]}
         >
-          <div style={styles.groupHeaderContent}>
+          <LineStackLayout noMargin alignItems="center">
             <div style={styles.groupHeaderIcon}>{getGroupIcon(group)}</div>
             <Text
               noMargin
               allowSelection
               style={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
+                ...textEllipsisStyle,
                 flex: 1,
               }}
               size="block-title"
             >
               {group.label}
             </Text>
-          </div>
+          </LineStackLayout>
         </AccordionHeader>
         <AccordionBody disableGutters>
-          <Column noMargin expand>
+          <Column noMargin expand noOverflowParent>
             <SearchMatchRowList group={group} />
           </Column>
         </AccordionBody>

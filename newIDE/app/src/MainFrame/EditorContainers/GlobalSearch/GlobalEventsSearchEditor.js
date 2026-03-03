@@ -26,7 +26,16 @@ import { useSearchForm } from './useSearchForm';
 import { deduplicateEventPaths } from './utils';
 import { styles } from './styles';
 import { GroupList } from './GroupList';
+import {
+  ResponsiveLineStackLayout,
+  LineStackLayout,
+  ColumnStackLayout,
+} from '../../../UI/Layout';
+import Paper from '../../../UI/Paper';
+import ScrollView from '../../../UI/ScrollView';
+import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
 import type { EventPath } from '../../../Types/EventPath';
+import Cross from '../../../UI/CustomSvgIcons/Cross';
 
 type GlobalEventsSearchEditorProps = {|
   project: gdProject,
@@ -116,115 +125,110 @@ export const GlobalEventsSearchEditor = ({
   return (
     <div style={styles.container}>
       <Background maxWidth>
-        <div style={styles.scrollableContent}>
-          <div>
-            <Line noMargin expand>
-              <Column expand noMargin>
-                <SearchBar
-                  value={search}
-                  onChange={setSearch}
-                  onRequestSearch={launchSearch}
-                  placeholder={t`Search in all event sheets...`}
-                  autoFocus="desktop"
-                />
-              </Column>
-              <RaisedButton
-                // $FlowFixMe[incompatible-type]
-                style={styles.searchButton}
-                disabled={!hasSearchText}
-                primary
-                label={<Trans>Search</Trans>}
-                onClick={launchSearch}
+        <ColumnStackLayout expand useFullHeight>
+          <LineStackLayout noMargin>
+            <Column expand noMargin>
+              <SearchBar
+                value={search}
+                onChange={setSearch}
+                onRequestSearch={launchSearch}
+                placeholder={t`Search in all event sheets...`}
+                autoFocus="desktop"
               />
-            </Line>
-            <div style={styles.optionsRow}>
-              <IconButton
-                size="small"
-                tooltip={t`Match case`}
-                selected={checkBoxesState.matchCase}
-                onClick={() =>
-                  setCheckBoxesState(prev => ({
-                    ...prev,
-                    matchCase: !prev.matchCase,
-                  }))
-                }
-              >
-                <MatchCase />
-              </IconButton>
-              <ElementWithMenu
-                element={
-                  <IconButton size="small" tooltip={t`Search filters`}>
-                    <DotBadge
-                      overlap="circle"
-                      color="error"
-                      invisible={
-                        checkBoxesState.searchInConditions ||
-                        checkBoxesState.searchInActions ||
-                        checkBoxesState.searchInEventStrings
-                      }
-                    >
-                      <Filter />
-                    </DotBadge>
-                  </IconButton>
-                }
-                buildMenuTemplate={(i18n: I18nType) => [
-                  {
-                    type: 'checkbox',
-                    label: i18n._(t`Conditions`),
-                    checked: checkBoxesState.searchInConditions,
-                    click: () =>
-                      setCheckBoxesState(prev => ({
-                        ...prev,
-                        searchInConditions: !prev.searchInConditions,
-                      })),
-                  },
-                  {
-                    type: 'checkbox',
-                    label: i18n._(t`Actions`),
-                    checked: checkBoxesState.searchInActions,
-                    click: () =>
-                      setCheckBoxesState(prev => ({
-                        ...prev,
-                        searchInActions: !prev.searchInActions,
-                      })),
-                  },
-                  {
-                    type: 'checkbox',
-                    label: i18n._(t`Texts`),
-                    checked: checkBoxesState.searchInEventStrings,
-                    click: () =>
-                      setCheckBoxesState(prev => ({
-                        ...prev,
-                        searchInEventStrings: !prev.searchInEventStrings,
-                      })),
-                  },
-                  {
-                    type: 'checkbox',
-                    label: i18n._(t`Event sentences`),
-                    checked: checkBoxesState.searchInEventSentences,
-                    click: () =>
-                      setCheckBoxesState(prev => ({
-                        ...prev,
-                        searchInEventSentences: !prev.searchInEventSentences,
-                      })),
-                  },
-                  { type: 'separator' },
-                  {
-                    type: 'checkbox',
-                    label: i18n._(t`Include store extensions`),
-                    checked: checkBoxesState.includeStoreExtensions,
-                    click: () =>
-                      setCheckBoxesState(prev => ({
-                        ...prev,
-                        includeStoreExtensions: !prev.includeStoreExtensions,
-                      })),
-                  },
-                ]}
-              />
-            </div>
-          </div>
-
-          <div style={styles.resultsArea}>
+            </Column>
+            <RaisedButton
+              disabled={!hasSearchText}
+              primary
+              label={<Trans>Search</Trans>}
+              onClick={launchSearch}
+            />
+          </LineStackLayout>
+          <LineStackLayout noMargin alignItems="center">
+            <IconButton
+              size="small"
+              tooltip={t`Match case`}
+              selected={checkBoxesState.matchCase}
+              onClick={() =>
+                setCheckBoxesState(prev => ({
+                  ...prev,
+                  matchCase: !prev.matchCase,
+                }))
+              }
+            >
+              <MatchCase />
+            </IconButton>
+            <ElementWithMenu
+              element={
+                <IconButton size="small" tooltip={t`Search filters`}>
+                  <DotBadge
+                    overlap="circle"
+                    color="error"
+                    invisible={
+                      checkBoxesState.searchInConditions ||
+                      checkBoxesState.searchInActions ||
+                      checkBoxesState.searchInEventStrings
+                    }
+                  >
+                    <Filter />
+                  </DotBadge>
+                </IconButton>
+              }
+              buildMenuTemplate={(i18n: I18nType) => [
+                {
+                  type: 'checkbox',
+                  label: i18n._(t`Conditions`),
+                  checked: checkBoxesState.searchInConditions,
+                  click: () =>
+                    setCheckBoxesState(prev => ({
+                      ...prev,
+                      searchInConditions: !prev.searchInConditions,
+                    })),
+                },
+                {
+                  type: 'checkbox',
+                  label: i18n._(t`Actions`),
+                  checked: checkBoxesState.searchInActions,
+                  click: () =>
+                    setCheckBoxesState(prev => ({
+                      ...prev,
+                      searchInActions: !prev.searchInActions,
+                    })),
+                },
+                {
+                  type: 'checkbox',
+                  label: i18n._(t`Texts`),
+                  checked: checkBoxesState.searchInEventStrings,
+                  click: () =>
+                    setCheckBoxesState(prev => ({
+                      ...prev,
+                      searchInEventStrings: !prev.searchInEventStrings,
+                    })),
+                },
+                {
+                  type: 'checkbox',
+                  label: i18n._(t`Event sentences`),
+                  checked: checkBoxesState.searchInEventSentences,
+                  click: () =>
+                    setCheckBoxesState(prev => ({
+                      ...prev,
+                      searchInEventSentences: !prev.searchInEventSentences,
+                    })),
+                },
+                { type: 'separator' },
+                {
+                  type: 'checkbox',
+                  label: i18n._(t`Include store extensions`),
+                  checked: checkBoxesState.includeStoreExtensions,
+                  click: () =>
+                    setCheckBoxesState(prev => ({
+                      ...prev,
+                      includeStoreExtensions: !prev.includeStoreExtensions,
+                    })),
+                },
+              ]}
+            />
+          </LineStackLayout>
+          <ScrollView expand>
             {!hasSearched ? (
               <div style={styles.emptyStateContainer}>
                 <SearchIcon style={styles.emptyStateIcon} />
@@ -236,58 +240,70 @@ export const GlobalEventsSearchEditor = ({
                 </Text>
               </div>
             ) : groups.length === 0 ? (
-              <div style={styles.noMatchesContainer}>
-                <Text noMargin align="center">
-                  <Trans>No matches found.</Trans>
-                </Text>
-                <Text
-                  noMargin
-                  size="body-small"
-                  color="secondary"
-                  align="center"
-                >
+              <EmptyPlaceholder
+                title={
+                  <Trans>
+                    No matches found for "{freezedSearchState.searchText}".
+                  </Trans>
+                }
+                description={
                   <Trans>
                     Try different search terms or check your search options.
                   </Trans>
-                </Text>
-              </div>
+                }
+                actionLabel={<Trans>Clear search</Trans>}
+                actionIcon={<Cross />}
+                onAction={() => setSearch('')}
+              />
             ) : (
-              <div style={styles.accordionGroupContainer}>
-                <div style={styles.searchQueryHeader}>
-                  <span style={styles.searchQueryLabel}>
-                    <Trans>Search:</Trans>
-                  </span>
-                  <span style={styles.searchQueryText}>
-                    <span>"{freezedSearchState.searchText}"</span>
-                    <Text noMargin size="body-small" color="secondary">
-                      {totalMatchCount === 1 && groups.length === 1 ? (
-                        <Trans>Found 1 match in 1 event sheet</Trans>
-                      ) : totalMatchCount === 1 ? (
-                        <Trans>
-                          Found 1 match in {groups.length} event sheets
-                        </Trans>
-                      ) : groups.length === 1 ? (
-                        <Trans>
-                          Found {totalMatchCount} matches in 1 event sheet
-                        </Trans>
-                      ) : (
-                        <Trans>
-                          Found {totalMatchCount} matches in {groups.length}{' '}
-                          event sheets
-                        </Trans>
-                      )}
-                    </Text>
-                  </span>
-                </div>
+              <ColumnStackLayout expand noMargin>
+                <Paper variant="outlined" background="light">
+                  <Line expand>
+                    <Column expand>
+                      <ResponsiveLineStackLayout
+                        justifyContent="space-between"
+                        alignItems="center"
+                        noMargin
+                      >
+                        <ResponsiveLineStackLayout noMargin alignItems="center">
+                          <Text noMargin size="body" color="secondary">
+                            <Trans>Results for:</Trans>
+                          </Text>
+                          <Text noMargin size="body" color="primary">
+                            "{freezedSearchState.searchText}"
+                          </Text>
+                        </ResponsiveLineStackLayout>
+                        <Text noMargin size="body-small" color="secondary">
+                          {totalMatchCount === 1 && groups.length === 1 ? (
+                            <Trans>Found 1 match in 1 event sheet</Trans>
+                          ) : totalMatchCount === 1 ? (
+                            <Trans>
+                              Found 1 match in {groups.length} event sheets
+                            </Trans>
+                          ) : groups.length === 1 ? (
+                            <Trans>
+                              Found {totalMatchCount} matches in 1 event sheet
+                            </Trans>
+                          ) : (
+                            <Trans>
+                              Found {totalMatchCount} matches in {groups.length}{' '}
+                              event sheets
+                            </Trans>
+                          )}
+                        </Text>
+                      </ResponsiveLineStackLayout>
+                    </Column>
+                  </Line>
+                </Paper>
                 <GlobalSearchContextProvider.Provider
                   value={globalSearchContextValue}
                 >
                   <GroupList groups={groups} />
                 </GlobalSearchContextProvider.Provider>
-              </div>
+              </ColumnStackLayout>
             )}
-          </div>
-        </div>
+          </ScrollView>
+        </ColumnStackLayout>
       </Background>
     </div>
   );

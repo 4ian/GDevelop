@@ -24,6 +24,7 @@ type _UseGenerateEventsReturnType = {
     placementHint: string,
     relatedAiRequestId: string,
     sceneName: string,
+    estimatedComplexity: number | null,
   }) => Promise<EventsGenerationResult>,
 };
 export const useGenerateEvents = ({
@@ -45,6 +46,7 @@ export const useGenerateEvents = ({
       existingEventsJson,
       placementHint,
       relatedAiRequestId,
+      estimatedComplexity,
     }: {|
       sceneName: string,
       eventsDescription: string,
@@ -54,6 +56,7 @@ export const useGenerateEvents = ({
       existingEventsJson: string | null,
       placementHint: string,
       relatedAiRequestId: string,
+      estimatedComplexity: number | null,
     |}): Promise<EventsGenerationResult> => {
       if (!project) throw new Error('No project is opened.');
       if (!profile) throw new Error('User should be authenticated.');
@@ -97,6 +100,7 @@ export const useGenerateEvents = ({
               existingEventsAsText,
               placementHint,
               relatedAiRequestId,
+              estimatedComplexity,
             })
         );
 

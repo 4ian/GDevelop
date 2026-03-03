@@ -147,6 +147,7 @@ export type EventsGenerationOptions = {|
   existingEventsJson: string | null,
   placementHint: string,
   relatedAiRequestId: string,
+  estimatedComplexity: number | null,
 |};
 
 export type AssetSearchAndInstallResult = {|
@@ -3648,6 +3649,10 @@ const addSceneEvents: EditorFunction = {
       args,
       'objects_list'
     );
+    const estimatedComplexity = SafeExtractor.extractNumberProperty(
+      args,
+      'estimated_complexity'
+    );
     const objectsList = objectsListArgument === null ? '' : objectsListArgument;
     const placementHint =
       SafeExtractor.extractStringProperty(args, 'placement_hint') || '';
@@ -3682,6 +3687,7 @@ const addSceneEvents: EditorFunction = {
           existingEventsJson,
           placementHint,
           relatedAiRequestId,
+          estimatedComplexity,
         }
       );
 

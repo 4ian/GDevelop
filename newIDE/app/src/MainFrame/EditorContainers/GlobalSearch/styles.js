@@ -20,9 +20,6 @@ export const styles = {
     marginTop: 8,
     gap: 8,
   },
-  searchInLabel: {
-    opacity: 0.7,
-  },
   searchButton: {
     marginLeft: 8,
   },

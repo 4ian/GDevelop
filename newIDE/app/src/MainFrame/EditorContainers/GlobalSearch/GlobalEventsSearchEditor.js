@@ -1,13 +1,18 @@
 // @flow
 import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import SearchBar from '../../../UI/SearchBar';
-import { Column, Line, Spacer } from '../../../UI/Grid';
+import { Column, Line } from '../../../UI/Grid';
 import Text from '../../../UI/Text';
-import InlineCheckbox from '../../../UI/InlineCheckbox';
 import Background from '../../../UI/Background';
 import RaisedButton from '../../../UI/RaisedButton';
+import IconButton from '../../../UI/IconButton';
 import SearchIcon from '../../../UI/CustomSvgIcons/Search';
+import MatchCase from '../../../UI/CustomSvgIcons/MatchCase';
+import Filter from '../../../UI/CustomSvgIcons/Filter';
+import ElementWithMenu from '../../../UI/Menu/ElementWithMenu';
+import DotBadge from '../../../UI/DotBadge';
 import {
   scanProjectForGlobalEventsSearch,
   type GlobalSearchGroup,
@@ -46,20 +51,6 @@ export const GlobalEventsSearchEditor = ({
     hasSearched,
     setHasSearched,
   } = useSearchForm();
-
-  const handleChangeCheckBoxesForm = (
-    event: SyntheticEvent<HTMLFormElement>
-  ) => {
-    const target = event.target;
-    if (!(target instanceof HTMLInputElement)) return;
-    const name = target.name;
-    // $FlowFixMe[incompatible-type]
-    setCheckBoxesState(prevState => ({
-      ...prevState,
-      // $FlowFixMe[invalid-computed-prop]
-      [name]: !prevState[name],
-    }));
-  };
 
   const launchSearch = () => {
     const groups = scanProjectForGlobalEventsSearch(project, {
@@ -134,6 +125,7 @@ export const GlobalEventsSearchEditor = ({
                   onChange={setSearch}
                   onRequestSearch={launchSearch}
                   placeholder={t`Search in all event sheets...`}
+                  autoFocus="desktop"
                 />
               </Column>
               <RaisedButton
@@ -145,51 +137,91 @@ export const GlobalEventsSearchEditor = ({
                 onClick={launchSearch}
               />
             </Line>
-            <form
-              style={styles.optionsRow}
-              onChange={handleChangeCheckBoxesForm}
-            >
-              <InlineCheckbox
-                label={<Trans>Case insensitive</Trans>}
-                name={'matchCase'}
-                checked={!checkBoxesState.matchCase}
-              />
-              <Spacer />
-              <Text
-                noMargin
-                size="body-small"
-                color="secondary"
-                // $FlowFixMe[incompatible-type]
-                style={styles.searchInLabel}
+            <div style={styles.optionsRow}>
+              <IconButton
+                size="small"
+                tooltip={t`Match case`}
+                selected={checkBoxesState.matchCase}
+                onClick={() =>
+                  setCheckBoxesState(prev => ({
+                    ...prev,
+                    matchCase: !prev.matchCase,
+                  }))
+                }
               >
-                <Trans>Search in:</Trans>
-              </Text>
-              <InlineCheckbox
-                label={<Trans>Conditions</Trans>}
-                name={'searchInConditions'}
-                checked={checkBoxesState.searchInConditions}
+                <MatchCase />
+              </IconButton>
+              <ElementWithMenu
+                element={
+                  <IconButton size="small" tooltip={t`Search filters`}>
+                    <DotBadge
+                      overlap="circle"
+                      color="error"
+                      invisible={
+                        checkBoxesState.searchInConditions ||
+                        checkBoxesState.searchInActions ||
+                        checkBoxesState.searchInEventStrings
+                      }
+                    >
+                      <Filter />
+                    </DotBadge>
+                  </IconButton>
+                }
+                buildMenuTemplate={(i18n: I18nType) => [
+                  {
+                    type: 'checkbox',
+                    label: i18n._(t`Conditions`),
+                    checked: checkBoxesState.searchInConditions,
+                    click: () =>
+                      setCheckBoxesState(prev => ({
+                        ...prev,
+                        searchInConditions: !prev.searchInConditions,
+                      })),
+                  },
+                  {
+                    type: 'checkbox',
+                    label: i18n._(t`Actions`),
+                    checked: checkBoxesState.searchInActions,
+                    click: () =>
+                      setCheckBoxesState(prev => ({
+                        ...prev,
+                        searchInActions: !prev.searchInActions,
+                      })),
+                  },
+                  {
+                    type: 'checkbox',
+                    label: i18n._(t`Texts`),
+                    checked: checkBoxesState.searchInEventStrings,
+                    click: () =>
+                      setCheckBoxesState(prev => ({
+                        ...prev,
+                        searchInEventStrings: !prev.searchInEventStrings,
+                      })),
+                  },
+                  {
+                    type: 'checkbox',
+                    label: i18n._(t`Event sentences`),
+                    checked: checkBoxesState.searchInEventSentences,
+                    click: () =>
+                      setCheckBoxesState(prev => ({
+                        ...prev,
+                        searchInEventSentences: !prev.searchInEventSentences,
+                      })),
+                  },
+                  { type: 'separator' },
+                  {
+                    type: 'checkbox',
+                    label: i18n._(t`Include store extensions`),
+                    checked: checkBoxesState.includeStoreExtensions,
+                    click: () =>
+                      setCheckBoxesState(prev => ({
+                        ...prev,
+                        includeStoreExtensions: !prev.includeStoreExtensions,
+                      })),
+                  },
+                ]}
               />
-              <InlineCheckbox
-                label={<Trans>Actions</Trans>}
-                name={'searchInActions'}
-                checked={checkBoxesState.searchInActions}
-              />
-              <InlineCheckbox
-                label={<Trans>Texts</Trans>}
-                name={'searchInEventStrings'}
-                checked={checkBoxesState.searchInEventStrings}
-              />
-              <InlineCheckbox
-                label={<Trans>Event sentences</Trans>}
-                name={'searchInEventSentences'}
-                checked={checkBoxesState.searchInEventSentences}
-              />
-              <InlineCheckbox
-                label={<Trans>Include store extensions</Trans>}
-                name={'includeStoreExtensions'}
-                checked={checkBoxesState.includeStoreExtensions}
-              />
-            </form>
+            </div>
           </div>
 
           <div style={styles.resultsArea}>

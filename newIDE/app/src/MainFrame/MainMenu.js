@@ -243,6 +243,7 @@ export const buildMainMenuDeclarativeTemplate = ({
         label: i18n._(t`Global search`),
         onClickSendEvent: 'main-menu-open-global-search',
         enabled: !!project,
+        accelerator: getElectronAccelerator(shortcutMap['OPEN_GLOBAL_SEARCH']),
       },
       // Some Electron specific menu items, not shown in the web-app.
       ...(!!electron

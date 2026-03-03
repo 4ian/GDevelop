@@ -1,11 +1,12 @@
 // @flow
 import * as React from 'react';
 import { type EditorTabsState } from './EditorTabs/EditorTabsHandler';
+import type { EventPath } from '../Types/EventPath';
 
 export type EventNavigationTarget = {|
   name: string,
-  locationType: 'layout' | 'external-events',
-  eventPath: Array<number>,
+  locationType: 'layout' | 'external-events' | 'extension',
+  eventPath: EventPath,
 |};
 
 type UseNavigationToEventProps = {|
@@ -37,7 +38,11 @@ export const useNavigationToEvent = ({
       const timeoutId = setTimeout(() => {
         const { name, locationType, eventPath } = pendingEventNavigation;
         const editorKind =
-          locationType === 'layout' ? 'layout events' : 'external events';
+          locationType === 'layout'
+            ? 'layout events'
+            : locationType === 'external-events'
+            ? 'external events'
+            : 'events functions extension';
 
         for (const paneIdentifier in editorTabs.panes) {
           const pane = editorTabs.panes[paneIdentifier];

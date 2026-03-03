@@ -644,6 +644,7 @@ export const createAiGeneratedEvent = async (
     existingEventsJsonUserRelativeKey,
     placementHint,
     relatedAiRequestId,
+    estimatedComplexity,
   }: {|
     userId: string,
     gameProjectJson: string | null,
@@ -659,6 +660,7 @@ export const createAiGeneratedEvent = async (
     existingEventsJsonUserRelativeKey: string | null,
     placementHint: string | null,
     relatedAiRequestId: string,
+    estimatedComplexity: number | null,
   |}
 ): Promise<CreateAiGeneratedEventResult> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -679,6 +681,7 @@ export const createAiGeneratedEvent = async (
       existingEventsJsonUserRelativeKey,
       placementHint,
       relatedAiRequestId,
+      estimatedComplexity,
     },
     {
       params: {

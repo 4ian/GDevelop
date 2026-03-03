@@ -934,7 +934,7 @@ describe('editorFunctions', () => {
             resultMessage: 'Successfully added explosion events.',
             changes: [
               {
-                operationName: 'add',
+                operationName: 'insert_at_end',
                 operationTargetEvent: null,
                 isEventsJsonValid: true,
                 generatedEvents: JSON.stringify([

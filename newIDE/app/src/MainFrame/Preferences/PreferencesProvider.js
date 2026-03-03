@@ -5,6 +5,8 @@ import PreferencesContext, {
   initialPreferences,
   type Preferences,
   type AlertMessageIdentifier,
+  type EditorStateForProject,
+  type EditorStateForProjectUpdate,
 } from './PreferencesContext';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { getIDEVersion } from '../../Version';
@@ -21,7 +23,6 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
-import { type EditorTabsPersistedState } from '../EditorTabs/EditorTabsHandler';
 import {
   getBrowserLanguageOrLocale,
   setLanguageInDOM,
@@ -1249,24 +1250,50 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _getEditorStateForProject(projectId: string): any {
-    return this.state.values.editorStateByProject[projectId];
+    const editorState = this.state.values.editorStateByProject[projectId];
+    if (!editorState) return null;
+
+    return {
+      editorTabs:
+        editorState.editorTabs == null ? null : editorState.editorTabs,
+      propertiesPanelScroll: editorState.propertiesPanelScroll || {},
+    };
   }
 
   _setEditorStateForProject(
     projectId: string,
-    editorState?: {| editorTabs: EditorTabsPersistedState |}
+    editorState: EditorStateForProjectUpdate | null
   ) {
     this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          editorStateByProject: {
-            ...state.values.editorStateByProject,
-            // $FlowFixMe[incompatible-type]
-            [projectId]: editorState,
+      state => {
+        const nextEditorStateByProject = {
+          ...state.values.editorStateByProject,
+        };
+
+        if (editorState === null) {
+          delete nextEditorStateByProject[projectId];
+        } else {
+          const previousEditorState = state.values.editorStateByProject[
+            projectId
+          ] || {
+            editorTabs: null,
+            propertiesPanelScroll: {},
+          };
+          const mergedEditorState: EditorStateForProject = {
+            ...previousEditorState,
+            ...editorState,
+          };
+
+          nextEditorStateByProject[projectId] = mergedEditorState;
+        }
+
+        return {
+          values: {
+            ...state.values,
+            editorStateByProject: nextEditorStateByProject,
           },
-        },
-      }),
+        };
+      },
       () => this._persistValuesToLocalStorage(this.state)
     );
   }

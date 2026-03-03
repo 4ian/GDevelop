@@ -79,13 +79,22 @@ export const getObjectSizeAndOriginInfo = (
   // Events-based (custom) objects: derive size from their declared area.
   if (project.hasEventsBasedObject(objectType)) {
     const eventsBasedObject = project.getEventsBasedObject(objectType);
-    const minX = eventsBasedObject.getAreaMinX();
-    const maxX = eventsBasedObject.getAreaMaxX();
-    const minY = eventsBasedObject.getAreaMinY();
-    const maxY = eventsBasedObject.getAreaMaxY();
+    const customObjectConfiguration = gd.asCustomObjectConfiguration(
+      objectConfiguration
+    );
+    const variantName = customObjectConfiguration.getVariantName();
+
     const isRenderedIn3D = eventsBasedObject.isRenderedIn3D();
-    const minZ = isRenderedIn3D ? eventsBasedObject.getAreaMinZ() : 0;
-    const maxZ = isRenderedIn3D ? eventsBasedObject.getAreaMaxZ() : 0;
+    const variant = eventsBasedObject.getVariants().hasVariantNamed(variantName)
+      ? eventsBasedObject.getVariants().getVariant(variantName)
+      : eventsBasedObject.getDefaultVariant();
+
+    const minX = variant.getAreaMinX();
+    const maxX = variant.getAreaMaxX();
+    const minY = variant.getAreaMinY();
+    const maxY = variant.getAreaMaxY();
+    const minZ = isRenderedIn3D ? variant.getAreaMinZ() : 0;
+    const maxZ = isRenderedIn3D ? variant.getAreaMaxZ() : 0;
     const width = maxX - minX;
     const height = maxY - minY;
     const depth = maxZ - minZ;

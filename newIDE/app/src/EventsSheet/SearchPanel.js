@@ -1,5 +1,6 @@
 // @flow
 import { Trans, t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import Background from '../UI/Background';
@@ -7,18 +8,13 @@ import TextField, { type TextFieldInterface } from '../UI/TextField';
 import { Column, Line } from '../UI/Grid';
 import IconButton from '../UI/IconButton';
 import FlatButton from '../UI/FlatButton';
-import InlineCheckbox from '../UI/InlineCheckbox';
 import Text from '../UI/Text';
 import {
   type SearchInEventsInputs,
   type ReplaceInEventsInputs,
 } from './EventsSearcher';
 import RaisedButton from '../UI/RaisedButton';
-import {
-  ColumnStackLayout,
-  LineStackLayout,
-  ResponsiveLineStackLayout,
-} from '../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import {
   shouldBrowsePrevious,
   shouldCloseOrCancel,
@@ -29,6 +25,10 @@ import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasur
 import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
 import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 import Cross from '../UI/CustomSvgIcons/Cross';
+import Filter from '../UI/CustomSvgIcons/Filter';
+import MatchCase from '../UI/CustomSvgIcons/MatchCase';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
+import DotBadge from '../UI/DotBadge';
 import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 
 type SearchTypeTab = 'search-and-replace' | 'search-in-event-sentences';
@@ -324,56 +324,59 @@ const SearchPanel = (
                 />
               </LineStackLayout>
             )}
-            <ResponsiveLineStackLayout
+            <LineStackLayout
               noMargin
               alignItems="center"
               justifyContent="space-between"
             >
-              <ResponsiveLineStackLayout noMargin alignItems="center">
-                <LineStackLayout noMargin alignItems="center">
-                  <InlineCheckbox
-                    label={<Trans>Case insensitive</Trans>}
-                    checked={!matchCase}
-                    onCheck={(e, checked) => {
-                      setMatchCase(!checked);
-                    }}
-                  />
-                  {!isMobile && (
-                    <Text>
-                      <Trans>Search in:</Trans>
-                    </Text>
-                  )}
-                  <InlineCheckbox
-                    label={<Trans>Conditions</Trans>}
-                    checked={searchInConditions}
-                    onCheck={(e, checked) => {
-                      setSearchInConditions(checked);
-                    }}
-                  />
-                </LineStackLayout>
-                <Line noMargin alignItems="center">
-                  <InlineCheckbox
-                    label={<Trans>Actions</Trans>}
-                    checked={searchInActions}
-                    onCheck={(e, checked) => {
-                      setSearchInActions(checked);
-                    }}
-                  />
-                  <InlineCheckbox
-                    label={<Trans>Texts</Trans>}
-                    checked={searchInEventStrings}
-                    onCheck={(e, checked) => {
-                      setSearchInEventStrings(checked);
-                    }}
-                  />
-                  {/* <InlineCheckbox //TODO: Implement search/replace in selection
-                label={<Trans>Replace in selection</Trans>}
-                checked={searchInSelection}
-                onCheck={(e, checked) =>
-                  this.setState({ searchInSelection: checked })}
-              /> */}
-                </Line>
-              </ResponsiveLineStackLayout>
+              <LineStackLayout noMargin alignItems="center">
+                <IconButton
+                  size="small"
+                  tooltip={t`Match case`}
+                  selected={matchCase}
+                  onClick={() => setMatchCase(!matchCase)}
+                >
+                  <MatchCase />
+                </IconButton>
+                <ElementWithMenu
+                  element={
+                    <IconButton size="small" tooltip={t`Search filters`}>
+                      <DotBadge
+                        overlap="circle"
+                        color="error"
+                        invisible={
+                          searchInConditions ||
+                          searchInActions ||
+                          searchInEventStrings
+                        }
+                      >
+                        <Filter />
+                      </DotBadge>
+                    </IconButton>
+                  }
+                  buildMenuTemplate={(i18n: I18nType) => [
+                    {
+                      type: 'checkbox',
+                      label: i18n._(t`Conditions`),
+                      checked: searchInConditions,
+                      click: () => setSearchInConditions(!searchInConditions),
+                    },
+                    {
+                      type: 'checkbox',
+                      label: i18n._(t`Actions`),
+                      checked: searchInActions,
+                      click: () => setSearchInActions(!searchInActions),
+                    },
+                    {
+                      type: 'checkbox',
+                      label: i18n._(t`Texts`),
+                      checked: searchInEventStrings,
+                      click: () =>
+                        setSearchInEventStrings(!searchInEventStrings),
+                    },
+                  ]}
+                />
+              </LineStackLayout>
               <Line noMargin alignItems="center" justifyContent="flex-end">
                 <Text>
                   {resultsCount === null || resultsCount === undefined ? (
@@ -414,7 +417,7 @@ const SearchPanel = (
                   }}
                 />
               </Line>
-            </ResponsiveLineStackLayout>
+            </LineStackLayout>
           </ColumnStackLayout>
         </Line>
       </Column>

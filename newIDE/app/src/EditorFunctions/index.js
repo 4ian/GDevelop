@@ -106,6 +106,7 @@ export type EditorFunctionGenericOutput = {|
   generatedEventsErrorDiagnostics?: string,
   aiGeneratedEventId?: string,
   warnings?: string,
+  errors?: Array<string>,
 
   initializedProject?: boolean,
   initializedFromTemplateSlug?: string,
@@ -146,6 +147,7 @@ export type EventsGenerationOptions = {|
   existingEventsJson: string | null,
   placementHint: string,
   relatedAiRequestId: string,
+  estimatedComplexity: number | null,
 |};
 
 export type AssetSearchAndInstallResult = {|
@@ -1084,6 +1086,7 @@ const createOrReplaceObject: EditorFunction = {
         project
       );
       newObject.setName(targetObjectName); // Unserialization has overwritten the name.
+      newObject.resetPersistentUuid();
 
       // Update behaviors shared data for the scene where the object was duplicated.
       if (target_object_scope === 'global') {
@@ -3646,6 +3649,10 @@ const addSceneEvents: EditorFunction = {
       args,
       'objects_list'
     );
+    const estimatedComplexity = SafeExtractor.extractNumberProperty(
+      args,
+      'estimated_complexity'
+    );
     const objectsList = objectsListArgument === null ? '' : objectsListArgument;
     const placementHint =
       SafeExtractor.extractStringProperty(args, 'placement_hint') || '';
@@ -3680,6 +3687,7 @@ const addSceneEvents: EditorFunction = {
           existingEventsJson,
           placementHint,
           relatedAiRequestId,
+          estimatedComplexity,
         }
       );
 
@@ -3804,12 +3812,25 @@ const addSceneEvents: EditorFunction = {
           }
         }
 
-        applyEventsChanges(
+        const { applied, errors } = applyEventsChanges(
           project,
           currentSceneEvents,
           changes,
           aiGeneratedEvent.id
         );
+
+        if (applied === 0) {
+          return {
+            success: false,
+            message: `Changes were properly generated, but could not be applied. Event generation output is:
+
+${aiGeneratedEvent.resultMessage || '(no generation output was given)'}].
+
+No changes were done on the project, see attached errors.`,
+            errors,
+          };
+        }
+
         onSceneEventsModifiedOutsideEditor({
           scene,
           newOrChangedAiGeneratedEventIds: new Set([aiGeneratedEvent.id]),
@@ -3826,13 +3847,20 @@ const addSceneEvents: EditorFunction = {
         });
 
         const resultMessage =
-          aiGeneratedEvent.resultMessage ||
-          'Properly modified or added new event(s).';
+          errors.length > 0
+            ? `Changes were properly generated, but some errors happened when applying some of them in the project. Generation output is:
+
+${aiGeneratedEvent.resultMessage || '(no generation output was given)'}].
+
+See attached errors that happened when some changes were applied in the project. Verify the content of events if necessary to be sure what was done.`
+            : aiGeneratedEvent.resultMessage ||
+              'Properly modified or added new event(s).';
         return {
           success: true,
           message: resultMessage,
           aiGeneratedEventId: aiGeneratedEvent.id,
           newlyAddedResources,
+          ...(errors.length > 0 ? { errors } : undefined),
         };
       } catch (error) {
         console.error(

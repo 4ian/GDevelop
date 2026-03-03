@@ -243,10 +243,10 @@ class GD_CORE_API Object {
   Object& ResetPersistentUuid();
 
   /**
-   * \brief Remove the persistent UUID - when the object no
-   * longer need to be recognized between serializations.
+   * \brief Return the persistent UUID, used to recognize
+   * the same object between serialization.
    */
-  Object& ClearPersistentUuid();
+  const gd::String& GetPersistentUuid() const;
   ///@}
 
  protected:

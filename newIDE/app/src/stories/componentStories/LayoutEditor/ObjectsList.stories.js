@@ -39,6 +39,7 @@ export const Default = (): React.Node => (
         onOpenEventBasedObjectEditor={action('On edit children')}
         onOpenEventBasedObjectVariantEditor={action('On edit variant')}
         onExportAssets={action('On export assets')}
+        onImportAssets={action('On import assets')}
         onAddObjectInstance={action('On add instance to the scene')}
         onObjectCreated={action('On object created')}
         onObjectEdited={action('On object edited')}
@@ -81,6 +82,7 @@ export const WithSerializedObjectView = (): React.Node => (
           onOpenEventBasedObjectEditor={action('On edit children')}
           onOpenEventBasedObjectVariantEditor={action('On edit variant')}
           onExportAssets={action('On export assets')}
+          onImportAssets={action('On import assets')}
           onAddObjectInstance={action('On add instance to the scene')}
           onObjectCreated={action('On object created')}
           onObjectEdited={action('On object edited')}
@@ -123,6 +125,7 @@ export const Locked = (): React.Node => (
         onOpenEventBasedObjectEditor={action('On edit children')}
         onOpenEventBasedObjectVariantEditor={action('On edit variant')}
         onExportAssets={action('On export assets')}
+        onImportAssets={action('On import assets')}
         onAddObjectInstance={action('On add instance to the scene')}
         onObjectCreated={action('On object created')}
         onObjectEdited={action('On object edited')}

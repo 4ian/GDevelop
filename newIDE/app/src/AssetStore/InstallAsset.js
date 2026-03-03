@@ -285,6 +285,7 @@ export const addAssetToProject = async ({
     );
     // The name was overwritten after unserialization.
     object.setName(newName);
+    object.resetPersistentUuid();
     object.setAssetStoreId(asset.id);
     if (project.hasEventsBasedObject(object.getType())) {
       const customObjectConfiguration = gd.asCustomObjectConfiguration(

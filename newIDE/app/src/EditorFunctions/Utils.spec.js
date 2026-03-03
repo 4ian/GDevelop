@@ -205,6 +205,48 @@ describe('getObjectSizeAndOriginInfo', () => {
       });
     });
 
+    it('uses the variant area bounds when a non-default variant is set', () => {
+      const extension = project.insertNewEventsFunctionsExtension(
+        'MyExtVariant',
+        0
+      );
+      const eventsBasedObject = extension
+        .getEventsBasedObjects()
+        .insertNew('MyVariantObject', 0);
+      // Set default variant bounds.
+      eventsBasedObject.setAreaMinX(0);
+      eventsBasedObject.setAreaMaxX(100);
+      eventsBasedObject.setAreaMinY(0);
+      eventsBasedObject.setAreaMaxY(80);
+
+      // Add a named variant with different bounds.
+      const variant = eventsBasedObject
+        .getVariants()
+        .insertNewVariant('Small', 0);
+      variant.setAreaMinX(-5);
+      variant.setAreaMaxX(45);
+      variant.setAreaMinY(-10);
+      variant.setAreaMaxY(30);
+
+      const objects = project.getObjects();
+      const object = objects.insertNewObject(
+        project,
+        'MyExtVariant::MyVariantObject',
+        'MyVariantObjectInstance',
+        objects.getObjectsCount()
+      );
+      const customObjectConfiguration = gd.asCustomObjectConfiguration(
+        object.getConfiguration()
+      );
+      customObjectConfiguration.setVariantName('Small');
+
+      expect(getObjectSizeAndOriginInfo(object, project, null)).toEqual({
+        size: '50x40',
+        origin: '5;10',
+        center: '25;20',
+      });
+    });
+
     it('handles 3D events-based objects with Z bounds included in size/origin/center', () => {
       const extension = project.insertNewEventsFunctionsExtension('MyExt3', 0);
       const eventsBasedObject = extension

@@ -1,6 +1,7 @@
 namespace gdjs {
   /**
    * @category Other extensions > Inventory
+   * @deprecated use the extension from the extension store instead.
    */
   export class Inventory {
     _items: any = {};

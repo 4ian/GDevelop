@@ -36,12 +36,13 @@ import {
 } from '../../ObjectEditor/CompactObjectPropertiesEditor';
 import { ColumnStackLayout } from '../../UI/Layout';
 import Link from '../../UI/Link';
-import { CompactBehaviorPropertiesEditor } from '../../ObjectEditor/CompactObjectPropertiesEditor/CompactBehaviorPropertiesEditor';
 import { IconContainer } from '../../UI/IconContainer';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
+import { usePersistedScrollPosition } from '../../Utils/UsePersistedScrollPosition';
 import EmptyMessage from '../../UI/EmptyMessage';
+import CompactBehaviorsEditorService from '../../ObjectEditor/CompactObjectPropertiesEditor/CompactBehaviorsEditorService';
 
 const gd: libGDevelop = global.gd;
 
@@ -164,6 +165,35 @@ export const CompactInstancePropertiesEditor = ({
       scrollViewRef.current.scrollBy(deltaY);
     }
   }, []);
+
+  const scrollKey = instances
+    .map((instance: gdInitialInstance) => '' + instance.ptr)
+    .join(';');
+
+  const persistedScrollId = React.useMemo(
+    () => {
+      if (!instances.length || !scrollKey) return null;
+
+      const selectedObjectForScroll = getObjectByName(
+        globalObjectsContainer,
+        objectsContainer,
+        instances[0].getObjectName()
+      );
+
+      return selectedObjectForScroll
+        ? selectedObjectForScroll.getPersistentUuid()
+        : null;
+    },
+    [globalObjectsContainer, instances, scrollKey, objectsContainer]
+  );
+
+  const onScroll = usePersistedScrollPosition({
+    project,
+    scrollViewRef,
+    scrollKey,
+    persistedScrollId,
+    persistedScrollType: 'instances-of-object',
+  });
 
   const { object, instanceSchema, allVisibleBehaviors } = React.useMemo<{|
     object?: gdObject,
@@ -313,9 +343,8 @@ export const CompactInstancePropertiesEditor = ({
         ref={scrollViewRef}
         autoHideScrollbar
         style={styles.scrollView}
-        key={instances
-          .map((instance: gdInitialInstance) => '' + instance.ptr)
-          .join(';')}
+        key={scrollKey}
+        onScroll={onScroll}
       >
         <Column expand noMargin id="instance-properties-editor">
           <Column>
@@ -386,9 +415,10 @@ export const CompactInstancePropertiesEditor = ({
                     )
                       ? instance.getBehaviorOverriding(behaviorName)
                       : null;
-
                     const iconUrl = behaviorMetadata.getIconFilename();
-
+                    const CompactBehaviorComponent = CompactBehaviorsEditorService.getEditor(
+                      behaviorTypeName
+                    );
                     return (
                       <StatefulCollapsibleSubPanel
                         key={behavior.ptr}
@@ -406,7 +436,7 @@ export const CompactInstancePropertiesEditor = ({
                                 </Column>
                               )
                             : () => (
-                                <CompactBehaviorPropertiesEditor
+                                <CompactBehaviorComponent
                                   project={project}
                                   behaviorMetadata={behaviorMetadata}
                                   behavior={behavior}

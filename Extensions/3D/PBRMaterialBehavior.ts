@@ -100,7 +100,9 @@ namespace gdjs {
       this._normalMapTextureAsset = '';
       this._aoMapAsset = behaviorData.aoMapAsset || '';
       this._aoMapIntensity = this._clamp(
-        behaviorData.aoMapIntensity !== undefined ? behaviorData.aoMapIntensity : 1,
+        behaviorData.aoMapIntensity !== undefined
+          ? behaviorData.aoMapIntensity
+          : 1,
         0,
         1
       );
@@ -286,7 +288,8 @@ namespace gdjs {
         return false;
       }
       return !!(
-        typedMaterial.isMeshStandardMaterial || typedMaterial.isMeshPhysicalMaterial
+        typedMaterial.isMeshStandardMaterial ||
+        typedMaterial.isMeshPhysicalMaterial
       );
     }
 
@@ -301,9 +304,11 @@ namespace gdjs {
       return owner3DObject.get3DRendererObject() || null;
     }
 
-    private _getThreeSceneAndRenderer():
-      | { scene: THREE.Scene; renderer: THREE.WebGLRenderer; timeMs: number }
-      | null {
+    private _getThreeSceneAndRenderer(): {
+      scene: THREE.Scene;
+      renderer: THREE.WebGLRenderer;
+      timeMs: number;
+    } | null {
       const runtimeScene = this.owner.getRuntimeScene();
       if (!runtimeScene) {
         return null;
@@ -394,10 +399,7 @@ namespace gdjs {
           environmentRenderTarget = pmremGenerator.fromCubemap(
             backgroundTexture as THREE.CubeTexture
           );
-        } else if (
-          backgroundTexture &&
-          (backgroundTexture as any).isTexture
-        ) {
+        } else if (backgroundTexture && (backgroundTexture as any).isTexture) {
           environmentRenderTarget =
             pmremGenerator.fromEquirectangular(backgroundTexture);
         } else {
@@ -645,7 +647,9 @@ namespace gdjs {
         this._patchedMeshes.delete(mesh);
       }
 
-      const originalMaterial = mesh.material as THREE.Material | THREE.Material[];
+      const originalMaterial = mesh.material as
+        | THREE.Material
+        | THREE.Material[];
       const sourceMaterials = Array.isArray(originalMaterial)
         ? originalMaterial.slice()
         : [originalMaterial];

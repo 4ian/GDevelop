@@ -103,7 +103,8 @@ namespace gdjs {
             const height = Math.max(
               1,
               Math.round(
-                (this._renderSize.y || target.getHeight()) * quality.captureScale
+                (this._renderSize.y || target.getHeight()) *
+                  quality.captureScale
               )
             );
             this.shaderPass.setSize(width, height);

@@ -212,7 +212,8 @@ namespace gdjs {
             this.shaderPass.uniforms.density.value = this._density;
             this.shaderPass.uniforms.lightScatter.value = this._lightScatter;
             this.shaderPass.uniforms.maxDistance.value = this._maxDistance;
-            this.shaderPass.uniforms.lightPositions.value = this._lightPositions;
+            this.shaderPass.uniforms.lightPositions.value =
+              this._lightPositions;
             this.shaderPass.uniforms.lightColors.value = this._lightColors;
             this.shaderPass.uniforms.lightRanges.value = this._lightRanges;
             this.shaderPass.enabled = true;
@@ -297,7 +298,8 @@ namespace gdjs {
             }
 
             this.shaderPass.uniforms.lightCount.value = lightCount;
-            this.shaderPass.uniforms.lightPositions.value = this._lightPositions;
+            this.shaderPass.uniforms.lightPositions.value =
+              this._lightPositions;
             this.shaderPass.uniforms.lightColors.value = this._lightColors;
             this.shaderPass.uniforms.lightRanges.value = this._lightRanges;
           }
@@ -354,7 +356,9 @@ namespace gdjs {
             threeCamera.projectionMatrixInverse
               .copy(threeCamera.projectionMatrix)
               .invert();
-            threeCamera.matrixWorldInverse.copy(threeCamera.matrixWorld).invert();
+            threeCamera.matrixWorldInverse
+              .copy(threeCamera.matrixWorld)
+              .invert();
 
             this.shaderPass.enabled = true;
             this.shaderPass.uniforms.resolution.value.set(
@@ -376,8 +380,7 @@ namespace gdjs {
             const quality = gdjs.getScene3DPostProcessingQualityProfileForMode(
               this._qualityMode
             );
-            this.shaderPass.uniforms.stepCount.value =
-              quality.fogSteps;
+            this.shaderPass.uniforms.stepCount.value = quality.fogSteps;
 
             this._updateLightsUniforms(threeScene, threeCamera);
           }

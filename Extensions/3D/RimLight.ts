@@ -65,7 +65,10 @@ namespace gdjs {
           _shadowStrength: number;
           _colorHex: number;
           _debugForceMaxRim: boolean;
-          _patchedMaterials: Map<RimLightPatchedMaterial, RimLightPatchedMaterialState>;
+          _patchedMaterials: Map<
+            RimLightPatchedMaterial,
+            RimLightPatchedMaterialState
+          >;
           _cameraPosition: THREE.Vector3;
           _cameraMatrixWorld: THREE.Matrix4;
           _materialScanCounter: number;
@@ -126,7 +129,9 @@ namespace gdjs {
             this._warnedNoShaderInjection = false;
           }
 
-          private _isMaterialPatchable(material: RimLightPatchedMaterial): boolean {
+          private _isMaterialPatchable(
+            material: RimLightPatchedMaterial
+          ): boolean {
             if (!material) {
               return false;
             }
@@ -156,13 +161,16 @@ namespace gdjs {
           }
 
           private _injectShader(shader: any): boolean {
-            if (shader.fragmentShader.indexOf(rimLightShaderPatchToken) !== -1) {
+            if (
+              shader.fragmentShader.indexOf(rimLightShaderPatchToken) !== -1
+            ) {
               return true;
             }
 
             if (
               shader.vertexShader.indexOf('#include <common>') === -1 ||
-              shader.vertexShader.indexOf('#include <defaultnormal_vertex>') === -1 ||
+              shader.vertexShader.indexOf('#include <defaultnormal_vertex>') ===
+                -1 ||
               shader.vertexShader.indexOf('#include <project_vertex>') === -1 ||
               shader.fragmentShader.indexOf('#include <common>') === -1 ||
               shader.fragmentShader.indexOf('#include <output_fragment>') === -1
@@ -278,14 +286,17 @@ outgoingLight += rimColor * (rimIntensity * scene3dRimStrength);
             uniforms.rimIntensity.value = this._effectEnabled
               ? this._debugForceMaxRim
                 ? 1.0
-                : this._intensity * Math.max(0, Math.min(1, this._shadowStrength))
+                : this._intensity *
+                  Math.max(0, Math.min(1, this._shadowStrength))
               : 0;
             uniforms.rimOuterWrap.value = this._outerWrap;
             uniforms.rimPower.value = this._power;
             uniforms.rimFresnel0.value = this._fresnel0;
             uniforms.rimCameraPosition.value.copy(this._cameraPosition);
             uniforms.rimCameraMatrixWorld.value.copy(this._cameraMatrixWorld);
-            uniforms.rimDebugForceMax.value = this._debugForceMaxRim ? 1.0 : 0.0;
+            uniforms.rimDebugForceMax.value = this._debugForceMaxRim
+              ? 1.0
+              : 0.0;
           }
 
           private _patchMaterial(material: RimLightPatchedMaterial): void {
@@ -299,7 +310,8 @@ outgoingLight += rimColor * (rimIntensity * scene3dRimStrength);
             const originalOnBeforeCompile = material.onBeforeCompile
               ? material.onBeforeCompile
               : () => {};
-            const originalCustomProgramCacheKey = material.customProgramCacheKey;
+            const originalCustomProgramCacheKey =
+              material.customProgramCacheKey;
 
             const patchState: RimLightPatchedMaterialState = {
               originalOnBeforeCompile,
@@ -312,7 +324,11 @@ outgoingLight += rimColor * (rimIntensity * scene3dRimStrength);
               shader: any,
               renderer: THREE.WebGLRenderer
             ) => {
-              patchState.originalOnBeforeCompile.call(material, shader, renderer);
+              patchState.originalOnBeforeCompile.call(
+                material,
+                shader,
+                renderer
+              );
 
               if (!this._injectShader(shader)) {
                 return;

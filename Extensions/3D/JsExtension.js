@@ -384,13 +384,18 @@ module.exports = {
         behaviorProperties
           .getOrCreate('offDuration')
           .setValue(
-            behaviorContent.getChild('offDuration').getDoubleValue().toString(10)
+            behaviorContent
+              .getChild('offDuration')
+              .getDoubleValue()
+              .toString(10)
           )
           .setType('Number')
           .setLabel(_('Off duration (seconds)'));
         behaviorProperties
           .getOrCreate('targetLayerName')
-          .setValue(behaviorContent.getChild('targetLayerName').getStringValue())
+          .setValue(
+            behaviorContent.getChild('targetLayerName').getStringValue()
+          )
           .setType('String')
           .setLabel(_('Target layer name (optional)'))
           .setDescription(
@@ -815,18 +820,25 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('metalness')
-          .setValue(behaviorContent.getChild('metalness').getDoubleValue().toString())
+          .setValue(
+            behaviorContent.getChild('metalness').getDoubleValue().toString()
+          )
           .setType('number')
           .setLabel(_('Metalness'));
         behaviorProperties
           .getOrCreate('roughness')
-          .setValue(behaviorContent.getChild('roughness').getDoubleValue().toString())
+          .setValue(
+            behaviorContent.getChild('roughness').getDoubleValue().toString()
+          )
           .setType('number')
           .setLabel(_('Roughness'));
         behaviorProperties
           .getOrCreate('envMapIntensity')
           .setValue(
-            behaviorContent.getChild('envMapIntensity').getDoubleValue().toString()
+            behaviorContent
+              .getChild('envMapIntensity')
+              .getDoubleValue()
+              .toString()
           )
           .setType('number')
           .setLabel(_('Environment intensity'));
@@ -838,13 +850,18 @@ module.exports = {
         behaviorProperties
           .getOrCreate('emissiveIntensity')
           .setValue(
-            behaviorContent.getChild('emissiveIntensity').getDoubleValue().toString()
+            behaviorContent
+              .getChild('emissiveIntensity')
+              .getDoubleValue()
+              .toString()
           )
           .setType('number')
           .setLabel(_('Emissive intensity'));
         behaviorProperties
           .getOrCreate('normalScale')
-          .setValue(behaviorContent.getChild('normalScale').getDoubleValue().toString())
+          .setValue(
+            behaviorContent.getChild('normalScale').getDoubleValue().toString()
+          )
           .setType('number')
           .setLabel(_('Normal scale'));
         behaviorProperties
@@ -862,7 +879,10 @@ module.exports = {
         behaviorProperties
           .getOrCreate('aoMapIntensity')
           .setValue(
-            behaviorContent.getChild('aoMapIntensity').getDoubleValue().toString()
+            behaviorContent
+              .getChild('aoMapIntensity')
+              .getDoubleValue()
+              .toString()
           )
           .setType('number')
           .setLabel(_('AO intensity'));
@@ -1021,7 +1041,9 @@ module.exports = {
         .addScopedAction(
           'SetNormalMapAsset',
           _('Set normal map'),
-          _('Set the normal map resource used by PBR materials on this object.'),
+          _(
+            'Set the normal map resource used by PBR materials on this object.'
+          ),
           _('Set normal map of _PARAM0_ to _PARAM2_'),
           _('PBR material'),
           'res/conditions/3d_box.svg',
@@ -1051,7 +1073,9 @@ module.exports = {
         .addScopedAction(
           'SetMap',
           _('Set albedo map'),
-          _('Set the albedo (base color) map resource used by PBR materials on this object.'),
+          _(
+            'Set the albedo (base color) map resource used by PBR materials on this object.'
+          ),
           _('Set albedo map of _PARAM0_ to _PARAM2_'),
           _('PBR material'),
           'res/conditions/3d_box.svg',
@@ -2863,9 +2887,7 @@ module.exports = {
         .setValue('0.02')
         .setLabel(_('Shadow normal bias'))
         .setDescription(
-          _(
-            'Offset along normals to reduce acne on sloped/curved surfaces.'
-          )
+          _('Offset along normals to reduce acne on sloped/curved surfaces.')
         )
         .setType('number')
         .setGroup(_('Shadows'))
@@ -2932,9 +2954,7 @@ module.exports = {
         .setValue('2000')
         .setLabel(_('Max shadow distance'))
         .setDescription(
-          _(
-            'Maximum world distance covered by cascaded directional shadows.'
-          )
+          _('Maximum world distance covered by cascaded directional shadows.')
         )
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
@@ -3200,9 +3220,7 @@ module.exports = {
         .setValue('0')
         .setLabel(_('Maximum distance'))
         .setDescription(
-          _(
-            'Maximum range of the light. 0 means unlimited range.'
-          )
+          _('Maximum range of the light. 0 means unlimited range.')
         )
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
@@ -3247,7 +3265,9 @@ module.exports = {
         .setValue('0.02')
         .setLabel(_('Shadow normal bias'))
         .setDescription(
-          _('Offset along object normals to prevent acne on curved surfaces. Default: 0.02.')
+          _(
+            'Offset along object normals to prevent acne on curved surfaces. Default: 0.02.'
+          )
         )
         .setType('number')
         .setGroup(_('Shadows'));
@@ -3255,9 +3275,7 @@ module.exports = {
         .getOrCreate('shadowRadius')
         .setValue('1.5')
         .setLabel(_('Shadow softness'))
-        .setDescription(
-          _('Softness radius for point-light shadow filtering.')
-        )
+        .setDescription(_('Softness radius for point-light shadow filtering.'))
         .setType('number')
         .setGroup(_('Shadows'));
       properties
@@ -3504,9 +3522,7 @@ module.exports = {
         .setValue('0')
         .setLabel(_('Maximum distance'))
         .setDescription(
-          _(
-            'Maximum range of the light. 0 means unlimited range.'
-          )
+          _('Maximum range of the light. 0 means unlimited range.')
         )
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
@@ -3559,9 +3575,7 @@ module.exports = {
         .getOrCreate('shadowRadius')
         .setValue('1.5')
         .setLabel(_('Shadow softness'))
-        .setDescription(
-          _('Softness radius for spot-light shadow filtering.')
-        )
+        .setDescription(_('Softness radius for spot-light shadow filtering.'))
         .setType('number')
         .setGroup(_('Shadows'));
       properties
@@ -3801,14 +3815,18 @@ module.exports = {
         .setLabel(_('Max distance'))
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setDescription(_('Maximum reflection tracing distance (balanced for performance).'));
+        .setDescription(
+          _('Maximum reflection tracing distance (balanced for performance).')
+        );
       properties
         .getOrCreate('thickness')
         .setValue('4')
         .setLabel(_('Thickness'))
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setDescription(_('Depth tolerance to detect reflection hits reliably.'));
+        .setDescription(
+          _('Depth tolerance to detect reflection hits reliably.')
+        );
       properties
         .getOrCreate('qualityMode')
         .setValue('medium')
@@ -3950,7 +3968,9 @@ module.exports = {
         .setValue('4')
         .setLabel(_('Samples'))
         .setType('number')
-        .setDescription(_('Quality/performance control (higher = better, slower).'));
+        .setDescription(
+          _('Quality/performance control (higher = better, slower).')
+        );
       properties
         .getOrCreate('qualityMode')
         .setValue('medium')
@@ -4040,7 +4060,9 @@ module.exports = {
         .setLabel(_('Focus range'))
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setDescription(_('How gradually blur increases around focus distance.'));
+        .setDescription(
+          _('How gradually blur increases around focus distance.')
+        );
       properties
         .getOrCreate('maxBlur')
         .setValue('6')
@@ -4052,7 +4074,9 @@ module.exports = {
         .setValue('4')
         .setLabel(_('Samples'))
         .setType('number')
-        .setDescription(_('Blur taps around each pixel (higher = smoother, slower).'));
+        .setDescription(
+          _('Blur taps around each pixel (higher = smoother, slower).')
+        );
       properties
         .getOrCreate('qualityMode')
         .setValue('medium')

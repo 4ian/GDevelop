@@ -152,7 +152,10 @@ namespace gdjs {
                 : 6;
             this._samples =
               effectData.doubleParameters.samples !== undefined
-                ? Math.max(2, Math.min(8, Math.round(effectData.doubleParameters.samples)))
+                ? Math.max(
+                    2,
+                    Math.min(8, Math.round(effectData.doubleParameters.samples))
+                  )
                 : 4;
             this._effectiveSamples = this._samples;
             this._effectiveBlurScale = 1.0;

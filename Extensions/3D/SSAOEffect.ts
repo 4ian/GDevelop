@@ -202,7 +202,13 @@ namespace gdjs {
                 : 0.6;
             this._samples =
               effectData.doubleParameters.samples !== undefined
-                ? Math.max(4, Math.min(32, Math.round(effectData.doubleParameters.samples)))
+                ? Math.max(
+                    4,
+                    Math.min(
+                      32,
+                      Math.round(effectData.doubleParameters.samples)
+                    )
+                  )
                 : 4;
             this._effectiveSamples = this._samples;
             this._qualityMode =
@@ -334,10 +340,7 @@ namespace gdjs {
             } else if (parameterName === 'bias') {
               this._bias = Math.max(0, value);
             } else if (parameterName === 'samples') {
-              this._samples = Math.max(
-                4,
-                Math.min(32, Math.round(value))
-              );
+              this._samples = Math.max(4, Math.min(32, Math.round(value)));
             }
           }
           getDoubleParameter(parameterName: string): number {

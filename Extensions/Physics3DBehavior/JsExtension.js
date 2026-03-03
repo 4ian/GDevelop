@@ -2520,6 +2520,19 @@ module.exports = {
 
       aut
         .addExpression(
+          'MassCenterY',
+          _('Mass center Y'),
+          _('Mass center Y'),
+          '',
+          'JsPlatform/Extensions/physics3d.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics3DBehavior')
+        .getCodeExtraInformation()
+        .setFunctionName('getMassCenterY');
+
+      aut
+        .addExpression(
           'MassCenterZ',
           _('Mass center Z'),
           _('Mass center Z'),

@@ -2526,6 +2526,447 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('setColor');
 
+    const SpotLightObject = new gd.ObjectJsImplementation();
+    SpotLightObject.updateProperty = function (propertyName, newValue) {
+      const objectContent = this.content;
+      if (
+        propertyName === 'width' ||
+        propertyName === 'height' ||
+        propertyName === 'depth' ||
+        propertyName === 'intensity' ||
+        propertyName === 'distance' ||
+        propertyName === 'angle' ||
+        propertyName === 'penumbra' ||
+        propertyName === 'decay' ||
+        propertyName === 'shadowBias' ||
+        propertyName === 'shadowNormalBias' ||
+        propertyName === 'shadowRadius' ||
+        propertyName === 'shadowNear' ||
+        propertyName === 'shadowFar'
+      ) {
+        const value = parseFloat(newValue);
+        if (value !== value) {
+          return false;
+        }
+        objectContent[propertyName] = value;
+        return true;
+      }
+      if (propertyName === 'color' || propertyName === 'shadowQuality') {
+        objectContent[propertyName] = newValue;
+        return true;
+      }
+      if (
+        propertyName === 'enabled' ||
+        propertyName === 'castShadow' ||
+        propertyName === 'guardrailsEnabled'
+      ) {
+        objectContent[propertyName] = newValue === '1' || newValue === 'true';
+        return true;
+      }
+
+      return false;
+    };
+    SpotLightObject.getProperties = function () {
+      const objectProperties = new gd.MapStringPropertyDescriptor();
+      const objectContent = this.content;
+
+      objectProperties
+        .getOrCreate('width')
+        .setValue((objectContent.width || 0).toString())
+        .setType('number')
+        .setLabel(_('Width'))
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Default size'));
+      objectProperties
+        .getOrCreate('height')
+        .setValue((objectContent.height || 0).toString())
+        .setType('number')
+        .setLabel(_('Height'))
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Default size'));
+      objectProperties
+        .getOrCreate('depth')
+        .setValue((objectContent.depth || 0).toString())
+        .setType('number')
+        .setLabel(_('Depth'))
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Default size'));
+
+      objectProperties
+        .getOrCreate('enabled')
+        .setValue(objectContent.enabled ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Enabled'))
+        .setGroup(_('Light'));
+      objectProperties
+        .getOrCreate('color')
+        .setValue(objectContent.color || '255;255;255')
+        .setType('color')
+        .setLabel(_('Color'))
+        .setGroup(_('Light'));
+      objectProperties
+        .getOrCreate('intensity')
+        .setValue((objectContent.intensity || 0).toString())
+        .setType('number')
+        .setLabel(_('Intensity'))
+        .setGroup(_('Light'));
+      objectProperties
+        .getOrCreate('distance')
+        .setValue((objectContent.distance || 0).toString())
+        .setType('number')
+        .setLabel(_('Maximum distance'))
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setDescription(_('0 means unlimited range.'))
+        .setGroup(_('Light'));
+      objectProperties
+        .getOrCreate('angle')
+        .setValue((objectContent.angle || 0).toString())
+        .setType('number')
+        .setLabel(_('Cone angle'))
+        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+        .setDescription(_('Maximum cone angle in degrees.'))
+        .setGroup(_('Light'));
+      objectProperties
+        .getOrCreate('penumbra')
+        .setValue((objectContent.penumbra || 0).toString())
+        .setType('number')
+        .setLabel(_('Penumbra'))
+        .setDescription(_('Edge softness, between 0 and 1.'))
+        .setGroup(_('Light'));
+      objectProperties
+        .getOrCreate('decay')
+        .setValue((objectContent.decay || 0).toString())
+        .setType('number')
+        .setLabel(_('Decay'))
+        .setDescription(_('How quickly light fades with distance.'))
+        .setGroup(_('Light'));
+
+      objectProperties
+        .getOrCreate('guardrailsEnabled')
+        .setValue(objectContent.guardrailsEnabled ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Use nearest-lights guardrails'))
+        .setDescription(
+          _(
+            'If enabled, this light participates in the nearest-lights limit system.'
+          )
+        )
+        .setGroup(_('Performance'))
+        .setAdvanced(true);
+
+      objectProperties
+        .getOrCreate('castShadow')
+        .setValue(objectContent.castShadow ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Shadow casting'))
+        .setGroup(_('Shadows'));
+      objectProperties
+        .getOrCreate('shadowQuality')
+        .setValue(objectContent.shadowQuality || 'medium')
+        .setType('choice')
+        .addChoice('low', _('Low quality'))
+        .addChoice('medium', _('Medium quality'))
+        .addChoice('high', _('High quality'))
+        .setLabel(_('Shadow quality'))
+        .setGroup(_('Shadows'));
+      objectProperties
+        .getOrCreate('shadowBias')
+        .setValue((objectContent.shadowBias || 0).toString())
+        .setType('number')
+        .setLabel(_('Shadow bias'))
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      objectProperties
+        .getOrCreate('shadowNormalBias')
+        .setValue((objectContent.shadowNormalBias || 0).toString())
+        .setType('number')
+        .setLabel(_('Shadow normal bias'))
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      objectProperties
+        .getOrCreate('shadowRadius')
+        .setValue((objectContent.shadowRadius || 0).toString())
+        .setType('number')
+        .setLabel(_('Shadow softness'))
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      objectProperties
+        .getOrCreate('shadowNear')
+        .setValue((objectContent.shadowNear || 0).toString())
+        .setType('number')
+        .setLabel(_('Shadow near'))
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      objectProperties
+        .getOrCreate('shadowFar')
+        .setValue((objectContent.shadowFar || 0).toString())
+        .setType('number')
+        .setLabel(_('Shadow far'))
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+
+      return objectProperties;
+    };
+    SpotLightObject.content = {
+      width: 48,
+      height: 48,
+      depth: 48,
+      enabled: true,
+      color: '255;244;214',
+      intensity: 1,
+      distance: 600,
+      angle: 45,
+      penumbra: 0.1,
+      decay: 2,
+      castShadow: false,
+      shadowQuality: 'medium',
+      shadowBias: 0.001,
+      shadowNormalBias: 0.02,
+      shadowRadius: 1.5,
+      shadowNear: 1,
+      shadowFar: 2000,
+      guardrailsEnabled: true,
+    };
+    SpotLightObject.updateInitialInstanceProperty = function (
+      instance,
+      propertyName,
+      newValue
+    ) {
+      return false;
+    };
+    SpotLightObject.getInitialInstanceProperties = function (instance) {
+      const instanceProperties = new gd.MapStringPropertyDescriptor();
+      return instanceProperties;
+    };
+
+    const spotLightObject = extension
+      .addObject(
+        'SpotLightObject',
+        _('3D Spot Light'),
+        _(
+          'A spotlight object for 3D scenes. Includes nearest-lights guardrails to keep performance stable.'
+        ),
+        'CppPlatform/Extensions/lightIcon32.png',
+        SpotLightObject
+      )
+      .setCategory('Visual effect')
+      .addDefaultBehavior('ResizableCapability::ResizableBehavior')
+      .addDefaultBehavior('ScalableCapability::ScalableBehavior')
+      .addDefaultBehavior('FlippableCapability::FlippableBehavior')
+      .addDefaultBehavior('Scene3D::Base3DBehavior')
+      .markAsRenderedIn3D()
+      .setIncludeFile('Extensions/3D/A_RuntimeObject3D.js')
+      .addIncludeFile('Extensions/3D/A_RuntimeObject3DRenderer.js')
+      .addIncludeFile('Extensions/3D/SpotLightRuntimeObject.js');
+
+    spotLightObject
+      .addExpressionAndConditionAndAction(
+        'boolean',
+        'Enabled',
+        _('Enabled'),
+        _('if the spot light is enabled'),
+        _('enabled'),
+        _('Spot light'),
+        'CppPlatform/Extensions/lightIcon24.png'
+      )
+      .addParameter('object', _('3D spot light'), 'SpotLightObject', false)
+      .useStandardParameters(
+        'boolean',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Enable or disable this light.')
+        )
+      )
+      .setFunctionName('setEnabled')
+      .setGetter('isEnabled');
+
+    spotLightObject
+      .addScopedCondition(
+        'IsActiveAfterGuardrails',
+        _('Is active after guardrails'),
+        _('Check if this spot light is currently active after guardrails.'),
+        _('_PARAM0_ is active after guardrails'),
+        _('Spot light'),
+        'CppPlatform/Extensions/lightIcon24.png',
+        'CppPlatform/Extensions/lightIcon16.png'
+      )
+      .addParameter('object', _('3D spot light'), 'SpotLightObject', false)
+      .setFunctionName('isActiveAfterGuardrails');
+
+    spotLightObject
+      .addScopedAction(
+        'SetColor',
+        _('Color'),
+        _('Set the light color.'),
+        _('Set color of _PARAM0_ to _PARAM1_'),
+        _('Spot light'),
+        'res/actions/color24.png',
+        'res/actions/color.png'
+      )
+      .addParameter('object', _('3D spot light'), 'SpotLightObject', false)
+      .addParameter('color', _('Color'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('setColor');
+
+    spotLightObject
+      .addExpressionAndConditionAndAction(
+        'number',
+        'Intensity',
+        _('Intensity'),
+        _('the light intensity'),
+        _('the intensity'),
+        _('Spot light'),
+        'CppPlatform/Extensions/lightIcon24.png'
+      )
+      .addParameter('object', _('3D spot light'), 'SpotLightObject', false)
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setIntensity')
+      .setGetter('getIntensity');
+
+    spotLightObject
+      .addExpressionAndConditionAndAction(
+        'number',
+        'Distance',
+        _('Maximum distance'),
+        _('the maximum distance'),
+        _('the maximum distance'),
+        _('Spot light'),
+        'CppPlatform/Extensions/lightIcon24.png'
+      )
+      .addParameter('object', _('3D spot light'), 'SpotLightObject', false)
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Maximum range of the light. 0 means unlimited.')
+        )
+      )
+      .setFunctionName('setDistance')
+      .setGetter('getDistance');
+
+    spotLightObject
+      .addExpressionAndConditionAndAction(
+        'number',
+        'Angle',
+        _('Cone angle'),
+        _('the cone angle in degrees'),
+        _('the cone angle'),
+        _('Spot light'),
+        'CppPlatform/Extensions/lightIcon24.png'
+      )
+      .addParameter('object', _('3D spot light'), 'SpotLightObject', false)
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Cone angle in degrees.')
+        )
+      )
+      .setFunctionName('setConeAngle')
+      .setGetter('getConeAngle');
+
+    spotLightObject
+      .addExpressionAndConditionAndAction(
+        'number',
+        'Penumbra',
+        _('Penumbra'),
+        _('the penumbra between 0 and 1'),
+        _('the penumbra'),
+        _('Spot light'),
+        'CppPlatform/Extensions/lightIcon24.png'
+      )
+      .addParameter('object', _('3D spot light'), 'SpotLightObject', false)
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setPenumbra')
+      .setGetter('getPenumbra');
+
+    spotLightObject
+      .addExpressionAndConditionAndAction(
+        'number',
+        'Decay',
+        _('Decay'),
+        _('the light decay'),
+        _('the decay'),
+        _('Spot light'),
+        'CppPlatform/Extensions/lightIcon24.png'
+      )
+      .addParameter('object', _('3D spot light'), 'SpotLightObject', false)
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setDecay')
+      .setGetter('getDecay');
+
+    spotLightObject
+      .addExpressionAndConditionAndAction(
+        'boolean',
+        'CastShadow',
+        _('Shadow casting'),
+        _('if shadow casting is enabled'),
+        _('shadow casting'),
+        _('Spot light'),
+        'CppPlatform/Extensions/lightIcon24.png'
+      )
+      .addParameter('object', _('3D spot light'), 'SpotLightObject', false)
+      .useStandardParameters(
+        'boolean',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Enable or disable shadow casting.')
+        )
+      )
+      .setFunctionName('setCastShadow')
+      .setGetter('isCastingShadow');
+
+    spotLightObject
+      .addExpressionAndConditionAndAction(
+        'boolean',
+        'GuardrailsEnabled',
+        _('Use nearest-lights guardrails'),
+        _('if nearest-lights guardrails are enabled for this light'),
+        _('nearest-lights guardrails'),
+        _('Spot light'),
+        'CppPlatform/Extensions/lightIcon24.png'
+      )
+      .addParameter('object', _('3D spot light'), 'SpotLightObject', false)
+      .useStandardParameters(
+        'boolean',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _(
+            'If enabled, this light is managed by the nearest-lights limit system.'
+          )
+        )
+      )
+      .setFunctionName('setGuardrailsEnabled')
+      .setGetter('areGuardrailsEnabled');
+
+    extension
+      .addAction(
+        'SetMaxActiveSpotLights',
+        _('Set max active 3D spot lights'),
+        _(
+          'Set the maximum number of active spot lights for a layer (nearest to camera are kept active).'
+        ),
+        _('Set max active 3D spot lights on layer _PARAM1_ to _PARAM2_'),
+        _('Layers and cameras'),
+        'CppPlatform/Extensions/lightIcon24.png',
+        'CppPlatform/Extensions/lightIcon16.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Maximum active spot lights'), '', false)
+      .setFunctionName('gdjs.scene3d.spotLights.setMaxActiveSpotLights')
+      .setIncludeFile('Extensions/3D/SpotLightRuntimeObject.js');
+
+    extension
+      .addExpression(
+        'MaxActiveSpotLights',
+        _('Max active 3D spot lights'),
+        _('the maximum number of active 3D spot lights on the layer'),
+        _('Layers and cameras'),
+        'CppPlatform/Extensions/lightIcon24.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .setFunctionName('gdjs.scene3d.spotLights.getMaxActiveSpotLights')
+      .setIncludeFile('Extensions/3D/SpotLightRuntimeObject.js');
+
     extension
       .addExpressionAndConditionAndAction(
         'number',
@@ -4129,7 +4570,14 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerEditorConfigurations: function (objectsEditorService) {},
+  registerEditorConfigurations: function (objectsEditorService) {
+    objectsEditorService.registerEditorConfiguration(
+      'Scene3D::SpotLightObject',
+      objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
+        helpPagePath: '/all-features/3d/reference',
+      })
+    );
+  },
   /**
    * Register renderers for instance of objects on the scene editor.
    *
@@ -4216,6 +4664,276 @@ module.exports = {
       transparentMaterial = newTransparentMaterial;
       return newTransparentMaterial;
     };
+
+    class RenderedSpotLightObject2DInstance extends RenderedInstance {
+      /** @type {number} */
+      _defaultWidth;
+      /** @type {number} */
+      _defaultHeight;
+      /** @type {number} */
+      _defaultDepth;
+      _coneGraphics;
+      _originGraphics;
+
+      constructor(
+        project,
+        instance,
+        associatedObjectConfiguration,
+        pixiContainer,
+        pixiResourcesLoader
+      ) {
+        super(
+          project,
+          instance,
+          associatedObjectConfiguration,
+          pixiContainer,
+          pixiResourcesLoader
+        );
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
+        this._defaultWidth = object.content.width || 48;
+        this._defaultHeight = object.content.height || 48;
+        this._defaultDepth = object.content.depth || 48;
+
+        this._pixiObject = new PIXI.Container();
+        this._coneGraphics = new PIXI.Graphics();
+        this._originGraphics = new PIXI.Graphics();
+        this._pixiObject.addChild(this._coneGraphics);
+        this._pixiObject.addChild(this._originGraphics);
+        this._pixiContainer.addChild(this._pixiObject);
+      }
+
+      onRemovedFromScene() {
+        super.onRemovedFromScene();
+        this._pixiObject.destroy({ children: true });
+      }
+
+      static getThumbnail() {
+        return 'CppPlatform/Extensions/lightIcon32.png';
+      }
+
+      update() {
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
+
+        this._defaultWidth = object.content.width || 48;
+        this._defaultHeight = object.content.height || 48;
+        this._defaultDepth = object.content.depth || 48;
+
+        const width = this.getWidth();
+        const height = this.getHeight();
+        const centerX = width / 2;
+        const centerY = height / 2;
+        this._pixiObject.position.x = this._instance.getX() + centerX;
+        this._pixiObject.position.y = this._instance.getY() + centerY;
+        this._pixiObject.angle = this._instance.getAngle();
+
+        const distance = Math.max(0, Number(object.content.distance || 0));
+        const angle = Math.max(
+          1,
+          Math.min(89, Number(object.content.angle || 45))
+        );
+        const previewDistance = Math.max(
+          20,
+          Math.min(220, distance > 0 ? distance * 0.25 : 120)
+        );
+        const halfAngleInRad = (angle * Math.PI) / 360;
+        const leftX = -Math.sin(halfAngleInRad) * previewDistance;
+        const leftY = -Math.cos(halfAngleInRad) * previewDistance;
+        const rightX = -leftX;
+        const rightY = leftY;
+
+        const color = objectsRenderingService.rgbOrHexToHexNumber(
+          object.content.color || '255;255;255'
+        );
+        const enabled = object.content.enabled !== false;
+        const guardrailsEnabled = object.content.guardrailsEnabled !== false;
+
+        this._coneGraphics.clear();
+        this._coneGraphics.lineStyle(2, color, enabled ? 0.85 : 0.4);
+        this._coneGraphics.beginFill(color, enabled ? 0.12 : 0.05);
+        this._coneGraphics.moveTo(0, 0);
+        this._coneGraphics.lineTo(leftX, leftY);
+        this._coneGraphics.lineTo(rightX, rightY);
+        this._coneGraphics.closePath();
+        this._coneGraphics.endFill();
+
+        this._originGraphics.clear();
+        this._originGraphics.beginFill(color, enabled ? 0.95 : 0.5);
+        this._originGraphics.drawCircle(0, 0, 7);
+        this._originGraphics.endFill();
+        this._originGraphics.lineStyle(
+          2,
+          guardrailsEnabled ? 0x5cf26f : 0xb0b0b0,
+          0.85
+        );
+        this._originGraphics.drawCircle(0, 0, 10);
+      }
+
+      getDefaultWidth() {
+        return this._defaultWidth;
+      }
+
+      getDefaultHeight() {
+        return this._defaultHeight;
+      }
+
+      getDefaultDepth() {
+        return this._defaultDepth;
+      }
+    }
+
+    class RenderedSpotLightObject3DInstance extends Rendered3DInstance {
+      /** @type {number} */
+      _defaultWidth;
+      /** @type {number} */
+      _defaultHeight;
+      /** @type {number} */
+      _defaultDepth;
+      _coneMesh;
+      _originMesh;
+
+      constructor(
+        project,
+        instance,
+        associatedObjectConfiguration,
+        pixiContainer,
+        threeGroup,
+        pixiResourcesLoader
+      ) {
+        super(
+          project,
+          instance,
+          associatedObjectConfiguration,
+          pixiContainer,
+          threeGroup,
+          pixiResourcesLoader
+        );
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
+        this._defaultWidth = object.content.width || 48;
+        this._defaultHeight = object.content.height || 48;
+        this._defaultDepth = object.content.depth || 48;
+
+        this._pixiObject = new PIXI.Graphics();
+        this._pixiContainer.addChild(this._pixiObject);
+
+        const markerGroup = new THREE.Group();
+        const originMesh = new THREE.Mesh(
+          new THREE.SphereGeometry(0.08, 14, 12),
+          new THREE.MeshBasicMaterial({
+            color: 0xffeb8a,
+            transparent: true,
+            opacity: 0.95,
+            depthWrite: false,
+          })
+        );
+        const coneMesh = new THREE.Mesh(
+          new THREE.ConeGeometry(0.16, 0.55, 20, 1, true),
+          new THREE.MeshBasicMaterial({
+            color: 0xffeb8a,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.85,
+            depthWrite: false,
+          })
+        );
+        coneMesh.rotation.x = Math.PI / 2;
+        coneMesh.position.z = -0.28;
+        markerGroup.add(originMesh);
+        markerGroup.add(coneMesh);
+
+        this._threeObject = markerGroup;
+        this._threeGroup.add(markerGroup);
+        this._originMesh = originMesh;
+        this._coneMesh = coneMesh;
+      }
+
+      onRemovedFromScene() {
+        super.onRemovedFromScene();
+        this._pixiObject.destroy({ children: true });
+      }
+
+      static getThumbnail() {
+        return 'CppPlatform/Extensions/lightIcon32.png';
+      }
+
+      update() {
+        const object = gd.castObject(
+          this._associatedObjectConfiguration,
+          gd.ObjectJsImplementation
+        );
+        this._defaultWidth = object.content.width || 48;
+        this._defaultHeight = object.content.height || 48;
+        this._defaultDepth = object.content.depth || 48;
+
+        const width = this.getWidth();
+        const height = this.getHeight();
+        const depth = this.getDepth();
+
+        const x = this._instance.getX() + width / 2;
+        const y = this._instance.getY() + height / 2;
+        const z = this._instance.getZ() + depth / 2;
+        this._threeObject.position.set(x, y, z);
+        this._threeObject.rotation.set(
+          RenderedInstance.toRad(this._instance.getRotationX()),
+          RenderedInstance.toRad(this._instance.getRotationY()),
+          RenderedInstance.toRad(this._instance.getAngle())
+        );
+
+        const angle = Math.max(
+          1,
+          Math.min(89, Number(object.content.angle || 45))
+        );
+        const distance = Math.max(0, Number(object.content.distance || 0));
+        const coneRadiusScale = Math.max(
+          0.25,
+          Math.tan(RenderedInstance.toRad(angle / 2))
+        );
+        const coneLengthScale = Math.max(
+          0.7,
+          Math.min(2.4, distance > 0 ? distance / 320 : 1.2)
+        );
+        this._coneMesh.scale.set(
+          coneRadiusScale,
+          coneLengthScale,
+          coneRadiusScale
+        );
+
+        const color = objectsRenderingService.rgbOrHexToHexNumber(
+          object.content.color || '255;255;255'
+        );
+        const enabled = object.content.enabled !== false;
+        this._originMesh.material.color.setHex(color);
+        this._coneMesh.material.color.setHex(color);
+        this._originMesh.material.opacity = enabled ? 0.95 : 0.4;
+        this._coneMesh.material.opacity = enabled ? 0.85 : 0.25;
+
+        this._pixiObject.clear();
+        this._pixiObject.beginFill(color, enabled ? 0.55 : 0.25);
+        this._pixiObject.drawCircle(0, 0, 5);
+        this._pixiObject.endFill();
+        this._pixiObject.position.set(x, y);
+      }
+
+      getDefaultWidth() {
+        return this._defaultWidth;
+      }
+
+      getDefaultHeight() {
+        return this._defaultHeight;
+      }
+
+      getDefaultDepth() {
+        return this._defaultDepth;
+      }
+    }
 
     class RenderedCube3DObject2DInstance extends RenderedInstance {
       /** @type {number} */
@@ -4923,6 +5641,15 @@ module.exports = {
         return this._defaultDepth;
       }
     }
+
+    objectsRenderingService.registerInstanceRenderer(
+      'Scene3D::SpotLightObject',
+      RenderedSpotLightObject2DInstance
+    );
+    objectsRenderingService.registerInstance3DRenderer(
+      'Scene3D::SpotLightObject',
+      RenderedSpotLightObject3DInstance
+    );
 
     objectsRenderingService.registerInstanceRenderer(
       'Scene3D::Cube3DObject',

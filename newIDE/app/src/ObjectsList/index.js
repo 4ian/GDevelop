@@ -423,6 +423,7 @@ const objectTypeToDefaultName = {
   'TextInput::TextInputObject': 'NewTextInput',
   'Scene3D::Model3DObject': 'New3DModel',
   'Scene3D::Cube3DObject': 'New3DBox',
+  'Scene3D::SpotLightObject': 'New3DSpotLight',
   'SpineObject::SpineObject': 'NewSpine',
   'Video::VideoObject': 'NewVideo',
 };

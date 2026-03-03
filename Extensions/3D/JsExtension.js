@@ -1946,6 +1946,8 @@ module.exports = {
         const value = parseFloat(rawValue);
         return Number.isFinite(value) ? value : fallbackValue;
       };
+      const clampNumber = (value, minValue, maxValue) =>
+        Math.max(minValue, Math.min(maxValue, value));
       PointLight3DObject.updateProperty = function (propertyName, newValue) {
         const objectContent = this.content;
 
@@ -1963,18 +1965,20 @@ module.exports = {
         }
 
         if (propertyName === 'distance') {
-          objectContent.distance = parseValidNumber(
+          const rawDistance = parseValidNumber(
             newValue,
             objectContent.distance !== undefined ? objectContent.distance : 100
           );
+          objectContent.distance = Math.max(0, rawDistance);
           return true;
         }
 
         if (propertyName === 'decay') {
-          objectContent.decay = parseValidNumber(
+          const rawDecay = parseValidNumber(
             newValue,
             objectContent.decay !== undefined ? objectContent.decay : 2
           );
+          objectContent.decay = clampNumber(rawDecay, 0, 2);
           return true;
         }
 
@@ -2753,6 +2757,41 @@ module.exports = {
         .setLabel(_('Saturation'))
         .setType('number')
         .setDescription(_('Between -1 and 1'));
+    }
+    {
+      const effect = extension
+        .addEffect('ToneMapping')
+        .setFullName(_('Tone mapping'))
+        .setDescription(
+          _(
+            'Apply renderer tone mapping for 3D rendering (global to the scene renderer). Recommended default: ACES Filmic with exposure 1.0.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/ToneMappingEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('toneMapping')
+        .setValue('acesFilmic')
+        .addChoice('none', _('None'))
+        .addChoice('linear', _('Linear'))
+        .addChoice('reinhard', _('Reinhard'))
+        .addChoice('cineon', _('Cineon'))
+        .addChoice('acesFilmic', _('ACES Filmic (recommended)'))
+        .setLabel(_('Tone mapping'))
+        .setDescription(
+          _(
+            'None: no tonemapping. Linear/Reinhard/Cineon: legacy looks. ACES Filmic: best default for realistic highlights.'
+          )
+        )
+        .setType('choice');
+      properties
+        .getOrCreate('exposure')
+        .setValue('1')
+        .setLabel(_('Exposure'))
+        .setType('number')
+        .setDescription(_('Range 0 to 10. Typical values: 0.8 to 1.4.'));
     }
     {
       const effect = extension
@@ -3685,28 +3724,12 @@ module.exports = {
       update() {
         const width = 48;
         const height = 48;
-        const object = gd.castObject(
-          this._associatedObjectConfiguration,
-          gd.ObjectJsImplementation
-        );
-        const color = object.content.color || '255;255;255';
-        const [r, g, b] = color.split(';').map((v) => parseInt(v));
-        const colorHex = (r << 16) | (g << 8) | b;
 
         this._pixiObject.clear();
-        // Draw light helper icon with a larger clickable area.
-        this._pixiObject.beginFill(colorHex, 0.95);
-        this._pixiObject.lineStyle(2, 0xffaa00, 1);
-        this._pixiObject.drawCircle(0, 0, 16);
+        this._pixiObject.beginFill(0x999999, 0.2);
+        this._pixiObject.lineStyle(1, 0xffd900, 0);
+        this._pixiObject.drawRect(-width / 2, -height / 2, width, height);
         this._pixiObject.endFill();
-
-        // Draw rays
-        for (let i = 0; i < 8; i++) {
-          const angle = (i / 8) * Math.PI * 2;
-          this._pixiObject.lineStyle(2, colorHex, 0.8);
-          this._pixiObject.moveTo(Math.cos(angle) * 18, Math.sin(angle) * 18);
-          this._pixiObject.lineTo(Math.cos(angle) * 26, Math.sin(angle) * 26);
-        }
         this._pixiObject.hitArea = new PIXI.Circle(0, 0, 24);
 
         this._pixiObject.position.x = this._instance.getX() + width / 2;
@@ -3734,17 +3757,8 @@ module.exports = {
       _defaultWidth = 48;
       _defaultHeight = 48;
       _defaultDepth = 48;
-
-      /** @type {THREE.Group | null} */
-      _helperGroup = null;
       /** @type {THREE.Mesh | null} */
-      _coreSphere = null;
-      /** @type {THREE.Mesh | null} */
-      _coreGlow = null;
-      /** @type {THREE.Sprite | null} */
-      _iconSprite = null;
-      /** @type {THREE.LineSegments | null} */
-      _rangeMesh = null;
+      _iconMesh = null;
 
       constructor(
         project,
@@ -3767,154 +3781,20 @@ module.exports = {
         this._pixiObject = new PIXI.Graphics();
         this._pixiContainer.addChild(this._pixiObject);
 
-        // Create helper group
-        this._helperGroup = new THREE.Group();
-        this._threeObject = this._helperGroup;
-        this._threeGroup.add(this._helperGroup);
+        this._threeObject = new THREE.Group();
+        this._threeObject.rotation.order = 'ZYX';
 
-        // Create solid sphere helper used for selection/manipulation.
-        this._createSelectionSphere();
-
-        // Create billboard icon
-        this._createBillboardIcon();
-
-        // Create range visualization
-        this._createRangeVisualization();
-      }
-
-      _createSelectionSphere() {
-        const coreGeometry = new THREE.SphereGeometry(8, 20, 12);
-        const coreMaterial = new THREE.MeshStandardMaterial({
-          color: 0xfff4a8,
-          emissive: 0xffd84d,
-          emissiveIntensity: 1.1,
-          roughness: 0.2,
-          metalness: 0,
+        const iconGeometry = new THREE.BoxGeometry(12, 12, 12);
+        const iconMaterial = new THREE.MeshBasicMaterial({
+          color: 0xffd84d,
           transparent: true,
-          opacity: 0.98,
-          depthWrite: false,
-        });
-        this._coreSphere = new THREE.Mesh(coreGeometry, coreMaterial);
-        this._coreSphere.renderOrder = 999;
-        this._helperGroup.add(this._coreSphere);
-
-        const glowGeometry = new THREE.SphereGeometry(12, 18, 10);
-        const glowMaterial = new THREE.MeshBasicMaterial({
-          color: 0xffe066,
-          transparent: true,
-          opacity: 0.22,
-          depthWrite: false,
-          side: THREE.DoubleSide,
-        });
-        this._coreGlow = new THREE.Mesh(glowGeometry, glowMaterial);
-        this._coreGlow.renderOrder = 998;
-        this._helperGroup.add(this._coreGlow);
-      }
-
-      _createBillboardIcon() {
-        const canvas = document.createElement('canvas');
-        canvas.width = 64;
-        canvas.height = 64;
-        const ctx = canvas.getContext('2d');
-
-        // Clear canvas
-        ctx.clearRect(0, 0, 64, 64);
-
-        // Draw light bulb circle
-        ctx.beginPath();
-        ctx.arc(32, 32, 18, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffff00';
-        ctx.fill();
-        ctx.strokeStyle = '#ffaa00';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
-        // Draw light rays
-        for (let i = 0; i < 8; i++) {
-          const angle = (i / 8) * Math.PI * 2;
-          ctx.beginPath();
-          ctx.moveTo(
-            32 + Math.cos(angle) * 22,
-            32 + Math.sin(angle) * 22
-          );
-          ctx.lineTo(
-            32 + Math.cos(angle) * 30,
-            32 + Math.sin(angle) * 30
-          );
-          ctx.strokeStyle = '#ffaa00';
-          ctx.lineWidth = 3;
-          ctx.stroke();
-        }
-
-        const texture = new THREE.CanvasTexture(canvas);
-        const material = new THREE.SpriteMaterial({
-          map: texture,
-          transparent: true,
-          opacity: 0.9,
+          opacity: 0.8,
           depthTest: false,
           depthWrite: false,
         });
-
-        this._iconSprite = new THREE.Sprite(material);
-        this._iconSprite.scale.set(22, 22, 1);
-        this._iconSprite.renderOrder = 999;
-        this._helperGroup.add(this._iconSprite);
-      }
-
-      _createRangeVisualization() {
-        const object = gd.castObject(
-          this._associatedObjectConfiguration,
-          gd.ObjectJsImplementation
-        );
-        const color = object.content.color || '255;255;255';
-        const [r, g, b] = color.split(';').map((v) => parseInt(v) / 255);
-
-        // Point light visualization: sphere wireframe with configurable range.
-        const geometry = new THREE.SphereGeometry(1, 32, 16);
-        const wireframe = new THREE.WireframeGeometry(geometry);
-        this._rangeMesh = new THREE.LineSegments(
-          wireframe,
-          new THREE.LineBasicMaterial({
-            color: new THREE.Color(r, g, b),
-            transparent: true,
-            opacity: 0.3,
-            depthTest: false,
-            depthWrite: false,
-          })
-        );
-        this._rangeMesh.renderOrder = 998;
-
-        this._helperGroup.add(this._rangeMesh);
-      }
-
-      _updateHelperColor(color) {
-        const [r, g, b] = color.split(';').map((v) => parseInt(v) / 255);
-        const threeColor = new THREE.Color(r, g, b);
-
-        if (this._iconSprite) {
-          this._iconSprite.material.color = threeColor;
-        }
-
-        if (this._coreSphere) {
-          this._coreSphere.material.color = threeColor;
-          this._coreSphere.material.emissive = threeColor;
-        }
-
-        if (this._coreGlow) {
-          this._coreGlow.material.color = threeColor;
-        }
-
-        if (this._rangeMesh) {
-          this._rangeMesh.material.color = threeColor;
-        }
-
-      }
-
-      _updateRangeScale(distance) {
-        if (!this._rangeMesh) return;
-
-        // Point light range visualization: uniform sphere.
-        this._rangeMesh.scale.set(distance, distance, distance);
+        this._iconMesh = new THREE.Mesh(iconGeometry, iconMaterial);
+        this._threeObject.add(this._iconMesh);
+        this._threeGroup.add(this._threeObject);
       }
 
       updatePixiObject() {
@@ -3922,8 +3802,7 @@ module.exports = {
         const height = 32;
 
         this._pixiObject.clear();
-        this._pixiObject.beginFill(0x999999, 0.2);
-        this._pixiObject.lineStyle(1, 0xffd900, 0);
+        this._pixiObject.beginFill(0x000000, 0);
         this._pixiObject.drawRect(-width / 2, -height / 2, width, height);
         this._pixiObject.endFill();
         this._pixiObject.hitArea = new PIXI.Circle(0, 0, 24);
@@ -3934,38 +3813,27 @@ module.exports = {
 
       update() {
         this.updatePixiObject();
-
         const object = gd.castObject(
           this._associatedObjectConfiguration,
           gd.ObjectJsImplementation
         );
-
         const color = object.content.color || '255;255;255';
-        const distance =
-          object.content.distance !== undefined ? object.content.distance : 100;
-        const showHelper =
-          object.content.showHelper !== undefined
-            ? object.content.showHelper
-            : true;
-
-        // Update position
-        this._helperGroup.position.set(
+        const [r = 255, g = 255, b = 255] = color
+          .split(';')
+          .map((v) => parseInt(v, 10));
+        if (this._iconMesh) {
+          const iconMaterial = /** @type {THREE.MeshBasicMaterial} */ (
+            this._iconMesh.material
+          );
+          iconMaterial.color.setRGB(r / 255, g / 255, b / 255);
+        }
+        this._threeObject.position.set(
           this._instance.getX(),
           this._instance.getY(),
           this._instance.getZ()
         );
-
         // Point lights don't have direction.
-        this._helperGroup.rotation.set(0, 0, 0);
-
-        // Update visibility
-        this._helperGroup.visible = showHelper;
-
-        // Update color
-        this._updateHelperColor(color);
-
-        // Update range scale
-        this._updateRangeScale(distance);
+        this._threeObject.rotation.set(0, 0, 0);
       }
 
       getDefaultWidth() {

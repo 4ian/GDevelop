@@ -97,7 +97,7 @@ namespace gdjs {
       });
 
       const defaultShadowLayerState = createShadowLayerState();
-      const shadowLayerStates = new WeakMap<gdjs.RuntimeLayer, ShadowLayerState>();
+      const shadowSceneStates = new WeakMap<gdjs.RuntimeScene, ShadowLayerState>();
 
       const getShadowLayerState = (
         runtimeLayerOrUnknown: unknown
@@ -110,18 +110,19 @@ namespace gdjs {
         if (!runtimeLayer) {
           return defaultShadowLayerState;
         }
-        const existingShadowLayerState = shadowLayerStates.get(runtimeLayer);
+        const runtimeScene = runtimeLayer.getRuntimeScene();
+        const existingShadowLayerState = shadowSceneStates.get(runtimeScene);
         if (existingShadowLayerState) {
           return existingShadowLayerState;
         }
         const createdShadowLayerState = createShadowLayerState();
-        shadowLayerStates.set(runtimeLayer, createdShadowLayerState);
+        shadowSceneStates.set(runtimeScene, createdShadowLayerState);
         return createdShadowLayerState;
       };
 
       const pointLightShadowCameraNear = 0.1;
       const pointLightInfiniteShadowFar = 5000;
-      const pointLightMinimumFiniteShadowFar = 100;
+      const pointLightMinimumFiniteShadowFar = 50;
       const directionalLightShadowCameraNear = 1;
       const directionalLightExtraFarDistance = 10000;
 
@@ -258,7 +259,7 @@ namespace gdjs {
 
       export const getShadowMapType = (
         shadowMapTypeName: ShadowMapTypeName
-      ): number => {
+      ): THREE.ShadowMapType => {
         if (shadowMapTypeName === 'basic') {
           return THREE.BasicShadowMap;
         }
@@ -314,9 +315,9 @@ namespace gdjs {
       };
 
       export const getPointLightShadowCameraFar = (lightDistance: number): number =>
-        lightDistance <= 0
+        !Number.isFinite(lightDistance) || lightDistance <= 0
           ? pointLightInfiniteShadowFar
-          : Math.max(lightDistance * 2, pointLightMinimumFiniteShadowFar);
+          : Math.max(lightDistance * 1.5, pointLightMinimumFiniteShadowFar);
 
       export const applyToThreeRenderer = (
         runtimeLayer: gdjs.RuntimeLayer | null,

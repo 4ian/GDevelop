@@ -15,6 +15,7 @@ namespace gdjs {
     t: string;
   }
   const shadowHelper = false;
+  const lightFollowGridSize = 10;
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::DirectionalLight',
     new (class implements gdjs.PixiFiltersTools.FilterCreator {
@@ -144,9 +145,9 @@ namespace gdjs {
             const y = layer.getCameraY();
             const z = layer.getCameraZ(layer.getInitialCamera3DFieldOfView());
 
-            const roundedX = Math.floor(x / 100) * 100;
-            const roundedY = Math.floor(y / 100) * 100;
-            const roundedZ = Math.floor(z / 100) * 100;
+            const roundedX = Math.floor(x / lightFollowGridSize) * lightFollowGridSize;
+            const roundedY = Math.floor(y / lightFollowGridSize) * lightFollowGridSize;
+            const roundedZ = Math.floor(z / lightFollowGridSize) * lightFollowGridSize;
             if (this._top === 'Y-') {
               const posLightX =
                 roundedX +

@@ -16,8 +16,6 @@ namespace gdjs {
       height: number;
       /** Zoom level (0.01 to 1.0) */
       zoom: number;
-      /** Whether the map stays fixed on screen */
-      stayOnScreen: boolean;
       /** Background image resource name */
       backgroundImage: string;
       /** Frame image resource name */
@@ -93,7 +91,6 @@ namespace gdjs {
     _width: number;
     _height: number;
     _zoom: number;
-    _stayOnScreen: boolean;
     _mode: string;
     _shape: string;
     _backgroundImage: string;
@@ -149,7 +146,6 @@ namespace gdjs {
         width: 200,
         height: 200,
         zoom: 0.1,
-        stayOnScreen: true,
         backgroundImage: '',
         frameImage: '',
         backgroundColor: '0;0;0',
@@ -178,7 +174,6 @@ namespace gdjs {
       this._width = Math.max(1, content.width);
       this._height = Math.max(1, content.height);
       this._zoom = content.zoom;
-      this._stayOnScreen = content.stayOnScreen;
       this._backgroundImage = content.backgroundImage;
       this._frameImage = content.frameImage;
       this._backgroundColor = content.backgroundColor;
@@ -223,7 +218,6 @@ namespace gdjs {
         width: 200,
         height: 200,
         zoom: 0.1,
-        stayOnScreen: true,
         backgroundImage: '',
         frameImage: '',
         backgroundColor: '0;0;0',
@@ -272,10 +266,6 @@ namespace gdjs {
       }
       if (oldContent.zoom !== content.zoom) {
         this._zoom = content.zoom;
-        needsUpdate = true;
-      }
-      if (oldContent.stayOnScreen !== content.stayOnScreen) {
-        this._stayOnScreen = content.stayOnScreen;
         needsUpdate = true;
       }
       if (oldContent.backgroundImage !== content.backgroundImage) {
@@ -756,14 +746,6 @@ namespace gdjs {
      */
     getZoom(): number {
       return this._zoom;
-    }
-
-    /**
-     * Check if the map stays on screen.
-     * @returns True if the map stays on screen.
-     */
-    getStayOnScreen(): boolean {
-      return this._stayOnScreen;
     }
 
     /**

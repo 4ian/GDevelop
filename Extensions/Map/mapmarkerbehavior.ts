@@ -3,19 +3,19 @@ namespace gdjs {
    * MapMarker behavior data structure.
    * @category Behaviors > MapMarker
    */
-  export type MapMarkerBehaviorData = {
+  export type MapMarkerBehaviorData = BehaviorData & {
     /** The type of marker (Player, Enemy, Item, etc.) */
-    markerType: string;
+    markerType?: string;
     /** Custom color in "R;G;B" format */
-    customColor: string;
+    customColor?: string;
     /** Custom size (0 to use default) */
-    customSize: number;
+    customSize?: number;
     /** Custom icon resource name */
-    customIcon: string;
+    customIcon?: string;
     /** Whether to show rotation */
-    showRotation: boolean;
+    showRotation?: boolean;
     /** Whether the marker is visible on the map */
-    visibleOnMap: boolean;
+    visibleOnMap?: boolean;
   };
 
   /**
@@ -73,25 +73,35 @@ namespace gdjs {
       oldBehaviorData: MapMarkerBehaviorData,
       newBehaviorData: MapMarkerBehaviorData
     ): boolean {
-      if (oldBehaviorData.markerType !== newBehaviorData.markerType) {
-        this._markerType = newBehaviorData.markerType;
+      const oldMarkerType = oldBehaviorData.markerType || 'Player';
+      const newMarkerType = newBehaviorData.markerType || 'Player';
+      if (oldMarkerType !== newMarkerType) {
+        this._markerType = newMarkerType;
       }
-      if (oldBehaviorData.customColor !== newBehaviorData.customColor) {
-        this._customColor = newBehaviorData.customColor;
+      const oldCustomColor = oldBehaviorData.customColor || '255;255;255';
+      const newCustomColor = newBehaviorData.customColor || '255;255;255';
+      if (oldCustomColor !== newCustomColor) {
+        this._customColor = newCustomColor;
       }
-      if (oldBehaviorData.customSize !== newBehaviorData.customSize) {
-        this._customSize = newBehaviorData.customSize;
+      const oldCustomSize = oldBehaviorData.customSize || 0;
+      const newCustomSize = newBehaviorData.customSize || 0;
+      if (oldCustomSize !== newCustomSize) {
+        this._customSize = newCustomSize;
       }
-      if (oldBehaviorData.customIcon !== newBehaviorData.customIcon) {
-        this._customIcon = newBehaviorData.customIcon;
+      const oldCustomIcon = oldBehaviorData.customIcon || '';
+      const newCustomIcon = newBehaviorData.customIcon || '';
+      if (oldCustomIcon !== newCustomIcon) {
+        this._customIcon = newCustomIcon;
       }
-      if (oldBehaviorData.showRotation !== newBehaviorData.showRotation) {
-        this._showRotation = newBehaviorData.showRotation;
+      const oldShowRotation = oldBehaviorData.showRotation || false;
+      const newShowRotation = newBehaviorData.showRotation || false;
+      if (oldShowRotation !== newShowRotation) {
+        this._showRotation = newShowRotation;
       }
-      if (
-        oldBehaviorData.visibleOnMap !== newBehaviorData.visibleOnMap
-      ) {
-        this._visibleOnMap = newBehaviorData.visibleOnMap;
+      const oldVisibleOnMap = oldBehaviorData.visibleOnMap !== false;
+      const newVisibleOnMap = newBehaviorData.visibleOnMap !== false;
+      if (oldVisibleOnMap !== newVisibleOnMap) {
+        this._visibleOnMap = newVisibleOnMap;
       }
 
       return true;

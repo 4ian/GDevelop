@@ -134,25 +134,9 @@ namespace gdjs {
      * Update the position of the map on screen.
      */
     updatePosition(): void {
-      if (this._object.getStayOnScreen()) {
-        // Fixed position on screen (UI layer behavior)
-        const layer = this._instanceContainer.getLayer(this._object.getLayer());
-        const cameraX = layer.getCameraX();
-        const cameraY = layer.getCameraY();
-        const cameraWidth = layer.getCameraWidth();
-        const cameraHeight = layer.getCameraHeight();
-
-        // Position relative to camera
-        const screenX = this._object.getX();
-        const screenY = this._object.getY();
-
-        this._pixiContainer.position.x = cameraX - cameraWidth / 2 + screenX;
-        this._pixiContainer.position.y = cameraY - cameraHeight / 2 + screenY;
-      } else {
-        // World position
-        this._pixiContainer.position.x = this._object.getX();
-        this._pixiContainer.position.y = this._object.getY();
-      }
+      // Always render the map using world coordinates, like regular 2D objects.
+      this._pixiContainer.position.x = this._object.getX();
+      this._pixiContainer.position.y = this._object.getY();
     }
 
     /**

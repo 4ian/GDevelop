@@ -1,5 +1,9 @@
 namespace gdjs {
   const pointLightAllowedShadowMapSizes = [256, 512, 1024, 2048, 4096];
+  const minimumPointLightDistance = 0;
+  const defaultPointLightDecay = 2;
+  const minimumPointLightDecay = 0;
+  const maximumPointLightDecay = 2;
   const sanitizePointLightShadowMapSize = (rawSize: number): number => {
     if (!Number.isFinite(rawSize)) {
       return 1024;
@@ -17,6 +21,18 @@ namespace gdjs {
       }
     }
     return nearestSize;
+  };
+  const sanitizePointLightDistance = (rawDistance: number): number => {
+    if (!Number.isFinite(rawDistance)) {
+      return minimumPointLightDistance;
+    }
+    return Math.max(minimumPointLightDistance, rawDistance);
+  };
+  const sanitizePointLightDecay = (rawDecay: number): number => {
+    if (!Number.isFinite(rawDecay)) {
+      return defaultPointLightDecay;
+    }
+    return Math.max(minimumPointLightDecay, Math.min(maximumPointLightDecay, rawDecay));
   };
 
   /**
@@ -70,8 +86,12 @@ namespace gdjs {
       const content = objectData.content;
       this._color = content.color || '255;255;255';
       this._intensity = content.intensity !== undefined ? content.intensity : 1;
-      this._distance = content.distance !== undefined ? content.distance : 100;
-      this._decay = content.decay !== undefined ? content.decay : 2;
+      this._distance = sanitizePointLightDistance(
+        content.distance !== undefined ? content.distance : 100
+      );
+      this._decay = sanitizePointLightDecay(
+        content.decay !== undefined ? content.decay : defaultPointLightDecay
+      );
       this._castShadow = content.castShadow || false;
       this._shadowMapSize = sanitizePointLightShadowMapSize(
         content.shadowMapSize !== undefined ? content.shadowMapSize : 1024
@@ -132,8 +152,9 @@ namespace gdjs {
      * Set the light range (distance).
      */
     setDistance(distance: number): void {
-      if (this._distance === distance) return;
-      this._distance = distance;
+      const sanitizedDistance = sanitizePointLightDistance(distance);
+      if (this._distance === sanitizedDistance) return;
+      this._distance = sanitizedDistance;
       this._renderer.updateDistance();
     }
 
@@ -148,8 +169,9 @@ namespace gdjs {
      * Set the light decay.
      */
     setDecay(decay: number): void {
-      if (this._decay === decay) return;
-      this._decay = decay;
+      const sanitizedDecay = sanitizePointLightDecay(decay);
+      if (this._decay === sanitizedDecay) return;
+      this._decay = sanitizedDecay;
       this._renderer.updateDecay();
     }
 

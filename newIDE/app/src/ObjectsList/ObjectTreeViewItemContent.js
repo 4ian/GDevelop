@@ -161,6 +161,7 @@ export const addSerializedObjectToObjectsContainer = ({
     project
   );
   newObject.setName(newName); // Unserialization has overwritten the name.
+  newObject.resetPersistentUuid();
 
   return { object: newObject, global };
 };

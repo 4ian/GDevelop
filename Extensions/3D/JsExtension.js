@@ -384,13 +384,18 @@ module.exports = {
         behaviorProperties
           .getOrCreate('offDuration')
           .setValue(
-            behaviorContent.getChild('offDuration').getDoubleValue().toString(10)
+            behaviorContent
+              .getChild('offDuration')
+              .getDoubleValue()
+              .toString(10)
           )
           .setType('Number')
           .setLabel(_('Off duration (seconds)'));
         behaviorProperties
           .getOrCreate('targetLayerName')
-          .setValue(behaviorContent.getChild('targetLayerName').getStringValue())
+          .setValue(
+            behaviorContent.getChild('targetLayerName').getStringValue()
+          )
           .setType('String')
           .setLabel(_('Target layer name (optional)'))
           .setDescription(
@@ -609,6 +614,477 @@ module.exports = {
         )
         .setFunctionName('setOffDuration')
         .setGetter('getOffDuration');
+    }
+
+    {
+      const behavior = new gd.BehaviorJsImplementation();
+
+      behavior.updateProperty = function (
+        behaviorContent,
+        propertyName,
+        newValue
+      ) {
+        if (!behaviorContent.hasChild('enabled')) {
+          behaviorContent.addChild('enabled').setBoolValue(true);
+        }
+
+        if (propertyName === 'enabled') {
+          behaviorContent
+            .getChild('enabled')
+            .setBoolValue(newValue === '1' || newValue === 'true');
+          return true;
+        }
+
+        return false;
+      };
+
+      behavior.getProperties = function (behaviorContent) {
+        const behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+        if (!behaviorContent.hasChild('enabled')) {
+          behaviorContent.addChild('enabled').setBoolValue(true);
+        }
+
+        behaviorProperties
+          .getOrCreate('enabled')
+          .setValue(
+            behaviorContent.getChild('enabled').getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setType('Boolean')
+          .setLabel(_('Enabled'));
+
+        return behaviorProperties;
+      };
+
+      behavior.initializeContent = function (behaviorContent) {
+        behaviorContent.addChild('enabled').setBoolValue(true);
+      };
+
+      const ssrExclude = extension
+        .addBehavior(
+          'SSRExclude',
+          _('SSR exclude'),
+          'SSRExclude',
+          _('Exclude this 3D object from Scene3D screen-space reflections.'),
+          '',
+          'res/conditions/3d_box.svg',
+          'SSRExclude',
+          // @ts-ignore
+          behavior,
+          new gd.BehaviorsSharedData()
+        )
+        .setIncludeFile('Extensions/3D/SSRExcludeBehavior.js');
+
+      ssrExclude
+        .addScopedAction(
+          'SetEnabled',
+          _('Enable/disable SSR exclusion'),
+          _('Enable or disable exclusion of this object from SSR.'),
+          _('Set SSR exclusion of _PARAM0_ to _PARAM2_'),
+          _('SSR exclusion'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'SSRExclude')
+        .addParameter('yesorno', _('Enabled'))
+        .setFunctionName('setEnabled');
+
+      ssrExclude
+        .addScopedCondition(
+          'IsEnabled',
+          _('SSR exclusion enabled'),
+          _('Check if SSR exclusion is enabled for this object.'),
+          _('SSR exclusion is enabled for _PARAM0_'),
+          _('SSR exclusion'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'SSRExclude')
+        .setFunctionName('isEnabled');
+    }
+
+    {
+      const behavior = new gd.BehaviorJsImplementation();
+
+      const ensurePBRMaterialDefaults = function (behaviorContent) {
+        if (!behaviorContent.hasChild('metalness')) {
+          behaviorContent.addChild('metalness').setDoubleValue(0.0);
+        }
+        if (!behaviorContent.hasChild('roughness')) {
+          behaviorContent.addChild('roughness').setDoubleValue(0.5);
+        }
+        if (!behaviorContent.hasChild('envMapIntensity')) {
+          behaviorContent.addChild('envMapIntensity').setDoubleValue(1.0);
+        }
+        if (!behaviorContent.hasChild('emissiveColor')) {
+          behaviorContent.addChild('emissiveColor').setStringValue('0;0;0');
+        }
+        if (!behaviorContent.hasChild('emissiveIntensity')) {
+          behaviorContent.addChild('emissiveIntensity').setDoubleValue(0.0);
+        }
+        if (!behaviorContent.hasChild('normalScale')) {
+          behaviorContent.addChild('normalScale').setDoubleValue(1.0);
+        }
+        if (!behaviorContent.hasChild('normalMapAsset')) {
+          behaviorContent.addChild('normalMapAsset').setStringValue('');
+        }
+        if (!behaviorContent.hasChild('aoMapAsset')) {
+          behaviorContent.addChild('aoMapAsset').setStringValue('');
+        }
+        if (!behaviorContent.hasChild('aoMapIntensity')) {
+          behaviorContent.addChild('aoMapIntensity').setDoubleValue(1.0);
+        }
+        if (!behaviorContent.hasChild('map')) {
+          behaviorContent.addChild('map').setStringValue('');
+        }
+      };
+
+      const clampValue = function (value, min, max) {
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue)) {
+          return min;
+        }
+        return Math.max(min, Math.min(max, numericValue));
+      };
+
+      behavior.updateProperty = function (
+        behaviorContent,
+        propertyName,
+        newValue
+      ) {
+        ensurePBRMaterialDefaults(behaviorContent);
+
+        if (propertyName === 'metalness') {
+          behaviorContent
+            .getChild('metalness')
+            .setDoubleValue(clampValue(newValue, 0, 1));
+          return true;
+        }
+        if (propertyName === 'roughness') {
+          behaviorContent
+            .getChild('roughness')
+            .setDoubleValue(clampValue(newValue, 0, 1));
+          return true;
+        }
+        if (propertyName === 'envMapIntensity') {
+          behaviorContent
+            .getChild('envMapIntensity')
+            .setDoubleValue(clampValue(newValue, 0, 4));
+          return true;
+        }
+        if (propertyName === 'emissiveColor') {
+          behaviorContent.getChild('emissiveColor').setStringValue(newValue);
+          return true;
+        }
+        if (propertyName === 'emissiveIntensity') {
+          behaviorContent
+            .getChild('emissiveIntensity')
+            .setDoubleValue(clampValue(newValue, 0, 4));
+          return true;
+        }
+        if (propertyName === 'normalScale') {
+          behaviorContent
+            .getChild('normalScale')
+            .setDoubleValue(clampValue(newValue, 0, 2));
+          return true;
+        }
+        if (propertyName === 'normalMapAsset') {
+          behaviorContent.getChild('normalMapAsset').setStringValue(newValue);
+          return true;
+        }
+        if (propertyName === 'aoMapAsset') {
+          behaviorContent.getChild('aoMapAsset').setStringValue(newValue);
+          return true;
+        }
+        if (propertyName === 'aoMapIntensity') {
+          behaviorContent
+            .getChild('aoMapIntensity')
+            .setDoubleValue(clampValue(newValue, 0, 1));
+          return true;
+        }
+        if (propertyName === 'map') {
+          behaviorContent.getChild('map').setStringValue(newValue);
+          return true;
+        }
+
+        return false;
+      };
+
+      behavior.getProperties = function (behaviorContent) {
+        const behaviorProperties = new gd.MapStringPropertyDescriptor();
+        ensurePBRMaterialDefaults(behaviorContent);
+
+        behaviorProperties
+          .getOrCreate('metalness')
+          .setValue(
+            behaviorContent.getChild('metalness').getDoubleValue().toString()
+          )
+          .setType('number')
+          .setLabel(_('Metalness'));
+        behaviorProperties
+          .getOrCreate('roughness')
+          .setValue(
+            behaviorContent.getChild('roughness').getDoubleValue().toString()
+          )
+          .setType('number')
+          .setLabel(_('Roughness'));
+        behaviorProperties
+          .getOrCreate('envMapIntensity')
+          .setValue(
+            behaviorContent
+              .getChild('envMapIntensity')
+              .getDoubleValue()
+              .toString()
+          )
+          .setType('number')
+          .setLabel(_('Environment intensity'));
+        behaviorProperties
+          .getOrCreate('emissiveColor')
+          .setValue(behaviorContent.getChild('emissiveColor').getStringValue())
+          .setType('color')
+          .setLabel(_('Emissive color'));
+        behaviorProperties
+          .getOrCreate('emissiveIntensity')
+          .setValue(
+            behaviorContent
+              .getChild('emissiveIntensity')
+              .getDoubleValue()
+              .toString()
+          )
+          .setType('number')
+          .setLabel(_('Emissive intensity'));
+        behaviorProperties
+          .getOrCreate('normalScale')
+          .setValue(
+            behaviorContent.getChild('normalScale').getDoubleValue().toString()
+          )
+          .setType('number')
+          .setLabel(_('Normal scale'));
+        behaviorProperties
+          .getOrCreate('normalMapAsset')
+          .setValue(behaviorContent.getChild('normalMapAsset').getStringValue())
+          .setType('resource')
+          .addExtraInfo('image')
+          .setLabel(_('Normal map'));
+        behaviorProperties
+          .getOrCreate('aoMapAsset')
+          .setValue(behaviorContent.getChild('aoMapAsset').getStringValue())
+          .setType('resource')
+          .addExtraInfo('image')
+          .setLabel(_('AO map'));
+        behaviorProperties
+          .getOrCreate('aoMapIntensity')
+          .setValue(
+            behaviorContent
+              .getChild('aoMapIntensity')
+              .getDoubleValue()
+              .toString()
+          )
+          .setType('number')
+          .setLabel(_('AO intensity'));
+        behaviorProperties
+          .getOrCreate('map')
+          .setValue(behaviorContent.getChild('map').getStringValue())
+          .setType('resource')
+          .addExtraInfo('image')
+          .setLabel(_('Albedo map'));
+
+        return behaviorProperties;
+      };
+
+      behavior.initializeContent = function (behaviorContent) {
+        behaviorContent.addChild('metalness').setDoubleValue(0.0);
+        behaviorContent.addChild('roughness').setDoubleValue(0.5);
+        behaviorContent.addChild('envMapIntensity').setDoubleValue(1.0);
+        behaviorContent.addChild('emissiveColor').setStringValue('0;0;0');
+        behaviorContent.addChild('emissiveIntensity').setDoubleValue(0.0);
+        behaviorContent.addChild('normalScale').setDoubleValue(1.0);
+        behaviorContent.addChild('normalMapAsset').setStringValue('');
+        behaviorContent.addChild('aoMapAsset').setStringValue('');
+        behaviorContent.addChild('aoMapIntensity').setDoubleValue(1.0);
+        behaviorContent.addChild('map').setStringValue('');
+      };
+
+      const pbrMaterial = extension
+        .addBehavior(
+          'PBRMaterial',
+          _('PBR material'),
+          'PBRMaterial',
+          _(
+            'Control physically based material parameters for 3D meshes using MeshStandardMaterial and MeshPhysicalMaterial.'
+          ),
+          '',
+          'res/conditions/3d_box.svg',
+          'PBRMaterial',
+          // @ts-ignore
+          behavior,
+          new gd.BehaviorsSharedData()
+        )
+        .setIncludeFile('Extensions/3D/PBRMaterialBehavior.js');
+
+      pbrMaterial
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Metalness',
+          _('Metalness'),
+          _('the metalness'),
+          _('the metalness'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setMetalness')
+        .setGetter('getMetalness');
+
+      pbrMaterial
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Roughness',
+          _('Roughness'),
+          _('the roughness'),
+          _('the roughness'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setRoughness')
+        .setGetter('getRoughness');
+
+      pbrMaterial
+        .addExpressionAndConditionAndAction(
+          'number',
+          'EnvironmentIntensity',
+          _('Environment intensity'),
+          _('the environment map intensity'),
+          _('the environment intensity'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setEnvMapIntensity')
+        .setGetter('getEnvMapIntensity');
+
+      pbrMaterial
+        .addExpressionAndConditionAndAction(
+          'number',
+          'EmissiveIntensity',
+          _('Emissive intensity'),
+          _('the emissive intensity'),
+          _('the emissive intensity'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setEmissiveIntensity')
+        .setGetter('getEmissiveIntensity');
+
+      pbrMaterial
+        .addExpressionAndConditionAndAction(
+          'number',
+          'NormalScale',
+          _('Normal scale'),
+          _('the normal map scale'),
+          _('the normal scale'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setNormalScale')
+        .setGetter('getNormalScale');
+
+      pbrMaterial
+        .addExpressionAndConditionAndAction(
+          'number',
+          'AOMapIntensity',
+          _('AO map intensity'),
+          _('the AO map intensity'),
+          _('the AO map intensity'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setAOMapIntensity')
+        .setGetter('getAOMapIntensity');
+
+      pbrMaterial
+        .addScopedAction(
+          'SetEmissiveColor',
+          _('Set emissive color'),
+          _('Set the emissive color used by PBR materials on this object.'),
+          _('Set emissive color of _PARAM0_ to _PARAM2_'),
+          _('PBR material'),
+          'res/actions/color24.png',
+          'res/actions/color.png'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .addParameter('color', _('Emissive color'))
+        .setFunctionName('setEmissiveColor');
+
+      pbrMaterial
+        .addScopedAction(
+          'SetNormalMapAsset',
+          _('Set normal map'),
+          _(
+            'Set the normal map resource used by PBR materials on this object.'
+          ),
+          _('Set normal map of _PARAM0_ to _PARAM2_'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .addParameter('imageResource', _('Normal map'), '', true)
+        .setFunctionName('setNormalMapAsset');
+
+      pbrMaterial
+        .addScopedAction(
+          'SetAOMapAsset',
+          _('Set AO map'),
+          _('Set the AO map resource used by PBR materials on this object.'),
+          _('Set AO map of _PARAM0_ to _PARAM2_'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .addParameter('imageResource', _('AO map'), '', true)
+        .setFunctionName('setAOMapAsset');
+
+      pbrMaterial
+        .addScopedAction(
+          'SetMap',
+          _('Set albedo map'),
+          _(
+            'Set the albedo (base color) map resource used by PBR materials on this object.'
+          ),
+          _('Set albedo map of _PARAM0_ to _PARAM2_'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .addParameter('imageResource', _('Albedo map'), '', true)
+        .setFunctionName('setMap');
     }
 
     {
@@ -2411,9 +2887,7 @@ module.exports = {
         .setValue('0.02')
         .setLabel(_('Shadow normal bias'))
         .setDescription(
-          _(
-            'Offset along normals to reduce acne on sloped/curved surfaces.'
-          )
+          _('Offset along normals to reduce acne on sloped/curved surfaces.')
         )
         .setType('number')
         .setGroup(_('Shadows'))
@@ -2480,9 +2954,7 @@ module.exports = {
         .setValue('2000')
         .setLabel(_('Max shadow distance'))
         .setDescription(
-          _(
-            'Maximum world distance covered by cascaded directional shadows.'
-          )
+          _('Maximum world distance covered by cascaded directional shadows.')
         )
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
@@ -2527,12 +2999,11 @@ module.exports = {
         .setFullName(_('Rim light'))
         .setDescription(
           _(
-            'Screen-space rim shading pass using depth, camera view and existing scene capture. Includes fog fade and shadow-map suppression.'
+            'Injects Fresnel-based rim lighting directly into 3D mesh materials via shader compilation. Rim direction is updated every frame from the active camera position.'
           )
         )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
-        .addIncludeFile('Extensions/3D/PostProcessingSharedResources.js')
         .addIncludeFile('Extensions/3D/RimLight.js');
       const properties = effect.getProperties();
       properties
@@ -2561,6 +3032,40 @@ module.exports = {
           )
         )
         .setType('number')
+        .setAdvanced(true);
+      properties
+        .getOrCreate('power')
+        .setValue('2.2')
+        .setLabel(_('Rim power'))
+        .setDescription(
+          _(
+            'Controls rim falloff near silhouette. Higher values make a tighter, sharper rim.'
+          )
+        )
+        .setType('number')
+        .setAdvanced(true);
+      properties
+        .getOrCreate('fresnel0')
+        .setValue('0.04')
+        .setLabel(_('Fresnel F0'))
+        .setDescription(
+          _(
+            'Base reflectance used by Schlick Fresnel. Typical non-metal values are around 0.02 to 0.08.'
+          )
+        )
+        .setType('number')
+        .setAdvanced(true);
+      properties
+        .getOrCreate('debugForceMaxRim')
+        .setValue('false')
+        .setLabel(_('Debug: force max rim'))
+        .setDescription(
+          _(
+            'For debugging shader injection: force full rim contribution on patched materials regardless of view angle.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Debug'))
         .setAdvanced(true);
     }
     {
@@ -2715,9 +3220,7 @@ module.exports = {
         .setValue('0')
         .setLabel(_('Maximum distance'))
         .setDescription(
-          _(
-            'Maximum range of the light. 0 means unlimited range.'
-          )
+          _('Maximum range of the light. 0 means unlimited range.')
         )
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
@@ -2762,7 +3265,9 @@ module.exports = {
         .setValue('0.02')
         .setLabel(_('Shadow normal bias'))
         .setDescription(
-          _('Offset along object normals to prevent acne on curved surfaces. Default: 0.02.')
+          _(
+            'Offset along object normals to prevent acne on curved surfaces. Default: 0.02.'
+          )
         )
         .setType('number')
         .setGroup(_('Shadows'));
@@ -2770,9 +3275,7 @@ module.exports = {
         .getOrCreate('shadowRadius')
         .setValue('1.5')
         .setLabel(_('Shadow softness'))
-        .setDescription(
-          _('Softness radius for point-light shadow filtering.')
-        )
+        .setDescription(_('Softness radius for point-light shadow filtering.'))
         .setType('number')
         .setGroup(_('Shadows'));
       properties
@@ -3019,9 +3522,7 @@ module.exports = {
         .setValue('0')
         .setLabel(_('Maximum distance'))
         .setDescription(
-          _(
-            'Maximum range of the light. 0 means unlimited range.'
-          )
+          _('Maximum range of the light. 0 means unlimited range.')
         )
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
@@ -3074,9 +3575,7 @@ module.exports = {
         .getOrCreate('shadowRadius')
         .setValue('1.5')
         .setLabel(_('Shadow softness'))
-        .setDescription(
-          _('Softness radius for spot-light shadow filtering.')
-        )
+        .setDescription(_('Softness radius for spot-light shadow filtering.'))
         .setType('number')
         .setGroup(_('Shadows'));
       properties
@@ -3278,6 +3777,12 @@ module.exports = {
         .setLabel(_('Threshold'))
         .setType('number')
         .setDescription(_('Between 0 and 1'));
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .setLabel(_('Quality mode'))
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension
@@ -3310,14 +3815,24 @@ module.exports = {
         .setLabel(_('Max distance'))
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setDescription(_('Maximum reflection tracing distance (balanced for performance).'));
+        .setDescription(
+          _('Maximum reflection tracing distance (balanced for performance).')
+        );
       properties
         .getOrCreate('thickness')
         .setValue('4')
         .setLabel(_('Thickness'))
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setDescription(_('Depth tolerance to detect reflection hits reliably.'));
+        .setDescription(
+          _('Depth tolerance to detect reflection hits reliably.')
+        );
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .setLabel(_('Quality mode'))
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension
@@ -3450,10 +3965,18 @@ module.exports = {
         .setDescription(_('Prevents self-occlusion artifacts.'));
       properties
         .getOrCreate('samples')
-        .setValue('16')
+        .setValue('4')
         .setLabel(_('Samples'))
         .setType('number')
-        .setDescription(_('Quality/performance control (higher = better, slower).'));
+        .setDescription(
+          _('Quality/performance control (higher = better, slower).')
+        );
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .setLabel(_('Quality mode'))
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension
@@ -3498,6 +4021,12 @@ module.exports = {
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setDescription(_('Maximum distance for volumetric ray marching.'));
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .setLabel(_('Quality mode'))
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension
@@ -3531,13 +4060,29 @@ module.exports = {
         .setLabel(_('Focus range'))
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setDescription(_('How gradually blur increases around focus distance.'));
+        .setDescription(
+          _('How gradually blur increases around focus distance.')
+        );
       properties
         .getOrCreate('maxBlur')
         .setValue('6')
         .setLabel(_('Max blur'))
         .setType('number')
         .setDescription(_('Maximum blur radius strength.'));
+      properties
+        .getOrCreate('samples')
+        .setValue('4')
+        .setLabel(_('Samples'))
+        .setType('number')
+        .setDescription(
+          _('Blur taps around each pixel (higher = smoother, slower).')
+        );
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .setLabel(_('Quality mode'))
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension

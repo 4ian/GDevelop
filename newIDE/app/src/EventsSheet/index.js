@@ -1171,7 +1171,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       return;
 
     const forEachEvent = gd.asForEachEvent(eventContext.event);
-    forEachEvent.setOrderBy('0');
+    const objectName = forEachEvent.getObjectToPick();
+    const objectPrefix = objectName || '<Object>';
+    forEachEvent.setOrderBy(`${objectPrefix}.`);
     forEachEvent.setOrder('asc');
 
     if (this._eventsTree) {

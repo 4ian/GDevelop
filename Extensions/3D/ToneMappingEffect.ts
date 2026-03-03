@@ -6,7 +6,10 @@ namespace gdjs {
   }
 
   const normalizeToneMappingMode = (mode: string): string => {
-    const normalized = (mode || '').trim().toLowerCase().replace(/[\s_-]/g, '');
+    const normalized = (mode || '')
+      .trim()
+      .toLowerCase()
+      .replace(/[\s_-]/g, '');
     if (normalized === 'reinhard') {
       return 'Reinhard';
     }
@@ -80,7 +83,8 @@ namespace gdjs {
               this._oldUseLegacyLights === null &&
               typeof rendererWithLegacyLights.useLegacyLights === 'boolean'
             ) {
-              this._oldUseLegacyLights = rendererWithLegacyLights.useLegacyLights;
+              this._oldUseLegacyLights =
+                rendererWithLegacyLights.useLegacyLights;
             }
             if (typeof rendererWithLegacyLights.useLegacyLights === 'boolean') {
               rendererWithLegacyLights.useLegacyLights = false;
@@ -95,7 +99,8 @@ namespace gdjs {
               this._oldUseLegacyLights !== null &&
               typeof rendererWithLegacyLights.useLegacyLights === 'boolean'
             ) {
-              rendererWithLegacyLights.useLegacyLights = this._oldUseLegacyLights;
+              rendererWithLegacyLights.useLegacyLights =
+                this._oldUseLegacyLights;
             }
           }
 
@@ -208,7 +213,9 @@ namespace gdjs {
             };
           }
 
-          updateFromNetworkSyncData(syncData: ToneMappingNetworkSyncData): void {
+          updateFromNetworkSyncData(
+            syncData: ToneMappingNetworkSyncData
+          ): void {
             this._mode = normalizeToneMappingMode(syncData.m);
             this._exposure = Math.max(0, syncData.x);
             this._effectEnabled = !!syncData.e;

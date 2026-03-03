@@ -28,6 +28,12 @@
   padding: 0 14px 0 0;
 }
 
+.inlineSelect option,
+.inlineSelect optgroup {
+  color: initial;
+  background-color: initial;
+}
+
 .arrowContainer {
   pointer-events: none;
   position: absolute;

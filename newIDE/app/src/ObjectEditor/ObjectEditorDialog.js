@@ -131,7 +131,6 @@ const InnerDialog = (props: InnerDialogProps) => {
     serializableObject: object,
     useProjectToUnserialize: project,
     onCancel: onCancel,
-    resetThenClearPersistentUuid: true,
   });
 
   const [hasResourceChanged, setResourceChanged] = React.useState<boolean>(
@@ -192,9 +191,6 @@ const InnerDialog = (props: InnerDialogProps) => {
         object.getName(),
         changeset
       );
-    }
-    if (typeof object.clearPersistentUuid === 'function') {
-      object.clearPersistentUuid();
     }
 
     // Do the renaming *after* applying changes, as "withSerializableObject"

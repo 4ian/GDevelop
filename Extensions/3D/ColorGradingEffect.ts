@@ -247,7 +247,9 @@ namespace gdjs {
             };
           }
 
-          updateFromNetworkSyncData(syncData: ColorGradingNetworkSyncData): void {
+          updateFromNetworkSyncData(
+            syncData: ColorGradingNetworkSyncData
+          ): void {
             this._temperature = gdjs.evtTools.common.clamp(-2, 2, syncData.t);
             this._tint = gdjs.evtTools.common.clamp(-2, 2, syncData.ti);
             this._saturation = Math.max(0, syncData.s);

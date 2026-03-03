@@ -758,6 +758,7 @@ const ObjectImporterDialog = ({
         );
         // The name was overwritten after unserialization.
         object.setName(newName);
+        object.resetPersistentUuid();
       }
 
       onClose();

@@ -147,11 +147,11 @@ Object& Object::ResetPersistentUuid() {
   return *this;
 }
 
-Object& Object::ClearPersistentUuid() {
-  persistentUuid = "";
-  objectVariables.ClearPersistentUuid();
-
-  return *this;
+const gd::String& Object::GetPersistentUuid() const {
+  if (persistentUuid.empty()) {
+    persistentUuid = UUID::MakeUuid4();
+  }
+  return persistentUuid;
 }
 
 }  // namespace gd

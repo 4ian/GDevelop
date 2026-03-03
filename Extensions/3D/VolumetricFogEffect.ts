@@ -5,6 +5,7 @@ namespace gdjs {
     ls: number;
     md: number;
     e: boolean;
+    q?: string;
   }
 
   const MAX_VOLUMETRIC_LIGHTS = 16;
@@ -162,10 +163,7 @@ namespace gdjs {
           _density: number;
           _lightScatter: number;
           _maxDistance: number;
-          _sceneRenderTarget: THREE.WebGLRenderTarget;
-          _previousViewport: THREE.Vector4;
-          _previousScissor: THREE.Vector4;
-          _renderSize: THREE.Vector2;
+          _qualityMode: string;
           _lightPositions: THREE.Vector3[];
           _lightColors: THREE.Vector3[];
           _lightRanges: number[];
@@ -176,36 +174,36 @@ namespace gdjs {
             this.shaderPass = new THREE_ADDONS.ShaderPass(volumetricFogShader);
             gdjs.markScene3DPostProcessingPass(this.shaderPass, 'FOG');
             this._isEnabled = false;
-            this._effectEnabled = true;
-            this._fogColor = new THREE.Color(0xc8dcff);
-            this._density = 0.012;
-            this._lightScatter = 1.0;
-            this._maxDistance = 1200;
+            this._effectEnabled =
+              effectData.booleanParameters.enabled === undefined
+                ? true
+                : !!effectData.booleanParameters.enabled;
+            this._fogColor = new THREE.Color(
+              gdjs.rgbOrHexStringToNumber(
+                effectData.stringParameters.fogColor || '200;220;255'
+              )
+            );
+            this._density =
+              effectData.doubleParameters.density !== undefined
+                ? Math.max(0, effectData.doubleParameters.density)
+                : 0.012;
+            this._lightScatter =
+              effectData.doubleParameters.lightScatter !== undefined
+                ? Math.max(0, effectData.doubleParameters.lightScatter)
+                : 1.0;
+            this._maxDistance =
+              effectData.doubleParameters.maxDistance !== undefined
+                ? Math.max(0, effectData.doubleParameters.maxDistance)
+                : 1200;
+            this._qualityMode =
+              effectData.stringParameters.qualityMode || 'medium';
 
-            this._sceneRenderTarget = new THREE.WebGLRenderTarget(1, 1, {
-              minFilter: THREE.LinearFilter,
-              magFilter: THREE.LinearFilter,
-              format: THREE.RGBAFormat,
-              depthBuffer: true,
-              stencilBuffer: false,
-            });
-            this._sceneRenderTarget.texture.generateMipmaps = false;
-            this._sceneRenderTarget.depthTexture = new THREE.DepthTexture(1, 1);
-            this._sceneRenderTarget.depthTexture.format = THREE.DepthFormat;
-            this._sceneRenderTarget.depthTexture.type = THREE.UnsignedIntType;
-            this._sceneRenderTarget.depthTexture.needsUpdate = true;
-
-            this._previousViewport = new THREE.Vector4();
-            this._previousScissor = new THREE.Vector4();
-            this._renderSize = new THREE.Vector2();
             this._lightPositions = makeVector3Array(MAX_VOLUMETRIC_LIGHTS);
             this._lightColors = makeVector3Array(MAX_VOLUMETRIC_LIGHTS);
             this._lightRanges = makeNumberArray(MAX_VOLUMETRIC_LIGHTS);
             this._tempWorldPosition = new THREE.Vector3();
             this._tempViewPosition = new THREE.Vector3();
 
-            this.shaderPass.uniforms.tDepth.value =
-              this._sceneRenderTarget.depthTexture;
             this.shaderPass.uniforms.fogColor.value.set(
               this._fogColor.r,
               this._fogColor.g,
@@ -218,9 +216,6 @@ namespace gdjs {
             this.shaderPass.uniforms.lightColors.value = this._lightColors;
             this.shaderPass.uniforms.lightRanges.value = this._lightRanges;
             this.shaderPass.enabled = true;
-            // Kept for backward compatibility while shared capture is active.
-            void this._updateRenderTargetSize;
-            void this._captureScene;
           }
 
           isEnabled(target: EffectsTarget): boolean {
@@ -241,6 +236,7 @@ namespace gdjs {
               return false;
             }
             target.getRenderer().addPostProcessingPass(this.shaderPass);
+            gdjs.reorderScene3DPostProcessingPasses(target);
             this._isEnabled = true;
             return true;
           }
@@ -249,59 +245,9 @@ namespace gdjs {
               return false;
             }
             target.getRenderer().removePostProcessingPass(this.shaderPass);
+            gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'FOG');
             this._isEnabled = false;
             return true;
-          }
-
-          private _updateRenderTargetSize(
-            target: gdjs.Layer,
-            threeRenderer: THREE.WebGLRenderer
-          ): void {
-            threeRenderer.getDrawingBufferSize(this._renderSize);
-            const width = Math.max(1, Math.round(this._renderSize.x || 1));
-            const height = Math.max(1, Math.round(this._renderSize.y || 1));
-
-            if (
-              this._sceneRenderTarget.width !== width ||
-              this._sceneRenderTarget.height !== height
-            ) {
-              this._sceneRenderTarget.setSize(width, height);
-              if (this._sceneRenderTarget.depthTexture) {
-                this._sceneRenderTarget.depthTexture.needsUpdate = true;
-              }
-            }
-
-            this.shaderPass.uniforms.resolution.value.set(width, height);
-            this.shaderPass.uniforms.tDepth.value =
-              this._sceneRenderTarget.depthTexture;
-            this._sceneRenderTarget.texture.colorSpace =
-              threeRenderer.outputColorSpace;
-          }
-
-          private _captureScene(
-            threeRenderer: THREE.WebGLRenderer,
-            scene: THREE.Scene,
-            camera: THREE.Camera
-          ): void {
-            const previousRenderTarget = threeRenderer.getRenderTarget();
-            const previousAutoClear = threeRenderer.autoClear;
-            const previousScissorTest = threeRenderer.getScissorTest();
-            const previousXrEnabled = threeRenderer.xr.enabled;
-            threeRenderer.getViewport(this._previousViewport);
-            threeRenderer.getScissor(this._previousScissor);
-
-            threeRenderer.xr.enabled = false;
-            threeRenderer.autoClear = true;
-            threeRenderer.setRenderTarget(this._sceneRenderTarget);
-            threeRenderer.clear(true, true, true);
-            threeRenderer.render(scene, camera);
-
-            threeRenderer.setRenderTarget(previousRenderTarget);
-            threeRenderer.setViewport(this._previousViewport);
-            threeRenderer.setScissor(this._previousScissor);
-            threeRenderer.setScissorTest(previousScissorTest);
-            threeRenderer.autoClear = previousAutoClear;
-            threeRenderer.xr.enabled = previousXrEnabled;
           }
 
           private _updateLightsUniforms(
@@ -357,10 +303,15 @@ namespace gdjs {
           }
 
           updatePreRender(target: gdjs.EffectsTarget): any {
-            if (!this._isEnabled || !this._effectEnabled) {
+            if (!this._isEnabled) {
               return;
             }
             if (!(target instanceof gdjs.Layer)) {
+              return;
+            }
+            if (!this._effectEnabled) {
+              this.shaderPass.enabled = false;
+              gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'FOG');
               return;
             }
 
@@ -379,8 +330,14 @@ namespace gdjs {
 
             if (!gdjs.isScene3DPostProcessingEnabled(target)) {
               this.shaderPass.enabled = false;
+              gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'FOG');
               return;
             }
+            gdjs.setScene3DPostProcessingEffectQualityMode(
+              target,
+              'FOG',
+              this._qualityMode
+            );
 
             const sharedCapture = gdjs.captureScene3DSharedTextures(
               target,
@@ -393,6 +350,10 @@ namespace gdjs {
             }
 
             threeCamera.updateMatrixWorld();
+            threeCamera.updateProjectionMatrix();
+            threeCamera.projectionMatrixInverse
+              .copy(threeCamera.projectionMatrix)
+              .invert();
             threeCamera.matrixWorldInverse.copy(threeCamera.matrixWorld).invert();
 
             this.shaderPass.enabled = true;
@@ -412,8 +373,11 @@ namespace gdjs {
             this.shaderPass.uniforms.density.value = this._density;
             this.shaderPass.uniforms.lightScatter.value = this._lightScatter;
             this.shaderPass.uniforms.maxDistance.value = this._maxDistance;
+            const quality = gdjs.getScene3DPostProcessingQualityProfileForMode(
+              this._qualityMode
+            );
             this.shaderPass.uniforms.stepCount.value =
-              sharedCapture.quality.fogSteps;
+              quality.fogSteps;
 
             this._updateLightsUniforms(threeScene, threeCamera);
           }
@@ -442,6 +406,8 @@ namespace gdjs {
           updateStringParameter(parameterName: string, value: string): void {
             if (parameterName === 'fogColor') {
               this._fogColor.setHex(gdjs.rgbOrHexStringToNumber(value));
+            } else if (parameterName === 'qualityMode') {
+              this._qualityMode = value || 'medium';
             }
           }
           updateColorParameter(parameterName: string, value: number): void {
@@ -468,6 +434,7 @@ namespace gdjs {
               ls: this._lightScatter,
               md: this._maxDistance,
               e: this._effectEnabled,
+              q: this._qualityMode,
             };
           }
           updateFromNetworkSyncData(
@@ -478,6 +445,7 @@ namespace gdjs {
             this._lightScatter = syncData.ls;
             this._maxDistance = syncData.md;
             this._effectEnabled = syncData.e;
+            this._qualityMode = syncData.q || 'medium';
 
             this.shaderPass.uniforms.fogColor.value.set(
               this._fogColor.r,

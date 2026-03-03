@@ -5,6 +5,7 @@ namespace gdjs {
     b: number;
     s: number;
     e: boolean;
+    q?: string;
   }
 
   const ssaoShader = {
@@ -15,7 +16,7 @@ namespace gdjs {
       radius: { value: 60.0 },
       intensity: { value: 0.9 },
       bias: { value: 0.6 },
-      sampleCount: { value: 16.0 },
+      sampleCount: { value: 4.0 },
       cameraProjectionMatrix: { value: new THREE.Matrix4() },
       cameraProjectionMatrixInverse: { value: new THREE.Matrix4() },
     },
@@ -177,50 +178,36 @@ namespace gdjs {
           _bias: number;
           _samples: number;
           _effectiveSamples: number;
-          _sceneRenderTarget: THREE.WebGLRenderTarget;
-          _previousViewport: THREE.Vector4;
-          _previousScissor: THREE.Vector4;
-          _renderSize: THREE.Vector2;
-          _captureScale: number;
-          _frameTimeSmoothing: number;
-          _framesSinceCapture: number;
-          _captureIntervalFrames: number;
+          _qualityMode: string;
 
           constructor() {
             this.shaderPass = new THREE_ADDONS.ShaderPass(ssaoShader);
             gdjs.markScene3DPostProcessingPass(this.shaderPass, 'SSAO');
             this._isEnabled = false;
-            this._effectEnabled = true;
-            this._radius = 60;
-            this._intensity = 0.9;
-            this._bias = 0.6;
-            this._samples = 16;
-            this._effectiveSamples = 16;
-            this._sceneRenderTarget = new THREE.WebGLRenderTarget(1, 1, {
-              minFilter: THREE.LinearFilter,
-              magFilter: THREE.LinearFilter,
-              format: THREE.RGBAFormat,
-              depthBuffer: true,
-              stencilBuffer: false,
-            });
-            this._sceneRenderTarget.texture.generateMipmaps = false;
-            this._sceneRenderTarget.depthTexture = new THREE.DepthTexture(1, 1);
-            this._sceneRenderTarget.depthTexture.format = THREE.DepthFormat;
-            this._sceneRenderTarget.depthTexture.type = THREE.UnsignedIntType;
-            this._sceneRenderTarget.depthTexture.needsUpdate = true;
-            this.shaderPass.uniforms.tDepth.value =
-              this._sceneRenderTarget.depthTexture;
+            this._effectEnabled =
+              effectData.booleanParameters.enabled === undefined
+                ? true
+                : !!effectData.booleanParameters.enabled;
+            this._radius =
+              effectData.doubleParameters.radius !== undefined
+                ? Math.max(0.1, effectData.doubleParameters.radius)
+                : 60;
+            this._intensity =
+              effectData.doubleParameters.intensity !== undefined
+                ? Math.max(0, effectData.doubleParameters.intensity)
+                : 0.9;
+            this._bias =
+              effectData.doubleParameters.bias !== undefined
+                ? Math.max(0, effectData.doubleParameters.bias)
+                : 0.6;
+            this._samples =
+              effectData.doubleParameters.samples !== undefined
+                ? Math.max(4, Math.min(32, Math.round(effectData.doubleParameters.samples)))
+                : 4;
+            this._effectiveSamples = this._samples;
+            this._qualityMode =
+              effectData.stringParameters.qualityMode || 'medium';
             this.shaderPass.enabled = true;
-            this._previousViewport = new THREE.Vector4();
-            this._previousScissor = new THREE.Vector4();
-            this._renderSize = new THREE.Vector2();
-            this._captureScale = 0.75;
-            this._frameTimeSmoothing = 16.6;
-            this._framesSinceCapture = 9999;
-            this._captureIntervalFrames = 1;
-            // Kept for backward compatibility while shared capture is active.
-            void this._updateRenderTargetSize;
-            void this._captureScene;
           }
 
           isEnabled(target: EffectsTarget): boolean {
@@ -241,6 +228,7 @@ namespace gdjs {
               return false;
             }
             target.getRenderer().addPostProcessingPass(this.shaderPass);
+            gdjs.reorderScene3DPostProcessingPasses(target);
             this._isEnabled = true;
             return true;
           }
@@ -249,97 +237,34 @@ namespace gdjs {
               return false;
             }
             target.getRenderer().removePostProcessingPass(this.shaderPass);
+            gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'SSAO');
             this._isEnabled = false;
             return true;
-          }
-
-          private _updateRenderTargetSize(
-            target: gdjs.Layer,
-            threeRenderer: THREE.WebGLRenderer
-          ): void {
-            threeRenderer.getDrawingBufferSize(this._renderSize);
-            const width = Math.max(
-              1,
-              Math.round((this._renderSize.x || target.getWidth()) * this._captureScale)
-            );
-            const height = Math.max(
-              1,
-              Math.round((this._renderSize.y || target.getHeight()) * this._captureScale)
-            );
-            if (
-              this._sceneRenderTarget.width !== width ||
-              this._sceneRenderTarget.height !== height
-            ) {
-              this._sceneRenderTarget.setSize(width, height);
-              if (this._sceneRenderTarget.depthTexture) {
-                this._sceneRenderTarget.depthTexture.needsUpdate = true;
-              }
-            }
-
-            this.shaderPass.uniforms.resolution.value.set(width, height);
-            this.shaderPass.uniforms.tDepth.value =
-              this._sceneRenderTarget.depthTexture;
-            this._sceneRenderTarget.texture.colorSpace =
-              threeRenderer.outputColorSpace;
           }
 
           private _adaptQuality(target: gdjs.EffectsTarget): void {
             if (!(target instanceof gdjs.Layer)) {
               return;
             }
-            const quality = gdjs.getScene3DPostProcessingQualityProfile(target);
-            this._captureScale = quality.captureScale;
-            this._captureIntervalFrames = 1;
+            const quality = gdjs.getScene3DPostProcessingQualityProfileForMode(
+              this._qualityMode
+            );
             this._effectiveSamples = Math.max(
               4,
               Math.min(quality.ssaoSamples, this._samples)
             );
           }
 
-          private _captureScene(
-            threeRenderer: THREE.WebGLRenderer,
-            scene: THREE.Scene,
-            camera: THREE.Camera
-          ): void {
-            const previousRenderTarget = threeRenderer.getRenderTarget();
-            const previousAutoClear = threeRenderer.autoClear;
-            const previousScissorTest = threeRenderer.getScissorTest();
-            const previousXrEnabled = threeRenderer.xr.enabled;
-            threeRenderer.getViewport(this._previousViewport);
-            threeRenderer.getScissor(this._previousScissor);
-
-            threeRenderer.xr.enabled = false;
-            threeRenderer.autoClear = true;
-            threeRenderer.setRenderTarget(this._sceneRenderTarget);
-            threeRenderer.setViewport(
-              0,
-              0,
-              this._sceneRenderTarget.width,
-              this._sceneRenderTarget.height
-            );
-            threeRenderer.setScissor(
-              0,
-              0,
-              this._sceneRenderTarget.width,
-              this._sceneRenderTarget.height
-            );
-            threeRenderer.setScissorTest(false);
-            threeRenderer.clear(true, true, true);
-            threeRenderer.render(scene, camera);
-
-            threeRenderer.setRenderTarget(previousRenderTarget);
-            threeRenderer.setViewport(this._previousViewport);
-            threeRenderer.setScissor(this._previousScissor);
-            threeRenderer.setScissorTest(previousScissorTest);
-            threeRenderer.autoClear = previousAutoClear;
-            threeRenderer.xr.enabled = previousXrEnabled;
-          }
-
           updatePreRender(target: gdjs.EffectsTarget): any {
-            if (!this._isEnabled || !this._effectEnabled) {
+            if (!this._isEnabled) {
               return;
             }
             if (!(target instanceof gdjs.Layer)) {
+              return;
+            }
+            if (!this._effectEnabled) {
+              this.shaderPass.enabled = false;
+              gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'SSAO');
               return;
             }
 
@@ -359,8 +284,14 @@ namespace gdjs {
             this._adaptQuality(target);
             if (!gdjs.isScene3DPostProcessingEnabled(target)) {
               this.shaderPass.enabled = false;
+              gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'SSAO');
               return;
             }
+            gdjs.setScene3DPostProcessingEffectQualityMode(
+              target,
+              'SSAO',
+              this._qualityMode
+            );
 
             const sharedCapture = gdjs.captureScene3DSharedTextures(
               target,
@@ -424,7 +355,11 @@ namespace gdjs {
             }
             return 0;
           }
-          updateStringParameter(parameterName: string, value: string): void {}
+          updateStringParameter(parameterName: string, value: string): void {
+            if (parameterName === 'qualityMode') {
+              this._qualityMode = value || 'medium';
+            }
+          }
           updateColorParameter(parameterName: string, value: number): void {}
           getColorParameter(parameterName: string): number {
             return 0;
@@ -442,6 +377,7 @@ namespace gdjs {
               b: this._bias,
               s: this._samples,
               e: this._effectEnabled,
+              q: this._qualityMode,
             };
           }
           updateFromNetworkSyncData(syncData: SSAONetworkSyncData): void {
@@ -451,6 +387,7 @@ namespace gdjs {
             this._samples = Math.max(4, Math.min(32, Math.round(syncData.s)));
             this._effectiveSamples = Math.max(4, Math.min(24, this._samples));
             this._effectEnabled = syncData.e;
+            this._qualityMode = syncData.q || 'medium';
 
             this.shaderPass.uniforms.radius.value = this._radius;
             this.shaderPass.uniforms.intensity.value = this._intensity;

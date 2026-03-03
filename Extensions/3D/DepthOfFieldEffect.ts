@@ -3,7 +3,9 @@ namespace gdjs {
     fd: number;
     fr: number;
     mb: number;
+    s: number;
     e: boolean;
+    q?: string;
   }
 
   const depthOfFieldShader = {
@@ -14,6 +16,7 @@ namespace gdjs {
       focusDistance: { value: 400.0 },
       focusRange: { value: 250.0 },
       maxBlur: { value: 6.0 },
+      sampleCount: { value: 4.0 },
       cameraProjectionMatrixInverse: { value: new THREE.Matrix4() },
     },
     vertexShader: `
@@ -33,8 +36,11 @@ namespace gdjs {
       uniform float focusDistance;
       uniform float focusRange;
       uniform float maxBlur;
+      uniform float sampleCount;
       uniform mat4 cameraProjectionMatrixInverse;
       varying vec2 vUv;
+
+      const int MAX_DOF_SAMPLES = 8;
 
       vec3 viewPositionFromDepth(vec2 uv, float depth) {
         vec4 clip = vec4(uv * 2.0 - 1.0, depth * 2.0 - 1.0, 1.0);
@@ -73,22 +79,26 @@ namespace gdjs {
 
         float blurRadius = maxBlur * blurFactor;
         vec2 texel = 1.0 / resolution;
-        float sigma = max(blurRadius * 0.75, 0.5);
-        float twoSigmaSquared = 2.0 * sigma * sigma;
+        float count = clamp(sampleCount, 2.0, float(MAX_DOF_SAMPLES));
 
-        vec3 accumColor = vec3(0.0);
-        float accumWeight = 0.0;
+        vec3 accumColor = baseColor.rgb;
+        float accumWeight = 1.0;
 
-        for (int x = -3; x <= 3; x++) {
-          for (int y = -3; y <= 3; y++) {
-            vec2 offset = vec2(float(x), float(y));
-            float distanceSquared = dot(offset, offset);
-            float weight = exp(-distanceSquared / twoSigmaSquared);
-            vec2 sampleUv = vUv + offset * texel * blurRadius;
-            vec3 sampleColor = texture2D(tDiffuse, sampleUv).rgb;
-            accumColor += sampleColor * weight;
-            accumWeight += weight;
+        for (int i = 0; i < MAX_DOF_SAMPLES; i++) {
+          if (float(i) >= count) {
+            break;
           }
+          float t = (float(i) + 0.5) / count;
+          float angle = 6.28318530718 * t;
+          vec2 direction = vec2(cos(angle), sin(angle));
+          vec2 sampleUv = clamp(
+            vUv + direction * texel * blurRadius,
+            vec2(0.0),
+            vec2(1.0)
+          );
+          vec3 sampleColor = texture2D(tDiffuse, sampleUv).rgb;
+          accumColor += sampleColor;
+          accumWeight += 1.0;
         }
 
         vec3 blurredColor = accumColor / max(accumWeight, 0.00001);
@@ -115,46 +125,45 @@ namespace gdjs {
           _focusDistance: number;
           _focusRange: number;
           _maxBlur: number;
-          _sceneRenderTarget: THREE.WebGLRenderTarget;
-          _previousViewport: THREE.Vector4;
-          _previousScissor: THREE.Vector4;
-          _renderSize: THREE.Vector2;
+          _samples: number;
+          _effectiveSamples: number;
+          _effectiveBlurScale: number;
+          _qualityMode: string;
 
           constructor() {
             this.shaderPass = new THREE_ADDONS.ShaderPass(depthOfFieldShader);
             gdjs.markScene3DPostProcessingPass(this.shaderPass, 'DOF');
             this._isEnabled = false;
-            this._effectEnabled = true;
-            this._focusDistance = 400;
-            this._focusRange = 250;
-            this._maxBlur = 6;
+            this._effectEnabled =
+              effectData.booleanParameters.enabled === undefined
+                ? true
+                : !!effectData.booleanParameters.enabled;
+            this._focusDistance =
+              effectData.doubleParameters.focusDistance !== undefined
+                ? Math.max(0, effectData.doubleParameters.focusDistance)
+                : 400;
+            this._focusRange =
+              effectData.doubleParameters.focusRange !== undefined
+                ? Math.max(0.0001, effectData.doubleParameters.focusRange)
+                : 250;
+            this._maxBlur =
+              effectData.doubleParameters.maxBlur !== undefined
+                ? Math.max(0, effectData.doubleParameters.maxBlur)
+                : 6;
+            this._samples =
+              effectData.doubleParameters.samples !== undefined
+                ? Math.max(2, Math.min(8, Math.round(effectData.doubleParameters.samples)))
+                : 4;
+            this._effectiveSamples = this._samples;
+            this._effectiveBlurScale = 1.0;
+            this._qualityMode =
+              effectData.stringParameters.qualityMode || 'medium';
 
-            this._sceneRenderTarget = new THREE.WebGLRenderTarget(1, 1, {
-              minFilter: THREE.LinearFilter,
-              magFilter: THREE.LinearFilter,
-              format: THREE.RGBAFormat,
-              depthBuffer: true,
-              stencilBuffer: false,
-            });
-            this._sceneRenderTarget.texture.generateMipmaps = false;
-            this._sceneRenderTarget.depthTexture = new THREE.DepthTexture(1, 1);
-            this._sceneRenderTarget.depthTexture.format = THREE.DepthFormat;
-            this._sceneRenderTarget.depthTexture.type = THREE.UnsignedIntType;
-            this._sceneRenderTarget.depthTexture.needsUpdate = true;
-
-            this.shaderPass.uniforms.tDepth.value =
-              this._sceneRenderTarget.depthTexture;
             this.shaderPass.uniforms.focusDistance.value = this._focusDistance;
             this.shaderPass.uniforms.focusRange.value = this._focusRange;
             this.shaderPass.uniforms.maxBlur.value = this._maxBlur;
+            this.shaderPass.uniforms.sampleCount.value = this._samples;
             this.shaderPass.enabled = true;
-
-            this._previousViewport = new THREE.Vector4();
-            this._previousScissor = new THREE.Vector4();
-            this._renderSize = new THREE.Vector2();
-            // Kept for backward compatibility while shared capture is active.
-            void this._updateRenderTargetSize;
-            void this._captureScene;
           }
 
           isEnabled(target: EffectsTarget): boolean {
@@ -175,6 +184,7 @@ namespace gdjs {
               return false;
             }
             target.getRenderer().addPostProcessingPass(this.shaderPass);
+            gdjs.reorderScene3DPostProcessingPasses(target);
             this._isEnabled = true;
             return true;
           }
@@ -183,65 +193,35 @@ namespace gdjs {
               return false;
             }
             target.getRenderer().removePostProcessingPass(this.shaderPass);
+            gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'DOF');
             this._isEnabled = false;
             return true;
           }
 
-          private _updateRenderTargetSize(
-            threeRenderer: THREE.WebGLRenderer
-          ): void {
-            threeRenderer.getDrawingBufferSize(this._renderSize);
-            const width = Math.max(1, Math.round(this._renderSize.x || 1));
-            const height = Math.max(1, Math.round(this._renderSize.y || 1));
-
-            if (
-              this._sceneRenderTarget.width !== width ||
-              this._sceneRenderTarget.height !== height
-            ) {
-              this._sceneRenderTarget.setSize(width, height);
-              if (this._sceneRenderTarget.depthTexture) {
-                this._sceneRenderTarget.depthTexture.needsUpdate = true;
-              }
+          private _adaptQuality(target: gdjs.EffectsTarget): void {
+            if (!(target instanceof gdjs.Layer)) {
+              return;
             }
-
-            this.shaderPass.uniforms.resolution.value.set(width, height);
-            this.shaderPass.uniforms.tDepth.value =
-              this._sceneRenderTarget.depthTexture;
-            this._sceneRenderTarget.texture.colorSpace =
-              threeRenderer.outputColorSpace;
-          }
-
-          private _captureScene(
-            threeRenderer: THREE.WebGLRenderer,
-            scene: THREE.Scene,
-            camera: THREE.Camera
-          ): void {
-            const previousRenderTarget = threeRenderer.getRenderTarget();
-            const previousAutoClear = threeRenderer.autoClear;
-            const previousScissorTest = threeRenderer.getScissorTest();
-            const previousXrEnabled = threeRenderer.xr.enabled;
-            threeRenderer.getViewport(this._previousViewport);
-            threeRenderer.getScissor(this._previousScissor);
-
-            threeRenderer.xr.enabled = false;
-            threeRenderer.autoClear = true;
-            threeRenderer.setRenderTarget(this._sceneRenderTarget);
-            threeRenderer.clear(true, true, true);
-            threeRenderer.render(scene, camera);
-
-            threeRenderer.setRenderTarget(previousRenderTarget);
-            threeRenderer.setViewport(this._previousViewport);
-            threeRenderer.setScissor(this._previousScissor);
-            threeRenderer.setScissorTest(previousScissorTest);
-            threeRenderer.autoClear = previousAutoClear;
-            threeRenderer.xr.enabled = previousXrEnabled;
+            const quality = gdjs.getScene3DPostProcessingQualityProfileForMode(
+              this._qualityMode
+            );
+            this._effectiveSamples = Math.max(
+              2,
+              Math.min(quality.dofSamples, this._samples)
+            );
+            this._effectiveBlurScale = quality.dofBlurScale;
           }
 
           updatePreRender(target: gdjs.EffectsTarget): any {
-            if (!this._isEnabled || !this._effectEnabled) {
+            if (!this._isEnabled) {
               return;
             }
             if (!(target instanceof gdjs.Layer)) {
+              return;
+            }
+            if (!this._effectEnabled) {
+              this.shaderPass.enabled = false;
+              gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'DOF');
               return;
             }
 
@@ -260,8 +240,15 @@ namespace gdjs {
 
             if (!gdjs.isScene3DPostProcessingEnabled(target)) {
               this.shaderPass.enabled = false;
+              gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'DOF');
               return;
             }
+            gdjs.setScene3DPostProcessingEffectQualityMode(
+              target,
+              'DOF',
+              this._qualityMode
+            );
+            this._adaptQuality(target);
 
             const sharedCapture = gdjs.captureScene3DSharedTextures(
               target,
@@ -274,6 +261,10 @@ namespace gdjs {
             }
 
             threeCamera.updateMatrixWorld();
+            threeCamera.updateProjectionMatrix();
+            threeCamera.projectionMatrixInverse
+              .copy(threeCamera.projectionMatrix)
+              .invert();
             this.shaderPass.enabled = true;
             this.shaderPass.uniforms.resolution.value.set(
               sharedCapture.width,
@@ -286,7 +277,8 @@ namespace gdjs {
             this.shaderPass.uniforms.focusDistance.value = this._focusDistance;
             this.shaderPass.uniforms.focusRange.value = this._focusRange;
             this.shaderPass.uniforms.maxBlur.value =
-              this._maxBlur * sharedCapture.quality.dofBlurScale;
+              this._maxBlur * this._effectiveBlurScale;
+            this.shaderPass.uniforms.sampleCount.value = this._effectiveSamples;
           }
 
           updateDoubleParameter(parameterName: string, value: number): void {
@@ -299,6 +291,9 @@ namespace gdjs {
             } else if (parameterName === 'maxBlur') {
               this._maxBlur = Math.max(0, value);
               this.shaderPass.uniforms.maxBlur.value = this._maxBlur;
+            } else if (parameterName === 'samples') {
+              this._samples = Math.max(2, Math.min(8, Math.round(value)));
+              this.shaderPass.uniforms.sampleCount.value = this._samples;
             }
           }
           getDoubleParameter(parameterName: string): number {
@@ -311,9 +306,16 @@ namespace gdjs {
             if (parameterName === 'maxBlur') {
               return this._maxBlur;
             }
+            if (parameterName === 'samples') {
+              return this._samples;
+            }
             return 0;
           }
-          updateStringParameter(parameterName: string, value: string): void {}
+          updateStringParameter(parameterName: string, value: string): void {
+            if (parameterName === 'qualityMode') {
+              this._qualityMode = value || 'medium';
+            }
+          }
           updateColorParameter(parameterName: string, value: number): void {}
           getColorParameter(parameterName: string): number {
             return 0;
@@ -329,18 +331,23 @@ namespace gdjs {
               fd: this._focusDistance,
               fr: this._focusRange,
               mb: this._maxBlur,
+              s: this._samples,
               e: this._effectEnabled,
+              q: this._qualityMode,
             };
           }
           updateFromNetworkSyncData(syncData: DepthOfFieldNetworkSyncData): void {
             this._focusDistance = syncData.fd;
             this._focusRange = syncData.fr;
             this._maxBlur = syncData.mb;
+            this._samples = Math.max(2, Math.min(8, Math.round(syncData.s)));
             this._effectEnabled = syncData.e;
+            this._qualityMode = syncData.q || 'medium';
 
             this.shaderPass.uniforms.focusDistance.value = this._focusDistance;
             this.shaderPass.uniforms.focusRange.value = this._focusRange;
             this.shaderPass.uniforms.maxBlur.value = this._maxBlur;
+            this.shaderPass.uniforms.sampleCount.value = this._samples;
             this.shaderPass.enabled = this._effectEnabled;
           }
         })();

@@ -1,230 +1,48 @@
-﻿namespace gdjs {
+namespace gdjs {
   interface RimLightNetworkSyncData {
     i: number;
     c: number;
     o: number;
     s: number;
+    p?: number;
+    f?: number;
     e: boolean;
+    d?: boolean;
   }
 
-  const rimLightShader = {
-    uniforms: {
-      tDiffuse: { value: null },
-      tSceneColor: { value: null },
-      tDepth: { value: null },
-      resolution: { value: new THREE.Vector2(1, 1) },
-      cameraProjectionMatrix: { value: new THREE.Matrix4() },
-      cameraProjectionMatrixInverse: { value: new THREE.Matrix4() },
-      cameraMatrixWorld: { value: new THREE.Matrix4() },
-      smoothedCameraPosition: { value: new THREE.Vector3() },
-      rimColor: { value: new THREE.Color(0xffffff) },
-      rimIntensity: { value: 0.8 },
-      rimOuterWrap: { value: 0.18 },
-      shadowStrength: { value: 1.0 },
-      shadowBias: { value: 0.0008 },
-      shadowMap0: { value: null },
-      shadowMap1: { value: null },
-      shadowMap2: { value: null },
-      shadowMatrix0: { value: new THREE.Matrix4() },
-      shadowMatrix1: { value: new THREE.Matrix4() },
-      shadowMatrix2: { value: new THREE.Matrix4() },
-      shadowEnabled0: { value: 0.0 },
-      shadowEnabled1: { value: 0.0 },
-      shadowEnabled2: { value: 0.0 },
-      fogMode: { value: 0.0 },
-      fogNear: { value: 1.0 },
-      fogFar: { value: 2000.0 },
-      fogDensity: { value: 0.001 },
-    },
-    vertexShader: `
-      varying vec2 vUv;
-
-      void main() {
-        vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-    `,
-    fragmentShader: `
-      precision highp float;
-
-      uniform sampler2D tDiffuse;
-      uniform sampler2D tSceneColor;
-      uniform sampler2D tDepth;
-      uniform vec2 resolution;
-      uniform mat4 cameraProjectionMatrix;
-      uniform mat4 cameraProjectionMatrixInverse;
-      uniform mat4 cameraMatrixWorld;
-      uniform vec3 smoothedCameraPosition;
-      uniform vec3 rimColor;
-      uniform float rimIntensity;
-      uniform float rimOuterWrap;
-      uniform float shadowStrength;
-      uniform float shadowBias;
-      uniform sampler2D shadowMap0;
-      uniform sampler2D shadowMap1;
-      uniform sampler2D shadowMap2;
-      uniform mat4 shadowMatrix0;
-      uniform mat4 shadowMatrix1;
-      uniform mat4 shadowMatrix2;
-      uniform float shadowEnabled0;
-      uniform float shadowEnabled1;
-      uniform float shadowEnabled2;
-      uniform float fogMode;
-      uniform float fogNear;
-      uniform float fogFar;
-      uniform float fogDensity;
-      varying vec2 vUv;
-
-      vec3 viewPositionFromDepth(vec2 uv, float depth) {
-        vec4 clip = vec4(uv * 2.0 - 1.0, depth * 2.0 - 1.0, 1.0);
-        vec4 view = cameraProjectionMatrixInverse * clip;
-        return view.xyz / max(view.w, 0.00001);
-      }
-
-      vec3 worldPositionFromView(vec3 viewPosition) {
-        return (cameraMatrixWorld * vec4(viewPosition, 1.0)).xyz;
-      }
-
-      vec3 reconstructNormal(vec2 uv, float depth) {
-        vec2 texel = 1.0 / resolution;
-        float depthRight = texture2D(tDepth, uv + vec2(texel.x, 0.0)).x;
-        float depthUp = texture2D(tDepth, uv + vec2(0.0, texel.y)).x;
-
-        vec3 center = viewPositionFromDepth(uv, depth);
-        vec3 right = viewPositionFromDepth(uv + vec2(texel.x, 0.0), depthRight);
-        vec3 up = viewPositionFromDepth(uv + vec2(0.0, texel.y), depthUp);
-
-        vec3 normal = normalize(cross(right - center, up - center));
-        if (dot(normal, -normalize(center)) < 0.0) {
-          normal = -normal;
-        }
-        return normal;
-      }
-
-      float computeRimZone(vec3 normalVS, vec3 viewDirVS) {
-        float ndv = clamp(abs(dot(normalVS, viewDirVS)), 0.0, 1.0);
-
-        // Inner: 0-15 deg from silhouette => full intensity.
-        float innerMax = 0.2588190451; // cos(75 deg)
-        // Mid: 15-45 deg from silhouette => smooth falloff.
-        float midMax = 0.7071067812; // cos(45 deg)
-
-        if (ndv <= innerMax) {
-          return 1.0;
-        }
-        if (ndv <= midMax) {
-          return 1.0 - smoothstep(innerMax, midMax, ndv);
-        }
-
-        // Outer: 45-90 deg from silhouette => ambient wrap.
-        float outerFactor = 1.0 - smoothstep(midMax, 1.0, ndv);
-        return outerFactor * rimOuterWrap;
-      }
-
-      float sampleShadowSingle(
-        sampler2D shadowMap,
-        mat4 shadowMatrix,
-        vec3 worldPos,
-        float enabledFlag
-      ) {
-        if (enabledFlag < 0.5) {
-          return -1.0;
-        }
-
-        vec4 shadowCoord = shadowMatrix * vec4(worldPos, 1.0);
-        shadowCoord.xyz /= max(shadowCoord.w, 0.00001);
-
-        // Outside this cascade frustum => no decision from this map.
-        if (
-          shadowCoord.x < 0.0 || shadowCoord.x > 1.0 ||
-          shadowCoord.y < 0.0 || shadowCoord.y > 1.0 ||
-          shadowCoord.z < 0.0 || shadowCoord.z > 1.0
-        ) {
-          return -1.0;
-        }
-
-        float mapDepth = texture2D(shadowMap, shadowCoord.xy).x;
-        float receiverDepth = shadowCoord.z - shadowBias;
-        return receiverDepth <= mapDepth ? 1.0 : 0.0;
-      }
-
-      float computeShadowVisibility(vec3 worldPos) {
-        float litMax = 0.0;
-        float contributors = 0.0;
-
-        float lit0 = sampleShadowSingle(shadowMap0, shadowMatrix0, worldPos, shadowEnabled0);
-        if (lit0 >= 0.0) {
-          contributors += 1.0;
-          litMax = max(litMax, lit0);
-        }
-
-        float lit1 = sampleShadowSingle(shadowMap1, shadowMatrix1, worldPos, shadowEnabled1);
-        if (lit1 >= 0.0) {
-          contributors += 1.0;
-          litMax = max(litMax, lit1);
-        }
-
-        float lit2 = sampleShadowSingle(shadowMap2, shadowMatrix2, worldPos, shadowEnabled2);
-        if (lit2 >= 0.0) {
-          contributors += 1.0;
-          litMax = max(litMax, lit2);
-        }
-
-        if (contributors <= 0.0) {
-          return 1.0;
-        }
-        return litMax;
-      }
-
-      float computeFogAttenuation(float distanceToCamera) {
-        if (fogMode < 0.5) {
-          return 1.0;
-        }
-        if (fogMode < 1.5) {
-          float linearFog = smoothstep(fogNear, fogFar, distanceToCamera);
-          return clamp(1.0 - linearFog, 0.0, 1.0);
-        }
-        float expFog = 1.0 - exp(-fogDensity * fogDensity * distanceToCamera * distanceToCamera);
-        return clamp(1.0 - expFog, 0.0, 1.0);
-      }
-
-      void main() {
-        vec4 baseColor = texture2D(tDiffuse, vUv);
-        if (rimIntensity <= 0.0) {
-          gl_FragColor = baseColor;
-          return;
-        }
-
-        float depth = texture2D(tDepth, vUv).x;
-        if (depth >= 1.0) {
-          gl_FragColor = baseColor;
-          return;
-        }
-
-        vec3 viewPos = viewPositionFromDepth(vUv, depth);
-        vec3 normalVS = reconstructNormal(vUv, depth);
-        vec3 worldPos = worldPositionFromView(viewPos);
-
-        vec3 viewDirWorld = normalize(smoothedCameraPosition - worldPos);
-        vec3 viewDirVS = normalize((viewMatrix * vec4(viewDirWorld, 0.0)).xyz);
-
-        float rimZone = computeRimZone(normalVS, viewDirVS);
-        float shadowVisibility = computeShadowVisibility(worldPos);
-        float distanceToCamera = length(smoothedCameraPosition - worldPos);
-        float fogAttenuation = computeFogAttenuation(distanceToCamera);
-
-        // Preserve energy in very dark areas by slightly mixing with captured scene color.
-        vec3 sceneColor = texture2D(tSceneColor, vUv).rgb;
-        float sceneLuma = dot(sceneColor, vec3(0.2126, 0.7152, 0.0722));
-        float darkLift = mix(0.55, 1.0, clamp(sceneLuma * 1.5, 0.0, 1.0));
-
-        float shadowFactor = mix(1.0, shadowVisibility, clamp(shadowStrength, 0.0, 1.0));
-        float rim = rimIntensity * rimZone * shadowFactor * fogAttenuation * darkLift;
-
-        gl_FragColor = vec4(baseColor.rgb + rimColor * rim, baseColor.a);
-      }
-    `,
+  type RimLightPatchedMaterial = THREE.Material & {
+    onBeforeCompile?: (shader: any, renderer: THREE.WebGLRenderer) => void;
+    customProgramCacheKey?: () => string;
+    needsUpdate?: boolean;
+    userData: {
+      [key: string]: any;
+    };
   };
+
+  interface RimLightShaderUniforms {
+    rimColor: { value: THREE.Color };
+    rimIntensity: { value: number };
+    rimOuterWrap: { value: number };
+    rimPower: { value: number };
+    rimFresnel0: { value: number };
+    rimCameraPosition: { value: THREE.Vector3 };
+    rimCameraMatrixWorld: { value: THREE.Matrix4 };
+    rimDebugForceMax: { value: number };
+  }
+
+  interface RimLightPatchedMaterialState {
+    originalOnBeforeCompile: (
+      shader: any,
+      renderer: THREE.WebGLRenderer
+    ) => void;
+    originalCustomProgramCacheKey?: (() => string) | undefined;
+    uniforms: RimLightShaderUniforms | null;
+    shaderInjected: boolean;
+  }
+
+  const rimLightShaderPatchKey = 'Scene3D_RimLight_Patch_v4';
+  const rimLightShaderPatchToken = 'SCENE3D_RIM_LIGHT_PATCH';
+  const rimMaterialScanIntervalFrames = 15;
 
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::RimLight',
@@ -236,20 +54,25 @@
         if (typeof THREE === 'undefined') {
           return new gdjs.PixiFiltersTools.EmptyFilter();
         }
+
         return new (class implements gdjs.PixiFiltersTools.Filter {
-          shaderPass: THREE_ADDONS.ShaderPass;
           _isEnabled: boolean;
           _effectEnabled: boolean;
           _intensity: number;
           _outerWrap: number;
+          _power: number;
+          _fresnel0: number;
           _shadowStrength: number;
           _colorHex: number;
-          _smoothedCameraPosition: THREE.Vector3;
-          _hasSmoothedCameraPosition: boolean;
+          _debugForceMaxRim: boolean;
+          _patchedMaterials: Map<RimLightPatchedMaterial, RimLightPatchedMaterialState>;
+          _cameraPosition: THREE.Vector3;
+          _cameraMatrixWorld: THREE.Matrix4;
+          _materialScanCounter: number;
+          _warnedNoMaterials: boolean;
+          _warnedNoShaderInjection: boolean;
 
           constructor() {
-            this.shaderPass = new THREE_ADDONS.ShaderPass(rimLightShader);
-            gdjs.markScene3DPostProcessingPass(this.shaderPass, 'RIM');
             this._isEnabled = false;
             this._effectEnabled =
               effectData.booleanParameters.enabled === undefined
@@ -270,106 +93,347 @@
                   : 0.18
               )
             );
+            this._power = Math.max(
+              0.05,
+              effectData.doubleParameters.power !== undefined
+                ? effectData.doubleParameters.power
+                : 2.2
+            );
+            this._fresnel0 = Math.max(
+              0,
+              Math.min(
+                1,
+                effectData.doubleParameters.fresnel0 !== undefined
+                  ? effectData.doubleParameters.fresnel0
+                  : 0.04
+              )
+            );
+            // Kept for network sync compatibility with previous implementation.
             this._shadowStrength = 1.0;
             this._colorHex = gdjs.rgbOrHexStringToNumber(
               effectData.stringParameters.color || '255;255;255'
             );
-            this._smoothedCameraPosition = new THREE.Vector3();
-            this._hasSmoothedCameraPosition = false;
+            this._debugForceMaxRim =
+              effectData.booleanParameters.debugForceMaxRim === undefined
+                ? false
+                : !!effectData.booleanParameters.debugForceMaxRim;
 
-            this.shaderPass.uniforms.rimIntensity.value = this._intensity;
-            this.shaderPass.uniforms.rimOuterWrap.value = this._outerWrap;
-            this.shaderPass.uniforms.shadowStrength.value = this._shadowStrength;
-            this.shaderPass.uniforms.rimColor.value.setHex(this._colorHex);
-            this.shaderPass.enabled = this._effectEnabled;
+            this._patchedMaterials = new Map();
+            this._cameraPosition = new THREE.Vector3();
+            this._cameraMatrixWorld = new THREE.Matrix4();
+            this._materialScanCounter = rimMaterialScanIntervalFrames;
+            this._warnedNoMaterials = false;
+            this._warnedNoShaderInjection = false;
           }
 
-          private _getShadowLights(scene: THREE.Scene): Array<THREE.DirectionalLight> {
-            const lights: Array<THREE.DirectionalLight> = [];
-            scene.traverse((object3D) => {
-              if (lights.length >= 3) {
+          private _isMaterialPatchable(material: RimLightPatchedMaterial): boolean {
+            if (!material) {
+              return false;
+            }
+            // ShaderMaterial is already user-defined; avoid mutating it unexpectedly.
+            const typedMaterial = material as THREE.Material & {
+              isShaderMaterial?: boolean;
+              isMeshBasicMaterial?: boolean;
+              isMeshLambertMaterial?: boolean;
+              isMeshPhongMaterial?: boolean;
+              isMeshStandardMaterial?: boolean;
+              isMeshPhysicalMaterial?: boolean;
+              isMeshToonMaterial?: boolean;
+              isMeshMatcapMaterial?: boolean;
+            };
+            if (typedMaterial.isShaderMaterial) {
+              return false;
+            }
+            return !!(
+              typedMaterial.isMeshBasicMaterial ||
+              typedMaterial.isMeshLambertMaterial ||
+              typedMaterial.isMeshPhongMaterial ||
+              typedMaterial.isMeshStandardMaterial ||
+              typedMaterial.isMeshPhysicalMaterial ||
+              typedMaterial.isMeshToonMaterial ||
+              typedMaterial.isMeshMatcapMaterial
+            );
+          }
+
+          private _injectShader(shader: any): boolean {
+            if (shader.fragmentShader.indexOf(rimLightShaderPatchToken) !== -1) {
+              return true;
+            }
+
+            if (
+              shader.vertexShader.indexOf('#include <common>') === -1 ||
+              shader.vertexShader.indexOf('#include <defaultnormal_vertex>') === -1 ||
+              shader.vertexShader.indexOf('#include <project_vertex>') === -1 ||
+              shader.fragmentShader.indexOf('#include <common>') === -1 ||
+              shader.fragmentShader.indexOf('#include <output_fragment>') === -1
+            ) {
+              return false;
+            }
+
+            shader.vertexShader = shader.vertexShader.replace(
+              '#include <common>',
+              `#include <common>
+uniform mat4 rimCameraMatrixWorld;
+varying vec3 vScene3DRimWorldPosition;
+varying vec3 vScene3DRimWorldNormal;`
+            );
+
+            shader.vertexShader = shader.vertexShader.replace(
+              '#include <defaultnormal_vertex>',
+              `#include <defaultnormal_vertex>
+vScene3DRimWorldNormal = normalize(mat3(rimCameraMatrixWorld) * transformedNormal);`
+            );
+
+            shader.vertexShader = shader.vertexShader.replace(
+              '#include <project_vertex>',
+              `#include <project_vertex>
+vScene3DRimWorldPosition = (modelMatrix * vec4(transformed, 1.0)).xyz;`
+            );
+
+            shader.fragmentShader = shader.fragmentShader.replace(
+              '#include <common>',
+              `#include <common>
+uniform vec3 rimColor;
+uniform float rimIntensity;
+uniform float rimOuterWrap;
+uniform float rimPower;
+uniform float rimFresnel0;
+uniform vec3 rimCameraPosition;
+uniform float rimDebugForceMax;
+varying vec3 vScene3DRimWorldPosition;
+varying vec3 vScene3DRimWorldNormal;
+
+float scene3dPow5(float x) {
+  float x2 = x * x;
+  return x2 * x2 * x;
+}
+
+float scene3dSchlickFresnel(float ndv, float f0) {
+  float clampedNdv = clamp(ndv, 0.0, 1.0);
+  return f0 + (1.0 - f0) * scene3dPow5(1.0 - clampedNdv);
+}
+
+float scene3dComputeRimStrength(
+  vec3 worldNormal,
+  vec3 viewDirWorld,
+  float outerWrap,
+  float rimPower,
+  float fresnel0
+) {
+  vec3 resolvedNormal = normalize(worldNormal);
+  #ifdef DOUBLE_SIDED
+    resolvedNormal = gl_FrontFacing ? resolvedNormal : -resolvedNormal;
+  #endif
+
+  float ndv = clamp(dot(resolvedNormal, normalize(viewDirWorld)), 0.0, 1.0);
+  float oneMinusNdv = 1.0 - ndv;
+
+  // Artistic shaping term used in most realtime rim-light implementations.
+  float rimCore = pow(max(oneMinusNdv, 0.0), max(rimPower, 0.05));
+
+  // "Outer wrap" broadens the highlighted zone away from the strict silhouette.
+  float wrapped = clamp(oneMinusNdv + clamp(outerWrap, 0.0, 1.0) * 0.5, 0.0, 1.0);
+  float rimEnvelope = smoothstep(0.0, 1.0, wrapped);
+
+  // Physically-inspired angular response (Schlick Fresnel).
+  float fresnel = scene3dSchlickFresnel(ndv, clamp(fresnel0, 0.0, 1.0));
+
+  return clamp(rimCore * rimEnvelope * fresnel, 0.0, 1.0);
+}`
+            );
+
+            shader.fragmentShader = shader.fragmentShader.replace(
+              '#include <output_fragment>',
+              `float scene3dRimStrength = 0.0;
+if (rimDebugForceMax > 0.5) {
+  // Debug mode: force full-rim contribution everywhere to verify shader reach.
+  scene3dRimStrength = 1.0;
+} else if (rimIntensity > 0.0) {
+  vec3 scene3dViewDir = normalize(rimCameraPosition - vScene3DRimWorldPosition);
+  scene3dRimStrength = scene3dComputeRimStrength(
+    vScene3DRimWorldNormal,
+    scene3dViewDir,
+    rimOuterWrap,
+    rimPower,
+    rimFresnel0
+  );
+}
+outgoingLight += rimColor * (rimIntensity * scene3dRimStrength);
+// ${rimLightShaderPatchToken}
+#include <output_fragment>`
+            );
+
+            return true;
+          }
+
+          private _updateUniformState(
+            patchState: RimLightPatchedMaterialState
+          ): void {
+            const uniforms = patchState.uniforms;
+            if (!uniforms) {
+              return;
+            }
+
+            uniforms.rimColor.value.setHex(this._colorHex);
+            uniforms.rimIntensity.value = this._effectEnabled
+              ? this._debugForceMaxRim
+                ? 1.0
+                : this._intensity * Math.max(0, Math.min(1, this._shadowStrength))
+              : 0;
+            uniforms.rimOuterWrap.value = this._outerWrap;
+            uniforms.rimPower.value = this._power;
+            uniforms.rimFresnel0.value = this._fresnel0;
+            uniforms.rimCameraPosition.value.copy(this._cameraPosition);
+            uniforms.rimCameraMatrixWorld.value.copy(this._cameraMatrixWorld);
+            uniforms.rimDebugForceMax.value = this._debugForceMaxRim ? 1.0 : 0.0;
+          }
+
+          private _patchMaterial(material: RimLightPatchedMaterial): void {
+            if (this._patchedMaterials.has(material)) {
+              return;
+            }
+            if (!this._isMaterialPatchable(material)) {
+              return;
+            }
+
+            const originalOnBeforeCompile = material.onBeforeCompile
+              ? material.onBeforeCompile
+              : () => {};
+            const originalCustomProgramCacheKey = material.customProgramCacheKey;
+
+            const patchState: RimLightPatchedMaterialState = {
+              originalOnBeforeCompile,
+              originalCustomProgramCacheKey,
+              uniforms: null,
+              shaderInjected: false,
+            };
+
+            material.onBeforeCompile = (
+              shader: any,
+              renderer: THREE.WebGLRenderer
+            ) => {
+              patchState.originalOnBeforeCompile.call(material, shader, renderer);
+
+              if (!this._injectShader(shader)) {
                 return;
               }
-              const light = object3D as THREE.DirectionalLight & {
-                isDirectionalLight?: boolean;
+
+              shader.uniforms.rimColor = {
+                value: new THREE.Color(this._colorHex),
               };
-              if (!light || !light.isDirectionalLight || !light.castShadow) {
+              shader.uniforms.rimIntensity = {
+                value: 0,
+              };
+              shader.uniforms.rimOuterWrap = {
+                value: this._outerWrap,
+              };
+              shader.uniforms.rimPower = {
+                value: this._power,
+              };
+              shader.uniforms.rimFresnel0 = {
+                value: this._fresnel0,
+              };
+              shader.uniforms.rimCameraPosition = {
+                value: new THREE.Vector3(),
+              };
+              shader.uniforms.rimCameraMatrixWorld = {
+                value: new THREE.Matrix4(),
+              };
+              shader.uniforms.rimDebugForceMax = {
+                value: this._debugForceMaxRim ? 1.0 : 0.0,
+              };
+
+              patchState.uniforms = shader.uniforms as RimLightShaderUniforms;
+              patchState.shaderInjected = true;
+              this._updateUniformState(patchState);
+            };
+
+            material.customProgramCacheKey = () => {
+              const previousKey = patchState.originalCustomProgramCacheKey
+                ? patchState.originalCustomProgramCacheKey.call(material)
+                : '';
+              return `${previousKey}|${rimLightShaderPatchKey}`;
+            };
+
+            material.needsUpdate = true;
+            this._patchedMaterials.set(material, patchState);
+          }
+
+          private _unpatchMaterial(material: RimLightPatchedMaterial): void {
+            const patchState = this._patchedMaterials.get(material);
+            if (!patchState) {
+              return;
+            }
+
+            material.onBeforeCompile = patchState.originalOnBeforeCompile;
+
+            if (patchState.originalCustomProgramCacheKey) {
+              material.customProgramCacheKey =
+                patchState.originalCustomProgramCacheKey;
+            } else {
+              material.customProgramCacheKey = () => '';
+            }
+
+            material.needsUpdate = true;
+            this._patchedMaterials.delete(material);
+          }
+
+          private _unpatchAllMaterials(): void {
+            for (const material of Array.from(this._patchedMaterials.keys())) {
+              this._unpatchMaterial(material);
+            }
+            this._patchedMaterials.clear();
+          }
+
+          private _applyToSceneMaterials(scene: THREE.Scene): void {
+            let encounteredMaterials = 0;
+
+            scene.traverse((object3D) => {
+              const mesh = object3D as THREE.Mesh;
+              if (!mesh || !mesh.isMesh || !mesh.material) {
                 return;
               }
-              const shadowMap = light.shadow && light.shadow.map;
-              if (!shadowMap || !shadowMap.texture) {
-                return;
+
+              const materials = Array.isArray(mesh.material)
+                ? (mesh.material as RimLightPatchedMaterial[])
+                : ([mesh.material] as RimLightPatchedMaterial[]);
+
+              for (const material of materials) {
+                if (!material) {
+                  continue;
+                }
+                encounteredMaterials++;
+                this._patchMaterial(material);
               }
-              lights.push(light);
             });
-            return lights;
+
+            if (encounteredMaterials === 0 && !this._warnedNoMaterials) {
+              this._warnedNoMaterials = true;
+              console.warn(
+                '[Scene3D::RimLight] No mesh materials found on the target scene layer. Rim light was not applied.'
+              );
+            }
           }
 
-          private _updateShadowUniforms(scene: THREE.Scene): void {
-            const lights = this._getShadowLights(scene);
-            for (let i = 0; i < 3; i++) {
-              const light = lights[i];
-              const shadowTextureUniform = this.shaderPass.uniforms[
-                `shadowMap${i}`
-              ];
-              const shadowMatrixUniform = this.shaderPass.uniforms[
-                `shadowMatrix${i}`
-              ];
-              const shadowEnabledUniform = this.shaderPass.uniforms[
-                `shadowEnabled${i}`
-              ];
-
-              if (!light || !light.shadow || !light.shadow.map) {
-                shadowTextureUniform.value = null;
-                shadowEnabledUniform.value = 0.0;
-                continue;
+          private _updatePatchedMaterialsUniforms(): void {
+            let injectedMaterialCount = 0;
+            for (const patchState of this._patchedMaterials.values()) {
+              if (patchState.shaderInjected) {
+                injectedMaterialCount++;
               }
-
-              shadowTextureUniform.value = light.shadow.map.texture;
-              shadowMatrixUniform.value.copy(light.shadow.matrix);
-              shadowEnabledUniform.value = 1.0;
-            }
-          }
-
-          private _updateFogUniforms(scene: THREE.Scene): void {
-            const fog = scene.fog;
-            if (!fog) {
-              this.shaderPass.uniforms.fogMode.value = 0.0;
-              this.shaderPass.uniforms.fogNear.value = 1.0;
-              this.shaderPass.uniforms.fogFar.value = 2000.0;
-              this.shaderPass.uniforms.fogDensity.value = 0.001;
-              return;
+              this._updateUniformState(patchState);
             }
 
-            const linearFog = fog as THREE.Fog;
-            if ((linearFog as THREE.Fog & { isFog?: boolean }).isFog) {
-              this.shaderPass.uniforms.fogMode.value = 1.0;
-              this.shaderPass.uniforms.fogNear.value = linearFog.near;
-              this.shaderPass.uniforms.fogFar.value = linearFog.far;
-              this.shaderPass.uniforms.fogDensity.value = 0.001;
-              return;
+            if (
+              this._patchedMaterials.size > 0 &&
+              injectedMaterialCount === 0 &&
+              !this._warnedNoShaderInjection
+            ) {
+              this._warnedNoShaderInjection = true;
+              console.warn(
+                '[Scene3D::RimLight] Materials were found, but shader injection has not compiled yet. Enable debugForceMaxRim to validate when compilation occurs.'
+              );
             }
-
-            const expFog = fog as THREE.FogExp2;
-            if ((expFog as THREE.FogExp2 & { isFogExp2?: boolean }).isFogExp2) {
-              this.shaderPass.uniforms.fogMode.value = 2.0;
-              this.shaderPass.uniforms.fogNear.value = 1.0;
-              this.shaderPass.uniforms.fogFar.value = 2000.0;
-              this.shaderPass.uniforms.fogDensity.value = expFog.density;
-              return;
-            }
-
-            this.shaderPass.uniforms.fogMode.value = 0.0;
-          }
-
-          private _updateSmoothedCamera(camera: THREE.Camera): void {
-            if (!this._hasSmoothedCameraPosition) {
-              this._smoothedCameraPosition.copy(camera.position);
-              this._hasSmoothedCameraPosition = true;
-              return;
-            }
-            // 1-frame lerp buffer to reduce fast-rotation edge jitter.
-            this._smoothedCameraPosition.lerp(camera.position, 0.5);
           }
 
           isEnabled(target: EffectsTarget): boolean {
@@ -387,93 +451,53 @@
           }
 
           applyEffect(target: EffectsTarget): boolean {
-            if (!(target instanceof gdjs.Layer)) {
+            const scene = target.get3DRendererObject() as THREE.Scene | null;
+            if (!scene) {
               return false;
             }
-            target.getRenderer().addPostProcessingPass(this.shaderPass);
-            this._hasSmoothedCameraPosition = false;
+
+            this._materialScanCounter = rimMaterialScanIntervalFrames;
+            this._warnedNoMaterials = false;
+            this._warnedNoShaderInjection = false;
+            this._applyToSceneMaterials(scene);
             this._isEnabled = true;
             return true;
           }
 
           removeEffect(target: EffectsTarget): boolean {
-            if (!(target instanceof gdjs.Layer)) {
-              return false;
-            }
-            target.getRenderer().removePostProcessingPass(this.shaderPass);
+            this._unpatchAllMaterials();
             this._isEnabled = false;
             return true;
           }
 
           updatePreRender(target: gdjs.EffectsTarget): any {
-            if (!this._isEnabled || !this._effectEnabled) {
+            if (!this._isEnabled) {
               return;
             }
             if (!(target instanceof gdjs.Layer)) {
               return;
             }
 
-            const runtimeScene = target.getRuntimeScene();
-            const threeRenderer = runtimeScene
-              .getGame()
-              .getRenderer()
-              .getThreeRenderer();
             const layerRenderer = target.getRenderer();
             const threeScene = layerRenderer.getThreeScene();
             const threeCamera = layerRenderer.getThreeCamera();
 
-            if (!threeRenderer || !threeScene || !threeCamera) {
-              return;
-            }
-
-            if (!gdjs.isScene3DPostProcessingEnabled(target)) {
-              this.shaderPass.enabled = false;
-              return;
-            }
-
-            const sharedCapture = gdjs.captureScene3DSharedTextures(
-              target,
-              threeRenderer,
-              threeScene,
-              threeCamera
-            );
-            if (!sharedCapture || !sharedCapture.depthTexture) {
+            if (!threeScene || !threeCamera) {
               return;
             }
 
             threeCamera.updateMatrixWorld();
-            threeCamera.updateProjectionMatrix();
-            threeCamera.projectionMatrixInverse
-              .copy(threeCamera.projectionMatrix)
-              .invert();
+            this._cameraMatrixWorld.copy(threeCamera.matrixWorld);
+            this._cameraPosition.setFromMatrixPosition(threeCamera.matrixWorld);
 
-            this._updateSmoothedCamera(threeCamera);
-            this._updateShadowUniforms(threeScene);
-            this._updateFogUniforms(threeScene);
+            if (this._materialScanCounter >= rimMaterialScanIntervalFrames) {
+              this._applyToSceneMaterials(threeScene);
+              this._materialScanCounter = 0;
+            } else {
+              this._materialScanCounter++;
+            }
 
-            this.shaderPass.enabled = true;
-            this.shaderPass.uniforms.tSceneColor.value = sharedCapture.colorTexture;
-            this.shaderPass.uniforms.tDepth.value = sharedCapture.depthTexture;
-            this.shaderPass.uniforms.resolution.value.set(
-              sharedCapture.width,
-              sharedCapture.height
-            );
-            this.shaderPass.uniforms.cameraProjectionMatrix.value.copy(
-              threeCamera.projectionMatrix
-            );
-            this.shaderPass.uniforms.cameraProjectionMatrixInverse.value.copy(
-              threeCamera.projectionMatrixInverse
-            );
-            this.shaderPass.uniforms.cameraMatrixWorld.value.copy(
-              threeCamera.matrixWorld
-            );
-            this.shaderPass.uniforms.smoothedCameraPosition.value.copy(
-              this._smoothedCameraPosition
-            );
-            this.shaderPass.uniforms.rimIntensity.value = this._intensity;
-            this.shaderPass.uniforms.rimOuterWrap.value = this._outerWrap;
-            this.shaderPass.uniforms.shadowStrength.value = this._shadowStrength;
-            this.shaderPass.uniforms.rimColor.value.setHex(this._colorHex);
+            this._updatePatchedMaterialsUniforms();
           }
 
           updateDoubleParameter(parameterName: string, value: number): void {
@@ -481,6 +505,10 @@
               this._intensity = Math.max(0, value);
             } else if (parameterName === 'outerWrap') {
               this._outerWrap = Math.max(0, Math.min(1, value));
+            } else if (parameterName === 'power') {
+              this._power = Math.max(0.05, value);
+            } else if (parameterName === 'fresnel0') {
+              this._fresnel0 = Math.max(0, Math.min(1, value));
             } else if (parameterName === 'shadowStrength') {
               this._shadowStrength = Math.max(0, Math.min(1, value));
             }
@@ -492,6 +520,12 @@
             }
             if (parameterName === 'outerWrap') {
               return this._outerWrap;
+            }
+            if (parameterName === 'power') {
+              return this._power;
+            }
+            if (parameterName === 'fresnel0') {
+              return this._fresnel0;
             }
             if (parameterName === 'shadowStrength') {
               return this._shadowStrength;
@@ -521,7 +555,8 @@
           updateBooleanParameter(parameterName: string, value: boolean): void {
             if (parameterName === 'enabled') {
               this._effectEnabled = value;
-              this.shaderPass.enabled = value;
+            } else if (parameterName === 'debugForceMaxRim') {
+              this._debugForceMaxRim = value;
             }
           }
 
@@ -531,7 +566,10 @@
               c: this._colorHex,
               o: this._outerWrap,
               s: this._shadowStrength,
+              p: this._power,
+              f: this._fresnel0,
               e: this._effectEnabled,
+              d: this._debugForceMaxRim,
             };
           }
 
@@ -540,13 +578,14 @@
             this._colorHex = syncData.c;
             this._outerWrap = Math.max(0, Math.min(1, syncData.o));
             this._shadowStrength = Math.max(0, Math.min(1, syncData.s));
+            if (syncData.p !== undefined) {
+              this._power = Math.max(0.05, syncData.p);
+            }
+            if (syncData.f !== undefined) {
+              this._fresnel0 = Math.max(0, Math.min(1, syncData.f));
+            }
             this._effectEnabled = !!syncData.e;
-
-            this.shaderPass.uniforms.rimIntensity.value = this._intensity;
-            this.shaderPass.uniforms.rimOuterWrap.value = this._outerWrap;
-            this.shaderPass.uniforms.shadowStrength.value = this._shadowStrength;
-            this.shaderPass.uniforms.rimColor.value.setHex(this._colorHex);
-            this.shaderPass.enabled = this._effectEnabled;
+            this._debugForceMaxRim = !!syncData.d;
           }
         })();
       }

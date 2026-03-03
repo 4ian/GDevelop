@@ -612,6 +612,97 @@ module.exports = {
     }
 
     {
+      const behavior = new gd.BehaviorJsImplementation();
+
+      behavior.updateProperty = function (
+        behaviorContent,
+        propertyName,
+        newValue
+      ) {
+        if (!behaviorContent.hasChild('enabled')) {
+          behaviorContent.addChild('enabled').setBoolValue(true);
+        }
+
+        if (propertyName === 'enabled') {
+          behaviorContent
+            .getChild('enabled')
+            .setBoolValue(newValue === '1' || newValue === 'true');
+          return true;
+        }
+
+        return false;
+      };
+
+      behavior.getProperties = function (behaviorContent) {
+        const behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+        if (!behaviorContent.hasChild('enabled')) {
+          behaviorContent.addChild('enabled').setBoolValue(true);
+        }
+
+        behaviorProperties
+          .getOrCreate('enabled')
+          .setValue(
+            behaviorContent.getChild('enabled').getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setType('Boolean')
+          .setLabel(_('Enabled'));
+
+        return behaviorProperties;
+      };
+
+      behavior.initializeContent = function (behaviorContent) {
+        behaviorContent.addChild('enabled').setBoolValue(true);
+      };
+
+      const ssrExclude = extension
+        .addBehavior(
+          'SSRExclude',
+          _('SSR exclude'),
+          'SSRExclude',
+          _('Exclude this 3D object from Scene3D screen-space reflections.'),
+          '',
+          'res/conditions/3d_box.svg',
+          'SSRExclude',
+          // @ts-ignore
+          behavior,
+          new gd.BehaviorsSharedData()
+        )
+        .setIncludeFile('Extensions/3D/SSRExcludeBehavior.js');
+
+      ssrExclude
+        .addScopedAction(
+          'SetEnabled',
+          _('Enable/disable SSR exclusion'),
+          _('Enable or disable exclusion of this object from SSR.'),
+          _('Set SSR exclusion of _PARAM0_ to _PARAM2_'),
+          _('SSR exclusion'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'SSRExclude')
+        .addParameter('yesorno', _('Enabled'))
+        .setFunctionName('setEnabled');
+
+      ssrExclude
+        .addScopedCondition(
+          'IsEnabled',
+          _('SSR exclusion enabled'),
+          _('Check if SSR exclusion is enabled for this object.'),
+          _('SSR exclusion is enabled for _PARAM0_'),
+          _('SSR exclusion'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'SSRExclude')
+        .setFunctionName('isEnabled');
+    }
+
+    {
       const object = extension
         .addObject(
           'Model3DObject',
@@ -2527,12 +2618,11 @@ module.exports = {
         .setFullName(_('Rim light'))
         .setDescription(
           _(
-            'Screen-space rim shading pass using depth, camera view and existing scene capture. Includes fog fade and shadow-map suppression.'
+            'Injects Fresnel-based rim lighting directly into 3D mesh materials via shader compilation. Rim direction is updated every frame from the active camera position.'
           )
         )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
-        .addIncludeFile('Extensions/3D/PostProcessingSharedResources.js')
         .addIncludeFile('Extensions/3D/RimLight.js');
       const properties = effect.getProperties();
       properties
@@ -2561,6 +2651,40 @@ module.exports = {
           )
         )
         .setType('number')
+        .setAdvanced(true);
+      properties
+        .getOrCreate('power')
+        .setValue('2.2')
+        .setLabel(_('Rim power'))
+        .setDescription(
+          _(
+            'Controls rim falloff near silhouette. Higher values make a tighter, sharper rim.'
+          )
+        )
+        .setType('number')
+        .setAdvanced(true);
+      properties
+        .getOrCreate('fresnel0')
+        .setValue('0.04')
+        .setLabel(_('Fresnel F0'))
+        .setDescription(
+          _(
+            'Base reflectance used by Schlick Fresnel. Typical non-metal values are around 0.02 to 0.08.'
+          )
+        )
+        .setType('number')
+        .setAdvanced(true);
+      properties
+        .getOrCreate('debugForceMaxRim')
+        .setValue('false')
+        .setLabel(_('Debug: force max rim'))
+        .setDescription(
+          _(
+            'For debugging shader injection: force full rim contribution on patched materials regardless of view angle.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Debug'))
         .setAdvanced(true);
     }
     {
@@ -3278,6 +3402,12 @@ module.exports = {
         .setLabel(_('Threshold'))
         .setType('number')
         .setDescription(_('Between 0 and 1'));
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .setLabel(_('Quality mode'))
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension
@@ -3318,6 +3448,12 @@ module.exports = {
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setDescription(_('Depth tolerance to detect reflection hits reliably.'));
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .setLabel(_('Quality mode'))
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension
@@ -3450,10 +3586,16 @@ module.exports = {
         .setDescription(_('Prevents self-occlusion artifacts.'));
       properties
         .getOrCreate('samples')
-        .setValue('16')
+        .setValue('4')
         .setLabel(_('Samples'))
         .setType('number')
         .setDescription(_('Quality/performance control (higher = better, slower).'));
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .setLabel(_('Quality mode'))
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension
@@ -3498,6 +3640,12 @@ module.exports = {
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setDescription(_('Maximum distance for volumetric ray marching.'));
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .setLabel(_('Quality mode'))
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension
@@ -3538,6 +3686,18 @@ module.exports = {
         .setLabel(_('Max blur'))
         .setType('number')
         .setDescription(_('Maximum blur radius strength.'));
+      properties
+        .getOrCreate('samples')
+        .setValue('4')
+        .setLabel(_('Samples'))
+        .setType('number')
+        .setDescription(_('Blur taps around each pixel (higher = smoother, slower).'));
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .setLabel(_('Quality mode'))
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension

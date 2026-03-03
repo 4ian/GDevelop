@@ -27,7 +27,7 @@ if (!args['skip-clean']) {
 // Build GDJS runtime (and extensions).
 destinationPaths.forEach(destinationPath => {
   const outPath = path.join(destinationPath, 'Runtime');
-  const output = shell.exec(`node scripts/build.js --out ${outPath}`, {
+  const output = shell.exec(`node scripts/build.js --out "${outPath}"`, {
     cwd: path.join(gdevelopRootPath, 'GDJS'),
   });
   if (output.code !== 0) {

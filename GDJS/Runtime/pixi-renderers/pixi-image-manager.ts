@@ -92,6 +92,9 @@ namespace gdjs {
      * @returns The requested texture, or a placeholder if not found.
      */
     getPIXITexture(resourceName: string): PIXI.Texture {
+      if (!resourceName) {
+        return this._invalidTexture;
+      }
       const resource = this._getImageResource(resourceName);
       if (!resource) {
         logger.warn(
@@ -129,6 +132,9 @@ namespace gdjs {
      * @returns The requested texture, or a placeholder if not valid.
      */
     getOrLoadPIXITexture(resourceName: string): PIXI.Texture {
+      if (!resourceName) {
+        return this._invalidTexture;
+      }
       const resource = this._getImageResource(resourceName);
       if (!resource) {
         logger.warn(
@@ -394,6 +400,9 @@ namespace gdjs {
      * used by calling `getPIXITexture`.
      */
     async loadResource(resourceName: string): Promise<void> {
+      if (!resourceName) {
+        return;
+      }
       const resource = this._resourceLoader.getResource(resourceName);
       if (!resource) {
         logger.warn(

@@ -3,6 +3,7 @@ namespace gdjs {
     s: number;
     r: number;
     t: number;
+    q?: string;
   }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::Bloom',
@@ -17,6 +18,8 @@ namespace gdjs {
         return new (class implements gdjs.PixiFiltersTools.Filter {
           shaderPass: THREE_ADDONS.UnrealBloomPass;
           _isEnabled: boolean;
+          _qualityMode: string;
+          _renderSize: THREE.Vector2;
 
           constructor() {
             this.shaderPass = new THREE_ADDONS.UnrealBloomPass(
@@ -25,7 +28,11 @@ namespace gdjs {
               0,
               0
             );
+            gdjs.markScene3DPostProcessingPass(this.shaderPass, 'BLOOM');
             this._isEnabled = false;
+            this._qualityMode =
+              effectData.stringParameters.qualityMode || 'medium';
+            this._renderSize = new THREE.Vector2();
           }
 
           isEnabled(target: EffectsTarget): boolean {
@@ -46,6 +53,7 @@ namespace gdjs {
               return false;
             }
             target.getRenderer().addPostProcessingPass(this.shaderPass);
+            gdjs.reorderScene3DPostProcessingPasses(target);
             this._isEnabled = true;
             return true;
           }
@@ -54,10 +62,54 @@ namespace gdjs {
               return false;
             }
             target.getRenderer().removePostProcessingPass(this.shaderPass);
+            gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'BLOOM');
             this._isEnabled = false;
             return true;
           }
-          updatePreRender(target: gdjs.EffectsTarget): any {}
+          updatePreRender(target: gdjs.EffectsTarget): any {
+            if (!(target instanceof gdjs.Layer)) {
+              return;
+            }
+            const runtimeScene = target.getRuntimeScene();
+            const threeRenderer = runtimeScene
+              .getGame()
+              .getRenderer()
+              .getThreeRenderer();
+            if (!threeRenderer) {
+              return;
+            }
+            if (!gdjs.isScene3DPostProcessingEnabled(target)) {
+              this.shaderPass.enabled = false;
+              gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'BLOOM');
+              return;
+            }
+
+            gdjs.setScene3DPostProcessingEffectQualityMode(
+              target,
+              'BLOOM',
+              this._qualityMode
+            );
+
+            const quality = gdjs.getScene3DPostProcessingQualityProfileForMode(
+              this._qualityMode
+            );
+            threeRenderer.getDrawingBufferSize(this._renderSize);
+            const width = Math.max(
+              1,
+              Math.round(
+                (this._renderSize.x || target.getWidth()) * quality.captureScale
+              )
+            );
+            const height = Math.max(
+              1,
+              Math.round(
+                (this._renderSize.y || target.getHeight()) *
+                  quality.captureScale
+              )
+            );
+            this.shaderPass.setSize(width, height);
+            this.shaderPass.enabled = true;
+          }
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'strength') {
               this.shaderPass.strength = value;
@@ -81,7 +133,11 @@ namespace gdjs {
             }
             return 0;
           }
-          updateStringParameter(parameterName: string, value: string): void {}
+          updateStringParameter(parameterName: string, value: string): void {
+            if (parameterName === 'qualityMode') {
+              this._qualityMode = value || 'medium';
+            }
+          }
           updateColorParameter(parameterName: string, value: number): void {}
           getColorParameter(parameterName: string): number {
             return 0;
@@ -92,12 +148,14 @@ namespace gdjs {
               s: this.shaderPass.strength,
               r: this.shaderPass.radius,
               t: this.shaderPass.threshold,
+              q: this._qualityMode,
             };
           }
           updateFromNetworkSyncData(data: BloomFilterNetworkSyncData) {
             this.shaderPass.strength = data.s;
             this.shaderPass.radius = data.r;
             this.shaderPass.threshold = data.t;
+            this._qualityMode = data.q || 'medium';
           }
         })();
       }

@@ -61,5 +61,20 @@ namespace gdjs {
             .y ?? 0)
         : 0;
     }
+
+    /**
+     * Get the Steam Input type string for a controller at the given index.
+     * Returns the InputType string (e.g., 'XBox360Controller', 'PS5Controller',
+     * 'SteamDeckController') or an empty string if unavailable.
+     */
+    export function getSteamControllerType(
+      controllerIndex: number
+    ): string {
+      if (!gdjs.steamworks.steamAPI) return '';
+      const controllers = gdjs.steamworks.steamAPI.input.getControllers();
+      const controller = controllers[controllerIndex];
+      if (!controller) return '';
+      return controller.getType();
+    }
   }
 }

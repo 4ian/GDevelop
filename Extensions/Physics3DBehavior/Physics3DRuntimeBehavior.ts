@@ -4799,10 +4799,7 @@ namespace gdjs {
       settings.mPlaneHalfConeAngle = gdjs.toRad(clampedPlaneHalfConeAngle);
       const orderedMinTwistAngle = Math.min(twistMinAngle, twistMaxAngle);
       const orderedMaxTwistAngle = Math.max(twistMinAngle, twistMaxAngle);
-      const minTwistAngle = Math.max(
-        -179,
-        Math.min(179, orderedMinTwistAngle)
-      );
+      const minTwistAngle = Math.max(-179, Math.min(179, orderedMinTwistAngle));
       const maxTwistAngle = Math.max(
         minTwistAngle,
         Math.max(-179, Math.min(179, orderedMaxTwistAngle))
@@ -5261,7 +5258,10 @@ namespace gdjs {
     setPulleyJointLength(jointId: integer | string, totalLength: float): void {
       const constraint = this._sharedData.getJoint(jointId);
       if (!constraint) return;
-      const pulleyConstraint = Jolt.castObject(constraint, Jolt.PulleyConstraint);
+      const pulleyConstraint = Jolt.castObject(
+        constraint,
+        Jolt.PulleyConstraint
+      );
       const clampedLength = Math.max(epsilon, totalLength);
       const lengthInMeters = clampedLength * this._sharedData.worldInvScale;
       pulleyConstraint.SetLength(lengthInMeters, lengthInMeters);
@@ -5274,7 +5274,10 @@ namespace gdjs {
     getPulleyJointCurrentLength(jointId: integer | string): float {
       const constraint = this._sharedData.getJoint(jointId);
       if (!constraint) return 0;
-      const pulleyConstraint = Jolt.castObject(constraint, Jolt.PulleyConstraint);
+      const pulleyConstraint = Jolt.castObject(
+        constraint,
+        Jolt.PulleyConstraint
+      );
       return pulleyConstraint.GetCurrentLength() * this._sharedData.worldScale;
     }
 
@@ -5285,10 +5288,13 @@ namespace gdjs {
     getPulleyJointTotalLength(jointId: integer | string): float {
       const constraint = this._sharedData.getJoint(jointId);
       if (!constraint) return 0;
-      const pulleyConstraint = Jolt.castObject(constraint, Jolt.PulleyConstraint);
+      const pulleyConstraint = Jolt.castObject(
+        constraint,
+        Jolt.PulleyConstraint
+      );
       return (
-        ((pulleyConstraint.GetMinLength() + pulleyConstraint.GetMaxLength()) *
-          0.5) *
+        (pulleyConstraint.GetMinLength() + pulleyConstraint.GetMaxLength()) *
+        0.5 *
         this._sharedData.worldScale
       );
     }

@@ -117,7 +117,10 @@ namespace gdjs {
 
       const deltaTime = Math.max(0, instanceContainer.getElapsedTime() / 1000);
       if (this._remainingOffTime > 0) {
-        this._remainingOffTime = Math.max(0, this._remainingOffTime - deltaTime);
+        this._remainingOffTime = Math.max(
+          0,
+          this._remainingOffTime - deltaTime
+        );
         this._applyIntensity(0, effect);
         return;
       }
@@ -169,7 +172,9 @@ namespace gdjs {
       );
     }
 
-    private _getAttachedObjectName(effect: gdjs.PixiFiltersTools.Filter): string {
+    private _getAttachedObjectName(
+      effect: gdjs.PixiFiltersTools.Filter
+    ): string {
       const attachedObjectName = (effect as any)._attachedObjectName;
       return typeof attachedObjectName === 'string' ? attachedObjectName : '';
     }
@@ -187,7 +192,9 @@ namespace gdjs {
       return runtimeScene.getLayer(layerName);
     }
 
-    private _getPreferredLayer(runtimeScene: gdjs.RuntimeScene): gdjs.RuntimeLayer {
+    private _getPreferredLayer(
+      runtimeScene: gdjs.RuntimeScene
+    ): gdjs.RuntimeLayer {
       const targetLayerName = (this._targetLayerName || '').trim();
       const fallbackLayerName = this.owner.getLayer();
       if (targetLayerName) {

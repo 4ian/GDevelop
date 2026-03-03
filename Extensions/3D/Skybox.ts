@@ -16,10 +16,7 @@ namespace gdjs {
           _cubeTexture: THREE.CubeTexture;
           _pmremGenerator: THREE.PMREMGenerator | null = null;
           _pmremRenderTarget: THREE.WebGLRenderTarget | null = null;
-          _oldBackground:
-            | THREE.Texture
-            | THREE.Color
-            | null = null;
+          _oldBackground: THREE.Texture | THREE.Color | null = null;
           _oldEnvironment: THREE.Texture | null = null;
           _oldEnvironmentIntensity: number | null = null;
           _environmentIntensity: number;
@@ -76,7 +73,9 @@ namespace gdjs {
             }
           }
 
-          private _buildEnvironmentTexture(target: EffectsTarget): THREE.Texture {
+          private _buildEnvironmentTexture(
+            target: EffectsTarget
+          ): THREE.Texture {
             const renderer = this._getThreeRenderer(target);
             if (!renderer) {
               return this._cubeTexture;

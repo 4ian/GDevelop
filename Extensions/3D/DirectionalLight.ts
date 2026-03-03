@@ -150,7 +150,10 @@ namespace gdjs {
           }
 
           private _clampShadowMapSizeToRenderer(size: integer): integer {
-            const safeRendererMax = Math.max(512, this._maxRendererShadowMapSize);
+            const safeRendererMax = Math.max(
+              512,
+              this._maxRendererShadowMapSize
+            );
             let clampedSize = 512;
             while (clampedSize * 2 <= safeRendererMax) {
               clampedSize *= 2;
@@ -192,7 +195,10 @@ namespace gdjs {
           }
 
           private _updateCascadeRanges(layer: gdjs.RuntimeLayer): void {
-            const cameraNear = Math.max(0.01, layer.getCamera3DNearPlaneDistance());
+            const cameraNear = Math.max(
+              0.01,
+              layer.getCamera3DNearPlaneDistance()
+            );
             const cameraFar = Math.max(
               cameraNear + 1,
               layer.getCamera3DFarPlaneDistance()
@@ -239,7 +245,10 @@ namespace gdjs {
             const rangeDepth = Math.max(1, range.far - range.near);
 
             const cameraHeight = Math.max(1, layer.getCameraHeight());
-            const cameraAspect = Math.max(0.1, layer.getCameraWidth() / cameraHeight);
+            const cameraAspect = Math.max(
+              0.1,
+              layer.getCameraWidth() / cameraHeight
+            );
             const fovRad = gdjs.toRad(
               Math.max(1, layer.getInitialCamera3DFieldOfView())
             );
@@ -277,9 +286,16 @@ namespace gdjs {
 
             this._updateCascadeRanges(layer);
 
-            const safeDistanceFromCamera = Math.max(10, this._distanceFromCamera);
+            const safeDistanceFromCamera = Math.max(
+              10,
+              this._distanceFromCamera
+            );
 
-            for (let cascadeIndex = 0; cascadeIndex < this._lights.length; cascadeIndex++) {
+            for (
+              let cascadeIndex = 0;
+              cascadeIndex < this._lights.length;
+              cascadeIndex++
+            ) {
               const light = this._lights[cascadeIndex];
               const cascadeFrustumSize = this._computeCascadeFrustumSize(
                 layer,
@@ -315,7 +331,11 @@ namespace gdjs {
             }
             this._shadowMapDirty = false;
 
-            for (let cascadeIndex = 0; cascadeIndex < this._lights.length; cascadeIndex++) {
+            for (
+              let cascadeIndex = 0;
+              cascadeIndex < this._lights.length;
+              cascadeIndex++
+            ) {
               const light = this._lights[cascadeIndex];
               const cascadeMapSize = this._computeCascadeMapSize(cascadeIndex);
               this._cascadeMapSizes[cascadeIndex] = cascadeMapSize;
@@ -374,7 +394,8 @@ namespace gdjs {
                   Math.sin(gdjs.toRad(this._rotation)) *
                   Math.cos(gdjs.toRad(this._elevation)),
               targetZ +
-                this._distanceFromCamera * Math.sin(gdjs.toRad(this._elevation)),
+                this._distanceFromCamera *
+                  Math.sin(gdjs.toRad(this._elevation)),
             ];
           }
 
@@ -397,7 +418,8 @@ namespace gdjs {
             const light = this._lights[cascadeIndex];
             const cascadeMapSize = this._cascadeMapSizes[cascadeIndex];
             const cascadeFrustumSize = this._cascadeFrustumSizes[cascadeIndex];
-            const texelWorldSize = cascadeFrustumSize / Math.max(1, cascadeMapSize);
+            const texelWorldSize =
+              cascadeFrustumSize / Math.max(1, cascadeMapSize);
 
             const resolutionMultiplier =
               cascadeMapSize < 1024 ? 2 : cascadeMapSize < 2048 ? 1.25 : 1;
@@ -405,11 +427,9 @@ namespace gdjs {
               cascadeIndex === 0 ? 1 : cascadeIndex === 1 ? 1.8 : 2.8;
             const automaticBias = Math.max(0.00005, texelWorldSize * 0.0008);
 
-            const baseBias = Math.max(
-              this._minimumShadowBias,
-              automaticBias
-            );
-            light.shadow.bias = -baseBias * resolutionMultiplier * distanceMultiplier;
+            const baseBias = Math.max(this._minimumShadowBias, automaticBias);
+            light.shadow.bias =
+              -baseBias * resolutionMultiplier * distanceMultiplier;
 
             const baseNormalBias = Math.max(0, this._shadowNormalBias);
             const automaticNormalBias = texelWorldSize * 0.03;
@@ -472,7 +492,8 @@ namespace gdjs {
             forwardY: float;
             forwardZ: float;
           } {
-            const [forwardX, forwardY, forwardZ] = this._computeLightDirection();
+            const [forwardX, forwardY, forwardZ] =
+              this._computeLightDirection();
 
             // Build a stable orthonormal basis around light direction.
             let referenceUpX = 0;
@@ -484,12 +505,9 @@ namespace gdjs {
               referenceUpZ = 0;
             }
 
-            let rightX =
-              referenceUpY * forwardZ - referenceUpZ * forwardY;
-            let rightY =
-              referenceUpZ * forwardX - referenceUpX * forwardZ;
-            let rightZ =
-              referenceUpX * forwardY - referenceUpY * forwardX;
+            let rightX = referenceUpY * forwardZ - referenceUpZ * forwardY;
+            let rightY = referenceUpZ * forwardX - referenceUpX * forwardZ;
+            let rightZ = referenceUpX * forwardY - referenceUpY * forwardX;
             let rightLength = Math.sqrt(
               rightX * rightX + rightY * rightY + rightZ * rightZ
             );
@@ -550,7 +568,8 @@ namespace gdjs {
             if (step <= 0) {
               return [x, y, z];
             }
-            const rightCoord = x * basis.rightX + y * basis.rightY + z * basis.rightZ;
+            const rightCoord =
+              x * basis.rightX + y * basis.rightY + z * basis.rightZ;
             const upCoord = x * basis.upX + y * basis.upY + z * basis.upZ;
             const forwardCoord =
               x * basis.forwardX + y * basis.forwardY + z * basis.forwardZ;
@@ -734,7 +753,9 @@ namespace gdjs {
             const layer = target.getRuntimeLayer();
             const cameraX = layer.getCameraX();
             const cameraY = layer.getCameraY();
-            const cameraZ = layer.getCameraZ(layer.getInitialCamera3DFieldOfView());
+            const cameraZ = layer.getCameraZ(
+              layer.getInitialCamera3DFieldOfView()
+            );
             const [anchorX, anchorY, anchorZ] = this._computeShadowAnchor(
               cameraX,
               cameraY,
@@ -747,7 +768,11 @@ namespace gdjs {
             this._updateShadowMapSize();
             const lightSpaceBasis = this._computeLightSpaceBasis();
 
-            for (let cascadeIndex = 0; cascadeIndex < this._lights.length; cascadeIndex++) {
+            for (
+              let cascadeIndex = 0;
+              cascadeIndex < this._lights.length;
+              cascadeIndex++
+            ) {
               const light = this._lights[cascadeIndex];
               const stabilizationStep = this._shadowCastingEnabled
                 ? this._getEffectiveShadowStabilizationStep(cascadeIndex)
@@ -761,7 +786,12 @@ namespace gdjs {
                   lightSpaceBasis
                 );
 
-              this._applyCascadeTransform(light, stabilizedX, stabilizedY, stabilizedZ);
+              this._applyCascadeTransform(
+                light,
+                stabilizedX,
+                stabilizedY,
+                stabilizedZ
+              );
 
               if (this._shadowCastingEnabled) {
                 this._applyCascadeShadowTuning(cascadeIndex);
@@ -865,7 +895,8 @@ namespace gdjs {
             if (parameterName === 'shadowMapSize') {
               const parsedValue = parseFloat(value);
               if (!isNaN(parsedValue)) {
-                this._shadowMapSize = this._getClosestShadowMapSize(parsedValue);
+                this._shadowMapSize =
+                  this._getClosestShadowMapSize(parsedValue);
                 this._shadowMapDirty = true;
                 this._shadowCameraDirty = true;
               }
@@ -930,11 +961,17 @@ namespace gdjs {
             this._distanceFromCamera = Math.max(10, syncData.dfc ?? 1500);
             this._frustumSize = Math.max(64, syncData.fs ?? 4000);
             this._maxShadowDistance = Math.max(64, syncData.msd ?? 2000);
-            this._cascadeSplitLambda = Math.max(0, Math.min(1, syncData.csl ?? 0.7));
+            this._cascadeSplitLambda = Math.max(
+              0,
+              Math.min(1, syncData.csl ?? 0.7)
+            );
             this._shadowMapSize = this._getClosestShadowMapSize(
               syncData.sms ?? 1024
             );
-            this._shadowFollowLead = Math.max(0, Math.min(2, syncData.sfl ?? 0.45));
+            this._shadowFollowLead = Math.max(
+              0,
+              Math.min(2, syncData.sfl ?? 0.45)
+            );
             this._shadowFollowCamera = syncData.sfc ?? false;
             this._hadPreviousCameraPosition = false;
             this._staticAnchorInitialized = false;

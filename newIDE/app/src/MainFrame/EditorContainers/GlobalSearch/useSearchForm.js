@@ -10,7 +10,7 @@ type CheckBoxesState = {|
   includeStoreExtensions: boolean,
 |};
 
-type FreezeSearchedState = {|
+type FreezedSearchState = {|
   ...CheckBoxesState,
   searchText: string,
 |};
@@ -22,9 +22,9 @@ type UseSearchFormReturn = {|
   setCheckBoxesState: (
     CheckBoxesState | (CheckBoxesState => CheckBoxesState)
   ) => void,
-  frezeSearchedState: FreezeSearchedState,
-  setFrezeSearchedState: (
-    FreezeSearchedState | (FreezeSearchedState => FreezeSearchedState)
+  freezedSearchState: FreezedSearchState,
+  setFreezedSearchState: (
+    FreezedSearchState | (FreezedSearchState => FreezedSearchState)
   ) => void,
   hasSearched: boolean,
   setHasSearched: boolean => void,
@@ -41,7 +41,7 @@ export const useSearchForm = (): UseSearchFormReturn => {
     includeStoreExtensions: false,
   });
 
-  const [frezeSearchedState, setFrezeSearchedState] = React.useState({
+  const [freezedSearchState, setFreezedSearchState] = React.useState({
     ...checkBoxesState,
     searchText: search,
   });
@@ -52,8 +52,8 @@ export const useSearchForm = (): UseSearchFormReturn => {
     setSearch,
     checkBoxesState,
     setCheckBoxesState,
-    frezeSearchedState,
-    setFrezeSearchedState,
+    freezedSearchState,
+    setFreezedSearchState,
     hasSearched,
     setHasSearched,
   };

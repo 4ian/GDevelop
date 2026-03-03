@@ -41,8 +41,8 @@ export const GlobalEventsSearchEditor = ({
     setSearch,
     checkBoxesState,
     setCheckBoxesState,
-    frezeSearchedState,
-    setFrezeSearchedState,
+    freezedSearchState,
+    setFreezedSearchState,
     hasSearched,
     setHasSearched,
   } = useSearchForm();
@@ -68,7 +68,7 @@ export const GlobalEventsSearchEditor = ({
     });
     setGroups(groups);
     setHasSearched(true);
-    setFrezeSearchedState({ ...checkBoxesState, searchText: search });
+    setFreezedSearchState({ ...checkBoxesState, searchText: search });
   };
 
   const navigateToMatch = React.useCallback(
@@ -78,8 +78,8 @@ export const GlobalEventsSearchEditor = ({
         name: group.name || '',
         eventPath: focusedEventPath,
         highlightedEventPaths: deduplicateEventPaths(group.matches),
-        searchText: frezeSearchedState.searchText,
-        matchCase: frezeSearchedState.matchCase,
+        searchText: freezedSearchState.searchText,
+        matchCase: freezedSearchState.matchCase,
       };
 
       if (group.targetType === 'extension') {
@@ -97,8 +97,8 @@ export const GlobalEventsSearchEditor = ({
       onNavigateToEventFromGlobalSearch(params);
     },
     [
-      frezeSearchedState.searchText,
-      frezeSearchedState.matchCase,
+      freezedSearchState.searchText,
+      freezedSearchState.matchCase,
       onNavigateToEventFromGlobalSearch,
     ]
   );
@@ -106,13 +106,13 @@ export const GlobalEventsSearchEditor = ({
   const globalSearchContextValue = React.useMemo<GlobalSearchContextType>(
     () => ({
       navigateToMatch,
-      searchText: frezeSearchedState.searchText,
-      matchCase: frezeSearchedState.matchCase,
+      searchText: freezedSearchState.searchText,
+      matchCase: freezedSearchState.matchCase,
     }),
     [
       navigateToMatch,
-      frezeSearchedState.matchCase,
-      frezeSearchedState.searchText,
+      freezedSearchState.matchCase,
+      freezedSearchState.searchText,
     ]
   );
 
@@ -226,14 +226,24 @@ export const GlobalEventsSearchEditor = ({
                     <Trans>Search:</Trans>
                   </span>
                   <span style={styles.searchQueryText}>
-                    <span>"{frezeSearchedState.searchText}"</span>
+                    <span>"{freezedSearchState.searchText}"</span>
                     <Text noMargin size="body-small" color="secondary">
-                      <Trans>
-                        Found {totalMatchCount}{' '}
-                        {totalMatchCount === 1 ? 'match' : 'matches'} in{' '}
-                        {groups.length}{' '}
-                        {groups.length === 1 ? 'event sheet' : 'event sheets'}
-                      </Trans>
+                      {totalMatchCount === 1 && groups.length === 1 ? (
+                        <Trans>Found 1 match in 1 event sheet</Trans>
+                      ) : totalMatchCount === 1 ? (
+                        <Trans>
+                          Found 1 match in {groups.length} event sheets
+                        </Trans>
+                      ) : groups.length === 1 ? (
+                        <Trans>
+                          Found {totalMatchCount} matches in 1 event sheet
+                        </Trans>
+                      ) : (
+                        <Trans>
+                          Found {totalMatchCount} matches in {groups.length}{' '}
+                          event sheets
+                        </Trans>
+                      )}
                     </Text>
                   </span>
                 </div>

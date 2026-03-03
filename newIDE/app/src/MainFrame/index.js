@@ -43,6 +43,7 @@ import {
   getCurrentTabForPane,
   getCustomObjectEditor,
   getOpenedAskAiEditor,
+  getEditorTabOpenedWithKey,
   changeCurrentTab,
   getAllEditorTabs,
   hasEditorsInPane,
@@ -2863,8 +2864,21 @@ const MainFrame = (props: Props): React.MixedElement => {
           getEditorOpeningOptions({ kind: 'global-search', name: '' })
         ),
       }));
+      // Focus the search bar when re-opening an already opened tab.
+      const existingEditor = getEditorTabOpenedWithKey(
+        state.editorTabs,
+        'global-search'
+      );
+      if (existingEditor) {
+        const { editorRef } = existingEditor.editorTab;
+        // $FlowFixMe[prop-missing] - focusInitialField is optionally implemented by editors.
+        if (editorRef && editorRef.focusInitialField) {
+          // $FlowFixMe[not-a-function]
+          editorRef.focusInitialField();
+        }
+      }
     },
-    [getEditorOpeningOptions, setState]
+    [getEditorOpeningOptions, setState, state.editorTabs]
   );
 
   const onEditorTabClosing = React.useCallback(

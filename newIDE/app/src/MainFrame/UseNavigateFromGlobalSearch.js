@@ -3,6 +3,7 @@
 import * as React from 'react';
 import type { EditorTabsState } from './EditorTabs/EditorTabsHandler';
 import type { EventPath } from '../Utils/EventPath';
+import { type State } from './MainFrameState';
 
 type Props = {|
   editorTabs: EditorTabsState,
@@ -33,8 +34,6 @@ type Props = {|
   ) => void,
 |};
 
-type State = any; // Using any to avoid circular dependency with MainFrame's State type.
-
 const useNavigateFromGlobalSearch = ({
   editorTabs,
   setState,
@@ -42,7 +41,23 @@ const useNavigateFromGlobalSearch = ({
   openLayout,
   openExternalEvents,
   openEventsFunctionsExtension,
-}: Props) => {
+}: Props): {|
+  navigateToEventFromGlobalSearch: (params: {|
+    locationType: 'layout' | 'external-events' | 'extension',
+    name: string,
+    eventPath: EventPath,
+    highlightedEventPaths: Array<EventPath>,
+    searchText: string,
+    matchCase?: boolean,
+    extensionName?: string,
+    functionName?: string,
+    behaviorName?: string,
+    objectName?: string,
+  |}) => void,
+  clearGlobalSearchHighlightsInEditorTabs: (
+    editorTabs: EditorTabsState
+  ) => void,
+|} => {
   const hasGlobalSearchTab = React.useCallback(
     (editorTabs: EditorTabsState) => {
       for (const paneIdentifier in editorTabs.panes) {

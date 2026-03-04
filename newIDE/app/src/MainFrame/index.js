@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { type State } from './MainFrameState';
 import './MainFrame.css';
 import Snackbar from '@material-ui/core/Snackbar';
 import HomeIcon from '../UI/CustomSvgIcons/Home';
@@ -208,7 +209,6 @@ import {
   readProjectSettings,
   getProjectDirectory,
 } from '../Utils/ProjectSettingsReader';
-import { type ToolbarButtonConfig } from './CustomToolbarButton';
 import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
 import {
   EmbeddedGameFrame,
@@ -236,7 +236,6 @@ import StandaloneDialog from './StandAloneDialog';
 import { useInGameEditorSettings } from '../EmbeddedGame/InGameEditorSettings';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { useAutomatedRegularInGameEditorRestart } from '../EmbeddedGame/UseAutomatedRegularInGameEditorRestart';
-import type { EventPath } from '../Utils/EventPath';
 import type { EditorTab } from './EditorTabs/EditorTabsHandler';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
@@ -314,20 +313,6 @@ const updateFileMetadataWithOpenedProject = (
   gameId: project.getProjectUuid(),
   name: project.getName(),
 });
-
-export type State = {|
-  currentProject: ?gdProject,
-  currentFileMetadata: ?FileMetadata,
-  editorTabs: EditorTabsState,
-  snackMessage: string,
-  snackMessageOpen: boolean,
-  snackDuration: ?number,
-  updateStatus: ElectronUpdateStatus,
-  openFromStorageProviderDialogOpen: boolean,
-  saveToStorageProviderDialogOpen: boolean,
-  gdjsDevelopmentWatcherEnabled: boolean,
-  toolbarButtons: Array<ToolbarButtonConfig>,
-|};
 
 const initialPreviewState: PreviewState = {
   previewLayoutName: null,

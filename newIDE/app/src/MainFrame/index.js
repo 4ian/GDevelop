@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { type State } from './MainFrameState';
 import './MainFrame.css';
 import Snackbar from '@material-ui/core/Snackbar';
 import HomeIcon from '../UI/CustomSvgIcons/Home';
@@ -11,6 +12,7 @@ import EventsIcon from '../UI/CustomSvgIcons/Events';
 import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
 import ExternalLayoutIcon from '../UI/CustomSvgIcons/ExternalLayout';
 import ExtensionIcon from '../UI/CustomSvgIcons/Extension';
+import SearchIcon from '../UI/CustomSvgIcons/Search';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
 import AboutDialog from './AboutDialog';
@@ -42,6 +44,7 @@ import {
   getCurrentTabForPane,
   getCustomObjectEditor,
   getOpenedAskAiEditor,
+  getEditorTabOpenedWithKey,
   changeCurrentTab,
   getAllEditorTabs,
   hasEditorsInPane,
@@ -58,6 +61,7 @@ import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
 import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
+import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
 import {
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
@@ -205,7 +209,6 @@ import {
   readProjectSettings,
   getProjectDirectory,
 } from '../Utils/ProjectSettingsReader';
-import { type ToolbarButtonConfig } from './CustomToolbarButton';
 import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
 import {
   EmbeddedGameFrame,
@@ -214,6 +217,7 @@ import {
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import useHomePageSwitch from './useHomePageSwitch';
 import { useNavigationToEvent } from './UseNavigationToEvent';
+import useNavigateFromGlobalSearch from './UseNavigateFromGlobalSearch';
 import RobotIcon from '../ProjectCreation/RobotIcon';
 import PublicProfileContext from '../Profile/PublicProfileContext';
 import { useGamesPlatformFrame } from './EditorContainers/HomePage/PlaySection/UseGamesPlatformFrame';
@@ -232,6 +236,7 @@ import StandaloneDialog from './StandAloneDialog';
 import { useInGameEditorSettings } from '../EmbeddedGame/InGameEditorSettings';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { useAutomatedRegularInGameEditorRestart } from '../EmbeddedGame/UseAutomatedRegularInGameEditorRestart';
+import type { EditorTab } from './EditorTabs/EditorTabsHandler';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -249,6 +254,7 @@ const editorKindToRenderer: {
   'custom object': renderCustomObjectEditorContainer,
   'start page': renderHomePageContainer,
   resources: renderResourcesEditorContainer,
+  'global-search': renderGlobalEventsSearchEditorContainer,
   'ask-ai': renderAskAiEditorContainer,
 };
 
@@ -307,20 +313,6 @@ const updateFileMetadataWithOpenedProject = (
   gameId: project.getProjectUuid(),
   name: project.getName(),
 });
-
-export type State = {|
-  currentProject: ?gdProject,
-  currentFileMetadata: ?FileMetadata,
-  editorTabs: EditorTabsState,
-  snackMessage: string,
-  snackMessageOpen: boolean,
-  snackDuration: ?number,
-  updateStatus: ElectronUpdateStatus,
-  openFromStorageProviderDialogOpen: boolean,
-  saveToStorageProviderDialogOpen: boolean,
-  gdjsDevelopmentWatcherEnabled: boolean,
-  toolbarButtons: Array<ToolbarButtonConfig>,
-|};
 
 const initialPreviewState: PreviewState = {
   previewLayoutName: null,
@@ -704,6 +696,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       const label =
         kind === 'resources'
           ? i18n._(t`Resources`)
+          : kind === 'global-search'
+          ? i18n._(t`Global search`)
           : kind === 'ask-ai'
           ? i18n._(t`Ask AI`)
           : kind === 'start page'
@@ -753,6 +747,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           <DebuggerIcon />
         ) : kind === 'resources' ? (
           <ProjectResourcesIcon />
+        ) : kind === 'global-search' ? (
+          <SearchIcon />
         ) : kind === 'layout' ? (
           <SceneIcon />
         ) : kind === 'layout events' ? (
@@ -2775,6 +2771,54 @@ const MainFrame = (props: Props): React.MixedElement => {
     [getEditorOpeningOptions, setState]
   );
 
+  const openGlobalSearch = React.useCallback(
+    () => {
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          // $FlowFixMe[incompatible-type]
+          getEditorOpeningOptions({ kind: 'global-search', name: '' })
+        ),
+      }));
+      // Focus the search bar when re-opening an already opened tab.
+      const existingEditor = getEditorTabOpenedWithKey(
+        state.editorTabs,
+        'global-search'
+      );
+      if (existingEditor) {
+        const { editorRef } = existingEditor.editorTab;
+        // $FlowFixMe[prop-missing] - focusInitialField is optionally implemented by editors.
+        if (editorRef && editorRef.focusInitialField) {
+          // $FlowFixMe[not-a-function]
+          editorRef.focusInitialField();
+        }
+      }
+    },
+    [getEditorOpeningOptions, setState, state.editorTabs]
+  );
+
+  const {
+    navigateToEventFromGlobalSearch,
+    clearGlobalSearchHighlightsInEditorTabs,
+  } = useNavigateFromGlobalSearch({
+    editorTabs: state.editorTabs,
+    setState,
+    setPendingEventNavigation,
+    openLayout,
+    openExternalEvents,
+    openEventsFunctionsExtension,
+  });
+
+  const onEditorTabClosing = React.useCallback(
+    (editorTab: EditorTab) => {
+      if (editorTab.kind === 'global-search') {
+        clearGlobalSearchHighlightsInEditorTabs(state.editorTabs);
+      }
+    },
+    [clearGlobalSearchHighlightsInEditorTabs, state.editorTabs]
+  );
+
   const openHomePage = React.useCallback(
     () => {
       setState(state => ({
@@ -4756,6 +4800,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenCommandPalette: openCommandPalette,
     onOpenProfile: onOpenProfileDialog,
     onRestartInGameEditor,
+    onOpenGlobalSearch: openGlobalSearch,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -4857,6 +4902,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenProjectManager: () => openProjectManager(true),
     onOpenHomePage: openHomePage,
     onOpenDebugger: openDebugger,
+    onOpenGlobalSearch: openGlobalSearch,
     onOpenAbout: () => openAboutDialog(true),
     onOpenPreferences: () => openPreferencesDialog(true),
     onOpenLanguage: () => openLanguageDialog(true),
@@ -4921,9 +4967,12 @@ const MainFrame = (props: Props): React.MixedElement => {
     onCreateEventsFunction: onCreateEventsFunction,
     openInstructionOrExpression: openInstructionOrExpression,
     onOpenCustomObjectEditor: openCustomObjectEditor,
+    onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onRenamedEventsBasedObject: onRenamedEventsBasedObject,
     onDeletedEventsBasedObject: onDeletedEventsBasedObject,
     openObjectEvents: openObjectEvents,
+    onNavigateToEventFromGlobalSearch: navigateToEventFromGlobalSearch,
+    onEditorTabClosing: onEditorTabClosing,
     canOpen: !!props.storageProviders.filter(
       ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
     ).length,

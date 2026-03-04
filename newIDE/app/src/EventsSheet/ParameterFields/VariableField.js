@@ -21,6 +21,7 @@ import SemiControlledAutoComplete, {
 } from '../../UI/SemiControlledAutoComplete';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
+import { highlightSearchText } from '../../Utils/HighlightSearchText';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
@@ -528,6 +529,8 @@ export const renderVariableWithIcon = (
     DeprecatedParameterValue,
     MissingParameterValue,
     projectScopedContainersAccessor,
+    highlightedSearchText,
+    highlightedSearchMatchCase,
   }: ParameterInlineRendererProps,
   tooltip: string,
   getVariableSourceFromIdentifier: (
@@ -570,7 +573,9 @@ export const renderVariableWithIcon = (
             [icon]: true,
           })}
         />
-        {value}
+        {highlightSearchText(value, highlightedSearchText, {
+          matchCase: highlightedSearchMatchCase,
+        })}
       </IconAndNameContainer>
     </span>
   );

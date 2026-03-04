@@ -23,6 +23,7 @@ import { type GamesPlatformFrameTools } from './HomePage/PlaySection/UseGamesPla
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type CreateProjectResult } from '../../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../../AiGeneration/Utils';
+import type { EventPath } from '../../Types/EventPath';
 
 export type EditorContainerExtraProps = {|
   // Events function extension editor
@@ -53,6 +54,23 @@ export type ObjectsOutsideEditorChanges = {|
 
 export type ObjectGroupsOutsideEditorChanges = {|
   scene: gdLayout,
+|};
+
+export type NavigateToEventFromGlobalSearchParams = {|
+  locationType: 'layout' | 'external-events' | 'extension',
+  name: string,
+  eventPath: EventPath,
+  highlightedEventPaths: Array<EventPath>,
+  searchText: string,
+  matchCase?: boolean,
+  searchInConditions?: boolean,
+  searchInActions?: boolean,
+  searchInEventStrings?: boolean,
+  searchInInstructionNames?: boolean,
+  extensionName?: string,
+  functionName?: string,
+  behaviorName?: string,
+  objectName?: string,
 |};
 
 export type RenderEditorContainerProps = {|
@@ -111,7 +129,16 @@ export type RenderEditorContainerProps = {|
     gdEventsBasedObject,
     variantName: string
   ) => void,
+  onOpenEventsFunctionsExtension: (
+    extensionName: string,
+    initiallyFocusedFunctionName?: ?string,
+    initiallyFocusedBehaviorName?: ?string,
+    initiallyFocusedObjectName?: ?string
+  ) => void,
   openObjectEvents: (extensionName: string, objectName: string) => void,
+  onNavigateToEventFromGlobalSearch: (
+    params: NavigateToEventFromGlobalSearchParams
+  ) => void,
   onOpenAskAi: (?OpenAskAiOptions) => void,
   onCloseAskAi: () => void,
 

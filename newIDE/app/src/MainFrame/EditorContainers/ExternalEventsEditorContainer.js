@@ -32,6 +32,7 @@ import {
   type HotReloadSteps,
 } from '../../EmbeddedGame/EmbeddedGameFrame';
 import Background from '../../UI/Background';
+import type { EventPath } from '../../Types/EventPath';
 
 const styles = {
   container: {
@@ -94,8 +95,35 @@ export class ExternalEventsEditorContainer extends React.Component<
     }
   }
 
-  scrollToEventPath(eventPath: Array<number>) {
+  scrollToEventPath(eventPath: EventPath) {
     if (this.editor) this.editor.scrollToEventPath(eventPath);
+  }
+
+  setGlobalSearchResults(
+    eventPaths: Array<EventPath>,
+    focusedEventPath: EventPath,
+    searchText: string,
+    matchCase: boolean,
+    searchFilters?: {|
+      searchInConditions?: boolean,
+      searchInActions?: boolean,
+      searchInEventStrings?: boolean,
+      searchInInstructionNames?: boolean,
+    |}
+  ) {
+    if (this.editor) {
+      this.editor.setGlobalSearchResults(
+        eventPaths,
+        focusedEventPath,
+        searchText,
+        matchCase,
+        searchFilters
+      );
+    }
+  }
+
+  clearGlobalSearchResults() {
+    if (this.editor) this.editor.clearGlobalSearchResults();
   }
 
   forceUpdateEditor() {
@@ -199,7 +227,10 @@ export class ExternalEventsEditorContainer extends React.Component<
     });
   };
 
-  onCreateEventsFunction = (extensionName: any, eventsFunction: any) => {
+  onCreateEventsFunction = (
+    extensionName: string,
+    eventsFunction: gdEventsFunction
+  ) => {
     this.props.onCreateEventsFunction(
       extensionName,
       eventsFunction,

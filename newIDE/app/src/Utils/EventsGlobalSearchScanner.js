@@ -6,11 +6,17 @@ import { mapFor } from './MapFor';
 
 const gd: libGDevelop = global.gd;
 
+export type GlobalSearchMatchContext = {|
+  conditionText: string,
+  actionText: string,
+  otherText: string,
+|};
+
 export type GlobalSearchMatch = {|
   id: string,
   eventPath: EventPath,
   positionInList: number,
-  context: string,
+  context: GlobalSearchMatchContext,
 |};
 
 type BaseGroup = {|
@@ -148,13 +154,10 @@ const searchInEventsList = (
       positionInList: entry.positionInList,
       context: event
         ? getEventContext(event, inputs.searchText, inputs.matchCase)
-        : 'Event',
+        : { conditionText: '', actionText: '', otherText: 'Event' },
     };
   });
 };
-
-const truncate = (text: string, maxLength: number = 140): string =>
-  text.length > maxLength ? `${text.slice(0, maxLength - 1)}...` : text;
 
 const getInstructionSentence = (
   instruction: gdInstruction,
@@ -209,10 +212,7 @@ const getEventContextFromConditionsAndActions = (
   actions: gdInstructionsList,
   searchText: string,
   matchCase: boolean
-): string => {
-  // Find the instruction that actually contains the search match,
-  // falling back to the first instruction if the match is in event strings
-  // rather than instruction sentences.
+): GlobalSearchMatchContext => {
   const conditionSentence =
     findMatchingInstructionSentence(conditions, true, searchText, matchCase) ||
     getFirstInstructionSentence(conditions, true);
@@ -220,23 +220,24 @@ const getEventContextFromConditionsAndActions = (
     findMatchingInstructionSentence(actions, false, searchText, matchCase) ||
     getFirstInstructionSentence(actions, false);
 
-  if (conditionSentence && actionSentence) {
-    return truncate(`If ${conditionSentence} then ${actionSentence}`);
-  }
-  if (conditionSentence) {
-    return truncate(`Condition: ${conditionSentence}`);
-  }
-  if (actionSentence) {
-    return truncate(`Action: ${actionSentence}`);
-  }
-  return 'Event';
+  return {
+    conditionText: conditionSentence,
+    actionText: actionSentence,
+    otherText: '',
+  };
 };
+
+const otherContext = (text: string): GlobalSearchMatchContext => ({
+  conditionText: '',
+  actionText: '',
+  otherText: text,
+});
 
 const getEventContext = (
   event: gdBaseEvent,
   searchText: string,
   matchCase: boolean
-): string => {
+): GlobalSearchMatchContext => {
   const eventType = event.getType();
   switch (eventType) {
     case 'BuiltinCommonInstructions::Comment': {
@@ -244,32 +245,32 @@ const getEventContext = (
         .asCommentEvent(event)
         .getComment()
         .trim();
-      return comment ? truncate(comment) : 'Comment';
+      return otherContext(comment);
     }
     case 'BuiltinCommonInstructions::Group': {
       const groupName = gd
         .asGroupEvent(event)
         .getName()
         .trim();
-      return groupName ? truncate(`Group: ${groupName}`) : 'Group';
+      return otherContext(groupName ? `Group: ${groupName}` : 'Group');
     }
     case 'BuiltinCommonInstructions::JsCode': {
       const inlineCode = gd
         .asJsCodeEvent(event)
         .getInlineCode()
         .trim();
-      return inlineCode
-        ? truncate(`JavaScript: ${inlineCode}`)
-        : 'JavaScript event';
+      return otherContext(
+        inlineCode ? `JavaScript: ${inlineCode}` : 'JavaScript event'
+      );
     }
     case 'BuiltinCommonInstructions::Link': {
       const target = gd
         .asLinkEvent(event)
         .getTarget()
         .trim();
-      return target ? truncate(`Link to: ${target}`) : 'Link event';
+      return otherContext(target ? `Link to: ${target}` : 'Link event');
     }
-    case 'BuiltinCommonInstructions::Standard':
+    case 'BuiltinCommonInstructions::Standard': {
       const standartEvent = gd.asStandardEvent(event);
       return getEventContextFromConditionsAndActions(
         standartEvent.getConditions(),
@@ -277,7 +278,8 @@ const getEventContext = (
         searchText,
         matchCase
       );
-    case 'BuiltinCommonInstructions::Else':
+    }
+    case 'BuiltinCommonInstructions::Else': {
       const elseEvent = gd.asElseEvent(event);
       return getEventContextFromConditionsAndActions(
         elseEvent.getConditions(),
@@ -285,7 +287,8 @@ const getEventContext = (
         searchText,
         matchCase
       );
-    case 'BuiltinCommonInstructions::While':
+    }
+    case 'BuiltinCommonInstructions::While': {
       const whileEvent = gd.asWhileEvent(event);
       return getEventContextFromConditionsAndActions(
         whileEvent.getConditions(),
@@ -293,7 +296,8 @@ const getEventContext = (
         searchText,
         matchCase
       );
-    case 'BuiltinCommonInstructions::Repeat':
+    }
+    case 'BuiltinCommonInstructions::Repeat': {
       const repeatEvent = gd.asRepeatEvent(event);
       return getEventContextFromConditionsAndActions(
         repeatEvent.getConditions(),
@@ -301,7 +305,8 @@ const getEventContext = (
         searchText,
         matchCase
       );
-    case 'BuiltinCommonInstructions::ForEach':
+    }
+    case 'BuiltinCommonInstructions::ForEach': {
       const forEachEvent = gd.asForEachEvent(event);
       return getEventContextFromConditionsAndActions(
         forEachEvent.getConditions(),
@@ -309,18 +314,18 @@ const getEventContext = (
         searchText,
         matchCase
       );
-    case 'BuiltinCommonInstructions::ForEachChildVariable':
-      const eaasForEachChildVariableEventchEvent = gd.asForEachChildVariableEvent(
-        event
-      );
+    }
+    case 'BuiltinCommonInstructions::ForEachChildVariable': {
+      const forEachChildVariableEvent = gd.asForEachChildVariableEvent(event);
       return getEventContextFromConditionsAndActions(
-        eaasForEachChildVariableEventchEvent.getConditions(),
-        eaasForEachChildVariableEventchEvent.getActions(),
+        forEachChildVariableEvent.getConditions(),
+        forEachChildVariableEvent.getActions(),
         searchText,
         matchCase
       );
+    }
     default:
-      return truncate(`Event type: ${eventType}`);
+      return otherContext(`Event type: ${eventType}`);
   }
 };
 

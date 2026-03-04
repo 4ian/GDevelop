@@ -7,12 +7,14 @@ import type {
 import { highlightSearchText } from '../../../Utils/HighlightSearchText';
 import { GlobalSearchContextProvider } from './GlobalSearchContext';
 import { styles, useEventRowStyles } from './styles';
-import { getMatchContext, parseMatchContext } from './utils';
 
 type SearchMatchRowProps = {|
   match: GlobalSearchMatch,
   group: GlobalSearchGroup,
 |};
+
+const truncate = (text: string, maxLength: number = 140): string =>
+  text.length > maxLength ? `${text.slice(0, maxLength - 1)}...` : text;
 
 export const SearchMatchRow: React.ComponentType<SearchMatchRowProps> = React.memo<SearchMatchRowProps>(
   ({ match, group }): React.MixedElement => {
@@ -20,8 +22,7 @@ export const SearchMatchRow: React.ComponentType<SearchMatchRowProps> = React.me
       GlobalSearchContextProvider
     );
     const classes = useEventRowStyles();
-    const context = getMatchContext(match);
-    const parsed = parseMatchContext(context);
+    const { conditionText, actionText, otherText } = match.context;
 
     const handleClick = () => {
       navigateToMatch(group, match.eventPath);
@@ -44,22 +45,35 @@ export const SearchMatchRow: React.ComponentType<SearchMatchRowProps> = React.me
       >
         <div style={styles.eventRowIndicator} />
         <div style={styles.eventRowColumns}>
-          <div style={styles.eventRowConditions}>
-            <span style={styles.eventRowText}>
-              {highlightSearchText(parsed.conditionText, searchText, {
-                style: styles.searchMatchText,
-                matchCase,
-              })}
-            </span>
-          </div>
-          <div style={styles.eventRowActions}>
-            <span style={styles.eventRowText}>
-              {highlightSearchText(parsed.actionText, searchText, {
-                style: styles.searchMatchText,
-                matchCase,
-              })}
-            </span>
-          </div>
+          {otherText ? (
+            <div style={styles.eventRowOther}>
+              <span style={styles.eventRowText}>
+                {highlightSearchText(truncate(otherText), searchText, {
+                  style: styles.searchMatchText,
+                  matchCase,
+                })}
+              </span>
+            </div>
+          ) : (
+            <>
+              <div style={styles.eventRowConditions}>
+                <span style={styles.eventRowText}>
+                  {highlightSearchText(truncate(conditionText), searchText, {
+                    style: styles.searchMatchText,
+                    matchCase,
+                  })}
+                </span>
+              </div>
+              <div style={styles.eventRowActions}>
+                <span style={styles.eventRowText}>
+                  {highlightSearchText(truncate(actionText), searchText, {
+                    style: styles.searchMatchText,
+                    matchCase,
+                  })}
+                </span>
+              </div>
+            </>
+          )}
         </div>
       </div>
     );

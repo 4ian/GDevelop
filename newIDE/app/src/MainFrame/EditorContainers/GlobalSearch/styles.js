@@ -2,12 +2,6 @@
 import { makeStyles } from '@material-ui/styles';
 
 export const styles = {
-  container: {
-    display: 'flex',
-    flex: 1,
-    minWidth: 0,
-    overflow: 'hidden',
-  },
   groupHeaderIcon: {
     opacity: 0.7,
     flexShrink: 0,

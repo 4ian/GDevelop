@@ -142,9 +142,9 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
     );
 
     return (
-      <div style={styles.container}>
-        <Background maxWidth>
-          <ColumnStackLayout expand useFullHeight>
+      <Background maxWidth>
+        <LineStackLayout expand useFullHeight>
+          <ColumnStackLayout expand useFullHeight noOverflowParent>
             <LineStackLayout noMargin>
               <Column expand noMargin>
                 <SearchBar
@@ -162,91 +162,91 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
                 label={<Trans>Search</Trans>}
                 onClick={() => launchSearch(search)}
               />
-            </LineStackLayout>
-            <LineStackLayout noMargin alignItems="center">
-              <IconButton
-                size="small"
-                tooltip={t`Match case`}
-                selected={checkBoxesState.matchCase}
-                onClick={() =>
-                  setCheckBoxesState(prev => ({
-                    ...prev,
-                    matchCase: !prev.matchCase,
-                  }))
-                }
-              >
-                <MatchCase />
-              </IconButton>
-              <ElementWithMenu
-                element={
-                  <IconButton size="small" tooltip={t`Search filters`}>
-                    <DotBadge
-                      overlap="circle"
-                      color="error"
-                      invisible={
-                        checkBoxesState.searchInConditions ||
-                        checkBoxesState.searchInActions ||
-                        checkBoxesState.searchInEventStrings
-                      }
-                    >
-                      <Filter />
-                    </DotBadge>
-                  </IconButton>
-                }
-                buildMenuTemplate={(i18n: I18nType) => [
-                  {
-                    type: 'checkbox',
-                    label: i18n._(t`Conditions`),
-                    checked: checkBoxesState.searchInConditions,
-                    click: () =>
-                      setCheckBoxesState(prev => ({
-                        ...prev,
-                        searchInConditions: !prev.searchInConditions,
-                      })),
-                  },
-                  {
-                    type: 'checkbox',
-                    label: i18n._(t`Actions`),
-                    checked: checkBoxesState.searchInActions,
-                    click: () =>
-                      setCheckBoxesState(prev => ({
-                        ...prev,
-                        searchInActions: !prev.searchInActions,
-                      })),
-                  },
-                  {
-                    type: 'checkbox',
-                    label: i18n._(t`Texts`),
-                    checked: checkBoxesState.searchInEventStrings,
-                    click: () =>
-                      setCheckBoxesState(prev => ({
-                        ...prev,
-                        searchInEventStrings: !prev.searchInEventStrings,
-                      })),
-                  },
-                  {
-                    type: 'checkbox',
-                    label: i18n._(t`Event sentences`),
-                    checked: checkBoxesState.searchInEventSentences,
-                    click: () =>
-                      setCheckBoxesState(prev => ({
-                        ...prev,
-                        searchInEventSentences: !prev.searchInEventSentences,
-                      })),
-                  },
-                  { type: 'separator' },
-                  {
-                    type: 'checkbox',
-                    label: i18n._(t`Include store extensions`),
-                    checked: checkBoxesState.includeStoreExtensions,
-                    click: () =>
-                      setCheckBoxesState(prev => ({
-                        ...prev,
-                        includeStoreExtensions: !prev.includeStoreExtensions,
-                      })),
-                  },
-                ]}
-              />
+              <LineStackLayout noMargin alignItems="center">
+                <IconButton
+                  size="small"
+                  tooltip={t`Match case`}
+                  selected={checkBoxesState.matchCase}
+                  onClick={() =>
+                    setCheckBoxesState(prev => ({
+                      ...prev,
+                      matchCase: !prev.matchCase,
+                    }))
+                  }
+                >
+                  <MatchCase />
+                </IconButton>
+                <ElementWithMenu
+                  element={
+                    <IconButton size="small" tooltip={t`Search filters`}>
+                      <DotBadge
+                        overlap="circle"
+                        color="error"
+                        invisible={
+                          checkBoxesState.searchInConditions ||
+                          checkBoxesState.searchInActions ||
+                          checkBoxesState.searchInEventStrings
+                        }
+                      >
+                        <Filter />
+                      </DotBadge>
+                    </IconButton>
+                  }
+                  buildMenuTemplate={(i18n: I18nType) => [
+                    {
+                      type: 'checkbox',
+                      label: i18n._(t`Conditions`),
+                      checked: checkBoxesState.searchInConditions,
+                      click: () =>
+                        setCheckBoxesState(prev => ({
+                          ...prev,
+                          searchInConditions: !prev.searchInConditions,
+                        })),
+                    },
+                    {
+                      type: 'checkbox',
+                      label: i18n._(t`Actions`),
+                      checked: checkBoxesState.searchInActions,
+                      click: () =>
+                        setCheckBoxesState(prev => ({
+                          ...prev,
+                          searchInActions: !prev.searchInActions,
+                        })),
+                    },
+                    {
+                      type: 'checkbox',
+                      label: i18n._(t`Texts`),
+                      checked: checkBoxesState.searchInEventStrings,
+                      click: () =>
+                        setCheckBoxesState(prev => ({
+                          ...prev,
+                          searchInEventStrings: !prev.searchInEventStrings,
+                        })),
+                    },
+                    {
+                      type: 'checkbox',
+                      label: i18n._(t`Event sentences`),
+                      checked: checkBoxesState.searchInEventSentences,
+                      click: () =>
+                        setCheckBoxesState(prev => ({
+                          ...prev,
+                          searchInEventSentences: !prev.searchInEventSentences,
+                        })),
+                    },
+                    { type: 'separator' },
+                    {
+                      type: 'checkbox',
+                      label: i18n._(t`Include store extensions`),
+                      checked: checkBoxesState.includeStoreExtensions,
+                      click: () =>
+                        setCheckBoxesState(prev => ({
+                          ...prev,
+                          includeStoreExtensions: !prev.includeStoreExtensions,
+                        })),
+                    },
+                  ]}
+                />
+              </LineStackLayout>
             </LineStackLayout>
             <ScrollView>
               {!hasSearched ? (
@@ -327,8 +327,8 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
               )}
             </ScrollView>
           </ColumnStackLayout>
-        </Background>
-      </div>
+        </LineStackLayout>
+      </Background>
     );
   }
 );

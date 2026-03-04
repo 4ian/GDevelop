@@ -552,6 +552,10 @@ export default class ForEachEvent extends React.Component<
                     this.props.projectScopedContainersAccessor
                   }
                   idPrefix={this.props.idPrefix}
+                  highlightedSearchText={this.props.highlightedSearchText}
+                  highlightedSearchMatchCase={
+                    this.props.highlightedSearchMatchCase
+                  }
                 />
               )}
               renderActionsList={({ className }) => (
@@ -589,6 +593,10 @@ export default class ForEachEvent extends React.Component<
                     this.props.projectScopedContainersAccessor
                   }
                   idPrefix={this.props.idPrefix}
+                  highlightedSearchText={this.props.highlightedSearchText}
+                  highlightedSearchMatchCase={
+                    this.props.highlightedSearchMatchCase
+                  }
                 />
               )}
             />

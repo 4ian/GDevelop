@@ -2,6 +2,8 @@
 // Scanner for validation errors in events (missing instructions, invalid parameters)
 import { mapFor } from './MapFor';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
+import type { EventPath } from '../Types/EventPath';
+import { renderInstructionSentenceAsPlainText } from '../EventsSheet/EventsTree/TextRenderer';
 
 const gd: libGDevelop = global.gd;
 
@@ -19,21 +21,8 @@ export type ValidationError = {|
   parameterValue?: string,
   locationName: string,
   locationType: 'scene' | 'external-events' | 'extension',
-  eventPath: Array<number>,
+  eventPath: EventPath,
 |};
-
-const getInstructionSentence = (
-  instruction: gdInstruction,
-  metadata: gdInstructionMetadata
-): string => {
-  const formatter = gd.InstructionSentenceFormatter.get();
-  const formattedTexts = formatter.getAsFormattedText(instruction, metadata);
-  let sentence = '';
-  mapFor(0, formattedTexts.size(), i => {
-    sentence += formattedTexts.getString(i);
-  });
-  return sentence.trim() || instruction.getType();
-};
 
 /**
  * Build a map from event pointer to its path in the events list.
@@ -41,9 +30,9 @@ const getInstructionSentence = (
  */
 const buildEventPtrToPathMap = (
   eventsList: gdEventsList,
-  parentPath: Array<number> = []
-): Map<number, Array<number>> => {
-  const map = new Map<number, Array<number>>();
+  parentPath: EventPath = []
+): Map<number, EventPath> => {
+  const map = new Map<number, EventPath>();
   mapFor(0, eventsList.getEventsCount(), index => {
     const event = eventsList.getEventAt(index);
     const currentPath = [...parentPath, index];
@@ -70,12 +59,12 @@ const createValidationWorker = (
   platform: gdPlatform,
   locationName: string,
   locationType: 'scene' | 'external-events' | 'extension',
-  eventPtrToPathMap: Map<number, Array<number>>,
+  eventPtrToPathMap: Map<number, EventPath>,
   errors: Array<ValidationError>
 ): gdReadOnlyArbitraryEventsWorkerWithContextJS => {
   const worker = new gd.ReadOnlyArbitraryEventsWorkerWithContextJS();
 
-  let currentEventPath: Array<number> = [];
+  let currentEventPath: EventPath = [];
 
   // $FlowFixMe[incompatible-type] - overriding C++ method:
   // $FlowFixMe[cannot-write]
@@ -121,7 +110,10 @@ const createValidationWorker = (
       return;
     }
 
-    const instructionSentence = getInstructionSentence(instruction, metadata);
+    const instructionSentence = renderInstructionSentenceAsPlainText(
+      instruction,
+      metadata
+    );
 
     // Validate parameters
     const parametersCount = metadata.getParametersCount();
@@ -266,7 +258,7 @@ export type GroupedValidationErrors = {|
  */
 export const findEventByPath = (
   eventsList: gdEventsList,
-  path: Array<number>
+  path: EventPath
 ): ?gdBaseEvent => {
   if (path.length === 0) return null;
 

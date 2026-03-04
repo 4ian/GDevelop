@@ -43,10 +43,10 @@ function createWindow() {
   // and load the index.html of the app.
   mainWindow.loadFile('app/index.html');
 
-  Menu.setApplicationMenu(null);
+  // Menu.setApplicationMenu(null);
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {

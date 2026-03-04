@@ -1,8 +1,17 @@
 namespace gdjs {
   export namespace steamworks {
-    gdjs.registerFirstRuntimeSceneLoadedCallback(() => {
-      if (gdjs.steamworks.steamAPI) gdjs.steamworks.steamAPI.input.init();
-    });
+    let hasInitializedSteamInput = false;
+
+    export function initSteamInput(): void {
+      if (gdjs.steamworks.steamAPI) {
+        gdjs.steamworks.steamAPI.input.init();
+        hasInitializedSteamInput = true;
+      }
+    }
+
+    export function isSteamInputInitialized(): boolean {
+      return hasInitializedSteamInput;
+    }
 
     export function getControllerCount(): integer {
       return gdjs.steamworks.steamAPI

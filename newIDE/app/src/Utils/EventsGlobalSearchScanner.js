@@ -116,36 +116,31 @@ const searchInEventsList = (
     inputs.searchInEventSentences
   ).clone();
 
-  // Phase 1: Extract lightweight data from the C++ vector.
-  // Avoid any heavy C++ calls (like getEventContext) while the vector is alive,
-  // because they can trigger emscripten heap growth and invalidate the vector's memory.
+  // Phase 1: Extract paths and positions from the C++ search results,
+  // then free the C++ vector promptly.
   type RawEntry = {|
     eventPath: EventPath,
     positionInList: number,
     index: number,
   |};
-  const rawEntries: Array<RawEntry> = [];
-  try {
-    mapFor(0, rawResults.size(), index => {
-      const searchResult = rawResults.at(index);
-      if (!searchResult.isEventValid()) return;
+  const rawEntries: Array<RawEntry> = mapFor(0, rawResults.size(), index => {
+    const searchResult = rawResults.at(index);
+    if (!searchResult.isEventValid()) return null;
 
-      const event = searchResult.getEvent();
-      const eventPath = eventPtrToPathMap.get(event.ptr);
-      if (!eventPath) return;
+    const event = searchResult.getEvent();
+    const eventPath = eventPtrToPathMap.get(event.ptr);
+    if (!eventPath) return;
 
-      rawEntries.push({
-        eventPath,
-        positionInList: searchResult.getPositionInList(),
-        index,
-      });
-    });
-  } finally {
-    rawResults.delete();
-  }
+    return {
+      eventPath,
+      positionInList: searchResult.getPositionInList(),
+      index,
+    };
+  }).filter(Boolean);
+  rawResults.delete();
 
-  // Phase 2: Now that the C++ vector is freed, it is safe to do heavy C++
-  // operations (formatting instruction sentences, metadata lookups, etc.).
+  // Phase 2: Build rich context (instruction sentences, metadata) from
+  // the raw entries — doing more calls to C++ here to complete the context.
   return rawEntries.map(entry => {
     const event = getEventAtPath(eventsList, entry.eventPath);
     return {

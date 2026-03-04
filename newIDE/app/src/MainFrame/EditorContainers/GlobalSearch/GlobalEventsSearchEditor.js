@@ -79,14 +79,15 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
       setHasSearched,
     } = useSearchForm();
 
-    const launchSearch = () => {
+    const launchSearch = (searchText: string) => {
+      setSearch(searchText);
       const groups = scanProjectForGlobalEventsSearch(project, {
-        searchText: search,
+        searchText,
         ...checkBoxesState,
       });
       setGroups(groups);
       setHasSearched(true);
-      setFreezedSearchState({ ...checkBoxesState, searchText: search });
+      setFreezedSearchState({ ...checkBoxesState, searchText });
     };
 
     const navigateToMatch = React.useCallback(
@@ -159,7 +160,7 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
                 disabled={!hasSearchText}
                 primary
                 label={<Trans>Search</Trans>}
-                onClick={launchSearch}
+                onClick={() => launchSearch(search)}
               />
             </LineStackLayout>
             <LineStackLayout noMargin alignItems="center">

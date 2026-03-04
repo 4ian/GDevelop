@@ -248,7 +248,6 @@ const TreeRow = ({
   const {
     flatData,
     matchIndexSet,
-    matchIndexes,
     onVisibilityToggle,
     scaffoldBlockPxWidth,
     searchFocusedEvent,

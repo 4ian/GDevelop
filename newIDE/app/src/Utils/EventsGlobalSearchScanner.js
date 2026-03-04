@@ -1,4 +1,5 @@
 // @flow
+import { renderInstructionSentenceAsPlainText } from '../EventsSheet/EventsTree/TextRenderer';
 import type { EventPath } from '../Types/EventPath';
 
 import { mapFor } from './MapFor';
@@ -160,7 +161,6 @@ const getInstructionSentence = (
   isCondition: boolean
 ): string => {
   const instructionType = instruction.getType();
-  if (!instructionType) return '';
 
   const metadata = isCondition
     ? gd.MetadataProvider.getConditionMetadata(
@@ -171,17 +171,8 @@ const getInstructionSentence = (
         gd.JsPlatform.get(),
         instructionType
       );
-  if (gd.MetadataProvider.isBadInstructionMetadata(metadata)) {
-    return instructionType;
-  }
 
-  const formatter = gd.InstructionSentenceFormatter.get();
-  const formattedTexts = formatter.getAsFormattedText(instruction, metadata);
-  let sentence = '';
-  mapFor(0, formattedTexts.size(), i => {
-    sentence += formattedTexts.getString(i);
-  });
-  return sentence.trim() || instructionType;
+  return renderInstructionSentenceAsPlainText(instruction, metadata);
 };
 
 const getFirstInstructionSentence = (

@@ -25,7 +25,7 @@ export const deduplicateEventPaths = (
   return [...uniquePathByKey.values()];
 };
 
-export const getMatchContext = (match: any): string =>
+export const getMatchContext = (match: GlobalSearchMatch): string =>
   match.context || `Match at event path ${getEventPathLabel(match.eventPath)}`;
 
 export type ParsedContext = {|

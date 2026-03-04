@@ -95,6 +95,18 @@ namespace gdjs {
           private _bounceLight: THREE.SpotLight;
           private _shadowMapDirty = true;
           private _shadowCameraDirty = true;
+          private _maxRendererShadowMapSize: integer = 2048;
+          private _threeRenderer: THREE.WebGLRenderer | null = null;
+          private _shadowFramesSinceLastRender: integer = 0;
+          private _shadowMaxStaleFrames: integer = 4;
+          private _shadowMotionThreshold: float = 0.35;
+          private _hasPreviousShadowState = false;
+          private _previousLightX: float = 0;
+          private _previousLightY: float = 0;
+          private _previousLightZ: float = 0;
+          private _previousTargetX: float = 0;
+          private _previousTargetY: float = 0;
+          private _previousTargetZ: float = 0;
 
           constructor() {
             this._light = new THREE.SpotLight();
@@ -118,11 +130,40 @@ namespace gdjs {
             this._light.shadow.camera.updateProjectionMatrix();
           }
 
-          private _updateShadowMapSize(): void {
+          private _clampShadowMapSizeToRenderer(size: integer): integer {
+            const safeRendererMax = Math.max(
+              512,
+              this._maxRendererShadowMapSize
+            );
+            let clampedSize = 512;
+            while (clampedSize * 2 <= safeRendererMax) {
+              clampedSize *= 2;
+            }
+            return Math.max(512, Math.min(size, clampedSize));
+          }
+
+          private _sanitizeShadowMapSize(value: number): integer {
+            const supportedSizes = [512, 1024, 2048, 4096];
+            const target = Math.max(512, value);
+            let closestSize = supportedSizes[0];
+            let closestDelta = Math.abs(target - closestSize);
+            for (let i = 1; i < supportedSizes.length; i++) {
+              const size = supportedSizes[i];
+              const delta = Math.abs(target - size);
+              if (delta < closestDelta) {
+                closestDelta = delta;
+                closestSize = size;
+              }
+            }
+            return this._clampShadowMapSizeToRenderer(closestSize);
+          }
+
+          private _updateShadowMapSize(): boolean {
             if (!this._shadowMapDirty) {
-              return;
+              return false;
             }
             this._shadowMapDirty = false;
+            this._shadowMapSize = this._sanitizeShadowMapSize(this._shadowMapSize);
 
             this._light.shadow.mapSize.set(
               this._shadowMapSize,
@@ -133,29 +174,154 @@ namespace gdjs {
             this._light.shadow.map?.dispose();
             this._light.shadow.map = null;
             this._light.shadow.needsUpdate = true;
+            return true;
           }
 
-          private _updateShadowCamera(): void {
+          private _updateShadowCamera(): boolean {
             if (!this._shadowCameraDirty) {
-              return;
+              return false;
             }
             this._shadowCameraDirty = false;
 
             const safeNear = Math.max(0.01, this._shadowNear);
             this._shadowNear = safeNear;
-            
+
             // Auto-adjust far plane if distance is explicitly set
-            const effectiveFar = (this._distance > 0) ? 
-                Math.min(this._shadowFar, this._distance + Math.max(50, this._distance * 0.25)) : 
-                this._shadowFar;
-            
+            const effectiveFar =
+              this._distance > 0
+                ? Math.min(
+                    this._shadowFar,
+                    this._distance + Math.max(50, this._distance * 0.25)
+                  )
+                : this._shadowFar;
+
             this._light.shadow.camera.near = safeNear;
             this._light.shadow.camera.far = Math.max(safeNear + 1, effectiveFar);
-            
+
             // FOV of shadow camera for SpotLight should match the light's angle (angle is half of fov)
-            this._light.shadow.camera.fov = Math.max(2, Math.min(170, this._angle * 2));
-            
+            this._light.shadow.camera.fov = Math.max(
+              2,
+              Math.min(170, this._angle * 2)
+            );
+
             this._light.shadow.camera.updateProjectionMatrix();
+            this._light.shadow.needsUpdate = true;
+            return true;
+          }
+
+          private _isAnyShadowCasterActive(): boolean {
+            return (
+              this._light.castShadow ||
+              (this._bounceLight.castShadow && this._bounceLight.visible)
+            );
+          }
+
+          private _resetShadowRefreshTracking(): void {
+            this._shadowFramesSinceLastRender = 0;
+            this._hasPreviousShadowState = false;
+          }
+
+          private _hasShadowStateMovedEnough(): boolean {
+            const lightPosition = this._light.position;
+            const targetPosition = this._light.target.position;
+            if (!this._hasPreviousShadowState) {
+              this._hasPreviousShadowState = true;
+              this._previousLightX = lightPosition.x;
+              this._previousLightY = lightPosition.y;
+              this._previousLightZ = lightPosition.z;
+              this._previousTargetX = targetPosition.x;
+              this._previousTargetY = targetPosition.y;
+              this._previousTargetZ = targetPosition.z;
+              return true;
+            }
+
+            const lightDeltaX = lightPosition.x - this._previousLightX;
+            const lightDeltaY = lightPosition.y - this._previousLightY;
+            const lightDeltaZ = lightPosition.z - this._previousLightZ;
+            const targetDeltaX = targetPosition.x - this._previousTargetX;
+            const targetDeltaY = targetPosition.y - this._previousTargetY;
+            const targetDeltaZ = targetPosition.z - this._previousTargetZ;
+            const movementSquared =
+              lightDeltaX * lightDeltaX +
+              lightDeltaY * lightDeltaY +
+              lightDeltaZ * lightDeltaZ +
+              targetDeltaX * targetDeltaX +
+              targetDeltaY * targetDeltaY +
+              targetDeltaZ * targetDeltaZ;
+            const threshold = Math.max(0.05, this._shadowMotionThreshold);
+            if (movementSquared < threshold * threshold) {
+              return false;
+            }
+
+            this._previousLightX = lightPosition.x;
+            this._previousLightY = lightPosition.y;
+            this._previousLightZ = lightPosition.z;
+            this._previousTargetX = targetPosition.x;
+            this._previousTargetY = targetPosition.y;
+            this._previousTargetZ = targetPosition.z;
+            return true;
+          }
+
+          private _requestShadowRender(forceUpdate: boolean): void {
+            if (!this._isAnyShadowCasterActive()) {
+              this._resetShadowRefreshTracking();
+              return;
+            }
+
+            const intervalReached =
+              this._shadowFramesSinceLastRender >= this._shadowMaxStaleFrames;
+            if (!forceUpdate && !intervalReached) {
+              this._shadowFramesSinceLastRender++;
+              return;
+            }
+
+            if (this._light.castShadow) {
+              this._light.shadow.needsUpdate = true;
+            }
+            if (this._bounceLight.castShadow && this._bounceLight.visible) {
+              this._bounceLight.shadow.needsUpdate = true;
+            }
+            if (this._threeRenderer && this._threeRenderer.shadowMap) {
+              this._threeRenderer.shadowMap.needsUpdate = true;
+            }
+            this._shadowFramesSinceLastRender = 0;
+          }
+
+          private _ensureShadowRenderer(target: gdjs.EffectsTarget): void {
+            const runtimeScene = target.getRuntimeScene();
+            if (!runtimeScene || !runtimeScene.getGame) {
+              return;
+            }
+            const gameRenderer = runtimeScene.getGame().getRenderer();
+            if (!gameRenderer || !(gameRenderer as any).getThreeRenderer) {
+              return;
+            }
+            const threeRenderer = (gameRenderer as any).getThreeRenderer();
+            if (!threeRenderer || !threeRenderer.shadowMap) {
+              return;
+            }
+            this._threeRenderer = threeRenderer;
+
+            const rendererMaxTextureSize =
+              threeRenderer.capabilities &&
+              typeof threeRenderer.capabilities.maxTextureSize === 'number'
+                ? threeRenderer.capabilities.maxTextureSize
+                : 2048;
+            this._maxRendererShadowMapSize = Math.max(
+              512,
+              rendererMaxTextureSize
+            );
+
+            if (!this._isAnyShadowCasterActive()) {
+              return;
+            }
+
+            threeRenderer.shadowMap.enabled = true;
+            threeRenderer.shadowMap.autoUpdate = false;
+            threeRenderer.shadowMap.type =
+              this._shadowRadius > 1
+                ? THREE.PCFShadowMap
+                : THREE.PCFSoftShadowMap;
           }
 
           private _setAnyPosition(
@@ -420,6 +586,7 @@ namespace gdjs {
             scene.add(this._light.target);
             scene.add(this._bounceLight);
             scene.add(this._bounceLight.target);
+            this._resetShadowRefreshTracking();
             this._isEnabled = true;
             return true;
           }
@@ -435,6 +602,7 @@ namespace gdjs {
             scene.remove(this._light.target);
             scene.remove(this._bounceLight);
             scene.remove(this._bounceLight.target);
+            this._resetShadowRefreshTracking();
             this._isEnabled = false;
             return true;
           }
@@ -452,14 +620,33 @@ namespace gdjs {
               this._updateTarget();
             }
 
-            if (this._light.castShadow) {
-              this._updateShadowCamera();
-              this._updateShadowMapSize();
-              this._light.shadow.bias = this._shadowBias;
-              this._light.shadow.normalBias = this._shadowNormalBias;
-              this._light.shadow.radius = this._shadowRadius;
-            }
             this._updatePhysicsBounce(target);
+            this._ensureShadowRenderer(target);
+
+            if (!this._isAnyShadowCasterActive()) {
+              this._resetShadowRefreshTracking();
+              return;
+            }
+
+            const shadowCameraUpdated = this._light.castShadow
+              ? this._updateShadowCamera()
+              : false;
+            const shadowMapUpdated = this._light.castShadow
+              ? this._updateShadowMapSize()
+              : false;
+            this._light.shadow.bias = this._shadowBias;
+            this._light.shadow.normalBias = this._shadowNormalBias;
+            this._light.shadow.radius = this._shadowRadius;
+
+            const bounceShadowForcesUpdate =
+              this._bounceLight.castShadow && this._bounceLight.visible;
+            const shadowStateMoved = this._hasShadowStateMovedEnough();
+            this._requestShadowRender(
+              shadowCameraUpdated ||
+                shadowMapUpdated ||
+                shadowStateMoved ||
+                bounceShadowForcesUpdate
+            );
           }
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
@@ -631,6 +818,12 @@ namespace gdjs {
               if (value) {
                 this._shadowMapDirty = true;
                 this._shadowCameraDirty = true;
+                this._shadowFramesSinceLastRender = this._shadowMaxStaleFrames;
+              } else if (
+                !this._bounceLight.castShadow ||
+                !this._bounceLight.visible
+              ) {
+                this._resetShadowRefreshTracking();
               }
             } else if (parameterName === 'rotateOffsetsWithObjectAngle') {
               this._rotateOffsetsWithObjectAngle = value;
@@ -638,10 +831,18 @@ namespace gdjs {
               this._physicsBounceEnabled = value;
               if (!value) {
                 this._hideBounceLight();
+                if (!this._light.castShadow) {
+                  this._resetShadowRefreshTracking();
+                }
               }
             } else if (parameterName === 'physicsBounceCastShadow') {
               this._physicsBounceCastShadow = value;
               this._bounceLight.castShadow = value;
+              if (value) {
+                this._shadowFramesSinceLastRender = this._shadowMaxStaleFrames;
+              } else if (!this._light.castShadow) {
+                this._resetShadowRefreshTracking();
+              }
             }
           }
           getNetworkSyncData(): SpotLightFilterNetworkSyncData {
@@ -725,6 +926,7 @@ namespace gdjs {
             this._updateTarget();
             this._shadowMapDirty = true;
             this._shadowCameraDirty = true;
+            this._resetShadowRefreshTracking();
           }
         })();
       }

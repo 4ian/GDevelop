@@ -389,30 +389,41 @@ const scanEvents = ({
   groups: Array<GlobalSearchGroup>,
   where: 'layout' | 'external-events',
 }) => {
-  const isLayouts = where === 'layout';
-  const count = project[
-    isLayouts ? 'getLayoutsCount' : 'getExternalEventsCount'
-  ]();
-
-  mapFor(0, count, index => {
-    const events = project[isLayouts ? 'getLayoutAt' : 'getExternalEventsAt'](
-      index
-    );
-    const name = events.getName();
-    const matches = searchInEventsList(events.getEvents(), inputs);
-    pushIfMatches(
-      groups,
-      // $FlowFixMe[incompatible-type]
-      matches => ({
-        id: `${where}:${name}`,
-        label: name,
-        targetType: where,
-        name,
-        matches,
-      }),
-      matches
-    );
-  });
+  if (where === 'layout') {
+    mapFor(0, project.getLayoutsCount(), index => {
+      const layout = project.getLayoutAt(index);
+      const name = layout.getName();
+      const matches = searchInEventsList(layout.getEvents(), inputs);
+      pushIfMatches(
+        groups,
+        matches => ({
+          id: `${where}:${name}`,
+          label: name,
+          targetType: where,
+          name,
+          matches,
+        }),
+        matches
+      );
+    });
+  } else if (where === 'external-events') {
+    mapFor(0, project.getExternalEventsCount(), index => {
+      const externalEvents = project.getExternalEventsAt(index);
+      const name = externalEvents.getName();
+      const matches = searchInEventsList(externalEvents.getEvents(), inputs);
+      pushIfMatches(
+        groups,
+        matches => ({
+          id: `${where}:${name}`,
+          label: name,
+          targetType: where,
+          name,
+          matches,
+        }),
+        matches
+      );
+    });
+  }
 };
 
 export const scanProjectForGlobalEventsSearch = (

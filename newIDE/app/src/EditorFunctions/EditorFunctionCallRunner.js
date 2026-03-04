@@ -12,11 +12,16 @@ import {
   type EventsGenerationOptions,
   type AssetSearchAndInstallOptions,
   type AssetSearchAndInstallResult,
+  type RelatedAiRequestLastMessages,
+  type ResourceSearchAndInstallOptions,
+  type ResourceSearchAndInstallResult,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
+  type ToolOptions,
 } from '.';
+import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 
 export type EditorFunctionCallResult =
@@ -40,7 +45,10 @@ export type ProcessEditorFunctionCallsOptions = {|
   functionCalls: Array<EditorFunctionCall>,
   i18n: I18nType,
   editorCallbacks: EditorCallbacks,
+  toolOptions: ToolOptions | null,
   ignore: boolean,
+  relatedAiRequestId: string | null,
+  getRelatedAiRequestLastMessages: () => RelatedAiRequestLastMessages,
   generateEvents: (
     options: EventsGenerationOptions
   ) => Promise<EventsGenerationResult>,
@@ -64,6 +72,9 @@ export type ProcessEditorFunctionCallsOptions = {|
   searchAndInstallAsset: (
     options: AssetSearchAndInstallOptions
   ) => Promise<AssetSearchAndInstallResult>,
+  searchAndInstallResources: (
+    options: ResourceSearchAndInstallOptions
+  ) => Promise<ResourceSearchAndInstallResult>,
 |};
 
 export const processEditorFunctionCalls = async ({
@@ -71,16 +82,20 @@ export const processEditorFunctionCalls = async ({
   project,
   i18n,
   editorCallbacks,
+  toolOptions,
   generateEvents,
   onSceneEventsModifiedOutsideEditor,
   onInstancesModifiedOutsideEditor,
   onObjectsModifiedOutsideEditor,
   onObjectGroupsModifiedOutsideEditor,
   ignore,
+  relatedAiRequestId,
+  getRelatedAiRequestLastMessages,
   ensureExtensionInstalled,
   onWillInstallExtension,
   onExtensionInstalled,
   searchAndInstallAsset,
+  searchAndInstallResources,
 }: ProcessEditorFunctionCallsOptions): Promise<{|
   results: Array<EditorFunctionCallResult>,
   createdSceneNames: Array<string>,
@@ -128,6 +143,7 @@ export const processEditorFunctionCalls = async ({
         });
       }
 
+      // $FlowFixMe[invalid-compare]
       if (name === null) {
         results.push({
           status: 'finished',
@@ -140,6 +156,7 @@ export const processEditorFunctionCalls = async ({
         continue;
       }
 
+      // $FlowFixMe[invalid-compare]
       if (args === null) {
         results.push({
           status: 'finished',
@@ -172,7 +189,10 @@ export const processEditorFunctionCalls = async ({
       const argumentsWithoutProject = {
         args,
         i18n,
+        toolOptions,
         editorCallbacks,
+        relatedAiRequestId,
+        getRelatedAiRequestLastMessages,
         generateEvents,
         onSceneEventsModifiedOutsideEditor,
         onInstancesModifiedOutsideEditor,
@@ -182,6 +202,8 @@ export const processEditorFunctionCalls = async ({
         onWillInstallExtension,
         onExtensionInstalled,
         searchAndInstallAsset,
+        searchAndInstallResources,
+        PixiResourcesLoader,
       };
 
       // Execute the function

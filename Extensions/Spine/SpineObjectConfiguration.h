@@ -146,6 +146,8 @@ public:
   double GetScale() const { return scale; };
 
   const gd::String& GetSpineResourceName() const { return spineResourceName; };
+
+  const gd::String& GetSkinName() const { return skinName; };
   ///@}
 
 protected:
@@ -156,6 +158,7 @@ private:
   double scale;
 
   gd::String spineResourceName;
+  gd::String skinName;
 
   std::vector<SpineAnimation> animations;
 

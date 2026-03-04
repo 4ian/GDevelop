@@ -47,7 +47,7 @@
         <preference name="SwiftVersion" value="5.3" />
 
         <!-- Required by admob-plus plugin > version 2 -->
-        <preference name="deployment-target" value="12.0" />
+        <preference name="deployment-target" value="13.0" />
 
         <!-- GDJS_ICONS_IOS -->
     </platform>
@@ -63,8 +63,4 @@
     <preference name="phonegap-version" value="cli-9.0.0" />
 
     <!-- GDJS_EXTENSION_CORDOVA_DEPENDENCY -->
-
-    <!-- Keep cordova-plugin-ionic-webview plugin last as it has a deployment-target to 11, which
-    affects the installation of other plugins.-->
-    <plugin name="cordova-plugin-ionic-webview" version="5.0.1" />
 </widget>

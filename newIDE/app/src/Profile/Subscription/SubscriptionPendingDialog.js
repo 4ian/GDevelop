@@ -22,13 +22,15 @@ type Props = {|
   onClose: () => void,
   authenticatedUser: AuthenticatedUser,
   onSuccess: () => void,
+  immediatelyShowSuccessMessage?: boolean,
 |};
 
 export default function SubscriptionPendingDialog({
   onClose,
   authenticatedUser,
   onSuccess,
-}: Props) {
+  immediatelyShowSuccessMessage,
+}: Props): React.Node {
   const userPlanIdAtOpening = React.useRef<?string>(
     !!authenticatedUser.subscription
       ? authenticatedUser.subscription.planId
@@ -37,7 +39,8 @@ export default function SubscriptionPendingDialog({
   const userPlanId = !!authenticatedUser.subscription
     ? authenticatedUser.subscription.planId
     : null;
-  const hasUserPlanChanged = userPlanId !== userPlanIdAtOpening.current;
+  const hasUserPlanChanged =
+    immediatelyShowSuccessMessage || userPlanId !== userPlanIdAtOpening.current;
   const canUserBenefitFromDiscordRole =
     !!authenticatedUser &&
     canBenefitFromDiscordRole(authenticatedUser.subscription);

@@ -1,22 +1,22 @@
 // @flow
 import { mapFor } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
-import { type ExtensionDependency } from '../Utils/GDevelopServices/Extension';
 
 const gd: libGDevelop = global.gd;
 
 export type EnumeratedObjectMetadata = {|
   extension: gdPlatformExtension,
   objectMetadata: gdObjectMetadata,
+  type: string,
   name: string,
   fullName: string,
   description: string,
   iconFilename: string,
-  categoryFullName: string,
+  category: string,
   isRenderedIn3D: boolean,
-  assetStorePackTag?: string,
-  requiredExtensions?: Array<ExtensionDependency>,
+  assetStoreTag?: string,
   isDependentWithParent?: boolean,
+  tags: Array<string>,
 |};
 
 export type ObjectWithContext = {|
@@ -32,7 +32,9 @@ export type GroupWithContext = {|
 export type ObjectWithContextList = Array<ObjectWithContext>;
 export type GroupWithContextList = Array<GroupWithContext>;
 
-export const isSameGroupWithContext = (groupWithContext: ?GroupWithContext) => (
+export const isSameGroupWithContext = (
+  groupWithContext: ?GroupWithContext
+): ((other: ?GroupWithContext) => ?(false | boolean)) => (
   other: ?GroupWithContext
 ) => {
   return (
@@ -45,7 +47,9 @@ export const isSameGroupWithContext = (groupWithContext: ?GroupWithContext) => (
 
 export const isSameObjectWithContext = (
   objectWithContext: ?ObjectWithContext
-) => (other: ?ObjectWithContext) => {
+): ((other: ?ObjectWithContext) => ?(false | boolean)) => (
+  other: ?ObjectWithContext
+) => {
   return (
     objectWithContext &&
     other &&
@@ -58,7 +62,11 @@ export const enumerateObjects = (
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   filters: ?{| type?: string, names?: Array<string> |}
-) => {
+): {
+  allObjectsList: ObjectWithContextList,
+  containerObjectsList: ObjectWithContextList,
+  projectObjectsList: ObjectWithContextList,
+} => {
   const typeFilter = (filters && filters.type) || null;
   const namesFilter = (filters && filters.names) || null;
   const filterObjectByType = typeFilter
@@ -131,7 +139,8 @@ export const enumerateObjects = (
 };
 
 export const enumerateObjectTypes = (
-  project: gdProject
+  project: gdProject,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null
 ): Array<EnumeratedObjectMetadata> => {
   const platform = project.getCurrentPlatform();
   const extensionsList = platform.getAllPlatformExtensions();
@@ -143,21 +152,29 @@ export const enumerateObjectTypes = (
       return extension
         .getExtensionObjectsTypes()
         .toJSArray()
-        .map(objectType => extension.getObjectMetadata(objectType))
+        .map(objectType => {
+          const objectMetadata = extension.getObjectMetadata(objectType);
+          return {
+            extension,
+            objectMetadata,
+            type: objectType,
+            name: objectMetadata.getName(),
+            fullName: objectMetadata.getFullName(),
+            description: objectMetadata.getDescription(),
+            iconFilename: objectMetadata.getIconFilename(),
+            category: objectMetadata.getCategory() || 'General',
+            assetStoreTag: objectMetadata.getAssetStoreTag(),
+            isRenderedIn3D: objectMetadata.isRenderedIn3D(),
+            tags: extension.getTags().toJSArray(),
+          };
+        })
         .filter(
-          objectMetadata =>
-            !objectMetadata.isHidden() && !objectMetadata.isPrivate()
-        )
-        .map(objectMetadata => ({
-          extension,
-          objectMetadata,
-          name: objectMetadata.getName(),
-          fullName: objectMetadata.getFullName(),
-          description: objectMetadata.getDescription(),
-          iconFilename: objectMetadata.getIconFilename(),
-          categoryFullName: objectMetadata.getCategoryFullName(),
-          isRenderedIn3D: objectMetadata.isRenderedIn3D(),
-        }));
+          ({ objectMetadata }) =>
+            !objectMetadata.isHidden() &&
+            (!objectMetadata.isPrivate() ||
+              (eventsFunctionsExtension &&
+                extension.getName() === eventsFunctionsExtension.getName()))
+        );
     })
   );
 };
@@ -214,7 +231,12 @@ export const enumerateObjectsAndGroups = (
   objectsContainersList: gdObjectsContainersList,
   objectType: ?string = undefined,
   requiredBehaviorTypes?: Array<string> = []
-) => {
+):
+  | { allGroupsList: Array<empty>, allObjectsList: Array<empty> }
+  | {
+      allGroupsList: GroupWithContextList,
+      allObjectsList: ObjectWithContextList,
+    } => {
   // The objects must never be kept in a state as they may be temporary copies.
   // Search for "ProjectScopedContainers wrongly containing temporary objects containers or objects"
   // in the codebase.

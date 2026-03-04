@@ -6,6 +6,7 @@ const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
+    minWidth: 0,
   },
   maxWidth: {
     maxWidth: '100%',
@@ -25,7 +26,7 @@ type Props = {|
  * This is the component to be used to display the standard
  * background of editor/windows/dialogs.
  */
-const Background = (props: Props) => (
+const Background = (props: Props): React.Node => (
   <Paper
     square
     style={{

@@ -22,6 +22,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
             "for most elements of a 2D game."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("Animated 2D object with multiple directions, frames, collision masks, and points.")
+      .SetDimension("2D")
       .SetExtensionHelpPath("/objects/sprite");
   extension.AddInstructionOrExpressionGroupMetadata(_("Sprite"))
       .SetIcon("CppPlatform/Extensions/spriteicon.png");
@@ -33,7 +35,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                                    _("Animated object which can be used for "
                                      "most elements of a 2D game."),
                                    "CppPlatform/Extensions/spriteicon.png")
-          .SetCategoryFullName(_("General"))
+          .SetCategory("General")
           .SetOpenFullEditorLabel(_("Edit animations"))
           .AddDefaultBehavior("EffectCapability::EffectBehavior")
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")

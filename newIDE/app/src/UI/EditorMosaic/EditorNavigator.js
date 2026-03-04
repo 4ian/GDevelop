@@ -27,10 +27,10 @@ type Props = {|
   },
   transitions: {
     [string]: {|
-      nextEditor?: string | (() => string),
-      nextLabel?: React.Node,
-      nextIcon?: React.Node,
-      previousEditor?: string | (() => string),
+      nextEditor?: string | (() => string) | null,
+      nextLabel?: React.Node | null,
+      nextIcon?: React.Node | null,
+      previousEditor?: string | (() => string) | null,
     |},
   },
   onEditorChanged: (editorName: string) => void,
@@ -43,7 +43,7 @@ export type EditorNavigatorInterface = {|
 // Flow types might have to be changed/removed if upgrading Flow
 // (see example at https://github.com/wgao19/flow-notes/blob/master/react/react-memo.md)
 
-export default React.forwardRef<Props, EditorNavigatorInterface>(
+export default (React.forwardRef<Props, EditorNavigatorInterface>(
   (
     { initialEditorName, editors, transitions, onEditorChanged }: Props,
     ref
@@ -123,4 +123,7 @@ export default React.forwardRef<Props, EditorNavigatorInterface>(
       </Column>
     );
   }
-);
+): React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<EditorNavigatorInterface>,
+}>);

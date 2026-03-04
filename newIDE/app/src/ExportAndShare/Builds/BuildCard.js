@@ -134,7 +134,7 @@ export const BuildCard = ({
   onBuildUpdated,
   onBuildDeleted,
   authenticatedUser,
-}: Props) => {
+}: Props): React.Node => {
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const defaultBuildName = `${game.gameName
     .toLowerCase()
@@ -295,6 +295,7 @@ export const BuildCard = ({
               <Line noMargin>
                 {isEditingName ? (
                   <Line noMargin expand>
+                    {/* $FlowFixMe[incompatible-type] */}
                     <TextField
                       ref={nameInput}
                       style={styles.textField}
@@ -322,6 +323,7 @@ export const BuildCard = ({
                     {gameUpdating && (
                       <>
                         <Spacer />
+                        {/* $FlowFixMe[incompatible-type] */}
                         <CircularProgress style={styles.circularProgress} />
                       </>
                     )}

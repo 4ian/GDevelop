@@ -13,6 +13,7 @@ import {
 } from '../Utils/Serializer';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import {
+  // $FlowFixMe[import-type-as-value]
   TreeViewItemContent,
   type TreeItemProps,
   extensionObjectsRootFolderId,
@@ -155,7 +156,7 @@ export class EventsBasedObjectTreeViewItemContent
     this.props.editName(this.getId());
   }
 
-  buildMenuTemplate(i18n: I18nType, index: number) {
+  buildMenuTemplate(i18n: I18nType, index: number): any {
     return [
       {
         label: i18n._(t`Open visual editor`),
@@ -376,7 +377,7 @@ export class EventsBasedObjectTreeViewItemContent
     this.props.forceUpdate();
   }
 
-  getRightButton(i18n: I18nType) {
+  getRightButton(i18n: I18nType): any {
     return {
       icon: <Add />,
       label: i18n._(t`Add a function`),

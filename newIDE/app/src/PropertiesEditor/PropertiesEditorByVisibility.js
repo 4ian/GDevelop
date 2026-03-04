@@ -21,7 +21,7 @@ import {
   isAnyPropertyModified,
 } from '../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
 
-export const hasSchemaAnyProperty = (propertiesSchema: Schema) =>
+export const hasSchemaAnyProperty = (propertiesSchema: Schema): boolean =>
   !propertiesSchema.every(
     property =>
       property.isHiddenWhenOnlyOneChoice &&
@@ -45,6 +45,7 @@ type Props = {|
   object?: ?gdObject,
   projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
   resourceManagementProps?: ?ResourceManagementProps,
+  isAdvancedSectionInitiallyUncollapsed?: boolean,
 |};
 
 const PropertiesEditorByVisibility = ({
@@ -58,7 +59,8 @@ const PropertiesEditorByVisibility = ({
   projectScopedContainersAccessor,
   resourceManagementProps,
   placeholder,
-}: Props) => {
+  isAdvancedSectionInitiallyUncollapsed,
+}: Props): ?(false | 0 | '' | React$Portal | React.Node) => {
   const [
     shouldShowDeprecatedProperties,
     setShouldShowDeprecatedProperties,
@@ -92,8 +94,11 @@ const PropertiesEditorByVisibility = ({
   );
 
   const areAdvancedPropertiesExpandedByDefault = React.useMemo(
-    () => isAnyPropertyModified(advancedPropertiesSchema, instances),
-    [instances, advancedPropertiesSchema]
+    () =>
+      isAdvancedSectionInitiallyUncollapsed === undefined
+        ? isAnyPropertyModified(advancedPropertiesSchema, instances)
+        : isAdvancedSectionInitiallyUncollapsed,
+    [isAdvancedSectionInitiallyUncollapsed, advancedPropertiesSchema, instances]
   );
 
   return hasAnyProperty ? (

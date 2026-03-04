@@ -28,6 +28,7 @@ const useFormGroupStyles = makeStyles({
 type Props = {|
   label?: ?React.Node,
   checked: boolean,
+  indeterminate?: boolean,
   onCheck?: (e: {||}, checked: boolean) => void | Promise<void>,
   tooltipOrHelperText?: React.Node,
   checkedIcon?: React.Node,
@@ -45,7 +46,7 @@ type Props = {|
 /**
  * A checkbox based on Material-UI checkbox.
  */
-const Checkbox = (props: Props) => {
+const Checkbox = (props: Props): React.Node => {
   const { onCheck } = props;
   const classes = useStyles();
   const formGroupClasses = useFormGroupStyles();
@@ -54,6 +55,7 @@ const Checkbox = (props: Props) => {
       className={classes.root}
       disabled={props.disabled}
       checked={props.checked}
+      indeterminate={props.indeterminate}
       onChange={
         onCheck ? event => onCheck(event, event.target.checked) : undefined
       }

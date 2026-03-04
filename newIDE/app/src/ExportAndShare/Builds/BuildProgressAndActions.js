@@ -116,7 +116,7 @@ const BuildProgressAndActions = ({
   gameUpdating,
   setGameUpdating,
   onCopyToClipboard,
-}: Props) => {
+}: Props): React.Node => {
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
@@ -311,12 +311,14 @@ const BuildProgressAndActions = ({
                   </>
                 )}
                 {downloadButtons
+                  // $FlowFixMe[invalid-computed-prop]
                   .filter(button => !!build[button.key])
                   .map(button => (
                     <React.Fragment key={button.key}>
                       <RaisedButton
                         primary
                         label={i18n._(button.displayName)}
+                        // $FlowFixMe[incompatible-type]
                         onClick={() => onDownload(button.key)}
                         icon={button.icon}
                       />

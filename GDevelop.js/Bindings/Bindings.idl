@@ -59,6 +59,11 @@ interface VectorObjectFolderOrObject {
     [Const] ObjectFolderOrObject at(unsigned long index);
 };
 
+interface VectorPropertyFolderOrProperty {
+    unsigned long size();
+    [Const] PropertyFolderOrProperty at(unsigned long index);
+};
+
 interface VectorScreenshot {
     unsigned long size();
     [Const, Ref] Screenshot at(unsigned long index);
@@ -473,6 +478,7 @@ interface ObjectFolderOrObject {
     unsigned long GetChildPosition([Const, Ref] ObjectFolderOrObject child);
     [Ref] ObjectFolderOrObject GetParent();
     [Ref] ObjectFolderOrObject InsertNewFolder([Const] DOMString name, unsigned long newPosition);
+    [Ref] ObjectFolderOrObject GetOrCreateFolderChild([Const] DOMString name);
     void MoveObjectFolderOrObjectToAnotherFolder([Ref] ObjectFolderOrObject objectFolderOrObject, [Ref] ObjectFolderOrObject newParentFolder, unsigned long newPosition);
     void MoveChild(unsigned long oldIndex, unsigned long newIndex);
     void RemoveFolderChild([Const, Ref] ObjectFolderOrObject childToRemove);
@@ -800,7 +806,9 @@ interface Behavior {
 
     [Value] MapStringPropertyDescriptor GetProperties();
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
+    void RemoveProperty([Const] DOMString name);
     void InitializeContent();
+    boolean HasPropertyValue([Const] DOMString name);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -904,7 +912,7 @@ interface gdObject {
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
     [Ref] gdObject ResetPersistentUuid();
-    [Ref] gdObject ClearPersistentUuid();
+    [Const, Ref] DOMString GetPersistentUuid();
 };
 
 interface UniquePtrObject {
@@ -1050,7 +1058,7 @@ interface ExternalLayout {
     [Ref] EditorSettings GetAssociatedEditorSettings();
 
     void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Const, Ref] SerializerElement element);
+    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
 
 interface Effect {
@@ -1329,12 +1337,14 @@ interface ResourcesContainer {
     [Value] VectorString FindFilesNotInResources([Const, Ref] VectorString filesToCheck);
     boolean HasResource([Const] DOMString name);
     [Const, Ref] Resource GetResource([Const] DOMString name);
+    [Const, Ref] Resource GetResourceAt(unsigned long index);
     [Const, Ref] DOMString GetResourceNameWithOrigin([Const] DOMString originName, [Const] DOMString originIdentifier);
     [Const, Ref] DOMString GetResourceNameWithFile([Const] DOMString file);
     boolean AddResource([Const, Ref] Resource res);
     void RemoveResource([Const] DOMString name);
     void RenameResource([Const] DOMString oldName, [Const] DOMString name);
     unsigned long GetResourcePosition([Const] DOMString name);
+    unsigned long Count();
     boolean MoveResourceUpInList([Const] DOMString oldName);
     boolean MoveResourceDownInList([Const] DOMString oldName);
     void MoveResource(unsigned long oldIndex, unsigned long newIndex);
@@ -1487,8 +1497,17 @@ interface InitialInstance {
 
     [Ref] VariablesContainer GetVariables();
 
+    boolean HasAnyOverriddenProperty([Const, Ref] gdObject obj);
+    boolean HasAnyOverriddenPropertyForBehavior([Const, Ref] Behavior behavior);
+
+    boolean HasBehaviorOverridingNamed([Const] DOMString name);
+    Behavior AddNewBehaviorOverriding([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
+    [Ref] Behavior GetBehaviorOverriding([Const] DOMString name);
+    void RemoveBehaviorOverriding([Const] DOMString name);
+    boolean RenameBehaviorOverriding([Const] DOMString oldName, [Const] DOMString name);
+
     void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Const, Ref] SerializerElement element);
+    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
 
 interface InitialInstancesContainer {
@@ -1513,7 +1532,7 @@ interface InitialInstancesContainer {
     [Ref] InitialInstance InsertInitialInstance([Const, Ref] InitialInstance inst);
 
     void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Const, Ref] SerializerElement element);
+    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
 
 interface HighestZOrderFinder {
@@ -1721,6 +1740,7 @@ interface InstructionMetadata {
     [Const, Ref] ParameterMetadataContainer GetParameters();
     long GetUsageComplexity();
     boolean IsHidden();
+    [Const, Ref] DOMString GetDeprecationMessage();
     boolean IsPrivate();
     boolean IsAsync();
     boolean IsOptionallyAsync();
@@ -1787,6 +1807,8 @@ interface ExpressionMetadata {
     [Const, Ref] DOMString GetHelpPath();
     boolean IsShown();
     boolean IsPrivate();
+    boolean IsDeprecated();
+    [Const, Ref] DOMString GetDeprecationMessage();
     boolean IsRelevantForLayoutEvents();
     boolean IsRelevantForFunctionEvents();
     boolean IsRelevantForAsynchronousFunctionEvents();
@@ -1970,9 +1992,11 @@ interface ObjectMetadata {
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetIconFilename();
     [Const, Ref] DOMString GetHelpPath();
-    [Const, Ref] DOMString GetCategoryFullName();
+    [Const, Ref] DOMString GetCategory();
+    [Const, Ref] DOMString GetAssetStoreTag();
 
-    [Ref] ObjectMetadata SetCategoryFullName([Const] DOMString categoryFullName);
+    [Ref] ObjectMetadata SetCategory([Const] DOMString categoryFullName);
+    [Ref] ObjectMetadata SetAssetStoreTag([Const] DOMString assetStoreTag);
     [Ref] InGameEditorResourceMetadata AddInGameEditorResource();
 
     [Const, Ref] InstructionMetadata AddScopedCondition([Const] DOMString name,
@@ -2263,6 +2287,10 @@ interface PlatformExtension {
     [Ref] PlatformExtension SetExtensionHelpPath([Const] DOMString helpPath);
     [Ref] PlatformExtension SetIconUrl([Const] DOMString iconUrl);
     [Ref] PlatformExtension SetCategory([Const] DOMString category);
+    [Ref] PlatformExtension SetShortDescription([Const] DOMString shortDescription);
+    [Const, Ref] DOMString GetShortDescription();
+    [Ref] PlatformExtension SetDimension([Const] DOMString dimension);
+    [Const, Ref] DOMString GetDimension();
     [Ref] InstructionOrExpressionGroupMetadata AddInstructionOrExpressionGroupMetadata([Const] DOMString name);
     void MarkAsDeprecated();
 
@@ -2451,6 +2479,14 @@ interface StandardEvent {
 };
 StandardEvent implements BaseEvent;
 
+interface ElseEvent {
+    void ElseEvent();
+
+    [Ref] InstructionsList GetConditions();
+    [Ref] InstructionsList GetActions();
+};
+ElseEvent implements BaseEvent;
+
 interface RepeatEvent {
     void RepeatEvent();
 
@@ -2458,6 +2494,8 @@ interface RepeatEvent {
     [Ref] InstructionsList GetActions();
     void SetRepeatExpressionPlainString([Const] DOMString expr);
     [Const, Ref] Expression GetRepeatExpression();
+    [Const, Ref] DOMString GetLoopIndexVariableName();
+    void SetLoopIndexVariableName([Const] DOMString name);
 };
 RepeatEvent implements BaseEvent;
 
@@ -2467,6 +2505,8 @@ interface WhileEvent {
     [Ref] InstructionsList GetConditions();
     [Ref] InstructionsList GetWhileConditions();
     [Ref] InstructionsList GetActions();
+    [Const, Ref] DOMString GetLoopIndexVariableName();
+    void SetLoopIndexVariableName([Const] DOMString name);
 };
 WhileEvent implements BaseEvent;
 
@@ -2477,6 +2517,16 @@ interface ForEachEvent {
     [Const, Ref] DOMString GetObjectToPick();
     [Ref] InstructionsList GetConditions();
     [Ref] InstructionsList GetActions();
+    [Const, Ref] DOMString GetLoopIndexVariableName();
+    void SetLoopIndexVariableName([Const] DOMString name);
+    [Const, Ref] DOMString GetOrderBy();
+    void SetOrderBy([Const] DOMString orderBy);
+    [Const, Ref] Expression GetOrderByExpression();
+    [Const, Ref] DOMString GetOrder();
+    void SetOrder([Const] DOMString order);
+    [Const, Ref] DOMString GetLimit();
+    void SetLimit([Const] DOMString limit);
+    [Const, Ref] Expression GetLimitExpression();
 };
 ForEachEvent implements BaseEvent;
 
@@ -2492,6 +2542,8 @@ interface ForEachChildVariableEvent {
     void SetIterableVariableName([Const] DOMString newName);
     void SetKeyIteratorVariableName([Const] DOMString newName);
     void SetValueIteratorVariableName([Const] DOMString newName);
+    [Const, Ref] DOMString GetLoopIndexVariableName();
+    void SetLoopIndexVariableName([Const] DOMString name);
 };
 ForEachChildVariableEvent implements BaseEvent;
 
@@ -2915,8 +2967,27 @@ interface BehaviorParameterFiller {
         [Ref] Instruction instruction);
 };
 
+interface ParameterValidationResult {
+  boolean IsValid();
+  boolean HasDeprecationWarning();
+};
+
 interface InstructionValidator {
+  [Value] ParameterValidationResult STATIC_ValidateParameter(
+    [Const, Ref] Platform platform,
+    [Const, Ref] ProjectScopedContainers projectScopedContainers,
+    [Const, Ref] Instruction instruction,
+    [Const, Ref] InstructionMetadata metadata,
+    long parameterIndex,
+    [Const] DOMString value);
   boolean STATIC_IsParameterValid(
+    [Const, Ref] Platform platform,
+    [Const, Ref] ProjectScopedContainers projectScopedContainers,
+    [Const, Ref] Instruction instruction,
+    [Const, Ref] InstructionMetadata metadata,
+    long parameterIndex,
+    [Const] DOMString value);
+  boolean STATIC_HasDeprecationWarnings(
     [Const, Ref] Platform platform,
     [Const, Ref] ProjectScopedContainers projectScopedContainers,
     [Const, Ref] Instruction instruction,
@@ -3058,7 +3129,26 @@ interface WholeProjectDiagnosticReport {
     boolean HasAnyIssue();
 };
 
+enum ExpressionParserError_ErrorType {
+    "ExpressionParserError::SyntaxError",
+    "ExpressionParserError::InvalidOperator",
+    "ExpressionParserError::MismatchedType",
+    "ExpressionParserError::UndeclaredVariable",
+    "ExpressionParserError::UnknownIdentifier",
+    "ExpressionParserError::BracketsNotAllowedForObjects",
+    "ExpressionParserError::TooFewParameters",
+    "ExpressionParserError::TooManyParameters",
+    "ExpressionParserError::InvalidFunctionName",
+    "ExpressionParserError::MalformedVariableParameter",
+    "ExpressionParserError::MalformedObjectParameter",
+    "ExpressionParserError::UnknownParameterType",
+    "ExpressionParserError::MissingBehavior",
+    "ExpressionParserError::VariableNameCollision",
+    "ExpressionParserError::DeprecatedExpression"
+};
+
 interface ExpressionParserError {
+    ExpressionParserError_ErrorType GetType();
     [Const, Ref] DOMString GetMessage();
     unsigned long GetStartPosition();
     unsigned long GetEndPosition();
@@ -3180,6 +3270,12 @@ interface EventsFunction {
     boolean IsPrivate();
     [Ref] EventsFunction SetAsync(boolean isAsync);
     boolean IsAsync();
+    [Ref] EventsFunction SetHelpUrl([Const] DOMString helpUrl);
+    [Const, Ref] DOMString GetHelpUrl();
+    [Ref] EventsFunction SetDeprecated(boolean isDeprecated);
+    boolean IsDeprecated();
+    [Ref] EventsFunction SetDeprecationMessage([Const] DOMString message);
+    [Const, Ref] DOMString GetDeprecationMessage();
     boolean IsAction();
     boolean IsExpression();
     boolean IsCondition();
@@ -3275,8 +3371,11 @@ interface EventsBasedObject {
     [Ref] EventsBasedObject SetDescription([Const] DOMString description);
     [Ref] EventsBasedObject SetPrivate(boolean isPrivate);
 
+
     [Ref] EventsBasedObject SetDefaultName([Const] DOMString defaultName);
+    [Ref] EventsBasedObject SetAssetStoreTag([Const] DOMString assetStoreTag);
     [Const, Ref] DOMString GetDefaultName();
+    [Const, Ref] DOMString GetAssetStoreTag();
     [Ref] EventsBasedObject MarkAsRenderedIn3D(boolean isRenderedIn3D);
     boolean IsRenderedIn3D();
     [Ref] EventsBasedObject MarkAsAnimatable(boolean isAnimatable);
@@ -3373,6 +3472,28 @@ interface EventsBasedObjectsList {
     [Ref] EventsBasedObject at(unsigned long index);
 };
 
+interface PropertyFolderOrProperty {
+    void PropertyFolderOrProperty();
+    boolean IsFolder();
+    boolean IsRootFolder();
+    [Ref] NamedPropertyDescriptor GetProperty();
+    [Const, Ref] DOMString GetFolderName();
+    void SetFolderName([Const] DOMString name);
+    boolean HasPropertyNamed([Const] DOMString name);
+    [Ref] PropertyFolderOrProperty GetPropertyNamed([Const] DOMString name);
+    unsigned long GetChildrenCount();
+    [Ref] PropertyFolderOrProperty GetChildAt(unsigned long pos);
+    [Ref] PropertyFolderOrProperty GetPropertyChild([Const] DOMString name);
+    [Ref] PropertyFolderOrProperty GetOrCreateChildFolder([Const] DOMString name);
+    unsigned long GetChildPosition([Const, Ref] PropertyFolderOrProperty child);
+    [Ref] PropertyFolderOrProperty GetParent();
+    [Ref] PropertyFolderOrProperty InsertNewFolder([Const] DOMString name, unsigned long newPosition);
+    void MovePropertyFolderOrPropertyToAnotherFolder([Ref] PropertyFolderOrProperty propertyFolderOrProperty, [Ref] PropertyFolderOrProperty newParentFolder, unsigned long newPosition);
+    void MoveChild(unsigned long oldIndex, unsigned long newIndex);
+    void RemoveFolderChild([Const, Ref] PropertyFolderOrProperty childToRemove);
+    boolean IsADescendantOf([Const, Ref] PropertyFolderOrProperty otherPropertyFolderOrProperty);
+};
+
 interface PropertiesContainer {
     void PropertiesContainer(EventsFunctionsContainer_FunctionOwner owner);
 
@@ -3388,6 +3509,14 @@ interface PropertiesContainer {
 
     unsigned long size();
     [Ref] NamedPropertyDescriptor at(unsigned long index);
+
+    [Ref] NamedPropertyDescriptor InsertNewPropertyInFolder(
+        [Const] DOMString name,
+        [Ref] PropertyFolderOrProperty folder,
+        unsigned long pos);
+    [Ref] PropertyFolderOrProperty GetRootFolder();
+    [Value] VectorPropertyFolderOrProperty GetAllPropertyFolderOrProperty();
+    void AddMissingPropertiesInRootFolder();
 };
 
 interface EventsFunctionsExtension {
@@ -3401,6 +3530,8 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetShortDescription();
     [Ref] EventsFunctionsExtension SetDescription([Const] DOMString description);
     [Const, Ref] DOMString GetDescription();
+    [Ref] EventsFunctionsExtension SetDimension([Const] DOMString dimension);
+    [Const, Ref] DOMString GetDimension();
     [Ref] EventsFunctionsExtension SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
     [Ref] EventsFunctionsExtension SetFullName([Const] DOMString fullName);
@@ -3527,6 +3658,21 @@ interface EventsContextAnalyzer {
     //Inherited from ArbitraryEventsWorkerWithContext
     void Launch([Ref] EventsList events, [Const, Ref] ProjectScopedContainers projectScopedContainers);
 };
+
+interface ReadOnlyArbitraryEventsWorkerWithContext {
+    void Launch([Const, Ref] EventsList events, [Const, Ref] ProjectScopedContainers projectScopedContainers);
+};
+[JSImplementation=ReadOnlyArbitraryEventsWorkerWithContext]
+interface ReadOnlyArbitraryEventsWorkerWithContextJS {
+    void ReadOnlyArbitraryEventsWorkerWithContextJS();
+
+    // Called for each event visited
+    void DoVisitEvent([Const, Ref] BaseEvent event);
+
+    // Called for each instruction visited, with the current scoped containers (includes local variables)
+    void DoVisitInstruction([Const, Ref] Instruction instruction, boolean isCondition, [Const, Ref] ProjectScopedContainers projectScopedContainers);
+};
+ReadOnlyArbitraryEventsWorkerWithContextJS implements ReadOnlyArbitraryEventsWorkerWithContext;
 
 interface ArbitraryResourceWorker {
 };
@@ -3795,6 +3941,7 @@ interface SpineObjectConfiguration {
 
     double GetScale();
     [Const, Ref] DOMString GetSpineResourceName();
+    [Const, Ref] DOMString GetSkinName();
 };
 SpineObjectConfiguration implements ObjectConfiguration;
 

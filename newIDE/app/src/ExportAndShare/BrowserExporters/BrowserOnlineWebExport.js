@@ -155,6 +155,7 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
     return getBuildFileUploadOptions().then(uploadOptions => {
       return uploadBlobFile(
         blobFile,
+        // $FlowFixMe[incompatible-type]
         uploadOptions,
         context.updateStepProgress
       ).then(() => uploadOptions.key);

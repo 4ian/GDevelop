@@ -12,10 +12,12 @@ import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPrevi
 import {
   type FileMetadataAndStorageProviderName,
   type FileMetadata,
+  type SaveAsLocation,
 } from '../../ProjectsStorage';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 import { type CourseChapter } from '../../Utils/GDevelopServices/Asset';
+import { type ExpandedCloudProjectVersion } from '../../Utils/GDevelopServices/Project';
 import { type GamesList } from '../../GameDashboard/UseGamesList';
 import { type GamesPlatformFrameTools } from './HomePage/PlaySection/UseGamesPlatformFrame';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
@@ -186,8 +188,26 @@ export type RenderEditorContainerProps = {|
   onOpenPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
 
   // Project save
-  onSave: () => Promise<void>,
+  onSave: (options?: {|
+    skipNewVersionWarning: boolean,
+  |}) => Promise<?FileMetadata>,
+  onSaveProjectAsWithStorageProvider: (
+    options: ?{|
+      requestedStorageProvider?: StorageProvider,
+      forcedSavedAsLocation?: SaveAsLocation,
+      createdProject?: gdProject,
+    |}
+  ) => Promise<?FileMetadata>,
   canSave: boolean,
+
+  // Project versions
+  onCheckoutVersion: (
+    version: ExpandedCloudProjectVersion,
+    options?: {| dontSaveCheckedOutVersionStatus?: boolean |}
+  ) => Promise<boolean>,
+  getOrLoadProjectVersion: (
+    versionId: string
+  ) => Promise<?ExpandedCloudProjectVersion>,
 
   // Object editing
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,

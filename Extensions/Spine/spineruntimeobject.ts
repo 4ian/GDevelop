@@ -8,6 +8,7 @@ namespace gdjs {
       scale: float;
       timeScale: float;
       spineResourceName: string;
+      skinName: string;
       animations: SpineAnimation[];
     };
   };
@@ -68,9 +69,10 @@ namespace gdjs {
      */
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: SpineObjectData
+      objectData: SpineObjectData,
+      instanceData?: InstanceData
     ) {
-      super(instanceContainer, objectData);
+      super(instanceContainer, objectData, instanceData);
 
       this._animations = objectData.content.animations;
       this._originalScale = objectData.content.scale;
@@ -80,6 +82,13 @@ namespace gdjs {
         this,
         instanceContainer
       );
+
+      // Apply default skin if specified in the configuration.
+      const skinName = objectData.content.skinName;
+      if (skinName) {
+        this._renderer.setSkin(skinName);
+      }
+
       this.setAnimationIndex(0);
       this._renderer.updateAnimation(0);
 
@@ -534,6 +543,72 @@ namespace gdjs {
         .y;
     }
 
+    getPointAttachmentScaleXWorld(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentScale(
+        attachmentName,
+        slotName,
+        true
+      ).x;
+    }
+
+    getPointAttachmentScaleXLocal(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentScale(
+        attachmentName,
+        slotName,
+        false
+      ).x;
+    }
+
+    getPointAttachmentScaleYWorld(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentScale(
+        attachmentName,
+        slotName,
+        true
+      ).y;
+    }
+
+    getPointAttachmentScaleYLocal(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentScale(
+        attachmentName,
+        slotName,
+        false
+      ).y;
+    }
+
+    getPointAttachmentRotationWorld(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentRotation(
+        attachmentName,
+        slotName,
+        true
+      );
+    }
+
+    getPointAttachmentRotationLocal(
+      attachmentName: string,
+      slotName?: string
+    ): number {
+      return this._renderer.getPointAttachmentRotation(
+        attachmentName,
+        slotName,
+        false
+      );
+    }
+
     getAnimationDuration(): number {
       if (this._animations.length === 0) {
         return 0;
@@ -541,6 +616,15 @@ namespace gdjs {
       return this._renderer.getAnimationDuration(
         this._animations[this._currentAnimationIndex].source
       );
+    }
+
+    setSkin(skinName: string): void {
+      this._renderer.setSkin(skinName);
+      this.invalidateHitboxes();
+    }
+
+    getSkin(): string {
+      return this._renderer.getSkin();
     }
   }
 

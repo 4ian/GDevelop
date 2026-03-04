@@ -65,6 +65,9 @@ module.exports = {
         'Matthias Meike, Florian Rival',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        'Smoothly animate position, scale, rotation, opacity, color, variables over time. Easing functions.'
+      )
       .setCategory('Visual effect')
       .setTags('tween, interpolation, smooth')
       .setExtensionHelpPath('/behaviors/tween');

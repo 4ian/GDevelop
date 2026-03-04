@@ -11,6 +11,38 @@ import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehavio
 const gd: libGDevelop = global.gd;
 
 /**
+ * Recursively searches for an event with the given aiGeneratedEventId in the events list.
+ * Returns the path to the event as an array of indices, or null if not found.
+ */
+const findEventPathByAiGeneratedEventId = (
+  eventsList: gdEventsList,
+  targetId: string,
+  currentPath: Array<number> = []
+): Array<number> | null => {
+  for (let i = 0; i < eventsList.getEventsCount(); i++) {
+    const event = eventsList.getEventAt(i);
+    const eventPath = [...currentPath, i];
+
+    if (event.getAiGeneratedEventId() === targetId) {
+      return eventPath;
+    }
+
+    if (event.canHaveSubEvents()) {
+      const subEvents = event.getSubEvents();
+      const foundPath = findEventPathByAiGeneratedEventId(
+        subEvents,
+        targetId,
+        eventPath
+      );
+      if (foundPath) {
+        return foundPath;
+      }
+    }
+  }
+  return null;
+};
+
+/**
  * Parses an event path string (e.g., "event-0.1.2") into an array of 0-based indices (e.g., [0, 1, 2]).
  * Throws an error for invalid formats or non-positive indices.
  */
@@ -22,7 +54,7 @@ const parseEventPath = (pathString: string): Array<number> => {
     const partsNoPrefix = pathString.split('.');
     if (
       partsNoPrefix.length > 0 &&
-      partsNoPrefix.every(s => s !== '' && !isNaN(parseInt(s, 10)))
+      partsNoPrefix.every(s => s !== '' && Number.isInteger(Number(s)))
     ) {
       console.warn(
         `Event path string "${originalPathString}" does not start with "event-". Parsed as direct indices.`
@@ -39,14 +71,14 @@ const parseEventPath = (pathString: string): Array<number> => {
   const parts = pathString.split('.');
   if (
     parts.length === 0 ||
-    parts.some(s => s === '' || isNaN(parseInt(s, 10)))
+    parts.some(s => s === '' || !Number.isInteger(Number(s)))
   ) {
     throw new Error(
       `Invalid event path string content: "${originalPathString}". Ensure numbers are separated by dots.`
     );
   }
   return parts.map(s => {
-    const num = parseInt(s, 10);
+    const num = Number(s);
     if (num < 0) {
       throw new Error(
         `Event path indices must be positive in string "${originalPathString}", but found ${num}.`
@@ -135,12 +167,81 @@ const getEventByPath = (
   return parentList.getEventAt(eventIndexInParentList);
 };
 
-type EventOperationType = 'delete' | 'insert' | 'insertAsSub';
+type EventOperationType =
+  | 'delete'
+  | 'insert'
+  | 'insertAsSub'
+  | 'replaceKeepSubEvents'
+  | 'insertActionsConditionsAtEnd'
+  | 'insertActionsConditionsAtStart'
+  | 'replaceAllActions'
+  | 'replaceAllConditions';
 type EventOperation = {|
   type: EventOperationType,
   path: Array<number>,
   eventsToInsert?: gdEventsList,
 |};
+
+/**
+ * Copy instructions from source list to target list at the specified position.
+ */
+const copyInstructions = (
+  source: gdInstructionsList,
+  target: gdInstructionsList,
+  position: number
+): void => {
+  target.insertInstructions(source, 0, source.size(), position);
+};
+
+/**
+ * Helper to get conditions from an event if it supports them.
+ */
+const getEventConditions = (event: gdBaseEvent): gdInstructionsList | null => {
+  const eventType = event.getType();
+  if (eventType === 'BuiltinCommonInstructions::Standard') {
+    return gd.asStandardEvent(event).getConditions();
+  } else if (eventType === 'BuiltinCommonInstructions::While') {
+    return gd.asWhileEvent(event).getConditions();
+  } else if (eventType === 'BuiltinCommonInstructions::Repeat') {
+    return gd.asRepeatEvent(event).getConditions();
+  } else if (eventType === 'BuiltinCommonInstructions::ForEach') {
+    return gd.asForEachEvent(event).getConditions();
+  } else if (eventType === 'BuiltinCommonInstructions::ForEachChildVariable') {
+    return gd.asForEachChildVariableEvent(event).getConditions();
+  }
+  return null;
+};
+
+/**
+ * Helper to get actions from an event if it supports them.
+ */
+const getEventActions = (event: gdBaseEvent): gdInstructionsList | null => {
+  const eventType = event.getType();
+  if (eventType === 'BuiltinCommonInstructions::Standard') {
+    return gd.asStandardEvent(event).getActions();
+  } else if (eventType === 'BuiltinCommonInstructions::While') {
+    return gd.asWhileEvent(event).getActions();
+  } else if (eventType === 'BuiltinCommonInstructions::Repeat') {
+    return gd.asRepeatEvent(event).getActions();
+  } else if (eventType === 'BuiltinCommonInstructions::ForEach') {
+    return gd.asForEachEvent(event).getActions();
+  } else if (eventType === 'BuiltinCommonInstructions::ForEachChildVariable') {
+    return gd.asForEachChildVariableEvent(event).getActions();
+  }
+  return null;
+};
+
+/**
+ * Helper to get while conditions from a While event.
+ */
+const getEventWhileConditions = (
+  event: gdBaseEvent
+): gdInstructionsList | null => {
+  if (event.getType() === 'BuiltinCommonInstructions::While') {
+    return gd.asWhileEvent(event).getWhileConditions();
+  }
+  return null;
+};
 
 const comparePathsReverseLexicographically = (
   p1: Array<number>,
@@ -161,8 +262,9 @@ export const applyEventsChanges = (
   sceneEvents: gdEventsList,
   eventOperationsInput: Array<AiGeneratedEventChange>,
   aiGeneratedEventId: string
-): void => {
+): {| applied: number, errors: Array<string> |} => {
   const operations: Array<EventOperation> = [];
+  const errors: Array<string> = [];
 
   eventOperationsInput.forEach(change => {
     const { operationName, operationTargetEvent, generatedEvents } = change;
@@ -170,11 +272,61 @@ export const applyEventsChanges = (
     let localEventsToInsert: gdEventsList | null = null;
 
     try {
+      // Check for comma-separated targets
+      if (operationTargetEvent && operationTargetEvent.includes(',')) {
+        if (operationName !== 'delete_event') {
+          errors.push(
+            `Operation "${operationName}" does not support multiple comma separated events as target.`
+          );
+          return;
+        }
+
+        // Handle comma-separated delete targets
+        const targets = operationTargetEvent
+          .split(',')
+          .map(t => t.trim())
+          .filter(t => t.length > 0);
+        for (const target of targets) {
+          let targetPath = findEventPathByAiGeneratedEventId(
+            sceneEvents,
+            target
+          );
+          if (!targetPath) {
+            try {
+              targetPath = parseEventPath(target);
+            } catch (pathParseError) {
+              errors.push(
+                `Could not find event with aiGeneratedEventId "${target}" and could not parse as path. Skipping deletion of "${target}".`
+              );
+              continue;
+            }
+          }
+          operations.push({ type: 'delete', path: targetPath });
+        }
+        return;
+      }
+
       if (operationTargetEvent) {
-        parsedPath = parseEventPath(operationTargetEvent);
+        // First search for an event with the exact aiGeneratedEventId.
+        parsedPath = findEventPathByAiGeneratedEventId(
+          sceneEvents,
+          operationTargetEvent
+        );
+
+        if (!parsedPath) {
+          // Then try to parse as a path string (e.g., "event-0.1.2" or "0.1.2")
+          try {
+            parsedPath = parseEventPath(operationTargetEvent);
+          } catch (pathParseError) {
+            errors.push(
+              `Could not find event with aiGeneratedEventId "${operationTargetEvent}" and could not parse as path. Skipping operation "${operationName}".`
+            );
+            return;
+          }
+        }
       } else if (operationName !== 'insert_at_end') {
         // Path is generally required, except for 'insert_at_end'.
-        console.warn(
+        errors.push(
           `Skipping operation "${operationName}" due to missing operationTargetEvent path.`
         );
         return;
@@ -190,7 +342,7 @@ export const applyEventsChanges = (
           project
         );
         if (localEventsToInsert.isEmpty()) {
-          console.warn(
+          errors.push(
             `Generated events for operation "${operationName}" (path: ${operationTargetEvent ||
               'N/A'}) are empty. Insertion might not add any events.`
           );
@@ -205,9 +357,10 @@ export const applyEventsChanges = (
 
       switch (operationName) {
         case 'insert_and_replace_event':
+        case 'replace_entire_event_and_sub_events':
           if (!parsedPath) {
-            console.warn(
-              `Skipping "insert_and_replace_event" due to missing or invalid path.`
+            errors.push(
+              `Skipping "${operationName}" due to missing or invalid path.`
             );
             if (localEventsToInsert) localEventsToInsert.delete();
             return;
@@ -221,9 +374,23 @@ export const applyEventsChanges = (
           // localEventsToInsert is now "owned" by the 'insert' operation,
           // it should not be deleted here in the switch case.
           break;
+        case 'replace_event_but_keep_existing_sub_events':
+          if (!parsedPath) {
+            errors.push(
+              `Skipping "replace_event_but_keep_existing_sub_events" due to missing or invalid path.`
+            );
+            if (localEventsToInsert) localEventsToInsert.delete();
+            return;
+          }
+          operations.push({
+            type: 'replaceKeepSubEvents',
+            path: parsedPath,
+            eventsToInsert: localEventsToInsert || undefined,
+          });
+          break;
         case 'insert_before_event':
           if (!parsedPath) {
-            console.warn(
+            errors.push(
               `Skipping "insert_before_event" due to missing or invalid path.`
             );
             if (localEventsToInsert) localEventsToInsert.delete();
@@ -235,9 +402,26 @@ export const applyEventsChanges = (
             eventsToInsert: localEventsToInsert || undefined,
           });
           break;
+        case 'insert_after_event':
+          if (!parsedPath) {
+            errors.push(
+              `Skipping "insert_after_event" due to missing or invalid path.`
+            );
+            if (localEventsToInsert) localEventsToInsert.delete();
+            return;
+          }
+          // Insert after means we insert at path[last] + 1
+          const insertAfterPath = [...parsedPath];
+          insertAfterPath[insertAfterPath.length - 1] += 1;
+          operations.push({
+            type: 'insert',
+            path: insertAfterPath,
+            eventsToInsert: localEventsToInsert || undefined,
+          });
+          break;
         case 'insert_as_sub_event':
           if (!parsedPath) {
-            console.warn(
+            errors.push(
               `Skipping "insert_as_sub_event" due to missing or invalid path.`
             );
             if (localEventsToInsert) localEventsToInsert.delete();
@@ -249,9 +433,65 @@ export const applyEventsChanges = (
             eventsToInsert: localEventsToInsert || undefined,
           });
           break;
+        case 'insert_actions_conditions_at_end':
+          if (!parsedPath) {
+            errors.push(
+              `Skipping "insert_actions_conditions_at_end" due to missing or invalid path.`
+            );
+            if (localEventsToInsert) localEventsToInsert.delete();
+            return;
+          }
+          operations.push({
+            type: 'insertActionsConditionsAtEnd',
+            path: parsedPath,
+            eventsToInsert: localEventsToInsert || undefined,
+          });
+          break;
+        case 'insert_actions_conditions_at_start':
+          if (!parsedPath) {
+            errors.push(
+              `Skipping "insert_actions_conditions_at_start" due to missing or invalid path.`
+            );
+            if (localEventsToInsert) localEventsToInsert.delete();
+            return;
+          }
+          operations.push({
+            type: 'insertActionsConditionsAtStart',
+            path: parsedPath,
+            eventsToInsert: localEventsToInsert || undefined,
+          });
+          break;
+        case 'replace_all_actions':
+          if (!parsedPath) {
+            errors.push(
+              `Skipping "replace_all_actions" due to missing or invalid path.`
+            );
+            if (localEventsToInsert) localEventsToInsert.delete();
+            return;
+          }
+          operations.push({
+            type: 'replaceAllActions',
+            path: parsedPath,
+            eventsToInsert: localEventsToInsert || undefined,
+          });
+          break;
+        case 'replace_all_conditions':
+          if (!parsedPath) {
+            errors.push(
+              `Skipping "replace_all_conditions" due to missing or invalid path.`
+            );
+            if (localEventsToInsert) localEventsToInsert.delete();
+            return;
+          }
+          operations.push({
+            type: 'replaceAllConditions',
+            path: parsedPath,
+            eventsToInsert: localEventsToInsert || undefined,
+          });
+          break;
         case 'delete_event':
           if (!parsedPath) {
-            console.warn(
+            errors.push(
               `Skipping "delete_event" due to missing or invalid path.`
             );
             // No localEventsToInsert expected or created for delete_event.
@@ -275,14 +515,14 @@ export const applyEventsChanges = (
           });
           break;
         default:
-          console.warn(
+          errors.push(
             `Unknown operationName: "${operationName}". Skipping operation.`
           );
           // Clean up localEventsToInsert if it was created for an unknown operation
           if (localEventsToInsert) localEventsToInsert.delete();
       }
     } catch (e) {
-      console.warn(
+      errors.push(
         `Error processing event change (operation: "${operationName}", path: "${operationTargetEvent ||
           'N/A'}"): ${e.message}. Skipping this change.`
       );
@@ -304,6 +544,7 @@ export const applyEventsChanges = (
     return 0;
   });
 
+  let applied = 0;
   operations.forEach(op => {
     const pathForLog = op.path.join('.');
     try {
@@ -315,6 +556,7 @@ export const applyEventsChanges = (
         );
         // Check already done by getParentListAndIndex for 'access'
         parentList.removeEventAt(eventIndexInParentList);
+        applied++;
       } else if (op.type === 'insert') {
         const {
           parentList,
@@ -327,13 +569,16 @@ export const applyEventsChanges = (
         // Check already done by getParentListAndIndex for 'insertion'
         if (op.eventsToInsert && !op.eventsToInsert.isEmpty()) {
           parentList.insertEvents(
+            // $FlowFixMe[incompatible-type]
             op.eventsToInsert,
             0,
+            // $FlowFixMe[incompatible-use]
             op.eventsToInsert.getEventsCount(),
             insertionIndex
           );
+          applied++;
         } else {
-          console.warn(
+          errors.push(
             `Insert operation for path [${pathForLog}] skipped: no events to insert or events list is empty.`
           );
         }
@@ -341,7 +586,7 @@ export const applyEventsChanges = (
         // op.path is the path to the PARENT event
         const parentEvent = getEventByPath(sceneEvents, op.path);
         if (!parentEvent.canHaveSubEvents()) {
-          console.warn(
+          errors.push(
             `Cannot insert sub-events: Event at path [${pathForLog}] does not support sub-events. Skipping.`
           );
           return;
@@ -349,23 +594,221 @@ export const applyEventsChanges = (
         const subEventsList = parentEvent.getSubEvents();
         if (op.eventsToInsert && !op.eventsToInsert.isEmpty()) {
           subEventsList.insertEvents(
+            // $FlowFixMe[incompatible-type]
             op.eventsToInsert,
             0,
+            // $FlowFixMe[incompatible-use]
             op.eventsToInsert.getEventsCount(),
             subEventsList.getEventsCount() // Insert at the end of sub-events
           );
+          applied++;
         } else {
-          console.warn(
+          errors.push(
             `InsertAsSub operation for parent path [${pathForLog}] skipped: no events to insert or events list is empty.`
           );
         }
+      } else if (op.type === 'replaceKeepSubEvents') {
+        // Replace the event but keep existing sub-events
+        const { parentList, eventIndexInParentList } = getParentListAndIndex(
+          sceneEvents,
+          op.path,
+          'access'
+        );
+        const targetEvent = parentList.getEventAt(eventIndexInParentList);
+
+        // Get existing sub-events from target event before replacement
+        let existingSubEvents: gdEventsList | null = null;
+        if (targetEvent.canHaveSubEvents()) {
+          existingSubEvents = new gd.EventsList();
+          const targetSubEvents = targetEvent.getSubEvents();
+          existingSubEvents.insertEvents(
+            targetSubEvents,
+            0,
+            targetSubEvents.getEventsCount(),
+            0
+          );
+        }
+
+        // Delete the target event
+        parentList.removeEventAt(eventIndexInParentList);
+
+        // Insert new events from generated events
+        if (op.eventsToInsert && !op.eventsToInsert.isEmpty()) {
+          parentList.insertEvents(
+            // $FlowFixMe[incompatible-type]
+            op.eventsToInsert,
+            0,
+            // $FlowFixMe[incompatible-use]
+            op.eventsToInsert.getEventsCount(),
+            eventIndexInParentList
+          );
+
+          // If there were existing sub-events, add them to the first new event
+          if (existingSubEvents && existingSubEvents.getEventsCount() > 0) {
+            const firstNewEvent = parentList.getEventAt(eventIndexInParentList);
+            if (firstNewEvent.canHaveSubEvents()) {
+              const newSubEvents = firstNewEvent.getSubEvents();
+              // Insert existing sub-events at the beginning
+              newSubEvents.insertEvents(
+                existingSubEvents,
+                0,
+                existingSubEvents.getEventsCount(),
+                0
+              );
+            }
+          }
+        }
+
+        if (existingSubEvents) {
+          existingSubEvents.delete();
+        }
+        applied++;
+      } else if (op.type === 'insertActionsConditionsAtEnd') {
+        // Copy actions/conditions from generated event(s) to target event at end
+        const targetEvent = getEventByPath(sceneEvents, op.path);
+        const eventsToInsert = op.eventsToInsert;
+        if (eventsToInsert && !eventsToInsert.isEmpty()) {
+          for (let i = 0; i < eventsToInsert.getEventsCount(); i++) {
+            const sourceEvent = eventsToInsert.getEventAt(i);
+
+            // Copy conditions
+            const sourceConditions = getEventConditions(sourceEvent);
+            const targetConditions = getEventConditions(targetEvent);
+            if (sourceConditions && targetConditions) {
+              copyInstructions(
+                sourceConditions,
+                targetConditions,
+                targetConditions.size()
+              );
+            }
+
+            // Copy actions
+            const sourceActions = getEventActions(sourceEvent);
+            const targetActions = getEventActions(targetEvent);
+            if (sourceActions && targetActions) {
+              copyInstructions(
+                sourceActions,
+                targetActions,
+                targetActions.size()
+              );
+            }
+
+            // Copy while conditions if both are While events
+            const sourceWhileConditions = getEventWhileConditions(sourceEvent);
+            const targetWhileConditions = getEventWhileConditions(targetEvent);
+            if (sourceWhileConditions && targetWhileConditions) {
+              copyInstructions(
+                sourceWhileConditions,
+                targetWhileConditions,
+                targetWhileConditions.size()
+              );
+            }
+          }
+        }
+        applied++;
+      } else if (op.type === 'insertActionsConditionsAtStart') {
+        // Copy actions/conditions from generated event(s) to target event at start
+        const targetEvent = getEventByPath(sceneEvents, op.path);
+        const eventsToInsert = op.eventsToInsert;
+        if (eventsToInsert && !eventsToInsert.isEmpty()) {
+          // Process in reverse order so that insertion at start maintains order
+          for (let i = eventsToInsert.getEventsCount() - 1; i >= 0; i--) {
+            const sourceEvent = eventsToInsert.getEventAt(i);
+
+            // Copy conditions at start
+            const sourceConditions = getEventConditions(sourceEvent);
+            const targetConditions = getEventConditions(targetEvent);
+            if (sourceConditions && targetConditions) {
+              copyInstructions(sourceConditions, targetConditions, 0);
+            }
+
+            // Copy actions at start
+            const sourceActions = getEventActions(sourceEvent);
+            const targetActions = getEventActions(targetEvent);
+            if (sourceActions && targetActions) {
+              copyInstructions(sourceActions, targetActions, 0);
+            }
+
+            // Copy while conditions at start if both are While events
+            const sourceWhileConditions = getEventWhileConditions(sourceEvent);
+            const targetWhileConditions = getEventWhileConditions(targetEvent);
+            if (sourceWhileConditions && targetWhileConditions) {
+              copyInstructions(sourceWhileConditions, targetWhileConditions, 0);
+            }
+          }
+        }
+        applied++;
+      } else if (op.type === 'replaceAllActions') {
+        // Clear target event actions and replace with generated event(s) actions
+        const targetEvent = getEventByPath(sceneEvents, op.path);
+        const targetActions = getEventActions(targetEvent);
+        if (targetActions) {
+          targetActions.clear();
+          const eventsToInsert = op.eventsToInsert;
+          if (eventsToInsert && !eventsToInsert.isEmpty()) {
+            for (let i = 0; i < eventsToInsert.getEventsCount(); i++) {
+              const sourceEvent = eventsToInsert.getEventAt(i);
+              const sourceActions = getEventActions(sourceEvent);
+              if (sourceActions) {
+                copyInstructions(
+                  sourceActions,
+                  targetActions,
+                  targetActions.size()
+                );
+              }
+            }
+          }
+        }
+        applied++;
+      } else if (op.type === 'replaceAllConditions') {
+        // Clear target event conditions and replace with generated event(s) conditions
+        const targetEvent = getEventByPath(sceneEvents, op.path);
+        const eventsToInsert = op.eventsToInsert;
+        const targetConditions = getEventConditions(targetEvent);
+        if (targetConditions) {
+          targetConditions.clear();
+          if (eventsToInsert && !eventsToInsert.isEmpty()) {
+            for (let i = 0; i < eventsToInsert.getEventsCount(); i++) {
+              const sourceEvent = eventsToInsert.getEventAt(i);
+              const sourceConditions = getEventConditions(sourceEvent);
+              if (sourceConditions) {
+                copyInstructions(
+                  sourceConditions,
+                  targetConditions,
+                  targetConditions.size()
+                );
+              }
+            }
+          }
+        }
+
+        // Also replace while conditions if both are While events
+        const targetWhileConditions = getEventWhileConditions(targetEvent);
+        if (targetWhileConditions) {
+          targetWhileConditions.clear();
+          if (eventsToInsert && !eventsToInsert.isEmpty()) {
+            for (let i = 0; i < eventsToInsert.getEventsCount(); i++) {
+              const sourceEvent = eventsToInsert.getEventAt(i);
+              const sourceWhileConditions = getEventWhileConditions(
+                sourceEvent
+              );
+              if (sourceWhileConditions) {
+                copyInstructions(
+                  sourceWhileConditions,
+                  targetWhileConditions,
+                  targetWhileConditions.size()
+                );
+              }
+            }
+          }
+        }
+        applied++;
       }
     } catch (error) {
-      console.error(
+      errors.push(
         `Error applying event operation type ${
           op.type
-        } for path [${pathForLog}]:`,
-        error
+        } for path [${pathForLog}]: ${error.message}`
       );
     } finally {
       // Clean up the gd.EventsList associated with this operation, if any.
@@ -374,6 +817,8 @@ export const applyEventsChanges = (
       }
     }
   });
+
+  return { applied, errors };
 };
 
 export const addUndeclaredVariables = ({

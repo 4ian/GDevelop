@@ -9,6 +9,8 @@ declare class gdForEachChildVariableEvent extends gdBaseEvent {
   setIterableVariableName(newName: string): void;
   setKeyIteratorVariableName(newName: string): void;
   setValueIteratorVariableName(newName: string): void;
+  getLoopIndexVariableName(): string;
+  setLoopIndexVariableName(name: string): void;
   delete(): void;
   ptr: number;
 };

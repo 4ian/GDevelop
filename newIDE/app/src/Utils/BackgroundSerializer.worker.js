@@ -17,15 +17,19 @@ const getLibGDevelop = (versionWithHash /*: string */) => {
       // eslint-disable-next-line no-undef
       importScripts(url);
 
-      // eslint-disable-next-line no-undef
-      // $FlowFixMe
+      /* eslint-disable no-undef */
+      // $FlowFixMe[incompatible-type]
+      // $FlowFixMe[cannot-resolve-name]
       if (typeof initializeGDevelopJs !== 'function') {
+        /* eslint-enable no-undef */
         reject(new Error('Missing initializeGDevelopJs in worker'));
         return;
       }
 
-      // eslint-disable-next-line no-undef
+      /* eslint-disable no-undef */
+      // $FlowFixMe[cannot-resolve-name]
       initializeGDevelopJs({
+        /* eslint-enable no-undef */
         // Override the resolved URL for the .wasm file,
         // to ensure a new version is fetched when the version changes.
         locateFile: (path /*: string */, prefix /*: string */) => {
@@ -81,20 +85,26 @@ const unserializeBinarySnapshotToJson = (
 
 // eslint-disable-next-line no-restricted-globals
 self.onmessage = async (event /*: MessageEvent */) => {
-  // $FlowExpectedError
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[prop-missing]
+  // $FlowFixMe[incompatible-use]
   const { type, binary, requestId, versionWithHash } = event.data || {};
 
   const startTime = Date.now();
 
+  // $FlowFixMe[incompatible-type]
   log(`Request #${requestId} received (${type}).`);
   if (type !== 'SERIALIZE_TO_JSON' && type !== 'SERIALIZE_TO_JS_OBJECT') return;
 
   try {
+    // $FlowFixMe[incompatible-type]
     const gd = await getLibGDevelop(versionWithHash);
 
+    // $FlowFixMe[incompatible-type]
     const json = unserializeBinarySnapshotToJson(gd, binary);
     const result = type === 'SERIALIZE_TO_JSON' ? json : JSON.parse(json);
 
+    // $FlowFixMe[incompatible-type]
     log(`Request #${requestId} done in ${Date.now() - startTime}ms.`);
 
     // eslint-disable-next-line no-restricted-globals

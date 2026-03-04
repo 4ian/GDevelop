@@ -14,6 +14,8 @@ import { CompactObjectPropertiesEditor } from '../ObjectEditor/CompactObjectProp
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { CompactLayerPropertiesEditor } from '../LayersList/CompactLayerPropertiesEditor';
+import { CompactEventsBasedObjectVariantPropertiesEditor } from '../SceneEditor/CompactEventsBasedObjectVariantPropertiesEditor';
+import Rectangle from '../Utils/Rectangle';
 
 export const styles = {
   paper: {
@@ -32,8 +34,6 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
   lastSelectionType: 'instance' | 'object' | 'layer',
-
-  // For objects or instances:
   historyHandler?: HistoryHandler,
   isVariableListLocked: boolean,
   layout?: ?gdLayout,
@@ -75,6 +75,14 @@ type Props = {|
   onEditLayer: (layer: gdLayer) => void,
   onEditLayerEffects: (layer: gdLayer) => void,
   onLayersModified: (layers: Array<gdLayer>) => void,
+
+  // For event-based object variants:
+  eventsBasedObject: gdEventsBasedObject | null,
+  eventsBasedObjectVariant: gdEventsBasedObjectVariant | null,
+  getContentAABB: () => Rectangle | null,
+  onEventsBasedObjectChildrenEdited: (
+    eventsBasedObject: gdEventsBasedObject
+  ) => void,
 |};
 
 export type InstanceOrObjectPropertiesEditorInterface = {|
@@ -82,122 +90,158 @@ export type InstanceOrObjectPropertiesEditorInterface = {|
   getEditorTitle: () => React.Node,
 |};
 
-export const InstanceOrObjectPropertiesEditorContainer = React.forwardRef<
-  Props,
-  InstanceOrObjectPropertiesEditorInterface
->((props, ref) => {
-  const forceUpdate = useForceUpdate();
-  React.useImperativeHandle(ref, () => ({
-    forceUpdate,
-    getEditorTitle: () =>
-      lastSelectionType === 'instance' ? (
-        <Trans>Instance properties</Trans>
-      ) : (
-        <Trans>Object properties</Trans>
-      ),
-  }));
+export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<InstanceOrObjectPropertiesEditorInterface>,
+}> = React.forwardRef<Props, InstanceOrObjectPropertiesEditorInterface>(
+  (props, ref) => {
+    const forceUpdate = useForceUpdate();
+    // $FlowFixMe[incompatible-type]
+    React.useImperativeHandle(ref, () => ({
+      forceUpdate,
+      getEditorTitle: () =>
+        lastSelectionType === 'instance' ? (
+          <Trans>Instance properties</Trans>
+        ) : (
+          <Trans>Object properties</Trans>
+        ),
+    }));
 
-  const {
-    lastSelectionType,
+    const {
+      project,
+      layersContainer,
+      projectScopedContainersAccessor,
+      unsavedChanges,
+      i18n,
+      lastSelectionType,
 
-    // For objects:
-    objects,
-    onEditObject,
-    onObjectsModified,
-    onEffectAdded,
-    resourceManagementProps,
-    eventsFunctionsExtension,
-    onUpdateBehaviorsSharedData,
-    onWillInstallExtension,
-    onExtensionInstalled,
-    onOpenEventBasedObjectVariantEditor,
-    onDeleteEventsBasedObjectVariant,
-    isBehaviorListLocked,
+      // For objects:
+      objects,
+      onEditObject,
+      onObjectsModified,
+      onEffectAdded,
+      resourceManagementProps,
+      eventsFunctionsExtension,
+      onUpdateBehaviorsSharedData,
+      onWillInstallExtension,
+      onExtensionInstalled,
+      onOpenEventBasedObjectVariantEditor,
+      onDeleteEventsBasedObjectVariant,
+      isBehaviorListLocked,
 
-    // For instances:
-    instances,
-    editObjectInPropertiesPanel,
-    onInstancesModified,
-    onGetInstanceSize,
-    editInstanceVariables,
-    tileMapTileSelection,
-    onSelectTileMapTile,
+      // For instances:
+      instances,
+      editObjectInPropertiesPanel,
+      onInstancesModified,
+      onGetInstanceSize,
+      editInstanceVariables,
+      tileMapTileSelection,
+      onSelectTileMapTile,
 
-    // For layers
-    layer,
-    onEditLayer,
-    onEditLayerEffects,
-    onLayersModified,
+      // For layers
+      layer,
+      onEditLayer,
+      onEditLayerEffects,
+      onLayersModified,
 
-    // For objects or instances:
-    historyHandler,
-    isVariableListLocked,
-    layout,
-    objectsContainer,
-    globalObjectsContainer,
+      // For event-based object variants
+      eventsBasedObject,
+      eventsBasedObjectVariant,
+      getContentAABB,
+      onEventsBasedObjectChildrenEdited,
 
-    ...commonProps
-  } = props;
+      // For objects or instances:
+      historyHandler,
+      isVariableListLocked,
+      layout,
+      objectsContainer,
+      globalObjectsContainer,
+    } = props;
 
-  return (
-    <Paper background="dark" square style={styles.paper}>
-      {!!instances.length && lastSelectionType === 'instance' ? (
-        <CompactInstancePropertiesEditor
-          instances={instances}
-          editObjectInPropertiesPanel={editObjectInPropertiesPanel}
-          onInstancesModified={onInstancesModified}
-          onGetInstanceSize={onGetInstanceSize}
-          editInstanceVariables={editInstanceVariables}
-          tileMapTileSelection={tileMapTileSelection}
-          onSelectTileMapTile={onSelectTileMapTile}
-          historyHandler={historyHandler}
-          isVariableListLocked={isVariableListLocked}
-          layout={layout}
-          objectsContainer={objectsContainer}
-          globalObjectsContainer={globalObjectsContainer}
-          {...commonProps}
-        />
-      ) : !!objects.length && lastSelectionType === 'object' ? (
-        <CompactObjectPropertiesEditor
-          objects={objects}
-          onEditObject={onEditObject}
-          onObjectsModified={onObjectsModified}
-          onEffectAdded={onEffectAdded}
-          resourceManagementProps={resourceManagementProps}
-          eventsFunctionsExtension={eventsFunctionsExtension}
-          onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
-          onWillInstallExtension={onWillInstallExtension}
-          onExtensionInstalled={onExtensionInstalled}
-          isBehaviorListLocked={isBehaviorListLocked}
-          onOpenEventBasedObjectVariantEditor={
-            onOpenEventBasedObjectVariantEditor
-          }
-          onDeleteEventsBasedObjectVariant={onDeleteEventsBasedObjectVariant}
-          historyHandler={historyHandler}
-          isVariableListLocked={isVariableListLocked}
-          layout={layout}
-          objectsContainer={objectsContainer}
-          globalObjectsContainer={globalObjectsContainer}
-          {...commonProps}
-        />
-      ) : layer && lastSelectionType === 'layer' ? (
-        <CompactLayerPropertiesEditor
-          layer={layer}
-          onEditLayer={onEditLayer}
-          onEditLayerEffects={onEditLayerEffects}
-          onLayersModified={onLayersModified}
-          onEffectAdded={onEffectAdded}
-          resourceManagementProps={resourceManagementProps}
-          {...commonProps}
-        />
-      ) : (
-        <EmptyMessage>
-          <Trans>
-            Click on an instance on the canvas or an object in the list to
-            display their properties.
-          </Trans>
-        </EmptyMessage>
-      )}
-    </Paper>
-  );
-});
+    return (
+      <Paper background="dark" square style={styles.paper}>
+        {!!instances.length && lastSelectionType === 'instance' ? (
+          <CompactInstancePropertiesEditor
+            instances={instances}
+            editObjectInPropertiesPanel={editObjectInPropertiesPanel}
+            onInstancesModified={onInstancesModified}
+            onGetInstanceSize={onGetInstanceSize}
+            editInstanceVariables={editInstanceVariables}
+            tileMapTileSelection={tileMapTileSelection}
+            onSelectTileMapTile={onSelectTileMapTile}
+            historyHandler={historyHandler}
+            layout={layout}
+            objectsContainer={objectsContainer}
+            globalObjectsContainer={globalObjectsContainer}
+            layersContainer={layersContainer}
+            project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            resourceManagementProps={resourceManagementProps}
+            unsavedChanges={unsavedChanges}
+            i18n={i18n}
+            canOverrideBehaviorProperties={!!eventsFunctionsExtension}
+          />
+        ) : !!objects.length && lastSelectionType === 'object' ? (
+          <CompactObjectPropertiesEditor
+            objects={objects}
+            onEditObject={onEditObject}
+            onObjectsModified={onObjectsModified}
+            onEffectAdded={onEffectAdded}
+            resourceManagementProps={resourceManagementProps}
+            eventsFunctionsExtension={eventsFunctionsExtension}
+            onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
+            onWillInstallExtension={onWillInstallExtension}
+            onExtensionInstalled={onExtensionInstalled}
+            isBehaviorListLocked={isBehaviorListLocked}
+            onOpenEventBasedObjectVariantEditor={
+              onOpenEventBasedObjectVariantEditor
+            }
+            onDeleteEventsBasedObjectVariant={onDeleteEventsBasedObjectVariant}
+            historyHandler={historyHandler}
+            isVariableListLocked={isVariableListLocked}
+            layout={layout}
+            objectsContainer={objectsContainer}
+            globalObjectsContainer={globalObjectsContainer}
+            layersContainer={layersContainer}
+            project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            unsavedChanges={unsavedChanges}
+            i18n={i18n}
+          />
+        ) : layer && lastSelectionType === 'layer' ? (
+          <CompactLayerPropertiesEditor
+            layer={layer}
+            onEditLayer={onEditLayer}
+            onEditLayerEffects={onEditLayerEffects}
+            onLayersModified={onLayersModified}
+            onEffectAdded={onEffectAdded}
+            resourceManagementProps={resourceManagementProps}
+            layersContainer={layersContainer}
+            project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            unsavedChanges={unsavedChanges}
+            i18n={i18n}
+          />
+        ) : eventsBasedObject && eventsBasedObjectVariant ? (
+          <CompactEventsBasedObjectVariantPropertiesEditor
+            eventsBasedObject={eventsBasedObject}
+            eventsBasedObjectVariant={eventsBasedObjectVariant}
+            getContentAABB={getContentAABB}
+            onEventsBasedObjectChildrenEdited={() =>
+              onEventsBasedObjectChildrenEdited(eventsBasedObject)
+            }
+            unsavedChanges={unsavedChanges}
+            i18n={i18n}
+          />
+        ) : (
+          <EmptyMessage>
+            <Trans>
+              Click on an instance on the canvas or an object in the list to
+              display their properties.
+            </Trans>
+          </EmptyMessage>
+        )}
+      </Paper>
+    );
+  }
+);

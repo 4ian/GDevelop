@@ -65,6 +65,7 @@ namespace gdjs {
           `Error while preloading json resource ${resource.name}:`,
           error
         );
+        throw error;
       }
     }
 

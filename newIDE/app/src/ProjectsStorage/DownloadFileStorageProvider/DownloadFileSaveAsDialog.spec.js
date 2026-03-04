@@ -9,6 +9,7 @@ jest.mock('../../Utils/OptionalRequire');
 const mockFn = (fn: Function): JestMockFn<any, any> => fn;
 
 const makeTestProjectWithResourcesToDownload = () => {
+  // $FlowFixMe[invalid-constructor]
   const project = new gd.ProjectHelper.createNewGDJSProject();
 
   // Add a resource that uses a URL, which will be left as is.
@@ -77,6 +78,7 @@ describe('DownloadFileSaveAsDialog', () => {
     it('downloads files as blobs', async () => {
       if (!project)
         throw new Error('Missing project, test is not properly setup.');
+      // $FlowFixMe[underconstrained-implicit-instantiation]
       const onAddBlobFile = jest.fn();
       mockFn(downloadUrlsToBlobs).mockImplementationOnce(({ urlContainers }) =>
         urlContainers.map(({ filename, resource }) => ({
@@ -90,6 +92,7 @@ describe('DownloadFileSaveAsDialog', () => {
       );
 
       const result = await downloadResourcesAsBlobs({
+        // $FlowFixMe[incompatible-type]
         project,
         onAddBlobFile,
         onProgress: () => {},

@@ -314,6 +314,7 @@ namespace gdjs {
   const KEY_DIGIT_1 = 49;
   const KEY_DIGIT_2 = 50;
   const KEY_DIGIT_3 = 51;
+  const ROTATION_SNAP_DEGREES = 45;
 
   const exceptionallyGetKeyCodeFromLocationAwareKeyCode = (
     locationAwareKeyCode: number
@@ -623,8 +624,9 @@ namespace gdjs {
   }
 
   class ObjectMover {
-    editor: InGameEditor;
-    _changeHappened = false;
+    private editor: InGameEditor;
+    private _changeHappened = false;
+    private startTime = 0;
 
     constructor(editor: InGameEditor) {
       this.editor = editor;
@@ -648,6 +650,7 @@ namespace gdjs {
     startMove() {
       this._changeHappened = false;
       this._objectInitialPositions.clear();
+      this.startTime = Date.now();
     }
 
     endMove(): boolean {
@@ -671,6 +674,10 @@ namespace gdjs {
         scaleZ: float;
       }
     ) {
+      if (Date.now() - this.startTime < 150) {
+        // Avoid miss-clicks gizmo dragging point to change object positions.
+        return;
+      }
       selectedObjects.forEach((object) => {
         if (this.editor.isInstanceLocked(object)) {
           return;
@@ -2414,6 +2421,19 @@ namespace gdjs {
         !this._draggedSelectedObject
       ) {
         const { threeTransformControls } = this._selectionControls;
+
+        // Update the rotation snap.
+        const inputManager = this._runtimeGame.getInputManager();
+        const shouldSnap =
+          this._transformControlsMode === 'rotate' &&
+          isAltPressed(inputManager);
+        const rotationSnap = shouldSnap
+          ? gdjs.toRad(ROTATION_SNAP_DEGREES)
+          : null;
+
+        threeTransformControls.setRotationSnap(rotationSnap);
+
+        // Update the grid.
         const axis = threeTransformControls.axis;
         if (axis) {
           const isMovingOnX = axis ? axis.includes('X') : false;
@@ -4486,7 +4506,7 @@ namespace gdjs {
             if (dy3 !== 0) {
               const tiltSpeed = 0.2;
               this.elevationAngle += dy3 * tiltSpeed;
-              if (this.elevationAngle < 5) this.elevationAngle = 5;
+              if (this.elevationAngle < -45) this.elevationAngle = -45;
               if (this.elevationAngle > 175) this.elevationAngle = 175;
               this._editorCamera.onHasCameraChanged();
             }
@@ -5060,9 +5080,10 @@ namespace gdjs {
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: gdjs.Object3DData
+      objectData: gdjs.Object3DData,
+      instanceData?: InstanceData
     ) {
-      super(instanceContainer, objectData);
+      super(instanceContainer, objectData, instanceData);
       this._renderer = new UnknownRuntimeObjectRenderer(
         this,
         instanceContainer

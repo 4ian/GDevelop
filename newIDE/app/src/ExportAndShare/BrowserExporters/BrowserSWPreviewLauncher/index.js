@@ -76,8 +76,9 @@ export default class BrowserSWPreviewLauncher extends React.Component<
   PreviewLauncherProps,
   State
 > {
-  canDoNetworkPreview = () => false;
+  canDoNetworkPreview = (): any => false;
 
+  // $FlowFixMe[missing-local-annot]
   state = {
     error: null,
   };
@@ -89,7 +90,7 @@ export default class BrowserSWPreviewLauncher extends React.Component<
 
   immediatelyPreparePreviewWindows = (
     options: PreparePreviewWindowsOptions
-  ) => {
+  ): any => {
     const debuggerIds = options.isForInGameEdition
       ? this.getPreviewDebuggerServer().getExistingEmbeddedGameFrameDebuggerIds()
       : this.getPreviewDebuggerServer().getExistingPreviewDebuggerIds();
@@ -135,7 +136,9 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       previewOptions
     );
 
-    const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
+    const debuggerIds = previewOptions.isForInGameEdition
+      ? this.getPreviewDebuggerServer().getExistingEmbeddedGameFrameDebuggerIds()
+      : this.getPreviewDebuggerServer().getExistingPreviewDebuggerIds();
     const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
 
     try {
@@ -402,11 +405,11 @@ export default class BrowserSWPreviewLauncher extends React.Component<
     }
   };
 
-  getPreviewDebuggerServer() {
+  getPreviewDebuggerServer(): any {
     return browserPreviewDebuggerServer;
   }
 
-  render() {
+  render(): any {
     const { error } = this.state;
 
     if (error) {

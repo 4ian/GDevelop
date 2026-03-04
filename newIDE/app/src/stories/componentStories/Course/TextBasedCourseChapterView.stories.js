@@ -9,6 +9,7 @@ import {
   textBasedCourseChapter,
   textBasedCourseChapterWithCode,
   textBasedCourseChapterWithTables,
+  textBasedCourseChapterWithCallout,
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
@@ -17,7 +18,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Chapter1 = () => {
+export const Chapter1 = (): React.Node => {
   return (
     <TextBasedCourseChapterView
       course={premiumCourse}
@@ -32,7 +33,7 @@ export const Chapter1 = () => {
   );
 };
 
-export const Chapter2 = () => {
+export const Chapter2 = (): React.Node => {
   return (
     <TextBasedCourseChapterView
       course={premiumCourse}
@@ -47,7 +48,7 @@ export const Chapter2 = () => {
   );
 };
 
-export const Chapter3 = () => {
+export const Chapter3 = (): React.Node => {
   return (
     <TextBasedCourseChapterView
       course={premiumCourse}
@@ -57,6 +58,21 @@ export const Chapter3 = () => {
       isTaskCompleted={action('isTaskCompleted')}
       getChapterCompletion={action('getChapterCompletion')}
       chapterIndex={2}
+      onClickUnlock={() => action('onClickUnlock')()}
+    />
+  );
+};
+
+export const Chapter4 = (): React.Node => {
+  return (
+    <TextBasedCourseChapterView
+      course={premiumCourse}
+      courseChapter={textBasedCourseChapterWithCallout}
+      onOpenTemplate={action('open template')}
+      onCompleteTask={action('onCompleteTask')}
+      isTaskCompleted={action('isTaskCompleted')}
+      getChapterCompletion={action('getChapterCompletion')}
+      chapterIndex={3}
       onClickUnlock={() => action('onClickUnlock')()}
     />
   );

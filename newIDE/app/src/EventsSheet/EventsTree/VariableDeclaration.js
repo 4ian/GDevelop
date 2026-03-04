@@ -30,6 +30,7 @@ export const reactDndInstructionType = 'GD_DRAGGED_VARIABLE_DECLARATION';
 type Props = {|
   variableName: string,
   variable: gdVariable,
+  isLoopIndexVariable?: boolean,
   onClick: Function,
   onDoubleClick: () => void,
   selected: boolean,
@@ -77,8 +78,8 @@ const getVariableValueAsString = (variable: gdVariable, i18n: I18nType) => {
     : null;
 };
 
-export const VariableDeclaration = (props: Props) => {
-  const { variableName, variable, id } = props;
+export const VariableDeclaration = (props: Props): React.Node => {
+  const { variableName, variable, id, isLoopIndexVariable } = props;
   /**
    * Render the different parts of the text of the instruction.
    * Parameter can have formatting, be hovered and clicked. The rest
@@ -88,6 +89,29 @@ export const VariableDeclaration = (props: Props) => {
     const { disabled } = props;
 
     const VariableTypeIcon = getVariableTypeIcon(variable.getType());
+
+    if (isLoopIndexVariable) {
+      return (
+        <span
+          className={classNames({
+            [disabledText]: disabled,
+          })}
+        >
+          <Trans>
+            Use{' '}
+            <span>
+              <LocalVariableIcon
+                className={classNames({
+                  [icon]: true,
+                })}
+              />
+              {variableName}
+            </span>{' '}
+            as the loop counter
+          </Trans>
+        </span>
+      );
+    }
 
     return (
       <span

@@ -24,10 +24,10 @@ import {
 } from '../../AssetStore/ProductPageHelper';
 import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
 import { BundleStoreContext } from '../../AssetStore/Bundles/BundleStoreContext';
 import { sendBundleBuyClicked } from '../../Utils/Analytics/EventSender';
 import BundlePurchaseDialog from '../../AssetStore/Bundles/BundlePurchaseDialog';
-import RedemptionCodesDialog from '../../RedemptionCode/RedemptionCodesDialog';
 import {
   getEstimatedSavingsFormatted,
   renderEstimatedTotalPriceFormatted,
@@ -79,7 +79,7 @@ const BundlePageHeader = ({
   i18n,
   fastCheckout,
   onCloseAfterPurchaseDone,
-}: Props) => {
+}: Props): React.Node => {
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
   );
@@ -90,6 +90,7 @@ const BundlePageHeader = ({
   const { privateAssetPackListingDatas } = React.useContext(AssetStoreContext);
   const { listedCourses } = React.useContext(CourseStoreContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const { openRedeemCodeDialog } = React.useContext(SubscriptionContext);
   const { receivedBundles, bundlePurchases } = authenticatedUser;
   const [
     purchasingBundleListingData,
@@ -97,10 +98,6 @@ const BundlePageHeader = ({
   ] = React.useState<?BundleListingData>(null);
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();
   const isMobileOrMediumScreen = isMobile || isMediumScreen;
-  const [
-    isRedemptionCodesDialogOpen,
-    setIsRedemptionCodesDialogOpen,
-  ] = React.useState<boolean>(false);
   const shouldUseOrSimulateAppStoreProduct =
     shouldUseAppStoreProduct() || simulateAppStoreProduct;
 
@@ -186,8 +183,8 @@ const BundlePageHeader = ({
           <Line noMargin>
             <FlatButton
               primary
-              label={<Trans>See my subscription codes</Trans>}
-              onClick={() => setIsRedemptionCodesDialogOpen(true)}
+              label={<Trans>Activate my subscription</Trans>}
+              onClick={() => openRedeemCodeDialog()}
             />
           </Line>
         );
@@ -210,6 +207,7 @@ const BundlePageHeader = ({
       bundleListingData,
       productListingDatasIncludedInBundle,
       isMobile,
+      openRedeemCodeDialog,
     ]
   );
 
@@ -412,6 +410,7 @@ const BundlePageHeader = ({
                 justifyContent="flex-start"
                 noMargin={isMobile}
               >
+                {/* $FlowFixMe[incompatible-type] */}
                 <Text size="title" noMargin style={styles.title}>
                   {selectMessageByLocale(i18n, bundle.nameByLocale)}
                 </Text>
@@ -508,11 +507,6 @@ const BundlePageHeader = ({
               onClose={() => setPurchasingBundleListingData(null)}
               fastCheckout={fastCheckout}
               onCloseAfterPurchaseDone={onCloseAfterPurchaseDone}
-            />
-          )}
-          {isRedemptionCodesDialogOpen && (
-            <RedemptionCodesDialog
-              onClose={() => setIsRedemptionCodesDialogOpen(false)}
             />
           )}
         </Column>

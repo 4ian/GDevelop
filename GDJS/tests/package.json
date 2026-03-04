@@ -7,6 +7,7 @@
   "scripts": {
     "test": "karma start --browsers ChromeHeadless --single-run",
     "test:watch": "karma start --browsers ChromeHeadless",
+    "test:chromeHeadlessNoSandbox": "karma start --browsers ChromeHeadlessNoSandbox --single-run",
     "test-benchmark": "karma start --browsers ChromeHeadless --single-run --enableBenchmarks",
     "test-benchmark:watch": "karma start --browsers ChromeHeadless --enableBenchmarks",
     "test:firefox": "karma start --browsers Firefox --single-run",
@@ -14,7 +15,9 @@
     "test:chrome": "karma start --browsers Chrome --single-run",
     "test:chrome:watch": "karma start --browsers Chrome",
     "test:edge": "karma start --browsers EdgeHeadless --single-run",
-    "test:edge:watch": "karma start --browsers EdgeHeadless"
+    "test:edge:watch": "karma start --browsers EdgeHeadless",
+    "test:chromium": "karma start --browsers ChromiumHeadless --single-run",
+    "test:chromium:watch": "karma start --browsers ChromiumHeadless"
   },
   "keywords": [
     "HTML5",

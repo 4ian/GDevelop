@@ -5,6 +5,7 @@ import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import { type BuildStep } from './Builds/BuildStepsProgress';
 import { type Quota } from '../Utils/GDevelopServices/Usage';
 import { type GameAndBuildsManager } from '../Utils/UseGameAndBuildsManager';
+import { type FileMetadata } from '../ProjectsStorage';
 
 export type ExportPipelineContext<ExportState> = {|
   project: gdProject,
@@ -30,7 +31,7 @@ export type ExportFlowProps = {|
   project: gdProject,
   gameAndBuildsManager: GameAndBuildsManager,
   build: ?Build,
-  onSaveProject: () => Promise<void>,
+  onSaveProject: () => Promise<?FileMetadata>,
   isSavingProject: boolean,
   errored: boolean,
   exportStep: BuildStep,

@@ -1090,8 +1090,16 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
 gd::String EventsCodeGenerator::GenerateEventsListCode(
     gd::EventsList& events, EventsCodeGenerationContext& parentContext) {
   gd::String output;
+  bool hasAnyElseEvent = false;
+  bool elseChainCanContinue = false;
   for (std::size_t eId = 0; eId < events.size(); ++eId) {
     auto& event = events[eId];
+
+    // Disabled and Comment events are completely transparent: they generate no
+    // code (and must not affect the else-chain state or context or anything else).
+    if (event.IsDisabled() || !event.IsExecutable())
+      continue;
+
     if (event.HasVariables()) {
       GetProjectScopedContainers().GetVariablesContainersList().Push(
           event.GetVariables());
@@ -1117,7 +1125,48 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
 
     auto& context = reuseParentContext ? reusedContext : newContext;
 
+    const bool isStandardEvent =
+        event.GetType() == "BuiltinCommonInstructions::Standard";
+    const bool isElseEvent =
+        event.GetType() == "BuiltinCommonInstructions::Else";
+
+    // Skip transparent events (disabled, comments) when looking for a
+    // following Else event.
+    bool hasFollowingElseEvent = false;
+    for (std::size_t nextId = eId + 1; nextId < events.size(); ++nextId) {
+      auto& nextEvent = events[nextId];
+      if (nextEvent.IsDisabled() || !nextEvent.IsExecutable())
+        continue;
+      hasFollowingElseEvent =
+          nextEvent.GetType() == "BuiltinCommonInstructions::Else";
+      break;
+    }
+
+    context.SetFollowedByElseEvent(hasFollowingElseEvent);
+
     gd::String eventCoreCode = event.GenerateEventCode(*this, context);
+
+    if (isElseEvent) {
+      hasAnyElseEvent = true;
+      if (!elseChainCanContinue) {
+        // If an Else event is not preceded by a Standard/Else chain,
+        // make it act like a Standard event.
+        eventCoreCode =
+            "elseEventsChainSatisfied = false;\n" +
+            eventCoreCode;
+      }
+      elseChainCanContinue = hasFollowingElseEvent;
+    } else if (isStandardEvent) {
+      if (hasFollowingElseEvent) {
+        eventCoreCode =
+            "elseEventsChainSatisfied = false;\n" +
+            eventCoreCode;
+      }
+      elseChainCanContinue = hasFollowingElseEvent;
+    } else {
+      elseChainCanContinue = false;
+    }
+
     gd::String scopeBegin = GenerateScopeBegin(context);
     gd::String scopeEnd = GenerateScopeEnd(context);
     gd::String declarationsCode = GenerateObjectsDeclarationCode(context);
@@ -1128,6 +1177,13 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
     if (event.HasVariables()) {
       GetProjectScopedContainers().GetVariablesContainersList().Pop();
     }
+  }
+
+  if (hasAnyElseEvent) {
+    output = GenerateScopeBegin(parentContext) +
+      "\nlet elseEventsChainSatisfied = false;\n" +
+      output +
+      GenerateScopeEnd(parentContext);
   }
 
   return output;

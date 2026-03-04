@@ -16,10 +16,13 @@ declare class libGDevelop {
   getTypeOfBehaviorInObjectOrGroup(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): string;
   getBehaviorNamesInObjectOrGroup(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): gdVectorString;
 
+  // $FlowFixMe[cannot-resolve-name]
   removeFromVectorParameterMetadata(gdVectorParameterMetadata, index: number): void;
+  // $FlowFixMe[cannot-resolve-name]
   swapInVectorParameterMetadata(gdVectorParameterMetadata, oldIndex: number, newIndex: number): void;
 
   asStandardEvent(gdBaseEvent): gdStandardEvent;
+  asElseEvent(gdBaseEvent): gdStandardEvent;
   asRepeatEvent(gdBaseEvent): gdRepeatEvent;
   asWhileEvent(gdBaseEvent): gdWhileEvent;
   asForEachEvent(gdBaseEvent): gdForEachEvent;
@@ -35,6 +38,7 @@ declare class libGDevelop {
   asPanelSpriteConfiguration(gdObjectConfiguration): gdPanelSpriteObject;
   asTextObjectConfiguration(gdObjectConfiguration): gdTextObject;
   asShapePainterConfiguration(gdObjectConfiguration): gdShapePainterObject;
+  // $FlowFixMe[cannot-resolve-name]
   asAdMobConfiguration(gdObjectConfiguration): gdAdMobObject;
   asTextEntryConfiguration(gdObjectConfiguration): gdTextEntryObject;
   asParticleEmitterConfiguration(gdObjectConfiguration): gdParticleEmitterObject;
@@ -52,6 +56,7 @@ declare class libGDevelop {
   VectorInt: Class<gdVectorInt>;
   VectorVariable: Class<gdVectorVariable>;
   VectorObjectFolderOrObject: Class<gdVectorObjectFolderOrObject>;
+  VectorPropertyFolderOrProperty: Class<gdVectorPropertyFolderOrProperty>;
   VectorScreenshot: Class<gdVectorScreenshot>;
   MapStringString: Class<gdMapStringString>;
   MapStringBoolean: Class<gdMapStringBoolean>;
@@ -179,6 +184,7 @@ declare class libGDevelop {
   EventsList: Class<gdEventsList>;
   BaseEvent: Class<gdBaseEvent>;
   StandardEvent: Class<gdStandardEvent>;
+  ElseEvent: Class<gdElseEvent>;
   RepeatEvent: Class<gdRepeatEvent>;
   WhileEvent: Class<gdWhileEvent>;
   ForEachEvent: Class<gdForEachEvent>;
@@ -198,6 +204,7 @@ declare class libGDevelop {
   VariablesChangeset: Class<gdVariablesChangeset>;
   WholeProjectRefactorer: Class<gdWholeProjectRefactorer>;
   BehaviorParameterFiller: Class<gdBehaviorParameterFiller>;
+  ParameterValidationResult: Class<gdParameterValidationResult>;
   InstructionValidator: Class<gdInstructionValidator>;
   ObjectTools: Class<gdObjectTools>;
   EventsBasedObjectDependencyFinder: Class<gdEventsBasedObjectDependencyFinder>;
@@ -217,6 +224,7 @@ declare class libGDevelop {
   ProjectDiagnostic: Class<gdProjectDiagnostic>;
   DiagnosticReport: Class<gdDiagnosticReport>;
   WholeProjectDiagnosticReport: Class<gdWholeProjectDiagnosticReport>;
+  ExpressionParserError_ErrorType: Class<ExpressionParserError_ErrorType>;
   ExpressionParserError: Class<gdExpressionParserError>;
   VectorExpressionParserError: Class<gdVectorExpressionParserError>;
   ExpressionParser2NodeWorker: Class<gdExpressionParser2NodeWorker>;
@@ -241,6 +249,7 @@ declare class libGDevelop {
   EventsBasedObjectVariant: Class<gdEventsBasedObjectVariant>;
   EventsBasedObjectVariantsContainer: Class<gdEventsBasedObjectVariantsContainer>;
   EventsBasedObjectsList: Class<gdEventsBasedObjectsList>;
+  PropertyFolderOrProperty: Class<gdPropertyFolderOrProperty>;
   PropertiesContainer: Class<gdPropertiesContainer>;
   EventsFunctionsExtension: Class<gdEventsFunctionsExtension>;
   AbstractFileSystem: Class<gdAbstractFileSystem>;
@@ -254,6 +263,8 @@ declare class libGDevelop {
   InstructionsTypeRenamer: Class<gdInstructionsTypeRenamer>;
   EventsContext: Class<gdEventsContext>;
   EventsContextAnalyzer: Class<gdEventsContextAnalyzer>;
+  ReadOnlyArbitraryEventsWorkerWithContext: Class<gdReadOnlyArbitraryEventsWorkerWithContext>;
+  ReadOnlyArbitraryEventsWorkerWithContextJS: Class<gdReadOnlyArbitraryEventsWorkerWithContextJS>;
   ArbitraryResourceWorker: Class<gdArbitraryResourceWorker>;
   ArbitraryResourceWorkerJS: Class<gdArbitraryResourceWorkerJS>;
   ResourcesMergingHelper: Class<gdResourcesMergingHelper>;
@@ -286,10 +297,12 @@ declare class libGDevelop {
   ParticleEmitterObject: Class<gdParticleEmitterObject>;
   LayoutCodeGenerator: Class<gdLayoutCodeGenerator>;
   BehaviorCodeGenerator: Class<gdBehaviorCodeGenerator>;
+  // $FlowFixMe[cannot-resolve-name]
   ObjectCodeGenerator: Class<gdObjectCodeGenerator>;
   EventsFunctionsExtensionCodeGenerator: Class<gdEventsFunctionsExtensionCodeGenerator>;
   PreviewExportOptions: Class<gdPreviewExportOptions>;
   ExportOptions: Class<gdExportOptions>;
+  // $FlowFixMe[cannot-resolve-name]
   Exporter: Class<gdExporter>;
   JsCodeEvent: Class<gdJsCodeEvent>;
   MetadataDeclarationHelper: Class<gdMetadataDeclarationHelper>;

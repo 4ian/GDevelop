@@ -3,8 +3,8 @@
  * Copyright 2008-2023 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_OBJECTFOLDEROROBJECT_H
-#define GDCORE_OBJECTFOLDEROROBJECT_H
+#pragma once
+
 #include <memory>
 #include <vector>
 
@@ -151,6 +151,13 @@ class GD_CORE_API ObjectFolderOrObject {
    */
   ObjectFolderOrObject& InsertNewFolder(const gd::String& newFolderName,
                                         std::size_t position);
+
+  /**
+   * \brief Return a folder with the given name and create it if it didn't
+   * exist.
+   */
+  ObjectFolderOrObject &GetOrCreateFolderChild(const gd::String &name);
+
   /**
    * \brief Returns true if the instance is a descendant of the given instance
    * of ObjectFolderOrObject.
@@ -210,5 +217,3 @@ class GD_CORE_API ObjectFolderOrObject {
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_OBJECTFOLDEROROBJECT_H

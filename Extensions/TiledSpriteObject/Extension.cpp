@@ -23,6 +23,8 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
           "Sprite objects.",
           "Victor Levasseur and Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("Repeating 2D image over an area. Useful for scrolling backgrounds. Adjustable offset.")
+      .SetDimension("2D")
       .SetExtensionHelpPath("/objects/tiled_sprite");
   extension.AddInstructionOrExpressionGroupMetadata(_("Tiled Sprite Object"))
       .SetIcon("CppPlatform/Extensions/TiledSpriteIcon.png");
@@ -37,7 +39,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
           .AddDefaultBehavior("EffectCapability::EffectBehavior")
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("OpacityCapability::OpacityBehavior")
-          .SetCategoryFullName(_("General"));
+          .SetCategory("General");
 
   // Deprecated
   obj.AddCondition("Opacity",
@@ -271,4 +273,15 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                     _("Image offset"),
                     "res/actions/scaleWidth_black.png")
       .AddParameter("object", _("Object"), "TiledSprite");
+
+  obj.AddAction("SetImageFromResource",
+                _("Image"),
+                _("Change the image of a Tiled Sprite."),
+                _("Set image _PARAM1_ on _PARAM0_"),
+                _("Image"),
+                "res/imageicon24.png",
+                "res/imageicon.png")
+      .AddParameter("object", _("Object"), "TiledSprite")
+      .AddParameter("imageResource", _("Image resource"))
+      .AddCodeOnlyParameter("currentScene", "");
 }

@@ -15,19 +15,23 @@ import {
   ensureIsArray,
   ensureIsNullOrObjectHasProperty,
 } from '../DataValidator';
+import { type FileMetadata } from '../../ProjectsStorage';
+import CloudStorageProvider from '../../ProjectsStorage/CloudStorageProvider';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 60;
 export const CLOUD_PROJECT_VERSION_LABEL_MAX_LENGTH = 50;
 export const PROJECT_RESOURCE_MAX_SIZE_IN_BYTES = 15 * 1000 * 1000;
 
-export const projectResourcesClient = axios.create({
+// $FlowFixMe[cannot-resolve-name]
+export const projectResourcesClient: Axios = axios.create({
   baseURL: GDevelopProjectResourcesStorage.baseUrl,
   // On web/desktop, "credentials" are necessary to use the cookie previously
   // returned by the server.
   withCredentials: !isNativeMobileApp(),
 });
 
-export const apiClient = axios.create({
+// $FlowFixMe[cannot-resolve-name]
+export const apiClient: Axios = axios.create({
   baseURL: GDevelopProjectApi.baseUrl,
 });
 
@@ -54,11 +58,12 @@ export const cleanGDevelopResourceJwtToken = () => {
   gdResourceJwt = null;
 };
 
-export const addGDevelopResourceJwtTokenToUrl = (url: string) => {
+export const addGDevelopResourceJwtTokenToUrl = (url: string): string => {
   if (!gdResourceJwt) return url;
 
   const separator = url.indexOf('?') === -1 ? '?' : '&';
   return (
+    // $FlowFixMe[incompatible-type]
     url + separator + 'gd_resource_token=' + encodeURIComponent(gdResourceJwt)
   );
 };
@@ -231,6 +236,7 @@ export const getCredentialsForCloudProject = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await projectResourcesCredentialsApiClient.get(
     `/project/${cloudProjectId}/action/authorize`,
     {
@@ -254,10 +260,32 @@ export const clearCloudProjectCredentials = async (): Promise<void> => {
   if (isNativeMobileApp()) {
     cleanGDevelopResourceJwtToken();
   } else {
+    // $FlowFixMe[underconstrained-implicit-instantiation]
     await projectResourcesCredentialsApiClient.get(
       '/action/clear-authorization'
     );
   }
+};
+
+export const getCloudProjectFileMetadataIdentifier = (
+  storageProviderInternalName: string,
+  fileMetadata: ?FileMetadata
+): null | string => {
+  if (
+    !fileMetadata ||
+    !(storageProviderInternalName === CloudStorageProvider.internalName)
+  )
+    return null;
+  if (fileMetadata.fileIdentifier.startsWith('http')) {
+    // When creating a cloud project from an example, there might be a moment where
+    // the used Storage Provider is the cloud one but the file identifier is the url
+    // to the example such as `https://ressources.gdevelop-app.com/...`.
+    // A cloud project identifier is a uuid at the moment, so it does not contain the
+    // 3 letters h t and p so there should be no risk af having a cloud project
+    // uuid starting with http.
+    return null;
+  }
+  return fileMetadata.fileIdentifier;
 };
 
 export const createCloudProject = async (
@@ -637,6 +665,7 @@ export const getProjectFileAsZipBlob = async (
   return response.data;
 };
 
+// $FlowFixMe[missing-local-annot]
 const escapeStringForRegExp = string => {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 };
@@ -796,7 +825,7 @@ export const listVersionsOfProject = async (
   const authorizationHeader = await getAuthorizationHeader();
   const uri = options.forceUri || `/project/${cloudProjectId}/version`;
 
-  // $FlowFixMe
+  // $FlowFixMe[incompatible-type]
   const response = await apiClient.get(uri, {
     headers: {
       Authorization: authorizationHeader,
@@ -815,4 +844,29 @@ export const listVersionsOfProject = async (
     }),
     nextPageUri,
   };
+};
+
+export const getCloudProjectVersion = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    cloudProjectId,
+    versionId,
+  }: {| userId: string, cloudProjectId: string, versionId: string |}
+): Promise<?ExpandedCloudProjectVersion> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.get(
+    `/project/${cloudProjectId}/version/${versionId}`,
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: { userId },
+    }
+  );
+  return ensureIsNullOrObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/project/{id}/version/{id} of Project API',
+  });
 };

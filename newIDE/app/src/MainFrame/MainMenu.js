@@ -2,7 +2,10 @@
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import { type ElectronUpdateStatus } from './UpdaterTools';
-import { type FileMetadataAndStorageProviderName } from '../ProjectsStorage';
+import {
+  type FileMetadata,
+  type FileMetadataAndStorageProviderName,
+} from '../ProjectsStorage';
 import { type ShortcutMap } from '../KeyboardShortcuts/DefaultShortcuts';
 import {
   type MenuDeclarativeItemTemplate,
@@ -31,7 +34,7 @@ export type MainMenuCallbacks = {|
   onOpenRecentFile: (
     fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
   ) => Promise<void>,
-  onSaveProject: () => Promise<void>,
+  onSaveProject: () => Promise<?FileMetadata>,
   onSaveProjectAs: () => void,
   onShowVersionHistory: () => void,
   onCloseProject: () => Promise<boolean>,
@@ -102,6 +105,7 @@ const getMainMenuEventCallback = (
     'update-status': callbacks.setElectronUpdateStatus,
   };
 
+  // $FlowFixMe[invalid-computed-prop]
   return mapping[mainMenuEvent] || (() => {});
 };
 
@@ -391,7 +395,8 @@ export const buildMainMenuDeclarativeTemplate = ({
       ],
     });
 
-    // $FlowFixMe - submenu is guaranteed to exist.
+    // $FlowFixMe[incompatible-type] - submenu is guaranteed to exist.
+    // $FlowFixMe[incompatible-use]
     editTemplate.submenu.push(
       { type: 'separator' },
       {
@@ -400,7 +405,8 @@ export const buildMainMenuDeclarativeTemplate = ({
       }
     );
 
-    // $FlowFixMe - submenu is guaranteed to exist.
+    // $FlowFixMe[incompatible-type] - submenu is guaranteed to exist.
+    // $FlowFixMe[prop-missing]
     windowTemplate.submenu = [
       { role: 'minimize' },
       { role: 'zoom' },
@@ -421,18 +427,18 @@ export const adaptFromDeclarativeTemplate = (
   ): Array<MenuItemTemplate> =>
     menuTemplate.map((menuItemTemplate: MenuDeclarativeItemTemplate) => {
       const {
-        // $FlowFixMe - property can be undefined.
+        // $FlowFixMe[incompatible-type] - property can be undefined.
         onClickSendEvent,
-        // $FlowFixMe - property can be undefined.
+        // $FlowFixMe[incompatible-type] - property can be undefined.
         onClickOpenLink,
-        // $FlowFixMe - property can be undefined.
+        // $FlowFixMe[incompatible-type] - property can be undefined.
         eventArgs,
         ...menuItemTemplateRest
       } = menuItemTemplate;
 
       const hasOnClick = onClickSendEvent || onClickOpenLink;
 
-      // $FlowFixMe - we're putting both a click and a submenu, so not strictly following the schema.
+      // $FlowFixMe[incompatible-type] - we're putting both a click and a submenu, so not strictly following the schema.
       return {
         ...menuItemTemplateRest,
         click: hasOnClick

@@ -16,14 +16,21 @@
 <PROJECT_ROOT>/node_modules/react-window/*
 
 [declarations]
+<PROJECT_ROOT>/node_modules/fbjs/.*
+<PROJECT_ROOT>/flow-libs/.*
+<PROJECT_ROOT>/../../GDevelop.js/types/.*
+<PROJECT_ROOT>/flow-typed/.*
 # lingui-js triggers some Flow errors
 <PROJECT_ROOT>/node_modules/@lingui/core/.*
 # JSS triggers a Flow error
 <PROJECT_ROOT>/node_modules/jss/src/index.js
 
 [libs]
+flow-libs
 ../../GDevelop.js/types
 
 [options]
 module.ignore_non_literal_requires=true
 sharedmemory.hash_table_pow=22
+
+[lints]

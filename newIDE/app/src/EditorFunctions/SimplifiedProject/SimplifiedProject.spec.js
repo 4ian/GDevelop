@@ -62,6 +62,86 @@ describe('SimplifiedProject', () => {
           "gameResolutionHeight": 600,
           "gameResolutionWidth": 800,
         },
+        "resources": Array [
+          Object {
+            "file": "fake-image1.png",
+            "metadata": undefined,
+            "name": "fake-image1.png",
+            "type": "image",
+          },
+          Object {
+            "file": "fake-image2.png",
+            "metadata": undefined,
+            "name": "fake-image2.png",
+            "type": "image",
+          },
+          Object {
+            "file": "res/icon128.png",
+            "metadata": undefined,
+            "name": "icon128.png",
+            "type": "image",
+          },
+          Object {
+            "file": "res/powered-pixijs.png",
+            "metadata": undefined,
+            "name": "pixi",
+            "type": "image",
+          },
+          Object {
+            "file": "fake-audio1.mp3",
+            "metadata": undefined,
+            "name": "fake-audio1.mp3",
+            "type": "audio",
+          },
+          Object {
+            "file": "fake-video1.mp4",
+            "metadata": undefined,
+            "name": "fake-video1.mp4",
+            "type": "video",
+          },
+          Object {
+            "file": "fake-video2.mp4",
+            "metadata": undefined,
+            "name": "fake-video2.mp4",
+            "type": "video",
+          },
+          Object {
+            "file": "font.ttf",
+            "metadata": undefined,
+            "name": "font.ttf",
+            "type": "font",
+          },
+          Object {
+            "file": "bmfont.xml",
+            "metadata": undefined,
+            "name": "bmfont.xml",
+            "type": "bitmapFont",
+          },
+          Object {
+            "file": "super-font.fnt",
+            "metadata": undefined,
+            "name": "super-font.fnt",
+            "type": "bitmapFont",
+          },
+          Object {
+            "file": "levelData.json",
+            "metadata": undefined,
+            "name": "levelData.json",
+            "type": "json",
+          },
+          Object {
+            "file": "InventoryData.json",
+            "metadata": undefined,
+            "name": "InventoryData.json",
+            "type": "json",
+          },
+          Object {
+            "file": "text-data.json",
+            "metadata": undefined,
+            "name": "text-data.json",
+            "type": "json",
+          },
+        ],
         "scenes": Array [
           Object {
             "instancesOnSceneDescription": "On the scene, there are:
@@ -75,6 +155,23 @@ describe('SimplifiedProject', () => {
         - 1 MySpriteObject
 
       Inspect instances on the scene to get more details if needed.",
+            "layers": Array [
+              Object {
+                "isBaseLayer": undefined,
+                "layerName": "GUI",
+                "position": 0,
+              },
+              Object {
+                "isBaseLayer": undefined,
+                "layerName": "OtherLayer",
+                "position": 1,
+              },
+              Object {
+                "isBaseLayer": true,
+                "layerName": "",
+                "position": 2,
+              },
+            ],
             "objectGroups": Array [
               Object {
                 "behaviors": Array [
@@ -174,6 +271,10 @@ describe('SimplifiedProject', () => {
               },
               Object {
                 "behaviors": Array [
+                  Object {
+                    "behaviorName": "Anchor",
+                    "behaviorType": "AnchorBehavior::AnchorBehavior",
+                  },
                   Object {
                     "behaviorName": "Animation",
                     "behaviorType": "AnimatableCapability::AnimatableBehavior",
@@ -344,6 +445,10 @@ describe('SimplifiedProject', () => {
               },
               Object {
                 "behaviors": Array [
+                  Object {
+                    "behaviorName": "Anchor",
+                    "behaviorType": "AnchorBehavior::AnchorBehavior",
+                  },
                   Object {
                     "behaviorName": "Animation",
                     "behaviorType": "AnimatableCapability::AnimatableBehavior",
@@ -887,6 +992,13 @@ describe('SimplifiedProject', () => {
           },
           Object {
             "instancesOnSceneDescription": "There are no instances of objects placed on the scene - the scene is empty.",
+            "layers": Array [
+              Object {
+                "isBaseLayer": true,
+                "layerName": "",
+                "position": 0,
+              },
+            ],
             "objectGroups": Array [],
             "objects": Array [],
             "sceneName": "EmptyLayout",
@@ -894,6 +1006,13 @@ describe('SimplifiedProject', () => {
           },
           Object {
             "instancesOnSceneDescription": "There are no instances of objects placed on the scene - the scene is empty.",
+            "layers": Array [
+              Object {
+                "isBaseLayer": true,
+                "layerName": "",
+                "position": 0,
+              },
+            ],
             "objectGroups": Array [],
             "objects": Array [],
             "sceneName": "Layout with a very looooooooong naaaaame to test in the project manager",
@@ -966,6 +1085,7 @@ describe('SimplifiedProject', () => {
               },
             },
             "description": "A fake extension with a fake behavior containing 2 properties.",
+            "dimension": "",
             "effects": Object {},
             "extensionFullName": "Fake extension with a fake behavior",
             "extensionName": "FakeBehavior",
@@ -973,6 +1093,7 @@ describe('SimplifiedProject', () => {
             "freeConditions": Array [],
             "freeExpressions": Array [],
             "objects": Object {},
+            "shortDescription": "Fake behavior with two properties",
           },
         ],
       }
@@ -998,7 +1119,8 @@ describe('SimplifiedProject', () => {
     expect(buttonExtensionSummary).toMatchInlineSnapshot(`
       Object {
         "behaviors": Object {},
-        "description": "Fake event-based object",
+        "description": "Fake event-based object (long description)",
+        "dimension": "2D",
         "effects": Object {},
         "extensionFullName": "Fake event-based object",
         "extensionName": "Button",
@@ -1054,6 +1176,7 @@ describe('SimplifiedProject', () => {
             ],
           },
         },
+        "shortDescription": "Fake event-based object",
       }
     `);
 

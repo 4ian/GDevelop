@@ -150,7 +150,15 @@ const commitProjectVersion = async ({
 
 export const generateOnSaveProject = (
   authenticatedUser: AuthenticatedUser
-) => async (
+): ((
+  project: gdProject,
+  fileMetadata: FileMetadata,
+  options?: SaveProjectOptions,
+  actions: {
+    showAlert: ShowAlertFunction,
+    showConfirmation: ShowConfirmFunction,
+  }
+) => Promise<{ fileMetadata: FileMetadata, wasSaved: boolean }>) => async (
   project: gdProject,
   fileMetadata: FileMetadata,
   options?: SaveProjectOptions,
@@ -180,7 +188,12 @@ export const generateOnSaveProject = (
   const [canBeSafelySaved, { presignedUrl, zippedProject }] = await Promise.all(
     [
       // Check (with a network call) if the project can be safely saved (not modified by someone else).
-      canFileMetadataBeSafelySaved(authenticatedUser, fileMetadata, actions),
+      canFileMetadataBeSafelySaved(
+        authenticatedUser,
+        fileMetadata,
+        options,
+        actions
+      ),
       // At the same time, serialize & zip the project and also get (with a network call) a presigned url to upload the project version.
       zipAndPrepareProjectVersionForCommit({
         authenticatedUser,
@@ -227,7 +240,11 @@ export const generateOnSaveProject = (
 
 export const generateOnChangeProjectProperty = (
   authenticatedUser: AuthenticatedUser
-) => async (
+): ((
+  project: gdProject,
+  fileMetadata: FileMetadata,
+  properties: { gameId?: string, name?: string }
+) => Promise<null | { lastModifiedDate: number, version: string }>) => async (
   project: gdProject,
   fileMetadata: FileMetadata,
   properties: {| name?: string, gameId?: string |}
@@ -288,7 +305,14 @@ export const generateOnChooseSaveProjectAsLocation = ({
   authenticatedUser: AuthenticatedUser,
   setDialog: (() => React.Node) => void,
   closeDialog: () => void,
-|}) => async ({
+|}): (({
+  displayOptionToGenerateNewProjectUuid: boolean,
+  fileMetadata: ?FileMetadata,
+  project: gdProject,
+}) => Promise<{
+  saveAsLocation: ?SaveAsLocation,
+  saveAsOptions: ?SaveAsOptions,
+}>) => async ({
   project,
   fileMetadata,
   displayOptionToGenerateNewProjectUuid,
@@ -330,9 +354,11 @@ export const generateOnChooseSaveProjectAsLocation = ({
 
   return {
     saveAsLocation: {
+      // $FlowFixMe[incompatible-use]
       name: options.name,
     },
     saveAsOptions: {
+      // $FlowFixMe[incompatible-use]
       generateNewProjectUuid: options.generateNewProjectUuid,
     },
   };
@@ -342,7 +368,16 @@ export const generateOnSaveProjectAs = (
   authenticatedUser: AuthenticatedUser,
   setDialog: (() => React.Node) => void,
   closeDialog: () => void
-) => async (
+): ((
+  project: gdProject,
+  saveAsLocation: ?SaveAsLocation,
+  options: {
+    onMoveResources: ({ newFileMetadata: FileMetadata }) => Promise<void>,
+    onStartSaving: () => void,
+  }
+) =>
+  | Promise<{ fileMetadata: null, wasSaved: boolean }>
+  | Promise<{ fileMetadata: FileMetadata, wasSaved: boolean }>) => async (
   project: gdProject,
   saveAsLocation: ?SaveAsLocation,
   options: {|
@@ -439,7 +474,7 @@ export const renderNewProjectSaveAsLocationChooser = ({
   saveAsLocation: ?SaveAsLocation,
   setSaveAsLocation: (?SaveAsLocation) => void,
   newProjectsDefaultFolder?: string,
-|}) => {
+|}): null => {
   if (!saveAsLocation || saveAsLocation.name !== projectName) {
     setSaveAsLocation(
       getProjectLocation({
@@ -454,7 +489,7 @@ export const renderNewProjectSaveAsLocationChooser = ({
 
 export const generateOnAutoSaveProject = (
   authenticatedUser: AuthenticatedUser
-) =>
+): ((project: gdProject, fileMetadata: FileMetadata) => Promise<void>) | void =>
   ProjectCache.isAvailable()
     ? async (project: gdProject, fileMetadata: FileMetadata): Promise<void> => {
         const { profile } = authenticatedUser;
@@ -474,6 +509,7 @@ export const generateOnAutoSaveProject = (
 const canFileMetadataBeSafelySaved = async (
   authenticatedUser: AuthenticatedUser,
   fileMetadata: FileMetadata,
+  options: ?SaveProjectOptions,
   actions: {|
     showAlert: ShowAlertFunction,
     showConfirmation: ShowConfirmFunction,
@@ -496,27 +532,40 @@ const canFileMetadataBeSafelySaved = async (
     });
     return false;
   }
+
+  const shouldSkipNewVersionWarning = options && options.skipNewVersionWarning;
   const { currentVersion, committedAt } = cloudProject;
   if (
     openedProjectVersion &&
     currentVersion && // should always be defined.
     committedAt && // should always be defined.
-    currentVersion !== openedProjectVersion
+    currentVersion !== openedProjectVersion &&
+    !shouldSkipNewVersionWarning
   ) {
+    let currentUserWasLastToModifyProject = false;
     let lastUsernameWhoModifiedProject = null;
     const committedAtDate = new Date(committedAt);
     const formattedDate = format(committedAtDate, 'dd-MM-yyyy');
     const formattedTime = format(committedAtDate, 'HH:mm:ss');
     const lastCommittedBy = cloudProject.lastCommittedBy;
     if (lastCommittedBy) {
-      const lastUser = await getUserPublicProfile(lastCommittedBy);
-      if (lastUser) {
-        lastUsernameWhoModifiedProject = lastUser.username;
+      if (
+        authenticatedUser.profile &&
+        lastCommittedBy === authenticatedUser.profile.id
+      ) {
+        currentUserWasLastToModifyProject = true;
+      } else {
+        const lastUser = await getUserPublicProfile(lastCommittedBy);
+        if (lastUser) {
+          lastUsernameWhoModifiedProject = lastUser.username;
+        }
       }
     }
     const answer = await actions.showConfirmation({
       title: t`Project was modified`,
-      message: lastUsernameWhoModifiedProject
+      message: currentUserWasLastToModifyProject
+        ? t`You modified this project on the ${formattedDate} at ${formattedTime}. Do you want to overwrite your changes?`
+        : lastUsernameWhoModifiedProject
         ? t`This project was modified by ${lastUsernameWhoModifiedProject} on the ${formattedDate} at ${formattedTime}. Do you want to overwrite their changes?`
         : t`This project was modified by someone else on the ${formattedDate} at ${formattedTime}. Do you want to overwrite their changes?`,
       level: 'warning',

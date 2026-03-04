@@ -66,7 +66,7 @@ void EventsBasedObjectVariant::UnserializeFrom(
   } else {
     layers.Reset();
   }
-  initialInstances.UnserializeFrom(element.GetChild("instances"));
+  initialInstances.UnserializeFrom(project, element.GetChild("instances"));
   editorSettings.UnserializeFrom(element.GetChild("editionSettings"));
 }
 

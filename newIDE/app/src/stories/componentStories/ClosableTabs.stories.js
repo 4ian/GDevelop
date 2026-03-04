@@ -24,7 +24,7 @@ export default {
   decorators: [GDevelopJsInitializerDecorator],
 };
 
-export const ThreeTabs = () => (
+export const ThreeTabs = (): React.Node => (
   <ValueStateHolder
     initialValue={0}
     render={(value, onChange) => (
@@ -110,7 +110,7 @@ export const ThreeTabs = () => (
   />
 );
 
-export const LongLabels = () => (
+export const LongLabels = (): React.Node => (
   <ValueStateHolder
     initialValue={0}
     render={(value, onChange) => (
@@ -227,7 +227,7 @@ const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = {
   ),
 };
 
-export const WithObjectsList = () => (
+export const WithObjectsList = (): React.Node => (
   <ValueStateHolder
     initialValue={0}
     render={(value, onChange) => (
@@ -299,6 +299,7 @@ export const WithObjectsList = () => (
                   getThumbnail={() => 'res/unknown32.png'}
                   project={testProject.project}
                   layout={testProject.testLayout}
+                  eventsFunctionsExtension={null}
                   eventsBasedObject={null}
                   projectScopedContainersAccessor={
                     testProject.testSceneProjectScopedContainersAccessor
@@ -312,6 +313,7 @@ export const WithObjectsList = () => (
                     'On edit variant'
                   )}
                   onExportAssets={action('On export assets')}
+                  onImportAssets={action('On import assets')}
                   onAddObjectInstance={action('On add instance to the scene')}
                   selectedObjectFolderOrObjectsWithContext={[]}
                   getValidatedObjectOrGroupName={newName => newName}

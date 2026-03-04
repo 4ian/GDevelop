@@ -11,6 +11,7 @@ import {
   enumerateExternalLayouts,
   enumerateEventsFunctionsExtensions,
 } from '../ProjectManager/EnumerateProjectItems';
+import { type FileMetadata } from '../ProjectsStorage';
 
 type Item =
   | gdLayout
@@ -26,6 +27,7 @@ const generateProjectItemOptions = <T: Item>(
   project: ?gdProject,
   enumerate: (project: gdProject) => Array<T>,
   onOpen: string => void
+  // $FlowFixMe[missing-local-annot]
 ) => {
   if (!project) return [];
   return enumerate(project).map(item => ({
@@ -47,11 +49,12 @@ type CommandHandlers = {|
   onLaunchNetworkPreview: () => Promise<void>,
   onHotReloadPreview: () => Promise<void>,
   onLaunchPreviewWithDiagnosticReport: () => Promise<void>,
+  onOpenDiagnosticReport: () => void,
   allowNetworkPreview: boolean,
   onOpenHomePage: () => void,
   onCreateProject: () => void,
   onOpenProject: () => void,
-  onSaveProject: () => Promise<void>,
+  onSaveProject: () => Promise<?FileMetadata>,
   onSaveProjectAs: () => void,
   onCloseApp: () => void,
   onCloseProject: () => Promise<void>,
@@ -111,6 +114,10 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     }
   );
 
+  useCommand('OPEN_DIAGNOSTIC_REPORT', !!handlers.project, {
+    handler: handlers.onOpenDiagnosticReport,
+  });
+
   useCommand('OPEN_HOME_PAGE', true, {
     handler: handlers.onOpenHomePage,
   });
@@ -123,8 +130,14 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     handler: handlers.onOpenProject,
   });
 
+  const onSaveProject = handlers.onSaveProject;
   useCommand('SAVE_PROJECT', !!handlers.project, {
-    handler: handlers.onSaveProject,
+    handler: React.useCallback(
+      () => {
+        onSaveProject();
+      },
+      [onSaveProject]
+    ),
   });
 
   useCommand('SAVE_PROJECT_AS', !!handlers.project, {

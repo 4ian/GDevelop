@@ -109,8 +109,12 @@ CameraExtension::CameraExtension() {
       "gdjs.evtTools.camera.centerCameraWithinLimits");  // Deprecated
   GetAllActions()["ClampCamera"].SetFunctionName(
       "gdjs.evtTools.camera.clampCamera");
+  GetAllActions()["CenterCameraOnObject"].SetFunctionName(
+      "gdjs.evtTools.camera.centerCamera");
+  // Compatibility with GD <= 5.6.251
   GetAllActions()["CentreCamera"].SetFunctionName(
       "gdjs.evtTools.camera.centerCamera");
+  // End of compatibility code
 
   GetAllActions()["SetLayerEffectParameter"].SetFunctionName(
       "gdjs.evtTools.camera.setLayerEffectDoubleParameter");

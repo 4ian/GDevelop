@@ -15,11 +15,12 @@ type Props = {|
   disabled: boolean,
 |};
 
-const BooleanField = ({ value, onChange, disabled }: Props) => {
+const BooleanField = ({ value, onChange, disabled }: Props): React.Node => {
   return (
     <Line>
       <Column noMargin>
         <RaisedButton
+          // $FlowFixMe[incompatible-type]
           style={buttonStyle}
           label={<Trans>True</Trans>}
           primary={value && !disabled}
@@ -30,6 +31,7 @@ const BooleanField = ({ value, onChange, disabled }: Props) => {
       </Column>
       <Column noMargin>
         <RaisedButton
+          // $FlowFixMe[incompatible-type]
           style={buttonStyle}
           label={<Trans>False</Trans>}
           primary={!value && !disabled}

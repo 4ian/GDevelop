@@ -1,5 +1,7 @@
 // @flow
 
+import { getInitialPreferences } from '../MainFrame/Preferences/PreferencesProvider';
+
 jest.mock('../locales/LocalesMetadata', () => [
   {
     languageCode: 'pt_PT',
@@ -27,9 +29,11 @@ jest.mock('../locales/LocalesMetadata', () => [
   },
 ]);
 
+// $FlowFixMe[underconstrained-implicit-instantiation]
 const mockGetBrowserLanguageOrLocale = jest.fn();
 
 jest.mock('./Language', () => {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
   const originalModule = jest.requireActual('./Language');
 
   return {
@@ -38,9 +42,6 @@ jest.mock('./Language', () => {
     getBrowserLanguageOrLocale: () => mockGetBrowserLanguageOrLocale(),
   };
 });
-
-import { getBrowserLanguageOrLocale } from './Language';
-import { getInitialPreferences } from '../MainFrame/Preferences/PreferencesProvider';
 
 describe('PreferencesProvider', () => {
   describe('getInitialPreferences', () => {

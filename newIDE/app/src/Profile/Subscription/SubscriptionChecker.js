@@ -36,10 +36,10 @@ type Props = {|
   isNotShownDuringInAppTutorial?: boolean,
 |};
 
-const SubscriptionChecker = React.forwardRef<
-  Props,
-  SubscriptionCheckerInterface
->(
+const SubscriptionChecker: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<SubscriptionCheckerInterface>,
+}> = React.forwardRef<Props, SubscriptionCheckerInterface>(
   (
     {
       mode,
@@ -130,7 +130,7 @@ const SubscriptionChecker = React.forwardRef<
               if (onChangeSubscription) onChangeSubscription();
               setDialogOpen(false);
             }}
-            recommendedPlanIdIfNoSubscription="gdevelop_silver"
+            recommendedPlanId="gdevelop_silver"
             placementId={placementId}
           >
             <Column noMargin expand>

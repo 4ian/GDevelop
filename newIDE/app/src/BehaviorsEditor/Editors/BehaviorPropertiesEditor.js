@@ -18,7 +18,8 @@ const BehaviorPropertiesEditor = ({
   onBehaviorUpdated,
   resourceManagementProps,
   projectScopedContainersAccessor,
-}: Props) => {
+  isAdvancedSectionInitiallyUncollapsed,
+}: Props): React.Node => {
   const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
     gd.JsPlatform.get(),
     behavior.getTypeName()
@@ -29,7 +30,11 @@ const BehaviorPropertiesEditor = ({
       propertiesMapToSchema({
         properties: behavior.getProperties(),
         defaultValueProperties: behaviorMetadata.getProperties(),
-        getProperties: instance => instance.getProperties(),
+        getPropertyValue: (instance, name) =>
+          instance
+            .getProperties()
+            .get(name)
+            .getValue(),
         onUpdateProperty: (instance, name, value) => {
           instance.updateProperty(name, value);
         },
@@ -54,6 +59,9 @@ const BehaviorPropertiesEditor = ({
             There is nothing to configure for this behavior. You can still use
             events to interact with the object and this behavior.
           </Trans>
+        }
+        isAdvancedSectionInitiallyUncollapsed={
+          isAdvancedSectionInitiallyUncollapsed
         }
       />
     </Column>

@@ -107,7 +107,7 @@ const EducationCurriculumLesson = ({
   onOpenTemplateFromTutorial,
   isLocked,
   onClickSubscribe,
-}: Props) => {
+}: Props): React.MixedElement => {
   const { isMobile, isLandscape } = useResponsiveWindowSize();
   const [isImageLoaded, setIsImageLoaded] = React.useState<boolean>(false);
   const isLessonLocked =
@@ -122,10 +122,11 @@ const EducationCurriculumLesson = ({
         })}`
       )
     : null;
-  const { gameLink, courseId } = tutorial;
+  const { gameLink, courseId, examUrl } = tutorial;
 
   const title = (
     <LineStackLayout noMargin alignItems="center">
+      {/* $FlowFixMe[invalid-computed-prop] */}
       <Chip size="small" color="secondary" label={rankLabel[index + 1]} />
       <Text size="block-title" noMargin>
         {selectMessageByLocale(i18n, tutorial.titleByLocale)}
@@ -229,6 +230,14 @@ const EducationCurriculumLesson = ({
                         fullWidth={isMobile && !isLandscape}
                         label={<Trans>Open project</Trans>}
                         onClick={onOpenTemplateFromTutorial}
+                      />
+                    )}
+                    {examUrl && (
+                      <FlatButton
+                        primary
+                        fullWidth={isMobile && !isLandscape}
+                        label={<Trans>Open exam</Trans>}
+                        onClick={() => Window.openExternalURL(examUrl)}
                       />
                     )}
                     {courseId ? (

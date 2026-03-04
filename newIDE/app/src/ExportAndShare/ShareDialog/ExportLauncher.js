@@ -9,6 +9,7 @@ import { Column, Line } from '../../UI/Grid';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import CreateProfile from '../../Profile/CreateProfile';
 import CurrentUsageDisplayer from '../../Profile/CurrentUsageDisplayer';
+import { type FileMetadata } from '../../ProjectsStorage';
 import {
   displayProjectErrorsBox,
   getProjectPropertiesErrors,
@@ -47,7 +48,7 @@ type State = {|
 type Props = {|
   i18n: I18nType,
   project: gdProject,
-  onSaveProject: () => Promise<void>,
+  onSaveProject: () => Promise<?FileMetadata>,
   isSavingProject: boolean,
   gameAndBuildsManager: GameAndBuildsManager,
   onChangeSubscription: () => void,
@@ -116,6 +117,7 @@ const getErrorMessage = (i18n: I18nType, exportStep: BuildStep) => {
  * of an export.
  */
 export default class ExportLauncher extends Component<Props, State> {
+  // $FlowFixMe[missing-local-annot]
   state = {
     exportStep: '',
     build: null,
@@ -125,12 +127,13 @@ export default class ExportLauncher extends Component<Props, State> {
     doneFooterOpen: false,
     errored: false,
     shouldBumpVersionNumber: true,
-    exportState: this.props.exportPipeline.getInitialExportState(
+    exportState: (this.props.exportPipeline.getInitialExportState(
       this.props.project
-    ),
+    ): any),
   };
   _candidateBumpedVersionNumber = '';
-  buildsWatcher = new BuildsWatcher();
+  // $FlowFixMe[missing-local-annot]
+  buildsWatcher = (new BuildsWatcher(): BuildsWatcher);
   launchWholeExport: ({|
     payWithCredits?: boolean,
   |}) => Promise<void>;
@@ -183,7 +186,7 @@ export default class ExportLauncher extends Component<Props, State> {
   _updateStepProgress = (
     stepCurrentProgress: number,
     stepMaxProgress: number
-  ) =>
+  ): any =>
     this.setState({
       stepCurrentProgress,
       stepMaxProgress,
@@ -384,7 +387,7 @@ export default class ExportLauncher extends Component<Props, State> {
     }));
   };
 
-  render() {
+  render(): any {
     const {
       exportStep,
       compressionOutput,

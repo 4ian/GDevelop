@@ -27,8 +27,12 @@ type Props = {|
 
 export type TwoStatesButtonInterface = {| focusLeftButton: () => void |};
 
-const TwoStatesButton = React.forwardRef<Props, TwoStatesButtonInterface>(
+const TwoStatesButton: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<TwoStatesButtonInterface>,
+}> = React.forwardRef<Props, TwoStatesButtonInterface>(
   ({ leftButton, rightButton, onChange, value, disabled }, ref) => {
+    // $FlowFixMe[value-as-type]
     const leftButtonRef = React.useRef<?Button>(null);
 
     const focusLeftButton = React.useCallback(() => {
@@ -46,6 +50,7 @@ const TwoStatesButton = React.forwardRef<Props, TwoStatesButtonInterface>(
       <ButtonGroup size="small" disableElevation disabled={disabled}>
         <Button
           id={leftButton.id}
+          // $FlowFixMe[incompatible-type]
           {...dataObjectToProps(leftButtonDataset)}
           variant={isLeft ? 'contained' : 'outlined'}
           color={isLeft ? 'secondary' : 'default'}
@@ -58,6 +63,7 @@ const TwoStatesButton = React.forwardRef<Props, TwoStatesButtonInterface>(
         </Button>
         <Button
           id={rightButton.id}
+          // $FlowFixMe[incompatible-type]
           {...dataObjectToProps(rightButtonDataset)}
           variant={!isLeft ? 'contained' : 'outlined'}
           color={!isLeft ? 'secondary' : 'default'}

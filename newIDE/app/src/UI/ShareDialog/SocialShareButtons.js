@@ -55,7 +55,7 @@ const styles = {
   },
 };
 
-const SocialShareButtons = ({ url }: Props) => {
+const SocialShareButtons = ({ url }: Props): React.MixedElement => {
   const classNames = useStyles();
   return (
     <div style={styles.container}>

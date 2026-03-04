@@ -90,7 +90,7 @@ const ExampleStore = ({
   showLoadMore,
   hidePremiumTemplates,
   disabled,
-}: Props) => {
+}: Props): React.Node => {
   const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', true);
   const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
   const { windowSize, isLandscape } = useResponsiveWindowSize();

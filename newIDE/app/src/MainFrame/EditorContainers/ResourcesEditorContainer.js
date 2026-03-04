@@ -18,7 +18,7 @@ import {
 export class ResourcesEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?ResourcesEditor;
 
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     // We stop updates when the component is inactive.
     // If it's active, was active or becoming active again we let update propagate.
     // Especially important to note that when becoming inactive, a "last" update is allowed.
@@ -34,7 +34,13 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
   }
 
   updateToolbar() {
-    if (this.editor) this.editor.updateToolbar();
+    if (this.editor) {
+      this.editor.updateToolbar();
+    } else {
+      // Clear the toolbar if the editor is not ready yet to avoid showing stale toolbar
+      // from the previous editor (e.g., HomePage)
+      this.props.setToolbar(null);
+    }
   }
 
   forceUpdateEditor() {
@@ -86,7 +92,7 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
       this.editor.refreshResourcesList();
   }
 
-  render() {
+  render(): any {
     const { project } = this.props;
     if (!project) return null;
 
@@ -107,4 +113,4 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
 
 export const renderResourcesEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-) => <ResourcesEditorContainer {...props} />;
+): React.Node => <ResourcesEditorContainer {...props} />;

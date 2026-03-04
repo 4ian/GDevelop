@@ -10,7 +10,7 @@ import { enumerateParametersUsableInExpressions } from './EnumerateFunctionParam
 import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function FunctionParameterNameField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SelectFieldInterface>(null);
     const focus: FieldFocusFunction = options => {
@@ -54,6 +54,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       );
     });
 
+    // $FlowFixMe[missing-local-annot]
     const onChangeSelectValue = (event, value) => {
       props.onChange(event.target.value);
     };
@@ -86,4 +87,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       </SelectField>
     );
   }
-);
+): React.ComponentType<{
+  ...ParameterFieldProps,
+  +ref?: React.RefSetter<ParameterFieldInterface>,
+}>);

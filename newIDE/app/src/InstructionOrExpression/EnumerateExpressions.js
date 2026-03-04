@@ -18,7 +18,10 @@ const enumerateExpressionMetadataMap = (
   expressions: gdMapStringExpressionMetadata,
   scope: InstructionOrExpressionScope
 ): Array<EnumeratedExpressionMetadata> => {
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-exact]
   return mapVector(expressions.keys(), expressionType => {
+    // $FlowFixMe[incompatible-type]
     const exprMetadata = expressions.get(expressionType);
     if (!exprMetadata.isShown()) {
       return null; // Skip hidden expressions
@@ -63,9 +66,12 @@ export const enumerateFreeExpressions = (
     .getAllPlatformExtensions();
 
   return flatten(
+    // $FlowFixMe[incompatible-exact]
     mapVector(allExtensions, extension => {
+      // $FlowFixMe[incompatible-type]
       const prefix = getExtensionPrefix(extension, i18n);
       const scope = {
+        // $FlowFixMe[incompatible-use]
         extension: { name: extension.getName() },
         objectMetadata: undefined,
         behaviorMetadata: undefined,
@@ -75,13 +81,17 @@ export const enumerateFreeExpressions = (
         ...(!shouldOnlyBeNumberType(type)
           ? enumerateExpressionMetadataMap(
               prefix,
+              // $FlowFixMe[incompatible-use]
               extension.getAllStrExpressions(),
+              // $FlowFixMe[incompatible-type]
               scope
             )
           : []),
         ...enumerateExpressionMetadataMap(
           prefix,
+          // $FlowFixMe[incompatible-use]
           extension.getAllExpressions(),
+          // $FlowFixMe[incompatible-type]
           scope
         ),
       ];
@@ -114,11 +124,13 @@ export const enumerateObjectExpressions = (
       : enumerateExpressionMetadataMap(
           '',
           extension.getAllStrExpressionsForObject(objectType),
+          // $FlowFixMe[incompatible-type]
           scope
         )),
     ...enumerateExpressionMetadataMap(
       '',
       extension.getAllExpressionsForObject(objectType),
+      // $FlowFixMe[incompatible-type]
       scope
     ),
   ];
@@ -138,11 +150,13 @@ export const enumerateObjectExpressions = (
         : enumerateExpressionMetadataMap(
             '',
             extension.getAllStrExpressionsForObject(baseObjectType),
+            // $FlowFixMe[incompatible-type]
             scope
           )),
       ...enumerateExpressionMetadataMap(
         '',
         extension.getAllExpressionsForObject(baseObjectType),
+        // $FlowFixMe[incompatible-type]
         scope
       ),
     ];
@@ -176,11 +190,13 @@ export const enumerateBehaviorExpressions = (
       : enumerateExpressionMetadataMap(
           '',
           extension.getAllStrExpressionsForBehavior(behaviorType),
+          // $FlowFixMe[incompatible-type]
           scope
         )),
     ...enumerateExpressionMetadataMap(
       '',
       extension.getAllExpressionsForBehavior(behaviorType),
+      // $FlowFixMe[incompatible-type]
       scope
     ),
   ];
@@ -191,20 +207,27 @@ export const enumerateAllExpressions = (
   type: string,
   i18n: I18nType
 ): Array<EnumeratedExpressionMetadata> => {
+  // $FlowFixMe[missing-empty-array-annot]
   const objectsExpressions = [];
+  // $FlowFixMe[missing-empty-array-annot]
   const behaviorsExpressions = [];
   const freeExpressions = enumerateFreeExpressions(type, i18n);
 
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
+  // $FlowFixMe[incompatible-exact]
   mapVector(allExtensions, extension => {
+    // $FlowFixMe[incompatible-type]
     const prefix = getExtensionPrefix(extension, i18n);
 
     //Objects expressions:
+    // $FlowFixMe[incompatible-use]
     mapVector(extension.getExtensionObjectsTypes(), objectType => {
+      // $FlowFixMe[incompatible-use]
       const objectMetadata = extension.getObjectMetadata(objectType);
       const scope = {
+        // $FlowFixMe[incompatible-use]
         extension: { name: extension.getName() },
         objectMetadata: {
           name: objectMetadata.getName(),
@@ -213,28 +236,35 @@ export const enumerateAllExpressions = (
       };
 
       if (!shouldOnlyBeNumberType(type))
-        objectsExpressions.push.apply(
-          objectsExpressions,
-          enumerateExpressionMetadataMap(
+        // $FlowFixMe[incompatible-type]
+        objectsExpressions.push(
+          ...enumerateExpressionMetadataMap(
             prefix,
+            // $FlowFixMe[incompatible-use]
             extension.getAllStrExpressionsForObject(objectType),
+            // $FlowFixMe[incompatible-type]
             scope
           )
         );
-      objectsExpressions.push.apply(
-        objectsExpressions,
-        enumerateExpressionMetadataMap(
+      // $FlowFixMe[incompatible-type]
+      objectsExpressions.push(
+        ...enumerateExpressionMetadataMap(
           prefix,
+          // $FlowFixMe[incompatible-use]
           extension.getAllExpressionsForObject(objectType),
+          // $FlowFixMe[incompatible-type]
           scope
         )
       );
     });
 
     //Behaviors expressions:
+    // $FlowFixMe[incompatible-use]
     mapVector(extension.getBehaviorsTypes(), behaviorType => {
+      // $FlowFixMe[incompatible-use]
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
       const scope = {
+        // $FlowFixMe[incompatible-use]
         extension: { name: extension.getName() },
         behaviorMetadata: {
           name: behaviorMetadata.getName(),
@@ -243,19 +273,23 @@ export const enumerateAllExpressions = (
       };
 
       if (!shouldOnlyBeNumberType(type))
-        behaviorsExpressions.push.apply(
-          behaviorsExpressions,
-          enumerateExpressionMetadataMap(
+        // $FlowFixMe[incompatible-type]
+        behaviorsExpressions.push(
+          ...enumerateExpressionMetadataMap(
             prefix,
+            // $FlowFixMe[incompatible-use]
             extension.getAllStrExpressionsForBehavior(behaviorType),
+            // $FlowFixMe[incompatible-type]
             scope
           )
         );
-      behaviorsExpressions.push.apply(
-        behaviorsExpressions,
-        enumerateExpressionMetadataMap(
+      // $FlowFixMe[incompatible-type]
+      behaviorsExpressions.push(
+        ...enumerateExpressionMetadataMap(
           prefix,
+          // $FlowFixMe[incompatible-use]
           extension.getAllExpressionsForBehavior(behaviorType),
+          // $FlowFixMe[incompatible-type]
           scope
         )
       );
@@ -283,6 +317,7 @@ export const filterExpressions = (
   const favorExactMatch = (
     list: Array<EnumeratedExpressionMetadata>
   ): Array<EnumeratedExpressionMetadata> => {
+    // $FlowFixMe[constant-condition]
     if (!searchText) {
       return list;
     }

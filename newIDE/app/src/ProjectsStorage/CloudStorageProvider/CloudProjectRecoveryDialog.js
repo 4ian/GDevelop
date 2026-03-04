@@ -30,7 +30,7 @@ const CloudProjectRecoveryDialog = ({
   cloudProjectId,
   onClose,
   onOpenPreviousVersion,
-}: Props) => {
+}: Props): React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile } = authenticatedUser;
   const [
@@ -165,6 +165,7 @@ const CloudProjectRecoveryDialog = ({
           maxWidth="sm"
           onRequestClose={onClose}
           onApply={onApply}
+          // $FlowFixMe[incompatible-type]
           actions={actions}
           title={
             lastSaneVersion && !isLoading ? (

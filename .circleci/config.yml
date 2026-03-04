@@ -12,7 +12,7 @@ version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@2.0.6
   macos: circleci/macos@2.5.1 # For Rosetta (see below)
-  node: circleci/node@5.2.0 # For a recent npm version (see below)
+  node: circleci/node@7.1.0 # For a recent npm version (see below)
   win: circleci/windows@5.1.0
 jobs:
   # Build the **entire** app for macOS (including the GDevelop.js library).
@@ -47,9 +47,9 @@ jobs:
       # GDevelop.js dependencies
       - restore_cache:
           keys:
-            - gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
+            - gd-macos-nodejs-dependencies-v2-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
             # fallback to using the latest cache if no exact match is found
-            - gd-macos-nodejs-dependencies-
+            - gd-macos-nodejs-dependencies-v2-
 
       - run:
           name: Install GDevelop.js dependencies
@@ -71,7 +71,7 @@ jobs:
             - newIDE/app/node_modules
             - GDevelop.js/node_modules
             - GDJS/node_modules
-          key: gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
+          key: gd-macos-nodejs-dependencies-v2-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
 
       # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       # Note: Code signing is done using CSC_LINK (see https://www.electron.build/code-signing).
@@ -87,7 +87,6 @@ jobs:
       # Upload artifacts (CircleCI)
       - store_artifacts:
           path: newIDE/electron-app/dist
-
 
       # Upload artifacts (AWS)
       - run:
@@ -123,7 +122,7 @@ jobs:
     # CircleCI docker workers are failing if they don't have enough memory (no swap)
     resource_class: xlarge
     docker:
-      - image: cimg/node:16.13
+      - image: cimg/node:24.13.0
 
     working_directory: ~/GDevelop
 
@@ -142,9 +141,9 @@ jobs:
 
       - restore_cache:
           keys:
-            - gd-linux-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
+            - gd-linux-nodejs-dependencies-v2-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
             # fallback to using the latest cache if no exact match is found
-            - gd-linux-nodejs-dependencies-
+            - gd-linux-nodejs-dependencies-v2-
 
       # GDevelop IDE dependencies (using an exact version of GDevelop.js, built previously)
       - run:
@@ -157,7 +156,7 @@ jobs:
             - newIDE/app/node_modules
             - GDevelop.js/node_modules
             - GDJS/node_modules
-          key: gd-linux-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
+          key: gd-linux-nodejs-dependencies-v2-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}-{{ checksum "GDJS/package-lock.json" }}
 
       # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       - run:
@@ -184,7 +183,7 @@ jobs:
   build-gdevelop_js-wasm-only:
     resource_class: medium+ # Compilation time decrease linearly with the number of CPUs, but not linking (so "large" does not speedup total build time).
     docker:
-      - image: cimg/node:16.13
+      - image: cimg/node:24.13.0
 
     working_directory: ~/GDevelop
 
@@ -198,19 +197,15 @@ jobs:
           command: sudo apt-get update && sudo apt install cmake
 
       - run:
-          name: Install Python3 dependencies for Emscripten
-          command: sudo apt install python-is-python3 python3-distutils -y
-
-      - run:
           name: Install Emscripten (for GDevelop.js)
           command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
 
       # GDevelop.js dependencies
       - restore_cache:
           keys:
-            - gdevelop.js-linux-nodejs-dependencies-{{ checksum "GDevelop.js/package-lock.json" }}
+            - gdevelop.js-linux-nodejs-dependencies-v2-{{ checksum "GDevelop.js/package-lock.json" }}
             # fallback to using the latest cache if no exact match is found
-            - gdevelop.js-linux-nodejs-dependencies-
+            - gdevelop.js-linux-nodejs-dependencies-v2-
 
       - run:
           name: Install GDevelop.js dependencies and build it
@@ -225,7 +220,7 @@ jobs:
       - save_cache:
           paths:
             - GDevelop.js/node_modules
-          key: gdevelop.js-linux-nodejs-dependencies-{{ checksum "GDevelop.js/package-lock.json" }}
+          key: gdevelop.js-linux-nodejs-dependencies-v2-{{ checksum "GDevelop.js/package-lock.json" }}
 
       # Upload artifacts (CircleCI)
       - store_artifacts:
@@ -243,7 +238,7 @@ jobs:
   build-gdevelop_js-debug-sanitizers-and-extra-checks:
     resource_class: xlarge # Total time decrease linearly with the number of CPUs.
     docker:
-      - image: cimg/node:16.13
+      - image: cimg/node:24.13.0
 
     working_directory: ~/GDevelop
 
@@ -261,19 +256,15 @@ jobs:
           command: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 19 && sudo apt install clang-tidy-19
 
       - run:
-          name: Install Python3 dependencies for Emscripten
-          command: sudo apt install python-is-python3 python3-distutils -y
-
-      - run:
           name: Install Emscripten (for GDevelop.js)
           command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
 
       # GDevelop.js dependencies
       - restore_cache:
           keys:
-            - gdevelop.js-linux-nodejs-dependencies-{{ checksum "GDevelop.js/package-lock.json" }}
+            - gdevelop.js-linux-nodejs-dependencies-v2-{{ checksum "GDevelop.js/package-lock.json" }}
             # fallback to using the latest cache if no exact match is found
-            - gdevelop.js-linux-nodejs-dependencies-
+            - gdevelop.js-linux-nodejs-dependencies-v2-
 
       - run:
           name: Install GDevelop.js dependencies and build it
@@ -304,7 +295,7 @@ jobs:
   # Trigger AppVeyor build, which also does a Windows build (keep it for redundancy).
   trigger-appveyor-windows-build:
     docker:
-      - image: cimg/node:16.13
+      - image: cimg/base:current
     steps:
       - run:
           name: Trigger AppVeyor Windows build
@@ -373,8 +364,8 @@ jobs:
       - restore_cache:
           name: Restore node_modules cache
           keys:
-            - v1-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}-{{ checksum "GDJS/package-lock.json" }}
-            - v1-win-node-
+            - v2-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}-{{ checksum "GDJS/package-lock.json" }}
+            - v2-win-node-
 
       - run:
           name: Install dependencies
@@ -405,7 +396,7 @@ jobs:
 
       - save_cache:
           name: Save node_modules cache
-          key: v1-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}-{{ checksum "GDJS/package-lock.json" }}
+          key: v2-win-node-{{ checksum "newIDE/app/package-lock.json" }}-{{ checksum "newIDE/electron-app/package-lock.json" }}-{{ checksum "GDJS/package-lock.json" }}
           paths:
             - newIDE/app/node_modules
             - newIDE/electron-app/node_modules

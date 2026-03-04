@@ -26,6 +26,7 @@ type Props = {|
 
 const getExtraInfoArray = (type: gdValueTypeMetadata) => {
   const extraInfoJson = type.getExtraInfo();
+  // $FlowFixMe[missing-empty-array-annot]
   let array = [];
   try {
     if (extraInfoJson !== '') array = JSON.parse(extraInfoJson);
@@ -59,7 +60,7 @@ export default function ValueTypeEditor({
   onTypeUpdated,
   getLastObjectParameterObjectType,
   isExpressionType,
-}: Props) {
+}: Props): React.Node {
   const forceUpdate = useForceUpdate();
 
   const type = convertTypeToSelectorValue(valueTypeMetadata.getName());
@@ -97,6 +98,10 @@ export default function ValueTypeEditor({
                 <SelectOption
                   value="stringWithSelector"
                   label={t`String from a list of options (text)`}
+                />
+                <SelectOption
+                  value="numberWithChoices"
+                  label={t`Number from a list of options (number)`}
                 />
                 <SelectOption
                   value="keyboardKey"
@@ -181,6 +186,7 @@ export default function ValueTypeEditor({
             {valueTypeMetadata.isObject() && (
               <ObjectTypeSelector
                 project={project}
+                eventsFunctionsExtension={eventsFunctionsExtension}
                 value={valueTypeMetadata.getExtraInfo()}
                 onChange={(value: string) => {
                   valueTypeMetadata.setExtraInfo(value);
@@ -291,7 +297,8 @@ export default function ValueTypeEditor({
               />
             )}
           </ResponsiveLineStackLayout>
-          {valueTypeMetadata.getName() === 'stringWithSelector' && (
+          {(valueTypeMetadata.getName() === 'stringWithSelector' ||
+            valueTypeMetadata.getName() === 'numberWithChoices') && (
             <ChoicesEditor
               disabled={disabled}
               choices={getExtraInfoArray(valueTypeMetadata).map(value => ({
@@ -307,6 +314,7 @@ export default function ValueTypeEditor({
                 forceUpdate();
                 onTypeUpdated();
               }}
+              isNumber={valueTypeMetadata.getName() === 'numberWithChoices'}
             />
           )}
         </ColumnStackLayout>

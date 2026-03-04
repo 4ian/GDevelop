@@ -27,6 +27,9 @@ module.exports = {
         'Neyl Mahfouf',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        'Save/load full game state (objects, variables, sounds, effects). Profile-based filtering.'
+      )
       .setExtensionHelpPath('/all-features/save-state')
       .setCategory('Game mechanic')
       .addInstructionOrExpressionGroupMetadata(_('Save State (experimental)'))
@@ -407,10 +410,20 @@ module.exports = {
       newValue
     ) {
       if (propertyName === 'defaultProfilePersistence') {
-        behaviorContent
-          .getChild('defaultProfilePersistence')
-          .setStringValue(newValue);
-        return true;
+        const normalizedValue = newValue.toLowerCase();
+        if (normalizedValue === 'persisted') {
+          behaviorContent
+            .getChild('defaultProfilePersistence')
+            .setStringValue('Persisted');
+          return true;
+        }
+        if (normalizedValue === 'donotsave') {
+          behaviorContent
+            .getChild('defaultProfilePersistence')
+            .setStringValue('DoNotSave');
+          return true;
+        }
+        return false;
       }
       if (propertyName === 'persistedInProfiles') {
         behaviorContent

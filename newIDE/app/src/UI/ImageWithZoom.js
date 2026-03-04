@@ -20,7 +20,7 @@ type Props = {|
  * On the contrary, if you're displaying a built-in GDevelop image, coming for example from the
  * "res/" folder (i.e: a GDevelop icon), you don't need this and can use `<img>` as usual.
  */
-const ImageWithZoom = ({ src, ...props }: Props) => {
+const ImageWithZoom = ({ src, ...props }: Props): React.Node => {
   const [isZoomedIn, setIsZoomedIn] = React.useState<boolean>(false);
   return (
     <InnerImageZoom

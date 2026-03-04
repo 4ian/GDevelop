@@ -29,7 +29,7 @@ const EventsBasedObjectScenePropertiesDialog = ({
   onClose,
   getContentAABB,
   onEventsBasedObjectChildrenEdited,
-}: Props) => {
+}: Props): React.Node => {
   const [areaMinX, setAreaMinX] = React.useState<number>(
     eventsBasedObjectVariant.getAreaMinX()
   );
@@ -128,6 +128,7 @@ const EventsBasedObjectScenePropertiesDialog = ({
           properties
         </Trans>
       }
+      // $FlowFixMe[incompatible-type]
       actions={actions}
       onRequestClose={onClose}
       onApply={onSubmit}
@@ -135,7 +136,8 @@ const EventsBasedObjectScenePropertiesDialog = ({
       maxWidth="sm"
       secondaryActions={[
         <RaisedButton
-          key="edit-scene-variables"
+          key="fit-area-to-content"
+          id="fit-area-to-content"
           label={<Trans>Fit to content</Trans>}
           fullWidth
           onClick={() => {

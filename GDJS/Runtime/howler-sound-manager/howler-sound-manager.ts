@@ -135,6 +135,13 @@ namespace gdjs {
     }
 
     /**
+     * Checks whether the id exists in howl._sounds[]
+     */
+    private isActualId(): boolean {
+      return !!this._howl._soundById(this._id);
+    }
+
+    /**
      * Returns true if the associated howl is fully loaded.
      */
     isLoaded(): boolean {
@@ -185,7 +192,7 @@ namespace gdjs {
      */
     pause(): this {
       try {
-        if (this._id !== null) this._howl.pause(this._id);
+        if (this._id !== null && this.isActualId()) this._howl.pause(this._id!);
       } catch (error) {
         handleHowlerSoundMethodError(error, 'pause');
       }
@@ -198,7 +205,7 @@ namespace gdjs {
      */
     stop(): this {
       try {
-        if (this._id !== null) this._howl.stop(this._id);
+        if (this._id !== null && this.isActualId()) this._howl.stop(this._id);
       } catch (error) {
         handleHowlerSoundMethodError(error, 'stop');
       }
@@ -254,7 +261,7 @@ namespace gdjs {
       try {
         this._rate = rate;
         // If the sound has already started playing, then change the value directly.
-        if (this._id !== null) {
+        if (this._id !== null && this.isActualId()) {
           rate = gdjs.HowlerSoundManager.clampRate(rate);
           this._howl.rate(rate, this._id);
         }
@@ -279,7 +286,8 @@ namespace gdjs {
       try {
         this._loop = loop;
         // If the sound has already started playing, then change the value directly.
-        if (this._id !== null) this._howl.loop(loop, this._id);
+        if (this._id !== null && this.isActualId())
+          this._howl.loop(loop, this._id);
       } catch (error) {
         handleHowlerSoundMethodError(error, 'loop');
       }
@@ -292,8 +300,13 @@ namespace gdjs {
      * @returns A float from 0 to 1.
      */
     getVolume(): float {
-      if (this._id === null) return this._initialVolume;
-      return this._howl.volume(this._id);
+      try {
+        if (this._id === null || !this.isActualId()) return this._initialVolume;
+        return this._howl.volume(this._id);
+      } catch (error) {
+        handleHowlerSoundMethodError(error, 'getVolume');
+      }
+      return this._initialVolume;
     }
 
     /**
@@ -306,7 +319,8 @@ namespace gdjs {
         this._initialVolume = clampVolume(volume);
 
         // If the sound has already started playing, then change the value directly.
-        if (this._id !== null) this._howl.volume(this._initialVolume, this._id);
+        if (this._id !== null && this.isActualId())
+          this._howl.volume(this._initialVolume, this._id);
       } catch (error) {
         handleHowlerSoundMethodError(error, 'volume');
       }
@@ -317,7 +331,7 @@ namespace gdjs {
      * Get if the sound is muted.
      */
     getMute(): boolean {
-      if (this._id === null) return false;
+      if (this._id === null || !this.isActualId()) return false;
       return this._howl.mute(this._id);
     }
 
@@ -327,7 +341,8 @@ namespace gdjs {
      */
     setMute(mute: boolean): this {
       try {
-        if (this._id !== null) this._howl.mute(mute, this._id);
+        if (this._id !== null && this.isActualId())
+          this._howl.mute(mute, this._id);
       } catch (error) {
         handleHowlerSoundMethodError(error, 'mute');
       }
@@ -338,7 +353,7 @@ namespace gdjs {
      * Get the sound seek.
      */
     getSeek(): float {
-      if (this._id === null) return 0;
+      if (this._id === null || !this.isActualId()) return 0;
       return this._howl.seek(this._id);
     }
 
@@ -348,7 +363,8 @@ namespace gdjs {
      */
     setSeek(seek: float): this {
       try {
-        if (this._id !== null) this._howl.seek(seek, this._id);
+        if (this._id !== null && this.isActualId())
+          this._howl.seek(seek, this._id);
       } catch (error) {
         handleHowlerSoundMethodError(error, 'seek');
       }
@@ -359,7 +375,7 @@ namespace gdjs {
      * Get the sound spatial position.
      */
     getSpatialPosition(axis: 'x' | 'y' | 'z'): float {
-      if (this._id === null) return 0;
+      if (this._id === null || !this.isActualId()) return 0;
       return this._howl.pos(this._id)[axis === 'x' ? 0 : axis === 'y' ? 1 : 2];
     }
 
@@ -368,7 +384,8 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     setSpatialPosition(x: float, y: float, z: float): this {
-      if (this._id !== null) this._howl.pos(x, y, z, this._id);
+      if (this._id !== null && this.isActualId())
+        this._howl.pos(x, y, z, this._id);
       return this;
     }
 
@@ -378,7 +395,7 @@ namespace gdjs {
      */
     fade(from: float, to: float, duration: float): this {
       try {
-        if (this._id !== null)
+        if (this._id !== null && this.isActualId())
           this._howl.fade(
             clampVolume(from),
             clampVolume(to),
@@ -1031,9 +1048,11 @@ namespace gdjs {
         try {
           await this._preloadAudioFile(resource, /* isMusic= */ true);
         } catch (error) {
+          delete this._availableResources[resource.name];
           logger.warn(
             'There was an error while preloading an audio file: ' + error
           );
+          throw error;
         }
       }
 
@@ -1041,9 +1060,11 @@ namespace gdjs {
         try {
           await this._preloadAudioFile(resource, /* isMusic= */ false);
         } catch (error) {
+          delete this._availableResources[resource.name];
           logger.warn(
             'There was an error while preloading an audio file: ' + error
           );
+          throw error;
         }
       } else if (
         resource.preloadInCache ||
@@ -1061,7 +1082,15 @@ namespace gdjs {
             const sound = new XMLHttpRequest();
             sound.withCredentials =
               this._resourceLoader.checkIfCredentialsRequired(file);
-            sound.addEventListener('load', resolve);
+            sound.addEventListener('load', () => {
+              if (sound.status >= 200 && sound.status < 300) {
+                resolve(undefined);
+              } else {
+                reject(
+                  `HTTP error while preloading audio file in cache. Status is ${sound.status}.`
+                );
+              }
+            });
             sound.addEventListener('error', (_) =>
               reject('XHR error: ' + file)
             );
@@ -1072,9 +1101,11 @@ namespace gdjs {
             sound.send();
           });
         } catch (error) {
+          delete this._availableResources[resource.name];
           logger.warn(
             'There was an error while preloading an audio file: ' + error
           );
+          throw error;
         }
       }
     }

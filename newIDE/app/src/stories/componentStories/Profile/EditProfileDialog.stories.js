@@ -83,13 +83,15 @@ const defaultProps: EditProfileDialogProps = {
   },
   limits: limitsForNoSubscriptionUser,
 };
-export const WithSubscription = () => <EditProfileDialog {...defaultProps} />;
+export const WithSubscription = (): React.Node => (
+  <EditProfileDialog {...defaultProps} />
+);
 
-export const WithoutSubscription = () => (
+export const WithoutSubscription = (): React.Node => (
   <EditProfileDialog {...defaultProps} subscription={null} />
 );
 
-export const WithoutGithubUsernameAndNoGithubStarBadge = () => (
+export const WithoutGithubUsernameAndNoGithubStarBadge = (): React.Node => (
   <EditProfileDialog
     {...defaultProps}
     badges={[]}
@@ -98,7 +100,7 @@ export const WithoutGithubUsernameAndNoGithubStarBadge = () => (
   />
 );
 
-export const WithGithubUsernameButNoGithubStarBadge = () => (
+export const WithGithubUsernameButNoGithubStarBadge = (): React.Node => (
   <EditProfileDialog
     {...defaultProps}
     subscription={null}
@@ -109,7 +111,7 @@ export const WithGithubUsernameButNoGithubStarBadge = () => (
   />
 );
 
-export const WithGithubUsernameButErrorWhenGivingGithubStarBadge = () => (
+export const WithGithubUsernameButErrorWhenGivingGithubStarBadge = (): React.Node => (
   <EditProfileDialog
     {...defaultProps}
     subscription={null}
@@ -120,7 +122,7 @@ export const WithGithubUsernameButErrorWhenGivingGithubStarBadge = () => (
   />
 );
 
-export const WithGithubUsernameButUserNotFoundWhenGivingGithubStarBadge = () => (
+export const WithGithubUsernameButUserNotFoundWhenGivingGithubStarBadge = (): React.Node => (
   <EditProfileDialog
     {...defaultProps}
     subscription={null}
@@ -131,7 +133,7 @@ export const WithGithubUsernameButUserNotFoundWhenGivingGithubStarBadge = () => 
   />
 );
 
-export const WithNoTiktokBadge = () => (
+export const WithNoTiktokBadge = (): React.Node => (
   <EditProfileDialog
     {...defaultProps}
     subscription={null}
@@ -142,7 +144,7 @@ export const WithNoTiktokBadge = () => (
   />
 );
 
-export const WithErrorWhenGivingTiktokBadge = () => (
+export const WithErrorWhenGivingTiktokBadge = (): React.Node => (
   <EditProfileDialog
     {...defaultProps}
     subscription={null}
@@ -153,7 +155,7 @@ export const WithErrorWhenGivingTiktokBadge = () => (
   />
 );
 
-export const WithUserNotFoundWhenGivingTiktokBadge = () => (
+export const WithUserNotFoundWhenGivingTiktokBadge = (): React.Node => (
   <EditProfileDialog
     {...defaultProps}
     subscription={null}
@@ -164,13 +166,13 @@ export const WithUserNotFoundWhenGivingTiktokBadge = () => (
   />
 );
 
-export const ErrorFromBackend = () => (
+export const ErrorFromBackend = (): React.Node => (
   <EditProfileDialog {...defaultProps} error={{ code: 'auth/username-used' }} />
 );
 
-export const Submitting = () => (
+export const Submitting = (): React.Node => (
   <EditProfileDialog {...defaultProps} actionInProgress />
 );
-export const WithStudentUser = () => (
+export const WithStudentUser = (): React.Node => (
   <EditProfileDialog {...defaultProps} limits={limitsForStudentUser} />
 );

@@ -4,16 +4,20 @@ import { type ChosenCategory } from './FiltersChooser';
 import {
   type ExtensionShortHeader,
   type BehaviorShortHeader,
+  type ObjectShortHeader,
 } from '../../Utils/GDevelopServices/Extension';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import shuffle from 'lodash/shuffle';
 import Fuse from 'fuse.js';
+import { type ObjectCategory } from '../../AssetStore/ObjectStoreContext';
 
 type SearchableItem =
   | ExtensionShortHeader
   | ExampleShortHeader
   | BehaviorShortHeader
+  | ObjectShortHeader
+  | ObjectCategory
   | PrivateGameTemplateListingData;
 
 export type SearchMatch = {|
@@ -58,7 +62,9 @@ export const sharedFuseConfiguration = {
 /**
  * This helper allows creating the search query for a search within a simple array of strings.
  */
-export const getFuseSearchQueryForSimpleArray = (searchText: string) => {
+export const getFuseSearchQueryForSimpleArray = (
+  searchText: string
+): string => {
   const tokenisedSearchQuery = searchText.trim().split(' ');
   return `'${tokenisedSearchQuery.join(" '")}`;
 };
@@ -72,11 +78,13 @@ export const getFuseSearchQueryForSimpleArray = (searchText: string) => {
 export const getFuseSearchQueryForMultipleKeys = (
   searchText: string,
   keys: Array<string>
-) => {
+): { $or: Array<{ $or: Array<any> }> } => {
   const tokenisedSearchQuery = searchText.trim().split(' ');
   const searchQuery: {
+    // $FlowFixMe[value-as-type]
     $or: Fuse.Expression[],
   }[] = tokenisedSearchQuery.map((searchToken: string) => {
+    // $FlowFixMe[value-as-type]
     const orFields: Fuse.Expression[] = keys.map(key => ({
       [key]: searchToken,
     }));
@@ -158,7 +166,9 @@ const getFirstExactMatchPosition = (
   };
 };
 
-export const nullifySingleCharacterMatches = <T>(result: SearchResult<T>) => {
+export const nullifySingleCharacterMatches = <T>(
+  result: SearchResult<T>
+): any => {
   const matchesWithAtLeastOneSignificantIndex = result.matches
     .map(match => {
       const newIndices = match.indices
@@ -190,17 +200,27 @@ export const augmentSearchResult = <T>(
   };
 };
 
-export const tuneMatches = <T>(result: SearchResult<T>, searchText: string) =>
+export const tuneMatches = <T>(
+  result: SearchResult<T>,
+  searchText: string
+): any =>
+  // $FlowFixMe[missing-type-arg]
   result.matches.map<SearchMatch>(match => ({
     key: match.key,
     value: match.value,
     indices: tuneMatchIndices(match, searchText),
   }));
 
-export const sortResultsUsingExactMatches = (orderedKeys: string[]) => {
+export const sortResultsUsingExactMatches = (
+  orderedKeys: Array<string>
+): (<T>(
+  resultA: AugmentedSearchResult<T>,
+  resultB: AugmentedSearchResult<T>
+) => any) => {
   return <T>(
     resultA: AugmentedSearchResult<T>,
     resultB: AugmentedSearchResult<T>
+    // $FlowFixMe[missing-local-annot]
   ) => {
     // First give priority to result that have an exact match at start of word and not the other.
     const resultAExactMatchesAtStartOfWordCount = resultA.matches.filter(
@@ -316,7 +336,8 @@ export const filterSearchResults = <SearchItem: SearchableItem>(
   chosenItemCategory: ?string,
   chosenCategory: ?ChosenCategory,
   chosenFilters: Set<string>,
-  excludedTiers: Set<string>
+  excludedTiers: Set<string>,
+  isSearchTextEmpty: boolean = false
 ): ?Array<SearchResult<SearchItem>> => {
   if (!searchResults) return null;
 
@@ -374,6 +395,11 @@ export const filterSearchResults = <SearchItem: SearchableItem>(
           ));
 
       return passTier && passChosenFilters;
+    })
+    .filter(({ item }) => {
+      //$FlowFixMe[incompatible-type] Only categories are excluded.
+      const category: ObjectCategory = item;
+      return (isSearchTextEmpty && !chosenItemCategory) || !category.categoryId;
     });
 
   const totalTime = performance.now() - startTime;
@@ -487,7 +513,8 @@ export const useSearchStructuredItem = <SearchItem: SearchableItem>(
             chosenItemCategory,
             chosenCategory,
             chosenFilters,
-            excludedTiers
+            excludedTiers,
+            true /*isSearchTextEmpty*/
           )
         );
       } else {

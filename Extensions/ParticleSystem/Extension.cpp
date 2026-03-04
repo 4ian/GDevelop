@@ -26,6 +26,8 @@ void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
           "the 3D particle emitter instead.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("2D particle emitter for fire, smoke, explosions, magic effects. Configurable color, size, speed, lifetime.")
+      .SetDimension("2D")
       .SetCategory("Visual effect")
       .SetExtensionHelpPath("/objects/particles_emitter");
   extension.AddInstructionOrExpressionGroupMetadata(_("Particle system"))
@@ -38,10 +40,10 @@ void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
             .AddObject<ParticleEmitterObject>(
                 "ParticleEmitter",
                 _("2D particles emitter"),
-                _("Displays a large number of small 2D particles to create "
-                  "visual effects in a 2D game or user interface."),
+                _("2D effects like smoke, fire or sparks."),
                 "CppPlatform/Extensions/particleSystemicon.png")
-            .SetCategoryFullName(_("Visual effect"))
+            .SetCategory("Visual effect")
+            .SetAssetStoreTag("particles emitter")
             .AddDefaultBehavior("EffectCapability::EffectBehavior");
 
     // Declaration is too big to be compiled by GCC in one file, unless you have

@@ -1,24 +1,33 @@
-const liveServer = require('live-server');
+const FiveServer = require('five-server').default;
 const httpsConfiguration = require('./Utils/DevServerHttpsConfiguration.js');
 const { getAvailablePort } = require('./Utils/AvailablePortFinder');
 
-/** @type {import("live-server").LiveServerParams} */
-let currentServerParams = null;
+// Track servers per window ID
+// Map<windowId, { serverParams, serverInstance }>
+const serversByWindow = new Map();
 
 module.exports = {
   /**
-   * Start a server to serve a folder
+   * Start a server to serve a folder for a specific window
    */
-  serveFolder: ({ root, useHttps }, onDone) => {
-    if (currentServerParams && currentServerParams.root === root) {
-      onDone(null, currentServerParams);
+  serveFolder: ({ root, useHttps, windowId }, onDone) => {
+    // Check if this window already has a server for the same root
+    const existingServer = serversByWindow.get(windowId);
+    if (existingServer && existingServer.serverParams.root === root) {
+      onDone(null, existingServer.serverParams);
       return;
     }
 
-    liveServer.shutdown();
+    // Stop any existing server for this window
+    if (existingServer && existingServer.serverInstance) {
+      existingServer.serverInstance.shutdown().catch(() => {
+        // Ignore shutdown errors
+      });
+    }
+
     getAvailablePort(2929, 4000).then(
       port => {
-        currentServerParams = {
+        const serverParams = {
           port,
           root,
           open: false,
@@ -29,6 +38,21 @@ module.exports = {
           // be used - and the user can still reload manually on its browser.
           watch: [],
           middleware: [
+            // Handle requests with query parameters by serving index.html
+            // This ensures URLs like http://localhost:2929/?i=123 work correctly
+            function handleQueryParams(req, res, next) {
+              try {
+                const url = new URL(req.url, `http://${req.headers.host}`);
+                // If the request is for the root path with query parameters,
+                // rewrite to serve index.html while preserving the query string
+                if (url.pathname === '/' && url.search) {
+                  req.url = '/index.html' + url.search;
+                }
+              } catch (e) {
+                // If URL parsing fails, leave req.url unchanged
+              }
+              next();
+            },
             // Disable caching, as it can lead to older generated code being served
             // in case preview files are proxied through a CDN (see
             // https://github.com/4ian/GDevelop/pull/6553 for example)
@@ -44,20 +68,55 @@ module.exports = {
             },
           ],
         };
-        liveServer.start(currentServerParams);
-        onDone(null, currentServerParams);
+
+        const serverInstance = new FiveServer();
+        serverInstance
+          .start(serverParams)
+          .then(() => {
+            serversByWindow.set(windowId, { serverParams, serverInstance });
+            onDone(null, serverParams);
+          })
+          .catch(err => {
+            onDone(err);
+          });
       },
       err => onDone(err)
     );
   },
 
   /**
-   * Stop any running server
+   * Stop the server for a specific window
    */
-  stopServer: onDone => {
-    liveServer.shutdown();
-    currentServerParams = null;
+  stopServer: (windowId, onDone) => {
+    const server = serversByWindow.get(windowId);
+    if (server && server.serverInstance) {
+      server.serverInstance
+        .shutdown()
+        .then(() => {
+          serversByWindow.delete(windowId);
+          onDone();
+        })
+        .catch(err => {
+          serversByWindow.delete(windowId);
+          onDone(err);
+        });
+    } else {
+      serversByWindow.delete(windowId);
+      onDone();
+    }
+  },
 
-    onDone();
+  /**
+   * Stop all servers (for cleanup on app quit)
+   */
+  stopAllServers: () => {
+    serversByWindow.forEach((server, windowId) => {
+      if (server && server.serverInstance) {
+        server.serverInstance.shutdown().catch(() => {
+          // Silently ignore errors during shutdown
+        });
+      }
+    });
+    serversByWindow.clear();
   },
 };

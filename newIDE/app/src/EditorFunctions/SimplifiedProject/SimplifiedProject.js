@@ -34,12 +34,26 @@ type SimplifiedObjectGroup = {|
   variables?: Array<SimplifiedVariable>,
 |};
 
+type SimplifiedLayer = {|
+  layerName: string,
+  position: number,
+  isBaseLayer?: boolean,
+|};
+
 type SimplifiedScene = {|
   sceneName: string,
   objects: Array<SimplifiedObject>,
   objectGroups: Array<SimplifiedObjectGroup>,
   sceneVariables: Array<SimplifiedVariable>,
+  layers: Array<SimplifiedLayer>,
   instancesOnSceneDescription: string,
+|};
+
+type SimplifiedResource = {|
+  name: string,
+  type: string,
+  file: string,
+  metadata?: string,
 |};
 
 type SimplifiedProject = {|
@@ -51,6 +65,7 @@ type SimplifiedProject = {|
   globalObjectGroups: Array<SimplifiedObjectGroup>,
   scenes: Array<SimplifiedScene>,
   globalVariables: Array<SimplifiedVariable>,
+  resources: Array<SimplifiedResource>,
 |};
 
 type ProjectSpecificExtensionsSummary = {|
@@ -61,7 +76,17 @@ export type SimplifiedProjectOptions = {|
   scopeToScene?: string,
 |};
 
-export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
+export const makeSimplifiedProjectBuilder = (
+  gd: libGDevelop
+): {
+  getProjectSpecificExtensionsSummary: (
+    project: gdProject
+  ) => ProjectSpecificExtensionsSummary,
+  getSimplifiedProject: (
+    project: gdProject,
+    options: SimplifiedProjectOptions
+  ) => SimplifiedProject,
+} => {
   const getVariableType = (variable: gdVariable) => {
     const type = variable.getType();
     return type === gd.Variable.String
@@ -99,6 +124,7 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
   const getSimplifiedVariable = (
     name: string,
     variable: gdVariable,
+    // $FlowFixMe[missing-local-annot]
     depth = 0
   ): SimplifiedVariable => {
     const isCollection = isCollectionVariable(variable);
@@ -246,15 +272,47 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
     });
   };
 
+  const getSimplifiedResourcesJson = (
+    resources: gdResourcesContainer
+  ): Array<SimplifiedResource> => {
+    return resources
+      .getAllResourceNames()
+      .toJSArray()
+      .map(resourceName => {
+        const resource = resources.getResource(resourceName);
+        return {
+          name: resourceName,
+          type: resource.getKind(),
+          file: resource.getFile(),
+          metadata: resource.getMetadata() ? resource.getMetadata() : undefined,
+        };
+      });
+  };
+
+  const getSimplifiedLayers = (
+    layers: gdLayersContainer
+  ): Array<SimplifiedLayer> => {
+    return mapFor(0, layers.getLayersCount(), i => {
+      const layer = layers.getLayerAt(i);
+      return {
+        layerName: layer.getName(),
+        position: i,
+        isBaseLayer: layer.getName() === '' ? true : undefined,
+      };
+    });
+  };
+
   const getInstancesDescription = (scene: gdLayout): string => {
     let isEmpty = true;
     const instancesCountPerLayer: { [string]: { [string]: number } } = {};
 
     const instancesListerFunctor = new gd.InitialInstanceJSFunctor();
-    // $FlowFixMe - invoke is not writable
+    // $FlowFixMe[incompatible-type] - invoke is not writable
+    // $FlowFixMe[cannot-write]
     instancesListerFunctor.invoke = instancePtr => {
-      // $FlowFixMe - wrapPointer is not exposed
+      // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
       const instance: gdInitialInstance = gd.wrapPointer(
+        // $FlowFixMe[incompatible-type]
         instancePtr,
         gd.InitialInstance
       );
@@ -268,7 +326,7 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
       layerInstancesCount[name] = (layerInstancesCount[name] || 0) + 1;
       isEmpty = false;
     };
-    // $FlowFixMe - JSFunctor is incompatible with Functor
+    // $FlowFixMe[incompatible-type] - JSFunctor is incompatible with Functor
     scene.getInitialInstances().iterateOverInstances(instancesListerFunctor);
     instancesListerFunctor.delete();
 
@@ -316,6 +374,7 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
         projectScopedContainers.getObjectsContainersList()
       ),
       sceneVariables: getSimplifiedVariablesContainerJson(scene.getVariables()),
+      layers: getSimplifiedLayers(scene.getLayers()),
       instancesOnSceneDescription: getInstancesDescription(scene),
     };
   };
@@ -344,6 +403,7 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
         gameResolutionWidth: project.getGameResolutionWidth(),
         gameResolutionHeight: project.getGameResolutionHeight(),
       },
+      resources: getSimplifiedResourcesJson(project.getResourcesManager()),
       globalObjects,
       globalObjectGroups: getSimplifiedObjectGroups(
         project.getObjects().getObjectGroups(),
@@ -372,9 +432,12 @@ export const makeSimplifiedProjectBuilder = (gd: libGDevelop) => {
       })
     );
 
+    // $FlowFixMe[incompatible-type]
     const projectSpecificExtensions: Array<gdPlatformExtension> = mapVector(
+      // $FlowFixMe[incompatible-exact]
       allExtensions,
       extension => {
+        // $FlowFixMe[incompatible-use]
         if (projectExtensionNames.has(extension.getName())) {
           return extension;
         }

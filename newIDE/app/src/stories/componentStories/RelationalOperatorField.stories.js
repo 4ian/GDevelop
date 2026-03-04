@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
 
 import paperDecorator from '../PaperDecorator';
 
@@ -9,15 +8,13 @@ import { testProject } from '../GDevelopJsInitializerDecorator';
 import RelationalOperatorField from '../../EventsSheet/ParameterFields/RelationalOperatorField';
 import ValueStateHolder from '../ValueStateHolder';
 
-const gd: libGDevelop = global.gd;
-
 export default {
   title: 'ParameterFields/RelationalOperatorField',
   component: RelationalOperatorField,
   decorators: [paperDecorator],
 };
 
-export const RelationalOperatorFieldString = () => (
+export const RelationalOperatorFieldString = (): React.Node => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (
@@ -37,7 +34,7 @@ export const RelationalOperatorFieldString = () => (
     )}
   />
 );
-export const RelationalOperatorFieldNumber = () => (
+export const RelationalOperatorFieldNumber = (): React.Node => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (
@@ -57,7 +54,7 @@ export const RelationalOperatorFieldNumber = () => (
     )}
   />
 );
-export const RelationalOperatorFieldColor = () => (
+export const RelationalOperatorFieldColor = (): React.Node => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (
@@ -75,7 +72,7 @@ export const RelationalOperatorFieldColor = () => (
     )}
   />
 );
-export const RelationalOperatorFieldUnknownType = () => (
+export const RelationalOperatorFieldUnknownType = (): React.Node => (
   <ValueStateHolder
     initialValue=""
     render={(value, onChange) => (

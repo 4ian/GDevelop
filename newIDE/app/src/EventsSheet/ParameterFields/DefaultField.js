@@ -10,7 +10,7 @@ import {
 } from './ParameterFieldCommons';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function DefaultField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SemiControlledTextFieldInterface>(null);
     const focus: FieldFocusFunction = options => {
@@ -40,20 +40,28 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-);
+): React.ComponentType<{
+  ...ParameterFieldProps,
+  +ref?: React.RefSetter<ParameterFieldInterface>,
+}>);
 
 export const renderInlineDefaultField = ({
   value,
   expressionIsValid,
+  hasDeprecationWarning,
   parameterMetadata,
   InvalidParameterValue,
+  DeprecatedParameterValue,
   MissingParameterValue,
-}: ParameterInlineRendererProps) => {
+}: ParameterInlineRendererProps): string | React.MixedElement => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }
   if (!expressionIsValid) {
     return <InvalidParameterValue>{value}</InvalidParameterValue>;
+  }
+  if (hasDeprecationWarning) {
+    return <DeprecatedParameterValue>{value}</DeprecatedParameterValue>;
   }
   return value;
 };

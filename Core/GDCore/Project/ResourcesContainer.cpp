@@ -311,6 +311,20 @@ ResourcesContainer::GetResourcePosition(const gd::String &name) const {
   return gd::String::npos;
 }
 
+Resource &ResourcesContainer::GetResourceAt(std::size_t index) {
+  if (index < resources.size())
+    return *resources[index];
+
+  return badResource;
+}
+
+const Resource &ResourcesContainer::GetResourceAt(std::size_t index) const {
+  if (index < resources.size())
+    return *resources[index];
+
+  return badResource;
+}
+
 void ResourcesContainer::MoveResource(std::size_t oldIndex,
                                       std::size_t newIndex) {
   if (oldIndex >= resources.size() || newIndex >= resources.size())

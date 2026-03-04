@@ -7,6 +7,7 @@ import {
 } from '../../Utils/GDevelopServices/Shop';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
 import CreateProfile from '../../Profile/CreateProfile';
 import Text from '../../UI/Text';
 import { useInterval } from '../../Utils/UseInterval';
@@ -26,6 +27,8 @@ import {
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 import PasswordPromptDialog from '../PasswordPromptDialog';
 import { getUserUUID } from '../../Utils/Analytics/UserUUID';
+import { getNewestRedemptionCodeForBundle } from '../../Utils/GDevelopServices/Usage';
+import ActivateSubscriptionPromptDialog from '../../Profile/ActivateSubscriptionPromptDialog';
 
 type Props = {|
   bundleListingData: BundleListingData,
@@ -43,7 +46,7 @@ const BundlePurchaseDialog = ({
   simulateAppStoreProduct,
   fastCheckout,
   onCloseAfterPurchaseDone,
-}: Props) => {
+}: Props): React.Node => {
   const {
     profile,
     onOpenLoginDialog,
@@ -53,6 +56,7 @@ const BundlePurchaseDialog = ({
     onRefreshBundlePurchases,
     bundlePurchases,
   } = React.useContext(AuthenticatedUserContext);
+  const { openRedeemCodeDialog } = React.useContext(SubscriptionContext);
   const [isPurchasing, setIsPurchasing] = React.useState(false);
   const [
     isCheckingPurchasesAfterLogin,
@@ -66,6 +70,12 @@ const BundlePurchaseDialog = ({
   const [password, setPassword] = React.useState<string>('');
   const { showAlert } = useAlertDialog();
   const [isOpeningUrl, setIsOpeningUrl] = React.useState(false);
+  const [showActivatePrompt, setShowActivatePrompt] = React.useState(false);
+  const [
+    redemptionCodeToActivate,
+    setRedemptionCodeToActivate,
+  ] = React.useState<?string>(null);
+  const { getAuthorizationHeader } = React.useContext(AuthenticatedUserContext);
 
   const shouldUseOrSimulateAppStoreProduct =
     shouldUseAppStoreProduct() || simulateAppStoreProduct;
@@ -116,6 +126,7 @@ const BundlePurchaseDialog = ({
           password: password || undefined,
         });
         // Mark the Url as opening if opening in the same tab, as it can take some time to load.
+        // $FlowFixMe[incompatible-type]
         setIsOpeningUrl(willReceiveAnEmailForThePurchase);
         Window.openExternalURL(checkoutUrl, {
           shouldOpenInSameTabIfPossible: willReceiveAnEmailForThePurchase,
@@ -242,6 +253,36 @@ const BundlePurchaseDialog = ({
     [receivedBundles]
   );
 
+  // Fetch the newest redemption code for the bundle and show activation prompt
+  const fetchNewestCodeAndPromptActivation = React.useCallback(
+    async () => {
+      if (
+        !profile ||
+        !bundleListingData.includedRedemptionCodes ||
+        bundleListingData.includedRedemptionCodes.length === 0
+      ) {
+        return;
+      }
+
+      try {
+        const code = await getNewestRedemptionCodeForBundle(
+          getAuthorizationHeader,
+          profile.id,
+          bundleListingData
+        );
+
+        if (code) {
+          setRedemptionCodeToActivate(code);
+          setShowActivatePrompt(true);
+        }
+      } catch (error) {
+        console.error('Error fetching redemption code:', error);
+        // Silently fail - user can redeem manually later
+      }
+    },
+    [profile, bundleListingData, getAuthorizationHeader]
+  );
+
   // If the user has received this particular bundle, either:
   // - they just logged in, and already have it, so we close the dialog.
   // - they just bought it, we display the success message.
@@ -255,6 +296,8 @@ const BundlePurchaseDialog = ({
           if (isPurchasing) {
             setIsPurchasing(false);
             setPurchaseSuccessful(true);
+            // Check if bundle has redemption codes and prompt for activation
+            fetchNewestCodeAndPromptActivation();
           } else if (!purchaseSuccessful) {
             onCloseDialog();
           }
@@ -268,6 +311,7 @@ const BundlePurchaseDialog = ({
       onCloseDialog,
       isCheckingPurchasesAfterLogin,
       purchaseSuccessful,
+      fetchNewestCodeAndPromptActivation,
     ]
   );
 
@@ -418,6 +462,7 @@ const BundlePurchaseDialog = ({
         maxWidth="sm"
         open
         onRequestClose={onCloseDialog}
+        // $FlowFixMe[incompatible-type]
         actions={dialogActions}
         onApply={purchaseSuccessful ? onCloseDialog : onWillPurchase}
         flexColumnBody
@@ -435,6 +480,21 @@ const BundlePurchaseDialog = ({
           onClose={() => setDisplayPasswordPrompt(false)}
           passwordValue={password}
           setPasswordValue={setPassword}
+        />
+      )}
+      {showActivatePrompt && redemptionCodeToActivate && (
+        <ActivateSubscriptionPromptDialog
+          bundleListingData={bundleListingData}
+          onActivateNow={() => {
+            setShowActivatePrompt(false);
+            openRedeemCodeDialog({
+              codeToPrefill: redemptionCodeToActivate,
+              autoSubmit: true,
+            });
+          }}
+          onClose={() => {
+            setShowActivatePrompt(false);
+          }}
         />
       )}
     </>

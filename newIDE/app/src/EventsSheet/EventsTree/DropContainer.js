@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
-import { getIndentWidth, type SortableTreeNode } from '.';
+import { type SortableTreeNode } from './SortableEventsTree';
+import { getIndentWidth } from '.';
 import {
   moveNodeAbove,
   moveNodeBelow,
@@ -178,7 +179,7 @@ function HorizontalDraggedNodeDropContainer({
   const { depth } = node;
   return (
     <>
-      {new Array(depth).fill(0).map((_, depthStep) => {
+      {new Array<number>(depth).fill(0).map((_, depthStep) => {
         // Skip so that it does not hinder dragging and so that we don't have to
         // worry about delaying the drop target activation.
         if (depthStep === draggedNode.depth) return null;
@@ -230,7 +231,7 @@ export function DropContainer({
   indentScale,
   draggedNodeHeight,
   getNodeAtPath,
-}: DropContainerProps) {
+}: DropContainerProps): React.MixedElement {
   const isDraggedNodeSibling = isSibling(node, draggedNode);
   const isDraggedNodeJustBelow = isJustBelow(node, draggedNode);
   // We want to allow dropping below if the event has no children OR if the only
@@ -341,7 +342,7 @@ export function AutoScroll({
   DnDComponent: DropTargetComponent<SortableTreeNode>,
   activateTargets: boolean,
   onHover: () => void,
-|}) {
+|}): React.MixedElement {
   const delayActivationTimer = React.useRef<?TimeoutID>(null);
   const [show, setShow] = React.useState(false);
 

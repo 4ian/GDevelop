@@ -16,7 +16,7 @@ const NotificationDot = ({
 }: {
   size?: number,
   color: 'notification' | 'warning',
-}) => {
+}): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <span

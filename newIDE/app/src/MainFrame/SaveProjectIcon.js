@@ -9,15 +9,18 @@ import UnsavedChangesContext from './UnsavedChangesContext';
 import { getUnsavedChangesAmount } from './UseSaveReminder';
 import { useInterval } from '../Utils/UseInterval';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import type { FileMetadata } from '../ProjectsStorage';
 
 type Props = {|
-  onSave: () => Promise<void>,
+  onSave: (options?: {|
+    skipNewVersionWarning: boolean,
+  |}) => Promise<?FileMetadata>,
   canSave: boolean,
   id: string,
 |};
 const CHECK_FREQUENCY = 5000;
 
-const SaveProjectIcon = (props: Props) => {
+const SaveProjectIcon = (props: Props): React.Node => {
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const unsavedChangesAmount = getUnsavedChangesAmount(unsavedChanges);
   const displayDotBadge = unsavedChangesAmount !== 'none';
@@ -29,7 +32,9 @@ const SaveProjectIcon = (props: Props) => {
     <IconButton
       size="small"
       id={props.id}
-      onClick={props.onSave}
+      onClick={() => {
+        props.onSave();
+      }}
       tooltip={t`Save project`}
       color="default"
       disabled={!props.canSave}

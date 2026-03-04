@@ -1,7 +1,6 @@
 // @flow
 import { t } from '@lingui/macro';
 import * as React from 'react';
-import SubscriptionDialog from './SubscriptionDialog';
 import {
   sendSubscriptionDialogShown,
   type SubscriptionDialogDisplayReason,
@@ -19,10 +18,11 @@ import {
 } from '../../Utils/GDevelopServices/Usage';
 import AuthenticatedUserContext from '../AuthenticatedUserContext';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
-import PromotionSubscriptionDialog from './PromotionSubscriptionDialog';
+import SubscriptionDialog from './SubscriptionDialog';
 import SubscriptionPendingDialog from './SubscriptionPendingDialog';
 import LoaderModal from '../../UI/LoaderModal';
 import { useAsyncLazyMemo } from '../../Utils/UseLazyMemo';
+import RedeemCodeDialog from '../RedeemCodeDialog';
 
 export type SubscriptionType = 'individual' | 'team' | 'education';
 
@@ -42,6 +42,7 @@ const mergeSubscriptionPlansWithPrices = (
       if (subscriptionPlan.id === 'free') {
         return {
           ...subscriptionPlan,
+          // $FlowFixMe[missing-empty-array-annot]
           pricingSystems: [],
         };
       }
@@ -84,28 +85,40 @@ type SubscriptionState = {|
     | SubscriptionPlanWithPricingSystems[]
     | null,
   /**
-   * Returns subscription plans with pricing systems including legacy plans, or null if not yet fetched.
-   * Calling this function will trigger a fetch in the background if not already loaded.
+   * Returns subscription plan of the user, even if it's a legacy plan, or null if not found or no subscription.
    */
-  getSubscriptionPlansWithPricingSystemsIncludingLegacy: () =>
-    | SubscriptionPlanWithPricingSystems[]
-    | null,
+  getUserSubscriptionPlanEvenIfLegacy: () => SubscriptionPlanWithPricingSystems | null,
   /**
    * Call this when a subscription or subscription upgrade is required.
    */
   openSubscriptionDialog: ({|
     analyticsMetadata: SubscriptionAnalyticsMetadata,
-    filter?: SubscriptionType,
+    couponCode?: string,
   |}) => void,
-  openSubscriptionPendingDialog: () => void,
+  /**
+   * Returns the current coupon code being used, or null.
+   */
+  getCouponCode: () => ?string,
+  /**
+   * Clears the current coupon code.
+   */
+  clearCouponCode: () => void,
+  openRedeemCodeDialog: (options?: {|
+    codeToPrefill?: string,
+    autoSubmit?: boolean,
+  |}) => void,
 |};
 
-export const SubscriptionContext = React.createContext<SubscriptionState>({
-  getSubscriptionPlansWithPricingSystems: () => null,
-  getSubscriptionPlansWithPricingSystemsIncludingLegacy: () => null,
-  openSubscriptionDialog: () => {},
-  openSubscriptionPendingDialog: () => {},
-});
+export const SubscriptionContext: React.Context<SubscriptionState> = React.createContext<SubscriptionState>(
+  {
+    getSubscriptionPlansWithPricingSystems: () => null,
+    getUserSubscriptionPlanEvenIfLegacy: () => null,
+    openSubscriptionDialog: () => {},
+    getCouponCode: () => null,
+    clearCouponCode: () => {},
+    openRedeemCodeDialog: () => {},
+  }
+);
 
 type SubscriptionProviderProps = {|
   children: React.Node,
@@ -115,23 +128,28 @@ type SubscriptionProviderProps = {|
 export const SubscriptionProvider = ({
   children,
   simulateMobileApp,
-}: SubscriptionProviderProps) => {
+}: SubscriptionProviderProps): React.MixedElement => {
   const [
     analyticsMetadata,
     setAnalyticsMetadata,
   ] = React.useState<?SubscriptionAnalyticsMetadata>(null);
+  const [couponCode, setCouponCode] = React.useState<?string>(null);
   const recommendedPlanId = analyticsMetadata
     ? analyticsMetadata.recommendedPlanId
     : null;
-  const [filter, setFilter] = React.useState<
-    'individual' | 'team' | 'education' | null
-  >(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
   const [
     subscriptionPendingDialogOpen,
     setSubscriptionPendingDialogOpen,
   ] = React.useState(false);
+  const [
+    subscriptionPendingDialogImmediateSuccess,
+    setSubscriptionPendingDialogImmediateSuccess,
+  ] = React.useState(false);
+  const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
+  const [codeToPrefill, setCodeToPrefill] = React.useState<?string>(null);
+  const [autoSubmit, setAutoSubmit] = React.useState(false);
   const userId =
     authenticatedUser && authenticatedUser.profile
       ? authenticatedUser.profile.id
@@ -205,14 +223,18 @@ export const SubscriptionProvider = ({
   );
 
   const openSubscriptionPendingDialog = React.useCallback(
-    () => setSubscriptionPendingDialogOpen(true),
+    (open: boolean) => setSubscriptionPendingDialogOpen(open),
     []
   );
 
-  const closeSubscriptionDialog = () => setAnalyticsMetadata(null);
+  const closeSubscriptionDialog = () => {
+    setAnalyticsMetadata(null);
+    setCouponCode(null);
+  };
 
   const openSubscriptionDialog = React.useCallback(
-    ({ analyticsMetadata: metadata, filter: subscriptionsFilter }) => {
+    // $FlowFixMe[missing-local-annot]
+    ({ analyticsMetadata: metadata, couponCode: coupon }) => {
       if (isNativeMobileApp() || simulateMobileApp) {
         if (hasValidSubscriptionPlan(authenticatedUser.subscription)) {
           if (
@@ -220,7 +242,7 @@ export const SubscriptionProvider = ({
           ) {
             showAlert({
               title: t`Subscription outside the app store`,
-              message: t`The subscription of this account comes from outside the app store. Connect with your account on gdevelop.io from your web-browser to manage it.`,
+              message: t`The subscription of this account comes from outside the app store. Connect with your account on editor.gdevelop.io from your web-browser to manage it.`,
             });
             return;
           }
@@ -228,58 +250,78 @@ export const SubscriptionProvider = ({
 
         // Would present App Store screen.
       } else {
-        setFilter(subscriptionsFilter || null);
         setAnalyticsMetadata(metadata);
+        setCouponCode(coupon || null);
       }
     },
     [authenticatedUser.subscription, showAlert, simulateMobileApp]
   );
 
-  const getUserLegacySubscriptionPlanWithPricingSystem = React.useCallback(
+  const getUserSubscriptionPlanEvenIfLegacy = React.useCallback(
     () => {
-      const subscriptionPlansWithPricingSystems = getSubscriptionPlansWithPricingSystems();
+      const subscriptionPlansWithPricingSystemsIncludingLegacy = getSubscriptionPlansWithPricingSystemsIncludingLegacy();
       if (
-        !authenticatedUser.subscription ||
-        !authenticatedUser.subscription.planId ||
-        !authenticatedUser.subscription.pricingSystemId ||
-        !subscriptionPlansWithPricingSystems
-      ) {
+        !subscriptionPlansWithPricingSystemsIncludingLegacy ||
+        !authenticatedUser.subscription
+      )
         return null;
-      }
-      const {
-        planId: userPlanId,
-        pricingSystemId: userPricingSystemId,
-      } = authenticatedUser.subscription;
-      const userPlanWithPricingSystems = subscriptionPlansWithPricingSystems.find(
-        planWithPricingSystems => planWithPricingSystems.id === userPlanId
+
+      const userSubscriptionPlanId = authenticatedUser.subscription.planId;
+      const userSubscriptionPlan = subscriptionPlansWithPricingSystemsIncludingLegacy.find(
+        plan => plan.id === userSubscriptionPlanId
       );
-      if (!userPlanWithPricingSystems || !userPlanWithPricingSystems.isLegacy) {
-        return null;
-      }
-      const userPricingSystem = userPlanWithPricingSystems.pricingSystems.find(
-        pricingSystem => pricingSystem.id === userPricingSystemId
-      );
-      if (!userPricingSystem) return null;
-      return {
-        ...userPlanWithPricingSystems,
-        pricingSystems: [userPricingSystem],
-      };
+      return userSubscriptionPlan || null;
     },
-    [getSubscriptionPlansWithPricingSystems, authenticatedUser.subscription]
+    [
+      authenticatedUser.subscription,
+      getSubscriptionPlansWithPricingSystemsIncludingLegacy,
+    ]
+  );
+
+  const getCouponCode = React.useCallback(() => couponCode, [couponCode]);
+
+  const clearCouponCode = React.useCallback(() => setCouponCode(null), []);
+
+  const openRedeemCodeDialog = React.useCallback(
+    (options?: {| codeToPrefill?: string, autoSubmit?: boolean |}) => {
+      setRedeemCodeDialogOpen(true);
+      setCodeToPrefill((options && options.codeToPrefill) || null);
+      setAutoSubmit((options && options.autoSubmit) || false);
+    },
+    []
+  );
+
+  const closeRedeemCodeDialog = React.useCallback(
+    async (hasJustRedeemedCode: boolean) => {
+      setRedeemCodeDialogOpen(false);
+      setCodeToPrefill(null);
+      setAutoSubmit(false);
+      if (hasJustRedeemedCode) {
+        await authenticatedUser.onRefreshSubscription();
+        // Show the success message after the subscription has been refreshed.
+        setSubscriptionPendingDialogImmediateSuccess(true);
+        setSubscriptionPendingDialogOpen(true);
+      }
+    },
+    [authenticatedUser]
   );
 
   const value = React.useMemo(
     () => ({
       getSubscriptionPlansWithPricingSystems,
-      getSubscriptionPlansWithPricingSystemsIncludingLegacy,
+      getUserSubscriptionPlanEvenIfLegacy,
       openSubscriptionDialog,
-      openSubscriptionPendingDialog,
+      getCouponCode,
+      clearCouponCode,
+      openRedeemCodeDialog,
     }),
     [
       getSubscriptionPlansWithPricingSystems,
-      getSubscriptionPlansWithPricingSystemsIncludingLegacy,
+      getUserSubscriptionPlanEvenIfLegacy,
       openSubscriptionDialog,
-      openSubscriptionPendingDialog,
+      getCouponCode,
+      clearCouponCode,
+      openRedeemCodeDialog,
     ]
   );
 
@@ -299,8 +341,12 @@ export const SubscriptionProvider = ({
       {subscriptionPendingDialogOpen && (
         <SubscriptionPendingDialog
           authenticatedUser={authenticatedUser}
+          immediatelyShowSuccessMessage={
+            subscriptionPendingDialogImmediateSuccess
+          }
           onClose={() => {
             setSubscriptionPendingDialogOpen(false);
+            setSubscriptionPendingDialogImmediateSuccess(false);
             authenticatedUser.onRefreshSubscription();
           }}
           onSuccess={closeSubscriptionDialog}
@@ -309,28 +355,24 @@ export const SubscriptionProvider = ({
       {analyticsMetadata ? (
         authenticatedUser.loginState === 'loggingIn' ? (
           <LoaderModal showImmediately />
-        ) : !hasValidSubscriptionPlan(authenticatedUser.subscription) &&
-          recommendedPlanId ? (
-          <PromotionSubscriptionDialog
-            availableSubscriptionPlansWithPrices={getSubscriptionPlansWithPricingSystems()}
-            onClose={closeSubscriptionDialog}
-            recommendedPlanId={recommendedPlanId}
-            onOpenPendingDialog={(open: boolean) =>
-              setSubscriptionPendingDialogOpen(open)
-            }
-          />
         ) : (
           <SubscriptionDialog
             availableSubscriptionPlansWithPrices={getSubscriptionPlansWithPricingSystems()}
-            userLegacySubscriptionPlanWithPricingSystem={getUserLegacySubscriptionPlanWithPricingSystem()}
+            userSubscriptionPlanEvenIfLegacy={getUserSubscriptionPlanEvenIfLegacy()}
             onClose={closeSubscriptionDialog}
-            filter={filter}
-            onOpenPendingDialog={(open: boolean) =>
-              setSubscriptionPendingDialogOpen(open)
-            }
+            recommendedPlanId={recommendedPlanId}
+            onOpenPendingDialog={openSubscriptionPendingDialog}
+            couponCode={couponCode}
           />
         )
       ) : null}
+      {redeemCodeDialogOpen && (
+        <RedeemCodeDialog
+          codeToPrefill={codeToPrefill || undefined}
+          autoSubmit={autoSubmit}
+          onClose={closeRedeemCodeDialog}
+        />
+      )}
     </SubscriptionContext.Provider>
   );
 };

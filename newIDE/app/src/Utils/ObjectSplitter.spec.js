@@ -291,12 +291,6 @@ describe('unsplit', () => {
   });
 
   it('can unsplit with a maximum depth', () => {
-    const originalObject = {
-      myArray: [
-        { name: 'A', aa: '1', ab: '2', innerObject: { hello: 'world' } },
-        { name: 'B', ba: '3', bb: '4', innerObject: { hello: 'world2' } },
-      ],
-    };
     const splitObject = {
       myArray: [
         { __REFERENCE_TO_SPLIT_OBJECT: true, referenceTo: '/myArray/A' },
@@ -414,7 +408,9 @@ describe('unsplit', () => {
   });
 
   // Helper that "load" references from a list of partial objects returned by split.
+  // $FlowFixMe[missing-local-annot]
   const getReferencePartialObjectInArray = partialObjects => {
+    // $FlowFixMe[missing-local-annot]
     return referencePath => {
       const partialObject = partialObjects.find(
         partialObject => partialObject.reference === referencePath
@@ -428,6 +424,7 @@ describe('unsplit', () => {
   };
 
   // Helper to create an "integration" test, testing both splitting and unsplitting.
+  // $FlowFixMe[missing-local-annot]
   const testSplitThenUnsplit = (object, shouldSplit) => {
     const originalObjectJSON = JSON.stringify(object);
     const partialObjects = split(object, {

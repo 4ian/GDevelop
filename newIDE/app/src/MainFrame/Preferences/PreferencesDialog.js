@@ -73,6 +73,7 @@ const PreferencesDialog = ({
     setShowExperimentalExtensions,
     setShowInAppTutorialDeveloperMode,
     setOpenDiagnosticReportAutomatically,
+    setBlockPreviewAndExportOnDiagnosticErrors,
     setShowDeprecatedInstructionWarning,
     setUse3DEditor,
     setShowBasicProfilingCounters,
@@ -86,7 +87,7 @@ const PreferencesDialog = ({
     setShowAiAskButtonInTitleBar,
     setAutomaticallyUseCreditsForAiRequests,
     setShowCreateSectionByDefault,
-    setHasSeenInGameEditorWarning,
+    setDisableNpmScriptConfirmation,
     setUseBackgroundSerializerForSaving,
   } = React.useContext(PreferencesContext);
 
@@ -421,199 +422,223 @@ const PreferencesDialog = ({
               <Text size="sub-title">
                 <Trans>Previews</Trans>
               </Text>
-              <ColumnStackLayout>
-                <CompactToggleField
-                  labelColor="primary"
-                  hideTooltip
-                  onCheck={setAutosaveOnPreview}
-                  checked={values.autosaveOnPreview}
-                  label={i18n._(t`Auto-save project on preview`)}
-                />
-                <CompactToggleField
-                  labelColor="primary"
-                  hideTooltip
-                  onCheck={setFetchPlayerTokenForPreviewAutomatically}
-                  checked={values.fetchPlayerTokenForPreviewAutomatically}
-                  label={i18n._(t`Automatically log in as a player in preview`)}
-                />
-                <CompactToggleField
-                  labelColor="primary"
-                  hideTooltip
-                  onCheck={setOpenDiagnosticReportAutomatically}
-                  checked={values.openDiagnosticReportAutomatically}
-                  label={i18n._(
-                    t`Automatically open the diagnostic report at preview`
-                  )}
-                />
-                <CompactToggleField
-                  labelColor="primary"
-                  hideTooltip
-                  onCheck={check =>
-                    setPreviewCrashReportUploadLevel(
-                      check ? 'exclude-javascript-code-events' : 'none'
-                    )
-                  }
-                  checked={values.previewCrashReportUploadLevel !== 'none'}
-                  label={i18n._(
-                    t`Send crash reports during previews to GDevelop`
-                  )}
-                />
-                <CompactToggleField
-                  labelColor="primary"
-                  hideTooltip
-                  onCheck={setTakeScreenshotOnPreview}
-                  checked={values.takeScreenshotOnPreview}
-                  label={i18n._(
-                    t`Automatically take a screenshot in game previews`
-                  )}
-                />
-                {electron && (
-                  <>
-                    <ColumnStackLayout expand noMargin>
-                      <CompactToggleField
-                        labelColor="primary"
-                        hideTooltip
-                        onCheck={setIsMenuBarHiddenInPreview}
-                        checked={values.isMenuBarHiddenInPreview}
-                        label={i18n._(
-                          t`Hide the menu bar in the preview window`
-                        )}
-                      />
-                      <CompactToggleField
-                        labelColor="primary"
-                        hideTooltip
-                        onCheck={setIsAlwaysOnTopInPreview}
-                        checked={values.isAlwaysOnTopInPreview}
-                        label={i18n._(
-                          t`Always display the preview window on top of the editor`
-                        )}
-                      />
-                      <CompactToggleField
-                        labelColor="primary"
-                        hideTooltip
-                        onCheck={setUseShortcutToClosePreviewWindow}
-                        checked={values.useShortcutToClosePreviewWindow}
-                        label={i18n._(
-                          t`Enable "Close project" shortcut (${adaptAcceleratorString(
-                            getElectronAccelerator(
-                              values.userShortcutMap['CLOSE_PROJECT'] ||
-                                defaultShortcuts['CLOSE_PROJECT']
-                            )
-                          )}) to close preview window`
-                        )}
-                      />
-                    </ColumnStackLayout>
-                  </>
+              <CompactToggleField
+                labelColor="primary"
+                hideTooltip
+                onCheck={setAutosaveOnPreview}
+                checked={values.autosaveOnPreview}
+                label={i18n._(t`Auto-save project on preview`)}
+              />
+              <CompactToggleField
+                labelColor="primary"
+                hideTooltip
+                onCheck={setFetchPlayerTokenForPreviewAutomatically}
+                checked={values.fetchPlayerTokenForPreviewAutomatically}
+                label={i18n._(t`Automatically log in as a player in preview`)}
+              />
+              <CompactToggleField
+                labelColor="primary"
+                hideTooltip
+                onCheck={setOpenDiagnosticReportAutomatically}
+                checked={values.openDiagnosticReportAutomatically}
+                label={i18n._(
+                  t`Automatically open the diagnostic report at preview`
                 )}
-              </ColumnStackLayout>
+              />
+              <CompactToggleField
+                labelColor="primary"
+                hideTooltip
+                onCheck={setBlockPreviewAndExportOnDiagnosticErrors}
+                checked={values.blockPreviewAndExportOnDiagnosticErrors}
+                label={i18n._(
+                  t`Block preview and export when diagnostic errors are found`
+                )}
+              />
+              <CompactToggleField
+                labelColor="primary"
+                hideTooltip
+                onCheck={check =>
+                  setPreviewCrashReportUploadLevel(
+                    check ? 'exclude-javascript-code-events' : 'none'
+                  )
+                }
+                checked={values.previewCrashReportUploadLevel !== 'none'}
+                label={i18n._(
+                  t`Send crash reports during previews to GDevelop`
+                )}
+              />
+              <CompactToggleField
+                labelColor="primary"
+                hideTooltip
+                onCheck={setTakeScreenshotOnPreview}
+                checked={values.takeScreenshotOnPreview}
+                label={i18n._(
+                  t`Automatically take a screenshot in game previews`
+                )}
+              />
+              {electron && (
+                <>
+                  <ColumnStackLayout expand noMargin>
+                    <CompactToggleField
+                      labelColor="primary"
+                      hideTooltip
+                      onCheck={setIsMenuBarHiddenInPreview}
+                      checked={values.isMenuBarHiddenInPreview}
+                      label={i18n._(t`Hide the menu bar in the preview window`)}
+                    />
+                    <CompactToggleField
+                      labelColor="primary"
+                      hideTooltip
+                      onCheck={setIsAlwaysOnTopInPreview}
+                      checked={values.isAlwaysOnTopInPreview}
+                      label={i18n._(
+                        t`Always display the preview window on top of the editor`
+                      )}
+                    />
+                    <CompactToggleField
+                      labelColor="primary"
+                      hideTooltip
+                      onCheck={setUseShortcutToClosePreviewWindow}
+                      checked={values.useShortcutToClosePreviewWindow}
+                      label={i18n._(
+                        t`Enable "Close project" shortcut (${adaptAcceleratorString(
+                          getElectronAccelerator(
+                            values.userShortcutMap['CLOSE_PROJECT'] ||
+                              defaultShortcuts['CLOSE_PROJECT']
+                          )
+                        )}) to close preview window`
+                      )}
+                    />
+                  </ColumnStackLayout>
+                </>
+              )}
               <Text size="sub-title">
                 <Trans>Scene editor</Trans>
               </Text>
-              <ColumnStackLayout>
-                <CompactToggleField
-                  labelColor="primary"
-                  hideTooltip
-                  onCheck={setShowBasicProfilingCounters}
-                  checked={values.showBasicProfilingCounters}
-                  label={i18n._(
-                    t`Display profiling information in scene editor`
-                  )}
-                />
-                <CompactToggleField
-                  labelColor="primary"
-                  hideTooltip
-                  onCheck={setUse3DEditor}
-                  checked={values.use3DEditor}
-                  label={i18n._(t`Show objects in 3D in the scene editor`)}
-                />
-                {initialUse3DEditor.current !== values.use3DEditor && (
-                  <AlertMessage kind="info">
-                    <Trans>
-                      For the 3D change to take effect, close and reopen all
-                      currently opened scenes.
-                    </Trans>
-                  </AlertMessage>
-                )}
-              </ColumnStackLayout>
+              <CompactToggleField
+                labelColor="primary"
+                hideTooltip
+                onCheck={setShowBasicProfilingCounters}
+                checked={values.showBasicProfilingCounters}
+                label={i18n._(t`Display profiling information in scene editor`)}
+              />
+              <CompactToggleField
+                labelColor="primary"
+                hideTooltip
+                onCheck={setUse3DEditor}
+                checked={values.use3DEditor}
+                label={i18n._(t`Show objects in 3D in the scene editor`)}
+              />
+              {initialUse3DEditor.current !== values.use3DEditor && (
+                <AlertMessage kind="info">
+                  <Trans>
+                    For the 3D change to take effect, close and reopen all
+                    currently opened scenes.
+                  </Trans>
+                </AlertMessage>
+              )}
               <Text size="sub-title">
                 <Trans>Other</Trans>
               </Text>
-              <ColumnStackLayout>
-                <FlatButton
-                  label={<Trans>Reset hidden Ask AI text inputs</Trans>}
-                  onClick={() => showAllAskAiStandAloneForms()}
-                  disabled={
-                    !Object.keys(values.hiddenAskAiStandAloneForms).length
-                  }
-                />
-                <CompactToggleField
-                  labelColor="primary"
-                  hideTooltip
-                  onCheck={setShowAiAskButtonInTitleBar}
-                  checked={values.showAiAskButtonInTitleBar}
-                  label={i18n._(t`Show "Ask AI" button in the title bar`)}
-                />
-                <CompactToggleField
-                  labelColor="primary"
-                  hideTooltip
-                  onCheck={setAutomaticallyUseCreditsForAiRequests}
-                  checked={values.automaticallyUseCreditsForAiRequests}
-                  label={i18n._(
-                    t`Automatically use GDevelop credits for AI requests when run out of AI credits`
-                  )}
-                />
+              <FlatButton
+                label={<Trans>Reset hidden Ask AI text inputs</Trans>}
+                onClick={() => showAllAskAiStandAloneForms()}
+                disabled={
+                  !Object.keys(values.hiddenAskAiStandAloneForms).length
+                }
+              />
+              <CompactToggleField
+                labelColor="primary"
+                hideTooltip
+                onCheck={setShowAiAskButtonInTitleBar}
+                checked={values.showAiAskButtonInTitleBar}
+                label={i18n._(t`Show "Ask AI" button in the title bar`)}
+              />
+              <CompactToggleField
+                labelColor="primary"
+                hideTooltip
+                onCheck={setAutomaticallyUseCreditsForAiRequests}
+                checked={values.automaticallyUseCreditsForAiRequests}
+                label={i18n._(
+                  t`Automatically use GDevelop credits for AI requests when run out of AI credits`
+                )}
+              />
+              <CompactToggleField
+                labelColor="primary"
+                hideTooltip
+                onCheck={check => setDisplaySaveReminder({ activated: check })}
+                checked={values.displaySaveReminder.activated}
+                label={i18n._(
+                  t`Display save reminder after significant changes in project`
+                )}
+              />
+              <CompactToggleField
+                labelColor="primary"
+                hideTooltip
+                onCheck={setShowExperimentalExtensions}
+                checked={values.showExperimentalExtensions}
+                label={i18n._(
+                  t`Show experimental extensions in the list of extensions`
+                )}
+              />
+              <LineStackLayout noMargin alignItems="center">
+                <Column noMargin expand>
+                  <Text noMargin>
+                    <Trans>Deprecated actions and conditions warning</Trans>
+                  </Text>
+                </Column>
+                <Column noMargin expand>
+                  <CompactSelectField
+                    value={values.showDeprecatedInstructionWarning}
+                    onChange={(value: string) => {
+                      if (
+                        value === 'no' ||
+                        value === 'icon' ||
+                        value === 'icon-and-deprecated-warning-text'
+                      ) {
+                        setShowDeprecatedInstructionWarning(value);
+                      }
+                    }}
+                  >
+                    <SelectOption value="no" label={t`No warning`} />
+                    <SelectOption value="icon" label={t`Icon only`} />
+                    <SelectOption
+                      value="icon-and-deprecated-warning-text"
+                      label={t`Icon and [DEPRECATED] text`}
+                    />
+                  </CompactSelectField>
+                </Column>
+              </LineStackLayout>
+              <CompactToggleField
+                labelColor="primary"
+                hideTooltip
+                onCheck={setUseBackgroundSerializerForSaving}
+                checked={values.useBackgroundSerializerForSaving}
+                label={i18n._(
+                  t`Use experimental background serializer for saving projects`
+                )}
+              />
+              {!!electron && (
                 <CompactToggleField
                   labelColor="primary"
                   hideTooltip
                   onCheck={check =>
-                    setDisplaySaveReminder({ activated: check })
+                    setWatchProjectFolderFilesForLocalProjects(check)
                   }
-                  checked={values.displaySaveReminder.activated}
+                  checked={values.watchProjectFolderFilesForLocalProjects}
                   label={i18n._(
-                    t`Display save reminder after significant changes in project`
+                    t`Watch the project folder for file changes in order to refresh the resources used in the editor (images, 3D models, fonts, etc.)`
                   )}
                 />
-                <CompactToggleField
-                  labelColor="primary"
-                  hideTooltip
-                  onCheck={setShowExperimentalExtensions}
-                  checked={values.showExperimentalExtensions}
-                  label={i18n._(
-                    t`Show experimental extensions in the list of extensions`
-                  )}
-                />
-                <CompactToggleField
-                  labelColor="primary"
-                  hideTooltip
-                  onCheck={setShowDeprecatedInstructionWarning}
-                  checked={values.showDeprecatedInstructionWarning}
-                  label={i18n._(
-                    t`Show a warning on deprecated actions and conditions`
-                  )}
-                />
-                <CompactToggleField
-                  labelColor="primary"
-                  hideTooltip
-                  onCheck={setUseBackgroundSerializerForSaving}
-                  checked={values.useBackgroundSerializerForSaving}
-                  label={i18n._(
-                    t`Use experimental background serializer for saving projects`
-                  )}
-                />
-                {!!electron && (
-                  <CompactToggleField
-                    labelColor="primary"
-                    hideTooltip
-                    onCheck={check =>
-                      setWatchProjectFolderFilesForLocalProjects(check)
-                    }
-                    checked={values.watchProjectFolderFilesForLocalProjects}
-                    label={i18n._(
-                      t`Watch the project folder for file changes in order to refresh the resources used in the editor (images, 3D models, fonts, etc.)`
-                    )}
+              )}
+              {!!electron && values.disableNpmScriptConfirmation && (
+                <Line noMargin>
+                  <FlatButton
+                    label={<Trans>Re-enable npm script security warning</Trans>}
+                    onClick={() => setDisableNpmScriptConfirmation(false)}
                   />
-                )}
-              </ColumnStackLayout>
+                </Line>
+              )}
             </ColumnStackLayout>
           </Column>
 
@@ -653,12 +678,6 @@ const PreferencesDialog = ({
                     onClick={onOpenQuickCustomizationDialog}
                     label={<Trans>Open quick customization</Trans>}
                   />
-                  <FlatButton
-                    fullWidth
-                    label={<Trans>Show again in-game editor warning</Trans>}
-                    onClick={() => setHasSeenInGameEditorWarning(false)}
-                    disabled={!values.hasSeenInGameEditorWarning}
-                  />
                 </ColumnStackLayout>
               </ColumnStackLayout>
             </>
@@ -691,7 +710,7 @@ const PreferencesDialog = ({
   );
 };
 
-const PreferencesDialogWithErrorBoundary = (props: Props) => (
+const PreferencesDialogWithErrorBoundary = (props: Props): React.Node => (
   <ErrorBoundary
     componentTitle={<Trans>Preferences</Trans>}
     scope="preferences"

@@ -312,7 +312,6 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
                       runtimeGameOptions, options.isInGameEdition,
                       inGameEditorResources);
-    includesFiles.push_back(codeOutputDir + "/data.js");
 
     previousTime = LogTimeSpent("Project data export", previousTime);
   }
@@ -321,6 +320,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   }
 
   if (options.shouldReloadLibraries || options.shouldClearExportFolder) {
+    includesFiles.push_back(codeOutputDir + "/data.js");
     // Copy all the dependencies and their source maps
     ExportIncludesAndLibs(includesFiles, options.exportPath, true);
     ExportIncludesAndLibs(resourcesFiles, options.exportPath, true);
@@ -1036,7 +1036,7 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
             .FindAndReplace(
                 "600 /*GDJS_WINDOW_HEIGHT*/",
                 gd::String::From<int>(project.GetGameResolutionHeight()))
-            .FindAndReplace("\"GDJS_GAME_NAME\"", jsonName);
+            .FindAndReplace("'GDJS_GAME_NAME'", jsonName);
 
     if (!fs.WriteToFile(exportDir + "/main.js", str)) {
       lastError = "Unable to write Electron main.js file.";

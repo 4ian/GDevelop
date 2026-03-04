@@ -75,6 +75,31 @@ type Props = {|
 /**
  * Helper for Mainframe to create a new project.
  */
+type _UseCreateProjectReturnType = {
+  createEmptyProject: (
+    newProjectSetup: NewProjectSetup
+  ) => Promise<CreateProjectResult>,
+  createProjectFromCourseChapter: ({
+    courseChapter: CourseChapter,
+    newProjectSetup: NewProjectSetup,
+    templateId?: string,
+  }) => Promise<CreateProjectResult>,
+  createProjectFromExample: (
+    exampleProjectSetup: ExampleProjectSetup
+  ) => Promise<CreateProjectResult>,
+  createProjectFromInAppTutorial: (
+    tutorialId: string,
+    newProjectSetup: NewProjectSetup
+  ) => Promise<CreateProjectResult>,
+  createProjectFromPrivateGameTemplate: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData,
+    newProjectSetup: NewProjectSetup
+  ) => Promise<CreateProjectResult>,
+  createProjectFromTutorial: (
+    tutorialId: string,
+    newProjectSetup: NewProjectSetup
+  ) => Promise<CreateProjectResult>,
+};
 const useCreateProject = ({
   beforeCreatingProject,
   afterCreatingProject,
@@ -87,7 +112,7 @@ const useCreateProject = ({
   onProjectSaved,
   ensureResourcesAreMoved,
   onGameRegistered,
-}: Props) => {
+}: Props): _UseCreateProjectReturnType => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const profile = authenticatedUser.profile;
   const unsavedChanges = React.useContext(UnsavedChangesContext);
@@ -174,6 +199,7 @@ const useCreateProject = ({
             await registerGame(
               authenticatedUser.getAuthorizationHeader,
               authenticatedUser.profile.id,
+              // $FlowFixMe[incompatible-type]
               getDefaultRegisterGameProperties({
                 projectId: currentProject.getProjectUuid(),
                 projectName: currentProject.getName(),

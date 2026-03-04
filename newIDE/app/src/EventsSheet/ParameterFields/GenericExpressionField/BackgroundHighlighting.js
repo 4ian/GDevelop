@@ -4,7 +4,7 @@ import * as React from 'react';
 export type Highlight = {|
   begin: number,
   end: number,
-  type?: 'error',
+  type?: 'error' | 'deprecated',
   message: string,
 |};
 
@@ -22,13 +22,23 @@ const defaultStyle = {
   color: 'transparent',
 };
 
-const highlightedText = {
+const highlightedErrorText = {
   backgroundColor: 'rgba(244, 67, 54, 0.15)',
   borderSizing: 'border-box',
   borderBottom: '3px solid rgba(244, 67, 54, 0.7)',
 };
 
-const BackgroundHighlighting = ({ value, style, highlights }: Props) => {
+const highlightedDeprecatedText = {
+  backgroundColor: 'rgba(255, 152, 0, 0.15)',
+  borderSizing: 'border-box',
+  borderBottom: '3px solid rgba(255, 152, 0, 0.7)',
+};
+
+const BackgroundHighlighting = ({
+  value,
+  style,
+  highlights,
+}: Props): React.MixedElement => {
   const sortedHighlights = highlights
     .slice()
     .sort((highlight1, highlight2) => highlight1.begin - highlight2.begin);
@@ -47,8 +57,12 @@ const BackgroundHighlighting = ({ value, style, highlights }: Props) => {
     }
 
     if (lastPos < highlight.end) {
+      const highlightStyle =
+        highlight.type === 'deprecated'
+          ? highlightedDeprecatedText
+          : highlightedErrorText;
       elements.push(
-        <span key={`highlightedText-${i}`} style={highlightedText}>
+        <span key={`highlightedText-${i}`} style={highlightStyle}>
           {value.substring(startPos, highlight.end)}
         </span>
       );

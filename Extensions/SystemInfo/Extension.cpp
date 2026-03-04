@@ -17,6 +17,7 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
             "or if the game runs as a preview."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("Check touchscreen, mobile device, preview mode, native mobile app, web environment.")
       .SetCategory("Advanced");
   extension.AddInstructionOrExpressionGroupMetadata(_("System information"))
       .SetIcon("CppPlatform/Extensions/systeminfoicon.png");

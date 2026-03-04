@@ -104,3 +104,17 @@ bool CustomConfigurationHelper::UpdateProperty(
 
   return true;
 }
+
+bool CustomConfigurationHelper::RenameProperty(
+    const gd::PropertiesContainer &properties,
+    gd::SerializerElement &configurationContent, const gd::String &oldName,
+    const gd::String &newName) {
+  if (!configurationContent.HasChild(oldName)) {
+    return false;
+  }
+  auto &oldElement = configurationContent.GetChild(oldName);
+  auto &newElement = configurationContent.AddChild(newName);
+  newElement = oldElement;
+  configurationContent.RemoveChild(oldName);
+  return true;
+}

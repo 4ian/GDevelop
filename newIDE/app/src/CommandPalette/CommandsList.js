@@ -10,6 +10,7 @@ export type CommandName =
   | 'LAUNCH_NETWORK_PREVIEW'
   | 'HOT_RELOAD_PREVIEW'
   | 'LAUNCH_PREVIEW_WITH_DIAGNOSTIC_REPORT'
+  | 'OPEN_DIAGNOSTIC_REPORT'
   | 'OPEN_HOME_PAGE'
   | 'CREATE_NEW_PROJECT'
   | 'OPEN_PROJECT'
@@ -68,11 +69,11 @@ export type CommandName =
   | 'OPEN_PROFILE';
 
 export const commandAreas = {
-  GENERAL: t`General`,
-  IDE: t`IDE`,
-  PROJECT: t`Project`,
-  SCENE: t`Scene`,
-  EVENTS: t`Events`,
+  GENERAL: (t`General`: any),
+  IDE: (t`IDE`: any),
+  PROJECT: (t`Project`: any),
+  SCENE: (t`Scene`: any),
+  EVENTS: (t`Events`: any),
 };
 
 type CommandArea = $Keys<typeof commandAreas>;
@@ -117,6 +118,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   LAUNCH_PREVIEW_WITH_DIAGNOSTIC_REPORT: {
     area: 'PROJECT',
     displayText: t`Launch preview with diagnostic report`,
+  },
+  OPEN_DIAGNOSTIC_REPORT: {
+    area: 'PROJECT',
+    displayText: t`Show diagnostic report`,
   },
   OPEN_HOME_PAGE: { area: 'IDE', displayText: t`Show Home` },
   CREATE_NEW_PROJECT: {

@@ -93,7 +93,8 @@ export type SigningCredential =
   | AppleCertificateSigningCredential
   | AppleAuthKeySigningCredential;
 
-export const client = axios.create({
+// $FlowFixMe[cannot-resolve-name]
+export const client: Axios = axios.create({
   baseURL: GDevelopBuildApi.baseUrl,
 });
 
@@ -101,7 +102,7 @@ export const filterAppleCertificateSigningCredentials = (
   signingCredentials: Array<SigningCredential> | null
 ): Array<AppleCertificateSigningCredential> | null => {
   return signingCredentials
-    ? // $FlowFixMe - we're sure this should refine the type.
+    ? // $FlowFixMe[incompatible-type] - we're sure this should refine the type.
       signingCredentials.filter(
         signingCredential => signingCredential.type === 'apple-certificate'
       )
@@ -112,7 +113,7 @@ export const filterAppleAuthKeySigningCredentials = (
   signingCredentials: Array<SigningCredential> | null
 ): Array<AppleAuthKeySigningCredential> | null => {
   return signingCredentials
-    ? // $FlowFixMe - we're sure this should refine the type.
+    ? // $FlowFixMe[incompatible-type] - we're sure this should refine the type.
       signingCredentials.filter(
         signingCredential => signingCredential.type === 'apple-auth-key'
       )

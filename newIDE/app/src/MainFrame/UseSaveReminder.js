@@ -8,11 +8,14 @@ import InfoBar from '../UI/Messages/InfoBar';
 import type { UnsavedChanges } from './UnsavedChangesContext';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import { useInterval } from '../Utils/UseInterval';
+import { type FileMetadata } from '../ProjectsStorage';
 
 export type UnsavedChangesAmount = 'none' | 'small' | 'significant' | 'risky';
 
 type Props = {|
-  onSave: () => Promise<void>,
+  onSave: (options?: {|
+    skipNewVersionWarning: boolean,
+  |}) => Promise<?FileMetadata>,
   project: ?gdProject,
   isInQuickCustomization: boolean,
 |};
@@ -54,7 +57,7 @@ const useSaveReminder = ({
   onSave,
   project,
   isInQuickCustomization,
-}: Props) => {
+}: Props): (() => React.MixedElement) => {
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext

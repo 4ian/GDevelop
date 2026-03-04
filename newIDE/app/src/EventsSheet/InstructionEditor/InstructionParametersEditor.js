@@ -10,6 +10,11 @@ import { mapFor } from '../../Utils/MapFor';
 import EmptyMessage from '../../UI/EmptyMessage';
 import ParameterRenderingService from '../ParameterRenderingService';
 import HelpButton from '../../UI/HelpButton';
+import HelpIcon from '../../UI/HelpIcon';
+import {
+  isRelativePathToDocumentationRoot,
+  isDocumentationAbsoluteUrl,
+} from '../../Utils/HelpLink';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
@@ -28,6 +33,7 @@ import ScrollView from '../../UI/ScrollView';
 import { getInstructionTutorialIds } from '../../Utils/GDevelopServices/Tutorial';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import FlatButton from '../../UI/FlatButton';
 import {
   type ParameterFieldInterface,
@@ -111,10 +117,10 @@ const isParameterVisible = (
   return true;
 };
 
-const InstructionParametersEditor = React.forwardRef<
-  Props,
-  InstructionParametersEditorInterface
->(
+const InstructionParametersEditor: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<InstructionParametersEditorInterface>,
+}> = React.forwardRef<Props, InstructionParametersEditorInterface>(
   (
     {
       instruction,
@@ -139,6 +145,9 @@ const InstructionParametersEditor = React.forwardRef<
     const {
       palette: { type: paletteType },
     } = React.useContext(GDevelopThemeContext);
+    const preferences = React.useContext(PreferencesContext);
+    const showDeprecatedInstructionWarning =
+      preferences.values.showDeprecatedInstructionWarning;
 
     const forceUpdate = useForceUpdate();
 
@@ -293,8 +302,8 @@ const InstructionParametersEditor = React.forwardRef<
       <I18n>
         {({ i18n }) => (
           <ScrollView autoHideScrollbar id={id}>
-            <Column expand>
-              <Line alignItems="flex-start">
+            <ColumnStackLayout expand>
+              <Line alignItems="flex-start" noMargin>
                 <img
                   src={iconFilename}
                   alt=""
@@ -306,11 +315,32 @@ const InstructionParametersEditor = React.forwardRef<
                   }}
                 />
                 <Column expand>
-                  <Text style={styles.description}>
-                    {instructionMetadata.getDescription()}
-                  </Text>
+                  <Line noMargin alignItems="flex-start">
+                    {/* $FlowFixMe[incompatible-type] */}
+                    <Text style={styles.description} noMargin>
+                      {instructionMetadata.getDescription()}
+                    </Text>
+                    {helpPage && isDocumentationAbsoluteUrl(helpPage) && (
+                      <HelpIcon size="small" helpPagePath={helpPage} />
+                    )}
+                  </Line>
                 </Column>
               </Line>
+              {showDeprecatedInstructionWarning !== 'no' &&
+                instructionMetadata.isHidden() && (
+                  <Line>
+                    <AlertMessage kind="warning">
+                      {instructionMetadata.getDeprecationMessage() ? (
+                        <>
+                          <Trans>Deprecated:</Trans>{' '}
+                          {instructionMetadata.getDeprecationMessage()}
+                        </>
+                      ) : (
+                        <Trans>Deprecated</Trans>
+                      )}
+                    </AlertMessage>
+                  </Line>
+                )}
               {instructionExtraInformation && (
                 <Line>
                   {instructionExtraInformation.identifier === undefined ? (
@@ -420,6 +450,7 @@ const InstructionParametersEditor = React.forwardRef<
                     label={<Trans>Invert condition</Trans>}
                     labelPosition="right"
                     toggled={instruction.isInverted()}
+                    // $FlowFixMe[incompatible-type]
                     style={styles.invertToggle}
                     onToggle={(e, enabled) => {
                       instruction.setInverted(enabled);
@@ -437,6 +468,7 @@ const InstructionParametersEditor = React.forwardRef<
                     }
                     labelPosition="right"
                     toggled={instruction.isAwaited()}
+                    // $FlowFixMe[incompatible-type]
                     style={styles.invertToggle}
                     onToggle={(e, enabled) => {
                       instruction.setAwaited(enabled);
@@ -464,20 +496,22 @@ const InstructionParametersEditor = React.forwardRef<
                 )}
               </div>
               <Line>
-                {!noHelpButton && helpPage && (
-                  <HelpButton
-                    helpPagePath={instructionMetadata.getHelpPath()}
-                    label={
-                      isCondition ? (
-                        <Trans>Help for this condition</Trans>
-                      ) : (
-                        <Trans>Help for this action</Trans>
-                      )
-                    }
-                  />
-                )}
+                {!noHelpButton &&
+                  helpPage &&
+                  isRelativePathToDocumentationRoot(helpPage) && (
+                    <HelpButton
+                      helpPagePath={helpPage}
+                      label={
+                        isCondition ? (
+                          <Trans>Help for this condition</Trans>
+                        ) : (
+                          <Trans>Help for this action</Trans>
+                        )
+                      }
+                    />
+                  )}
               </Line>
-            </Column>
+            </ColumnStackLayout>
           </ScrollView>
         )}
       </I18n>

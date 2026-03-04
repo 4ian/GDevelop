@@ -31,7 +31,7 @@ const OpenFromStorageProviderDialog = ({
   onClose,
   storageProviders,
   onChooseProvider,
-}: Props) => {
+}: Props): React.Node => {
   const isCloudStorageProviderEnabled = storageProviders.some(
     provider => provider.internalName === 'Cloud'
   );

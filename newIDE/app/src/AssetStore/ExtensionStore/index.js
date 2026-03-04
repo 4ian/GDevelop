@@ -37,18 +37,16 @@ export const ExtensionStore = ({
   project,
   onInstall,
   showOnlyWithBehaviors,
-}: Props) => {
+}: Props): React.Node => {
   const preferences = React.useContext(PreferencesContext);
   const [
     selectedExtensionShortHeader,
     setSelectedExtensionShortHeader,
   ] = React.useState<?ExtensionShortHeader>(null);
   const {
-    filters,
     searchResults,
     error,
     fetchExtensionsAndFilters,
-    filtersState,
     searchText,
     setSearchText,
     allCategories,
@@ -70,15 +68,6 @@ export const ExtensionStore = ({
           extensionShortHeader.eventsBasedBehaviorsCount > 0
       )
     : null;
-
-  const tagsHandler = React.useMemo(
-    () => ({
-      add: filtersState.addFilter,
-      remove: filtersState.removeFilter,
-      chosenTags: filtersState.chosenFilters,
-    }),
-    [filtersState]
-  );
 
   const getExtensionsMatches = (
     extensionShortHeader: ExtensionShortHeader
@@ -120,8 +109,6 @@ export const ExtensionStore = ({
                 value={searchText}
                 onChange={setSearchText}
                 onRequestSearch={() => {}}
-                tagsHandler={tagsHandler}
-                tags={filters && filters.allTags}
                 placeholder={t`Search extensions`}
                 autoFocus="desktop"
               />
@@ -148,6 +135,7 @@ export const ExtensionStore = ({
             filteredSearchResults.map(({ item }) => item)
           }
           getSearchItemUniqueId={getExtensionName}
+          // $FlowFixMe[missing-local-annot]
           renderSearchItem={(extensionShortHeader, onHeightComputed) => (
             <ExtensionListItem
               id={`extension-list-item-${extensionShortHeader.name}`}

@@ -27,7 +27,7 @@ const CreditsStatusBanner = ({
   displayPurchaseAction,
   actionButtonLabel,
   onActionButtonClick,
-}: Props) => {
+}: Props): null | React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { limits, onRefreshLimits } = React.useContext(
     AuthenticatedUserContext

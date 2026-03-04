@@ -15,16 +15,16 @@ const styles = {
     textOverflow: 'ellipsis',
     lineHeight: '17px',
     maxHeight: 34, // 2 * lineHeight to limit to 2 lines.
-    opacity: 0.7,
   },
 };
 type Props = {|
   label: string,
   markdownDescription?: ?string,
   field: React.Node,
+  labelColor?: 'primary' | 'secondary',
 |};
 
-const CompactPropertiesEditorRowField = (props: Props) => {
+const CompactPropertiesEditorRowField = (props: Props): React.Node => {
   const title = !props.markdownDescription
     ? props.label
     : [
@@ -52,7 +52,12 @@ const CompactPropertiesEditorRowField = (props: Props) => {
             },
           }}
         >
-          <Text noMargin style={styles.label}>
+          <Text
+            noMargin
+            // $FlowFixMe[incompatible-type]
+            style={styles.label}
+            color={props.labelColor === 'primary' ? 'primary' : 'secondary'}
+          >
             {props.label}
           </Text>
         </Tooltip>

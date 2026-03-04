@@ -2034,6 +2034,15 @@ namespace gdjs {
     };
 
     /**
+     * Action to close the lobbies window.
+     */
+    export const closeLobbiesWindow = function (
+      runtimeScene: gdjs.RuntimeScene
+    ) {
+      removeLobbiesContainer(runtimeScene);
+    };
+
+    /**
      * Remove the container displaying the lobbies window and the callback.
      */
     export const removeLobbiesContainer = function (

@@ -19,12 +19,13 @@ import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext'
 import CircularProgress from '../../../UI/CircularProgress';
 import RouterContext from '../../../MainFrame/RouterContext';
 import ShareOnlineGameDialog from './ShareOnlineGameDialog';
+import { type FileMetadata } from '../../../ProjectsStorage';
 
 type OnlineGameLinkProps = {|
   build: ?Build,
   game: ?Game,
   project: gdProject,
-  onSaveProject: () => Promise<void>,
+  onSaveProject: () => Promise<?FileMetadata>,
   isSavingProject: boolean,
   errored: boolean,
   exportStep: BuildStep,
@@ -48,7 +49,7 @@ const OnlineGameLink = ({
   onGameUpdated,
   automaticallyPublishNewBuild,
   shouldShowShareDialog,
-}: OnlineGameLinkProps) => {
+}: OnlineGameLinkProps): null | React.Node => {
   const [isShareDialogOpen, setIsShareDialogOpen] = React.useState<boolean>(
     false
   );

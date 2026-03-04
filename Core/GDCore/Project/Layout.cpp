@@ -50,9 +50,9 @@ Layout& Layout::operator=(const Layout& other) {
 Layout::~Layout() {};
 
 Layout::Layout()
-    : backgroundColorR(209),
-      backgroundColorG(209),
-      backgroundColorB(209),
+    : backgroundColorR(247),
+      backgroundColorG(249),
+      backgroundColorB(255),
       stopSoundsOnStartup(true),
       resourcesPreloading("inherit"),
       resourcesUnloading("inherit"),
@@ -334,7 +334,7 @@ void Layout::UnserializeFrom(gd::Project& project,
   objectsContainer.AddMissingObjectsInRootFolder();
 
   initialInstances.UnserializeFrom(
-      element.GetChild("instances", 0, "Positions"));
+      project, element.GetChild("instances", 0, "Positions"));
   variables.UnserializeFrom(element.GetChild("variables", 0, "Variables"));
 
   layers.UnserializeLayersFrom(element.GetChild("layers", 0, "Layers"));

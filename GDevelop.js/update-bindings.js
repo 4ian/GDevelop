@@ -64,11 +64,14 @@ function patchGlueCppFile(cb) {
     'BehaviorJsImplementation',
     'ObjectJsImplementation',
     'BehaviorSharedDataJsImplementation',
+    'ReadOnlyArbitraryEventsWorkerWithContextJS',
   ];
   var functionsToErase = [
     'emscripten_bind_ArbitraryResourceWorkerJS_ExposeImage_1',
     'emscripten_bind_ArbitraryResourceWorkerJS_ExposeShader_1',
     'emscripten_bind_ArbitraryResourceWorkerJS_ExposeFile_1',
+    'emscripten_bind_ReadOnlyArbitraryEventsWorkerWithContextJS_DoVisitEvent_1',
+    'emscripten_bind_ReadOnlyArbitraryEventsWorkerWithContextJS_DoVisitInstruction_3',
   ];
   fs.readFile(file, function(err, data) {
     if (err) cb(err);

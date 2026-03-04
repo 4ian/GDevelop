@@ -6,13 +6,14 @@ import { fakeSilverAuthenticatedUser } from '../../../fixtures/GDevelopServicesT
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 import { GDevelopUsageApi } from '../../../Utils/GDevelopServices/ApiConfigs';
+import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 
 export default {
   title: 'Profile/RedeemCodeDialog',
   component: RedeemCodeDialog,
 };
 
-export const WorkingCode = () => {
+export const WorkingCode = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 100 });
   mock
     .onPost(`${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`)
@@ -24,14 +25,13 @@ export const WorkingCode = () => {
     });
 
   return (
-    <RedeemCodeDialog
-      authenticatedUser={fakeSilverAuthenticatedUser}
-      onClose={action('onClose')}
-    />
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <RedeemCodeDialog onClose={action('onClose')} />
+    </AuthenticatedUserContext.Provider>
   );
 };
 
-export const CodeDoesNotExist = () => {
+export const CodeDoesNotExist = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 100 });
   mock
     .onPost(`${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`)
@@ -43,14 +43,13 @@ export const CodeDoesNotExist = () => {
     });
 
   return (
-    <RedeemCodeDialog
-      authenticatedUser={fakeSilverAuthenticatedUser}
-      onClose={action('onClose')}
-    />
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <RedeemCodeDialog onClose={action('onClose')} />
+    </AuthenticatedUserContext.Provider>
   );
 };
 
-export const UnknownError = () => {
+export const UnknownError = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 100 });
   mock
     .onPost(`${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`)
@@ -62,14 +61,13 @@ export const UnknownError = () => {
     });
 
   return (
-    <RedeemCodeDialog
-      authenticatedUser={fakeSilverAuthenticatedUser}
-      onClose={action('onClose')}
-    />
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <RedeemCodeDialog onClose={action('onClose')} />
+    </AuthenticatedUserContext.Provider>
   );
 };
 
-export const CannotBeRedeemedAnymoreError = () => {
+export const CannotBeRedeemedAnymoreError = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 100 });
   mock
     .onPost(`${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`)
@@ -83,14 +81,13 @@ export const CannotBeRedeemedAnymoreError = () => {
     });
 
   return (
-    <RedeemCodeDialog
-      authenticatedUser={fakeSilverAuthenticatedUser}
-      onClose={action('onClose')}
-    />
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <RedeemCodeDialog onClose={action('onClose')} />
+    </AuthenticatedUserContext.Provider>
   );
 };
 
-export const AlreadyRedeemedByUser = () => {
+export const AlreadyRedeemedByUser = (): React.Node => {
   const mock = new MockAdapter(axios, { delayResponse: 100 });
   mock
     .onPost(`${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`)
@@ -104,9 +101,8 @@ export const AlreadyRedeemedByUser = () => {
     });
 
   return (
-    <RedeemCodeDialog
-      authenticatedUser={fakeSilverAuthenticatedUser}
-      onClose={action('onClose')}
-    />
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <RedeemCodeDialog onClose={action('onClose')} />
+    </AuthenticatedUserContext.Provider>
   );
 };

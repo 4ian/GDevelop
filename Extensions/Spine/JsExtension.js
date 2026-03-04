@@ -26,6 +26,10 @@ module.exports = {
         'Vladyslav Pohorielov',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        'Spine skeletal animation object. Play animations, mix, set skins, track events.'
+      )
+      .setDimension('2D')
       .setExtensionHelpPath('/objects/spine')
       .setCategory('Advanced');
 
@@ -54,7 +58,7 @@ module.exports = {
       .addIncludeFile('Extensions/Spine/pixi-spine/pixi-spine.js')
       .addIncludeFile('Extensions/Spine/managers/pixi-spine-atlas-manager.js')
       .addIncludeFile('Extensions/Spine/managers/pixi-spine-manager.js')
-      .setCategoryFullName(_('Advanced'))
+      .setCategory('Advanced')
       .setOpenFullEditorLabel(_('Edit animations'));
 
     object
@@ -106,6 +110,145 @@ module.exports = {
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('getPointAttachmentY');
 
+    object
+      .addExpressionAndCondition(
+        'number',
+        'PointAttachmentScaleXWorld',
+        _('Point attachment scale world X position'),
+        _('world x position of spine point attachment scale'),
+        _(
+          'world x position of spine _PARAM1_ point attachment for _PARAM2_ slot'
+        ),
+        _('Animations and images'),
+        'JsPlatform/Extensions/spine.svg'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .addParameter('string', _('Attachment name'))
+      .addParameter('string', _('Slot name (use "" if names are the same)'))
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('getPointAttachmentScaleXWorld');
+
+    object
+      .addExpressionAndCondition(
+        'number',
+        'PointAttachmentScaleXLocal',
+        _('Point attachment scale local X position'),
+        _('local x position of spine point attachment scale'),
+        _(
+          'local x position of spine _PARAM1_ point attachment for _PARAM2_ slot'
+        ),
+        _('Animations and images'),
+        'JsPlatform/Extensions/spine.svg'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .addParameter('string', _('Attachment name'))
+      .addParameter('string', _('Slot name (use "" if names are the same)'))
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('getPointAttachmentScaleXLocal');
+
+    object
+      .addExpressionAndCondition(
+        'number',
+        'PointAttachmentScaleYWorld',
+        _('Point attachment scale world Y position'),
+        _('world y position of spine point attachment scale'),
+        _(
+          'world y position of spine _PARAM1_ point attachment for _PARAM2_ slot'
+        ),
+        _('Animations and images'),
+        'JsPlatform/Extensions/spine.svg'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .addParameter('string', _('Attachment name'))
+      .addParameter('string', _('Slot name (use "" if names are the same)'))
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('getPointAttachmentScaleYWorld');
+
+    object
+      .addExpressionAndCondition(
+        'number',
+        'PointAttachmentScaleYLocal',
+        _('Point attachment scale local Y position'),
+        _('local y position of spine point attachment scale'),
+        _(
+          'local y position of spine _PARAM1_ point attachment for _PARAM2_ slot'
+        ),
+        _('Animations and images'),
+        'JsPlatform/Extensions/spine.svg'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .addParameter('string', _('Attachment name'))
+      .addParameter('string', _('Slot name (use "" if names are the same)'))
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('getPointAttachmentScaleYLocal');
+
+    object
+      .addExpressionAndCondition(
+        'number',
+        'PointAttachmentRotationWorld',
+        _('Point attachment world rotation'),
+        _('world rotation of spine point attachment'),
+        _(
+          'world rotation of spine _PARAM1_ point attachment for _PARAM2_ slot'
+        ),
+        _('Animations and images'),
+        'JsPlatform/Extensions/spine.svg'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .addParameter('string', _('Attachment name'))
+      .addParameter('string', _('Slot name (use "" if names are the same)'))
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('getPointAttachmentRotationWorld');
+
+    object
+      .addExpressionAndCondition(
+        'number',
+        'PointAttachmentRotationLocal',
+        _('Point attachment local rotation'),
+        _('local rotation of spine point attachment'),
+        _(
+          'local rotation of spine _PARAM1_ point attachment for _PARAM2_ slot'
+        ),
+        _('Animations and images'),
+        'JsPlatform/Extensions/spine.svg'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .addParameter('string', _('Attachment name'))
+      .addParameter('string', _('Slot name (use "" if names are the same)'))
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('getPointAttachmentRotationLocal');
+
+    object
+      .addExpressionAndCondition(
+        'string',
+        'getSkin',
+        _('Get skin name'),
+        _('the skin of the object'),
+        _('the skin'),
+        _('Animations and images'),
+        'JsPlatform/Extensions/spine.svg'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .useStandardParameters(
+        'string',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Skin name'))
+      )
+      .setFunctionName('getSkin');
+
+    object
+      .addAction(
+        'SetSkin',
+        _('Set skin'),
+        _('Set the skin of a Spine object.'),
+        _('Set the skin of _PARAM0_ to _PARAM1_'),
+        _('Animations and images'),
+        'JsPlatform/Extensions/spine.svg',
+        'JsPlatform/Extensions/spine.svg'
+      )
+      .addParameter('object', _('Spine'), 'SpineObject')
+      .addParameter('objectSkinName', _('Skin name'))
+      .setFunctionName('setSkin');
+
     return extension;
   },
 
@@ -146,6 +289,8 @@ module.exports = {
       _animationIndex = -1;
       _spineOriginOffsetX = 0;
       _spineOriginOffsetY = 0;
+      /** @type {string} */
+      _skinName = RenderedSpineInstance.getDefaultSkinName();
 
       constructor(
         project,
@@ -175,6 +320,10 @@ module.exports = {
         this._loadSpine();
       }
 
+      static getDefaultSkinName() {
+        return 'default';
+      }
+
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
         return 'JsPlatform/Extensions/spine.svg';
       }
@@ -189,6 +338,21 @@ module.exports = {
         if (this._spineResourceName !== spineResourceName) {
           this._spineResourceName = spineResourceName;
           this._loadSpine();
+        }
+
+        // Apply skin if it changed.
+        const skinName = object.getSkinName();
+        if (this._skinName !== skinName && this._spine) {
+          this._skinName = skinName;
+          try {
+            this._spine.skeleton.setSkinByName(
+              skinName || RenderedSpineInstance.getDefaultSkinName()
+            );
+            this._spine.skeleton.setSlotsToSetupPose();
+            this._spine.update(0);
+          } catch (skinError) {
+            console.warn('Unable to set skin "' + skinName + '":', skinError);
+          }
         }
 
         this._pixiObject.position.set(
@@ -353,6 +517,21 @@ module.exports = {
 
             try {
               this._spine = new PIXI.Spine(spineDataOrLoadingError.skeleton);
+
+              // Apply the default skin if configured.
+              const skinName = object.getSkinName();
+              if (skinName && this._spine) {
+                try {
+                  this._spine.skeleton.setSkinByName(skinName);
+                  this._spine.skeleton.setSlotsToSetupPose();
+                } catch (skinError) {
+                  console.warn(
+                    'Unable to set skin "' + skinName + '":',
+                    skinError
+                  );
+                }
+              }
+
               this._pixiObject.addChild(this._spine);
               this._placeholder.alpha = 0;
             } catch (error) {

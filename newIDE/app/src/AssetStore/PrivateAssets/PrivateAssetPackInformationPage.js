@@ -179,7 +179,7 @@ const PrivateAssetPackInformationPage = ({
   onGameTemplateOpen,
   onBundleOpen,
   simulateAppStoreProduct,
-}: Props) => {
+}: Props): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const { id, name, sellerId } = privateAssetPackListingData;
   const { privateAssetPackListingDatas } = React.useContext(AssetStoreContext);
@@ -704,7 +704,6 @@ const PrivateAssetPackInformationPage = ({
                                             recommendedPlanId: 'gdevelop_gold',
                                             placementId: 'claim-asset-pack',
                                           },
-                                          filter: 'individual',
                                         })
                                 }
                               />

@@ -23,6 +23,8 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
           "corners as well as the filling.",
           "Victor Levasseur and Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("9-patch/panel sprite: image with stretched/tiled edges and corners for resizable UI elements.")
+      .SetDimension("2D")
       .SetExtensionHelpPath("/objects/panel_sprite");
   extension
       .AddInstructionOrExpressionGroupMetadata(
@@ -38,7 +40,7 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
                 "from "
                 "the full image."),
               "CppPlatform/Extensions/PanelSpriteIcon.png")
-          .SetCategoryFullName(_("General"))
+          .SetCategory("General")
           .AddDefaultBehavior("EffectCapability::EffectBehavior")
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("OpacityCapability::OpacityBehavior");

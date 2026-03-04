@@ -1,7 +1,8 @@
 # Writing extensions for GDevelop 5
 
-GDevelop editor and games engines are designed so that all objects, behaviors, effects, actions, conditions and expressions
-are provided by _extensions_. These extensions are composed of two parts:
+The recommended way to [create extensions](https://wiki.gdevelop.io/gdevelop5/extensions/create/) is from GDevelop itself using the extension editor and JavaScript or events. This documentation is about implementing extensions directly in the codebase. This is usually done because of a limitation of the extension editor, for instance when dedicated editors are needed.
+
+GDevelop editor and games engines are designed so that all objects, behaviors, effects, actions, conditions and expressions are provided by _extensions_. These extensions are composed of two parts:
 
 -   the _declaration_ of the extension, traditionally done in a file called `JsExtension.js`.
 -   the _implementation_ of the extension for the game engine (also called the "Runtime"), written in [TypeScript](https://www.typescriptlang.org/), containing the functions corresponding to the actions/conditions/expressions and the classes used for the objects or behaviors. The implementation is traditionally in files called `extensionnametools.ts`, `objectnameruntimeobject.ts` or `objectnameruntimebehavior.ts`.

@@ -1053,16 +1053,19 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
     // Add a property:
     eventsBasedBehavior.GetPropertyDescriptors()
         .InsertNew("MyProperty", 0)
-        .SetType("Number");
+        .SetType("Number")
+        .SetValue("0");
     // Add a shared property:
     eventsBasedBehavior.GetSharedPropertyDescriptors()
         .InsertNew("MySharedProperty", 0)
-        .SetType("Number");
+        .SetType("Number")
+        .SetValue("0");
     // The same name is used for another shared property to ensure there is no name
     // collision.
     eventsBasedBehavior.GetSharedPropertyDescriptors()
         .InsertNew("MyProperty", 0)
-        .SetType("Number");
+        .SetType("Number")
+        .SetValue("0");
   }
 
   // Add a events based object
@@ -3660,6 +3663,37 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MyRenamedProperty])");
   }
 
+  SECTION("(Events based behavior) property renamed (in objects)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+    REQUIRE(eventsBasedBehavior.GetPropertyDescriptors().Has("MyProperty"));
+    auto &property =
+        eventsBasedBehavior.GetPropertyDescriptors().Get("MyProperty");
+
+    auto &layout = project.GetLayout("Scene");
+    auto &object = layout.GetObjects().GetObject("ObjectWithMyBehavior");
+    auto &behavior = object.GetBehavior("MyBehavior");
+    behavior.UpdateProperty("MyProperty", "123");
+    {
+      auto properties = behavior.GetProperties();
+      REQUIRE(properties.find("MyProperty") != properties.end());
+      REQUIRE(properties.at("MyProperty").GetValue() == "123");
+    }
+
+    gd::WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(
+        project, eventsExtension, eventsBasedBehavior, "MyProperty",
+        "MyRenamedProperty");
+    property.SetName("MyRenamedProperty");
+
+    auto properties = behavior.GetProperties();
+    REQUIRE(properties.find("MyRenamedProperty") != properties.end());
+    REQUIRE(properties.at("MyRenamedProperty").GetValue() == "123");
+  }
+
   SECTION("(Events based behavior) property renamed (in variable setter)") {
     gd::Project project;
     gd::Platform platform;
@@ -3922,6 +3956,37 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyRenamedProperty");
     REQUIRE(instruction2.GetParameter(0).GetPlainString() ==
             "MyExtension::GetVariableAsNumber(MyVariable.MyChild[MyRenamedProperty])");
+  }
+
+  SECTION("(Events based object) property renamed (in objects)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedObject =
+        eventsExtension.GetEventsBasedObjects().Get("MyEventsBasedObject");
+    REQUIRE(eventsBasedObject.GetPropertyDescriptors().Has("MyProperty"));
+    auto &property =
+        eventsBasedObject.GetPropertyDescriptors().Get("MyProperty");
+
+    auto &layout = project.GetLayout("Scene");
+    auto &object = layout.GetObjects().GetObject("MyCustomObject");
+    auto &objectConfiguration = object.GetConfiguration();
+    objectConfiguration.UpdateProperty("MyProperty", "123");
+    {
+      auto properties = objectConfiguration.GetProperties();
+      REQUIRE(properties.find("MyProperty") != properties.end());
+      REQUIRE(properties.at("MyProperty").GetValue() == "123");
+    }
+
+    gd::WholeProjectRefactorer::RenameEventsBasedObjectProperty(
+        project, eventsExtension, eventsBasedObject, "MyProperty",
+        "MyRenamedProperty");
+    property.SetName("MyRenamedProperty");
+
+    auto properties = objectConfiguration.GetProperties();
+    REQUIRE(properties.find("MyRenamedProperty") != properties.end());
+    REQUIRE(properties.at("MyRenamedProperty").GetValue() == "123");
   }
 
   SECTION("(Events based object) property renamed (in variable setter)") {

@@ -86,6 +86,7 @@ export type SceneEditorsDisplayProps = {|
   ) => void,
   onSetAsGlobalObject: (object: gdObject) => void,
   onExportAssets: () => void,
+  onImportAssets: () => void,
   onDeleteObjects: (
     i18n: I18nType,
     objectsWithContext: ObjectWithContext[],
@@ -156,6 +157,7 @@ export type SceneEditorsDisplayProps = {|
   onOpenedEditorsChanged: () => void,
   onRestartInGameEditor: (reason: string) => void,
   showRestartInGameEditorAfterErrorButton: boolean,
+  onEventsBasedObjectChildrenEdited: gdEventsBasedObject => void,
 |};
 
 export type SceneEditorsDisplayInterface = {|

@@ -25,6 +25,10 @@ module.exports = {
         'Various contributors from PixiJS, PixiJS filters and GDevelop',
         'MIT'
       )
+      .setDimension('2D')
+      .setShortDescription(
+        'Visual effects: blur, glow, color adjust, outline, shadow, pixelate, CRT, reflection, displacement, and more.'
+      )
       .setCategory('Visual effect')
       .setExtensionHelpPath('/interface/scene-editor/layer-effects');
 

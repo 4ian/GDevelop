@@ -22,6 +22,7 @@ import InstructionsList from './InstructionsList';
 import DropIndicator from './DropIndicator';
 import ParameterRenderingService from '../ParameterRenderingService';
 import InvalidParameterValue from './InvalidParameterValue';
+import DeprecatedParameterValue from './DeprecatedParameterValue';
 import MissingParameterValue from './MissingParameterValue';
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
 import {
@@ -131,6 +132,7 @@ const formatValue = ({
     ? i18n._(t`Base layer`)
     : value;
 
+// $FlowFixMe[missing-local-annot]
 const isInstructionVisible = (scope, instructionMetadata) =>
   (instructionMetadata.isRelevantForLayoutEvents() &&
     (scope.layout || scope.externalEvents)) ||
@@ -204,7 +206,7 @@ const InstructionMissing = (props: {|
   }
 };
 
-const Instruction = (props: Props) => {
+const Instruction = (props: Props): React.Node => {
   const {
     platform,
     instruction,
@@ -279,7 +281,14 @@ const Instruction = (props: Props) => {
                 />
               );
             }
-            return <span key={i}>{value}</span>;
+            const deprecatedPrefix =
+              i === 0 &&
+              showDeprecatedInstructionWarning ===
+                'icon-and-deprecated-warning-text' &&
+              metadata.isHidden()
+                ? '[DEPRECATED] '
+                : '';
+            return <span key={i}>{deprecatedPrefix + value}</span>;
           }
 
           const parameterMetadata = metadata.getParameter(parameterIndex);
@@ -290,8 +299,9 @@ const Instruction = (props: Props) => {
               ? 'number'
               : parameterMetadata.getType();
           let expressionIsValid = true;
+          let hasDeprecationWarning = false;
           if (!shouldNotBeValidated({ value, parameterType })) {
-            expressionIsValid = gd.InstructionValidator.isParameterValid(
+            const validationResult = gd.InstructionValidator.validateParameter(
               platform,
               projectScopedContainers,
               instruction,
@@ -299,6 +309,10 @@ const Instruction = (props: Props) => {
               parameterIndex,
               value
             );
+            expressionIsValid = validationResult.isValid();
+            if (showDeprecatedInstructionWarning !== 'no') {
+              hasDeprecationWarning = validationResult.hasDeprecationWarning();
+            }
             // TODO Move this code inside `InstructionValidator.isParameterValid`
             if (
               expressionIsValid &&
@@ -355,6 +369,7 @@ const Instruction = (props: Props) => {
               className={classNames({
                 [selectableArea]: true,
                 [instructionParameter]: true,
+                // $FlowFixMe[invalid-computed-prop]
                 [parameterType]: true,
               })}
               onClick={domEvent => {
@@ -379,9 +394,11 @@ const Instruction = (props: Props) => {
                 scope,
                 value: formattedValue,
                 expressionIsValid,
+                hasDeprecationWarning,
                 parameterMetadata,
                 renderObjectThumbnail,
                 InvalidParameterValue,
+                DeprecatedParameterValue,
                 MissingParameterValue,
                 useAssignmentOperators,
                 projectScopedContainersAccessor:
@@ -462,8 +479,9 @@ const Instruction = (props: Props) => {
                   [selectableArea]: true,
                   [selectedArea]: props.selected,
                   [warningInstruction]:
-                    showDeprecatedInstructionWarning &&
-                    !isInstructionVisible(scope, metadata),
+                    showDeprecatedInstructionWarning !== 'no' &&
+                    (!isInstructionVisible(scope, metadata) ||
+                      metadata.isHidden()),
                 })}
                 onClick={e => {
                   e.stopPropagation();
@@ -498,10 +516,21 @@ const Instruction = (props: Props) => {
                 tabIndex={0}
                 id={id}
               >
-                {showDeprecatedInstructionWarning && metadata.isHidden() ? (
+                {showDeprecatedInstructionWarning !== 'no' &&
+                metadata.isHidden() ? (
                   <Tooltip
                     title={
-                      props.isCondition ? (
+                      metadata.getDeprecationMessage() ? (
+                        <>
+                          {props.isCondition ? (
+                            <Trans>Deprecated condition</Trans>
+                          ) : (
+                            <Trans>Deprecated action</Trans>
+                          )}
+                          {': '}
+                          {metadata.getDeprecationMessage()}
+                        </>
+                      ) : props.isCondition ? (
                         <Trans>Deprecated condition</Trans>
                       ) : (
                         <Trans>Deprecated action</Trans>

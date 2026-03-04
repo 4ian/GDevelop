@@ -24,15 +24,12 @@ namespace gdjs {
       this._hasBeenOnScreen = false;
     }
 
-    updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
-      if (oldBehaviorData.extraBorder !== newBehaviorData.extraBorder) {
-        this._extraBorder = newBehaviorData.extraBorder;
+    override applyBehaviorOverriding(behaviorData): boolean {
+      if (behaviorData.extraBorder !== undefined) {
+        this._extraBorder = behaviorData.extraBorder;
       }
-      if (
-        oldBehaviorData.unseenGraceDistance !==
-        newBehaviorData.unseenGraceDistance
-      ) {
-        this._unseenGraceDistance = newBehaviorData.unseenGraceDistance;
+      if (behaviorData.unseenGraceDistance !== undefined) {
+        this._unseenGraceDistance = behaviorData.unseenGraceDistance;
       }
       return true;
     }

@@ -56,7 +56,7 @@ export const initialBundleStoreState: BundleStoreState = {
   },
 };
 
-export const BundleStoreContext = React.createContext<BundleStoreState>(
+export const BundleStoreContext: React.Context<BundleStoreState> = React.createContext<BundleStoreState>(
   initialBundleStoreState
 );
 
@@ -66,7 +66,7 @@ type BundleStoreStateProviderProps = {|
 
 export const BundleStoreStateProvider = ({
   children,
-}: BundleStoreStateProviderProps) => {
+}: BundleStoreStateProviderProps): React.MixedElement => {
   const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
   const {
     searchText: shopSearchText,
@@ -118,6 +118,7 @@ export const BundleStoreStateProvider = ({
 
           setBundleListingDatas(fetchedBundleListingDatas);
           const defaultTags = fetchedBundleListingDatas.reduce(
+            // $FlowFixMe[missing-local-annot]
             (allCategories, bundleListingData) => {
               return allCategories.concat(
                 bundleListingData.categories.map(category =>
@@ -237,9 +238,11 @@ export const BundleStoreStateProvider = ({
       if (hidePremiumProducts) return bundleListingDatasById;
       bundleListingDatas.forEach(bundleListingData => {
         const id = bundleListingData.id;
+        // $FlowFixMe[invalid-computed-prop]
         if (bundleListingDatasById[id]) {
           console.warn(`Multiple bundles with the same id: ${id}`);
         }
+        // $FlowFixMe[prop-missing]
         bundleListingDatasById[id] = bundleListingData;
       });
       return bundleListingDatasById;
@@ -288,6 +291,7 @@ export const BundleStoreStateProvider = ({
   );
 
   return (
+    // $FlowFixMe[incompatible-type]
     <BundleStoreContext.Provider value={BundleStoreState}>
       {children}
     </BundleStoreContext.Provider>

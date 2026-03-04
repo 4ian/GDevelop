@@ -15,6 +15,7 @@ import {
   ensureObjectHasProperty,
   ensureIsObjectWithPropertyOfType,
 } from '../DataValidator';
+import { type BundleListingData } from './Shop';
 
 export type Usage = {
   id: string,
@@ -68,6 +69,7 @@ type AiCapability = {
     disabled?: boolean,
     enableWith?: 'higher-tier-plan',
   }>,
+  versionHistory?: { retentionDays: number },
 };
 
 /**
@@ -263,7 +265,8 @@ export type RedemptionCode = {|
 
 export const EDUCATION_PLAN_MIN_SEATS = 5;
 export const EDUCATION_PLAN_MAX_SEATS = 300;
-export const apiClient = axios.create({
+// $FlowFixMe[cannot-resolve-name]
+export const apiClient: Axios = axios.create({
   baseURL: GDevelopUsageApi.baseUrl,
 });
 
@@ -535,7 +538,9 @@ export const isSubscriptionComingFromTeam = (
   return !!subscription && subscription.pricingSystemId === 'TEAM_MEMBER';
 };
 
-export const hasValidSubscriptionPlan = (subscription: ?Subscription) => {
+export const hasValidSubscriptionPlan = (
+  subscription: ?Subscription
+): boolean => {
   const hasValidSubscription =
     !!subscription &&
     !!subscription.planId &&
@@ -619,11 +624,13 @@ export const getRedirectToCheckoutUrl = ({
   userId,
   userEmail,
   quantity,
+  couponCode,
 }: {|
   pricingSystemId: string,
   userId: string,
   userEmail: string,
   quantity?: number,
+  couponCode?: string,
 |}): string => {
   const url = new URL(
     `${GDevelopUsageApi.baseUrl}/subscription-v2/action/redirect-to-checkout-v2`
@@ -633,6 +640,7 @@ export const getRedirectToCheckoutUrl = ({
   url.searchParams.set('customerEmail', userEmail);
   if (quantity !== undefined && quantity > 1)
     url.searchParams.set('quantity', quantity.toString());
+  if (couponCode) url.searchParams.set('couponCode', couponCode);
   return url.toString();
 };
 
@@ -659,30 +667,64 @@ export const redeemCode = async (
   );
 };
 
-export const canBenefitFromDiscordRole = (subscription: ?Subscription) => {
+export interface PricingSystemDiscount {
+  pricingSystemId: string;
+  discountMessage: string;
+  originalAmountInCents: number;
+  discountedAmountInCents: number;
+  currency: string;
+  discountedPaypalPlanId: string | null;
+}
+
+export type CouponValidationApiResponse = {
+  isValid: boolean,
+  pricingSystemDiscounts: PricingSystemDiscount[],
+  errorMessage?: string,
+};
+
+export const validateCoupon = async (
+  couponCode: string
+): Promise<CouponValidationApiResponse> => {
+  const response = await apiClient.post(
+    '/subscription-v2/action/validate-coupon',
+    {
+      couponCode,
+    }
+  );
+
+  return response.data;
+};
+
+export const canBenefitFromDiscordRole = (
+  subscription: ?Subscription
+): false | true | boolean => {
   return (
     !!subscription &&
     ['gdevelop_education', 'gdevelop_startup', 'gdevelop_gold'].includes(
+      // $FlowFixMe[incompatible-type]
       subscription.planId
     ) &&
     !subscription.benefitsFromEducationPlan
   );
 };
 
-export const canUpgradeSubscription = (subscription: ?Subscription) => {
+export const canUpgradeSubscription = (
+  subscription: ?Subscription
+): false | true | boolean => {
   return (
     !!subscription &&
+    // $FlowFixMe[incompatible-type]
     !['gdevelop_education', 'gdevelop_startup'].includes(subscription.planId) &&
     !subscription.benefitsFromEducationPlan
   );
 };
 
-export const canUseClassroomFeature = (limits: ?Limits) =>
+export const canUseClassroomFeature = (limits: ?Limits): ?boolean =>
   limits &&
   limits.capabilities.classrooms &&
   limits.capabilities.classrooms.showClassroomTab;
 
-export const shouldHideClassroomTab = (limits: ?Limits) =>
+export const shouldHideClassroomTab = (limits: ?Limits): boolean =>
   !limits ||
   !limits.capabilities.classrooms ||
   limits.capabilities.classrooms.showClassroomTab
@@ -692,6 +734,10 @@ export const shouldHideClassroomTab = (limits: ?Limits) =>
 export const getCloudProjectHistoryRetentionDays = (limits: ?Limits): number =>
   limits && limits.capabilities.versionHistory.enabled
     ? limits.capabilities.versionHistory.retentionDays
+    : 0;
+export const getAiVersionHistoryRetentionDays = (limits: ?Limits): number =>
+  limits && limits.capabilities.ai.versionHistory
+    ? limits.capabilities.ai.versionHistory.retentionDays
     : 0;
 
 export function getSummarizedSubscriptionPlanFeatures(
@@ -719,18 +765,23 @@ export function getSummarizedSubscriptionPlanFeatures(
     };
 
     if (feature.enabled) {
+      // $FlowFixMe[prop-missing]
       planFeature.enabled = feature.enabled;
     }
     if (feature.unlimited) {
+      // $FlowFixMe[prop-missing]
       planFeature.unlimited = feature.unlimited;
     }
     if (feature.upcoming) {
+      // $FlowFixMe[prop-missing]
       planFeature.upcoming = feature.upcoming;
     }
     if (feature.trialLike) {
+      // $FlowFixMe[prop-missing]
       planFeature.trialLike = feature.trialLike;
     }
     if (feature.descriptionByLocale) {
+      // $FlowFixMe[prop-missing]
       planFeature.description = selectMessageByLocale(
         i18n,
         feature.descriptionByLocale
@@ -762,4 +813,37 @@ export const getRedemptionCodes = async (
     data: response.data,
     endpointName: '/redemption-code of Usage API',
   });
+};
+
+export const getNewestRedemptionCodeForBundle = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  bundleListingData: BundleListingData
+): Promise<?string> => {
+  if (
+    !bundleListingData.includedRedemptionCodes ||
+    bundleListingData.includedRedemptionCodes.length === 0
+  ) {
+    return null;
+  }
+
+  const expectedPlanId =
+    bundleListingData.includedRedemptionCodes[0].givenSubscriptionPlanId;
+
+  try {
+    const allCodes = await getRedemptionCodes(getAuthorizationHeader, userId);
+    const matchingCodes = allCodes.filter(
+      code => code.givenSubscriptionPlanId === expectedPlanId
+    );
+
+    if (matchingCodes.length === 0) {
+      return null;
+    }
+
+    matchingCodes.sort((a, b) => b.createdAt - a.createdAt);
+    return matchingCodes[0].code;
+  } catch (error) {
+    console.error('Error fetching redemption codes:', error);
+    return null;
+  }
 };

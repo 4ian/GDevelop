@@ -13,6 +13,10 @@ import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { useInstallAsset } from '../AssetStore/NewObjectDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 
+type _FuncReturnType = {
+  searchAndInstallAsset: AssetSearchAndInstallOptions => Promise<AssetSearchAndInstallResult>,
+};
+
 export const useSearchAndInstallAsset = ({
   project,
   resourceManagementProps,
@@ -23,7 +27,7 @@ export const useSearchAndInstallAsset = ({
   resourceManagementProps: ResourceManagementProps,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
-|}) => {
+|}): _FuncReturnType => {
   const { profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
@@ -43,11 +47,13 @@ export const useSearchAndInstallAsset = ({
       }: AssetSearchAndInstallOptions): Promise<AssetSearchAndInstallResult> => {
         if (!profile) throw new Error('User should be authenticated.');
 
-        const assetSearch: AssetSearch = await retryIfFailed({ times: 2 }, () =>
-          createAssetSearch(getAuthorizationHeader, {
-            userId: profile.id,
-            ...assetSearchOptions,
-          })
+        const assetSearch: AssetSearch = await retryIfFailed(
+          { times: 3, backoff: { initialDelay: 300, factor: 2 } },
+          () =>
+            createAssetSearch(getAuthorizationHeader, {
+              userId: profile.id,
+              ...assetSearchOptions,
+            })
         );
         if (!assetSearch.results || assetSearch.results.length === 0) {
           return {

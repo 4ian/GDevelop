@@ -52,6 +52,7 @@ type Props = {|
   title: string | null,
   subtitle: React.Node,
   onSoundLoaded: () => void,
+  onSoundError?: () => void,
   onSkipForward?: () => void,
   onSkipBack?: () => void,
 |};
@@ -60,9 +61,20 @@ export type SoundPlayerInterface = {|
   playPause: (forcePlay: boolean) => void,
 |};
 
-const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
+const SoundPlayer: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<SoundPlayerInterface>,
+}> = React.forwardRef<Props, SoundPlayerInterface>(
   (
-    { soundSrc, onSoundLoaded, onSkipBack, onSkipForward, title, subtitle },
+    {
+      soundSrc,
+      onSoundLoaded,
+      onSoundError,
+      onSkipBack,
+      onSkipForward,
+      title,
+      subtitle,
+    },
     ref
   ) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -75,6 +87,7 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
     const [isPlaying, setIsPlaying] = React.useState(false);
 
     const onWaveSurferReady = React.useCallback(
+      // $FlowFixMe[missing-local-annot]
       ws => {
         waveSurferRef.current = ws;
         setDuration(Math.ceil(ws.getDuration()));
@@ -119,6 +132,13 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
       setIsPlaying(false);
     }, []);
 
+    const onError = React.useCallback(
+      () => {
+        if (onSoundError) onSoundError();
+      },
+      [onSoundError]
+    );
+
     React.useEffect(
       () => {
         if (!waveSurferRef.current && !mobileAudioRef.current) return;
@@ -145,6 +165,7 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
       setIsPlaying(false);
     }, []);
 
+    // $FlowFixMe[incompatible-type]
     React.useImperativeHandle(ref, () => ({
       playPause: onPlayPause,
     }));
@@ -175,6 +196,7 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
             audio.addEventListener('ended', onFinishPlaying);
             audio.addEventListener('loadstart', onLoad);
             audio.addEventListener('loadedmetadata', onAudioReady);
+            audio.addEventListener('error', onError);
             mobileAudioRef.current = audio;
           }
           waveSurferRef.current = null;
@@ -183,7 +205,15 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
         }
         onLoad();
       },
-      [isMobile, soundSrc, onTimeupdate, onFinishPlaying, onLoad, onAudioReady]
+      [
+        isMobile,
+        soundSrc,
+        onTimeupdate,
+        onFinishPlaying,
+        onLoad,
+        onAudioReady,
+        onError,
+      ]
     );
 
     return (
@@ -250,6 +280,7 @@ const SoundPlayer = React.forwardRef<Props, SoundPlayerInterface>(
                     onTimeupdate={onTimeupdate}
                     onLoad={onLoad}
                     onFinish={onFinishPlaying}
+                    onError={onError}
                   />
                 </div>
               )}

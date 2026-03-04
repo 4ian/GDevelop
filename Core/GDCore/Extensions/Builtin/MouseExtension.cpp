@@ -26,6 +26,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
           "separately in different events.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("Mouse buttons, wheel, cursor position. Touch positions, started/ended touches. Multi-touch support.")
       .SetExtensionHelpPath("/all-features/mouse-touch")
       .SetCategory("Input");
   extension.AddInstructionOrExpressionGroupMetadata(_("Mouse and touch"))
@@ -83,7 +84,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddAction("CentreSourisX",
+      .AddAction("CenterCursorHorizontally",
                  _("Center cursor horizontally"),
                  _("Put the cursor in the middle of the screen horizontally."),
                  _("Center cursor horizontally"),
@@ -94,8 +95,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("CentreSourisX", "CenterCursorHorizontally")
+      .SetHidden();
+  // End of compatibility code
+
   extension
-      .AddAction("CentreSourisY",
+      .AddAction("CenterCursorVertically",
                  _("Center cursor vertically"),
                  _("Put the cursor in the middle of the screen vertically."),
                  _("Center cursor vertically"),
@@ -106,8 +112,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("CentreSourisY", "CenterCursorVertically")
+      .SetHidden();
+  // End of compatibility code
+
   extension
-      .AddAction("CacheSouris",
+      .AddAction("HideCursor",
                  _("Hide the cursor"),
                  _("Hide the cursor."),
                  _("Hide the cursor"),
@@ -117,8 +128,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("CacheSouris", "HideCursor").SetHidden();
+  // End of compatibility code
+
   extension
-      .AddAction("MontreSouris",
+      .AddAction("ShowCursor",
                  _("Show the cursor"),
                  _("Show the cursor."),
                  _("Show the cursor"),
@@ -129,8 +144,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("MontreSouris", "ShowCursor").SetHidden();
+  // End of compatibility code
+
   extension
-      .AddAction("SetSourisXY",
+      .AddAction("SetCursorPosition",
                  _("Position the cursor of the mouse"),
                  _("Position the cursor at the given coordinates."),
                  _("Position cursor at _PARAM1_;_PARAM2_"),
@@ -143,8 +162,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddParameter("expression", _("Y position"))
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("SetSourisXY", "SetCursorPosition").SetHidden();
+  // End of compatibility code
+
   extension
-      .AddAction("CentreSouris",
+      .AddAction("CenterCursor",
                  _("Center the cursor"),
                  _("Center the cursor on the screen."),
                  _("Center the cursor"),
@@ -154,6 +177,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
 
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("CentreSouris", "CenterCursor").SetHidden();
+  // End of compatibility code
 
   extension
       .AddExpressionAndCondition(

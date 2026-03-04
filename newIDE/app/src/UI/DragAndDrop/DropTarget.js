@@ -61,7 +61,10 @@ export const makeDropTarget = <DraggedItemType>(
     };
   }
 
+  // $FlowFixMe[underconstrained-implicit-instantiation]
+  // $FlowFixMe[incompatible-variance]
   const InnerDropTarget = DropTarget(reactDndType, targetSpec, targetCollect)(
+    // $FlowFixMe[missing-local-annot]
     ({ children, connectDropTarget, isOver, isOverLazy, canDrop }) => {
       return children({
         connectDropTarget,

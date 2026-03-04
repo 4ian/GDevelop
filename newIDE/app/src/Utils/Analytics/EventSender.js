@@ -57,7 +57,8 @@ const ensureGDevelopEditorAnalyticsReady = async () => {
       const module = await retryIfFailed(
         { times: 2 },
         async () =>
-          // $FlowExpectedError - Remote script cannot be found.
+          // $FlowFixMe[incompatible-type] - Remote script cannot be found.
+          // $FlowFixMe[cannot-resolve-module]
           (await import(/* webpackIgnore: true */ 'https://resources.gdevelop.io/a/gea.js'))
             .default
       );
@@ -83,19 +84,22 @@ const ensureGDevelopEditorAnalyticsReady = async () => {
   return gdevelopEditorAnalyticsPromise;
 };
 
-export const setCurrentlyRunningInAppTutorial = (tutorial: string | null) =>
-  (currentlyRunningInAppTutorial = tutorial);
+export const setCurrentlyRunningInAppTutorial = (
+  tutorial: string | null
+): string | null => (currentlyRunningInAppTutorial = tutorial);
 
 const makeCanSendEvent = (options: {| minimumTimeBetweenEvents: number |}) => {
   const lastSentEventTimestamps = {};
   return (eventName: string) => {
     const now = Date.now();
+    // $FlowFixMe[invalid-computed-prop]
     if (lastSentEventTimestamps[eventName]) {
       const timeSinceLastEvent = now - lastSentEventTimestamps[eventName];
       if (timeSinceLastEvent < options.minimumTimeBetweenEvents) {
         return false;
       }
     }
+    // $FlowFixMe[prop-missing]
     lastSentEventTimestamps[eventName] = now;
     return true;
   };
@@ -255,6 +259,7 @@ export const identifyUserForAnalytics = (
  * This is only done on signup as an ID can only be an alias of another ID once.
  */
 export const aliasUserForAnalyticsAfterSignUp = (
+  // $FlowFixMe[value-as-type]
   firebaseUser: FirebaseUser
 ) => {
   if (isDev) {
@@ -536,7 +541,9 @@ export type SubscriptionDialogDisplayReason =
   | 'Unlock course chapter'
   | 'Account get premium'
   | 'AI requests (subscribe)'
-  | 'AI requests (upgrade)';
+  | 'AI requests (upgrade)'
+  | 'AI requests history'
+  | 'Coupon code entered';
 
 export type SubscriptionPlacementId =
   | 'builds'
@@ -556,7 +563,8 @@ export type SubscriptionPlacementId =
   | 'unlock-course-chapter'
   | 'account-get-premium'
   | 'education'
-  | 'ai-requests';
+  | 'ai-requests'
+  | 'redeem-code';
 
 export const sendSubscriptionDialogShown = (
   metadata: SubscriptionAnalyticsMetadata

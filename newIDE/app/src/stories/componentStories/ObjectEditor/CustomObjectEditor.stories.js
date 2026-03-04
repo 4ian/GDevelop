@@ -1,7 +1,6 @@
 // @flow
 
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
 
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
@@ -17,7 +16,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const ButtonObject = () => (
+export const ButtonObject = (): React.Node => (
   <SerializedObjectDisplay object={testProject.customObject.getConfiguration()}>
     <CustomObjectPropertiesEditor
       objectConfiguration={testProject.customObject.getConfiguration()}

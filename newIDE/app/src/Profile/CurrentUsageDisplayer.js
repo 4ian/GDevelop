@@ -48,7 +48,7 @@ const CurrentUsageDisplayer = ({
   onChangeSubscription,
   onStartBuildWithCredits,
   hidePurchaseWithCredits,
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { openCreditsPackageDialog, openCreditsUsageDialog } = React.useContext(
     CreditsPackageStoreContext
@@ -172,7 +172,7 @@ const CurrentUsageDisplayer = ({
                   }
             }
             hideButton={cannotUpgradeSubscription}
-            recommendedPlanIdIfNoSubscription="gdevelop_silver"
+            recommendedPlanId="gdevelop_silver"
             placementId="builds"
           >
             <Line>
@@ -219,7 +219,7 @@ const CurrentUsageDisplayer = ({
                   onPayWithCredits: onPurchaseBuildWithCredits,
                 }
           }
-          recommendedPlanIdIfNoSubscription="gdevelop_silver"
+          recommendedPlanId="gdevelop_silver"
           placementId="builds"
         >
           <Line>

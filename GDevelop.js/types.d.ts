@@ -84,6 +84,24 @@ export enum ProjectDiagnostic_ErrorType {
   MismatchedObjectType = 3,
 }
 
+export enum ExpressionParserError_ErrorType {
+  SyntaxError = 0,
+  InvalidOperator = 1,
+  MismatchedType = 2,
+  UndeclaredVariable = 3,
+  UnknownIdentifier = 4,
+  BracketsNotAllowedForObjects = 5,
+  TooFewParameters = 6,
+  TooManyParameters = 7,
+  InvalidFunctionName = 8,
+  MalformedVariableParameter = 9,
+  MalformedObjectParameter = 10,
+  UnknownParameterType = 11,
+  MissingBehavior = 12,
+  VariableNameCollision = 13,
+  DeprecatedExpression = 14,
+}
+
 export enum ExpressionCompletionDescription_CompletionKind {
   Object = 0,
   BehaviorWithPrefix = 1,
@@ -153,6 +171,11 @@ export class VectorVariable extends EmscriptenObject {
 export class VectorObjectFolderOrObject extends EmscriptenObject {
   size(): number;
   at(index: number): ObjectFolderOrObject;
+}
+
+export class VectorPropertyFolderOrProperty extends EmscriptenObject {
+  size(): number;
+  at(index: number): PropertyFolderOrProperty;
 }
 
 export class VectorScreenshot extends EmscriptenObject {
@@ -479,6 +502,7 @@ export class ObjectFolderOrObject extends EmscriptenObject {
   getChildPosition(child: ObjectFolderOrObject): number;
   getParent(): ObjectFolderOrObject;
   insertNewFolder(name: string, newPosition: number): ObjectFolderOrObject;
+  getOrCreateFolderChild(name: string): ObjectFolderOrObject;
   moveObjectFolderOrObjectToAnotherFolder(objectFolderOrObject: ObjectFolderOrObject, newParentFolder: ObjectFolderOrObject, newPosition: number): void;
   moveChild(oldIndex: number, newIndex: number): void;
   removeFolderChild(childToRemove: ObjectFolderOrObject): void;
@@ -687,7 +711,9 @@ export class Behavior extends EmscriptenObject {
   getTypeName(): string;
   getProperties(): MapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
+  removeProperty(name: string): void;
   initializeContent(): void;
+  hasPropertyValue(name: string): boolean;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
   isFolded(): boolean;
@@ -763,7 +789,7 @@ export class gdObject extends EmscriptenObject {
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
   resetPersistentUuid(): gdObject;
-  clearPersistentUuid(): gdObject;
+  getPersistentUuid(): string;
 }
 
 export class UniquePtrObject extends EmscriptenObject {
@@ -861,7 +887,7 @@ export class ExternalLayout extends EmscriptenObject {
   getInitialInstances(): InitialInstancesContainer;
   getAssociatedEditorSettings(): EditorSettings;
   serializeTo(element: SerializerElement): void;
-  unserializeFrom(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class Effect extends EmscriptenObject {
@@ -1100,12 +1126,14 @@ export class ResourcesContainer extends EmscriptenObject {
   findFilesNotInResources(filesToCheck: VectorString): VectorString;
   hasResource(name: string): boolean;
   getResource(name: string): Resource;
+  getResourceAt(index: number): Resource;
   getResourceNameWithOrigin(originName: string, originIdentifier: string): string;
   getResourceNameWithFile(file: string): string;
   addResource(res: Resource): boolean;
   removeResource(name: string): void;
   renameResource(oldName: string, name: string): void;
   getResourcePosition(name: string): number;
+  count(): number;
   moveResourceUpInList(oldName: string): boolean;
   moveResourceDownInList(oldName: string): boolean;
   moveResource(oldIndex: number, newIndex: number): void;
@@ -1228,8 +1256,15 @@ export class InitialInstance extends EmscriptenObject {
   setRawDoubleProperty(name: string, value: number): void;
   setRawStringProperty(name: string, value: string): void;
   getVariables(): VariablesContainer;
+  hasAnyOverriddenProperty(obj: gdObject): boolean;
+  hasAnyOverriddenPropertyForBehavior(behavior: Behavior): boolean;
+  hasBehaviorOverridingNamed(name: string): boolean;
+  addNewBehaviorOverriding(project: Project, type: string, name: string): Behavior;
+  getBehaviorOverriding(name: string): Behavior;
+  removeBehaviorOverriding(name: string): void;
+  renameBehaviorOverriding(oldName: string, name: string): boolean;
   serializeTo(element: SerializerElement): void;
-  unserializeFrom(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class InitialInstancesContainer extends EmscriptenObject {
@@ -1250,7 +1285,7 @@ export class InitialInstancesContainer extends EmscriptenObject {
   insertNewInitialInstance(): InitialInstance;
   insertInitialInstance(inst: InitialInstance): InitialInstance;
   serializeTo(element: SerializerElement): void;
-  unserializeFrom(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class HighestZOrderFinder extends EmscriptenObject {
@@ -1422,6 +1457,7 @@ export class InstructionMetadata extends AbstractFunctionMetadata {
   getParameters(): ParameterMetadataContainer;
   getUsageComplexity(): number;
   isHidden(): boolean;
+  getDeprecationMessage(): string;
   isPrivate(): boolean;
   isAsync(): boolean;
   isOptionallyAsync(): boolean;
@@ -1470,6 +1506,8 @@ export class ExpressionMetadata extends AbstractFunctionMetadata {
   getHelpPath(): string;
   isShown(): boolean;
   isPrivate(): boolean;
+  isDeprecated(): boolean;
+  getDeprecationMessage(): string;
   isRelevantForLayoutEvents(): boolean;
   isRelevantForFunctionEvents(): boolean;
   isRelevantForAsynchronousFunctionEvents(): boolean;
@@ -1617,8 +1655,10 @@ export class ObjectMetadata extends EmscriptenObject {
   getDescription(): string;
   getIconFilename(): string;
   getHelpPath(): string;
-  getCategoryFullName(): string;
-  setCategoryFullName(categoryFullName: string): ObjectMetadata;
+  getCategory(): string;
+  getAssetStoreTag(): string;
+  setCategory(categoryFullName: string): ObjectMetadata;
+  setAssetStoreTag(assetStoreTag: string): ObjectMetadata;
   addInGameEditorResource(): InGameEditorResourceMetadata;
   addScopedCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
   addScopedAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
@@ -1760,6 +1800,10 @@ export class PlatformExtension extends EmscriptenObject {
   setExtensionHelpPath(helpPath: string): PlatformExtension;
   setIconUrl(iconUrl: string): PlatformExtension;
   setCategory(category: string): PlatformExtension;
+  setShortDescription(shortDescription: string): PlatformExtension;
+  getShortDescription(): string;
+  setDimension(dimension: string): PlatformExtension;
+  getDimension(): string;
   addInstructionOrExpressionGroupMetadata(name: string): InstructionOrExpressionGroupMetadata;
   markAsDeprecated(): void;
   getTags(): VectorString;
@@ -1864,12 +1908,20 @@ export class StandardEvent extends BaseEvent {
   getActions(): InstructionsList;
 }
 
+export class ElseEvent extends BaseEvent {
+  constructor();
+  getConditions(): InstructionsList;
+  getActions(): InstructionsList;
+}
+
 export class RepeatEvent extends BaseEvent {
   constructor();
   getConditions(): InstructionsList;
   getActions(): InstructionsList;
   setRepeatExpressionPlainString(expr: string): void;
   getRepeatExpression(): Expression;
+  getLoopIndexVariableName(): string;
+  setLoopIndexVariableName(name: string): void;
 }
 
 export class WhileEvent extends BaseEvent {
@@ -1877,6 +1929,8 @@ export class WhileEvent extends BaseEvent {
   getConditions(): InstructionsList;
   getWhileConditions(): InstructionsList;
   getActions(): InstructionsList;
+  getLoopIndexVariableName(): string;
+  setLoopIndexVariableName(name: string): void;
 }
 
 export class ForEachEvent extends BaseEvent {
@@ -1885,6 +1939,16 @@ export class ForEachEvent extends BaseEvent {
   getObjectToPick(): string;
   getConditions(): InstructionsList;
   getActions(): InstructionsList;
+  getLoopIndexVariableName(): string;
+  setLoopIndexVariableName(name: string): void;
+  getOrderBy(): string;
+  setOrderBy(orderBy: string): void;
+  getOrderByExpression(): Expression;
+  getOrder(): string;
+  setOrder(order: string): void;
+  getLimit(): string;
+  setLimit(limit: string): void;
+  getLimitExpression(): Expression;
 }
 
 export class ForEachChildVariableEvent extends BaseEvent {
@@ -1897,6 +1961,8 @@ export class ForEachChildVariableEvent extends BaseEvent {
   setIterableVariableName(newName: string): void;
   setKeyIteratorVariableName(newName: string): void;
   setValueIteratorVariableName(newName: string): void;
+  getLoopIndexVariableName(): string;
+  setLoopIndexVariableName(name: string): void;
 }
 
 export class CommentEvent extends BaseEvent {
@@ -2077,8 +2143,15 @@ export class BehaviorParameterFiller extends EmscriptenObject {
   static fillBehaviorParameters(platform: Platform, projectScopedContainers: ProjectScopedContainers, instructionMetadata: InstructionMetadata, instruction: Instruction): boolean;
 }
 
+export class ParameterValidationResult extends EmscriptenObject {
+  isValid(): boolean;
+  hasDeprecationWarning(): boolean;
+}
+
 export class InstructionValidator extends EmscriptenObject {
+  static validateParameter(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number, value: string): ParameterValidationResult;
   static isParameterValid(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number, value: string): boolean;
+  static hasDeprecationWarnings(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction, metadata: InstructionMetadata, parameterIndex: number, value: string): boolean;
 }
 
 export class ObjectTools extends EmscriptenObject {
@@ -2195,6 +2268,7 @@ export class WholeProjectDiagnosticReport extends EmscriptenObject {
 }
 
 export class ExpressionParserError extends EmscriptenObject {
+  getType(): ExpressionParserError_ErrorType;
   getMessage(): string;
   getStartPosition(): number;
   getEndPosition(): number;
@@ -2284,6 +2358,12 @@ export class EventsFunction extends EmscriptenObject {
   isPrivate(): boolean;
   setAsync(isAsync: boolean): EventsFunction;
   isAsync(): boolean;
+  setHelpUrl(helpUrl: string): EventsFunction;
+  getHelpUrl(): string;
+  setDeprecated(isDeprecated: boolean): EventsFunction;
+  isDeprecated(): boolean;
+  setDeprecationMessage(message: string): EventsFunction;
+  getDeprecationMessage(): string;
   isAction(): boolean;
   isExpression(): boolean;
   isCondition(): boolean;
@@ -2362,7 +2442,9 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   setDescription(description: string): EventsBasedObject;
   setPrivate(isPrivate: boolean): EventsBasedObject;
   setDefaultName(defaultName: string): EventsBasedObject;
+  setAssetStoreTag(assetStoreTag: string): EventsBasedObject;
   getDefaultName(): string;
+  getAssetStoreTag(): string;
   markAsRenderedIn3D(isRenderedIn3D: boolean): EventsBasedObject;
   isRenderedIn3D(): boolean;
   markAsAnimatable(isAnimatable: boolean): EventsBasedObject;
@@ -2450,6 +2532,28 @@ export class EventsBasedObjectsList extends EmscriptenObject {
   at(index: number): EventsBasedObject;
 }
 
+export class PropertyFolderOrProperty extends EmscriptenObject {
+  constructor();
+  isFolder(): boolean;
+  isRootFolder(): boolean;
+  getProperty(): NamedPropertyDescriptor;
+  getFolderName(): string;
+  setFolderName(name: string): void;
+  hasPropertyNamed(name: string): boolean;
+  getPropertyNamed(name: string): PropertyFolderOrProperty;
+  getChildrenCount(): number;
+  getChildAt(pos: number): PropertyFolderOrProperty;
+  getPropertyChild(name: string): PropertyFolderOrProperty;
+  getOrCreateChildFolder(name: string): PropertyFolderOrProperty;
+  getChildPosition(child: PropertyFolderOrProperty): number;
+  getParent(): PropertyFolderOrProperty;
+  insertNewFolder(name: string, newPosition: number): PropertyFolderOrProperty;
+  movePropertyFolderOrPropertyToAnotherFolder(propertyFolderOrProperty: PropertyFolderOrProperty, newParentFolder: PropertyFolderOrProperty, newPosition: number): void;
+  moveChild(oldIndex: number, newIndex: number): void;
+  removeFolderChild(childToRemove: PropertyFolderOrProperty): void;
+  isADescendantOf(otherPropertyFolderOrProperty: PropertyFolderOrProperty): boolean;
+}
+
 export class PropertiesContainer extends EmscriptenObject {
   constructor(owner: EventsFunctionsContainer_FunctionOwner);
   insertNew(name: string, pos: number): NamedPropertyDescriptor;
@@ -2463,6 +2567,10 @@ export class PropertiesContainer extends EmscriptenObject {
   getPosition(item: NamedPropertyDescriptor): number;
   size(): number;
   at(index: number): NamedPropertyDescriptor;
+  insertNewPropertyInFolder(name: string, folder: PropertyFolderOrProperty, pos: number): NamedPropertyDescriptor;
+  getRootFolder(): PropertyFolderOrProperty;
+  getAllPropertyFolderOrProperty(): VectorPropertyFolderOrProperty;
+  addMissingPropertiesInRootFolder(): void;
 }
 
 export class EventsFunctionsExtension extends EmscriptenObject {
@@ -2475,6 +2583,8 @@ export class EventsFunctionsExtension extends EmscriptenObject {
   getShortDescription(): string;
   setDescription(description: string): EventsFunctionsExtension;
   getDescription(): string;
+  setDimension(dimension: string): EventsFunctionsExtension;
+  getDimension(): string;
   setName(name: string): EventsFunctionsExtension;
   getName(): string;
   setFullName(fullName: string): EventsFunctionsExtension;
@@ -2578,6 +2688,16 @@ export class EventsContextAnalyzer extends EmscriptenObject {
   constructor(platform: Platform);
   getEventsContext(): EventsContext;
   launch(events: EventsList, projectScopedContainers: ProjectScopedContainers): void;
+}
+
+export class ReadOnlyArbitraryEventsWorkerWithContext extends EmscriptenObject {
+  launch(events: EventsList, projectScopedContainers: ProjectScopedContainers): void;
+}
+
+export class ReadOnlyArbitraryEventsWorkerWithContextJS extends ReadOnlyArbitraryEventsWorkerWithContext {
+  constructor();
+  doVisitEvent(event: BaseEvent): void;
+  doVisitInstruction(instruction: Instruction, isCondition: boolean, projectScopedContainers: ProjectScopedContainers): void;
 }
 
 export class ArbitraryResourceWorker extends EmscriptenObject {}
@@ -2796,6 +2916,7 @@ export class SpineObjectConfiguration extends ObjectConfiguration {
   moveAnimation(oldIndex: number, newIndex: number): void;
   getScale(): number;
   getSpineResourceName(): string;
+  getSkinName(): string;
 }
 
 export class Vector2f extends EmscriptenObject {
@@ -3127,6 +3248,8 @@ export function removeFromVectorVector2f(index: number): void;
 export function moveVector2fInVector(oldIndex: number, newIndex: number): void;
 
 export function asStandardEvent(object: Event): StandardEvent;
+
+export function asElseEvent(object: Event): ElseEvent;
 
 export function asRepeatEvent(object: Event): RepeatEvent;
 

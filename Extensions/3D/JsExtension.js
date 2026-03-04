@@ -27,6 +27,10 @@ module.exports = {
         'Florian Rival',
         'MIT'
       )
+      .setShortDescription(
+        '3D objects (box, model), 3D camera, Z position/rotation/size. Base 3D capability for all objects.'
+      )
+      .setDimension('3D')
       .setCategory('General');
     extension
       .addInstructionOrExpressionGroupMetadata(_('3D'))
@@ -256,7 +260,7 @@ module.exports = {
           'JsPlatform/Extensions/3d_model.svg',
           new gd.Model3DObjectConfiguration()
         )
-        .setCategoryFullName(_('General'))
+        .setCategory('General')
         // Effects are unsupported because the object is not rendered with PIXI.
         .addDefaultBehavior('ResizableCapability::ResizableBehavior')
         .addDefaultBehavior('ScalableCapability::ScalableBehavior')
@@ -851,6 +855,34 @@ module.exports = {
         objectContent[propertyName] = parseFloat(newValue);
         return true;
       }
+      if (propertyName === 'facesOrientation') {
+        const normalizedValue = newValue.toUpperCase();
+        if (normalizedValue === 'Y' || normalizedValue === 'Z') {
+          objectContent.facesOrientation = normalizedValue;
+          return true;
+        }
+        return false;
+      }
+      if (propertyName === 'backFaceUpThroughWhichAxisRotation') {
+        const normalizedValue = newValue.toUpperCase();
+        if (normalizedValue === 'X' || normalizedValue === 'Y') {
+          objectContent.backFaceUpThroughWhichAxisRotation = normalizedValue;
+          return true;
+        }
+        return false;
+      }
+      if (propertyName === 'materialType') {
+        const normalizedValue = newValue.toLowerCase();
+        if (normalizedValue === 'basic') {
+          objectContent.materialType = 'Basic';
+          return true;
+        }
+        if (normalizedValue === 'standardwithoutmetalness') {
+          objectContent.materialType = 'StandardWithoutMetalness';
+          return true;
+        }
+        return false;
+      }
       if (
         propertyName === 'frontFaceResourceName' ||
         propertyName === 'backFaceResourceName' ||
@@ -858,9 +890,6 @@ module.exports = {
         propertyName === 'rightFaceResourceName' ||
         propertyName === 'topFaceResourceName' ||
         propertyName === 'bottomFaceResourceName' ||
-        propertyName === 'backFaceUpThroughWhichAxisRotation' ||
-        propertyName === 'facesOrientation' ||
-        propertyName === 'materialType' ||
         propertyName === 'tint'
       ) {
         objectContent[propertyName] = newValue;
@@ -1183,7 +1212,7 @@ module.exports = {
         'JsPlatform/Extensions/3d_box.svg',
         Cube3DObject
       )
-      .setCategoryFullName(_('General'))
+      .setCategory('General')
       // Effects are unsupported because the object is not rendered with PIXI.
       .addDefaultBehavior('ResizableCapability::ResizableBehavior')
       .addDefaultBehavior('ScalableCapability::ScalableBehavior')

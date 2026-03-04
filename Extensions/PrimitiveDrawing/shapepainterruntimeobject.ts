@@ -100,9 +100,10 @@ namespace gdjs {
      */
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      shapePainterObjectData: ShapePainterObjectData
+      shapePainterObjectData: ShapePainterObjectData,
+      instanceData?: InstanceData
     ) {
-      super(instanceContainer, shapePainterObjectData);
+      super(instanceContainer, shapePainterObjectData, instanceData);
       this._fillColor =
         typeof shapePainterObjectData.fillColor === 'string'
           ? gdjs.rgbOrHexStringToNumber(shapePainterObjectData.fillColor)

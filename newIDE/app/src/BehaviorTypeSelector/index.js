@@ -13,6 +13,7 @@ type Props = {|
   objectType: string,
   value: string,
   onChange: string => void,
+  onFocus?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
   disabled?: boolean,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
 |};
@@ -24,16 +25,17 @@ export default class BehaviorTypeSelector extends React.Component<
   Props,
   State
 > {
+  // $FlowFixMe[missing-local-annot]
   state = {
-    behaviorMetadata: enumerateBehaviorsMetadata(
+    behaviorMetadata: (enumerateBehaviorsMetadata(
       this.props.project.getCurrentPlatform(),
       this.props.project,
       this.props.eventsFunctionsExtension
-    ),
+    ): Array<EnumeratedBehaviorMetadata>),
   };
 
-  render() {
-    const { disabled, objectType, value, onChange } = this.props;
+  render(): any {
+    const { disabled, objectType, value, onChange, onFocus } = this.props;
     const { behaviorMetadata } = this.state;
 
     // If the behavior type is not in the list, we'll still
@@ -48,6 +50,7 @@ export default class BehaviorTypeSelector extends React.Component<
         onChange={(e, i, value: string) => {
           onChange(value);
         }}
+        onFocus={onFocus}
         disabled={disabled}
         fullWidth
       >

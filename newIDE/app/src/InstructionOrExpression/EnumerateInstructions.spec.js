@@ -8,7 +8,9 @@ import {
 } from './EnumerateInstructions';
 const gd: libGDevelop = global.gd;
 
-// $FlowExpectedError
+// $FlowFixMe[incompatible-type]
+// $FlowFixMe[missing-local-annot]
+// $FlowFixMe[cannot-resolve-name]
 const makeFakeI18n = (fakeI18n): I18nType => ({
   ...fakeI18n,
   _: message => message.id,
@@ -18,7 +20,7 @@ describe('EnumerateInstructions', () => {
   it('can enumerate instructions being conditions', () => {
     const instructions = enumerateAllInstructions(
       true,
-      // $FlowFixMe The fake I18n translates groups to empty strings.
+      // $FlowFixMe[incompatible-type] The fake I18n translates groups to empty strings.
       null
     );
 
@@ -58,12 +60,12 @@ describe('EnumerateInstructions', () => {
       })
     );
     expect(
-      instructions.find(instruction => instruction.type === 'SourisSurObjet')
+      instructions.find(instruction => instruction.type === 'IsCursorOnObject')
     ).toEqual(
       expect.objectContaining({
         displayedName: 'The cursor/touch is on an object',
         fullGroupName: 'General ❯ Objects ❯ Mouse and touch',
-        type: 'SourisSurObjet',
+        type: 'IsCursorOnObject',
       })
     );
   });
@@ -71,7 +73,7 @@ describe('EnumerateInstructions', () => {
   it('can enumerate instructions being actions', () => {
     const instructions = enumerateAllInstructions(
       false,
-      // $FlowFixMe The fake I18n translates groups to empty strings.
+      // $FlowFixMe[incompatible-type] The fake I18n translates groups to empty strings.
       null
     );
 
@@ -129,11 +131,15 @@ describe('EnumerateInstructions', () => {
     expect(createInstruction).not.toBeUndefined();
     expect(getObjectParameterIndex(createInstruction.metadata)).toBe(1);
 
-    const pickRandom = actions.filter(({ type }) => type === 'AjoutHasard')[0];
+    const pickRandom = actions.filter(
+      ({ type }) => type === 'PickRandomInstance'
+    )[0];
     expect(pickRandom).not.toBeUndefined();
     expect(getObjectParameterIndex(pickRandom.metadata)).toBe(1);
 
-    const pickAll = actions.filter(({ type }) => type === 'AjoutObjConcern')[0];
+    const pickAll = actions.filter(
+      ({ type }) => type === 'PickAllInstances'
+    )[0];
     expect(pickAll).not.toBeUndefined();
     expect(getObjectParameterIndex(pickAll.metadata)).toBe(1);
 
@@ -153,6 +159,7 @@ describe('EnumerateInstructions', () => {
 
   it('can enumerate instructions for an object (Sprite)', () => {
     makeTestExtensions(gd);
+    // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Scene', 0);
     layout.getObjects().insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
@@ -173,7 +180,7 @@ describe('EnumerateInstructions', () => {
         }),
         expect.objectContaining({
           displayedName: 'The cursor/touch is on an object',
-          type: 'SourisSurObjet',
+          type: 'IsCursorOnObject',
         }),
       ])
     );

@@ -29,7 +29,10 @@ import ExtensionInstallDialog from '../ExtensionStore/ExtensionInstallDialog';
 import { getIDEVersion } from '../../Version';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
-export const useExtensionUpdateAlertDialog = () => {
+export const useExtensionUpdateAlertDialog = (): ((
+  project: gdProject,
+  behaviorShortHeader: BehaviorShortHeader
+) => Promise<boolean>) => {
   const { showConfirmation } = useAlertDialog();
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
@@ -82,18 +85,16 @@ export const BehaviorStore = ({
   deprecatedBehaviorMetadataList,
   onInstall,
   onChoose,
-}: Props) => {
+}: Props): React.Node => {
   const preferences = React.useContext(PreferencesContext);
   const [
     selectedBehaviorShortHeader,
     setSelectedBehaviorShortHeader,
   ] = React.useState<?BehaviorShortHeader>(null);
   const {
-    filters,
     searchResults,
     error,
     fetchBehaviors,
-    filtersState,
     searchText,
     setSearchText,
     allCategories,
@@ -131,15 +132,6 @@ export const BehaviorStore = ({
   );
 
   const filteredSearchResults = searchResults ? searchResults : null;
-
-  const tagsHandler = React.useMemo(
-    () => ({
-      add: filtersState.addFilter,
-      remove: filtersState.removeFilter,
-      chosenTags: filtersState.chosenFilters,
-    }),
-    [filtersState]
-  );
 
   const getExtensionsMatches = React.useCallback(
     (extensionShortHeader: BehaviorShortHeader): SearchMatch[] => {
@@ -255,8 +247,6 @@ export const BehaviorStore = ({
                   value={searchText}
                   onChange={setSearchText}
                   onRequestSearch={() => {}}
-                  tagsHandler={tagsHandler}
-                  tags={filters && filters.allTags}
                   placeholder={t`Search behaviors`}
                   autoFocus="desktop"
                 />
@@ -306,6 +296,7 @@ export const BehaviorStore = ({
             filteredSearchResults.map(({ item }) => item)
           }
           getSearchItemUniqueId={getBehaviorType}
+          // $FlowFixMe[missing-local-annot]
           renderSearchItem={(behaviorShortHeader, onHeightComputed) => (
             <BehaviorListItem
               id={

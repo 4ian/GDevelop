@@ -67,7 +67,7 @@ export const LoadingScreenEditor = ({
   project,
   resourceManagementProps,
   projectScopedContainersAccessor,
-}: Props) => {
+}: Props): React.Node => {
   const subscriptionChecker = React.useRef<?SubscriptionCheckerInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const forceUpdate = useForceUpdate();
@@ -240,7 +240,7 @@ export const LoadingScreenEditor = ({
             {!hasValidSubscription && (
               <GetSubscriptionCard
                 subscriptionDialogOpeningReason="Disable GDevelop splash at startup"
-                recommendedPlanIdIfNoSubscription="gdevelop_silver"
+                recommendedPlanId="gdevelop_silver"
                 placementId="gdevelop-branding"
               >
                 <Text>

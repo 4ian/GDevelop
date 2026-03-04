@@ -7,7 +7,7 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import Background from '../UI/Background';
-import SearchBar from '../UI/SearchBar';
+import CompactSearchBar from '../UI/CompactSearchBar';
 import NewObjectDialog from '../AssetStore/NewObjectDialog';
 import AssetSwappingDialog from '../AssetStore/AssetSwappingDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -158,6 +158,7 @@ class LeafTreeViewItem implements TreeViewItem {
   }
 }
 
+// $FlowFixMe[incompatible-type]
 class PlaceHolderTreeViewItem implements TreeViewItem {
   isPlaceholder = true;
   content: TreeViewItemContent;
@@ -206,6 +207,7 @@ const createTreeViewItem = ({
   }
 };
 
+// $FlowFixMe[incompatible-type]
 class ObjectFolderTreeViewItem implements TreeViewItem {
   isRoot: boolean;
   global: boolean;
@@ -277,6 +279,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     this.id = id;
     this.label = label;
     this.buildMenuTemplateFunction = (i18n: I18nType, index: number) =>
+      // $FlowFixMe[incompatible-type]
       [
         rightButton
           ? {
@@ -317,6 +320,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
 
   onClick(): void {}
 
+  // $FlowFixMe[missing-local-annot]
   buildMenuTemplate(i18n: I18nType, index: number) {
     return this.buildMenuTemplateFunction(i18n, index);
   }
@@ -432,6 +436,7 @@ export type ObjectsListInterface = {|
 type Props = {|
   project: gdProject,
   layout: ?gdLayout,
+  eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,
   initialInstances?: gdInitialInstancesContainer,
   /** The objects retrieved from ProjectScopedContainers must never be kept in a
@@ -481,6 +486,7 @@ type Props = {|
     variantName: string
   ) => void,
   onExportAssets: () => void,
+  onImportAssets: () => void,
   onObjectCreated: (
     objects: Array<gdObject>,
     isTheFirstOfItsTypeInProject: boolean
@@ -512,6 +518,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     {
       project,
       layout,
+      eventsFunctionsExtension,
       eventsBasedObject,
       initialInstances,
       projectScopedContainersAccessor,
@@ -531,6 +538,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onOpenEventBasedObjectEditor,
       onOpenEventBasedObjectVariantEditor,
       onExportAssets,
+      onImportAssets,
       onObjectCreated,
       onObjectEdited,
       onObjectFolderOrObjectWithContextSelected,
@@ -608,7 +616,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           ? 'New' +
             (project.getEventsBasedObject(objectType).getDefaultName() ||
               project.getEventsBasedObject(objectType).getName())
-          : objectTypeToDefaultName[objectType] || 'NewObject';
+          : // $FlowFixMe[invalid-computed-prop]
+            objectTypeToDefaultName[objectType] || 'NewObject';
         const name = newNameGenerator(
           defaultName,
           name =>
@@ -681,6 +690,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         setNewObjectDialogOpen(null);
         // TODO Should it be called later?
+        // $FlowFixMe[constant-condition]
         if (onEditObject) {
           onEditObject(object);
           onObjectFolderOrObjectWithContextSelected(
@@ -811,7 +821,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // If all parents are open, return the objectFolderOrObject given as input.
         return getTreeViewItemIdFromObjectFolderOrObject(objectFolderOrObject);
       }
-      // $FlowFixMe - We are confident this TreeView item is in fact a ObjectFolderOrObjectWithContext
+      // $FlowFixMe[incompatible-type] - We are confident this TreeView item is in fact a ObjectFolderOrObjectWithContext
       return topToBottomAscendanceId[firstClosedFolderIndex];
     };
 
@@ -1230,6 +1240,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                   label: i18n._(t`Export as assets`),
                   click: () => onExportAssets(),
                 },
+                {
+                  label: i18n._(t`Import assets`),
+                  click: () => onImportAssets(),
+                },
               ]
             ),
             placeholder: new PlaceHolderTreeViewItem(
@@ -1240,7 +1254,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             objectFolderTreeViewItemProps,
           }),
         ].filter(Boolean);
-        // $FlowFixMe
+        // $FlowFixMe[incompatible-type]
         return treeViewItems;
       },
       [
@@ -1250,13 +1264,14 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectTreeViewItemProps,
         objectFolderTreeViewItemProps,
         objectsRootFolder,
+        isEntirelyEmpty,
         isListLocked,
         addFolder,
         expandFolders,
         onAddNewObject,
         selectedObjectFolderOrObjectsWithContext,
         onExportAssets,
-        isEntirelyEmpty,
+        onImportAssets,
       ]
     );
 
@@ -1539,10 +1554,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     return (
       <Background maxWidth>
         <LineStackLayout>
-          <Column expand>
-            <SearchBar
+          <Column expand noOverflowParent>
+            <CompactSearchBar
               value={searchText}
-              onRequestSearch={() => {}}
               onChange={setSearchText}
               placeholder={t`Search objects`}
             />
@@ -1559,6 +1573,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               <div style={styles.autoSizerContainer}>
                 <AutoSizer style={styles.autoSizer} disableWidth>
                   {({ height }) => (
+                    // $FlowFixMe[incompatible-type]
+                    // $FlowFixMe[incompatible-exact]
                     <TreeView
                       key={listKey}
                       ref={treeViewRef}
@@ -1625,6 +1641,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             onObjectsAddedFromAssets={onObjectsAddedFromAssets}
             project={project}
             layout={layout}
+            eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedObject={eventsBasedObject}
             objectsContainer={objectsContainer}
             resourceManagementProps={resourceManagementProps}
@@ -1671,19 +1688,23 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.globalObjectsContainer === nextProps.globalObjectsContainer &&
   prevProps.objectsContainer === nextProps.objectsContainer;
 
+// $FlowFixMe[incompatible-type]
 const MemoizedObjectsList = React.memo<Props, ObjectsListInterface>(
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-exact]
   ObjectsList,
   arePropsEqual
 );
 
-const ObjectsListWithErrorBoundary = React.forwardRef<
-  Props,
-  ObjectsListInterface
->((props, ref) => (
+const ObjectsListWithErrorBoundary: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<ObjectsListInterface>,
+}> = React.forwardRef<Props, ObjectsListInterface>((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Objects list</Trans>}
     scope="scene-editor-objects-list"
   >
+    {/* $FlowFixMe[incompatible-type] */}
     <MemoizedObjectsList ref={ref} {...props} />
   </ErrorBoundary>
 ));

@@ -18,6 +18,7 @@ import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { CreditsPackageStoreContext } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import { type EditorCallbacks } from '../EditorFunctions';
 import {
+  getFunctionCallNameByCallId,
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
 } from './AiRequestUtils';
@@ -97,7 +98,7 @@ export const AskAiStandAloneForm = ({
   dismissableIdentifier,
   onWillInstallExtension,
   onExtensionInstalled,
-}: Props) => {
+}: Props): null | React.Node => {
   const onCreateProject = React.useCallback(
     async ({
       name,
@@ -276,12 +277,19 @@ export const AskAiStandAloneForm = ({
             userId: profile.id,
             simplifiedProjectJson: null,
             projectSpecificExtensionsSummaryJson: null,
+            eventsJson: null,
           });
 
           const aiRequest = await createAiRequest(getAuthorizationHeader, {
             userRequest: userRequest,
             userId: profile.id,
-            ...preparedAiUserContent,
+            gameProjectJsonUserRelativeKey:
+              preparedAiUserContent.gameProjectJsonUserRelativeKey,
+            gameProjectJson: preparedAiUserContent.gameProjectJson,
+            projectSpecificExtensionsSummaryJsonUserRelativeKey:
+              preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
+            projectSpecificExtensionsSummaryJson:
+              preparedAiUserContent.projectSpecificExtensionsSummaryJson,
             payWithCredits,
             gameId: null, // No game associated when starting from the standalone form.
             fileMetadata: null, // No file metadata when starting from the standalone form.
@@ -295,7 +303,7 @@ export const AskAiStandAloneForm = ({
 
           console.info('Successfully created a new AI request:', aiRequest);
           setSendingAiRequest(null, false);
-          updateAiRequest(aiRequest.id, aiRequest);
+          updateAiRequest(aiRequest.id, () => aiRequest);
 
           // Select the new AI request just created - unless the user switched to another one
           // in the meantime.
@@ -426,6 +434,7 @@ export const AskAiStandAloneForm = ({
           userId: profile.id,
           simplifiedProjectJson,
           projectSpecificExtensionsSummaryJson,
+          eventsJson: null,
         });
 
         // If we're updating the request, following a function call to initialize the project,
@@ -433,7 +442,11 @@ export const AskAiStandAloneForm = ({
         const paused =
           functionCallOutputs.length > 0 &&
           functionCallOutputs.some(
-            output => output.call_id.indexOf('initialize_project') !== -1
+            output =>
+              getFunctionCallNameByCallId({
+                aiRequest: aiRequestForForm,
+                callId: output.call_id,
+              }) === 'initialize_project'
           );
 
         const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
@@ -441,7 +454,13 @@ export const AskAiStandAloneForm = ({
             userId: profile.id,
             aiRequestId: aiRequestIdForForm,
             functionCallOutputs,
-            ...preparedAiUserContent,
+            gameProjectJsonUserRelativeKey:
+              preparedAiUserContent.gameProjectJsonUserRelativeKey,
+            gameProjectJson: preparedAiUserContent.gameProjectJson,
+            projectSpecificExtensionsSummaryJsonUserRelativeKey:
+              preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
+            projectSpecificExtensionsSummaryJson:
+              preparedAiUserContent.projectSpecificExtensionsSummaryJson,
             gameId: upToDateProject
               ? upToDateProject.getProjectUuid()
               : undefined,
@@ -452,7 +471,7 @@ export const AskAiStandAloneForm = ({
             toolsVersion: AI_AGENT_TOOLS_VERSION,
           })
         );
-        updateAiRequest(aiRequest.id, aiRequest);
+        updateAiRequest(aiRequest.id, () => aiRequest);
         setSendingAiRequest(aiRequest.id, false);
         clearEditorFunctionCallResults(aiRequest.id);
       } catch (error) {
@@ -577,6 +596,7 @@ export const AskAiStandAloneForm = ({
           { limits, getAiSettings }
         )}
         project={project}
+        fileMetadata={fileMetadata}
         ref={aiRequestChatRef}
         aiRequest={aiRequestForForm}
         onStartNewAiRequest={startNewAiRequest}
@@ -628,6 +648,11 @@ export const AskAiStandAloneForm = ({
         editorCallbacks={editorCallbacks}
         onStartOrOpenChat={() => {}}
         standAloneForm
+        // Restoring project version not relevant to standalone form.
+        isFetchingSuggestions={false}
+        savingProjectForMessageId={null}
+        forkingState={null}
+        onRestore={async () => {}}
       />
     </Column>
   );

@@ -9,7 +9,7 @@ type Props = {|
   showOnTop?: boolean,
 |};
 
-const PlaceholderMessage = (props: Props) => {
+const PlaceholderMessage = (props: Props): React.MixedElement => {
   return (
     <div
       {...dataObjectToProps(props.data)}

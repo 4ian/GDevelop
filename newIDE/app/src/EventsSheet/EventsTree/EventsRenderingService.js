@@ -2,6 +2,7 @@
 import { type ComponentType } from 'react';
 import UnknownEvent from './Renderers/UnknownEvent';
 import StandardEvent from './Renderers/StandardEvent';
+import ElseEvent from './Renderers/ElseEvent';
 import GroupEvent from './Renderers/GroupEvent';
 import CommentEvent from './Renderers/CommentEvent';
 import ForEachEvent from './Renderers/ForEachEvent';
@@ -16,6 +17,7 @@ const EventsRenderingService = {
   components: {
     unknownEvent: UnknownEvent,
     'BuiltinCommonInstructions::Standard': StandardEvent,
+    'BuiltinCommonInstructions::Else': ElseEvent,
     'BuiltinCommonInstructions::Group': GroupEvent,
     'BuiltinCommonInstructions::Comment': CommentEvent,
     'BuiltinCommonInstructions::ForEach': ForEachEvent,
@@ -25,6 +27,7 @@ const EventsRenderingService = {
     'BuiltinCommonInstructions::Link': LinkEvent,
     'BuiltinCommonInstructions::JsCode': JsCodeEvent,
   },
+  // $FlowFixMe[missing-this-annot]
   getEventComponent: function(
     event: gdBaseEvent
   ): ComponentType<EventRendererProps> {
@@ -32,6 +35,7 @@ const EventsRenderingService = {
       return this.components[event.getType()];
     else return this.components.unknownEvent;
   },
+  // $FlowFixMe[missing-this-annot]
   registerEvent: function(
     eventType: string,
     renderFunction: ComponentType<EventRendererProps>

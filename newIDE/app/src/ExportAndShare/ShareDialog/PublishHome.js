@@ -37,6 +37,7 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { type GameAndBuildsManager } from '../../Utils/UseGameAndBuildsManager';
 import { I18n } from '@lingui/react';
+import { type FileMetadata } from '../../ProjectsStorage';
 
 const styles = {
   buttonBase: {
@@ -263,7 +264,7 @@ const SectionLine = ({
 
 type PublishHomeProps = {|
   project: gdProject,
-  onSaveProject: () => Promise<void>,
+  onSaveProject: () => Promise<?FileMetadata>,
   isSavingProject: boolean,
   gameAndBuildsManager: GameAndBuildsManager,
   onChangeSubscription: () => void,
@@ -293,7 +294,7 @@ const PublishHome = ({
   chosenSubSection,
   allExportersRequireOnline,
   showOnlineWebExporterOnly,
-}: PublishHomeProps) => {
+}: PublishHomeProps): React.Node => {
   const { isMobile } = useResponsiveWindowSize();
   const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);

@@ -27,6 +27,10 @@ module.exports = {
         'Todor Imreorov',
         'Open source (MIT License)'
       )
+      .setShortDescription(
+        'Rich text with BBCode markup: bold, italic, colors, sizes, shadows in a single object.'
+      )
+      .setDimension('2D')
       .setExtensionHelpPath('/objects/bbtext')
       .setCategory('Text');
     extension
@@ -36,6 +40,30 @@ module.exports = {
     var objectBBText = new gd.ObjectJsImplementation();
     objectBBText.updateProperty = function (propertyName, newValue) {
       const objectContent = this.content;
+      if (propertyName === 'align') {
+        const normalizedValue = newValue.toLowerCase();
+        if (
+          normalizedValue === 'left' ||
+          normalizedValue === 'center' ||
+          normalizedValue === 'right'
+        ) {
+          objectContent.align = normalizedValue;
+          return true;
+        }
+        return false;
+      }
+      if (propertyName === 'verticalTextAlignment') {
+        const normalizedValue = newValue.toLowerCase();
+        if (
+          normalizedValue === 'top' ||
+          normalizedValue === 'center' ||
+          normalizedValue === 'bottom'
+        ) {
+          objectContent.verticalTextAlignment = normalizedValue;
+          return true;
+        }
+        return false;
+      }
       if (propertyName in objectContent) {
         if (typeof objectContent[propertyName] === 'boolean')
           objectContent[propertyName] = newValue === '1';
@@ -138,9 +166,7 @@ module.exports = {
       .addObject(
         'BBText',
         _('BBText'),
-        _(
-          'Displays a rich text label using BBCode markup (allowing to set parts of the text as bold, italic, use different colors and shadows).'
-        ),
+        _('Formatted text allowing to mix styles using BBCode markup.'),
         'JsPlatform/Extensions/bbcode32.png',
         objectBBText
       )
@@ -149,7 +175,7 @@ module.exports = {
       .addIncludeFile(
         'Extensions/BBText/pixi-multistyle-text/dist/pixi-multistyle-text.umd.js'
       )
-      .setCategoryFullName(_('Text'))
+      .setCategory('Text')
       .addDefaultBehavior('EffectCapability::EffectBehavior')
       .addDefaultBehavior('OpacityCapability::OpacityBehavior');
 

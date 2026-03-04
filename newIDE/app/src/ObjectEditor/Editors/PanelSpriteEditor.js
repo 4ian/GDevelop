@@ -13,7 +13,7 @@ export default class PanelSpriteEditor extends React.Component<
   EditorProps,
   void
 > {
-  render() {
+  render(): any {
     const {
       objectConfiguration,
       project,

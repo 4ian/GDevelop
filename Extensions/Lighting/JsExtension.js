@@ -26,6 +26,10 @@ module.exports = {
         'Harsimran Virk',
         'MIT'
       )
+      .setShortDescription(
+        '2D light objects with configurable radius, color, and optional texture. Obstacle behavior blocks light.'
+      )
+      .setDimension('2D')
       .setCategory('Visual effect')
       .setTags('light');
 
@@ -164,7 +168,7 @@ module.exports = {
         'LightObject',
         _('Light'),
         _(
-          'Displays a 2D light on the scene, with a customizable radius and color. Add then the Light Obstacle behavior to the objects that must act as obstacle to the lights.'
+          'Displays a 2D light on the scene, with a customizable radius and color. Then add the Light Obstacle behavior to the objects that must act as obstacle to the lights.'
         ),
         'CppPlatform/Extensions/lightIcon32.png',
         lightObject
@@ -172,7 +176,7 @@ module.exports = {
       .setIncludeFile('Extensions/Lighting/lightruntimeobject.js')
       .addIncludeFile('Extensions/Lighting/lightruntimeobject-pixi-renderer.js')
       .addIncludeFile('Extensions/Lighting/lightobstacleruntimebehavior.js')
-      .setCategoryFullName(_('Visual effect'))
+      .setCategory('Visual effect')
       .addDefaultBehavior('EffectCapability::EffectBehavior');
 
     object

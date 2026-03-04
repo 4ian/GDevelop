@@ -14,7 +14,7 @@ import { keyNames } from '../../Utils/KeyboardKeyNames';
 
 const isKeyValid = (key: string) => keyNames.indexOf(key) !== -1;
 
-export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function KeyField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
     const focus: FieldFocusFunction = options => {
@@ -65,12 +65,15 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       />
     );
   }
-);
+): React.ComponentType<{
+  ...ParameterFieldProps,
+  +ref?: React.RefSetter<ParameterFieldInterface>,
+}>);
 
 export const renderInlineKey = ({
   value,
   InvalidParameterValue,
-}: ParameterInlineRendererProps) => {
+}: ParameterInlineRendererProps): string | React.MixedElement => {
   if (!value) {
     return (
       <InvalidParameterValue isEmpty>

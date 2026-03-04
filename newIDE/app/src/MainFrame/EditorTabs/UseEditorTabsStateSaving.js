@@ -70,7 +70,10 @@ const useEditorTabsStateSaving = ({
   editorTabs,
   getEditorOpeningOptions,
   setEditorTabs,
-}: Props) => {
+}: Props): {
+  hasAPreviousSaveForEditorTabsState: (project: gdProject) => boolean,
+  openEditorTabsFromPersistedState: (project: gdProject) => number,
+} => {
   const {
     setEditorStateForProject,
     getEditorStateForProject,
@@ -93,7 +96,7 @@ const useEditorTabsStateSaving = ({
       setEditorStateForProject(
         currentProjectId,
         editorState.editors.length === 0
-          ? undefined
+          ? { editorTabs: null }
           : { editorTabs: editorState }
       );
     },
@@ -124,7 +127,8 @@ const useEditorTabsStateSaving = ({
   const hasAPreviousSaveForEditorTabsState = React.useCallback(
     (project: gdProject) => {
       const projectId = project.getProjectUuid();
-      return !!getEditorStateForProject(projectId);
+      const editorState = getEditorStateForProject(projectId);
+      return !!(editorState && editorState.editorTabs);
     },
     [getEditorStateForProject]
   );
@@ -133,7 +137,7 @@ const useEditorTabsStateSaving = ({
     (project: gdProject): number => {
       const projectId = project.getProjectUuid();
       const editorState = getEditorStateForProject(projectId);
-      if (!editorState) return 0;
+      if (!editorState || !editorState.editorTabs) return 0;
       let shouldOpenSavedCurrentTab = true;
 
       const editorsOpeningOptions = editorState.editorTabs.editors
@@ -180,7 +184,7 @@ const useEditorTabsStateSaving = ({
       newEditorTabs = changeCurrentTab(
         newEditorTabs,
         'center',
-        shouldOpenSavedCurrentTab
+        shouldOpenSavedCurrentTab && editorState.editorTabs
           ? editorState.editorTabs.currentTab
           : newEditorTabs.panes.center.editors.length >= 1
           ? 1

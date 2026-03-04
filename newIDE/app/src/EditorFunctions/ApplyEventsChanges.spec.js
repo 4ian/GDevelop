@@ -1,6 +1,13 @@
 // @flow
-import { applyEventsChanges } from './ApplyEventsChanges';
+import {
+  applyEventsChanges,
+  addMissingObjectBehaviors,
+} from './ApplyEventsChanges';
 import { type AiGeneratedEventChange } from '../Utils/GDevelopServices/Generation';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 
 const gd: libGDevelop = global.gd;
 
@@ -11,7 +18,7 @@ describe('applyEventsChanges', () => {
   const fakeGeneratedEventId = 'fakeGeneratedEventId';
 
   beforeEach(() => {
-    project = new gd.ProjectHelper.createNewGDJSProject();
+    project = gd.ProjectHelper.createNewGDJSProject();
     sceneEventsList = new gd.EventsList();
   });
 
@@ -54,9 +61,10 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
-    applyEventsChanges(
+    const result = applyEventsChanges(
       project,
       sceneEventsList,
       eventOperations,
@@ -69,6 +77,8 @@ describe('applyEventsChanges', () => {
     expect(sceneEventsList.getEventAt(1).getType()).toBe(
       'BuiltinCommonInstructions::Standard'
     );
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
   });
 
   it('should delete a sub-event', () => {
@@ -97,9 +107,10 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
-    applyEventsChanges(
+    const result = applyEventsChanges(
       project,
       sceneEventsList,
       eventOperations,
@@ -114,6 +125,573 @@ describe('applyEventsChanges', () => {
         .getEventAt(0)
         .getType()
     ).toBe('BuiltinCommonInstructions::Comment');
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('should delete an event by aiGeneratedEventId', () => {
+    sceneEventsList.clear();
+    unserializeFromJSObject(
+      sceneEventsList,
+      [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [{ type: { value: 'Hide' }, parameters: ['Box_Collider1'] }],
+        },
+        {
+          aiGeneratedEventId: '01KG391494T5Y99ZN04G8MNABN',
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [{ type: { value: 'Hide' }, parameters: ['Box_Collider2'] }],
+        },
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [{ type: { value: 'Hide' }, parameters: ['Box_Collider3'] }],
+          events: [
+            {
+              aiGeneratedEventId: '01KG391494T5Y99ZN04G8MNAB3',
+              type: 'BuiltinCommonInstructions::Standard',
+              conditions: [],
+              actions: [
+                { type: { value: 'Hide' }, parameters: ['Box_Collider4'] },
+              ],
+            },
+            {
+              aiGeneratedEventId: '01KG391494T5Y99ZN04G8MNAB2',
+              type: 'BuiltinCommonInstructions::Standard',
+              conditions: [],
+              actions: [
+                { type: { value: 'Hide' }, parameters: ['Box_Collider5'] },
+              ],
+            },
+          ],
+        },
+      ],
+      'unserializeFrom',
+      project
+    );
+
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationTargetEvent: '01KG391494T5Y99ZN04G8MNABN',
+        undeclaredObjectVariables: {},
+        generatedEvents: null,
+        diagnosticLines: [],
+        extensionNames: null,
+        undeclaredVariables: [],
+        isEventsJsonValid: true,
+        operationName: 'delete_event',
+        missingResources: [],
+        areEventsValid: true,
+        missingObjectBehaviors: {},
+      },
+      {
+        operationTargetEvent: '01KG391494T5Y99ZN04G8MNAB2',
+        undeclaredObjectVariables: {},
+        generatedEvents: null,
+        diagnosticLines: [],
+        extensionNames: null,
+        undeclaredVariables: [],
+        isEventsJsonValid: true,
+        operationName: 'delete_event',
+        missingResources: [],
+        areEventsValid: true,
+        missingObjectBehaviors: {},
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
+    expect(serializeToJSObject(sceneEventsList)).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "actions": Array [
+            Object {
+              "parameters": Array [
+                "Box_Collider1",
+              ],
+              "type": Object {
+                "value": "Hide",
+              },
+            },
+          ],
+          "conditions": Array [],
+          "type": "BuiltinCommonInstructions::Standard",
+        },
+        Object {
+          "actions": Array [
+            Object {
+              "parameters": Array [
+                "Box_Collider3",
+              ],
+              "type": Object {
+                "value": "Hide",
+              },
+            },
+          ],
+          "conditions": Array [],
+          "events": Array [
+            Object {
+              "actions": Array [
+                Object {
+                  "parameters": Array [
+                    "Box_Collider4",
+                  ],
+                  "type": Object {
+                    "value": "Hide",
+                  },
+                },
+              ],
+              "aiGeneratedEventId": "01KG391494T5Y99ZN04G8MNAB3",
+              "conditions": Array [],
+              "type": "BuiltinCommonInstructions::Standard",
+            },
+          ],
+          "type": "BuiltinCommonInstructions::Standard",
+        },
+      ]
+    `);
+  });
+
+  it('should delete multiple events via comma-separated paths', () => {
+    setupInitialSceneEvents([
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::Comment',
+      'BuiltinCommonInstructions::Repeat',
+      'BuiltinCommonInstructions::While',
+    ]);
+    // Delete events at indices 1 and 3 using comma-separated paths
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'delete_event',
+        operationTargetEvent: 'event-1,event-3',
+        generatedEvents: null,
+        isEventsJsonValid: null,
+        areEventsValid: null,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+    expect(sceneEventsList.getEventsCount()).toBe(2);
+    expect(getEventTypes(sceneEventsList)).toEqual([
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::Repeat',
+    ]);
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('should delete multiple events via comma-separated paths regardless of order', () => {
+    setupInitialSceneEvents([
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::Comment',
+      'BuiltinCommonInstructions::Repeat',
+      'BuiltinCommonInstructions::While',
+      'BuiltinCommonInstructions::ForEach',
+    ]);
+    // Delete events at indices 3, 0, and 1 (given in non-sequential order)
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'delete_event',
+        operationTargetEvent: 'event-3 , event-0 ,,,event-1',
+        generatedEvents: null,
+        isEventsJsonValid: null,
+        areEventsValid: null,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+    // Only Repeat (idx 2) and ForEach (idx 4) should remain
+    expect(sceneEventsList.getEventsCount()).toBe(2);
+    expect(getEventTypes(sceneEventsList)).toEqual([
+      'BuiltinCommonInstructions::Repeat',
+      'BuiltinCommonInstructions::ForEach',
+    ]);
+    expect(result.applied).toBe(3);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('should delete multiple events via comma-separated mixing paths and aiGeneratedEventIds', () => {
+    sceneEventsList.clear();
+    unserializeFromJSObject(
+      sceneEventsList,
+      [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [{ type: { value: 'Hide' }, parameters: ['Obj1'] }],
+        },
+        {
+          aiGeneratedEventId: 'id-to-delete',
+          type: 'BuiltinCommonInstructions::Comment',
+          conditions: [],
+          actions: [],
+        },
+        {
+          type: 'BuiltinCommonInstructions::Repeat',
+          conditions: [],
+          actions: [{ type: { value: 'Hide' }, parameters: ['Obj2'] }],
+        },
+        {
+          type: 'BuiltinCommonInstructions::While',
+          conditions: [],
+          actions: [{ type: { value: 'Hide' }, parameters: ['Obj3'] }],
+          whileConditions: [],
+        },
+      ],
+      'unserializeFrom',
+      project
+    );
+    // Delete using a mix of aiGeneratedEventId and path
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'delete_event',
+        operationTargetEvent: 'id-to-delete ,,event-3,',
+        generatedEvents: null,
+        isEventsJsonValid: null,
+        areEventsValid: null,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+    expect(sceneEventsList.getEventsCount()).toBe(2);
+    expect(serializeToJSObject(sceneEventsList)).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "actions": Array [
+            Object {
+              "parameters": Array [
+                "Obj1",
+              ],
+              "type": Object {
+                "value": "Hide",
+              },
+            },
+          ],
+          "conditions": Array [],
+          "type": "BuiltinCommonInstructions::Standard",
+        },
+        Object {
+          "actions": Array [
+            Object {
+              "parameters": Array [
+                "Obj2",
+              ],
+              "type": Object {
+                "value": "Hide",
+              },
+            },
+          ],
+          "conditions": Array [],
+          "repeatExpression": "",
+          "type": "BuiltinCommonInstructions::Repeat",
+        },
+      ]
+    `);
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('should delete comma-separated events mixed with a traditional single delete', () => {
+    setupInitialSceneEvents([
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::Comment',
+      'BuiltinCommonInstructions::Repeat',
+      'BuiltinCommonInstructions::While',
+      'BuiltinCommonInstructions::ForEach',
+    ]);
+    // One operation deletes events 0 and 3 via comma-separated, another deletes event 4 traditionally
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'delete_event',
+        operationTargetEvent: 'event-0,event-3',
+        generatedEvents: null,
+        isEventsJsonValid: null,
+        areEventsValid: null,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+      {
+        operationName: 'delete_event',
+        operationTargetEvent: 'event-4',
+        generatedEvents: null,
+        isEventsJsonValid: null,
+        areEventsValid: null,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+    // Only Comment (idx 1) and Repeat (idx 2) should remain
+    expect(sceneEventsList.getEventsCount()).toBe(2);
+    expect(getEventTypes(sceneEventsList)).toEqual([
+      'BuiltinCommonInstructions::Comment',
+      'BuiltinCommonInstructions::Repeat',
+    ]);
+    expect(result.applied).toBe(3);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('should reject comma-separated targets for non-delete operations', () => {
+    setupInitialSceneEvents([
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::Repeat',
+    ]);
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'insert_before_event',
+        operationTargetEvent: 'event-0,event-1',
+        generatedEvents: newEventsForInsertionJson,
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+      {
+        operationName: 'insert_and_replace_event',
+        operationTargetEvent: 'event-0,event-1',
+        generatedEvents: newEventsForInsertionJson,
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+      {
+        operationName: 'replace_all_actions',
+        operationTargetEvent: 'event-0,event-1',
+        generatedEvents: newEventsForInsertionJson,
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+    // No changes should be applied
+    expect(sceneEventsList.getEventsCount()).toBe(2);
+    expect(result.applied).toBe(0);
+    expect(result.errors).toEqual([
+      'Operation "insert_before_event" does not support multiple comma separated events as target.',
+      'Operation "insert_and_replace_event" does not support multiple comma separated events as target.',
+      'Operation "replace_all_actions" does not support multiple comma separated events as target.',
+    ]);
+  });
+
+  it('should produce the same result regardless of operation order (mixing single delete, comma-separated delete, insert, and replace)', () => {
+    const permutations = (arr: Array<number>): Array<Array<number>> => {
+      if (arr.length <= 1) return [arr];
+      const result: Array<Array<number>> = [];
+      for (let i = 0; i < arr.length; i++) {
+        const rest = [...arr.slice(0, i), ...arr.slice(i + 1)];
+        for (const perm of permutations(rest)) {
+          result.push([arr[i], ...perm]);
+        }
+      }
+      return result;
+    };
+
+    // 4 operations:
+    // 1. Single delete: delete Comment at index 1
+    // 2. Comma-separated delete: delete While(3) and ForEach(4)
+    // 3. Insert before: insert 2 new Standard events before index 0
+    // 4. Replace all actions: replace actions of Repeat at index 2
+    const operationFactories: Array<() => AiGeneratedEventChange> = [
+      () => ({
+        operationName: 'delete_event',
+        operationTargetEvent: 'event-1',
+        generatedEvents: null,
+        isEventsJsonValid: null,
+        areEventsValid: null,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      }),
+      () => ({
+        operationName: 'delete_event',
+        operationTargetEvent: 'event-3,event-4',
+        generatedEvents: null,
+        isEventsJsonValid: null,
+        areEventsValid: null,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      }),
+      () => ({
+        operationName: 'insert_before_event',
+        operationTargetEvent: 'event-0',
+        generatedEvents: newEventsForInsertionJson,
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      }),
+      () => ({
+        operationName: 'replace_all_actions',
+        operationTargetEvent: 'event-2',
+        generatedEvents:
+          '[{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[{"type":{"value":"ReplacedAction"}}]}]',
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      }),
+    ];
+
+    const allPermutations = permutations([0, 1, 2, 3]);
+    expect(allPermutations.length).toBe(24);
+
+    allPermutations.forEach(perm => {
+      // Reset scene events for each permutation
+      setupInitialSceneEvents([
+        'BuiltinCommonInstructions::Standard',
+        'BuiltinCommonInstructions::Comment',
+        'BuiltinCommonInstructions::Repeat',
+        'BuiltinCommonInstructions::While',
+        'BuiltinCommonInstructions::ForEach',
+      ]);
+
+      const eventOperations: Array<AiGeneratedEventChange> = perm.map(i =>
+        operationFactories[i]()
+      );
+      const result = applyEventsChanges(
+        project,
+        sceneEventsList,
+        eventOperations,
+        fakeGeneratedEventId
+      );
+
+      const permDescription = perm
+        .map(i => eventOperations[i].operationName)
+        .join(', ');
+
+      // Expected result regardless of order:
+      // - Comment(1), While(3), ForEach(4) deleted (3 deletes)
+      // - 2 new Standard events inserted before Standard(0) (1 insert)
+      // - Repeat(2) actions replaced (1 replace)
+      // Final: NewS, NewS, S0, R2 (with replaced actions)
+      expect({
+        permDescription,
+        count: sceneEventsList.getEventsCount(),
+      }).toEqual({ permDescription, count: 4 });
+      expect({
+        permDescription,
+        types: getEventTypes(sceneEventsList),
+      }).toEqual({
+        permDescription,
+        types: [
+          'BuiltinCommonInstructions::Standard',
+          'BuiltinCommonInstructions::Standard',
+          'BuiltinCommonInstructions::Standard',
+          'BuiltinCommonInstructions::Repeat',
+        ],
+      });
+
+      // Verify the Repeat event has replaced actions
+      const repeatEvent = gd.asRepeatEvent(sceneEventsList.getEventAt(3));
+      expect({
+        permDescription,
+        actionsCount: repeatEvent.getActions().size(),
+      }).toEqual({ permDescription, actionsCount: 1 });
+      expect({
+        permDescription,
+        actionType: repeatEvent
+          .getActions()
+          .get(0)
+          .getType(),
+      }).toEqual({ permDescription, actionType: 'ReplacedAction' });
+
+      // 3 deletes + 1 insert + 1 replace = 5 applied
+      expect({ permDescription, applied: result.applied }).toEqual({
+        permDescription,
+        applied: 5,
+      });
+      expect({ permDescription, errors: result.errors }).toEqual({
+        permDescription,
+        errors: [],
+      });
+    });
   });
 
   it('should insert events before a specified path', () => {
@@ -134,9 +712,10 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
-    applyEventsChanges(
+    const result = applyEventsChanges(
       project,
       sceneEventsList,
       eventOperations,
@@ -150,6 +729,8 @@ describe('applyEventsChanges', () => {
       'BuiltinCommonInstructions::Standard',
       'BuiltinCommonInstructions::Repeat',
     ]);
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
   });
 
   it('should append events if path targets end of list', () => {
@@ -169,9 +750,10 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
-    applyEventsChanges(
+    const result = applyEventsChanges(
       project,
       sceneEventsList,
       eventOperations,
@@ -185,6 +767,8 @@ describe('applyEventsChanges', () => {
       'BuiltinCommonInstructions::Standard',
       'BuiltinCommonInstructions::Standard',
     ]);
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
   });
 
   it('should insert events as sub-events', () => {
@@ -205,9 +789,10 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
-    applyEventsChanges(
+    const result = applyEventsChanges(
       project,
       sceneEventsList,
       eventOperations,
@@ -219,6 +804,8 @@ describe('applyEventsChanges', () => {
       'BuiltinCommonInstructions::Standard',
       'BuiltinCommonInstructions::Standard',
     ]);
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
   });
 
   it('should replace an event', () => {
@@ -240,9 +827,10 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
-    applyEventsChanges(
+    const result = applyEventsChanges(
       project,
       sceneEventsList,
       eventOperations,
@@ -256,6 +844,8 @@ describe('applyEventsChanges', () => {
       'BuiltinCommonInstructions::Standard',
       'BuiltinCommonInstructions::While',
     ]);
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
   });
 
   it('should process deletions before insertions when paths are sorted', () => {
@@ -279,6 +869,7 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
       {
         operationName: 'insert_before_event',
@@ -291,9 +882,10 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
-    applyEventsChanges(
+    const result = applyEventsChanges(
       project,
       sceneEventsList,
       eventOperations,
@@ -310,13 +902,12 @@ describe('applyEventsChanges', () => {
       'BuiltinCommonInstructions::Repeat', // R1
       'BuiltinCommonInstructions::ForEach', // F3
     ]);
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
   });
 
-  it('should warn and skip insert if no generatedEvents provided for an insert operation', () => {
+  it('should return error and skip insert if no generatedEvents provided for an insert operation', () => {
     setupInitialSceneEvents(['BuiltinCommonInstructions::Standard']);
-    const consoleWarnSpy = jest
-      .spyOn(console, 'warn')
-      .mockImplementation(() => {});
 
     const eventOperations: Array<AiGeneratedEventChange> = [
       {
@@ -330,10 +921,11 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
 
-    applyEventsChanges(
+    const result = applyEventsChanges(
       project,
       sceneEventsList,
       eventOperations,
@@ -341,19 +933,18 @@ describe('applyEventsChanges', () => {
     );
 
     expect(sceneEventsList.getEventsCount()).toBe(1); // No events added
-    expect(consoleWarnSpy).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'Insert operation for path [1] skipped: no events to insert or events list is empty'
-      )
+    expect(result.applied).toBe(0);
+    expect(result.errors).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining(
+          'Insert operation for path [1] skipped: no events to insert or events list is empty'
+        ),
+      ])
     );
-    consoleWarnSpy.mockRestore();
   });
 
-  it('should skip invalid delete path (out of bounds) gracefully and log error', () => {
+  it('should skip invalid delete path (out of bounds) gracefully and return error', () => {
     setupInitialSceneEvents(['BuiltinCommonInstructions::Standard']);
-    const consoleErrorSpy = jest
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
     const eventOperations: Array<AiGeneratedEventChange> = [
       {
         operationName: 'delete_event',
@@ -366,21 +957,860 @@ describe('applyEventsChanges', () => {
         undeclaredVariables: [],
         undeclaredObjectVariables: {},
         missingObjectBehaviors: {},
+        missingResources: [],
       },
     ];
-    applyEventsChanges(
+    const result = applyEventsChanges(
       project,
       sceneEventsList,
       eventOperations,
       fakeGeneratedEventId
     );
     expect(sceneEventsList.getEventsCount()).toBe(1); // No change
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'Error applying event operation type delete for path [5]'
-      ),
-      expect.any(Error)
+    expect(result.applied).toBe(0);
+    expect(result.errors).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining(
+          'Error applying event operation type delete for path [5]'
+        ),
+      ])
     );
-    consoleErrorSpy.mockRestore();
+  });
+
+  it('should replace event using replace_entire_event_and_sub_events (synonym for insert_and_replace_event)', () => {
+    setupInitialSceneEvents([
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::Repeat',
+      'BuiltinCommonInstructions::While',
+    ]);
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'replace_entire_event_and_sub_events',
+        operationTargetEvent: 'event-1',
+        generatedEvents: newEventsForInsertionJson,
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+    // Expected: S0, NewS, NewS, W2 (original R1 is gone, 2 new events inserted)
+    expect(sceneEventsList.getEventsCount()).toBe(4);
+    expect(getEventTypes(sceneEventsList)).toEqual([
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::While',
+    ]);
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('should replace event but keep existing sub-events with replace_event_but_keep_existing_sub_events', () => {
+    sceneEventsList.clear();
+    // Create a Group event with sub-events
+    const groupEvent = gd.asGroupEvent(
+      sceneEventsList.insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::Group',
+        0
+      )
+    );
+    groupEvent.setName('TestGroup');
+    const subEvents = groupEvent.getSubEvents();
+    subEvents.insertNewEvent(project, 'BuiltinCommonInstructions::Comment', 0);
+    subEvents.insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 1);
+
+    // Replace the group event with a standard event - should keep the sub-events
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'replace_event_but_keep_existing_sub_events',
+        operationTargetEvent: 'event-0',
+        generatedEvents:
+          '[{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[]}]',
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    expect(sceneEventsList.getEventsCount()).toBe(1);
+    const replacedEvent = sceneEventsList.getEventAt(0);
+    expect(replacedEvent.getType()).toBe('BuiltinCommonInstructions::Standard');
+    // Check that sub-events were preserved
+    expect(replacedEvent.getSubEvents().getEventsCount()).toBe(2);
+    expect(
+      replacedEvent
+        .getSubEvents()
+        .getEventAt(0)
+        .getType()
+    ).toBe('BuiltinCommonInstructions::Comment');
+    expect(
+      replacedEvent
+        .getSubEvents()
+        .getEventAt(1)
+        .getType()
+    ).toBe('BuiltinCommonInstructions::Standard');
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('should append sub-events from replacement event with replace_event_but_keep_existing_sub_events', () => {
+    sceneEventsList.clear();
+    // Create a Group event with one sub-event
+    const groupEvent = gd.asGroupEvent(
+      sceneEventsList.insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::Group',
+        0
+      )
+    );
+    const subEvents = groupEvent.getSubEvents();
+    subEvents.insertNewEvent(project, 'BuiltinCommonInstructions::Comment', 0);
+
+    // Replace with a standard event that also has a sub-event
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'replace_event_but_keep_existing_sub_events',
+        operationTargetEvent: 'event-0',
+        generatedEvents:
+          '[{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[],"events":[{"type":"BuiltinCommonInstructions::Repeat","conditions":[],"actions":[]}]}]',
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    expect(sceneEventsList.getEventsCount()).toBe(1);
+    const replacedEvent = sceneEventsList.getEventAt(0);
+    // Existing sub-event at start, new sub-event appended at end
+    expect(replacedEvent.getSubEvents().getEventsCount()).toBe(2);
+    expect(
+      replacedEvent
+        .getSubEvents()
+        .getEventAt(0)
+        .getType()
+    ).toBe('BuiltinCommonInstructions::Comment'); // Existing
+    expect(
+      replacedEvent
+        .getSubEvents()
+        .getEventAt(1)
+        .getType()
+    ).toBe('BuiltinCommonInstructions::Repeat'); // From replacement
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('should insert events after target with insert_after_event', () => {
+    setupInitialSceneEvents([
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::Repeat',
+      'BuiltinCommonInstructions::While',
+    ]);
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'insert_after_event',
+        operationTargetEvent: 'event-0',
+        generatedEvents: newEventsForInsertionJson,
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+    // Expected: S0, NewS, NewS, R1, W2
+    expect(sceneEventsList.getEventsCount()).toBe(5);
+    expect(getEventTypes(sceneEventsList)).toEqual([
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::Repeat',
+      'BuiltinCommonInstructions::While',
+    ]);
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('should insert events after last event with insert_after_event', () => {
+    setupInitialSceneEvents([
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::Repeat',
+    ]);
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'insert_after_event',
+        operationTargetEvent: 'event-1', // After the last event
+        generatedEvents: newEventsForInsertionJson,
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+    // Expected: S0, R1, NewS, NewS
+    expect(sceneEventsList.getEventsCount()).toBe(4);
+    expect(getEventTypes(sceneEventsList)).toEqual([
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::Repeat',
+      'BuiltinCommonInstructions::Standard',
+      'BuiltinCommonInstructions::Standard',
+    ]);
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('should copy actions and conditions at end with insert_actions_conditions_at_end', () => {
+    sceneEventsList.clear();
+    const standardEvent = gd.asStandardEvent(
+      sceneEventsList.insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::Standard',
+        0
+      )
+    );
+    // Add one existing action and condition
+    const existingAction = new gd.Instruction();
+    existingAction.setType('ExistingAction');
+    standardEvent.getActions().insert(existingAction, 0);
+    existingAction.delete();
+
+    const existingCondition = new gd.Instruction();
+    existingCondition.setType('ExistingCondition');
+    standardEvent.getConditions().insert(existingCondition, 0);
+    existingCondition.delete();
+
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'insert_actions_conditions_at_end',
+        operationTargetEvent: 'event-0',
+        generatedEvents:
+          '[{"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"value":"NewCondition"}}],"actions":[{"type":{"value":"NewAction"}}]}]',
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    const resultEvent = gd.asStandardEvent(sceneEventsList.getEventAt(0));
+    // Check actions: existing first, new at end
+    expect(resultEvent.getActions().size()).toBe(2);
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
+    expect(
+      resultEvent
+        .getActions()
+        .get(0)
+        .getType()
+    ).toBe('ExistingAction');
+    expect(
+      resultEvent
+        .getActions()
+        .get(1)
+        .getType()
+    ).toBe('NewAction');
+    // Check conditions: existing first, new at end
+    expect(resultEvent.getConditions().size()).toBe(2);
+    expect(
+      resultEvent
+        .getConditions()
+        .get(0)
+        .getType()
+    ).toBe('ExistingCondition');
+    expect(
+      resultEvent
+        .getConditions()
+        .get(1)
+        .getType()
+    ).toBe('NewCondition');
+  });
+
+  it('should copy while conditions at end for While events with insert_actions_conditions_at_end', () => {
+    sceneEventsList.clear();
+    const whileEvent = gd.asWhileEvent(
+      sceneEventsList.insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::While',
+        0
+      )
+    );
+    // Add one existing while condition
+    const existingWhileCondition = new gd.Instruction();
+    existingWhileCondition.setType('ExistingWhileCondition');
+    whileEvent.getWhileConditions().insert(existingWhileCondition, 0);
+    existingWhileCondition.delete();
+
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'insert_actions_conditions_at_end',
+        operationTargetEvent: 'event-0',
+        generatedEvents:
+          '[{"type":"BuiltinCommonInstructions::While","whileConditions":[{"type":{"value":"NewWhileCondition"}}],"conditions":[],"actions":[]}]',
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    const resultEvent = gd.asWhileEvent(sceneEventsList.getEventAt(0));
+    expect(resultEvent.getWhileConditions().size()).toBe(2);
+    expect(
+      resultEvent
+        .getWhileConditions()
+        .get(0)
+        .getType()
+    ).toBe('ExistingWhileCondition');
+    expect(
+      resultEvent
+        .getWhileConditions()
+        .get(1)
+        .getType()
+    ).toBe('NewWhileCondition');
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('should copy actions and conditions at start with insert_actions_conditions_at_start', () => {
+    sceneEventsList.clear();
+    const standardEvent = gd.asStandardEvent(
+      sceneEventsList.insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::Standard',
+        0
+      )
+    );
+    // Add existing action and condition
+    const existingAction = new gd.Instruction();
+    existingAction.setType('ExistingAction');
+    standardEvent.getActions().insert(existingAction, 0);
+    existingAction.delete();
+
+    const existingCondition = new gd.Instruction();
+    existingCondition.setType('ExistingCondition');
+    standardEvent.getConditions().insert(existingCondition, 0);
+    existingCondition.delete();
+
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'insert_actions_conditions_at_start',
+        operationTargetEvent: 'event-0',
+        generatedEvents:
+          '[{"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"value":"NewCondition"}}],"actions":[{"type":{"value":"NewAction"}}]}]',
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    const resultEvent = gd.asStandardEvent(sceneEventsList.getEventAt(0));
+    // Check actions: new first, existing at end
+    expect(resultEvent.getActions().size()).toBe(2);
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
+    expect(
+      resultEvent
+        .getActions()
+        .get(0)
+        .getType()
+    ).toBe('NewAction');
+    expect(
+      resultEvent
+        .getActions()
+        .get(1)
+        .getType()
+    ).toBe('ExistingAction');
+    // Check conditions: new first, existing at end
+    expect(resultEvent.getConditions().size()).toBe(2);
+    expect(
+      resultEvent
+        .getConditions()
+        .get(0)
+        .getType()
+    ).toBe('NewCondition');
+    expect(
+      resultEvent
+        .getConditions()
+        .get(1)
+        .getType()
+    ).toBe('ExistingCondition');
+  });
+
+  it('should replace all actions with replace_all_actions', () => {
+    sceneEventsList.clear();
+    const standardEvent = gd.asStandardEvent(
+      sceneEventsList.insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::Standard',
+        0
+      )
+    );
+    // Add existing actions
+    const existingAction1 = new gd.Instruction();
+    existingAction1.setType('ExistingAction1');
+    standardEvent.getActions().insert(existingAction1, 0);
+    existingAction1.delete();
+    const existingAction2 = new gd.Instruction();
+    existingAction2.setType('ExistingAction2');
+    standardEvent.getActions().insert(existingAction2, 1);
+    existingAction2.delete();
+
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'replace_all_actions',
+        operationTargetEvent: 'event-0',
+        generatedEvents:
+          '[{"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[{"type":{"value":"ReplacementAction"}}]}]',
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    const resultEvent = gd.asStandardEvent(sceneEventsList.getEventAt(0));
+    // Only the replacement action should remain
+    expect(resultEvent.getActions().size()).toBe(1);
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
+    expect(
+      resultEvent
+        .getActions()
+        .get(0)
+        .getType()
+    ).toBe('ReplacementAction');
+  });
+
+  it('should replace all conditions with replace_all_conditions', () => {
+    sceneEventsList.clear();
+    const standardEvent = gd.asStandardEvent(
+      sceneEventsList.insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::Standard',
+        0
+      )
+    );
+    // Add existing conditions
+    const existingCondition1 = new gd.Instruction();
+    existingCondition1.setType('ExistingCondition1');
+    standardEvent.getConditions().insert(existingCondition1, 0);
+    existingCondition1.delete();
+    const existingCondition2 = new gd.Instruction();
+    existingCondition2.setType('ExistingCondition2');
+    standardEvent.getConditions().insert(existingCondition2, 1);
+    existingCondition2.delete();
+
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'replace_all_conditions',
+        operationTargetEvent: 'event-0',
+        generatedEvents:
+          '[{"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"value":"ReplacementCondition"}}],"actions":[]}]',
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    const resultEvent = gd.asStandardEvent(sceneEventsList.getEventAt(0));
+    // Only the replacement condition should remain
+    expect(resultEvent.getConditions().size()).toBe(1);
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
+    expect(
+      resultEvent
+        .getConditions()
+        .get(0)
+        .getType()
+    ).toBe('ReplacementCondition');
+  });
+
+  it('should replace while conditions with replace_all_conditions for While events', () => {
+    sceneEventsList.clear();
+    const whileEvent = gd.asWhileEvent(
+      sceneEventsList.insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::While',
+        0
+      )
+    );
+    // Add existing while conditions
+    const existingWhileCondition = new gd.Instruction();
+    existingWhileCondition.setType('ExistingWhileCondition');
+    whileEvent.getWhileConditions().insert(existingWhileCondition, 0);
+    existingWhileCondition.delete();
+
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'replace_all_conditions',
+        operationTargetEvent: 'event-0',
+        generatedEvents:
+          '[{"type":"BuiltinCommonInstructions::While","whileConditions":[{"type":{"value":"ReplacementWhileCondition"}}],"conditions":[],"actions":[]}]',
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    const resultEvent = gd.asWhileEvent(sceneEventsList.getEventAt(0));
+    expect(resultEvent.getWhileConditions().size()).toBe(1);
+    expect(
+      resultEvent
+        .getWhileConditions()
+        .get(0)
+        .getType()
+    ).toBe('ReplacementWhileCondition');
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('should target event by aiGeneratedEventId instead of path', () => {
+    sceneEventsList.clear();
+    const event1 = sceneEventsList.insertNewEvent(
+      project,
+      'BuiltinCommonInstructions::Standard',
+      0
+    );
+    event1.setAiGeneratedEventId('target-event-id');
+
+    sceneEventsList.insertNewEvent(
+      project,
+      'BuiltinCommonInstructions::Repeat',
+      1
+    );
+
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'insert_and_replace_event',
+        operationTargetEvent: 'target-event-id', // Using aiGeneratedEventId instead of path
+        generatedEvents:
+          '[{"type":"BuiltinCommonInstructions::Comment","conditions":[],"actions":[]}]',
+        isEventsJsonValid: true,
+        areEventsValid: true,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    // First event should be replaced with Comment
+    expect(sceneEventsList.getEventsCount()).toBe(2);
+    expect(getEventTypes(sceneEventsList)).toEqual([
+      'BuiltinCommonInstructions::Comment',
+      'BuiltinCommonInstructions::Repeat',
+    ]);
+    expect(result.applied).toBe(2);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('should find nested event by aiGeneratedEventId', () => {
+    sceneEventsList.clear();
+    const parentEvent = gd.asGroupEvent(
+      sceneEventsList.insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::Group',
+        0
+      )
+    );
+    const subEvents = parentEvent.getSubEvents();
+    subEvents.insertNewEvent(project, 'BuiltinCommonInstructions::Comment', 0);
+    const targetSubEvent = subEvents.insertNewEvent(
+      project,
+      'BuiltinCommonInstructions::Standard',
+      1
+    );
+    targetSubEvent.setAiGeneratedEventId('nested-target-id');
+
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'delete_event',
+        operationTargetEvent: 'nested-target-id', // Target nested event by ID
+        generatedEvents: null,
+        isEventsJsonValid: null,
+        areEventsValid: null,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    // The nested Standard event should be deleted
+    const finalParentEvent = sceneEventsList.getEventAt(0);
+    expect(finalParentEvent.getSubEvents().getEventsCount()).toBe(1);
+    expect(
+      finalParentEvent
+        .getSubEvents()
+        .getEventAt(0)
+        .getType()
+    ).toBe('BuiltinCommonInstructions::Comment');
+    expect(result.applied).toBe(1);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('should skip operation if event with aiGeneratedEventId is not found and return error', () => {
+    setupInitialSceneEvents(['BuiltinCommonInstructions::Standard']);
+
+    const eventOperations: Array<AiGeneratedEventChange> = [
+      {
+        operationName: 'delete_event',
+        operationTargetEvent: 'non-existent-id',
+        generatedEvents: null,
+        isEventsJsonValid: null,
+        areEventsValid: null,
+        diagnosticLines: [],
+        extensionNames: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: [],
+      },
+    ];
+    const result = applyEventsChanges(
+      project,
+      sceneEventsList,
+      eventOperations,
+      fakeGeneratedEventId
+    );
+
+    expect(sceneEventsList.getEventsCount()).toBe(1); // No change
+    expect(result.applied).toBe(0);
+    expect(result.errors).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('Could not find event with aiGeneratedEventId'),
+      ])
+    );
+  });
+});
+
+describe('addMissingObjectBehaviors', () => {
+  let project: gdProject;
+  let testScene: gdLayout;
+
+  beforeEach(() => {
+    // $FlowFixMe[invalid-constructor]
+    project = new gd.ProjectHelper.createNewGDJSProject();
+    testScene = project.insertNewLayout('TestScene', 0);
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  it('should add a PlatformerObjectBehavior to an object', () => {
+    // Create a Sprite object in the scene
+    const testSceneObjects = testScene.getObjects();
+    const playerObject = testSceneObjects.insertNewObject(
+      project,
+      'Sprite',
+      'Player',
+      testSceneObjects.getObjectsCount()
+    );
+
+    // Verify the object does not have the behavior initially
+    expect(playerObject.hasBehaviorNamed('PlatformerObject')).toBe(false);
+
+    // Add the PlatformerObjectBehavior
+    addMissingObjectBehaviors({
+      project,
+      scene: testScene,
+      objectName: 'Player',
+      missingBehaviors: [
+        {
+          objectName: 'Player',
+          name: 'PlatformerObject',
+          type: 'PlatformBehavior::PlatformerObjectBehavior',
+        },
+      ],
+    });
+
+    // Verify the behavior was added
+    expect(playerObject.hasBehaviorNamed('PlatformerObject')).toBe(true);
+    expect(playerObject.getBehavior('PlatformerObject').getTypeName()).toBe(
+      'PlatformBehavior::PlatformerObjectBehavior'
+    );
+  });
+
+  it('should add a PlatformerObjectBehavior to all objects in an object group', () => {
+    // Create multiple Sprite objects in the scene
+    const testSceneObjects = testScene.getObjects();
+    const player1 = testSceneObjects.insertNewObject(
+      project,
+      'Sprite',
+      'Player1',
+      testSceneObjects.getObjectsCount()
+    );
+    const player2 = testSceneObjects.insertNewObject(
+      project,
+      'Sprite',
+      'Player2',
+      testSceneObjects.getObjectsCount()
+    );
+
+    // Create an object group containing both players
+    const objectGroups = testSceneObjects.getObjectGroups();
+    const playersGroup = objectGroups.insertNew('Players', 0);
+    playersGroup.addObject('Player1');
+    playersGroup.addObject('Player2');
+
+    // Verify the objects do not have the behavior initially
+    expect(player1.hasBehaviorNamed('PlatformerObject')).toBe(false);
+    expect(player2.hasBehaviorNamed('PlatformerObject')).toBe(false);
+
+    // Add the PlatformerObjectBehavior to the group
+    addMissingObjectBehaviors({
+      project,
+      scene: testScene,
+      objectName: 'Players',
+      missingBehaviors: [
+        {
+          objectName: 'Players',
+          name: 'PlatformerObject',
+          type: 'PlatformBehavior::PlatformerObjectBehavior',
+        },
+      ],
+    });
+
+    // Verify the behavior was added to all objects in the group
+    expect(player1.hasBehaviorNamed('PlatformerObject')).toBe(true);
+    expect(player1.getBehavior('PlatformerObject').getTypeName()).toBe(
+      'PlatformBehavior::PlatformerObjectBehavior'
+    );
+    expect(player2.hasBehaviorNamed('PlatformerObject')).toBe(true);
+    expect(player2.getBehavior('PlatformerObject').getTypeName()).toBe(
+      'PlatformBehavior::PlatformerObjectBehavior'
+    );
   });
 });

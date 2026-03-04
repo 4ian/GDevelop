@@ -81,17 +81,58 @@ class GD_CORE_API BehaviorConfigurationContainer {
    * behavior
    *
    * \return false if the new value cannot be set
-   * \see gd::InitialInstance
    */
   bool UpdateProperty(const gd::String& name, const gd::String& value) {
     return UpdateProperty(content, name, value);
   };
 
   /**
+   * \brief Called when the IDE wants to rename a custom property of the object
+   * configuration.
+   *
+   * \return false if properties can't be renamed
+   */
+  virtual bool RenameProperty(const gd::String &oldName,
+                              const gd::String &newName) {
+    return RenameProperty(content, oldName, newName);
+  };
+
+  /**
+   * \brief Called when the IDE wants to remove a custom property from the
+   * behavior
+   *
+   * \see gd::InitialInstance
+   */
+  void RemoveProperty(const gd::String &name) {
+    content.RemoveChild(name);
+    content.RemoveAttribute(name);
+  };
+
+  /**
+   * \brief Called to check if a property is overriden.
+   *
+   * \see gd::InitialInstance
+   */
+  bool HasPropertyValue(const gd::String name) const {
+    return content.HasChild(name) || content.HasAttribute(name);
+  }
+
+  /**
    * \brief Called to initialize the content with the default properties
    * for the behavior.
    */
-  virtual void InitializeContent() { InitializeContent(content); };
+  virtual void InitializeContent() {
+    InitializeContent(content);
+  };
+
+  /**
+   * \brief Called to remove all properties values for the behavior.
+   * 
+   * \see gd::InitialInstance
+   */
+  void ClearContent() {
+    content.Clear();
+  };
 
   /**
    * \brief Serialize the behavior content.
@@ -191,11 +232,22 @@ class GD_CORE_API BehaviorConfigurationContainer {
    * behavior
    *
    * \return false if the new value cannot be set
-   * \see gd::InitialInstance
    */
   virtual bool UpdateProperty(gd::SerializerElement& behaviorContent,
                               const gd::String& name,
                               const gd::String& value) {
+    return false;
+  };
+
+  /**
+   * \brief Called when the IDE wants to rename a custom property of the object
+   * configuration.
+   *
+   * \return false if properties can't be renamed
+   */
+  virtual bool RenameProperty(gd::SerializerElement &behaviorContent,
+                              const gd::String &oldName,
+                              const gd::String &newName) {
     return false;
   };
 

@@ -74,6 +74,7 @@ const useEditorFunctionCallResultsStorage = (): EditorFunctionCallResultsStorage
       setEditorFunctionCallResultsPerRequest(
         editorFunctionCallResultsPerRequest => ({
           ...editorFunctionCallResultsPerRequest,
+          // $FlowFixMe[incompatible-type]
           [aiRequestId]: null,
         })
       );
@@ -88,12 +89,17 @@ type AiRequestStorage = {|
   error: ?Error,
   isLoading: boolean,
   aiRequests: { [string]: AiRequest },
-  updateAiRequest: (aiRequestId: string, aiRequest: AiRequest) => void,
+  updateAiRequest: (
+    aiRequestId: string,
+    updateFn: (prevAiRequest: ?AiRequest) => AiRequest
+  ) => void,
   refreshAiRequest: (aiRequestId: string) => Promise<void>,
   isSendingAiRequest: (aiRequestId: string | null) => boolean,
   getLastSendError: (aiRequestId: string | null) => ?Error,
   setSendingAiRequest: (aiRequestId: string | null, isSending: boolean) => void,
   setLastSendError: (aiRequestId: string | null, lastSendError: ?Error) => void,
+  forkingState: ?{| aiRequestId: string, messageId: string |},
+  setForkingState: (?{| aiRequestId: string, messageId: string |}) => void,
 |};
 
 type AiRequestHistory = {|
@@ -111,7 +117,7 @@ type AiRequestSendState = {|
 |};
 
 type PaginationState = {|
-  aiRequests: { [string]: AiRequest },
+  aiRequests: { [aiRequestId: string]: AiRequest },
   nextPageUri: ?Object,
 |};
 
@@ -130,6 +136,10 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
   );
   const [error, setError] = React.useState<Error | null>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [forkingState, setForkingState] = React.useState<?{|
+    aiRequestId: string,
+    messageId: string,
+  |}>(null);
 
   const fetchAiRequests = React.useCallback(
     async () => {
@@ -146,6 +156,7 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
         if (!history) return;
         const aiRequestsById = history.aiRequests.reduce(
           (accumulator, aiRequest) => {
+            // $FlowFixMe[prop-missing]
             accumulator[aiRequest.id] = aiRequest;
             return accumulator;
           },
@@ -202,14 +213,23 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
   );
 
   const updateAiRequest = React.useCallback(
-    (aiRequestId: string, aiRequest: AiRequest) => {
-      setState(prevState => ({
-        ...prevState,
-        aiRequests: {
-          ...(prevState.aiRequests || {}),
-          [aiRequestId]: aiRequest,
-        },
-      }));
+    (
+      aiRequestId: string,
+      updateFn: (prevAiRequest: ?AiRequest) => AiRequest
+    ) => {
+      setState(prevState => {
+        const currentAiRequest = prevState.aiRequests
+          ? prevState.aiRequests[aiRequestId]
+          : null;
+        const newAiRequest = updateFn(currentAiRequest || null);
+        return {
+          ...prevState,
+          aiRequests: {
+            ...(prevState.aiRequests || {}),
+            [aiRequestId]: newAiRequest,
+          },
+        };
+      });
     },
     []
   );
@@ -223,7 +243,7 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
           userId: profile.id,
           aiRequestId: aiRequestId,
         });
-        updateAiRequest(updatedAiRequest.id, updatedAiRequest);
+        updateAiRequest(updatedAiRequest.id, () => updatedAiRequest);
       } catch (error) {
         console.error(
           'Error while background refreshing AI request - ignoring:',
@@ -300,6 +320,8 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
     setSendingAiRequest,
     setLastSendError,
     getLastSendError,
+    forkingState,
+    setForkingState,
   };
 };
 
@@ -319,7 +341,7 @@ export const useAiRequestHistory = (
       // information about the request date, not the date of each user message.
       Object.values(aiRequests)
         .sort(
-          // $FlowFixMe - Object.values() loses the type of aiRequests.
+          // $FlowFixMe[incompatible-type] - Object.values() loses the type of aiRequests.
           (a: AiRequest, b: AiRequest) => {
             return (
               new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
@@ -327,14 +349,15 @@ export const useAiRequestHistory = (
           }
         )
         .forEach(
-          // $FlowFixMe - Object.values() loses the type of aiRequests.
+          // $FlowFixMe[incompatible-type] - Object.values() loses the type of aiRequests.
           (request: AiRequest) => {
             const userMessages = request.output
               .filter(
                 message => message.type === 'message' && message.role === 'user'
               )
               .map(
-                // $FlowFixMe - We filtered the type above.
+                // $FlowFixMe[incompatible-type] - We filtered the type above.
+                // $FlowFixMe[cannot-resolve-name]
                 (message: AiRequestUserMessage) => {
                   const userRequest = message.content.find(
                     item => item.type === 'user_request'
@@ -427,6 +450,8 @@ export const initialAiRequestContextState: AiRequestContextState = {
     getLastSendError: () => null,
     setSendingAiRequest: () => {},
     setLastSendError: () => {},
+    forkingState: null,
+    setForkingState: () => {},
   },
   aiRequestHistory: {
     handleNavigateHistory: ({ direction, currentText, onChangeText }) => {},
@@ -439,7 +464,7 @@ export const initialAiRequestContextState: AiRequestContextState = {
   },
   getAiSettings: () => null,
 };
-export const AiRequestContext = React.createContext<AiRequestContextState>(
+export const AiRequestContext: React.Context<AiRequestContextState> = React.createContext<AiRequestContextState>(
   initialAiRequestContextState
 );
 
@@ -447,7 +472,9 @@ type AiRequestProviderProps = {|
   children: React.Node,
 |};
 
-export const AiRequestProvider = ({ children }: AiRequestProviderProps) => {
+export const AiRequestProvider = ({
+  children,
+}: AiRequestProviderProps): React.MixedElement => {
   const editorFunctionCallResultsStorage = useEditorFunctionCallResultsStorage();
   const aiRequestStorage = useAiRequestsStorage();
   const aiRequestHistory = useAiRequestHistory(aiRequestStorage);

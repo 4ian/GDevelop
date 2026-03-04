@@ -56,6 +56,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
 > {
   editor: ?SceneEditor;
   resourceExternallyChangedCallbackId: ?string;
+  // $FlowFixMe[missing-local-annot]
   state = {
     externalPropertiesDialogOpen: false,
   };
@@ -64,7 +65,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
     return this.props.project;
   }
 
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     if (!this.props.isActive && nextProps.isActive) {
       this._setPreviewedLayout();
     }
@@ -80,6 +81,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
       this._setPreviewedLayout();
     }
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
+      // $FlowFixMe[method-unbinding]
       this.onResourceExternallyChanged.bind(this)
     );
   }
@@ -154,7 +156,13 @@ export class ExternalLayoutEditorContainer extends React.Component<
   }
 
   updateToolbar() {
-    if (this.editor) this.editor.updateToolbar();
+    if (this.editor) {
+      this.editor.updateToolbar();
+    } else {
+      // Clear the toolbar if the editor is not ready yet to avoid showing stale toolbar
+      // from the previous editor (e.g., HomePage when opening external layout from home page)
+      this.props.setToolbar(null);
+    }
   }
 
   forceUpdateEditor() {
@@ -310,7 +318,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
     }
   };
 
-  render() {
+  render(): any {
     const { project, projectItemName, isActive } = this.props;
     const externalLayout = this.getExternalLayout();
     const layout = this.getLayout();
@@ -453,4 +461,4 @@ export class ExternalLayoutEditorContainer extends React.Component<
 
 export const renderExternalLayoutEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-) => <ExternalLayoutEditorContainer {...props} />;
+): React.Node => <ExternalLayoutEditorContainer {...props} />;

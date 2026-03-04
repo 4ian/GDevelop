@@ -7,7 +7,7 @@ import { action } from '@storybook/addon-actions';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import paperDecorator from '../../PaperDecorator';
-import EventsBasedObjectEditor from '../../../EventsBasedObjectEditor';
+import EventsBasedObjectEditor from '../../../EventsFunctionsExtensionEditor/EventsBasedBehaviorOrObjectEditor/EventsBasedObjectEditor';
 
 export default {
   title: 'EventsBasedObjectEditor/index',
@@ -15,7 +15,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => (
+export const Default = (): React.Node => (
   <EventsBasedObjectEditor
     eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
     eventsBasedObject={testProject.testEventsBasedObject}

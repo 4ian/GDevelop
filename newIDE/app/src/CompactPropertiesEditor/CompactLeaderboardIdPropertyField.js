@@ -33,7 +33,7 @@ const CompactLeaderboardIdPropertyField = ({
   value: string,
   onChange: (newValue: string) => void,
   id?: string,
-|}) => {
+|}): React.Node => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
 
   const isOnline = useOnlineStatus();
@@ -73,7 +73,7 @@ const CompactLeaderboardIdPropertyField = ({
     <I18n>
       {({ i18n }) => (
         <LineStackLayout noMargin expand id={idToUse.current}>
-          <Column noMargin expand>
+          <Column noMargin expand noOverflowParent>
             {!isExpressionField ? (
               <CompactSelectField
                 value={gameHasLeaderboards ? value : 'empty'}

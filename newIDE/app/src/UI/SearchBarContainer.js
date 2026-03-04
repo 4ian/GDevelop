@@ -159,7 +159,7 @@ const SearchBarContainer = ({
   buildMenuTemplate,
   onCancel,
   renderSubLine,
-}: Props) => {
+}: Props): React.Node => {
   const GDevelopTheme = React.useContext(GDevelopThemeContext);
 
   const styles = getStyles({
@@ -206,6 +206,7 @@ const SearchBarContainer = ({
           {buildMenuTemplate && (
             <ElementWithMenu
               element={
+                // $FlowFixMe[incompatible-type]
                 <IconButton
                   style={styles.iconButtonFilter.style}
                   disabled={disabled}
@@ -221,10 +222,12 @@ const SearchBarContainer = ({
             <HelpIcon
               disabled={disabled}
               helpPagePath={helpPagePath}
+              // $FlowFixMe[incompatible-type]
               style={styles.iconButtonHelp.style}
               size="small"
             />
           )}
+          {/* $FlowFixMe[incompatible-type] */}
           <IconButton
             onClick={onCancel}
             style={styles.iconButtonClose.style}

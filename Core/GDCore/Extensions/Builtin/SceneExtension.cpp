@@ -23,6 +23,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
             "game, set background color, or disable input when focus is lost."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("Change/pause/stop scenes, check scene start, preload assets, get scene name, quit game.")
       .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
   extension.AddInstructionOrExpressionGroupMetadata(_("Scene"))
       .SetIcon("res/conditions/depart24.png");
@@ -36,7 +37,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddCodeOnlyParameter("currentScene", "");
 
   extension
-      .AddCondition("DepartScene",
+      .AddCondition("SceneJustBegins",
                     _("At the beginning of the scene"),
                     _("Is true only when scene just begins."),
                     _("At the beginning of the scene"),
@@ -46,6 +47,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .SetHelpPath("/interface/scene-editor/events")
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsSimple();
+
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedCondition("DepartScene", "SceneJustBegins").SetHidden();
+  // End of compatibility code
 
   extension
       .AddCondition("SceneJustResumed",

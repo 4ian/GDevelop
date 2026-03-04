@@ -39,10 +39,18 @@ export type ObjectAnchor = {
 };
 
 const getPropertyValue = (
+  name: string,
   properties: gdMapStringPropertyDescriptor,
-  name: string
+  behaviorOverriding: gdBehavior | null
 ): CustomObjectConfiguration_EdgeAnchor =>
-  properties.has(name)
+  behaviorOverriding && behaviorOverriding.hasPropertyValue(name)
+    ? gd.CustomObjectConfiguration.getEdgeAnchorFromString(
+        behaviorOverriding
+          .getProperties()
+          .get(name)
+          .getValue()
+      )
+    : properties.has(name)
     ? gd.CustomObjectConfiguration.getEdgeAnchorFromString(
         properties.get(name).getValue()
       )
@@ -64,21 +72,45 @@ const getDefaultAnchor = () => ({
  */
 export const getObjectAnchor = (
   eventBasedObjectVariant: gdEventsBasedObjectVariant,
-  objectName: string
+  objectName: string,
+  initialInstance: gdInitialInstance
 ): ObjectAnchor => {
   const objects = eventBasedObjectVariant.getObjects();
   if (!objects.hasObjectNamed(objectName)) {
+    // $FlowFixMe[incompatible-type]
     return getDefaultAnchor();
   }
   const childObject = objects.getObject(objectName);
   if (!childObject.hasBehaviorNamed('Anchor')) {
+    // $FlowFixMe[incompatible-type]
     return getDefaultAnchor();
   }
   const properties = childObject.getBehavior('Anchor').getProperties();
-  const leftEdgeAnchor = getPropertyValue(properties, 'leftEdgeAnchor');
-  const topEdgeAnchor = getPropertyValue(properties, 'topEdgeAnchor');
-  const rightEdgeAnchor = getPropertyValue(properties, 'rightEdgeAnchor');
-  const bottomEdgeAnchor = getPropertyValue(properties, 'bottomEdgeAnchor');
+  const behaviorOverriding = initialInstance.hasBehaviorOverridingNamed(
+    'Anchor'
+  )
+    ? initialInstance.getBehaviorOverriding('Anchor')
+    : null;
+  const leftEdgeAnchor = getPropertyValue(
+    'leftEdgeAnchor',
+    properties,
+    behaviorOverriding
+  );
+  const topEdgeAnchor = getPropertyValue(
+    'topEdgeAnchor',
+    properties,
+    behaviorOverriding
+  );
+  const rightEdgeAnchor = getPropertyValue(
+    'rightEdgeAnchor',
+    properties,
+    behaviorOverriding
+  );
+  const bottomEdgeAnchor = getPropertyValue(
+    'bottomEdgeAnchor',
+    properties,
+    behaviorOverriding
+  );
   return { leftEdgeAnchor, topEdgeAnchor, rightEdgeAnchor, bottomEdgeAnchor };
 };
 
@@ -110,31 +142,31 @@ export class LayoutedInstance {
     this._customDepth = instance.getCustomWidth();
   }
 
-  getX() {
+  getX(): any {
     return this.x;
   }
 
-  getY() {
+  getY(): any {
     return this.y;
   }
 
-  getZ() {
+  getZ(): any {
     return this.z;
   }
 
-  getAngle() {
-    return 0;
+  getAngle(): any {
+    return this.instance.getAngle();
   }
 
-  getRotationX() {
-    return 0;
+  getRotationX(): any {
+    return this.instance.getRotationX();
   }
 
-  getRotationY() {
-    return 0;
+  getRotationY(): any {
+    return this.instance.getRotationY();
   }
 
-  getObjectName() {
+  getObjectName(): any {
     return this.instance.getObjectName();
   }
 
@@ -150,50 +182,50 @@ export class LayoutedInstance {
 
   setRotationY(angle: number) {}
 
-  isLocked() {
+  isLocked(): any {
     return false;
   }
 
   setLocked(lock: boolean) {}
 
-  isSealed() {
+  isSealed(): any {
     return false;
   }
 
   setSealed(seal: boolean) {}
 
-  getZOrder() {
-    return 0;
+  getZOrder(): any {
+    return this.instance.getZOrder();
   }
 
   setZOrder(zOrder: number) {}
 
-  getOpacity() {
+  getOpacity(): any {
     return this.instance.getOpacity();
   }
 
   setOpacity(opacity: number) {}
 
-  isFlippedX() {
+  isFlippedX(): any {
     return this.instance.isFlippedX();
   }
 
   setFlippedX(flippedX: boolean) {}
 
-  isFlippedY() {
+  isFlippedY(): any {
     return this.instance.isFlippedY();
   }
 
   setFlippedY(flippedY: boolean) {}
 
-  isFlippedZ() {
+  isFlippedZ(): any {
     return this.instance.isFlippedZ();
   }
 
   setFlippedZ(flippedY: boolean) {}
 
-  getLayer() {
-    return '';
+  getLayer(): any {
+    return this.instance.getLayer();
   }
 
   setLayer(layer: string) {}
@@ -202,11 +234,11 @@ export class LayoutedInstance {
     this._hasCustomSize = enable;
   }
 
-  hasCustomSize() {
+  hasCustomSize(): any {
     return this._hasCustomSize;
   }
 
-  hasCustomDepth() {
+  hasCustomDepth(): any {
     return this._hasCustomDepth;
   }
 
@@ -215,7 +247,7 @@ export class LayoutedInstance {
     this._hasCustomSize = true;
   }
 
-  getCustomWidth() {
+  getCustomWidth(): any {
     return this._customWidth;
   }
 
@@ -224,7 +256,7 @@ export class LayoutedInstance {
     this._hasCustomSize = true;
   }
 
-  getCustomHeight() {
+  getCustomHeight(): any {
     return this._customHeight;
   }
 
@@ -233,11 +265,11 @@ export class LayoutedInstance {
     this._hasCustomDepth = true;
   }
 
-  getCustomDepth() {
+  getCustomDepth(): any {
     return this._customDepth;
   }
 
-  resetPersistentUuid() {
+  resetPersistentUuid(): any {
     return this;
   }
 
@@ -251,24 +283,35 @@ export class LayoutedInstance {
   getCustomProperties(
     globalObjectsContainer: gdObjectsContainer,
     objectsContainer: gdObjectsContainer
-  ) {
-    return null;
+  ): any {
+    return this.instance.getCustomProperties(
+      globalObjectsContainer,
+      objectsContainer
+    );
   }
 
-  getRawDoubleProperty(name: string) {
-    return 0;
+  getRawDoubleProperty(name: string): any {
+    return this.instance.getRawDoubleProperty(name);
   }
 
-  getRawStringProperty(name: string) {
-    return '';
+  getRawStringProperty(name: string): any {
+    return this.instance.getRawStringProperty(name);
   }
 
   setRawDoubleProperty(name: string, value: number) {}
 
   setRawStringProperty(name: string, value: string) {}
 
-  getVariables() {
+  getVariables(): any {
     return [];
+  }
+
+  hasBehaviorOverridingNamed(name: string): boolean {
+    return this.instance.hasBehaviorOverridingNamed(name);
+  }
+
+  getBehaviorOverriding(name: string): gdBehavior {
+    return this.instance.getBehaviorOverriding(name);
   }
 
   serializeTo(element: gdSerializerElement) {}
@@ -334,7 +377,8 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
 
   const objectAnchor = getObjectAnchor(
     eventBasedObjectVariant,
-    layoutedInstance.getObjectName()
+    layoutedInstance.getObjectName(),
+    initialInstance
   );
   const leftEdgeAnchor = objectAnchor
     ? objectAnchor.leftEdgeAnchor

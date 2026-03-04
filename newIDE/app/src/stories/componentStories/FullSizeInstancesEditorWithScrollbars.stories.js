@@ -27,6 +27,7 @@ const instancesEditorSettings: InstancesEditorSettings = {
   zoomFactor: 1,
   windowMask: false,
   selectedLayer: '',
+  gameEditorMode: 'instances-editor',
 };
 
 export default {
@@ -35,7 +36,7 @@ export default {
   decorators: [paperDecorator, GDevelopJsInitializerDecorator],
 };
 
-export const Default = () => (
+export const Default = (): React.Node => (
   <FixedHeightFlexContainer height={600}>
     <DragAndDropContextProvider>
       <FullSizeInstancesEditorWithScrollbars

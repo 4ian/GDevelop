@@ -50,7 +50,7 @@ import Window from '../../../../../Utils/Window';
 import useAlertDialog from '../../../../../UI/Alert/useAlertDialog';
 import { delay } from '../../../../../Utils/Delay';
 import Check from '../../../../../UI/CustomSvgIcons/Check';
-import { getPlanIcon } from '../../../../../Profile/Subscription/PlanCard';
+import { getPlanIcon } from '../../../../../Profile/Subscription/PlanSmallCard';
 import { selectMessageByLocale } from '../../../../../Utils/i18n/MessageByLocale';
 import TextButton from '../../../../../UI/TextButton';
 import Chip from '../../../../../UI/Chip';
@@ -195,6 +195,7 @@ const AddTeacherDialog = ({ onClose, onAddTeacher }: AddTeacherDialogProps) => {
           } else {
             error = 'unexpected';
           }
+          // $FlowFixMe[incompatible-type]
           setAddError(error);
         }
       } finally {
@@ -268,7 +269,9 @@ type Props = {|
   onClose: () => void,
 |};
 
-const ManageEducationAccountDialog = ({ onClose }: Props) => {
+const ManageEducationAccountDialog = ({
+  onClose,
+}: Props): null | React.Node => {
   const { profile, subscription } = React.useContext(AuthenticatedUserContext);
   const {
     openSubscriptionDialog,
@@ -369,10 +372,13 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
     () => {
       if (!members) return;
       let content = 'Username,Full Name,Email,Password';
+      // $FlowFixMe[missing-empty-array-annot]
       let membersToConsider = [];
       if (selectedUserIds.length === 0) {
+        // $FlowFixMe[incompatible-type]
         membersToConsider = members.filter(member => !member.deactivatedAt);
       } else {
+        // $FlowFixMe[incompatible-type]
         membersToConsider = members.filter(member =>
           selectedUserIds.includes(member.id)
         );
@@ -449,6 +455,7 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
           } else {
             error = 'unexpected';
           }
+          // $FlowFixMe[incompatible-type]
           setRemoveAdminError(error);
         }
       } finally {
@@ -653,7 +660,6 @@ const ManageEducationAccountDialog = ({ onClose }: Props) => {
                               recommendedPlanId: 'gdevelop_education',
                               placementId: 'education',
                             },
-                            filter: 'education',
                           })
                         }
                       />

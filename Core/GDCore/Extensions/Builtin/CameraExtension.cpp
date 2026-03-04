@@ -32,6 +32,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetCategory("Camera")
+      .SetShortDescription("Layers, 2D/3D camera position/zoom/rotation, show/hide layers, layer effects, layer time scale.")
+      .SetDimension("2D/3D")
       .SetExtensionHelpPath("/interface/scene-editor/layers-and-cameras");
   extension.AddInstructionOrExpressionGroupMetadata(_("Layers and cameras"))
       .SetIcon("res/conditions/camera24.png");
@@ -409,7 +411,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddAction("CentreCamera",
+      .AddAction("CenterCameraOnObject",
                  _("Center the camera on an object"),
                  _("Center the camera on the specified object."),
                  _("Center camera on _PARAM1_ (layer: _PARAM3_)"),
@@ -428,6 +430,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0")
       .MarkAsSimple();
+
+  // Compatibility with GD <= 5.6.251
+  extension.AddDuplicatedAction("CentreCamera", "CenterCameraOnObject")
+      .SetHidden();
+  // End of compatibility code
 
   extension
       .AddAction("ShowLayer",

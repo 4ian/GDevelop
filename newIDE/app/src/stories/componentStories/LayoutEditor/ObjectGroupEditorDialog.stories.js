@@ -13,7 +13,7 @@ export default {
   component: ObjectGroupEditorDialog,
 };
 
-export const Default = () => (
+export const Default = (): React.Node => (
   <ObjectGroupEditorDialog
     project={testProject.project}
     projectScopedContainersAccessor={
@@ -28,10 +28,11 @@ export const Default = () => (
     onObjectGroupAdded={action('onObjectGroupAdded')}
     isVariableListLocked={false}
     isObjectListLocked={false}
+    getValidatedObjectOrGroupName={newName => newName}
   />
 );
 
-export const WithLongObjectNames = () => (
+export const WithLongObjectNames = (): React.Node => (
   <ObjectGroupEditorDialog
     project={testProject.project}
     projectScopedContainersAccessor={
@@ -46,10 +47,11 @@ export const WithLongObjectNames = () => (
     onObjectGroupAdded={action('onObjectGroupAdded')}
     isVariableListLocked={false}
     isObjectListLocked={false}
+    getValidatedObjectOrGroupName={newName => newName}
   />
 );
 
-export const Empty = () => (
+export const Empty = (): React.Node => (
   <ObjectGroupEditorDialog
     project={testProject.project}
     projectScopedContainersAccessor={
@@ -64,5 +66,6 @@ export const Empty = () => (
     onObjectGroupAdded={action('onObjectGroupAdded')}
     isVariableListLocked={false}
     isObjectListLocked={false}
+    getValidatedObjectOrGroupName={newName => newName}
   />
 );

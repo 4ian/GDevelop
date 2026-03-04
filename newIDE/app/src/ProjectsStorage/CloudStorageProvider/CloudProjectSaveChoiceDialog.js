@@ -7,11 +7,12 @@ import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import { Line } from '../../UI/Grid';
 import FlatButton from '../../UI/FlatButton';
 import LeftLoader from '../../UI/LeftLoader';
+import { type FileMetadata } from '../../ProjectsStorage';
 
 type Props = {|
   onClose: () => void,
   isLoading: boolean,
-  onSaveAsMainVersion: () => void | Promise<void>,
+  onSaveAsMainVersion: () => void | Promise<?FileMetadata>,
   onSaveAsDuplicate: () => void | Promise<void>,
 |};
 
@@ -20,7 +21,7 @@ const CloudProjectRecoveryDialog = ({
   isLoading,
   onSaveAsDuplicate,
   onSaveAsMainVersion,
-}: Props) => {
+}: Props): React.Node => {
   const actions = [
     <FlatButton
       disabled={isLoading}
@@ -33,7 +34,9 @@ const CloudProjectRecoveryDialog = ({
         primary
         disabled={isLoading}
         label={<Trans>Save as main version</Trans>}
-        onClick={onSaveAsMainVersion}
+        onClick={() => {
+          onSaveAsMainVersion();
+        }}
       />
     </LeftLoader>,
   ];
@@ -45,7 +48,10 @@ const CloudProjectRecoveryDialog = ({
       cannotBeDismissed={isLoading}
       maxWidth="sm"
       onRequestClose={onClose}
-      onApply={onSaveAsMainVersion}
+      onApply={() => {
+        onSaveAsMainVersion();
+      }}
+      // $FlowFixMe[incompatible-type]
       actions={actions}
       title={
         <Trans>

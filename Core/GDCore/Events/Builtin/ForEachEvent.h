@@ -10,6 +10,7 @@
 
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
+#include "GDCore/Project/VariablesContainer.h"
 namespace gd {
 class Instruction;
 class Project;
@@ -36,6 +37,12 @@ class GD_CORE_API ForEachEvent : public gd::BaseEvent {
   virtual const gd::EventsList& GetSubEvents() const { return events; };
   virtual gd::EventsList& GetSubEvents() { return events; };
 
+  virtual bool CanHaveVariables() const { return true; }
+  virtual const gd::VariablesContainer& GetVariables() const {
+    return variables;
+  };
+  virtual gd::VariablesContainer& GetVariables() { return variables; };
+
   const gd::InstructionsList& GetConditions() const { return conditions; };
   gd::InstructionsList& GetConditions() { return conditions; };
 
@@ -48,6 +55,28 @@ class GD_CORE_API ForEachEvent : public gd::BaseEvent {
   void SetObjectToPick(gd::String objectsToPick_) {
     objectsToPick = gd::Expression(objectsToPick_);
   };
+
+  const gd::String& GetLoopIndexVariableName() const { return loopIndexVariableName; }
+  void SetLoopIndexVariableName(const gd::String& name) { loopIndexVariableName = name; }
+
+  const gd::String& GetOrderBy() const {
+    return orderBy.GetPlainString();
+  };
+  void SetOrderBy(gd::String orderBy_) {
+    orderBy = gd::Expression(orderBy_);
+  };
+  const gd::Expression& GetOrderByExpression() const { return orderBy; };
+
+  const gd::String& GetOrder() const { return order; }
+  void SetOrder(const gd::String& order_) { order = order_; }
+
+  const gd::String& GetLimit() const {
+    return limit.GetPlainString();
+  };
+  void SetLimit(gd::String limit_) {
+    limit = gd::Expression(limit_);
+  };
+  const gd::Expression& GetLimitExpression() const { return limit; };
 
   virtual std::vector<const gd::InstructionsList*> GetAllConditionsVectors()
       const;
@@ -69,6 +98,11 @@ class GD_CORE_API ForEachEvent : public gd::BaseEvent {
   gd::InstructionsList conditions;
   gd::InstructionsList actions;
   gd::EventsList events;
+  VariablesContainer variables;
+  gd::String loopIndexVariableName;
+  gd::Expression orderBy;
+  gd::String order;
+  gd::Expression limit;
 };
 
 }  // namespace gd

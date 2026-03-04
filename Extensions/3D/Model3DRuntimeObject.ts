@@ -17,7 +17,7 @@ namespace gdjs {
     Model3DObjectNetworkSyncDataType;
 
   /**
-   * Base parameters for {@link gdjs.Cube3DRuntimeObject}
+   * Base parameters for {@link gdjs.Model3DRuntimeObject}
    * @category Objects > 3D Model
    */
   export interface Model3DObjectData extends Object3DData {
@@ -110,12 +110,15 @@ namespace gdjs {
     _crossfadeDuration: float = 0;
     _isCastingShadow: boolean = true;
     _isReceivingShadow: boolean = true;
+    _data: Model3DObjectData;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: Model3DObjectData
+      objectData: Model3DObjectData,
+      instanceData?: InstanceData
     ) {
-      super(instanceContainer, objectData);
+      super(instanceContainer, objectData, instanceData);
+      this._data = objectData;
       this._modelResourceName = objectData.content.modelResourceName;
       this._animations = objectData.content.animations;
       this._originPoint = getPointForLocation(

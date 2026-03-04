@@ -5,7 +5,6 @@ import NewObjectGroupEditorDialog from './NewObjectGroupEditorDialog';
 import EditedObjectGroupEditorDialog, {
   type ObjectGroupEditorTab,
 } from './EditedObjectGroupEditorDialog';
-import newNameGenerator from '../Utils/NewNameGenerator';
 
 const gd: libGDevelop = global.gd;
 
@@ -32,6 +31,7 @@ type Props = {|
   onComputeAllVariableNames?: () => Array<string>,
   isVariableListLocked: boolean,
   isObjectListLocked: boolean,
+  getValidatedObjectOrGroupName: (newName: string, global: boolean) => string,
 |};
 
 const ObjectGroupEditorDialog = ({
@@ -49,7 +49,8 @@ const ObjectGroupEditorDialog = ({
   onComputeAllVariableNames,
   isVariableListLocked,
   isObjectListLocked,
-}: Props) => {
+  getValidatedObjectOrGroupName,
+}: Props): React.Node => {
   const [
     editedObjectGroup,
     setEditedObjectGroup,
@@ -68,11 +69,9 @@ const ObjectGroupEditorDialog = ({
       if (editedObjectGroup) {
         objectGroup = editedObjectGroup;
       } else {
-        const name = newNameGenerator(objectGroupName || 'Group', name =>
-          projectScopedContainersAccessor
-            .get()
-            .getObjectsContainersList()
-            .hasObjectOrGroupNamed(name)
+        const name = getValidatedObjectOrGroupName(
+          objectGroupName || 'Group',
+          false
         );
         const objectGroupContainer =
           bypassedObjectGroupsContainer || objectsContainer.getObjectGroups();
@@ -103,11 +102,11 @@ const ObjectGroupEditorDialog = ({
     [
       bypassedObjectGroupsContainer,
       editedObjectGroup,
+      getValidatedObjectOrGroupName,
       globalObjectsContainer,
       objectsContainer,
       onApply,
       onObjectGroupAdded,
-      projectScopedContainersAccessor,
     ]
   );
 

@@ -107,25 +107,16 @@ TopDownMovementBehavior::GetProperties(
       .SetType("Boolean");
 
   gd::String viewpoint = behaviorContent.GetStringAttribute("viewpoint");
-  gd::String viewpointStr = _("Top-Down");
-  if (viewpoint == "TopDown")
-    viewpointStr = _("Top-Down");
-  else if (viewpoint == "PixelIsometry")
-    viewpointStr = _("Isometry 2:1 (26.565°)");
-  else if (viewpoint == "TrueIsometry")
-    viewpointStr = _("True Isometry (30°)");
-  else if (viewpoint == "CustomIsometry")
-    viewpointStr = _("Custom Isometry");
   properties["Viewpoint"]
       .SetLabel(_("Viewpoint"))
       .SetGroup(_("Viewpoint"))
       .SetAdvanced()
-      .SetValue(viewpointStr)
+      .SetValue(viewpoint.empty() ? "TopDown" : viewpoint)
       .SetType("Choice")
-      .AddExtraInfo(_("Top-Down"))
-      .AddExtraInfo(_("Isometry 2:1 (26.565°)"))
-      .AddExtraInfo(_("True Isometry (30°)"))
-      .AddExtraInfo(_("Custom Isometry"));
+      .AddChoice("TopDown", _("Top-Down"))
+      .AddChoice("PixelIsometry", _("Isometry 2:1 (26.565°)"))
+      .AddChoice("TrueIsometry", _("True Isometry (30°)"))
+      .AddChoice("CustomIsometry", _("Custom Isometry"));
   properties["CustomIsometryAngle"]
       .SetLabel(_("Custom isometry angle (between 1deg and 44deg)"))
       .SetGroup(_("Viewpoint"))
@@ -171,26 +162,27 @@ bool TopDownMovementBehavior::UpdateProperty(
     behaviorContent.SetAttribute("useLegacyTurnBack", (value == "1"));
   }
   if (name == "Viewpoint") {
+    auto normalizedValue = value.LowerCase();
     // Fix the offset angle when switching between top-down and isometry
     const gd::String& oldValue =
         behaviorContent.GetStringAttribute("viewpoint", "TopDown", "");
-    if (value == _("Top-Down") && oldValue != "TopDown") {
+    if (normalizedValue == "topdown" && oldValue != "TopDown") {
       behaviorContent.SetAttribute(
           "movementAngleOffset",
           behaviorContent.GetDoubleAttribute("movementAngleOffset", 0, "") +
               45);
-    } else if (value != _("Top-Down") && oldValue == "TopDown") {
+    } else if (normalizedValue != "topdown" && oldValue == "TopDown") {
       behaviorContent.SetAttribute(
           "movementAngleOffset",
           behaviorContent.GetDoubleAttribute("movementAngleOffset", 45, "") -
               45);
     }
 
-    if (value == _("Isometry 2:1 (26.565°)"))
+    if (normalizedValue == "pixelisometry")
       behaviorContent.SetAttribute("viewpoint", "PixelIsometry");
-    else if (value == _("True Isometry (30°)"))
+    else if (normalizedValue == "trueisometry")
       behaviorContent.SetAttribute("viewpoint", "TrueIsometry");
-    else if (value == _("Custom Isometry"))
+    else if (normalizedValue == "customisometry")
       behaviorContent.SetAttribute("viewpoint", "CustomIsometry");
     else
       behaviorContent.SetAttribute("viewpoint", "TopDown");

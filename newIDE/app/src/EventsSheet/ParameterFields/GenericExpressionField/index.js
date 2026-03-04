@@ -49,6 +49,7 @@ import {
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import Paper from '../../../UI/Paper';
 import { ProjectScopedContainersAccessor } from '../../../InstructionOrExpression/EventsScope';
+import PreferencesContext from '../../../MainFrame/Preferences/PreferencesContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -92,6 +93,9 @@ const styles = {
     paddingLeft: 0,
     paddingRight: 0,
   },
+  warningText: {
+    color: '#ff9800',
+  },
 };
 
 type State = {|
@@ -101,6 +105,7 @@ type State = {|
   validatedValue: string,
   errorText: ?string,
   errorHighlights: Array<Highlight>,
+  isOnlyWarning: boolean,
   autocompletions: AutocompletionsState,
 |};
 
@@ -130,10 +135,15 @@ const extractErrors = (
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   expressionType: string,
   parameterMetadata: ?gdParameterMetadata,
-  expressionNode: gdExpressionNode
+  expressionNode: gdExpressionNode,
+  showDeprecatedInstructionWarning:
+    | 'no'
+    | 'icon'
+    | 'icon-and-deprecated-warning-text'
 ): {|
   errorText: ?string,
   errorHighlights: Array<Highlight>,
+  isOnlyWarning: boolean,
 |} => {
   const expressionValidator = new gd.ExpressionValidator(
     gd.JsPlatform.get(),
@@ -143,13 +153,30 @@ const extractErrors = (
   );
   expressionNode.visit(expressionValidator);
   const errors = expressionValidator.getAllErrors();
+  const fatalErrors = expressionValidator.getFatalErrors();
+  const hasFatalErrors = fatalErrors.size() > 0;
 
-  const errorHighlights: Array<Highlight> = mapVector(errors, error => ({
-    begin: error.getStartPosition(),
-    end: error.getEndPosition() + 1,
-    message: error.getMessage(),
-    type: 'error',
-  }));
+  // $FlowFixMe[incompatible-type]
+  // $FlowFixMe[incompatible-exact]
+  const errorHighlights: Array<Highlight> = mapVector(errors, error => {
+    // $FlowFixMe[incompatible-use]
+    const errorType = error.getType();
+    const isDeprecated =
+      errorType === gd.ExpressionParserError.DeprecatedExpression;
+    // Skip deprecation warnings if the preference is set to 'no'
+    if (isDeprecated && showDeprecatedInstructionWarning === 'no') {
+      return null;
+    }
+    return {
+      // $FlowFixMe[incompatible-use]
+      begin: error.getStartPosition(),
+      // $FlowFixMe[incompatible-use]
+      end: error.getEndPosition() + 1,
+      // $FlowFixMe[incompatible-use]
+      message: error.getMessage(),
+      type: isDeprecated ? 'deprecated' : 'error',
+    };
+  }).filter(Boolean);
   const otherErrorsCount = Math.max(
     0,
     errorHighlights.length - MAX_ERRORS_COUNT
@@ -168,25 +195,33 @@ const extractErrors = (
     )
     .join(' ');
 
+  // If there are warnings but no fatal errors, it's only a warning
+  const isOnlyWarning = errors.size() > 0 && !hasFatalErrors;
+
   expressionValidator.delete();
 
-  return { errorText, errorHighlights };
+  return { errorText, errorHighlights, isOnlyWarning };
 };
 
 export default class ExpressionField extends React.Component<Props, State> {
+  // $FlowFixMe[missing-local-annot]
+  static contextType = PreferencesContext;
+
   _field: ?SemiControlledTextFieldInterface = null;
   _fieldElementWidth: ?number = null;
   _inputElement: ?HTMLInputElement = null;
 
+  // $FlowFixMe[missing-local-annot]
   state = {
     popoverOpen: false,
     parametersDialogOpen: false,
     selectedExpressionInfo: null,
 
-    validatedValue: this.props.value,
+    validatedValue: (this.props.value: string),
     errorText: null,
-    errorHighlights: [],
-    autocompletions: getAutocompletionsInitialState(),
+    errorHighlights: ([]: Array<empty>),
+    isOnlyWarning: false,
+    autocompletions: (getAutocompletionsInitialState(): AutocompletionsState),
   };
 
   componentDidMount() {
@@ -266,6 +301,7 @@ export default class ExpressionField extends React.Component<Props, State> {
   _handleExpressionChosen = (expressionInfo: EnumeratedExpressionMetadata) => {
     let newState = { popoverOpen: false };
     if (this._shouldOpenParametersDialog(expressionInfo)) {
+      // $FlowFixMe[incompatible-type]
       newState = {
         ...newState,
         parametersDialogOpen: true,
@@ -419,11 +455,12 @@ export default class ExpressionField extends React.Component<Props, State> {
     );
   };
 
-  _enqueueValidation = debounce(() => {
+  // $FlowFixMe[missing-local-annot]
+  _enqueueValidation = (debounce(() => {
     this._doValidation();
-  }, 250);
+  }, 250): any);
 
-  _doValidation = () => {
+  _doValidation = (): any => {
     const {
       project,
       projectScopedContainersAccessor,
@@ -443,13 +480,18 @@ export default class ExpressionField extends React.Component<Props, State> {
     const parser = new gd.ExpressionParser2();
     const expressionNode = parser.parseExpression(expression).get();
 
-    const { errorText, errorHighlights } = extractErrors(
+    const showDeprecatedInstructionWarning = this.context
+      ? this.context.values.showDeprecatedInstructionWarning
+      : 'icon';
+
+    const { errorText, errorHighlights, isOnlyWarning } = extractErrors(
       gd.JsPlatform.get(),
       project,
       projectScopedContainersAccessor,
       expressionType,
       parameterMetadata,
-      expressionNode
+      expressionNode,
+      showDeprecatedInstructionWarning
     );
     const extraErrorText = onExtractAdditionalErrors
       ? onExtractAdditionalErrors(expression, expressionNode)
@@ -467,6 +509,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       this.setState(state => ({
         errorText: formattedErrorText,
         errorHighlights,
+        isOnlyWarning,
         autocompletions: getAutocompletionsInitialState(),
       }));
       return;
@@ -491,7 +534,7 @@ export default class ExpressionField extends React.Component<Props, State> {
         scope,
       },
       completionDescriptions,
-      // $FlowFixMe The autocompletion doesn't display the groups so it doesn't need to be able to translate them.
+      // $FlowFixMe[incompatible-type] The autocompletion doesn't display the groups so it doesn't need to be able to translate them.
       null
     );
 
@@ -504,6 +547,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     this.setState(state => ({
       errorText: formattedErrorText,
       errorHighlights,
+      isOnlyWarning,
       autocompletions: setNewAutocompletions(
         state.autocompletions,
         allNewAutocompletions
@@ -511,7 +555,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     }));
   };
 
-  render() {
+  render(): any {
     const {
       value,
       expressionType,
@@ -582,8 +626,19 @@ export default class ExpressionField extends React.Component<Props, State> {
                       onChange={this._handleChange}
                       onBlur={this._handleBlurEvent}
                       ref={field => (this._field = field)}
+                      // $FlowFixMe[incompatible-type]
                       onFocus={this._handleFocus}
-                      errorText={this.state.errorText}
+                      errorText={
+                        this.state.errorText ? (
+                          this.state.isOnlyWarning ? (
+                            <span style={styles.warningText}>
+                              {this.state.errorText}
+                            </span>
+                          ) : (
+                            this.state.errorText
+                          )
+                        ) : null
+                      }
                       onClick={() => this._enqueueValidation()}
                       onKeyDown={event => {
                         const autocompletions = handleAutocompletionsKeyDown(
@@ -740,6 +795,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                       selectedExpressionInfo: null,
                     });
                   }}
+                  // $FlowFixMe[incompatible-type]
                   parameterRenderingService={parameterRenderingService}
                 />
               )}

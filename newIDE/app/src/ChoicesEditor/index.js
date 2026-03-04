@@ -24,6 +24,7 @@ type ChoicesEditorProps = {|
   setChoices: (Array<Choice>) => void,
   disabled?: boolean,
   hideLabels?: boolean,
+  isNumber: boolean,
 |};
 
 const ChoicesEditor = ({
@@ -31,7 +32,8 @@ const ChoicesEditor = ({
   setChoices,
   disabled,
   hideLabels,
-}: ChoicesEditorProps) => {
+  isNumber,
+}: ChoicesEditorProps): React.Node => {
   const updateChoices = () => setChoices(choices);
 
   return (
@@ -87,7 +89,11 @@ const ChoicesEditor = ({
             disabled={disabled}
             primary
             onClick={() => {
-              choices.push({ value: 'New Option', label: '' });
+              choices.push(
+                isNumber
+                  ? { value: choices.length.toString(), label: 'New Option' }
+                  : { value: 'New Option', label: '' }
+              );
               updateChoices();
             }}
             label={<Trans>Add a new option</Trans>}

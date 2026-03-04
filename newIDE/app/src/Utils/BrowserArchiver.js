@@ -53,6 +53,7 @@ export const downloadUrlFilesToBlobFiles = async ({
 |}): Promise<Array<BlobFileDescriptor>> => {
   const downloadedBlobs: Array<
     ItemResult<UrlFileDescriptor>
+    // $FlowFixMe[incompatible-type]
   > = await downloadUrlsToBlobs({
     urlContainers: urlFiles.filter(({ url }) => url.indexOf('.h') === -1), // Should be useless now, still keep it by safety.
     onProgress,
@@ -79,7 +80,7 @@ export const downloadUrlFilesToBlobFiles = async ({
 
   return downloadedBlobs.map(({ item, blob }) => {
     return {
-      // $FlowFixMe - any non existing blob is discarded before.
+      // $FlowFixMe[incompatible-type] - any non existing blob is discarded before.
       blob,
       filePath: item.filePath,
     };
@@ -110,6 +111,7 @@ export const archiveFiles = async ({
 
   return new Promise((resolve, reject) => {
     zipJs.createWriter(
+      // $FlowFixMe[invalid-constructor]
       new zipJs.BlobWriter('application/zip'),
       function(zipWriter) {
         eachCallback(
@@ -120,6 +122,7 @@ export const archiveFiles = async ({
 
             zipWriter.add(
               relativeFilePath,
+              // $FlowFixMe[invalid-constructor]
               new zipJs.BlobReader(blob),
               () => {
                 zippedFilesCount++;
@@ -140,6 +143,7 @@ export const archiveFiles = async ({
 
                 zipWriter.add(
                   relativeFilePath,
+                  // $FlowFixMe[invalid-constructor]
                   new zipJs.TextReader(text),
                   () => {
                     zippedFilesCount++;
@@ -171,6 +175,84 @@ export const archiveFiles = async ({
             );
           }
         );
+      },
+      error => {
+        console.error('Error while making zip:', error);
+        reject(error);
+      }
+    );
+  });
+};
+
+export const listArchiveFiles = async ({
+  archiveBlob,
+  onProgress,
+  sizeLimit,
+}: {|
+  archiveBlob: Blob,
+  onProgress: (count: number, total: number) => void,
+  sizeLimit?: number,
+|}): Promise<any> => {
+  const zipJs: ZipJs = await initializeZipJs();
+
+  return new Promise((resolve, reject) => {
+    zipJs.createReader(
+      // $FlowFixMe[invalid-constructor]
+      new zipJs.BlobReader(archiveBlob),
+      function(zipReader) {
+        zipReader.getEntries(entries => {
+          const enumeratedEntries = entries.map(entry => entry.filename);
+          zipReader.close(() => {
+            resolve(enumeratedEntries);
+          });
+        });
+      },
+      error => {
+        console.error('Error while making zip:', error);
+        reject(error);
+      }
+    );
+  });
+};
+
+export const getFileBlob = async ({
+  archiveBlob,
+  filePath,
+  contentType,
+  onProgress,
+  sizeLimit,
+}: {|
+  archiveBlob: Blob,
+  filePath: string,
+  contentType: string,
+  onProgress: (count: number, total: number) => void,
+  sizeLimit?: number,
+|}): Promise<Blob> => {
+  const zipJs: ZipJs = await initializeZipJs();
+
+  return new Promise((resolve, reject) => {
+    zipJs.createReader(
+      // $FlowFixMe[invalid-constructor]
+      new zipJs.BlobReader(archiveBlob),
+      function(zipReader) {
+        zipReader.getEntries(entries => {
+          const entry = entries.find(entry => entry.filename === filePath);
+          if (!entry) {
+            const error = `The archive doesn't contain: ${filePath}`;
+            console.error(error);
+            reject(error);
+            return;
+          }
+          entry.getData(
+            // $FlowFixMe[invalid-constructor]
+            new zipJs.BlobWriter(contentType),
+            result => {
+              zipReader.close(() => {
+                resolve(result);
+              });
+            }
+          );
+        });
       },
       error => {
         console.error('Error while making zip:', error);

@@ -118,6 +118,16 @@ ObjectFolderOrObject& ObjectFolderOrObject::InsertNewFolder(
   return newFolder;
 };
 
+ObjectFolderOrObject& ObjectFolderOrObject::GetOrCreateFolderChild(
+    const gd::String& name) {
+  for (std::size_t j = 0; j < children.size(); j++) {
+    if (children[j]->IsFolder()) {
+      if (children[j]->GetFolderName() == name) return *children[j];
+    };
+  }
+  return InsertNewFolder(name, children.size());
+}
+
 void ObjectFolderOrObject::RemoveRecursivelyObjectNamed(
     const gd::String& name) {
   if (IsFolder()) {

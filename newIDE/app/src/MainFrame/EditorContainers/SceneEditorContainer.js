@@ -30,7 +30,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     return this.props.project;
   }
 
-  shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
+  shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     if (!this.props.isActive && nextProps.isActive) {
       this._setPreviewedLayout();
     }
@@ -101,7 +101,13 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
   }
 
   updateToolbar() {
-    if (this.editor) this.editor.updateToolbar();
+    if (this.editor) {
+      this.editor.updateToolbar();
+    } else {
+      // Clear the toolbar if the editor is not ready yet to avoid showing stale toolbar
+      // from the previous editor (e.g., HomePage when opening scene from home page)
+      this.props.setToolbar(null);
+    }
   }
 
   forceUpdateEditor() {
@@ -211,7 +217,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     }
   };
 
-  render() {
+  render(): any {
     const { project, projectItemName, isActive } = this.props;
     const layout = this.getLayout();
     if (!layout || !project) {
@@ -286,8 +292,9 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         // It's only used to refresh events-based object variants.
         onObjectGroupEdited={() => {}}
         onObjectGroupsDeleted={() => {}}
-        // Nothing to do as scenes are not events-based objects.
-        onEventsBasedObjectChildrenEdited={() => {}}
+        onEventsBasedObjectChildrenEdited={
+          this.props.onEventsBasedObjectChildrenEdited
+        }
       />
     );
   }
@@ -295,4 +302,4 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
 export const renderSceneEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-) => <SceneEditorContainer {...props} />;
+): React.Node => <SceneEditorContainer {...props} />;

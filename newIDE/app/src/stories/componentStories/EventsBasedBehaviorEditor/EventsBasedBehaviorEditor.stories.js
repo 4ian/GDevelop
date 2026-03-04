@@ -1,13 +1,12 @@
 // @flow
 
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
 
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import paperDecorator from '../../PaperDecorator';
-import EventsBasedBehaviorEditor from '../../../EventsBasedBehaviorEditor/';
+import EventsBasedBehaviorEditor from '../../../EventsFunctionsExtensionEditor/EventsBasedBehaviorOrObjectEditor/EventsBasedBehaviorEditor';
 
 export default {
   title: 'EventsBasedBehaviorEditor/index',
@@ -15,7 +14,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Default = () => (
+export const Default = (): React.Node => (
   <EventsBasedBehaviorEditor
     project={testProject.project}
     eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
@@ -23,7 +22,7 @@ export const Default = () => (
   />
 );
 
-export const WithoutFunction = () => (
+export const WithoutFunction = (): React.Node => (
   <EventsBasedBehaviorEditor
     project={testProject.project}
     eventsFunctionsExtension={testProject.testEventsFunctionsExtension}

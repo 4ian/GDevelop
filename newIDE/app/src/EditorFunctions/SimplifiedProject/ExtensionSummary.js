@@ -6,6 +6,7 @@ export type ParameterSummary = {|
   name?: string,
   type: string,
   description?: string,
+  longDescription?: string,
   isOptional?: boolean,
   extraInfo?: string,
 |};
@@ -89,6 +90,8 @@ export type ExtensionSummary = {|
   extensionName: string,
   extensionFullName: string,
   description: string,
+  shortDescription: string,
+  dimension: string,
   freeActions: Array<InstructionSummary>,
   freeConditions: Array<InstructionSummary>,
   freeExpressions: Array<ExpressionSummary>,
@@ -121,6 +124,9 @@ const getParameterSummary = (
   };
   if (parameterMetadata.getDescription()) {
     parameterSummary.description = parameterMetadata.getDescription();
+  }
+  if (parameterMetadata.getLongDescription()) {
+    parameterSummary.longDescription = parameterMetadata.getLongDescription();
   }
   if (parameterMetadata.getName()) {
     parameterSummary.name = parameterMetadata.getName();
@@ -159,8 +165,11 @@ const getPropertySummary = (
     };
   }
   if (property.getChoices().size() > 0) {
+    // $FlowFixMe[incompatible-exact]
     propertySummary.choices = mapVector(property.getChoices(), choice => ({
+      // $FlowFixMe[incompatible-use]
       value: choice.getValue(),
+      // $FlowFixMe[incompatible-use]
       label: choice.getLabel(),
     }));
   }
@@ -198,7 +207,10 @@ const getPropertiesSummary = ({
       });
 
   if (propertiesContainer)
+    // $FlowFixMe[incompatible-exact]
     return mapVector(propertiesContainer, namedProperty => {
+      // $FlowFixMe[incompatible-use]
+      // $FlowFixMe[incompatible-type]
       return getPropertySummary(namedProperty.getName(), namedProperty);
     });
 
@@ -319,7 +331,8 @@ export const buildExtensionSummary = ({
         fullName: objectMetadata.getFullName(),
         description: objectMetadata.getDescription(),
         properties: eventsBasedObject
-          ? getPropertiesSummary({
+          ? // $FlowFixMe[incompatible-type]
+            getPropertiesSummary({
               propertiesContainer: eventsBasedObject.getPropertyDescriptors(),
             })
           : undefined,
@@ -355,9 +368,11 @@ export const buildExtensionSummary = ({
         name: behaviorMetadata.getName(),
         fullName: behaviorMetadata.getFullName(),
         description: behaviorMetadata.getDescription(),
+        // $FlowFixMe[incompatible-type]
         properties: getPropertiesSummary({
           propertiesMetadata: behaviorMetadata.getProperties(),
         }),
+        // $FlowFixMe[incompatible-type]
         sharedProperties: getPropertiesSummary({
           propertiesMetadata: behaviorMetadata.getSharedProperties(),
         }),
@@ -399,6 +414,7 @@ export const buildExtensionSummary = ({
         onlyWorkingFor2D: effectMetadata.isMarkedAsOnlyWorkingFor2D(),
         onlyWorkingFor3D: effectMetadata.isMarkedAsOnlyWorkingFor3D(),
         unique: effectMetadata.isMarkedAsUnique(),
+        // $FlowFixMe[incompatible-type]
         properties: getPropertiesSummary({
           propertiesMetadata: effectMetadata.getProperties(),
         }),
@@ -411,6 +427,8 @@ export const buildExtensionSummary = ({
     extensionName: extension.getName(),
     extensionFullName: extension.getFullName(),
     description: extension.getDescription(),
+    shortDescription: extension.getShortDescription(),
+    dimension: extension.getDimension(),
     freeActions: generateInstructionsSummaries({
       instructionsMetadata: extension.getAllActions(),
     }),

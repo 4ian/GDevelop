@@ -32,7 +32,10 @@ type ChipInterface = {|
   focus: () => void,
 |};
 
-const Chip = React.forwardRef<Props, ChipInterface>((props, ref) => {
+const Chip: React.ComponentType<{
+  ...Props,
+  +ref?: React.RefSetter<ChipInterface>,
+}> = React.forwardRef<Props, ChipInterface>((props, ref) => {
   const chipRef = React.useRef<?HTMLDivElement>(null);
   const muiTheme = useTheme();
   const focus = () => {

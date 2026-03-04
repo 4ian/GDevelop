@@ -23,6 +23,8 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
             "events."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetShortDescription("Move objects in 4/8 directions via keyboard, joystick, or gamepad. Speed, acceleration, rotation.")
+      .SetDimension("2D")
       .SetCategory("Movement")
       .SetTags("top-down")
       .SetExtensionHelpPath("/behaviors/topdown");

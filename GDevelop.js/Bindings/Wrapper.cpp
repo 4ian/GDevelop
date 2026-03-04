@@ -1,4 +1,5 @@
 #include <GDCore/Events/Builtin/CommentEvent.h>
+#include <GDCore/Events/Builtin/ElseEvent.h>
 #include <GDCore/Events/Builtin/ForEachChildVariableEvent.h>
 #include <GDCore/Events/Builtin/ForEachEvent.h>
 #include <GDCore/Events/Builtin/GroupEvent.h>
@@ -91,6 +92,7 @@
 #include <GDCore/Project/PropertiesContainer.h>
 #include <GDCore/Project/PropertiesContainersList.h>
 #include <GDCore/Project/PropertyDescriptor.h>
+#include <GDCore/Project/PropertyFolderOrProperty.h>
 #include <GDCore/Project/ResourcesContainer.h>
 #include <GDCore/Project/ResourcesContainersList.h>
 #include <GDCore/Project/Variable.h>
@@ -369,6 +371,42 @@ class AbstractFileSystemJS : public AbstractFileSystem {
   virtual ~AbstractFileSystemJS(){};
 };
 
+/**
+ * \brief Manual binding of gd::ReadOnlyArbitraryEventsWorkerWithContext to allow
+ * overriding DoVisitEvent and DoVisitInstruction from JavaScript.
+ */
+class ReadOnlyArbitraryEventsWorkerWithContextJS : public ReadOnlyArbitraryEventsWorkerWithContext {
+ public:
+  ReadOnlyArbitraryEventsWorkerWithContextJS(){};
+  virtual ~ReadOnlyArbitraryEventsWorkerWithContextJS(){};
+
+  virtual void DoVisitEvent(const gd::BaseEvent &event) {
+    EM_ASM(
+        {
+          var self = Module['getCache'](Module['ReadOnlyArbitraryEventsWorkerWithContextJS'])[$0];
+          if (!self.hasOwnProperty('doVisitEvent'))
+            throw 'a JSImplementation must implement all functions, you forgot ReadOnlyArbitraryEventsWorkerWithContextJS::doVisitEvent.';
+          self.doVisitEvent(wrapPointer($1, Module['BaseEvent']));
+        },
+        (int)this,
+        (int)&event);
+  }
+
+  virtual void DoVisitInstruction(const gd::Instruction &instruction, bool isCondition) {
+    EM_ASM(
+        {
+          var self = Module['getCache'](Module['ReadOnlyArbitraryEventsWorkerWithContextJS'])[$0];
+          if (!self.hasOwnProperty('doVisitInstruction'))
+            throw 'a JSImplementation must implement all functions, you forgot ReadOnlyArbitraryEventsWorkerWithContextJS::doVisitInstruction.';
+          self.doVisitInstruction(wrapPointer($1, Module['Instruction']), !!$2, wrapPointer($3, Module['ProjectScopedContainers']));
+        },
+        (int)this,
+        (int)&instruction,
+        isCondition,
+        (int)&GetProjectScopedContainers());
+  }
+};
+
 class InitialInstanceJSFunctorWrapper : public gd::InitialInstanceFunctor {
  public:
   InitialInstanceJSFunctorWrapper(){};
@@ -448,6 +486,8 @@ typedef std::unique_ptr<gd::Behavior> UniquePtrBehavior;
 typedef std::unique_ptr<ExpressionNode> UniquePtrExpressionNode;
 typedef std::vector<gd::ExpressionParserError *>
     VectorExpressionParserError;
+typedef gd::ExpressionParserError::ErrorType
+    ExpressionParserError_ErrorType;
 typedef gd::SerializableWithNameList<gd::EventsBasedBehavior>
     EventsBasedBehaviorsList;
 typedef gd::SerializableWithNameList<gd::EventsBasedObject>
@@ -471,6 +511,7 @@ typedef std::shared_ptr<SerializerElement> SharedPtrSerializerElement;
 typedef std::vector<UnfilledRequiredBehaviorPropertyProblem>
     VectorUnfilledRequiredBehaviorPropertyProblem;
 typedef std::vector<const gd::ObjectFolderOrObject*> VectorObjectFolderOrObject;
+typedef std::vector<const gd::PropertyFolderOrProperty*> VectorPropertyFolderOrProperty;
 typedef std::vector<gd::Screenshot> VectorScreenshot;
 typedef QuickCustomization::Visibility
     QuickCustomization_Visibility;
@@ -675,7 +716,9 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_GetBehaviorsWithType GetBehaviorsWithType
 #define STATIC_IsBehaviorCompatibleWithObject IsBehaviorCompatibleWithObject
 #define STATIC_FillBehaviorParameters FillBehaviorParameters
+#define STATIC_ValidateParameter ValidateParameter
 #define STATIC_IsParameterValid IsParameterValid
+#define STATIC_HasDeprecationWarnings HasDeprecationWarnings
 #define STATIC_FixInvalidRequiredBehaviorProperties \
   FixInvalidRequiredBehaviorProperties
 #define STATIC_RemoveLayerInScene RemoveLayerInScene

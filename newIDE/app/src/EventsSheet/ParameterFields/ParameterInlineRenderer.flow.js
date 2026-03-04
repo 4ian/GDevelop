@@ -27,6 +27,8 @@ export type ParameterInlineRendererProps = {|
   DeprecatedParameterValue: DeprecatedParameterValueProps => React.Node,
   MissingParameterValue: () => React.Node,
   useAssignmentOperators: boolean,
+  highlightedSearchText?: ?string,
+  highlightedSearchMatchCase?: boolean,
 |};
 
 /**

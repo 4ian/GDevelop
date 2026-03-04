@@ -4,6 +4,31 @@ import { isElseEventValid, getPreviousExecutableEventIndex } from '../helpers';
 
 const gd: libGDevelop = global.gd;
 
+export const renderInstructionSentenceAsPlainText = (
+  instruction: gdInstruction,
+  metadata: gdInstructionMetadata
+): string => {
+  // Note: we could do like in `MetadataDeclarationHelper` for events-based extensions
+  // and create if necessary a default sentence. Here though we assume all extensions
+  // will have a sentence.
+
+  if (gd.MetadataProvider.isBadInstructionMetadata(metadata)) {
+    return instruction.getType();
+  }
+
+  const formattedTexts = gd.InstructionSentenceFormatter.get().getAsFormattedText(
+    instruction,
+    metadata
+  );
+
+  return (
+    mapFor(0, formattedTexts.size(), i => {
+      const value = formattedTexts.getString(i);
+      return value;
+    }).join('') || instruction.getType()
+  );
+};
+
 // $FlowFixMe[recursive-definition]
 // $FlowFixMe[definition-cycle]
 const renderInstructionsAsText = ({
@@ -27,15 +52,10 @@ const renderInstructionsAsText = ({
           instruction.getType()
         );
 
-    const formattedTexts = gd.InstructionSentenceFormatter.get().getAsFormattedText(
+    const sentence = renderInstructionSentenceAsPlainText(
       instruction,
       metadata
     );
-
-    const sentence = mapFor(0, formattedTexts.size(), i => {
-      const value = formattedTexts.getString(i);
-      return value;
-    }).join('');
 
     return {
       text: `${padding}- ${[invertedText, sentence].filter(Boolean).join('')}`,

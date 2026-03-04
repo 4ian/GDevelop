@@ -14,6 +14,7 @@ import {
   setEditorHotReloadNeeded,
   type HotReloadSteps,
 } from '../../EmbeddedGame/EmbeddedGameFrame';
+import type { EventPath } from '../../Types/EventPath';
 
 const styles = {
   container: {
@@ -45,6 +46,34 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
       // Clear the toolbar if the editor is not ready yet to avoid showing stale toolbar
       // from the previous editor (e.g., HomePage)
       this.props.setToolbar(null);
+    }
+  }
+
+  setGlobalSearchResults(
+    eventPaths: Array<EventPath>,
+    focusedEventPath: EventPath,
+    searchText: string,
+    matchCase: boolean
+  ) {
+    if (this.editor) {
+      this.editor.setGlobalSearchResults(
+        eventPaths,
+        focusedEventPath,
+        searchText,
+        matchCase
+      );
+    }
+  }
+
+  clearGlobalSearchResults() {
+    if (this.editor) {
+      this.editor.clearGlobalSearchResults();
+    }
+  }
+
+  scrollToEventPath(eventPath: EventPath) {
+    if (this.editor) {
+      this.editor.scrollToEventPath(eventPath);
     }
   }
 

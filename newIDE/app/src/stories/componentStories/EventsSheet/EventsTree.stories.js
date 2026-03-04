@@ -80,6 +80,7 @@ export const DefaultMediumScreenScopeInLayout = (): React.Node => (
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}
+          highlightedSearchText={null}
           highlightedAiGeneratedEventIds={
             new Set(['fake-ai-generated-event-id-1'])
           }
@@ -138,6 +139,7 @@ export const DefaultSmallScreenScopeInLayout = (): React.Node => (
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}
+          highlightedSearchText={null}
           highlightedAiGeneratedEventIds={
             new Set(['fake-ai-generated-event-id-1'])
           }
@@ -193,6 +195,7 @@ export const DefaultMediumScreenScopeNotInLayout = (): React.Node => (
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}
+          highlightedSearchText={null}
           highlightedAiGeneratedEventIds={
             new Set(['fake-ai-generated-event-id-1'])
           }
@@ -251,6 +254,7 @@ export const EmptySmallScreenScopeInALayout = (): React.Node => (
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
           onEndEditingEvent={action('end editing event')}
+          highlightedSearchText={null}
           highlightedAiGeneratedEventIds={
             new Set(['fake-ai-generated-event-id-1'])
           }

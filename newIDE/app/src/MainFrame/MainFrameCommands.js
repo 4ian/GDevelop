@@ -67,6 +67,7 @@ type CommandHandlers = {|
   onOpenCommandPalette: () => void,
   onOpenProfile: () => void,
   onRestartInGameEditor: (reason: string) => void,
+  onOpenGlobalSearch: () => void,
 |};
 
 const useMainFrameCommands = (handlers: CommandHandlers) => {
@@ -158,6 +159,10 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
 
   useCommand('OPEN_COMMAND_PALETTE', true, {
     handler: handlers.onOpenCommandPalette,
+  });
+
+  useCommand('OPEN_GLOBAL_SEARCH', !!handlers.project, {
+    handler: handlers.onOpenGlobalSearch,
   });
 
   const onRestartInGameEditor = handlers.onRestartInGameEditor;

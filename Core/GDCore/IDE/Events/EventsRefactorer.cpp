@@ -758,7 +758,8 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
     bool inConditions,
     bool inActions,
     bool inEventStrings,
-    bool inEventSentences) {
+    bool inEventSentences,
+    bool inInstructionNames) {
   vector<EventsSearchResult> results;
 
   const gd::String& ignored_characters =
@@ -807,7 +808,8 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
                                      *conditionsVectors[j],
                                      search,
                                      matchCase,
-                                     inEventSentences)) {
+                                     inEventSentences,
+                                     inInstructionNames)) {
           results.push_back(EventsSearchResult(
               std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
               &events,
@@ -825,7 +827,8 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
                                                           *actionsVectors[j],
                                                           search,
                                                           matchCase,
-                                                          inEventSentences)) {
+                                                          inEventSentences,
+                                                          inInstructionNames)) {
           results.push_back(EventsSearchResult(
               std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
               &events,
@@ -854,7 +857,8 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
                          inConditions,
                          inActions,
                          inEventStrings,
-                         inEventSentences);
+                         inEventSentences,
+                         inInstructionNames);
       std::copy(
           subResults.begin(), subResults.end(), std::back_inserter(results));
     }
@@ -867,7 +871,8 @@ bool EventsRefactorer::SearchStringInActions(const gd::Platform& platform,
                                              gd::InstructionsList& actions,
                                              gd::String search,
                                              bool matchCase,
-                                             bool inSentences) {
+                                             bool inSentences,
+                                             bool inInstructionNames) {
   for (std::size_t aId = 0; aId < actions.size(); ++aId) {
     for (std::size_t pNb = 0; pNb < actions[aId].GetParameters().size();
          ++pNb) {
@@ -886,12 +891,18 @@ bool EventsRefactorer::SearchStringInActions(const gd::Platform& platform,
                            platform, actions[aId], search, matchCase, false))
       return true;
 
+    if (inInstructionNames && SearchStringInFormattedText(
+                                 platform, actions[aId], search, matchCase,
+                                 false, true))
+      return true;
+
     if (!actions[aId].GetSubInstructions().empty() &&
         SearchStringInActions(platform,
                               actions[aId].GetSubInstructions(),
                               search,
                               matchCase,
-                              inSentences))
+                              inSentences,
+                              inInstructionNames))
       return true;
   }
 
@@ -902,7 +913,8 @@ bool EventsRefactorer::SearchStringInFormattedText(const gd::Platform& platform,
                                                    gd::Instruction& instruction,
                                                    gd::String search,
                                                    bool matchCase,
-                                                   bool isCondition) {
+                                                   bool isCondition,
+                                                   bool inInstructionNames) {
   const auto& metadata = isCondition
                              ? gd::MetadataProvider::GetConditionMetadata(
                                    platform, instruction.GetType())
@@ -930,7 +942,22 @@ bool EventsRefactorer::SearchStringInFormattedText(const gd::Platform& platform,
                              ? completeSentence.find(search)
                              : completeSentence.FindCaseInsensitive(search);
 
-  return foundPosition != gd::String::npos;
+  if (foundPosition != gd::String::npos) return true;
+
+  if (inInstructionNames) {
+    const gd::String& instructionType = instruction.GetType();
+    size_t lastSeparator = instructionType.find_last_of("::");
+    gd::String instructionName =
+        lastSeparator != gd::String::npos
+            ? instructionType.substr(lastSeparator + 1)
+            : instructionType;
+    size_t nameFoundPosition =
+        matchCase ? instructionName.find(search)
+                  : instructionName.FindCaseInsensitive(search);
+    if (nameFoundPosition != gd::String::npos) return true;
+  }
+
+  return false;
 }
 
 bool EventsRefactorer::SearchStringInConditions(
@@ -938,7 +965,8 @@ bool EventsRefactorer::SearchStringInConditions(
     gd::InstructionsList& conditions,
     gd::String search,
     bool matchCase,
-    bool inSentences) {
+    bool inSentences,
+    bool inInstructionNames) {
   for (std::size_t cId = 0; cId < conditions.size(); ++cId) {
     for (std::size_t pNb = 0; pNb < conditions[cId].GetParameters().size();
          ++pNb) {
@@ -957,12 +985,18 @@ bool EventsRefactorer::SearchStringInConditions(
                            platform, conditions[cId], search, matchCase, true))
       return true;
 
+    if (inInstructionNames && SearchStringInFormattedText(
+                                 platform, conditions[cId], search, matchCase,
+                                 true, true))
+      return true;
+
     if (!conditions[cId].GetSubInstructions().empty() &&
         SearchStringInConditions(platform,
                                  conditions[cId].GetSubInstructions(),
                                  search,
                                  matchCase,
-                                 inSentences))
+                                 inSentences,
+                                 inInstructionNames))
       return true;
   }
 

@@ -51,6 +51,7 @@ export type GlobalSearchInputs = {|
   searchInActions: boolean,
   searchInEventStrings: boolean,
   searchInEventSentences: boolean,
+  searchInInstructionNames: boolean,
   includeStoreExtensions: boolean,
 |};
 
@@ -106,7 +107,8 @@ const searchInEventsList = (
     inputs.searchInConditions,
     inputs.searchInActions,
     inputs.searchInEventStrings,
-    inputs.searchInEventSentences
+    inputs.searchInEventSentences,
+    inputs.searchInInstructionNames
   ).clone();
 
   // Phase 1: Extract lightweight data from the C++ vector.

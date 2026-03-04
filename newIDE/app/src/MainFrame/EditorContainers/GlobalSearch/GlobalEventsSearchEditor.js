@@ -98,6 +98,10 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
           highlightedEventPaths: deduplicateEventPaths(group.matches),
           searchText: freezedSearchState.searchText,
           matchCase: freezedSearchState.matchCase,
+          searchInConditions: freezedSearchState.searchInConditions,
+          searchInActions: freezedSearchState.searchInActions,
+          searchInEventStrings: freezedSearchState.searchInEventStrings,
+          searchInInstructionNames: freezedSearchState.searchInInstructionNames,
         };
 
         if (group.targetType === 'extension') {
@@ -117,6 +121,10 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
       [
         freezedSearchState.searchText,
         freezedSearchState.matchCase,
+        freezedSearchState.searchInConditions,
+        freezedSearchState.searchInActions,
+        freezedSearchState.searchInEventStrings,
+        freezedSearchState.searchInInstructionNames,
         onNavigateToEventFromGlobalSearch,
       ]
     );
@@ -231,6 +239,16 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
                       setCheckBoxesState(prev => ({
                         ...prev,
                         searchInEventSentences: !prev.searchInEventSentences,
+                      })),
+                  },
+                  {
+                    type: 'checkbox',
+                    label: i18n._(t`Instruction names`),
+                    checked: checkBoxesState.searchInInstructionNames,
+                    click: () =>
+                      setCheckBoxesState(prev => ({
+                        ...prev,
+                        searchInInstructionNames: !prev.searchInInstructionNames,
                       })),
                   },
                   { type: 'separator' },

@@ -7,6 +7,7 @@ type CheckBoxesState = {|
   searchInActions: boolean,
   searchInEventStrings: boolean,
   searchInEventSentences: boolean,
+  searchInInstructionNames: boolean,
   includeStoreExtensions: boolean,
 |};
 
@@ -38,6 +39,7 @@ export const useSearchForm = (): UseSearchFormReturn => {
     searchInActions: true,
     searchInEventStrings: true,
     searchInEventSentences: true,
+    searchInInstructionNames: false,
     includeStoreExtensions: false,
   });
 

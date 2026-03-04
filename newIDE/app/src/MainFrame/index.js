@@ -2936,6 +2936,10 @@ const MainFrame = (props: Props): React.MixedElement => {
       highlightedEventPaths,
       searchText,
       matchCase,
+      searchInConditions,
+      searchInActions,
+      searchInEventStrings,
+      searchInInstructionNames,
       extensionName,
       functionName,
       behaviorName,
@@ -2947,6 +2951,10 @@ const MainFrame = (props: Props): React.MixedElement => {
       highlightedEventPaths: Array<EventPath>,
       searchText: string,
       matchCase?: boolean,
+      searchInConditions?: boolean,
+      searchInActions?: boolean,
+      searchInEventStrings?: boolean,
+      searchInInstructionNames?: boolean,
       extensionName?: string,
       functionName?: string,
       behaviorName?: string,
@@ -2997,7 +3005,13 @@ const MainFrame = (props: Props): React.MixedElement => {
                     highlightedEventPaths,
                     eventPath,
                     searchText,
-                    matchCase
+                    matchCase,
+                    {
+                      searchInConditions,
+                      searchInActions,
+                      searchInEventStrings,
+                      searchInInstructionNames,
+                    }
                   );
                 };
                 // For extensions: ensure we're on the correct function before

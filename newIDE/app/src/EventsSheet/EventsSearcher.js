@@ -13,6 +13,7 @@ export type SearchInEventsInputs = {|
   searchInActions: boolean,
   searchInEventStrings: boolean,
   searchInEventSentences: boolean,
+  searchInInstructionNames: boolean,
 |};
 
 export type ReplaceInEventsInputs = {|
@@ -194,6 +195,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
       searchInActions,
       searchInEventStrings,
       searchInEventSentences,
+      searchInInstructionNames,
     }: SearchInEventsInputs,
     cb: () => void
   ) => {
@@ -214,7 +216,8 @@ export default class EventsSearcher extends React.Component<Props, State> {
       searchInConditions,
       searchInActions,
       searchInEventStrings,
-      searchInEventSentences
+      searchInEventSentences,
+      searchInInstructionNames
     );
 
     if (this.state.eventsSearchResults) {

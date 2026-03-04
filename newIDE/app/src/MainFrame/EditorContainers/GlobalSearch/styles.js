@@ -48,26 +48,6 @@ export const styles = {
     display: 'flex',
     alignItems: 'center',
   },
-  eventRowConditionsFull: {
-    flex: 1,
-    background: 'var(--event-sheet-conditions-background-color, #f1f2f2)',
-    color: 'var(--event-sheet-conditions-color, black)',
-    padding: '6px 10px',
-    fontSize: 13,
-    overflow: 'hidden',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  eventRowActionsFull: {
-    flex: 1,
-    background: 'var(--event-sheet-actions-background-color, #FFFFFF)',
-    color: 'var(--event-sheet-actions-color, black)',
-    padding: '6px 10px',
-    fontSize: 13,
-    overflow: 'hidden',
-    display: 'flex',
-    alignItems: 'center',
-  },
   eventRowOther: {
     flex: 1,
     background: 'var(--event-sheet-actions-background-color, #FFFFFF)',
@@ -107,20 +87,10 @@ export const styles = {
     fontSize: 48,
     opacity: 0.4,
   },
-  noMatchesContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '32px 24px',
-    gap: 8,
-    opacity: 0.6,
-  },
 };
 
 export const useEventRowStyles: () => {
   eventRow: string,
-  groupLableText: string,
 } = makeStyles({
   eventRow: {
     cursor: 'pointer',
@@ -131,11 +101,5 @@ export const useEventRowStyles: () => {
     '&:last-child': {
       marginBottom: 0,
     },
-  },
-  groupLableText: {
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-    flex: 1,
   },
 });

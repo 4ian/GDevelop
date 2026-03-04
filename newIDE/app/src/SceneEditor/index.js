@@ -1356,9 +1356,22 @@ export default class SceneEditor extends React.Component<Props, State> {
   }: {|
     updatedObjects: Array<gdObject>,
   |}) => {
-    const serializedObjects = updatedObjects.map(object =>
-      serializeObjectWithCleanDefaultBehaviorFlags(object)
-    );
+    let serializedObjects;
+    try {
+      serializedObjects = updatedObjects.map(object =>
+        serializeObjectWithCleanDefaultBehaviorFlags(object)
+      );
+    } catch (error) {
+      // Hot-reloading is non-critical: if serialization fails (e.g. truncated
+      // JSON from the WASM serializer due to memory pressure), log the error
+      // but don't crash the editor. The preview simply won't reflect the
+      // latest changes until restarted.
+      console.error(
+        'Failed to serialize objects for hot-reload, skipping.',
+        error
+      );
+      return;
+    }
     const { previewDebuggerServer } = this.props;
     if (previewDebuggerServer) {
       previewDebuggerServer

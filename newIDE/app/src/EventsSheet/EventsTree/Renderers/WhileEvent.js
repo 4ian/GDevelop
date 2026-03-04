@@ -96,6 +96,8 @@ export default class WhileEvent extends React.Component<
             this.props.projectScopedContainersAccessor
           }
           idPrefix={this.props.idPrefix}
+          highlightedSearchText={this.props.highlightedSearchText}
+          highlightedSearchMatchCase={this.props.highlightedSearchMatchCase}
         />
         <div
           className={classNames({
@@ -140,6 +142,8 @@ export default class WhileEvent extends React.Component<
                 this.props.projectScopedContainersAccessor
               }
               idPrefix={this.props.idPrefix}
+              highlightedSearchText={this.props.highlightedSearchText}
+              highlightedSearchMatchCase={this.props.highlightedSearchMatchCase}
             />
           )}
           renderActionsList={({ className }) => (
@@ -177,6 +181,8 @@ export default class WhileEvent extends React.Component<
                 this.props.projectScopedContainersAccessor
               }
               idPrefix={this.props.idPrefix}
+              highlightedSearchText={this.props.highlightedSearchText}
+              highlightedSearchMatchCase={this.props.highlightedSearchMatchCase}
             />
           )}
         />

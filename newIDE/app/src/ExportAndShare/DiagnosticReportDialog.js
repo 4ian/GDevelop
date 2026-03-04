@@ -27,7 +27,7 @@ import Link from '../UI/Link';
 import IconButton from '../UI/IconButton';
 import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
-import type { EventPath } from '../Types/EventPath';
+import type { EventPath } from '../Utils/EventPath';
 
 const gd: libGDevelop = global.gd;
 

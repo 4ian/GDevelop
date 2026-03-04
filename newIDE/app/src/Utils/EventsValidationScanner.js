@@ -2,7 +2,7 @@
 // Scanner for validation errors in events (missing instructions, invalid parameters)
 import { mapFor } from './MapFor';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
-import type { EventPath } from '../Types/EventPath';
+import type { EventPath } from './EventPath';
 import { renderInstructionSentenceAsPlainText } from '../EventsSheet/EventsTree/TextRenderer';
 
 const gd: libGDevelop = global.gd;

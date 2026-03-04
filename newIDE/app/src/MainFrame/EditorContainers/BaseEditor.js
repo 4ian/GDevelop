@@ -23,7 +23,7 @@ import { type GamesPlatformFrameTools } from './HomePage/PlaySection/UseGamesPla
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type CreateProjectResult } from '../../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../../AiGeneration/Utils';
-import type { EventPath } from '../../Types/EventPath';
+import type { EventPath } from '../../Utils/EventPath';
 
 export type EditorContainerExtraProps = {|
   // Events function extension editor

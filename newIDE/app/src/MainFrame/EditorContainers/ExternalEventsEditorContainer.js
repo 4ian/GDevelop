@@ -32,7 +32,7 @@ import {
   type HotReloadSteps,
 } from '../../EmbeddedGame/EmbeddedGameFrame';
 import Background from '../../UI/Background';
-import type { EventPath } from '../../Types/EventPath';
+import type { EventPath } from '../../Utils/EventPath';
 
 const styles = {
   container: {

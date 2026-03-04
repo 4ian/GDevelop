@@ -7,7 +7,7 @@ import type {
   GlobalSearchGroup,
   GlobalSearchMatch,
 } from '../../../Utils/EventsGlobalSearchScanner';
-import type { EventPath } from '../../../Types/EventPath';
+import type { EventPath } from '../../../Utils/EventPath';
 
 export const getEventPathLabel = (path: EventPath): string =>
   path.length ? path.map(index => index + 1).join(' > ') : '-';

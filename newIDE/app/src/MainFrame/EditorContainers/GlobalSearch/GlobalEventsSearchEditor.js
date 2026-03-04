@@ -34,7 +34,7 @@ import {
 import Paper from '../../../UI/Paper';
 import ScrollView from '../../../UI/ScrollView';
 import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
-import type { EventPath } from '../../../Types/EventPath';
+import type { EventPath } from '../../../Utils/EventPath';
 import Cross from '../../../UI/CustomSvgIcons/Cross';
 
 type GlobalEventsSearchEditorProps = {|

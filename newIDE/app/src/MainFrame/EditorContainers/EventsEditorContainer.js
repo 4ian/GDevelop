@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import EventsSheet, { type EventsSheetInterface } from '../../EventsSheet';
-import type { EventPath } from '../../Types/EventPath';
+import type { EventPath } from '../../Utils/EventPath';
 import { sendEventsExtractedAsFunction } from '../../Utils/Analytics/EventSender';
 import {
   type RenderEditorContainerProps,

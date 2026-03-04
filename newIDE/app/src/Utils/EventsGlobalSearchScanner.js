@@ -1,6 +1,6 @@
 // @flow
 import { renderInstructionSentenceAsPlainText } from '../EventsSheet/EventsTree/TextRenderer';
-import type { EventPath } from '../Types/EventPath';
+import type { EventPath } from './EventPath';
 
 import { mapFor } from './MapFor';
 

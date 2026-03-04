@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type EditorTabsState } from './EditorTabs/EditorTabsHandler';
-import type { EventPath } from '../Types/EventPath';
+import type { EventPath } from '../Utils/EventPath';
 
 export type EventNavigationTarget = {|
   name: string,

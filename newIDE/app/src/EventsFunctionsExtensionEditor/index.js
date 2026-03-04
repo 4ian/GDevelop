@@ -48,7 +48,7 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import PropertyListEditor, {
   type PropertyListEditorInterface,
 } from './PropertyListEditor';
-import type { EventPath } from '../Types/EventPath';
+import type { EventPath } from '../Utils/EventPath';
 
 const gd: libGDevelop = global.gd;
 

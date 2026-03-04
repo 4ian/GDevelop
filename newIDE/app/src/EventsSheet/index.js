@@ -85,7 +85,7 @@ import PreferencesContext, {
 import EventsFunctionExtractorDialog from './EventsFunctionExtractor/EventsFunctionExtractorDialog';
 import { createNewInstructionForEventsFunction } from './EventsFunctionExtractor';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope';
-import type { EventPath } from '../Types/EventPath';
+import type { EventPath } from '../Utils/EventPath';
 import {
   pasteEventsFromClipboardInSelection,
   copySelectionToClipboard,

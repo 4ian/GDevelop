@@ -56,6 +56,20 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
     this.props = props;
   }
 
+  /**
+   * Returns true if the underlying C++ object is still valid and accessible.
+   * The object may have been freed if the project was closed/reloaded or if
+   * the external events were removed.
+   */
+  _isValid(): boolean {
+    try {
+      this.externalEvents.getName();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return itemContent.getId() === externalEventsRootFolderId;
   }
@@ -65,7 +79,15 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
   }
 
   getName(): string | React.Node {
-    return this.externalEvents.getName();
+    try {
+      return this.externalEvents.getName();
+    } catch (e) {
+      console.warn(
+        'Could not read the name of an external events - it was probably removed or the project was closed.',
+        e
+      );
+      return '';
+    }
   }
 
   getId(): string {
@@ -77,9 +99,13 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
   }
 
   getDataSet(): ?HTMLDataset {
-    return {
-      'external-events': this.externalEvents.getName(),
-    };
+    try {
+      return {
+        'external-events': this.externalEvents.getName(),
+      };
+    } catch (e) {
+      return null;
+    }
   }
 
   getThumbnail(): ?string {
@@ -87,10 +113,12 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
   }
 
   onClick(): void {
+    if (!this._isValid()) return;
     this.props.onOpenExternalEvents(this.externalEvents.getName());
   }
 
   rename(newName: string): void {
+    if (!this._isValid()) return;
     const oldName = this.externalEvents.getName();
     if (oldName === newName) {
       return;
@@ -149,12 +177,14 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
   }
 
   getIndex(): number {
+    if (!this._isValid()) return 0;
     return this.props.project.getExternalEventsPosition(
       this.externalEvents.getName()
     );
   }
 
   moveAt(destinationIndex: number): void {
+    if (!this._isValid()) return;
     const originIndex = this.getIndex();
     if (destinationIndex !== originIndex) {
       this.props.project.moveExternalEvents(
@@ -167,6 +197,7 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
   }
 
   copy(): void {
+    if (!this._isValid()) return;
     Clipboard.set(EXTERNAL_EVENTS_CLIPBOARD_KIND, {
       externalEvents: serializeToJSObject(this.externalEvents),
       name: this.externalEvents.getName(),

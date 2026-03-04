@@ -67,6 +67,20 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     this.props = props;
   }
 
+  /**
+   * Returns true if the underlying C++ object is still valid and accessible.
+   * The object may have been freed if the project was closed/reloaded or if
+   * the scene was removed.
+   */
+  _isValid(): boolean {
+    try {
+      this.scene.getName();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return itemContent.getId() === scenesRootFolderId;
   }
@@ -76,7 +90,15 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   getName(): string | React.Node {
-    return this.scene.getName();
+    try {
+      return this.scene.getName();
+    } catch (e) {
+      console.warn(
+        'Could not read the name of a scene - it was probably removed or the project was closed.',
+        e
+      );
+      return '';
+    }
   }
 
   getId(): string {
@@ -88,9 +110,13 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   getDataSet(): ?HTMLDataset {
-    return {
-      scene: this.scene.getName(),
-    };
+    try {
+      return {
+        scene: this.scene.getName(),
+      };
+    } catch (e) {
+      return null;
+    }
   }
 
   getThumbnail(): ?string {
@@ -98,6 +124,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   onClick(): void {
+    if (!this._isValid()) return;
     this.props.onOpenLayout(this.scene.getName(), {
       openEventsEditor: true,
       openSceneEditor: true,
@@ -106,6 +133,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   rename(newName: string): void {
+    if (!this._isValid()) return;
     const oldName = this.scene.getName();
     if (oldName === newName) {
       return;
@@ -197,6 +225,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   _isFirstScene(): boolean {
+    if (!this._isValid()) return false;
     return this.scene.getName() === this.props.project.getFirstLayout();
   }
 
@@ -227,10 +256,12 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   getIndex(): number {
+    if (!this._isValid()) return 0;
     return this.props.project.getLayoutPosition(this.scene.getName());
   }
 
   moveAt(destinationIndex: number): void {
+    if (!this._isValid()) return;
     const originIndex = this.getIndex();
     if (destinationIndex !== originIndex) {
       this.props.project.moveLayout(
@@ -243,6 +274,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   copy(): void {
+    if (!this._isValid()) return;
     Clipboard.set(SCENE_CLIPBOARD_KIND, {
       layout: serializeToJSObject(this.scene),
       name: this.scene.getName(),
@@ -283,6 +315,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   _duplicate(): void {
+    if (!this._isValid()) return;
     const { project } = this.props;
     const newName = newNameGenerator(this.scene.getName(), name =>
       project.hasLayoutNamed(name)

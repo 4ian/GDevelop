@@ -57,6 +57,20 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
     this.props = props;
   }
 
+  /**
+   * Returns true if the underlying C++ object is still valid and accessible.
+   * The object may have been freed if the project was closed/reloaded or if
+   * the external layout was removed.
+   */
+  _isValid(): boolean {
+    try {
+      this.externalLayout.getName();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return itemContent.getId() === externalLayoutsRootFolderId;
   }
@@ -66,7 +80,15 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
   }
 
   getName(): string | React.Node {
-    return this.externalLayout.getName();
+    try {
+      return this.externalLayout.getName();
+    } catch (e) {
+      console.warn(
+        'Could not read the name of an external layout - it was probably removed or the project was closed.',
+        e
+      );
+      return '';
+    }
   }
 
   getId(): string {
@@ -78,9 +100,13 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
   }
 
   getDataSet(): ?HTMLDataset {
-    return {
-      'external-layout': this.externalLayout.getName(),
-    };
+    try {
+      return {
+        'external-layout': this.externalLayout.getName(),
+      };
+    } catch (e) {
+      return null;
+    }
   }
 
   getThumbnail(): ?string {
@@ -88,10 +114,12 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
   }
 
   onClick(): void {
+    if (!this._isValid()) return;
     this.props.onOpenExternalLayout(this.externalLayout.getName());
   }
 
   rename(newName: string): void {
+    if (!this._isValid()) return;
     const oldName = this.externalLayout.getName();
     if (oldName === newName) {
       return;
@@ -150,12 +178,14 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
   }
 
   getIndex(): number {
+    if (!this._isValid()) return 0;
     return this.props.project.getExternalLayoutPosition(
       this.externalLayout.getName()
     );
   }
 
   moveAt(destinationIndex: number): void {
+    if (!this._isValid()) return;
     const originIndex = this.getIndex();
     if (destinationIndex !== originIndex) {
       this.props.project.moveExternalLayout(
@@ -168,6 +198,7 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
   }
 
   copy(): void {
+    if (!this._isValid()) return;
     Clipboard.set(EXTERNAL_LAYOUT_CLIPBOARD_KIND, {
       externalLayout: serializeToJSObject(this.externalLayout),
       name: this.externalLayout.getName(),

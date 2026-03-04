@@ -61,6 +61,20 @@ export class ExtensionTreeViewItemContent implements TreeViewItemContent {
     this.props = props;
   }
 
+  /**
+   * Returns true if the underlying C++ object is still valid and accessible.
+   * The object may have been freed if the project was closed/reloaded or if
+   * the extension was removed.
+   */
+  _isValid(): boolean {
+    try {
+      this.eventsFunctionsExtension.getName();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return itemContent.getId() === extensionsRootFolderId;
   }
@@ -70,7 +84,15 @@ export class ExtensionTreeViewItemContent implements TreeViewItemContent {
   }
 
   getName(): string | React.Node {
-    return this.eventsFunctionsExtension.getName();
+    try {
+      return this.eventsFunctionsExtension.getName();
+    } catch (e) {
+      console.warn(
+        'Could not read the name of an extension - it was probably removed or the project was closed.',
+        e
+      );
+      return '';
+    }
   }
 
   getId(): string {
@@ -82,16 +104,24 @@ export class ExtensionTreeViewItemContent implements TreeViewItemContent {
   }
 
   getDataSet(): ?HTMLDataset {
-    return {
-      extension: this.eventsFunctionsExtension.getName(),
-    };
+    try {
+      return {
+        extension: this.eventsFunctionsExtension.getName(),
+      };
+    } catch (e) {
+      return null;
+    }
   }
 
   getThumbnail(): ?string {
-    return (
-      this.eventsFunctionsExtension.getIconUrl() ||
-      'res/functions/extension_black.svg'
-    );
+    try {
+      return (
+        this.eventsFunctionsExtension.getIconUrl() ||
+        'res/functions/extension_black.svg'
+      );
+    } catch (e) {
+      return 'res/functions/extension_black.svg';
+    }
   }
 
   onClick(): void {
@@ -101,6 +131,7 @@ export class ExtensionTreeViewItemContent implements TreeViewItemContent {
   }
 
   rename(newName: string): void {
+    if (!this._isValid()) return;
     const oldName = this.eventsFunctionsExtension.getName();
     if (oldName === newName) {
       return;
@@ -160,12 +191,14 @@ export class ExtensionTreeViewItemContent implements TreeViewItemContent {
   }
 
   getIndex(): number {
+    if (!this._isValid()) return 0;
     return this.props.project.getEventsFunctionsExtensionPosition(
       this.eventsFunctionsExtension.getName()
     );
   }
 
   moveAt(destinationIndex: number): void {
+    if (!this._isValid()) return;
     const originIndex = this.getIndex();
     if (destinationIndex !== originIndex) {
       this.props.project.moveEventsFunctionsExtension(
@@ -178,6 +211,7 @@ export class ExtensionTreeViewItemContent implements TreeViewItemContent {
   }
 
   copy(): void {
+    if (!this._isValid()) return;
     Clipboard.set(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND, {
       eventsFunctionsExtension: serializeToJSObject(
         this.eventsFunctionsExtension

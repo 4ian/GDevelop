@@ -3649,9 +3649,34 @@ module.exports = {
       properties
         .getOrCreate('qualityMode')
         .setValue('medium')
+        .addChoice('low', _('Low quality'))
+        .addChoice('medium', _('Medium quality'))
+        .addChoice('high', _('High quality'))
         .setLabel(_('Quality mode'))
-        .setType('string')
-        .setDescription(_('Use: low, medium, or high.'));
+        .setType('choice')
+        .setDescription(
+          _(
+            'Base quality profile for all managed 3D post-processing effects.'
+          )
+        );
+      properties
+        .getOrCreate('adaptivePerformance')
+        .setValue('true')
+        .setLabel(_('Adaptive performance'))
+        .setType('boolean')
+        .setDescription(
+          _(
+            'Automatically reduces quality/load when frame time is too high, then restores when performance recovers.'
+          )
+        )
+        .setAdvanced(true);
+      properties
+        .getOrCreate('targetFps')
+        .setValue('60')
+        .setLabel(_('Target FPS'))
+        .setType('number')
+        .setDescription(_('Target framerate for adaptive performance (30-240).'))
+        .setAdvanced(true);
     }
     {
       const effect = extension
@@ -3681,6 +3706,20 @@ module.exports = {
         .setLabel(_('Threshold'))
         .setType('number')
         .setDescription(_('Between 0 and 1'));
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .addChoice('low', _('Low quality'))
+        .addChoice('medium', _('Medium quality'))
+        .addChoice('high', _('High quality'))
+        .setLabel(_('Quality mode'))
+        .setType('choice')
+        .setDescription(
+          _(
+            'Controls internal bloom rendering resolution through the shared quality system.'
+          )
+        )
+        .setAdvanced(true);
     }
     {
       const effect = extension
@@ -3725,6 +3764,20 @@ module.exports = {
         .setDescription(
           _('Depth tolerance to detect reflection hits reliably.')
         );
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .addChoice('low', _('Low quality'))
+        .addChoice('medium', _('Medium quality'))
+        .addChoice('high', _('High quality'))
+        .setLabel(_('Quality mode'))
+        .setType('choice')
+        .setDescription(
+          _(
+            'Controls SSR ray step budget and shared capture quality.'
+          )
+        )
+        .setAdvanced(true);
     }
     {
       const effect = extension
@@ -3910,6 +3963,18 @@ module.exports = {
         .setDescription(
           _('Quality/performance control (higher = better, slower).')
         );
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .addChoice('low', _('Low quality'))
+        .addChoice('medium', _('Medium quality'))
+        .addChoice('high', _('High quality'))
+        .setLabel(_('Quality mode'))
+        .setType('choice')
+        .setDescription(
+          _('Controls SSAO sample cap and shared capture quality.')
+        )
+        .setAdvanced(true);
     }
     {
       const effect = extension
@@ -3954,6 +4019,18 @@ module.exports = {
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setDescription(_('Maximum distance for volumetric ray marching.'));
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .addChoice('low', _('Low quality'))
+        .addChoice('medium', _('Medium quality'))
+        .addChoice('high', _('High quality'))
+        .setLabel(_('Quality mode'))
+        .setType('choice')
+        .setDescription(
+          _('Controls volumetric fog ray-marching step count and shared capture quality.')
+        )
+        .setAdvanced(true);
     }
     {
       const effect = extension
@@ -4073,6 +4150,26 @@ module.exports = {
         .setLabel(_('Max blur'))
         .setType('number')
         .setDescription(_('Maximum blur radius strength.'));
+      properties
+        .getOrCreate('samples')
+        .setValue('4')
+        .setLabel(_('Samples'))
+        .setType('number')
+        .setDescription(
+          _('Blur sample count (higher = smoother, slower).')
+        );
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .addChoice('low', _('Low quality'))
+        .addChoice('medium', _('Medium quality'))
+        .addChoice('high', _('High quality'))
+        .setLabel(_('Quality mode'))
+        .setType('choice')
+        .setDescription(
+          _('Controls depth-of-field sample cap and blur scaling.')
+        )
+        .setAdvanced(true);
     }
     {
       const effect = extension

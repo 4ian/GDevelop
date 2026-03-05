@@ -503,13 +503,9 @@ namespace gdjs {
             return true;
           }
 
-          private _adaptQuality(target: gdjs.EffectsTarget): void {
-            if (!(target instanceof gdjs.Layer)) {
-              return;
-            }
-            const quality = gdjs.getScene3DPostProcessingQualityProfileForMode(
-              this._qualityMode
-            );
+          private _adaptQuality(
+            quality: gdjs.Scene3DPostProcessingQualityProfile
+          ): void {
             this._raySteps = quality.ssrSteps;
           }
 
@@ -941,7 +937,6 @@ namespace gdjs {
               return;
             }
 
-            this._adaptQuality(target);
             if (!gdjs.isScene3DPostProcessingEnabled(target)) {
               this.shaderPass.enabled = false;
               gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'SSR');
@@ -964,6 +959,7 @@ namespace gdjs {
             if (!sharedCapture || !sharedCapture.depthTexture) {
               return;
             }
+            this._adaptQuality(sharedCapture.quality);
 
             let ssrExcludeMaskTexture: THREE.Texture =
               this._excludeMaskFallbackTexture;

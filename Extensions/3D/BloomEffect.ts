@@ -90,9 +90,7 @@ namespace gdjs {
               this._qualityMode
             );
 
-            const quality = gdjs.getScene3DPostProcessingQualityProfileForMode(
-              this._qualityMode
-            );
+            const quality = gdjs.getScene3DPostProcessingQualityProfile(target);
             threeRenderer.getDrawingBufferSize(this._renderSize);
             const width = Math.max(
               1,

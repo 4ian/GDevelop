@@ -249,18 +249,20 @@ namespace gdjs {
             this.shaderPass.enabled = this._effectEnabled;
           }
 
-          private _applyQualityPreset(): void {
+          private _applyQualityPreset(
+            qualityMode?: gdjs.Scene3DPostProcessingQualityMode
+          ): void {
             if (this._qualityMode === 'custom') {
               return;
             }
 
-            const qualityMode = gdjs.setScene3DPostProcessingEffectQualityMode(
-              this._qualityMode
-            );
-            if (qualityMode === 'low') {
+            const resolvedQualityMode =
+              qualityMode ||
+              gdjs.setScene3DPostProcessingEffectQualityMode(this._qualityMode);
+            if (resolvedQualityMode === 'low') {
               this._dropCount = 8;
               this._streakCount = 12;
-            } else if (qualityMode === 'high') {
+            } else if (resolvedQualityMode === 'high') {
               this._dropCount = 48;
               this._streakCount = 64;
             } else {
@@ -300,6 +302,16 @@ namespace gdjs {
               return false;
             }
             target.getRenderer().addPostProcessingPass(this.shaderPass);
+            gdjs.reorderScene3DPostProcessingPasses(target);
+            if (this._qualityMode !== 'custom') {
+              gdjs.setScene3DPostProcessingEffectQualityMode(
+                target,
+                'RAIN',
+                this._qualityMode
+              );
+            } else {
+              gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'RAIN');
+            }
             this._isEnabled = true;
             return true;
           }
@@ -309,15 +321,21 @@ namespace gdjs {
               return false;
             }
             target.getRenderer().removePostProcessingPass(this.shaderPass);
+            gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'RAIN');
             this._isEnabled = false;
             return true;
           }
 
           updatePreRender(target: gdjs.EffectsTarget): any {
-            if (!this._isEnabled || !this._effectEnabled) {
+            if (!this._isEnabled) {
               return;
             }
             if (!(target instanceof gdjs.Layer)) {
+              return;
+            }
+            if (!this._effectEnabled) {
+              this.shaderPass.enabled = false;
+              gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'RAIN');
               return;
             }
 
@@ -332,10 +350,22 @@ namespace gdjs {
 
             if (!gdjs.isScene3DPostProcessingEnabled(target)) {
               this.shaderPass.enabled = false;
+              gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'RAIN');
               return;
             }
 
-            this._applyQualityPreset();
+            if (this._qualityMode === 'custom') {
+              gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'RAIN');
+            } else {
+              gdjs.setScene3DPostProcessingEffectQualityMode(
+                target,
+                'RAIN',
+                this._qualityMode
+              );
+              this._applyQualityPreset(
+                gdjs.getScene3DPostProcessingQualityMode(target)
+              );
+            }
 
             const deltaTime = Math.max(0, runtimeScene.getElapsedTime() / 1000);
             this._time += deltaTime;

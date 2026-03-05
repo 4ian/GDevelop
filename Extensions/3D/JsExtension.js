@@ -384,13 +384,18 @@ module.exports = {
         behaviorProperties
           .getOrCreate('offDuration')
           .setValue(
-            behaviorContent.getChild('offDuration').getDoubleValue().toString(10)
+            behaviorContent
+              .getChild('offDuration')
+              .getDoubleValue()
+              .toString(10)
           )
           .setType('Number')
           .setLabel(_('Off duration (seconds)'));
         behaviorProperties
           .getOrCreate('targetLayerName')
-          .setValue(behaviorContent.getChild('targetLayerName').getStringValue())
+          .setValue(
+            behaviorContent.getChild('targetLayerName').getStringValue()
+          )
           .setType('String')
           .setLabel(_('Target layer name (optional)'))
           .setDescription(
@@ -2441,9 +2446,7 @@ module.exports = {
         .setValue('false')
         .setLabel(_('Rotate offsets with object angle'))
         .setDescription(
-          _(
-            'Rotate X/Y offsets using the attached object angle.'
-          )
+          _('Rotate X/Y offsets using the attached object angle.')
         )
         .setType('boolean')
         .setGroup(_('Attachment'))
@@ -2465,9 +2468,7 @@ module.exports = {
         .setValue('false')
         .setLabel(_('Inherit attached object scale'))
         .setDescription(
-          _(
-            'Scale attachment offsets using attached object scale (X/Y/Z).'
-          )
+          _('Scale attachment offsets using attached object scale (X/Y/Z).')
         )
         .setType('boolean')
         .setGroup(_('Attachment'))
@@ -2528,9 +2529,7 @@ module.exports = {
         .setValue('0.02')
         .setLabel(_('Shadow normal bias'))
         .setDescription(
-          _(
-            'Offset along normals to reduce acne on sloped/curved surfaces.'
-          )
+          _('Offset along normals to reduce acne on sloped/curved surfaces.')
         )
         .setType('number')
         .setGroup(_('Shadows'))
@@ -2609,9 +2608,7 @@ module.exports = {
         .setValue('2000')
         .setLabel(_('Max shadow distance'))
         .setDescription(
-          _(
-            'Maximum world distance covered by cascaded directional shadows.'
-          )
+          _('Maximum world distance covered by cascaded directional shadows.')
         )
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
@@ -2900,9 +2897,7 @@ module.exports = {
         .setValue('false')
         .setLabel(_('Inherit attached object scale'))
         .setDescription(
-          _(
-            'Scale attached offsets using the attached object scale (X/Y/Z).'
-          )
+          _('Scale attached offsets using the attached object scale (X/Y/Z).')
         )
         .setType('boolean')
         .setGroup(_('Attachment'))
@@ -2912,9 +2907,7 @@ module.exports = {
         .setValue('0')
         .setLabel(_('Maximum distance'))
         .setDescription(
-          _(
-            'Maximum range of the light. 0 means unlimited range.'
-          )
+          _('Maximum range of the light. 0 means unlimited range.')
         )
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
@@ -2984,7 +2977,9 @@ module.exports = {
         .setValue('0.02')
         .setLabel(_('Shadow normal bias'))
         .setDescription(
-          _('Offset along object normals to prevent acne on curved surfaces. Default: 0.02.')
+          _(
+            'Offset along object normals to prevent acne on curved surfaces. Default: 0.02.'
+          )
         )
         .setType('number')
         .setGroup(_('Shadows'));
@@ -2992,9 +2987,7 @@ module.exports = {
         .getOrCreate('shadowRadius')
         .setValue('1.5')
         .setLabel(_('Shadow softness'))
-        .setDescription(
-          _('Softness radius for point-light shadow filtering.')
-        )
+        .setDescription(_('Softness radius for point-light shadow filtering.'))
         .setType('number')
         .setGroup(_('Shadows'));
       properties
@@ -3177,9 +3170,7 @@ module.exports = {
         .setValue('false')
         .setLabel(_('Follow target 3D rotation'))
         .setDescription(
-          _(
-            'Apply target attached offsets in the target object local 3D axes.'
-          )
+          _('Apply target attached offsets in the target object local 3D axes.')
         )
         .setType('boolean')
         .setGroup(_('Target attachment'))
@@ -3223,11 +3214,7 @@ module.exports = {
         .getOrCreate('flashlightDistance')
         .setValue('600')
         .setLabel(_('Flashlight distance'))
-        .setDescription(
-          _(
-            'Forward target distance used by flashlight mode.'
-          )
-        )
+        .setDescription(_('Forward target distance used by flashlight mode.'))
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setGroup(_('Flashlight'));
@@ -3356,9 +3343,7 @@ module.exports = {
         .setValue('0')
         .setLabel(_('Maximum distance'))
         .setDescription(
-          _(
-            'Maximum range of the light. 0 means unlimited range.'
-          )
+          _('Maximum range of the light. 0 means unlimited range.')
         )
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
@@ -3436,9 +3421,7 @@ module.exports = {
         .getOrCreate('shadowRadius')
         .setValue('1.5')
         .setLabel(_('Shadow softness'))
-        .setDescription(
-          _('Softness radius for spot-light shadow filtering.')
-        )
+        .setDescription(_('Softness radius for spot-light shadow filtering.'))
         .setType('number')
         .setGroup(_('Shadows'));
       properties
@@ -3588,6 +3571,66 @@ module.exports = {
     }
     {
       const effect = extension
+        .addEffect('RuntimeLightMap')
+        .setFullName(_('Runtime light map'))
+        .setDescription(
+          _(
+            'Apply a baked light map texture at runtime, with optional automatic UV2 generation and adaptive blending with dynamic lights.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/RuntimeLightMapEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('enabled')
+        .setValue('true')
+        .setLabel(_('Enabled'))
+        .setType('boolean');
+      properties
+        .getOrCreate('lightMapResourceName')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Light map texture'));
+      properties
+        .getOrCreate('lightMapIntensity')
+        .setValue('1')
+        .setLabel(_('Light map intensity'))
+        .setType('number')
+        .setDescription(_('Strength of the baked light map contribution.'));
+      properties
+        .getOrCreate('dynamicBlend')
+        .setValue('0.35')
+        .setLabel(_('Dynamic blend'))
+        .setType('number')
+        .setDescription(
+          _(
+            'How much strong dynamic lights reduce baked light map influence (0 to 1).'
+          )
+        );
+      properties
+        .getOrCreate('autoAssignUv2')
+        .setValue('true')
+        .setLabel(_('Auto-assign UV2'))
+        .setType('boolean')
+        .setDescription(
+          _(
+            'When enabled, meshes missing UV2 will copy UV to UV2 automatically for light map support.'
+          )
+        );
+      properties
+        .getOrCreate('onlyIfMissingLightMap')
+        .setValue('true')
+        .setLabel(_('Only if missing light map'))
+        .setType('boolean')
+        .setDescription(
+          _(
+            'Keep existing per-material light maps unchanged and only apply to materials without one.'
+          )
+        );
+    }
+    {
+      const effect = extension
         .addEffect('PostProcessingStack')
         .setFullName(_('Post-processing stack'))
         .setDescription(
@@ -3672,14 +3715,18 @@ module.exports = {
         .setLabel(_('Max distance'))
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setDescription(_('Maximum reflection tracing distance (balanced for performance).'));
+        .setDescription(
+          _('Maximum reflection tracing distance (balanced for performance).')
+        );
       properties
         .getOrCreate('thickness')
         .setValue('4')
         .setLabel(_('Thickness'))
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setDescription(_('Depth tolerance to detect reflection hits reliably.'));
+        .setDescription(
+          _('Depth tolerance to detect reflection hits reliably.')
+        );
     }
     {
       const effect = extension
@@ -3815,7 +3862,9 @@ module.exports = {
         .setValue('16')
         .setLabel(_('Samples'))
         .setType('number')
-        .setDescription(_('Quality/performance control (higher = better, slower).'));
+        .setDescription(
+          _('Quality/performance control (higher = better, slower).')
+        );
     }
     {
       const effect = extension
@@ -3970,7 +4019,9 @@ module.exports = {
         .setLabel(_('Focus range'))
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setDescription(_('How gradually blur increases around focus distance.'));
+        .setDescription(
+          _('How gradually blur increases around focus distance.')
+        );
       properties
         .getOrCreate('maxBlur')
         .setValue('6')

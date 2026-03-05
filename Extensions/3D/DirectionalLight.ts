@@ -847,17 +847,17 @@ namespace gdjs {
             }
             if (parameterName === 'shadowQuality') {
               if (value === 'low' && this._shadowMapSize !== 512) {
-                this._shadowMapSize = 512;
+                this._shadowMapSize = this._getClosestShadowMapSize(512);
                 this._shadowMapDirty = true;
                 this._shadowCameraDirty = true;
               }
               if (value === 'medium' && this._shadowMapSize !== 1024) {
-                this._shadowMapSize = 1024;
+                this._shadowMapSize = this._getClosestShadowMapSize(1024);
                 this._shadowMapDirty = true;
                 this._shadowCameraDirty = true;
               }
               if (value === 'high' && this._shadowMapSize !== 2048) {
-                this._shadowMapSize = 2048;
+                this._shadowMapSize = this._getClosestShadowMapSize(2048);
                 this._shadowMapDirty = true;
                 this._shadowCameraDirty = true;
               }

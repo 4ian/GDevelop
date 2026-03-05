@@ -17,6 +17,7 @@ namespace gdjs {
     oy?: number;
     oz?: number;
     ro?: boolean;
+    sms?: number;
   }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::PointLight',
@@ -51,6 +52,7 @@ namespace gdjs {
           private _light: THREE.PointLight;
           private _shadowMapDirty = true;
           private _shadowCameraDirty = true;
+          private _maxRendererShadowMapSize: integer = 2048;
 
           constructor() {
             this._light = new THREE.PointLight();
@@ -71,12 +73,76 @@ namespace gdjs {
             this._light.shadow.camera.updateProjectionMatrix();
           }
 
+          private _clampShadowMapSizeToRenderer(size: integer): integer {
+            const safeRendererMax = Math.max(512, this._maxRendererShadowMapSize);
+            let clampedSize = 512;
+            while (clampedSize * 2 <= safeRendererMax) {
+              clampedSize *= 2;
+            }
+            return Math.max(512, Math.min(size, clampedSize));
+          }
+
+          private _getClosestShadowMapSize(value: float): integer {
+            const supportedSizes = [512, 1024, 2048, 4096];
+            const target = Math.max(512, value);
+            let closestSize = supportedSizes[0];
+            let closestDelta = Math.abs(target - closestSize);
+            for (let i = 1; i < supportedSizes.length; i++) {
+              const size = supportedSizes[i];
+              const delta = Math.abs(target - size);
+              if (delta < closestDelta) {
+                closestDelta = delta;
+                closestSize = size;
+              }
+            }
+            return this._clampShadowMapSizeToRenderer(closestSize);
+          }
+
+          private _ensureSoftShadowRenderer(target: gdjs.EffectsTarget): void {
+            const runtimeScene = target.getRuntimeScene();
+            if (!runtimeScene || !runtimeScene.getGame) {
+              return;
+            }
+            const gameRenderer = runtimeScene.getGame().getRenderer();
+            if (!gameRenderer || !(gameRenderer as any).getThreeRenderer) {
+              return;
+            }
+            const threeRenderer = (gameRenderer as any).getThreeRenderer();
+            if (!threeRenderer || !threeRenderer.shadowMap) {
+              return;
+            }
+
+            const rendererMaxTextureSize =
+              threeRenderer.capabilities &&
+              typeof threeRenderer.capabilities.maxTextureSize === 'number'
+                ? threeRenderer.capabilities.maxTextureSize
+                : 2048;
+            this._maxRendererShadowMapSize = Math.max(
+              512,
+              rendererMaxTextureSize
+            );
+
+            if (!this._light.castShadow) {
+              return;
+            }
+
+            threeRenderer.shadowMap.enabled = true;
+            threeRenderer.shadowMap.autoUpdate = true;
+            threeRenderer.shadowMap.type =
+              this._shadowRadius > 1
+                ? THREE.PCFShadowMap
+                : THREE.PCFSoftShadowMap;
+          }
+
           private _updateShadowMapSize(): void {
             if (!this._shadowMapDirty) {
               return;
             }
             this._shadowMapDirty = false;
 
+            this._shadowMapSize = this._getClosestShadowMapSize(
+              this._shadowMapSize
+            );
             this._light.shadow.mapSize.set(
               this._shadowMapSize,
               this._shadowMapSize
@@ -237,6 +303,7 @@ namespace gdjs {
               this._updatePosition();
             }
 
+            this._ensureSoftShadowRenderer(target);
             if (!this._light.castShadow) {
               return;
             }
@@ -278,6 +345,10 @@ namespace gdjs {
               this._shadowNormalBias = Math.max(0, value);
             } else if (parameterName === 'shadowRadius') {
               this._shadowRadius = Math.max(0, value);
+            } else if (parameterName === 'shadowMapSize') {
+              this._shadowMapSize = this._getClosestShadowMapSize(value);
+              this._shadowMapDirty = true;
+              this._shadowCameraDirty = true;
             } else if (parameterName === 'shadowNear') {
               this._shadowNear = Math.max(0.01, value);
               this._shadowCameraDirty = true;
@@ -311,6 +382,8 @@ namespace gdjs {
               return this._shadowNormalBias;
             } else if (parameterName === 'shadowRadius') {
               return this._shadowRadius;
+            } else if (parameterName === 'shadowMapSize') {
+              return this._shadowMapSize;
             } else if (parameterName === 'shadowNear') {
               return this._shadowNear;
             } else if (parameterName === 'shadowFar') {
@@ -333,16 +406,24 @@ namespace gdjs {
             }
             if (parameterName === 'shadowQuality') {
               if (value === 'low' && this._shadowMapSize !== 512) {
-                this._shadowMapSize = 512;
+                this._shadowMapSize = this._getClosestShadowMapSize(512);
                 this._shadowMapDirty = true;
               }
               if (value === 'medium' && this._shadowMapSize !== 1024) {
-                this._shadowMapSize = 1024;
+                this._shadowMapSize = this._getClosestShadowMapSize(1024);
                 this._shadowMapDirty = true;
               }
               if (value === 'high' && this._shadowMapSize !== 2048) {
-                this._shadowMapSize = 2048;
+                this._shadowMapSize = this._getClosestShadowMapSize(2048);
                 this._shadowMapDirty = true;
+              }
+            }
+            if (parameterName === 'shadowMapSize') {
+              const parsedValue = parseFloat(value);
+              if (!isNaN(parsedValue)) {
+                this._shadowMapSize = this._getClosestShadowMapSize(parsedValue);
+                this._shadowMapDirty = true;
+                this._shadowCameraDirty = true;
               }
             }
           }
@@ -387,6 +468,7 @@ namespace gdjs {
               oy: this._attachedOffsetY,
               oz: this._attachedOffsetZ,
               ro: this._rotateOffsetsWithObjectAngle,
+              sms: this._shadowMapSize,
             };
           }
           updateFromNetworkSyncData(
@@ -404,6 +486,9 @@ namespace gdjs {
             this._shadowNear = Math.max(0.01, syncData.sn ?? 1);
             this._shadowFar = Math.max(this._shadowNear + 1, syncData.sf ?? 10000);
             this._shadowRadius = Math.max(0, syncData.sr ?? 1.5);
+            this._shadowMapSize = this._getClosestShadowMapSize(
+              syncData.sms ?? 1024
+            );
             this._attachedObjectName = syncData.ao || '';
             this._attachedOffsetX = syncData.ox ?? 0;
             this._attachedOffsetY = syncData.oy ?? 0;

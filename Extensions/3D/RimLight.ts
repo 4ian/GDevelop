@@ -5,6 +5,8 @@
     o: number;
     s: number;
     e: boolean;
+    sb?: number;
+    cs?: number;
   }
 
   const rimLightShader = {
@@ -243,6 +245,8 @@
           _intensity: number;
           _outerWrap: number;
           _shadowStrength: number;
+          _shadowBias: number;
+          _cameraSmoothingFactor: number;
           _colorHex: number;
           _smoothedCameraPosition: THREE.Vector3;
           _hasSmoothedCameraPosition: boolean;
@@ -270,7 +274,30 @@
                   : 0.18
               )
             );
-            this._shadowStrength = 1.0;
+            this._shadowStrength = Math.max(
+              0,
+              Math.min(
+                1,
+                effectData.doubleParameters.shadowStrength !== undefined
+                  ? effectData.doubleParameters.shadowStrength
+                  : 1.0
+              )
+            );
+            this._shadowBias = Math.max(
+              0,
+              effectData.doubleParameters.shadowBias !== undefined
+                ? effectData.doubleParameters.shadowBias
+                : 0.0008
+            );
+            this._cameraSmoothingFactor = Math.max(
+              0,
+              Math.min(
+                1,
+                effectData.doubleParameters.cameraSmoothing !== undefined
+                  ? effectData.doubleParameters.cameraSmoothing
+                  : 0.5
+              )
+            );
             this._colorHex = gdjs.rgbOrHexStringToNumber(
               effectData.stringParameters.color || '255;255;255'
             );
@@ -280,6 +307,7 @@
             this.shaderPass.uniforms.rimIntensity.value = this._intensity;
             this.shaderPass.uniforms.rimOuterWrap.value = this._outerWrap;
             this.shaderPass.uniforms.shadowStrength.value = this._shadowStrength;
+            this.shaderPass.uniforms.shadowBias.value = this._shadowBias;
             this.shaderPass.uniforms.rimColor.value.setHex(this._colorHex);
             this.shaderPass.enabled = this._effectEnabled;
           }
@@ -369,7 +397,10 @@
               return;
             }
             // 1-frame lerp buffer to reduce fast-rotation edge jitter.
-            this._smoothedCameraPosition.lerp(camera.position, 0.5);
+            this._smoothedCameraPosition.lerp(
+              camera.position,
+              this._cameraSmoothingFactor
+            );
           }
 
           isEnabled(target: EffectsTarget): boolean {
@@ -473,6 +504,7 @@
             this.shaderPass.uniforms.rimIntensity.value = this._intensity;
             this.shaderPass.uniforms.rimOuterWrap.value = this._outerWrap;
             this.shaderPass.uniforms.shadowStrength.value = this._shadowStrength;
+            this.shaderPass.uniforms.shadowBias.value = this._shadowBias;
             this.shaderPass.uniforms.rimColor.value.setHex(this._colorHex);
           }
 
@@ -483,6 +515,10 @@
               this._outerWrap = Math.max(0, Math.min(1, value));
             } else if (parameterName === 'shadowStrength') {
               this._shadowStrength = Math.max(0, Math.min(1, value));
+            } else if (parameterName === 'shadowBias') {
+              this._shadowBias = Math.max(0, value);
+            } else if (parameterName === 'cameraSmoothing') {
+              this._cameraSmoothingFactor = Math.max(0, Math.min(1, value));
             }
           }
 
@@ -495,6 +531,12 @@
             }
             if (parameterName === 'shadowStrength') {
               return this._shadowStrength;
+            }
+            if (parameterName === 'shadowBias') {
+              return this._shadowBias;
+            }
+            if (parameterName === 'cameraSmoothing') {
+              return this._cameraSmoothingFactor;
             }
             return 0;
           }
@@ -532,6 +574,8 @@
               o: this._outerWrap,
               s: this._shadowStrength,
               e: this._effectEnabled,
+              sb: this._shadowBias,
+              cs: this._cameraSmoothingFactor,
             };
           }
 
@@ -541,10 +585,16 @@
             this._outerWrap = Math.max(0, Math.min(1, syncData.o));
             this._shadowStrength = Math.max(0, Math.min(1, syncData.s));
             this._effectEnabled = !!syncData.e;
+            this._shadowBias = Math.max(0, syncData.sb ?? 0.0008);
+            this._cameraSmoothingFactor = Math.max(
+              0,
+              Math.min(1, syncData.cs ?? 0.5)
+            );
 
             this.shaderPass.uniforms.rimIntensity.value = this._intensity;
             this.shaderPass.uniforms.rimOuterWrap.value = this._outerWrap;
             this.shaderPass.uniforms.shadowStrength.value = this._shadowStrength;
+            this.shaderPass.uniforms.shadowBias.value = this._shadowBias;
             this.shaderPass.uniforms.rimColor.value.setHex(this._colorHex);
             this.shaderPass.enabled = this._effectEnabled;
           }

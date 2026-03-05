@@ -2327,7 +2327,7 @@ module.exports = {
         .setFullName(_('Directional light'))
         .setDescription(
           _(
-            "A very far light source like the sun. This is the light to use for casting shadows for 3D objects (other lights won't emit shadows). Often used along with a Hemisphere light."
+            'A very far light source like the sun. Best for stable large-scene shadows and outdoor lighting. Often used along with a Hemisphere light.'
           )
         )
         .markAsNotWorkingForObjects()
@@ -2562,6 +2562,39 @@ module.exports = {
         )
         .setType('number')
         .setAdvanced(true);
+      properties
+        .getOrCreate('shadowStrength')
+        .setValue('1')
+        .setLabel(_('Shadow influence'))
+        .setDescription(
+          _(
+            'How much directional shadows reduce rim lighting (0 = ignore shadows, 1 = fully shadow-aware).'
+          )
+        )
+        .setType('number')
+        .setAdvanced(true);
+      properties
+        .getOrCreate('shadowBias')
+        .setValue('0.0008')
+        .setLabel(_('Shadow bias'))
+        .setDescription(
+          _(
+            'Depth bias used when sampling directional shadow maps in the rim pass.'
+          )
+        )
+        .setType('number')
+        .setAdvanced(true);
+      properties
+        .getOrCreate('cameraSmoothing')
+        .setValue('0.5')
+        .setLabel(_('Camera smoothing'))
+        .setDescription(
+          _(
+            'Camera position smoothing for rim stability during fast movement (0 to 1).'
+          )
+        )
+        .setType('number')
+        .setAdvanced(true);
     }
     {
       const effect = extension
@@ -2748,6 +2781,19 @@ module.exports = {
         .setLabel(_('Shadow quality'))
         .setType('choice')
         .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowMapSize')
+        .setValue('1024')
+        .setLabel(_('Shadow map size'))
+        .setDescription(
+          _(
+            'Custom shadow map size. Recommended values: 512, 1024, 2048, or 4096 on high-end GPUs.'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
       properties
         .getOrCreate('shadowBias')
         .setValue('0.001')
@@ -3052,6 +3098,19 @@ module.exports = {
         .setLabel(_('Shadow quality'))
         .setType('choice')
         .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowMapSize')
+        .setValue('1024')
+        .setLabel(_('Shadow map size'))
+        .setDescription(
+          _(
+            'Custom shadow map size. Recommended values: 512, 1024, 2048, or 4096 on high-end GPUs.'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
       properties
         .getOrCreate('shadowBias')
         .setValue('0.001')

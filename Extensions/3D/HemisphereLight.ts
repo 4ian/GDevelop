@@ -70,7 +70,7 @@ namespace gdjs {
           updatePreRender(target: gdjs.EffectsTarget): any {}
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
-              this._light.intensity = value;
+              this._light.intensity = Math.max(0, value);
             } else if (parameterName === 'elevation') {
               this._elevation = value;
               this.updateRotation();
@@ -157,7 +157,7 @@ namespace gdjs {
           updateFromNetworkSyncData(
             syncData: HemisphereLightFilterNetworkSyncData
           ): void {
-            this._light.intensity = syncData.i;
+            this._light.intensity = Math.max(0, syncData.i);
             this._light.color.setHex(syncData.sc);
             this._light.groundColor.setHex(syncData.gc);
             this._elevation = syncData.e;

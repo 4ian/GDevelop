@@ -62,7 +62,7 @@ namespace gdjs {
           updatePreRender(target: gdjs.EffectsTarget): any {}
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
-              this.light.intensity = value;
+              this.light.intensity = Math.max(0, value);
             }
           }
           getDoubleParameter(parameterName: string): number {
@@ -95,7 +95,7 @@ namespace gdjs {
             };
           }
           updateFromNetworkSyncData(data: AmbientLightFilterNetworkSyncData) {
-            this.light.intensity = data.i;
+            this.light.intensity = Math.max(0, data.i);
             this.light.color.setHex(data.c);
           }
         })();

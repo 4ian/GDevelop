@@ -32,6 +32,7 @@ namespace gdjs {
     pbo?: number;
     pbcs?: boolean;
     sms?: number;
+    sat?: boolean;
   }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::SpotLight',
@@ -75,6 +76,7 @@ namespace gdjs {
           private _physicsBounceDistance: float = 600;
           private _physicsBounceOriginOffset: float = 2;
           private _physicsBounceCastShadow: boolean = false;
+          private _shadowAutoTuningEnabled: boolean = true;
           private _physicsBounceRaycastResult: gdjs.Physics3DRaycastResult = {
             hasHit: false,
             hitX: 0,
@@ -212,6 +214,38 @@ namespace gdjs {
               this._bounceLight.shadow.map = null;
               this._bounceLight.shadow.needsUpdate = true;
             }
+          }
+
+          private _applySpotShadowTuning(
+            light: THREE.SpotLight,
+            mapSize: float,
+            normalBiasScale: float = 1,
+            radiusScale: float = 1
+          ): void {
+            const manualBias = Math.max(0, -this._shadowBias);
+            const manualNormalBias =
+              Math.max(0, this._shadowNormalBias) * normalBiasScale;
+            const manualRadius = Math.max(0, this._shadowRadius) * radiusScale;
+
+            if (!this._shadowAutoTuningEnabled) {
+              light.shadow.bias = -manualBias;
+              light.shadow.normalBias = manualNormalBias;
+              light.shadow.radius = manualRadius;
+              return;
+            }
+
+            const shadowFar = Math.max(1, light.shadow.camera.far);
+            const coneDiameter = Math.tan(gdjs.toRad(this._angle)) * shadowFar * 2;
+            const texelWorldSize = coneDiameter / Math.max(1, mapSize);
+            const automaticBias = Math.max(0.00005, texelWorldSize * 0.0008);
+            const automaticNormalBias = texelWorldSize * 0.03 * normalBiasScale;
+
+            light.shadow.bias = -Math.max(manualBias, automaticBias);
+            light.shadow.normalBias = Math.max(
+              manualNormalBias,
+              automaticNormalBias
+            );
+            light.shadow.radius = manualRadius;
           }
 
           private _updateShadowCamera(): void {
@@ -403,11 +437,11 @@ namespace gdjs {
             this._bounceLight.decay = this._light.decay;
             this._bounceLight.castShadow = this._physicsBounceCastShadow;
             if (this._bounceLight.castShadow) {
-              this._bounceLight.shadow.bias = this._shadowBias;
-              this._bounceLight.shadow.normalBias = this._shadowNormalBias;
-              this._bounceLight.shadow.radius = Math.max(
-                0,
-                this._shadowRadius * 0.75
+              this._applySpotShadowTuning(
+                this._bounceLight,
+                this._bounceLight.shadow.mapSize.x,
+                0.75,
+                0.75
               );
             }
             this._bounceLight.visible = true;
@@ -562,9 +596,7 @@ namespace gdjs {
               this._updateShadowMapSize();
             }
             if (this._light.castShadow) {
-              this._light.shadow.bias = this._shadowBias;
-              this._light.shadow.normalBias = this._shadowNormalBias;
-              this._light.shadow.radius = this._shadowRadius;
+              this._applySpotShadowTuning(this._light, this._shadowMapSize);
             }
             this._updatePhysicsBounce(target);
           }
@@ -771,6 +803,8 @@ namespace gdjs {
                 this._shadowMapDirty = true;
                 this._shadowCameraDirty = true;
               }
+            } else if (parameterName === 'shadowAutoTuning') {
+              this._shadowAutoTuningEnabled = value;
             }
           }
           getNetworkSyncData(): SpotLightFilterNetworkSyncData {
@@ -807,6 +841,7 @@ namespace gdjs {
               pbo: this._physicsBounceOriginOffset,
               pbcs: this._physicsBounceCastShadow,
               sms: this._shadowMapSize,
+              sat: this._shadowAutoTuningEnabled,
             };
           }
           updateFromNetworkSyncData(
@@ -846,6 +881,7 @@ namespace gdjs {
             this._physicsBounceDistance = Math.max(0, syncData.pbd ?? 600);
             this._physicsBounceOriginOffset = syncData.pbo ?? 2;
             this._physicsBounceCastShadow = syncData.pbcs ?? false;
+            this._shadowAutoTuningEnabled = syncData.sat ?? true;
             this._light.distance = this._distance;
             this._light.angle = gdjs.toRad(this._angle);
             this._light.penumbra = this._penumbra;

@@ -2320,6 +2320,17 @@ module.exports = {
         .setValue('0.25')
         .setLabel(_('Intensity'))
         .setType('number');
+      properties
+        .getOrCreate('smoothing')
+        .setValue('0')
+        .setLabel(_('Transition smoothing'))
+        .setDescription(
+          _(
+            'Smooth interpolation speed for intensity and color transitions (0 = immediate).'
+          )
+        )
+        .setType('number')
+        .setAdvanced(true);
     }
     {
       const effect = extension
@@ -2437,6 +2448,18 @@ module.exports = {
         .setDescription(
           _(
             'Snap shadow tracking to a stable grid to reduce shimmering while the camera moves.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('shadowAutoTuning')
+        .setValue('true')
+        .setLabel(_('Shadow auto tuning'))
+        .setDescription(
+          _(
+            'Automatically adapt bias/normal bias per cascade for cleaner and more stable shadows.'
           )
         )
         .setType('boolean')
@@ -2625,6 +2648,17 @@ module.exports = {
         .setLabel(_('Intensity'))
         .setType('number');
       properties
+        .getOrCreate('smoothing')
+        .setValue('0')
+        .setLabel(_('Transition smoothing'))
+        .setDescription(
+          _(
+            'Smooth interpolation speed for intensity and sky/ground colors (0 = immediate).'
+          )
+        )
+        .setType('number')
+        .setAdvanced(true);
+      properties
         .getOrCreate('top')
         .setValue('Z+')
         .setLabel(_('3D world top'))
@@ -2781,6 +2815,18 @@ module.exports = {
         .setLabel(_('Shadow quality'))
         .setType('choice')
         .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowAutoTuning')
+        .setValue('true')
+        .setLabel(_('Shadow auto tuning'))
+        .setDescription(
+          _(
+            'Automatically adapt bias and normal bias based on shadow coverage to reduce acne and peter-panning.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
       properties
         .getOrCreate('shadowMapSize')
         .setValue('1024')
@@ -3098,6 +3144,18 @@ module.exports = {
         .setLabel(_('Shadow quality'))
         .setType('choice')
         .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowAutoTuning')
+        .setValue('true')
+        .setLabel(_('Shadow auto tuning'))
+        .setDescription(
+          _(
+            'Automatically adapt bias and normal bias according to cone coverage and map resolution.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
       properties
         .getOrCreate('shadowMapSize')
         .setValue('1024')

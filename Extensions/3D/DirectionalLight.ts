@@ -17,6 +17,7 @@ namespace gdjs {
     sms?: number;
     sfl?: number;
     sfc?: boolean;
+    sat?: boolean;
   }
 
   const shadowHelper = false;
@@ -49,6 +50,7 @@ namespace gdjs {
           private _cascadeSplitLambda: float = 0.7;
           private _shadowFollowLead: float = 0.45;
           private _shadowFollowCamera: boolean = false;
+          private _shadowAutoTuningEnabled: boolean = true;
 
           private _intensity: float = 0.5;
           private _colorHex: number = 0xffffff;
@@ -424,6 +426,13 @@ namespace gdjs {
             light.shadow.radius = baseRadius * radiusMultiplier;
           }
 
+          private _applyManualShadowTuning(cascadeIndex: integer): void {
+            const light = this._lights[cascadeIndex];
+            light.shadow.bias = -Math.max(0, this._minimumShadowBias);
+            light.shadow.normalBias = Math.max(0, this._shadowNormalBias);
+            light.shadow.radius = Math.max(0, this._shadowRadius);
+          }
+
           private _computeLightDirection(): [float, float, float] {
             let directionX = 0;
             let directionY = 0;
@@ -764,7 +773,11 @@ namespace gdjs {
               this._applyCascadeTransform(light, stabilizedX, stabilizedY, stabilizedZ);
 
               if (this._shadowCastingEnabled) {
-                this._applyCascadeShadowTuning(cascadeIndex);
+                if (this._shadowAutoTuningEnabled) {
+                  this._applyCascadeShadowTuning(cascadeIndex);
+                } else {
+                  this._applyManualShadowTuning(cascadeIndex);
+                }
               }
 
               const helper = this._shadowCameraHelpers[cascadeIndex];
@@ -891,6 +904,8 @@ namespace gdjs {
               this._shadowFollowCamera = value;
               this._hadPreviousCameraPosition = false;
               this._staticAnchorInitialized = false;
+            } else if (parameterName === 'shadowAutoTuning') {
+              this._shadowAutoTuningEnabled = value;
             }
           }
           getNetworkSyncData(): DirectionalLightFilterNetworkSyncData {
@@ -912,6 +927,7 @@ namespace gdjs {
               sms: this._shadowMapSize,
               sfl: this._shadowFollowLead,
               sfc: this._shadowFollowCamera,
+              sat: this._shadowAutoTuningEnabled,
             };
           }
           updateFromNetworkSyncData(
@@ -936,6 +952,7 @@ namespace gdjs {
             );
             this._shadowFollowLead = Math.max(0, Math.min(2, syncData.sfl ?? 0.45));
             this._shadowFollowCamera = syncData.sfc ?? false;
+            this._shadowAutoTuningEnabled = syncData.sat ?? true;
             this._hadPreviousCameraPosition = false;
             this._staticAnchorInitialized = false;
             this._shadowMapDirty = true;

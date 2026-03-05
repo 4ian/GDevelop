@@ -18,6 +18,7 @@ namespace gdjs {
     oz?: number;
     ro?: boolean;
     sms?: number;
+    sat?: boolean;
   }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::PointLight',
@@ -47,6 +48,7 @@ namespace gdjs {
           private _attachedOffsetY: float = 0;
           private _attachedOffsetZ: float = 0;
           private _rotateOffsetsWithObjectAngle: boolean = false;
+          private _shadowAutoTuningEnabled: boolean = true;
 
           private _isEnabled: boolean = false;
           private _light: THREE.PointLight;
@@ -171,6 +173,30 @@ namespace gdjs {
             this._light.shadow.camera.near = safeNear;
             this._light.shadow.camera.far = Math.max(safeNear + 1, effectiveFar);
             this._light.shadow.camera.updateProjectionMatrix();
+          }
+
+          private _applyShadowTuning(): void {
+            const manualBias = Math.max(0, -this._shadowBias);
+            const manualNormalBias = Math.max(0, this._shadowNormalBias);
+            if (!this._shadowAutoTuningEnabled) {
+              this._light.shadow.bias = -manualBias;
+              this._light.shadow.normalBias = manualNormalBias;
+              this._light.shadow.radius = this._shadowRadius;
+              return;
+            }
+
+            const shadowFar = Math.max(1, this._light.shadow.camera.far);
+            const texelWorldSize =
+              (shadowFar * 2) / Math.max(1, this._shadowMapSize);
+            const automaticBias = Math.max(0.00005, texelWorldSize * 0.0008);
+            const automaticNormalBias = texelWorldSize * 0.03;
+
+            this._light.shadow.bias = -Math.max(manualBias, automaticBias);
+            this._light.shadow.normalBias = Math.max(
+              manualNormalBias,
+              automaticNormalBias
+            );
+            this._light.shadow.radius = this._shadowRadius;
           }
 
           private _setLightPosition(x: float, y: float, z: float): void {
@@ -309,10 +335,7 @@ namespace gdjs {
             }
             this._updateShadowCamera();
             this._updateShadowMapSize();
-
-            this._light.shadow.bias = this._shadowBias;
-            this._light.shadow.normalBias = this._shadowNormalBias;
-            this._light.shadow.radius = this._shadowRadius;
+            this._applyShadowTuning();
           }
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
@@ -447,6 +470,8 @@ namespace gdjs {
               }
             } else if (parameterName === 'rotateOffsetsWithObjectAngle') {
               this._rotateOffsetsWithObjectAngle = value;
+            } else if (parameterName === 'shadowAutoTuning') {
+              this._shadowAutoTuningEnabled = value;
             }
           }
           getNetworkSyncData(): PointLightFilterNetworkSyncData {
@@ -469,6 +494,7 @@ namespace gdjs {
               oz: this._attachedOffsetZ,
               ro: this._rotateOffsetsWithObjectAngle,
               sms: this._shadowMapSize,
+              sat: this._shadowAutoTuningEnabled,
             };
           }
           updateFromNetworkSyncData(
@@ -494,6 +520,7 @@ namespace gdjs {
             this._attachedOffsetY = syncData.oy ?? 0;
             this._attachedOffsetZ = syncData.oz ?? 0;
             this._rotateOffsetsWithObjectAngle = syncData.ro ?? false;
+            this._shadowAutoTuningEnabled = syncData.sat ?? true;
             this._light.distance = syncData.d;
             this._light.decay = this._decay;
             this._updatePosition();

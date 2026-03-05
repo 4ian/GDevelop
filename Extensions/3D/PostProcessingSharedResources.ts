@@ -1,5 +1,10 @@
 namespace gdjs {
   export type Scene3DPostProcessingQualityMode = 'low' | 'medium' | 'high';
+  export type Scene3DPostProcessingPreset =
+    | 'performance'
+    | 'balanced'
+    | 'cinematic'
+    | 'custom';
 
   export interface Scene3DPostProcessingQualityProfile {
     captureScale: number;
@@ -8,6 +13,14 @@ namespace gdjs {
     fogSteps: number;
     dofSamples: number;
     dofBlurScale: number;
+  }
+
+  export interface Scene3DResolvedStackSettings {
+    preset: Scene3DPostProcessingPreset;
+    qualityMode: Scene3DPostProcessingQualityMode;
+    adaptivePerformanceEnabled: boolean;
+    targetFps: number;
+    qualityCeilingMode: Scene3DPostProcessingQualityMode | null;
   }
 
   export interface Scene3DSharedCapture {
@@ -28,6 +41,8 @@ namespace gdjs {
     previousScissor: THREE.Vector4;
     lastCaptureTimeFromStartMs: number;
     qualityMode: Scene3DPostProcessingQualityMode;
+    preset: Scene3DPostProcessingPreset;
+    qualityCeilingMode: Scene3DPostProcessingQualityMode | null;
     hasStackController: boolean;
     stackEnabled: boolean;
     adaptivePerformanceEnabled: boolean;
@@ -83,6 +98,35 @@ namespace gdjs {
     'medium',
     'high',
   ];
+  interface Scene3DPostProcessingPresetConfig {
+    qualityMode: Scene3DPostProcessingQualityMode;
+    adaptivePerformanceEnabled: boolean;
+    targetFps: number;
+    qualityCeilingMode: Scene3DPostProcessingQualityMode | null;
+  }
+  const presetConfigs: Record<
+    Exclude<Scene3DPostProcessingPreset, 'custom'>,
+    Scene3DPostProcessingPresetConfig
+  > = {
+    performance: {
+      qualityMode: 'low',
+      adaptivePerformanceEnabled: true,
+      targetFps: 60,
+      qualityCeilingMode: 'low',
+    },
+    balanced: {
+      qualityMode: 'medium',
+      adaptivePerformanceEnabled: true,
+      targetFps: 60,
+      qualityCeilingMode: 'high',
+    },
+    cinematic: {
+      qualityMode: 'high',
+      adaptivePerformanceEnabled: true,
+      targetFps: 50,
+      qualityCeilingMode: 'high',
+    },
+  };
 
   const managedPassOrder: string[] = [
     'SSAO',
@@ -112,11 +156,28 @@ namespace gdjs {
     }
     return 'medium';
   };
+  const normalizePreset = (value: string): Scene3DPostProcessingPreset => {
+    const normalized = (value || '').toLowerCase();
+    if (
+      normalized === 'performance' ||
+      normalized === 'cinematic' ||
+      normalized === 'custom'
+    ) {
+      return normalized;
+    }
+    return 'balanced';
+  };
   const getHigherQualityMode = (
     first: Scene3DPostProcessingQualityMode,
     second: Scene3DPostProcessingQualityMode
   ): Scene3DPostProcessingQualityMode => {
     return qualityRank[first] >= qualityRank[second] ? first : second;
+  };
+  const getLowerQualityBetween = (
+    first: Scene3DPostProcessingQualityMode,
+    second: Scene3DPostProcessingQualityMode
+  ): Scene3DPostProcessingQualityMode => {
+    return qualityRank[first] <= qualityRank[second] ? first : second;
   };
   const getLowerQualityMode = (
     mode: Scene3DPostProcessingQualityMode,
@@ -132,6 +193,50 @@ namespace gdjs {
   };
   const clampTargetFps = (value: number): number =>
     gdjs.evtTools.common.clamp(30, 240, Number.isFinite(value) ? value : 60);
+  const applyPresetConfigToState = (
+    state: Scene3DSharedPostProcessingState,
+    preset: Scene3DPostProcessingPreset,
+    qualityMode: string,
+    adaptivePerformanceEnabled: boolean,
+    targetFps: number
+  ): void => {
+    const resolved = resolveScene3DPostProcessingStackSettings(
+      preset,
+      qualityMode,
+      adaptivePerformanceEnabled,
+      targetFps
+    );
+    state.preset = resolved.preset;
+    state.qualityMode = resolved.qualityMode;
+    state.adaptivePerformanceEnabled = resolved.adaptivePerformanceEnabled;
+    state.targetFps = resolved.targetFps;
+    state.qualityCeilingMode = resolved.qualityCeilingMode;
+  };
+  export const resolveScene3DPostProcessingStackSettings = function (
+    preset: string,
+    qualityMode: string,
+    adaptivePerformanceEnabled: boolean,
+    targetFps: number
+  ): Scene3DResolvedStackSettings {
+    const normalizedPreset = normalizePreset(preset);
+    if (normalizedPreset === 'custom') {
+      return {
+        preset: normalizedPreset,
+        qualityMode: normalizeQualityMode(qualityMode),
+        adaptivePerformanceEnabled: !!adaptivePerformanceEnabled,
+        targetFps: clampTargetFps(targetFps),
+        qualityCeilingMode: null,
+      };
+    }
+    const presetConfig = presetConfigs[normalizedPreset];
+    return {
+      preset: normalizedPreset,
+      qualityMode: presetConfig.qualityMode,
+      adaptivePerformanceEnabled: presetConfig.adaptivePerformanceEnabled,
+      targetFps: clampTargetFps(presetConfig.targetFps),
+      qualityCeilingMode: presetConfig.qualityCeilingMode,
+    };
+  };
 
   const getLayerRendererKey = (target: gdjs.Layer): object | null => {
     const renderer = target.getRenderer();
@@ -162,6 +267,8 @@ namespace gdjs {
       previousScissor: new THREE.Vector4(),
       lastCaptureTimeFromStartMs: -1,
       qualityMode: 'medium',
+      preset: 'balanced',
+      qualityCeilingMode: 'high',
       hasStackController: false,
       stackEnabled: true,
       adaptivePerformanceEnabled: true,
@@ -290,7 +397,8 @@ namespace gdjs {
     enabled: boolean,
     qualityMode: string,
     adaptivePerformanceEnabled: boolean = true,
-    targetFps: number = 60
+    targetFps: number = 60,
+    preset: string = 'balanced'
   ): void {
     const state = getOrCreateSharedState(target);
     if (!state) {
@@ -299,9 +407,13 @@ namespace gdjs {
 
     state.hasStackController = true;
     state.stackEnabled = enabled;
-    state.qualityMode = normalizeQualityMode(qualityMode);
-    state.adaptivePerformanceEnabled = !!adaptivePerformanceEnabled;
-    state.targetFps = clampTargetFps(targetFps);
+    applyPresetConfigToState(
+      state,
+      normalizePreset(preset),
+      qualityMode,
+      adaptivePerformanceEnabled,
+      targetFps
+    );
     if (!state.adaptivePerformanceEnabled) {
       resetAdaptivePerformanceState(state);
     }
@@ -332,6 +444,8 @@ namespace gdjs {
     state.hasStackController = false;
     state.stackEnabled = true;
     state.qualityMode = 'medium';
+    state.preset = 'balanced';
+    state.qualityCeilingMode = 'high';
     state.adaptivePerformanceEnabled = true;
     state.targetFps = 60;
     state.smoothedFrameTimeMs = 1000 / 60;
@@ -360,6 +474,9 @@ namespace gdjs {
     let mode = state.qualityMode;
     for (const effectId in state.effectQualityOverrides) {
       mode = getHigherQualityMode(mode, state.effectQualityOverrides[effectId]);
+    }
+    if (state.qualityCeilingMode) {
+      mode = getLowerQualityBetween(mode, state.qualityCeilingMode);
     }
     return mode;
   };

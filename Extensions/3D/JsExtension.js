@@ -3647,6 +3647,20 @@ module.exports = {
         .setLabel(_('Enabled'))
         .setType('boolean');
       properties
+        .getOrCreate('preset')
+        .setValue('balanced')
+        .addChoice('performance', _('Performance'))
+        .addChoice('balanced', _('Balanced'))
+        .addChoice('cinematic', _('Cinematic'))
+        .addChoice('custom', _('Custom'))
+        .setLabel(_('Preset'))
+        .setType('choice')
+        .setDescription(
+          _(
+            'Performance targets stable framerate, Balanced targets good visual/performance mix, Cinematic prioritizes quality, Custom uses manual settings.'
+          )
+        );
+      properties
         .getOrCreate('qualityMode')
         .setValue('medium')
         .addChoice('low', _('Low quality'))
@@ -3656,7 +3670,7 @@ module.exports = {
         .setType('choice')
         .setDescription(
           _(
-            'Base quality profile for all managed 3D post-processing effects.'
+            'Base quality profile in Custom preset mode.'
           )
         );
       properties
@@ -3666,7 +3680,7 @@ module.exports = {
         .setType('boolean')
         .setDescription(
           _(
-            'Automatically reduces quality/load when frame time is too high, then restores when performance recovers.'
+            'Automatically reduces quality/load when frame time is too high, then restores when performance recovers (Custom preset mode).'
           )
         )
         .setAdvanced(true);
@@ -3675,7 +3689,9 @@ module.exports = {
         .setValue('60')
         .setLabel(_('Target FPS'))
         .setType('number')
-        .setDescription(_('Target framerate for adaptive performance (30-240).'))
+        .setDescription(
+          _('Target framerate for adaptive performance (30-240, Custom mode).')
+        )
         .setAdvanced(true);
     }
     {

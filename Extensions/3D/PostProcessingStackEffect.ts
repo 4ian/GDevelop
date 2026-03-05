@@ -4,6 +4,7 @@ namespace gdjs {
     e: boolean;
     ap?: boolean;
     tf?: number;
+    p?: string;
   }
 
   const clampStackTargetFps = (value: number): number =>
@@ -23,6 +24,7 @@ namespace gdjs {
         return new (class implements gdjs.PixiFiltersTools.Filter {
           _isEnabled: boolean;
           _stackEnabled: boolean;
+          _preset: string;
           _qualityMode: string;
           _adaptivePerformance: boolean;
           _targetFps: number;
@@ -33,6 +35,7 @@ namespace gdjs {
               effectData.booleanParameters.enabled === undefined
                 ? true
                 : !!effectData.booleanParameters.enabled;
+            this._preset = effectData.stringParameters.preset || 'balanced';
             this._qualityMode =
               effectData.stringParameters.qualityMode || 'medium';
             this._adaptivePerformance =
@@ -44,6 +47,22 @@ namespace gdjs {
                 ? effectData.doubleParameters.targetFps
                 : 60
             );
+            this._applyPresetSettings();
+          }
+
+          private _applyPresetSettings(): void {
+            const resolvedSettings =
+              gdjs.resolveScene3DPostProcessingStackSettings(
+                this._preset,
+                this._qualityMode,
+                this._adaptivePerformance,
+                this._targetFps
+              );
+            this._preset = resolvedSettings.preset;
+            this._qualityMode = resolvedSettings.qualityMode;
+            this._adaptivePerformance =
+              resolvedSettings.adaptivePerformanceEnabled;
+            this._targetFps = resolvedSettings.targetFps;
           }
 
           isEnabled(target: EffectsTarget): boolean {
@@ -71,7 +90,8 @@ namespace gdjs {
               this._stackEnabled,
               this._qualityMode,
               this._adaptivePerformance,
-              this._targetFps
+              this._targetFps,
+              this._preset
             );
             gdjs.reorderScene3DPostProcessingPasses(target);
             return true;
@@ -99,7 +119,8 @@ namespace gdjs {
               this._stackEnabled,
               this._qualityMode,
               this._adaptivePerformance,
-              this._targetFps
+              this._targetFps,
+              this._preset
             );
             gdjs.updateScene3DPostProcessingPerformance(target);
             gdjs.reorderScene3DPostProcessingPasses(target);
@@ -135,6 +156,10 @@ namespace gdjs {
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'targetFps') {
               this._targetFps = clampStackTargetFps(value);
+              if (this._preset !== 'custom') {
+                this._preset = 'custom';
+              }
+              this._applyPresetSettings();
             }
           }
 
@@ -146,8 +171,15 @@ namespace gdjs {
           }
 
           updateStringParameter(parameterName: string, value: string): void {
-            if (parameterName === 'qualityMode') {
+            if (parameterName === 'preset') {
+              this._preset = value || 'balanced';
+              this._applyPresetSettings();
+            } else if (parameterName === 'qualityMode') {
               this._qualityMode = value || 'medium';
+              if (this._preset !== 'custom') {
+                this._preset = 'custom';
+              }
+              this._applyPresetSettings();
             }
           }
 
@@ -162,6 +194,10 @@ namespace gdjs {
               this._stackEnabled = value;
             } else if (parameterName === 'adaptivePerformance') {
               this._adaptivePerformance = value;
+              if (this._preset !== 'custom') {
+                this._preset = 'custom';
+              }
+              this._applyPresetSettings();
             }
           }
 
@@ -171,16 +207,19 @@ namespace gdjs {
               e: this._stackEnabled,
               ap: this._adaptivePerformance,
               tf: this._targetFps,
+              p: this._preset,
             };
           }
 
           updateFromNetworkSyncData(
             syncData: PostProcessingStackNetworkSyncData
           ): void {
+            this._preset = syncData.p || 'custom';
             this._qualityMode = syncData.q || 'medium';
             this._stackEnabled = !!syncData.e;
             this._adaptivePerformance = syncData.ap ?? true;
             this._targetFps = clampStackTargetFps(syncData.tf ?? this._targetFps);
+            this._applyPresetSettings();
           }
         })();
       }

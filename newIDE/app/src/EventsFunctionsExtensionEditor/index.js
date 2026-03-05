@@ -49,6 +49,7 @@ import PropertyListEditor, {
   type PropertyListEditorInterface,
 } from './PropertyListEditor';
 import type { EventPath } from '../Utils/EventPath';
+import type { SearchFilterParams } from '../Utils/Search';
 
 const gd: libGDevelop = global.gd;
 
@@ -281,14 +282,16 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     eventPaths: Array<EventPath>,
     focusedEventPath: EventPath,
     searchText: string,
-    matchCase: boolean
+    matchCase: boolean,
+    searchFilters?: SearchFilterParams
   ) => {
     if (this.editor) {
       this.editor.setGlobalSearchResults(
         eventPaths,
         focusedEventPath,
         searchText,
-        matchCase
+        matchCase,
+        searchFilters
       );
     }
   };

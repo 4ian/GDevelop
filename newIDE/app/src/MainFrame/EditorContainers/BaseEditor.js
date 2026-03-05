@@ -24,6 +24,7 @@ import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type CreateProjectResult } from '../../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../../AiGeneration/Utils';
 import type { EventPath } from '../../Utils/EventPath';
+import type { SearchFilterParams } from '../../Utils/Search';
 
 export type EditorContainerExtraProps = {|
   // Events function extension editor
@@ -67,6 +68,7 @@ export type NavigateToEventFromGlobalSearchParams = {|
   functionName?: string,
   behaviorName?: string,
   objectName?: string,
+  ...SearchFilterParams,
 |};
 
 export type RenderEditorContainerProps = {|

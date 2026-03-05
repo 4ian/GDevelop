@@ -3,16 +3,15 @@ import * as React from 'react';
 import { type SelectionState, getSelectedEvents } from './SelectionHandler';
 import { mapFor } from '../Utils/MapFor';
 import uniqBy from 'lodash/uniqBy';
+import type { SearchFilterParams } from '../Utils/Search';
 const gd: libGDevelop = global.gd;
 
 export type SearchInEventsInputs = {|
   searchInSelection: boolean,
   searchText: string,
   matchCase: boolean,
-  searchInConditions: boolean,
-  searchInActions: boolean,
-  searchInEventStrings: boolean,
   searchInEventSentences: boolean,
+  ...Required<SearchFilterParams>,
 |};
 
 export type ReplaceInEventsInputs = {|
@@ -194,6 +193,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
       searchInActions,
       searchInEventStrings,
       searchInEventSentences,
+      searchInInstructionNames,
     }: SearchInEventsInputs,
     cb: () => void
   ) => {
@@ -214,7 +214,8 @@ export default class EventsSearcher extends React.Component<Props, State> {
       searchInConditions,
       searchInActions,
       searchInEventStrings,
-      searchInEventSentences
+      searchInEventSentences,
+      searchInInstructionNames
     );
 
     if (this.state.eventsSearchResults) {

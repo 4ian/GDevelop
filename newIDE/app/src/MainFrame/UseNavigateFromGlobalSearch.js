@@ -4,6 +4,7 @@ import * as React from 'react';
 import type { EditorTabsState } from './EditorTabs/EditorTabsHandler';
 import type { EventPath } from '../Utils/EventPath';
 import { type State } from './MainFrameState';
+import type { SearchFilterParams } from '../Utils/Search';
 
 type Props = {|
   editorTabs: EditorTabsState,
@@ -53,6 +54,7 @@ const useNavigateFromGlobalSearch = ({
     functionName?: string,
     behaviorName?: string,
     objectName?: string,
+    ...SearchFilterParams,
   |}) => void,
   clearGlobalSearchHighlightsInEditorTabs: (
     editorTabs: EditorTabsState
@@ -170,6 +172,10 @@ const useNavigateFromGlobalSearch = ({
       highlightedEventPaths,
       searchText,
       matchCase,
+      searchInConditions,
+      searchInActions,
+      searchInEventStrings,
+      searchInInstructionNames,
       extensionName,
       functionName,
       behaviorName,
@@ -185,6 +191,7 @@ const useNavigateFromGlobalSearch = ({
       functionName?: string,
       behaviorName?: string,
       objectName?: string,
+      ...SearchFilterParams,
     |}) => {
       clearGlobalSearchRetryTimeoutId();
       clearGlobalSearchHighlightsInEditorTabs(editorTabs);
@@ -231,7 +238,13 @@ const useNavigateFromGlobalSearch = ({
                     highlightedEventPaths,
                     eventPath,
                     searchText,
-                    matchCase
+                    matchCase,
+                    {
+                      searchInConditions,
+                      searchInActions,
+                      searchInEventStrings,
+                      searchInInstructionNames,
+                    }
                   );
                 };
                 // For extensions: ensure we're on the correct function before

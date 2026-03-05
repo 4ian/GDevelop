@@ -3,6 +3,7 @@ import { renderInstructionSentenceAsPlainText } from '../EventsSheet/EventsTree/
 import type { EventPath } from './EventPath';
 
 import { mapFor } from './MapFor';
+import type { SearchFilterParams } from './Search';
 
 const gd: libGDevelop = global.gd;
 
@@ -54,11 +55,9 @@ export type GlobalSearchGroup =
 export type GlobalSearchInputs = {|
   searchText: string,
   matchCase: boolean,
-  searchInConditions: boolean,
-  searchInActions: boolean,
-  searchInEventStrings: boolean,
   searchInEventSentences: boolean,
   includeStoreExtensions: boolean,
+  ...Required<SearchFilterParams>,
 |};
 
 const buildEventPtrToPathMap = (
@@ -113,7 +112,8 @@ const searchInEventsList = (
     inputs.searchInConditions,
     inputs.searchInActions,
     inputs.searchInEventStrings,
-    inputs.searchInEventSentences
+    inputs.searchInEventSentences,
+    inputs.searchInInstructionNames
   ).clone();
 
   // Phase 1: Extract paths and positions from the C++ search results,

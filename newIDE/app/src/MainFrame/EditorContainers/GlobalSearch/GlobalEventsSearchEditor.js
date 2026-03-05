@@ -71,8 +71,8 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
     const {
       search,
       setSearch,
-      checkBoxesState,
-      setCheckBoxesState,
+      searchFiltersState,
+      setSearchFiltersState,
       freezedSearchState,
       setFreezedSearchState,
       hasSearched,
@@ -83,11 +83,11 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
       setSearch(searchText);
       const groups = scanProjectForGlobalEventsSearch(project, {
         searchText,
-        ...checkBoxesState,
+        ...searchFiltersState,
       });
       setGroups(groups);
       setHasSearched(true);
-      setFreezedSearchState({ ...checkBoxesState, searchText });
+      setFreezedSearchState({ ...searchFiltersState, searchText });
     };
 
     const navigateToMatch = React.useCallback(
@@ -99,6 +99,10 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
           highlightedEventPaths: deduplicateEventPaths(group.matches),
           searchText: freezedSearchState.searchText,
           matchCase: freezedSearchState.matchCase,
+          searchInConditions: freezedSearchState.searchInConditions,
+          searchInActions: freezedSearchState.searchInActions,
+          searchInEventStrings: freezedSearchState.searchInEventStrings,
+          searchInInstructionNames: freezedSearchState.searchInInstructionNames,
         };
 
         if (group.targetType === 'extension') {
@@ -118,6 +122,10 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
       [
         freezedSearchState.searchText,
         freezedSearchState.matchCase,
+        freezedSearchState.searchInConditions,
+        freezedSearchState.searchInActions,
+        freezedSearchState.searchInEventStrings,
+        freezedSearchState.searchInInstructionNames,
         onNavigateToEventFromGlobalSearch,
       ]
     );
@@ -166,9 +174,9 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
                 <IconButton
                   size="small"
                   tooltip={t`Match case`}
-                  selected={checkBoxesState.matchCase}
+                  selected={searchFiltersState.matchCase}
                   onClick={() =>
-                    setCheckBoxesState(prev => ({
+                    setSearchFiltersState(prev => ({
                       ...prev,
                       matchCase: !prev.matchCase,
                     }))
@@ -183,9 +191,9 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
                         overlap="circle"
                         color="error"
                         invisible={
-                          checkBoxesState.searchInConditions ||
-                          checkBoxesState.searchInActions ||
-                          checkBoxesState.searchInEventStrings
+                          searchFiltersState.searchInConditions ||
+                          searchFiltersState.searchInActions ||
+                          searchFiltersState.searchInEventStrings
                         }
                       >
                         <Filter />
@@ -196,9 +204,9 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
                     {
                       type: 'checkbox',
                       label: i18n._(t`Conditions`),
-                      checked: checkBoxesState.searchInConditions,
+                      checked: searchFiltersState.searchInConditions,
                       click: () =>
-                        setCheckBoxesState(prev => ({
+                        setSearchFiltersState(prev => ({
                           ...prev,
                           searchInConditions: !prev.searchInConditions,
                         })),
@@ -206,9 +214,9 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
                     {
                       type: 'checkbox',
                       label: i18n._(t`Actions`),
-                      checked: checkBoxesState.searchInActions,
+                      checked: searchFiltersState.searchInActions,
                       click: () =>
-                        setCheckBoxesState(prev => ({
+                        setSearchFiltersState(prev => ({
                           ...prev,
                           searchInActions: !prev.searchInActions,
                         })),
@@ -216,9 +224,9 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
                     {
                       type: 'checkbox',
                       label: i18n._(t`Texts`),
-                      checked: checkBoxesState.searchInEventStrings,
+                      checked: searchFiltersState.searchInEventStrings,
                       click: () =>
-                        setCheckBoxesState(prev => ({
+                        setSearchFiltersState(prev => ({
                           ...prev,
                           searchInEventStrings: !prev.searchInEventStrings,
                         })),
@@ -226,20 +234,30 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
                     {
                       type: 'checkbox',
                       label: i18n._(t`Event sentences`),
-                      checked: checkBoxesState.searchInEventSentences,
+                      checked: searchFiltersState.searchInEventSentences,
                       click: () =>
-                        setCheckBoxesState(prev => ({
+                        setSearchFiltersState(prev => ({
                           ...prev,
                           searchInEventSentences: !prev.searchInEventSentences,
+                        })),
+                    },
+                    {
+                      type: 'checkbox',
+                      label: i18n._(t`Instruction names`),
+                      checked: searchFiltersState.searchInInstructionNames,
+                      click: () =>
+                        setSearchFiltersState(prev => ({
+                          ...prev,
+                          searchInInstructionNames: !prev.searchInInstructionNames,
                         })),
                     },
                     { type: 'separator' },
                     {
                       type: 'checkbox',
                       label: i18n._(t`Include store extensions`),
-                      checked: checkBoxesState.includeStoreExtensions,
+                      checked: searchFiltersState.includeStoreExtensions,
                       click: () =>
-                        setCheckBoxesState(prev => ({
+                        setSearchFiltersState(prev => ({
                           ...prev,
                           includeStoreExtensions: !prev.includeStoreExtensions,
                         })),

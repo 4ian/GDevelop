@@ -193,23 +193,6 @@ namespace gdjs {
     state.qualityMode = normalizeQualityMode(qualityMode);
   };
 
-  export const setScene3DPostProcessingEffectQualityMode = function (
-    target: gdjs.Layer,
-    effectId: string,
-    qualityMode: string
-  ): void {
-    const state = getOrCreateSharedState(target);
-    if (!state) {
-      return;
-    }
-
-    if (!effectId) {
-      return;
-    }
-
-    state.effectQualityOverrides[effectId] = normalizeQualityMode(qualityMode);
-  };
-
   export const clearScene3DPostProcessingEffectQualityMode = function (
     target: gdjs.Layer,
     effectId: string
@@ -275,11 +258,31 @@ namespace gdjs {
     return qualityProfiles[getEffectiveScene3DQualityMode(state)];
   };
 
-  export const setScene3DPostProcessingEffectQualityMode = function (
+  export function setScene3DPostProcessingEffectQualityMode(
     qualityMode: string
-  ): Scene3DPostProcessingQualityMode {
-    return normalizeQualityMode(qualityMode);
-  };
+  ): Scene3DPostProcessingQualityMode;
+  export function setScene3DPostProcessingEffectQualityMode(
+    target: gdjs.Layer,
+    effectId: string,
+    qualityMode: string
+  ): void;
+  export function setScene3DPostProcessingEffectQualityMode(
+    qualityModeOrTarget: string | gdjs.Layer,
+    effectId?: string,
+    qualityMode?: string
+  ): Scene3DPostProcessingQualityMode | void {
+    if (qualityModeOrTarget instanceof gdjs.Layer) {
+      const state = getOrCreateSharedState(qualityModeOrTarget);
+      if (!state || !effectId) {
+        return;
+      }
+      state.effectQualityOverrides[effectId] = normalizeQualityMode(
+        qualityMode || 'medium'
+      );
+      return;
+    }
+    return normalizeQualityMode(qualityModeOrTarget);
+  }
 
   export const captureScene3DSharedTextures = function (
     target: gdjs.Layer,

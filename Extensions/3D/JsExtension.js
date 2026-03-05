@@ -3618,6 +3618,83 @@ module.exports = {
     }
     {
       const effect = extension
+        .addEffect('RainDrops')
+        .setFullName(_('Rain drops'))
+        .setDescription(
+          _(
+            'Screen-space rain drops and streaks on the camera lens with optional refraction and wetness darkening.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/PostProcessingSharedResources.js')
+        .addIncludeFile('Extensions/3D/RainDropsEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('enabled')
+        .setValue('true')
+        .setLabel(_('Enabled'))
+        .setType('boolean');
+      properties
+        .getOrCreate('intensity')
+        .setValue('1')
+        .setLabel(_('Intensity'))
+        .setType('number')
+        .setDescription(_('Overall rain strength (0 to 2).'));
+      properties
+        .getOrCreate('dropCount')
+        .setValue('24')
+        .setLabel(_('Drop count'))
+        .setType('number')
+        .setDescription(_('Number of lens drop blobs (1 to 48).'));
+      properties
+        .getOrCreate('streakCount')
+        .setValue('32')
+        .setLabel(_('Streak count'))
+        .setType('number')
+        .setDescription(_('Number of falling streaks (1 to 64).'));
+      properties
+        .getOrCreate('streakIntensity')
+        .setValue('0.6')
+        .setLabel(_('Streak intensity'))
+        .setType('number')
+        .setDescription(_('Streak brightness contribution (0 to 1).'));
+      properties
+        .getOrCreate('refractionStrength')
+        .setValue('1')
+        .setLabel(_('Refraction strength'))
+        .setType('number')
+        .setDescription(_('Lens distortion strength (0 to 2).'));
+      properties
+        .getOrCreate('windAngle')
+        .setValue('0')
+        .setLabel(_('Wind angle'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+        .setDescription(_('Tilt direction for falling streaks (in degrees).'));
+      properties
+        .getOrCreate('wetness')
+        .setValue('1')
+        .setLabel(_('Wetness'))
+        .setType('number')
+        .setDescription(_('Subtle wet-surface darkening amount (0 to 1).'));
+      properties
+        .getOrCreate('qualityMode')
+        .setValue('medium')
+        .addChoice('low', _('Low quality'))
+        .addChoice('medium', _('Medium quality'))
+        .addChoice('high', _('High quality'))
+        .addChoice('custom', _('Custom'))
+        .setLabel(_('Quality mode'))
+        .setType('choice')
+        .setDescription(
+          _(
+            'Low/medium/high apply drop/streak density presets. Custom keeps manual drop/streak counts.'
+          )
+        );
+    }
+    {
+      const effect = extension
         .addEffect('DepthOfField')
         .setFullName(_('Depth of field'))
         .setDescription(

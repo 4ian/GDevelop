@@ -31,6 +31,17 @@ namespace gdjs {
     pbd?: number;
     pbo?: number;
     pbcs?: boolean;
+    sms?: number;
+    sat?: boolean;
+    fr?: boolean;
+    tr?: boolean;
+    ia?: boolean;
+    it?: boolean;
+    fm?: boolean;
+    fd?: number;
+    fa?: string;
+    fy?: number;
+    fp?: number;
   }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::SpotLight',
@@ -69,11 +80,21 @@ namespace gdjs {
           private _targetAttachedOffsetY: float = 0;
           private _targetAttachedOffsetZ: float = 0;
           private _rotateOffsetsWithObjectAngle: boolean = false;
+          private _followAttachedObjectRotation3D: boolean = false;
+          private _followTargetObjectRotation3D: boolean = false;
+          private _inheritAttachedObjectScale: boolean = false;
+          private _inheritTargetObjectScale: boolean = false;
+          private _flashlightMode: boolean = false;
+          private _flashlightDistance: float = 600;
+          private _flashlightForwardAxis: string = 'X+';
+          private _flashlightYawOffset: float = 0;
+          private _flashlightPitchOffset: float = 0;
           private _physicsBounceEnabled: boolean = false;
           private _physicsBounceIntensityScale: float = 0.35;
           private _physicsBounceDistance: float = 600;
           private _physicsBounceOriginOffset: float = 2;
           private _physicsBounceCastShadow: boolean = false;
+          private _shadowAutoTuningEnabled: boolean = true;
           private _physicsBounceRaycastResult: gdjs.Physics3DRaycastResult = {
             hasHit: false,
             hitX: 0,
@@ -96,17 +117,9 @@ namespace gdjs {
           private _shadowMapDirty = true;
           private _shadowCameraDirty = true;
           private _maxRendererShadowMapSize: integer = 2048;
-          private _threeRenderer: THREE.WebGLRenderer | null = null;
-          private _shadowFramesSinceLastRender: integer = 0;
-          private _shadowMaxStaleFrames: integer = 4;
-          private _shadowMotionThreshold: float = 0.35;
-          private _hasPreviousShadowState = false;
-          private _previousLightX: float = 0;
-          private _previousLightY: float = 0;
-          private _previousLightZ: float = 0;
-          private _previousTargetX: float = 0;
-          private _previousTargetY: float = 0;
-          private _previousTargetZ: float = 0;
+          private _temporaryOffsetVector = new THREE.Vector3();
+          private _temporaryDirectionVector = new THREE.Vector3(1, 0, 0);
+          private _temporaryEuler = new THREE.Euler(0, 0, 0, 'ZYX');
 
           constructor() {
             this._light = new THREE.SpotLight();
@@ -131,10 +144,7 @@ namespace gdjs {
           }
 
           private _clampShadowMapSizeToRenderer(size: integer): integer {
-            const safeRendererMax = Math.max(
-              512,
-              this._maxRendererShadowMapSize
-            );
+            const safeRendererMax = Math.max(512, this._maxRendererShadowMapSize);
             let clampedSize = 512;
             while (clampedSize * 2 <= safeRendererMax) {
               clampedSize *= 2;
@@ -142,7 +152,7 @@ namespace gdjs {
             return Math.max(512, Math.min(size, clampedSize));
           }
 
-          private _sanitizeShadowMapSize(value: number): integer {
+          private _getClosestShadowMapSize(value: float): integer {
             const supportedSizes = [512, 1024, 2048, 4096];
             const target = Math.max(512, value);
             let closestSize = supportedSizes[0];
@@ -158,136 +168,7 @@ namespace gdjs {
             return this._clampShadowMapSizeToRenderer(closestSize);
           }
 
-          private _updateShadowMapSize(): boolean {
-            if (!this._shadowMapDirty) {
-              return false;
-            }
-            this._shadowMapDirty = false;
-            this._shadowMapSize = this._sanitizeShadowMapSize(this._shadowMapSize);
-
-            this._light.shadow.mapSize.set(
-              this._shadowMapSize,
-              this._shadowMapSize
-            );
-
-            // Force the recreation of the shadow map texture:
-            this._light.shadow.map?.dispose();
-            this._light.shadow.map = null;
-            this._light.shadow.needsUpdate = true;
-            return true;
-          }
-
-          private _updateShadowCamera(): boolean {
-            if (!this._shadowCameraDirty) {
-              return false;
-            }
-            this._shadowCameraDirty = false;
-
-            const safeNear = Math.max(0.01, this._shadowNear);
-            this._shadowNear = safeNear;
-
-            // Auto-adjust far plane if distance is explicitly set
-            const effectiveFar =
-              this._distance > 0
-                ? Math.min(
-                    this._shadowFar,
-                    this._distance + Math.max(50, this._distance * 0.25)
-                  )
-                : this._shadowFar;
-
-            this._light.shadow.camera.near = safeNear;
-            this._light.shadow.camera.far = Math.max(safeNear + 1, effectiveFar);
-
-            // FOV of shadow camera for SpotLight should match the light's angle (angle is half of fov)
-            this._light.shadow.camera.fov = Math.max(
-              2,
-              Math.min(170, this._angle * 2)
-            );
-
-            this._light.shadow.camera.updateProjectionMatrix();
-            this._light.shadow.needsUpdate = true;
-            return true;
-          }
-
-          private _isAnyShadowCasterActive(): boolean {
-            return (
-              this._light.castShadow ||
-              (this._bounceLight.castShadow && this._bounceLight.visible)
-            );
-          }
-
-          private _resetShadowRefreshTracking(): void {
-            this._shadowFramesSinceLastRender = 0;
-            this._hasPreviousShadowState = false;
-          }
-
-          private _hasShadowStateMovedEnough(): boolean {
-            const lightPosition = this._light.position;
-            const targetPosition = this._light.target.position;
-            if (!this._hasPreviousShadowState) {
-              this._hasPreviousShadowState = true;
-              this._previousLightX = lightPosition.x;
-              this._previousLightY = lightPosition.y;
-              this._previousLightZ = lightPosition.z;
-              this._previousTargetX = targetPosition.x;
-              this._previousTargetY = targetPosition.y;
-              this._previousTargetZ = targetPosition.z;
-              return true;
-            }
-
-            const lightDeltaX = lightPosition.x - this._previousLightX;
-            const lightDeltaY = lightPosition.y - this._previousLightY;
-            const lightDeltaZ = lightPosition.z - this._previousLightZ;
-            const targetDeltaX = targetPosition.x - this._previousTargetX;
-            const targetDeltaY = targetPosition.y - this._previousTargetY;
-            const targetDeltaZ = targetPosition.z - this._previousTargetZ;
-            const movementSquared =
-              lightDeltaX * lightDeltaX +
-              lightDeltaY * lightDeltaY +
-              lightDeltaZ * lightDeltaZ +
-              targetDeltaX * targetDeltaX +
-              targetDeltaY * targetDeltaY +
-              targetDeltaZ * targetDeltaZ;
-            const threshold = Math.max(0.05, this._shadowMotionThreshold);
-            if (movementSquared < threshold * threshold) {
-              return false;
-            }
-
-            this._previousLightX = lightPosition.x;
-            this._previousLightY = lightPosition.y;
-            this._previousLightZ = lightPosition.z;
-            this._previousTargetX = targetPosition.x;
-            this._previousTargetY = targetPosition.y;
-            this._previousTargetZ = targetPosition.z;
-            return true;
-          }
-
-          private _requestShadowRender(forceUpdate: boolean): void {
-            if (!this._isAnyShadowCasterActive()) {
-              this._resetShadowRefreshTracking();
-              return;
-            }
-
-            const intervalReached =
-              this._shadowFramesSinceLastRender >= this._shadowMaxStaleFrames;
-            if (!forceUpdate && !intervalReached) {
-              this._shadowFramesSinceLastRender++;
-              return;
-            }
-
-            if (this._light.castShadow) {
-              this._light.shadow.needsUpdate = true;
-            }
-            if (this._bounceLight.castShadow && this._bounceLight.visible) {
-              this._bounceLight.shadow.needsUpdate = true;
-            }
-            if (this._threeRenderer && this._threeRenderer.shadowMap) {
-              this._threeRenderer.shadowMap.needsUpdate = true;
-            }
-            this._shadowFramesSinceLastRender = 0;
-          }
-
-          private _ensureShadowRenderer(target: gdjs.EffectsTarget): void {
+          private _ensureSoftShadowRenderer(target: gdjs.EffectsTarget): void {
             const runtimeScene = target.getRuntimeScene();
             if (!runtimeScene || !runtimeScene.getGame) {
               return;
@@ -300,7 +181,6 @@ namespace gdjs {
             if (!threeRenderer || !threeRenderer.shadowMap) {
               return;
             }
-            this._threeRenderer = threeRenderer;
 
             const rendererMaxTextureSize =
               threeRenderer.capabilities &&
@@ -312,16 +192,118 @@ namespace gdjs {
               rendererMaxTextureSize
             );
 
-            if (!this._isAnyShadowCasterActive()) {
+            const shouldCastAnyShadow =
+              this._light.castShadow ||
+              (this._physicsBounceEnabled && this._physicsBounceCastShadow);
+            if (!shouldCastAnyShadow) {
               return;
             }
 
             threeRenderer.shadowMap.enabled = true;
-            threeRenderer.shadowMap.autoUpdate = false;
+            threeRenderer.shadowMap.autoUpdate = true;
             threeRenderer.shadowMap.type =
               this._shadowRadius > 1
                 ? THREE.PCFShadowMap
                 : THREE.PCFSoftShadowMap;
+          }
+
+          private _updateShadowMapSize(): void {
+            if (!this._shadowMapDirty) {
+              return;
+            }
+            this._shadowMapDirty = false;
+
+            this._shadowMapSize = this._getClosestShadowMapSize(
+              this._shadowMapSize
+            );
+            this._light.shadow.mapSize.set(
+              this._shadowMapSize,
+              this._shadowMapSize
+            );
+
+            // Force the recreation of the shadow map texture:
+            this._light.shadow.map?.dispose();
+            this._light.shadow.map = null;
+            this._light.shadow.needsUpdate = true;
+
+            if (this._physicsBounceCastShadow) {
+              const bounceMapSize = this._getClosestShadowMapSize(
+                Math.max(512, this._shadowMapSize * 0.5)
+              );
+              this._bounceLight.shadow.mapSize.set(bounceMapSize, bounceMapSize);
+              this._bounceLight.shadow.map?.dispose();
+              this._bounceLight.shadow.map = null;
+              this._bounceLight.shadow.needsUpdate = true;
+            }
+          }
+
+          private _applySpotShadowTuning(
+            light: THREE.SpotLight,
+            mapSize: float,
+            normalBiasScale: float = 1,
+            radiusScale: float = 1
+          ): void {
+            const manualBias = Math.max(0, -this._shadowBias);
+            const manualNormalBias =
+              Math.max(0, this._shadowNormalBias) * normalBiasScale;
+            const manualRadius = Math.max(0, this._shadowRadius) * radiusScale;
+
+            if (!this._shadowAutoTuningEnabled) {
+              light.shadow.bias = -manualBias;
+              light.shadow.normalBias = manualNormalBias;
+              light.shadow.radius = manualRadius;
+              return;
+            }
+
+            const shadowFar = Math.max(1, light.shadow.camera.far);
+            const coneDiameter = Math.tan(gdjs.toRad(this._angle)) * shadowFar * 2;
+            const texelWorldSize = coneDiameter / Math.max(1, mapSize);
+            const automaticBias = Math.max(0.00005, texelWorldSize * 0.0008);
+            const automaticNormalBias = texelWorldSize * 0.03 * normalBiasScale;
+
+            light.shadow.bias = -Math.max(manualBias, automaticBias);
+            light.shadow.normalBias = Math.max(
+              manualNormalBias,
+              automaticNormalBias
+            );
+            light.shadow.radius = manualRadius;
+          }
+
+          private _updateShadowCamera(): void {
+            if (!this._shadowCameraDirty) {
+              return;
+            }
+            this._shadowCameraDirty = false;
+
+            const safeNear = Math.max(0.01, this._shadowNear);
+            this._shadowNear = safeNear;
+            
+            // Auto-adjust far plane if distance is explicitly set
+            const effectiveFar = (this._distance > 0) ? 
+                Math.min(this._shadowFar, this._distance + Math.max(50, this._distance * 0.25)) : 
+                this._shadowFar;
+            
+            this._light.shadow.camera.near = safeNear;
+            this._light.shadow.camera.far = Math.max(safeNear + 1, effectiveFar);
+            
+            // FOV of shadow camera for SpotLight should match the light's angle (angle is half of fov)
+            this._light.shadow.camera.fov = Math.max(2, Math.min(170, this._angle * 2));
+            
+            this._light.shadow.camera.updateProjectionMatrix();
+
+            if (this._physicsBounceCastShadow) {
+              const bounceFar = Math.max(
+                safeNear + 1,
+                this._physicsBounceDistance + Math.max(25, this._physicsBounceDistance * 0.25)
+              );
+              this._bounceLight.shadow.camera.near = safeNear;
+              this._bounceLight.shadow.camera.far = bounceFar;
+              this._bounceLight.shadow.camera.fov = Math.max(
+                2,
+                Math.min(170, this._angle * 2)
+              );
+              this._bounceLight.shadow.camera.updateProjectionMatrix();
+            }
           }
 
           private _setAnyPosition(
@@ -475,6 +457,14 @@ namespace gdjs {
             this._bounceLight.penumbra = this._light.penumbra;
             this._bounceLight.decay = this._light.decay;
             this._bounceLight.castShadow = this._physicsBounceCastShadow;
+            if (this._bounceLight.castShadow) {
+              this._applySpotShadowTuning(
+                this._bounceLight,
+                this._bounceLight.shadow.mapSize.x,
+                0.75,
+                0.75
+              );
+            }
             this._bounceLight.visible = true;
           }
 
@@ -518,6 +508,134 @@ namespace gdjs {
             ];
           }
 
+          private _getObjectRotationX(object: gdjs.RuntimeObject): float {
+            const object3D = object as gdjs.RuntimeObject & {
+              getRotationX?: () => float;
+            };
+            return typeof object3D.getRotationX === 'function'
+              ? object3D.getRotationX()
+              : 0;
+          }
+
+          private _getObjectRotationY(object: gdjs.RuntimeObject): float {
+            const object3D = object as gdjs.RuntimeObject & {
+              getRotationY?: () => float;
+            };
+            return typeof object3D.getRotationY === 'function'
+              ? object3D.getRotationY()
+              : 0;
+          }
+
+          private _getObjectScaleX(object: gdjs.RuntimeObject): float {
+            const scalableObject = object as gdjs.RuntimeObject & {
+              getScaleX?: () => float;
+            };
+            if (typeof scalableObject.getScaleX === 'function') {
+              return Math.max(0.0001, Math.abs(scalableObject.getScaleX()));
+            }
+            return 1;
+          }
+
+          private _getObjectScaleY(object: gdjs.RuntimeObject): float {
+            const scalableObject = object as gdjs.RuntimeObject & {
+              getScaleY?: () => float;
+            };
+            if (typeof scalableObject.getScaleY === 'function') {
+              return Math.max(0.0001, Math.abs(scalableObject.getScaleY()));
+            }
+            return 1;
+          }
+
+          private _getObjectScaleZ(object: gdjs.RuntimeObject): float {
+            const scalableObject = object as gdjs.RuntimeObject & {
+              getScaleZ?: () => float;
+            };
+            if (typeof scalableObject.getScaleZ === 'function') {
+              return Math.max(0.0001, Math.abs(scalableObject.getScaleZ()));
+            }
+            return Math.max(
+              0.0001,
+              (this._getObjectScaleX(object) + this._getObjectScaleY(object)) *
+                0.5
+            );
+          }
+
+          private _setFlashlightForwardAxis(value: string): void {
+            const normalizedValue = (value || 'X+').toUpperCase();
+            if (
+              normalizedValue === 'X+' ||
+              normalizedValue === 'X-' ||
+              normalizedValue === 'Y+' ||
+              normalizedValue === 'Y-' ||
+              normalizedValue === 'Z+' ||
+              normalizedValue === 'Z-'
+            ) {
+              this._flashlightForwardAxis = normalizedValue;
+            } else {
+              this._flashlightForwardAxis = 'X+';
+            }
+          }
+
+          private _getRotatedOffsets3D(
+            object: gdjs.RuntimeObject,
+            offsetX: float,
+            offsetY: float,
+            offsetZ: float,
+            use3DRotation: boolean
+          ): [float, float, float] {
+            this._temporaryEuler.set(
+              use3DRotation ? gdjs.toRad(this._getObjectRotationX(object)) : 0,
+              use3DRotation ? gdjs.toRad(this._getObjectRotationY(object)) : 0,
+              gdjs.toRad(object.getAngle()),
+              'ZYX'
+            );
+            this._temporaryOffsetVector.set(offsetX, offsetY, offsetZ);
+            this._temporaryOffsetVector.applyEuler(this._temporaryEuler);
+            return [
+              this._temporaryOffsetVector.x,
+              this._temporaryOffsetVector.y,
+              this._temporaryOffsetVector.z,
+            ];
+          }
+
+          private _getForwardDirectionFromObject(
+            object: gdjs.RuntimeObject,
+            use3DRotation: boolean
+          ): [float, float, float] {
+            const baseRotationX = use3DRotation
+              ? this._getObjectRotationX(object)
+              : 0;
+            const baseRotationY = use3DRotation
+              ? this._getObjectRotationY(object)
+              : 0;
+            this._temporaryEuler.set(
+              gdjs.toRad(baseRotationX + this._flashlightPitchOffset),
+              gdjs.toRad(baseRotationY),
+              gdjs.toRad(object.getAngle() + this._flashlightYawOffset),
+              'ZYX'
+            );
+            if (this._flashlightForwardAxis === 'X-') {
+              this._temporaryDirectionVector.set(-1, 0, 0);
+            } else if (this._flashlightForwardAxis === 'Y+') {
+              this._temporaryDirectionVector.set(0, 1, 0);
+            } else if (this._flashlightForwardAxis === 'Y-') {
+              this._temporaryDirectionVector.set(0, -1, 0);
+            } else if (this._flashlightForwardAxis === 'Z+') {
+              this._temporaryDirectionVector.set(0, 0, 1);
+            } else if (this._flashlightForwardAxis === 'Z-') {
+              this._temporaryDirectionVector.set(0, 0, -1);
+            } else {
+              this._temporaryDirectionVector.set(1, 0, 0);
+            }
+            this._temporaryDirectionVector.applyEuler(this._temporaryEuler);
+            this._temporaryDirectionVector.normalize();
+            return [
+              this._temporaryDirectionVector.x,
+              this._temporaryDirectionVector.y,
+              this._temporaryDirectionVector.z,
+            ];
+          }
+
           private _applyAttachedPosition(target: EffectsTarget): boolean {
             const attachedObject = this._getFirstObjectByName(
               target,
@@ -526,15 +644,33 @@ namespace gdjs {
             if (!attachedObject) {
               return false;
             }
-            const [offsetX, offsetY] = this._getRotatedOffsets(
-              attachedObject,
-              this._attachedOffsetX,
-              this._attachedOffsetY
-            );
+            let offsetX = this._attachedOffsetX;
+            let offsetY = this._attachedOffsetY;
+            let offsetZ = this._attachedOffsetZ;
+            if (this._inheritAttachedObjectScale) {
+              offsetX *= this._getObjectScaleX(attachedObject);
+              offsetY *= this._getObjectScaleY(attachedObject);
+              offsetZ *= this._getObjectScaleZ(attachedObject);
+            }
+            if (this._followAttachedObjectRotation3D) {
+              [offsetX, offsetY, offsetZ] = this._getRotatedOffsets3D(
+                attachedObject,
+                offsetX,
+                offsetY,
+                offsetZ,
+                true
+              );
+            } else if (this._rotateOffsetsWithObjectAngle) {
+              [offsetX, offsetY] = this._getRotatedOffsets(
+                attachedObject,
+                offsetX,
+                offsetY
+              );
+            }
             this._setLightPosition(
               attachedObject.getCenterXInScene() + offsetX,
               attachedObject.getCenterYInScene() + offsetY,
-              this._getObjectCenterZ(attachedObject) + this._attachedOffsetZ
+              this._getObjectCenterZ(attachedObject) + offsetZ
             );
             return true;
           }
@@ -547,16 +683,87 @@ namespace gdjs {
             if (!attachedObject) {
               return false;
             }
-            const [offsetX, offsetY] = this._getRotatedOffsets(
-              attachedObject,
-              this._targetAttachedOffsetX,
-              this._targetAttachedOffsetY
-            );
+            let offsetX = this._targetAttachedOffsetX;
+            let offsetY = this._targetAttachedOffsetY;
+            let offsetZ = this._targetAttachedOffsetZ;
+            if (this._inheritTargetObjectScale) {
+              offsetX *= this._getObjectScaleX(attachedObject);
+              offsetY *= this._getObjectScaleY(attachedObject);
+              offsetZ *= this._getObjectScaleZ(attachedObject);
+            }
+            if (this._followTargetObjectRotation3D) {
+              [offsetX, offsetY, offsetZ] = this._getRotatedOffsets3D(
+                attachedObject,
+                offsetX,
+                offsetY,
+                offsetZ,
+                true
+              );
+            } else if (this._rotateOffsetsWithObjectAngle) {
+              [offsetX, offsetY] = this._getRotatedOffsets(
+                attachedObject,
+                offsetX,
+                offsetY
+              );
+            }
             this._setTargetPosition(
               attachedObject.getCenterXInScene() + offsetX,
               attachedObject.getCenterYInScene() + offsetY,
-              this._getObjectCenterZ(attachedObject) +
-                this._targetAttachedOffsetZ
+              this._getObjectCenterZ(attachedObject) + offsetZ
+            );
+            return true;
+          }
+
+          private _applyFlashlightTarget(target: EffectsTarget): boolean {
+            const attachedObject = this._getFirstObjectByName(
+              target,
+              this._attachedObjectName
+            );
+            if (!attachedObject) {
+              return false;
+            }
+
+            let offsetX = this._attachedOffsetX;
+            let offsetY = this._attachedOffsetY;
+            let offsetZ = this._attachedOffsetZ;
+            if (this._inheritAttachedObjectScale) {
+              offsetX *= this._getObjectScaleX(attachedObject);
+              offsetY *= this._getObjectScaleY(attachedObject);
+              offsetZ *= this._getObjectScaleZ(attachedObject);
+            }
+            if (this._followAttachedObjectRotation3D) {
+              [offsetX, offsetY, offsetZ] = this._getRotatedOffsets3D(
+                attachedObject,
+                offsetX,
+                offsetY,
+                offsetZ,
+                true
+              );
+            } else if (this._rotateOffsetsWithObjectAngle) {
+              [offsetX, offsetY] = this._getRotatedOffsets(
+                attachedObject,
+                offsetX,
+                offsetY
+              );
+            }
+
+            const originX = attachedObject.getCenterXInScene() + offsetX;
+            const originY = attachedObject.getCenterYInScene() + offsetY;
+            const originZ = this._getObjectCenterZ(attachedObject) + offsetZ;
+            this._setLightPosition(originX, originY, originZ);
+
+            const [forwardX, forwardY, forwardZ] = this._getForwardDirectionFromObject(
+              attachedObject,
+              this._followAttachedObjectRotation3D
+            );
+            const flashlightDistance = Math.max(
+              1,
+              this._flashlightDistance > 0 ? this._flashlightDistance : 600
+            );
+            this._setTargetPosition(
+              originX + forwardX * flashlightDistance,
+              originY + forwardY * flashlightDistance,
+              originZ + forwardZ * flashlightDistance
             );
             return true;
           }
@@ -586,7 +793,6 @@ namespace gdjs {
             scene.add(this._light.target);
             scene.add(this._bounceLight);
             scene.add(this._bounceLight.target);
-            this._resetShadowRefreshTracking();
             this._isEnabled = true;
             return true;
           }
@@ -602,51 +808,42 @@ namespace gdjs {
             scene.remove(this._light.target);
             scene.remove(this._bounceLight);
             scene.remove(this._bounceLight.target);
-            this._resetShadowRefreshTracking();
             this._isEnabled = false;
             return true;
           }
           updatePreRender(target: gdjs.EffectsTarget): any {
-            if (
-              !this._applyAttachedPosition(target) &&
-              this._attachedObjectName !== ''
-            ) {
-              this._updatePosition();
-            }
-            if (
-              !this._applyAttachedTarget(target) &&
-              this._targetAttachedObjectName !== ''
-            ) {
-              this._updateTarget();
+            if (this._flashlightMode && this._attachedObjectName !== '') {
+              if (!this._applyFlashlightTarget(target)) {
+                this._updatePosition();
+                this._updateTarget();
+              }
+            } else {
+              if (
+                !this._applyAttachedPosition(target) &&
+                this._attachedObjectName !== ''
+              ) {
+                this._updatePosition();
+              }
+              if (
+                !this._applyAttachedTarget(target) &&
+                this._targetAttachedObjectName !== ''
+              ) {
+                this._updateTarget();
+              }
             }
 
+            this._ensureSoftShadowRenderer(target);
+            const shouldUpdateShadows =
+              this._light.castShadow ||
+              (this._physicsBounceEnabled && this._physicsBounceCastShadow);
+            if (shouldUpdateShadows) {
+              this._updateShadowCamera();
+              this._updateShadowMapSize();
+            }
+            if (this._light.castShadow) {
+              this._applySpotShadowTuning(this._light, this._shadowMapSize);
+            }
             this._updatePhysicsBounce(target);
-            this._ensureShadowRenderer(target);
-
-            if (!this._isAnyShadowCasterActive()) {
-              this._resetShadowRefreshTracking();
-              return;
-            }
-
-            const shadowCameraUpdated = this._light.castShadow
-              ? this._updateShadowCamera()
-              : false;
-            const shadowMapUpdated = this._light.castShadow
-              ? this._updateShadowMapSize()
-              : false;
-            this._light.shadow.bias = this._shadowBias;
-            this._light.shadow.normalBias = this._shadowNormalBias;
-            this._light.shadow.radius = this._shadowRadius;
-
-            const bounceShadowForcesUpdate =
-              this._bounceLight.castShadow && this._bounceLight.visible;
-            const shadowStateMoved = this._hasShadowStateMovedEnough();
-            this._requestShadowRender(
-              shadowCameraUpdated ||
-                shadowMapUpdated ||
-                shadowStateMoved ||
-                bounceShadowForcesUpdate
-            );
           }
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
@@ -701,6 +898,10 @@ namespace gdjs {
               this._shadowNormalBias = Math.max(0, value);
             } else if (parameterName === 'shadowRadius') {
               this._shadowRadius = Math.max(0, value);
+            } else if (parameterName === 'shadowMapSize') {
+              this._shadowMapSize = this._getClosestShadowMapSize(value);
+              this._shadowMapDirty = true;
+              this._shadowCameraDirty = true;
             } else if (parameterName === 'shadowNear') {
               this._shadowNear = Math.max(0.01, value);
               this._shadowCameraDirty = true;
@@ -710,9 +911,16 @@ namespace gdjs {
             } else if (parameterName === 'physicsBounceIntensityScale') {
               this._physicsBounceIntensityScale = value;
             } else if (parameterName === 'physicsBounceDistance') {
-              this._physicsBounceDistance = value;
+              this._physicsBounceDistance = Math.max(0, value);
+              this._shadowCameraDirty = true;
             } else if (parameterName === 'physicsBounceOriginOffset') {
               this._physicsBounceOriginOffset = value;
+            } else if (parameterName === 'flashlightDistance') {
+              this._flashlightDistance = Math.max(1, value);
+            } else if (parameterName === 'flashlightYawOffset') {
+              this._flashlightYawOffset = value;
+            } else if (parameterName === 'flashlightPitchOffset') {
+              this._flashlightPitchOffset = value;
             }
           }
           getDoubleParameter(parameterName: string): number {
@@ -756,6 +964,8 @@ namespace gdjs {
               return this._shadowNormalBias;
             } else if (parameterName === 'shadowRadius') {
               return this._shadowRadius;
+            } else if (parameterName === 'shadowMapSize') {
+              return this._shadowMapSize;
             } else if (parameterName === 'shadowNear') {
               return this._shadowNear;
             } else if (parameterName === 'shadowFar') {
@@ -766,6 +976,12 @@ namespace gdjs {
               return this._physicsBounceDistance;
             } else if (parameterName === 'physicsBounceOriginOffset') {
               return this._physicsBounceOriginOffset;
+            } else if (parameterName === 'flashlightDistance') {
+              return this._flashlightDistance;
+            } else if (parameterName === 'flashlightYawOffset') {
+              return this._flashlightYawOffset;
+            } else if (parameterName === 'flashlightPitchOffset') {
+              return this._flashlightPitchOffset;
             }
             return 0;
           }
@@ -786,18 +1002,29 @@ namespace gdjs {
             if (parameterName === 'targetAttachedObject') {
               this._targetAttachedObjectName = value;
             }
+            if (parameterName === 'flashlightForwardAxis') {
+              this._setFlashlightForwardAxis(value);
+            }
             if (parameterName === 'shadowQuality') {
               if (value === 'low' && this._shadowMapSize !== 512) {
-                this._shadowMapSize = 512;
+                this._shadowMapSize = this._getClosestShadowMapSize(512);
                 this._shadowMapDirty = true;
               }
               if (value === 'medium' && this._shadowMapSize !== 1024) {
-                this._shadowMapSize = 1024;
+                this._shadowMapSize = this._getClosestShadowMapSize(1024);
                 this._shadowMapDirty = true;
               }
               if (value === 'high' && this._shadowMapSize !== 2048) {
-                this._shadowMapSize = 2048;
+                this._shadowMapSize = this._getClosestShadowMapSize(2048);
                 this._shadowMapDirty = true;
+              }
+            }
+            if (parameterName === 'shadowMapSize') {
+              const parsedValue = parseFloat(value);
+              if (!isNaN(parsedValue)) {
+                this._shadowMapSize = this._getClosestShadowMapSize(parsedValue);
+                this._shadowMapDirty = true;
+                this._shadowCameraDirty = true;
               }
             }
           }
@@ -818,31 +1045,36 @@ namespace gdjs {
               if (value) {
                 this._shadowMapDirty = true;
                 this._shadowCameraDirty = true;
-                this._shadowFramesSinceLastRender = this._shadowMaxStaleFrames;
-              } else if (
-                !this._bounceLight.castShadow ||
-                !this._bounceLight.visible
-              ) {
-                this._resetShadowRefreshTracking();
               }
             } else if (parameterName === 'rotateOffsetsWithObjectAngle') {
               this._rotateOffsetsWithObjectAngle = value;
+            } else if (parameterName === 'followAttachedObjectRotation3D') {
+              this._followAttachedObjectRotation3D = value;
+            } else if (parameterName === 'followTargetObjectRotation3D') {
+              this._followTargetObjectRotation3D = value;
+            } else if (parameterName === 'inheritAttachedObjectScale') {
+              this._inheritAttachedObjectScale = value;
+            } else if (parameterName === 'inheritTargetObjectScale') {
+              this._inheritTargetObjectScale = value;
             } else if (parameterName === 'physicsBounceEnabled') {
               this._physicsBounceEnabled = value;
               if (!value) {
                 this._hideBounceLight();
-                if (!this._light.castShadow) {
-                  this._resetShadowRefreshTracking();
-                }
+              } else if (this._physicsBounceCastShadow) {
+                this._shadowMapDirty = true;
+                this._shadowCameraDirty = true;
               }
             } else if (parameterName === 'physicsBounceCastShadow') {
               this._physicsBounceCastShadow = value;
               this._bounceLight.castShadow = value;
               if (value) {
-                this._shadowFramesSinceLastRender = this._shadowMaxStaleFrames;
-              } else if (!this._light.castShadow) {
-                this._resetShadowRefreshTracking();
+                this._shadowMapDirty = true;
+                this._shadowCameraDirty = true;
               }
+            } else if (parameterName === 'shadowAutoTuning') {
+              this._shadowAutoTuningEnabled = value;
+            } else if (parameterName === 'flashlightMode') {
+              this._flashlightMode = value;
             }
           }
           getNetworkSyncData(): SpotLightFilterNetworkSyncData {
@@ -873,11 +1105,22 @@ namespace gdjs {
               toy: this._targetAttachedOffsetY,
               toz: this._targetAttachedOffsetZ,
               ro: this._rotateOffsetsWithObjectAngle,
+              fr: this._followAttachedObjectRotation3D,
+              tr: this._followTargetObjectRotation3D,
+              ia: this._inheritAttachedObjectScale,
+              it: this._inheritTargetObjectScale,
               pbe: this._physicsBounceEnabled,
               pbi: this._physicsBounceIntensityScale,
               pbd: this._physicsBounceDistance,
               pbo: this._physicsBounceOriginOffset,
               pbcs: this._physicsBounceCastShadow,
+              sms: this._shadowMapSize,
+              sat: this._shadowAutoTuningEnabled,
+              fm: this._flashlightMode,
+              fd: this._flashlightDistance,
+              fa: this._flashlightForwardAxis,
+              fy: this._flashlightYawOffset,
+              fp: this._flashlightPitchOffset,
             };
           }
           updateFromNetworkSyncData(
@@ -900,6 +1143,9 @@ namespace gdjs {
             this._shadowNear = Math.max(0.01, syncData.sn ?? 1);
             this._shadowFar = Math.max(this._shadowNear + 1, syncData.sf ?? 10000);
             this._shadowRadius = Math.max(0, syncData.sr ?? 1.5);
+            this._shadowMapSize = this._getClosestShadowMapSize(
+              syncData.sms ?? 1024
+            );
             this._attachedObjectName = syncData.ao || '';
             this._attachedOffsetX = syncData.ox ?? 0;
             this._attachedOffsetY = syncData.oy ?? 0;
@@ -909,11 +1155,21 @@ namespace gdjs {
             this._targetAttachedOffsetY = syncData.toy ?? 0;
             this._targetAttachedOffsetZ = syncData.toz ?? 0;
             this._rotateOffsetsWithObjectAngle = syncData.ro ?? false;
+            this._followAttachedObjectRotation3D = syncData.fr ?? false;
+            this._followTargetObjectRotation3D = syncData.tr ?? false;
+            this._inheritAttachedObjectScale = syncData.ia ?? false;
+            this._inheritTargetObjectScale = syncData.it ?? false;
             this._physicsBounceEnabled = syncData.pbe ?? false;
             this._physicsBounceIntensityScale = syncData.pbi ?? 0.35;
-            this._physicsBounceDistance = syncData.pbd ?? 600;
+            this._physicsBounceDistance = Math.max(0, syncData.pbd ?? 600);
             this._physicsBounceOriginOffset = syncData.pbo ?? 2;
             this._physicsBounceCastShadow = syncData.pbcs ?? false;
+            this._shadowAutoTuningEnabled = syncData.sat ?? true;
+            this._flashlightMode = syncData.fm ?? false;
+            this._flashlightDistance = Math.max(1, syncData.fd ?? 600);
+            this._setFlashlightForwardAxis(syncData.fa ?? 'X+');
+            this._flashlightYawOffset = syncData.fy ?? 0;
+            this._flashlightPitchOffset = syncData.fp ?? 0;
             this._light.distance = this._distance;
             this._light.angle = gdjs.toRad(this._angle);
             this._light.penumbra = this._penumbra;
@@ -926,7 +1182,6 @@ namespace gdjs {
             this._updateTarget();
             this._shadowMapDirty = true;
             this._shadowCameraDirty = true;
-            this._resetShadowRefreshTracking();
           }
         })();
       }

@@ -17,6 +17,17 @@ namespace gdjs {
     sms?: number;
     sfl?: number;
     sfc?: boolean;
+    sat?: boolean;
+    ao?: string;
+    ox?: number;
+    oy?: number;
+    oz?: number;
+    ro?: boolean;
+    fr?: boolean;
+    ia?: boolean;
+    fdr?: boolean;
+    dro?: number;
+    deo?: number;
   }
 
   const shadowHelper = false;
@@ -49,6 +60,17 @@ namespace gdjs {
           private _cascadeSplitLambda: float = 0.7;
           private _shadowFollowLead: float = 0.45;
           private _shadowFollowCamera: boolean = false;
+          private _shadowAutoTuningEnabled: boolean = true;
+          private _attachedObjectName: string = '';
+          private _attachedOffsetX: float = 0;
+          private _attachedOffsetY: float = 0;
+          private _attachedOffsetZ: float = 0;
+          private _rotateOffsetsWithObjectAngle: boolean = false;
+          private _followAttachedObjectRotation3D: boolean = false;
+          private _inheritAttachedObjectScale: boolean = false;
+          private _followDirectionWithAttachedObjectRotation3D: boolean = false;
+          private _directionRotationOffset: float = 0;
+          private _directionElevationOffset: float = 0;
 
           private _intensity: float = 0.5;
           private _colorHex: number = 0xffffff;
@@ -75,14 +97,9 @@ namespace gdjs {
           private _staticAnchorX: float = 0;
           private _staticAnchorY: float = 0;
           private _staticAnchorZ: float = 0;
-          private _threeRenderer: THREE.WebGLRenderer | null = null;
-          private _shadowFramesSinceLastRender: integer = 0;
-          private _shadowMaxStaleFrames: integer = 6;
-          private _shadowAnchorMotionThreshold: float = 0.5;
-          private _hasPreviousStabilizedAnchor = false;
-          private _previousStabilizedAnchorX: float = 0;
-          private _previousStabilizedAnchorY: float = 0;
-          private _previousStabilizedAnchorZ: float = 0;
+          private _temporaryOffsetVector = new THREE.Vector3();
+          private _temporaryDirectionVector = new THREE.Vector3(1, 0, 0);
+          private _temporaryEuler = new THREE.Euler(0, 0, 0, 'ZYX');
 
           constructor() {
             for (let i = 0; i < csmCascadeCount; i++) {
@@ -138,10 +155,6 @@ namespace gdjs {
             }
             if (enabled) {
               this._updateShadowCameraDirtyState();
-              this._shadowFramesSinceLastRender = this._shadowMaxStaleFrames;
-              this._hasPreviousStabilizedAnchor = false;
-            } else {
-              this._resetShadowRefreshTracking();
             }
           }
 
@@ -282,9 +295,9 @@ namespace gdjs {
             );
           }
 
-          private _updateShadowCamera(layer: gdjs.RuntimeLayer): boolean {
+          private _updateShadowCamera(layer: gdjs.RuntimeLayer): void {
             if (!this._shadowCameraDirty) {
-              return false;
+              return;
             }
             this._shadowCameraDirty = false;
 
@@ -335,12 +348,11 @@ namespace gdjs {
               light.shadow.camera.updateProjectionMatrix();
               light.shadow.needsUpdate = true;
             }
-            return true;
           }
 
-          private _updateShadowMapSize(): boolean {
+          private _updateShadowMapSize(): void {
             if (!this._shadowMapDirty) {
-              return false;
+              return;
             }
             this._shadowMapDirty = false;
 
@@ -360,7 +372,6 @@ namespace gdjs {
               light.shadow.map = null;
               light.shadow.needsUpdate = true;
             }
-            return true;
           }
 
           private _getEffectiveShadowStabilizationStep(
@@ -377,39 +388,176 @@ namespace gdjs {
             return Math.max(0.25, frustumSize / Math.max(1, shadowMapSize));
           }
 
+          private _getFirstObjectByName(
+            target: EffectsTarget,
+            objectName: string
+          ): gdjs.RuntimeObject | null {
+            if (!objectName) {
+              return null;
+            }
+            const objects = target.getRuntimeScene().getObjects(objectName);
+            if (!objects || objects.length === 0) {
+              return null;
+            }
+            return objects[0];
+          }
+
+          private _getObjectCenterZ(object: gdjs.RuntimeObject): float {
+            const object3D = object as gdjs.RuntimeObject & {
+              getCenterZInScene?: () => float;
+            };
+            return typeof object3D.getCenterZInScene === 'function'
+              ? object3D.getCenterZInScene()
+              : 0;
+          }
+
+          private _getObjectRotationX(object: gdjs.RuntimeObject): float {
+            const object3D = object as gdjs.RuntimeObject & {
+              getRotationX?: () => float;
+            };
+            return typeof object3D.getRotationX === 'function'
+              ? object3D.getRotationX()
+              : 0;
+          }
+
+          private _getObjectRotationY(object: gdjs.RuntimeObject): float {
+            const object3D = object as gdjs.RuntimeObject & {
+              getRotationY?: () => float;
+            };
+            return typeof object3D.getRotationY === 'function'
+              ? object3D.getRotationY()
+              : 0;
+          }
+
+          private _getObjectScaleX(object: gdjs.RuntimeObject): float {
+            const scalableObject = object as gdjs.RuntimeObject & {
+              getScaleX?: () => float;
+            };
+            if (typeof scalableObject.getScaleX === 'function') {
+              return Math.max(0.0001, Math.abs(scalableObject.getScaleX()));
+            }
+            return 1;
+          }
+
+          private _getObjectScaleY(object: gdjs.RuntimeObject): float {
+            const scalableObject = object as gdjs.RuntimeObject & {
+              getScaleY?: () => float;
+            };
+            if (typeof scalableObject.getScaleY === 'function') {
+              return Math.max(0.0001, Math.abs(scalableObject.getScaleY()));
+            }
+            return 1;
+          }
+
+          private _getObjectScaleZ(object: gdjs.RuntimeObject): float {
+            const scalableObject = object as gdjs.RuntimeObject & {
+              getScaleZ?: () => float;
+            };
+            if (typeof scalableObject.getScaleZ === 'function') {
+              return Math.max(0.0001, Math.abs(scalableObject.getScaleZ()));
+            }
+            return Math.max(
+              0.0001,
+              (this._getObjectScaleX(object) + this._getObjectScaleY(object)) *
+                0.5
+            );
+          }
+
+          private _getRotatedOffsets(
+            object: gdjs.RuntimeObject,
+            offsetX: float,
+            offsetY: float
+          ): [float, float] {
+            if (!this._rotateOffsetsWithObjectAngle) {
+              return [offsetX, offsetY];
+            }
+            const angleRad = gdjs.toRad(object.getAngle());
+            const cos = Math.cos(angleRad);
+            const sin = Math.sin(angleRad);
+            return [
+              offsetX * cos - offsetY * sin,
+              offsetX * sin + offsetY * cos,
+            ];
+          }
+
+          private _getRotatedOffsets3D(
+            object: gdjs.RuntimeObject,
+            offsetX: float,
+            offsetY: float,
+            offsetZ: float
+          ): [float, float, float] {
+            this._temporaryEuler.set(
+              gdjs.toRad(this._getObjectRotationX(object)),
+              gdjs.toRad(this._getObjectRotationY(object)),
+              gdjs.toRad(object.getAngle()),
+              'ZYX'
+            );
+            this._temporaryOffsetVector.set(offsetX, offsetY, offsetZ);
+            this._temporaryOffsetVector.applyEuler(this._temporaryEuler);
+            return [
+              this._temporaryOffsetVector.x,
+              this._temporaryOffsetVector.y,
+              this._temporaryOffsetVector.z,
+            ];
+          }
+
+          private _computeAttachedAnchor(target: gdjs.EffectsTarget): {
+            attachedObject: gdjs.RuntimeObject;
+            anchorX: float;
+            anchorY: float;
+            anchorZ: float;
+          } | null {
+            const attachedObject = this._getFirstObjectByName(
+              target,
+              this._attachedObjectName
+            );
+            if (!attachedObject) {
+              return null;
+            }
+
+            let offsetX = this._attachedOffsetX;
+            let offsetY = this._attachedOffsetY;
+            let offsetZ = this._attachedOffsetZ;
+            if (this._inheritAttachedObjectScale) {
+              offsetX *= this._getObjectScaleX(attachedObject);
+              offsetY *= this._getObjectScaleY(attachedObject);
+              offsetZ *= this._getObjectScaleZ(attachedObject);
+            }
+            if (this._followAttachedObjectRotation3D) {
+              [offsetX, offsetY, offsetZ] = this._getRotatedOffsets3D(
+                attachedObject,
+                offsetX,
+                offsetY,
+                offsetZ
+              );
+            } else if (this._rotateOffsetsWithObjectAngle) {
+              [offsetX, offsetY] = this._getRotatedOffsets(
+                attachedObject,
+                offsetX,
+                offsetY
+              );
+            }
+
+            return {
+              attachedObject,
+              anchorX: attachedObject.getCenterXInScene() + offsetX,
+              anchorY: attachedObject.getCenterYInScene() + offsetY,
+              anchorZ: this._getObjectCenterZ(attachedObject) + offsetZ,
+            };
+          }
+
           private _computeDirectionalPosition(
             targetX: float,
             targetY: float,
-            targetZ: float
+            targetZ: float,
+            attachedObject: gdjs.RuntimeObject | null = null
           ): [float, float, float] {
-            if (this._top === 'Y-') {
-              return [
-                targetX +
-                  this._distanceFromCamera *
-                    Math.cos(gdjs.toRad(-this._rotation + 90)) *
-                    Math.cos(gdjs.toRad(this._elevation)),
-                targetY -
-                  this._distanceFromCamera *
-                    Math.sin(gdjs.toRad(this._elevation)),
-                targetZ +
-                  this._distanceFromCamera *
-                    Math.sin(gdjs.toRad(-this._rotation + 90)) *
-                    Math.cos(gdjs.toRad(this._elevation)),
-              ];
-            }
-
+            const [directionX, directionY, directionZ] =
+              this._computeLightDirection(attachedObject);
             return [
-              targetX +
-                this._distanceFromCamera *
-                  Math.cos(gdjs.toRad(this._rotation)) *
-                  Math.cos(gdjs.toRad(this._elevation)),
-              targetY +
-                this._distanceFromCamera *
-                  Math.sin(gdjs.toRad(this._rotation)) *
-                  Math.cos(gdjs.toRad(this._elevation)),
-              targetZ +
-                this._distanceFromCamera *
-                  Math.sin(gdjs.toRad(this._elevation)),
+              targetX + this._distanceFromCamera * directionX,
+              targetY + this._distanceFromCamera * directionY,
+              targetZ + this._distanceFromCamera * directionZ,
             ];
           }
 
@@ -417,12 +565,14 @@ namespace gdjs {
             light: THREE.DirectionalLight,
             targetX: float,
             targetY: float,
-            targetZ: float
+            targetZ: float,
+            attachedObject: gdjs.RuntimeObject | null = null
           ): void {
             const [lightX, lightY, lightZ] = this._computeDirectionalPosition(
               targetX,
               targetY,
-              targetZ
+              targetZ,
+              attachedObject
             );
             light.position.set(lightX, lightY, lightZ);
             light.target.position.set(targetX, targetY, targetZ);
@@ -458,26 +608,60 @@ namespace gdjs {
             light.shadow.radius = baseRadius * radiusMultiplier;
           }
 
-          private _computeLightDirection(): [float, float, float] {
+          private _applyManualShadowTuning(cascadeIndex: integer): void {
+            const light = this._lights[cascadeIndex];
+            light.shadow.bias = -Math.max(0, this._minimumShadowBias);
+            light.shadow.normalBias = Math.max(0, this._shadowNormalBias);
+            light.shadow.radius = Math.max(0, this._shadowRadius);
+          }
+
+          private _computeLightDirection(
+            attachedObject: gdjs.RuntimeObject | null = null
+          ): [float, float, float] {
+            const effectiveRotation =
+              this._rotation + this._directionRotationOffset;
+            const effectiveElevation =
+              this._elevation + this._directionElevationOffset;
             let directionX = 0;
             let directionY = 0;
             let directionZ = 1;
             if (this._top === 'Y-') {
               directionX =
-                Math.cos(gdjs.toRad(-this._rotation + 90)) *
-                Math.cos(gdjs.toRad(this._elevation));
-              directionY = -Math.sin(gdjs.toRad(this._elevation));
+                Math.cos(gdjs.toRad(-effectiveRotation + 90)) *
+                Math.cos(gdjs.toRad(effectiveElevation));
+              directionY = -Math.sin(gdjs.toRad(effectiveElevation));
               directionZ =
-                Math.sin(gdjs.toRad(-this._rotation + 90)) *
-                Math.cos(gdjs.toRad(this._elevation));
+                Math.sin(gdjs.toRad(-effectiveRotation + 90)) *
+                Math.cos(gdjs.toRad(effectiveElevation));
             } else {
               directionX =
-                Math.cos(gdjs.toRad(this._rotation)) *
-                Math.cos(gdjs.toRad(this._elevation));
+                Math.cos(gdjs.toRad(effectiveRotation)) *
+                Math.cos(gdjs.toRad(effectiveElevation));
               directionY =
-                Math.sin(gdjs.toRad(this._rotation)) *
-                Math.cos(gdjs.toRad(this._elevation));
-              directionZ = Math.sin(gdjs.toRad(this._elevation));
+                Math.sin(gdjs.toRad(effectiveRotation)) *
+                Math.cos(gdjs.toRad(effectiveElevation));
+              directionZ = Math.sin(gdjs.toRad(effectiveElevation));
+            }
+
+            if (
+              attachedObject &&
+              this._followDirectionWithAttachedObjectRotation3D
+            ) {
+              this._temporaryEuler.set(
+                gdjs.toRad(this._getObjectRotationX(attachedObject)),
+                gdjs.toRad(this._getObjectRotationY(attachedObject)),
+                gdjs.toRad(attachedObject.getAngle()),
+                'ZYX'
+              );
+              this._temporaryDirectionVector.set(
+                directionX,
+                directionY,
+                directionZ
+              );
+              this._temporaryDirectionVector.applyEuler(this._temporaryEuler);
+              directionX = this._temporaryDirectionVector.x;
+              directionY = this._temporaryDirectionVector.y;
+              directionZ = this._temporaryDirectionVector.z;
             }
 
             const directionLength = Math.sqrt(
@@ -495,7 +679,9 @@ namespace gdjs {
             ];
           }
 
-          private _computeLightSpaceBasis(): {
+          private _computeLightSpaceBasis(
+            attachedObject: gdjs.RuntimeObject | null = null
+          ): {
             rightX: float;
             rightY: float;
             rightZ: float;
@@ -507,7 +693,7 @@ namespace gdjs {
             forwardZ: float;
           } {
             const [forwardX, forwardY, forwardZ] =
-              this._computeLightDirection();
+              this._computeLightDirection(attachedObject);
 
             // Build a stable orthonormal basis around light direction.
             let referenceUpX = 0;
@@ -665,65 +851,6 @@ namespace gdjs {
             ];
           }
 
-          private _resetShadowRefreshTracking(): void {
-            this._shadowFramesSinceLastRender = 0;
-            this._hasPreviousStabilizedAnchor = false;
-          }
-
-          private _hasStabilizedAnchorMovedEnough(
-            x: float,
-            y: float,
-            z: float
-          ): boolean {
-            if (!this._hasPreviousStabilizedAnchor) {
-              this._hasPreviousStabilizedAnchor = true;
-              this._previousStabilizedAnchorX = x;
-              this._previousStabilizedAnchorY = y;
-              this._previousStabilizedAnchorZ = z;
-              return true;
-            }
-
-            const deltaX = x - this._previousStabilizedAnchorX;
-            const deltaY = y - this._previousStabilizedAnchorY;
-            const deltaZ = z - this._previousStabilizedAnchorZ;
-            const distanceSquared =
-              deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
-            const threshold = Math.max(0.05, this._shadowAnchorMotionThreshold);
-            if (distanceSquared < threshold * threshold) {
-              return false;
-            }
-
-            this._previousStabilizedAnchorX = x;
-            this._previousStabilizedAnchorY = y;
-            this._previousStabilizedAnchorZ = z;
-            return true;
-          }
-
-          private _requestShadowRender(forceUpdate: boolean): void {
-            if (!this._shadowCastingEnabled) {
-              this._resetShadowRefreshTracking();
-              return;
-            }
-
-            const intervalReached =
-              this._shadowFramesSinceLastRender >= this._shadowMaxStaleFrames;
-            if (!forceUpdate && !intervalReached) {
-              this._shadowFramesSinceLastRender++;
-              return;
-            }
-
-            for (const light of this._lights) {
-              if (light.castShadow) {
-                light.shadow.needsUpdate = true;
-              }
-            }
-
-            if (this._threeRenderer && this._threeRenderer.shadowMap) {
-              this._threeRenderer.shadowMap.needsUpdate = true;
-            }
-            this._shadowFramesSinceLastRender = 0;
-          }
-
           private _ensureSoftShadowRenderer(target: gdjs.EffectsTarget): void {
             const runtimeScene = target.getRuntimeScene();
             if (!runtimeScene || !runtimeScene.getGame) {
@@ -737,7 +864,6 @@ namespace gdjs {
             if (!threeRenderer || !threeRenderer.shadowMap) {
               return;
             }
-            this._threeRenderer = threeRenderer;
             const rendererMaxTextureSize =
               threeRenderer.capabilities &&
               typeof threeRenderer.capabilities.maxTextureSize === 'number'
@@ -753,7 +879,7 @@ namespace gdjs {
             }
 
             threeRenderer.shadowMap.enabled = true;
-            threeRenderer.shadowMap.autoUpdate = false;
+            threeRenderer.shadowMap.autoUpdate = true;
             // `radius` has effect with PCFShadowMap, while PCFSoftShadowMap gives built-in soft filtering.
             threeRenderer.shadowMap.type =
               this._shadowRadius > 1
@@ -795,7 +921,6 @@ namespace gdjs {
 
             this._hadPreviousCameraPosition = false;
             this._staticAnchorInitialized = false;
-            this._resetShadowRefreshTracking();
             this._isEnabled = true;
             return true;
           }
@@ -818,7 +943,6 @@ namespace gdjs {
               }
             }
 
-            this._resetShadowRefreshTracking();
             this._isEnabled = false;
             return true;
           }
@@ -832,21 +956,25 @@ namespace gdjs {
             const cameraZ = layer.getCameraZ(
               layer.getInitialCamera3DFieldOfView()
             );
-            const [anchorX, anchorY, anchorZ] = this._computeShadowAnchor(
-              cameraX,
-              cameraY,
-              cameraZ
-            );
+            const attachedAnchor = this._computeAttachedAnchor(target);
+            const [anchorX, anchorY, anchorZ] = attachedAnchor
+              ? [
+                  attachedAnchor.anchorX,
+                  attachedAnchor.anchorY,
+                  attachedAnchor.anchorZ,
+                ]
+              : this._computeShadowAnchor(cameraX, cameraY, cameraZ);
+            const attachedObjectForDirection = attachedAnchor
+              ? attachedAnchor.attachedObject
+              : null;
 
             // CSM requires per-cascade cameras and map sizing to be refreshed when settings change.
             this._ensureSoftShadowRenderer(target);
-            const shadowCameraUpdated = this._updateShadowCamera(layer);
-            const shadowMapUpdated = this._updateShadowMapSize();
-            const shadowSettingsChanged = shadowCameraUpdated || shadowMapUpdated;
-            const lightSpaceBasis = this._computeLightSpaceBasis();
-            let firstCascadeAnchorX = anchorX;
-            let firstCascadeAnchorY = anchorY;
-            let firstCascadeAnchorZ = anchorZ;
+            this._updateShadowCamera(layer);
+            this._updateShadowMapSize();
+            const lightSpaceBasis = this._computeLightSpaceBasis(
+              attachedObjectForDirection
+            );
 
             for (
               let cascadeIndex = 0;
@@ -865,21 +993,21 @@ namespace gdjs {
                   stabilizationStep,
                   lightSpaceBasis
                 );
-              if (cascadeIndex === 0) {
-                firstCascadeAnchorX = stabilizedX;
-                firstCascadeAnchorY = stabilizedY;
-                firstCascadeAnchorZ = stabilizedZ;
-              }
 
               this._applyCascadeTransform(
                 light,
                 stabilizedX,
                 stabilizedY,
-                stabilizedZ
+                stabilizedZ,
+                attachedObjectForDirection
               );
 
               if (this._shadowCastingEnabled) {
-                this._applyCascadeShadowTuning(cascadeIndex);
+                if (this._shadowAutoTuningEnabled) {
+                  this._applyCascadeShadowTuning(cascadeIndex);
+                } else {
+                  this._applyManualShadowTuning(cascadeIndex);
+                }
               }
 
               const helper = this._shadowCameraHelpers[cascadeIndex];
@@ -887,20 +1015,6 @@ namespace gdjs {
                 helper.update();
               }
             }
-
-            if (!this._shadowCastingEnabled) {
-              this._resetShadowRefreshTracking();
-              return;
-            }
-
-            const stabilizedAnchorMoved = this._hasStabilizedAnchorMovedEnough(
-              firstCascadeAnchorX,
-              firstCascadeAnchorY,
-              firstCascadeAnchorZ
-            );
-            this._requestShadowRender(
-              shadowSettingsChanged || stabilizedAnchorMoved
-            );
           }
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
@@ -909,6 +1023,16 @@ namespace gdjs {
               this._elevation = value;
             } else if (parameterName === 'rotation') {
               this._rotation = value;
+            } else if (parameterName === 'attachedOffsetX') {
+              this._attachedOffsetX = value;
+            } else if (parameterName === 'attachedOffsetY') {
+              this._attachedOffsetY = value;
+            } else if (parameterName === 'attachedOffsetZ') {
+              this._attachedOffsetZ = value;
+            } else if (parameterName === 'directionRotationOffset') {
+              this._directionRotationOffset = value;
+            } else if (parameterName === 'directionElevationOffset') {
+              this._directionElevationOffset = value;
             } else if (parameterName === 'distanceFromCamera') {
               this._distanceFromCamera = Math.max(10, value);
               this._shadowCameraDirty = true;
@@ -944,6 +1068,16 @@ namespace gdjs {
               return this._elevation;
             } else if (parameterName === 'rotation') {
               return this._rotation;
+            } else if (parameterName === 'attachedOffsetX') {
+              return this._attachedOffsetX;
+            } else if (parameterName === 'attachedOffsetY') {
+              return this._attachedOffsetY;
+            } else if (parameterName === 'attachedOffsetZ') {
+              return this._attachedOffsetZ;
+            } else if (parameterName === 'directionRotationOffset') {
+              return this._directionRotationOffset;
+            } else if (parameterName === 'directionElevationOffset') {
+              return this._directionElevationOffset;
             } else if (parameterName === 'distanceFromCamera') {
               return this._distanceFromCamera;
             } else if (parameterName === 'frustumSize') {
@@ -974,19 +1108,24 @@ namespace gdjs {
             if (parameterName === 'top') {
               this._top = value;
             }
+            if (parameterName === 'attachedObject') {
+              this._attachedObjectName = value;
+              this._hadPreviousCameraPosition = false;
+              this._staticAnchorInitialized = false;
+            }
             if (parameterName === 'shadowQuality') {
               if (value === 'low' && this._shadowMapSize !== 512) {
-                this._shadowMapSize = 512;
+                this._shadowMapSize = this._getClosestShadowMapSize(512);
                 this._shadowMapDirty = true;
                 this._shadowCameraDirty = true;
               }
               if (value === 'medium' && this._shadowMapSize !== 1024) {
-                this._shadowMapSize = 1024;
+                this._shadowMapSize = this._getClosestShadowMapSize(1024);
                 this._shadowMapDirty = true;
                 this._shadowCameraDirty = true;
               }
               if (value === 'high' && this._shadowMapSize !== 2048) {
-                this._shadowMapSize = 2048;
+                this._shadowMapSize = this._getClosestShadowMapSize(2048);
                 this._shadowMapDirty = true;
                 this._shadowCameraDirty = true;
               }
@@ -1015,12 +1154,24 @@ namespace gdjs {
           updateBooleanParameter(parameterName: string, value: boolean): void {
             if (parameterName === 'isCastingShadow') {
               this._setShadowCastingEnabled(value);
+            } else if (parameterName === 'rotateOffsetsWithObjectAngle') {
+              this._rotateOffsetsWithObjectAngle = value;
+            } else if (parameterName === 'followAttachedObjectRotation3D') {
+              this._followAttachedObjectRotation3D = value;
+            } else if (parameterName === 'inheritAttachedObjectScale') {
+              this._inheritAttachedObjectScale = value;
+            } else if (
+              parameterName === 'followDirectionWithAttachedObjectRotation3D'
+            ) {
+              this._followDirectionWithAttachedObjectRotation3D = value;
             } else if (parameterName === 'shadowStabilization') {
               this._shadowStabilizationEnabled = value;
             } else if (parameterName === 'shadowFollowCamera') {
               this._shadowFollowCamera = value;
               this._hadPreviousCameraPosition = false;
               this._staticAnchorInitialized = false;
+            } else if (parameterName === 'shadowAutoTuning') {
+              this._shadowAutoTuningEnabled = value;
             }
           }
           getNetworkSyncData(): DirectionalLightFilterNetworkSyncData {
@@ -1042,6 +1193,17 @@ namespace gdjs {
               sms: this._shadowMapSize,
               sfl: this._shadowFollowLead,
               sfc: this._shadowFollowCamera,
+              sat: this._shadowAutoTuningEnabled,
+              ao: this._attachedObjectName,
+              ox: this._attachedOffsetX,
+              oy: this._attachedOffsetY,
+              oz: this._attachedOffsetZ,
+              ro: this._rotateOffsetsWithObjectAngle,
+              fr: this._followAttachedObjectRotation3D,
+              ia: this._inheritAttachedObjectScale,
+              fdr: this._followDirectionWithAttachedObjectRotation3D,
+              dro: this._directionRotationOffset,
+              deo: this._directionElevationOffset,
             };
           }
           updateFromNetworkSyncData(
@@ -1072,11 +1234,22 @@ namespace gdjs {
               Math.min(2, syncData.sfl ?? 0.45)
             );
             this._shadowFollowCamera = syncData.sfc ?? false;
+            this._shadowAutoTuningEnabled = syncData.sat ?? true;
+            this._attachedObjectName = syncData.ao || '';
+            this._attachedOffsetX = syncData.ox ?? 0;
+            this._attachedOffsetY = syncData.oy ?? 0;
+            this._attachedOffsetZ = syncData.oz ?? 0;
+            this._rotateOffsetsWithObjectAngle = syncData.ro ?? false;
+            this._followAttachedObjectRotation3D = syncData.fr ?? false;
+            this._inheritAttachedObjectScale = syncData.ia ?? false;
+            this._followDirectionWithAttachedObjectRotation3D =
+              syncData.fdr ?? false;
+            this._directionRotationOffset = syncData.dro ?? 0;
+            this._directionElevationOffset = syncData.deo ?? 0;
             this._hadPreviousCameraPosition = false;
             this._staticAnchorInitialized = false;
             this._shadowMapDirty = true;
             this._shadowCameraDirty = true;
-            this._resetShadowRefreshTracking();
           }
         })();
       }

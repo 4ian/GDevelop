@@ -5,6 +5,13 @@ namespace gdjs {
     e: boolean;
   }
 
+  interface ToneMappingRendererState {
+    toneMapping: THREE.ToneMapping;
+    toneMappingExposure: number;
+    outputColorSpace: any;
+    useLegacyLights: boolean | null;
+  }
+
   const normalizeToneMappingMode = (mode: string): string => {
     const normalized = (mode || '')
       .trim()
@@ -51,15 +58,26 @@ namespace gdjs {
           _effectEnabled: boolean;
           _mode: string;
           _exposure: number;
-          _oldUseLegacyLights: boolean | null;
+          _rendererState: ToneMappingRendererState | null;
+          _boundRenderer: THREE.WebGLRenderer | null;
 
           constructor() {
             this._isEnabled = false;
-            this._effectEnabled = true;
-            this._mode = 'ACESFilmic';
-            this._exposure = 1.0;
-            this._oldUseLegacyLights = null;
-            void effectData;
+            this._effectEnabled =
+              effectData.booleanParameters.enabled === undefined
+                ? true
+                : !!effectData.booleanParameters.enabled;
+            this._mode = normalizeToneMappingMode(
+              effectData.stringParameters.mode || 'ACESFilmic'
+            );
+            this._exposure = Math.max(
+              0,
+              effectData.doubleParameters.exposure !== undefined
+                ? effectData.doubleParameters.exposure
+                : 1.0
+            );
+            this._rendererState = null;
+            this._boundRenderer = null;
           }
 
           private _getRenderer(
@@ -75,32 +93,62 @@ namespace gdjs {
               .getThreeRenderer();
           }
 
+          private _captureRendererState(renderer: THREE.WebGLRenderer): void {
+            if (this._boundRenderer === renderer && this._rendererState) {
+              return;
+            }
+
+            // Defensive: if target renderer changes, restore old renderer first.
+            if (this._boundRenderer && this._rendererState) {
+              this._restoreRendererState(this._boundRenderer);
+            }
+
+            const rendererWithLegacyLights = renderer as THREE.WebGLRenderer & {
+              useLegacyLights?: boolean;
+            };
+            this._rendererState = {
+              toneMapping: renderer.toneMapping,
+              toneMappingExposure: renderer.toneMappingExposure,
+              outputColorSpace: renderer.outputColorSpace,
+              useLegacyLights:
+                typeof rendererWithLegacyLights.useLegacyLights === 'boolean'
+                  ? rendererWithLegacyLights.useLegacyLights
+                  : null,
+            };
+            this._boundRenderer = renderer;
+          }
+
+          private _restoreRendererState(renderer: THREE.WebGLRenderer): void {
+            if (!this._rendererState) {
+              return;
+            }
+
+            renderer.toneMapping = this._rendererState.toneMapping;
+            renderer.toneMappingExposure =
+              this._rendererState.toneMappingExposure;
+            renderer.outputColorSpace = this._rendererState.outputColorSpace;
+
+            const rendererWithLegacyLights = renderer as THREE.WebGLRenderer & {
+              useLegacyLights?: boolean;
+            };
+            if (
+              this._rendererState.useLegacyLights !== null &&
+              typeof rendererWithLegacyLights.useLegacyLights === 'boolean'
+            ) {
+              rendererWithLegacyLights.useLegacyLights =
+                this._rendererState.useLegacyLights;
+            }
+
+            this._rendererState = null;
+            this._boundRenderer = null;
+          }
+
           private _setPhysicalLighting(renderer: THREE.WebGLRenderer): void {
             const rendererWithLegacyLights = renderer as THREE.WebGLRenderer & {
               useLegacyLights?: boolean;
             };
-            if (
-              this._oldUseLegacyLights === null &&
-              typeof rendererWithLegacyLights.useLegacyLights === 'boolean'
-            ) {
-              this._oldUseLegacyLights =
-                rendererWithLegacyLights.useLegacyLights;
-            }
             if (typeof rendererWithLegacyLights.useLegacyLights === 'boolean') {
               rendererWithLegacyLights.useLegacyLights = false;
-            }
-          }
-
-          private _restoreLegacyLighting(renderer: THREE.WebGLRenderer): void {
-            const rendererWithLegacyLights = renderer as THREE.WebGLRenderer & {
-              useLegacyLights?: boolean;
-            };
-            if (
-              this._oldUseLegacyLights !== null &&
-              typeof rendererWithLegacyLights.useLegacyLights === 'boolean'
-            ) {
-              rendererWithLegacyLights.useLegacyLights =
-                this._oldUseLegacyLights;
             }
           }
 
@@ -110,6 +158,7 @@ namespace gdjs {
               return false;
             }
 
+            this._captureRendererState(renderer);
             const mode = normalizeToneMappingMode(this._mode);
             renderer.toneMapping = getToneMappingConstant(mode);
             renderer.toneMappingExposure = Math.max(0, this._exposure);
@@ -124,8 +173,11 @@ namespace gdjs {
               return false;
             }
 
-            renderer.toneMapping = THREE.NoToneMapping;
-            this._restoreLegacyLighting(renderer);
+            if (this._boundRenderer === renderer && this._rendererState) {
+              this._restoreRendererState(renderer);
+            } else if (this._boundRenderer && this._rendererState) {
+              this._restoreRendererState(this._boundRenderer);
+            }
             return true;
           }
 

@@ -72,6 +72,7 @@ namespace gdjs {
     'DOF',
     'SSR',
     'FOG',
+    'RAIN',
     'BLOOM',
   ];
   const managedPassOrderMap = new Map<string, number>(
@@ -271,6 +272,12 @@ namespace gdjs {
       return qualityProfiles.medium;
     }
     return qualityProfiles[getEffectiveScene3DQualityMode(state)];
+  };
+
+  export const setScene3DPostProcessingEffectQualityMode = function (
+    qualityMode: string
+  ): Scene3DPostProcessingQualityMode {
+    return normalizeQualityMode(qualityMode);
   };
 
   export const captureScene3DSharedTextures = function (

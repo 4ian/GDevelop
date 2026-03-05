@@ -6,6 +6,7 @@ namespace gdjs {
     e: number;
     r: number;
     t: string;
+    sm?: number;
   }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::HemisphereLight',
@@ -24,9 +25,38 @@ namespace gdjs {
 
           _isEnabled: boolean = false;
           _light: THREE.HemisphereLight;
+          _targetIntensity: float;
+          _targetSkyColor: THREE.Color;
+          _targetGroundColor: THREE.Color;
+          _smoothing: float;
 
           constructor() {
             this._light = new THREE.HemisphereLight();
+            this._targetIntensity = Math.max(
+              0,
+              effectData.doubleParameters.intensity !== undefined
+                ? effectData.doubleParameters.intensity
+                : this._light.intensity
+            );
+            this._targetSkyColor = new THREE.Color(
+              gdjs.rgbOrHexStringToNumber(
+                effectData.stringParameters.skyColor || '255;255;255'
+              )
+            );
+            this._targetGroundColor = new THREE.Color(
+              gdjs.rgbOrHexStringToNumber(
+                effectData.stringParameters.groundColor || '127;127;127'
+              )
+            );
+            this._smoothing = Math.max(
+              0,
+              effectData.doubleParameters.smoothing !== undefined
+                ? effectData.doubleParameters.smoothing
+                : 0
+            );
+            this._light.intensity = this._targetIntensity;
+            this._light.color.copy(this._targetSkyColor);
+            this._light.groundColor.copy(this._targetGroundColor);
             this.updateRotation();
           }
 
@@ -67,10 +97,47 @@ namespace gdjs {
             this._isEnabled = false;
             return true;
           }
-          updatePreRender(target: gdjs.EffectsTarget): any {}
+          updatePreRender(target: gdjs.EffectsTarget): any {
+            if (this._smoothing <= 0) {
+              this._light.intensity = this._targetIntensity;
+              this._light.color.copy(this._targetSkyColor);
+              this._light.groundColor.copy(this._targetGroundColor);
+              return;
+            }
+
+            const runtimeScene = target.getRuntimeScene
+              ? target.getRuntimeScene()
+              : null;
+            if (!runtimeScene) {
+              this._light.intensity = this._targetIntensity;
+              this._light.color.copy(this._targetSkyColor);
+              this._light.groundColor.copy(this._targetGroundColor);
+              return;
+            }
+
+            const deltaTime = Math.max(0, runtimeScene.getElapsedTime() / 1000);
+            if (deltaTime <= 0) {
+              return;
+            }
+            const alpha = 1 - Math.exp(-this._smoothing * deltaTime);
+            this._light.intensity +=
+              (this._targetIntensity - this._light.intensity) * alpha;
+            this._light.color.lerp(this._targetSkyColor, alpha);
+            this._light.groundColor.lerp(this._targetGroundColor, alpha);
+          }
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
-              this._light.intensity = value;
+              this._targetIntensity = Math.max(0, value);
+              if (this._smoothing <= 0) {
+                this._light.intensity = this._targetIntensity;
+              }
+            } else if (parameterName === 'smoothing') {
+              this._smoothing = Math.max(0, value);
+              if (this._smoothing <= 0) {
+                this._light.intensity = this._targetIntensity;
+                this._light.color.copy(this._targetSkyColor);
+                this._light.groundColor.copy(this._targetGroundColor);
+              }
             } else if (parameterName === 'elevation') {
               this._elevation = value;
               this.updateRotation();
@@ -81,7 +148,9 @@ namespace gdjs {
           }
           getDoubleParameter(parameterName: string): number {
             if (parameterName === 'intensity') {
-              return this._light.intensity;
+              return this._targetIntensity;
+            } else if (parameterName === 'smoothing') {
+              return this._smoothing;
             } else if (parameterName === 'elevation') {
               return this._elevation;
             } else if (parameterName === 'rotation') {
@@ -91,14 +160,16 @@ namespace gdjs {
           }
           updateStringParameter(parameterName: string, value: string): void {
             if (parameterName === 'skyColor') {
-              this._light.color = new THREE.Color(
-                gdjs.rgbOrHexStringToNumber(value)
-              );
+              this._targetSkyColor.setHex(gdjs.rgbOrHexStringToNumber(value));
+              if (this._smoothing <= 0) {
+                this._light.color.copy(this._targetSkyColor);
+              }
             }
             if (parameterName === 'groundColor') {
-              this._light.groundColor = new THREE.Color(
-                gdjs.rgbOrHexStringToNumber(value)
-              );
+              this._targetGroundColor.setHex(gdjs.rgbOrHexStringToNumber(value));
+              if (this._smoothing <= 0) {
+                this._light.groundColor.copy(this._targetGroundColor);
+              }
             }
             if (parameterName === 'top') {
               this._top = value;
@@ -107,18 +178,24 @@ namespace gdjs {
           }
           updateColorParameter(parameterName: string, value: number): void {
             if (parameterName === 'skyColor') {
-              this._light.color.setHex(value);
+              this._targetSkyColor.setHex(value);
+              if (this._smoothing <= 0) {
+                this._light.color.copy(this._targetSkyColor);
+              }
             }
             if (parameterName === 'groundColor') {
-              this._light.groundColor.setHex(value);
+              this._targetGroundColor.setHex(value);
+              if (this._smoothing <= 0) {
+                this._light.groundColor.copy(this._targetGroundColor);
+              }
             }
           }
           getColorParameter(parameterName: string): number {
             if (parameterName === 'skyColor') {
-              return this._light.color.getHex();
+              return this._targetSkyColor.getHex();
             }
             if (parameterName === 'groundColor') {
-              return this._light.groundColor.getHex();
+              return this._targetGroundColor.getHex();
             }
             return 0;
           }
@@ -146,24 +223,31 @@ namespace gdjs {
           }
           getNetworkSyncData(): HemisphereLightFilterNetworkSyncData {
             return {
-              i: this._light.intensity,
-              sc: this._light.color.getHex(),
-              gc: this._light.groundColor.getHex(),
+              i: this._targetIntensity,
+              sc: this._targetSkyColor.getHex(),
+              gc: this._targetGroundColor.getHex(),
               e: this._elevation,
               r: this._rotation,
               t: this._top,
+              sm: this._smoothing,
             };
           }
           updateFromNetworkSyncData(
             syncData: HemisphereLightFilterNetworkSyncData
           ): void {
-            this._light.intensity = syncData.i;
-            this._light.color.setHex(syncData.sc);
-            this._light.groundColor.setHex(syncData.gc);
+            this._targetIntensity = Math.max(0, syncData.i);
+            this._targetSkyColor.setHex(syncData.sc);
+            this._targetGroundColor.setHex(syncData.gc);
             this._elevation = syncData.e;
             this._rotation = syncData.r;
             this._top = syncData.t;
+            this._smoothing = Math.max(0, syncData.sm ?? this._smoothing);
             this.updateRotation();
+            if (this._smoothing <= 0) {
+              this._light.intensity = this._targetIntensity;
+              this._light.color.copy(this._targetSkyColor);
+              this._light.groundColor.copy(this._targetGroundColor);
+            }
           }
         })();
       }

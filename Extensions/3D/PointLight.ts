@@ -17,6 +17,8 @@ namespace gdjs {
     oy?: number;
     oz?: number;
     ro?: boolean;
+    fr?: boolean;
+    ia?: boolean;
     sms?: number;
     sat?: boolean;
   }
@@ -48,6 +50,8 @@ namespace gdjs {
           private _attachedOffsetY: float = 0;
           private _attachedOffsetZ: float = 0;
           private _rotateOffsetsWithObjectAngle: boolean = false;
+          private _followAttachedObjectRotation3D: boolean = false;
+          private _inheritAttachedObjectScale: boolean = false;
           private _shadowAutoTuningEnabled: boolean = true;
 
           private _isEnabled: boolean = false;
@@ -55,6 +59,8 @@ namespace gdjs {
           private _shadowMapDirty = true;
           private _shadowCameraDirty = true;
           private _maxRendererShadowMapSize: integer = 2048;
+          private _temporaryOffsetVector = new THREE.Vector3();
+          private _temporaryEuler = new THREE.Euler(0, 0, 0, 'ZYX');
 
           constructor() {
             this._light = new THREE.PointLight();
@@ -263,6 +269,78 @@ namespace gdjs {
             ];
           }
 
+          private _getObjectRotationX(object: gdjs.RuntimeObject): float {
+            const object3D = object as gdjs.RuntimeObject & {
+              getRotationX?: () => float;
+            };
+            return typeof object3D.getRotationX === 'function'
+              ? object3D.getRotationX()
+              : 0;
+          }
+
+          private _getObjectRotationY(object: gdjs.RuntimeObject): float {
+            const object3D = object as gdjs.RuntimeObject & {
+              getRotationY?: () => float;
+            };
+            return typeof object3D.getRotationY === 'function'
+              ? object3D.getRotationY()
+              : 0;
+          }
+
+          private _getRotatedOffsets3D(
+            object: gdjs.RuntimeObject,
+            offsetX: float,
+            offsetY: float,
+            offsetZ: float
+          ): [float, float, float] {
+            this._temporaryEuler.set(
+              gdjs.toRad(this._getObjectRotationX(object)),
+              gdjs.toRad(this._getObjectRotationY(object)),
+              gdjs.toRad(object.getAngle()),
+              'ZYX'
+            );
+            this._temporaryOffsetVector.set(offsetX, offsetY, offsetZ);
+            this._temporaryOffsetVector.applyEuler(this._temporaryEuler);
+            return [
+              this._temporaryOffsetVector.x,
+              this._temporaryOffsetVector.y,
+              this._temporaryOffsetVector.z,
+            ];
+          }
+
+          private _getObjectScaleX(object: gdjs.RuntimeObject): float {
+            const scalableObject = object as gdjs.RuntimeObject & {
+              getScaleX?: () => float;
+            };
+            if (typeof scalableObject.getScaleX === 'function') {
+              return Math.max(0.0001, Math.abs(scalableObject.getScaleX()));
+            }
+            return 1;
+          }
+
+          private _getObjectScaleY(object: gdjs.RuntimeObject): float {
+            const scalableObject = object as gdjs.RuntimeObject & {
+              getScaleY?: () => float;
+            };
+            if (typeof scalableObject.getScaleY === 'function') {
+              return Math.max(0.0001, Math.abs(scalableObject.getScaleY()));
+            }
+            return 1;
+          }
+
+          private _getObjectScaleZ(object: gdjs.RuntimeObject): float {
+            const scalableObject = object as gdjs.RuntimeObject & {
+              getScaleZ?: () => float;
+            };
+            if (typeof scalableObject.getScaleZ === 'function') {
+              return Math.max(0.0001, Math.abs(scalableObject.getScaleZ()));
+            }
+            return Math.max(
+              0.0001,
+              (this._getObjectScaleX(object) + this._getObjectScaleY(object)) * 0.5
+            );
+          }
+
           private _applyAttachedPosition(target: EffectsTarget): boolean {
             const attachedObject = this._getFirstObjectByName(
               target,
@@ -271,15 +349,32 @@ namespace gdjs {
             if (!attachedObject) {
               return false;
             }
-            const [offsetX, offsetY] = this._getRotatedOffsets(
-              attachedObject,
-              this._attachedOffsetX,
-              this._attachedOffsetY
-            );
+            let offsetX = this._attachedOffsetX;
+            let offsetY = this._attachedOffsetY;
+            let offsetZ = this._attachedOffsetZ;
+            if (this._inheritAttachedObjectScale) {
+              offsetX *= this._getObjectScaleX(attachedObject);
+              offsetY *= this._getObjectScaleY(attachedObject);
+              offsetZ *= this._getObjectScaleZ(attachedObject);
+            }
+            if (this._followAttachedObjectRotation3D) {
+              [offsetX, offsetY, offsetZ] = this._getRotatedOffsets3D(
+                attachedObject,
+                offsetX,
+                offsetY,
+                offsetZ
+              );
+            } else if (this._rotateOffsetsWithObjectAngle) {
+              [offsetX, offsetY] = this._getRotatedOffsets(
+                attachedObject,
+                offsetX,
+                offsetY
+              );
+            }
             this._setLightPosition(
               attachedObject.getCenterXInScene() + offsetX,
               attachedObject.getCenterYInScene() + offsetY,
-              this._getObjectCenterZ(attachedObject) + this._attachedOffsetZ
+              this._getObjectCenterZ(attachedObject) + offsetZ
             );
             return true;
           }
@@ -470,6 +565,10 @@ namespace gdjs {
               }
             } else if (parameterName === 'rotateOffsetsWithObjectAngle') {
               this._rotateOffsetsWithObjectAngle = value;
+            } else if (parameterName === 'followAttachedObjectRotation3D') {
+              this._followAttachedObjectRotation3D = value;
+            } else if (parameterName === 'inheritAttachedObjectScale') {
+              this._inheritAttachedObjectScale = value;
             } else if (parameterName === 'shadowAutoTuning') {
               this._shadowAutoTuningEnabled = value;
             }
@@ -493,6 +592,8 @@ namespace gdjs {
               oy: this._attachedOffsetY,
               oz: this._attachedOffsetZ,
               ro: this._rotateOffsetsWithObjectAngle,
+              fr: this._followAttachedObjectRotation3D,
+              ia: this._inheritAttachedObjectScale,
               sms: this._shadowMapSize,
               sat: this._shadowAutoTuningEnabled,
             };
@@ -520,6 +621,8 @@ namespace gdjs {
             this._attachedOffsetY = syncData.oy ?? 0;
             this._attachedOffsetZ = syncData.oz ?? 0;
             this._rotateOffsetsWithObjectAngle = syncData.ro ?? false;
+            this._followAttachedObjectRotation3D = syncData.fr ?? false;
+            this._inheritAttachedObjectScale = syncData.ia ?? false;
             this._shadowAutoTuningEnabled = syncData.sat ?? true;
             this._light.distance = syncData.d;
             this._light.decay = this._decay;

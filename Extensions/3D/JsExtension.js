@@ -2379,6 +2379,112 @@ module.exports = {
         .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
         .setGroup(_('Orientation'));
       properties
+        .getOrCreate('directionRotationOffset')
+        .setValue('0')
+        .setLabel(_('Direction rotation offset'))
+        .setDescription(
+          _(
+            'Additional horizontal angle offset applied to the directional light orientation.'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+        .setGroup(_('Direction'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('directionElevationOffset')
+        .setValue('0')
+        .setLabel(_('Direction elevation offset'))
+        .setDescription(
+          _(
+            'Additional vertical angle offset applied to the directional light orientation.'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+        .setGroup(_('Direction'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('attachedObject')
+        .setValue('')
+        .setLabel(_('Attached object name'))
+        .setDescription(
+          _(
+            'Object name used as directional anchor. When set, shadow anchor follows this object instead of camera anchor.'
+          )
+        )
+        .setType('string')
+        .setGroup(_('Attachment'));
+      properties
+        .getOrCreate('attachedOffsetX')
+        .setValue('0')
+        .setLabel(_('Attached offset X'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Attachment'));
+      properties
+        .getOrCreate('attachedOffsetY')
+        .setValue('0')
+        .setLabel(_('Attached offset Y'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Attachment'));
+      properties
+        .getOrCreate('attachedOffsetZ')
+        .setValue('0')
+        .setLabel(_('Attached offset Z'))
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Attachment'));
+      properties
+        .getOrCreate('rotateOffsetsWithObjectAngle')
+        .setValue('false')
+        .setLabel(_('Rotate offsets with object angle'))
+        .setDescription(
+          _(
+            'Rotate X/Y offsets using the attached object angle.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Attachment'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('followAttachedObjectRotation3D')
+        .setValue('false')
+        .setLabel(_('Follow attachment 3D rotation'))
+        .setDescription(
+          _(
+            'Apply attachment offsets in local object 3D axes (X/Y/Z rotations).'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Attachment'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('inheritAttachedObjectScale')
+        .setValue('false')
+        .setLabel(_('Inherit attached object scale'))
+        .setDescription(
+          _(
+            'Scale attachment offsets using attached object scale (X/Y/Z).'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Attachment'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('followDirectionWithAttachedObjectRotation3D')
+        .setValue('false')
+        .setLabel(_('Follow attached 3D direction'))
+        .setDescription(
+          _(
+            'Rotate directional light direction using attached object 3D orientation.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Direction'))
+        .setAdvanced(true);
+      properties
         .getOrCreate('isCastingShadow')
         .setValue('false')
         .setLabel(_('Shadow casting'))
@@ -2778,6 +2884,30 @@ module.exports = {
         .setType('boolean')
         .setGroup(_('Attachment'));
       properties
+        .getOrCreate('followAttachedObjectRotation3D')
+        .setValue('false')
+        .setLabel(_('Follow 3D rotation'))
+        .setDescription(
+          _(
+            'Apply attached offsets in the object local 3D axes (X/Y/Z rotations), useful for rigs and hands.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Attachment'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('inheritAttachedObjectScale')
+        .setValue('false')
+        .setLabel(_('Inherit attached object scale'))
+        .setDescription(
+          _(
+            'Scale attached offsets using the attached object scale (X/Y/Z).'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Attachment'))
+        .setAdvanced(true);
+      properties
         .getOrCreate('distance')
         .setValue('0')
         .setLabel(_('Maximum distance'))
@@ -3030,6 +3160,121 @@ module.exports = {
         )
         .setType('boolean')
         .setGroup(_('Attachment'));
+      properties
+        .getOrCreate('followAttachedObjectRotation3D')
+        .setValue('false')
+        .setLabel(_('Follow light 3D rotation'))
+        .setDescription(
+          _(
+            'Apply light attached offsets in the object local 3D axes (X/Y/Z rotations).'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Attachment'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('followTargetObjectRotation3D')
+        .setValue('false')
+        .setLabel(_('Follow target 3D rotation'))
+        .setDescription(
+          _(
+            'Apply target attached offsets in the target object local 3D axes.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Target attachment'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('inheritAttachedObjectScale')
+        .setValue('false')
+        .setLabel(_('Inherit light attachment scale'))
+        .setDescription(
+          _(
+            'Scale light attached offsets using the attached object scale (X/Y/Z).'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Attachment'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('inheritTargetObjectScale')
+        .setValue('false')
+        .setLabel(_('Inherit target attachment scale'))
+        .setDescription(
+          _(
+            'Scale target attached offsets using the target object scale (X/Y/Z).'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Target attachment'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('flashlightMode')
+        .setValue('false')
+        .setLabel(_('Flashlight mode'))
+        .setDescription(
+          _(
+            'Automatically aims the spot target forward from the attached object orientation.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Flashlight'));
+      properties
+        .getOrCreate('flashlightDistance')
+        .setValue('600')
+        .setLabel(_('Flashlight distance'))
+        .setDescription(
+          _(
+            'Forward target distance used by flashlight mode.'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Flashlight'));
+      properties
+        .getOrCreate('flashlightForwardAxis')
+        .setValue('X+')
+        .addChoice('X+', _('X+'))
+        .addChoice('X-', _('X-'))
+        .addChoice('Y+', _('Y+'))
+        .addChoice('Y-', _('Y-'))
+        .addChoice('Z+', _('Z+'))
+        .addChoice('Z-', _('Z-'))
+        .setLabel(_('Flashlight forward axis'))
+        .setDescription(
+          _(
+            'Choose which local axis of the attached object is considered forward in flashlight mode.'
+          )
+        )
+        .setType('choice')
+        .setGroup(_('Flashlight'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('flashlightYawOffset')
+        .setValue('0')
+        .setLabel(_('Flashlight yaw offset'))
+        .setDescription(
+          _(
+            'Horizontal angle offset applied to flashlight direction (in degrees).'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+        .setGroup(_('Flashlight'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('flashlightPitchOffset')
+        .setValue('0')
+        .setLabel(_('Flashlight pitch offset'))
+        .setDescription(
+          _(
+            'Vertical angle offset applied to flashlight direction (in degrees).'
+          )
+        )
+        .setType('number')
+        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+        .setGroup(_('Flashlight'))
+        .setAdvanced(true);
       properties
         .getOrCreate('physicsBounceEnabled')
         .setValue('false')

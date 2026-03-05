@@ -33,6 +33,15 @@ namespace gdjs {
     pbcs?: boolean;
     sms?: number;
     sat?: boolean;
+    fr?: boolean;
+    tr?: boolean;
+    ia?: boolean;
+    it?: boolean;
+    fm?: boolean;
+    fd?: number;
+    fa?: string;
+    fy?: number;
+    fp?: number;
   }
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::SpotLight',
@@ -71,6 +80,15 @@ namespace gdjs {
           private _targetAttachedOffsetY: float = 0;
           private _targetAttachedOffsetZ: float = 0;
           private _rotateOffsetsWithObjectAngle: boolean = false;
+          private _followAttachedObjectRotation3D: boolean = false;
+          private _followTargetObjectRotation3D: boolean = false;
+          private _inheritAttachedObjectScale: boolean = false;
+          private _inheritTargetObjectScale: boolean = false;
+          private _flashlightMode: boolean = false;
+          private _flashlightDistance: float = 600;
+          private _flashlightForwardAxis: string = 'X+';
+          private _flashlightYawOffset: float = 0;
+          private _flashlightPitchOffset: float = 0;
           private _physicsBounceEnabled: boolean = false;
           private _physicsBounceIntensityScale: float = 0.35;
           private _physicsBounceDistance: float = 600;
@@ -99,6 +117,9 @@ namespace gdjs {
           private _shadowMapDirty = true;
           private _shadowCameraDirty = true;
           private _maxRendererShadowMapSize: integer = 2048;
+          private _temporaryOffsetVector = new THREE.Vector3();
+          private _temporaryDirectionVector = new THREE.Vector3(1, 0, 0);
+          private _temporaryEuler = new THREE.Euler(0, 0, 0, 'ZYX');
 
           constructor() {
             this._light = new THREE.SpotLight();
@@ -487,6 +508,134 @@ namespace gdjs {
             ];
           }
 
+          private _getObjectRotationX(object: gdjs.RuntimeObject): float {
+            const object3D = object as gdjs.RuntimeObject & {
+              getRotationX?: () => float;
+            };
+            return typeof object3D.getRotationX === 'function'
+              ? object3D.getRotationX()
+              : 0;
+          }
+
+          private _getObjectRotationY(object: gdjs.RuntimeObject): float {
+            const object3D = object as gdjs.RuntimeObject & {
+              getRotationY?: () => float;
+            };
+            return typeof object3D.getRotationY === 'function'
+              ? object3D.getRotationY()
+              : 0;
+          }
+
+          private _getObjectScaleX(object: gdjs.RuntimeObject): float {
+            const scalableObject = object as gdjs.RuntimeObject & {
+              getScaleX?: () => float;
+            };
+            if (typeof scalableObject.getScaleX === 'function') {
+              return Math.max(0.0001, Math.abs(scalableObject.getScaleX()));
+            }
+            return 1;
+          }
+
+          private _getObjectScaleY(object: gdjs.RuntimeObject): float {
+            const scalableObject = object as gdjs.RuntimeObject & {
+              getScaleY?: () => float;
+            };
+            if (typeof scalableObject.getScaleY === 'function') {
+              return Math.max(0.0001, Math.abs(scalableObject.getScaleY()));
+            }
+            return 1;
+          }
+
+          private _getObjectScaleZ(object: gdjs.RuntimeObject): float {
+            const scalableObject = object as gdjs.RuntimeObject & {
+              getScaleZ?: () => float;
+            };
+            if (typeof scalableObject.getScaleZ === 'function') {
+              return Math.max(0.0001, Math.abs(scalableObject.getScaleZ()));
+            }
+            return Math.max(
+              0.0001,
+              (this._getObjectScaleX(object) + this._getObjectScaleY(object)) *
+                0.5
+            );
+          }
+
+          private _setFlashlightForwardAxis(value: string): void {
+            const normalizedValue = (value || 'X+').toUpperCase();
+            if (
+              normalizedValue === 'X+' ||
+              normalizedValue === 'X-' ||
+              normalizedValue === 'Y+' ||
+              normalizedValue === 'Y-' ||
+              normalizedValue === 'Z+' ||
+              normalizedValue === 'Z-'
+            ) {
+              this._flashlightForwardAxis = normalizedValue;
+            } else {
+              this._flashlightForwardAxis = 'X+';
+            }
+          }
+
+          private _getRotatedOffsets3D(
+            object: gdjs.RuntimeObject,
+            offsetX: float,
+            offsetY: float,
+            offsetZ: float,
+            use3DRotation: boolean
+          ): [float, float, float] {
+            this._temporaryEuler.set(
+              use3DRotation ? gdjs.toRad(this._getObjectRotationX(object)) : 0,
+              use3DRotation ? gdjs.toRad(this._getObjectRotationY(object)) : 0,
+              gdjs.toRad(object.getAngle()),
+              'ZYX'
+            );
+            this._temporaryOffsetVector.set(offsetX, offsetY, offsetZ);
+            this._temporaryOffsetVector.applyEuler(this._temporaryEuler);
+            return [
+              this._temporaryOffsetVector.x,
+              this._temporaryOffsetVector.y,
+              this._temporaryOffsetVector.z,
+            ];
+          }
+
+          private _getForwardDirectionFromObject(
+            object: gdjs.RuntimeObject,
+            use3DRotation: boolean
+          ): [float, float, float] {
+            const baseRotationX = use3DRotation
+              ? this._getObjectRotationX(object)
+              : 0;
+            const baseRotationY = use3DRotation
+              ? this._getObjectRotationY(object)
+              : 0;
+            this._temporaryEuler.set(
+              gdjs.toRad(baseRotationX + this._flashlightPitchOffset),
+              gdjs.toRad(baseRotationY),
+              gdjs.toRad(object.getAngle() + this._flashlightYawOffset),
+              'ZYX'
+            );
+            if (this._flashlightForwardAxis === 'X-') {
+              this._temporaryDirectionVector.set(-1, 0, 0);
+            } else if (this._flashlightForwardAxis === 'Y+') {
+              this._temporaryDirectionVector.set(0, 1, 0);
+            } else if (this._flashlightForwardAxis === 'Y-') {
+              this._temporaryDirectionVector.set(0, -1, 0);
+            } else if (this._flashlightForwardAxis === 'Z+') {
+              this._temporaryDirectionVector.set(0, 0, 1);
+            } else if (this._flashlightForwardAxis === 'Z-') {
+              this._temporaryDirectionVector.set(0, 0, -1);
+            } else {
+              this._temporaryDirectionVector.set(1, 0, 0);
+            }
+            this._temporaryDirectionVector.applyEuler(this._temporaryEuler);
+            this._temporaryDirectionVector.normalize();
+            return [
+              this._temporaryDirectionVector.x,
+              this._temporaryDirectionVector.y,
+              this._temporaryDirectionVector.z,
+            ];
+          }
+
           private _applyAttachedPosition(target: EffectsTarget): boolean {
             const attachedObject = this._getFirstObjectByName(
               target,
@@ -495,15 +644,33 @@ namespace gdjs {
             if (!attachedObject) {
               return false;
             }
-            const [offsetX, offsetY] = this._getRotatedOffsets(
-              attachedObject,
-              this._attachedOffsetX,
-              this._attachedOffsetY
-            );
+            let offsetX = this._attachedOffsetX;
+            let offsetY = this._attachedOffsetY;
+            let offsetZ = this._attachedOffsetZ;
+            if (this._inheritAttachedObjectScale) {
+              offsetX *= this._getObjectScaleX(attachedObject);
+              offsetY *= this._getObjectScaleY(attachedObject);
+              offsetZ *= this._getObjectScaleZ(attachedObject);
+            }
+            if (this._followAttachedObjectRotation3D) {
+              [offsetX, offsetY, offsetZ] = this._getRotatedOffsets3D(
+                attachedObject,
+                offsetX,
+                offsetY,
+                offsetZ,
+                true
+              );
+            } else if (this._rotateOffsetsWithObjectAngle) {
+              [offsetX, offsetY] = this._getRotatedOffsets(
+                attachedObject,
+                offsetX,
+                offsetY
+              );
+            }
             this._setLightPosition(
               attachedObject.getCenterXInScene() + offsetX,
               attachedObject.getCenterYInScene() + offsetY,
-              this._getObjectCenterZ(attachedObject) + this._attachedOffsetZ
+              this._getObjectCenterZ(attachedObject) + offsetZ
             );
             return true;
           }
@@ -516,16 +683,87 @@ namespace gdjs {
             if (!attachedObject) {
               return false;
             }
-            const [offsetX, offsetY] = this._getRotatedOffsets(
-              attachedObject,
-              this._targetAttachedOffsetX,
-              this._targetAttachedOffsetY
-            );
+            let offsetX = this._targetAttachedOffsetX;
+            let offsetY = this._targetAttachedOffsetY;
+            let offsetZ = this._targetAttachedOffsetZ;
+            if (this._inheritTargetObjectScale) {
+              offsetX *= this._getObjectScaleX(attachedObject);
+              offsetY *= this._getObjectScaleY(attachedObject);
+              offsetZ *= this._getObjectScaleZ(attachedObject);
+            }
+            if (this._followTargetObjectRotation3D) {
+              [offsetX, offsetY, offsetZ] = this._getRotatedOffsets3D(
+                attachedObject,
+                offsetX,
+                offsetY,
+                offsetZ,
+                true
+              );
+            } else if (this._rotateOffsetsWithObjectAngle) {
+              [offsetX, offsetY] = this._getRotatedOffsets(
+                attachedObject,
+                offsetX,
+                offsetY
+              );
+            }
             this._setTargetPosition(
               attachedObject.getCenterXInScene() + offsetX,
               attachedObject.getCenterYInScene() + offsetY,
-              this._getObjectCenterZ(attachedObject) +
-                this._targetAttachedOffsetZ
+              this._getObjectCenterZ(attachedObject) + offsetZ
+            );
+            return true;
+          }
+
+          private _applyFlashlightTarget(target: EffectsTarget): boolean {
+            const attachedObject = this._getFirstObjectByName(
+              target,
+              this._attachedObjectName
+            );
+            if (!attachedObject) {
+              return false;
+            }
+
+            let offsetX = this._attachedOffsetX;
+            let offsetY = this._attachedOffsetY;
+            let offsetZ = this._attachedOffsetZ;
+            if (this._inheritAttachedObjectScale) {
+              offsetX *= this._getObjectScaleX(attachedObject);
+              offsetY *= this._getObjectScaleY(attachedObject);
+              offsetZ *= this._getObjectScaleZ(attachedObject);
+            }
+            if (this._followAttachedObjectRotation3D) {
+              [offsetX, offsetY, offsetZ] = this._getRotatedOffsets3D(
+                attachedObject,
+                offsetX,
+                offsetY,
+                offsetZ,
+                true
+              );
+            } else if (this._rotateOffsetsWithObjectAngle) {
+              [offsetX, offsetY] = this._getRotatedOffsets(
+                attachedObject,
+                offsetX,
+                offsetY
+              );
+            }
+
+            const originX = attachedObject.getCenterXInScene() + offsetX;
+            const originY = attachedObject.getCenterYInScene() + offsetY;
+            const originZ = this._getObjectCenterZ(attachedObject) + offsetZ;
+            this._setLightPosition(originX, originY, originZ);
+
+            const [forwardX, forwardY, forwardZ] = this._getForwardDirectionFromObject(
+              attachedObject,
+              this._followAttachedObjectRotation3D
+            );
+            const flashlightDistance = Math.max(
+              1,
+              this._flashlightDistance > 0 ? this._flashlightDistance : 600
+            );
+            this._setTargetPosition(
+              originX + forwardX * flashlightDistance,
+              originY + forwardY * flashlightDistance,
+              originZ + forwardZ * flashlightDistance
             );
             return true;
           }
@@ -574,17 +812,24 @@ namespace gdjs {
             return true;
           }
           updatePreRender(target: gdjs.EffectsTarget): any {
-            if (
-              !this._applyAttachedPosition(target) &&
-              this._attachedObjectName !== ''
-            ) {
-              this._updatePosition();
-            }
-            if (
-              !this._applyAttachedTarget(target) &&
-              this._targetAttachedObjectName !== ''
-            ) {
-              this._updateTarget();
+            if (this._flashlightMode && this._attachedObjectName !== '') {
+              if (!this._applyFlashlightTarget(target)) {
+                this._updatePosition();
+                this._updateTarget();
+              }
+            } else {
+              if (
+                !this._applyAttachedPosition(target) &&
+                this._attachedObjectName !== ''
+              ) {
+                this._updatePosition();
+              }
+              if (
+                !this._applyAttachedTarget(target) &&
+                this._targetAttachedObjectName !== ''
+              ) {
+                this._updateTarget();
+              }
             }
 
             this._ensureSoftShadowRenderer(target);
@@ -670,6 +915,12 @@ namespace gdjs {
               this._shadowCameraDirty = true;
             } else if (parameterName === 'physicsBounceOriginOffset') {
               this._physicsBounceOriginOffset = value;
+            } else if (parameterName === 'flashlightDistance') {
+              this._flashlightDistance = Math.max(1, value);
+            } else if (parameterName === 'flashlightYawOffset') {
+              this._flashlightYawOffset = value;
+            } else if (parameterName === 'flashlightPitchOffset') {
+              this._flashlightPitchOffset = value;
             }
           }
           getDoubleParameter(parameterName: string): number {
@@ -725,6 +976,12 @@ namespace gdjs {
               return this._physicsBounceDistance;
             } else if (parameterName === 'physicsBounceOriginOffset') {
               return this._physicsBounceOriginOffset;
+            } else if (parameterName === 'flashlightDistance') {
+              return this._flashlightDistance;
+            } else if (parameterName === 'flashlightYawOffset') {
+              return this._flashlightYawOffset;
+            } else if (parameterName === 'flashlightPitchOffset') {
+              return this._flashlightPitchOffset;
             }
             return 0;
           }
@@ -744,6 +1001,9 @@ namespace gdjs {
             }
             if (parameterName === 'targetAttachedObject') {
               this._targetAttachedObjectName = value;
+            }
+            if (parameterName === 'flashlightForwardAxis') {
+              this._setFlashlightForwardAxis(value);
             }
             if (parameterName === 'shadowQuality') {
               if (value === 'low' && this._shadowMapSize !== 512) {
@@ -788,6 +1048,14 @@ namespace gdjs {
               }
             } else if (parameterName === 'rotateOffsetsWithObjectAngle') {
               this._rotateOffsetsWithObjectAngle = value;
+            } else if (parameterName === 'followAttachedObjectRotation3D') {
+              this._followAttachedObjectRotation3D = value;
+            } else if (parameterName === 'followTargetObjectRotation3D') {
+              this._followTargetObjectRotation3D = value;
+            } else if (parameterName === 'inheritAttachedObjectScale') {
+              this._inheritAttachedObjectScale = value;
+            } else if (parameterName === 'inheritTargetObjectScale') {
+              this._inheritTargetObjectScale = value;
             } else if (parameterName === 'physicsBounceEnabled') {
               this._physicsBounceEnabled = value;
               if (!value) {
@@ -805,6 +1073,8 @@ namespace gdjs {
               }
             } else if (parameterName === 'shadowAutoTuning') {
               this._shadowAutoTuningEnabled = value;
+            } else if (parameterName === 'flashlightMode') {
+              this._flashlightMode = value;
             }
           }
           getNetworkSyncData(): SpotLightFilterNetworkSyncData {
@@ -835,6 +1105,10 @@ namespace gdjs {
               toy: this._targetAttachedOffsetY,
               toz: this._targetAttachedOffsetZ,
               ro: this._rotateOffsetsWithObjectAngle,
+              fr: this._followAttachedObjectRotation3D,
+              tr: this._followTargetObjectRotation3D,
+              ia: this._inheritAttachedObjectScale,
+              it: this._inheritTargetObjectScale,
               pbe: this._physicsBounceEnabled,
               pbi: this._physicsBounceIntensityScale,
               pbd: this._physicsBounceDistance,
@@ -842,6 +1116,11 @@ namespace gdjs {
               pbcs: this._physicsBounceCastShadow,
               sms: this._shadowMapSize,
               sat: this._shadowAutoTuningEnabled,
+              fm: this._flashlightMode,
+              fd: this._flashlightDistance,
+              fa: this._flashlightForwardAxis,
+              fy: this._flashlightYawOffset,
+              fp: this._flashlightPitchOffset,
             };
           }
           updateFromNetworkSyncData(
@@ -876,12 +1155,21 @@ namespace gdjs {
             this._targetAttachedOffsetY = syncData.toy ?? 0;
             this._targetAttachedOffsetZ = syncData.toz ?? 0;
             this._rotateOffsetsWithObjectAngle = syncData.ro ?? false;
+            this._followAttachedObjectRotation3D = syncData.fr ?? false;
+            this._followTargetObjectRotation3D = syncData.tr ?? false;
+            this._inheritAttachedObjectScale = syncData.ia ?? false;
+            this._inheritTargetObjectScale = syncData.it ?? false;
             this._physicsBounceEnabled = syncData.pbe ?? false;
             this._physicsBounceIntensityScale = syncData.pbi ?? 0.35;
             this._physicsBounceDistance = Math.max(0, syncData.pbd ?? 600);
             this._physicsBounceOriginOffset = syncData.pbo ?? 2;
             this._physicsBounceCastShadow = syncData.pbcs ?? false;
             this._shadowAutoTuningEnabled = syncData.sat ?? true;
+            this._flashlightMode = syncData.fm ?? false;
+            this._flashlightDistance = Math.max(1, syncData.fd ?? 600);
+            this._setFlashlightForwardAxis(syncData.fa ?? 'X+');
+            this._flashlightYawOffset = syncData.fy ?? 0;
+            this._flashlightPitchOffset = syncData.fp ?? 0;
             this._light.distance = this._distance;
             this._light.angle = gdjs.toRad(this._angle);
             this._light.penumbra = this._penumbra;

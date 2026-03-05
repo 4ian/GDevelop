@@ -200,6 +200,11 @@ const ElectronMainMenu = ({
     shouldApply: isFocusedOnMainWindow,
   });
   useIPCEventListener({
+    ipcEvent: 'main-menu-open-global-search',
+    callback: callbacks.onOpenGlobalSearch,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
     ipcEvent: 'main-menu-open-about',
     callback: callbacks.onOpenAbout,
     shouldApply: isFocusedOnMainWindow,

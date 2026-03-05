@@ -40,6 +40,7 @@ export type EditorKind =
   | 'custom object'
   | 'debugger'
   | 'resources'
+  | 'global-search'
   | 'ask-ai'
   | 'start page';
 

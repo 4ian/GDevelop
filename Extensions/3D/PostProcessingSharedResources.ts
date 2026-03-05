@@ -74,6 +74,7 @@ namespace gdjs {
     'FOG',
     'RAIN',
     'BLOOM',
+    'VIGNETTE',
   ];
   const managedPassOrderMap = new Map<string, number>(
     managedPassOrder.map((id, index) => [id, index])

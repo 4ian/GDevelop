@@ -3820,6 +3820,52 @@ module.exports = {
     }
     {
       const effect = extension
+        .addEffect('Vignette')
+        .setFullName(_('Vignette'))
+        .setDescription(
+          _(
+            'Darkens screen edges with controllable softness, roundness, and tint for cinematic framing.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/VignetteEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('enabled')
+        .setValue('true')
+        .setLabel(_('Enabled'))
+        .setType('boolean');
+      properties
+        .getOrCreate('intensity')
+        .setValue('0.35')
+        .setLabel(_('Intensity'))
+        .setType('number')
+        .setDescription(_('How strong edge darkening is (0 to 1).'));
+      properties
+        .getOrCreate('softness')
+        .setValue('0.45')
+        .setLabel(_('Softness'))
+        .setType('number')
+        .setDescription(
+          _('How gradually the vignette fades from center to edges.')
+        );
+      properties
+        .getOrCreate('roundness')
+        .setValue('1')
+        .setLabel(_('Roundness'))
+        .setType('number')
+        .setDescription(
+          _('1 = circular, lower values make it wider horizontally.')
+        );
+      properties
+        .getOrCreate('color')
+        .setValue('0;0;0')
+        .setLabel(_('Vignette color'))
+        .setType('color');
+    }
+    {
+      const effect = extension
         .addEffect('SSAO')
         .setFullName(_('Ambient occlusion (SSAO)'))
         .setDescription(

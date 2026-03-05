@@ -28,7 +28,7 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
     'scripts',
     'copy-to-newIDE.js'
   );
-  shell.exec(`node ${copyToNewIDEScriptPath}`);
+  shell.exec(`node "${copyToNewIDEScriptPath}"`);
 } else {
   // Download a pre-built version otherwise
   shell.echo(

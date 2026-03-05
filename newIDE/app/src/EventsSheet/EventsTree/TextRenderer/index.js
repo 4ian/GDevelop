@@ -13,7 +13,8 @@ export const renderInstructionSentenceAsPlainText = (
   // will have a sentence.
 
   if (gd.MetadataProvider.isBadInstructionMetadata(metadata)) {
-    return instruction.getType();
+    // Even if the instruction is bad, we still render it so that it's displayed
+    // as "Unknown or unsupported instruction".
   }
 
   const formattedTexts = gd.InstructionSentenceFormatter.get().getAsFormattedText(
@@ -21,12 +22,10 @@ export const renderInstructionSentenceAsPlainText = (
     metadata
   );
 
-  return (
-    mapFor(0, formattedTexts.size(), i => {
-      const value = formattedTexts.getString(i);
-      return value;
-    }).join('') || instruction.getType()
-  );
+  return mapFor(0, formattedTexts.size(), i => {
+    const value = formattedTexts.getString(i);
+    return value;
+  }).join('');
 };
 
 // $FlowFixMe[recursive-definition]

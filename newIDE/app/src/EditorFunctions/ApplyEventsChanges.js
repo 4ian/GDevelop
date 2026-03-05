@@ -7,7 +7,7 @@ import {
 } from '../Utils/GDevelopServices/Generation';
 import { mapFor } from '../Utils/MapFor';
 import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
-import type { EventPath } from '../Utils/EventPath';
+import type { EventPath } from '../Types/EventPath';
 
 const gd: libGDevelop = global.gd;
 

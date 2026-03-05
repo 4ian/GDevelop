@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import EventsSheet, { type EventsSheetInterface } from '../../EventsSheet';
-import type { EventPath } from '../../Utils/EventPath';
+import type { EventPath } from '../../Types/EventPath';
 import { sendEventsExtractedAsFunction } from '../../Utils/Analytics/EventSender';
 import {
   type RenderEditorContainerProps,
@@ -72,14 +72,21 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     eventPaths: Array<EventPath>,
     focusedEventPath: EventPath,
     searchText: string,
-    matchCase: boolean
+    matchCase: boolean,
+    searchFilters?: {|
+      searchInConditions?: boolean,
+      searchInActions?: boolean,
+      searchInEventStrings?: boolean,
+      searchInInstructionNames?: boolean,
+    |}
   ) {
     if (this.editor) {
       this.editor.setGlobalSearchResults(
         eventPaths,
         focusedEventPath,
         searchText,
-        matchCase
+        matchCase,
+        searchFilters
       );
     }
   }

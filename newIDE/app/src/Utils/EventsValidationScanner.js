@@ -2,8 +2,7 @@
 // Scanner for validation errors in events (missing instructions, invalid parameters)
 import { mapFor } from './MapFor';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
-import type { EventPath } from './EventPath';
-import { renderInstructionSentenceAsPlainText } from '../EventsSheet/EventsTree/TextRenderer';
+import type { EventPath } from '../Types/EventPath';
 
 const gd: libGDevelop = global.gd;
 
@@ -23,6 +22,19 @@ export type ValidationError = {|
   locationType: 'scene' | 'external-events' | 'extension',
   eventPath: EventPath,
 |};
+
+const getInstructionSentence = (
+  instruction: gdInstruction,
+  metadata: gdInstructionMetadata
+): string => {
+  const formatter = gd.InstructionSentenceFormatter.get();
+  const formattedTexts = formatter.getAsFormattedText(instruction, metadata);
+  let sentence = '';
+  mapFor(0, formattedTexts.size(), i => {
+    sentence += formattedTexts.getString(i);
+  });
+  return sentence.trim() || instruction.getType();
+};
 
 /**
  * Build a map from event pointer to its path in the events list.
@@ -110,10 +122,7 @@ const createValidationWorker = (
       return;
     }
 
-    const instructionSentence = renderInstructionSentenceAsPlainText(
-      instruction,
-      metadata
-    );
+    const instructionSentence = getInstructionSentence(instruction, metadata);
 
     // Validate parameters
     const parametersCount = metadata.getParametersCount();

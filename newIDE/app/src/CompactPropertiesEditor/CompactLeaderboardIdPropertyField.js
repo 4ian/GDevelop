@@ -73,7 +73,7 @@ const CompactLeaderboardIdPropertyField = ({
     <I18n>
       {({ i18n }) => (
         <LineStackLayout noMargin expand id={idToUse.current}>
-          <Column noMargin expand noOverflowParent>
+          <Column noMargin expand>
             {!isExpressionField ? (
               <CompactSelectField
                 value={gameHasLeaderboards ? value : 'empty'}

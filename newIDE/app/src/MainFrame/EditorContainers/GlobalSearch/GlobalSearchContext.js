@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import type { GlobalSearchGroup } from '../../../Utils/EventsGlobalSearchScanner';
-import type { EventPath } from '../../../Utils/EventPath';
+import type { EventPath } from '../../../Types/EventPath';
 
 export type GlobalSearchContextType = {|
   searchText: string,

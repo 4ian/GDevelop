@@ -85,7 +85,7 @@ import PreferencesContext, {
 import EventsFunctionExtractorDialog from './EventsFunctionExtractor/EventsFunctionExtractorDialog';
 import { createNewInstructionForEventsFunction } from './EventsFunctionExtractor';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope';
-import type { EventPath } from '../Utils/EventPath';
+import type { EventPath } from '../Types/EventPath';
 import {
   pasteEventsFromClipboardInSelection,
   copySelectionToClipboard,
@@ -227,6 +227,10 @@ type State = {|
     focusOffset: number,
     text: string,
     matchCase: boolean,
+    searchInConditions?: boolean,
+    searchInActions?: boolean,
+    searchInEventStrings?: boolean,
+    searchInInstructionNames?: boolean,
   |},
   localSearchText: string,
   localSearchMatchCase: boolean,
@@ -437,7 +441,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     eventPaths: Array<EventPath>,
     focusedEventPath: EventPath,
     searchText: string,
-    matchCase: boolean
+    matchCase: boolean,
+    searchFilters?: {|
+      searchInConditions?: boolean,
+      searchInActions?: boolean,
+      searchInEventStrings?: boolean,
+      searchInInstructionNames?: boolean,
+    |}
   ) => {
     const eventsTree = this._eventsTree;
     const eventsByPtr = new Map<number, gdBaseEvent>();
@@ -467,6 +477,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       focusOffset,
       text: searchText || '',
       matchCase,
+      searchInConditions: searchFilters?.searchInConditions,
+      searchInActions: searchFilters?.searchInActions,
+      searchInEventStrings: searchFilters?.searchInEventStrings,
+      searchInInstructionNames: searchFilters?.searchInInstructionNames,
     };
 
     this.setState(
@@ -2585,6 +2599,18 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                           ? 'search-in-event-sentences'
                           : undefined
                       }
+                      initialSearchInConditions={
+                        this.state.searchHighlight?.searchInConditions
+                      }
+                      initialSearchInActions={
+                        this.state.searchHighlight?.searchInActions
+                      }
+                      initialSearchInEventStrings={
+                        this.state.searchHighlight?.searchInEventStrings
+                      }
+                      initialSearchInInstructionNames={
+                        this.state.searchHighlight?.searchInInstructionNames
+                      }
                     />
                   </ErrorBoundary>
                 )}
@@ -2782,7 +2808,13 @@ export type EventsSheetInterface = {|
     eventPaths: Array<EventPath>,
     focusedEventPath: EventPath,
     searchText: string,
-    matchCase: boolean
+    matchCase: boolean,
+    searchFilters?: {|
+      searchInConditions?: boolean,
+      searchInActions?: boolean,
+      searchInEventStrings?: boolean,
+      searchInInstructionNames?: boolean,
+    |}
   ) => void,
   clearGlobalSearchResults: () => void,
 |};
@@ -2824,14 +2856,21 @@ const EventsSheet = (props, ref) => {
     eventPaths: Array<EventPath>,
     focusedEventPath: EventPath,
     searchText: string,
-    matchCase: boolean
+    matchCase: boolean,
+    searchFilters?: {|
+      searchInConditions?: boolean,
+      searchInActions?: boolean,
+      searchInEventStrings?: boolean,
+      searchInInstructionNames?: boolean,
+    |}
   ) => {
     if (component.current)
       component.current.setGlobalSearchResults(
         eventPaths,
         focusedEventPath,
         searchText,
-        matchCase
+        matchCase,
+        searchFilters
       );
   };
   const clearGlobalSearchResults = () => {

@@ -433,11 +433,14 @@ const EventsTree: React.ComponentType<{
     };
   }, []);
 
-  const forceEventsUpdate = React.useCallback(
-    (cb?: () => void) => {
-      // Note: do not do anything here that would trigger re-render of the events yet,
-      // because they can be invalid (deleted). We just ask for a re-render of this component,
-      // which will rebuild the tree data passed to SortableEventsTree.
+  /**
+   * Should be called whenever an event height has changed
+   */
+  const onHeightsChanged = React.useCallback(
+    (cb: ?() => void) => {
+      if (_list.current) {
+        _list.current.recomputeRowHeights();
+      }
       forceUpdate();
 
       // Use a timeout so that the callback is called after the events
@@ -448,9 +451,10 @@ const EventsTree: React.ComponentType<{
     },
     [forceUpdate]
   );
+  const forceEventsUpdate = onHeightsChanged;
 
   React.useEffect(() => {
-    forceUpdate();
+    onHeightsChanged();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -466,25 +470,25 @@ const EventsTree: React.ComponentType<{
   const unfoldForEvent = React.useCallback(
     (event: gdBaseEvent) => {
       gd.EventsListUnfolder.unfoldWhenContaining(props.events, event);
-      forceUpdate();
+      forceEventsUpdate();
     },
-    [forceUpdate, props.events]
+    [forceEventsUpdate, props.events]
   );
 
   const foldAll = React.useCallback(
     () => {
       gd.EventsListUnfolder.foldAll(props.events);
-      forceUpdate();
+      forceEventsUpdate();
     },
-    [forceUpdate, props.events]
+    [forceEventsUpdate, props.events]
   );
 
   const unfoldToLevel = React.useCallback(
     (level: number) => {
       gd.EventsListUnfolder.unfoldToLevel(props.events, level);
-      forceUpdate();
+      forceEventsUpdate();
     },
-    [forceUpdate, props.events]
+    [forceEventsUpdate, props.events]
   );
 
   const tutorial = React.useMemo(
@@ -507,9 +511,9 @@ const EventsTree: React.ComponentType<{
       );
 
       temporaryUnfoldedNodes.current = [];
-      forceUpdate();
+      forceEventsUpdate();
     },
-    [forceUpdate]
+    [forceEventsUpdate]
   );
 
   const _onEndDrag = React.useCallback(
@@ -522,10 +526,10 @@ const EventsTree: React.ComponentType<{
       if (draggedNode) {
         setDraggedNode(null);
         _restoreFoldedNodes();
-        forceUpdate();
+        forceEventsUpdate();
       }
     },
-    [draggedNode, _restoreFoldedNodes, forceUpdate]
+    [draggedNode, _restoreFoldedNodes, forceEventsUpdate]
   );
 
   const eventPtrToRowIndex = React.useRef<{ [key: string]: number }>({});
@@ -551,7 +555,7 @@ const EventsTree: React.ComponentType<{
               // $FlowFixMe[incompatible-type] - Per the condition above, we are confident that node.event is not null.
               event.setFolded(false);
               temporaryUnfoldedNodes.current.push(node);
-              forceUpdate();
+              forceEventsUpdate();
             }, 1000);
           }
         }
@@ -560,7 +564,7 @@ const EventsTree: React.ComponentType<{
         _hoverTimerId.current = null;
       }
     },
-    [forceUpdate]
+    [forceEventsUpdate]
   );
 
   const _getRowHeight = ({ node }: { node: ?SortableTreeNode }) => {
@@ -1020,6 +1024,7 @@ const EventsTree: React.ComponentType<{
       .filter(Boolean);
   };
 
+  // $FlowFixMe[incompatible-type]
   React.useImperativeHandle(ref, () => ({
     forceEventsUpdate,
     foldAll,
@@ -1036,9 +1041,9 @@ const EventsTree: React.ComponentType<{
       if (!event) return;
 
       event.setFolded(!event.isFolded());
-      forceUpdate();
+      forceEventsUpdate();
     },
-    [forceUpdate]
+    [forceEventsUpdate]
   );
 
   const _isNodeHighlighted = React.useCallback(

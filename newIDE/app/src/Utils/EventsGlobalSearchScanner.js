@@ -1,22 +1,15 @@
 // @flow
-import { renderInstructionSentenceAsPlainText } from '../EventsSheet/EventsTree/TextRenderer';
-import type { EventPath } from './EventPath';
+import type { EventPath } from '../Types/EventPath';
 
 import { mapFor } from './MapFor';
 
 const gd: libGDevelop = global.gd;
 
-export type GlobalSearchMatchContext = {|
-  conditionText: string,
-  actionText: string,
-  otherText: string,
-|};
-
 export type GlobalSearchMatch = {|
   id: string,
   eventPath: EventPath,
   positionInList: number,
-  context: GlobalSearchMatchContext,
+  context: string,
 |};
 
 type BaseGroup = {|
@@ -58,6 +51,7 @@ export type GlobalSearchInputs = {|
   searchInActions: boolean,
   searchInEventStrings: boolean,
   searchInEventSentences: boolean,
+  searchInInstructionNames: boolean,
   includeStoreExtensions: boolean,
 |};
 
@@ -113,34 +107,40 @@ const searchInEventsList = (
     inputs.searchInConditions,
     inputs.searchInActions,
     inputs.searchInEventStrings,
-    inputs.searchInEventSentences
+    inputs.searchInEventSentences,
+    inputs.searchInInstructionNames
   ).clone();
 
-  // Phase 1: Extract paths and positions from the C++ search results,
-  // then free the C++ vector promptly.
+  // Phase 1: Extract lightweight data from the C++ vector.
+  // Avoid any heavy C++ calls (like getEventContext) while the vector is alive,
+  // because they can trigger emscripten heap growth and invalidate the vector's memory.
   type RawEntry = {|
     eventPath: EventPath,
     positionInList: number,
     index: number,
   |};
-  const rawEntries: Array<RawEntry> = mapFor(0, rawResults.size(), index => {
-    const searchResult = rawResults.at(index);
-    if (!searchResult.isEventValid()) return null;
+  const rawEntries: Array<RawEntry> = [];
+  try {
+    mapFor(0, rawResults.size(), index => {
+      const searchResult = rawResults.at(index);
+      if (!searchResult.isEventValid()) return;
 
-    const event = searchResult.getEvent();
-    const eventPath = eventPtrToPathMap.get(event.ptr);
-    if (!eventPath) return;
+      const event = searchResult.getEvent();
+      const eventPath = eventPtrToPathMap.get(event.ptr);
+      if (!eventPath) return;
 
-    return {
-      eventPath,
-      positionInList: searchResult.getPositionInList(),
-      index,
-    };
-  }).filter(Boolean);
-  rawResults.delete();
+      rawEntries.push({
+        eventPath,
+        positionInList: searchResult.getPositionInList(),
+        index,
+      });
+    });
+  } finally {
+    rawResults.delete();
+  }
 
-  // Phase 2: Build rich context (instruction sentences, metadata) from
-  // the raw entries — doing more calls to C++ here to complete the context.
+  // Phase 2: Now that the C++ vector is freed, it is safe to do heavy C++
+  // operations (formatting instruction sentences, metadata lookups, etc.).
   return rawEntries.map(entry => {
     const event = getEventAtPath(eventsList, entry.eventPath);
     return {
@@ -149,16 +149,20 @@ const searchInEventsList = (
       positionInList: entry.positionInList,
       context: event
         ? getEventContext(event, inputs.searchText, inputs.matchCase)
-        : { conditionText: '', actionText: '', otherText: 'Event' },
+        : 'Event',
     };
   });
 };
+
+const truncate = (text: string, maxLength: number = 140): string =>
+  text.length > maxLength ? `${text.slice(0, maxLength - 1)}...` : text;
 
 const getInstructionSentence = (
   instruction: gdInstruction,
   isCondition: boolean
 ): string => {
   const instructionType = instruction.getType();
+  if (!instructionType) return '';
 
   const metadata = isCondition
     ? gd.MetadataProvider.getConditionMetadata(
@@ -169,8 +173,17 @@ const getInstructionSentence = (
         gd.JsPlatform.get(),
         instructionType
       );
+  if (gd.MetadataProvider.isBadInstructionMetadata(metadata)) {
+    return instructionType;
+  }
 
-  return renderInstructionSentenceAsPlainText(instruction, metadata);
+  const formatter = gd.InstructionSentenceFormatter.get();
+  const formattedTexts = formatter.getAsFormattedText(instruction, metadata);
+  let sentence = '';
+  mapFor(0, formattedTexts.size(), i => {
+    sentence += formattedTexts.getString(i);
+  });
+  return sentence.trim() || instructionType;
 };
 
 const getFirstInstructionSentence = (
@@ -207,7 +220,10 @@ const getEventContextFromConditionsAndActions = (
   actions: gdInstructionsList,
   searchText: string,
   matchCase: boolean
-): GlobalSearchMatchContext => {
+): string => {
+  // Find the instruction that actually contains the search match,
+  // falling back to the first instruction if the match is in event strings
+  // rather than instruction sentences.
   const conditionSentence =
     findMatchingInstructionSentence(conditions, true, searchText, matchCase) ||
     getFirstInstructionSentence(conditions, true);
@@ -215,24 +231,23 @@ const getEventContextFromConditionsAndActions = (
     findMatchingInstructionSentence(actions, false, searchText, matchCase) ||
     getFirstInstructionSentence(actions, false);
 
-  return {
-    conditionText: conditionSentence,
-    actionText: actionSentence,
-    otherText: '',
-  };
+  if (conditionSentence && actionSentence) {
+    return truncate(`If ${conditionSentence} then ${actionSentence}`);
+  }
+  if (conditionSentence) {
+    return truncate(`Condition: ${conditionSentence}`);
+  }
+  if (actionSentence) {
+    return truncate(`Action: ${actionSentence}`);
+  }
+  return 'Event';
 };
-
-const otherContext = (text: string): GlobalSearchMatchContext => ({
-  conditionText: '',
-  actionText: '',
-  otherText: text,
-});
 
 const getEventContext = (
   event: gdBaseEvent,
   searchText: string,
   matchCase: boolean
-): GlobalSearchMatchContext => {
+): string => {
   const eventType = event.getType();
   switch (eventType) {
     case 'BuiltinCommonInstructions::Comment': {
@@ -240,32 +255,32 @@ const getEventContext = (
         .asCommentEvent(event)
         .getComment()
         .trim();
-      return otherContext(comment);
+      return comment ? truncate(comment) : 'Comment';
     }
     case 'BuiltinCommonInstructions::Group': {
       const groupName = gd
         .asGroupEvent(event)
         .getName()
         .trim();
-      return otherContext(groupName ? `Group: ${groupName}` : 'Group');
+      return groupName ? truncate(`Group: ${groupName}`) : 'Group';
     }
     case 'BuiltinCommonInstructions::JsCode': {
       const inlineCode = gd
         .asJsCodeEvent(event)
         .getInlineCode()
         .trim();
-      return otherContext(
-        inlineCode ? `JavaScript: ${inlineCode}` : 'JavaScript event'
-      );
+      return inlineCode
+        ? truncate(`JavaScript: ${inlineCode}`)
+        : 'JavaScript event';
     }
     case 'BuiltinCommonInstructions::Link': {
       const target = gd
         .asLinkEvent(event)
         .getTarget()
         .trim();
-      return otherContext(target ? `Link to: ${target}` : 'Link event');
+      return target ? truncate(`Link to: ${target}`) : 'Link event';
     }
-    case 'BuiltinCommonInstructions::Standard': {
+    case 'BuiltinCommonInstructions::Standard':
       const standartEvent = gd.asStandardEvent(event);
       return getEventContextFromConditionsAndActions(
         standartEvent.getConditions(),
@@ -273,8 +288,7 @@ const getEventContext = (
         searchText,
         matchCase
       );
-    }
-    case 'BuiltinCommonInstructions::Else': {
+    case 'BuiltinCommonInstructions::Else':
       const elseEvent = gd.asElseEvent(event);
       return getEventContextFromConditionsAndActions(
         elseEvent.getConditions(),
@@ -282,8 +296,7 @@ const getEventContext = (
         searchText,
         matchCase
       );
-    }
-    case 'BuiltinCommonInstructions::While': {
+    case 'BuiltinCommonInstructions::While':
       const whileEvent = gd.asWhileEvent(event);
       return getEventContextFromConditionsAndActions(
         whileEvent.getConditions(),
@@ -291,8 +304,7 @@ const getEventContext = (
         searchText,
         matchCase
       );
-    }
-    case 'BuiltinCommonInstructions::Repeat': {
+    case 'BuiltinCommonInstructions::Repeat':
       const repeatEvent = gd.asRepeatEvent(event);
       return getEventContextFromConditionsAndActions(
         repeatEvent.getConditions(),
@@ -300,8 +312,7 @@ const getEventContext = (
         searchText,
         matchCase
       );
-    }
-    case 'BuiltinCommonInstructions::ForEach': {
+    case 'BuiltinCommonInstructions::ForEach':
       const forEachEvent = gd.asForEachEvent(event);
       return getEventContextFromConditionsAndActions(
         forEachEvent.getConditions(),
@@ -309,18 +320,18 @@ const getEventContext = (
         searchText,
         matchCase
       );
-    }
-    case 'BuiltinCommonInstructions::ForEachChildVariable': {
-      const forEachChildVariableEvent = gd.asForEachChildVariableEvent(event);
+    case 'BuiltinCommonInstructions::ForEachChildVariable':
+      const eaasForEachChildVariableEventchEvent = gd.asForEachChildVariableEvent(
+        event
+      );
       return getEventContextFromConditionsAndActions(
-        forEachChildVariableEvent.getConditions(),
-        forEachChildVariableEvent.getActions(),
+        eaasForEachChildVariableEventchEvent.getConditions(),
+        eaasForEachChildVariableEventchEvent.getActions(),
         searchText,
         matchCase
       );
-    }
     default:
-      return otherContext(`Event type: ${eventType}`);
+      return truncate(`Event type: ${eventType}`);
   }
 };
 
@@ -389,41 +400,30 @@ const scanEvents = ({
   groups: Array<GlobalSearchGroup>,
   where: 'layout' | 'external-events',
 }) => {
-  if (where === 'layout') {
-    mapFor(0, project.getLayoutsCount(), index => {
-      const layout = project.getLayoutAt(index);
-      const name = layout.getName();
-      const matches = searchInEventsList(layout.getEvents(), inputs);
-      pushIfMatches(
-        groups,
-        matches => ({
-          id: `${where}:${name}`,
-          label: name,
-          targetType: where,
-          name,
-          matches,
-        }),
-        matches
-      );
-    });
-  } else if (where === 'external-events') {
-    mapFor(0, project.getExternalEventsCount(), index => {
-      const externalEvents = project.getExternalEventsAt(index);
-      const name = externalEvents.getName();
-      const matches = searchInEventsList(externalEvents.getEvents(), inputs);
-      pushIfMatches(
-        groups,
-        matches => ({
-          id: `${where}:${name}`,
-          label: name,
-          targetType: where,
-          name,
-          matches,
-        }),
-        matches
-      );
-    });
-  }
+  const isLayouts = where === 'layout';
+  const count = project[
+    isLayouts ? 'getLayoutsCount' : 'getExternalEventsCount'
+  ]();
+
+  mapFor(0, count, index => {
+    const events = project[isLayouts ? 'getLayoutAt' : 'getExternalEventsAt'](
+      index
+    );
+    const name = events.getName();
+    const matches = searchInEventsList(events.getEvents(), inputs);
+    pushIfMatches(
+      groups,
+      // $FlowFixMe[incompatible-type]
+      matches => ({
+        id: `${where}:${name}`,
+        label: name,
+        targetType: where,
+        name,
+        matches,
+      }),
+      matches
+    );
+  });
 };
 
 export const scanProjectForGlobalEventsSearch = (

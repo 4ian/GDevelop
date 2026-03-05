@@ -4,30 +4,6 @@ import { isElseEventValid, getPreviousExecutableEventIndex } from '../helpers';
 
 const gd: libGDevelop = global.gd;
 
-export const renderInstructionSentenceAsPlainText = (
-  instruction: gdInstruction,
-  metadata: gdInstructionMetadata
-): string => {
-  // Note: we could do like in `MetadataDeclarationHelper` for events-based extensions
-  // and create if necessary a default sentence. Here though we assume all extensions
-  // will have a sentence.
-
-  if (gd.MetadataProvider.isBadInstructionMetadata(metadata)) {
-    // Even if the instruction is bad, we still render it so that it's displayed
-    // as "Unknown or unsupported instruction".
-  }
-
-  const formattedTexts = gd.InstructionSentenceFormatter.get().getAsFormattedText(
-    instruction,
-    metadata
-  );
-
-  return mapFor(0, formattedTexts.size(), i => {
-    const value = formattedTexts.getString(i);
-    return value;
-  }).join('');
-};
-
 // $FlowFixMe[recursive-definition]
 // $FlowFixMe[definition-cycle]
 const renderInstructionsAsText = ({
@@ -51,10 +27,15 @@ const renderInstructionsAsText = ({
           instruction.getType()
         );
 
-    const sentence = renderInstructionSentenceAsPlainText(
+    const formattedTexts = gd.InstructionSentenceFormatter.get().getAsFormattedText(
       instruction,
       metadata
     );
+
+    const sentence = mapFor(0, formattedTexts.size(), i => {
+      const value = formattedTexts.getString(i);
+      return value;
+    }).join('');
 
     return {
       text: `${padding}- ${[invertedText, sentence].filter(Boolean).join('')}`,

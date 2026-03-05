@@ -48,7 +48,7 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import PropertyListEditor, {
   type PropertyListEditorInterface,
 } from './PropertyListEditor';
-import type { EventPath } from '../Utils/EventPath';
+import type { EventPath } from '../Types/EventPath';
 
 const gd: libGDevelop = global.gd;
 
@@ -281,14 +281,21 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     eventPaths: Array<EventPath>,
     focusedEventPath: EventPath,
     searchText: string,
-    matchCase: boolean
+    matchCase: boolean,
+    searchFilters?: {|
+      searchInConditions?: boolean,
+      searchInActions?: boolean,
+      searchInEventStrings?: boolean,
+      searchInInstructionNames?: boolean,
+    |}
   ) => {
     if (this.editor) {
       this.editor.setGlobalSearchResults(
         eventPaths,
         focusedEventPath,
         searchText,
-        matchCase
+        matchCase,
+        searchFilters
       );
     }
   };

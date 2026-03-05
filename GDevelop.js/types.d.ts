@@ -2042,7 +2042,7 @@ export class VectorEventsSearchResult extends EmscriptenObject {
 export class EventsRefactorer extends EmscriptenObject {
   static renameObjectInEvents(platform: Platform, projectScopedContainers: ProjectScopedContainers, events: EventsList, targetedObjectsContainer: ObjectsContainer, oldName: string, newName: string): void;
   static replaceStringInEvents(project: ObjectsContainer, layout: ObjectsContainer, events: EventsList, toReplace: string, newString: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean): VectorEventsSearchResult;
-  static searchInEvents(platform: Platform, events: EventsList, search: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean, inEventSentences: boolean): VectorEventsSearchResult;
+  static searchInEvents(platform: Platform, events: EventsList, search: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean, inEventSentences: boolean, inInstructionNames: boolean): VectorEventsSearchResult;
 }
 
 export class UnfilledRequiredBehaviorPropertyProblem extends EmscriptenObject {

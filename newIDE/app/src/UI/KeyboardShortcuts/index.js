@@ -326,7 +326,12 @@ export default class KeyboardShortcuts {
       evt.preventDefault();
       onRedo();
     }
-    if (onSearch && this._isControlOrCmdPressed() && evt.which === F_KEY) {
+    if (
+      onSearch &&
+      this._isControlOrCmdPressed() &&
+      !evt.shiftKey &&
+      evt.which === F_KEY
+    ) {
       evt.preventDefault();
       onSearch();
     }

@@ -13,7 +13,7 @@ import {
   type NewProjectSetup,
   type ExampleProjectSetup,
 } from '../ProjectCreation/NewProjectSetupDialog';
-import { type State } from '../MainFrame';
+import { type State } from '../MainFrame/MainFrameState';
 import {
   type StorageProvider,
   type StorageProviderOperations,

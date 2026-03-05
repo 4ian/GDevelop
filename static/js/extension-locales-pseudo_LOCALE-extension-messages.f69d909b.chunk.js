@@ -1,0 +1,2 @@
+(self.webpackChunkgdevelop_ide=self.webpackChunkgdevelop_ide||[]).push([[6882],{46178:function(e){e.exports={languageData:{plurals:function(e,n){return n?1==e?"one":"other":e>=0&&e<2?"one":"other"}},messages:{}}}}]);
+//# sourceMappingURL=extension-locales-pseudo_LOCALE-extension-messages.f69d909b.chunk.js.map

@@ -122,6 +122,26 @@ const InnerDialog = (props: InnerDialogProps) => {
   );
   const [objectName, setObjectName] = React.useState(props.objectName);
   const forceUpdate = useForceUpdate();
+
+  // Reset variable UUIDs for changeset tracking. This must happen before
+  // the cancelable editor hook serializes the object, so that both the
+  // serialized "original" state and the in-memory state share the same UUIDs.
+  // We only reset variable UUIDs (not the object's own UUID) to preserve
+  // the object's persistent UUID used for scroll position tracking.
+  const variableUuidsResetRef = React.useRef(false);
+  if (!variableUuidsResetRef.current) {
+    object.getVariables().resetPersistentUuid();
+    variableUuidsResetRef.current = true;
+  }
+
+  const onCancelAndClearVariableUuids = React.useCallback(
+    () => {
+      object.getVariables().clearPersistentUuid();
+      onCancel();
+    },
+    [object, onCancel]
+  );
+
   const {
     onCancelChanges,
     notifyOfChange,
@@ -130,7 +150,7 @@ const InnerDialog = (props: InnerDialogProps) => {
   } = useSerializableObjectCancelableEditor({
     serializableObject: object,
     useProjectToUnserialize: project,
-    onCancel: onCancel,
+    onCancel: onCancelAndClearVariableUuids,
   });
 
   const [hasResourceChanged, setResourceChanged] = React.useState<boolean>(
@@ -192,6 +212,7 @@ const InnerDialog = (props: InnerDialogProps) => {
         changeset
       );
     }
+    object.getVariables().clearPersistentUuid();
 
     // Do the renaming *after* applying changes, as "withSerializableObject"
     // HOC will unserialize the object to apply modifications, which will

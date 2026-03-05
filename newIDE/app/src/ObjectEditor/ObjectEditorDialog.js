@@ -122,6 +122,28 @@ const InnerDialog = (props: InnerDialogProps) => {
   );
   const [objectName, setObjectName] = React.useState(props.objectName);
   const forceUpdate = useForceUpdate();
+
+  // Reset variable UUIDs before the hook serializes the object,
+  // so that the changeset computation can properly track variable
+  // identity (renames, deletions, etc.) when the dialog is applied.
+  // Without this, variables may have empty UUIDs, causing the changeset
+  // to incorrectly match variables and overwrite event references.
+  const hasResetVariableUuids = React.useRef(false);
+  if (!hasResetVariableUuids.current) {
+    object.getVariables().resetPersistentUuid();
+    hasResetVariableUuids.current = true;
+  }
+
+  const onCancelAndClearUuids = React.useCallback(
+    () => {
+      // After the hook restores the original serialized state (which now
+      // includes UUIDs), clear them so they don't persist in the project.
+      object.getVariables().clearPersistentUuid();
+      onCancel();
+    },
+    [object, onCancel]
+  );
+
   const {
     onCancelChanges,
     notifyOfChange,
@@ -130,7 +152,7 @@ const InnerDialog = (props: InnerDialogProps) => {
   } = useSerializableObjectCancelableEditor({
     serializableObject: object,
     useProjectToUnserialize: project,
-    onCancel: onCancel,
+    onCancel: onCancelAndClearUuids,
   });
 
   const [hasResourceChanged, setResourceChanged] = React.useState<boolean>(
@@ -192,6 +214,10 @@ const InnerDialog = (props: InnerDialogProps) => {
         changeset
       );
     }
+
+    // Clear the persistent UUIDs that were set for changeset computation,
+    // so they don't persist in the project file.
+    object.getVariables().clearPersistentUuid();
 
     // Do the renaming *after* applying changes, as "withSerializableObject"
     // HOC will unserialize the object to apply modifications, which will

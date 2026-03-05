@@ -163,12 +163,19 @@ WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
     const auto &variable = oldVariablesContainer.Get(i);
     const auto &variableName = oldVariablesContainer.GetNameAt(i);
 
+    // Skip variables with empty UUIDs to avoid all of them mapping to the
+    // same key, which would cause incorrect rename detection.
+    if (variable.GetPersistentUuid().empty()) continue;
+
     // All variables are candidate to be removed.
     removedUuidAndNames[variable.GetPersistentUuid()] = variableName;
   }
   for (std::size_t i = 0; i < newVariablesContainer.Count(); ++i) {
     const auto &variable = newVariablesContainer.Get(i);
     const auto &variableName = newVariablesContainer.GetNameAt(i);
+
+    // Skip variables with empty UUIDs - they can't be tracked.
+    if (variable.GetPersistentUuid().empty()) continue;
 
     auto existingOldVariableUuidAndName =
         removedUuidAndNames.find(variable.GetPersistentUuid());
@@ -229,6 +236,9 @@ WholeProjectRefactorer::ComputeChangesetForVariable(
     const auto &oldName = pair.first;
     const auto oldChild = pair.second;
 
+    // Skip variables with empty UUIDs to avoid collisions in the map.
+    if (oldChild->GetPersistentUuid().empty()) continue;
+
     // All variables are candidate to be removed.
     oldVariableNamesByUuid[oldChild->GetPersistentUuid()] = oldName;
   }
@@ -237,6 +247,9 @@ WholeProjectRefactorer::ComputeChangesetForVariable(
   for (const auto &pair : newVariable.GetAllChildren()) {
     const auto &newName = pair.first;
     const auto newChild = pair.second;
+
+    // Skip variables with empty UUIDs - they can't be tracked.
+    if (newChild->GetPersistentUuid().empty()) continue;
 
     auto existingOldVariableUuidAndName =
         oldVariableNamesByUuid.find(newChild->GetPersistentUuid());
@@ -282,6 +295,9 @@ bool WholeProjectRefactorer::HasAnyVariableTypeChanged(
     const auto &oldName = pair.first;
     const auto oldChild = pair.second;
 
+    // Skip variables with empty UUIDs to avoid collisions in the map.
+    if (oldChild->GetPersistentUuid().empty()) continue;
+
     // All variables are candidate to be removed.
     oldVariableNamesByUuid[oldChild->GetPersistentUuid()] = oldName;
   }
@@ -289,6 +305,9 @@ bool WholeProjectRefactorer::HasAnyVariableTypeChanged(
   for (const auto &pair : newVariable.GetAllChildren()) {
     const auto &newName = pair.first;
     const auto newChild = pair.second;
+
+    // Skip variables with empty UUIDs - they can't be tracked.
+    if (newChild->GetPersistentUuid().empty()) continue;
 
     auto existingOldVariableUuidAndName =
         oldVariableNamesByUuid.find(newChild->GetPersistentUuid());

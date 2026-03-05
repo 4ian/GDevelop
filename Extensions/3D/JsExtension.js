@@ -2336,6 +2336,64 @@ module.exports = {
         )
         .setType('number')
         .setAdvanced(true);
+      properties
+        .getOrCreate('lightMapEnabled')
+        .setValue('false')
+        .setLabel(_('Enable light map'))
+        .setDescription(
+          _(
+            'Apply a baked light map texture directly from the official ambient lighting effect.'
+          )
+        )
+        .setType('boolean')
+        .setAdvanced(true);
+      properties
+        .getOrCreate('lightMapResourceName')
+        .setType('resource')
+        .addExtraInfo('image')
+        .setLabel(_('Light map texture'))
+        .setDescription(_('Texture resource used as baked light map.'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('lightMapIntensity')
+        .setValue('1')
+        .setLabel(_('Light map intensity'))
+        .setType('number')
+        .setDescription(_('Strength of the baked light map contribution.'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('lightMapDynamicBlend')
+        .setValue('0.35')
+        .setLabel(_('Light map dynamic blend'))
+        .setType('number')
+        .setDescription(
+          _(
+            'How much strong dynamic lights reduce baked light map influence (0 to 1).'
+          )
+        )
+        .setAdvanced(true);
+      properties
+        .getOrCreate('lightMapAutoAssignUv2')
+        .setValue('true')
+        .setLabel(_('Auto-assign UV2'))
+        .setType('boolean')
+        .setDescription(
+          _(
+            'When enabled, meshes missing UV2 will copy UV to UV2 automatically for light map support.'
+          )
+        )
+        .setAdvanced(true);
+      properties
+        .getOrCreate('lightMapOnlyIfMissing')
+        .setValue('true')
+        .setLabel(_('Only if missing light map'))
+        .setType('boolean')
+        .setDescription(
+          _(
+            'Keep existing per-material light maps unchanged and only apply to materials without one.'
+          )
+        )
+        .setAdvanced(true);
     }
     {
       const effect = extension
@@ -3571,66 +3629,6 @@ module.exports = {
     }
     {
       const effect = extension
-        .addEffect('RuntimeLightMap')
-        .setFullName(_('Runtime light map'))
-        .setDescription(
-          _(
-            'Apply a baked light map texture at runtime, with optional automatic UV2 generation and adaptive blending with dynamic lights.'
-          )
-        )
-        .markAsNotWorkingForObjects()
-        .markAsOnlyWorkingFor3D()
-        .addIncludeFile('Extensions/3D/RuntimeLightMapEffect.js');
-      const properties = effect.getProperties();
-      properties
-        .getOrCreate('enabled')
-        .setValue('true')
-        .setLabel(_('Enabled'))
-        .setType('boolean');
-      properties
-        .getOrCreate('lightMapResourceName')
-        .setType('resource')
-        .addExtraInfo('image')
-        .setLabel(_('Light map texture'));
-      properties
-        .getOrCreate('lightMapIntensity')
-        .setValue('1')
-        .setLabel(_('Light map intensity'))
-        .setType('number')
-        .setDescription(_('Strength of the baked light map contribution.'));
-      properties
-        .getOrCreate('dynamicBlend')
-        .setValue('0.35')
-        .setLabel(_('Dynamic blend'))
-        .setType('number')
-        .setDescription(
-          _(
-            'How much strong dynamic lights reduce baked light map influence (0 to 1).'
-          )
-        );
-      properties
-        .getOrCreate('autoAssignUv2')
-        .setValue('true')
-        .setLabel(_('Auto-assign UV2'))
-        .setType('boolean')
-        .setDescription(
-          _(
-            'When enabled, meshes missing UV2 will copy UV to UV2 automatically for light map support.'
-          )
-        );
-      properties
-        .getOrCreate('onlyIfMissingLightMap')
-        .setValue('true')
-        .setLabel(_('Only if missing light map'))
-        .setType('boolean')
-        .setDescription(
-          _(
-            'Keep existing per-material light maps unchanged and only apply to materials without one.'
-          )
-        );
-    }
-    {
-      const effect = extension
         .addEffect('PostProcessingStack')
         .setFullName(_('Post-processing stack'))
         .setDescription(
@@ -3829,6 +3827,7 @@ module.exports = {
         )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/PostProcessingSharedResources.js')
         .addIncludeFile('Extensions/3D/VignetteEffect.js');
       const properties = effect.getProperties();
       properties

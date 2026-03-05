@@ -72,6 +72,30 @@ namespace gdjs {
   const clampVignetteRoundness = (value: number): number =>
     gdjs.evtTools.common.clamp(0, 1, value);
 
+  const markScene3DPostProcessingPassIfAvailable = (
+    pass: THREE_ADDONS.ShaderPass,
+    effectId: string
+  ): void => {
+    const maybeMarker = (gdjs as unknown as {
+      markScene3DPostProcessingPass?: (
+        pass: THREE_ADDONS.ShaderPass,
+        effectId: string
+      ) => void;
+    }).markScene3DPostProcessingPass;
+    if (typeof maybeMarker === 'function') {
+      maybeMarker(pass, effectId);
+    }
+  };
+
+  const isScene3DPostProcessingEnabledOrFallback = (
+    target: gdjs.Layer
+  ): boolean => {
+    const maybeChecker = (gdjs as unknown as {
+      isScene3DPostProcessingEnabled?: (target: gdjs.Layer) => boolean;
+    }).isScene3DPostProcessingEnabled;
+    return typeof maybeChecker === 'function' ? maybeChecker(target) : true;
+  };
+
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::Vignette',
     new (class implements gdjs.PixiFiltersTools.FilterCreator {
@@ -95,7 +119,10 @@ namespace gdjs {
 
           constructor() {
             this.shaderPass = new THREE_ADDONS.ShaderPass(vignetteShader);
-            gdjs.markScene3DPostProcessingPass(this.shaderPass, 'VIGNETTE');
+            markScene3DPostProcessingPassIfAvailable(
+              this.shaderPass,
+              'VIGNETTE'
+            );
             this._isEnabled = false;
             this._effectEnabled =
               effectData.booleanParameters.enabled === undefined
@@ -183,7 +210,7 @@ namespace gdjs {
             if (!threeRenderer) {
               return;
             }
-            if (!gdjs.isScene3DPostProcessingEnabled(target)) {
+            if (!isScene3DPostProcessingEnabledOrFallback(target)) {
               this.shaderPass.enabled = false;
               return;
             }

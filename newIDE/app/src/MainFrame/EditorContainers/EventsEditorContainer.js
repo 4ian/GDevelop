@@ -17,6 +17,7 @@ import {
   setEditorHotReloadNeeded,
   type HotReloadSteps,
 } from '../../EmbeddedGame/EmbeddedGameFrame';
+import type { SearchFilterParams } from '../../Utils/Search';
 
 export class EventsEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?EventsSheetInterface;
@@ -72,14 +73,14 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     eventPaths: Array<EventPath>,
     focusedEventPath: EventPath,
     searchText: string,
-    matchCase: boolean
+    searchFilters?: SearchFilterParams
   ) {
     if (this.editor) {
       this.editor.setGlobalSearchResults(
         eventPaths,
         focusedEventPath,
         searchText,
-        matchCase
+        searchFilters
       );
     }
   }

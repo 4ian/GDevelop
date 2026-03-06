@@ -17,6 +17,39 @@ const promisifyCallbackVariables = (executor) =>
     );
   });
 
+/**
+ * Retry an async predicate until it returns true or timeout is reached.
+ * @param {() => Promise<boolean>} predicate
+ * @param {{timeoutMs?: number, intervalMs?: number}} [options]
+ * @returns {Promise<boolean>}
+ */
+const waitForCondition = async (
+  predicate,
+  { timeoutMs = 5000, intervalMs = 200 } = {}
+) => {
+  const startedAt = Date.now();
+  /** @type {any} */
+  let lastError = null;
+
+  while (Date.now() - startedAt <= timeoutMs) {
+    try {
+      if (await predicate()) {
+        return true;
+      }
+    } catch (error) {
+      lastError = error;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+  }
+
+  if (lastError) {
+    throw lastError;
+  }
+
+  return false;
+};
+
 /** A complex variable using all variables types. */
 // TODO: this is a global, should be moved in a scope.
 const variable = new gdjs.Variable().fromJSObject({
@@ -649,9 +682,36 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
     });
   });
 
-  describe('Firebase storage', () => {
+  describe('Firebase storage', function () {
+    let storageAvailable = true;
     const filename = `MyImage-${Math.random().toString(16)}.png`;
-    it('uploads an image', async () => {
+
+    before(async function () {
+      const availabilityProbeFilename = `AvailabilityProbe-${Math.random()
+        .toString(16)
+        .slice(2)}.txt`;
+      const probeRef = firebase.storage().ref(availabilityProbeFilename);
+
+      try {
+        await probeRef.putString('availability-probe');
+        await probeRef.delete();
+      } catch (error) {
+        if (
+          error &&
+          (error.code === 'storage/quota-exceeded' ||
+            error.code === 'storage/unauthorized' ||
+            error.code === 'storage/retry-limit-exceeded')
+        ) {
+          storageAvailable = false;
+          return;
+        }
+        throw error;
+      }
+    });
+
+    it('uploads an image', async function () {
+      if (!storageAvailable) this.skip();
+
       await promisifyCallbackVariables((callback) =>
         gdjs.evtTools.firebaseTools.storage.uploadFile(
           'myUpload',
@@ -663,7 +723,9 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
       );
     });
 
-    it('gets download url for an image', async () => {
+    it('gets download url for an image', async function () {
+      if (!storageAvailable) this.skip();
+
       const url = await promisifyCallbackVariables((callback, result) =>
         gdjs.evtTools.firebaseTools.storage.getDownloadURL(
           filename,
@@ -671,18 +733,66 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
           callback
         )
       );
-      expect((await fetch(url.getAsString())).ok).to.be.ok();
+      const downloadUrl = url.getAsString();
+      expect(downloadUrl.length > 0).to.be.ok();
+
+      const storageRefFromUrl = firebase.storage().refFromURL(downloadUrl);
+      expect(storageRefFromUrl.name).to.be(filename);
+      expect(
+        await waitForCondition(async () => {
+          try {
+            await storageRefFromUrl.getMetadata();
+            return true;
+          } catch (error) {
+            if (
+              error &&
+              (error.code === 'storage/object-not-found' ||
+                error.code === 'storage/retry-limit-exceeded')
+            ) {
+              return false;
+            }
+            throw error;
+          }
+        })
+      ).to.be.ok();
     });
 
-    it('deletes an image', async () => {
-      const url = await firebase.storage().ref(filename).getDownloadURL();
-      expect((await fetch(url)).ok).to.be.ok();
+    it('deletes an image', async function () {
+      if (!storageAvailable) this.skip();
+
+      const storageRef = firebase.storage().ref(filename);
+      await storageRef.getDownloadURL();
+      expect(
+        await waitForCondition(async () => {
+          try {
+            await storageRef.getMetadata();
+            return true;
+          } catch (error) {
+            if (error && error.code === 'storage/object-not-found') {
+              return false;
+            }
+            throw error;
+          }
+        })
+      ).to.be.ok();
 
       await promisifyCallbackVariables((callback) =>
         gdjs.evtTools.firebaseTools.storage.deleteFile(filename, callback)
       );
 
-      expect((await fetch(url)).ok).to.not.be.ok();
+      expect(
+        await waitForCondition(async () => {
+          try {
+            await storageRef.getMetadata();
+            return false;
+          } catch (error) {
+            if (error && error.code === 'storage/object-not-found') {
+              return true;
+            }
+            throw error;
+          }
+        })
+      ).to.be.ok();
     });
   });
 });

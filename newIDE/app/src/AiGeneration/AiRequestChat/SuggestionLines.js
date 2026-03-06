@@ -12,22 +12,13 @@ import {
   type AiRequestAssistantMessage,
   type AiRequestFunctionCallOutput,
 } from '../../Utils/GDevelopServices/Generation';
-import {
-  type EditorFunctionCallResult,
-  type EditorCallbacks,
-} from '../../EditorFunctions';
+import { type EditorCallbacks } from '../../EditorFunctions';
 import Text from '../../UI/Text';
 import { ColumnStackLayout } from '../../UI/Layout';
 import FlatButton from '../../UI/FlatButton';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import classes from './SuggestionLines.module.css';
-
-type FunctionCallItem = {|
-  key: string,
-  messageContent: AiRequestMessageAssistantFunctionCall,
-  existingFunctionCallOutput: AiRequestFunctionCallOutput | null | void,
-  editorFunctionCallResult: EditorFunctionCallResult | null,
-|};
+import { type FunctionCallItem } from './Utils';
 
 type Props = {|
   aiRequest: AiRequest,

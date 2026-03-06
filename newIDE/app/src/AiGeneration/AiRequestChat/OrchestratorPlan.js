@@ -12,32 +12,15 @@ import { FunctionCallRow } from './FunctionCallRow';
 import { ChatBubble } from './ChatBubble';
 import {
   type AiRequestMessageAssistantFunctionCall,
-  type AiRequestFunctionCallOutput,
+  type AiRequestPlanTask,
 } from '../../Utils/GDevelopServices/Generation';
-import {
-  type EditorFunctionCallResult,
-  type EditorCallbacks,
-} from '../../EditorFunctions';
+import { type EditorCallbacks } from '../../EditorFunctions';
 import { ChatMarkdownText } from './ChatMarkdownText';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-
-export type FunctionCallItem = {|
-  key: string,
-  messageContent: AiRequestMessageAssistantFunctionCall,
-  existingFunctionCallOutput: AiRequestFunctionCallOutput | null | void,
-  editorFunctionCallResult: EditorFunctionCallResult | null,
-|};
-
-type Task = {
-  id: string,
-  title: string,
-  description: string,
-  status: 'pending' | 'in_progress' | 'done' | 'voided',
-  dependsOn: string[],
-};
+import { type FunctionCallItem } from './Utils';
 
 type Props = {|
-  tasks: Array<Task>,
+  tasks: Array<AiRequestPlanTask>,
   messageId: string,
   followingText?: string,
   functionCallItemsByTaskId: Map<string, Array<FunctionCallItem>>,
@@ -102,7 +85,7 @@ const TaskRow = ({
   onProcessFunctionCalls,
   editorCallbacks,
 }: {|
-  task: Task,
+  task: AiRequestPlanTask,
   isLast: boolean,
   functionCallItems: Array<FunctionCallItem>,
   project: ?gdProject,

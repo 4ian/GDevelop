@@ -508,6 +508,22 @@ export const AiRequestProvider = ({
     if (!profile) return;
     if (!selectedAiRequestId || !status || status !== 'working') return;
 
+    const clearFetchingSuggestionsIfDone = (aiRequest: AiRequest) => {
+      if (!isFetchingSuggestions) return;
+      const lastMessage =
+        aiRequest.output.length > 0
+          ? aiRequest.output[aiRequest.output.length - 1]
+          : null;
+      const hasSuggestions =
+        lastMessage &&
+        ((lastMessage.type === 'message' && lastMessage.role === 'assistant') ||
+          lastMessage.type === 'function_call_output') &&
+        lastMessage.suggestions;
+      if (aiRequest.status === 'ready' || hasSuggestions) {
+        setIsFetchingSuggestions(false);
+      }
+    };
+
     const now = Date.now();
     const shouldDoFullFetch =
       now - lastFullFetchTimeRef.current >= fullFetchIntervalInMs;
@@ -523,23 +539,7 @@ export const AiRequestProvider = ({
         );
 
         updateAiRequest(selectedAiRequestId, () => aiRequest);
-
-        if (isFetchingSuggestions) {
-          const lastMessage =
-            aiRequest.output.length > 0
-              ? aiRequest.output[aiRequest.output.length - 1]
-              : null;
-          const hasSuggestions =
-            lastMessage &&
-            ((lastMessage.type === 'message' &&
-              lastMessage.role === 'assistant') ||
-              lastMessage.type === 'function_call_output') &&
-            lastMessage.suggestions;
-
-          if (aiRequest.status === 'ready' || hasSuggestions) {
-            setIsFetchingSuggestions(false);
-          }
-        }
+        clearFetchingSuggestionsIfDone(aiRequest);
       } else {
         // Use partial request to only fetch the status between full fetches.
         const partialAiRequest = await getPartialAiRequest(
@@ -567,23 +567,7 @@ export const AiRequestProvider = ({
           );
 
           updateAiRequest(selectedAiRequestId, () => aiRequest);
-
-          if (isFetchingSuggestions) {
-            const lastMessage =
-              aiRequest.output.length > 0
-                ? aiRequest.output[aiRequest.output.length - 1]
-                : null;
-            const hasSuggestions =
-              lastMessage &&
-              ((lastMessage.type === 'message' &&
-                lastMessage.role === 'assistant') ||
-                lastMessage.type === 'function_call_output') &&
-              lastMessage.suggestions;
-
-            if (aiRequest.status === 'ready' || hasSuggestions) {
-              setIsFetchingSuggestions(false);
-            }
-          }
+          clearFetchingSuggestionsIfDone(aiRequest);
         }
       }
     } catch (error) {

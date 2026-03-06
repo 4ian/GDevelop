@@ -64,7 +64,7 @@
 .suspendedDot {
   width: 6px;
   height: 6px;
-  background-color: #ff9800;
+  background-color: var(--theme-message-warning-color);
   border-radius: 50%;
   flex-shrink: 0;
 }

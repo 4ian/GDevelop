@@ -41,6 +41,7 @@ import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import { SubscriptionContext } from '../Profile/Subscription/SubscriptionContext';
 import {
   useProcessFunctionCalls,
+  useRefreshLimits,
   type NewAiRequestOptions,
   AI_ORCHESTRATOR_TOOLS_VERSION,
 } from './Utils';
@@ -199,7 +200,9 @@ export const AskAiStandAloneForm = ({
   } = React.useContext(AuthenticatedUserContext);
   const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
 
-  const [isRefreshingLimits, setIsRefreshingLimits] = React.useState(false);
+  const { isRefreshingLimits, refreshLimits } = useRefreshLimits(
+    onRefreshLimits
+  );
   const [isSendingUserMessage, setIsSendingUserMessage] = React.useState(false);
 
   const hideAskAi =
@@ -220,16 +223,7 @@ export const AskAiStandAloneForm = ({
   // we display the proper quota and credits information for the user.
   React.useEffect(
     () => {
-      (async () => {
-        setIsRefreshingLimits(true);
-        try {
-          await onRefreshLimits();
-        } catch (error) {
-          // Ignore limits refresh error.
-        }
-        await delay(200);
-        setIsRefreshingLimits(false);
-      })();
+      refreshLimits();
     },
     // Only on mount, we'll refresh again when sending an AI request.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -346,14 +340,7 @@ export const AskAiStandAloneForm = ({
         // Refresh the user limits, to ensure quota and credits information
         // is up-to-date after an AI request.
         await delay(500);
-        setIsRefreshingLimits(true);
-        try {
-          await retryIfFailed({ times: 2 }, onRefreshLimits);
-        } catch (error) {
-          // Ignore limits refresh error.
-        }
-        await delay(200);
-        setIsRefreshingLimits(false);
+        await refreshLimits({ withRetry: true });
       })();
     },
     [
@@ -361,7 +348,7 @@ export const AskAiStandAloneForm = ({
       availableCredits,
       getAuthorizationHeader,
       onOpenCreateAccountDialog,
-      onRefreshLimits,
+      refreshLimits,
       openCreditsPackageDialog,
       profile,
       project,
@@ -500,14 +487,7 @@ export const AskAiStandAloneForm = ({
       // Refresh the user limits, to ensure quota and credits information
       // is up-to-date after an AI request.
       await delay(500);
-      setIsRefreshingLimits(true);
-      try {
-        await retryIfFailed({ times: 2 }, onRefreshLimits);
-      } catch (error) {
-        // Ignore limits refresh error.
-      }
-      await delay(200);
-      setIsRefreshingLimits(false);
+      await refreshLimits({ withRetry: true });
     },
     [
       profile,
@@ -520,7 +500,7 @@ export const AskAiStandAloneForm = ({
       setLastSendError,
       project,
       aiRequestForForm,
-      onRefreshLimits,
+      refreshLimits,
     ]
   );
   const onSendEditorFunctionCallResults = React.useCallback(

@@ -74,6 +74,7 @@ import {
   type OpenAskAiOptions,
   type NewAiRequestOptions,
   useProcessFunctionCalls,
+  useRefreshLimits,
   AI_AGENT_TOOLS_VERSION,
   AI_CHAT_TOOLS_VERSION,
   AI_ORCHESTRATOR_TOOLS_VERSION,
@@ -412,7 +413,9 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         subscription,
       } = authenticatedUser;
 
-      const [isRefreshingLimits, setIsRefreshingLimits] = React.useState(false);
+      const { isRefreshingLimits, refreshLimits } = useRefreshLimits(
+        onRefreshLimits
+      );
       const [isSendingUserMessage, setIsSendingUserMessage] = React.useState(
         false
       );
@@ -433,19 +436,10 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
       React.useEffect(
         () => {
           if (isActive) {
-            (async () => {
-              setIsRefreshingLimits(true);
-              try {
-                await onRefreshLimits();
-              } catch (error) {
-                // Ignore limits refresh error.
-              }
-              await delay(200);
-              setIsRefreshingLimits(false);
-            })();
+            refreshLimits();
           }
         },
-        [isActive, onRefreshLimits]
+        [isActive, refreshLimits]
       );
 
       // Trigger the start of the new AI request if the user has requested it
@@ -581,14 +575,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             // Refresh the user limits, to ensure quota and credits information
             // is up-to-date after an AI request.
             await delay(500);
-            setIsRefreshingLimits(true);
-            try {
-              await retryIfFailed({ times: 2 }, onRefreshLimits);
-            } catch (error) {
-              // Ignore limits refresh error.
-            }
-            await delay(200);
-            setIsRefreshingLimits(false);
+            await refreshLimits({ withRetry: true });
           })();
         },
         [
@@ -596,7 +583,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           availableCredits,
           getAuthorizationHeader,
           onOpenCreateAccountDialog,
-          onRefreshLimits,
+          refreshLimits,
           profile,
           project,
           fileMetadata,
@@ -796,14 +783,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           // Refresh the user limits, to ensure quota and credits information
           // is up-to-date after an AI request.
           await delay(500);
-          setIsRefreshingLimits(true);
-          try {
-            await retryIfFailed({ times: 2 }, onRefreshLimits);
-          } catch (error) {
-            // Ignore limits refresh error.
-          }
-          await delay(200);
-          setIsRefreshingLimits(false);
+          await refreshLimits({ withRetry: true });
 
           if (
             selectedAiRequest &&
@@ -832,7 +812,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           clearEditorFunctionCallResults,
           getAuthorizationHeader,
           setLastSendError,
-          onRefreshLimits,
+          refreshLimits,
           project,
           onOpenLayout,
           selectedAiRequest,

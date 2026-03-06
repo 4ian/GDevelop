@@ -4,6 +4,7 @@ import {
   type AiRequestMessage,
   type AiRequestMessageAssistantFunctionCall,
   type AiRequestFunctionCallOutput,
+  type AiRequestPlan,
 } from '../Utils/GDevelopServices/Generation';
 import { type EditorFunctionCallResult } from '../EditorFunctions/EditorFunctionCallRunner';
 import { type RelatedAiRequestLastMessages } from '../EditorFunctions';
@@ -142,7 +143,7 @@ export const getFunctionCallNameByCallId = ({
  */
 export const getLatestActivePlan = (
   aiRequest: AiRequest
-): {| tasks: Array<any> |} | null => {
+): AiRequestPlan | null => {
   let latestPlan = null;
   for (let i = aiRequest.output.length - 1; i >= 0; i--) {
     const message = aiRequest.output[i];

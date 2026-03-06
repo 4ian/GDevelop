@@ -21,10 +21,7 @@ import { Trans, t } from '@lingui/macro';
 import {
   type AiRequest,
   type AiRequestMessageAssistantFunctionCall,
-  type AiRequestAssistantMessage,
-  type AiRequestFunctionCallOutput,
   type AiRequestMessage,
-  type AiRequestUserMessage,
 } from '../../Utils/GDevelopServices/Generation';
 import {
   type EditorFunctionCallResult,
@@ -52,74 +49,7 @@ import Link from '../../UI/Link';
 import { type FileMetadata } from '../../ProjectsStorage';
 import UnsavedChangesContext from '../../MainFrame/UnsavedChangesContext';
 import { OrchestratorPlan } from './OrchestratorPlan';
-
-type FunctionCallItem = {|
-  key: string,
-  messageContent: AiRequestMessageAssistantFunctionCall,
-  existingFunctionCallOutput: AiRequestFunctionCallOutput | null | void,
-  editorFunctionCallResult: EditorFunctionCallResult | null,
-|};
-
-type UserMessageRenderItem = {|
-  type: 'user_message',
-  messageIndex: number,
-  message: AiRequestUserMessage,
-|};
-
-type MessageContentRenderItem = {|
-  type: 'message_content',
-  messageIndex: number,
-  messageContentIndex: number,
-  message: AiRequestAssistantMessage,
-  messageContent: {|
-    type: 'output_text' | 'reasoning',
-    status: 'completed',
-    text?: string,
-    summary?: {
-      text: string,
-      type: 'summary_text',
-    },
-    annotations?: Array<{}>,
-  |},
-  isLastMessage: boolean,
-  functionCallItems?: Array<FunctionCallItem>,
-|};
-
-type FunctionCallGroupRenderItem = {|
-  type: 'function_call_group',
-  items: Array<FunctionCallItem>,
-|};
-
-type SaveRenderItem = {|
-  type: 'save',
-  messageIndex: number,
-  message: AiRequestMessage,
-  isRestored: boolean,
-  isSaving: boolean,
-|};
-
-type SuggestionsRenderItem = {|
-  type: 'suggestions',
-  messageIndex: number,
-  message: AiRequestAssistantMessage | AiRequestFunctionCallOutput,
-  onlyShowExplanationMessage: boolean,
-  functionCallItems?: Array<FunctionCallItem>,
-|};
-
-type OrchestratorPlanRenderItem = {|
-  type: 'orchestrator_plan',
-  plan: {| tasks: Array<any> |},
-  messageIndex: number,
-  messageId: string,
-|};
-
-type RenderItem =
-  | UserMessageRenderItem
-  | MessageContentRenderItem
-  | FunctionCallGroupRenderItem
-  | SaveRenderItem
-  | SuggestionsRenderItem
-  | OrchestratorPlanRenderItem;
+import { type FunctionCallItem, type RenderItem } from './Utils';
 
 const styles = {
   subscriptionPaper: {
@@ -791,21 +721,27 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
 
     // Pre-compute which message_content items are absorbed into the preceding
     // plan bubble so they don't render as a separate ChatBubble.
-    const absorbedMessageContentIndices: Set<number> = new Set();
-    filteredRenderItems.forEach((item, index) => {
-      if (item.type === 'orchestrator_plan') {
-        const next = filteredRenderItems[index + 1];
-        if (
-          next &&
-          next.type === 'message_content' &&
-          next.messageContent.type === 'output_text' &&
-          next.messageContent.text &&
-          next.messageContent.text.trim()
-        ) {
-          absorbedMessageContentIndices.add(index + 1);
-        }
-      }
-    });
+    const absorbedMessageContentIndices: Set<number> = React.useMemo(
+      () => {
+        const set: Set<number> = new Set();
+        filteredRenderItems.forEach((item, index) => {
+          if (item.type === 'orchestrator_plan') {
+            const next = filteredRenderItems[index + 1];
+            if (
+              next &&
+              next.type === 'message_content' &&
+              next.messageContent.type === 'output_text' &&
+              next.messageContent.text &&
+              next.messageContent.text.trim()
+            ) {
+              set.add(index + 1);
+            }
+          }
+        });
+        return set;
+      },
+      [filteredRenderItems]
+    );
 
     return (
       <>
@@ -839,7 +775,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
             }
 
             if (absorbedMessageContentIndices.has(itemIndex)) {
-              return null;
+              return ([]: Array<React.Node>);
             }
 
             if (item.type === 'user_message') {

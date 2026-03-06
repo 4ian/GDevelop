@@ -36,6 +36,8 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { AiRequestContext } from './AiRequestContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
+import { delay } from '../Utils/Delay';
+import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
 import { prepareAiUserContent } from './PrepareAiUserContent';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
@@ -49,6 +51,43 @@ import CloudStorageProvider from '../ProjectsStorage/CloudStorageProvider';
 import { checkIfHasTooManyCloudProjects } from '../MainFrame/EditorContainers/HomePage/CreateSection/MaxProjectCountAlertMessage';
 
 const gd: libGDevelop = global.gd;
+
+// How long to keep the "Calculating..." indicator visible after a refresh
+// completes, to prevent it from flashing on fast calls.
+const REFRESH_LIMITS_SETTLE_DELAY_MS = 200;
+
+/**
+ * Wraps `onRefreshLimits` with a loading state and a short settle delay so
+ * the "Calculating..." indicator doesn't flash on fast network calls.
+ */
+export const useRefreshLimits = (
+  onRefreshLimits: () => Promise<void>
+): {|
+  isRefreshingLimits: boolean,
+  refreshLimits: (options?: {| withRetry?: boolean |}) => Promise<void>,
+|} => {
+  const [isRefreshingLimits, setIsRefreshingLimits] = React.useState(false);
+
+  const refreshLimits = React.useCallback(
+    async (options?: {| withRetry?: boolean |}) => {
+      setIsRefreshingLimits(true);
+      try {
+        if (options && options.withRetry) {
+          await retryIfFailed({ times: 2 }, onRefreshLimits);
+        } else {
+          await onRefreshLimits();
+        }
+      } catch (error) {
+        // Ignore limits refresh error.
+      }
+      await delay(REFRESH_LIMITS_SETTLE_DELAY_MS);
+      setIsRefreshingLimits(false);
+    },
+    [onRefreshLimits]
+  );
+
+  return { isRefreshingLimits, refreshLimits };
+};
 
 export const AI_AGENT_TOOLS_VERSION = 'v8';
 export const AI_CHAT_TOOLS_VERSION = 'v8';

@@ -93,9 +93,9 @@ const MainPage = ({
   onSelectExampleShortHeader,
 }: Props): React.Node => {
   const { limits } = React.useContext(AuthenticatedUserContext);
-  const {
-    palette: { type: paletteType },
-  } = React.useContext(GDevelopThemeContext);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const paletteType = gdevelopTheme.palette.type;
+  const paperDarkBackgroundColor = gdevelopTheme.paper.backgroundColor.dark;
 
   const { listedCourses } = React.useContext(CourseStoreContext);
   const {
@@ -192,8 +192,8 @@ const MainPage = ({
             backgroundSize: isMobile && !isLandscape ? 'contain' : 'auto',
             backgroundImage: `url('res/premium/premium_dialog_background.png'),${
               paletteType === 'dark'
-                ? 'linear-gradient(180deg, #322659 0px, #3F2458 20px, #1D1D26 200px, #1D1D26 100%)'
-                : 'linear-gradient(180deg, #CBBAFF 0px, #DEBBFF 20px, #F5F5F7 200px, #F5F5F7 100%)'
+                ? `linear-gradient(180deg, #322659 0px, #3F2458 20px, ${paperDarkBackgroundColor} 200px, ${paperDarkBackgroundColor} 100%)`
+                : `linear-gradient(180deg, #CBBAFF 0px, #DEBBFF 20px, ${paperDarkBackgroundColor} 200px, ${paperDarkBackgroundColor} 100%)`
             }`,
           }}
         >

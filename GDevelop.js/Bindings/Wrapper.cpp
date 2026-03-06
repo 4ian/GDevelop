@@ -68,6 +68,7 @@
 #include <GDCore/IDE/VariableInstructionSwitcher.h>
 #include <GDCore/IDE/WholeProjectRefactorer.h>
 #include <GDCore/Project/Behavior.h>
+#include <GDCore/Tools/MemoryTrackedRegistry.h>
 #include <GDCore/Project/CustomObjectConfiguration.h>
 #include <GDCore/Project/Effect.h>
 #include <GDCore/Project/EventsBasedBehavior.h>
@@ -678,6 +679,11 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_GetBehaviorStrExpressionMetadata GetBehaviorStrExpressionMetadata
 #define STATIC_IsPrimitive IsPrimitive
 #define STATIC_TypeAsString TypeAsString
+
+#define STATIC_IsDead IsDead
+#define STATIC_AliveCount AliveCount
+#define STATIC_DeadCount DeadCount
+#define STATIC_PruneDead PruneDead
 
 #define STATIC_Major Major
 #define STATIC_Minor Minor

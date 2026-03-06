@@ -320,3 +320,140 @@ var adaptNamingConventions = function (gd) {
 };
 
 adaptNamingConventions(Module);
+
+// --- MemoryTrackedError: liveness protection for WebIDL binder objects ---
+//
+// Every method/getter/setter on every WebIDL class will check ptr liveness
+// before touching C++/Wasm memory.
+// If the object is dead, you get a MemoryTrackedError (a JS exception)
+// instead of a Wasm crash or silent memory corruption.
+
+class MemoryTrackedError extends Error {
+  constructor(msg) {
+    super(msg);
+    this.name = "MemoryTrackedError";
+  }
+}
+
+Module.MemoryTrackedError = MemoryTrackedError;
+
+/**
+ * Assert a "MemoryTracked" WebIDL object is still alive. Called before every
+ * method/getter/setter call on patched prototypes.
+ */
+function assertNotDead(obj, label) {
+  const ptr = obj.ptr;
+
+  // Check 1: ptr is zero/undefined — __destroy__() was called on this wrapper
+  if (!ptr) {
+    throw new MemoryTrackedError(
+      `${label}: ptr is ${ptr} — object was already destroyed`
+    );
+  }
+
+  // Check 2: C++ registry (covers both MemoryTracked and untracked
+  // classes — untracked ones simply return false / "not dead")
+  if (Module.MemoryTrackedRegistry.isDead(ptr)) {
+    throw new MemoryTrackedError(
+      `${label}: ptr 0x${ptr.toString(16)} is dead`
+    );
+  }
+}
+
+/**
+ * Patch all WebIDL classes so that every method/getter/setter checks
+ * pointer liveness before calling into Wasm.
+ *
+ * @param {object}   mod              The Emscripten Module
+ * @param {object}   [options]
+ * @param {string[]} [options.skip]   Class names to leave unpatched
+ * @param {boolean}  [options.quiet]  Suppress the console.log summary
+ */
+function patchAllWebIDLClasses(mod, options) {
+  options = options || {};
+  var skip = {};
+  if (options.skip) {
+    for (var i = 0; i < options.skip.length; i++) {
+      skip[options.skip[i]] = true;
+    }
+  }
+  var patched = [];
+  var classCount = 0;
+  var methodCount = 0;
+
+  for (var key in mod) {
+    if (!mod.hasOwnProperty(key)) continue;
+    if (skip[key]) continue;
+
+    var Ctor = mod[key];
+    if (typeof Ctor !== "function") continue;
+
+    var proto = Ctor.prototype;
+    if (!proto || patched.indexOf(proto) !== -1) continue;
+    if (typeof proto.__destroy__ !== "function") continue;
+
+    patched.push(proto);
+    classCount++;
+
+    // Patch all methods and accessors on the prototype
+    var descriptors = Object.getOwnPropertyDescriptors(proto);
+    var names = Object.keys(descriptors);
+
+    for (var j = 0; j < names.length; j++) {
+      var name = names[j];
+      var desc = descriptors[name];
+
+      if (name === "constructor" || name === "__destroy__") continue;
+      // Skip .ptr itself — we need raw access to it for the checks
+      if (name === "ptr") continue;
+      // Skip .delete — it's fine to call delete on an already-destroyed object
+      if (name === "delete") continue;
+
+      var classMethod = key + "." + name;
+
+      // Regular methods
+      if (typeof desc.value === "function") {
+        (function(origFn, label) {
+          proto[name] = function notDeadCheck() {
+            assertNotDead(this, label);
+            return origFn.apply(this, arguments);
+          };
+        })(desc.value, classMethod);
+        methodCount++;
+        continue;
+      }
+
+      // Getters / setters (WebIDL uses these for IDL attributes)
+      if (desc.get || desc.set) {
+        var newDesc = { configurable: desc.configurable, enumerable: desc.enumerable };
+
+        if (desc.get) {
+          (function(origGet, label) {
+            newDesc.get = function () {
+              assertNotDead(this, label + "[get]");
+              return origGet.call(this);
+            };
+          })(desc.get, classMethod);
+        }
+
+        if (desc.set) {
+          (function(origSet, label) {
+            newDesc.set = function (val) {
+              assertNotDead(this, label + "[set]");
+              return origSet.call(this, val);
+            };
+          })(desc.set, classMethod);
+        }
+
+        Object.defineProperty(proto, name, newDesc);
+        methodCount++;
+      }
+    }
+  }
+
+  if (!options.quiet) {
+    console.log("[MemoryTracked] Patched " + classCount + " classes, " + methodCount + " methods/accessors");
+  }
+}
+
+patchAllWebIDLClasses(Module, {});

@@ -8,6 +8,7 @@
 #include "GDCore/String.h"
 #include "GDCore/Project/BehaviorConfigurationContainer.h"
 #include "GDCore/Tools/MakeUnique.h"
+#include "GDCore/Tools/MemoryTrackedRegistry.h"
 
 namespace gd {
 
@@ -20,7 +21,7 @@ namespace gd {
  * \see gd::Object
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API Behavior: public BehaviorConfigurationContainer {
+class GD_CORE_API Behavior: public BehaviorConfigurationContainer, public MemoryTracked {
  public:
 
   Behavior(): BehaviorConfigurationContainer(), isDefaultBehavior(false) {};

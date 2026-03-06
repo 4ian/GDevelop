@@ -16,6 +16,7 @@
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/MakeUnique.h"
+#include "GDCore/Tools/MemoryTrackedRegistry.h"
 #include "GDCore/Vector2.h"
 
 namespace gd {
@@ -35,7 +36,7 @@ namespace gd {
  *
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API Object {
+class GD_CORE_API Object : public MemoryTracked {
  public:
   /**
    * Create a new object with the name passed as argument.

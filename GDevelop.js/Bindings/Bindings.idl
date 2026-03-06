@@ -189,6 +189,13 @@ interface InstructionOrExpressionGroupMetadata {
     [Const, Ref] DOMString GetIcon();
 };
 
+interface MemoryTrackedRegistry {
+    boolean STATIC_IsDead(unsigned long ptr);
+    unsigned long STATIC_AliveCount();
+    unsigned long STATIC_DeadCount();
+    void STATIC_PruneDead();
+};
+
 interface VersionWrapper {
     long STATIC_Major();
     long STATIC_Minor();

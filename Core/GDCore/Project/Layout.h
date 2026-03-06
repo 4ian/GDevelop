@@ -20,6 +20,7 @@
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
+#include "GDCore/Tools/MemoryTrackedRegistry.h"
 
 namespace gd {
 class BaseEvent;
@@ -37,7 +38,7 @@ namespace gd {
  *
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API Layout {
+class GD_CORE_API Layout : public MemoryTracked {
  public:
   Layout();
   Layout(const Layout&);

@@ -19,6 +19,7 @@
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/Watermark.h"
 #include "GDCore/String.h"
+#include "GDCore/Tools/MemoryTrackedRegistry.h"
 namespace gd {
 class Platform;
 class Layout;
@@ -47,7 +48,7 @@ namespace gd {
  *
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API Project {
+class GD_CORE_API Project : public MemoryTracked {
  public:
   Project();
   Project(const Project&);

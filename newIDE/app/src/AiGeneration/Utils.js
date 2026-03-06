@@ -9,7 +9,6 @@ import {
 } from '../MainFrame/EditorContainers/BaseEditor';
 import {
   getAiRequest,
-  getPartialAiRequest,
   getAiRequestSuggestions,
   type AiRequest,
   type AiRequestMessage,
@@ -27,6 +26,7 @@ import {
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
   getLastMessagesFromAiRequestOutput,
+  getLatestActivePlan,
 } from './AiRequestUtils';
 import { useEnsureExtensionInstalled } from './UseEnsureExtensionInstalled';
 import { useGenerateEvents } from './UseGenerateEvents';
@@ -35,11 +35,10 @@ import { useSearchAndInstallResource } from './UseSearchAndInstallResource';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { AiRequestContext } from './AiRequestContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-import { useInterval } from '../Utils/UseInterval';
+
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
 import { prepareAiUserContent } from './PrepareAiUserContent';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
-import { retryIfFailed } from '../Utils/RetryIfFailed';
 import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 import {
   type FileMetadata,
@@ -53,6 +52,7 @@ const gd: libGDevelop = global.gd;
 
 export const AI_AGENT_TOOLS_VERSION = 'v8';
 export const AI_CHAT_TOOLS_VERSION = 'v8';
+export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v1';
 
 export const useProcessFunctionCalls = ({
   i18n,
@@ -104,15 +104,9 @@ export const useProcessFunctionCalls = ({
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   isReadyToProcessFunctionCalls: boolean,
 |}): {
-  isAutoProcessingFunctionCalls: (aiRequestId: string) => boolean,
   onProcessFunctionCalls: (
-    functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
-    options: ?{ ignore?: boolean }
+    functionCalls: Array<AiRequestMessageAssistantFunctionCall>
   ) => Promise<void>,
-  setAutoProcessFunctionCalls: (
-    aiRequestId: string,
-    shouldAutoProcess: boolean
-  ) => void,
 } => {
   const { ensureExtensionInstalled } = useEnsureExtensionInstalled({
     project,
@@ -130,38 +124,10 @@ export const useProcessFunctionCalls = ({
   });
   const { generateEvents } = useGenerateEvents({ project });
 
-  const [
-    aiRequestAutoProcessState,
-    setAiRequestAutoprocessState,
-  ] = React.useState<{
-    [string]: boolean,
-  }>({});
-  const isAutoProcessingFunctionCalls = React.useCallback(
-    (aiRequestId: string) =>
-      aiRequestAutoProcessState[aiRequestId] !== undefined
-        ? aiRequestAutoProcessState[aiRequestId]
-        : true,
-    [aiRequestAutoProcessState]
-  );
-
-  const setAutoProcessFunctionCalls = React.useCallback(
-    (aiRequestId: string, shouldAutoProcess: boolean) => {
-      setAiRequestAutoprocessState(aiRequestAutoProcessState => ({
-        ...aiRequestAutoProcessState,
-        [aiRequestId]: shouldAutoProcess,
-      }));
-    },
-    [setAiRequestAutoprocessState]
-  );
-
   const onProcessFunctionCalls = React.useCallback(
-    async (
-      functionCalls: Array<AiRequestMessageAssistantFunctionCall>,
-      options: ?{|
-        ignore?: boolean,
-      |}
-    ) => {
+    async (functionCalls: Array<AiRequestMessageAssistantFunctionCall>) => {
       if (!selectedAiRequest || !isReadyToProcessFunctionCalls) return;
+      if (selectedAiRequest.status === 'suspended') return;
 
       addEditorFunctionCallResults(
         selectedAiRequest.id,
@@ -186,7 +152,6 @@ export const useProcessFunctionCalls = ({
           arguments: functionCall.arguments,
           call_id: functionCall.call_id,
         })),
-        ignore: !!options && !!options.ignore,
         relatedAiRequestId: selectedAiRequest.id,
         getRelatedAiRequestLastMessages: () =>
           getLastMessagesFromAiRequestOutput(selectedAiRequest.output),
@@ -201,6 +166,13 @@ export const useProcessFunctionCalls = ({
         searchAndInstallAsset,
         searchAndInstallResources,
       });
+
+      // If the request was suspended while we were processing, discard the
+      // results — we don't want to re-populate the cleared results or send
+      // anything to a suspended request.
+      if (results.some(r => r.status === 'aborted')) {
+        return;
+      }
 
       const newResults = addEditorFunctionCallResults(
         selectedAiRequest.id,
@@ -252,27 +224,16 @@ export const useProcessFunctionCalls = ({
     () => {
       (async () => {
         if (!selectedAiRequest) return;
-
-        if (isAutoProcessingFunctionCalls(selectedAiRequest.id)) {
-          if (allFunctionCallsToProcess.length === 0) {
-            return;
-          }
-          console.info('Automatically processing AI function calls...');
-          await onProcessFunctionCalls(allFunctionCallsToProcess);
-        }
+        if (selectedAiRequest.status === 'suspended') return;
+        if (allFunctionCallsToProcess.length === 0) return;
+        console.info('Automatically processing AI function calls...');
+        await onProcessFunctionCalls(allFunctionCallsToProcess);
       })();
     },
-    [
-      selectedAiRequest,
-      isAutoProcessingFunctionCalls,
-      onProcessFunctionCalls,
-      allFunctionCallsToProcess,
-    ]
+    [selectedAiRequest, onProcessFunctionCalls, allFunctionCallsToProcess]
   );
 
   return {
-    isAutoProcessingFunctionCalls,
-    setAutoProcessFunctionCalls,
     onProcessFunctionCalls,
   };
 };
@@ -309,6 +270,8 @@ export const useAiRequestState = ({
   const {
     aiRequestStorage,
     editorFunctionCallResultsStorage,
+    isFetchingSuggestions,
+    setIsFetchingSuggestions,
   } = React.useContext(AiRequestContext);
   const { aiRequests, updateAiRequest, isSendingAiRequest } = aiRequestStorage;
   const { getEditorFunctionCallResults } = editorFunctionCallResultsStorage;
@@ -318,14 +281,6 @@ export const useAiRequestState = ({
 
   const selectedAiRequest =
     (selectedAiRequestId && aiRequests[selectedAiRequestId]) || null;
-
-  const [shouldWatchRequest, setShouldWatchRequest] = React.useState<boolean>(
-    false
-  );
-  const [
-    isFetchingSuggestions,
-    setIsFetchingSuggestions,
-  ] = React.useState<boolean>(false);
   const [
     savingProjectForMessageId,
     setSavingProjectForMessageId,
@@ -342,80 +297,6 @@ export const useAiRequestState = ({
       ? fileMetadata.version
       : null;
 
-  // If the selected AI request is in a "working" state, watch it until it's finished.
-  const status = selectedAiRequest ? selectedAiRequest.status : null;
-  const onWatch = async () => {
-    if (!profile) return;
-    if (!selectedAiRequestId || !status || status !== 'working') return;
-
-    try {
-      // Use partial request to only fetch the status
-      const partialAiRequest = await getPartialAiRequest(
-        getAuthorizationHeader,
-        {
-          userId: profile.id,
-          aiRequestId: selectedAiRequestId,
-          include: 'status',
-        }
-      );
-
-      if (partialAiRequest.status === 'working') {
-        updateAiRequest(selectedAiRequestId, prevRequest => ({
-          ...(prevRequest || {}),
-          ...partialAiRequest,
-        }));
-      } else {
-        // The request is not "working" anymore, refresh it entirely.
-        // Note: if this fails, the request will be refreshed again on the next interval
-        // (because no call to updateAiRequest is made).
-        const aiRequest = await retryIfFailed({ times: 2 }, () =>
-          getAiRequest(getAuthorizationHeader, {
-            userId: profile.id,
-            aiRequestId: selectedAiRequestId,
-          })
-        );
-
-        updateAiRequest(selectedAiRequestId, () => aiRequest);
-
-        // If we were fetching suggestions and the request is now ready, or if suggestions
-        // are present in the last message, clear the flag
-        if (isFetchingSuggestions) {
-          const lastMessage =
-            aiRequest.output.length > 0
-              ? aiRequest.output[aiRequest.output.length - 1]
-              : null;
-          const hasSuggestions =
-            lastMessage &&
-            ((lastMessage.type === 'message' &&
-              lastMessage.role === 'assistant') ||
-              lastMessage.type === 'function_call_output') &&
-            lastMessage.suggestions;
-
-          if (aiRequest.status === 'ready' || hasSuggestions) {
-            setIsFetchingSuggestions(false);
-          }
-        }
-      }
-    } catch (error) {
-      console.warn(
-        'Error while watching AI request. Ignoring and will retry on the next interval.',
-        error
-      );
-    }
-  };
-
-  const watchPollingIntervalInMs =
-    (selectedAiRequest &&
-      selectedAiRequest.toolOptions &&
-      selectedAiRequest.toolOptions.watchPollingIntervalInMs) ||
-    1400;
-  useInterval(
-    () => {
-      onWatch();
-    },
-    shouldWatchRequest ? watchPollingIntervalInMs : null
-  );
-
   React.useEffect(
     () => {
       async function fetchSuggestionsIfNeeded() {
@@ -429,7 +310,8 @@ export const useAiRequestState = ({
         // Then ask for some.
         if (
           !selectedAiRequest ||
-          selectedAiRequest.mode !== 'agent' ||
+          (selectedAiRequest.mode !== 'agent' &&
+            selectedAiRequest.mode !== 'orchestrator') ||
           isSendingAiRequest(selectedAiRequest.id) ||
           selectedAiRequest.output.length === 0 ||
           selectedAiRequest.status !== 'ready' ||
@@ -469,6 +351,26 @@ export const useAiRequestState = ({
           return;
         }
 
+        const isLastMessageFunctionCallOutputProjectInitialization =
+          lastMessage.type === 'function_call_output' &&
+          getFunctionCallNameByCallId({
+            aiRequest: selectedAiRequest,
+            callId: lastMessage.call_id,
+          }) === 'initialize_project';
+
+        if (selectedAiRequest.mode === 'orchestrator') {
+          if (isLastMessageFunctionCallOutputProjectInitialization) {
+            // Don't fetch suggestions right after project initialization, as a plan
+            // will be generated in the next messages and we want to display it instead.
+            return;
+          }
+          if (getLatestActivePlan(selectedAiRequest)) {
+            // For orchestrator mode, don't fetch suggestions if there is an active plan
+            // being displayed.
+            return;
+          }
+        }
+
         const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
         const simplifiedProjectJson = project
           ? JSON.stringify(
@@ -489,13 +391,6 @@ export const useAiRequestState = ({
           projectSpecificExtensionsSummaryJson,
           eventsJson: null,
         });
-
-        const isLastMessageFunctionCallOutputProjectInitialization =
-          lastMessage.type === 'function_call_output' &&
-          getFunctionCallNameByCallId({
-            aiRequest: selectedAiRequest,
-            callId: lastMessage.call_id,
-          }) === 'initialize_project';
 
         try {
           // The request will switch from "ready" to "working" while suggestions are generated.
@@ -565,6 +460,7 @@ export const useAiRequestState = ({
       updateAiRequest,
       isSendingAiRequest,
       isFetchingSuggestions,
+      setIsFetchingSuggestions,
     ]
   );
 
@@ -644,7 +540,8 @@ export const useAiRequestState = ({
         // to allow the user to restore the project to that state later.
         if (
           !selectedAiRequest ||
-          selectedAiRequest.mode !== 'agent' ||
+          (selectedAiRequest.mode !== 'agent' &&
+            selectedAiRequest.mode !== 'orchestrator') ||
           isSendingAiRequest(selectedAiRequest.id) ||
           selectedAiRequest.output.length === 0 ||
           !profile ||
@@ -679,6 +576,20 @@ export const useAiRequestState = ({
           getEditorFunctionCallResults(selectedAiRequest.id)
         );
 
+        const hasJustInitializedProject =
+          lastMessage.type === 'function_call_output' &&
+          getFunctionCallNameByCallId({
+            aiRequest: selectedAiRequest,
+            callId: lastMessage.call_id,
+          }) === 'initialize_project';
+
+        // Save as cloud project right after initialization, even if the request
+        // is still working (orchestrator keeps running after initialize_project).
+        const shouldSaveProjectAsAfterInitialization =
+          hasJustInitializedProject &&
+          !currentlyOpenedCloudProjectVersionId &&
+          !isCloudProjectsMaximumReached;
+
         const shouldSaveVersionBeforeMessage =
           lastMessage.type === 'message' &&
           lastMessage.role === 'user' &&
@@ -690,18 +601,13 @@ export const useAiRequestState = ({
           !lastMessage.projectVersionIdAfterMessage &&
           !hasFunctionsCallsToProcess &&
           !hasUnfinishedResult;
-        if (!shouldSaveVersionBeforeMessage && !shouldSaveVersionAfterMessage) {
+        if (
+          !shouldSaveVersionBeforeMessage &&
+          !shouldSaveVersionAfterMessage &&
+          !shouldSaveProjectAsAfterInitialization
+        ) {
           return;
         }
-
-        const hasJustInitializedProject =
-          lastMessage.type === 'function_call_output' &&
-          lastMessage.call_id.indexOf('initialize_project') !== -1;
-
-        const shouldSaveProjectAsAfterInitialization =
-          hasJustInitializedProject &&
-          !currentlyOpenedCloudProjectVersionId &&
-          !isCloudProjectsMaximumReached;
         try {
           if (shouldSaveProjectAsAfterInitialization) {
             console.info(
@@ -734,8 +640,9 @@ export const useAiRequestState = ({
                 await updateAiRequestWithProjectVersion({
                   lastMessageId,
                   version: newVersion,
-                  shouldSaveVersionBeforeMessage,
-                  shouldSaveVersionAfterMessage,
+                  // The initialization output is always an "after message" version.
+                  shouldSaveVersionBeforeMessage: false,
+                  shouldSaveVersionAfterMessage: true,
                 });
               } catch (error) {
                 console.error(
@@ -839,26 +746,6 @@ export const useAiRequestState = ({
 
   React.useEffect(
     () => {
-      if (
-        selectedAiRequestId &&
-        selectedAiRequest &&
-        selectedAiRequest.status === 'working'
-      ) {
-        setShouldWatchRequest(true);
-      } else {
-        setShouldWatchRequest(false);
-      }
-
-      // Ensure we stop watching when the request is no longer working.
-      return () => {
-        setShouldWatchRequest(false);
-      };
-    },
-    [selectedAiRequestId, selectedAiRequest]
-  );
-
-  React.useEffect(
-    () => {
       // Reset selected request if user logs out.
       if (!profile) {
         setAiState({
@@ -922,7 +809,7 @@ export type OpenAskAiOptions = {|
 |};
 
 export type NewAiRequestOptions = {|
-  mode: 'chat' | 'agent',
+  mode: 'chat' | 'agent' | 'orchestrator',
   userRequest: string,
   aiConfigurationPresetId: string,
 |};

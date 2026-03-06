@@ -17,6 +17,8 @@ import {
   createAiRequest,
   sendAiRequestFeedback,
   forkAiRequest,
+  suspendAiRequest,
+  getAiRequest,
   type AiRequest,
   type AiRequestMessage,
 } from '../Utils/GDevelopServices/Generation';
@@ -36,6 +38,7 @@ import {
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { type EditorCallbacks } from '../EditorFunctions';
 import {
+  aiRequestHasWorkInProgress,
   getFunctionCallNameByCallId,
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
@@ -73,6 +76,7 @@ import {
   useProcessFunctionCalls,
   AI_AGENT_TOOLS_VERSION,
   AI_CHAT_TOOLS_VERSION,
+  AI_ORCHESTRATOR_TOOLS_VERSION,
 } from './Utils';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
@@ -201,6 +205,12 @@ export type AskAiEditorInterface = {|
   ) => void,
   notifyChangesToInGameEditor: (hotReloadSteps: HotReloadSteps) => void,
   switchInGameEditorIfNoHotReloadIsNeeded: () => void,
+  /**
+   * Call before closing this tab to reposition it to a different pane.
+   * Prevents the unmount cleanup from suspending the active AI request,
+   * since the tab is being moved rather than intentionally closed.
+   */
+  prepareToReposition: () => void,
 |};
 
 const noop = () => {};
@@ -402,6 +412,11 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         subscription,
       } = authenticatedUser;
 
+      const [isRefreshingLimits, setIsRefreshingLimits] = React.useState(false);
+      const [isSendingUserMessage, setIsSendingUserMessage] = React.useState(
+        false
+      );
+
       const availableCredits = limits ? limits.credits.userBalance.amount : 0;
       const quota =
         (limits && limits.quotas && limits.quotas['consumed-ai-credits']) ||
@@ -418,7 +433,16 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
       React.useEffect(
         () => {
           if (isActive) {
-            onRefreshLimits();
+            (async () => {
+              setIsRefreshingLimits(true);
+              try {
+                await onRefreshLimits();
+              } catch (error) {
+                // Ignore limits refresh error.
+              }
+              await delay(200);
+              setIsRefreshingLimits(false);
+            })();
           }
         },
         [isActive, onRefreshLimits]
@@ -480,6 +504,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 : null;
 
               setSendingAiRequest(null, true);
+              setIsSendingUserMessage(true);
 
               const preparedAiUserContent = await prepareAiUserContent({
                 getAuthorizationHeader,
@@ -508,6 +533,8 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 toolsVersion:
                   mode === 'agent'
                     ? AI_AGENT_TOOLS_VERSION
+                    : mode === 'orchestrator'
+                    ? AI_ORCHESTRATOR_TOOLS_VERSION
                     : AI_CHAT_TOOLS_VERSION,
                 aiConfiguration: {
                   presetId: aiConfigurationPresetId,
@@ -516,6 +543,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
 
               console.info('Successfully created a new AI request:', aiRequest);
               setSendingAiRequest(null, false);
+              setIsSendingUserMessage(false);
               updateAiRequest(aiRequest.id, () => aiRequest);
 
               // Select the new AI request just created - unless the user switched to another one
@@ -547,16 +575,20 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             } catch (error) {
               console.error('Error starting a new AI request:', error);
               setLastSendError(null, error);
+              setIsSendingUserMessage(false);
             }
 
             // Refresh the user limits, to ensure quota and credits information
             // is up-to-date after an AI request.
             await delay(500);
+            setIsRefreshingLimits(true);
             try {
               await retryIfFailed({ times: 2 }, onRefreshLimits);
             } catch (error) {
               // Ignore limits refresh error.
             }
+            await delay(200);
+            setIsRefreshingLimits(false);
           })();
         },
         [
@@ -574,6 +606,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           setLastSendError,
           setAiState,
           setSendingAiRequest,
+          setIsSendingUserMessage,
           upToDateSelectedAiRequestId,
           updateAiRequest,
           newAiRequestOptions,
@@ -595,7 +628,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           createdSceneNames?: Array<string>,
           createdProject?: ?gdProject,
           editorFunctionCallResults: Array<EditorFunctionCallResult>,
-          mode?: 'chat' | 'agent',
+          mode?: 'chat' | 'agent' | 'orchestrator',
         |}) => {
           if (
             !profile ||
@@ -650,6 +683,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
 
           try {
             setSendingAiRequest(selectedAiRequestId, true);
+            if (userMessage) setIsSendingUserMessage(true);
 
             const upToDateProject = createdProject || project;
 
@@ -713,11 +747,14 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                   : undefined,
                 payWithCredits,
                 userMessage,
-                paused: hasJustInitializedProject,
+                paused:
+                  hasJustInitializedProject && modeForThisMessage === 'agent',
                 mode,
                 toolsVersion:
                   mode === 'agent'
                     ? AI_AGENT_TOOLS_VERSION
+                    : mode === 'orchestrator'
+                    ? AI_ORCHESTRATOR_TOOLS_VERSION
                     : mode === 'chat'
                     ? AI_CHAT_TOOLS_VERSION
                     : undefined,
@@ -725,6 +762,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             );
             updateAiRequest(aiRequest.id, () => aiRequest);
             setSendingAiRequest(aiRequest.id, false);
+            setIsSendingUserMessage(false);
             clearEditorFunctionCallResults(aiRequest.id);
 
             if (userMessage) {
@@ -744,6 +782,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           } catch (error) {
             // TODO: update the label of the button to send again.
             setLastSendError(selectedAiRequestId, error);
+            setIsSendingUserMessage(false);
           }
 
           if (userMessage) {
@@ -757,11 +796,14 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           // Refresh the user limits, to ensure quota and credits information
           // is up-to-date after an AI request.
           await delay(500);
+          setIsRefreshingLimits(true);
           try {
             await retryIfFailed({ times: 2 }, onRefreshLimits);
           } catch (error) {
             // Ignore limits refresh error.
           }
+          await delay(200);
+          setIsRefreshingLimits(false);
 
           if (
             selectedAiRequest &&
@@ -785,6 +827,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           aiRequestPriceInCredits,
           availableCredits,
           setSendingAiRequest,
+          setIsSendingUserMessage,
           updateAiRequest,
           clearEditorFunctionCallResults,
           getAuthorizationHeader,
@@ -814,11 +857,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         },
         [onSendMessage]
       );
-      const {
-        isAutoProcessingFunctionCalls,
-        setAutoProcessFunctionCalls,
-        onProcessFunctionCalls,
-      } = useProcessFunctionCalls({
+      const { onProcessFunctionCalls } = useProcessFunctionCalls({
         project,
         resourceManagementProps,
         selectedAiRequest,
@@ -838,23 +877,14 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
 
       React.useEffect(() => {
         // When component is mounted, and an AI request was already selected,
-        // ensure function calls are not auto-processed,
-        // except if specified otherwise.
-        // Otherwise it will automatically resume processing on old requests,
-        // affecting the project without the user explicitly asking for it.
+        // ensure we reset the selection if not logged in.
         if (selectedAiRequestId) {
-          // If not logged in, reset selection.
           if (!profile) {
             setAiState({
               aiRequestId: null,
             });
             return;
           }
-
-          setAutoProcessFunctionCalls(
-            selectedAiRequestId,
-            !!continueProcessingFunctionCallsOnMount
-          );
         }
 
         setIsReadyToProcessFunctionCalls(true);
@@ -868,18 +898,29 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             aiRequestId: string | null,
           |}
         ) => {
-          const newOpenedRequestId = options && options.aiRequestId;
-          if (newOpenedRequestId) {
-            // If we're opening a new request,
-            // ensure it is paused, so we don't resume processing
-            // without the user's consent.
-            setAutoProcessFunctionCalls(newOpenedRequestId, false);
-          }
           if (options) {
+            // Suspend the current request when navigating away from it.
+            // upToDateOnStop is defined below - it is always up-to-date via the ref.
+            if (
+              selectedAiRequest &&
+              options.aiRequestId !== selectedAiRequest.id
+            ) {
+              // upToDateOnStop is declared below this callback, but it is only
+              // ever called at event-handler time (post-render), so it is always
+              // initialised by the time this runs.
+              // eslint-disable-next-line no-use-before-define
+              upToDateOnStop.current().catch(err => {
+                console.error(
+                  'Failed to suspend AI request when starting new chat:',
+                  err
+                );
+              });
+            }
             setAiState(options);
           }
         },
-        [setAiState, setAutoProcessFunctionCalls]
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [setAiState, selectedAiRequest]
       );
       const onStartNewChat = React.useCallback(
         () => {
@@ -923,6 +964,9 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         startOrOpenChat: onStartOrOpenChat,
         notifyChangesToInGameEditor: setEditorHotReloadNeeded,
         switchInGameEditorIfNoHotReloadIsNeeded: noop,
+        prepareToReposition: () => {
+          skipSuspendOnCloseRef.current = true;
+        },
       }));
 
       const onSendFeedback = React.useCallback(
@@ -955,6 +999,99 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           }
         },
         [getAuthorizationHeader, profile]
+      );
+
+      const onStop = React.useCallback(
+        async () => {
+          if (!selectedAiRequest || !profile) return;
+          const editorFunctionCallResultsForRequest =
+            getEditorFunctionCallResults(selectedAiRequest.id) || [];
+          if (
+            !aiRequestHasWorkInProgress(
+              selectedAiRequest,
+              editorFunctionCallResultsForRequest
+            )
+          )
+            return;
+          // Optimistic update: mark as suspended locally immediately so that
+          // any in-flight async code (e.g. processEditorFunctionCalls,
+          // prepareAiUserContent) sees the suspended status after the next
+          // React render — before the API call even completes.
+          const requestIdToSuspend = selectedAiRequest.id;
+          updateAiRequest(requestIdToSuspend, prevRequest => ({
+            ...(prevRequest || selectedAiRequest),
+            status: 'suspended',
+          }));
+          clearEditorFunctionCallResults(requestIdToSuspend);
+
+          const suspendedRequest = await suspendAiRequest(
+            getAuthorizationHeader,
+            {
+              userId: profile.id,
+              aiRequestId: requestIdToSuspend,
+            }
+          );
+          updateAiRequest(suspendedRequest.id, () => suspendedRequest);
+        },
+        [
+          selectedAiRequest,
+          profile,
+          getAuthorizationHeader,
+          updateAiRequest,
+          clearEditorFunctionCallResults,
+          getEditorFunctionCallResults,
+        ]
+      );
+
+      const upToDateOnStop = useStableUpToDateRef(onStop);
+
+      // Do a full fetch when the tab is opened to ensure the UI starts with
+      // up-to-date server state (e.g. request may have been suspended while
+      // the tab was closed).
+      React.useEffect(
+        () => {
+          if (!selectedAiRequest || !profile) return;
+          retryIfFailed({ times: 2 }, () =>
+            getAiRequest(getAuthorizationHeader, {
+              userId: profile.id,
+              aiRequestId: selectedAiRequest.id,
+            })
+          )
+            .then(aiRequest => {
+              updateAiRequest(aiRequest.id, () => aiRequest);
+            })
+            .catch(error => {
+              console.warn('Error fetching AI request on tab open:', error);
+            });
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        []
+      );
+
+      // When set to true before unmount, the cleanup will skip suspending the
+      // AI request (used when the tab is being repositioned to another pane).
+      const skipSuspendOnCloseRef = React.useRef(false);
+
+      // Suspend any running AI request when this editor tab is closed.
+      React.useEffect(
+        () => {
+          return () => {
+            if (skipSuspendOnCloseRef.current) {
+              // Tab is being repositioned to another pane — do not suspend.
+              return;
+            }
+            // Fire and forget - cannot await in a cleanup function.
+            // We intentionally read upToDateOnStop.current at cleanup time so
+            // we get the latest selectedAiRequest snapshot (that's the point of
+            // the stable ref).
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            upToDateOnStop.current().catch(err => {
+              console.error('Failed to suspend AI request on tab close:', err);
+            });
+          };
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        []
       );
 
       const onRestore = React.useCallback(
@@ -1231,7 +1368,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                   mode,
                 }: {|
                   userMessage: string,
-                  mode: 'chat' | 'agent',
+                  mode: 'chat' | 'agent' | 'orchestrator',
                 |}) =>
                   onSendMessage({
                     userMessage,
@@ -1242,6 +1379,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                   })
                 }
                 isSending={isSendingAiRequest(selectedAiRequestId)}
+                isSendingUserMessage={isSendingUserMessage}
                 lastSendError={getLastSendError(selectedAiRequestId)}
                 quota={quota}
                 increaseQuotaOffering={
@@ -1259,20 +1397,10 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 }
                 price={aiRequestPrice}
                 availableCredits={availableCredits}
+                isRefreshingLimits={isRefreshingLimits}
                 onSendFeedback={onSendFeedback}
                 hasOpenedProject={!!project}
-                isAutoProcessingFunctionCalls={
-                  selectedAiRequest
-                    ? isAutoProcessingFunctionCalls(selectedAiRequest.id)
-                    : false
-                }
-                setAutoProcessFunctionCalls={shouldAutoProcess => {
-                  if (!selectedAiRequest) return;
-                  setAutoProcessFunctionCalls(
-                    selectedAiRequest.id,
-                    shouldAutoProcess
-                  );
-                }}
+                onStop={onStop}
                 i18n={i18n}
                 editorCallbacks={editorCallbacks}
                 onStartOrOpenChat={onStartOrOpenChat}
@@ -1286,16 +1414,40 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           <AskAiHistory
             open={isHistoryOpen}
             onClose={onCloseHistory}
-            onSelectAiRequest={aiRequest => {
-              // Ensure function calls are not auto-processed when opening from history,
-              // otherwise it will automatically resume processing.
-              setAutoProcessFunctionCalls(aiRequest.id, false);
+            onSelectAiRequest={async aiRequest => {
+              let requestToOpen = aiRequest;
+              // Suspend the request if it was left with work in progress (e.g. from a previous session).
+              const editorFunctionCallResultsForRequest =
+                getEditorFunctionCallResults(aiRequest.id) || [];
+              if (
+                aiRequestHasWorkInProgress(
+                  aiRequest,
+                  editorFunctionCallResultsForRequest
+                ) &&
+                profile
+              ) {
+                try {
+                  requestToOpen = await suspendAiRequest(
+                    getAuthorizationHeader,
+                    {
+                      userId: profile.id,
+                      aiRequestId: aiRequest.id,
+                    }
+                  );
+                  clearEditorFunctionCallResults(requestToOpen.id);
+                } catch (err) {
+                  console.error(
+                    'Failed to suspend AI request when opening from history:',
+                    err
+                  );
+                }
+              }
               // Immediately switch the UI and refresh in the background.
-              updateAiRequest(aiRequest.id, () => aiRequest);
+              updateAiRequest(requestToOpen.id, () => requestToOpen);
               setAiState({
-                aiRequestId: aiRequest.id,
+                aiRequestId: requestToOpen.id,
               });
-              refreshAiRequest(aiRequest.id);
+              refreshAiRequest(requestToOpen.id);
               onCloseHistory();
             }}
             selectedAiRequestId={selectedAiRequestId}

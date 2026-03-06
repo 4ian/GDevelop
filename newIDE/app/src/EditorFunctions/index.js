@@ -61,7 +61,7 @@ export type EditorFunctionCallResult =
       output: any,
     |}
   | {|
-      status: 'ignored',
+      status: 'aborted',
       call_id: string,
     |};
 
@@ -126,6 +126,10 @@ export type EditorFunctionGenericOutput = {|
   newObjectDefaultSize?: {
     [string]: {| size: string, origin: string, center: string |},
   },
+
+  // Set to true when the function call was aborted mid-execution (e.g. the AI
+  // request was suspended while event generation was still polling).
+  aborted?: true,
 |};
 
 export type EventsGenerationResult =
@@ -136,6 +140,9 @@ export type EventsGenerationResult =
   | {|
       generationCompleted: false,
       errorMessage: string,
+    |}
+  | {|
+      generationAborted: true,
     |};
 
 export type EventsGenerationOptions = {|
@@ -616,7 +623,7 @@ const createOrReplaceObject: EditorFunction = {
     return {
       text: replaceExistingObject ? (
         <Trans>
-          Replace object <b>{object_name}</b> in scene{' '}
+          Replace <b>{object_name}</b> in scene{' '}
           <Link
             href="#"
             onClick={() =>
@@ -633,8 +640,8 @@ const createOrReplaceObject: EditorFunction = {
         </Trans>
       ) : duplicatedObjectName ? (
         <Trans>
-          Duplicate object <b>{duplicatedObjectName}</b> as <b>{object_name}</b>{' '}
-          in scene{' '}
+          Duplicate <b>{duplicatedObjectName}</b> as <b>{object_name}</b> in
+          scene{' '}
           <Link
             href="#"
             onClick={() =>
@@ -651,7 +658,7 @@ const createOrReplaceObject: EditorFunction = {
         </Trans>
       ) : (
         <Trans>
-          Create object <b>{object_name}</b> in scene{' '}
+          Add <b>{object_name}</b> to scene{' '}
           <Link
             href="#"
             onClick={() =>
@@ -1189,7 +1196,7 @@ const inspectObjectProperties: EditorFunction = {
     return {
       text: (
         <Trans>
-          Inspecting properties of object <b>{object_name}</b> in scene{' '}
+          Read <b>{object_name}</b>'s properties in scene{' '}
           <Link
             href="#"
             onClick={() =>
@@ -1315,13 +1322,13 @@ const changeObjectProperty: EditorFunction = {
           text:
             label === 'name' ? (
               <Trans>
-                Rename object "{object_name}" to "<b>{newValue}</b>" (in scene{' '}
+                Rename <b>{object_name}</b> to <b>{newValue}</b> (in scene{' '}
                 {scene_name}).
               </Trans>
             ) : (
               <Trans>
-                Change property "<b>{label}</b>" of object <b>{object_name}</b>{' '}
-                (in scene {scene_name}) to <b>{newValue}</b>.
+                Update <b>{label}</b> of <b>{object_name}</b> (in scene{' '}
+                {scene_name}) to <b>{newValue}</b>.
               </Trans>
             ),
         };
@@ -1330,7 +1337,7 @@ const changeObjectProperty: EditorFunction = {
       return {
         text: (
           <Trans>
-            Change {changes.length} properties of object {object_name} (in scene{' '}
+            Update {changes.length} properties of <b>{object_name}</b> (in scene{' '}
             {scene_name}).
           </Trans>
         ),
@@ -1339,11 +1346,11 @@ const changeObjectProperty: EditorFunction = {
           <ColumnStackLayout noMargin>
             {changes.map(change =>
               change.label === 'name' ? (
-                <Text key={change.label} noMargin>
+                <Text key={change.label} noMargin size="body-small">
                   <Trans>Renamed object to {change.newValue}.</Trans>
                 </Text>
               ) : (
-                <Text key={change.label} noMargin>
+                <Text key={change.label} noMargin size="body-small">
                   <Trans>
                     <b>{change.label}</b> set to {change.newValue}.
                   </Trans>
@@ -1611,7 +1618,7 @@ const addBehavior: EditorFunction = {
       return {
         text: (
           <Trans>
-            Add behavior {behaviorName} (<b>{behaviorTypeLabel}</b>) on object{' '}
+            Add {behaviorName} (<b>{behaviorTypeLabel}</b>) behavior to{' '}
             <b>{object_name}</b> in scene{' '}
             <Link
               href="#"
@@ -1823,8 +1830,8 @@ const removeBehavior: EditorFunction = {
     return {
       text: (
         <Trans>
-          Remove behavior {behavior_name} from object {object_name} in scene{' '}
-          {scene_name}.
+          Remove <b>{behavior_name}</b> behavior from <b>{object_name}</b> in
+          scene {scene_name}.
         </Trans>
       ),
     };
@@ -1897,8 +1904,8 @@ const inspectBehaviorProperties: EditorFunction = {
     return {
       text: (
         <Trans>
-          Inspecting properties of behavior {behavior_name} on object{' '}
-          {object_name} in scene {scene_name}.
+          Read <b>{behavior_name}</b>'s settings on <b>{object_name}</b> in
+          scene {scene_name}.
         </Trans>
       ),
     };
@@ -1998,8 +2005,8 @@ const changeBehaviorProperty: EditorFunction = {
         return {
           text: (
             <Trans>
-              Change property "<b>{label}</b>" of behavior {behavior_name} on
-              object <b>{object_name}</b> (in scene{' '}
+              Update <b>{label}</b> of behavior {behavior_name} on object{' '}
+              <b>{object_name}</b> (in scene{' '}
               <Link
                 href="#"
                 onClick={() =>
@@ -2021,7 +2028,7 @@ const changeBehaviorProperty: EditorFunction = {
       return {
         text: (
           <Trans>
-            Changed {changes.length} properties of behavior {behavior_name} on
+            Update {changes.length} settings of behavior {behavior_name} on
             object {object_name} (in scene {scene_name}).
           </Trans>
         ),
@@ -2029,7 +2036,7 @@ const changeBehaviorProperty: EditorFunction = {
         details: shouldShowDetails ? (
           <ColumnStackLayout noMargin>
             {changes.map(change => (
-              <Text key={change.label} noMargin>
+              <Text key={change.label} noMargin size="body-small">
                 <Trans>
                   <b>{change.label}</b> set to {change.newValue}.
                 </Trans>
@@ -2290,7 +2297,7 @@ const describeInstances: EditorFunction = {
     return {
       text: (
         <Trans>
-          Inspecting instances of scene{' '}
+          Read instances in scene{' '}
           <Link
             href="#"
             onClick={() =>
@@ -2301,8 +2308,9 @@ const describeInstances: EditorFunction = {
               })
             }
           >
-            {scene_name}.
+            {scene_name}
           </Link>
+          .
         </Trans>
       ),
     };
@@ -2377,10 +2385,8 @@ const describeInstances: EditorFunction = {
 // $FlowFixMe[missing-local-annot]
 const iterateOnInstances = (initialInstances, callback) => {
   const instanceGetter = new gd.InitialInstanceJSFunctor();
-  // $FlowFixMe[incompatible-type] - invoke is not writable
   // $FlowFixMe[cannot-write]
   instanceGetter.invoke = instancePtr => {
-    // $FlowFixMe[incompatible-type] - wrapPointer is not exposed
     const instance: gdInitialInstance = gd.wrapPointer(
       // $FlowFixMe[incompatible-type]
       instancePtr,
@@ -2388,7 +2394,6 @@ const iterateOnInstances = (initialInstances, callback) => {
     );
     callback(instance);
   };
-  // $FlowFixMe[incompatible-type] - JSFunctor is incompatible with Functor
   initialInstances.iterateOverInstances(instanceGetter);
   instanceGetter.delete();
 };
@@ -2449,7 +2454,7 @@ const put2dInstances: EditorFunction = {
       return {
         text: (
           <Trans>
-            Add {newInstancesCount} instance(s) of object {object_name} at{' '}
+            Place {newInstancesCount} <b>{object_name}</b> instance(s) at{' '}
             {brushPosition ? (
               brushPosition.join(', ')
             ) : (
@@ -2463,7 +2468,7 @@ const put2dInstances: EditorFunction = {
       return {
         text: (
           <Trans>
-            Move {existingInstanceCount} instance(s) of object {object_name} to{' '}
+            Move {existingInstanceCount} <b>{object_name}</b> instance(s) to{' '}
             {brushPosition ? (
               brushPosition.join(', ')
             ) : (
@@ -2477,8 +2482,8 @@ const put2dInstances: EditorFunction = {
       return {
         text: (
           <Trans>
-            Add {newInstancesCount} instance(s) and move {existingInstanceCount}{' '}
-            instance(s) of object {object_name} to{' '}
+            Place {newInstancesCount} and move {existingInstanceCount}{' '}
+            <b>{object_name}</b> instance(s) to{' '}
             {brushPosition ? (
               brushPosition.join(', ')
             ) : (
@@ -2995,7 +3000,7 @@ const put3dInstances: EditorFunction = {
       return {
         text: (
           <Trans>
-            Add {newInstancesCount} instance(s) of object {object_name} at{' '}
+            Place {newInstancesCount} <b>{object_name}</b> instance(s) at{' '}
             {brushPosition ? (
               brushPosition.join(', ')
             ) : (
@@ -3009,7 +3014,7 @@ const put3dInstances: EditorFunction = {
       return {
         text: (
           <Trans>
-            Move {existingInstanceCount} instance(s) of object {object_name} to{' '}
+            Move {existingInstanceCount} <b>{object_name}</b> instance(s) to{' '}
             {brushPosition ? (
               brushPosition.join(', ')
             ) : (
@@ -3023,8 +3028,8 @@ const put3dInstances: EditorFunction = {
       return {
         text: (
           <Trans>
-            Add {newInstancesCount} instance(s) and move {existingInstanceCount}{' '}
-            instance(s) of object {object_name} to{' '}
+            Place {newInstancesCount} and move {existingInstanceCount}{' '}
+            <b>{object_name}</b> instance(s) to{' '}
             {brushPosition ? (
               brushPosition.join(', ')
             ) : (
@@ -3452,7 +3457,7 @@ const readSceneEvents: EditorFunction = {
     return {
       text: (
         <Trans>
-          Inspecting event sheet of scene{' '}
+          Read events in scene{' '}
           <Link
             href="#"
             onClick={() =>
@@ -3519,6 +3524,7 @@ const addSceneEvents: EditorFunction = {
             noMargin
             allowSelection
             color="secondary"
+            size="body-small"
             style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
           >
             <b>
@@ -3532,6 +3538,7 @@ const addSceneEvents: EditorFunction = {
             noMargin
             allowSelection
             color="secondary"
+            size="body-small"
             style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
           >
             <b>
@@ -3545,6 +3552,7 @@ const addSceneEvents: EditorFunction = {
             noMargin
             allowSelection
             color="secondary"
+            size="body-small"
             style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
           >
             <b>
@@ -3560,7 +3568,7 @@ const addSceneEvents: EditorFunction = {
       return {
         text: (
           <Trans>
-            Add or rework{' '}
+            Write events for scene{' '}
             <Link
               href="#"
               onClick={() =>
@@ -3571,7 +3579,7 @@ const addSceneEvents: EditorFunction = {
                 })
               }
             >
-              events of scene {scene_name}
+              {scene_name}
             </Link>
             .
           </Trans>
@@ -3583,7 +3591,7 @@ const addSceneEvents: EditorFunction = {
       return {
         text: (
           <Trans>
-            Adapt{' '}
+            Adapt events in scene{' '}
             <Link
               href="#"
               onClick={() =>
@@ -3594,7 +3602,7 @@ const addSceneEvents: EditorFunction = {
                 })
               }
             >
-              events of scene {scene_name}
+              {scene_name}
             </Link>{' '}
             ("{placementHint}").
           </Trans>
@@ -3606,7 +3614,7 @@ const addSceneEvents: EditorFunction = {
       return {
         text: (
           <Trans>
-            Modify{' '}
+            Update events in scene{' '}
             <Link
               href="#"
               onClick={() =>
@@ -3617,7 +3625,7 @@ const addSceneEvents: EditorFunction = {
                 })
               }
             >
-              events of scene {scene_name}
+              {scene_name}
             </Link>
             .
           </Trans>
@@ -3690,6 +3698,10 @@ const addSceneEvents: EditorFunction = {
           estimatedComplexity,
         }
       );
+
+      if (eventsGenerationResult.generationAborted) {
+        return { success: false, aborted: true };
+      }
 
       if (!eventsGenerationResult.generationCompleted) {
         return makeGenericFailure(
@@ -3900,7 +3912,7 @@ const createScene: EditorFunction = {
     return {
       text: (
         <Trans>
-          Create a new scene called <b>{scene_name}</b>.{' '}
+          Create scene <b>{scene_name}</b>.{' '}
           <Link
             href="#"
             onClick={() =>
@@ -3977,7 +3989,11 @@ const deleteScene: EditorFunction = {
     const scene_name = extractRequiredString(args, 'scene_name');
 
     return {
-      text: <Trans>Delete scene {scene_name}.</Trans>,
+      text: (
+        <Trans>
+          Remove scene <b>{scene_name}</b>.
+        </Trans>
+      ),
     };
   },
   launchFunction: async ({ project, args }) => {
@@ -4037,8 +4053,7 @@ const inspectScenePropertiesLayersEffects: EditorFunction = {
     return {
       text: (
         <Trans>
-          Inspecting scene properties, layers and effects for scene {scene_name}
-          .
+          Read <b>{scene_name}</b>'s scene settings.
         </Trans>
       ),
     };
@@ -4145,62 +4160,61 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         changedLayerEffectsCount > 0 &&
         changedGroupsCount > 0 ? (
           <Trans>
-            Changing some scene properties, layers, effects and groups for scene{' '}
+            Update some scene properties, layers, effects and groups for scene{' '}
             {scene_name}.
           </Trans>
         ) : changedPropertiesCount > 0 &&
           changedLayersCount > 0 &&
           changedGroupsCount > 0 ? (
           <Trans>
-            Changing some scene properties, layers and groups for scene{' '}
+            Update some scene properties, layers and groups for scene{' '}
             {scene_name}.
           </Trans>
         ) : changedPropertiesCount > 0 &&
           changedLayerEffectsCount > 0 &&
           changedGroupsCount > 0 ? (
           <Trans>
-            Changing some scene properties, effects and groups for scene{' '}
+            Update some scene properties, effects and groups for scene{' '}
             {scene_name}.
           </Trans>
         ) : changedLayerEffectsCount > 0 &&
           changedLayersCount > 0 &&
           changedGroupsCount > 0 ? (
           <Trans>
-            Changing some scene effects, layers and groups for scene{' '}
-            {scene_name}.
+            Update some scene effects, layers and groups for scene {scene_name}.
           </Trans>
         ) : changedPropertiesCount > 0 && changedGroupsCount > 0 ? (
           <Trans>
-            Changing some scene properties and groups for scene {scene_name}.
+            Update some scene properties and groups for scene {scene_name}.
           </Trans>
         ) : changedLayersCount > 0 && changedGroupsCount > 0 ? (
           <Trans>
-            Changing some scene layers and groups for scene {scene_name}.
+            Update some scene layers and groups for scene {scene_name}.
           </Trans>
         ) : changedLayerEffectsCount > 0 && changedGroupsCount > 0 ? (
           <Trans>
-            Changing some scene effects and groups for scene {scene_name}.
+            Update some scene effects and groups for scene {scene_name}.
           </Trans>
         ) : changedPropertiesCount > 0 && changedLayersCount > 0 ? (
           <Trans>
-            Changing some scene properties and layers for scene {scene_name}.
+            Update some scene properties and layers for scene {scene_name}.
           </Trans>
         ) : changedPropertiesCount > 0 && changedLayerEffectsCount > 0 ? (
           <Trans>
-            Changing some scene properties and effects for scene {scene_name}.
+            Update some scene properties and effects for scene {scene_name}.
           </Trans>
         ) : changedLayerEffectsCount > 0 && changedLayersCount > 0 ? (
           <Trans>
-            Changing some scene effects and layers for scene {scene_name}.
+            Update some scene effects and layers for scene {scene_name}.
           </Trans>
         ) : changedPropertiesCount > 0 ? (
-          <Trans>Changing some scene properties for scene {scene_name}.</Trans>
+          <Trans>Update some scene properties for scene {scene_name}.</Trans>
         ) : changedLayersCount > 0 ? (
-          <Trans>Changing some scene layers for scene {scene_name}.</Trans>
+          <Trans>Update some scene layers for scene {scene_name}.</Trans>
         ) : changedLayerEffectsCount > 0 ? (
-          <Trans>Changing some scene effects for scene {scene_name}.</Trans>
+          <Trans>Update some scene effects for scene {scene_name}.</Trans>
         ) : changedGroupsCount > 0 ? (
-          <Trans>Changing some scene groups for scene {scene_name}.</Trans>
+          <Trans>Update some scene groups for scene {scene_name}.</Trans>
         ) : (
           <Trans>Unknown changes attempted for scene {scene_name}.</Trans>
         ),
@@ -4729,7 +4743,7 @@ const addOrEditVariable: EditorFunction = {
 
     const details = shouldShowDetails ? (
       <ColumnStackLayout noMargin>
-        <Text noMargin allowSelection color="secondary">
+        <Text noMargin allowSelection color="secondary" size="body-small">
           <b>
             <Trans>Value</Trans>
           </b>
@@ -4742,7 +4756,7 @@ const addOrEditVariable: EditorFunction = {
       return {
         text: (
           <Trans>
-            Add or edit scene variable {variable_name_or_path} in scene{' '}
+            Set scene variable <b>{variable_name_or_path}</b> in scene{' '}
             {scene_name}.
           </Trans>
         ),
@@ -4753,8 +4767,7 @@ const addOrEditVariable: EditorFunction = {
       return {
         text: (
           <Trans>
-            Add or edit object variable {variable_name_or_path} for object{' '}
-            {object_name}.
+            Set <b>{object_name}</b>'s variable <b>{variable_name_or_path}</b>.
           </Trans>
         ),
         details,
@@ -4763,7 +4776,9 @@ const addOrEditVariable: EditorFunction = {
     } else if (variable_scope === 'global') {
       return {
         text: (
-          <Trans>Add or edit global variable {variable_name_or_path}.</Trans>
+          <Trans>
+            Set global variable <b>{variable_name_or_path}</b>.
+          </Trans>
         ),
         details,
         hasDetailsToShow: true,
@@ -4771,7 +4786,11 @@ const addOrEditVariable: EditorFunction = {
     }
 
     return {
-      text: <Trans>Add or edit variable {variable_name_or_path}.</Trans>,
+      text: (
+        <Trans>
+          Set variable <b>{variable_name_or_path}</b>.
+        </Trans>
+      ),
     };
   },
   launchFunction: async ({ project, args }) => {
@@ -4855,6 +4874,19 @@ const addOrEditVariable: EditorFunction = {
   },
 };
 
+const createOrUpdatePlan: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    return {
+      text: <Trans>Update the plan.</Trans>,
+    };
+  },
+  launchFunction: async ({ args }) => {
+    return makeGenericFailure(
+      `Unable to create or update plan - this is handled server-side.`
+    );
+  },
+};
+
 const readFullDocs: EditorFunction = {
   renderForEditor: ({ args }) => {
     const extension_names = SafeExtractor.extractStringProperty(
@@ -4863,9 +4895,7 @@ const readFullDocs: EditorFunction = {
     );
 
     return {
-      text: (
-        <Trans>Inspecting {extension_names} features and capabilities.</Trans>
-      ),
+      text: <Trans>Read docs for {extension_names}.</Trans>,
     };
   },
   launchFunction: async ({ args }) => {
@@ -4882,7 +4912,7 @@ const initializeProject: EditorFunctionWithoutProject = {
     return {
       text: (
         <Trans>
-          Initializing a new game project "{<b>{project_name}</b>}".
+          Set up the base for your project <b>{project_name}</b>.
         </Trans>
       ),
     };
@@ -4982,6 +5012,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   change_scene_properties_layers_effects_groups: changeScenePropertiesLayersEffectsGroups,
   add_or_edit_variable: addOrEditVariable,
   read_full_docs: readFullDocs,
+  create_or_update_plan: createOrUpdatePlan,
 };
 
 export const editorFunctionsWithoutProject: {

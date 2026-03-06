@@ -136,6 +136,71 @@ export const getFunctionCallNameByCallId = ({
   return null;
 };
 
+/**
+ * Extract the latest plan from the AI request if it exists and should be displayed.
+ * Returns null if no plan should be displayed (no plan exists, or all tasks are done/voided).
+ */
+export const getLatestActivePlan = (
+  aiRequest: AiRequest
+): {| tasks: Array<any> |} | null => {
+  let latestPlan = null;
+  for (let i = aiRequest.output.length - 1; i >= 0; i--) {
+    const message = aiRequest.output[i];
+    if (message.type === 'function_call_output' && message.output) {
+      try {
+        const output = JSON.parse(message.output);
+        if (output && output.plan && output.plan.tasks) {
+          latestPlan = output.plan;
+          break;
+        }
+      } catch (e) {
+        // Ignore parse errors
+      }
+    }
+  }
+
+  if (!latestPlan) return null;
+
+  const hasActiveTasks = latestPlan.tasks.some(
+    task => task.status !== 'done' && task.status !== 'voided'
+  );
+
+  if (!hasActiveTasks) return null;
+
+  return latestPlan;
+};
+
+/**
+ * Returns true if the AI request has work in progress that should be suspended:
+ * - The server is actively processing (status === 'working')
+ * - OR the request is ready with function calls that still need to be processed and sent back
+ */
+export const aiRequestHasWorkInProgress = (
+  aiRequest: AiRequest,
+  editorFunctionCallResults: Array<EditorFunctionCallResult> | null
+): boolean => {
+  if (aiRequest.status === 'working') return true;
+  // A function call is either either being processed or has been processed by the editor but not yet sent back
+  // (e.g. generateEvents that finished execution but the output hasn't been sent back to the AI with the follow-up request).
+  // This means there's still work in progress from the AI perspective, even if the editor is not actively working on a function call.
+  if (
+    editorFunctionCallResults &&
+    editorFunctionCallResults.some(
+      r => r.status === 'finished' || r.status === 'working'
+    )
+  )
+    return true;
+  if (aiRequest.status === 'ready') {
+    return (
+      getFunctionCallsToProcess({
+        aiRequest,
+        editorFunctionCallResults,
+      }).length > 0
+    );
+  }
+  return false;
+};
+
 export const getFunctionCallOutputsFromEditorFunctionCallResults = (
   editorFunctionCallResults: Array<EditorFunctionCallResult> | null
 ): {|
@@ -155,15 +220,6 @@ export const getFunctionCallOutputsFromEditorFunctionCallResults = (
           output: JSON.stringify({
             success: functionCallOutput.success,
             ...functionCallOutput.output,
-          }),
-        };
-      } else if (functionCallOutput.status === 'ignored') {
-        return {
-          type: 'function_call_output',
-          call_id: functionCallOutput.call_id,
-          output: JSON.stringify({
-            ignored: true,
-            message: 'This was marked as ignored by the user.',
           }),
         };
       }

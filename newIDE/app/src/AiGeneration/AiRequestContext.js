@@ -2,6 +2,7 @@
 import * as React from 'react';
 import {
   getAiRequest,
+  getPartialAiRequest,
   fetchAiSettings,
   type AiRequest,
   type AiSettings,
@@ -13,6 +14,8 @@ import Window from '../Utils/Window';
 import { AI_SETTINGS_FETCH_TIMEOUT } from '../Utils/GlobalFetchTimeouts';
 import { useAsyncLazyMemo } from '../Utils/UseLazyMemo';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import { useInterval } from '../Utils/UseInterval';
 
 type EditorFunctionCallResultsStorage = {|
   getEditorFunctionCallResults: (
@@ -44,31 +47,33 @@ const useEditorFunctionCallResultsStorage = (): EditorFunctionCallResultsStorage
         aiRequestId: string,
         editorFunctionCallResults: EditorFunctionCallResult[]
       ) => {
-        const existingEditorFunctionCallResults = (
-          editorFunctionCallResultsPerRequest[aiRequestId] || []
-        ).filter(existingEditorFunctionCallResult => {
-          return !editorFunctionCallResults.some(editorFunctionCallResult => {
-            return (
-              editorFunctionCallResult.call_id ===
-              existingEditorFunctionCallResult.call_id
-            );
+        let computedResults: EditorFunctionCallResult[] = [];
+        setEditorFunctionCallResultsPerRequest(prevState => {
+          const existingEditorFunctionCallResults = (
+            prevState[aiRequestId] || []
+          ).filter(existingEditorFunctionCallResult => {
+            return !editorFunctionCallResults.some(editorFunctionCallResult => {
+              return (
+                editorFunctionCallResult.call_id ===
+                existingEditorFunctionCallResult.call_id
+              );
+            });
           });
-        });
 
-        const newEditorFunctionCallResultsPerRequest = {
-          ...editorFunctionCallResultsPerRequest,
-          [aiRequestId]: [
+          computedResults = [
             ...existingEditorFunctionCallResults,
             ...editorFunctionCallResults,
-          ],
-        };
-        setEditorFunctionCallResultsPerRequest(
-          newEditorFunctionCallResultsPerRequest
-        );
+          ];
 
-        return newEditorFunctionCallResultsPerRequest[aiRequestId];
+          return {
+            ...prevState,
+            [aiRequestId]: computedResults,
+          };
+        });
+
+        return computedResults;
       },
-      [editorFunctionCallResultsPerRequest]
+      []
     ),
     clearEditorFunctionCallResults: React.useCallback((aiRequestId: string) => {
       setEditorFunctionCallResultsPerRequest(
@@ -340,36 +345,29 @@ export const useAiRequestHistory = (
       // A request can request multiple user messages, but we only know the
       // information about the request date, not the date of each user message.
       Object.values(aiRequests)
-        .sort(
-          // $FlowFixMe[incompatible-type] - Object.values() loses the type of aiRequests.
-          (a: AiRequest, b: AiRequest) => {
-            return (
-              new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
-            );
-          }
-        )
-        .forEach(
-          // $FlowFixMe[incompatible-type] - Object.values() loses the type of aiRequests.
-          (request: AiRequest) => {
-            const userMessages = request.output
-              .filter(
-                message => message.type === 'message' && message.role === 'user'
-              )
-              .map(
-                // $FlowFixMe[incompatible-type] - We filtered the type above.
-                // $FlowFixMe[cannot-resolve-name]
-                (message: AiRequestUserMessage) => {
-                  const userRequest = message.content.find(
-                    item => item.type === 'user_request'
-                  );
-                  return userRequest ? userRequest.text : '';
-                }
-              )
-              .filter(text => text !== '');
+        .sort((a: AiRequest, b: AiRequest) => {
+          return (
+            new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+          );
+        })
+        .forEach((request: AiRequest) => {
+          const userMessages = request.output
+            .filter(
+              message => message.type === 'message' && message.role === 'user'
+            )
+            .map(
+              // $FlowFixMe[cannot-resolve-name]
+              (message: AiRequestUserMessage) => {
+                const userRequest = message.content.find(
+                  item => item.type === 'user_request'
+                );
+                return userRequest ? userRequest.text : '';
+              }
+            )
+            .filter(text => text !== '');
 
-            history.push(...userMessages);
-          }
-        );
+          history.push(...userMessages);
+        });
 
       return history;
     },
@@ -434,6 +432,8 @@ type AiRequestContextState = {|
   aiRequestHistory: AiRequestHistory,
   editorFunctionCallResultsStorage: EditorFunctionCallResultsStorage,
   getAiSettings: () => AiSettings | null,
+  isFetchingSuggestions: boolean,
+  setIsFetchingSuggestions: (value: boolean) => void,
 |};
 
 export const initialAiRequestContextState: AiRequestContextState = {
@@ -463,6 +463,8 @@ export const initialAiRequestContextState: AiRequestContextState = {
     clearEditorFunctionCallResults: () => {},
   },
   getAiSettings: () => null,
+  isFetchingSuggestions: false,
+  setIsFetchingSuggestions: () => {},
 };
 export const AiRequestContext: React.Context<AiRequestContextState> = React.createContext<AiRequestContextState>(
   initialAiRequestContextState
@@ -478,6 +480,151 @@ export const AiRequestProvider = ({
   const editorFunctionCallResultsStorage = useEditorFunctionCallResultsStorage();
   const aiRequestStorage = useAiRequestsStorage();
   const aiRequestHistory = useAiRequestHistory(aiRequestStorage);
+
+  const { profile, getAuthorizationHeader } = React.useContext(
+    AuthenticatedUserContext
+  );
+  const { values } = React.useContext(PreferencesContext);
+  const selectedAiRequestId = values.aiState.aiRequestId;
+  const { aiRequests, updateAiRequest } = aiRequestStorage;
+  const selectedAiRequest =
+    (selectedAiRequestId && aiRequests[selectedAiRequestId]) || null;
+
+  const [shouldWatchRequest, setShouldWatchRequest] = React.useState<boolean>(
+    false
+  );
+  const [
+    isFetchingSuggestions,
+    setIsFetchingSuggestions,
+  ] = React.useState<boolean>(false);
+  const lastFullFetchTimeRef = React.useRef<number>(0);
+  const fullFetchIntervalInMs = 5000;
+
+  // If the selected AI request is in a "working" state, watch it until it's finished.
+  // Every ~1.4s we do a partial (status-only) fetch; every 5s we do a full fetch to
+  // pick up new messages from the orchestrator/agent while it is still running.
+  const status = selectedAiRequest ? selectedAiRequest.status : null;
+  const onWatch = async () => {
+    if (!profile) return;
+    if (!selectedAiRequestId || !status || status !== 'working') return;
+
+    const now = Date.now();
+    const shouldDoFullFetch =
+      now - lastFullFetchTimeRef.current >= fullFetchIntervalInMs;
+
+    try {
+      if (shouldDoFullFetch) {
+        lastFullFetchTimeRef.current = now;
+        const aiRequest = await retryIfFailed({ times: 2 }, () =>
+          getAiRequest(getAuthorizationHeader, {
+            userId: profile.id,
+            aiRequestId: selectedAiRequestId,
+          })
+        );
+
+        updateAiRequest(selectedAiRequestId, () => aiRequest);
+
+        if (isFetchingSuggestions) {
+          const lastMessage =
+            aiRequest.output.length > 0
+              ? aiRequest.output[aiRequest.output.length - 1]
+              : null;
+          const hasSuggestions =
+            lastMessage &&
+            ((lastMessage.type === 'message' &&
+              lastMessage.role === 'assistant') ||
+              lastMessage.type === 'function_call_output') &&
+            lastMessage.suggestions;
+
+          if (aiRequest.status === 'ready' || hasSuggestions) {
+            setIsFetchingSuggestions(false);
+          }
+        }
+      } else {
+        // Use partial request to only fetch the status between full fetches.
+        const partialAiRequest = await getPartialAiRequest(
+          getAuthorizationHeader,
+          {
+            userId: profile.id,
+            aiRequestId: selectedAiRequestId,
+            include: 'status',
+          }
+        );
+
+        if (partialAiRequest.status === 'working') {
+          updateAiRequest(selectedAiRequestId, prevRequest => ({
+            ...(prevRequest || {}),
+            ...partialAiRequest,
+          }));
+        } else {
+          // Status changed — do a full fetch immediately to get the latest data.
+          lastFullFetchTimeRef.current = now;
+          const aiRequest = await retryIfFailed({ times: 2 }, () =>
+            getAiRequest(getAuthorizationHeader, {
+              userId: profile.id,
+              aiRequestId: selectedAiRequestId,
+            })
+          );
+
+          updateAiRequest(selectedAiRequestId, () => aiRequest);
+
+          if (isFetchingSuggestions) {
+            const lastMessage =
+              aiRequest.output.length > 0
+                ? aiRequest.output[aiRequest.output.length - 1]
+                : null;
+            const hasSuggestions =
+              lastMessage &&
+              ((lastMessage.type === 'message' &&
+                lastMessage.role === 'assistant') ||
+                lastMessage.type === 'function_call_output') &&
+              lastMessage.suggestions;
+
+            if (aiRequest.status === 'ready' || hasSuggestions) {
+              setIsFetchingSuggestions(false);
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.warn(
+        'Error while watching AI request. Ignoring and will retry on the next interval.',
+        error
+      );
+    }
+  };
+
+  const watchPollingIntervalInMs =
+    (selectedAiRequest &&
+      selectedAiRequest.toolOptions &&
+      selectedAiRequest.toolOptions.watchPollingIntervalInMs) ||
+    1400;
+  useInterval(
+    () => {
+      onWatch();
+    },
+    shouldWatchRequest ? watchPollingIntervalInMs : null
+  );
+
+  React.useEffect(
+    () => {
+      if (
+        selectedAiRequestId &&
+        selectedAiRequest &&
+        selectedAiRequest.status === 'working'
+      ) {
+        setShouldWatchRequest(true);
+      } else {
+        setShouldWatchRequest(false);
+      }
+
+      // Ensure we stop watching when the request is no longer working.
+      return () => {
+        setShouldWatchRequest(false);
+      };
+    },
+    [selectedAiRequestId, selectedAiRequest]
+  );
 
   const environment = Window.isDev() ? 'staging' : 'live';
   const getAiSettings = useAsyncLazyMemo(
@@ -511,17 +658,21 @@ export const AiRequestProvider = ({
   );
 
   const state = React.useMemo(
-    () => ({
+    (): AiRequestContextState => ({
       aiRequestStorage,
       aiRequestHistory,
       editorFunctionCallResultsStorage,
       getAiSettings,
+      isFetchingSuggestions,
+      setIsFetchingSuggestions,
     }),
     [
       aiRequestStorage,
       aiRequestHistory,
       editorFunctionCallResultsStorage,
       getAiSettings,
+      isFetchingSuggestions,
+      setIsFetchingSuggestions,
     ]
   );
 

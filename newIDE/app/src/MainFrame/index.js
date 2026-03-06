@@ -967,6 +967,11 @@ const MainFrame = (props: Props): React.MixedElement => {
           if (openedEditor.paneIdentifier !== newPaneIdentifier) {
             // The editor is opened, but not at the right position, close it.
             // It will re-open in the right pane.
+            // Tell the editor not to suspend the AI request on close, since
+            // we're just repositioning it, not intentionally closing it.
+            if (openedEditor.askAiEditor) {
+              openedEditor.askAiEditor.prepareToReposition();
+            }
             newEditorTabs = closeEditorTab(
               newEditorTabs,
               openedEditor.editorTab

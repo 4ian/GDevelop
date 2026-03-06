@@ -1,7 +1,50 @@
 .thinkingText {
   display: flex;
   align-items: center;
-  color: var(--theme-text-disabled-color)
+  color: var(--theme-text-secondary-color);
+  opacity: 0.6;
+}
+
+@keyframes typeReveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0% 0 0);
+  }
+}
+
+/* Stays visible during the 1s reveal, then vanishes. */
+@keyframes cursorBlink {
+  0%,  90% { opacity: 1; }
+  100%     { opacity: 0; }
+}
+
+.cursorWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.typeReveal {
+  display: inline-block;
+  animation: typeReveal 1s ease-out forwards;
+}
+
+@keyframes cursorMove {
+  from { left: 0; }
+  to   { left: 100%; }
+}
+
+.cursor {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 8px;
+  background: currentColor;
+  animation:
+    cursorMove 1s ease-out forwards,
+    cursorBlink 1s linear 1 forwards;
 }
 
 .feedbackButtonsContainer {
@@ -10,4 +53,18 @@
   justify-content: space-between;
   gap: 4px;
   margin-top: 4px;
+}
+
+.suspendedIndicator {
+  display: flex;
+  align-items: center;
+  color: var(--theme-text-secondary-color);
+}
+
+.suspendedDot {
+  width: 6px;
+  height: 6px;
+  background-color: #ff9800;
+  border-radius: 50%;
+  flex-shrink: 0;
 }

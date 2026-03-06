@@ -5,6 +5,7 @@ import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
 import {
   addMessageToAiRequest,
   createAiRequest,
+  suspendAiRequest,
   type AiRequest,
 } from '../Utils/GDevelopServices/Generation';
 import { delay } from '../Utils/Delay';
@@ -18,7 +19,7 @@ import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { CreditsPackageStoreContext } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import { type EditorCallbacks } from '../EditorFunctions';
 import {
-  getFunctionCallNameByCallId,
+  aiRequestHasWorkInProgress,
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
 } from './AiRequestUtils';
@@ -39,16 +40,14 @@ import { getAiConfigurationPresetsWithAvailability } from './AiConfiguration';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import { SubscriptionContext } from '../Profile/Subscription/SubscriptionContext';
 import {
-  useAiRequestState,
   useProcessFunctionCalls,
   type NewAiRequestOptions,
-  AI_AGENT_TOOLS_VERSION,
+  AI_ORCHESTRATOR_TOOLS_VERSION,
 } from './Utils';
-import { LineStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import RobotIcon from '../ProjectCreation/RobotIcon';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
-import { Column } from '../UI/Grid';
 import IconButton from '../UI/IconButton';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import Cross from '../UI/CustomSvgIcons/Cross';
@@ -172,11 +171,10 @@ export const AskAiStandAloneForm = ({
     setSendingAiRequest,
     setLastSendError,
   } = aiRequestStorage;
-  const { setAiState } = useAiRequestState({ project });
   const [aiRequestIdForForm, setAiRequestIdForForm] = React.useState<
     string | null
   >(null);
-  const aiRequestModeForForm = 'agent'; // Standalone form is only for AI agent requests for the moment.
+  const aiRequestModeForForm = 'orchestrator'; // Standalone form is for orchestrator mode requests.
   const aiRequestForForm =
     (aiRequestIdForForm && aiRequests[aiRequestIdForForm]) || null;
   const upToDateSelectedAiRequestId = useStableUpToDateRef(aiRequestIdForForm);
@@ -188,6 +186,7 @@ export const AskAiStandAloneForm = ({
   );
   const {
     values: { automaticallyUseCreditsForAiRequests },
+    setAiState,
   } = React.useContext(PreferencesContext);
 
   const {
@@ -199,6 +198,9 @@ export const AskAiStandAloneForm = ({
     subscription,
   } = React.useContext(AuthenticatedUserContext);
   const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
+
+  const [isRefreshingLimits, setIsRefreshingLimits] = React.useState(false);
+  const [isSendingUserMessage, setIsSendingUserMessage] = React.useState(false);
 
   const hideAskAi =
     !!limits &&
@@ -218,7 +220,16 @@ export const AskAiStandAloneForm = ({
   // we display the proper quota and credits information for the user.
   React.useEffect(
     () => {
-      onRefreshLimits();
+      (async () => {
+        setIsRefreshingLimits(true);
+        try {
+          await onRefreshLimits();
+        } catch (error) {
+          // Ignore limits refresh error.
+        }
+        await delay(200);
+        setIsRefreshingLimits(false);
+      })();
     },
     // Only on mount, we'll refresh again when sending an AI request.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -271,6 +282,7 @@ export const AskAiStandAloneForm = ({
             : null;
 
           setSendingAiRequest(null, true);
+          setIsSendingUserMessage(true);
 
           const preparedAiUserContent = await prepareAiUserContent({
             getAuthorizationHeader,
@@ -295,7 +307,7 @@ export const AskAiStandAloneForm = ({
             fileMetadata: null, // No file metadata when starting from the standalone form.
             storageProviderName,
             mode: aiRequestModeForForm,
-            toolsVersion: AI_AGENT_TOOLS_VERSION,
+            toolsVersion: AI_ORCHESTRATOR_TOOLS_VERSION,
             aiConfiguration: {
               presetId: aiConfigurationPresetId,
             },
@@ -303,6 +315,7 @@ export const AskAiStandAloneForm = ({
 
           console.info('Successfully created a new AI request:', aiRequest);
           setSendingAiRequest(null, false);
+          setIsSendingUserMessage(false);
           updateAiRequest(aiRequest.id, () => aiRequest);
 
           // Select the new AI request just created - unless the user switched to another one
@@ -327,16 +340,20 @@ export const AskAiStandAloneForm = ({
         } catch (error) {
           console.error('Error starting a new AI request:', error);
           setLastSendError(null, error);
+          setIsSendingUserMessage(false);
         }
 
         // Refresh the user limits, to ensure quota and credits information
         // is up-to-date after an AI request.
         await delay(500);
+        setIsRefreshingLimits(true);
         try {
           await retryIfFailed({ times: 2 }, onRefreshLimits);
         } catch (error) {
           // Ignore limits refresh error.
         }
+        await delay(200);
+        setIsRefreshingLimits(false);
       })();
     },
     [
@@ -437,18 +454,6 @@ export const AskAiStandAloneForm = ({
           eventsJson: null,
         });
 
-        // If we're updating the request, following a function call to initialize the project,
-        // pause the request, so that suggestions can be given by the agent.
-        const paused =
-          functionCallOutputs.length > 0 &&
-          functionCallOutputs.some(
-            output =>
-              getFunctionCallNameByCallId({
-                aiRequest: aiRequestForForm,
-                callId: output.call_id,
-              }) === 'initialize_project'
-          );
-
         const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
           addMessageToAiRequest(getAuthorizationHeader, {
             userId: profile.id,
@@ -466,9 +471,12 @@ export const AskAiStandAloneForm = ({
               : undefined,
             payWithCredits: false,
             userMessage: '', // No user message when sending only function call outputs.
-            paused,
+            // We don't pause when creating the request as we are in orchestrator mode.
+            // If we switch back to agent mode for the standalone form in the future,
+            // check if it has just initialized the project to mark it as paused.
+            paused: false,
             mode: aiRequestModeForForm,
-            toolsVersion: AI_AGENT_TOOLS_VERSION,
+            toolsVersion: AI_ORCHESTRATOR_TOOLS_VERSION,
           })
         );
         updateAiRequest(aiRequest.id, () => aiRequest);
@@ -492,11 +500,14 @@ export const AskAiStandAloneForm = ({
       // Refresh the user limits, to ensure quota and credits information
       // is up-to-date after an AI request.
       await delay(500);
+      setIsRefreshingLimits(true);
       try {
         await retryIfFailed({ times: 2 }, onRefreshLimits);
       } catch (error) {
         // Ignore limits refresh error.
       }
+      await delay(200);
+      setIsRefreshingLimits(false);
     },
     [
       profile,
@@ -529,11 +540,7 @@ export const AskAiStandAloneForm = ({
     },
     [onSendMessage]
   );
-  const {
-    isAutoProcessingFunctionCalls,
-    setAutoProcessFunctionCalls,
-    onProcessFunctionCalls,
-  } = useProcessFunctionCalls({
+  const { onProcessFunctionCalls } = useProcessFunctionCalls({
     project,
     resourceManagementProps,
     selectedAiRequest: aiRequestForForm,
@@ -551,6 +558,65 @@ export const AskAiStandAloneForm = ({
     isReadyToProcessFunctionCalls: true,
   });
 
+  const onStop = React.useCallback(
+    async () => {
+      if (!aiRequestForForm || !profile) return;
+      const editorFunctionCallResultsForRequest =
+        getEditorFunctionCallResults(aiRequestForForm.id) || [];
+      if (
+        !aiRequestHasWorkInProgress(
+          aiRequestForForm,
+          editorFunctionCallResultsForRequest
+        )
+      )
+        return;
+      // Optimistic update: mark as suspended locally immediately so that
+      // any in-flight async code (e.g. processEditorFunctionCalls,
+      // prepareAiUserContent) sees the suspended status after the next
+      // React render — before the API call even completes.
+      const requestIdToSuspend = aiRequestForForm.id;
+      updateAiRequest(requestIdToSuspend, prevRequest => ({
+        ...(prevRequest || aiRequestForForm),
+        status: 'suspended',
+      }));
+      clearEditorFunctionCallResults(requestIdToSuspend);
+
+      const suspendedRequest = await suspendAiRequest(getAuthorizationHeader, {
+        userId: profile.id,
+        aiRequestId: requestIdToSuspend,
+      });
+      updateAiRequest(suspendedRequest.id, () => suspendedRequest);
+    },
+    [
+      aiRequestForForm,
+      profile,
+      getAuthorizationHeader,
+      updateAiRequest,
+      clearEditorFunctionCallResults,
+      getEditorFunctionCallResults,
+    ]
+  );
+
+  const upToDateOnStop = useStableUpToDateRef(onStop);
+
+  // Suspend any running AI request when this form is unmounted.
+  React.useEffect(
+    () => {
+      return () => {
+        // Fire and forget - cannot await in a cleanup function.
+        // We intentionally read upToDateOnStop.current at cleanup time so
+        // we get the latest aiRequestForForm snapshot (that's the point of
+        // the stable ref).
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        upToDateOnStop.current().catch(err => {
+          console.error('Failed to suspend AI request on unmount:', err);
+        });
+      };
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
   const { values, showAskAiStandAloneForm } = React.useContext(
     PreferencesContext
   );
@@ -567,7 +633,7 @@ export const AskAiStandAloneForm = ({
   }
 
   return (
-    <Column noMargin>
+    <ColumnStackLayout noMargin>
       <LineStackLayout
         noMargin
         alignItems="center"
@@ -586,6 +652,7 @@ export const AskAiStandAloneForm = ({
             }}
             size="small"
             disabled={isLoading}
+            style={{ padding: 0 }}
           >
             <Cross />
           </IconButton>
@@ -605,7 +672,7 @@ export const AskAiStandAloneForm = ({
           mode,
         }: {|
           userMessage: string,
-          mode: 'chat' | 'agent',
+          mode: 'chat' | 'agent' | 'orchestrator',
         |}) =>
           onSendMessage({
             userMessage,
@@ -616,6 +683,7 @@ export const AskAiStandAloneForm = ({
           })
         }
         isSending={isLoading}
+        isSendingUserMessage={isSendingUserMessage}
         lastSendError={getLastSendError(aiRequestIdForForm)}
         quota={quota}
         increaseQuotaOffering={
@@ -633,17 +701,10 @@ export const AskAiStandAloneForm = ({
         }
         price={aiRequestPrice}
         availableCredits={availableCredits}
+        isRefreshingLimits={isRefreshingLimits}
         onSendFeedback={async () => {}}
         hasOpenedProject={!!project}
-        isAutoProcessingFunctionCalls={
-          aiRequestForForm
-            ? isAutoProcessingFunctionCalls(aiRequestForForm.id)
-            : false
-        }
-        setAutoProcessFunctionCalls={shouldAutoProcess => {
-          if (!aiRequestForForm) return;
-          setAutoProcessFunctionCalls(aiRequestForForm.id, shouldAutoProcess);
-        }}
+        onStop={onStop}
         i18n={i18n}
         editorCallbacks={editorCallbacks}
         onStartOrOpenChat={() => {}}
@@ -654,6 +715,6 @@ export const AskAiStandAloneForm = ({
         forkingState={null}
         onRestore={async () => {}}
       />
-    </Column>
+    </ColumnStackLayout>
   );
 };

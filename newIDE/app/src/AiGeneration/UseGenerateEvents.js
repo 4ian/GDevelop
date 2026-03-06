@@ -140,6 +140,12 @@ export const useGenerateEvents = ({
           }
         }
 
+        if (aiGeneratedEvent.status === 'suspended') {
+          return {
+            generationAborted: true,
+          };
+        }
+
         return { generationCompleted: true, aiGeneratedEvent };
       } catch (error) {
         console.error('Error while launching events generation:', error);

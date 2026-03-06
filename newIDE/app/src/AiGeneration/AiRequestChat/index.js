@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import useStableValue from '../../Utils/useStableValue';
 import type { I18n as I18nType } from '@lingui/core';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
@@ -56,6 +57,7 @@ import SelectOption from '../../UI/SelectOption';
 import CompactSelectField from '../../UI/CompactSelectField';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { type FileMetadata } from '../../ProjectsStorage';
+import Stop from '../../UI/CustomSvgIcons/Stop';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 15;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 20;
@@ -96,14 +98,40 @@ const getPriceAndRequestsTextAndTooltip = ({
   availableCredits,
   selectedMode,
   automaticallyUseCreditsForAiRequests,
+  isRefreshingLimits,
 }: {|
   quota: Quota | null,
   price: UsagePrice | null,
   availableCredits: number,
-  selectedMode: 'chat' | 'agent',
+  selectedMode: 'chat' | 'agent' | 'orchestrator',
   automaticallyUseCreditsForAiRequests: boolean,
+  isRefreshingLimits?: boolean,
 |}): React.Node => {
   if (!quota || !price) {
+    if (isRefreshingLimits) {
+      // Placeholder to avoid layout shift, while showing the (i) icon.
+      return (
+        <Text
+          size="body-small"
+          color="secondary"
+          noMargin
+          // $FlowFixMe[incompatible-type]
+          style={{ textAlign: 'right' }}
+        >
+          <Trans>Calculating...</Trans>
+          <span
+            style={{
+              verticalAlign: 'middle',
+              display: 'inline-block',
+              marginRight: -3,
+              marginTop: 1,
+            }}
+          >
+            <CircledInfo color="inherit" />
+          </span>
+        </Text>
+      );
+    }
     // Placeholder to avoid layout shift.
     return <div style={{ height: 29 }} />;
   }
@@ -174,25 +202,38 @@ const getPriceAndRequestsTextAndTooltip = ({
   const shouldShowCredits =
     quota.limitReached && automaticallyUseCreditsForAiRequests;
 
+  const iconSpanStyle = {
+    verticalAlign: 'middle',
+    display: 'inline-block',
+    marginTop: 1,
+  };
+
   return (
-    <LineStackLayout alignItems="center" noMargin>
-      {shouldShowCredits && <Coin fontSize="small" />}
-      <Text size="body-small" color="secondary" noMargin>
-        {shouldShowCredits ? creditsText : currentQuotaText}
-        <span
-          style={{
-            verticalAlign: 'middle',
-            display: 'inline-block',
-            marginRight: -3,
-            marginTop: 1,
-          }}
-        >
-          <Tooltip title={tooltipText} placement="top" interactive>
-            <CircledInfo color="inherit" />
-          </Tooltip>
+    <Text
+      size="body-small"
+      color="secondary"
+      noMargin
+      // $FlowFixMe[incompatible-type]
+      style={{ textAlign: 'right' }}
+    >
+      {!isRefreshingLimits && shouldShowCredits && (
+        <span style={{ ...iconSpanStyle, marginRight: 4 }}>
+          <Coin fontSize="small" />
         </span>
-      </Text>
-    </LineStackLayout>
+      )}
+      {isRefreshingLimits ? (
+        <Trans>Calculating...</Trans>
+      ) : shouldShowCredits ? (
+        creditsText
+      ) : (
+        currentQuotaText
+      )}
+      <span style={{ ...iconSpanStyle, marginRight: -3 }}>
+        <Tooltip title={tooltipText} placement="top" interactive>
+          <CircledInfo color="inherit" />
+        </Tooltip>
+      </span>
+    </Text>
   );
 };
 
@@ -205,7 +246,7 @@ const getSendButtonLabelAndIcon = ({
   standAloneForm,
 }: {|
   aiRequest: AiRequest | null,
-  selectedMode?: 'chat' | 'agent',
+  selectedMode?: 'chat' | 'agent' | 'orchestrator',
   isWorking: boolean,
   isMobile: boolean,
   hasOpenedProject: boolean,
@@ -217,7 +258,7 @@ const getSendButtonLabelAndIcon = ({
     return { label: null, icon: <Send fontSize="small" /> };
   }
 
-  return selectedMode === 'agent'
+  return selectedMode === 'agent' || selectedMode === 'orchestrator'
     ? isWorking
       ? { label: <Trans>Building...</Trans>, icon: <Send fontSize="small" /> }
       : isMobile
@@ -273,14 +314,15 @@ type Props = {|
   aiRequest: AiRequest | null,
 
   isSending: boolean,
+  isSendingUserMessage?: boolean,
   onStartNewAiRequest: ({|
-    mode: 'chat' | 'agent',
+    mode: 'chat' | 'agent' | 'orchestrator',
     userRequest: string,
     aiConfigurationPresetId: string,
   |}) => void,
   onSendUserMessage: ({|
     userMessage: string,
-    mode: 'chat' | 'agent',
+    mode: 'chat' | 'agent' | 'orchestrator',
   |}) => Promise<void>,
   onSendFeedback: (
     aiRequestId: string,
@@ -290,8 +332,7 @@ type Props = {|
     freeFormDetails?: string
   ) => Promise<void>,
   hasOpenedProject: boolean,
-  isAutoProcessingFunctionCalls: boolean,
-  setAutoProcessFunctionCalls: boolean => void,
+  onStop: () => Promise<void>,
   onStartOrOpenChat: (
     ?{|
       aiRequestId: string | null,
@@ -313,6 +354,7 @@ type Props = {|
   increaseQuotaOffering: 'subscribe' | 'upgrade' | 'none',
   price: UsagePrice | null,
   availableCredits: number,
+  isRefreshingLimits?: boolean,
 
   standAloneForm?: boolean,
 
@@ -340,6 +382,7 @@ export const AiRequestChat: React.ComponentType<{
       fileMetadata,
       aiRequest,
       isSending,
+      isSendingUserMessage,
       onStartNewAiRequest,
       onSendUserMessage,
       onSendFeedback,
@@ -349,11 +392,11 @@ export const AiRequestChat: React.ComponentType<{
       lastSendError,
       price,
       availableCredits,
+      isRefreshingLimits,
       hasOpenedProject,
       editorFunctionCallResults,
       onProcessFunctionCalls,
-      isAutoProcessingFunctionCalls,
-      setAutoProcessFunctionCalls,
+      onStop,
       i18n,
       editorCallbacks,
       standAloneForm,
@@ -367,8 +410,11 @@ export const AiRequestChat: React.ComponentType<{
     const {
       aiRequestHistory: { handleNavigateHistory, resetNavigation },
     } = React.useContext(AiRequestContext);
-    const [selectedMode, setSelectedMode] = React.useState<'chat' | 'agent'>(
-      (aiRequest && aiRequest.mode) || (hasOpenedProject ? 'chat' : 'agent')
+    const [selectedMode, setSelectedMode] = React.useState<
+      'chat' | 'agent' | 'orchestrator'
+    >(
+      (aiRequest && aiRequest.mode) ||
+        (hasOpenedProject ? 'chat' : 'orchestrator')
     );
     const {
       values: { automaticallyUseCreditsForAiRequests },
@@ -386,6 +432,9 @@ export const AiRequestChat: React.ComponentType<{
       hasSwitchedToGDevelopCreditsMidChat,
       setHasSwitchedToGDevelopCreditsMidChat,
     ] = React.useState<boolean>(false);
+    const [isButtonLoading, setIsButtonLoading] = React.useState<boolean>(
+      false
+    );
     const { showConfirmation } = useAlertDialog();
     const [
       aiConfigurationPresetId,
@@ -465,7 +514,7 @@ export const AiRequestChat: React.ComponentType<{
     const newChatPlaceholder = React.useMemo(
       () => {
         const newChatPlaceholders: Array<MessageDescriptor> =
-          selectedMode === 'agent'
+          selectedMode === 'agent' || selectedMode === 'orchestrator'
             ? hasOpenedProject && !standAloneForm
               ? actionsOnExistingProject
               : actionsToCreateAProject
@@ -523,12 +572,19 @@ export const AiRequestChat: React.ComponentType<{
       </Text>
     ) : null;
 
+    // Show "Calculating..." for at least 2s so it doesn't flash on fast calls.
+    const isRefreshingLimitsStable = useStableValue({
+      minimumDuration: 2000,
+      value: !!isRefreshingLimits,
+    });
+
     const priceAndRequestsText = getPriceAndRequestsTextAndTooltip({
       quota,
       price,
       availableCredits,
       selectedMode,
       automaticallyUseCreditsForAiRequests,
+      isRefreshingLimits: isRefreshingLimitsStable,
     });
 
     const chosenOrDefaultAiConfigurationPresetId =
@@ -558,8 +614,8 @@ export const AiRequestChat: React.ComponentType<{
       !!hasWorkingFunctionCalls ||
       !!hasFunctionsCallsToProcess ||
       (!!aiRequest && aiRequest.status === 'working');
-    const isPaused = !!aiRequest && !isAutoProcessingFunctionCalls;
-    const isWorking = isSending || (hasWorkToProcess && !isPaused);
+    const isWorking = isSending || hasWorkToProcess;
+    const canRequestBeStopped = isWorking && !!aiRequest;
 
     const doesNotHaveEnoughCreditsToContinue =
       !!price && availableCredits < price.priceInCredits;
@@ -649,8 +705,7 @@ export const AiRequestChat: React.ComponentType<{
         setHasStartedRequestButCannotContinue(cannotContinue);
         if (cannotContinue) return;
 
-        setAutoProcessFunctionCalls(true);
-        onSendUserMessage({
+        return onSendUserMessage({
           userMessage: userRequestTextPerAiRequestId[aiRequestId] || '',
           mode: selectedMode,
         });
@@ -660,30 +715,46 @@ export const AiRequestChat: React.ComponentType<{
         onSendUserMessage,
         userRequestTextPerAiRequestId,
         scrollToBottom,
-        setAutoProcessFunctionCalls,
         cannotContinue,
         selectedMode,
       ]
     );
 
+    const onClickExistingChatButton = React.useCallback(
+      () => {
+        setIsButtonLoading(true);
+        if (canRequestBeStopped) {
+          onStop()
+            .catch(err => console.error('Failed to stop AI request:', err))
+            .finally(() => setIsButtonLoading(false));
+        } else {
+          const promise = onSubmitForExistingChat();
+          (promise || Promise.resolve())
+            .catch(err => console.error('Failed to send message:', err))
+            .finally(() => setIsButtonLoading(false));
+        }
+      },
+      [canRequestBeStopped, onStop, onSubmitForExistingChat]
+    );
+
+    const onClickNewChatButton = React.useCallback(
+      () => {
+        setIsButtonLoading(true);
+        onSubmitForNewChat()
+          .catch(err => console.error('Failed to start chat:', err))
+          .finally(() => setIsButtonLoading(false));
+      },
+      [onSubmitForNewChat]
+    );
+
     // Calculate feedback banner visibility for sticky behavior
     // (must be before conditional returns to follow React hooks rules)
-    const allFunctionCallsToProcess =
-      aiRequest && editorFunctionCallResults
-        ? getFunctionCallsToProcess({
-            aiRequest,
-            editorFunctionCallResults,
-          })
-        : [];
-    const isPausedAndHasFunctionCallsToProcess =
-      !isAutoProcessingFunctionCalls && allFunctionCallsToProcess.length > 0;
     const shouldDisplayFeedbackBannerNow =
       !hasWorkingFunctionCalls &&
-      !isPausedAndHasFunctionCallsToProcess &&
       !isSending &&
       !!aiRequest &&
       aiRequest.status === 'ready' &&
-      aiRequest.mode === 'agent';
+      (aiRequest.mode === 'agent' || aiRequest.mode === 'orchestrator');
     const shouldDisplayFeedbackBanner = useStickyVisibility({
       shouldShow: shouldDisplayFeedbackBannerNow,
       showDelayMs: 1000,
@@ -712,7 +783,7 @@ export const AiRequestChat: React.ComponentType<{
                 </Text>
               </Column>
             )}
-            <form onSubmit={onSubmitForNewChat}>
+            <form onSubmit={onClickNewChatButton}>
               <ColumnStackLayout
                 noMargin
                 alignItems="stretch"
@@ -730,7 +801,7 @@ export const AiRequestChat: React.ComponentType<{
                       onUserRequestTextChange(userRequestText, '');
                     }}
                     onNavigateHistory={handleNavigateHistory}
-                    onSubmit={onSubmitForNewChat}
+                    onSubmit={onClickNewChatButton}
                     placeholder={
                       isWorking
                         ? t`Thinking about your request...`
@@ -761,8 +832,8 @@ export const AiRequestChat: React.ComponentType<{
                             icon={sendButtonIcon}
                             label={sendButtonLabel}
                             style={{ flexShrink: 0 }}
-                            disabled={shouldDisableButton}
-                            onClick={onSubmitForNewChat}
+                            disabled={isButtonLoading || shouldDisableButton}
+                            onClick={onClickNewChatButton}
                           />
                         </LineStackLayout>
                       </Column>
@@ -869,7 +940,7 @@ export const AiRequestChat: React.ComponentType<{
                     </Paper>
                   </div>
                 )}
-                <Line
+                <LineStackLayout
                   noMargin
                   expand
                   alignItems="center"
@@ -881,7 +952,11 @@ export const AiRequestChat: React.ComponentType<{
                         disabled={isWorking}
                         value={selectedMode}
                         onChange={value => {
-                          if (value !== 'chat' && value !== 'agent') {
+                          if (
+                            value !== 'chat' &&
+                            value !== 'agent' &&
+                            value !== 'orchestrator'
+                          ) {
                             return;
                           }
                           setSelectedMode(value);
@@ -899,13 +974,18 @@ export const AiRequestChat: React.ComponentType<{
                         <SelectOption
                           key="agent"
                           value="agent"
+                          label={t`Simple change`}
+                        />
+                        <SelectOption
+                          key="orchestrator"
+                          value="orchestrator"
                           label={t`Build`}
                         />
                       </CompactSelectField>
                     )}
                   </Column>
                   <Column noMargin>{errorText || priceAndRequestsText}</Column>
-                </Line>
+                </LineStackLayout>
               </ColumnStackLayout>
             </form>
           </ColumnStackLayout>
@@ -980,11 +1060,9 @@ export const AiRequestChat: React.ComponentType<{
             fileMetadata={fileMetadata}
             onProcessFunctionCalls={onProcessFunctionCalls}
             onUserRequestTextChange={onUserRequestTextChange}
-            isPaused={isPaused}
             shouldBeWorkingIfNotPaused={hasWorkToProcess || isWorking}
             isForAnotherProject={isForAnotherProject}
             shouldDisplayFeedbackBanner={shouldDisplayFeedbackBanner}
-            onPause={(pause: boolean) => setAutoProcessFunctionCalls(!pause)}
             onScrollToBottom={scrollToBottom}
             hasStartedRequestButCannotContinue={
               hasStartedRequestButCannotContinue
@@ -994,6 +1072,7 @@ export const AiRequestChat: React.ComponentType<{
             }
             onStartOrOpenChat={onStartOrOpenChat}
             isFetchingSuggestions={isFetchingSuggestions}
+            isSending={isSendingUserMessage}
             savingProjectForMessageId={savingProjectForMessageId}
             forkingState={forkingState}
             onRestore={onRestore}
@@ -1043,7 +1122,8 @@ export const AiRequestChat: React.ComponentType<{
                 }
                 onNavigateHistory={handleNavigateHistory}
                 placeholder={
-                  aiRequest.mode === 'agent'
+                  aiRequest.mode === 'agent' ||
+                  aiRequest.mode === 'orchestrator'
                     ? isForAnotherProject
                       ? t`You must re-open the project to continue this chat.`
                       : isWorking
@@ -1053,7 +1133,7 @@ export const AiRequestChat: React.ComponentType<{
                 }
                 rows={2}
                 maxRows={6}
-                onSubmit={onSubmitForExistingChat}
+                onSubmit={onClickExistingChatButton}
                 controls={
                   <Column>
                     <LineStackLayout
@@ -1061,18 +1141,27 @@ export const AiRequestChat: React.ComponentType<{
                       justifyContent="flex-end"
                     >
                       <RaisedButton
-                        color="primary"
-                        disabled={shouldDisableButton}
-                        icon={sendButtonIcon}
-                        label={sendButtonLabel}
-                        onClick={onSubmitForExistingChat}
+                        primary={!canRequestBeStopped}
+                        disabled={
+                          isButtonLoading ||
+                          (canRequestBeStopped ? false : shouldDisableButton)
+                        }
+                        icon={
+                          canRequestBeStopped ? (
+                            <Stop fontSize="small" />
+                          ) : (
+                            sendButtonIcon
+                          )
+                        }
+                        label={canRequestBeStopped ? null : sendButtonLabel}
+                        onClick={onClickExistingChatButton}
                       />
                     </LineStackLayout>
                   </Column>
                 }
               />
             )}
-            <Line
+            <LineStackLayout
               noMargin
               expand
               alignItems="center"
@@ -1083,7 +1172,11 @@ export const AiRequestChat: React.ComponentType<{
                   disabled={isWorking}
                   value={selectedMode}
                   onChange={value => {
-                    if (value !== 'chat' && value !== 'agent') {
+                    if (
+                      value !== 'chat' &&
+                      value !== 'agent' &&
+                      value !== 'orchestrator'
+                    ) {
                       return;
                     }
                     setSelectedMode(value);
@@ -1098,13 +1191,22 @@ export const AiRequestChat: React.ComponentType<{
                   rounded
                 >
                   <SelectOption key="chat" value="chat" label={t`Ask`} />
-                  <SelectOption key="agent" value="agent" label={t`Build`} />
+                  <SelectOption
+                    key="agent"
+                    value="agent"
+                    label={t`Simple change`}
+                  />
+                  <SelectOption
+                    key="orchestrator"
+                    value="orchestrator"
+                    label={t`Build`}
+                  />
                 </CompactSelectField>
               </Column>
               <Column noMargin>
                 {isForAnotherProjectText || errorText || priceAndRequestsText}
               </Column>
-            </Line>
+            </LineStackLayout>
           </ColumnStackLayout>
         </form>
       </div>

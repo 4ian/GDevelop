@@ -15,6 +15,7 @@ import {
   type HotReloadSteps,
 } from '../../EmbeddedGame/EmbeddedGameFrame';
 import type { EventPath } from '../../Utils/EventPath';
+import type { SearchFilterParams } from '../../Utils/Search';
 
 const styles = {
   container: {
@@ -53,14 +54,14 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     eventPaths: Array<EventPath>,
     focusedEventPath: EventPath,
     searchText: string,
-    matchCase: boolean
+    searchFilters?: SearchFilterParams
   ) {
     if (this.editor) {
       this.editor.setGlobalSearchResults(
         eventPaths,
         focusedEventPath,
         searchText,
-        matchCase
+        searchFilters
       );
     }
   }

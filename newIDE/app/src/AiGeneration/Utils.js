@@ -72,11 +72,10 @@ export const useRefreshLimits = (
     async (options?: {| withRetry?: boolean |}) => {
       setIsRefreshingLimits(true);
       try {
-        if (options && options.withRetry) {
-          await retryIfFailed({ times: 2 }, onRefreshLimits);
-        } else {
-          await onRefreshLimits();
-        }
+        await retryIfFailed(
+          { times: options && options.withRetry ? 2 : 1 },
+          onRefreshLimits
+        );
       } catch (error) {
         // Ignore limits refresh error.
       }

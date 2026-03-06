@@ -5,7 +5,6 @@ import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
 import {
   addMessageToAiRequest,
   createAiRequest,
-  suspendAiRequest,
   type AiRequest,
 } from '../Utils/GDevelopServices/Generation';
 import { delay } from '../Utils/Delay';
@@ -19,7 +18,6 @@ import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { CreditsPackageStoreContext } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import { type EditorCallbacks } from '../EditorFunctions';
 import {
-  aiRequestHasWorkInProgress,
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
 } from './AiRequestUtils';
@@ -538,65 +536,6 @@ export const AskAiStandAloneForm = ({
     isReadyToProcessFunctionCalls: true,
   });
 
-  const onStop = React.useCallback(
-    async () => {
-      if (!aiRequestForForm || !profile) return;
-      const editorFunctionCallResultsForRequest =
-        getEditorFunctionCallResults(aiRequestForForm.id) || [];
-      if (
-        !aiRequestHasWorkInProgress(
-          aiRequestForForm,
-          editorFunctionCallResultsForRequest
-        )
-      )
-        return;
-      // Optimistic update: mark as suspended locally immediately so that
-      // any in-flight async code (e.g. processEditorFunctionCalls,
-      // prepareAiUserContent) sees the suspended status after the next
-      // React render — before the API call even completes.
-      const requestIdToSuspend = aiRequestForForm.id;
-      updateAiRequest(requestIdToSuspend, prevRequest => ({
-        ...(prevRequest || aiRequestForForm),
-        status: 'suspended',
-      }));
-      clearEditorFunctionCallResults(requestIdToSuspend);
-
-      const suspendedRequest = await suspendAiRequest(getAuthorizationHeader, {
-        userId: profile.id,
-        aiRequestId: requestIdToSuspend,
-      });
-      updateAiRequest(suspendedRequest.id, () => suspendedRequest);
-    },
-    [
-      aiRequestForForm,
-      profile,
-      getAuthorizationHeader,
-      updateAiRequest,
-      clearEditorFunctionCallResults,
-      getEditorFunctionCallResults,
-    ]
-  );
-
-  const upToDateOnStop = useStableUpToDateRef(onStop);
-
-  // Suspend any running AI request when this form is unmounted.
-  React.useEffect(
-    () => {
-      return () => {
-        // Fire and forget - cannot await in a cleanup function.
-        // We intentionally read upToDateOnStop.current at cleanup time so
-        // we get the latest aiRequestForForm snapshot (that's the point of
-        // the stable ref).
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        upToDateOnStop.current().catch(err => {
-          console.error('Failed to suspend AI request on unmount:', err);
-        });
-      };
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
-
   const { values, showAskAiStandAloneForm } = React.useContext(
     PreferencesContext
   );
@@ -684,7 +623,9 @@ export const AskAiStandAloneForm = ({
         isRefreshingLimits={isRefreshingLimits}
         onSendFeedback={async () => {}}
         hasOpenedProject={!!project}
-        onStop={onStop}
+        onStop={async () => {
+          // Cannot stop a request on the standalone form.
+        }}
         i18n={i18n}
         editorCallbacks={editorCallbacks}
         onStartOrOpenChat={() => {}}

@@ -1,26 +1,21 @@
 // @flow
+import type { SearchFilterParams } from '../../../Utils/Search';
+
 import * as React from 'react';
 
-type CheckBoxesState = {|
-  matchCase: boolean,
-  searchInConditions: boolean,
-  searchInActions: boolean,
-  searchInEventStrings: boolean,
-  searchInEventSentences: boolean,
-  includeStoreExtensions: boolean,
-|};
+type SearchFiltersState = Required<SearchFilterParams>;
 
 type FreezedSearchState = {|
-  ...CheckBoxesState,
   searchText: string,
+  searchFilterParams: SearchFiltersState,
 |};
 
 type UseSearchFormReturn = {|
   search: string,
   setSearch: string => void,
-  checkBoxesState: CheckBoxesState,
-  setCheckBoxesState: (
-    CheckBoxesState | (CheckBoxesState => CheckBoxesState)
+  searchFiltersState: SearchFiltersState,
+  setSearchFiltersState: (
+    SearchFiltersState | (SearchFiltersState => SearchFiltersState)
   ) => void,
   freezedSearchState: FreezedSearchState,
   setFreezedSearchState: (
@@ -32,17 +27,24 @@ type UseSearchFormReturn = {|
 
 export const useSearchForm = (): UseSearchFormReturn => {
   const [search, setSearch] = React.useState<string>('');
-  const [checkBoxesState, setCheckBoxesState] = React.useState({
+  const [
+    searchFiltersState,
+    setSearchFiltersState,
+  ] = React.useState<SearchFiltersState>({
     matchCase: false,
     searchInConditions: true,
     searchInActions: true,
     searchInEventStrings: true,
     searchInEventSentences: true,
+    searchInInstructionNames: false,
     includeStoreExtensions: false,
   });
 
-  const [freezedSearchState, setFreezedSearchState] = React.useState({
-    ...checkBoxesState,
+  const [
+    freezedSearchState,
+    setFreezedSearchState,
+  ] = React.useState<FreezedSearchState>({
+    searchFilterParams: searchFiltersState,
     searchText: search,
   });
   const [hasSearched, setHasSearched] = React.useState(false);
@@ -50,8 +52,8 @@ export const useSearchForm = (): UseSearchFormReturn => {
   return {
     search,
     setSearch,
-    checkBoxesState,
-    setCheckBoxesState,
+    searchFiltersState,
+    setSearchFiltersState,
     freezedSearchState,
     setFreezedSearchState,
     hasSearched,

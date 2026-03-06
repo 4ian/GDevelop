@@ -6,9 +6,11 @@ import * as React from 'react';
 import Clipboard from '../Utils/Clipboard';
 import { SafeExtractor } from '../Utils/SafeExtractor';
 import {
-  // $FlowFixMe[import-type-as-value]
-  TreeViewItemContent,
+  type TreeViewItemContent,
   type TreeItemProps,
+  extensionFunctionsRootFolderId,
+  extensionBehaviorsRootFolderId,
+  extensionObjectsRootFolderId,
 } from '.';
 import {
   enumerateFoldersInContainer,
@@ -22,6 +24,62 @@ import {
 } from './EventsFunctionTreeViewItemContent';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+
+export const moveFunctionFolderOrFunction = (
+  selectedItemContent: TreeViewItemContent,
+  destinationItemContent: TreeViewItemContent,
+  where: 'before' | 'inside' | 'after',
+  animateFolder: (folder: gdFunctionFolderOrFunction) => void
+) => {
+  const selectedFunctionFolderOrFunction = selectedItemContent.getFunctionFolderOrFunction();
+
+  if (
+    !selectedFunctionFolderOrFunction ||
+    destinationItemContent.getId() === selectedItemContent.getId()
+  ) {
+    return;
+  }
+
+  const destinationFunctionFolderOrFunction = destinationItemContent.getFunctionFolderOrFunction();
+  if (!destinationFunctionFolderOrFunction) {
+    return;
+  }
+  if (
+    selectedItemContent.getEventsFunctionsContainer() !==
+    destinationItemContent.getEventsFunctionsContainer()
+  ) {
+    return;
+  }
+  // At this point, the move is done from within the same container.
+  let parent;
+  if (where === 'inside' && destinationFunctionFolderOrFunction.isFolder()) {
+    parent = destinationFunctionFolderOrFunction;
+  } else {
+    parent = destinationFunctionFolderOrFunction.getParent();
+  }
+  const selectedFunctionFolderOrFunctionParent = selectedFunctionFolderOrFunction.getParent();
+  if (parent === selectedFunctionFolderOrFunctionParent) {
+    const fromIndex = selectedItemContent.getIndex();
+    let toIndex = destinationItemContent.getIndex();
+    if (toIndex > fromIndex) toIndex -= 1;
+    if (where === 'after') toIndex += 1;
+    selectedFunctionFolderOrFunctionParent.moveChild(fromIndex, toIndex);
+  } else {
+    if (destinationItemContent.isDescendantOf(selectedItemContent)) {
+      return;
+    }
+    const position =
+      where === 'inside'
+        ? 0
+        : destinationItemContent.getIndex() + (where === 'after' ? 1 : 0);
+    selectedFunctionFolderOrFunctionParent.moveFunctionFolderOrFunctionToAnotherFolder(
+      selectedFunctionFolderOrFunction,
+      parent,
+      position
+    );
+    animateFolder(parent);
+  }
+};
 
 export const expandAllSubfolders = (
   functionFolder: gdFunctionFolderOrFunction,
@@ -101,6 +159,10 @@ export class EventsFunctionFolderTreeViewItemContent
     this.props = props;
   }
 
+  getEventsFunctionsContainer(): gdEventsFunctionsContainer {
+    return this.props.eventsFunctionsContainer;
+  }
+
   getFunctionFolderOrFunction(): gdFunctionFolderOrFunction | null {
     return this.functionFolder;
   }
@@ -109,12 +171,26 @@ export class EventsFunctionFolderTreeViewItemContent
     return null;
   }
 
-  isDescendantOf(treeViewItemContent: TreeViewItemContent): boolean {
-    const functionFolderOrFunction = treeViewItemContent.getFunctionFolderOrFunction();
-    return (
-      !!functionFolderOrFunction &&
-      this.functionFolder.isADescendantOf(functionFolderOrFunction)
-    );
+  getEventsBasedBehavior(): ?gdEventsBasedBehavior {
+    return this.props.eventsBasedBehavior;
+  }
+
+  getEventsBasedObject(): ?gdEventsBasedObject {
+    return this.props.eventsBasedObject;
+  }
+
+  isDescendantOf(itemContent: TreeViewItemContent): boolean {
+    const otherFunctionFolderOrFunction = itemContent.getFunctionFolderOrFunction();
+    return otherFunctionFolderOrFunction
+      ? otherFunctionFolderOrFunction.isADescendantOf(this.functionFolder)
+      : this.getEventsBasedBehavior() ===
+          itemContent.getEventsBasedBehavior() ||
+          this.getEventsBasedObject() === itemContent.getEventsBasedObject() ||
+          (this.getEventsBasedBehavior() &&
+            itemContent.getId() === extensionBehaviorsRootFolderId) ||
+          (this.getEventsBasedObject() &&
+            itemContent.getId() === extensionObjectsRootFolderId) ||
+          itemContent.getId() === extensionFunctionsRootFolderId;
   }
 
   isSibling(treeViewItemContent: TreeViewItemContent): boolean {
@@ -129,6 +205,19 @@ export class EventsFunctionFolderTreeViewItemContent
     return this.functionFolder
       .getParent()
       .getChildPosition(this.functionFolder);
+  }
+
+  moveAt(
+    destinationItemContent: TreeViewItemContent,
+    where: 'before' | 'inside' | 'after',
+    animateFolder: (folder: gdFunctionFolderOrFunction) => void
+  ): void {
+    moveFunctionFolderOrFunction(
+      this,
+      destinationItemContent,
+      where,
+      animateFolder
+    );
   }
 
   getName(): string | React.Node {

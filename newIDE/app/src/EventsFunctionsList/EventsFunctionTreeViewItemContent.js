@@ -13,8 +13,7 @@ import {
 } from '../Utils/Serializer';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import {
-  // $FlowFixMe[import-type-as-value]
-  TreeViewItemContent,
+  type TreeViewItemContent,
   type TreeItemProps,
   extensionFunctionsRootFolderId,
   extensionBehaviorsRootFolderId,
@@ -23,6 +22,7 @@ import {
 import Tooltip from '@material-ui/core/Tooltip';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 import AsyncIcon from '@material-ui/icons/SyncAlt';
+import { moveFunctionFolderOrFunction } from './EventsFunctionFolderTreeViewItemContent';
 
 const gd: libGDevelop = global.gd;
 
@@ -166,16 +166,19 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return (
-      itemContent.getEventsFunction() === null &&
-      (this.getEventsBasedBehavior() === itemContent.getEventsBasedBehavior() ||
-        this.getEventsBasedObject() === itemContent.getEventsBasedObject() ||
-        (this.getEventsBasedBehavior() &&
-          itemContent.getId() === extensionBehaviorsRootFolderId) ||
-        (this.getEventsBasedObject() &&
-          itemContent.getId() === extensionObjectsRootFolderId) ||
-        itemContent.getId() === extensionFunctionsRootFolderId)
-    );
+    const otherFunctionFolderOrFunction = itemContent.getFunctionFolderOrFunction();
+    return otherFunctionFolderOrFunction
+      ? otherFunctionFolderOrFunction.isADescendantOf(
+          this.functionFolderOrFunction
+        )
+      : this.getEventsBasedBehavior() ===
+          itemContent.getEventsBasedBehavior() ||
+          this.getEventsBasedObject() === itemContent.getEventsBasedObject() ||
+          (this.getEventsBasedBehavior() &&
+            itemContent.getId() === extensionBehaviorsRootFolderId) ||
+          (this.getEventsBasedObject() &&
+            itemContent.getId() === extensionObjectsRootFolderId) ||
+          itemContent.getId() === extensionFunctionsRootFolderId;
   }
 
   getName(): string | React.Node {
@@ -430,12 +433,16 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
       .getChildPosition(this.functionFolderOrFunction);
   }
 
-  moveAt(destinationIndex: number): void {
-    const originIndex = this.getIndex();
-    this.props.eventsFunctionsContainer.moveEventsFunction(
-      originIndex,
-      // When moving the item down, it must not be counted.
-      destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
+  moveAt(
+    destinationItemContent: TreeViewItemContent,
+    where: 'before' | 'inside' | 'after',
+    animateFolder: (folder: gdFunctionFolderOrFunction) => void
+  ): void {
+    moveFunctionFolderOrFunction(
+      this,
+      destinationItemContent,
+      where,
+      animateFolder
     );
   }
 
@@ -507,6 +514,4 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
   getRightButton(i18n: I18nType): any {
     return null;
   }
-
-  addFunctionAtSelection(): void {}
 }

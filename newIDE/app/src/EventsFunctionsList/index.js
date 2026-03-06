@@ -149,14 +149,17 @@ export interface TreeViewItemContent {
   paste(): void;
   cut(): void;
   getIndex(): number;
-  moveAt(destinationIndex: number): void;
+  moveAt(
+    destinationItemContent: TreeViewItemContent,
+    where: 'before' | 'inside' | 'after',
+    animateFolder: (folder: gdFunctionFolderOrFunction) => void
+  ): void;
   isDescendantOf(itemContent: TreeViewItemContent): boolean;
   getEventsFunctionsContainer(): ?gdEventsFunctionsContainer;
   getFunctionFolderOrFunction(): gdFunctionFolderOrFunction | null;
   getEventsFunction(): ?gdEventsFunction;
   getEventsBasedBehavior(): ?gdEventsBasedBehavior;
   getEventsBasedObject(): ?gdEventsBasedObject;
-  addFunctionAtSelection(): void;
 }
 
 interface TreeViewItem {
@@ -483,17 +486,15 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     return 0;
   }
 
-  moveAt(destinationIndex: number): void {}
+  moveAt(
+    destinationItemContent: TreeViewItemContent,
+    where: 'before' | 'inside' | 'after',
+    animateFolder: (folder: gdFunctionFolderOrFunction) => void
+  ): void {}
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return false;
   }
-
-  addFunctionAtSelection(
-    selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
-    selectedEventsBasedObject: ?gdEventsBasedObject,
-    selectedEventsFunction: ?gdEventsFunction
-  ): void {}
 }
 
 class ActionTreeViewItemContent implements TreeViewItemContent {
@@ -594,17 +595,15 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
     return 0;
   }
 
-  moveAt(destinationIndex: number): void {}
+  moveAt(
+    destinationItemContent: TreeViewItemContent,
+    where: 'before' | 'inside' | 'after',
+    animateFolder: (folder: gdFunctionFolderOrFunction) => void
+  ): void {}
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return false;
   }
-
-  addFunctionAtSelection(
-    selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
-    selectedEventsBasedObject: ?gdEventsBasedObject,
-    selectedEventsFunction: ?gdEventsFunction
-  ): void {}
 }
 
 const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
@@ -1540,10 +1539,10 @@ const EventsFunctionsList = React.forwardRef<
     const canMoveSelectionTo = React.useCallback(
       (destinationItem: TreeViewItem, where: 'before' | 'inside' | 'after') =>
         selectedItems.every(item => {
-          if (item.content.getEventsFunction()) {
+          if (item.content.getFunctionFolderOrFunction()) {
             // Functions from the same container
             return (
-              destinationItem.content.getEventsFunction() &&
+              destinationItem.content.getFunctionFolderOrFunction() &&
               item.content.getEventsFunctionsContainer() ===
                 destinationItem.content.getEventsFunctionsContainer()
             );
@@ -1571,68 +1570,22 @@ const EventsFunctionsList = React.forwardRef<
           return;
         }
         const selectedItem = selectedItems[0];
-        const selectedFunctionFolderOrFunction = selectedItem.content.getFunctionFolderOrFunction();
 
-        if (
-          !selectedFunctionFolderOrFunction ||
-          destinationItem.content.getId() === selectedItem.content.getId()
-        ) {
-          return;
-        }
-
-        if (destinationItem.isPlaceholder) {
-          return;
-        }
-
-        const destinationFunctionFolderOrFunction = destinationItem.content.getFunctionFolderOrFunction();
-        if (!destinationFunctionFolderOrFunction) {
-          return;
-        }
-        if (
-          selectedItem.content.getEventsFunctionsContainer() !==
-          destinationItem.content.getEventsFunctionsContainer()
-        ) {
-          return;
-        }
-        // At this point, the move is done from within the same container.
-        let parent;
-        if (
-          where === 'inside' &&
-          destinationFunctionFolderOrFunction.isFolder()
-        ) {
-          parent = destinationFunctionFolderOrFunction;
-        } else {
-          parent = destinationFunctionFolderOrFunction.getParent();
-        }
-        const selectedFunctionFolderOrFunctionParent = selectedFunctionFolderOrFunction.getParent();
-        if (parent === selectedFunctionFolderOrFunctionParent) {
-          const fromIndex = selectedItem.content.getIndex();
-          let toIndex = destinationItem.content.getIndex();
-          if (toIndex > fromIndex) toIndex -= 1;
-          if (where === 'after') toIndex += 1;
-          selectedFunctionFolderOrFunctionParent.moveChild(fromIndex, toIndex);
-        } else {
-          if (destinationItem.content.isDescendantOf(selectedItem.content)) {
+        const animateFolder = (folder: gdFunctionFolderOrFunction) => {
+          const treeView = treeViewRef.current;
+          if (!treeView) {
             return;
           }
-          const position =
-            where === 'inside'
-              ? 0
-              : destinationItem.content.getIndex() +
-                (where === 'after' ? 1 : 0);
-          selectedFunctionFolderOrFunctionParent.moveFunctionFolderOrFunctionToAnotherFolder(
-            selectedFunctionFolderOrFunction,
-            parent,
-            position
-          );
-          const treeView = treeViewRef.current;
-          if (treeView) {
-            const closestVisibleParentId = getClosestVisibleParentId(parent);
-            if (closestVisibleParentId) {
-              treeView.animateItemFromId(closestVisibleParentId);
-            }
+          const closestVisibleParentId = getClosestVisibleParentId(folder);
+          if (closestVisibleParentId) {
+            treeView.animateItemFromId(closestVisibleParentId);
           }
-        }
+        };
+        selectedItem.content.moveAt(
+          destinationItem.content,
+          where,
+          animateFolder
+        );
         onTreeModified(true);
       },
       [onTreeModified, selectedItems]

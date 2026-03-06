@@ -13,8 +13,7 @@ import {
 } from '../Utils/Serializer';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import {
-  // $FlowFixMe[import-type-as-value]
-  TreeViewItemContent,
+  type TreeViewItemContent,
   type TreeItemProps,
   extensionBehaviorsRootFolderId,
 } from '.';
@@ -87,6 +86,10 @@ export class EventsBasedBehaviorTreeViewItemContent
 
   getEventsFunctionsContainer(): gdEventsFunctionsContainer {
     return this.eventsBasedBehavior.getEventsFunctions();
+  }
+
+  getFunctionFolderOrFunction(): gdFunctionFolderOrFunction | null {
+    return null;
   }
 
   getEventsFunction(): ?gdEventsFunction {
@@ -260,8 +263,14 @@ export class EventsBasedBehaviorTreeViewItemContent
     );
   }
 
-  moveAt(destinationIndex: number): void {
+  moveAt(
+    destinationItemContent: TreeViewItemContent,
+    where: 'before' | 'inside' | 'after',
+    animateFolder: (folder: gdFunctionFolderOrFunction) => void
+  ): void {
     const originIndex = this.getIndex();
+    const destinationIndex =
+      destinationItemContent.getIndex() + (where === 'after' ? 1 : 0);
     this.props.eventsBasedBehaviorsList.move(
       originIndex,
       // When moving the item down, it must not be counted.

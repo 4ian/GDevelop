@@ -91,6 +91,9 @@ const gd::String FunctionFolderOrFunction::GetGroupPath() {
   }
   gd::String groupPath = groupFolder->GetFolderName();
   groupFolder = groupFolder->parent;
+  if (!groupFolder) {
+    return groupPath;
+  }
   while (groupFolder->parent) {
     groupPath = groupFolder->GetFolderName() + "/" + groupPath;
     groupFolder = groupFolder->parent;

@@ -33,6 +33,16 @@ import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 
 type SearchTypeTab = 'search-and-replace' | 'search-in-event-sentences';
 
+export type InitialSearchFilterParams = {|
+  initialSearchText?: string,
+  initialMatchCase?: boolean,
+  initialTab?: SearchTypeTab,
+  initialSearchInConditions?: boolean,
+  initialSearchInActions?: boolean,
+  initialSearchInEventStrings?: boolean,
+  initialSearchInInstructionNames?: boolean,
+|};
+
 type Props = {|
   onSearchInEvents: SearchInEventsInputs => void,
   onReplaceInEvents: ReplaceInEventsInputs => void,
@@ -42,13 +52,7 @@ type Props = {|
   onGoToPreviousSearchResult: () => ?gdBaseEvent,
   onGoToNextSearchResult: () => ?gdBaseEvent,
   searchFocusOffset: ?number,
-  initialSearchText?: string,
-  initialMatchCase?: boolean,
-  initialTab?: SearchTypeTab,
-  initialSearchInConditions?: boolean,
-  initialSearchInActions?: boolean,
-  initialSearchInEventStrings?: boolean,
-  initialSearchInInstructionNames?: boolean,
+  initialSearchFilterParams: InitialSearchFilterParams,
 |};
 
 export type SearchPanelInterface = {|
@@ -67,6 +71,12 @@ const SearchPanel = (
     onGoToPreviousSearchResult,
     onGoToNextSearchResult,
     searchFocusOffset,
+    initialSearchFilterParams,
+  }: Props,
+  // $FlowFixMe[missing-local-annot]
+  ref
+) => {
+  const {
     initialSearchText,
     initialMatchCase,
     initialTab,
@@ -74,10 +84,7 @@ const SearchPanel = (
     initialSearchInActions,
     initialSearchInEventStrings,
     initialSearchInInstructionNames,
-  }: Props,
-  // $FlowFixMe[missing-local-annot]
-  ref
-) => {
+  } = initialSearchFilterParams;
   const { isMobile } = useResponsiveWindowSize();
   const searchTextField = React.useRef<?TextFieldInterface>(null);
   const replaceTextField = React.useRef<?TextFieldInterface>(null);

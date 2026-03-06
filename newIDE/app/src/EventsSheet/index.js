@@ -127,6 +127,7 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import { useHighlightedAiGeneratedEvent } from './UseHighlightedAiGeneratedEvent';
 import { findEventByPath } from '../Utils/EventsValidationScanner';
 import type { SearchFilterParams } from '../Utils/Search';
+import type { InitialSearchFilterParams } from './SearchPanel';
 
 const gd: libGDevelop = global.gd;
 
@@ -2384,6 +2385,26 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       }
     }
 
+    const initialSearchFilterParams: InitialSearchFilterParams = {
+      initialSearchText: this.state.searchHighlight
+        ? this.state.searchHighlight.text || undefined
+        : undefined,
+      initialMatchCase: this.state.searchHighlight
+        ? this.state.searchHighlight?.searchFilterParams?.matchCase
+        : undefined,
+      initialTab: this.state.searchHighlight
+        ? 'search-in-event-sentences'
+        : undefined,
+      initialSearchInConditions: this.state.searchHighlight?.searchFilterParams
+        ?.searchInConditions,
+      initialSearchInActions: this.state.searchHighlight?.searchFilterParams
+        ?.searchInActions,
+      initialSearchInEventStrings: this.state.searchHighlight
+        ?.searchFilterParams?.searchInEventStrings,
+      initialSearchInInstructionNames: this.state.searchHighlight
+        ?.searchFilterParams?.searchInInstructionNames,
+    };
+
     return (
       <>
         <EventsSearcher
@@ -2579,38 +2600,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                           ? this.state.searchHighlight.focusOffset
                           : searchFocusOffset
                       }
-                      initialSearchText={
-                        this.state.searchHighlight
-                          ? this.state.searchHighlight.text || undefined
-                          : undefined
-                      }
-                      initialMatchCase={
-                        this.state.searchHighlight
-                          ? this.state.searchHighlight?.searchFilterParams
-                              ?.matchCase
-                          : undefined
-                      }
-                      initialTab={
-                        this.state.searchHighlight
-                          ? 'search-in-event-sentences'
-                          : undefined
-                      }
-                      initialSearchInConditions={
-                        this.state.searchHighlight?.searchFilterParams
-                          ?.searchInConditions
-                      }
-                      initialSearchInActions={
-                        this.state.searchHighlight?.searchFilterParams
-                          ?.searchInActions
-                      }
-                      initialSearchInEventStrings={
-                        this.state.searchHighlight?.searchFilterParams
-                          ?.searchInEventStrings
-                      }
-                      initialSearchInInstructionNames={
-                        this.state.searchHighlight?.searchFilterParams
-                          ?.searchInInstructionNames
-                      }
+                      initialSearchFilterParams={initialSearchFilterParams}
                     />
                   </ErrorBoundary>
                 )}

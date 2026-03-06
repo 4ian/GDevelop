@@ -252,7 +252,7 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
                     },
                     {
                       type: 'checkbox',
-                      label: i18n._(t`Instruction names`),
+                      label: i18n._(t`Internal instruction names`),
                       checked: searchFiltersState.searchInInstructionNames,
                       click: () =>
                         setSearchFiltersState(prev => ({

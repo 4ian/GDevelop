@@ -73,7 +73,6 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     eventPaths: Array<EventPath>,
     focusedEventPath: EventPath,
     searchText: string,
-    matchCase: boolean,
     searchFilters?: SearchFilterParams
   ) {
     if (this.editor) {
@@ -81,7 +80,6 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
         eventPaths,
         focusedEventPath,
         searchText,
-        matchCase,
         searchFilters
       );
     }

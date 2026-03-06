@@ -17,7 +17,7 @@ import {
   scanProjectForGlobalEventsSearch,
   type GlobalSearchGroup,
 } from '../../../Utils/EventsGlobalSearchScanner';
-import type { NavigateToEventFromGlobalSearchParams } from '../BaseEditor';
+import type { NavigateToEventFromGlobalSearchParams } from '../../../Utils/Search';
 import {
   GlobalSearchContextProvider,
   type GlobalSearchContextType,
@@ -83,11 +83,14 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
       setSearch(searchText);
       const groups = scanProjectForGlobalEventsSearch(project, {
         searchText,
-        ...searchFiltersState,
+        searchFilterParams: searchFiltersState,
       });
       setGroups(groups);
       setHasSearched(true);
-      setFreezedSearchState({ ...searchFiltersState, searchText });
+      setFreezedSearchState({
+        searchFilterParams: searchFiltersState,
+        searchText,
+      });
     };
 
     const navigateToMatch = React.useCallback(
@@ -98,11 +101,17 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
           eventPath: focusedEventPath,
           highlightedEventPaths: deduplicateEventPaths(group.matches),
           searchText: freezedSearchState.searchText,
-          matchCase: freezedSearchState.matchCase,
-          searchInConditions: freezedSearchState.searchInConditions,
-          searchInActions: freezedSearchState.searchInActions,
-          searchInEventStrings: freezedSearchState.searchInEventStrings,
-          searchInInstructionNames: freezedSearchState.searchInInstructionNames,
+          searchFilterParams: {
+            matchCase: freezedSearchState.searchFilterParams.matchCase,
+            searchInConditions:
+              freezedSearchState.searchFilterParams.searchInConditions,
+            searchInActions:
+              freezedSearchState.searchFilterParams.searchInActions,
+            searchInEventStrings:
+              freezedSearchState.searchFilterParams.searchInEventStrings,
+            searchInInstructionNames:
+              freezedSearchState.searchFilterParams.searchInInstructionNames,
+          },
         };
 
         if (group.targetType === 'extension') {
@@ -120,12 +129,12 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
         onNavigateToEventFromGlobalSearch(params);
       },
       [
+        freezedSearchState.searchFilterParams.matchCase,
+        freezedSearchState.searchFilterParams.searchInActions,
+        freezedSearchState.searchFilterParams.searchInConditions,
+        freezedSearchState.searchFilterParams.searchInEventStrings,
+        freezedSearchState.searchFilterParams.searchInInstructionNames,
         freezedSearchState.searchText,
-        freezedSearchState.matchCase,
-        freezedSearchState.searchInConditions,
-        freezedSearchState.searchInActions,
-        freezedSearchState.searchInEventStrings,
-        freezedSearchState.searchInInstructionNames,
         onNavigateToEventFromGlobalSearch,
       ]
     );
@@ -134,11 +143,11 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
       () => ({
         navigateToMatch,
         searchText: freezedSearchState.searchText,
-        matchCase: freezedSearchState.matchCase,
+        matchCase: freezedSearchState.searchFilterParams.matchCase,
       }),
       [
         navigateToMatch,
-        freezedSearchState.matchCase,
+        freezedSearchState.searchFilterParams.matchCase,
         freezedSearchState.searchText,
       ]
     );

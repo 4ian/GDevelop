@@ -54,10 +54,7 @@ export type GlobalSearchGroup =
 
 export type GlobalSearchInputs = {|
   searchText: string,
-  matchCase: boolean,
-  searchInEventSentences: boolean,
-  includeStoreExtensions: boolean,
-  ...Required<SearchFilterParams>,
+  searchFilterParams: Required<SearchFilterParams>,
 |};
 
 const buildEventPtrToPathMap = (
@@ -108,12 +105,12 @@ const searchInEventsList = (
     gd.JsPlatform.get(),
     eventsList,
     inputs.searchText,
-    inputs.matchCase,
-    inputs.searchInConditions,
-    inputs.searchInActions,
-    inputs.searchInEventStrings,
-    inputs.searchInEventSentences,
-    inputs.searchInInstructionNames
+    inputs.searchFilterParams.matchCase,
+    inputs.searchFilterParams.searchInConditions,
+    inputs.searchFilterParams.searchInActions,
+    inputs.searchFilterParams.searchInEventStrings,
+    inputs.searchFilterParams.searchInEventSentences,
+    inputs.searchFilterParams.searchInInstructionNames
   ).clone();
 
   // Phase 1: Extract paths and positions from the C++ search results,
@@ -148,7 +145,11 @@ const searchInEventsList = (
       eventPath: entry.eventPath,
       positionInList: entry.positionInList,
       context: event
-        ? getEventContext(event, inputs.searchText, inputs.matchCase)
+        ? getEventContext(
+            event,
+            inputs.searchText,
+            inputs.searchFilterParams.matchCase
+          )
         : { conditionText: '', actionText: '', otherText: 'Event' },
     };
   });
@@ -440,7 +441,7 @@ export const scanProjectForGlobalEventsSearch = (
   mapFor(0, project.getEventsFunctionsExtensionsCount(), extensionIndex => {
     const extension = project.getEventsFunctionsExtensionAt(extensionIndex);
     if (
-      !inputs.includeStoreExtensions &&
+      !inputs.searchFilterParams.includeStoreExtensions &&
       extension.getOriginName() === 'gdevelop-extension-store'
     ) {
       return;

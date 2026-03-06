@@ -183,6 +183,13 @@ type ComponentProps = {|
   highlightedAiGeneratedEventIds: Set<string>,
 |};
 
+type SearchHighlight = {|
+  results: Array<gdBaseEvent>,
+  focusOffset: number,
+  text: string,
+  searchFilterParams: SearchFilterParams,
+|};
+
 type State = {|
   eventsHistory: HistoryState,
 
@@ -223,13 +230,7 @@ type State = {|
   textEditedEvent: ?gdBaseEvent,
 
   showSearchPanel: boolean,
-  searchHighlight: ?{|
-    results: Array<gdBaseEvent>,
-    focusOffset: number,
-    text: string,
-    matchCase: boolean,
-    ...SearchFilterParams,
-  |},
+  searchHighlight: ?SearchHighlight,
   localSearchText: string,
   localSearchMatchCase: boolean,
   navigationHighlightEvent: ?gdBaseEvent,
@@ -439,7 +440,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     eventPaths: Array<EventPath>,
     focusedEventPath: EventPath,
     searchText: string,
-    matchCase: boolean,
     searchFilters?: SearchFilterParams
   ) => {
     const eventsTree = this._eventsTree;
@@ -465,15 +465,17 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       }
     }
 
-    const searchHighlight = {
+    const searchHighlight: SearchHighlight = {
       results: resultEvents,
       focusOffset,
       text: searchText || '',
-      matchCase,
-      searchInConditions: searchFilters?.searchInConditions,
-      searchInActions: searchFilters?.searchInActions,
-      searchInEventStrings: searchFilters?.searchInEventStrings,
-      searchInInstructionNames: searchFilters?.searchInInstructionNames,
+      searchFilterParams: {
+        matchCase: searchFilters?.matchCase,
+        searchInConditions: searchFilters?.searchInConditions,
+        searchInActions: searchFilters?.searchInActions,
+        searchInEventStrings: searchFilters?.searchInEventStrings,
+        searchInInstructionNames: searchFilters?.searchInInstructionNames,
+      },
     };
 
     this.setState(
@@ -482,7 +484,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         navigationHighlightEvent: null,
         showSearchPanel: true,
         localSearchText: searchText || '',
-        localSearchMatchCase: matchCase,
+        localSearchMatchCase: searchFilters?.matchCase,
       },
       () => {
         if (!eventsTree) return;
@@ -2150,7 +2152,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   ) => {
     this.setState({
       localSearchText: inputs.searchText || '',
-      localSearchMatchCase: inputs.matchCase,
+      localSearchMatchCase: !!inputs.searchFilterParams.matchCase,
       searchHighlight: null, // Switch from global to local search
     });
     doSearchInEvents(inputs, () => {
@@ -2584,7 +2586,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                       }
                       initialMatchCase={
                         this.state.searchHighlight
-                          ? this.state.searchHighlight.matchCase
+                          ? this.state.searchHighlight?.searchFilterParams
+                              ?.matchCase
                           : undefined
                       }
                       initialTab={
@@ -2593,16 +2596,20 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                           : undefined
                       }
                       initialSearchInConditions={
-                        this.state.searchHighlight?.searchInConditions
+                        this.state.searchHighlight?.searchFilterParams
+                          ?.searchInConditions
                       }
                       initialSearchInActions={
-                        this.state.searchHighlight?.searchInActions
+                        this.state.searchHighlight?.searchFilterParams
+                          ?.searchInActions
                       }
                       initialSearchInEventStrings={
-                        this.state.searchHighlight?.searchInEventStrings
+                        this.state.searchHighlight?.searchFilterParams
+                          ?.searchInEventStrings
                       }
                       initialSearchInInstructionNames={
-                        this.state.searchHighlight?.searchInInstructionNames
+                        this.state.searchHighlight?.searchFilterParams
+                          ?.searchInInstructionNames
                       }
                     />
                   </ErrorBoundary>
@@ -2801,7 +2808,6 @@ export type EventsSheetInterface = {|
     eventPaths: Array<EventPath>,
     focusedEventPath: EventPath,
     searchText: string,
-    matchCase: boolean,
     searchFilters?: SearchFilterParams
   ) => void,
   clearGlobalSearchResults: () => void,
@@ -2844,7 +2850,6 @@ const EventsSheet = (props, ref) => {
     eventPaths: Array<EventPath>,
     focusedEventPath: EventPath,
     searchText: string,
-    matchCase: boolean,
     searchFilters?: SearchFilterParams
   ) => {
     if (component.current)
@@ -2852,7 +2857,6 @@ const EventsSheet = (props, ref) => {
         eventPaths,
         focusedEventPath,
         searchText,
-        matchCase,
         searchFilters
       );
   };

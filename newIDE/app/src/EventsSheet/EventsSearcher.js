@@ -9,9 +9,9 @@ const gd: libGDevelop = global.gd;
 export type SearchInEventsInputs = {|
   searchInSelection: boolean,
   searchText: string,
-  matchCase: boolean,
-  searchInEventSentences: boolean,
-  ...Required<SearchFilterParams>,
+  searchFilterParams: Required<
+    Omit<SearchFilterParams, 'includeStoreExtensions'>
+  >,
 |};
 
 export type ReplaceInEventsInputs = {|
@@ -185,18 +185,17 @@ export default class EventsSearcher extends React.Component<Props, State> {
   };
 
   _doSearchInEvents = (
-    {
-      searchInSelection,
-      searchText,
+    { searchInSelection, searchText, searchFilterParams }: SearchInEventsInputs,
+    cb: () => void
+  ) => {
+    const {
       matchCase,
       searchInConditions,
       searchInActions,
       searchInEventStrings,
-      searchInEventSentences,
       searchInInstructionNames,
-    }: SearchInEventsInputs,
-    cb: () => void
-  ) => {
+      searchInEventSentences,
+    } = searchFilterParams;
     const { events } = this.props;
 
     if (searchInSelection) {

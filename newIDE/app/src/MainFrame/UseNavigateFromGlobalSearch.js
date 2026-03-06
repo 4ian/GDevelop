@@ -4,14 +4,17 @@ import * as React from 'react';
 import type { EditorTabsState } from './EditorTabs/EditorTabsHandler';
 import type { EventPath } from '../Utils/EventPath';
 import { type State } from './MainFrameState';
-import type { SearchFilterParams } from '../Utils/Search';
+import type {
+  NavigateToEventFromGlobalSearchParams,
+  LocationType,
+} from '../Utils/Search';
 
 type Props = {|
   editorTabs: EditorTabsState,
   setState: ((State => State) | State) => Promise<State>,
   setPendingEventNavigation: ({|
     name: string,
-    locationType: 'layout' | 'external-events' | 'extension',
+    locationType: LocationType,
     eventPath: EventPath,
   |}) => void,
   openLayout: (
@@ -43,19 +46,9 @@ const useNavigateFromGlobalSearch = ({
   openExternalEvents,
   openEventsFunctionsExtension,
 }: Props): {|
-  navigateToEventFromGlobalSearch: (params: {|
-    locationType: 'layout' | 'external-events' | 'extension',
-    name: string,
-    eventPath: EventPath,
-    highlightedEventPaths: Array<EventPath>,
-    searchText: string,
-    matchCase?: boolean,
-    extensionName?: string,
-    functionName?: string,
-    behaviorName?: string,
-    objectName?: string,
-    ...SearchFilterParams,
-  |}) => void,
+  navigateToEventFromGlobalSearch: (
+    params: NavigateToEventFromGlobalSearchParams
+  ) => void,
   clearGlobalSearchHighlightsInEditorTabs: (
     editorTabs: EditorTabsState
   ) => void,
@@ -135,7 +128,7 @@ const useNavigateFromGlobalSearch = ({
       behaviorName,
       objectName,
     }: {|
-      locationType: 'layout' | 'external-events' | 'extension',
+      locationType: LocationType,
       name: string,
       extensionName?: string,
       functionName?: string,
@@ -171,28 +164,19 @@ const useNavigateFromGlobalSearch = ({
       eventPath,
       highlightedEventPaths,
       searchText,
-      matchCase,
-      searchInConditions,
-      searchInActions,
-      searchInEventStrings,
-      searchInInstructionNames,
       extensionName,
       functionName,
       behaviorName,
       objectName,
-    }: {|
-      locationType: 'layout' | 'external-events' | 'extension',
-      name: string,
-      eventPath: EventPath,
-      highlightedEventPaths: Array<EventPath>,
-      searchText: string,
-      matchCase?: boolean,
-      extensionName?: string,
-      functionName?: string,
-      behaviorName?: string,
-      objectName?: string,
-      ...SearchFilterParams,
-    |}) => {
+      searchFilterParams,
+    }: NavigateToEventFromGlobalSearchParams) => {
+      const {
+        matchCase,
+        searchInConditions,
+        searchInActions,
+        searchInEventStrings,
+        searchInInstructionNames,
+      } = searchFilterParams;
       clearGlobalSearchRetryTimeoutId();
       clearGlobalSearchHighlightsInEditorTabs(editorTabs);
       setPendingEventNavigation({
@@ -238,12 +222,12 @@ const useNavigateFromGlobalSearch = ({
                     highlightedEventPaths,
                     eventPath,
                     searchText,
-                    matchCase,
                     {
                       searchInConditions,
                       searchInActions,
                       searchInEventStrings,
                       searchInInstructionNames,
+                      matchCase,
                     }
                   );
                 };

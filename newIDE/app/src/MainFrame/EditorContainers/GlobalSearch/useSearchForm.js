@@ -3,16 +3,11 @@ import type { SearchFilterParams } from '../../../Utils/Search';
 
 import * as React from 'react';
 
-type SearchFiltersState = {|
-  matchCase: boolean,
-  searchInEventSentences: boolean,
-  includeStoreExtensions: boolean,
-  ...Required<SearchFilterParams>,
-|};
+type SearchFiltersState = Required<SearchFilterParams>;
 
 type FreezedSearchState = {|
-  ...SearchFiltersState,
   searchText: string,
+  searchFilterParams: SearchFiltersState,
 |};
 
 type UseSearchFormReturn = {|
@@ -32,7 +27,10 @@ type UseSearchFormReturn = {|
 
 export const useSearchForm = (): UseSearchFormReturn => {
   const [search, setSearch] = React.useState<string>('');
-  const [searchFiltersState, setSearchFiltersState] = React.useState({
+  const [
+    searchFiltersState,
+    setSearchFiltersState,
+  ] = React.useState<SearchFiltersState>({
     matchCase: false,
     searchInConditions: true,
     searchInActions: true,
@@ -42,8 +40,11 @@ export const useSearchForm = (): UseSearchFormReturn => {
     includeStoreExtensions: false,
   });
 
-  const [freezedSearchState, setFreezedSearchState] = React.useState({
-    ...searchFiltersState,
+  const [
+    freezedSearchState,
+    setFreezedSearchState,
+  ] = React.useState<FreezedSearchState>({
+    searchFilterParams: searchFiltersState,
     searchText: search,
   });
   const [hasSearched, setHasSearched] = React.useState(false);

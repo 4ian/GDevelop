@@ -2,10 +2,11 @@
 import * as React from 'react';
 import { type EditorTabsState } from './EditorTabs/EditorTabsHandler';
 import type { EventPath } from '../Utils/EventPath';
+import type { LocationType } from '../Utils/Search';
 
 export type EventNavigationTarget = {|
   name: string,
-  locationType: 'layout' | 'external-events' | 'extension',
+  locationType: LocationType,
   eventPath: EventPath,
 |};
 

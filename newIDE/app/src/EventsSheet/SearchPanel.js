@@ -197,12 +197,14 @@ const SearchPanel = (
     onSearchInEvents({
       searchInSelection,
       searchText,
-      matchCase,
-      searchInActions,
-      searchInConditions,
-      searchInEventStrings,
-      searchInEventSentences: !isSearchAndReplaceTab(),
-      searchInInstructionNames,
+      searchFilterParams: {
+        matchCase,
+        searchInActions,
+        searchInConditions,
+        searchInEventStrings,
+        searchInInstructionNames,
+        searchInEventSentences: !isSearchAndReplaceTab(),
+      },
     });
   };
 

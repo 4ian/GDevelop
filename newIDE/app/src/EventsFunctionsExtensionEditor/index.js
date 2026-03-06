@@ -282,7 +282,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     eventPaths: Array<EventPath>,
     focusedEventPath: EventPath,
     searchText: string,
-    matchCase: boolean,
     searchFilters?: SearchFilterParams
   ) => {
     if (this.editor) {
@@ -290,7 +289,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         eventPaths,
         focusedEventPath,
         searchText,
-        matchCase,
         searchFilters
       );
     }

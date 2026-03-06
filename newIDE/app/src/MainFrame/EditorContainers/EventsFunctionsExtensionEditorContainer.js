@@ -54,7 +54,6 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     eventPaths: Array<EventPath>,
     focusedEventPath: EventPath,
     searchText: string,
-    matchCase: boolean,
     searchFilters?: SearchFilterParams
   ) {
     if (this.editor) {
@@ -62,7 +61,6 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
         eventPaths,
         focusedEventPath,
         searchText,
-        matchCase,
         searchFilters
       );
     }

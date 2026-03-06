@@ -104,7 +104,6 @@ export class ExternalEventsEditorContainer extends React.Component<
     eventPaths: Array<EventPath>,
     focusedEventPath: EventPath,
     searchText: string,
-    matchCase: boolean,
     searchFilters?: SearchFilterParams
   ) {
     if (this.editor) {
@@ -112,7 +111,6 @@ export class ExternalEventsEditorContainer extends React.Component<
         eventPaths,
         focusedEventPath,
         searchText,
-        matchCase,
         searchFilters
       );
     }

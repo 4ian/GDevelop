@@ -767,12 +767,12 @@ export default class SceneEditor extends React.Component<Props, State> {
       // deleted by something outside of the scene (for example,
       // a global object deleted in another scene).
       this.instancesSelection.cleanNonExistingInstances(
-        this.props.initialInstances
+        nextProps.initialInstances
       );
       this.setState(({ selectedObjectFolderOrObjectsWithContext }) => ({
         selectedObjectFolderOrObjectsWithContext: cleanNonExistingObjectFolderOrObjectWithContexts(
-          this.props.globalObjectsContainer,
-          this.props.objectsContainer,
+          nextProps.globalObjectsContainer,
+          nextProps.objectsContainer,
           selectedObjectFolderOrObjectsWithContext
         ),
       }));

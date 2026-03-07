@@ -183,9 +183,6 @@ export type TreeItemProps = {|
   showDeleteConfirmation: (
     options: ShowConfirmDeleteDialogOptions
   ) => Promise<boolean>,
-  selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
-  selectedEventsBasedObject: ?gdEventsBasedObject,
-  selectedEventsFunction: ?gdEventsFunction,
 |};
 
 const createTreeViewItem = ({
@@ -397,7 +394,8 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
   constructor(
     id: string,
     label: string | React.Node,
-    rightButton?: MenuButton
+    rightButton?: MenuButton,
+    menuItems?: Array<MenuItemTemplate>
   ) {
     this.id = id;
     this.label = label;
@@ -408,6 +406,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
               label: rightButton.label,
               click: rightButton.click,
             },
+            ...(menuItems ? menuItems : []),
           ]
         : [];
     this.rightButton = rightButton;
@@ -702,9 +701,24 @@ const EventsFunctionsList = React.forwardRef<
       Array<TreeViewItem>
     >([]);
 
+    // gdFunctionFolderOrFunction instances are the same from one refresh to
+    // another (contrary to TreeViewItem) so we can use it in functions without
+    // making refresh loops.
+    const selectedFunctionFolderOrFunction = React.useMemo(
+      () =>
+        selectedItems[0]
+          ? selectedItems[0].content.getFunctionFolderOrFunction()
+          : null,
+      [selectedItems]
+    );
+
     const setSelectedFunctionFolderOrFunction = React.useRef<
-      (functionFolderOrFunction: gdFunctionFolderOrFunction | null) => void
-    >((propertyFolderOrProperty, isSharedProperties) => {});
+      (
+        functionFolderOrFunction: gdFunctionFolderOrFunction | null,
+        eventsBasedBehavior: ?gdEventsBasedBehavior,
+        eventsBasedObject: ?gdEventsBasedObject
+      ) => void
+    >(() => {});
 
     const preferences = React.useContext(PreferencesContext);
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -760,13 +774,11 @@ const EventsFunctionsList = React.forwardRef<
         eventsBasedBehavior,
         eventsBasedObject,
         parentFolder,
-        index,
       }: {|
         itemContent: ?TreeViewItemContent,
         eventsBasedBehavior: ?gdEventsBasedBehavior,
         eventsBasedObject: ?gdEventsBasedObject,
         parentFolder: gdFunctionFolderOrFunction,
-        index: number,
       |}) => {
         const eventBasedEntity = eventsBasedBehavior || eventsBasedObject;
         const eventsFunctionsContainer = eventBasedEntity
@@ -797,10 +809,27 @@ const EventsFunctionsList = React.forwardRef<
                 eventsFunctionsContainer.hasEventsFunctionNamed(name)
               );
 
+            let insertionParentFolder = parentFolder;
+            let insertionIndex = parentFolder.getChildrenCount();
+            if (
+              selectedFunctionFolderOrFunction &&
+              selectedFunctionFolderOrFunction.isADescendantOf(parentFolder)
+            ) {
+              if (selectedFunctionFolderOrFunction.isFolder()) {
+                insertionParentFolder = selectedFunctionFolderOrFunction;
+                insertionIndex = selectedFunctionFolderOrFunction.getChildrenCount();
+              } else {
+                insertionParentFolder = selectedFunctionFolderOrFunction.getParent();
+                insertionIndex =
+                  insertionParentFolder.getChildPosition(
+                    selectedFunctionFolderOrFunction
+                  ) + 1;
+              }
+            }
             const eventsFunction = eventsFunctionsContainer.insertNewFunctionInFolder(
               eventsFunctionName,
-              parentFolder,
-              index || eventsFunctionsContainer.getEventsFunctionsCount()
+              insertionParentFolder,
+              insertionIndex
             );
             eventsFunction.setFunctionType(parameters.functionType);
 
@@ -865,17 +894,18 @@ const EventsFunctionsList = React.forwardRef<
         );
       },
       [
-        editName,
         eventsFunctionsExtension,
-        forceUpdate,
         onAddEventsFunction,
-        onEventsFunctionAdded,
         onSelectEventsBasedBehavior,
         onSelectEventsBasedObject,
-        project,
-        onSelectEventsFunction,
-        scrollToItem,
+        selectedFunctionFolderOrFunction,
+        onEventsFunctionAdded,
         unsavedChanges,
+        forceUpdate,
+        onSelectEventsFunction,
+        project,
+        scrollToItem,
+        editName,
       ]
     );
 
@@ -1050,9 +1080,6 @@ const EventsFunctionsList = React.forwardRef<
         showDeleteConfirmation,
         editName,
         scrollToItem,
-        selectedEventsBasedBehavior,
-        selectedEventsBasedObject,
-        selectedEventsFunction,
       }),
       [
         project,
@@ -1066,9 +1093,6 @@ const EventsFunctionsList = React.forwardRef<
         showDeleteConfirmation,
         editName,
         scrollToItem,
-        selectedEventsBasedBehavior,
-        selectedEventsBasedObject,
-        selectedEventsFunction,
       ]
     );
 
@@ -1213,11 +1237,8 @@ const EventsFunctionsList = React.forwardRef<
         addFolder,
         addNewEventsFunction,
         onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
-        setSelectedFunctionFolderOrFunction: (
-          functionFolderOrFunction,
-          isSharedProperties
-        ) =>
-          setSelectedFunctionFolderOrFunction.current(functionFolderOrFunction),
+        setSelectedFunctionFolderOrFunction:
+          setSelectedFunctionFolderOrFunction.current,
         onEventsFunctionAdded,
         onSelectEventsFunction,
       }),
@@ -1245,6 +1266,7 @@ const EventsFunctionsList = React.forwardRef<
         onEventsBasedBehaviorRenamed,
         onEventsBasedBehaviorPasted,
         addNewEventsFunction,
+        addFolder,
       }),
       [
         treeItemProps,
@@ -1255,6 +1277,7 @@ const EventsFunctionsList = React.forwardRef<
         onEventsBasedBehaviorRenamed,
         onEventsBasedBehaviorPasted,
         addNewEventsFunction,
+        addFolder,
       ]
     );
 
@@ -1271,6 +1294,7 @@ const EventsFunctionsList = React.forwardRef<
         onEventsBasedObjectPasted,
         onAddEventsBasedObject,
         addNewEventsFunction,
+        addFolder,
         onOpenCustomObjectEditor,
         onEventBasedObjectTypeChanged,
       }),
@@ -1284,6 +1308,7 @@ const EventsFunctionsList = React.forwardRef<
         onEventsBasedObjectPasted,
         onAddEventsBasedObject,
         addNewEventsFunction,
+        addFolder,
         onOpenCustomObjectEditor,
         onEventBasedObjectTypeChanged,
       ]
@@ -1405,15 +1430,6 @@ const EventsFunctionsList = React.forwardRef<
                 icon: <Add />,
                 label: i18n._(t`Add a function`),
                 click: () => {
-                  const freeEventsFunctions = eventsFunctionsExtension.getEventsFunctions();
-                  const index =
-                    !selectedEventsBasedBehavior &&
-                    !selectedEventsBasedObject &&
-                    selectedEventsFunction
-                      ? freeEventsFunctions.getEventsFunctionPosition(
-                          selectedEventsFunction
-                        ) + 1
-                      : freeEventsFunctions.getEventsFunctionsCount();
                   addNewEventsFunction({
                     itemContent: null,
                     eventsBasedBehavior: null,
@@ -1421,10 +1437,20 @@ const EventsFunctionsList = React.forwardRef<
                     parentFolder: eventsFunctionsExtension
                       .getEventsFunctions()
                       .getRootFolder(),
-                    index,
                   });
                 },
-              }
+              },
+              [
+                {
+                  label: i18n._(t`Add a new folder`),
+                  click: () =>
+                    addFolder([
+                      eventsFunctionsExtension
+                        .getEventsFunctions()
+                        .getRootFolder(),
+                    ]),
+                },
+              ]
             ),
             getChildren(i18n: I18nType): ?Array<TreeViewItem> {
               const freeEventsFunctions = eventsFunctionsExtension.getEventsFunctions();
@@ -1467,10 +1493,8 @@ const EventsFunctionsList = React.forwardRef<
         objectTreeViewItems,
         behaviorTreeViewItems,
         eventsFunctionsExtension,
-        selectedEventsBasedBehavior,
-        selectedEventsBasedObject,
-        selectedEventsFunction,
         addNewEventsFunction,
+        addFolder,
         eventFunctionCommonProps,
         eventFunctionFolderCommonProps,
       ]

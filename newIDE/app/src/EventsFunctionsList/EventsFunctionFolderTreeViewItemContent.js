@@ -108,7 +108,6 @@ export type EventFunctionFolderCommonProps = {|
     eventsBasedBehavior: ?gdEventsBasedBehavior,
     eventsBasedObject: ?gdEventsBasedObject,
     parentFolder: gdFunctionFolderOrFunction,
-    index: number,
   |}) => void,
   onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer: (
     functionFolderOrFunction: gdFunctionFolderOrFunction
@@ -116,7 +115,8 @@ export type EventFunctionFolderCommonProps = {|
   showDeleteConfirmation: (options: any) => Promise<boolean>,
   setSelectedFunctionFolderOrFunction: (
     functionFolderOrFunction: gdFunctionFolderOrFunction | null,
-    isSharedFunctions: boolean
+    eventsBasedBehavior?: ?gdEventsBasedBehavior,
+    eventsBasedObject?: ?gdEventsBasedObject
   ) => void,
   onSelectEventsFunction: (
     selectedEventsFunction: ?gdEventsFunction,
@@ -348,7 +348,6 @@ export class EventsFunctionFolderTreeViewItemContent
             eventsBasedBehavior,
             eventsBasedObject,
             parentFolder: this.functionFolder,
-            index: 0,
           }),
       },
       {
@@ -387,7 +386,7 @@ export class EventsFunctionFolderTreeViewItemContent
     const functionsToDelete = enumerateFunctionsInFolder(this.functionFolder);
     if (functionsToDelete.length === 0) {
       // Folder is empty or contains only empty folders.
-      setSelectedFunctionFolderOrFunction(null, false);
+      setSelectedFunctionFolderOrFunction(null);
       this.functionFolder.getParent().removeFolderChild(this.functionFolder);
       forceUpdateList();
       return;
@@ -411,7 +410,7 @@ export class EventsFunctionFolderTreeViewItemContent
     // TODO: Change selectedFunctionFolderOrFunctionWithContext so that it's easy
     // to remove an item using keyboard only and to navigate with the arrow
     // keys right after deleting it.
-    setSelectedFunctionFolderOrFunction(null, false);
+    setSelectedFunctionFolderOrFunction(null);
 
     for (const functionToDelete of functionsToDelete) {
       eventsFunctionsContainer.removeEventsFunction(functionToDelete.getName());

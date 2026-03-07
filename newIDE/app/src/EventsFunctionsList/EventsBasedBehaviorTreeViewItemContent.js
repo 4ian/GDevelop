@@ -66,8 +66,12 @@ export type EventsBasedBehaviorProps = {|
     eventsBasedBehavior: ?gdEventsBasedBehavior,
     eventsBasedObject: ?gdEventsBasedObject,
     parentFolder: gdFunctionFolderOrFunction,
-    index: number,
   |}) => void,
+  addFolder: (
+    items: Array<gdFunctionFolderOrFunction>,
+    eventsBasedBehavior?: ?gdEventsBasedBehavior,
+    eventsBasedObject?: ?gdEventsBasedObject
+  ) => void,
   eventsBasedBehaviorsList: gdEventsBasedBehaviorsList,
 |};
 
@@ -158,6 +162,15 @@ export class EventsBasedBehaviorTreeViewItemContent
       {
         label: i18n._(t`Add a function`),
         click: () => this.addFunctionAtSelection(),
+      },
+      {
+        label: i18n._(t`Add a new folder`),
+        click: () =>
+          this.props.addFolder(
+            [this.eventsBasedBehavior.getEventsFunctions().getRootFolder()],
+            this.eventsBasedBehavior,
+            null
+          ),
       },
       {
         type: 'separator',
@@ -390,17 +403,6 @@ export class EventsBasedBehaviorTreeViewItemContent
   }
 
   addFunctionAtSelection(): void {
-    const { selectedEventsFunction, selectedEventsBasedBehavior } = this.props;
-    const eventsFunctionsContainer = this.eventsBasedBehavior.getEventsFunctions();
-    // When the selected item is inside the behavior, the new function is
-    // added below it.
-    const index =
-      selectedEventsBasedBehavior === this.eventsBasedBehavior &&
-      selectedEventsFunction
-        ? eventsFunctionsContainer.getEventsFunctionPosition(
-            selectedEventsFunction
-          ) + 1
-        : eventsFunctionsContainer.getEventsFunctionsCount();
     this.props.addNewEventsFunction({
       itemContent: this,
       eventsBasedBehavior: this.eventsBasedBehavior,
@@ -408,7 +410,6 @@ export class EventsBasedBehaviorTreeViewItemContent
       parentFolder: this.eventsBasedBehavior
         .getEventsFunctions()
         .getRootFolder(),
-      index,
     });
   }
 }

@@ -7,6 +7,7 @@
 
 #include "GDCore/String.h"
 #include "GDCore/Project/BehaviorConfigurationContainer.h"
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/Tools/MakeUnique.h"
 
 namespace gd {
@@ -27,6 +28,16 @@ class GD_CORE_API Behavior: public BehaviorConfigurationContainer {
   Behavior(const gd::String& name_, const gd::String& type_)
       : BehaviorConfigurationContainer(name_, type_),
       isDefaultBehavior(false) {};
+  Behavior(const Behavior& other)
+      : BehaviorConfigurationContainer(other),
+        isDefaultBehavior(other.isDefaultBehavior) {};
+  Behavior& operator=(const Behavior& other) {
+    if (this != &other) {
+      BehaviorConfigurationContainer::operator=(other);
+      isDefaultBehavior = other.isDefaultBehavior;
+    }
+    return *this;
+  }
   virtual ~Behavior();
   virtual std::unique_ptr<gd::Behavior> Clone() const {
     return gd::make_unique<gd::Behavior>(*this);
@@ -41,6 +52,7 @@ class GD_CORE_API Behavior: public BehaviorConfigurationContainer {
   }
 
   private:
+  gd::MemoryTracked _memoryTracked{this, "Behavior"};
   bool isDefaultBehavior;
 };
 

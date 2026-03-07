@@ -4379,3 +4379,11 @@ interface MetadataDeclarationHelper {
     boolean STATIC_IsExtensionLifecycleEventsFunction([Const] DOMString functionName);
     [Const, Value] DOMString STATIC_ShiftSentenceParamIndexes([Const] DOMString sentence, long offset);
 };
+
+interface MemoryTrackedRegistry {
+    void STATIC_add(long ptr, DOMString className);
+    void STATIC_remove(long ptr, DOMString className);
+    boolean STATIC_isDead(long ptr, DOMString className);
+    long STATIC_deadCount();
+    void STATIC_pruneDead(long maxSize);
+};

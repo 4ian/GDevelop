@@ -18,6 +18,7 @@
 #include "GDCore/Project/ResourcesContainer.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/Watermark.h"
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/String.h"
 namespace gd {
 class Platform;
@@ -1093,6 +1094,8 @@ class GD_CORE_API Project {
    */
   std::unique_ptr<gd::ObjectConfiguration> CreateObjectConfiguration(
       const gd::String& type) const;
+
+  gd::MemoryTracked _memoryTracked{this, "Project"};
 
   gd::String name;         ///< Game name
   gd::String description;  ///< Game description

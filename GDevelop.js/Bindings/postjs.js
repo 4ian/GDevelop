@@ -69,6 +69,7 @@ var adaptNamingConventions = function (gd) {
     //Offer a delete method that does what gd.destroy does.
     proto.delete = function () {
       gd.destroy(this);
+      this.ptr = 0;
     };
   }
 
@@ -320,3 +321,121 @@ var adaptNamingConventions = function (gd) {
 };
 
 adaptNamingConventions(Module);
+
+// --- Use-after-free detection ---
+
+/**
+ * Custom error class for use-after-free detection.
+ */
+class MemoryTrackedError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'MemoryTrackedError';
+  }
+}
+
+Module.MemoryTrackedError = MemoryTrackedError;
+
+/**
+ * Check that an Emscripten WebIDL object is still alive.
+ * Throws MemoryTrackedError if the object has been destroyed.
+ *
+ * @param {object} obj - The WebIDL wrapper object.
+ * @param {string} label - Method name for the error message.
+ * @param {object} gd - The Module/gd object.
+ * @param {string|null} className - The C++ class name if tracked, null otherwise.
+ */
+function assertAlive(obj, label, gd, className) {
+  if (!obj.ptr) {
+    throw new MemoryTrackedError(
+      label + ': object was already destroyed (ptr is 0)'
+    );
+  }
+  if (
+    className !== null &&
+    gd.MemoryTrackedRegistry.isDead(obj.ptr, className)
+  ) {
+    throw new MemoryTrackedError(
+      label +
+        ': C++ object (' +
+        className +
+        ') was deleted but JS wrapper still exists'
+    );
+  }
+}
+
+/**
+ * Patch all WebIDL classes to check for use-after-free before every method call.
+ *
+ * @param {object} gd - The Module/gd object (after adaptNamingConventions).
+ * @param {object} [options]
+ * @param {string[]} [options.skip] - Class names to leave unpatched.
+ * @param {string[]} [options.tracked] - Class names that have MemoryTracked in C++.
+ * @param {boolean} [options.quiet] - Suppress the startup log.
+ */
+function patchAllWebIDLClasses(gd, options) {
+  var skip = (options && options.skip) || [];
+  var trackedList = (options && options.tracked) || [];
+  var quiet = (options && options.quiet) || false;
+
+  var trackedSet = {};
+  for (var i = 0; i < trackedList.length; i++) {
+    trackedSet[trackedList[i]] = true;
+  }
+
+  var patchedCount = 0;
+
+  for (var gdClass in gd) {
+    if (!gd.hasOwnProperty(gdClass)) continue;
+    if (typeof gd[gdClass] !== 'function') continue;
+    if (!gd[gdClass].prototype) continue;
+    if (!gd[gdClass].prototype.hasOwnProperty('__class__')) continue;
+    if (skip.indexOf(gdClass) !== -1) continue;
+
+    var proto = gd[gdClass].prototype;
+
+    // Determine if this class is tracked in C++.
+    var className = trackedSet[gdClass] ? gdClass : null;
+
+    var methodNames = Object.getOwnPropertyNames(proto);
+    for (var j = 0; j < methodNames.length; j++) {
+      var methodName = methodNames[j];
+
+      // Skip special methods.
+      if (
+        methodName === 'constructor' ||
+        methodName === '__destroy__' ||
+        methodName === '__class__' ||
+        methodName === 'delete'
+      )
+        continue;
+
+      var desc = Object.getOwnPropertyDescriptor(proto, methodName);
+      if (!desc || typeof desc.value !== 'function') continue;
+
+      // Wrap the method with a liveness check.
+      proto[methodName] = (function (original, mName, cName) {
+        return function () {
+          assertAlive(this, cName ? cName + '.' + mName : mName, gd, cName);
+          return original.apply(this, arguments);
+        };
+      })(desc.value, methodName, className);
+    }
+
+    patchedCount++;
+  }
+
+  if (!quiet) {
+    console.log(
+      '[MemoryTracked] Patched ' +
+        patchedCount +
+        ' classes (' +
+        trackedList.length +
+        ' tracked in C++).'
+    );
+  }
+}
+
+patchAllWebIDLClasses(Module, {
+  tracked: ['Project', 'Layout', 'gdObject', 'Behavior'],
+});

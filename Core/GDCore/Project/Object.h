@@ -14,6 +14,7 @@
 #include "GDCore/Project/EffectsContainer.h"
 #include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Project/VariablesContainer.h"
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/MakeUnique.h"
 #include "GDCore/Vector2.h"
@@ -250,6 +251,8 @@ class GD_CORE_API Object {
   ///@}
 
  protected:
+  gd::MemoryTracked _memoryTracked{this, "gdObject"};
+
   gd::String name;          ///< The full name of the object
   gd::String assetStoreId;  ///< The ID of the asset if the object comes from
                             ///< the store.

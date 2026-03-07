@@ -704,7 +704,7 @@ const EventsFunctionsList = React.forwardRef<
     // gdFunctionFolderOrFunction instances are the same from one refresh to
     // another (contrary to TreeViewItem) so we can use it in functions without
     // making refresh loops.
-    const selectedFunctionFolderOrFunction = React.useMemo(
+    const selectedFunctionFolderOrFunction = React.useMemo<gdFunctionFolderOrFunction | null>(
       () =>
         selectedItems[0]
           ? selectedItems[0].content.getFunctionFolderOrFunction()
@@ -1715,11 +1715,9 @@ const EventsFunctionsList = React.forwardRef<
           setSelectedItems([]);
         }
       },
+      // We only update the tree selection when the displayed content is changed.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [
-        eventBasedBehaviorProps,
-        eventFunctionCommonProps,
-        eventFunctionFolderCommonProps,
-        eventsBasedObjectProps,
         eventsFunctionsExtension,
         selectedEventsBasedBehavior,
         selectedEventsBasedObject,

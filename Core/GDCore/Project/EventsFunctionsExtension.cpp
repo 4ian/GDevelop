@@ -105,6 +105,9 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element, bool isEx
 
   eventsFunctionsContainer.SerializeEventsFunctionsTo(
       element.AddChild("eventsFunctions"));
+  eventsFunctionsContainer.SerializeFoldersTo(
+      element.AddChild("eventsFunctionsFolderStructure"));
+
   eventsBasedBehaviors.SerializeElementsTo(
       "eventsBasedBehavior", element.AddChild("eventsBasedBehaviors"));
   if (isExternal) {
@@ -229,6 +232,14 @@ void EventsFunctionsExtension::UnserializeExtensionImplementationFrom(
     const SerializerElement& element) {
   eventsFunctionsContainer.UnserializeEventsFunctionsFrom(
       project, element.GetChild("eventsFunctions"));
+  if (element.HasChild("eventsFunctionsFolderStructure")) {
+    eventsFunctionsContainer.UnserializeFoldersFrom(
+        element.GetChild("eventsFunctionsFolderStructure", 0));
+  }
+  // Compatibility with GD <= 5.6.261
+  eventsFunctionsContainer.AddMissingFunctionsInRootFolder();
+  // end of compatibility code
+
   eventsBasedBehaviors.UnserializeElementsFrom(
       "eventsBasedBehavior", project, element.GetChild("eventsBasedBehaviors"));
 

@@ -1472,7 +1472,7 @@ const EventsFunctionsList = React.forwardRef<
               };
               const rootFolder = freeEventsFunctions.getRootFolder();
               const childrenCount = rootFolder.getChildrenCount();
-              mapFor(0, childrenCount, i => {
+              return mapFor(0, childrenCount, i => {
                 const child = rootFolder.getChildAt(i);
                 return createTreeViewItem({
                   functionFolderOrFunction: child,

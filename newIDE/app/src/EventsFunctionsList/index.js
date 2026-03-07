@@ -31,9 +31,16 @@ import {
   getEventsFunctionTreeViewItemId,
   canFunctionBeRenamed,
   type EventFunctionCommonProps,
+  type EventsFunctionProps,
   type EventsFunctionCallbacks,
   type EventsFunctionCreationParameters,
 } from './EventsFunctionTreeViewItemContent';
+import {
+  EventsFunctionFolderTreeViewItemContent,
+  getEventsFunctionFolderTreeViewItemId,
+  type EventFunctionFolderCommonProps,
+  type EventsFunctionFolderProps,
+} from './EventsFunctionFolderTreeViewItemContent';
 import {
   EventsBasedBehaviorTreeViewItemContent,
   getEventsBasedBehaviorTreeViewItemId,
@@ -53,6 +60,10 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { type GDevelopTheme } from '../UI/Theme';
+import {
+  getFoldersAscendanceWithoutRootFolder,
+  enumerateFoldersInContainer,
+} from './EnumerateFunctionFolderOrFunction';
 
 const gd: libGDevelop = global.gd;
 
@@ -80,6 +91,46 @@ const extensionPropertiesItemId = 'extension-properties';
 const extensionGlobalVariablesItemId = 'extension-global-variables';
 const extensionSceneVariablesItemId = 'extension-scene-variables';
 
+export const getTreeViewItemIdFromFunctionFolderOrFunction = (
+  functionFolderOrFunction: gdFunctionFolderOrFunction
+): string => {
+  return functionFolderOrFunction.isFolder()
+    ? getEventsFunctionFolderTreeViewItemId(functionFolderOrFunction)
+    : getEventsFunctionTreeViewItemId(functionFolderOrFunction.getFunction());
+};
+
+export const getRootId = (
+  eventsBasedBehavior?: ?gdEventsBasedBehavior,
+  eventsBasedObject?: ?gdEventsBasedObject
+): string => {
+  return eventsBasedBehavior
+    ? extensionBehaviorsRootFolderId
+    : eventsBasedObject
+    ? extensionObjectsRootFolderId
+    : extensionFunctionsRootFolderId;
+};
+
+export const getRootFunctionFolderId = (
+  eventsBasedBehavior?: ?gdEventsBasedBehavior,
+  eventsBasedObject?: ?gdEventsBasedObject
+): string => {
+  return eventsBasedBehavior
+    ? getEventsBasedBehaviorTreeViewItemId(eventsBasedBehavior)
+    : eventsBasedObject
+    ? getObjectTreeViewItemId(eventsBasedObject)
+    : extensionFunctionsRootFolderId;
+};
+
+export const getRootFunctionFolder = (
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  eventsBasedBehavior?: ?gdEventsBasedBehavior,
+  eventsBasedObject?: ?gdEventsBasedObject
+): gdFunctionFolderOrFunction => {
+  return (eventsBasedObject || eventsBasedBehavior || eventsFunctionsExtension)
+    .getEventsFunctions()
+    .getRootFolder();
+};
+
 export interface TreeViewItemContent {
   getName(): string | React.Node;
   getId(): string;
@@ -98,13 +149,17 @@ export interface TreeViewItemContent {
   paste(): void;
   cut(): void;
   getIndex(): number;
-  moveAt(destinationIndex: number): void;
+  moveAt(
+    destinationItemContent: TreeViewItemContent,
+    where: 'before' | 'inside' | 'after',
+    animateFolder: (folder: gdFunctionFolderOrFunction) => void
+  ): void;
   isDescendantOf(itemContent: TreeViewItemContent): boolean;
   getEventsFunctionsContainer(): ?gdEventsFunctionsContainer;
+  getFunctionFolderOrFunction(): gdFunctionFolderOrFunction | null;
   getEventsFunction(): ?gdEventsFunction;
   getEventsBasedBehavior(): ?gdEventsBasedBehavior;
   getEventsBasedObject(): ?gdEventsBasedObject;
-  addFunctionAtSelection(): void;
 }
 
 interface TreeViewItem {
@@ -128,35 +183,111 @@ export type TreeItemProps = {|
   showDeleteConfirmation: (
     options: ShowConfirmDeleteDialogOptions
   ) => Promise<boolean>,
-  selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
-  selectedEventsBasedObject: ?gdEventsBasedObject,
-  selectedEventsFunction: ?gdEventsFunction,
 |};
+
+const createTreeViewItem = ({
+  functionFolderOrFunction,
+  functionFolderTreeViewItemProps,
+  functionTreeViewItemProps,
+}: {|
+  functionFolderOrFunction: gdFunctionFolderOrFunction,
+  functionFolderTreeViewItemProps: EventsFunctionFolderProps,
+  functionTreeViewItemProps: EventsFunctionProps,
+|}): TreeViewItem => {
+  if (functionFolderOrFunction.isFolder()) {
+    return new EventsFunctionFolderTreeViewItem({
+      functionFolderOrFunction: functionFolderOrFunction,
+      functionFolderTreeViewItemProps,
+      functionTreeViewItemProps,
+      content: new EventsFunctionFolderTreeViewItemContent(
+        functionFolderOrFunction,
+        functionFolderTreeViewItemProps
+      ),
+    });
+  } else {
+    return new LeafTreeViewItem(
+      new EventsFunctionTreeViewItemContent(
+        functionFolderOrFunction,
+        functionTreeViewItemProps
+      )
+    );
+  }
+};
+
+class EventsFunctionFolderTreeViewItem implements TreeViewItem {
+  content: TreeViewItemContent;
+  functionFolderOrFunction: gdFunctionFolderOrFunction;
+  placeholder: ?PlaceHolderTreeViewItem;
+  functionFolderTreeViewItemProps: EventsFunctionFolderProps;
+  functionTreeViewItemProps: EventsFunctionProps;
+
+  constructor({
+    functionFolderOrFunction,
+    content,
+    placeholder,
+    functionFolderTreeViewItemProps,
+    functionTreeViewItemProps,
+  }: {|
+    functionFolderOrFunction: gdFunctionFolderOrFunction,
+    content: TreeViewItemContent,
+    placeholder?: PlaceHolderTreeViewItem,
+    functionFolderTreeViewItemProps: EventsFunctionFolderProps,
+    functionTreeViewItemProps: EventsFunctionProps,
+  |}) {
+    this.content = content;
+    this.functionFolderOrFunction = functionFolderOrFunction;
+    this.placeholder = placeholder;
+    this.functionFolderTreeViewItemProps = functionFolderTreeViewItemProps;
+    this.functionTreeViewItemProps = functionTreeViewItemProps;
+  }
+
+  getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+    if (this.functionFolderOrFunction.getChildrenCount() === 0) {
+      return this.placeholder ? [this.placeholder] : [];
+    }
+    return mapFor(0, this.functionFolderOrFunction.getChildrenCount(), i => {
+      const child = this.functionFolderOrFunction.getChildAt(i);
+      return createTreeViewItem({
+        functionFolderOrFunction: child,
+        functionFolderTreeViewItemProps: this.functionFolderTreeViewItemProps,
+        functionTreeViewItemProps: this.functionTreeViewItemProps,
+      });
+    });
+  }
+}
 
 class EventsBasedObjectTreeViewItem implements TreeViewItem {
   content: EventsBasedObjectTreeViewItemContent;
   eventFunctionProps: EventFunctionCommonProps;
+  eventsFunctionFolderProps: EventFunctionFolderCommonProps;
 
   constructor(
     object: gdEventsBasedObject,
     props: EventsBasedObjectProps,
-    eventFunctionProps: EventFunctionCommonProps
+    eventFunctionProps: EventFunctionCommonProps,
+    eventsFunctionFolderProps: EventFunctionFolderCommonProps
   ) {
     this.content = new EventsBasedObjectTreeViewItemContent(object, props);
     this.eventFunctionProps = eventFunctionProps;
+    this.eventsFunctionFolderProps = eventsFunctionFolderProps;
   }
 
   getChildren(i18n: I18nType): ?Array<TreeViewItem> {
     const eventsBasedObject = this.content.eventsBasedObject;
     const eventsFunctionsContainer = eventsBasedObject.getEventsFunctions();
-    const eventFunctionProps = {
+    const eventFunctionProps: EventsFunctionProps = {
       eventsBasedObject,
       eventsFunctionsContainer,
       ...this.eventFunctionProps,
     };
-    const functions = eventsBasedObject.getEventsFunctions();
-    const functionsCount = functions.getEventsFunctionsCount();
-    return functionsCount === 0
+    const eventFunctionFolderProps: EventsFunctionFolderProps = {
+      eventsBasedObject,
+      eventsFunctionsContainer,
+      ...this.eventsFunctionFolderProps,
+    };
+    const rootFolder = eventsFunctionsContainer.getRootFolder();
+    const childrenCount = rootFolder.getChildrenCount();
+    return childrenCount === 0
       ? [
           new PlaceHolderTreeViewItem(
             'events-object-functions-placeholder.' +
@@ -164,44 +295,49 @@ class EventsBasedObjectTreeViewItem implements TreeViewItem {
             i18n._(t`Start by adding a new function.`)
           ),
         ]
-      : mapFor(
-          0,
-          functions.getEventsFunctionsCount(),
-          i =>
-            new LeafTreeViewItem(
-              new EventsFunctionTreeViewItemContent(
-                functions.getEventsFunctionAt(i),
-                // $FlowFixMe[incompatible-type]
-                eventFunctionProps
-              )
-            )
-        );
+      : mapFor(0, childrenCount, i => {
+          const child = rootFolder.getChildAt(i);
+          return createTreeViewItem({
+            functionFolderOrFunction: child,
+            functionFolderTreeViewItemProps: eventFunctionFolderProps,
+            functionTreeViewItemProps: eventFunctionProps,
+          });
+        });
   }
 }
 
 class BehaviorTreeViewItem implements TreeViewItem {
   content: EventsBasedBehaviorTreeViewItemContent;
   eventFunctionProps: EventFunctionCommonProps;
+  eventsFunctionFolderProps: EventFunctionFolderCommonProps;
 
   constructor(
     behavior: gdEventsBasedBehavior,
     props: EventsBasedBehaviorProps,
-    eventFunctionProps: EventFunctionCommonProps
+    eventFunctionProps: EventFunctionCommonProps,
+    eventsFunctionFolderProps: EventFunctionFolderCommonProps
   ) {
     this.content = new EventsBasedBehaviorTreeViewItemContent(behavior, props);
     this.eventFunctionProps = eventFunctionProps;
+    this.eventsFunctionFolderProps = eventsFunctionFolderProps;
   }
 
   getChildren(i18n: I18nType): ?Array<TreeViewItem> {
     const eventsBasedBehavior = this.content.eventsBasedBehavior;
     const eventsFunctionsContainer = eventsBasedBehavior.getEventsFunctions();
-    const eventFunctionProps = {
+    const eventFunctionProps: EventsFunctionProps = {
       eventsBasedBehavior,
       eventsFunctionsContainer,
       ...this.eventFunctionProps,
     };
-    const functionsCount = eventsFunctionsContainer.getEventsFunctionsCount();
-    return functionsCount === 0
+    const eventFunctionFolderProps: EventsFunctionFolderProps = {
+      eventsBasedBehavior,
+      eventsFunctionsContainer,
+      ...this.eventsFunctionFolderProps,
+    };
+    const rootFolder = eventsFunctionsContainer.getRootFolder();
+    const childrenCount = rootFolder.getChildrenCount();
+    return childrenCount === 0
       ? [
           new PlaceHolderTreeViewItem(
             'events-behavior-functions-placeholder.' +
@@ -209,18 +345,14 @@ class BehaviorTreeViewItem implements TreeViewItem {
             i18n._(t`Start by adding a new function.`)
           ),
         ]
-      : mapFor(
-          0,
-          eventsFunctionsContainer.getEventsFunctionsCount(),
-          i =>
-            new LeafTreeViewItem(
-              new EventsFunctionTreeViewItemContent(
-                eventsFunctionsContainer.getEventsFunctionAt(i),
-                // $FlowFixMe[incompatible-type]
-                eventFunctionProps
-              )
-            )
-        );
+      : mapFor(0, childrenCount, i => {
+          const child = rootFolder.getChildAt(i);
+          return createTreeViewItem({
+            functionFolderOrFunction: child,
+            functionFolderTreeViewItemProps: eventFunctionFolderProps,
+            functionTreeViewItemProps: eventFunctionProps,
+          });
+        });
   }
 }
 
@@ -262,7 +394,8 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
   constructor(
     id: string,
     label: string | React.Node,
-    rightButton?: MenuButton
+    rightButton?: MenuButton,
+    menuItems?: Array<MenuItemTemplate>
   ) {
     this.id = id;
     this.label = label;
@@ -273,6 +406,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
               label: rightButton.label,
               click: rightButton.click,
             },
+            ...(menuItems ? menuItems : []),
           ]
         : [];
     this.rightButton = rightButton;
@@ -291,6 +425,10 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
   }
 
   getEventsFunctionsContainer(): ?gdEventsFunctionsContainer {
+    return null;
+  }
+
+  getFunctionFolderOrFunction(): gdFunctionFolderOrFunction | null {
     return null;
   }
 
@@ -347,17 +485,15 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
     return 0;
   }
 
-  moveAt(destinationIndex: number): void {}
+  moveAt(
+    destinationItemContent: TreeViewItemContent,
+    where: 'before' | 'inside' | 'after',
+    animateFolder: (folder: gdFunctionFolderOrFunction) => void
+  ): void {}
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return false;
   }
-
-  addFunctionAtSelection(
-    selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
-    selectedEventsBasedObject: ?gdEventsBasedObject,
-    selectedEventsFunction: ?gdEventsFunction
-  ): void {}
 }
 
 class ActionTreeViewItemContent implements TreeViewItemContent {
@@ -396,6 +532,10 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
   }
 
   getEventsFunctionsContainer(): ?gdEventsFunctionsContainer {
+    return null;
+  }
+
+  getFunctionFolderOrFunction(): gdFunctionFolderOrFunction | null {
     return null;
   }
 
@@ -454,17 +594,15 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
     return 0;
   }
 
-  moveAt(destinationIndex: number): void {}
+  moveAt(
+    destinationItemContent: TreeViewItemContent,
+    where: 'before' | 'inside' | 'after',
+    animateFolder: (folder: gdFunctionFolderOrFunction) => void
+  ): void {}
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return false;
   }
-
-  addFunctionAtSelection(
-    selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
-    selectedEventsBasedObject: ?gdEventsBasedObject,
-    selectedEventsFunction: ?gdEventsFunction
-  ): void {}
 }
 
 const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
@@ -563,6 +701,25 @@ const EventsFunctionsList = React.forwardRef<
       Array<TreeViewItem>
     >([]);
 
+    // gdFunctionFolderOrFunction instances are the same from one refresh to
+    // another (contrary to TreeViewItem) so we can use it in functions without
+    // making refresh loops.
+    const selectedFunctionFolderOrFunction = React.useMemo<gdFunctionFolderOrFunction | null>(
+      () =>
+        selectedItems[0]
+          ? selectedItems[0].content.getFunctionFolderOrFunction()
+          : null,
+      [selectedItems]
+    );
+
+    const setSelectedFunctionFolderOrFunction = React.useRef<
+      (
+        functionFolderOrFunction: gdFunctionFolderOrFunction | null,
+        eventsBasedBehavior: ?gdEventsBasedBehavior,
+        eventsBasedObject: ?gdEventsBasedObject
+      ) => void
+    >(() => {});
+
     const preferences = React.useContext(PreferencesContext);
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const { currentlyRunningInAppTutorial } = React.useContext(
@@ -616,12 +773,12 @@ const EventsFunctionsList = React.forwardRef<
         itemContent,
         eventsBasedBehavior,
         eventsBasedObject,
-        index,
+        parentFolder,
       }: {|
         itemContent: ?TreeViewItemContent,
         eventsBasedBehavior: ?gdEventsBasedBehavior,
         eventsBasedObject: ?gdEventsBasedObject,
-        index: number,
+        parentFolder: gdFunctionFolderOrFunction,
       |}) => {
         const eventBasedEntity = eventsBasedBehavior || eventsBasedObject;
         const eventsFunctionsContainer = eventBasedEntity
@@ -652,9 +809,27 @@ const EventsFunctionsList = React.forwardRef<
                 eventsFunctionsContainer.hasEventsFunctionNamed(name)
               );
 
-            const eventsFunction = eventsFunctionsContainer.insertNewEventsFunction(
+            let insertionParentFolder = parentFolder;
+            let insertionIndex = parentFolder.getChildrenCount();
+            if (
+              selectedFunctionFolderOrFunction &&
+              selectedFunctionFolderOrFunction.isADescendantOf(parentFolder)
+            ) {
+              if (selectedFunctionFolderOrFunction.isFolder()) {
+                insertionParentFolder = selectedFunctionFolderOrFunction;
+                insertionIndex = selectedFunctionFolderOrFunction.getChildrenCount();
+              } else {
+                insertionParentFolder = selectedFunctionFolderOrFunction.getParent();
+                insertionIndex =
+                  insertionParentFolder.getChildPosition(
+                    selectedFunctionFolderOrFunction
+                  ) + 1;
+              }
+            }
+            const eventsFunction = eventsFunctionsContainer.insertNewFunctionInFolder(
               eventsFunctionName,
-              index || eventsFunctionsContainer.getEventsFunctionsCount()
+              insertionParentFolder,
+              insertionIndex
             );
             eventsFunction.setFunctionType(parameters.functionType);
 
@@ -719,17 +894,18 @@ const EventsFunctionsList = React.forwardRef<
         );
       },
       [
-        editName,
         eventsFunctionsExtension,
-        forceUpdate,
         onAddEventsFunction,
-        onEventsFunctionAdded,
         onSelectEventsBasedBehavior,
         onSelectEventsBasedObject,
-        project,
-        onSelectEventsFunction,
-        scrollToItem,
+        selectedFunctionFolderOrFunction,
+        onEventsFunctionAdded,
         unsavedChanges,
+        forceUpdate,
+        onSelectEventsFunction,
+        project,
+        scrollToItem,
+        editName,
       ]
     );
 
@@ -891,7 +1067,7 @@ const EventsFunctionsList = React.forwardRef<
       [editName, selectedItems]
     );
 
-    const eventFunctionCommonProps = React.useMemo<EventFunctionCommonProps>(
+    const treeItemProps = React.useMemo<TreeItemProps>(
       () => ({
         project,
         eventsFunctionsExtension,
@@ -904,14 +1080,6 @@ const EventsFunctionsList = React.forwardRef<
         showDeleteConfirmation,
         editName,
         scrollToItem,
-        onSelectEventsFunction,
-        onDeleteEventsFunction,
-        onRenameEventsFunction,
-        onAddEventsFunction,
-        onEventsFunctionAdded,
-        selectedEventsBasedBehavior,
-        selectedEventsBasedObject,
-        selectedEventsFunction,
       }),
       [
         project,
@@ -925,14 +1093,164 @@ const EventsFunctionsList = React.forwardRef<
         showDeleteConfirmation,
         editName,
         scrollToItem,
+      ]
+    );
+
+    const eventFunctionCommonProps = React.useMemo<EventFunctionCommonProps>(
+      () => ({
+        ...treeItemProps,
         onSelectEventsFunction,
         onDeleteEventsFunction,
         onRenameEventsFunction,
         onAddEventsFunction,
         onEventsFunctionAdded,
-        selectedEventsBasedBehavior,
-        selectedEventsBasedObject,
-        selectedEventsFunction,
+      }),
+      [
+        treeItemProps,
+        onSelectEventsFunction,
+        onDeleteEventsFunction,
+        onRenameEventsFunction,
+        onAddEventsFunction,
+        onEventsFunctionAdded,
+      ]
+    );
+
+    const getClosestVisibleParentId = (
+      functionFolderOrFunction: gdFunctionFolderOrFunction
+    ): ?string => {
+      const treeView = treeViewRef.current;
+      if (!treeView) return null;
+      const topToBottomAscendanceId = getFoldersAscendanceWithoutRootFolder(
+        functionFolderOrFunction
+      )
+        .reverse()
+        .map(parent =>
+          getEventsFunctionFolderTreeViewItemId(functionFolderOrFunction)
+        );
+      const topToBottomAscendanceOpenness = treeView.areItemsOpenFromId(
+        topToBottomAscendanceId
+      );
+      const firstClosedFolderIndex = topToBottomAscendanceOpenness.indexOf(
+        false
+      );
+      if (firstClosedFolderIndex === -1) {
+        // If all parents are open, return the functionFolderOrFunction given as input.
+        return getTreeViewItemIdFromFunctionFolderOrFunction(
+          functionFolderOrFunction
+        );
+      }
+      // $FlowFixMe[incompatible-type] - We are confident this TreeView item is in fact a FunctionFolderOrFunctionWithContext
+      return topToBottomAscendanceId[firstClosedFolderIndex];
+    };
+
+    const addFolder = React.useCallback(
+      (
+        items: Array<gdFunctionFolderOrFunction>,
+        eventsBasedBehavior?: ?gdEventsBasedBehavior,
+        eventsBasedObject?: ?gdEventsBasedObject
+      ) => {
+        let newFunctionFolderOrFunction;
+        if (items.length === 1) {
+          const selectedFunctionFolderOrFunction = items[0];
+          if (selectedFunctionFolderOrFunction.isFolder()) {
+            const newFolder = selectedFunctionFolderOrFunction.insertNewFolder(
+              'New folder',
+              0
+            );
+            newFunctionFolderOrFunction = newFolder;
+            if (treeViewRef.current) {
+              treeViewRef.current.openItems([
+                getEventsFunctionFolderTreeViewItemId(items[0]),
+              ]);
+            }
+          } else {
+            const parentFolder = selectedFunctionFolderOrFunction.getParent();
+            const newFolder = parentFolder.insertNewFolder(
+              'New folder',
+              parentFolder.getChildPosition(selectedFunctionFolderOrFunction) +
+                1
+            );
+            newFunctionFolderOrFunction = newFolder;
+          }
+        } else {
+          const rootFolder = getRootFunctionFolder(
+            eventsFunctionsExtension,
+            eventsBasedBehavior,
+            eventsBasedObject
+          );
+          const newFolder = rootFolder.insertNewFolder('New folder', 0);
+          newFunctionFolderOrFunction = newFolder;
+        }
+        setSelectedFunctionFolderOrFunction.current(
+          newFunctionFolderOrFunction
+        );
+        const itemsToOpen = getFoldersAscendanceWithoutRootFolder(
+          newFunctionFolderOrFunction
+        ).map(folder => getEventsFunctionFolderTreeViewItemId(folder));
+        itemsToOpen.push(
+          getRootFunctionFolderId(eventsBasedBehavior, eventsBasedObject)
+        );
+        if (treeViewRef.current) treeViewRef.current.openItems(itemsToOpen);
+
+        editName(
+          getEventsFunctionFolderTreeViewItemId(newFunctionFolderOrFunction)
+        );
+        forceUpdateList();
+      },
+      [editName, forceUpdateList, eventsFunctionsExtension]
+    );
+
+    const onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer = React.useCallback(
+      (functionFolderOrFunction: gdFunctionFolderOrFunction) => {
+        const treeView = treeViewRef.current;
+        if (treeView) {
+          const closestVisibleParentId = getClosestVisibleParentId(
+            functionFolderOrFunction
+          );
+          if (closestVisibleParentId) {
+            treeView.animateItemFromId(closestVisibleParentId);
+          }
+        }
+        onTreeModified(true);
+      },
+      [onTreeModified]
+    );
+
+    const expandFolders = React.useCallback(
+      (functionFolderOrFunctionList: Array<gdFunctionFolderOrFunction>) => {
+        if (treeViewRef.current) {
+          treeViewRef.current.openItems(
+            functionFolderOrFunctionList.map(functionFolderOrFunction =>
+              getEventsFunctionFolderTreeViewItemId(functionFolderOrFunction)
+            )
+          );
+        }
+      },
+      []
+    );
+
+    const eventFunctionFolderCommonProps = React.useMemo<EventFunctionFolderCommonProps>(
+      () => ({
+        ...treeItemProps,
+        showDeleteConfirmation,
+        expandFolders,
+        addFolder,
+        addNewEventsFunction,
+        onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
+        setSelectedFunctionFolderOrFunction:
+          setSelectedFunctionFolderOrFunction.current,
+        onEventsFunctionAdded,
+        onSelectEventsFunction,
+      }),
+      [
+        treeItemProps,
+        showDeleteConfirmation,
+        expandFolders,
+        addFolder,
+        addNewEventsFunction,
+        onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
+        onEventsFunctionAdded,
+        onSelectEventsFunction,
       ]
     );
 
@@ -940,50 +1258,26 @@ const EventsFunctionsList = React.forwardRef<
 
     const eventBasedBehaviorProps = React.useMemo<EventsBasedBehaviorProps>(
       () => ({
-        project,
-        eventsFunctionsExtension,
+        ...treeItemProps,
         eventsBasedBehaviorsList: eventBasedBehaviors,
-        unsavedChanges,
-        forceUpdateEditor,
-        preferences,
-        gdevelopTheme,
-        forceUpdate,
-        forceUpdateList,
-        showDeleteConfirmation,
-        editName,
-        scrollToItem,
         onSelectEventsBasedBehavior,
         onDeleteEventsBasedBehavior,
         onRenameEventsBasedBehavior,
         onEventsBasedBehaviorRenamed,
         onEventsBasedBehaviorPasted,
         addNewEventsFunction,
-        selectedEventsBasedBehavior,
-        selectedEventsBasedObject,
-        selectedEventsFunction,
+        addFolder,
       }),
       [
-        project,
-        eventsFunctionsExtension,
+        treeItemProps,
         eventBasedBehaviors,
-        unsavedChanges,
-        forceUpdateEditor,
-        preferences,
-        gdevelopTheme,
-        forceUpdate,
-        forceUpdateList,
-        showDeleteConfirmation,
-        editName,
-        scrollToItem,
         onSelectEventsBasedBehavior,
         onDeleteEventsBasedBehavior,
         onRenameEventsBasedBehavior,
         onEventsBasedBehaviorRenamed,
         onEventsBasedBehaviorPasted,
         addNewEventsFunction,
-        selectedEventsBasedBehavior,
-        selectedEventsBasedObject,
-        selectedEventsFunction,
+        addFolder,
       ]
     );
 
@@ -991,18 +1285,8 @@ const EventsFunctionsList = React.forwardRef<
 
     const eventsBasedObjectProps = React.useMemo<EventsBasedObjectProps>(
       () => ({
-        project,
-        eventsFunctionsExtension,
+        ...treeItemProps,
         eventsBasedObjectsList: eventBasedObjects,
-        unsavedChanges,
-        preferences,
-        forceUpdateEditor,
-        gdevelopTheme,
-        forceUpdate,
-        forceUpdateList,
-        showDeleteConfirmation,
-        editName,
-        scrollToItem,
         onSelectEventsBasedObject,
         onDeleteEventsBasedObject,
         onRenameEventsBasedObject,
@@ -1010,25 +1294,13 @@ const EventsFunctionsList = React.forwardRef<
         onEventsBasedObjectPasted,
         onAddEventsBasedObject,
         addNewEventsFunction,
-        selectedEventsBasedBehavior,
-        selectedEventsBasedObject,
-        selectedEventsFunction,
+        addFolder,
         onOpenCustomObjectEditor,
         onEventBasedObjectTypeChanged,
       }),
       [
-        project,
-        eventsFunctionsExtension,
+        treeItemProps,
         eventBasedObjects,
-        unsavedChanges,
-        preferences,
-        forceUpdateEditor,
-        gdevelopTheme,
-        forceUpdate,
-        forceUpdateList,
-        showDeleteConfirmation,
-        editName,
-        scrollToItem,
         onSelectEventsBasedObject,
         onDeleteEventsBasedObject,
         onRenameEventsBasedObject,
@@ -1036,9 +1308,7 @@ const EventsFunctionsList = React.forwardRef<
         onEventsBasedObjectPasted,
         onAddEventsBasedObject,
         addNewEventsFunction,
-        selectedEventsBasedBehavior,
-        selectedEventsBasedObject,
-        selectedEventsFunction,
+        addFolder,
         onOpenCustomObjectEditor,
         onEventBasedObjectTypeChanged,
       ]
@@ -1051,7 +1321,8 @@ const EventsFunctionsList = React.forwardRef<
         new EventsBasedObjectTreeViewItem(
           eventBasedObjects.at(i),
           eventsBasedObjectProps,
-          eventFunctionCommonProps
+          eventFunctionCommonProps,
+          eventFunctionFolderCommonProps
         )
     );
     const behaviorTreeViewItems = mapFor(
@@ -1061,7 +1332,8 @@ const EventsFunctionsList = React.forwardRef<
         new BehaviorTreeViewItem(
           eventBasedBehaviors.at(i),
           eventBasedBehaviorProps,
-          eventFunctionCommonProps
+          eventFunctionCommonProps,
+          eventFunctionFolderCommonProps
         )
     );
     const getTreeViewData = React.useCallback(
@@ -1158,23 +1430,27 @@ const EventsFunctionsList = React.forwardRef<
                 icon: <Add />,
                 label: i18n._(t`Add a function`),
                 click: () => {
-                  const freeEventsFunctions = eventsFunctionsExtension.getEventsFunctions();
-                  const index =
-                    !selectedEventsBasedBehavior &&
-                    !selectedEventsBasedObject &&
-                    selectedEventsFunction
-                      ? freeEventsFunctions.getEventsFunctionPosition(
-                          selectedEventsFunction
-                        ) + 1
-                      : freeEventsFunctions.getEventsFunctionsCount();
                   addNewEventsFunction({
                     itemContent: null,
                     eventsBasedBehavior: null,
                     eventsBasedObject: null,
-                    index,
+                    parentFolder: eventsFunctionsExtension
+                      .getEventsFunctions()
+                      .getRootFolder(),
                   });
                 },
-              }
+              },
+              [
+                {
+                  label: i18n._(t`Add a new folder`),
+                  click: () =>
+                    addFolder([
+                      eventsFunctionsExtension
+                        .getEventsFunctions()
+                        .getRootFolder(),
+                    ]),
+                },
+              ]
             ),
             getChildren(i18n: I18nType): ?Array<TreeViewItem> {
               const freeEventsFunctions = eventsFunctionsExtension.getEventsFunctions();
@@ -1186,22 +1462,24 @@ const EventsFunctionsList = React.forwardRef<
                   ),
                 ];
               }
-              const freeFunctionProps = {
+              const freeFunctionProps: EventsFunctionProps = {
                 eventsFunctionsContainer: freeEventsFunctions,
                 ...eventFunctionCommonProps,
               };
-              return mapFor(
-                0,
-                freeEventsFunctions.getEventsFunctionsCount(),
-                i =>
-                  new LeafTreeViewItem(
-                    new EventsFunctionTreeViewItemContent(
-                      freeEventsFunctions.getEventsFunctionAt(i),
-                      // $FlowFixMe[incompatible-type]
-                      freeFunctionProps
-                    )
-                  )
-              );
+              const freeFunctionFolderProps: EventsFunctionFolderProps = {
+                eventsFunctionsContainer: freeEventsFunctions,
+                ...eventFunctionFolderCommonProps,
+              };
+              const rootFolder = freeEventsFunctions.getRootFolder();
+              const childrenCount = rootFolder.getChildrenCount();
+              return mapFor(0, childrenCount, i => {
+                const child = rootFolder.getChildAt(i);
+                return createTreeViewItem({
+                  functionFolderOrFunction: child,
+                  functionFolderTreeViewItemProps: freeFunctionFolderProps,
+                  functionTreeViewItemProps: freeFunctionProps,
+                });
+              });
             },
           },
         ].filter(Boolean);
@@ -1214,22 +1492,81 @@ const EventsFunctionsList = React.forwardRef<
         onSelectExtensionSceneVariables,
         objectTreeViewItems,
         behaviorTreeViewItems,
-        selectedEventsBasedBehavior,
-        selectedEventsBasedObject,
-        selectedEventsFunction,
         eventsFunctionsExtension,
         addNewEventsFunction,
+        addFolder,
         eventFunctionCommonProps,
+        eventFunctionFolderCommonProps,
+      ]
+    );
+
+    // Avoid a circular dependency with functionsTreeViewItemProps
+    React.useEffect(
+      () => {
+        setSelectedFunctionFolderOrFunction.current = (
+          functionFolderOrFunction: gdFunctionFolderOrFunction | null,
+          eventsBasedBehavior: ?gdEventsBasedBehavior,
+          eventsBasedObject: ?gdEventsBasedObject
+        ) => {
+          if (!functionFolderOrFunction) {
+            setSelectedItems([]);
+            return;
+          }
+          const functionItemId = getTreeViewItemIdFromFunctionFolderOrFunction(
+            functionFolderOrFunction
+          );
+          setSelectedItems(selectedItems => {
+            if (
+              selectedItems.length === 1 &&
+              selectedItems[0].content.getId() === functionItemId
+            ) {
+              return selectedItems;
+            }
+            const eventsBasedEntity =
+              selectedEventsBasedBehavior || selectedEventsBasedObject;
+            const eventsFunctionsContainer = eventsBasedEntity
+              ? eventsBasedEntity.getEventsFunctions()
+              : eventsFunctionsExtension.getEventsFunctions();
+            const eventFunctionProps: EventsFunctionProps = {
+              eventsBasedObject,
+              eventsBasedBehavior,
+              eventsFunctionsContainer,
+              ...eventFunctionCommonProps,
+            };
+            const eventFunctionFolderProps: EventsFunctionFolderProps = {
+              eventsBasedObject,
+              eventsBasedBehavior,
+              eventsFunctionsContainer,
+              ...eventFunctionFolderCommonProps,
+            };
+            return [
+              createTreeViewItem({
+                functionFolderOrFunction,
+                functionTreeViewItemProps: eventFunctionProps,
+                functionFolderTreeViewItemProps: eventFunctionFolderProps,
+              }),
+            ].filter(Boolean);
+          });
+          scrollToItem(functionItemId);
+        };
+      },
+      [
+        scrollToItem,
+        selectedEventsBasedBehavior,
+        selectedEventsBasedObject,
+        eventsFunctionsExtension,
+        eventFunctionCommonProps,
+        eventFunctionFolderCommonProps,
       ]
     );
 
     const canMoveSelectionTo = React.useCallback(
       (destinationItem: TreeViewItem, where: 'before' | 'inside' | 'after') =>
         selectedItems.every(item => {
-          if (item.content.getEventsFunction()) {
+          if (item.content.getFunctionFolderOrFunction()) {
             // Functions from the same container
             return (
-              destinationItem.content.getEventsFunction() &&
+              destinationItem.content.getFunctionFolderOrFunction() &&
               item.content.getEventsFunctionsContainer() ===
                 destinationItem.content.getEventsFunctionsContainer()
             );
@@ -1253,12 +1590,25 @@ const EventsFunctionsList = React.forwardRef<
         destinationItem: TreeViewItem,
         where: 'before' | 'inside' | 'after'
       ) => {
-        if (selectedItems.length === 0) {
+        if (destinationItem.isRoot || selectedItems.length !== 1) {
           return;
         }
         const selectedItem = selectedItems[0];
+
+        const animateFolder = (folder: gdFunctionFolderOrFunction) => {
+          const treeView = treeViewRef.current;
+          if (!treeView) {
+            return;
+          }
+          const closestVisibleParentId = getClosestVisibleParentId(folder);
+          if (closestVisibleParentId) {
+            treeView.animateItemFromId(closestVisibleParentId);
+          }
+        };
         selectedItem.content.moveAt(
-          destinationItem.content.getIndex() + (where === 'after' ? 1 : 0)
+          destinationItem.content,
+          where,
+          animateFolder
         );
         onTreeModified(true);
       },
@@ -1293,6 +1643,23 @@ const EventsFunctionsList = React.forwardRef<
       extensionConfigurationRootFolderId,
       ...objectTreeViewItems.map(item => item.content.getId()),
       ...behaviorTreeViewItems.map(item => item.content.getId()),
+      ...objectTreeViewItems
+        .map(item =>
+          enumerateFoldersInContainer(
+            item.content.getEventsFunctionsContainer()
+          ).map(({ folder }) => getEventsFunctionFolderTreeViewItemId(folder))
+        )
+        .flat(),
+      ...behaviorTreeViewItems
+        .map(item =>
+          enumerateFoldersInContainer(
+            item.content.getEventsFunctionsContainer()
+          ).map(({ folder }) => getEventsFunctionFolderTreeViewItemId(folder))
+        )
+        .flat(),
+      ...enumerateFoldersInContainer(
+        eventsFunctionsExtension.getEventsFunctions()
+      ).map(({ folder }) => getEventsFunctionFolderTreeViewItemId(folder)),
     ];
 
     React.useEffect(
@@ -1310,10 +1677,18 @@ const EventsFunctionsList = React.forwardRef<
             eventsFunctionsContainer,
             ...eventFunctionCommonProps,
           };
+          const rootFunctionFolder = getRootFunctionFolder(
+            eventsFunctionsExtension,
+            selectedEventsBasedBehavior,
+            selectedEventsBasedObject
+          );
+
           setSelectedItems([
             new LeafTreeViewItem(
               new EventsFunctionTreeViewItemContent(
-                selectedEventsFunction,
+                rootFunctionFolder.getFunctionNamed(
+                  selectedEventsFunction.getName()
+                ),
                 eventFunctionProps
               )
             ),
@@ -1323,7 +1698,8 @@ const EventsFunctionsList = React.forwardRef<
             new BehaviorTreeViewItem(
               selectedEventsBasedBehavior,
               eventBasedBehaviorProps,
-              eventFunctionCommonProps
+              eventFunctionCommonProps,
+              eventFunctionFolderCommonProps
             ),
           ]);
         } else if (selectedEventsBasedObject) {
@@ -1331,17 +1707,17 @@ const EventsFunctionsList = React.forwardRef<
             new EventsBasedObjectTreeViewItem(
               selectedEventsBasedObject,
               eventsBasedObjectProps,
-              eventFunctionCommonProps
+              eventFunctionCommonProps,
+              eventFunctionFolderCommonProps
             ),
           ]);
         } else {
           setSelectedItems([]);
         }
       },
+      // We only update the tree selection when the displayed content is changed.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [
-        eventBasedBehaviorProps,
-        eventFunctionCommonProps,
-        eventsBasedObjectProps,
         eventsFunctionsExtension,
         selectedEventsBasedBehavior,
         selectedEventsBasedObject,

@@ -351,7 +351,7 @@ Module.UseAfterFreeError = UseAfterFreeError;
 function assertAlive(obj, label, gd, className) {
   if (!obj.ptr) {
     throw new UseAfterFreeError(
-      label + ': object was already destroyed (ptr is 0)'
+      label + ': object was already destroyed from JavaScript (ptr is 0)'
     );
   }
   if (

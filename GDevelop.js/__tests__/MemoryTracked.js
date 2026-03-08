@@ -80,46 +80,46 @@ describe('Use-after-free detection (MemoryTracked)', function () {
 
   describe('Per-class stats', function () {
     it('reports per-class alive and dead counts', function () {
-      const aliveBefore = gd.MemoryTrackedRegistry.aliveCount('Layout');
+      const aliveBefore = gd.MemoryTrackedRegistry.getAliveCountForClass('Layout');
       const layout1 = new gd.Layout();
       const layout2 = new gd.Layout();
-      expect(gd.MemoryTrackedRegistry.aliveCount('Layout')).toBe(
+      expect(gd.MemoryTrackedRegistry.getAliveCountForClass('Layout')).toBe(
         aliveBefore + 2
       );
 
       layout1.delete();
-      expect(gd.MemoryTrackedRegistry.aliveCount('Layout')).toBe(
+      expect(gd.MemoryTrackedRegistry.getAliveCountForClass('Layout')).toBe(
         aliveBefore + 1
       );
       expect(
-        gd.MemoryTrackedRegistry.deadCountForClass('Layout')
+        gd.MemoryTrackedRegistry.getDeadCountForClass('Layout')
       ).toBeGreaterThan(0);
 
       layout2.delete();
-      expect(gd.MemoryTrackedRegistry.aliveCount('Layout')).toBe(aliveBefore);
+      expect(gd.MemoryTrackedRegistry.getAliveCountForClass('Layout')).toBe(aliveBefore);
     });
 
     it('returns 0 for unknown classes', function () {
-      expect(gd.MemoryTrackedRegistry.aliveCount('NonExistent')).toBe(0);
-      expect(gd.MemoryTrackedRegistry.deadCountForClass('NonExistent')).toBe(0);
+      expect(gd.MemoryTrackedRegistry.getAliveCountForClass('NonExistent')).toBe(0);
+      expect(gd.MemoryTrackedRegistry.getDeadCountForClass('NonExistent')).toBe(0);
     });
 
     it('returns totals when given empty string', function () {
-      const totalAlive = gd.MemoryTrackedRegistry.aliveCount('');
+      const totalAlive = gd.MemoryTrackedRegistry.getAliveCountForClass('');
       expect(totalAlive).toBeGreaterThan(0);
-      const totalDead = gd.MemoryTrackedRegistry.deadCountForClass('');
+      const totalDead = gd.MemoryTrackedRegistry.getDeadCountForClass('');
       expect(typeof totalDead).toBe('number');
     });
 
     it('tracks different classes independently', function () {
-      const layoutAliveBefore = gd.MemoryTrackedRegistry.aliveCount('Layout');
-      const projectAliveBefore = gd.MemoryTrackedRegistry.aliveCount('Project');
+      const layoutAliveBefore = gd.MemoryTrackedRegistry.getAliveCountForClass('Layout');
+      const projectAliveBefore = gd.MemoryTrackedRegistry.getAliveCountForClass('Project');
 
       const layout = new gd.Layout();
-      expect(gd.MemoryTrackedRegistry.aliveCount('Layout')).toBe(
+      expect(gd.MemoryTrackedRegistry.getAliveCountForClass('Layout')).toBe(
         layoutAliveBefore + 1
       );
-      expect(gd.MemoryTrackedRegistry.aliveCount('Project')).toBe(
+      expect(gd.MemoryTrackedRegistry.getAliveCountForClass('Project')).toBe(
         projectAliveBefore
       );
 

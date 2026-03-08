@@ -74,7 +74,7 @@ class MemoryTrackedRegistry {
   }
 
   // Per-class stats. Pass empty string for totals.
-  static long aliveCount(const gd::String& className) {
+  static long getAliveCountForClass(const gd::String& className) {
     if (className.empty()) {
       long total = 0;
       for (auto& kv : alive()) total += static_cast<long>(kv.second.size());
@@ -84,7 +84,7 @@ class MemoryTrackedRegistry {
     return it != alive().end() ? static_cast<long>(it->second.size()) : 0;
   }
 
-  static long deadCountForClass(const gd::String& className) {
+  static long getDeadCountForClass(const gd::String& className) {
     if (className.empty()) return deadCount();
     auto it = dead().find(className.c_str());
     return it != dead().end() ? static_cast<long>(it->second.size()) : 0;

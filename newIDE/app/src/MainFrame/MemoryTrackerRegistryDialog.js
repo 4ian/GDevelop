@@ -15,7 +15,7 @@ import {
 
 const gd: libGDevelop = global.gd;
 
-const trackedClasses = ['Project', 'Layout', 'Object', 'Behavior'];
+const trackedClasses = ['Project', 'Layout', 'gdObject', 'Behavior'];
 
 type Stats = {|
   className: string,
@@ -26,8 +26,8 @@ type Stats = {|
 const getStats = (): Array<Stats> => {
   return trackedClasses.map(className => ({
     className,
-    alive: gd.MemoryTrackedRegistry.aliveCount(className),
-    dead: gd.MemoryTrackedRegistry.deadCountForClass(className),
+    alive: gd.MemoryTrackedRegistry.getAliveCountForClass(className),
+    dead: gd.MemoryTrackedRegistry.getDeadCountForClass(className),
   }));
 };
 

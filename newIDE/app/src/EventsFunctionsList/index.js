@@ -164,8 +164,8 @@ export interface TreeViewItemContent {
 }
 
 interface TreeViewItem {
-  isRoot?: boolean;
-  isPlaceholder?: boolean;
+  isRoot: boolean;
+  isPlaceholder: boolean;
   +content: TreeViewItemContent;
   getChildren(i18n: I18nType): ?Array<TreeViewItem>;
 }
@@ -215,7 +215,37 @@ const createTreeViewItem = ({
   }
 };
 
+class LeafTreeViewItem implements TreeViewItem {
+  isRoot = false;
+  isPlaceholder = false;
+  content: TreeViewItemContent;
+
+  constructor(content: TreeViewItemContent) {
+    this.content = content;
+  }
+
+  getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+    return null;
+  }
+}
+
+class PlaceHolderTreeViewItem implements TreeViewItem {
+  isRoot = false;
+  isPlaceholder = true;
+  content: TreeViewItemContent;
+
+  constructor(id: string, label: string | React.Node) {
+    this.content = new LabelTreeViewItemContent(id, label);
+  }
+
+  getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+    return null;
+  }
+}
+
 class EventsFunctionFolderTreeViewItem implements TreeViewItem {
+  isRoot = false;
+  isPlaceholder = false;
   content: TreeViewItemContent;
   functionFolderOrFunction: gdFunctionFolderOrFunction;
   placeholder: ?PlaceHolderTreeViewItem;
@@ -258,6 +288,8 @@ class EventsFunctionFolderTreeViewItem implements TreeViewItem {
 }
 
 class EventsBasedObjectTreeViewItem implements TreeViewItem {
+  isRoot = false;
+  isPlaceholder = false;
   content: EventsBasedObjectTreeViewItemContent;
   eventFunctionProps: EventFunctionCommonProps;
   eventsFunctionFolderProps: EventFunctionFolderCommonProps;
@@ -308,6 +340,8 @@ class EventsBasedObjectTreeViewItem implements TreeViewItem {
 }
 
 class BehaviorTreeViewItem implements TreeViewItem {
+  isRoot = false;
+  isPlaceholder = false;
   content: EventsBasedBehaviorTreeViewItemContent;
   eventFunctionProps: EventFunctionCommonProps;
   eventsFunctionFolderProps: EventFunctionFolderCommonProps;
@@ -354,32 +388,6 @@ class BehaviorTreeViewItem implements TreeViewItem {
             functionTreeViewItemProps: eventFunctionProps,
           });
         });
-  }
-}
-
-class LeafTreeViewItem implements TreeViewItem {
-  content: TreeViewItemContent;
-
-  constructor(content: TreeViewItemContent) {
-    this.content = content;
-  }
-
-  getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-    return null;
-  }
-}
-
-// $FlowFixMe[incompatible-type]
-class PlaceHolderTreeViewItem implements TreeViewItem {
-  isPlaceholder = true;
-  content: TreeViewItemContent;
-
-  constructor(id: string, label: string | React.Node) {
-    this.content = new LabelTreeViewItemContent(id, label);
-  }
-
-  getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-    return null;
   }
 }
 

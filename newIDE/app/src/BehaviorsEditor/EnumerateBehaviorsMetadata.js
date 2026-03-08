@@ -15,11 +15,38 @@ export type EnumeratedBehaviorMetadata = {|
   tags: Array<string>,
 |};
 
+const shouldShow3DContent = (): boolean => {
+  try {
+    if (typeof localStorage === 'undefined') return true;
+    const persistedState = localStorage.getItem('gd-preferences');
+    if (!persistedState) return true;
+    const values = JSON.parse(persistedState);
+    return values.use3DEditor !== false;
+  } catch (_e) {
+    return true;
+  }
+};
+
+const is3DValue = (value: ?string): boolean =>
+  !!value && value.toLowerCase().includes('3d');
+
+const shouldHideBehaviorIn2DMode = ({
+  behaviorType,
+  behaviorMetadata,
+}: {|
+  behaviorType: string,
+  behaviorMetadata: gdBehaviorMetadata,
+|}): boolean =>
+  is3DValue(behaviorType) ||
+  is3DValue(behaviorMetadata.getName()) ||
+  is3DValue(behaviorMetadata.getObjectType());
+
 export const enumerateBehaviorsMetadata = (
   platform: gdPlatform,
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null
 ): Array<EnumeratedBehaviorMetadata> => {
+  const show3DContent = shouldShow3DContent();
   const extensionsList = platform.getAllPlatformExtensions();
 
   return flatten(
@@ -38,6 +65,11 @@ export const enumerateBehaviorsMetadata = (
             !behaviorMetadata.isPrivate() ||
             (eventsFunctionsExtension &&
               extension.getName() === eventsFunctionsExtension.getName())
+        )
+        .filter(({ behaviorType, behaviorMetadata }) =>
+          show3DContent
+            ? true
+            : !shouldHideBehaviorIn2DMode({ behaviorType, behaviorMetadata })
         )
         .map(({ behaviorType, behaviorMetadata }) => ({
           extension,

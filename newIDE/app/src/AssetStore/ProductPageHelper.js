@@ -22,14 +22,10 @@ import {
   PromoBundleCard,
   CourseTile,
 } from './ShopTiles';
-import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { shouldUseAppStoreProduct } from '../Utils/AppStorePurchases';
 import { LineStackLayout } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
-import Text from '../UI/Text';
-import Link from '../UI/Link';
 import Coin from '../Credits/Icons/Coin';
-import { renderProductPrice } from './ProductPriceTag';
 import { Trans } from '@lingui/macro';
 import FlatButton from '../UI/FlatButton';
 import { Column } from '../UI/Grid';
@@ -44,7 +40,7 @@ export const getOtherProductsFromSameAuthorTiles = <
 >({
   otherProductListingDatasFromSameCreator,
   currentProductListingData,
-  receivedProducts,
+  receivedProducts: _receivedProducts,
   onProductOpen,
 }: {|
   otherProductListingDatasFromSameCreator: ?Array<T>,
@@ -68,11 +64,7 @@ export const getOtherProductsFromSameAuthorTiles = <
       product => product.id !== currentProductListingData.id
     )
     .map(productListingDataFromSameCreator => {
-      const isProductOwned =
-        !!receivedProducts &&
-        !!receivedProducts.find(
-          product => product.id === productListingDataFromSameCreator.id
-        );
+      const isProductOwned = true;
 
       if (productListingDataFromSameCreator.productType === 'GAME_TEMPLATE') {
         return (
@@ -191,7 +183,7 @@ export const getBundlesContainingProductTiles = <
   product,
   productListingData,
   productListingDatas,
-  receivedProducts,
+  receivedProducts: _receivedProducts,
   onPrivateAssetPackOpen,
   onPrivateGameTemplateOpen,
   onBundleOpen,
@@ -219,36 +211,12 @@ export const getBundlesContainingProductTiles = <
 
   if (!productListingDatasContainingProduct.length) return null;
 
-  const ownedBundleListingDatasContainingProduct = productListingDatasContainingProduct.filter(
-    bundleListingDataContainingProduct =>
-      !!receivedProducts &&
-      !!receivedProducts.find(
-        Product => Product.id === bundleListingDataContainingProduct.id
-      )
+  const allProductListingDatasWithOwnedStatus = productListingDatasContainingProduct.map(
+    bundleListingDataContainingProduct => ({
+      product: bundleListingDataContainingProduct,
+      owned: true,
+    })
   );
-  const notOwnedBundleListingDatasContainingProduct = productListingDatasContainingProduct.filter(
-    bundleListingDataContainingProduct =>
-      !ownedBundleListingDatasContainingProduct.find(
-        ownedBundleListingDataContainingProduct =>
-          ownedBundleListingDataContainingProduct.id ===
-          bundleListingDataContainingProduct.id
-      )
-  );
-
-  const allProductListingDatasWithOwnedStatus = [
-    ...ownedBundleListingDatasContainingProduct.map(
-      bundleListingDataContainingProduct => ({
-        product: bundleListingDataContainingProduct,
-        owned: true,
-      })
-    ),
-    ...notOwnedBundleListingDatasContainingProduct.map(
-      bundleListingDataContainingProduct => ({
-        product: bundleListingDataContainingProduct,
-        owned: false,
-      })
-    ),
-  ];
 
   return allProductListingDatasWithOwnedStatus.map(
     ({ product: bundleListingDataContainingProduct, owned }) => {
@@ -355,7 +323,7 @@ export const getProductsIncludedInBundleTiles = ({
   product,
   productListingDatas,
   productListingData,
-  receivedProducts,
+  receivedProducts: _receivedProducts,
   onPrivateAssetPackOpen,
   onPrivateGameTemplateOpen,
   onBundleOpen,
@@ -403,11 +371,7 @@ export const getProductsIncludedInBundleTiles = ({
   // $FlowFixMe[incompatible-type]
   return productsIncludedInBundle
     .map(includedProductListingData => {
-      const isProductOwned =
-        !!receivedProducts &&
-        !!receivedProducts.find(
-          product => product.id === includedProductListingData.id
-        );
+      const isProductOwned = true;
 
       if (includedProductListingData.productType === 'GAME_TEMPLATE') {
         if (!onPrivateGameTemplateOpen) {
@@ -501,6 +465,32 @@ export const getProductsIncludedInBundleTiles = ({
 // the product purchase usage type or the bundle purchase usage type.
 // In case the user has both, we consider the product purchase as the
 // most important one.
+const getFallbackUsageTypeFromListingData = <
+  T:
+    | PrivateAssetPackListingData
+    | PrivateGameTemplateListingData
+    | BundleListingData
+>({
+  productId,
+  allProductListingDatas,
+}: {|
+  productId: ?string,
+  allProductListingDatas: ?Array<T>,
+|}): string => {
+  if (!productId || !allProductListingDatas) return 'default';
+
+  const productListingData = allProductListingDatas.find(
+    listingData => listingData.id === productId
+  );
+  if (!productListingData) return 'default';
+
+  if (productListingData.prices.length > 0) {
+    return productListingData.prices[0].usageType;
+  }
+
+  return 'default';
+};
+
 export const getUserProductPurchaseUsageType = <
   T:
     | PrivateAssetPackListingData
@@ -521,13 +511,20 @@ export const getUserProductPurchaseUsageType = <
   if (!productId) return null;
   // User is not authenticated or still loading.
   if (!receivedProducts || !productPurchases || !allProductListingDatas)
-    return null;
+    return getFallbackUsageTypeFromListingData({
+      productId,
+      allProductListingDatas,
+    });
 
   const currentReceivedProduct = receivedProducts.find(
     receivedProduct => receivedProduct.id === productId
   );
   // User does not own the product.
-  if (!currentReceivedProduct) return null;
+  if (!currentReceivedProduct)
+    return getFallbackUsageTypeFromListingData({
+      productId,
+      allProductListingDatas,
+    });
 
   const productPurchase = productPurchases.find(
     productPurchase => productPurchase.productId === currentReceivedProduct.id
@@ -542,7 +539,11 @@ export const getUserProductPurchaseUsageType = <
         receivedProducts,
       }
     );
-    if (!receivedBundlesIncludingProduct.length) return null;
+    if (!receivedBundlesIncludingProduct.length)
+      return getFallbackUsageTypeFromListingData({
+        productId,
+        allProductListingDatas,
+      });
 
     // We look at all the purchases of the bundles that include the product.
     const receivedProductBundlePurchases = productPurchases.filter(
@@ -554,7 +555,10 @@ export const getUserProductPurchaseUsageType = <
     );
     // No purchase found for the bundles including the product.
     if (!receivedProductBundlePurchases.length) {
-      return null;
+      return getFallbackUsageTypeFromListingData({
+        productId,
+        allProductListingDatas,
+      });
     }
 
     // We don't really know which usage type to return, so we look at the first purchase.
@@ -563,7 +567,13 @@ export const getUserProductPurchaseUsageType = <
       const includedProduct = receivedBundlesIncludingProduct[0].includedProducts.find(
         includedProduct => includedProduct.productId === productId
       );
-      return includedProduct ? includedProduct.usageType : null;
+      return (
+        (includedProduct && includedProduct.usageType) ||
+        getFallbackUsageTypeFromListingData({
+          productId,
+          allProductListingDatas,
+        })
+      );
     }
 
     // Otherwise, we return the usage type of the purchase. (when included in an ASSET_PACK or GAME_TEMPLATE)
@@ -584,8 +594,8 @@ export const PurchaseProductButtons = <
   selectedUsageType,
   onUsageTypeChange,
   simulateAppStoreProduct,
-  i18n,
-  isAlreadyReceived,
+  i18n: _i18n,
+  isAlreadyReceived: _isAlreadyReceived,
   onClickBuy,
   onClickBuyWithCredits,
   customLabel,
@@ -602,7 +612,6 @@ export const PurchaseProductButtons = <
   customLabel?: React.Node,
   fullWidth?: boolean,
 |}): any => {
-  const { authenticated } = React.useContext(AuthenticatedUserContext);
   const shouldUseOrSimulateAppStoreProduct =
     simulateAppStoreProduct || shouldUseAppStoreProduct();
   const productType = productListingData.productType.toLowerCase();
@@ -630,37 +639,23 @@ export const PurchaseProductButtons = <
     }
   }
 
-  const formattedProductPriceText = renderProductPrice({
-    i18n,
-    usageType: selectedUsageType,
-    productListingData: productListingData,
-    plainText: true,
-  });
+  const defaultFreeLabel = customLabel || <Trans>Get for free</Trans>;
 
   return shouldUseOrSimulateAppStoreProduct && creditPrice ? (
     <LineStackLayout>
       <RaisedButton
         primary
-        label={
-          customLabel || <Trans>Buy for {formattedProductPriceText}</Trans>
-        }
+        label={defaultFreeLabel}
         onClick={onClickBuyWithCredits}
         id={`buy-${productType}-with-credits`}
         icon={<Coin fontSize="small" />}
         size="medium"
       />
-      {!isAlreadyReceived && !authenticated && (
-        <Text size="body-small">
-          <Link onClick={onClickBuy} href="">
-            <Trans>Restore a previous purchase</Trans>
-          </Link>
-        </Text>
-      )}
     </LineStackLayout>
   ) : fullWidth && !creditPrice ? (
     <RaisedButton
       primary
-      label={customLabel || <Trans>Buy for {formattedProductPriceText}</Trans>}
+      label={defaultFreeLabel}
       onClick={onClickBuy}
       id={`buy-${productType}`}
       size="medium"
@@ -671,9 +666,7 @@ export const PurchaseProductButtons = <
       {creditPrice && (
         <FlatButton
           primary
-          label={
-            customLabel || <Trans>Buy for {creditPrice.amount} credits</Trans>
-          }
+          label={defaultFreeLabel}
           onClick={onClickBuyWithCredits}
           id={`buy-${productType}-with-credits`}
           leftIcon={<Coin fontSize="small" />}
@@ -682,9 +675,7 @@ export const PurchaseProductButtons = <
       )}
       <RaisedButton
         primary
-        label={
-          customLabel || <Trans>Buy for {formattedProductPriceText}</Trans>
-        }
+        label={defaultFreeLabel}
         onClick={onClickBuy}
         id={`buy-${productType}`}
         size="medium"

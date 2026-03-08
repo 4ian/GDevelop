@@ -6,73 +6,217 @@ import type { I18n as I18nType } from '@lingui/core';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
-import GamesList from '../../../../GameDashboard/GamesList';
 import {
   deleteGame,
   registerGame,
   type Game,
 } from '../../../../Utils/GDevelopServices/Game';
-import { type QuickCustomizationRecommendation } from '../../../../Utils/GDevelopServices/User';
-import PlaceholderError from '../../../../UI/PlaceholderError';
-import { Column, LargeSpacer, Line } from '../../../../UI/Grid';
+import { Column, Line } from '../../../../UI/Grid';
 import { ColumnStackLayout } from '../../../../UI/Layout';
 import { type GameDetailsTab } from '../../../../GameDashboard';
 import GameDashboard from '../../../../GameDashboard';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
 import RouterContext from '../../../RouterContext';
 import { extractGDevelopApiErrorStatusAndCode } from '../../../../Utils/GDevelopServices/Errors';
-import UserEarningsWidget from '../../../../GameDashboard/Monetization/UserEarningsWidget';
 import {
   type FileMetadataAndStorageProviderName,
   type FileMetadata,
   type StorageProvider,
 } from '../../../../ProjectsStorage';
-import { type ResourceManagementProps } from '../../../../ResourcesList/ResourceSource';
 import Text from '../../../../UI/Text';
-import Grid from '@material-ui/core/Grid';
-import WalletWidget from '../../../../GameDashboard/Wallet/WalletWidget';
-import { QuickCustomizationGameTiles } from '../../../../QuickCustomization/QuickCustomizationGameTiles';
-import {
-  type NewProjectSetup,
-  type ExampleProjectSetup,
-} from '../../../../ProjectCreation/NewProjectSetupDialog';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
-import UrlStorageProvider from '../../../../ProjectsStorage/UrlStorageProvider';
-import {
-  type WindowSizeType,
-  useResponsiveWindowSize,
-} from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
-import FlatButton from '../../../../UI/FlatButton';
 import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
-import ExampleStore from '../../../../AssetStore/ExampleStore';
+import CreateNewFolderIcon from '@material-ui/icons/CreateNewFolder';
+import FolderSharedIcon from '@material-ui/icons/FolderShared';
 import {
   checkIfHasTooManyCloudProjects,
   MaxProjectCountAlertMessage,
 } from './MaxProjectCountAlertMessage';
-import { useProjectsListFor } from './utils';
 import { deleteCloudProject } from '../../../../Utils/GDevelopServices/Project';
 import { getDefaultRegisterGameProperties } from '../../../../Utils/UseGameAndBuildsManager';
-import { type CreateProjectResult } from '../../../../Utils/UseCreateProject';
-import { AskAiStandAloneForm } from '../../../../AiGeneration/AskAiStandAloneForm';
-import { AiRequestContext } from '../../../../AiGeneration/AiRequestContext';
+import EmptyAndStartingPointProjects from '../../../../ProjectCreation/EmptyAndStartingPointProjects';
 
-const getExampleItemsColumns = (
-  windowSize: WindowSizeType,
-  isLandscape: boolean
-) => {
-  switch (windowSize) {
-    case 'small':
-      return isLandscape ? 4 : 2;
-    case 'medium':
-      return 3;
-    case 'large':
-      return 4;
-    case 'xlarge':
-      return 6;
-    default:
-      return 4;
-  }
+const carrotsFontFamily =
+  '"Cairo", "Noto Sans Arabic", "Noto Sans", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Segoe UI", "Ubuntu", "Trebuchet MS", sans-serif';
+
+const styles = {
+  heroPanel: {
+    display: 'flex',
+    gap: 18,
+    flexWrap: 'wrap',
+    width: '100%',
+  },
+  actionCard: {
+    flex: '1 1 380px',
+    minHeight: 210,
+    borderRadius: 20,
+    border: '1px solid rgba(0, 0, 0, 0.08)',
+    background: 'linear-gradient(165deg, #f7f7f4, #eceee8)',
+    boxShadow: '0 10px 24px rgba(0, 0, 0, 0.08)',
+    padding: 26,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 20,
+  },
+  actionCardIcon: {
+    color: '#242323',
+    opacity: 0.9,
+    flexShrink: 0,
+  },
+  actionCardText: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+    flex: 1,
+  },
+  actionCardTitle: {
+    fontFamily: carrotsFontFamily,
+    fontSize: 38,
+    fontWeight: 800,
+    color: '#151515',
+    lineHeight: '44px',
+    textAlign: 'right',
+  },
+  actionCardTitleCompact: {
+    fontSize: 34,
+    lineHeight: '40px',
+  },
+  actionCardSubtitle: {
+    fontFamily: carrotsFontFamily,
+    fontSize: 25,
+    color: '#353534',
+    lineHeight: '32px',
+    textAlign: 'right',
+  },
+  actionCardActions: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    marginTop: 4,
+  },
+  filtersRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  filterChip: {
+    borderRadius: 999,
+    border: '1px solid rgba(28, 28, 28, 0.28)',
+    color: '#2d2d2c',
+    background: 'rgba(255, 255, 255, 0.74)',
+    fontFamily: carrotsFontFamily,
+    fontWeight: 700,
+    fontSize: 24,
+    lineHeight: '30px',
+    padding: '5px 16px',
+    cursor: 'pointer',
+    outline: 'none',
+  },
+  filterChipActive: {
+    background: '#ecebe7',
+    borderColor: 'rgba(36, 36, 36, 0.45)',
+  },
+  sectionCard: {
+    borderRadius: 20,
+    padding: 16,
+    border: '1px solid rgba(0, 0, 0, 0.1)',
+    background:
+      'linear-gradient(160deg, rgba(246, 246, 242, 0.98), rgba(234, 235, 230, 0.98))',
+    boxShadow: '0 14px 30px rgba(0, 0, 0, 0.08)',
+  },
+  sectionTitle: {
+    fontFamily: carrotsFontFamily,
+    fontSize: 40,
+    lineHeight: '46px',
+    fontWeight: 800,
+    color: '#161616',
+  },
+  sectionDescription: {
+    fontFamily: carrotsFontFamily,
+    fontSize: 20,
+    lineHeight: '28px',
+    color: '#3d3d3c',
+  },
+  carrotsButton: {
+    border: '1px solid rgba(28, 28, 28, 0.16)',
+    borderRadius: 999,
+    background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.95), #eceee8)',
+    color: '#262625',
+    fontFamily: carrotsFontFamily,
+    fontWeight: 700,
+    letterSpacing: 0.2,
+    fontSize: 22,
+    minHeight: 48,
+    padding: '7px 20px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 8,
+    cursor: 'pointer',
+    outline: 'none',
+    transition:
+      'background 120ms ease, border-color 120ms ease, transform 120ms ease',
+  },
+  carrotsButtonPrimary: {
+    borderColor: 'rgba(189, 170, 120, 0.6)',
+    background:
+      'linear-gradient(135deg, rgba(221, 171, 73, 0.94), rgba(142, 194, 132, 0.93))',
+    color: '#ffffff',
+    boxShadow: '0 8px 18px rgba(165, 153, 87, 0.28)',
+  },
+  carrotsButtonSecondary: {
+    borderColor: 'rgba(0, 0, 0, 0.2)',
+    background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.95), #eceee8)',
+    color: '#2f2f2e',
+  },
+  carrotsButtonDisabled: {
+    opacity: 0.56,
+    cursor: 'not-allowed',
+  },
+  carrotsButtonIcon: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+};
+
+type CarrotsActionButtonProps = {|
+  label: React.Node,
+  onClick: () => void,
+  disabled?: boolean,
+  icon?: React.Node,
+  id?: string,
+  variant?: 'primary' | 'secondary',
+|};
+
+const CarrotsActionButton = ({
+  label,
+  onClick,
+  disabled,
+  icon,
+  id,
+  variant = 'secondary',
+}: CarrotsActionButtonProps): React.Node => {
+  const buttonStyle = {
+    ...styles.carrotsButton,
+    ...(variant === 'primary'
+      ? styles.carrotsButtonPrimary
+      : styles.carrotsButtonSecondary),
+    ...(disabled ? styles.carrotsButtonDisabled : {}),
+  };
+  return (
+    <button
+      type="button"
+      style={buttonStyle}
+      onClick={onClick}
+      disabled={disabled}
+      id={id}
+    >
+      {icon && <span style={styles.carrotsButtonIcon}>{icon}</span>}
+      <span>{label}</span>
+    </button>
+  );
 };
 
 type Props = {|
@@ -80,33 +224,9 @@ type Props = {|
   currentFileMetadata: ?FileMetadata,
   onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   storageProviders: Array<StorageProvider>,
-  storageProvider: ?StorageProvider,
-  resourceManagementProps: ResourceManagementProps,
-  onCreateEmptyProject: (
-    newProjectSetup: NewProjectSetup
-  ) => Promise<CreateProjectResult>,
-  onOpenLayout: (
-    sceneName: string,
-    options: {|
-      openEventsEditor: boolean,
-      openSceneEditor: boolean,
-      focusWhenOpened:
-        | 'scene-or-events-otherwise'
-        | 'scene'
-        | 'events'
-        | 'none',
-    |}
-  ) => void,
-  onWillInstallExtension: (extensionNames: Array<string>) => void,
-  onExtensionInstalled: (extensionNames: Array<string>) => void,
-  onCloseAskAi: () => void,
   closeProject: () => Promise<void>,
   canOpen: boolean,
-  onOpenProfile: () => void,
   askToCloseProject: () => Promise<boolean>,
-  onCreateProjectFromExample: (
-    exampleProjectSetup: ExampleProjectSetup
-  ) => Promise<CreateProjectResult>,
   onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
@@ -121,6 +241,7 @@ type Props = {|
   currentTab: GameDetailsTab,
   setCurrentTab: GameDetailsTab => void,
   onOpenNewProjectSetupDialog: () => void,
+  onStartNewProject: () => void,
   onChooseProject: () => void,
   onSaveProject: () => Promise<?FileMetadata>,
   canSaveProject: boolean,
@@ -131,18 +252,9 @@ const CreateSection = ({
   currentFileMetadata,
   onOpenProject,
   storageProviders,
-  storageProvider,
-  resourceManagementProps,
-  onCreateEmptyProject,
-  onOpenLayout,
-  onWillInstallExtension,
-  onExtensionInstalled,
-  onCloseAskAi,
   closeProject,
   canOpen,
-  onOpenProfile,
   askToCloseProject,
-  onCreateProjectFromExample,
   onSelectPrivateGameTemplateListingData,
   onSelectExampleShortHeader,
   i18n,
@@ -155,54 +267,33 @@ const CreateSection = ({
   currentTab,
   setCurrentTab,
   onOpenNewProjectSetupDialog,
+  onStartNewProject,
   onChooseProject,
   onSaveProject,
   canSaveProject,
 }: Props) => {
+  void i18n;
+  void onSelectPrivateGameTemplateListingData;
+  void gamesFetchingError;
+  void onSaveProject;
+  void canSaveProject;
+
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const {
-    profile,
-    getAuthorizationHeader,
-    recommendations,
-    limits,
-  } = authenticatedUser;
+  const { profile, getAuthorizationHeader } = authenticatedUser;
   const {
     showDeleteConfirmation,
     showConfirmation,
     showAlert,
   } = useAlertDialog();
   const [isUpdatingGame, setIsUpdatingGame] = React.useState(false);
-  const [initialWidgetToScrollTo, setInitialWidgetToScrollTo] = React.useState(
-    null
-  );
+  const initialWidgetToScrollTo = null;
   const { routeArguments, removeRouteArguments } = React.useContext(
     RouterContext
   );
-  // $FlowIgnore
-  const quickCustomizationRecommendation: ?QuickCustomizationRecommendation = React.useMemo(
-    () => {
-      return recommendations
-        ? recommendations.find(
-            recommendation => recommendation.type === 'quick-customization'
-          )
-        : null;
-    },
-    [recommendations]
-  );
-  const { windowSize, isMobile, isLandscape } = useResponsiveWindowSize();
-  const isMobileOrMediumWidth =
-    windowSize === 'small' || windowSize === 'medium';
+  const { isMobile } = useResponsiveWindowSize();
   const hasTooManyCloudProjects = checkIfHasTooManyCloudProjects(
     authenticatedUser
   );
-  const allRecentProjectFiles = useProjectsListFor(null);
-  const savedGames = (games || []).filter(game => game.savedStatus !== 'draft');
-  const hasAProjectOpenedNowOrRecentlyOrGameSaved =
-    !!project || savedGames.length || !!allRecentProjectFiles.length;
-  const hidePerformanceDashboard =
-    !!limits &&
-    !!limits.capabilities.classrooms &&
-    limits.capabilities.classrooms.hideSocials;
 
   React.useEffect(
     () => {
@@ -223,8 +314,9 @@ const CreateSection = ({
     [profile, openedGame, setOpenedGameId]
   );
 
-  const [currentPage, setCurrentPage] = React.useState(1);
-  const [searchText, setSearchText] = React.useState<string>('');
+  const [templateCategory, setTemplateCategory] = React.useState<
+    'games' | '2d' | '3d'
+  >('games');
 
   const onUnregisterGame = React.useCallback(
     async (
@@ -448,12 +540,9 @@ const CreateSection = ({
       showAlert,
     ]
   );
+  void onRegisterProject;
 
-  const { aiRequestStorage } = React.useContext(AiRequestContext);
-  const { isSendingAiRequest } = aiRequestStorage;
-  const isLoadingAiRequest = isSendingAiRequest('');
-
-  const isLoading = isUpdatingGame || isLoadingAiRequest;
+  const isLoading = isUpdatingGame;
 
   if (openedGame) {
     return (
@@ -496,166 +585,124 @@ const CreateSection = ({
           }
           showUrgentAnnouncements
         >
-          <SectionRow expand>
-            <AskAiStandAloneForm
-              i18n={i18n}
-              project={project}
-              resourceManagementProps={resourceManagementProps}
-              fileMetadata={currentFileMetadata}
-              storageProvider={storageProvider}
-              onCreateProjectFromExample={onCreateProjectFromExample}
-              onCreateEmptyProject={onCreateEmptyProject}
-              onOpenLayout={onOpenLayout}
-              onWillInstallExtension={onWillInstallExtension}
-              onExtensionInstalled={onExtensionInstalled}
-              onCloseAskAi={onCloseAskAi}
-              dismissableIdentifier="home-page-create-section"
-            />
-            <ColumnStackLayout noMargin>
-              {hidePerformanceDashboard ? null : hasAProjectOpenedNowOrRecentlyOrGameSaved ? (
-                <ColumnStackLayout noMargin>
-                  <Grid container spacing={2}>
-                    <UserEarningsWidget
-                      size={
-                        isMobile && isLandscape
-                          ? 'half'
-                          : isMobileOrMediumWidth
-                          ? 'full'
-                          : 'twoThirds'
-                      }
-                    />
-                    <WalletWidget
-                      onOpenProfile={onOpenProfile}
-                      showOneItem
-                      size={
-                        isMobile && isLandscape
-                          ? 'half'
-                          : isMobileOrMediumWidth
-                          ? 'full'
-                          : 'oneThird'
-                      }
-                    />
-                  </Grid>
-                </ColumnStackLayout>
-              ) : (
-                <Grid container spacing={2}>
-                  <WalletWidget onOpenProfile={onOpenProfile} size="full" />
-                </Grid>
-              )}
-              <LargeSpacer />
-              {gamesFetchingError ? (
-                <PlaceholderError onRetry={onRefreshGames}>
-                  <Trans>
-                    Can't load the games. Verify your internet connection or
-                    retry later.
-                  </Trans>
-                </PlaceholderError>
-              ) : (
-                <GamesList
-                  storageProviders={storageProviders}
-                  project={project}
-                  games={games}
-                  onRefreshGames={onRefreshGames}
-                  onOpenGameManager={({
-                    game,
-                    widgetToScrollTo,
-                  }: {
-                    game: Game,
-                    widgetToScrollTo?: 'projects',
-                  }) => {
-                    // $FlowFixMe[incompatible-type]
-                    setInitialWidgetToScrollTo(widgetToScrollTo);
-                    setOpenedGameId(game.id);
-                  }}
-                  onOpenProject={onOpenProject}
-                  disabled={isLoading}
-                  onUnregisterGame={onUnregisterGame}
-                  canOpen={canOpen}
-                  onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
-                  onChooseProject={onChooseProject}
-                  currentFileMetadata={currentFileMetadata}
-                  closeProject={closeProject}
-                  askToCloseProject={askToCloseProject}
-                  onSaveProject={onSaveProject}
-                  canSaveProject={canSaveProject}
-                  onDeleteCloudProject={onDeleteCloudProject}
-                  onRegisterProject={onRegisterProject}
-                  // Controls
-                  currentPage={currentPage}
-                  setCurrentPage={setCurrentPage}
-                  searchText={searchText}
-                  setSearchText={setSearchText}
-                />
-              )}
-              {isMobile && hasTooManyCloudProjects && (
-                <MaxProjectCountAlertMessage margin="dense" />
-              )}
-              {quickCustomizationRecommendation && (
-                <ColumnStackLayout noMargin>
-                  <Line noMargin>
-                    <Text size="block-title">
-                      <Trans>Remix a game in 2 minutes</Trans>
-                    </Text>
-                  </Line>
-                  <QuickCustomizationGameTiles
-                    onSelectExampleShortHeader={async exampleShortHeader => {
-                      const projectIsClosed = await askToCloseProject();
-                      if (!projectIsClosed) {
-                        return;
-                      }
-
-                      const newProjectSetup: NewProjectSetup = {
-                        storageProvider: UrlStorageProvider,
-                        saveAsLocation: null,
-                        openQuickCustomizationDialog: true,
-                        creationSource: 'quick-customization',
-                      };
-                      onCreateProjectFromExample({
-                        exampleShortHeader,
-                        newProjectSetup,
-                        i18n,
-                      });
-                    }}
-                    quickCustomizationRecommendation={
-                      quickCustomizationRecommendation
-                    }
-                    disabled={isLoading}
-                  />
-                </ColumnStackLayout>
-              )}
-              {!hasAProjectOpenedNowOrRecentlyOrGameSaved && (
-                <ColumnStackLayout noMargin>
-                  <Line noMargin justifyContent="space-between">
-                    <Text size="block-title" noMargin>
-                      <Trans>Start from a template</Trans>
-                    </Text>
-                    <FlatButton
-                      onClick={onOpenNewProjectSetupDialog}
-                      label={
-                        isMobile ? (
-                          <Trans>Browse</Trans>
-                        ) : (
-                          <Trans>Browse all templates</Trans>
-                        )
-                      }
-                      leftIcon={<ChevronArrowRight fontSize="small" />}
+          <SectionRow>
+            <div id="carrots-home-build-section" style={styles.heroPanel}>
+              <div style={styles.actionCard}>
+                <div style={styles.actionCardIcon}>
+                  <CreateNewFolderIcon style={{ fontSize: 72 }} />
+                </div>
+                <div style={styles.actionCardText}>
+                  <Text noMargin style={styles.actionCardTitle}>
+                    <Trans>Create New Project</Trans>
+                  </Text>
+                  <Text noMargin style={styles.actionCardSubtitle}>
+                    <Trans>Start quickly with powerful and simple tools.</Trans>
+                  </Text>
+                  <div style={styles.actionCardActions}>
+                    <CarrotsActionButton
+                      label={<Trans>Start Project</Trans>}
+                      onClick={onStartNewProject}
                       disabled={isLoading}
+                      variant="primary"
                     />
-                  </Line>
-                  <ExampleStore
-                    onSelectExampleShortHeader={onSelectExampleShortHeader}
-                    onSelectPrivateGameTemplateListingData={
-                      onSelectPrivateGameTemplateListingData
+                  </div>
+                </div>
+              </div>
+              <div style={styles.actionCard}>
+                <div style={styles.actionCardIcon}>
+                  <FolderSharedIcon style={{ fontSize: 72 }} />
+                </div>
+                <div style={styles.actionCardText}>
+                  <Text
+                    noMargin
+                    style={{
+                      ...styles.actionCardTitle,
+                      ...styles.actionCardTitleCompact,
+                    }}
+                  >
+                    <Trans>Open Existing Project</Trans>
+                  </Text>
+                  <Text noMargin style={styles.actionCardSubtitle}>
+                    <Trans>Continue your saved projects.</Trans>
+                  </Text>
+                  <div style={styles.actionCardActions}>
+                    <CarrotsActionButton
+                      label={<Trans>Open Project</Trans>}
+                      onClick={onChooseProject}
+                      disabled={!canOpen || isLoading}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </SectionRow>
+          <SectionRow>
+            <div id="carrots-home-templates-section">
+              <ColumnStackLayout noMargin style={styles.sectionCard}>
+                <Line noMargin justifyContent="space-between">
+                  <Text size="title" noMargin style={styles.sectionTitle}>
+                    <Trans>Featured Templates</Trans>
+                  </Text>
+                  <CarrotsActionButton
+                    onClick={onOpenNewProjectSetupDialog}
+                    label={
+                      isMobile ? (
+                        <Trans>Browse</Trans>
+                      ) : (
+                        <Trans>Browse More Templates</Trans>
+                      )
                     }
-                    i18n={i18n}
-                    getColumnsFromWindowSize={getExampleItemsColumns}
-                    hideSearch
-                    onlyShowGames
+                    icon={<ChevronArrowRight fontSize="small" />}
                     disabled={isLoading}
+                    variant="secondary"
+                    id="browse-basic-templates"
                   />
-                </ColumnStackLayout>
-              )}
-            </ColumnStackLayout>
+                </Line>
+                <div style={styles.filtersRow}>
+                  <button
+                    type="button"
+                    style={{
+                      ...styles.filterChip,
+                      ...(templateCategory === 'games'
+                        ? styles.filterChipActive
+                        : {}),
+                    }}
+                    onClick={() => setTemplateCategory('games')}
+                  >
+                    <Trans>Games</Trans>
+                  </button>
+                  <button
+                    type="button"
+                    style={{
+                      ...styles.filterChip,
+                      ...(templateCategory === '2d'
+                        ? styles.filterChipActive
+                        : {}),
+                    }}
+                    onClick={() => setTemplateCategory('2d')}
+                  >
+                    <Trans>2D</Trans>
+                  </button>
+                  <button
+                    type="button"
+                    style={{
+                      ...styles.filterChip,
+                      ...(templateCategory === '3d'
+                        ? styles.filterChipActive
+                        : {}),
+                    }}
+                    onClick={() => setTemplateCategory('3d')}
+                  >
+                    <Trans>3D</Trans>
+                  </button>
+                </div>
+                <EmptyAndStartingPointProjects
+                  onSelectExampleShortHeader={onSelectExampleShortHeader}
+                  onSelectEmptyProject={onOpenNewProjectSetupDialog}
+                  disabled={isLoading}
+                />
+              </ColumnStackLayout>
+            </div>
           </SectionRow>
         </SectionContainer>
       )}

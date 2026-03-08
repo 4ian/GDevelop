@@ -330,6 +330,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
               )
             )
           }
+          onOpenProjectManager={this.props.onOpenProjectManager}
           onOpenEvents={() =>
             this.props.openObjectEvents(
               eventsFunctionsExtension.getName(),

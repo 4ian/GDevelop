@@ -57,6 +57,7 @@ import InlineCheckbox from '../UI/InlineCheckbox';
 import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
 import VisibilityOffIcon from '../UI/CustomSvgIcons/VisibilityOff';
 import PropertiesEditorByVisibility from '../PropertiesEditor/PropertiesEditorByVisibility';
+import { Tabs } from '../UI/Tabs';
 
 const gd: libGDevelop = global.gd;
 
@@ -82,6 +83,48 @@ const styles = {
     flex: 1,
     alignItems: 'center',
   },
+};
+
+export type EffectInterfaceMode = 'all' | 'effects' | 'shaders' | 'lighting';
+
+const lighting3DEffectTypeNames = new Set([
+  'AmbientLight',
+  'DirectionalLight',
+  'HemisphereLight',
+  'PointLight',
+  'SpotLight',
+  'LinearFog',
+  'ExponentialFog',
+  'VolumetricFog',
+]);
+
+const getEffectBaseType = (effectType: string): string =>
+  effectType.startsWith('Scene3D::')
+    ? effectType.substring('Scene3D::'.length)
+    : effectType;
+
+export const getEffectInterfaceModeForMetadata = (
+  effectMetadata: ?EnumeratedEffectMetadata
+): EffectInterfaceMode => {
+  if (!effectMetadata) {
+    return 'effects';
+  }
+
+  if (
+    effectMetadata.type.startsWith('Scene3D::') &&
+    lighting3DEffectTypeNames.has(getEffectBaseType(effectMetadata.type))
+  ) {
+    return 'lighting';
+  }
+
+  if (
+    effectMetadata.type.startsWith('Scene3D::') ||
+    effectMetadata.isMarkedAsOnlyWorkingFor3D
+  ) {
+    return 'shaders';
+  }
+
+  return 'effects';
 };
 
 export const useEffectOverridingAlertDialog = (): ((
@@ -403,6 +446,7 @@ type UseManageEffectsState = {|
   all3DEffectMetadata: Array<EnumeratedEffectMetadata>,
   draggedEffect: {| current: ?gdEffect |},
   addEffect: boolean => void,
+  addEffectWithType: string => void,
   chooseEffectType: (effect: gdEffect, newEffectType: string) => void,
   copyAllEffects: () => void,
   copyEffect: (effect: gdEffect) => void,
@@ -496,8 +540,8 @@ export const useManageEffects = ({
     [allEffectMetadata, onUpdate, onEffectsUpdated, onEffectAdded]
   );
 
-  const _addEffect = React.useCallback(
-    (is3D: boolean) => {
+  const _addEffectWithType = React.useCallback(
+    (effectType: string) => {
       const newName = newNameGenerator('Effect', name =>
         effectsContainer.hasEffectNamed(name)
       );
@@ -506,11 +550,7 @@ export const useManageEffects = ({
         effectsContainer.getEffectsCount()
       );
 
-      if (is3D) {
-        chooseEffectType(effect, 'Scene3D::DirectionalLight');
-      } else {
-        chooseEffectType(effect, 'Outline');
-      }
+      chooseEffectType(effect, effectType);
 
       onUpdate();
       onEffectsUpdated();
@@ -519,10 +559,17 @@ export const useManageEffects = ({
     [chooseEffectType, effectsContainer, onUpdate, onEffectsUpdated]
   );
 
-  const addEffect = addCreateBadgePreHookIfNotClaimed(
+  const addEffectWithType = addCreateBadgePreHookIfNotClaimed(
     authenticatedUser,
     TRIVIAL_FIRST_EFFECT,
-    _addEffect
+    _addEffectWithType
+  );
+
+  const addEffect = React.useCallback(
+    (is3D: boolean) => {
+      addEffectWithType(is3D ? 'Scene3D::DirectionalLight' : 'Outline');
+    },
+    [addEffectWithType]
   );
 
   const removeEffect = React.useCallback(
@@ -746,6 +793,7 @@ export const useManageEffects = ({
     all3DEffectMetadata,
     draggedEffect,
     addEffect,
+    addEffectWithType,
     chooseEffectType,
     copyAllEffects,
     copyEffect,
@@ -770,6 +818,7 @@ type Props = {|
   onEffectAdded: () => void,
   target: 'object' | 'layer',
   layerRenderingType: string,
+  effectInterfaceMode?: EffectInterfaceMode,
 |};
 
 /**
@@ -786,8 +835,14 @@ export default function EffectsList(props: Props): React.Node {
     project,
     target,
   } = props;
+  const effectInterfaceMode: EffectInterfaceMode =
+    props.effectInterfaceMode || 'all';
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const justAddedEffectElement = React.useRef<?any>(null);
+  const [
+    currentSeparatedInterfaceTab,
+    setCurrentSeparatedInterfaceTab,
+  ] = React.useState<EffectInterfaceMode>('effects');
 
   const forceUpdate = useForceUpdate();
   const {
@@ -795,6 +850,7 @@ export default function EffectsList(props: Props): React.Node {
     all2DEffectMetadata,
     all3DEffectMetadata,
     addEffect,
+    addEffectWithType,
     chooseEffectType,
     copyAllEffects,
     copyEffect,
@@ -816,6 +872,11 @@ export default function EffectsList(props: Props): React.Node {
     target,
   });
 
+  const shouldShowSeparatedInterfaces =
+    effectInterfaceMode === 'all' &&
+    target === 'layer' &&
+    props.layerRenderingType !== '2d';
+
   React.useEffect(
     () => {
       if (
@@ -835,16 +896,197 @@ export default function EffectsList(props: Props): React.Node {
     {}
   );
 
-  // Count the number of effects to hide titles of empty sections.
-  const platform = project.getCurrentPlatform();
-  const effects2DCount = getEffects2DCount(platform, effectsContainer);
-  const effects3DCount = getEffects3DCount(platform, effectsContainer);
-  const visibleEffectsCount =
-    props.layerRenderingType === '2d'
-      ? effects2DCount
-      : props.layerRenderingType === '3d'
-      ? effects3DCount
-      : effectsContainer.getEffectsCount();
+  const shouldDisplayEffectForInterfaceMode = React.useCallback(
+    (effectMetadata: ?EnumeratedEffectMetadata): boolean => {
+      if (effectInterfaceMode === 'all') {
+        return true;
+      }
+      return (
+        getEffectInterfaceModeForMetadata(effectMetadata) ===
+        effectInterfaceMode
+      );
+    },
+    [effectInterfaceMode]
+  );
+
+  const visibleEffectsCount = React.useMemo(
+    () => {
+      let count = 0;
+
+      for (let i = 0; i < effectsContainer.getEffectsCount(); i++) {
+        const effect: gdEffect = effectsContainer.getEffectAt(i);
+        const effectMetadata = getEnumeratedEffectMetadata(
+          allEffectMetadata,
+          effect.getEffectType()
+        );
+
+        if (!shouldDisplayEffectForInterfaceMode(effectMetadata)) {
+          continue;
+        }
+
+        if (
+          props.layerRenderingType === '2d' &&
+          effectMetadata &&
+          effectMetadata.isMarkedAsOnlyWorkingFor3D
+        ) {
+          continue;
+        }
+
+        if (
+          props.layerRenderingType === '3d' &&
+          effectMetadata &&
+          effectMetadata.isMarkedAsOnlyWorkingFor2D
+        ) {
+          continue;
+        }
+
+        count++;
+      }
+
+      return count;
+    },
+    [
+      allEffectMetadata,
+      effectsContainer,
+      props.layerRenderingType,
+      shouldDisplayEffectForInterfaceMode,
+    ]
+  );
+
+  const filtered2DEffectMetadata = React.useMemo(
+    () =>
+      all2DEffectMetadata.filter(effectMetadata =>
+        shouldDisplayEffectForInterfaceMode(effectMetadata)
+      ),
+    [all2DEffectMetadata, shouldDisplayEffectForInterfaceMode]
+  );
+
+  const filtered3DEffectMetadata = React.useMemo(
+    () =>
+      all3DEffectMetadata.filter(effectMetadata =>
+        shouldDisplayEffectForInterfaceMode(effectMetadata)
+      ),
+    [all3DEffectMetadata, shouldDisplayEffectForInterfaceMode]
+  );
+
+  const getDefaultEffectTypeForInterface = React.useCallback(
+    (): ?string => {
+      if (effectInterfaceMode === 'lighting') {
+        const lightingType =
+          filtered3DEffectMetadata.find(
+            effectMetadata =>
+              effectMetadata.type === 'Scene3D::DirectionalLight'
+          ) ||
+          filtered3DEffectMetadata.find(
+            effectMetadata => effectMetadata.type === 'Scene3D::AmbientLight'
+          ) ||
+          filtered3DEffectMetadata[0];
+        return lightingType ? lightingType.type : null;
+      }
+
+      if (effectInterfaceMode === 'shaders') {
+        const shaderType =
+          filtered3DEffectMetadata.find(
+            effectMetadata => effectMetadata.type === 'Scene3D::Bloom'
+          ) || filtered3DEffectMetadata[0];
+        return shaderType ? shaderType.type : null;
+      }
+
+      const baseEffectType =
+        filtered2DEffectMetadata.find(
+          effectMetadata => effectMetadata.type === 'Outline'
+        ) || filtered2DEffectMetadata[0];
+      if (baseEffectType) {
+        return baseEffectType.type;
+      }
+
+      return filtered3DEffectMetadata[0]
+        ? filtered3DEffectMetadata[0].type
+        : null;
+    },
+    [effectInterfaceMode, filtered2DEffectMetadata, filtered3DEffectMetadata]
+  );
+
+  const addCurrentInterfaceEffect = React.useCallback(
+    () => {
+      const defaultEffectType = getDefaultEffectTypeForInterface();
+      if (defaultEffectType) {
+        addEffectWithType(defaultEffectType);
+      }
+    },
+    [addEffectWithType, getDefaultEffectTypeForInterface]
+  );
+
+  const effects3DCount = React.useMemo(
+    () => {
+      let count = 0;
+      for (let i = 0; i < effectsContainer.getEffectsCount(); i++) {
+        const effect: gdEffect = effectsContainer.getEffectAt(i);
+        const effectMetadata = getEnumeratedEffectMetadata(
+          allEffectMetadata,
+          effect.getEffectType()
+        );
+        if (
+          (!effectMetadata || !effectMetadata.isMarkedAsOnlyWorkingFor2D) &&
+          shouldDisplayEffectForInterfaceMode(effectMetadata)
+        ) {
+          count++;
+        }
+      }
+      return count;
+    },
+    [allEffectMetadata, effectsContainer, shouldDisplayEffectForInterfaceMode]
+  );
+
+  const effects2DCount = React.useMemo(
+    () => {
+      let count = 0;
+      for (let i = 0; i < effectsContainer.getEffectsCount(); i++) {
+        const effect: gdEffect = effectsContainer.getEffectAt(i);
+        const effectMetadata = getEnumeratedEffectMetadata(
+          allEffectMetadata,
+          effect.getEffectType()
+        );
+        if (
+          (!effectMetadata || !effectMetadata.isMarkedAsOnlyWorkingFor3D) &&
+          shouldDisplayEffectForInterfaceMode(effectMetadata)
+        ) {
+          count++;
+        }
+      }
+      return count;
+    },
+    [allEffectMetadata, effectsContainer, shouldDisplayEffectForInterfaceMode]
+  );
+
+  if (shouldShowSeparatedInterfaces) {
+    return (
+      <Column noMargin expand useFullHeight>
+        <Tabs
+          value={currentSeparatedInterfaceTab}
+          onChange={newTab => setCurrentSeparatedInterfaceTab(newTab)}
+          options={[
+            {
+              value: 'effects',
+              label: <Trans>Effects</Trans>,
+            },
+            {
+              value: 'shaders',
+              label: <Trans>Shaders</Trans>,
+            },
+            {
+              value: 'lighting',
+              label: <Trans>Lighting</Trans>,
+            },
+          ]}
+        />
+        <EffectsList
+          {...props}
+          effectInterfaceMode={currentSeparatedInterfaceTab}
+        />
+      </Column>
+    );
+  }
 
   return (
     <I18n>
@@ -889,7 +1131,13 @@ export default function EffectsList(props: Props): React.Node {
                       <Column noMargin>
                         <Line>
                           <Text size="block-title">
-                            <Trans>3D effects</Trans>
+                            {effectInterfaceMode === 'lighting' ? (
+                              <Trans>Lighting</Trans>
+                            ) : effectInterfaceMode === 'shaders' ? (
+                              <Trans>Shaders</Trans>
+                            ) : (
+                              <Trans>3D effects</Trans>
+                            )}
                           </Text>
                         </Line>
                       </Column>
@@ -914,8 +1162,11 @@ export default function EffectsList(props: Props): React.Node {
                                 ? justAddedEffectElement
                                 : null;
 
-                            return !effectMetadata ||
-                              !effectMetadata.isMarkedAsOnlyWorkingFor2D ? (
+                            return (!effectMetadata ||
+                              !effectMetadata.isMarkedAsOnlyWorkingFor2D) &&
+                              shouldDisplayEffectForInterfaceMode(
+                                effectMetadata
+                              ) ? (
                               <DragSourceAndDropTarget3D
                                 key={effect.ptr}
                                 beginDrag={() => {
@@ -959,7 +1210,9 @@ export default function EffectsList(props: Props): React.Node {
                                         copyEffect={copyEffect}
                                         pasteEffectsBefore={pasteEffectsBefore}
                                         chooseEffectType={chooseEffectType}
-                                        allEffectMetadata={all3DEffectMetadata}
+                                        allEffectMetadata={
+                                          filtered3DEffectMetadata
+                                        }
                                         onEffectsUpdated={onEffectsUpdated}
                                         onEffectsRenamed={onEffectsRenamed}
                                         nameErrors={nameErrors}
@@ -983,7 +1236,11 @@ export default function EffectsList(props: Props): React.Node {
                       <Column noMargin>
                         <Line>
                           <Text size="block-title">
-                            <Trans>2D effects</Trans>
+                            {effectInterfaceMode === 'effects' ? (
+                              <Trans>Effects</Trans>
+                            ) : (
+                              <Trans>2D effects</Trans>
+                            )}
                           </Text>
                         </Line>
                       </Column>
@@ -1008,8 +1265,11 @@ export default function EffectsList(props: Props): React.Node {
                                 ? justAddedEffectElement
                                 : null;
 
-                            return !effectMetadata ||
-                              !effectMetadata.isMarkedAsOnlyWorkingFor3D ? (
+                            return (!effectMetadata ||
+                              !effectMetadata.isMarkedAsOnlyWorkingFor3D) &&
+                              shouldDisplayEffectForInterfaceMode(
+                                effectMetadata
+                              ) ? (
                               <DragSourceAndDropTarget2D
                                 key={effect.ptr}
                                 beginDrag={() => {
@@ -1053,7 +1313,9 @@ export default function EffectsList(props: Props): React.Node {
                                         copyEffect={copyEffect}
                                         pasteEffectsBefore={pasteEffectsBefore}
                                         chooseEffectType={chooseEffectType}
-                                        allEffectMetadata={all2DEffectMetadata}
+                                        allEffectMetadata={
+                                          filtered2DEffectMetadata
+                                        }
                                         onEffectsUpdated={onEffectsUpdated}
                                         onEffectsRenamed={onEffectsRenamed}
                                         nameErrors={nameErrors}
@@ -1094,20 +1356,40 @@ export default function EffectsList(props: Props): React.Node {
                     />
                   </LineStackLayout>
                   <LineStackLayout justifyContent="flex-end" expand>
-                    {props.layerRenderingType !== '2d' && (
+                    {effectInterfaceMode === 'all' ? (
+                      <React.Fragment>
+                        {props.layerRenderingType !== '2d' && (
+                          <RaisedButton
+                            primary
+                            label={<Trans>Add a 3D effect</Trans>}
+                            onClick={() => addEffect(true)}
+                            icon={<Add />}
+                          />
+                        )}
+                        {props.layerRenderingType !== '3d' && (
+                          <RaisedButton
+                            primary
+                            label={<Trans>Add a 2D effect</Trans>}
+                            onClick={() => addEffect(false)}
+                            icon={<Add />}
+                          />
+                        )}
+                      </React.Fragment>
+                    ) : (
                       <RaisedButton
                         primary
-                        label={<Trans>Add a 3D effect</Trans>}
-                        onClick={() => addEffect(true)}
+                        label={
+                          effectInterfaceMode === 'lighting' ? (
+                            <Trans>Add a lighting effect</Trans>
+                          ) : effectInterfaceMode === 'shaders' ? (
+                            <Trans>Add a shader</Trans>
+                          ) : (
+                            <Trans>Add an effect</Trans>
+                          )
+                        }
+                        onClick={addCurrentInterfaceEffect}
                         icon={<Add />}
-                      />
-                    )}
-                    {props.layerRenderingType !== '3d' && (
-                      <RaisedButton
-                        primary
-                        label={<Trans>Add a 2D effect</Trans>}
-                        onClick={() => addEffect(false)}
-                        icon={<Add />}
+                        disabled={!getDefaultEffectTypeForInterface()}
                       />
                     )}
                   </LineStackLayout>
@@ -1116,35 +1398,92 @@ export default function EffectsList(props: Props): React.Node {
             </React.Fragment>
           ) : (
             <Column noMargin expand justifyContent="center">
-              {props.layerRenderingType === '' ||
-              props.layerRenderingType === '2d+3d' ? (
-                <EmptyPlaceholder
-                  title={<Trans>Add your first effect</Trans>}
-                  description={
-                    <Trans>Effects create visual changes to the object.</Trans>
-                  }
-                  actionLabel={<Trans>Add a 2D effect</Trans>}
-                  helpPagePath={
-                    props.target === 'object'
-                      ? '/objects/effects'
-                      : '/interface/scene-editor/layer-effects'
-                  }
-                  onAction={() => addEffect(false)}
-                  secondaryActionIcon={<Add />}
-                  secondaryActionLabel={<Trans>Add a 3D effect</Trans>}
-                  onSecondaryAction={() => addEffect(true)}
-                />
+              {effectInterfaceMode === 'all' ? (
+                props.layerRenderingType === '' ||
+                props.layerRenderingType === '2d+3d' ? (
+                  <EmptyPlaceholder
+                    title={<Trans>Add your first effect</Trans>}
+                    description={
+                      <Trans>
+                        Effects create visual changes to the object.
+                      </Trans>
+                    }
+                    actionLabel={<Trans>Add a 2D effect</Trans>}
+                    helpPagePath={
+                      props.target === 'object'
+                        ? '/objects/effects'
+                        : '/interface/scene-editor/layer-effects'
+                    }
+                    onAction={() => addEffect(false)}
+                    secondaryActionIcon={<Add />}
+                    secondaryActionLabel={<Trans>Add a 3D effect</Trans>}
+                    onSecondaryAction={() => addEffect(true)}
+                  />
+                ) : (
+                  <EmptyPlaceholder
+                    title={<Trans>Add your first effect</Trans>}
+                    description={
+                      <Trans>
+                        Effects create visual changes to the object.
+                      </Trans>
+                    }
+                    actionLabel={
+                      props.layerRenderingType === '3d' ? (
+                        <Trans>Add a 3D effect</Trans>
+                      ) : (
+                        <Trans>Add a 2D effect</Trans>
+                      )
+                    }
+                    helpPagePath={
+                      props.target === 'object'
+                        ? '/objects/effects'
+                        : '/interface/scene-editor/layer-effects'
+                    }
+                    onAction={() =>
+                      addEffect(props.layerRenderingType === '3d')
+                    }
+                    secondaryActionIcon={<PasteIcon />}
+                    secondaryActionLabel={
+                      isClipboardContainingEffects ? <Trans>Paste</Trans> : null
+                    }
+                    onSecondaryAction={() => {
+                      pasteEffectsAtTheEnd();
+                    }}
+                  />
+                )
               ) : (
                 <EmptyPlaceholder
-                  title={<Trans>Add your first effect</Trans>}
+                  title={
+                    effectInterfaceMode === 'lighting' ? (
+                      <Trans>Add your first lighting effect</Trans>
+                    ) : effectInterfaceMode === 'shaders' ? (
+                      <Trans>Add your first shader</Trans>
+                    ) : (
+                      <Trans>Add your first effect</Trans>
+                    )
+                  }
                   description={
-                    <Trans>Effects create visual changes to the object.</Trans>
+                    effectInterfaceMode === 'lighting' ? (
+                      <Trans>
+                        Lighting controls 3D lights and fog in this layer.
+                      </Trans>
+                    ) : effectInterfaceMode === 'shaders' ? (
+                      <Trans>
+                        Shaders create advanced post-processing visuals.
+                      </Trans>
+                    ) : (
+                      <Trans>
+                        Effects create visual changes to the object.
+                      </Trans>
+                    )
                   }
                   actionLabel={
-                    props.layerRenderingType === '3d' ? (
-                      <Trans>Add a 3D effect</Trans>
+                    effectInterfaceMode === 'lighting' ? (
+                      <Trans>Add a lighting effect</Trans>
+                    ) : effectInterfaceMode === 'shaders' ? (
+                      <Trans>Add a shader</Trans>
                     ) : (
-                      <Trans>Add a 2D effect</Trans>
+                      <Trans>Add an effect</Trans>
                     )
                   }
                   helpPagePath={
@@ -1152,7 +1491,7 @@ export default function EffectsList(props: Props): React.Node {
                       ? '/objects/effects'
                       : '/interface/scene-editor/layer-effects'
                   }
-                  onAction={() => addEffect(props.layerRenderingType === '3d')}
+                  onAction={addCurrentInterfaceEffect}
                   secondaryActionIcon={<PasteIcon />}
                   secondaryActionLabel={
                     isClipboardContainingEffects ? <Trans>Paste</Trans> : null

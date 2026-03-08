@@ -31,7 +31,7 @@ const ChangelogRenderer = ({
   currentReleaseName,
 }: Props): React.Node => {
   const openReleaseNote = () =>
-    Window.openExternalURL('https://github.com/4ian/GDevelop/releases');
+    Window.openExternalURL('https://github.com/Carrotstudio0');
 
   if (error) {
     return (
@@ -48,8 +48,8 @@ const ChangelogRenderer = ({
         <Line>
           <EmptyMessage>
             <Trans>
-              Unable to load the information about the latest GDevelop releases.
-              Verify your internet connection or retry later.
+              Unable to load the information about the latest Carrots Engine
+              releases. Verify your internet connection or retry later.
             </Trans>
           </EmptyMessage>
         </Line>
@@ -75,9 +75,9 @@ const ChangelogRenderer = ({
     <Column noMargin>
       {currentVersionHasBreakingChange && (
         <AlertMessage kind="warning">
-          This version of GDevelop has a breaking change. Please make sure to
-          read the changes below to understand if any change or adaptation must
-          be made to your project.
+          This version of Carrots Engine has a breaking change. Please make sure
+          to read the changes below to understand if any change or adaptation
+          must be made to your project.
         </AlertMessage>
       )}
       {releases.map(release =>

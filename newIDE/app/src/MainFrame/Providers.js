@@ -79,7 +79,7 @@ const Providers = ({
                 <GDI18nProvider language={values.language.replace('_', '-')}>
                   <FullThemeProvider>
                     <ErrorBoundary
-                      componentTitle={<Trans>GDevelop app</Trans>}
+                      componentTitle={<Trans>Carrots Engine app</Trans>}
                       scope="app"
                     >
                       <InAppTutorialProvider>

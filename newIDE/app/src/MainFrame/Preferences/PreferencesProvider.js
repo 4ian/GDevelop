@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 import PreferencesContext, {
+  defaultEventsSheetActionsColor,
+  defaultEventsSheetConditionsColor,
   initialPreferences,
   type Preferences,
   type AlertMessageIdentifier,
@@ -63,8 +65,12 @@ export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
     }
 
     // Migrate renamed themes.
-    if (values.themeName === 'GDevelop default') {
-      values.themeName = 'GDevelop default Light';
+    if (
+      values.themeName === 'GDevelop default' ||
+      values.themeName === 'GDevelop default Light' ||
+      values.themeName === 'GDevelop default Dark'
+    ) {
+      values.themeName = 'Carrots Dark';
     } else if (values.themeName === 'Dark') {
       values.themeName = 'Blue Dark';
     }
@@ -97,6 +103,8 @@ export const getInitialPreferences = (): {
   editorStateByProject: {},
   eventsSheetCancelInlineParameter: string,
   eventsSheetIndentScale: number,
+  eventsSheetActionsCustomColor: string,
+  eventsSheetConditionsCustomColor: string,
   eventsSheetShowObjectThumbnails: boolean,
   eventsSheetUseAssignmentOperators: boolean,
   eventsSheetZoomLevel: number,
@@ -215,6 +223,14 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     ): any),
     // $FlowFixMe[method-unbinding]
     setEventsSheetZoomLevel: (this._setEventsSheetZoomLevel.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setEventsSheetConditionsCustomColor: (this._setEventsSheetConditionsCustomColor.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setEventsSheetActionsCustomColor: (this._setEventsSheetActionsCustomColor.bind(
+      this
+    ): any),
     // $FlowFixMe[method-unbinding]
     setShowEffectParameterNames: (this._setShowEffectParameterNames.bind(
       this
@@ -548,6 +564,35 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           eventsSheetZoomLevel,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setEventsSheetConditionsCustomColor(
+    eventsSheetConditionsCustomColor: string
+  ) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          eventsSheetConditionsCustomColor:
+            eventsSheetConditionsCustomColor ||
+            defaultEventsSheetConditionsColor,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setEventsSheetActionsCustomColor(eventsSheetActionsCustomColor: string) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          eventsSheetActionsCustomColor:
+            eventsSheetActionsCustomColor || defaultEventsSheetActionsColor,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

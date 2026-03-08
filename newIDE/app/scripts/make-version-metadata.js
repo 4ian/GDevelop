@@ -7,18 +7,20 @@
  * is changed.
  */
 const fs = require('fs');
-var shell = require('shelljs');
+const { execSync } = require('child_process');
 
 const electronAppPackageJson = require('../../electron-app/app/package.json');
 const version = electronAppPackageJson.version;
 const outputFile = '../src/Version/VersionMetadata.js';
-const gitHashShellString = shell.exec(`git rev-parse "HEAD"`, {
-  silent: true,
-});
 
-let gitHash = gitHashShellString.stdout.trim();
-if (gitHashShellString.stderr || gitHashShellString.code) {
-  shell.echo(`⚠️ Can't find the hash or branch of the associated commit.`);
+let gitHash = '';
+try {
+  gitHash = execSync('git rev-parse HEAD', {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'ignore'],
+  }).trim();
+} catch (error) {
+  console.warn("Warning: Can't find the hash or branch of the associated commit.");
   gitHash = 'unknown-hash';
 }
 
@@ -45,6 +47,6 @@ writeFile({
   gitHash,
   versionWithHash: [version, gitHash].join('-'),
 }).then(
-  () => console.info('✅ src/Version/VersionMetadata.js properly generated.'),
-  err => console.error('❌ Error while src/Version/VersionMetadata.js', err)
+  () => console.info('src/Version/VersionMetadata.js properly generated.'),
+  err => console.error('Error while generating src/Version/VersionMetadata.js', err)
 );

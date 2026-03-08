@@ -4,8 +4,138 @@
  */
 
 .gd-events-sheet .events-tree {
-  font-family: var(--gdevelop-classic-font-family) !important;
+  font-family: var(--gdevelop-modern-font-family),
+    var(--gdevelop-classic-font-family), sans-serif !important;
   background: var(--event-sheet-event-tree-background-color);
+  line-height: 1.38;
+}
+
+.gd-events-sheet .events-inspector-panel {
+  width: 320px;
+  min-width: 260px;
+  border-left: 1px solid var(--event-sheet-rst-line-background-color);
+  background: linear-gradient(
+      180deg,
+      color-mix(
+          in srgb,
+          var(--event-sheet-rst-line-background-color) 20%,
+          transparent
+        )
+        0%,
+      transparent 24%
+    ),
+    var(--event-sheet-event-tree-background-color);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+}
+
+.gd-events-sheet .events-inspector-section {
+  border: 1px solid
+    color-mix(in srgb, var(--event-sheet-rst-line-background-color) 65%, transparent);
+  border-radius: 10px;
+  background: color-mix(
+    in srgb,
+    var(--event-sheet-rst-row-contents-background-color) 82%,
+    transparent
+  );
+  padding: 10px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.gd-events-sheet .events-inspector-section + .events-inspector-section {
+  margin-top: 9px;
+}
+
+.gd-events-sheet .events-inspector-actions-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.gd-events-sheet .events-inspector-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.gd-events-sheet .events-inspector-badge {
+  border: 1px solid var(--event-sheet-rst-line-background-color);
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 0.76em;
+  line-height: 1.3;
+  background: color-mix(
+    in srgb,
+    var(--event-sheet-selectable-background-color) 56%,
+    transparent
+  );
+  opacity: 0.92;
+}
+
+.gd-events-sheet .events-inspector-warning {
+  border-left: 3px solid var(--event-sheet-instruction-parameter-warning-color);
+  background: color-mix(
+    in srgb,
+    var(--event-sheet-instruction-parameter-warning-color) 8%,
+    transparent
+  );
+}
+
+.gd-events-sheet .events-inspector-variables-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.gd-events-sheet .events-inspector-variable-item {
+  border: 1px solid
+    color-mix(in srgb, var(--event-sheet-rst-line-background-color) 74%, transparent);
+  border-radius: 8px;
+  padding: 7px;
+  background: color-mix(
+    in srgb,
+    var(--event-sheet-rst-row-contents-background-color) 70%,
+    transparent
+  );
+}
+
+.gd-events-sheet .events-inspector-variable-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.gd-events-sheet .events-inspector-overview-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.gd-events-sheet .events-inspector-overview-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+@media only screen and (max-width: 1280px) {
+  .gd-events-sheet .events-inspector-panel {
+    width: 280px;
+  }
+}
+
+@media only screen and (max-width: 1024px) {
+  .gd-events-sheet .events-inspector-panel {
+    display: none;
+  }
 }
 
 /**
@@ -54,11 +184,17 @@
 .gd-events-sheet .rst__rowContents {
   background-color: var(--event-sheet-rst-row-contents-background-color);
   color: var(--event-sheet-rst-row-contents-color);
+  border-radius: 8px;
 }
 
 /**
  * Selectable area (instructions)
  */
+.gd-events-sheet .selectable {
+  border-radius: 6px;
+  transition: background-color 110ms ease-out, border-color 110ms ease-out;
+}
+
 .gd-events-sheet .selectable:hover {
   background-color: var(--event-sheet-selectable-background-color);
 }
@@ -72,54 +208,424 @@
  * Large selectable area (events)
  */
 .gd-events-sheet .large-selectable {
+  --events-sheet-event-accent: var(
+    --event-sheet-drop-indicator-can-drop-border-top-color
+  );
+  --events-sheet-event-surface: transparent;
+  --events-sheet-event-highlight: transparent;
+  --events-sheet-event-accent-soft: color-mix(
+    in srgb,
+    var(--events-sheet-event-accent) 58%,
+    transparent
+  );
   border: var(--event-sheet-selectable-border) !important;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  background: var(
+    --events-sheet-event-card-background,
+    var(--event-sheet-rst-row-contents-background-color)
+  );
+  background: linear-gradient(
+      180deg,
+      var(--events-sheet-event-highlight) 0%,
+      transparent 42%
+    ),
+    linear-gradient(
+      90deg,
+      var(--events-sheet-event-surface) 0%,
+      transparent 74%
+    ),
+    var(
+      --events-sheet-event-card-background,
+      var(--event-sheet-rst-row-contents-background-color)
+    );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 3px 12px rgba(0, 0, 0, 0.16);
+  transition: border-color 120ms ease-out, box-shadow 140ms ease-out,
+    transform 120ms ease-out;
+}
+
+.gd-events-sheet .large-selectable::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: linear-gradient(
+    180deg,
+    var(--events-sheet-event-accent) 0%,
+    var(--events-sheet-event-accent) 72%,
+    transparent 100%
+  );
+  opacity: 0.95;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.gd-events-sheet .large-selectable::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--events-sheet-event-accent);
+  box-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--events-sheet-event-accent) 26%, transparent);
+  opacity: 0.72;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.gd-events-sheet .large-selectable:hover {
+  border-color: var(--events-sheet-event-accent-soft) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 7px 18px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
 }
 
 .gd-events-sheet .large-selectable.large-selected {
   border: var(--event-sheet-selectable-selected-border) !important;
+  box-shadow: 0 0 0 1px
+      color-mix(
+        in srgb,
+        var(--event-sheet-drop-indicator-can-drop-border-top-color) 70%,
+        transparent
+      ),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 9px 22px rgba(0, 0, 0, 0.24);
+  transform: translateY(-1px);
+}
+
+.gd-events-sheet .large-selectable.large-selected::before {
+  width: 4px;
+  opacity: 1;
+}
+
+.gd-events-sheet .large-selectable.large-selected::after {
+  opacity: 0.95;
+}
+
+.gd-events-sheet .large-selectable .conditions-container {
+  --events-sheet-user-conditions-border-color: color-mix(
+    in srgb,
+    var(--events-sheet-event-accent) 30%,
+    var(--event-sheet-conditions-border-color)
+  );
+  --events-sheet-user-conditions-accent-color: color-mix(
+    in srgb,
+    var(--events-sheet-event-accent) 72%,
+    transparent
+  );
+}
+
+.gd-events-sheet .large-selectable .actions-container,
+.gd-events-sheet .large-selectable .local-variables-container {
+  --events-sheet-user-actions-border-color: color-mix(
+    in srgb,
+    var(--events-sheet-event-accent) 26%,
+    var(--event-sheet-actions-background-color)
+  );
+  --events-sheet-user-actions-accent-color: color-mix(
+    in srgb,
+    var(--events-sheet-event-accent) 72%,
+    transparent
+  );
+}
+
+.gd-events-sheet .large-selectable.event-kind-standard {
+  --events-sheet-event-accent: var(
+    --event-sheet-instruction-parameter-object-color
+  );
+  --events-sheet-event-surface: color-mix(
+    in srgb,
+    var(--event-sheet-instruction-parameter-object-color) 10%,
+    transparent
+  );
+  --events-sheet-event-highlight: color-mix(
+    in srgb,
+    var(--event-sheet-instruction-parameter-object-color) 18%,
+    transparent
+  );
+}
+
+.gd-events-sheet .large-selectable.event-kind-loop {
+  --events-sheet-event-accent: var(--event-sheet-instruction-parameter-var-color);
+  --events-sheet-event-surface: color-mix(
+    in srgb,
+    var(--event-sheet-instruction-parameter-var-color) 10%,
+    transparent
+  );
+  --events-sheet-event-highlight: color-mix(
+    in srgb,
+    var(--event-sheet-instruction-parameter-var-color) 16%,
+    transparent
+  );
+}
+
+.gd-events-sheet .large-selectable.event-kind-else {
+  --events-sheet-event-accent: var(
+    --event-sheet-instruction-parameter-warning-color
+  );
+  --events-sheet-event-surface: color-mix(
+    in srgb,
+    var(--event-sheet-instruction-parameter-warning-color) 10%,
+    transparent
+  );
+  --events-sheet-event-highlight: color-mix(
+    in srgb,
+    var(--event-sheet-instruction-parameter-warning-color) 20%,
+    transparent
+  );
+}
+
+.gd-events-sheet .large-selectable.event-kind-group {
+  --events-sheet-event-accent: var(
+    --event-sheet-instruction-parameter-behavior-color
+  );
+  --events-sheet-event-surface: color-mix(
+    in srgb,
+    var(--event-sheet-instruction-parameter-behavior-color) 10%,
+    transparent
+  );
+  --events-sheet-event-highlight: color-mix(
+    in srgb,
+    var(--event-sheet-instruction-parameter-behavior-color) 16%,
+    transparent
+  );
+}
+
+.gd-events-sheet .large-selectable.event-kind-comment {
+  --events-sheet-event-accent: var(
+    --event-sheet-instruction-parameter-operator-color
+  );
+  --events-sheet-event-surface: color-mix(
+    in srgb,
+    var(--event-sheet-instruction-parameter-operator-color) 9%,
+    transparent
+  );
+  --events-sheet-event-highlight: color-mix(
+    in srgb,
+    var(--event-sheet-instruction-parameter-operator-color) 14%,
+    transparent
+  );
+}
+
+.gd-events-sheet .large-selectable.event-kind-jscode {
+  --events-sheet-event-accent: var(
+    --event-sheet-instruction-parameter-number-color
+  );
+  --events-sheet-event-surface: color-mix(
+    in srgb,
+    var(--event-sheet-instruction-parameter-number-color) 9%,
+    transparent
+  );
+  --events-sheet-event-highlight: color-mix(
+    in srgb,
+    var(--event-sheet-instruction-parameter-number-color) 16%,
+    transparent
+  );
+}
+
+.gd-events-sheet .large-selectable.event-kind-link {
+  --events-sheet-event-accent: var(--event-sheet-link-selectable-link-color);
+  --events-sheet-event-surface: color-mix(
+    in srgb,
+    var(--event-sheet-link-selectable-link-color) 11%,
+    transparent
+  );
+  --events-sheet-event-highlight: color-mix(
+    in srgb,
+    var(--event-sheet-link-selectable-link-color) 18%,
+    transparent
+  );
+}
+
+.gd-events-sheet .large-selectable.event-kind-unknown {
+  --events-sheet-event-accent: var(
+    --event-sheet-instruction-parameter-error-color
+  );
+  --events-sheet-event-surface: color-mix(
+    in srgb,
+    var(--event-sheet-instruction-parameter-error-color) 12%,
+    transparent
+  );
+  --events-sheet-event-highlight: color-mix(
+    in srgb,
+    var(--event-sheet-instruction-parameter-error-color) 20%,
+    transparent
+  );
 }
 
 /**
  * Conditions and actions containers
  */
 .gd-events-sheet .conditions-container {
-  background: var(--event-sheet-conditions-background-color);
-  border: var(--event-sheet-conditions-border);
-  color: var(--event-sheet-conditions-color);
-  border-right-color: var(--event-sheet-conditions-border-right-color);
-  padding-left: 5px;
-  padding-right: 5px;
+  background: var(
+    --events-sheet-user-conditions-background-color,
+    var(--event-sheet-conditions-background-color)
+  );
+  border: 1px solid
+    var(
+      --events-sheet-user-conditions-border-color,
+      var(--event-sheet-conditions-border-color)
+    );
+  color: var(
+    --events-sheet-user-conditions-text-color,
+    var(--event-sheet-conditions-color)
+  );
+  border-right-color: var(
+    --events-sheet-user-conditions-border-color,
+    var(--event-sheet-conditions-border-right-color)
+  );
+  border-radius: 10px 0 0 10px;
+  box-shadow: inset -1px 0 0
+    var(
+      --events-sheet-user-conditions-accent-color,
+      var(--events-sheet-event-accent, transparent)
+    );
+  padding-left: 6px;
+  padding-right: 6px;
+  padding-top: 2px;
+  padding-bottom: 2px;
   /* Prevent container to growing outside its parent - and still don't have a ridiculously small size */
   min-width: 100px;
+  transition: background-color 120ms ease-out, border-color 120ms ease-out,
+    color 120ms ease-out;
 }
 
 .gd-events-sheet .conditions-container.small-width-container {
-  border-right-color: var(--event-sheet-conditions-border-color);
-  border-bottom-color: var(--event-sheet-conditions-border-color);
+  border-radius: 10px 10px 0 0;
+  border-right-color: var(
+    --events-sheet-user-conditions-border-color,
+    var(--event-sheet-conditions-border-color)
+  );
+  border-bottom-color: var(
+    --events-sheet-user-conditions-border-color,
+    var(--event-sheet-conditions-border-color)
+  );
+  box-shadow: inset 0 -1px 0
+    var(
+      --events-sheet-user-conditions-accent-color,
+      var(--events-sheet-event-accent, transparent)
+    );
 }
 
 .gd-events-sheet .local-variables-container {
-  background: var(--event-sheet-actions-background-color);
-  color: var(--event-sheet-actions-color);
-  padding-left: 4px;
-  padding-right: 4px;
+  background: var(
+    --events-sheet-user-actions-background-color,
+    var(--event-sheet-actions-background-color)
+  );
+  color: var(
+    --events-sheet-user-actions-text-color,
+    var(--event-sheet-actions-color)
+  );
+  border: 1px solid
+    var(
+      --events-sheet-user-actions-border-color,
+      var(--event-sheet-actions-background-color)
+    );
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 2px;
+  padding-bottom: 2px;
   /* Prevent container to growing outside its parent. We don't have a way to prevent an infinitely
      * small variables column, but responsive design should avoid the problem on small screens. */
   min-width: 0;
+  transition: background-color 120ms ease-out, border-color 120ms ease-out,
+    color 120ms ease-out;
 }
 
 .gd-events-sheet .actions-container {
-  background: var(--event-sheet-actions-background-color);
-  color: var(--event-sheet-actions-color);
-  padding-left: 5px;
-  padding-right: 5px;
+  background: var(
+    --events-sheet-user-actions-background-color,
+    var(--event-sheet-actions-background-color)
+  );
+  color: var(
+    --events-sheet-user-actions-text-color,
+    var(--event-sheet-actions-color)
+  );
+  border: 1px solid
+    var(
+      --events-sheet-user-actions-border-color,
+      var(--event-sheet-actions-background-color)
+    );
+  border-left: none;
+  border-radius: 0 10px 10px 0;
+  box-shadow: inset 1px 0 0
+    var(
+      --events-sheet-user-actions-accent-color,
+      var(--events-sheet-event-accent, transparent)
+    );
+  padding-left: 6px;
+  padding-right: 6px;
+  padding-top: 2px;
+  padding-bottom: 2px;
   /* Prevent container to growing outside its parent. We don't have a way to prevent an infinitely
      * small action column, but responsive design should avoid the problem on small screens. */
   min-width: 0;
+  transition: background-color 120ms ease-out, border-color 120ms ease-out,
+    color 120ms ease-out;
 }
 
 .gd-events-sheet .actions-container.small-width-container {
-  padding-left: 20px;
+  padding-left: 18px;
+  border-left: 1px solid
+    var(
+      --events-sheet-user-actions-border-color,
+      var(--event-sheet-actions-background-color)
+    );
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  box-shadow: inset 0 1px 0
+    var(
+      --events-sheet-user-actions-accent-color,
+      var(--events-sheet-event-accent, transparent)
+    );
+}
+
+.gd-events-sheet .conditions-container .selectable:hover,
+.gd-events-sheet .conditions-container .selectable.selected {
+  background-color: var(
+    --events-sheet-user-conditions-hover-overlay-color,
+    var(--event-sheet-selectable-background-color)
+  );
+}
+
+.gd-events-sheet .actions-container .selectable:hover,
+.gd-events-sheet .actions-container .selectable.selected,
+.gd-events-sheet .local-variables-container .selectable:hover,
+.gd-events-sheet .local-variables-container .selectable.selected {
+  background-color: var(
+    --events-sheet-user-actions-hover-overlay-color,
+    var(--event-sheet-selectable-background-color)
+  );
+}
+
+.gd-events-sheet .conditions-container .selectable.selected {
+  border-color: var(
+    --events-sheet-user-conditions-accent-color,
+    var(--events-sheet-event-accent, currentColor)
+  ) !important;
+}
+
+.gd-events-sheet .actions-container .selectable.selected,
+.gd-events-sheet .local-variables-container .selectable.selected {
+  border-color: var(
+    --events-sheet-user-actions-accent-color,
+    var(--events-sheet-event-accent, currentColor)
+  ) !important;
+}
+
+.gd-events-sheet .conditions-container .add-link,
+.gd-events-sheet .actions-container .add-link,
+.gd-events-sheet .local-variables-container .add-link {
+  font-weight: 600;
+  text-underline-offset: 2px;
 }
 
 .gd-events-sheet .sub-instructions-container {
@@ -230,24 +736,39 @@
   min-width: var(--instruction-missing-parameter-min-width);
   min-height: var(--instruction-missing-parameter-min-height);
 }
-
 .gd-events-sheet .else-text-container {
-  padding-left: 5px;
+  padding: 5px 8px 4px 9px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--events-sheet-event-accent) 20%, transparent);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--events-sheet-event-accent) 11%, transparent) 0%,
+    transparent 66%
+  );
 }
-
 .gd-events-sheet .invalid-else {
   padding-left: 1px;
   color: var(--event-sheet-instruction-parameter-warning-color);
   opacity: 0.5;
   text-decoration: line-through;
 }
-
 .gd-events-sheet .event-label {
-  margin-left: 5px;
+  margin-left: 0;
+  padding: 5px 8px 4px 9px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--events-sheet-event-accent) 20%, transparent);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--events-sheet-event-accent) 11%, transparent) 0%,
+    transparent 68%
+  );
   white-space: normal;
   word-wrap: break-word;
 }
-
 /**
  * Search results highlight
  */
@@ -278,11 +799,9 @@
   outline: none;
   background-color: var(--event-sheet-events-highlighted-background-color);
 }
-
 .gd-events-sheet .with-search-results .rst__rowSearchFocus .move-handle {
   width: 15px;
 }
-
 /**
 * Drag'n'drop indicator (events - instructions)
 */
@@ -295,7 +814,6 @@
   width: 100%;
   box-sizing: border-box;
 }
-
 .gd-events-sheet .cant-drop-indicator {
   border-top: 2px solid
     var(--event-sheet-drop-indicator-can-drop-border-top-color);
@@ -305,7 +823,6 @@
   width: 100%;
   box-sizing: border-box;
 }
-
 /**
 * Skinning the "Link" event
 */
@@ -320,23 +837,23 @@
   text-decoration: var(--event-sheet-instruction-parameter-error-color)
     underline wavy;
 }
-
 .gd-events-sheet .link-container .selectable {
   color: var(--event-sheet-link-selectable-link-color);
   font-weight: bold;
   /* It avoids the warning underlying to get cut. */
   line-height: 1.6em;
 }
-
 /* Theming icons */
 .gd-events-sheet .icon {
-  padding-right: 2px;
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  margin-right: 4px;
+  padding-right: 0;
+  object-fit: contain;
+  vertical-align: middle;
 }
-
 .gd-events-sheet .link-container .icon {
-  padding-right: 3px;
-  width: 24px;
-  height: 24px;
+  margin-right: 6px;
 }

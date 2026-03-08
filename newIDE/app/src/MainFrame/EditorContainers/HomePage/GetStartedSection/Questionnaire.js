@@ -34,7 +34,7 @@ export type Questionnaire = {|
 
 const questionnaire: Questionnaire = {
   [firstQuestion]: {
-    text: t`What is your goal with GDevelop?`,
+    text: t`What is your goal with Carrots Engine?`,
     answers: [
       {
         text: t`I'm learning or teaching game development`,
@@ -90,7 +90,7 @@ const questionnaire: Questionnaire = {
     ],
   },
   learningKindOfProjects: {
-    text: t`What kind of projects do you want to build with GDevelop?`,
+    text: t`What kind of projects do you want to build with Carrots Engine?`,
     answers: [
       {
         text: t`A game to publish`,
@@ -119,7 +119,7 @@ const questionnaire: Questionnaire = {
     ],
   },
   buildingKindOfProjects: {
-    text: t`What kind of projects do you want to build with GDevelop?`,
+    text: t`What kind of projects do you want to build with Carrots Engine?`,
     nextQuestion: 'projectDescription',
     multi: true,
     answers: [

@@ -386,7 +386,7 @@ onMessageFromParentEditor('open-external-editor-input', externalEditorInput => {
     externalEditorInput.singleFrame
   );
 
-  setTitle('GDevelop Image Editor (Piskel) - ' + externalEditorInput.name);
+  setTitle('Carrots Image Editor (Piskel) - ' + externalEditorInput.name);
 
   // If there were no resources sent by GD, create an empty piskel document
   if (externalEditorInput.resources.length === 0) {

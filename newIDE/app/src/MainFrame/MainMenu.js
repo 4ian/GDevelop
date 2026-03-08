@@ -118,6 +118,7 @@ export const buildMainMenuDeclarativeTemplate = ({
   isApplicationTopLevelMenu,
   hideAskAi,
 }: BuildMainMenuProps): Array<MenuDeclarativeItemTemplate> => {
+  void hideAskAi;
   const fileTemplate: MenuDeclarativeItemTemplate = {
     label: i18n._(t`File`),
     submenu: [
@@ -263,89 +264,20 @@ export const buildMainMenuDeclarativeTemplate = ({
     label: i18n._(t`Help`),
     role: 'help',
     submenu: [
-      ...(hideAskAi
-        ? []
-        : [
-            {
-              label: i18n._(t`Ask AI (AI agent and chatbot)`),
-              onClickSendEvent: 'main-menu-open-ask-ai',
-            },
-          ]),
       {
-        label: i18n._(t`GDevelop website`),
-        onClickOpenLink: 'http://gdevelop.io',
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`GDevelop games on gd.games`),
-        onClickOpenLink: 'https://gd.games',
+        label: i18n._(t`Carrots Team Website`),
+        onClickOpenLink: 'https://carrots.odoo.com/',
       },
       {
-        label: i18n._(t`Community Forums`),
-        onClickOpenLink: 'https://forum.gdevelop.io',
-      },
-      {
-        label: i18n._(t`Community Discord Chat`),
-        onClickOpenLink: 'https://discord.gg/gdevelop',
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`YouTube channel (tutorials and more)`),
-        onClickOpenLink: 'https://www.youtube.com/c/gdevelopapp',
-      },
-      {
-        label: i18n._(t`TikTok`),
-        onClickOpenLink: 'https://tiktok.com/@gdevelop',
-      },
-      {
-        label: i18n._(t`Twitter`),
-        onClickOpenLink: 'https://twitter.com/gdevelopapp',
-      },
-      {
-        label: i18n._(t`Instagram`),
-        onClickOpenLink: 'https://www.instagram.com/gdevelopapp',
-      },
-      {
-        label: i18n._(t`Facebook`),
-        onClickOpenLink: 'https://facebook.com/gdevelopapp',
-      },
-      {
-        label: i18n._(t`Reddit`),
-        onClickOpenLink: 'https://www.reddit.com/r/gdevelop',
-      },
-      {
-        label: i18n._(t`GitHub repository`),
-        onClickOpenLink: 'https://github.com/4ian/GDevelop',
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Buy GDevelop goodies and swag`),
-        onClickOpenLink: 'https://goodies.gdevelop.io',
-      },
-      {
-        label: i18n._(t`Contribute to GDevelop`),
-        onClickOpenLink: 'https://gdevelop.io/page/contribute',
-      },
-      {
-        label: i18n._(t`Create Extensions for GDevelop`),
-        onClickOpenLink:
-          'https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md',
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Help translate GDevelop`),
-        onClickOpenLink: 'https://crowdin.com/project/gdevelop',
-      },
-      {
-        label: i18n._(t`Report a wrong translation`),
-        onClickOpenLink: 'https://github.com/4ian/GDevelop/issues/969',
+        label: i18n._(t`Carrots GitHub`),
+        onClickOpenLink: 'https://github.com/Carrotstudio0',
       },
       ...(isMacLike() && isDesktop
         ? []
         : [
             { type: 'separator' },
             {
-              label: i18n._(t`About GDevelop`),
+              label: i18n._(t`About Carrots Engine`),
               onClickSendEvent: 'main-menu-open-about',
             },
           ]),
@@ -365,10 +297,10 @@ export const buildMainMenuDeclarativeTemplate = ({
   // macOS has a menu with the name of the app.
   if (isMacLike() && isApplicationTopLevelMenu) {
     template.unshift({
-      label: i18n._(t`GDevelop 5`),
+      label: i18n._(t`Carrots Engine`),
       submenu: [
         {
-          label: i18n._(t`About GDevelop`),
+          label: i18n._(t`About Carrots Engine`),
           onClickSendEvent: 'main-menu-open-about',
         },
         { type: 'separator' },

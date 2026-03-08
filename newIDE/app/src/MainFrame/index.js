@@ -97,6 +97,7 @@ import PreferencesContext, {
   type InAppTutorialUserProgress,
 } from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
+import { ensureBundledEventsFunctionsExtensions } from '../EventsFunctionsExtensionsLoader/BundledExtensions';
 import {
   type ShareDialogWithoutExportsProps,
   type ShareTab,
@@ -1140,6 +1141,15 @@ const MainFrame = (props: Props): React.MixedElement => {
         currentFileMetadata: updatedFileMetadata,
       }));
 
+      const hasBundledExtensionsUpdate = ensureBundledEventsFunctionsExtensions(
+        project
+      );
+      if (hasBundledExtensionsUpdate) {
+        console.info(
+          'Bundled events extensions were installed or updated in the project.'
+        );
+      }
+
       // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
       // their editor will take care of reloading them.
       eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
@@ -1274,11 +1284,11 @@ const MainFrame = (props: Props): React.MixedElement => {
         await delay(200); // Ensure confirmation is shown on top of the loader.
         const answer = await showConfirmation({
           title: t`This project has an auto-saved version`,
-          message: t`GDevelop automatically saved a newer version of this project on ${new Date(
+          message: t`Carrots Engine automatically saved a newer version of this project on ${new Date(
             autoSaveCreationDate
           ).toLocaleString()}. This new version might differ from the one that you manually saved. Which version would you like to open?`,
           dismissButtonLabel: t`My manual save`,
-          confirmButtonLabel: t`GDevelop auto-save`,
+          confirmButtonLabel: t`Carrots auto-save`,
         });
 
         if (!answer) return fileMetadata;
@@ -1303,7 +1313,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         await delay(200); // Ensure confirmation is shown on top of the loader.
         const answer = await showConfirmation({
           title: t`This project cannot be opened`,
-          message: t`The project file appears to be corrupted, but an autosave file exists (backup made automatically by GDevelop on ${new Date(
+          message: t`The project file appears to be corrupted, but an autosave file exists (backup made automatically by Carrots Engine on ${new Date(
             autoSaveCreationDate
           ).toLocaleString()}). Would you like to try to load it instead?`,
           confirmButtonLabel: t`Load autosave`,
@@ -4797,6 +4807,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     renderNewProjectDialog,
     fetchAndOpenNewProjectSetupDialogForExample,
     openNewProjectDialog,
+    openNewProjectDialogForEmpty,
   } = useNewProjectDialog({
     project: state.currentProject,
     fileMetadata: currentFileMetadata,
@@ -4930,6 +4941,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     openOpenFromStorageProviderDialog: openOpenFromStorageProviderDialog,
     openFromFileMetadataWithStorageProvider: openFromFileMetadataWithStorageProvider,
     openNewProjectDialog: openNewProjectDialog,
+    openNewProjectDialogForEmpty: openNewProjectDialogForEmpty,
     openProjectManager: openProjectManager,
     askToCloseProject: askToCloseProject,
     closeProject: closeProject,

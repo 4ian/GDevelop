@@ -56,7 +56,7 @@ const buildElectronMenuFromDeclarativeTemplate = (window, mainMenuTemplate) => {
  */
 const buildPlaceholderMainMenu = () => {
   const placeholderMenuItem = {
-    label: 'GDevelop is loading...',
+    label: 'Carrots Engine is loading...',
     enabled: false,
   };
 
@@ -95,7 +95,7 @@ const buildPlaceholderMainMenu = () => {
 
   if (process.platform === 'darwin') {
     template.unshift({
-      label: 'GDevelop 5',
+      label: 'Carrots Engine',
       submenu: [placeholderMenuItem],
     });
 

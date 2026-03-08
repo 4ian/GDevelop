@@ -377,8 +377,10 @@ namespace gdjs {
             this.shaderPass.uniforms.density.value = this._density;
             this.shaderPass.uniforms.lightScatter.value = this._lightScatter;
             this.shaderPass.uniforms.maxDistance.value = this._maxDistance;
-            this.shaderPass.uniforms.stepCount.value =
-              sharedCapture.quality.fogSteps;
+            const quality = gdjs.getScene3DPostProcessingQualityProfileForMode(
+              this._qualityMode
+            );
+            this.shaderPass.uniforms.stepCount.value = quality.fogSteps;
 
             this._updateLightsUniforms(threeScene, threeCamera);
           }

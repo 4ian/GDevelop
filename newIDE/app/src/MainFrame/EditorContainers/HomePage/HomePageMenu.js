@@ -6,21 +6,12 @@ import Drawer from '@material-ui/core/Drawer';
 import IconButton from '../../../UI/IconButton';
 import VerticalTabButton from '../../../UI/VerticalTabButton';
 import DoubleChevronArrowLeft from '../../../UI/CustomSvgIcons/DoubleChevronArrowLeft';
-import HammerIcon from '../../../UI/CustomSvgIcons/Hammer';
-import SchoolIcon from '../../../UI/CustomSvgIcons/School';
-import ControllerIcon from '../../../UI/CustomSvgIcons/Controller';
-import BookLeafIcon from '../../../UI/CustomSvgIcons/BookLeaf';
-import StoreIcon from '../../../UI/CustomSvgIcons/Store';
-import Preferences from '../../../UI/CustomSvgIcons/Preferences';
-import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
-import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
+import DashboardIcon from '@material-ui/icons/Dashboard';
+import ViewQuiltIcon from '@material-ui/icons/ViewQuilt';
+import TuneIcon from '@material-ui/icons/Tune';
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import HomePageMenuBar from './HomePageMenuBar';
-import {
-  shouldHideClassroomTab,
-  type Limits,
-} from '../../../Utils/GDevelopServices/Usage';
-import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
-import { isNativeMobileApp } from '../../../Utils/Platform';
+import { type Limits } from '../../../Utils/GDevelopServices/Usage';
 
 export const styles = {
   // Ensure it's always interactive, even when another iframe disable pointer events.
@@ -32,6 +23,9 @@ export const styles = {
     overflowX: 'hidden',
     display: 'flex',
     flexDirection: 'column',
+    borderTopRightRadius: 16,
+    borderBottomRightRadius: 16,
+    boxShadow: '0 18px 34px rgba(0, 0, 0, 0.3)',
   },
   drawerTopButtonsContainer: {
     flex: 1,
@@ -42,7 +36,7 @@ export const styles = {
   },
 };
 
-export type HomeTab = 'create' | 'learn' | 'play' | 'shop' | 'team-view';
+export type HomeTab = 'create';
 
 export type GetIconFunction = ({
   color: string,
@@ -62,39 +56,7 @@ const homePageMenuTabs: { [tab: HomeTab]: HomePageMenuTab } = {
     tab: 'create',
     id: 'home-create-tab',
     getIcon: ({ color, fontSize }) => (
-      <HammerIcon fontSize={fontSize} color={color} />
-    ),
-  },
-  shop: {
-    label: <Trans>Shop</Trans>,
-    tab: 'shop',
-    id: 'home-shop-tab',
-    getIcon: ({ color, fontSize }) => (
-      <StoreIcon fontSize={fontSize} color={color} />
-    ),
-  },
-  learn: {
-    label: <Trans>Learn</Trans>,
-    tab: 'learn',
-    id: 'home-learn-tab',
-    getIcon: ({ color, fontSize }) => (
-      <SchoolIcon fontSize={fontSize} color={color} />
-    ),
-  },
-  play: {
-    label: <Trans>Play</Trans>,
-    tab: 'play',
-    id: 'home-play-tab',
-    getIcon: ({ color, fontSize }) => (
-      <ControllerIcon fontSize={fontSize} color={color} />
-    ),
-  },
-  'team-view': {
-    label: <Trans>Teach</Trans>,
-    tab: 'team-view',
-    id: 'team-view-tab',
-    getIcon: ({ color, fontSize }) => (
-      <BookLeafIcon fontSize={fontSize} color={color} />
+      <DashboardIcon fontSize={fontSize} style={{ color }} />
     ),
   },
 };
@@ -104,34 +66,14 @@ export const getTabsToDisplay = ({
 }: {|
   limits: ?Limits,
 |}): HomePageMenuTab[] => {
-  const displayPlayTab =
-    !limits ||
-    !(
-      limits.capabilities.classrooms &&
-      limits.capabilities.classrooms.hidePlayTab
-    );
-  const displayShopTab =
-    !limits ||
-    !(
-      limits.capabilities.classrooms &&
-      limits.capabilities.classrooms.hidePremiumProducts
-    );
-  const displayTeachTab =
-    !shouldHideClassroomTab(limits) && !isNativeMobileApp();
-  // $FlowFixMe[incompatible-type]
-  const tabs: HomeTab[] = [
-    'learn',
-    'create',
-    displayPlayTab ? 'play' : null,
-    displayShopTab ? 'shop' : null,
-    displayTeachTab ? 'team-view' : null,
-  ].filter(Boolean);
-  return tabs.map(tab => homePageMenuTabs[tab]);
+  void limits;
+  return [homePageMenuTabs.create];
 };
 
 type Props = {|
   setActiveTab: HomeTab => void,
   activeTab: HomeTab,
+  onOpenTemplates: () => void,
   onOpenPreferences: () => void,
   onOpenAbout: () => void,
 |};
@@ -139,17 +81,16 @@ type Props = {|
 export const HomePageMenu = ({
   setActiveTab,
   activeTab,
+  onOpenTemplates,
   onOpenPreferences,
   onOpenAbout,
 }: Props): React.MixedElement => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const { limits } = React.useContext(AuthenticatedUserContext);
   const [
     isHomePageMenuDrawerOpen,
     setIsHomePageMenuDrawerOpen,
   ] = React.useState(false);
 
-  const tabsToDisplay = getTabsToDisplay({ limits });
+  const tabsToDisplay = getTabsToDisplay({ limits: null });
 
   const buttons: {
     label: React.Node,
@@ -158,19 +99,27 @@ export const HomePageMenu = ({
     onClick: () => void,
   }[] = [
     {
+      label: <Trans>Templates</Trans>,
+      id: 'home-menu-templates',
+      onClick: onOpenTemplates,
+      getIcon: ({ color, fontSize }) => (
+        <ViewQuiltIcon fontSize={fontSize} style={{ color }} />
+      ),
+    },
+    {
       label: <Trans>Preferences</Trans>,
       id: 'settings',
       onClick: onOpenPreferences,
       getIcon: ({ color, fontSize }) => (
-        <Preferences fontSize={fontSize} color={color} />
+        <TuneIcon fontSize={fontSize} style={{ color }} />
       ),
     },
     {
-      label: <Trans>About GDevelop</Trans>,
-      id: 'about-gdevelop',
+      label: <Trans>About Carrots Engine</Trans>,
+      id: 'about-carrots',
       onClick: onOpenAbout,
       getIcon: ({ color, fontSize }) => (
-        <GDevelopGLogo fontSize={fontSize} color={color} />
+        <InfoOutlinedIcon fontSize={fontSize} style={{ color }} />
       ),
     },
   ];
@@ -182,6 +131,7 @@ export const HomePageMenu = ({
         onOpenAbout={onOpenAbout}
         onOpenHomePageMenuDrawer={() => setIsHomePageMenuDrawerOpen(true)}
         onOpenPreferences={onOpenPreferences}
+        onOpenTemplates={onOpenTemplates}
         setActiveTab={setActiveTab}
       />
       <Drawer
@@ -189,7 +139,9 @@ export const HomePageMenu = ({
         PaperProps={{
           style: {
             ...styles.drawerContent,
-            backgroundColor: gdevelopTheme.home.header.backgroundColor,
+            background:
+              'linear-gradient(180deg, rgba(238, 238, 238, 0.96), #cfcfd3)',
+            borderRight: `1px solid rgba(0, 0, 0, 0.1)`,
           },
           className: 'safe-area-aware-left-container',
         }}
@@ -226,15 +178,14 @@ export const HomePageMenu = ({
                     isActive={activeTab === tab}
                   />
                 ))}
-              </Column>
-            </div>
-            <div style={styles.drawerBottomButtonsContainer}>
-              <Column noMargin>
                 {buttons.map(({ label, getIcon, onClick, id }) => (
                   <VerticalTabButton
                     key={id}
                     label={label}
-                    onClick={onClick}
+                    onClick={() => {
+                      onClick();
+                      setIsHomePageMenuDrawerOpen(false);
+                    }}
                     getIcon={getIcon}
                     isActive={false}
                   />

@@ -29,6 +29,7 @@
 
 .gd-events-sheet .events-tree {
     height: 100%;
+    --events-sheet-icon-size: 20px;
 }
 
 /**
@@ -206,10 +207,13 @@
  * Icon (variable, object icon...)
  */
 .gd-events-sheet .icon {
-    vertical-align: sub;
+    display: inline-block;
+    vertical-align: middle;
     object-fit: contain;
-    width: var(--icon-size);
-    height: var(--icon-size);
+    width: var(--events-sheet-icon-size);
+    height: var(--events-sheet-icon-size);
+    min-width: var(--events-sheet-icon-size);
+    min-height: var(--events-sheet-icon-size);
 }
 
 .gd-events-sheet .rst__nodeContent .MuiIconButton-root {

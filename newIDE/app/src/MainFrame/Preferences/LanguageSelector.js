@@ -84,7 +84,7 @@ const LanguageSelector = ({ onLanguageChanged }: Props): React.Node => {
       <LineStackLayout noMargin alignItems="center">
         <Column noMargin expand>
           <Text noMargin>
-            <Trans>Choose GDevelop language</Trans>
+            <Trans>Choose Carrots Engine language</Trans>
           </Text>
         </Column>
         <Column noMargin expand>
@@ -114,7 +114,7 @@ const LanguageSelector = ({ onLanguageChanged }: Props): React.Node => {
               Window.openExternalURL('https://crowdin.com/project/gdevelop')
             }
           >
-            help translate GDevelop into your language
+            help translate Carrots Engine into your language
           </Link>
           .
         </Trans>

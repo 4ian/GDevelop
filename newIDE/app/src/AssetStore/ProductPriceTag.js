@@ -199,7 +199,7 @@ export const OwnedLabel = (): React.Node => {
         }}
       />
       <Text noMargin size="sub-title" color="inherit">
-        <Trans>Owned</Trans>
+        <Trans>Free</Trans>
       </Text>
     </LineStackLayout>
   );

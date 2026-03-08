@@ -25,7 +25,9 @@ const styles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
-    fontSize: '15px', // Same as in Mosaic.css (for mosaic-window-title)
+    fontSize: '14px',
+    fontWeight: 600,
+    letterSpacing: '0.01em',
   },
   tabIcon: {
     marginLeft: 4,
@@ -96,7 +98,7 @@ export const ClosableTabs = ({
     flexWrap: 'nowrap', // Single line of tab...
     overflowX: 'overlay', // ...scroll horizontally if needed
     overflowY: 'hidden', // ...never scroll vertically (useful on Safari)
-    marginTop: 7, // Chosen to align with the size of controls in the titlebar.
+    marginTop: 4,
   };
 
   const onScroll = React.useCallback((event: WheelEvent) => {
@@ -247,24 +249,28 @@ export function ClosableTab({
           flexShrink: 0, // Tabs are never resized to fit in flex container
           position: 'relative',
           display: 'inline-block',
-          marginRight: 2,
+          marginRight: 4,
           // Leave some space when scrolled into view to let the user understand
           // that there are more tabs.
           scrollMarginRight: 20,
           scrollMarginLeft: 20,
           // Style:
-          borderTopRightRadius: 8,
-          borderTopLeftRadius: 8,
-          borderTop: '1px solid black',
-          borderRight: '1px solid black',
-          borderLeft: '1px solid black',
+          borderTopRightRadius: 11,
+          borderTopLeftRadius: 11,
+          borderTop: '1px solid',
+          borderRight: '1px solid',
+          borderLeft: '1px solid',
           borderBottom: 'none',
           borderColor: active
             ? gdevelopTheme.closableTabs.selectedBorderColor
-            : gdevelopTheme.closableTabs.backgroundColor,
+            : 'transparent',
           backgroundColor: !active
             ? gdevelopTheme.closableTabs.backgroundColor
             : gdevelopTheme.closableTabs.selectedBackgroundColor,
+          boxShadow: active ? '0 10px 18px rgba(0, 0, 0, 0.22)' : 'none',
+          transform: active ? 'translateY(-1px)' : 'translateY(0)',
+          transition:
+            'background-color 140ms ease, border-color 140ms ease, transform 140ms ease, box-shadow 140ms ease',
         }}
         // A tab lives in the top bar, which has the ability to drag the app window.
         // Ensure the tab does not have this ability, as it can be dragged itself.

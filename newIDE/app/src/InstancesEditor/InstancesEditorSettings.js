@@ -42,6 +42,8 @@ export const prepareInstancesEditorSettings = (
   object: any,
   projectLargestResolutionSizeInPixels: number
 ): InstancesEditorSettings => {
+  // Always open a scene in design mode first.
+  // Persisting the embedded-game mode causes a black "Game View" on reopen.
   return {
     grid: object.grid || false,
     gridType: object.gridType || 'rectangular',
@@ -64,7 +66,7 @@ export const prepareInstancesEditorSettings = (
     ),
     windowMask: object.windowMask || false,
     selectedLayer: object.selectedLayer || '',
-    gameEditorMode: object.gameEditorMode || 'instances-editor',
+    gameEditorMode: 'instances-editor',
   };
 };
 

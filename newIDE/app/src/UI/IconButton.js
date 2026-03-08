@@ -83,13 +83,24 @@ const useStylesForIconButton = ({
   makeStyles({
     root: {
       color: selected ? theme.iconButton.selectedColor : undefined,
-      '&:hover': disableHover ? { backgroundColor: 'transparent' } : {},
-    },
-    label: {
+      borderRadius: 10,
+      padding: 6,
       backgroundColor: selected
         ? theme.iconButton.selectedBackgroundColor
-        : undefined,
-      borderRadius: selected ? 4 : undefined,
+        : 'transparent',
+      boxShadow: selected ? '0 8px 14px rgba(0, 0, 0, 0.2)' : 'none',
+      transition:
+        'background-color 140ms ease, color 140ms ease, box-shadow 140ms ease',
+      '&:hover': disableHover
+        ? { backgroundColor: 'transparent' }
+        : {
+            backgroundColor: selected
+              ? theme.iconButton.selectedBackgroundColor
+              : theme.paper.backgroundColor.light,
+          },
+    },
+    label: {
+      borderRadius: 8,
     },
   })();
 

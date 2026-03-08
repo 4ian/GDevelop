@@ -1,7 +1,7 @@
 {
   "name": "gdevelop",
-  "productName": "GDevelop 5",
-  "description": "GDevelop 5 IDE running on the Electron runtime",
+  "productName": "Carrots Engine",
+  "description": "Carrots Engine IDE running on the Electron runtime",
   "version": "1.0.0",
   "author": "Florian Rival",
   "license": "MIT",

@@ -62,9 +62,9 @@ type Props = {|
 
 const initialMosaicEditorNodes = {
   direction: 'row',
-  first: 'properties',
-  second: 'resources-list',
-  splitPercentage: 66,
+  first: 'resources-list',
+  second: 'properties',
+  splitPercentage: 68,
 };
 
 export default class ResourcesEditor extends React.Component<Props, State> {
@@ -268,7 +268,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
   toggleProperties = () => {
     if (!this.editorMosaic) return;
-    this.editorMosaic.toggleEditor('properties', 'left');
+    this.editorMosaic.toggleEditor('properties', 'right');
   };
 
   _onResourceSelected = (selectedResource: ?gdResource) => {
@@ -319,7 +319,8 @@ export default class ResourcesEditor extends React.Component<Props, State> {
       },
       'resources-list': {
         type: 'primary',
-        noTitleBar: true,
+        title: t`Assets`,
+        toolbarControls: [],
         renderEditor: () => (
           <ResourcesList
             project={project}

@@ -183,6 +183,9 @@ export type EditorStateForProject = {|
 // $FlowFixMe[deprecated-utility]
 export type EditorStateForProjectUpdate = $Shape<EditorStateForProject>;
 
+export const defaultEventsSheetConditionsColor = '42;53;45';
+export const defaultEventsSheetActionsColor = '28;34;29';
+
 export type PreferencesValues = {|
   language: string,
   autoDownloadUpdates: boolean,
@@ -200,6 +203,8 @@ export type PreferencesValues = {|
   eventsSheetUseAssignmentOperators: boolean,
   eventsSheetIndentScale: number,
   eventsSheetZoomLevel: number,
+  eventsSheetConditionsCustomColor: string,
+  eventsSheetActionsCustomColor: string,
   showEffectParameterNames: boolean,
   projectLastUsedPaths: { [string]: { [ResourceKind]: string } },
   defaultEditorMosaicNodes: { [EditorMosaicName]: ?EditorMosaicNode },
@@ -279,6 +284,8 @@ export type Preferences = {|
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => void,
   setEventsSheetIndentScale: (scale: number) => void,
   setEventsSheetZoomLevel: (zoomLevel: number) => void,
+  setEventsSheetConditionsCustomColor: (color: string) => void,
+  setEventsSheetActionsCustomColor: (color: string) => void,
   setShowEffectParameterNames: (enabled: boolean) => void,
   getLastUsedPath: (project: gdProject, kind: ResourceKind) => string,
   setLastUsedPath: (
@@ -377,9 +384,9 @@ export const initialPreferences = {
     autoDownloadUpdates: true,
     themeName: ((typeof window !== 'undefined' &&
     window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'GDevelop default Dark'
+      ? 'Carrots Dark'
       : // TODO: Use the light theme back when it's adapted to the modern theme.
-        'GDevelop default Dark'): string),
+        'Carrots Dark'): string),
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},
@@ -393,6 +400,8 @@ export const initialPreferences = {
     eventsSheetUseAssignmentOperators: false,
     eventsSheetZoomLevel: 14,
     eventsSheetIndentScale: 1,
+    eventsSheetConditionsCustomColor: defaultEventsSheetConditionsColor,
+    eventsSheetActionsCustomColor: defaultEventsSheetActionsColor,
     showEffectParameterNames: false,
     projectLastUsedPaths: {},
     defaultEditorMosaicNodes: {},
@@ -457,6 +466,8 @@ export const initialPreferences = {
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => {},
   setEventsSheetIndentScale: (scale: number) => {},
   setEventsSheetZoomLevel: (zoomLevel: number) => {},
+  setEventsSheetConditionsCustomColor: (color: string) => {},
+  setEventsSheetActionsCustomColor: (color: string) => {},
   setShowEffectParameterNames: (enabled: boolean) => {},
   getLastUsedPath: (project: gdProject, kind: ResourceKind): string => '',
   setLastUsedPath: (project: gdProject, kind: ResourceKind, path: string) => {},

@@ -30,6 +30,15 @@ html {
 
 body {
   overflow: hidden;
+  font-size: 15px;
+  line-height: 1.45;
+  font-family: var(--gdevelop-modern-font-family);
+  letter-spacing: 0.01em;
+  text-rendering: optimizeLegibility;
+  background:
+    radial-gradient(130% 110% at 8% 0%, rgba(46, 159, 91, 0.14), transparent 42%),
+    radial-gradient(90% 80% at 92% 0%, rgba(242, 140, 40, 0.13), transparent 40%),
+    #101512;
 }
 
 #root {
@@ -44,6 +53,9 @@ body {
   display: flex;
   flex-direction: column;
   max-width: 100%;
+  background:
+    linear-gradient(180deg, rgba(17, 23, 20, 0.95) 0%, rgba(14, 18, 16, 0.98) 100%);
+  color: var(--theme-text-default-color);
 
   /* Support portrait and landscape right only */
   padding-top: var(--safe-area-inset-top);
@@ -113,6 +125,29 @@ a[href^="ftp://"] {
  * dragged element is visible (and not hidden behind a drawer or dialog)
  */
 .sortable-helper {
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif; /* Font from the theme*/
+  font-family: var(--gdevelop-modern-font-family);
   z-index: 9999;
+}
+
+input,
+textarea,
+button,
+select {
+  font-family: var(--gdevelop-modern-font-family);
+}
+
+.carrots-tabs-titlebar .MuiButtonBase-root,
+.carrots-main-toolbar .MuiButtonBase-root {
+  border-radius: 10px;
+}
+
+.carrots-main-toolbar .MuiButton-root {
+  border-radius: 10px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.carrots-main-toolbar .MuiIconButton-root:hover,
+.carrots-tabs-titlebar .MuiIconButton-root:hover {
+  background-color: rgba(255, 177, 92, 0.14);
 }

@@ -8,7 +8,6 @@ import AuthenticatedUserContext, {
   type AuthenticatedUser,
 } from '../../../../Profile/AuthenticatedUserContext';
 import GetSubscriptionCard from '../../../../Profile/Subscription/GetSubscriptionCard';
-import { hasValidSubscriptionPlan } from '../../../../Utils/GDevelopServices/Usage';
 
 type Props = {|
   margin?: 'dense',
@@ -33,29 +32,27 @@ export const MaxProjectCountAlertMessage = ({
   margin,
 }: Props): null | React.Node => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { limits, subscription } = authenticatedUser;
+  const { limits } = authenticatedUser;
   if (!limits) return null;
-
-  const hasValidSubscription = hasValidSubscriptionPlan(subscription);
 
   const {
     maximumCount,
-    canMaximumCountBeIncreased,
+    canMaximumCountBeIncreased: _canMaximumCountBeIncreased,
   } = limits.capabilities.cloudProjects;
+
+  void _canMaximumCountBeIncreased;
 
   return (
     <GetSubscriptionCard
       subscriptionDialogOpeningReason="Cloud Project limit reached"
       label={
         margin === 'dense' ? (
-          <Trans>Upgrade</Trans>
-        ) : !hasValidSubscription ? (
-          <Trans>Upgrade to GDevelop Premium</Trans>
+          <Trans>Storage limit reached</Trans>
         ) : (
-          <Trans>Upgrade your Premium Plan</Trans>
+          <Trans>Cloud storage limit reached</Trans>
         )
       }
-      hideButton={!canMaximumCountBeIncreased}
+      hideButton
       recommendedPlanId="gdevelop_silver"
       placementId="max-projects-reached"
     >
@@ -75,25 +72,9 @@ export const MaxProjectCountAlertMessage = ({
             )}
           </Text>
           <Text noMargin={margin === 'dense'}>
-            {canMaximumCountBeIncreased ? (
-              !hasValidSubscription ? (
-                <Trans>
-                  Thanks for trying GDevelop! Unlock more projects, AI usage,
-                  publishing, multiplayer, courses and much more by upgrading.
-                </Trans>
-              ) : (
-                <Trans>
-                  Upgrade to get more cloud projects, AI usage, publishing,
-                  multiplayer, courses and credits every month with GDevelop
-                  Premium.
-                </Trans>
-              )
-            ) : (
-              <Trans>
-                To keep using GDevelop cloud, consider deleting old, unused
-                projects.
-              </Trans>
-            )}
+            <Trans>
+              To keep using cloud projects, delete old or unused projects.
+            </Trans>
           </Text>
         </Column>
       </Line>

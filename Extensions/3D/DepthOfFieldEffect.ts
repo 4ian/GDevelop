@@ -201,9 +201,13 @@ namespace gdjs {
             return true;
           }
 
-          private _adaptQuality(
-            quality: gdjs.Scene3DPostProcessingQualityProfile
-          ): void {
+          private _adaptQuality(target: gdjs.EffectsTarget): void {
+            if (!(target instanceof gdjs.Layer)) {
+              return;
+            }
+            const quality = gdjs.getScene3DPostProcessingQualityProfileForMode(
+              this._qualityMode
+            );
             this._effectiveSamples = Math.max(
               2,
               Math.min(quality.dofSamples, this._samples)
@@ -247,6 +251,8 @@ namespace gdjs {
               'DOF',
               this._qualityMode
             );
+            this._adaptQuality(target);
+
             const sharedCapture = gdjs.captureScene3DSharedTextures(
               target,
               threeRenderer,
@@ -256,7 +262,6 @@ namespace gdjs {
             if (!sharedCapture || !sharedCapture.depthTexture) {
               return;
             }
-            this._adaptQuality(sharedCapture.quality);
 
             threeCamera.updateMatrixWorld();
             threeCamera.updateProjectionMatrix();

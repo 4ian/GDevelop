@@ -262,6 +262,7 @@ export default class JsCodeEvent extends React.Component<
             className={classNames({
               [largeSelectableArea]: true,
               [largeSelectedArea]: this.props.selected,
+              'event-kind-jscode': true,
             })}
             ref={measureRef}
             id={`${this.props.idPrefix}-js-code`}

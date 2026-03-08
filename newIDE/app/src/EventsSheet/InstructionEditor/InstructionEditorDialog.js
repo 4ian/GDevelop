@@ -16,6 +16,7 @@ import InstructionOrObjectSelector, {
 } from './InstructionOrObjectSelector';
 import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
 import HelpButton from '../../UI/HelpButton';
+import Text from '../../UI/Text';
 import { isRelativePathToDocumentationRoot } from '../../Utils/HelpLink';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { SelectColumns } from '../../UI/Responsive/SelectColumns';
@@ -35,6 +36,7 @@ import ExtensionsSearchDialog from '../../AssetStore/ExtensionStore/ExtensionsSe
 import { sendBehaviorAdded } from '../../Utils/Analytics/EventSender';
 import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
 import ErrorBoundary from '../../UI/ErrorBoundary';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 
 const styles = {
@@ -42,6 +44,29 @@ const styles = {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
+  },
+  editorColumnPanel: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    minHeight: 0,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  editorColumnHeader: {
+    minHeight: 38,
+    display: 'flex',
+    alignItems: 'center',
+    padding: '0 12px',
+  },
+  editorColumnBody: {
+    flex: 1,
+    minHeight: 0,
+    display: 'flex',
+  },
+  editorColumnHeaderText: {
+    opacity: 0.82,
+    letterSpacing: '0.04em',
   },
 };
 
@@ -166,6 +191,39 @@ const InstructionEditorDialog = ({
     setNewExtensionDialogOpen,
   ] = React.useState<boolean>(false);
   const shouldAutofocusInput = useShouldAutofocusInput();
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
+  const editorColumnPanelStyle = React.useMemo(
+    () => ({
+      ...styles.editorColumnPanel,
+      backgroundColor: gdevelopTheme.paper.backgroundColor.medium,
+      border: `1px solid ${gdevelopTheme.dialog.separator}`,
+    }),
+    [gdevelopTheme.dialog.separator, gdevelopTheme.paper.backgroundColor.medium]
+  );
+
+  const editorColumnHeaderStyle = React.useMemo(
+    () => ({
+      ...styles.editorColumnHeader,
+      backgroundColor: gdevelopTheme.paper.backgroundColor.dark,
+      borderBottom: `1px solid ${gdevelopTheme.dialog.separator}`,
+    }),
+    [gdevelopTheme.dialog.separator, gdevelopTheme.paper.backgroundColor.dark]
+  );
+
+  const renderEditorColumn = (
+    title: React.Node,
+    content: React.Node
+  ): React.Node => (
+    <div style={editorColumnPanelStyle}>
+      <div style={editorColumnHeaderStyle}>
+        <Text size="body-small" noMargin style={styles.editorColumnHeaderText}>
+          {title}
+        </Text>
+      </div>
+      <div style={styles.editorColumnBody}>{content}</div>
+    </div>
+  );
 
   // Handle the back button
   const stepBackFrom = (origin: StepName) => {
@@ -231,81 +289,98 @@ const InstructionEditorDialog = ({
     ? instructionMetadata.getHelpPath()
     : undefined;
 
-  const renderInstructionOrObjectSelector = () => (
-    <I18n>
-      {({ i18n }) => (
-        <InstructionOrObjectSelector
-          key="instruction-or-object-selector"
-          style={styles.fullHeightSelector}
-          project={project}
-          projectScopedContainersAccessor={projectScopedContainersAccessor}
-          scope={scope}
-          ref={freeInstructionComponentRef}
-          currentTab={currentInstructionOrObjectSelectorTab}
-          onChangeTab={setCurrentInstructionOrObjectSelectorTab}
-          isCondition={isCondition}
-          chosenInstructionType={
-            !chosenObjectName ? instructionType : undefined
-          }
-          onChooseInstruction={(instructionType: string) => {
-            chooseInstruction(instructionType);
-            setStep('parameters');
-          }}
-          chosenObjectName={chosenObjectName}
-          onChooseObject={(chosenObjectName: string) => {
-            chooseObject(chosenObjectName);
-            setStep('object-instructions');
-          }}
-          focusOnMount={shouldAutofocusInput && !instructionType}
-          onSearchStartOrReset={forceUpdate}
-          onClickMore={() => setNewExtensionDialogOpen(true)}
-          i18n={i18n}
-        />
-      )}
-    </I18n>
-  );
+  const renderInstructionOrObjectSelector = () =>
+    renderEditorColumn(
+      isCondition ? (
+        <Trans>Objects and conditions</Trans>
+      ) : (
+        <Trans>Objects and actions</Trans>
+      ),
+      <I18n>
+        {({ i18n }) => (
+          <InstructionOrObjectSelector
+            key="instruction-or-object-selector"
+            style={styles.fullHeightSelector}
+            project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            scope={scope}
+            ref={freeInstructionComponentRef}
+            currentTab={currentInstructionOrObjectSelectorTab}
+            onChangeTab={setCurrentInstructionOrObjectSelectorTab}
+            isCondition={isCondition}
+            chosenInstructionType={
+              !chosenObjectName ? instructionType : undefined
+            }
+            onChooseInstruction={(instructionType: string) => {
+              chooseInstruction(instructionType);
+              setStep('parameters');
+            }}
+            chosenObjectName={chosenObjectName}
+            onChooseObject={(chosenObjectName: string) => {
+              chooseObject(chosenObjectName);
+              setStep('object-instructions');
+            }}
+            focusOnMount={shouldAutofocusInput && !instructionType}
+            onSearchStartOrReset={forceUpdate}
+            onClickMore={() => setNewExtensionDialogOpen(true)}
+            i18n={i18n}
+          />
+        )}
+      </I18n>
+    );
 
-  const renderParameters = () => (
-    <InstructionParametersEditor
-      key="parameters"
-      project={project}
-      scope={scope}
-      globalObjectsContainer={globalObjectsContainer}
-      objectsContainer={objectsContainer}
-      projectScopedContainersAccessor={projectScopedContainersAccessor}
-      objectName={chosenObjectName}
-      isCondition={isCondition}
-      instruction={instruction}
-      resourceManagementProps={resourceManagementProps}
-      openInstructionOrExpression={openInstructionOrExpression}
-      ref={instructionParametersEditor}
-      focusOnMount={shouldAutofocusInput && !!instructionType}
-      noHelpButton
-      id="object-instruction-parameters"
-    />
-  );
+  const renderParameters = () =>
+    renderEditorColumn(
+      <Trans>Configuration</Trans>,
+      <InstructionParametersEditor
+        key="parameters"
+        project={project}
+        scope={scope}
+        globalObjectsContainer={globalObjectsContainer}
+        objectsContainer={objectsContainer}
+        projectScopedContainersAccessor={projectScopedContainersAccessor}
+        objectName={chosenObjectName}
+        isCondition={isCondition}
+        instruction={instruction}
+        resourceManagementProps={resourceManagementProps}
+        openInstructionOrExpression={openInstructionOrExpression}
+        ref={instructionParametersEditor}
+        focusOnMount={shouldAutofocusInput && !!instructionType}
+        noHelpButton
+        id="object-instruction-parameters"
+      />
+    );
 
   const renderObjectInstructionSelector = () =>
-    chosenObjectInstructionsInfoTree && chosenObjectInstructionsInfo ? (
-      <InstructionOrExpressionSelector
-        key="object-instruction-selector"
-        style={styles.fullHeightSelector}
-        instructionsInfo={chosenObjectInstructionsInfo}
-        instructionsInfoTree={chosenObjectInstructionsInfoTree}
-        iconSize={24}
-        onChoose={(instructionType: string) => {
-          chooseObjectInstruction(instructionType);
-          setStep('parameters');
-        }}
-        selectedType={instructionType}
-        useSubheaders
-        focusOnMount={shouldAutofocusInput && !instructionType}
-        searchPlaceholderObjectName={chosenObjectName}
-        searchPlaceholderIsCondition={isCondition}
-        onClickMore={scope.layout ? () => setNewBehaviorDialogOpen(true) : null}
-        id="object-instruction-selector"
-      />
-    ) : null;
+    chosenObjectInstructionsInfoTree && chosenObjectInstructionsInfo
+      ? renderEditorColumn(
+          isCondition ? (
+            <Trans>Conditions on selected object</Trans>
+          ) : (
+            <Trans>Actions on selected object</Trans>
+          ),
+          <InstructionOrExpressionSelector
+            key="object-instruction-selector"
+            style={styles.fullHeightSelector}
+            instructionsInfo={chosenObjectInstructionsInfo}
+            instructionsInfoTree={chosenObjectInstructionsInfoTree}
+            iconSize={24}
+            onChoose={(instructionType: string) => {
+              chooseObjectInstruction(instructionType);
+              setStep('parameters');
+            }}
+            selectedType={instructionType}
+            useSubheaders
+            focusOnMount={shouldAutofocusInput && !instructionType}
+            searchPlaceholderObjectName={chosenObjectName}
+            searchPlaceholderIsCondition={isCondition}
+            onClickMore={
+              scope.layout ? () => setNewBehaviorDialogOpen(true) : null
+            }
+            id="object-instruction-selector"
+          />
+        )
+      : null;
 
   return (
     <>

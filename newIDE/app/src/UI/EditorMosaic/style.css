@@ -1,24 +1,27 @@
-/* This overwrite the default React Mosaic theme to make
- * it looks like Material UI  */
+/* Carrots Editor Mosaic overrides */
 
 /* Mosaic layout */
 .mosaic-gd-theme.mosaic {
-  padding: 0;
+  padding: 4px;
 }
 
 .mosaic-gd-theme.mosaic .mosaic-root {
-  left: 1px;
-  right: 1px;
-  top: 1px;
-  bottom: 1px;
+  left: 2px;
+  right: 2px;
+  top: 2px;
+  bottom: 2px;
 }
 
 .mosaic-gd-theme .mosaic-window {
   border: 0 !important;
+  background: transparent;
 }
 
 .mosaic-gd-theme .mosaic-window-body {
   display: flex;
+  border: 1px solid rgba(255, 177, 92, 0.14);
+  border-top: 0;
+  box-shadow: 0 14px 26px rgba(0, 0, 0, 0.24);
 }
 
 /* Make the horizontal split to have the same thickness as the vertical */
@@ -35,10 +38,41 @@
 }
 
 .mosaic-gd-theme .mosaic-tile {
-  margin: 1px;
-  border-radius: 4px;
+  margin: 2px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.mosaic-gd-theme .mosaic-window-toolbar {
+  min-height: 34px;
+  border-bottom: 1px solid rgba(255, 177, 92, 0.2);
+  background: linear-gradient(
+    90deg,
+    rgba(201, 106, 18, 0.22) 0%,
+    rgba(46, 159, 91, 0.14) 100%
+  ) !important;
+}
+
+.mosaic-gd-theme .mosaic-window-toolbar .mosaic-window-title {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em;
+}
+
+.mosaic-gd-theme .mosaic-window-toolbar .mosaic-window-controls {
+  gap: 2px;
+  padding-right: 4px;
 }
 
 .mosaic-gd-theme .draggable .mosaic-window-title {
-  cursor: move;
+  cursor: grab;
+}
+
+.mosaic-gd-theme .draggable:active .mosaic-window-title {
+  cursor: grabbing;
+}
+
+.mosaic-gd-theme .mosaic-split.-row .mosaic-split-line,
+.mosaic-gd-theme .mosaic-split.-column .mosaic-split-line {
+  opacity: 0.35;
 }

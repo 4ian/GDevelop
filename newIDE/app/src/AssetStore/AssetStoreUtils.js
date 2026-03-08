@@ -200,9 +200,7 @@ export const getBundleTiles = ({
         bundleListingData.categories.includes(openedShopCategory)
     )
     .forEach(bundleListingData => {
-      const isBundleOwned =
-        !!receivedBundles &&
-        !!receivedBundles.find(bundle => bundle.id === bundleListingData.id);
+      const isBundleOwned = true;
       const tile = (
         <BundleTile
           bundleListingData={bundleListingData}
@@ -287,11 +285,7 @@ export const getGameTemplateTiles = ({
   );
 
   filteredGameTemplates.forEach(privateGameTemplateListingData => {
-    const isGameTemplateOwned =
-      !!receivedGameTemplates &&
-      !!receivedGameTemplates.find(
-        pack => pack.id === privateGameTemplateListingData.id
-      );
+    const isGameTemplateOwned = true;
     const tile = (
       <PrivateGameTemplateTile
         privateGameTemplateListingData={privateGameTemplateListingData}
@@ -422,9 +416,7 @@ export const getAssetPackTiles = ({
 
   !!onPrivateAssetPackSelection &&
     filteredAssetPacks.forEach(assetPackListingData => {
-      const isPackOwned =
-        !!receivedAssetPacks &&
-        !!receivedAssetPacks.find(pack => pack.id === assetPackListingData.id);
+      const isPackOwned = true;
       const tile = (
         <PrivateAssetPackTile
           assetPackListingData={assetPackListingData}

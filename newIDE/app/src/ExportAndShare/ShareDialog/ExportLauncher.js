@@ -8,16 +8,12 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { Column, Line } from '../../UI/Grid';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import CreateProfile from '../../Profile/CreateProfile';
-import CurrentUsageDisplayer from '../../Profile/CurrentUsageDisplayer';
 import { type FileMetadata } from '../../ProjectsStorage';
 import {
   displayProjectErrorsBox,
   getProjectPropertiesErrors,
 } from '../../Utils/ProjectErrorsChecker';
-import {
-  type Quota,
-  type UsagePrice,
-} from '../../Utils/GDevelopServices/Usage';
+import { type Quota } from '../../Utils/GDevelopServices/Usage';
 import BuildsWatcher from '../Builds/BuildsWatcher';
 import { type BuildStep } from '../Builds/BuildStepsProgress';
 import { type ExportPipeline } from '../ExportPipeline.flow';
@@ -68,20 +64,9 @@ const getIncrementedVersionNumber = (project: gdProject) => {
 };
 
 const getBuildQuota = (
-  authenticatedUser: AuthenticatedUser,
-  onlineBuildType: ?string
-): ?Quota =>
-  authenticatedUser.limits && onlineBuildType
-    ? authenticatedUser.limits.quotas[onlineBuildType]
-    : null;
-
-const getBuildCreditPrice = (
-  authenticatedUser: AuthenticatedUser,
-  onlineBuildType: ?string
-): ?UsagePrice =>
-  authenticatedUser.limits && onlineBuildType
-    ? authenticatedUser.limits.credits.prices[onlineBuildType]
-    : null;
+  _authenticatedUser: AuthenticatedUser,
+  _onlineBuildType: ?string
+): ?Quota => null;
 
 const getErrorMessage = (i18n: I18nType, exportStep: BuildStep) => {
   switch (exportStep) {
@@ -413,11 +398,6 @@ export default class ExportLauncher extends Component<Props, State> {
       authenticatedUser,
       exportPipeline.onlineBuildType
     );
-    const buildCreditPrice = getBuildCreditPrice(
-      authenticatedUser,
-      exportPipeline.onlineBuildType
-    );
-
     const hasBuildsCurrentlyRunning = () => {
       if (!gameAndBuildsManager.gameBuilds) return false;
 
@@ -433,13 +413,6 @@ export default class ExportLauncher extends Component<Props, State> {
     };
 
     const canLaunchBuild = (authenticatedUser: AuthenticatedUser) => {
-      if (buildQuota) {
-        const buildsRemaining = buildQuota
-          ? Math.max(buildQuota.max - buildQuota.current, 0)
-          : 0;
-        if (!buildsRemaining) return false;
-      }
-
       return exportPipeline.canLaunchBuild(exportState, errored, exportStep);
     };
 
@@ -450,8 +423,6 @@ export default class ExportLauncher extends Component<Props, State> {
       (exportStep === 'done' && !isBuildRunning) || errored;
     const isUsingOnlineBuildNonAuthenticated =
       !!exportPipeline.onlineBuildType && !authenticatedUser.authenticated;
-    const isOnlineBuildIncludedInSubscription =
-      !!buildQuota && buildQuota.max > 0;
     const hasSomeBuildsRunning = hasBuildsCurrentlyRunning();
 
     return (
@@ -508,7 +479,6 @@ export default class ExportLauncher extends Component<Props, State> {
             </Line>
           )}
           {!isUsingOnlineBuildNonAuthenticated &&
-            isOnlineBuildIncludedInSubscription &&
             exportPipeline.shouldSuggestBumpingVersionNumber &&
             exportPipeline.shouldSuggestBumpingVersionNumber() &&
             !isExportAndBuildCompleteOrErrored && (
@@ -529,26 +499,6 @@ export default class ExportLauncher extends Component<Props, State> {
                   }}
                   disabled={isExportingOrWaitingForBuild}
                 />
-              </Line>
-            )}
-          {!!exportPipeline.limitedBuilds &&
-            authenticatedUser.authenticated &&
-            !isExportAndBuildCompleteOrErrored && (
-              <Line>
-                <Column noMargin expand>
-                  <CurrentUsageDisplayer
-                    subscription={authenticatedUser.subscription}
-                    quota={buildQuota}
-                    usagePrice={buildCreditPrice}
-                    onChangeSubscription={this.props.onChangeSubscription}
-                    onStartBuildWithCredits={() => {
-                      this._launchWholeExport({
-                        payWithCredits: true,
-                      });
-                    }}
-                    hidePurchaseWithCredits={isExportingOrWaitingForBuild}
-                  />
-                </Column>
               </Line>
             )}
           {!!exportPipeline.limitedBuilds &&

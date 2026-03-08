@@ -15,6 +15,7 @@ export default class UnknownEvent extends React.Component<
         className={classNames({
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
+          'event-kind-unknown': true,
         })}
       >
         {'Unknown event of type ' + this.props.event.getType()}

@@ -164,7 +164,7 @@ const formatItemForGrid = ({
   onSelectGameTemplate,
   onSelectExample,
   i18n,
-  receivedGameTemplates,
+  receivedGameTemplates: _receivedGameTemplates,
   disabled,
 }: {
   item: PrivateGameTemplateListingData | ExampleShortHeader,
@@ -184,11 +184,7 @@ const formatItemForGrid = ({
       />
     );
   } else {
-    const isTemplateOwned =
-      !!receivedGameTemplates &&
-      !!receivedGameTemplates.find(
-        receivedGameTemplate => receivedGameTemplate.id === item.id
-      );
+    const isTemplateOwned = true;
     return (
       <PrivateGameTemplateTile
         privateGameTemplateListingData={item}

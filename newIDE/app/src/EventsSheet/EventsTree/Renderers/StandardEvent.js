@@ -32,6 +32,7 @@ export default class StandardEvent extends React.Component<
         className={classNames({
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
+          'event-kind-standard': true,
         })}
       >
         <VariableDeclarationsList

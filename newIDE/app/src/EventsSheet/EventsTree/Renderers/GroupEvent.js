@@ -87,6 +87,7 @@ export default class GroupEvent extends React.Component<
         className={classNames({
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
+          'event-kind-group': true,
         })}
         style={{
           ...styles.container,

@@ -96,6 +96,7 @@ import {
   changeViewPosition,
   setCameraState,
 } from '../EmbeddedGame/EmbeddedGameFrame';
+import CommandsContext from '../CommandPalette/CommandsContext';
 import Rectangle from '../Utils/Rectangle';
 
 const gd: libGDevelop = global.gd;
@@ -204,6 +205,7 @@ type Props = {|
   getInitialInstancesEditorSettings: () => InstancesEditorSettings,
 
   onOpenMoreSettings?: ?() => void,
+  onOpenProjectManager: () => void,
   onOpenEvents: (sceneName: string) => void,
   onObjectEdited: (objectWithContext: ObjectWithContext) => void,
   onObjectGroupEdited: (objectGroupWithContext: GroupWithContext) => void,
@@ -297,6 +299,10 @@ type CopyCutPasteOptions = {|
 const editSceneIconReactNode = <EditSceneIcon />;
 
 export default class SceneEditor extends React.Component<Props, State> {
+  // $FlowFixMe[missing-local-annot]
+  static contextType = CommandsContext;
+
+  context: any;
   instancesSelection: InstancesSelection;
   contextMenu: ?ContextMenuInterface;
   editorDisplay: ?SceneEditorsDisplayInterface;
@@ -685,6 +691,8 @@ export default class SceneEditor extends React.Component<Props, State> {
           isObjectGroupsListShown={editorDisplay.isEditorVisible(
             'object-groups-list'
           )}
+          onOpenScenesManager={this.openScenesManager}
+          onOpenExtensionsManager={this.openExtensionsManager}
           toggleProperties={this.toggleProperties}
           isPropertiesShown={editorDisplay.isEditorVisible('properties')}
           deleteSelection={this.deleteSelection}
@@ -792,6 +800,28 @@ export default class SceneEditor extends React.Component<Props, State> {
   toggleObjectGroupsList = () => {
     if (!this.editorDisplay) return;
     this.editorDisplay.toggleEditorView('object-groups-list');
+  };
+
+  openScenesManager = () => {
+    this.props.onOpenProjectManager();
+  };
+
+  openExtensionsManager = () => {
+    this.props.onOpenProjectManager();
+
+    // The command is registered by ProjectManager, so we trigger it
+    // asynchronously after opening the drawer.
+    setTimeout(() => {
+      const commandManager = this.context;
+      if (!commandManager || !commandManager.getNamedCommand) return;
+
+      const command = commandManager.getNamedCommand(
+        'OPEN_SEARCH_EXTENSIONS_DIALOG'
+      );
+      if (command && command.handler) {
+        command.handler();
+      }
+    }, 120);
   };
 
   toggleInstancesList = () => {

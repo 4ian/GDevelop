@@ -8,9 +8,6 @@ import TextButton from '../TextButton';
 import { LineStackLayout } from '../Layout';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import CircularProgress from '../CircularProgress';
-import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
-import { hasValidSubscriptionPlan } from '../../Utils/GDevelopServices/Usage';
-import CrownShining from '../CustomSvgIcons/CrownShining';
 import UserAvatar from './UserAvatar';
 import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
 import IconButton from '../IconButton';
@@ -18,27 +15,6 @@ import FlatButton from '../FlatButton';
 
 const styles = {
   buttonContainer: { flexShrink: 0 },
-};
-
-const GetPremiumButton = () => {
-  const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
-  return (
-    <RaisedButton
-      icon={<CrownShining />}
-      onClick={() => {
-        openSubscriptionDialog({
-          analyticsMetadata: {
-            reason: 'Account get premium',
-            recommendedPlanId: 'gdevelop_silver',
-            placementId: 'account-get-premium',
-          },
-        });
-      }}
-      id="get-premium-button"
-      label={<Trans>Get premium</Trans>}
-      color="premium"
-    />
-  );
 };
 
 type Props = {|
@@ -54,10 +30,8 @@ const UserChip = ({
     onOpenCreateAccountDialog,
     onOpenLoginDialog,
     loginState,
-    subscription,
   } = authenticatedUser;
 
-  const isPremium = hasValidSubscriptionPlan(subscription);
   const { isMobile } = useResponsiveWindowSize();
 
   return !profile && loginState === 'loggingIn' ? (
@@ -72,7 +46,7 @@ const UserChip = ({
           icon={
             <UserAvatar
               iconUrl={getGravatarUrl(profile.email || '', { size: 50 })}
-              isPremium={isPremium}
+              isPremium={false}
             />
           }
         />
@@ -80,11 +54,10 @@ const UserChip = ({
         <IconButton size="small" onClick={onOpenProfile}>
           <UserAvatar
             iconUrl={getGravatarUrl(profile.email || '', { size: 50 })}
-            isPremium={isPremium}
+            isPremium={false}
           />
         </IconButton>
       )}
-      {isPremium ? null : <GetPremiumButton />}
     </LineStackLayout>
   ) : (
     <div style={styles.buttonContainer}>

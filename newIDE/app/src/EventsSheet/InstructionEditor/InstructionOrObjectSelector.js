@@ -63,6 +63,7 @@ import {
   getInstructionGroupId,
 } from './InstructionOrExpressionTreeViewItems';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -154,6 +155,15 @@ export const styles = {
   indentedListItem: { paddingLeft: 45 },
   treeViewContainer: { flex: 1 },
   treeViewAutoSizer: { width: '100%' },
+  rootContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+  },
+  tabsContainer: {
+    padding: 4,
+    borderRadius: 10,
+  },
 };
 
 export type TabName = 'objects' | 'free-instructions';
@@ -297,6 +307,7 @@ const InstructionOrObjectSelector: React.ComponentType<{
     const { currentlyRunningInAppTutorial } = React.useContext(
       InAppTutorialContext
     );
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
     const [searchText, setSearchText] = React.useState<string>('');
     const [searchResults, setSearchResults] = React.useState<{
@@ -696,6 +707,36 @@ const InstructionOrObjectSelector: React.ComponentType<{
 
     const displayEmptyMessage = !isSearching && !allObjectsList.length;
     const searchHasNoResults = isSearching && !hasResults;
+    const searchTabsContainerStyle = React.useMemo(
+      () => ({
+        ...styles.tabsContainer,
+        backgroundColor: gdevelopTheme.paper.backgroundColor.dark,
+        border: `1px solid ${gdevelopTheme.dialog.separator}`,
+      }),
+      [gdevelopTheme.dialog.separator, gdevelopTheme.paper.backgroundColor.dark]
+    );
+    const treeContainerStyle = React.useMemo(
+      () => ({
+        ...styles.treeViewContainer,
+        minHeight: 0,
+        backgroundColor: gdevelopTheme.paper.backgroundColor.light,
+        border: `1px solid ${gdevelopTheme.dialog.separator}`,
+        borderRadius: 10,
+        overflow: 'hidden',
+      }),
+      [
+        gdevelopTheme.dialog.separator,
+        gdevelopTheme.paper.backgroundColor.light,
+      ]
+    );
+    const emptyMessageContainerStyle = React.useMemo(
+      () => ({
+        backgroundColor: gdevelopTheme.paper.backgroundColor.dark,
+        border: `1px solid ${gdevelopTheme.dialog.separator}`,
+        borderRadius: 10,
+      }),
+      [gdevelopTheme.dialog.separator, gdevelopTheme.paper.backgroundColor.dark]
+    );
 
     return (
       <div
@@ -704,75 +745,82 @@ const InstructionOrObjectSelector: React.ComponentType<{
           // Important for the component to not take the full height in a dialog,
           // allowing to let the scrollview do its job.
           minHeight: 0,
+          ...styles.rootContainer,
           ...style,
         }}
       >
-        <SearchBar
-          id="search-bar"
-          value={searchText}
-          onChange={newSearchText => {
-            const oldSearchText = searchText;
-            if (!!newSearchText) search(newSearchText);
-            setSearchText(newSearchText);
-            // Notify if needed that we started or cleared a search
-            if (
-              (!oldSearchText && newSearchText) ||
-              (oldSearchText && !newSearchText)
-            ) {
-              if (onSearchStartOrReset) onSearchStartOrReset();
+        <div style={searchTabsContainerStyle}>
+          <SearchBar
+            id="search-bar"
+            value={searchText}
+            onChange={newSearchText => {
+              const oldSearchText = searchText;
+              if (!!newSearchText) search(newSearchText);
+              setSearchText(newSearchText);
+              // Notify if needed that we started or cleared a search
+              if (
+                (!oldSearchText && newSearchText) ||
+                (oldSearchText && !newSearchText)
+              ) {
+                if (onSearchStartOrReset) onSearchStartOrReset();
+              }
+            }}
+            onRequestSearch={onSubmitSearch}
+            ref={searchBarRef}
+            autoFocus={focusOnMount ? 'desktop' : undefined}
+            placeholder={
+              isCondition
+                ? t`Search objects or conditions`
+                : t`Search objects or actions`
             }
-          }}
-          onRequestSearch={onSubmitSearch}
-          ref={searchBarRef}
-          autoFocus={focusOnMount ? 'desktop' : undefined}
-          placeholder={
-            isCondition
-              ? t`Search objects or conditions`
-              : t`Search objects or actions`
-          }
-        />
-        {!isSearching && (
-          <Line>
-            <Column expand noMargin>
-              <Tabs
-                value={currentTab}
-                onChange={onChangeTab}
-                options={[
-                  {
-                    label: <Trans>Objects</Trans>,
-                    value: 'objects',
-                  },
-                  {
-                    label: isCondition ? (
-                      <Trans>Other conditions</Trans>
-                    ) : (
-                      <Trans>Other actions</Trans>
-                    ),
-                    value: 'free-instructions',
-                  },
-                ]}
-              />
-            </Column>
-          </Line>
-        )}
+          />
+          {!isSearching && (
+            <Line>
+              <Column expand noMargin>
+                <Tabs
+                  value={currentTab}
+                  onChange={onChangeTab}
+                  options={[
+                    {
+                      label: <Trans>Objects</Trans>,
+                      value: 'objects',
+                    },
+                    {
+                      label: isCondition ? (
+                        <Trans>Other conditions</Trans>
+                      ) : (
+                        <Trans>Other actions</Trans>
+                      ),
+                      value: 'free-instructions',
+                    },
+                  ]}
+                />
+              </Column>
+            </Line>
+          )}
+        </div>
         {displayEmptyMessage && currentTab === 'objects' ? (
-          <EmptyMessage>{getEmptyMessage(scope)}</EmptyMessage>
+          <div style={emptyMessageContainerStyle}>
+            <EmptyMessage>{getEmptyMessage(scope)}</EmptyMessage>
+          </div>
         ) : searchHasNoResults ? (
-          <EmptyMessage>
-            <Trans>
-              Nothing corresponding to your search. Choose an object first or
-              browse the list of actions/conditions.
-            </Trans>
-          </EmptyMessage>
+          <div style={emptyMessageContainerStyle}>
+            <EmptyMessage>
+              <Trans>
+                Nothing corresponding to your search. Choose an object first or
+                browse the list of actions/conditions.
+              </Trans>
+            </EmptyMessage>
+          </div>
         ) : null}
         <div
           style={{
-            ...styles.treeViewContainer,
+            ...treeContainerStyle,
             display:
               (currentTab === 'objects' || isSearching) &&
               !searchHasNoResults &&
               !displayEmptyMessage
-                ? 'unset'
+                ? 'flex'
                 : 'none',
           }}
         >
@@ -859,10 +907,10 @@ const InstructionOrObjectSelector: React.ComponentType<{
         </div>
         <div
           style={{
-            ...styles.treeViewContainer,
+            ...treeContainerStyle,
             display:
               currentTab === 'free-instructions' && !isSearching
-                ? 'unset'
+                ? 'flex'
                 : 'none',
           }}
         >

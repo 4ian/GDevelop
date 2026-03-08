@@ -29,7 +29,20 @@ import {
   getFuseSearchQueryForMultipleKeys,
 } from '../../../UI/Search/UseSearchStructuredItem';
 import Add from '../../../UI/CustomSvgIcons/Add';
+import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 const gd: libGDevelop = global.gd;
+
+const styles = {
+  rootContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+  },
+  searchContainer: {
+    padding: 4,
+    borderRadius: 10,
+  },
+};
 
 const getGroupIconSrc = (key: string) => {
   return gd.JsPlatform.get()
@@ -73,6 +86,7 @@ const InstructionOrExpressionSelector = <
   const searchBarRef = React.useRef<?SearchBarInterface>(null);
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
   const selectedItemRef = React.useRef<?ListItemRefType>(null);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const [searchText, setSearchText] = React.useState<string>('');
   const searchApi = React.useMemo(
     () =>
@@ -104,6 +118,24 @@ const InstructionOrExpressionSelector = <
           }))
       : [];
   const hasResults = !searchText || !!displayedInstructionsList.length;
+  const searchContainerStyle = React.useMemo(
+    () => ({
+      ...styles.searchContainer,
+      backgroundColor: gdevelopTheme.paper.backgroundColor.dark,
+      border: `1px solid ${gdevelopTheme.dialog.separator}`,
+    }),
+    [gdevelopTheme.dialog.separator, gdevelopTheme.paper.backgroundColor.dark]
+  );
+  const listContainerStyle = React.useMemo(
+    () => ({
+      backgroundColor: gdevelopTheme.paper.backgroundColor.light,
+      border: `1px solid ${gdevelopTheme.dialog.separator}`,
+      borderRadius: 10,
+      overflow: 'hidden',
+      minHeight: 0,
+    }),
+    [gdevelopTheme.dialog.separator, gdevelopTheme.paper.backgroundColor.light]
+  );
 
   const onSubmitSearch = () => {
     if (!displayedInstructionsList.length) return;
@@ -132,26 +164,33 @@ const InstructionOrExpressionSelector = <
         // Important for the component to not take the full height in a dialog,
         // allowing to let the scrollview do its job.
         minHeight: 0,
+        ...styles.rootContainer,
         ...style,
       }}
       id={id}
     >
-      <SearchBar
-        value={searchText}
-        onChange={setSearchText}
-        onRequestSearch={onSubmitSearch}
-        placeholder={
-          searchPlaceholderObjectName
-            ? searchPlaceholderIsCondition
-              ? t`Search ${searchPlaceholderObjectName} conditions`
-              : t`Search ${searchPlaceholderObjectName} actions`
-            : undefined
-        }
-        helpPagePath={helpPagePath}
-        ref={searchBarRef}
-        autoFocus={focusOnMount ? 'desktop' : undefined}
-      />
-      <ScrollView autoHideScrollbar ref={scrollViewRef}>
+      <div style={searchContainerStyle}>
+        <SearchBar
+          value={searchText}
+          onChange={setSearchText}
+          onRequestSearch={onSubmitSearch}
+          placeholder={
+            searchPlaceholderObjectName
+              ? searchPlaceholderIsCondition
+                ? t`Search ${searchPlaceholderObjectName} conditions`
+                : t`Search ${searchPlaceholderObjectName} actions`
+              : undefined
+          }
+          helpPagePath={helpPagePath}
+          ref={searchBarRef}
+          autoFocus={focusOnMount ? 'desktop' : undefined}
+        />
+      </div>
+      <ScrollView
+        autoHideScrollbar
+        ref={scrollViewRef}
+        style={listContainerStyle}
+      >
         {hasResults && (
           <List>
             {searchText ? (

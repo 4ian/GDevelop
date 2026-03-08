@@ -13,7 +13,10 @@ import { themes } from '../../UI/Theme/ThemeRegistry';
 import { getAllThemes } from '../../CodeEditor/Theme';
 import Window from '../../Utils/Window';
 import optionalRequire from '../../Utils/OptionalRequire';
-import PreferencesContext from './PreferencesContext';
+import PreferencesContext, {
+  defaultEventsSheetActionsColor,
+  defaultEventsSheetConditionsColor,
+} from './PreferencesContext';
 import Text from '../../UI/Text';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import { Tabs } from '../../UI/Tabs';
@@ -27,6 +30,7 @@ import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 import AlertMessage from '../../UI/AlertMessage';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import CompactSelectField from '../../UI/CompactSelectField';
+import { CompactColorField } from '../../UI/CompactColorField';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -53,13 +57,14 @@ const PreferencesDialog = ({
     showAllAlertMessages,
     showAllTutorialHints,
     showAllAnnouncements,
-    showAllAskAiStandAloneForms,
     setAutoDisplayChangelog,
     setEventsSheetShowObjectThumbnails,
     setAutosaveOnPreview,
     setUseGDJSDevelopmentWatcher,
     setEventsSheetUseAssignmentOperators,
     setEventsSheetIndentScale,
+    setEventsSheetConditionsCustomColor,
+    setEventsSheetActionsCustomColor,
     getDefaultEditorMosaicNode,
     setDefaultEditorMosaicNode,
     setAutoOpenMostRecentProject,
@@ -84,8 +89,6 @@ const PreferencesDialog = ({
     setFetchPlayerTokenForPreviewAutomatically,
     setPreviewCrashReportUploadLevel,
     setTakeScreenshotOnPreview,
-    setShowAiAskButtonInTitleBar,
-    setAutomaticallyUseCreditsForAiRequests,
     setShowCreateSectionByDefault,
     setDisableNpmScriptConfirmation,
     setUseBackgroundSerializerForSaving,
@@ -186,13 +189,9 @@ const PreferencesDialog = ({
                 <Trans>
                   You can contribute and{' '}
                   <Link
-                    href={
-                      'https://github.com/4ian/GDevelop/blob/master/newIDE/README-themes.md'
-                    }
+                    href={'https://github.com/Carrotstudio0'}
                     onClick={() =>
-                      Window.openExternalURL(
-                        'https://github.com/4ian/GDevelop/blob/master/newIDE/README-themes.md'
-                      )
+                      Window.openExternalURL('https://github.com/Carrotstudio0')
                     }
                   >
                     create your own themes
@@ -330,6 +329,53 @@ const PreferencesDialog = ({
             <LineStackLayout noMargin alignItems="center">
               <Column noMargin expand>
                 <Text noMargin>
+                  <Trans>Conditions blocks color</Trans>
+                </Text>
+              </Column>
+              <Column noMargin expand>
+                <CompactColorField
+                  color={values.eventsSheetConditionsCustomColor}
+                  disableAlpha
+                  placeholder="42;53;45"
+                  onChange={(newValue: string) =>
+                    setEventsSheetConditionsCustomColor(newValue)
+                  }
+                />
+              </Column>
+            </LineStackLayout>
+            <LineStackLayout noMargin alignItems="center">
+              <Column noMargin expand>
+                <Text noMargin>
+                  <Trans>Actions blocks color</Trans>
+                </Text>
+              </Column>
+              <Column noMargin expand>
+                <CompactColorField
+                  color={values.eventsSheetActionsCustomColor}
+                  disableAlpha
+                  placeholder="28;34;29"
+                  onChange={(newValue: string) =>
+                    setEventsSheetActionsCustomColor(newValue)
+                  }
+                />
+              </Column>
+            </LineStackLayout>
+            <Line noMargin>
+              <FlatButton
+                label={<Trans>Reset events sheet colors</Trans>}
+                onClick={() => {
+                  setEventsSheetConditionsCustomColor(
+                    defaultEventsSheetConditionsColor
+                  );
+                  setEventsSheetActionsCustomColor(
+                    defaultEventsSheetActionsColor
+                  );
+                }}
+              />
+            </Line>
+            <LineStackLayout noMargin alignItems="center">
+              <Column noMargin expand>
+                <Text noMargin>
                   <Trans>Indent Scale in Events Sheet</Trans>
                 </Text>
               </Column>
@@ -407,7 +453,7 @@ const PreferencesDialog = ({
                 onCheck={setShowCreateSectionByDefault}
                 checked={values.showCreateSectionByDefault}
                 label={i18n._(
-                  t`Show the "Create" section by default when opening GDevelop`
+                  t`Show the "Create" section by default when opening Carrots Engine`
                 )}
               />
               <CompactToggleField
@@ -464,7 +510,7 @@ const PreferencesDialog = ({
                 }
                 checked={values.previewCrashReportUploadLevel !== 'none'}
                 label={i18n._(
-                  t`Send crash reports during previews to GDevelop`
+                  t`Send crash reports during previews to Carrots Engine`
                 )}
               />
               <CompactToggleField
@@ -540,29 +586,6 @@ const PreferencesDialog = ({
               <Text size="sub-title">
                 <Trans>Other</Trans>
               </Text>
-              <FlatButton
-                label={<Trans>Reset hidden Ask AI text inputs</Trans>}
-                onClick={() => showAllAskAiStandAloneForms()}
-                disabled={
-                  !Object.keys(values.hiddenAskAiStandAloneForms).length
-                }
-              />
-              <CompactToggleField
-                labelColor="primary"
-                hideTooltip
-                onCheck={setShowAiAskButtonInTitleBar}
-                checked={values.showAiAskButtonInTitleBar}
-                label={i18n._(t`Show "Ask AI" button in the title bar`)}
-              />
-              <CompactToggleField
-                labelColor="primary"
-                hideTooltip
-                onCheck={setAutomaticallyUseCreditsForAiRequests}
-                checked={values.automaticallyUseCreditsForAiRequests}
-                label={i18n._(
-                  t`Automatically use GDevelop credits for AI requests when run out of AI credits`
-                )}
-              />
               <CompactToggleField
                 labelColor="primary"
                 hideTooltip

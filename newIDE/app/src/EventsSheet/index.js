@@ -55,6 +55,7 @@ import {
   getSelectedInstructionsLocatingEvents,
   selectEventsAfterHistoryChange,
   getLastSelectedTopMostOnlyEventContext,
+  getSelectedEventContexts,
   getSelectedTopMostOnlyEventContexts,
   getLastSelectedEventContext,
   getLastSelectedEventContextWhichCanHaveSubEvents,
@@ -125,6 +126,8 @@ import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariab
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { useHighlightedAiGeneratedEvent } from './UseHighlightedAiGeneratedEvent';
 import { findEventByPath } from '../Utils/EventsValidationScanner';
+import { isElseEventValid } from './EventsTree/helpers';
+import EventInspectorPanel from './EventInspectorPanel';
 
 const gd: libGDevelop = global.gd;
 
@@ -245,6 +248,18 @@ const styles = {
     flex: 1,
     position: 'relative', // To be sure that absolutely positioned PlaceholderMessage won't go outside of the EventsSheet
   },
+  editorLayout: {
+    display: 'flex',
+    flex: 1,
+    minHeight: 0,
+  },
+  editorMainColumn: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    minWidth: 0,
+    minHeight: 0,
+  },
 };
 
 export class EventsSheetComponentWithoutHandle extends React.Component<
@@ -256,6 +271,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _searchPanel: ?SearchPanelInterface;
   // $FlowFixMe[missing-local-annot]
   _containerDiv = (React.createRef<HTMLDivElement>(): React$RefObject<HTMLDivElement | null>);
+  // $FlowFixMe[missing-local-annot]
+  _eventsMainColumnDiv = (React.createRef<HTMLDivElement>(): React$RefObject<HTMLDivElement | null>);
   // $FlowFixMe[missing-local-annot]
   _containerDivLastKnownSize = null;
   // $FlowFixMe[missing-local-annot]
@@ -370,6 +387,16 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // allowing the keyboard shortcuts to work.
     if (!prevProps.isActive && this.props.isActive) {
       this._ensureFocused();
+    }
+
+    // Drop selection when leaving the tab to avoid stale C++ pointers
+    // being reused after focus/context switches.
+    if (prevProps.isActive && !this.props.isActive) {
+      this.setState({
+        selection: clearSelection(),
+        inlineEditing: false,
+        inlineEditingAnchorEl: null,
+      });
     }
   }
 
@@ -1103,21 +1130,38 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _selectionIsStandardEvent = (): any => {
     const eventContext = getLastSelectedEventContext(this.state.selection);
     return (
-      !!eventContext &&
-      eventContext.event.getType() === 'BuiltinCommonInstructions::Standard'
+      this._getSafeEventTypeFromContext(eventContext) ===
+      'BuiltinCommonInstructions::Standard'
     );
   };
 
   _selectionIsElseEvent = (): any => {
     const eventContext = getLastSelectedEventContext(this.state.selection);
     return (
-      !!eventContext &&
-      eventContext.event.getType() === 'BuiltinCommonInstructions::Else'
+      this._getSafeEventTypeFromContext(eventContext) ===
+      'BuiltinCommonInstructions::Else'
     );
   };
 
+  _getSafeEventType = (event: gdBaseEvent): string | null => {
+    try {
+      return event.getType();
+    } catch (error) {
+      console.warn('Ignoring stale selected event pointer.', error);
+      return null;
+    }
+  };
+
+  _getSafeEventTypeFromContext = (
+    eventContext: ?EventContext
+  ): string | null => {
+    if (!eventContext) return null;
+    return this._getSafeEventType(eventContext.event);
+  };
+
   _asLoopEvent = (event: gdBaseEvent): any | null => {
-    const eventType = event.getType();
+    const eventType = this._getSafeEventType(event);
+    if (!eventType) return null;
     if (eventType === 'BuiltinCommonInstructions::While')
       return gd.asWhileEvent(event);
     if (eventType === 'BuiltinCommonInstructions::Repeat')
@@ -1132,7 +1176,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _getLastSelectedLoopEventContext = (): EventContext | null => {
     const eventContext = getLastSelectedEventContext(this.state.selection);
     if (!eventContext) return null;
-    if (!loopEventTypes.includes(eventContext.event.getType())) return null;
+    const eventType = this._getSafeEventTypeFromContext(eventContext);
+    if (!eventType || !loopEventTypes.includes(eventType)) return null;
     return eventContext;
   };
 
@@ -1149,16 +1194,19 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   _selectionIsForEachEvent = (): boolean => {
     const eventContext = getLastSelectedEventContext(this.state.selection);
-    if (!eventContext) return false;
     return (
-      eventContext.event.getType() === 'BuiltinCommonInstructions::ForEach'
+      this._getSafeEventTypeFromContext(eventContext) ===
+      'BuiltinCommonInstructions::ForEach'
     );
   };
 
   _selectionForEachHasOrderBy = (): boolean => {
     const eventContext = getLastSelectedEventContext(this.state.selection);
     if (!eventContext) return false;
-    if (eventContext.event.getType() !== 'BuiltinCommonInstructions::ForEach')
+    if (
+      this._getSafeEventTypeFromContext(eventContext) !==
+      'BuiltinCommonInstructions::ForEach'
+    )
       return false;
     const forEachEvent = gd.asForEachEvent(eventContext.event);
     return !!forEachEvent.getOrderBy();
@@ -1167,7 +1215,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _addOrdering = () => {
     const eventContext = getLastSelectedEventContext(this.state.selection);
     if (!eventContext) return;
-    if (eventContext.event.getType() !== 'BuiltinCommonInstructions::ForEach')
+    if (
+      this._getSafeEventTypeFromContext(eventContext) !==
+      'BuiltinCommonInstructions::ForEach'
+    )
       return;
 
     const forEachEvent = gd.asForEachEvent(eventContext.event);
@@ -1190,7 +1241,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _removeOrdering = () => {
     const eventContext = getLastSelectedEventContext(this.state.selection);
     if (!eventContext) return;
-    if (eventContext.event.getType() !== 'BuiltinCommonInstructions::ForEach')
+    if (
+      this._getSafeEventTypeFromContext(eventContext) !==
+      'BuiltinCommonInstructions::ForEach'
+    )
       return;
 
     const forEachEvent = gd.asForEachEvent(eventContext.event);
@@ -1266,6 +1320,234 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         });
       });
     }
+  };
+
+  _forceUpdateEventAndSaveInHistory = (event: gdBaseEvent) => {
+    if (this._eventsTree) {
+      this._eventsTree.forceEventsUpdate(() => {
+        const positions = this._getChangedEventRows([event]);
+        this._saveChangesToHistory('EDIT', {
+          positionsBeforeAction: positions,
+          positionAfterAction: positions,
+        });
+      });
+      return;
+    }
+
+    const positions = this._getChangedEventRows([event]);
+    this._saveChangesToHistory('EDIT', {
+      positionsBeforeAction: positions,
+      positionAfterAction: positions,
+    });
+  };
+
+  _setSelectedEventFolded = (folded: boolean) => {
+    const eventContext = getLastSelectedEventContext(this.state.selection);
+    if (!eventContext) return;
+    if (!eventContext.event.canHaveSubEvents()) return;
+    if (eventContext.event.isFolded() === folded) return;
+
+    eventContext.event.setFolded(folded);
+    if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+  };
+
+  _toggleSelectedEventDisabled = () => {
+    const eventContext = getLastSelectedEventContext(this.state.selection);
+    if (!eventContext) return;
+    if (!eventContext.event.isExecutable()) return;
+
+    eventContext.event.setDisabled(!eventContext.event.isDisabled());
+    this._forceUpdateEventAndSaveInHistory(eventContext.event);
+  };
+
+  _setSelectedGroupName = (name: string) => {
+    const eventContext = getLastSelectedEventContext(this.state.selection);
+    if (!eventContext) return;
+    if (
+      this._getSafeEventTypeFromContext(eventContext) !==
+      'BuiltinCommonInstructions::Group'
+    )
+      return;
+
+    const groupEvent = gd.asGroupEvent(eventContext.event);
+    if (groupEvent.getName() === name) return;
+
+    groupEvent.setName(name);
+    this._forceUpdateEventAndSaveInHistory(eventContext.event);
+  };
+
+  _setSelectedCommentText = (comment: string) => {
+    const eventContext = getLastSelectedEventContext(this.state.selection);
+    if (!eventContext) return;
+    if (
+      this._getSafeEventTypeFromContext(eventContext) !==
+      'BuiltinCommonInstructions::Comment'
+    )
+      return;
+
+    const commentEvent = gd.asCommentEvent(eventContext.event);
+    if (commentEvent.getComment() === comment) return;
+
+    commentEvent.setComment(comment);
+    this._forceUpdateEventAndSaveInHistory(eventContext.event);
+  };
+
+  _setSelectedLocalVariablePrimitiveValue = (
+    variableName: string,
+    valueAsString: string
+  ) => {
+    const eventContext = getLastSelectedEventContext(this.state.selection);
+    if (!eventContext) return;
+    if (!eventContext.event.canHaveVariables()) return;
+
+    const variablesContainer = eventContext.event.getVariables();
+    if (!variablesContainer.has(variableName)) return;
+
+    const variable = variablesContainer.get(variableName);
+    const variableType = variable.getType();
+
+    let valueChanged = false;
+    if (variableType === gd.Variable.String) {
+      if (variable.getString() !== valueAsString) {
+        variable.setString(valueAsString);
+        valueChanged = true;
+      }
+    } else if (variableType === gd.Variable.Number) {
+      const parsedValue = parseFloat(valueAsString);
+      const safeValue = Number.isNaN(parsedValue) ? 0 : parsedValue;
+      if (variable.getValue() !== safeValue) {
+        variable.setValue(safeValue);
+        valueChanged = true;
+      }
+    } else if (variableType === gd.Variable.Boolean) {
+      const boolValue =
+        valueAsString.toLowerCase() === 'true' || valueAsString === '1';
+      if (variable.getBool() !== boolValue) {
+        variable.setBool(boolValue);
+        valueChanged = true;
+      }
+    }
+
+    if (!valueChanged) return;
+    this._forceUpdateEventAndSaveInHistory(eventContext.event);
+  };
+
+  _addSelectedLocalVariable = (requestedVariableName: string) => {
+    const trimmedName = requestedVariableName.trim();
+    if (!trimmedName) return;
+
+    const eventContext = getLastSelectedEventContext(this.state.selection);
+    if (!eventContext) return;
+    if (!eventContext.event.canHaveVariables()) return;
+
+    const variablesContainer = eventContext.event.getVariables();
+    const safeName = newNameGenerator(trimmedName, variableName =>
+      variablesContainer.has(variableName)
+    );
+    variablesContainer
+      .insertNew(safeName, variablesContainer.count())
+      .setValue(0);
+
+    this._forceUpdateEventAndSaveInHistory(eventContext.event);
+  };
+
+  _openSelectedLocalVariablesDialog = () => {
+    const eventContext =
+      getLastSelectedEventContextWhichCanHaveVariables(this.state.selection) ||
+      getLastSelectedInstructionEventContextWhichCanHaveVariables(
+        this.state.selection
+      );
+    if (!eventContext) return;
+
+    this.openVariablesEditor(
+      eventContext,
+      {
+        variablesContainer: eventContext.event.getVariables(),
+        variableName: 'Variable',
+      },
+      false
+    );
+  };
+
+  _setSelectedInstructionInverted = (inverted: boolean) => {
+    const instructionContext = getLastSelectedInstructionContext(
+      this.state.selection
+    );
+    if (!instructionContext) return;
+    if (!instructionContext.isCondition) return;
+    if (instructionContext.instruction.isInverted() === inverted) return;
+
+    instructionContext.instruction.setInverted(inverted);
+    this._forceUpdateEventAndSaveInHistory(
+      instructionContext.eventContext.event
+    );
+  };
+
+  _setSelectedInstructionAwaited = (awaited: boolean) => {
+    const instructionContext = getLastSelectedInstructionContext(
+      this.state.selection
+    );
+    if (!instructionContext) return;
+    if (instructionContext.isCondition) return;
+
+    const instructionMetadata = getInstructionMetadata({
+      instructionType: instructionContext.instruction.getType(),
+      project: this.props.project,
+      isCondition: false,
+    });
+    if (!instructionMetadata || !instructionMetadata.isOptionallyAsync()) {
+      return;
+    }
+    if (instructionContext.instruction.isAwaited() === awaited) return;
+
+    instructionContext.instruction.setAwaited(awaited);
+    this._forceUpdateEventAndSaveInHistory(
+      instructionContext.eventContext.event
+    );
+  };
+
+  _setSelectedInstructionParameterValue = (
+    parameterIndex: number,
+    valueAsString: string
+  ) => {
+    const instructionContext = getLastSelectedInstructionContext(
+      this.state.selection
+    );
+    if (!instructionContext) return;
+
+    const instruction = instructionContext.instruction;
+    if (
+      parameterIndex < 0 ||
+      parameterIndex >= instruction.getParametersCount()
+    )
+      return;
+    if (
+      instruction.getParameter(parameterIndex).getPlainString() ===
+      valueAsString
+    )
+      return;
+
+    instruction.setParameter(parameterIndex, valueAsString);
+    gd.VariableInstructionSwitcher.switchBetweenUnifiedInstructionIfNeeded(
+      this.props.project.getCurrentPlatform(),
+      instructionContext.eventContext.projectScopedContainersAccessor.get(),
+      instruction
+    );
+    this._forceUpdateEventAndSaveInHistory(
+      instructionContext.eventContext.event
+    );
+  };
+
+  _openSelectedInstructionEditorFromInspector = () => {
+    const instructionContext = getLastSelectedInstructionContext(
+      this.state.selection
+    );
+    if (!instructionContext) return;
+
+    this.openInstructionEditor(
+      instructionContext.eventContext,
+      instructionContext
+    );
   };
 
   _replaceSelectedEventType = (eventType: string) => {
@@ -2253,9 +2535,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // In this case, we keep the previous known size to avoid trashing the layout and events tree
     // memorized heights for events (which would create flickering when switching back
     // to the events editor tab).
-    if (this._containerDiv.current) {
-      const width = this._containerDiv.current.clientWidth;
-      const height = this._containerDiv.current.clientHeight;
+    const eventsTreeContainer =
+      this._eventsMainColumnDiv.current || this._containerDiv.current;
+    if (eventsTreeContainer) {
+      const width = eventsTreeContainer.clientWidth;
+      const height = eventsTreeContainer.clientHeight;
 
       if (width > 0 && height > 0) {
         this._containerDivLastKnownSize = {
@@ -2263,6 +2547,41 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           height,
         };
       }
+    }
+
+    const selectedInstructionContext = isActive
+      ? getLastSelectedInstructionContext(this.state.selection)
+      : null;
+    const selectedEventContext = isActive
+      ? getLastSelectedEventContext(this.state.selection)
+      : null;
+    const selectedEventsCount = isActive
+      ? getSelectedEventContexts(this.state.selection).length
+      : 0;
+    const selectedInstructionsCount = isActive
+      ? getSelectedInstructionsContexts(this.state.selection).length
+      : 0;
+    let isSelectedElseEventValid = true;
+    if (
+      isActive &&
+      selectedEventContext &&
+      this._getSafeEventTypeFromContext(selectedEventContext) ===
+        'BuiltinCommonInstructions::Else'
+    ) {
+      try {
+        isSelectedElseEventValid = isElseEventValid(
+          selectedEventContext.eventsList,
+          selectedEventContext.indexInList
+        );
+      } catch (error) {
+        console.warn('Ignoring stale else-event context in inspector.', error);
+      }
+    }
+    const eventMetadataByType: { [string]: EventMetadata } = {};
+    if (isActive) {
+      this.state.allEventsMetadata.forEach(eventMetadata => {
+        eventMetadataByType[eventMetadata.type] = eventMetadata;
+      });
     }
 
     return (
@@ -2296,122 +2615,189 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               ref={this._containerDiv}
               tabIndex={0}
             >
-              {isFunctionOnlyCallingItself && (
-                <Line>
-                  <Column expand>
-                    <AlertMessage kind="warning">
-                      <Trans>
-                        This function calls itself (it is "recursive"). Ensure
-                        this is expected and there is a proper condition to stop
-                        it if necessary.
-                      </Trans>
-                    </AlertMessage>
-                  </Column>
-                </Line>
-              )}
-              {this._containerDivLastKnownSize && (
-                <EventsTree
-                  ref={eventsTree => (this._eventsTree = eventsTree)}
-                  key={events.ptr}
-                  indentScale={preferences.values.eventsSheetIndentScale}
-                  onScroll={this._ensureFocused}
-                  events={events}
-                  project={project}
-                  scope={scope}
-                  globalObjectsContainer={globalObjectsContainer}
-                  objectsContainer={objectsContainer}
-                  projectScopedContainersAccessor={
-                    projectScopedContainersAccessor
-                  }
-                  selection={this.state.selection}
-                  onInstructionClick={this.selectInstruction}
-                  onInstructionDoubleClick={this.openInstructionEditor}
-                  onInstructionContextMenu={this.openInstructionContextMenu}
-                  onAddInstructionContextMenu={
-                    this.openAddInstructionContextMenu
-                  }
-                  onAddNewInstruction={this.openInstructionEditor}
-                  onPasteInstructions={this.pasteInstructionsInInstructionsList}
-                  onMoveToInstruction={this.moveSelectionToInstruction}
-                  onMoveToInstructionsList={
-                    this.moveSelectionToInstructionsList
-                  }
-                  onParameterClick={this.openParameterEditor}
-                  onVariableDeclarationClick={() => {
-                    // Nothing to do.
-                  }}
-                  onVariableDeclarationDoubleClick={this.openVariablesEditor}
-                  onEventClick={this.selectEvent}
-                  onEventContextMenu={this.openEventContextMenu}
-                  onAddNewEvent={(
-                    eventType: string,
-                    eventsList: gdEventsList
-                  ) => {
-                    this.addNewEvent(eventType, {
-                      eventsList,
-                      indexInList: eventsList.getEventsCount(),
-                    });
-                  }}
-                  onOpenExternalEvents={onOpenExternalEvents}
-                  onOpenLayout={onOpenLayout}
-                  searchResults={
-                    this.state.navigationHighlightEvent
-                      ? [this.state.navigationHighlightEvent]
-                      : eventsSearchResultEvents
-                  }
-                  searchFocusOffset={
-                    this.state.navigationHighlightEvent ? 0 : searchFocusOffset
-                  }
-                  onEventMoved={this._onEventMoved}
-                  onEndEditingEvent={this._onEndEditingStringEvent}
-                  showObjectThumbnails={
-                    preferences.values.eventsSheetShowObjectThumbnails
-                  }
-                  screenType={screenType}
-                  windowSize={windowSize}
-                  eventsSheetWidth={this._containerDivLastKnownSize.width}
-                  eventsSheetHeight={this._containerDivLastKnownSize.height}
-                  fontSize={preferences.values.eventsSheetZoomLevel}
-                  preferences={preferences}
-                  tutorials={tutorials}
-                  highlightedAiGeneratedEventIds={
-                    highlightedAiGeneratedEventIds
-                  }
-                />
-              )}
-              {this.state.showSearchPanel && (
-                <ErrorBoundary
-                  componentTitle={<Trans>Search panel</Trans>}
-                  scope="scene-events-search"
-                  onClose={() => this._closeSearchPanel()}
+              <div style={styles.editorLayout}>
+                <div
+                  style={styles.editorMainColumn}
+                  ref={this._eventsMainColumnDiv}
                 >
-                  <SearchPanel
-                    ref={searchPanel => (this._searchPanel = searchPanel)}
-                    onSearchInEvents={inputs =>
-                      this._searchInEvents(searchInEvents, inputs)
-                    }
-                    onReplaceInEvents={inputs => {
-                      this._replaceInEvents(replaceInEvents, inputs);
-                    }}
-                    resultsCount={
-                      eventsSearchResultEvents
-                        ? eventsSearchResultEvents.length
-                        : null
-                    }
-                    hasEventSelected={hasEventSelected(this.state.selection)}
-                    onGoToPreviousSearchResult={() =>
-                      this._ensureUnfoldedAndScrollTo(goToPreviousSearchResult)
-                    }
-                    onCloseSearchPanel={() => {
-                      this._closeSearchPanel();
-                    }}
-                    onGoToNextSearchResult={() =>
-                      this._ensureUnfoldedAndScrollTo(goToNextSearchResult)
-                    }
-                    searchFocusOffset={searchFocusOffset}
-                  />
-                </ErrorBoundary>
-              )}
+                  {isFunctionOnlyCallingItself && (
+                    <Line>
+                      <Column expand>
+                        <AlertMessage kind="warning">
+                          <Trans>
+                            This function calls itself (it is "recursive").
+                            Ensure this is expected and there is a proper
+                            condition to stop it if necessary.
+                          </Trans>
+                        </AlertMessage>
+                      </Column>
+                    </Line>
+                  )}
+                  {this._containerDivLastKnownSize && (
+                    <EventsTree
+                      ref={eventsTree => (this._eventsTree = eventsTree)}
+                      key={events.ptr}
+                      indentScale={preferences.values.eventsSheetIndentScale}
+                      onScroll={this._ensureFocused}
+                      events={events}
+                      project={project}
+                      scope={scope}
+                      globalObjectsContainer={globalObjectsContainer}
+                      objectsContainer={objectsContainer}
+                      projectScopedContainersAccessor={
+                        projectScopedContainersAccessor
+                      }
+                      selection={this.state.selection}
+                      onInstructionClick={this.selectInstruction}
+                      onInstructionDoubleClick={this.openInstructionEditor}
+                      onInstructionContextMenu={this.openInstructionContextMenu}
+                      onAddInstructionContextMenu={
+                        this.openAddInstructionContextMenu
+                      }
+                      onAddNewInstruction={this.openInstructionEditor}
+                      onPasteInstructions={
+                        this.pasteInstructionsInInstructionsList
+                      }
+                      onMoveToInstruction={this.moveSelectionToInstruction}
+                      onMoveToInstructionsList={
+                        this.moveSelectionToInstructionsList
+                      }
+                      onParameterClick={this.openParameterEditor}
+                      onVariableDeclarationClick={() => {
+                        // Nothing to do.
+                      }}
+                      onVariableDeclarationDoubleClick={
+                        this.openVariablesEditor
+                      }
+                      onEventClick={this.selectEvent}
+                      onEventContextMenu={this.openEventContextMenu}
+                      onAddNewEvent={(
+                        eventType: string,
+                        eventsList: gdEventsList
+                      ) => {
+                        this.addNewEvent(eventType, {
+                          eventsList,
+                          indexInList: eventsList.getEventsCount(),
+                        });
+                      }}
+                      onOpenExternalEvents={onOpenExternalEvents}
+                      onOpenLayout={onOpenLayout}
+                      searchResults={
+                        this.state.navigationHighlightEvent
+                          ? [this.state.navigationHighlightEvent]
+                          : eventsSearchResultEvents
+                      }
+                      searchFocusOffset={
+                        this.state.navigationHighlightEvent
+                          ? 0
+                          : searchFocusOffset
+                      }
+                      onEventMoved={this._onEventMoved}
+                      onEndEditingEvent={this._onEndEditingStringEvent}
+                      showObjectThumbnails={
+                        preferences.values.eventsSheetShowObjectThumbnails
+                      }
+                      screenType={screenType}
+                      windowSize={windowSize}
+                      eventsSheetWidth={this._containerDivLastKnownSize.width}
+                      eventsSheetHeight={this._containerDivLastKnownSize.height}
+                      fontSize={preferences.values.eventsSheetZoomLevel}
+                      preferences={preferences}
+                      tutorials={tutorials}
+                      highlightedAiGeneratedEventIds={
+                        highlightedAiGeneratedEventIds
+                      }
+                    />
+                  )}
+                  {this.state.showSearchPanel && (
+                    <ErrorBoundary
+                      componentTitle={<Trans>Search panel</Trans>}
+                      scope="scene-events-search"
+                      onClose={() => this._closeSearchPanel()}
+                    >
+                      <SearchPanel
+                        ref={searchPanel => (this._searchPanel = searchPanel)}
+                        onSearchInEvents={inputs =>
+                          this._searchInEvents(searchInEvents, inputs)
+                        }
+                        onReplaceInEvents={inputs => {
+                          this._replaceInEvents(replaceInEvents, inputs);
+                        }}
+                        resultsCount={
+                          eventsSearchResultEvents
+                            ? eventsSearchResultEvents.length
+                            : null
+                        }
+                        hasEventSelected={hasEventSelected(
+                          this.state.selection
+                        )}
+                        onGoToPreviousSearchResult={() =>
+                          this._ensureUnfoldedAndScrollTo(
+                            goToPreviousSearchResult
+                          )
+                        }
+                        onCloseSearchPanel={() => {
+                          this._closeSearchPanel();
+                        }}
+                        onGoToNextSearchResult={() =>
+                          this._ensureUnfoldedAndScrollTo(goToNextSearchResult)
+                        }
+                        searchFocusOffset={searchFocusOffset}
+                      />
+                    </ErrorBoundary>
+                  )}
+                </div>
+
+                {isActive && (
+                  <ErrorBoundary
+                    componentTitle={<Trans>Event inspector</Trans>}
+                    scope="scene-events-inspector"
+                  >
+                    <EventInspectorPanel
+                      project={project}
+                      selectedEventContext={selectedEventContext}
+                      selectedEventsCount={selectedEventsCount}
+                      selectedInstructionContext={selectedInstructionContext}
+                      selectedInstructionsCount={selectedInstructionsCount}
+                      eventMetadataByType={eventMetadataByType}
+                      isSelectedElseEventValid={isSelectedElseEventValid}
+                      canAddLoopIndexVariable={
+                        this._selectionIsLoopEvent() &&
+                        !this._selectionHasIndexVariable()
+                      }
+                      canRemoveLoopIndexVariable={
+                        this._selectionIsLoopEvent() &&
+                        this._selectionHasIndexVariable()
+                      }
+                      onSetSelectedInstructionInverted={
+                        this._setSelectedInstructionInverted
+                      }
+                      onSetSelectedInstructionAwaited={
+                        this._setSelectedInstructionAwaited
+                      }
+                      onSetInstructionParameterValue={
+                        this._setSelectedInstructionParameterValue
+                      }
+                      onOpenSelectedInstructionEditor={
+                        this._openSelectedInstructionEditorFromInspector
+                      }
+                      onToggleDisabledEvent={this._toggleSelectedEventDisabled}
+                      onSetEventFolded={this._setSelectedEventFolded}
+                      onSetGroupName={this._setSelectedGroupName}
+                      onSetCommentText={this._setSelectedCommentText}
+                      onSetLocalVariablePrimitiveValue={
+                        this._setSelectedLocalVariablePrimitiveValue
+                      }
+                      onAddLocalVariable={this._addSelectedLocalVariable}
+                      onOpenLocalVariablesDialog={
+                        this._openSelectedLocalVariablesDialog
+                      }
+                      onAddLoopIndexVariable={this._addLoopIndexVariable}
+                      onRemoveLoopIndexVariable={this._removeLoopIndexVariable}
+                    />
+                  </ErrorBoundary>
+                )}
+              </div>
               <InlineParameterEditor
                 open={this.state.inlineEditing}
                 anchorEl={this.state.inlineEditingAnchorEl}

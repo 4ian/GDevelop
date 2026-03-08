@@ -55,9 +55,7 @@ const LanguageDialog = ({ open, onClose }: Props): null | React.Node => {
                 key="report-wrong-translation"
                 primary={false}
                 onClick={() =>
-                  Window.openExternalURL(
-                    'https://github.com/4ian/GDevelop/issues/969'
-                  )
+                  Window.openExternalURL('https://github.com/Carrotstudio0')
                 }
               />,
             ]}

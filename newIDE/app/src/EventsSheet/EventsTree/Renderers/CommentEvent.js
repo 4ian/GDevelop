@@ -156,6 +156,7 @@ export default class CommentEvent extends React.Component<
         className={classNames({
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
+          'event-kind-comment': true,
         })}
         style={{
           ...styles.container,

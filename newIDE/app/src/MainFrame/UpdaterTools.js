@@ -49,7 +49,8 @@ export const getElectronUpdateStatusLabel = (
   if (status === 'update-downloaded')
     return (
       <Trans>
-        A new update will be installed after you quit and relaunch GDevelop
+        A new update will be installed after you quit and relaunch Carrots
+        Engine
       </Trans>
     );
   return '';
@@ -57,7 +58,7 @@ export const getElectronUpdateStatusLabel = (
 
 export const getElectronUpdateButtonLabel = (status: string): React.Node => {
   if (status === 'update-available')
-    return <Trans>Update GDevelop to latest version</Trans>;
+    return <Trans>Update Carrots Engine to latest version</Trans>;
   return <Trans>Check again for new updates</Trans>;
 };
 
@@ -117,8 +118,8 @@ export const getServiceWorkerStatusLabel = (
   } else if (status === 'update-ready') {
     return (
       <Trans>
-        An update is ready to be installed. Close ALL GDevelop apps or tabs in
-        your browser, then open it again.
+        An update is ready to be installed. Close ALL Carrots Engine apps or
+        tabs in your browser, then open it again.
       </Trans>
     );
   }

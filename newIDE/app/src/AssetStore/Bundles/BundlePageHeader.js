@@ -24,7 +24,6 @@ import {
 } from '../../AssetStore/ProductPageHelper';
 import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
 import { BundleStoreContext } from '../../AssetStore/Bundles/BundleStoreContext';
 import { sendBundleBuyClicked } from '../../Utils/Analytics/EventSender';
 import BundlePurchaseDialog from '../../AssetStore/Bundles/BundlePurchaseDialog';
@@ -37,7 +36,6 @@ import { CreditsPackageStoreContext } from '../../AssetStore/CreditsPackages/Cre
 import { AssetStoreContext } from '../../AssetStore/AssetStoreContext';
 import CourseStoreContext from '../../Course/CourseStoreContext';
 import SecureCheckout from '../../AssetStore/SecureCheckout/SecureCheckout';
-import FlatButton from '../../UI/FlatButton';
 import Chip from '../../UI/Chip';
 import ProductLimitedTimeOffer from '../../AssetStore/ProductLimitedTimeOffer';
 import Skeleton from '@material-ui/lab/Skeleton';
@@ -90,7 +88,6 @@ const BundlePageHeader = ({
   const { privateAssetPackListingDatas } = React.useContext(AssetStoreContext);
   const { listedCourses } = React.useContext(CourseStoreContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { openRedeemCodeDialog } = React.useContext(SubscriptionContext);
   const { receivedBundles, bundlePurchases } = authenticatedUser;
   const [
     purchasingBundleListingData,
@@ -181,11 +178,9 @@ const BundlePageHeader = ({
       if (isAlreadyReceived) {
         return (
           <Line noMargin>
-            <FlatButton
-              primary
-              label={<Trans>Activate my subscription</Trans>}
-              onClick={() => openRedeemCodeDialog()}
-            />
+            <Text color="secondary">
+              <Trans>Included for free in Carrots Engine.</Trans>
+            </Text>
           </Line>
         );
       }
@@ -207,7 +202,6 @@ const BundlePageHeader = ({
       bundleListingData,
       productListingDatasIncludedInBundle,
       isMobile,
-      openRedeemCodeDialog,
     ]
   );
 

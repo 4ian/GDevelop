@@ -26,7 +26,7 @@ export const SurveyCard = ({
         <ColumnStackLayout alignItems="flex-start" expand>
           <Text noMargin size="block-title">
             {hasFilledSurveyAlready ? (
-              <Trans>Have you changed your usage of GDevelop?</Trans>
+              <Trans>Have you changed your usage of Carrots Engine?</Trans>
             ) : (
               <Trans>Personalize your suggested content</Trans>
             )}

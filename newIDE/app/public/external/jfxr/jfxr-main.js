@@ -77,7 +77,7 @@ onMessageFromParentEditor('open-external-editor-input', externalEditorInput => {
   });
 
   setTitle(
-    'GDevelop Sound Effects Editor (Jfxr) - ' + externalEditorInput.name
+    'Carrots Sound Effects Editor (Jfxr) - ' + externalEditorInput.name
   );
 
   const isOverwritingExistingResource = resource && resource.name && resource.dataUrl;

@@ -23,7 +23,7 @@ const ChangelogDialog = ({ open, onClose }: Props): null | React.Node => {
   }
 
   const openReleaseNote = () =>
-    Window.openExternalURL('https://github.com/4ian/GDevelop/releases');
+    Window.openExternalURL('https://github.com/Carrotstudio0');
 
   const actions = [
     <FlatButton
@@ -36,7 +36,7 @@ const ChangelogDialog = ({ open, onClose }: Props): null | React.Node => {
 
   return (
     <Dialog
-      title={<Trans>What's new in GDevelop?</Trans>}
+      title={<Trans>What's new in Carrots Engine?</Trans>}
       // $FlowFixMe[incompatible-type]
       actions={actions}
       open={open}
@@ -46,7 +46,7 @@ const ChangelogDialog = ({ open, onClose }: Props): null | React.Node => {
       <ResponsiveLineStackLayout noMargin justifyContent="space-between">
         <Text>
           <Trans>
-            GDevelop was upgraded to a new version! Check out the changes.
+            Carrots Engine was upgraded to a new version! Check out the changes.
           </Trans>
         </Text>
         <FlatButton

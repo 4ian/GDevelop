@@ -49,20 +49,14 @@ import TextButton from '../UI/TextButton';
 import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
 import ExampleInformationPage from '../AssetStore/ExampleStore/ExampleInformationPage';
 import PrivateGameTemplateInformationPage from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateInformationPage';
-import ExampleStore from '../AssetStore/ExampleStore';
-import Text from '../UI/Text';
 import { type WindowSizeType } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { PrivateGameTemplateStoreContext } from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import { getUserProductPurchaseUsageType } from '../AssetStore/ProductPageHelper';
-import { useOnlineStatus } from '../Utils/OnlineStatus';
 import PrivateGameTemplateOwnedInformationPage from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateOwnedInformationPage';
 import { ExampleStoreContext } from '../AssetStore/ExampleStore/ExampleStoreContext';
-import EmptyMessage from '../UI/EmptyMessage';
 import { BundleStoreContext } from '../AssetStore/Bundles/BundleStoreContext';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import { isNativeMobileApp } from '../Utils/Platform';
-import { AskAiStandAloneForm } from '../AiGeneration/AskAiStandAloneForm';
-import { AiRequestContext } from '../AiGeneration/AiRequestContext';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -131,6 +125,7 @@ type Props = {|
   onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: ?PrivateGameTemplateListingData
   ) => void,
+  openEmptyProjectDirectly?: boolean,
   storageProviders: Array<StorageProvider>,
   storageProvider: ?StorageProvider,
   privateGameTemplateListingDatasFromSameCreator: ?Array<PrivateGameTemplateListingData>,
@@ -165,6 +160,7 @@ const NewProjectSetupDialog = ({
   onSelectExampleShortHeader,
   selectedPrivateGameTemplateListingData,
   onSelectPrivateGameTemplateListingData,
+  openEmptyProjectDirectly,
   storageProviders,
   storageProvider,
   privateGameTemplateListingDatasFromSameCreator,
@@ -173,6 +169,11 @@ const NewProjectSetupDialog = ({
   onWillInstallExtension,
   onExtensionInstalled,
 }: Props): React.Node => {
+  void onCloseAskAi;
+  void onOpenLayout;
+  void onWillInstallExtension;
+  void onExtensionInstalled;
+
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
     authenticated,
@@ -186,7 +187,7 @@ const NewProjectSetupDialog = ({
   const [
     emptyProjectSelected,
     setEmptyProjectSelected,
-  ] = React.useState<boolean>(false);
+  ] = React.useState<boolean>(!!openEmptyProjectDirectly);
   const [startersSelected, setStartersSelected] = React.useState<boolean>(
     false
   );
@@ -206,7 +207,6 @@ const NewProjectSetupDialog = ({
     PrivateGameTemplateStoreContext
   );
   const { bundleListingDatas } = React.useContext(BundleStoreContext);
-  const isOnline = useOnlineStatus();
   const { values, setNewProjectsDefaultStorageProviderName } = React.useContext(
     PreferencesContext
   );
@@ -310,9 +310,7 @@ const NewProjectSetupDialog = ({
     defaultCustomHeight;
   const selectedOrientation = resolutionOptions[resolutionOption].orientation;
 
-  const { aiRequestStorage } = React.useContext(AiRequestContext);
-  const { isSendingAiRequest } = aiRequestStorage;
-  const isLoading = isProjectOpening || isSendingAiRequest('');
+  const isLoading = !!isProjectOpening;
 
   const linkedExampleShortHeaders: {
     exampleShortHeader: ExampleShortHeader,
@@ -665,19 +663,6 @@ const NewProjectSetupDialog = ({
             )}
             {isOnHomePage && (
               <ColumnStackLayout noMargin>
-                <AskAiStandAloneForm
-                  i18n={i18n}
-                  project={project}
-                  resourceManagementProps={resourceManagementProps}
-                  fileMetadata={fileMetadata}
-                  storageProvider={storageProvider}
-                  onCreateProjectFromExample={onCreateFromExample}
-                  onCreateEmptyProject={onCreateEmptyProject}
-                  onOpenLayout={onOpenLayout}
-                  onWillInstallExtension={onWillInstallExtension}
-                  onExtensionInstalled={onExtensionInstalled}
-                  onCloseAskAi={onCloseAskAi}
-                />
                 <EmptyAndStartingPointProjects
                   onSelectExampleShortHeader={exampleShortHeader => {
                     onSelectExampleShortHeader(exampleShortHeader);
@@ -690,38 +675,6 @@ const NewProjectSetupDialog = ({
                     setStartersSelected(true);
                   }}
                 />
-                {isOnline ? (
-                  <>
-                    <Text size="block-title" noMargin>
-                      <Trans>Remix an existing game</Trans>
-                    </Text>
-                    <ExampleStore
-                      onSelectExampleShortHeader={exampleShortHeader => {
-                        onSelectExampleShortHeader(exampleShortHeader);
-                      }}
-                      onSelectPrivateGameTemplateListingData={privateGameTemplateListingData => {
-                        onSelectPrivateGameTemplateListingData(
-                          privateGameTemplateListingData
-                        );
-                      }}
-                      i18n={i18n}
-                      getColumnsFromWindowSize={getItemsColumns}
-                      hideStartingPoints
-                      limitRowsTo={6}
-                      showLoadMore
-                      disabled={isLoading}
-                    />
-                  </>
-                ) : (
-                  <EmptyMessage>
-                    <Text>
-                      <Trans>
-                        Get back online to browse the huge library of free and
-                        premium examples.
-                      </Trans>
-                    </Text>
-                  </EmptyMessage>
-                )}
               </ColumnStackLayout>
             )}
             {!isOnHomePage &&

@@ -210,6 +210,7 @@ export default class ForEachChildVariableEvent extends React.Component<
           [executableEventContainer]: true,
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
+          'event-kind-loop': true,
         })}
       >
         <VariableDeclarationsList

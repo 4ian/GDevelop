@@ -8,6 +8,7 @@ const path = require('path');
 const copy = require('recursive-copy');
 const args = require('minimist')(process.argv.slice(2));
 const fs = require('fs');
+const { spawnSync } = require('child_process');
 
 const gdevelopRootPath = path.join(__dirname, '..', '..', '..');
 const destinationPaths = [
@@ -18,7 +19,7 @@ const destinationPaths = [
 // Clean the paths where GDJS Runtime (and extensions) will be copied/bundled.
 if (!args['skip-clean']) {
   destinationPaths.forEach(destinationPath => {
-    shell.echo(`ℹ️ Cleaning destination first...`);
+    shell.echo('Cleaning destination first...');
     shell.rm('-rf', destinationPath);
     shell.mkdir('-p', destinationPath);
   });
@@ -27,11 +28,16 @@ if (!args['skip-clean']) {
 // Build GDJS runtime (and extensions).
 destinationPaths.forEach(destinationPath => {
   const outPath = path.join(destinationPath, 'Runtime');
-  const output = shell.exec(`node scripts/build.js --out "${outPath}"`, {
-    cwd: path.join(gdevelopRootPath, 'GDJS'),
-  });
-  if (output.code !== 0) {
-    shell.exit(0);
+  const output = spawnSync(
+    process.execPath,
+    ['scripts/build.js', '--out', outPath],
+    {
+      cwd: path.join(gdevelopRootPath, 'GDJS'),
+      stdio: 'inherit',
+    }
+  );
+  if (output.status !== 0) {
+    process.exit(1);
   }
 });
 
@@ -40,7 +46,7 @@ destinationPaths.forEach(destinationPath => {
 // up whenever any change is made.
 if (!args['skip-sources']) {
   shell.echo(
-    `ℹ️ Copying GDJS and extensions runtime sources to ${destinationPaths.join(
+    `Copying GDJS and extensions runtime sources to ${destinationPaths.join(
       ', '
     )}...`
   );
@@ -54,7 +60,11 @@ if (!args['skip-sources']) {
 
     const startTime = Date.now();
 
-    const typesDestinationPath = path.join(destinationPath, 'Runtime-sources', 'types');
+    const typesDestinationPath = path.join(
+      destinationPath,
+      'Runtime-sources',
+      'types'
+    );
     const pixiDestinationPath = path.join(typesDestinationPath, 'pixi');
     // TODO: Investigate the use of a smart & faster sync
     // that only copy files with changed content.
@@ -75,7 +85,14 @@ if (!args['skip-sources']) {
         { ...copyOptions, filter: ['*.d.ts'] }
       ),
       copy(
-        path.join(gdevelopRootPath, 'GDJS', 'node_modules', '@types', 'three', 'src'),
+        path.join(
+          gdevelopRootPath,
+          'GDJS',
+          'node_modules',
+          '@types',
+          'three',
+          'src'
+        ),
         path.join(typesDestinationPath, 'three', 'src'),
         { ...copyOptions, filter: ['**/*.d.ts'] }
       ),
@@ -89,11 +106,13 @@ if (!args['skip-sources']) {
         // Replace import of packages by import of relative folders.
         shell.sed(
           '-i',
-          'from \'@pixi((/\\w+)+)',
-          'from \'../..$1/lib',
+          "from '@pixi((/\\w+)+)",
+          "from '../..$1/lib",
           pixiDestinationPath + '/*/lib/*.d.ts'
         );
-        fs.writeFileSync(path.join(pixiDestinationPath, 'index.d.ts'), `
+        fs.writeFileSync(
+          path.join(pixiDestinationPath, 'index.d.ts'),
+          `
   import './mixin-cache-as-bitmap/lib';
   import './mixin-get-child-by-name/lib';
   import './mixin-get-global-position/lib';
@@ -133,16 +152,17 @@ if (!args['skip-sources']) {
   export * from './utils/lib';
   
   export as namespace PIXI;
-      `);
+      `
+        );
         const totalFilesCount =
           unbundledResults.length + unbundledExtensionsResults.length;
         const duration = Date.now() - startTime;
         console.info(
-          `✅ Runtime source files copy done (${totalFilesCount} file(s) copied in ${duration}ms).`
+          `Runtime source files copy done (${totalFilesCount} file(s) copied in ${duration}ms).`
         );
       })
       .catch(function(error) {
-        console.error('❌ Copy failed: ', error);
+        console.error('Copy failed:', error);
       });
   });
 }

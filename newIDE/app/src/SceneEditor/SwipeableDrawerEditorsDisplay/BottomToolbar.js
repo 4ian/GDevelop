@@ -51,6 +51,10 @@ const editors = {
     buttonId: OPEN_OBJECTS_PANEL_BUTTON_ID, // ???
     icon: <ObjectIcon fontSize="inherit" />,
   },
+  'layers-list': {
+    buttonId: OPEN_LAYERS_PANEL_BUTTON_ID,
+    icon: <LayersIcon fontSize="inherit" />,
+  },
   'object-groups-list': {
     buttonId: OPEN_OBJECT_GROUPS_PANEL_BUTTON_ID,
     icon: <ObjectGroupIcon fontSize="inherit" />,
@@ -62,10 +66,6 @@ const editors = {
   'instances-list': {
     buttonId: OPEN_INSTANCES_PANEL_BUTTON_ID,
     icon: <InstancesListIcon fontSize="inherit" />,
-  },
-  'layers-list': {
-    buttonId: OPEN_LAYERS_PANEL_BUTTON_ID,
-    icon: <LayersIcon fontSize="inherit" />,
   },
 };
 

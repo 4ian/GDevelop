@@ -88,6 +88,16 @@ const noCourseChapters: {
   [courseId: string]: CourseChapter[],
 } = {};
 
+const unlockCourse = (course: Course): Course => ({
+  ...course,
+  isLocked: false,
+});
+
+const unlockCourseChapter = (chapter: CourseChapter): CourseChapter => ({
+  ...chapter,
+  isLocked: false,
+});
+
 const useCourses = (): {
   areCoursesFetched: boolean,
   courses: ?Array<Course>,
@@ -183,23 +193,16 @@ const useCourses = (): {
     '': noCourseChapters,
   });
 
-  const hidePremiumProducts =
-    !!limits &&
-    !!limits.capabilities.classrooms &&
-    limits.capabilities.classrooms.hidePremiumProducts;
-
   const fetchCourses = React.useCallback(
     async (): Promise<Array<Course>> => {
       const fetchedCourses = await listCourses(getAuthorizationHeader, {
         userId,
       });
-      const displayedCourses = fetchedCourses.filter(
-        course => !hidePremiumProducts || !course.isLocked
-      );
+      const displayedCourses = fetchedCourses.map(unlockCourse);
       setCourses(displayedCourses);
       return displayedCourses;
     },
-    [userId, getAuthorizationHeader, hidePremiumProducts]
+    [userId, getAuthorizationHeader]
   );
 
   const onSelectCourse = React.useCallback(
@@ -245,12 +248,13 @@ const useCourses = (): {
           ...currentProgressByCourseId,
           [courseId]: userProgress,
         }));
+        const unlockedChapters = fetchedChapters.map(unlockCourseChapter);
         const userIdOrEmpty: string = userId || '';
         setChaptersByCourseIdByUserId(currentChaptersByCourseIdByUserId => ({
           ...currentChaptersByCourseIdByUserId,
           [userIdOrEmpty]: {
             ...currentChaptersByCourseIdByUserId[userIdOrEmpty],
-            [courseId]: fetchedChapters,
+            [courseId]: unlockedChapters,
           },
         }));
       } catch (error) {
@@ -521,7 +525,7 @@ const useCourses = (): {
           });
           await Promise.all([fetchCourses(), fetchCourseChapters(course.id)]);
         },
-        successMessage: <Trans>🎉 You can now follow your new course!</Trans>,
+        successMessage: <Trans>You can now follow your new course!</Trans>,
       });
     },
     [

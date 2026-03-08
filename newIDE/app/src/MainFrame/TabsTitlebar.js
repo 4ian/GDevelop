@@ -11,14 +11,9 @@ import { type EditorTab } from './EditorTabs/EditorTabsHandler';
 import { getTabId } from './EditorTabs/DraggableEditorTabs';
 import { useScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
 import TabsTitlebarTooltip from './TabsTitlebarTooltip';
-import RobotIcon from '../ProjectCreation/RobotIcon';
-import PreferencesContext from './Preferences/PreferencesContext';
-import TextButton from '../UI/TextButton';
-import { useInterval } from '../Utils/UseInterval';
-import { useIsMounted } from '../Utils/UseIsMounted';
-import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import Window from '../Utils/Window';
 import { isMacLike } from '../Utils/Platform';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
 const WINDOW_DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
 const WINDOW_NON_DRAGGABLE_PART_CLASS_NAME = 'title-bar-non-draggable-part';
@@ -27,22 +22,21 @@ const styles = {
   container: {
     display: 'flex',
     flexShrink: 0,
-    alignItems: 'flex-end',
+    alignItems: 'center',
     position: 'relative', // to ensure it is displayed above any global iframe
+    minHeight: 42,
+    paddingRight: 6,
   },
   menuIcon: {
     marginLeft: 4,
     marginRight: 4,
     // Make the icon slightly bigger to be centered on the row, so it aligns
     // with the project manager icon.
-    width: 34,
-    height: 34,
-  },
-  askAiContainer: {
-    zIndex: 0, // Create a stacking context to avoid the AI icon z-indexed element to display above other panes or UI elements.
-    marginBottom: 4,
-    marginRight: 1,
-    marginLeft: 2,
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: 'rgba(26, 33, 29, 0.8)',
+    transition: 'background-color 120ms ease',
   },
 };
 
@@ -61,46 +55,6 @@ type TabsTitlebarProps = {|
   onAskAiClicked: () => void,
 |};
 
-const useIsAskAiIconAnimated = (shouldDisplayAskAi: boolean) => {
-  const isMounted = useIsMounted();
-
-  const [isAskAiIconAnimated, setIsAskAiIconAnimated] = React.useState(true);
-  const animate = React.useCallback(
-    (animationDuration: number) => {
-      if (isMounted.current) {
-        setIsAskAiIconAnimated(true);
-        setTimeout(() => {
-          if (!isMounted.current) return;
-
-          setIsAskAiIconAnimated(false);
-        }, animationDuration);
-      }
-    },
-    [isMounted]
-  );
-
-  React.useEffect(
-    () => {
-      // Animate the icon for a long time at the beginning.
-      animate(9000);
-    },
-    [animate]
-  );
-
-  useInterval(
-    () => {
-      setIsAskAiIconAnimated(true);
-      setTimeout(() => {
-        setIsAskAiIconAnimated(false);
-      }, 8000);
-    },
-    // Animate the icon every 20 minutes.
-    shouldDisplayAskAi ? 20 * 60 * 1000 : null
-  );
-
-  return isAskAiIconAnimated;
-};
-
 /**
  * The titlebar containing a menu, the tabs and giving space for window controls.
  */
@@ -114,9 +68,11 @@ export default function TabsTitlebar({
   displayAskAi,
   onAskAiClicked,
 }: TabsTitlebarProps): React.MixedElement {
+  void displayAskAi;
+  void onAskAiClicked;
+
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const isTouchscreen = useScreenType() === 'touch';
-  const preferences = React.useContext(PreferencesContext);
-  const { limits } = React.useContext(AuthenticatedUserContext);
   const [tooltipData, setTooltipData] = React.useState<?{|
     element: HTMLElement,
     editorTab: EditorTab,
@@ -182,15 +138,6 @@ export default function TabsTitlebar({
     []
   );
 
-  const hideAskAi =
-    !!limits &&
-    !!limits.capabilities.classrooms &&
-    limits.capabilities.classrooms.hideAskAi;
-
-  const shouldDisplayAskAi =
-    preferences.values.showAiAskButtonInTitleBar && displayAskAi && !hideAskAi;
-  const isAskAiIconAnimated = useIsAskAiIconAnimated(shouldDisplayAskAi);
-
   const handleDoubleClick = React.useCallback(() => {
     // On macOS, double-clicking the title bar should maximize/restore the window
     if (isMacLike()) {
@@ -202,12 +149,16 @@ export default function TabsTitlebar({
     <div
       style={{
         ...styles.container,
-        backgroundColor: 'transparent',
+        background: `linear-gradient(180deg, ${
+          gdevelopTheme.paper.backgroundColor.dark
+        } 0%, ${gdevelopTheme.paper.backgroundColor.medium} 130%)`,
+        borderBottom: `1px solid ${gdevelopTheme.toolbar.separatorColor}`,
+        boxShadow: '0 8px 18px rgba(0, 0, 0, 0.2)',
         // Hiding the titlebar should still keep its position in the layout to avoid layout shifts:
         visibility: hidden ? 'hidden' : 'visible',
         pointerEvents: hidden ? undefined : 'all',
       }}
-      className={WINDOW_DRAGGABLE_PART_CLASS_NAME}
+      className={`${WINDOW_DRAGGABLE_PART_CLASS_NAME} carrots-tabs-titlebar`}
       onDoubleClick={handleDoubleClick}
     >
       {isLeftMostPane && <TitleBarLeftSafeMargins />}
@@ -228,18 +179,6 @@ export default function TabsTitlebar({
         </IconButton>
       )}
       {renderTabs(onEditorTabHovered, onEditorTabClosing)}
-      {shouldDisplayAskAi ? (
-        <div
-          style={styles.askAiContainer}
-          className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
-        >
-          <TextButton
-            icon={<RobotIcon size={16} rotating={isAskAiIconAnimated} />}
-            label={'Ask AI'}
-            onClick={onAskAiClicked}
-          />
-        </div>
-      ) : null}
       {isRightMostPane && <TitleBarRightSafeMargins />}
       {tooltipData && (
         <TabsTitlebarTooltip

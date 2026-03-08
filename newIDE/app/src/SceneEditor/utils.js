@@ -7,12 +7,17 @@ export const OPEN_PROPERTIES_PANEL_BUTTON_ID =
 export const OPEN_INSTANCES_PANEL_BUTTON_ID =
   'toolbar-open-instances-list-panel-button';
 export const OPEN_LAYERS_PANEL_BUTTON_ID = 'toolbar-open-layers-panel-button';
+export const OPEN_SCENES_MANAGER_BUTTON_ID = 'toolbar-open-scenes-button';
+export const OPEN_EXTENSIONS_MANAGER_BUTTON_ID =
+  'toolbar-open-extensions-button';
 export const TOOLBAR_COMMON_FORMATTED_BUTTON_IDS = [
   `#${OPEN_OBJECTS_PANEL_BUTTON_ID}`,
   `#${OPEN_OBJECT_GROUPS_PANEL_BUTTON_ID}`,
   `#${OPEN_PROPERTIES_PANEL_BUTTON_ID}`,
   `#${OPEN_INSTANCES_PANEL_BUTTON_ID}`,
   `#${OPEN_LAYERS_PANEL_BUTTON_ID}`,
+  `#${OPEN_SCENES_MANAGER_BUTTON_ID}`,
+  `#${OPEN_EXTENSIONS_MANAGER_BUTTON_ID}`,
 ];
 
 export type EditorId =

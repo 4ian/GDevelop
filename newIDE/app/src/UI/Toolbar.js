@@ -32,16 +32,21 @@ export const Toolbar: React.ComponentType<ToolbarProps> = React.memo<ToolbarProp
     hidden,
   }: ToolbarProps) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
+    const toolbarBackground = `linear-gradient(180deg, ${
+      gdevelopTheme.toolbar.backgroundColor
+    } 0%, ${gdevelopTheme.paper.backgroundColor.dark} 120%)`;
+
     return (
       <div
-        className="almost-invisible-scrollbar"
+        className="almost-invisible-scrollbar carrots-main-toolbar"
         style={{
           ...styles.toolbar,
-          backgroundColor: gdevelopTheme.toolbar.backgroundColor,
+          background: toolbarBackground,
           height,
           borderBottom: borderBottomColor
             ? `2px solid ${borderBottomColor}`
-            : undefined,
+            : '1px solid rgba(255, 177, 92, 0.24)',
+          boxShadow: '0 8px 20px rgba(0, 0, 0, 0.22)',
           ...(paddingBottom ? { paddingBottom } : undefined),
 
           // Hiding the titlebar should still keep its position in the layout to avoid layout shifts:

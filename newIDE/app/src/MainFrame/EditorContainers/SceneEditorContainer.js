@@ -264,6 +264,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
             )
           )
         }
+        onOpenProjectManager={this.props.onOpenProjectManager}
         onOpenEvents={this.props.onOpenEvents}
         isActive={isActive}
         previewDebuggerServer={this.props.previewDebuggerServer}

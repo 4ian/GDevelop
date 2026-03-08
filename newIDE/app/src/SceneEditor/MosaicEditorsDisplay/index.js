@@ -36,34 +36,49 @@ import { preventGameFramePointerEvents } from '../../EmbeddedGame/EmbeddedGameFr
 import { EmbeddedGameFrameHole } from '../../EmbeddedGame/EmbeddedGameFrameHole';
 
 const initialMosaicEditorNodes = {
-  direction: 'row',
-  first: 'properties',
-  splitPercentage: 23,
-  second: {
+  direction: 'column',
+  splitPercentage: 79,
+  first: {
     direction: 'row',
-    first: 'instances-editor',
-    second: 'objects-list',
-    splitPercentage: 77,
+    splitPercentage: 23,
+    first: {
+      direction: 'column',
+      splitPercentage: 46,
+      first: 'objects-list',
+      second: {
+        direction: 'column',
+        splitPercentage: 52,
+        first: 'layers-list',
+        second: 'object-groups-list',
+      },
+    },
+    second: {
+      direction: 'row',
+      splitPercentage: 72,
+      first: 'instances-editor',
+      second: 'properties',
+    },
   },
+  second: 'instances-list',
 };
 
 const noop = () => {};
 
 const defaultPanelConfigByEditor = {
   'objects-list': {
-    position: 'right',
-  },
-  properties: {
     position: 'left',
   },
-  'object-groups-list': {
+  properties: {
     position: 'right',
+  },
+  'object-groups-list': {
+    position: 'left',
   },
   'instances-list': {
     position: 'bottom',
   },
   'layers-list': {
-    position: 'right',
+    position: 'left',
   },
 };
 

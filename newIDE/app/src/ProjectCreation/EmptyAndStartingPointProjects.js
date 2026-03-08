@@ -156,7 +156,7 @@ const EmptyAndStartingPointProjects = ({
           {onSeeAll ? (
             <Line justifyContent="space-between" alignItems="center">
               <Text size="block-title">
-                <Trans>Continue with Human Intelligence</Trans>
+                <Trans>ابدأ الآن باستخدام قالب جاهز</Trans>
               </Text>
               <FlatButton
                 label={<Trans>See all</Trans>}

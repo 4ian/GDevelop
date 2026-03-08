@@ -65,6 +65,7 @@ type _UseNewProjectDialogReturnType = {
     preventBackHome?: boolean,
     privateGameTemplateListingData: ?PrivateGameTemplateListingData,
   }) => void,
+  openNewProjectDialogForEmpty: () => void,
   openNewProjectDialog: () => void,
   renderNewProjectDialog: () => React.Node,
   selectedExampleShortHeader: ?ExampleShortHeader,
@@ -97,6 +98,10 @@ const useNewProjectDialog = ({
     setSelectedExampleShortHeader,
   ] = React.useState<?ExampleShortHeader>(null);
   const [preventBackHome, setPreventBackHome] = React.useState(true);
+  const [
+    openEmptyProjectDirectly,
+    setOpenEmptyProjectDirectly,
+  ] = React.useState(false);
   const { removeRouteArguments } = React.useContext(RouterContext);
 
   const { receivedGameTemplates } = React.useContext(AuthenticatedUserContext);
@@ -107,6 +112,7 @@ const useNewProjectDialog = ({
   const closeNewProjectDialog = React.useCallback(
     () => {
       setPreventBackHome(false);
+      setOpenEmptyProjectDirectly(false);
       setSelectedExampleShortHeader(null);
       setSelectedPrivateGameTemplateListingData(null);
       setNewProjectSetupDialogOpen(false);
@@ -116,6 +122,17 @@ const useNewProjectDialog = ({
   const openNewProjectDialog = React.useCallback(
     () => {
       setPreventBackHome(false);
+      setOpenEmptyProjectDirectly(false);
+      setSelectedExampleShortHeader(null);
+      setSelectedPrivateGameTemplateListingData(null);
+      setNewProjectSetupDialogOpen(true);
+    },
+    [setNewProjectSetupDialogOpen]
+  );
+  const openNewProjectDialogForEmpty = React.useCallback(
+    () => {
+      setPreventBackHome(false);
+      setOpenEmptyProjectDirectly(true);
       setSelectedExampleShortHeader(null);
       setSelectedPrivateGameTemplateListingData(null);
       setNewProjectSetupDialogOpen(true);
@@ -162,6 +179,7 @@ const useNewProjectDialog = ({
       privateGameTemplateListingData: ?PrivateGameTemplateListingData,
       preventBackHome?: boolean,
     |}) => {
+      setOpenEmptyProjectDirectly(false);
       setSelectedPrivateGameTemplateListingData(privateGameTemplateListingData);
       setPreventBackHome(!!preventBackHome);
       if (privateGameTemplateListingData) {
@@ -179,6 +197,7 @@ const useNewProjectDialog = ({
       exampleShortHeader: ?ExampleShortHeader,
       preventBackHome?: boolean,
     |}) => {
+      setOpenEmptyProjectDirectly(false);
       setSelectedExampleShortHeader(exampleShortHeader);
       setPreventBackHome(!!preventBackHome);
       if (exampleShortHeader) {
@@ -257,6 +276,7 @@ const useNewProjectDialog = ({
             privateGameTemplateListingDatasFromSameCreator={
               privateGameTemplateListingDatasFromSameCreator
             }
+            openEmptyProjectDirectly={openEmptyProjectDirectly}
             preventBackHome={preventBackHome}
             onOpenLayout={onOpenLayout}
             onWillInstallExtension={onWillInstallExtension}
@@ -271,6 +291,7 @@ const useNewProjectDialog = ({
     selectedPrivateGameTemplateListingData: selectedPrivateGameTemplateListingData,
     closeNewProjectDialog,
     openNewProjectDialog,
+    openNewProjectDialogForEmpty,
     onSelectExampleShortHeader,
     onSelectPrivateGameTemplateListingData,
     renderNewProjectDialog,

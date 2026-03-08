@@ -200,6 +200,7 @@ export type EditorTabsPaneCommonProps = {|
     file: FileMetadataAndStorageProviderName
   ) => Promise<void>,
   openNewProjectDialog: () => void,
+  openNewProjectDialogForEmpty: () => void,
   openProjectManager: (open: boolean) => void,
   askToCloseProject: () => Promise<boolean>,
   closeProject: () => Promise<void>,
@@ -348,6 +349,7 @@ const EditorTabsPane: React.ComponentType<{
     openOpenFromStorageProviderDialog,
     openFromFileMetadataWithStorageProvider,
     openNewProjectDialog,
+    openNewProjectDialogForEmpty,
     openProjectManager,
     askToCloseProject,
     closeProject,
@@ -452,11 +454,22 @@ const EditorTabsPane: React.ComponentType<{
   // Tab management functions
   const onEditorTabActivated = React.useCallback(
     (editorTab: EditorTab) => {
-      updateToolbar();
+      try {
+        updateToolbar();
+      } catch (error) {
+        console.error('Failed to update toolbar after tab activation.', error);
+      }
       // Ensure the editors shown on the screen are updated. This is for
       // example useful if global objects have been updated in another editor.
       if (editorTab.editorRef) {
-        editorTab.editorRef.forceUpdateEditor();
+        try {
+          editorTab.editorRef.forceUpdateEditor();
+        } catch (error) {
+          console.error(
+            `Failed to activate editor tab "${editorTab.key}" without error.`,
+            error
+          );
+        }
       }
     },
     [updateToolbar]
@@ -717,6 +730,7 @@ const EditorTabsPane: React.ComponentType<{
                         openOpenFromStorageProviderDialog(),
                       onOpenRecentFile: openFromFileMetadataWithStorageProvider,
                       onOpenNewProjectSetupDialog: openNewProjectDialog,
+                      onOpenEmptyProjectSetupDialog: openNewProjectDialogForEmpty,
                       onOpenProjectManager: () => openProjectManager(true),
                       onOpenVersionHistory: openVersionHistoryPanel,
                       askToCloseProject,

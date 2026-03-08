@@ -166,6 +166,7 @@ export default class LinkEvent extends React.Component<
               [largeSelectableArea]: true,
               [largeSelectedArea]: this.props.selected,
               [linkContainer]: true,
+              'event-kind-link': true,
             })}
             style={styles.container}
             id={`${this.props.idPrefix}-link`}

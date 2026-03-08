@@ -88,7 +88,7 @@ export const TitleAndSubtitle = ({
       // $FlowFixMe[incompatible-type]
       <Text style={styles.subTitle} align={textAlign} noMargin>
         {i18n._(
-          t`The more descriptive you are, the better we can match the content we’ll recommend.`
+          t`The more descriptive you are, the better we can match the content we'll recommend.`
         )}
       </Text>
     ) : null}
@@ -176,7 +176,9 @@ const FreeAnswer = ({
         setErrorText(null);
         const cleanedInputValue = value.trim();
         if (!cleanedInputValue) {
-          setErrorText(<Trans>Please explain your use of GDevelop.</Trans>);
+          setErrorText(
+            <Trans>Please explain your use of Carrots Engine.</Trans>
+          );
           return;
         }
         onClickSend(cleanedInputValue);
@@ -260,7 +262,7 @@ const FreeAnswer = ({
               <img
                 src={imageSource}
                 style={styles.answerCoverImage}
-                alt={`Other`}
+                alt={i18n._(t`Other`)}
               />
               <Line justifyContent={showCheckbox ? 'flex-start' : 'center'}>
                 {showCheckbox ? (

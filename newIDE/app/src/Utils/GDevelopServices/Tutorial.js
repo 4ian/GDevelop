@@ -46,21 +46,10 @@ export type Tutorial = {|
 |};
 
 export const canAccessTutorial = (
-  tutorial: Tutorial,
-  capabilities: Capabilities | null
+  _tutorial: Tutorial,
+  _capabilities: Capabilities | null
 ): boolean => {
-  if (!tutorial.isPrivateTutorial) return true;
-
-  if (
-    capabilities &&
-    capabilities.privateTutorials &&
-    capabilities.privateTutorials.allowedIdPrefixes.some(prefix =>
-      tutorial.id.startsWith(prefix)
-    )
-  )
-    return true;
-
-  return false;
+  return true;
 };
 
 // $FlowFixMe[cannot-resolve-name]

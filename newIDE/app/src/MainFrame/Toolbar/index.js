@@ -6,7 +6,6 @@ import PreviewAndShareButtons, {
   type PreviewAndShareButtonsProps,
 } from './PreviewAndShareButtons';
 import IconButton from '../../UI/IconButton';
-import { Spacer } from '../../UI/Grid';
 import HistoryIcon from '../../UI/CustomSvgIcons/History';
 import OpenedVersionStatusChip from '../../VersionHistory/OpenedVersionStatusChip';
 import type { OpenedVersionStatus } from '../../VersionHistory';
@@ -113,7 +112,13 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
           onConfirm={handleConfirm}
           onDismiss={handleDismiss}
         />
-        <ToolbarGroup firstChild>
+        <span
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            flexShrink: 0,
+          }}
+        >
           <IconButton
             size="small"
             id="toolbar-history-button"
@@ -152,7 +157,7 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
               />
             </div>
           )}
-        </ToolbarGroup>
+        </span>
       </>
     );
   }
@@ -193,8 +198,27 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
               toolbarButtons={props.toolbarButtons}
               projectPath={props.projectPath}
             />
-            <ToolbarGroup>
-              <Spacer />
+            <span
+              style={{
+                flex: 1,
+                minWidth: 0,
+                display: 'flex',
+                alignItems: 'center',
+                marginLeft: 6,
+              }}
+            >
+              {editorToolbar || <ToolbarGroup />}
+            </span>
+            <span
+              style={{
+                position: 'absolute',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                display: 'flex',
+                alignItems: 'center',
+                zIndex: 2,
+              }}
+            >
               <PreviewAndShareButtons
                 onPreviewWithoutHotReload={props.onPreviewWithoutHotReload}
                 onOpenDebugger={props.onOpenDebugger}
@@ -211,11 +235,9 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
                 openShareDialog={props.openShareDialog}
                 isSharingEnabled={props.isSharingEnabled}
               />
-              <Spacer />
-            </ToolbarGroup>
+            </span>
           </>
         ) : null}
-        {editorToolbar || <ToolbarGroup />}
       </Toolbar>
     );
   }

@@ -51,8 +51,14 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
   },
+  descriptionCard: {
+    borderRadius: 10,
+    padding: '10px 12px',
+  },
   parametersContainer: {
     flex: 1,
+    borderRadius: 10,
+    padding: '10px 12px',
   },
   icon: {
     width: 24,
@@ -62,10 +68,14 @@ const styles = {
     flexShrink: 0,
   },
   invertToggle: {
-    marginTop: 8,
+    marginTop: 6,
   },
   description: {
     whiteSpace: 'pre-wrap',
+  },
+  advancedSection: {
+    marginTop: 10,
+    paddingTop: 10,
   },
 };
 
@@ -142,9 +152,10 @@ const InstructionParametersEditor: React.ComponentType<{
   ) => {
     const firstVisibleField = React.useRef<?ParameterFieldInterface>(null);
     const [isDirty, setIsDirty] = React.useState<boolean>(false);
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const {
       palette: { type: paletteType },
-    } = React.useContext(GDevelopThemeContext);
+    } = gdevelopTheme;
     const preferences = React.useContext(PreferencesContext);
     const showDeprecatedInstructionWarning =
       preferences.values.showDeprecatedInstructionWarning;
@@ -281,6 +292,33 @@ const InstructionParametersEditor: React.ComponentType<{
       ]
     );
 
+    const descriptionCardStyle = React.useMemo(
+      () => ({
+        ...styles.descriptionCard,
+        backgroundColor: gdevelopTheme.paper.backgroundColor.dark,
+        border: `1px solid ${gdevelopTheme.dialog.separator}`,
+      }),
+      [gdevelopTheme.dialog.separator, gdevelopTheme.paper.backgroundColor.dark]
+    );
+    const parametersContainerStyle = React.useMemo(
+      () => ({
+        ...styles.parametersContainer,
+        backgroundColor: gdevelopTheme.paper.backgroundColor.light,
+        border: `1px solid ${gdevelopTheme.dialog.separator}`,
+      }),
+      [
+        gdevelopTheme.dialog.separator,
+        gdevelopTheme.paper.backgroundColor.light,
+      ]
+    );
+    const advancedSectionStyle = React.useMemo(
+      () => ({
+        ...styles.advancedSection,
+        borderTop: `1px solid ${gdevelopTheme.dialog.separator}`,
+      }),
+      [gdevelopTheme.dialog.separator]
+    );
+
     if (!instructionMetadata) return renderEmpty();
 
     const helpPage = instructionMetadata.getHelpPath();
@@ -296,6 +334,10 @@ const InstructionParametersEditor: React.ComponentType<{
       paletteType === 'dark' &&
       (iconFilename.startsWith('data:image/svg+xml') ||
         iconFilename.includes('_black'));
+    const hasAdvancedSettings =
+      isCondition ||
+      instructionMetadata.isOptionallyAsync() ||
+      isAnEventFunctionMetadata(instructionMetadata);
 
     let parameterFieldIndex = 0;
     return (
@@ -303,29 +345,31 @@ const InstructionParametersEditor: React.ComponentType<{
         {({ i18n }) => (
           <ScrollView autoHideScrollbar id={id}>
             <ColumnStackLayout expand>
-              <Line alignItems="flex-start" noMargin>
-                <img
-                  src={iconFilename}
-                  alt=""
-                  style={{
-                    ...styles.icon,
-                    filter: shouldInvertGrayScale
-                      ? 'grayscale(1) invert(1)'
-                      : undefined,
-                  }}
-                />
-                <Column expand>
-                  <Line noMargin alignItems="flex-start">
-                    {/* $FlowFixMe[incompatible-type] */}
-                    <Text style={styles.description} noMargin>
-                      {instructionMetadata.getDescription()}
-                    </Text>
-                    {helpPage && isDocumentationAbsoluteUrl(helpPage) && (
-                      <HelpIcon size="small" helpPagePath={helpPage} />
-                    )}
-                  </Line>
-                </Column>
-              </Line>
+              <div style={descriptionCardStyle}>
+                <Line alignItems="flex-start" noMargin>
+                  <img
+                    src={iconFilename}
+                    alt=""
+                    style={{
+                      ...styles.icon,
+                      filter: shouldInvertGrayScale
+                        ? 'grayscale(1) invert(1)'
+                        : undefined,
+                    }}
+                  />
+                  <Column expand>
+                    <Line noMargin alignItems="flex-start">
+                      {/* $FlowFixMe[incompatible-type] */}
+                      <Text style={styles.description} noMargin>
+                        {instructionMetadata.getDescription()}
+                      </Text>
+                      {helpPage && isDocumentationAbsoluteUrl(helpPage) && (
+                        <HelpIcon size="small" helpPagePath={helpPage} />
+                      )}
+                    </Line>
+                  </Column>
+                </Line>
+              </div>
               {showDeprecatedInstructionWarning !== 'no' &&
                 instructionMetadata.isHidden() && (
                   <Line>
@@ -372,7 +416,7 @@ const InstructionParametersEditor: React.ComponentType<{
               <Spacer />
               <div
                 key={instructionType}
-                style={styles.parametersContainer}
+                style={parametersContainerStyle}
                 id="instruction-parameters-container"
               >
                 <ColumnStackLayout noMargin>
@@ -445,54 +489,58 @@ const InstructionParametersEditor: React.ComponentType<{
                     <Trans>There is nothing to configure.</Trans>
                   </EmptyMessage>
                 )}
-                {isCondition && (
-                  <Toggle
-                    label={<Trans>Invert condition</Trans>}
-                    labelPosition="right"
-                    toggled={instruction.isInverted()}
-                    // $FlowFixMe[incompatible-type]
-                    style={styles.invertToggle}
-                    onToggle={(e, enabled) => {
-                      instruction.setInverted(enabled);
-                      forceUpdate();
-                    }}
-                  />
-                )}
-                {instructionMetadata.isOptionallyAsync() && (
-                  <Toggle
-                    label={
-                      <Trans>
-                        Wait for the action to end before executing the actions
-                        (and subevents) following it
-                      </Trans>
-                    }
-                    labelPosition="right"
-                    toggled={instruction.isAwaited()}
-                    // $FlowFixMe[incompatible-type]
-                    style={styles.invertToggle}
-                    onToggle={(e, enabled) => {
-                      instruction.setAwaited(enabled);
-                      forceUpdate();
-                    }}
-                  />
-                )}
-                {isAnEventFunctionMetadata(instructionMetadata) && (
-                  <Line>
-                    <FlatButton
-                      key={'open-extension'}
-                      label={
-                        isCondition ? (
-                          <Trans>Edit this condition events</Trans>
-                        ) : (
-                          <Trans>Edit this action events</Trans>
-                        )
-                      }
-                      onClick={() => {
-                        openExtension(i18n);
-                      }}
-                      leftIcon={<Edit />}
-                    />
-                  </Line>
+                {hasAdvancedSettings && (
+                  <div style={advancedSectionStyle}>
+                    {isCondition && (
+                      <Toggle
+                        label={<Trans>Invert condition</Trans>}
+                        labelPosition="right"
+                        toggled={instruction.isInverted()}
+                        // $FlowFixMe[incompatible-type]
+                        style={styles.invertToggle}
+                        onToggle={(e, enabled) => {
+                          instruction.setInverted(enabled);
+                          forceUpdate();
+                        }}
+                      />
+                    )}
+                    {instructionMetadata.isOptionallyAsync() && (
+                      <Toggle
+                        label={
+                          <Trans>
+                            Wait for the action to end before executing the
+                            actions (and subevents) following it
+                          </Trans>
+                        }
+                        labelPosition="right"
+                        toggled={instruction.isAwaited()}
+                        // $FlowFixMe[incompatible-type]
+                        style={styles.invertToggle}
+                        onToggle={(e, enabled) => {
+                          instruction.setAwaited(enabled);
+                          forceUpdate();
+                        }}
+                      />
+                    )}
+                    {isAnEventFunctionMetadata(instructionMetadata) && (
+                      <Line>
+                        <FlatButton
+                          key={'open-extension'}
+                          label={
+                            isCondition ? (
+                              <Trans>Edit this condition events</Trans>
+                            ) : (
+                              <Trans>Edit this action events</Trans>
+                            )
+                          }
+                          onClick={() => {
+                            openExtension(i18n);
+                          }}
+                          leftIcon={<Edit />}
+                        />
+                      </Line>
+                    )}
+                  </div>
                 )}
               </div>
               <Line>

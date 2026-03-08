@@ -61,7 +61,7 @@ const styles = {
 };
 
 type Props = {|
-  game: Game,
+  game: ?Game,
   onOpenProject: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   storageProviders: Array<StorageProvider>,
   onDeleteCloudProject: (
@@ -90,7 +90,7 @@ const ProjectFileList = ({
   onDeleteCloudProject,
   disabled,
 }: Props) => {
-  const projectFiles = useProjectsListFor(game.id);
+  const projectFiles = useProjectsListFor(game ? game.id : null);
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
   const [loadingProjectId, setLoadingProjectId] = React.useState<?string>(null);
   const { removeRecentProjectFile } = React.useContext(PreferencesContext);

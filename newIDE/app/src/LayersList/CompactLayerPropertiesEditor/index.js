@@ -231,6 +231,7 @@ export const CompactLayerPropertiesEditor = ({
           {layer.getRenderingType() !== '3d' && (
             <CompactEffectsListEditor
               layerRenderingType={'2d'}
+              effectInterfaceMode={'effects'}
               target={'layer'}
               project={project}
               resourceManagementProps={resourceManagementProps}
@@ -244,19 +245,56 @@ export const CompactLayerPropertiesEditor = ({
             />
           )}
           {layer.getRenderingType() !== '2d' && !layer.isLightingLayer() && (
-            <CompactEffectsListEditor
-              layerRenderingType={'3d'}
-              target={'layer'}
-              project={project}
-              resourceManagementProps={resourceManagementProps}
-              projectScopedContainersAccessor={projectScopedContainersAccessor}
-              unsavedChanges={unsavedChanges}
-              i18n={i18n}
-              effectsContainer={layer.getEffects()}
-              onEffectsUpdated={() => onLayersModified([layer])}
-              onOpenFullEditor={() => onEditLayerEffects(layer)}
-              onEffectAdded={onEffectAdded}
-            />
+            <React.Fragment>
+              <CompactEffectsListEditor
+                layerRenderingType={'3d'}
+                effectInterfaceMode={'effects'}
+                target={'layer'}
+                project={project}
+                resourceManagementProps={resourceManagementProps}
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
+                unsavedChanges={unsavedChanges}
+                i18n={i18n}
+                effectsContainer={layer.getEffects()}
+                onEffectsUpdated={() => onLayersModified([layer])}
+                onOpenFullEditor={() => onEditLayerEffects(layer)}
+                onEffectAdded={onEffectAdded}
+              />
+              <CompactEffectsListEditor
+                layerRenderingType={'3d'}
+                effectInterfaceMode={'shaders'}
+                target={'layer'}
+                project={project}
+                resourceManagementProps={resourceManagementProps}
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
+                unsavedChanges={unsavedChanges}
+                i18n={i18n}
+                effectsContainer={layer.getEffects()}
+                onEffectsUpdated={() => onLayersModified([layer])}
+                onOpenFullEditor={() => onEditLayerEffects(layer)}
+                onEffectAdded={onEffectAdded}
+              />
+              <CompactEffectsListEditor
+                layerRenderingType={'3d'}
+                effectInterfaceMode={'lighting'}
+                target={'layer'}
+                project={project}
+                resourceManagementProps={resourceManagementProps}
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
+                unsavedChanges={unsavedChanges}
+                i18n={i18n}
+                effectsContainer={layer.getEffects()}
+                onEffectsUpdated={() => onLayersModified([layer])}
+                onOpenFullEditor={() => onEditLayerEffects(layer)}
+                onEffectAdded={onEffectAdded}
+              />
+            </React.Fragment>
           )}
         </Column>
       </ScrollView>

@@ -21,6 +21,43 @@ const freeInstructionsToKeep = {
   Scene3D: ['Scene3D::TurnCameraTowardObject'],
 };
 
+const shouldShow3DContent = (): boolean => {
+  try {
+    if (typeof localStorage === 'undefined') return true;
+    const persistedState = localStorage.getItem('gd-preferences');
+    if (!persistedState) return true;
+    const values = JSON.parse(persistedState);
+    return values.use3DEditor !== false;
+  } catch (_e) {
+    return true;
+  }
+};
+
+const is3DValue = (value: ?string): boolean =>
+  !!value && value.toLowerCase().includes('3d');
+
+const shouldHideInstructionIn2DMode = (
+  instruction: EnumeratedInstructionMetadata
+): boolean => {
+  const { extension, behaviorMetadata, objectMetadata } = instruction.scope;
+  return (
+    is3DValue(instruction.type) ||
+    is3DValue(instruction.displayedName) ||
+    is3DValue(extension && extension.name) ||
+    is3DValue(behaviorMetadata && behaviorMetadata.name) ||
+    is3DValue(objectMetadata && objectMetadata.name)
+  );
+};
+
+const filterInstructionsForEditorMode = (
+  instructions: Array<EnumeratedInstructionMetadata>
+): Array<EnumeratedInstructionMetadata> =>
+  shouldShow3DContent()
+    ? instructions
+    : instructions.filter(
+        instruction => !shouldHideInstructionIn2DMode(instruction)
+      );
+
 /**
  * Check if the instruction can be use according to an object and its behaviors.
  * @param instructionMetadata The instruction being checked
@@ -424,8 +461,7 @@ export const enumerateAllInstructions = (
     }
   }
 
-  // $FlowFixMe[incompatible-type]
-  return allInstructions;
+  return filterInstructionsForEditorMode(allInstructions);
 };
 
 const orderFirstInstructionsWithoutGroup = (
@@ -629,7 +665,9 @@ export const enumerateObjectAndBehaviorsInstructions = (
     );
   }
 
-  return orderFirstInstructionsWithoutGroup(allInstructions);
+  return orderFirstInstructionsWithoutGroup(
+    filterInstructionsForEditorMode(allInstructions)
+  );
 };
 
 /**
@@ -663,8 +701,7 @@ export const enumerateFreeInstructions = (
       )
     );
   }
-  // $FlowFixMe[incompatible-type]
-  return allFreeInstructions;
+  return filterInstructionsForEditorMode(allFreeInstructions);
 };
 
 export type InstructionFilteringOptions = {|

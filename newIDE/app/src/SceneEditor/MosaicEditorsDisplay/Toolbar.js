@@ -10,6 +10,8 @@ import ToolbarCommands from '../ToolbarCommands';
 import { type MenuItemTemplate } from '../../UI/Menu/Menu.flow';
 import ObjectIcon from '../../UI/CustomSvgIcons/Object';
 import ObjectGroupIcon from '../../UI/CustomSvgIcons/ObjectGroup';
+import SceneIcon from '../../UI/CustomSvgIcons/Scene';
+import ExtensionIcon from '../../UI/CustomSvgIcons/Extension';
 import EditIcon from '../../UI/CustomSvgIcons/Edit';
 import InstancesListIcon from '../../UI/CustomSvgIcons/InstancesList';
 import LayersIcon from '../../UI/CustomSvgIcons/Layers';
@@ -22,6 +24,8 @@ import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
 import {
   OPEN_INSTANCES_PANEL_BUTTON_ID,
   OPEN_LAYERS_PANEL_BUTTON_ID,
+  OPEN_SCENES_MANAGER_BUTTON_ID,
+  OPEN_EXTENSIONS_MANAGER_BUTTON_ID,
   OPEN_OBJECT_GROUPS_PANEL_BUTTON_ID,
   OPEN_OBJECTS_PANEL_BUTTON_ID,
   OPEN_PROPERTIES_PANEL_BUTTON_ID,
@@ -37,6 +41,8 @@ type Props = {|
   isObjectsListShown: boolean,
   toggleObjectGroupsList: () => void,
   isObjectGroupsListShown: boolean,
+  onOpenScenesManager: () => void,
+  onOpenExtensionsManager: () => void,
   toggleProperties: () => void,
   isPropertiesShown: boolean,
   undo: () => void,
@@ -83,7 +89,7 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
         canDeleteSelection={props.selectedInstancesCount !== 0}
         onOpenSceneVariables={props.onOpenSceneVariables}
       />
-      <ToolbarGroup lastChild>
+      <ToolbarGroup firstChild>
         <CompactToggleButtons
           id="game-editor-toggle"
           noSeparator
@@ -110,7 +116,37 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
             },
           ]}
         />
+        <IconButton
+          size="small"
+          color="default"
+          id={OPEN_INSTANCES_PANEL_BUTTON_ID}
+          onClick={props.toggleInstancesList}
+          selected={props.isInstancesListShown}
+          tooltip={
+            props.isInstancesListShown
+              ? t`Close Instances List Panel`
+              : t`Open Instances List Panel`
+          }
+        >
+          <InstancesListIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
+          id={OPEN_LAYERS_PANEL_BUTTON_ID}
+          onClick={props.toggleLayersList}
+          selected={props.isLayersListShown}
+          tooltip={
+            props.isLayersListShown
+              ? t`Close Layers Panel`
+              : t`Open Layers Panel`
+          }
+        >
+          <LayersIcon />
+        </IconButton>
         <ToolbarSeparator />
+      </ToolbarGroup>
+      <ToolbarGroup lastChild>
         <IconButton
           size="small"
           color="default"
@@ -142,6 +178,24 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
         <IconButton
           size="small"
           color="default"
+          id={OPEN_SCENES_MANAGER_BUTTON_ID}
+          onClick={props.onOpenScenesManager}
+          tooltip={t`Open Scenes Manager`}
+        >
+          <SceneIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
+          id={OPEN_EXTENSIONS_MANAGER_BUTTON_ID}
+          onClick={props.onOpenExtensionsManager}
+          tooltip={t`Open Extensions Manager`}
+        >
+          <ExtensionIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
           id={OPEN_PROPERTIES_PANEL_BUTTON_ID}
           onClick={props.toggleProperties}
           selected={props.isPropertiesShown}
@@ -153,34 +207,7 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
         >
           <EditIcon />
         </IconButton>
-        <IconButton
-          size="small"
-          color="default"
-          id={OPEN_INSTANCES_PANEL_BUTTON_ID}
-          onClick={props.toggleInstancesList}
-          selected={props.isInstancesListShown}
-          tooltip={
-            props.isInstancesListShown
-              ? t`Close Instances List Panel`
-              : t`Open Instances List Panel`
-          }
-        >
-          <InstancesListIcon />
-        </IconButton>
-        <IconButton
-          size="small"
-          color="default"
-          id={OPEN_LAYERS_PANEL_BUTTON_ID}
-          onClick={props.toggleLayersList}
-          selected={props.isLayersListShown}
-          tooltip={
-            props.isLayersListShown
-              ? t`Close Layers Panel`
-              : t`Open Layers Panel`
-          }
-        >
-          <LayersIcon />
-        </IconButton>
+        <ToolbarSeparator />
         <ElementWithMenu
           element={
             <IconButton

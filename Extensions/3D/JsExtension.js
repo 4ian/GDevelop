@@ -617,6 +617,477 @@ module.exports = {
     }
 
     {
+      const behavior = new gd.BehaviorJsImplementation();
+
+      behavior.updateProperty = function (
+        behaviorContent,
+        propertyName,
+        newValue
+      ) {
+        if (!behaviorContent.hasChild('enabled')) {
+          behaviorContent.addChild('enabled').setBoolValue(true);
+        }
+
+        if (propertyName === 'enabled') {
+          behaviorContent
+            .getChild('enabled')
+            .setBoolValue(newValue === '1' || newValue === 'true');
+          return true;
+        }
+
+        return false;
+      };
+
+      behavior.getProperties = function (behaviorContent) {
+        const behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+        if (!behaviorContent.hasChild('enabled')) {
+          behaviorContent.addChild('enabled').setBoolValue(true);
+        }
+
+        behaviorProperties
+          .getOrCreate('enabled')
+          .setValue(
+            behaviorContent.getChild('enabled').getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setType('Boolean')
+          .setLabel(_('Enabled'));
+
+        return behaviorProperties;
+      };
+
+      behavior.initializeContent = function (behaviorContent) {
+        behaviorContent.addChild('enabled').setBoolValue(true);
+      };
+
+      const ssrExclude = extension
+        .addBehavior(
+          'SSRExclude',
+          _('SSR exclude'),
+          'SSRExclude',
+          _('Exclude this 3D object from Scene3D screen-space reflections.'),
+          '',
+          'res/conditions/3d_box.svg',
+          'SSRExclude',
+          // @ts-ignore
+          behavior,
+          new gd.BehaviorsSharedData()
+        )
+        .setIncludeFile('Extensions/3D/SSRExcludeBehavior.js');
+
+      ssrExclude
+        .addScopedAction(
+          'SetEnabled',
+          _('Enable/disable SSR exclusion'),
+          _('Enable or disable exclusion of this object from SSR.'),
+          _('Set SSR exclusion of _PARAM0_ to _PARAM2_'),
+          _('SSR exclusion'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'SSRExclude')
+        .addParameter('yesorno', _('Enabled'))
+        .setFunctionName('setEnabled');
+
+      ssrExclude
+        .addScopedCondition(
+          'IsEnabled',
+          _('SSR exclusion enabled'),
+          _('Check if SSR exclusion is enabled for this object.'),
+          _('SSR exclusion is enabled for _PARAM0_'),
+          _('SSR exclusion'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'SSRExclude')
+        .setFunctionName('isEnabled');
+    }
+
+    {
+      const behavior = new gd.BehaviorJsImplementation();
+
+      const ensurePBRMaterialDefaults = function (behaviorContent) {
+        if (!behaviorContent.hasChild('metalness')) {
+          behaviorContent.addChild('metalness').setDoubleValue(0.0);
+        }
+        if (!behaviorContent.hasChild('roughness')) {
+          behaviorContent.addChild('roughness').setDoubleValue(0.5);
+        }
+        if (!behaviorContent.hasChild('envMapIntensity')) {
+          behaviorContent.addChild('envMapIntensity').setDoubleValue(1.0);
+        }
+        if (!behaviorContent.hasChild('emissiveColor')) {
+          behaviorContent.addChild('emissiveColor').setStringValue('0;0;0');
+        }
+        if (!behaviorContent.hasChild('emissiveIntensity')) {
+          behaviorContent.addChild('emissiveIntensity').setDoubleValue(0.0);
+        }
+        if (!behaviorContent.hasChild('normalScale')) {
+          behaviorContent.addChild('normalScale').setDoubleValue(1.0);
+        }
+        if (!behaviorContent.hasChild('normalMapAsset')) {
+          behaviorContent.addChild('normalMapAsset').setStringValue('');
+        }
+        if (!behaviorContent.hasChild('aoMapAsset')) {
+          behaviorContent.addChild('aoMapAsset').setStringValue('');
+        }
+        if (!behaviorContent.hasChild('aoMapIntensity')) {
+          behaviorContent.addChild('aoMapIntensity').setDoubleValue(1.0);
+        }
+        if (!behaviorContent.hasChild('map')) {
+          behaviorContent.addChild('map').setStringValue('');
+        }
+      };
+
+      const clampValue = function (value, min, max) {
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue)) {
+          return min;
+        }
+        return Math.max(min, Math.min(max, numericValue));
+      };
+
+      behavior.updateProperty = function (
+        behaviorContent,
+        propertyName,
+        newValue
+      ) {
+        ensurePBRMaterialDefaults(behaviorContent);
+
+        if (propertyName === 'metalness') {
+          behaviorContent
+            .getChild('metalness')
+            .setDoubleValue(clampValue(newValue, 0, 1));
+          return true;
+        }
+        if (propertyName === 'roughness') {
+          behaviorContent
+            .getChild('roughness')
+            .setDoubleValue(clampValue(newValue, 0, 1));
+          return true;
+        }
+        if (propertyName === 'envMapIntensity') {
+          behaviorContent
+            .getChild('envMapIntensity')
+            .setDoubleValue(clampValue(newValue, 0, 4));
+          return true;
+        }
+        if (propertyName === 'emissiveColor') {
+          behaviorContent.getChild('emissiveColor').setStringValue(newValue);
+          return true;
+        }
+        if (propertyName === 'emissiveIntensity') {
+          behaviorContent
+            .getChild('emissiveIntensity')
+            .setDoubleValue(clampValue(newValue, 0, 4));
+          return true;
+        }
+        if (propertyName === 'normalScale') {
+          behaviorContent
+            .getChild('normalScale')
+            .setDoubleValue(clampValue(newValue, 0, 2));
+          return true;
+        }
+        if (propertyName === 'normalMapAsset') {
+          behaviorContent.getChild('normalMapAsset').setStringValue(newValue);
+          return true;
+        }
+        if (propertyName === 'aoMapAsset') {
+          behaviorContent.getChild('aoMapAsset').setStringValue(newValue);
+          return true;
+        }
+        if (propertyName === 'aoMapIntensity') {
+          behaviorContent
+            .getChild('aoMapIntensity')
+            .setDoubleValue(clampValue(newValue, 0, 1));
+          return true;
+        }
+        if (propertyName === 'map') {
+          behaviorContent.getChild('map').setStringValue(newValue);
+          return true;
+        }
+
+        return false;
+      };
+
+      behavior.getProperties = function (behaviorContent) {
+        const behaviorProperties = new gd.MapStringPropertyDescriptor();
+        ensurePBRMaterialDefaults(behaviorContent);
+
+        behaviorProperties
+          .getOrCreate('metalness')
+          .setValue(
+            behaviorContent.getChild('metalness').getDoubleValue().toString()
+          )
+          .setType('number')
+          .setLabel(_('Metalness'));
+        behaviorProperties
+          .getOrCreate('roughness')
+          .setValue(
+            behaviorContent.getChild('roughness').getDoubleValue().toString()
+          )
+          .setType('number')
+          .setLabel(_('Roughness'));
+        behaviorProperties
+          .getOrCreate('envMapIntensity')
+          .setValue(
+            behaviorContent
+              .getChild('envMapIntensity')
+              .getDoubleValue()
+              .toString()
+          )
+          .setType('number')
+          .setLabel(_('Environment intensity'));
+        behaviorProperties
+          .getOrCreate('emissiveColor')
+          .setValue(behaviorContent.getChild('emissiveColor').getStringValue())
+          .setType('color')
+          .setLabel(_('Emissive color'));
+        behaviorProperties
+          .getOrCreate('emissiveIntensity')
+          .setValue(
+            behaviorContent
+              .getChild('emissiveIntensity')
+              .getDoubleValue()
+              .toString()
+          )
+          .setType('number')
+          .setLabel(_('Emissive intensity'));
+        behaviorProperties
+          .getOrCreate('normalScale')
+          .setValue(
+            behaviorContent.getChild('normalScale').getDoubleValue().toString()
+          )
+          .setType('number')
+          .setLabel(_('Normal scale'));
+        behaviorProperties
+          .getOrCreate('normalMapAsset')
+          .setValue(behaviorContent.getChild('normalMapAsset').getStringValue())
+          .setType('resource')
+          .addExtraInfo('image')
+          .setLabel(_('Normal map'));
+        behaviorProperties
+          .getOrCreate('aoMapAsset')
+          .setValue(behaviorContent.getChild('aoMapAsset').getStringValue())
+          .setType('resource')
+          .addExtraInfo('image')
+          .setLabel(_('AO map'));
+        behaviorProperties
+          .getOrCreate('aoMapIntensity')
+          .setValue(
+            behaviorContent
+              .getChild('aoMapIntensity')
+              .getDoubleValue()
+              .toString()
+          )
+          .setType('number')
+          .setLabel(_('AO intensity'));
+        behaviorProperties
+          .getOrCreate('map')
+          .setValue(behaviorContent.getChild('map').getStringValue())
+          .setType('resource')
+          .addExtraInfo('image')
+          .setLabel(_('Albedo map'));
+
+        return behaviorProperties;
+      };
+
+      behavior.initializeContent = function (behaviorContent) {
+        behaviorContent.addChild('metalness').setDoubleValue(0.0);
+        behaviorContent.addChild('roughness').setDoubleValue(0.5);
+        behaviorContent.addChild('envMapIntensity').setDoubleValue(1.0);
+        behaviorContent.addChild('emissiveColor').setStringValue('0;0;0');
+        behaviorContent.addChild('emissiveIntensity').setDoubleValue(0.0);
+        behaviorContent.addChild('normalScale').setDoubleValue(1.0);
+        behaviorContent.addChild('normalMapAsset').setStringValue('');
+        behaviorContent.addChild('aoMapAsset').setStringValue('');
+        behaviorContent.addChild('aoMapIntensity').setDoubleValue(1.0);
+        behaviorContent.addChild('map').setStringValue('');
+      };
+
+      const pbrMaterial = extension
+        .addBehavior(
+          'PBRMaterial',
+          _('PBR material'),
+          'PBRMaterial',
+          _(
+            'Control physically based material parameters for 3D meshes using MeshStandardMaterial and MeshPhysicalMaterial.'
+          ),
+          '',
+          'res/conditions/3d_box.svg',
+          'PBRMaterial',
+          // @ts-ignore
+          behavior,
+          new gd.BehaviorsSharedData()
+        )
+        .setIncludeFile('Extensions/3D/PBRMaterialBehavior.js');
+
+      pbrMaterial
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Metalness',
+          _('Metalness'),
+          _('the metalness'),
+          _('the metalness'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setMetalness')
+        .setGetter('getMetalness');
+
+      pbrMaterial
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Roughness',
+          _('Roughness'),
+          _('the roughness'),
+          _('the roughness'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setRoughness')
+        .setGetter('getRoughness');
+
+      pbrMaterial
+        .addExpressionAndConditionAndAction(
+          'number',
+          'EnvironmentIntensity',
+          _('Environment intensity'),
+          _('the environment map intensity'),
+          _('the environment intensity'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setEnvMapIntensity')
+        .setGetter('getEnvMapIntensity');
+
+      pbrMaterial
+        .addExpressionAndConditionAndAction(
+          'number',
+          'EmissiveIntensity',
+          _('Emissive intensity'),
+          _('the emissive intensity'),
+          _('the emissive intensity'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setEmissiveIntensity')
+        .setGetter('getEmissiveIntensity');
+
+      pbrMaterial
+        .addExpressionAndConditionAndAction(
+          'number',
+          'NormalScale',
+          _('Normal scale'),
+          _('the normal map scale'),
+          _('the normal scale'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setNormalScale')
+        .setGetter('getNormalScale');
+
+      pbrMaterial
+        .addExpressionAndConditionAndAction(
+          'number',
+          'AOMapIntensity',
+          _('AO map intensity'),
+          _('the AO map intensity'),
+          _('the AO map intensity'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setAOMapIntensity')
+        .setGetter('getAOMapIntensity');
+
+      pbrMaterial
+        .addScopedAction(
+          'SetEmissiveColor',
+          _('Set emissive color'),
+          _('Set the emissive color used by PBR materials on this object.'),
+          _('Set emissive color of _PARAM0_ to _PARAM2_'),
+          _('PBR material'),
+          'res/actions/color24.png',
+          'res/actions/color.png'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .addParameter('color', _('Emissive color'))
+        .setFunctionName('setEmissiveColor');
+
+      pbrMaterial
+        .addScopedAction(
+          'SetNormalMapAsset',
+          _('Set normal map'),
+          _(
+            'Set the normal map resource used by PBR materials on this object.'
+          ),
+          _('Set normal map of _PARAM0_ to _PARAM2_'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .addParameter('imageResource', _('Normal map'), '', true)
+        .setFunctionName('setNormalMapAsset');
+
+      pbrMaterial
+        .addScopedAction(
+          'SetAOMapAsset',
+          _('Set AO map'),
+          _('Set the AO map resource used by PBR materials on this object.'),
+          _('Set AO map of _PARAM0_ to _PARAM2_'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .addParameter('imageResource', _('AO map'), '', true)
+        .setFunctionName('setAOMapAsset');
+
+      pbrMaterial
+        .addScopedAction(
+          'SetMap',
+          _('Set albedo map'),
+          _(
+            'Set the albedo (base color) map resource used by PBR materials on this object.'
+          ),
+          _('Set albedo map of _PARAM0_ to _PARAM2_'),
+          _('PBR material'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'PBRMaterial')
+        .addParameter('imageResource', _('Albedo map'), '', true)
+        .setFunctionName('setMap');
+    }
+
+    {
       const object = extension
         .addObject(
           'Model3DObject',
@@ -2325,75 +2796,6 @@ module.exports = {
         .setValue('0.25')
         .setLabel(_('Intensity'))
         .setType('number');
-      properties
-        .getOrCreate('smoothing')
-        .setValue('0')
-        .setLabel(_('Transition smoothing'))
-        .setDescription(
-          _(
-            'Smooth interpolation speed for intensity and color transitions (0 = immediate).'
-          )
-        )
-        .setType('number')
-        .setAdvanced(true);
-      properties
-        .getOrCreate('lightMapEnabled')
-        .setValue('false')
-        .setLabel(_('Enable light map'))
-        .setDescription(
-          _(
-            'Apply a baked light map texture directly from the official ambient lighting effect.'
-          )
-        )
-        .setType('boolean')
-        .setAdvanced(true);
-      properties
-        .getOrCreate('lightMapResourceName')
-        .setType('resource')
-        .addExtraInfo('image')
-        .setLabel(_('Light map texture'))
-        .setDescription(_('Texture resource used as baked light map.'))
-        .setAdvanced(true);
-      properties
-        .getOrCreate('lightMapIntensity')
-        .setValue('1')
-        .setLabel(_('Light map intensity'))
-        .setType('number')
-        .setDescription(_('Strength of the baked light map contribution.'))
-        .setAdvanced(true);
-      properties
-        .getOrCreate('lightMapDynamicBlend')
-        .setValue('0.35')
-        .setLabel(_('Light map dynamic blend'))
-        .setType('number')
-        .setDescription(
-          _(
-            'How much strong dynamic lights reduce baked light map influence (0 to 1).'
-          )
-        )
-        .setAdvanced(true);
-      properties
-        .getOrCreate('lightMapAutoAssignUv2')
-        .setValue('true')
-        .setLabel(_('Auto-assign UV2'))
-        .setType('boolean')
-        .setDescription(
-          _(
-            'When enabled, meshes missing UV2 will copy UV to UV2 automatically for light map support.'
-          )
-        )
-        .setAdvanced(true);
-      properties
-        .getOrCreate('lightMapOnlyIfMissing')
-        .setValue('true')
-        .setLabel(_('Only if missing light map'))
-        .setType('boolean')
-        .setDescription(
-          _(
-            'Keep existing per-material light maps unchanged and only apply to materials without one.'
-          )
-        )
-        .setAdvanced(true);
     }
     {
       const effect = extension
@@ -2401,7 +2803,7 @@ module.exports = {
         .setFullName(_('Directional light'))
         .setDescription(
           _(
-            'A very far light source like the sun. Best for stable large-scene shadows and outdoor lighting. Often used along with a Hemisphere light.'
+            "A very far light source like the sun. This is the light to use for casting shadows for 3D objects (other lights won't emit shadows). Often used along with a Hemisphere light."
           )
         )
         .markAsNotWorkingForObjects()
@@ -2441,108 +2843,6 @@ module.exports = {
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
         .setGroup(_('Orientation'));
-      properties
-        .getOrCreate('directionRotationOffset')
-        .setValue('0')
-        .setLabel(_('Direction rotation offset'))
-        .setDescription(
-          _(
-            'Additional horizontal angle offset applied to the directional light orientation.'
-          )
-        )
-        .setType('number')
-        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
-        .setGroup(_('Direction'))
-        .setAdvanced(true);
-      properties
-        .getOrCreate('directionElevationOffset')
-        .setValue('0')
-        .setLabel(_('Direction elevation offset'))
-        .setDescription(
-          _(
-            'Additional vertical angle offset applied to the directional light orientation.'
-          )
-        )
-        .setType('number')
-        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
-        .setGroup(_('Direction'))
-        .setAdvanced(true);
-      properties
-        .getOrCreate('attachedObject')
-        .setValue('')
-        .setLabel(_('Attached object name'))
-        .setDescription(
-          _(
-            'Object name used as directional anchor. When set, shadow anchor follows this object instead of camera anchor.'
-          )
-        )
-        .setType('string')
-        .setGroup(_('Attachment'));
-      properties
-        .getOrCreate('attachedOffsetX')
-        .setValue('0')
-        .setLabel(_('Attached offset X'))
-        .setType('number')
-        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setGroup(_('Attachment'));
-      properties
-        .getOrCreate('attachedOffsetY')
-        .setValue('0')
-        .setLabel(_('Attached offset Y'))
-        .setType('number')
-        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setGroup(_('Attachment'));
-      properties
-        .getOrCreate('attachedOffsetZ')
-        .setValue('0')
-        .setLabel(_('Attached offset Z'))
-        .setType('number')
-        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setGroup(_('Attachment'));
-      properties
-        .getOrCreate('rotateOffsetsWithObjectAngle')
-        .setValue('false')
-        .setLabel(_('Rotate offsets with object angle'))
-        .setDescription(
-          _('Rotate X/Y offsets using the attached object angle.')
-        )
-        .setType('boolean')
-        .setGroup(_('Attachment'))
-        .setAdvanced(true);
-      properties
-        .getOrCreate('followAttachedObjectRotation3D')
-        .setValue('false')
-        .setLabel(_('Follow attachment 3D rotation'))
-        .setDescription(
-          _(
-            'Apply attachment offsets in local object 3D axes (X/Y/Z rotations).'
-          )
-        )
-        .setType('boolean')
-        .setGroup(_('Attachment'))
-        .setAdvanced(true);
-      properties
-        .getOrCreate('inheritAttachedObjectScale')
-        .setValue('false')
-        .setLabel(_('Inherit attached object scale'))
-        .setDescription(
-          _('Scale attachment offsets using attached object scale (X/Y/Z).')
-        )
-        .setType('boolean')
-        .setGroup(_('Attachment'))
-        .setAdvanced(true);
-      properties
-        .getOrCreate('followDirectionWithAttachedObjectRotation3D')
-        .setValue('false')
-        .setLabel(_('Follow attached 3D direction'))
-        .setDescription(
-          _(
-            'Rotate directional light direction using attached object 3D orientation.'
-          )
-        )
-        .setType('boolean')
-        .setGroup(_('Direction'))
-        .setAdvanced(true);
       properties
         .getOrCreate('isCastingShadow')
         .setValue('false')
@@ -2611,18 +2911,6 @@ module.exports = {
         .setDescription(
           _(
             'Snap shadow tracking to a stable grid to reduce shimmering while the camera moves.'
-          )
-        )
-        .setType('boolean')
-        .setGroup(_('Shadows'))
-        .setAdvanced(true);
-      properties
-        .getOrCreate('shadowAutoTuning')
-        .setValue('true')
-        .setLabel(_('Shadow auto tuning'))
-        .setDescription(
-          _(
-            'Automatically adapt bias/normal bias per cascade for cleaner and more stable shadows.'
           )
         )
         .setType('boolean')
@@ -2711,12 +2999,11 @@ module.exports = {
         .setFullName(_('Rim light'))
         .setDescription(
           _(
-            'Screen-space rim shading pass using depth, camera view and existing scene capture. Includes fog fade and shadow-map suppression.'
+            'Injects Fresnel-based rim lighting directly into 3D mesh materials via shader compilation. Rim direction is updated every frame from the active camera position.'
           )
         )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
-        .addIncludeFile('Extensions/3D/PostProcessingSharedResources.js')
         .addIncludeFile('Extensions/3D/RimLight.js');
       const properties = effect.getProperties();
       properties
@@ -2747,37 +3034,38 @@ module.exports = {
         .setType('number')
         .setAdvanced(true);
       properties
-        .getOrCreate('shadowStrength')
-        .setValue('1')
-        .setLabel(_('Shadow influence'))
+        .getOrCreate('power')
+        .setValue('2.2')
+        .setLabel(_('Rim power'))
         .setDescription(
           _(
-            'How much directional shadows reduce rim lighting (0 = ignore shadows, 1 = fully shadow-aware).'
+            'Controls rim falloff near silhouette. Higher values make a tighter, sharper rim.'
           )
         )
         .setType('number')
         .setAdvanced(true);
       properties
-        .getOrCreate('shadowBias')
-        .setValue('0.0008')
-        .setLabel(_('Shadow bias'))
+        .getOrCreate('fresnel0')
+        .setValue('0.04')
+        .setLabel(_('Fresnel F0'))
         .setDescription(
           _(
-            'Depth bias used when sampling directional shadow maps in the rim pass.'
+            'Base reflectance used by Schlick Fresnel. Typical non-metal values are around 0.02 to 0.08.'
           )
         )
         .setType('number')
         .setAdvanced(true);
       properties
-        .getOrCreate('cameraSmoothing')
-        .setValue('0.5')
-        .setLabel(_('Camera smoothing'))
+        .getOrCreate('debugForceMaxRim')
+        .setValue('false')
+        .setLabel(_('Debug: force max rim'))
         .setDescription(
           _(
-            'Camera position smoothing for rim stability during fast movement (0 to 1).'
+            'For debugging shader injection: force full rim contribution on patched materials regardless of view angle.'
           )
         )
-        .setType('number')
+        .setType('boolean')
+        .setGroup(_('Debug'))
         .setAdvanced(true);
     }
     {
@@ -2808,17 +3096,6 @@ module.exports = {
         .setValue('0.35')
         .setLabel(_('Intensity'))
         .setType('number');
-      properties
-        .getOrCreate('smoothing')
-        .setValue('0')
-        .setLabel(_('Transition smoothing'))
-        .setDescription(
-          _(
-            'Smooth interpolation speed for intensity and sky/ground colors (0 = immediate).'
-          )
-        )
-        .setType('number')
-        .setAdvanced(true);
       properties
         .getOrCreate('top')
         .setValue('Z+')
@@ -2939,28 +3216,6 @@ module.exports = {
         .setType('boolean')
         .setGroup(_('Attachment'));
       properties
-        .getOrCreate('followAttachedObjectRotation3D')
-        .setValue('false')
-        .setLabel(_('Follow 3D rotation'))
-        .setDescription(
-          _(
-            'Apply attached offsets in the object local 3D axes (X/Y/Z rotations), useful for rigs and hands.'
-          )
-        )
-        .setType('boolean')
-        .setGroup(_('Attachment'))
-        .setAdvanced(true);
-      properties
-        .getOrCreate('inheritAttachedObjectScale')
-        .setValue('false')
-        .setLabel(_('Inherit attached object scale'))
-        .setDescription(
-          _('Scale attached offsets using the attached object scale (X/Y/Z).')
-        )
-        .setType('boolean')
-        .setGroup(_('Attachment'))
-        .setAdvanced(true);
-      properties
         .getOrCreate('distance')
         .setValue('0')
         .setLabel(_('Maximum distance'))
@@ -2996,31 +3251,6 @@ module.exports = {
         .setLabel(_('Shadow quality'))
         .setType('choice')
         .setGroup(_('Shadows'));
-      properties
-        .getOrCreate('shadowAutoTuning')
-        .setValue('true')
-        .setLabel(_('Shadow auto tuning'))
-        .setDescription(
-          _(
-            'Automatically adapt bias and normal bias based on shadow coverage to reduce acne and peter-panning.'
-          )
-        )
-        .setType('boolean')
-        .setGroup(_('Shadows'))
-        .setAdvanced(true);
-      properties
-        .getOrCreate('shadowMapSize')
-        .setValue('1024')
-        .setLabel(_('Shadow map size'))
-        .setDescription(
-          _(
-            'Custom shadow map size. Recommended values: 512, 1024, 2048, or 4096 on high-end GPUs.'
-          )
-        )
-        .setType('number')
-        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setGroup(_('Shadows'))
-        .setAdvanced(true);
       properties
         .getOrCreate('shadowBias')
         .setValue('0.001')
@@ -3212,115 +3442,6 @@ module.exports = {
         .setType('boolean')
         .setGroup(_('Attachment'));
       properties
-        .getOrCreate('followAttachedObjectRotation3D')
-        .setValue('false')
-        .setLabel(_('Follow light 3D rotation'))
-        .setDescription(
-          _(
-            'Apply light attached offsets in the object local 3D axes (X/Y/Z rotations).'
-          )
-        )
-        .setType('boolean')
-        .setGroup(_('Attachment'))
-        .setAdvanced(true);
-      properties
-        .getOrCreate('followTargetObjectRotation3D')
-        .setValue('false')
-        .setLabel(_('Follow target 3D rotation'))
-        .setDescription(
-          _('Apply target attached offsets in the target object local 3D axes.')
-        )
-        .setType('boolean')
-        .setGroup(_('Target attachment'))
-        .setAdvanced(true);
-      properties
-        .getOrCreate('inheritAttachedObjectScale')
-        .setValue('false')
-        .setLabel(_('Inherit light attachment scale'))
-        .setDescription(
-          _(
-            'Scale light attached offsets using the attached object scale (X/Y/Z).'
-          )
-        )
-        .setType('boolean')
-        .setGroup(_('Attachment'))
-        .setAdvanced(true);
-      properties
-        .getOrCreate('inheritTargetObjectScale')
-        .setValue('false')
-        .setLabel(_('Inherit target attachment scale'))
-        .setDescription(
-          _(
-            'Scale target attached offsets using the target object scale (X/Y/Z).'
-          )
-        )
-        .setType('boolean')
-        .setGroup(_('Target attachment'))
-        .setAdvanced(true);
-      properties
-        .getOrCreate('flashlightMode')
-        .setValue('false')
-        .setLabel(_('Flashlight mode'))
-        .setDescription(
-          _(
-            'Automatically aims the spot target forward from the attached object orientation.'
-          )
-        )
-        .setType('boolean')
-        .setGroup(_('Flashlight'));
-      properties
-        .getOrCreate('flashlightDistance')
-        .setValue('600')
-        .setLabel(_('Flashlight distance'))
-        .setDescription(_('Forward target distance used by flashlight mode.'))
-        .setType('number')
-        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setGroup(_('Flashlight'));
-      properties
-        .getOrCreate('flashlightForwardAxis')
-        .setValue('X+')
-        .addChoice('X+', _('X+'))
-        .addChoice('X-', _('X-'))
-        .addChoice('Y+', _('Y+'))
-        .addChoice('Y-', _('Y-'))
-        .addChoice('Z+', _('Z+'))
-        .addChoice('Z-', _('Z-'))
-        .setLabel(_('Flashlight forward axis'))
-        .setDescription(
-          _(
-            'Choose which local axis of the attached object is considered forward in flashlight mode.'
-          )
-        )
-        .setType('choice')
-        .setGroup(_('Flashlight'))
-        .setAdvanced(true);
-      properties
-        .getOrCreate('flashlightYawOffset')
-        .setValue('0')
-        .setLabel(_('Flashlight yaw offset'))
-        .setDescription(
-          _(
-            'Horizontal angle offset applied to flashlight direction (in degrees).'
-          )
-        )
-        .setType('number')
-        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
-        .setGroup(_('Flashlight'))
-        .setAdvanced(true);
-      properties
-        .getOrCreate('flashlightPitchOffset')
-        .setValue('0')
-        .setLabel(_('Flashlight pitch offset'))
-        .setDescription(
-          _(
-            'Vertical angle offset applied to flashlight direction (in degrees).'
-          )
-        )
-        .setType('number')
-        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
-        .setGroup(_('Flashlight'))
-        .setAdvanced(true);
-      properties
         .getOrCreate('physicsBounceEnabled')
         .setValue('false')
         .setLabel(_('Physics bounce (Jolt)'))
@@ -3432,31 +3553,6 @@ module.exports = {
         .setLabel(_('Shadow quality'))
         .setType('choice')
         .setGroup(_('Shadows'));
-      properties
-        .getOrCreate('shadowAutoTuning')
-        .setValue('true')
-        .setLabel(_('Shadow auto tuning'))
-        .setDescription(
-          _(
-            'Automatically adapt bias and normal bias according to cone coverage and map resolution.'
-          )
-        )
-        .setType('boolean')
-        .setGroup(_('Shadows'))
-        .setAdvanced(true);
-      properties
-        .getOrCreate('shadowMapSize')
-        .setValue('1024')
-        .setLabel(_('Shadow map size'))
-        .setDescription(
-          _(
-            'Custom shadow map size. Recommended values: 512, 1024, 2048, or 4096 on high-end GPUs.'
-          )
-        )
-        .setType('number')
-        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-        .setGroup(_('Shadows'))
-        .setAdvanced(true);
       properties
         .getOrCreate('shadowBias')
         .setValue('0.001')
@@ -3647,52 +3743,11 @@ module.exports = {
         .setLabel(_('Enabled'))
         .setType('boolean');
       properties
-        .getOrCreate('preset')
-        .setValue('balanced')
-        .addChoice('performance', _('Performance'))
-        .addChoice('balanced', _('Balanced'))
-        .addChoice('cinematic', _('Cinematic'))
-        .addChoice('custom', _('Custom'))
-        .setLabel(_('Preset'))
-        .setType('choice')
-        .setDescription(
-          _(
-            'Performance targets stable framerate, Balanced targets good visual/performance mix, Cinematic prioritizes quality, Custom uses manual settings.'
-          )
-        );
-      properties
         .getOrCreate('qualityMode')
         .setValue('medium')
-        .addChoice('low', _('Low quality'))
-        .addChoice('medium', _('Medium quality'))
-        .addChoice('high', _('High quality'))
         .setLabel(_('Quality mode'))
-        .setType('choice')
-        .setDescription(
-          _(
-            'Base quality profile in Custom preset mode.'
-          )
-        );
-      properties
-        .getOrCreate('adaptivePerformance')
-        .setValue('true')
-        .setLabel(_('Adaptive performance'))
-        .setType('boolean')
-        .setDescription(
-          _(
-            'Automatically reduces quality/load when frame time is too high, then restores when performance recovers (Custom preset mode).'
-          )
-        )
-        .setAdvanced(true);
-      properties
-        .getOrCreate('targetFps')
-        .setValue('60')
-        .setLabel(_('Target FPS'))
-        .setType('number')
-        .setDescription(
-          _('Target framerate for adaptive performance (30-240, Custom mode).')
-        )
-        .setAdvanced(true);
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension
@@ -3725,17 +3780,9 @@ module.exports = {
       properties
         .getOrCreate('qualityMode')
         .setValue('medium')
-        .addChoice('low', _('Low quality'))
-        .addChoice('medium', _('Medium quality'))
-        .addChoice('high', _('High quality'))
         .setLabel(_('Quality mode'))
-        .setType('choice')
-        .setDescription(
-          _(
-            'Controls internal bloom rendering resolution through the shared quality system.'
-          )
-        )
-        .setAdvanced(true);
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension
@@ -3783,17 +3830,9 @@ module.exports = {
       properties
         .getOrCreate('qualityMode')
         .setValue('medium')
-        .addChoice('low', _('Low quality'))
-        .addChoice('medium', _('Medium quality'))
-        .addChoice('high', _('High quality'))
         .setLabel(_('Quality mode'))
-        .setType('choice')
-        .setDescription(
-          _(
-            'Controls SSR ray step budget and shared capture quality.'
-          )
-        )
-        .setAdvanced(true);
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension
@@ -3887,53 +3926,6 @@ module.exports = {
     }
     {
       const effect = extension
-        .addEffect('Vignette')
-        .setFullName(_('Vignette'))
-        .setDescription(
-          _(
-            'Darkens screen edges with controllable softness, roundness, and tint for cinematic framing.'
-          )
-        )
-        .markAsNotWorkingForObjects()
-        .markAsOnlyWorkingFor3D()
-        .addIncludeFile('Extensions/3D/PostProcessingSharedResources.js')
-        .addIncludeFile('Extensions/3D/VignetteEffect.js');
-      const properties = effect.getProperties();
-      properties
-        .getOrCreate('enabled')
-        .setValue('true')
-        .setLabel(_('Enabled'))
-        .setType('boolean');
-      properties
-        .getOrCreate('intensity')
-        .setValue('0.35')
-        .setLabel(_('Intensity'))
-        .setType('number')
-        .setDescription(_('How strong edge darkening is (0 to 1).'));
-      properties
-        .getOrCreate('softness')
-        .setValue('0.45')
-        .setLabel(_('Softness'))
-        .setType('number')
-        .setDescription(
-          _('How gradually the vignette fades from center to edges.')
-        );
-      properties
-        .getOrCreate('roundness')
-        .setValue('1')
-        .setLabel(_('Roundness'))
-        .setType('number')
-        .setDescription(
-          _('1 = circular, lower values make it wider horizontally.')
-        );
-      properties
-        .getOrCreate('color')
-        .setValue('0;0;0')
-        .setLabel(_('Vignette color'))
-        .setType('color');
-    }
-    {
-      const effect = extension
         .addEffect('SSAO')
         .setFullName(_('Ambient occlusion (SSAO)'))
         .setDescription(
@@ -3973,7 +3965,7 @@ module.exports = {
         .setDescription(_('Prevents self-occlusion artifacts.'));
       properties
         .getOrCreate('samples')
-        .setValue('16')
+        .setValue('4')
         .setLabel(_('Samples'))
         .setType('number')
         .setDescription(
@@ -3982,15 +3974,9 @@ module.exports = {
       properties
         .getOrCreate('qualityMode')
         .setValue('medium')
-        .addChoice('low', _('Low quality'))
-        .addChoice('medium', _('Medium quality'))
-        .addChoice('high', _('High quality'))
         .setLabel(_('Quality mode'))
-        .setType('choice')
-        .setDescription(
-          _('Controls SSAO sample cap and shared capture quality.')
-        )
-        .setAdvanced(true);
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension
@@ -4038,92 +4024,9 @@ module.exports = {
       properties
         .getOrCreate('qualityMode')
         .setValue('medium')
-        .addChoice('low', _('Low quality'))
-        .addChoice('medium', _('Medium quality'))
-        .addChoice('high', _('High quality'))
         .setLabel(_('Quality mode'))
-        .setType('choice')
-        .setDescription(
-          _('Controls volumetric fog ray-marching step count and shared capture quality.')
-        )
-        .setAdvanced(true);
-    }
-    {
-      const effect = extension
-        .addEffect('RainDrops')
-        .setFullName(_('Rain drops'))
-        .setDescription(
-          _(
-            'Screen-space rain drops and streaks on the camera lens with optional refraction and wetness darkening.'
-          )
-        )
-        .markAsNotWorkingForObjects()
-        .markAsOnlyWorkingFor3D()
-        .addIncludeFile('Extensions/3D/PostProcessingSharedResources.js')
-        .addIncludeFile('Extensions/3D/RainDropsEffect.js');
-      const properties = effect.getProperties();
-      properties
-        .getOrCreate('enabled')
-        .setValue('true')
-        .setLabel(_('Enabled'))
-        .setType('boolean');
-      properties
-        .getOrCreate('intensity')
-        .setValue('1')
-        .setLabel(_('Intensity'))
-        .setType('number')
-        .setDescription(_('Overall rain strength (0 to 2).'));
-      properties
-        .getOrCreate('dropCount')
-        .setValue('24')
-        .setLabel(_('Drop count'))
-        .setType('number')
-        .setDescription(_('Number of lens drop blobs (1 to 48).'));
-      properties
-        .getOrCreate('streakCount')
-        .setValue('32')
-        .setLabel(_('Streak count'))
-        .setType('number')
-        .setDescription(_('Number of falling streaks (1 to 64).'));
-      properties
-        .getOrCreate('streakIntensity')
-        .setValue('0.6')
-        .setLabel(_('Streak intensity'))
-        .setType('number')
-        .setDescription(_('Streak brightness contribution (0 to 1).'));
-      properties
-        .getOrCreate('refractionStrength')
-        .setValue('1')
-        .setLabel(_('Refraction strength'))
-        .setType('number')
-        .setDescription(_('Lens distortion strength (0 to 2).'));
-      properties
-        .getOrCreate('windAngle')
-        .setValue('0')
-        .setLabel(_('Wind angle'))
-        .setType('number')
-        .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
-        .setDescription(_('Tilt direction for falling streaks (in degrees).'));
-      properties
-        .getOrCreate('wetness')
-        .setValue('1')
-        .setLabel(_('Wetness'))
-        .setType('number')
-        .setDescription(_('Subtle wet-surface darkening amount (0 to 1).'));
-      properties
-        .getOrCreate('qualityMode')
-        .setValue('medium')
-        .addChoice('low', _('Low quality'))
-        .addChoice('medium', _('Medium quality'))
-        .addChoice('high', _('High quality'))
-        .addChoice('custom', _('Custom'))
-        .setLabel(_('Quality mode'))
-        .setType('choice')
-        .setDescription(
-          _(
-            'Low/medium/high apply drop/streak density presets. Custom keeps manual drop/streak counts.'
-          )
-        );
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension
@@ -4172,20 +4075,14 @@ module.exports = {
         .setLabel(_('Samples'))
         .setType('number')
         .setDescription(
-          _('Blur sample count (higher = smoother, slower).')
+          _('Blur taps around each pixel (higher = smoother, slower).')
         );
       properties
         .getOrCreate('qualityMode')
         .setValue('medium')
-        .addChoice('low', _('Low quality'))
-        .addChoice('medium', _('Medium quality'))
-        .addChoice('high', _('High quality'))
         .setLabel(_('Quality mode'))
-        .setType('choice')
-        .setDescription(
-          _('Controls depth-of-field sample cap and blur scaling.')
-        )
-        .setAdvanced(true);
+        .setType('string')
+        .setDescription(_('Use: low, medium, or high.'));
     }
     {
       const effect = extension

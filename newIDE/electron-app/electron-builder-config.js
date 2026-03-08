@@ -48,18 +48,18 @@ const config = {
       'Contents/Resources/app.asar.unpacked/node_modules/steamworks.js/dist/osx/steamworksjs.darwin-*.node',
   },
   win: {
-    executableName: 'GDevelop',
+    executableName: 'CarrotsEngine',
   },
   nsis: {
     oneClick: false,
     allowToChangeInstallationDirectory: true,
   },
   appx: {
-    publisherDisplayName: 'GDevelop game engine',
-    displayName: 'GDevelop',
+    publisherDisplayName: 'Carrots Engine',
+    displayName: 'Carrots Engine',
     publisher: 'CN=B13CB8D3-97AA-422C-A394-0EE51B9ACAD3',
     identityName: 'GDevelopgameengine.GDevelop',
-    backgroundColor: '#524F9C',
+    backgroundColor: '#F28C28',
     languages: [
       'EN-US',
       'ZH-HANS',

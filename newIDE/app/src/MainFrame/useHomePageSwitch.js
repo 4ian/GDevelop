@@ -41,6 +41,9 @@ const useHomePageSwitch = ({
       if (homePageRoutes.includes(initialDialog)) {
         closeDialogs();
         openHomePage();
+        // Consume the route argument so it does not force-navigation back
+        // to the home page on every subsequent re-render.
+        removeRouteArguments(['initial-dialog']);
       }
     },
     [routeArguments, openHomePage, closeDialogs, removeRouteArguments]

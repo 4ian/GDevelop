@@ -306,7 +306,7 @@ app.on('ready', function() {
         iconPath: process.execPath,
         iconIndex: 0,
         title: 'New window',
-        description: 'Open a new GDevelop window',
+        description: 'Open a new Carrots Engine window',
       },
     ]);
   }

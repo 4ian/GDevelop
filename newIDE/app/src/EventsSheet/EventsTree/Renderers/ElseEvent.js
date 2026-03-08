@@ -37,6 +37,7 @@ export default class ElseEvent extends React.Component<
         className={classNames({
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
+          'event-kind-else': true,
         })}
       >
         <div

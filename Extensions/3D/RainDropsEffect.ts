@@ -150,6 +150,17 @@ namespace gdjs {
 
   type RainDropsQualityMode = gdjs.Scene3DPostProcessingQualityMode | 'custom';
 
+  const normalizeRainQualityMode = (value: string): RainDropsQualityMode => {
+    const normalized = (value || '').toLowerCase();
+    if (normalized === 'custom') {
+      return 'custom';
+    }
+    if (normalized === 'low' || normalized === 'high') {
+      return normalized;
+    }
+    return 'medium';
+  };
+
   const clampRainIntensity = (value: number): number =>
     gdjs.evtTools.common.clamp(0, 2, value);
   const clampDropCount = (value: number): number =>
@@ -233,14 +244,9 @@ namespace gdjs {
                 : 1.0
             );
 
-            const requestedQualityMode =
-              (effectData.stringParameters.qualityMode || 'medium').toLowerCase();
-            this._qualityMode =
-              requestedQualityMode === 'custom'
-                ? 'custom'
-                : gdjs.setScene3DPostProcessingEffectQualityMode(
-                    requestedQualityMode
-                  );
+            this._qualityMode = normalizeRainQualityMode(
+              effectData.stringParameters.qualityMode || 'medium'
+            );
             this._time = 0;
             this._renderSize = new THREE.Vector2(1, 1);
 
@@ -256,9 +262,7 @@ namespace gdjs {
               return;
             }
 
-            const resolvedQualityMode =
-              qualityMode ||
-              gdjs.setScene3DPostProcessingEffectQualityMode(this._qualityMode);
+            const resolvedQualityMode = qualityMode || this._qualityMode;
             if (resolvedQualityMode === 'low') {
               this._dropCount = 8;
               this._streakCount = 12;
@@ -362,9 +366,7 @@ namespace gdjs {
                 'RAIN',
                 this._qualityMode
               );
-              this._applyQualityPreset(
-                gdjs.getScene3DPostProcessingQualityMode(target)
-              );
+              this._applyQualityPreset(this._qualityMode);
             }
 
             const deltaTime = Math.max(0, runtimeScene.getElapsedTime() / 1000);
@@ -421,13 +423,7 @@ namespace gdjs {
 
           updateStringParameter(parameterName: string, value: string): void {
             if (parameterName === 'qualityMode') {
-              const requestedMode = (value || 'medium').toLowerCase();
-              this._qualityMode =
-                requestedMode === 'custom'
-                  ? 'custom'
-                  : gdjs.setScene3DPostProcessingEffectQualityMode(
-                      requestedMode
-                    );
+              this._qualityMode = normalizeRainQualityMode(value);
               this._applyQualityPreset();
               this._updateShaderUniforms();
             }
@@ -469,10 +465,7 @@ namespace gdjs {
             this._refractionStrength = clampRefractionStrength(syncData.rs);
             this._windAngleRad = gdjs.toRad(syncData.wa);
             this._wetness = clampWetness(syncData.w);
-            this._qualityMode =
-              syncData.q === 'custom'
-                ? 'custom'
-                : gdjs.setScene3DPostProcessingEffectQualityMode(syncData.q);
+            this._qualityMode = normalizeRainQualityMode(syncData.q);
             this._effectEnabled = !!syncData.e;
             this._time = Math.max(0, syncData.t ?? this._time);
 

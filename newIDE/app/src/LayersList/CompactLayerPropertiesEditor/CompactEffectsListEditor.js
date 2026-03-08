@@ -23,6 +23,8 @@ import ChevronArrowRightWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronA
 import Add from '../../UI/CustomSvgIcons/Add';
 import { mapFor } from '../../Utils/MapFor';
 import {
+  type EffectInterfaceMode,
+  getEffectInterfaceModeForMetadata,
   getEnumeratedEffectMetadata,
   useManageEffects,
 } from '../../EffectsList';
@@ -202,6 +204,7 @@ type Props = {|
   onEffectAdded: () => void,
   layerRenderingType: '2d' | '3d',
   target: 'object' | 'layer',
+  effectInterfaceMode?: EffectInterfaceMode,
 |};
 
 export const CompactEffectsListEditor = ({
@@ -216,6 +219,7 @@ export const CompactEffectsListEditor = ({
   onEffectAdded,
   layerRenderingType,
   target,
+  effectInterfaceMode = 'all',
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const [isEffectsFolded, setEffectsFolded] = React.useState(false);
@@ -226,6 +230,7 @@ export const CompactEffectsListEditor = ({
     all2DEffectMetadata,
     all3DEffectMetadata,
     addEffect,
+    addEffectWithType,
     removeEffect,
     chooseEffectType,
   } = useManageEffects({
@@ -240,13 +245,119 @@ export const CompactEffectsListEditor = ({
     target,
   });
 
-  const filteredEffectMetadata =
-    layerRenderingType === '3d' ? all3DEffectMetadata : all2DEffectMetadata;
+  const filteredEffectMetadata = React.useMemo(
+    () => {
+      const metadataForLayer =
+        layerRenderingType === '3d' ? all3DEffectMetadata : all2DEffectMetadata;
+      if (effectInterfaceMode === 'all') {
+        return metadataForLayer;
+      }
+      return metadataForLayer.filter(
+        effectMetadata =>
+          getEffectInterfaceModeForMetadata(effectMetadata) ===
+          effectInterfaceMode
+      );
+    },
+    [
+      all2DEffectMetadata,
+      all3DEffectMetadata,
+      effectInterfaceMode,
+      layerRenderingType,
+    ]
+  );
+
+  const getDefaultEffectTypeForInterface = React.useCallback(
+    (): ?string => {
+      if (effectInterfaceMode === 'lighting') {
+        const lightingType =
+          filteredEffectMetadata.find(
+            effectMetadata =>
+              effectMetadata.type === 'Scene3D::DirectionalLight'
+          ) ||
+          filteredEffectMetadata.find(
+            effectMetadata => effectMetadata.type === 'Scene3D::AmbientLight'
+          ) ||
+          filteredEffectMetadata[0];
+        return lightingType ? lightingType.type : null;
+      }
+
+      if (effectInterfaceMode === 'shaders') {
+        const shaderType =
+          filteredEffectMetadata.find(
+            effectMetadata => effectMetadata.type === 'Scene3D::Bloom'
+          ) || filteredEffectMetadata[0];
+        return shaderType ? shaderType.type : null;
+      }
+
+      const baseEffectType =
+        filteredEffectMetadata.find(
+          effectMetadata => effectMetadata.type === 'Outline'
+        ) || filteredEffectMetadata[0];
+      return baseEffectType ? baseEffectType.type : null;
+    },
+    [effectInterfaceMode, filteredEffectMetadata]
+  );
+
+  const visibleEffectsCountForInterface = React.useMemo(
+    () => {
+      let count = 0;
+      for (let index = 0; index < effectsContainer.getEffectsCount(); index++) {
+        const effect: gdEffect = effectsContainer.getEffectAt(index);
+        const effectMetadata = getEnumeratedEffectMetadata(
+          allEffectMetadata,
+          effect.getEffectType()
+        );
+
+        const isMatchingInterfaceMode =
+          effectInterfaceMode === 'all' ||
+          getEffectInterfaceModeForMetadata(effectMetadata) ===
+            effectInterfaceMode;
+        const isMatchingLayerType =
+          !effectMetadata ||
+          (layerRenderingType !== '3d' &&
+            !effectMetadata.isMarkedAsOnlyWorkingFor3D) ||
+          (layerRenderingType !== '2d' &&
+            !effectMetadata.isMarkedAsOnlyWorkingFor2D);
+
+        if (isMatchingInterfaceMode && isMatchingLayerType) {
+          count++;
+        }
+      }
+      return count;
+    },
+    [
+      allEffectMetadata,
+      effectInterfaceMode,
+      effectsContainer,
+      layerRenderingType,
+    ]
+  );
+
+  const addCurrentInterfaceEffect = React.useCallback(
+    () => {
+      const defaultEffectType = getDefaultEffectTypeForInterface();
+      if (defaultEffectType) {
+        addEffectWithType(defaultEffectType);
+      } else {
+        addEffect(layerRenderingType === '3d');
+      }
+    },
+    [
+      addEffect,
+      addEffectWithType,
+      getDefaultEffectTypeForInterface,
+      layerRenderingType,
+    ]
+  );
 
   return (
     <TopLevelCollapsibleSection
       title={
-        target === 'object' ? (
+        effectInterfaceMode === 'lighting' ? (
+          <Trans>Lighting</Trans>
+        ) : effectInterfaceMode === 'shaders' ? (
+          <Trans>Shaders</Trans>
+        ) : target === 'object' ? (
           <Trans>Effects</Trans>
         ) : layerRenderingType === '3d' ? (
           <Trans>3D effects</Trans>
@@ -257,12 +368,34 @@ export const CompactEffectsListEditor = ({
       isFolded={isEffectsFolded}
       toggleFolded={() => setEffectsFolded(!isEffectsFolded)}
       onOpenFullEditor={onOpenFullEditor}
-      onAdd={() => addEffect(layerRenderingType === '3d')}
+      onAdd={addCurrentInterfaceEffect}
       renderContent={() => (
         <ColumnStackLayout noMargin>
-          {effectsContainer.getEffectsCount() === 0 && (
+          {visibleEffectsCountForInterface === 0 && (
             <Text size="body2" align="center" color="secondary">
-              {target === 'object' ? (
+              {effectInterfaceMode === 'lighting' ? (
+                <Trans>
+                  There are no{' '}
+                  <Link
+                    href={layerEffectsHelpLink}
+                    onClick={() => Window.openExternalURL(layerEffectsHelpLink)}
+                  >
+                    lighting effects
+                  </Link>{' '}
+                  on this layer.
+                </Trans>
+              ) : effectInterfaceMode === 'shaders' ? (
+                <Trans>
+                  There are no{' '}
+                  <Link
+                    href={layerEffectsHelpLink}
+                    onClick={() => Window.openExternalURL(layerEffectsHelpLink)}
+                  >
+                    shaders
+                  </Link>{' '}
+                  on this layer.
+                </Trans>
+              ) : target === 'object' ? (
                 <Trans>
                   There are no{' '}
                   <Link
@@ -307,12 +440,17 @@ export const CompactEffectsListEditor = ({
               allEffectMetadata,
               effectType
             );
+            const isMatchingInterfaceMode =
+              effectInterfaceMode === 'all' ||
+              getEffectInterfaceModeForMetadata(effectMetadata) ===
+                effectInterfaceMode;
 
-            return !effectMetadata ||
-              (layerRenderingType !== '3d' &&
-                !effectMetadata.isMarkedAsOnlyWorkingFor3D) ||
-              (layerRenderingType !== '2d' &&
-                !effectMetadata.isMarkedAsOnlyWorkingFor2D) ? (
+            return isMatchingInterfaceMode &&
+              (!effectMetadata ||
+                (layerRenderingType !== '3d' &&
+                  !effectMetadata.isMarkedAsOnlyWorkingFor3D) ||
+                (layerRenderingType !== '2d' &&
+                  !effectMetadata.isMarkedAsOnlyWorkingFor2D)) ? (
               <CollapsibleSubPanel
                 key={effect.ptr}
                 renderContent={() => (

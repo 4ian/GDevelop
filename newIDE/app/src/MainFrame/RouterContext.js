@@ -37,6 +37,24 @@ type RouteKey =
   | 'coupon-code';
 export type RouteArguments = { [RouteKey]: string };
 
+const routeKeys: RouteKey[] = [
+  'initial-dialog',
+  'game-id',
+  'games-dashboard-tab',
+  'asset-pack',
+  'game-template',
+  'bundle',
+  'bundle-category',
+  'tutorial-id',
+  'course-id',
+  'create-from-example',
+  'recommended-plan-id',
+  'playable-game-id',
+  'purchase-id',
+  'claimable-token',
+  'coupon-code',
+];
+
 export type Router = {|
   routeArguments: RouteArguments,
   removeRouteArguments: (RouteKey[]) => void,
@@ -103,10 +121,13 @@ export const RouterContextProvider = ({
 
   const navigateToRoute = React.useCallback(
     (route: Route, additionalArguments?: RouteArguments) => {
-      // add the new route, assumed to be a dialog, and possible additional arguments to the router.
+      // Reset all known route arguments before navigating,
+      // so stale parameters from previous routes can't force unexpected views.
+      removeRouteArguments(routeKeys);
+      // Add the new route, assumed to be a dialog, and possible additional arguments.
       addRouteArguments({ ...additionalArguments, 'initial-dialog': route });
     },
-    [addRouteArguments]
+    [addRouteArguments, removeRouteArguments]
   );
 
   return (

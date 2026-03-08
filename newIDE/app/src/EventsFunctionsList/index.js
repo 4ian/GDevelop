@@ -1529,66 +1529,6 @@ const EventsFunctionsList = React.forwardRef<
       ]
     );
 
-    // Avoid a circular dependency with functionsTreeViewItemProps
-    React.useEffect(
-      () => {
-        setSelectedFunctionFolderOrFunction.current = (
-          functionFolderOrFunction: gdFunctionFolderOrFunction | null,
-          eventsBasedBehavior: ?gdEventsBasedBehavior,
-          eventsBasedObject: ?gdEventsBasedObject
-        ) => {
-          if (!functionFolderOrFunction) {
-            setSelectedItems([]);
-            return;
-          }
-          const functionItemId = getTreeViewItemIdFromFunctionFolderOrFunction(
-            functionFolderOrFunction
-          );
-          setSelectedItems(selectedItems => {
-            if (
-              selectedItems.length === 1 &&
-              selectedItems[0].content.getId() === functionItemId
-            ) {
-              return selectedItems;
-            }
-            const eventsBasedEntity =
-              selectedEventsBasedBehavior || selectedEventsBasedObject;
-            const eventsFunctionsContainer = eventsBasedEntity
-              ? eventsBasedEntity.getEventsFunctions()
-              : eventsFunctionsExtension.getEventsFunctions();
-            const eventFunctionProps: EventsFunctionProps = {
-              eventsBasedObject,
-              eventsBasedBehavior,
-              eventsFunctionsContainer,
-              ...eventFunctionCommonProps,
-            };
-            const eventFunctionFolderProps: EventsFunctionFolderProps = {
-              eventsBasedObject,
-              eventsBasedBehavior,
-              eventsFunctionsContainer,
-              ...eventFunctionFolderCommonProps,
-            };
-            return [
-              createTreeViewItem({
-                functionFolderOrFunction,
-                functionTreeViewItemProps: eventFunctionProps,
-                functionFolderTreeViewItemProps: eventFunctionFolderProps,
-              }),
-            ].filter(Boolean);
-          });
-          scrollToItem(functionItemId);
-        };
-      },
-      [
-        scrollToItem,
-        selectedEventsBasedBehavior,
-        selectedEventsBasedObject,
-        eventsFunctionsExtension,
-        eventFunctionCommonProps,
-        eventFunctionFolderCommonProps,
-      ]
-    );
-
     const canMoveSelectionTo = React.useCallback(
       (destinationItem: TreeViewItem, where: 'before' | 'inside' | 'after') =>
         selectedItems.every(item => {
@@ -1690,6 +1630,75 @@ const EventsFunctionsList = React.forwardRef<
         eventsFunctionsExtension.getEventsFunctions()
       ).map(({ folder }) => getEventsFunctionFolderTreeViewItemId(folder)),
     ];
+
+    // TODO Unify selection handling
+    // - Add a function to set the selection in useImperativeHandle which
+    //   handles both folders and behaviors or objects.
+    // - Remove properties:
+    //   - selectedEventsFunction
+    //   - selectedEventsBasedBehavior
+    //   - selectedEventsBasedObject
+
+    // It would avoid a circular dependency with functionsTreeViewItemProps
+    // if setSelectedFunctionFolderOrFunction where used in useImperativeHandle.
+    React.useEffect(
+      () => {
+        setSelectedFunctionFolderOrFunction.current = (
+          functionFolderOrFunction: gdFunctionFolderOrFunction | null,
+          eventsBasedBehavior: ?gdEventsBasedBehavior,
+          eventsBasedObject: ?gdEventsBasedObject
+        ) => {
+          if (!functionFolderOrFunction) {
+            setSelectedItems([]);
+            return;
+          }
+          const functionItemId = getTreeViewItemIdFromFunctionFolderOrFunction(
+            functionFolderOrFunction
+          );
+          setSelectedItems(selectedItems => {
+            if (
+              selectedItems.length === 1 &&
+              selectedItems[0].content.getId() === functionItemId
+            ) {
+              return selectedItems;
+            }
+            const eventsBasedEntity =
+              selectedEventsBasedBehavior || selectedEventsBasedObject;
+            const eventsFunctionsContainer = eventsBasedEntity
+              ? eventsBasedEntity.getEventsFunctions()
+              : eventsFunctionsExtension.getEventsFunctions();
+            const eventFunctionProps: EventsFunctionProps = {
+              eventsBasedObject,
+              eventsBasedBehavior,
+              eventsFunctionsContainer,
+              ...eventFunctionCommonProps,
+            };
+            const eventFunctionFolderProps: EventsFunctionFolderProps = {
+              eventsBasedObject,
+              eventsBasedBehavior,
+              eventsFunctionsContainer,
+              ...eventFunctionFolderCommonProps,
+            };
+            return [
+              createTreeViewItem({
+                functionFolderOrFunction,
+                functionTreeViewItemProps: eventFunctionProps,
+                functionFolderTreeViewItemProps: eventFunctionFolderProps,
+              }),
+            ].filter(Boolean);
+          });
+          scrollToItem(functionItemId);
+        };
+      },
+      [
+        scrollToItem,
+        selectedEventsBasedBehavior,
+        selectedEventsBasedObject,
+        eventsFunctionsExtension,
+        eventFunctionCommonProps,
+        eventFunctionFolderCommonProps,
+      ]
+    );
 
     React.useEffect(
       () => {

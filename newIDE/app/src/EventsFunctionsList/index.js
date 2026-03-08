@@ -38,6 +38,7 @@ import {
 import {
   EventsFunctionFolderTreeViewItemContent,
   getEventsFunctionFolderTreeViewItemId,
+  expandAllSubfolders,
   type EventFunctionFolderCommonProps,
   type EventsFunctionFolderProps,
 } from './EventsFunctionFolderTreeViewItemContent';
@@ -1271,6 +1272,7 @@ const EventsFunctionsList = React.forwardRef<
         onEventsBasedBehaviorPasted,
         addNewEventsFunction,
         addFolder,
+        expandFolders,
       }),
       [
         treeItemProps,
@@ -1282,6 +1284,7 @@ const EventsFunctionsList = React.forwardRef<
         onEventsBasedBehaviorPasted,
         addNewEventsFunction,
         addFolder,
+        expandFolders,
       ]
     );
 
@@ -1299,6 +1302,7 @@ const EventsFunctionsList = React.forwardRef<
         onAddEventsBasedObject,
         addNewEventsFunction,
         addFolder,
+        expandFolders,
         onOpenCustomObjectEditor,
         onEventBasedObjectTypeChanged,
       }),
@@ -1313,6 +1317,7 @@ const EventsFunctionsList = React.forwardRef<
         onAddEventsBasedObject,
         addNewEventsFunction,
         addFolder,
+        expandFolders,
         onOpenCustomObjectEditor,
         onEventBasedObjectTypeChanged,
       ]
@@ -1454,6 +1459,17 @@ const EventsFunctionsList = React.forwardRef<
                         .getRootFolder(),
                     ]),
                 },
+                { type: 'separator' },
+                {
+                  label: i18n._(t`Expand all sub folders`),
+                  click: () =>
+                    expandAllSubfolders(
+                      eventsFunctionsExtension
+                        .getEventsFunctions()
+                        .getRootFolder(),
+                      expandFolders
+                    ),
+                },
               ]
             ),
             getChildren(i18n: I18nType): ?Array<TreeViewItem> {
@@ -1496,9 +1512,10 @@ const EventsFunctionsList = React.forwardRef<
         onSelectExtensionSceneVariables,
         objectTreeViewItems,
         behaviorTreeViewItems,
-        eventsFunctionsExtension,
         addNewEventsFunction,
+        eventsFunctionsExtension,
         addFolder,
+        expandFolders,
         eventFunctionCommonProps,
         eventFunctionFolderCommonProps,
       ]

@@ -20,6 +20,7 @@ import {
 import Tooltip from '@material-ui/core/Tooltip';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 import Add from '../UI/CustomSvgIcons/Add';
+import { expandAllSubfolders } from './EventsFunctionFolderTreeViewItemContent';
 
 const EVENTS_BASED_OBJECT_CLIPBOARD_KIND = 'Events Based Object';
 
@@ -68,6 +69,9 @@ export type EventsBasedObjectProps = {|
     items: Array<gdFunctionFolderOrFunction>,
     eventsBasedBehavior?: ?gdEventsBasedBehavior,
     eventsBasedObject?: ?gdEventsBasedObject
+  ) => void,
+  expandFolders: (
+    functionFolderOrFunctionList: Array<gdFunctionFolderOrFunction>
   ) => void,
   eventsBasedObjectsList: gdEventsBasedObjectsList,
 |};
@@ -221,6 +225,15 @@ export class EventsBasedObjectTreeViewItemContent
         enabled: Clipboard.has(EVENTS_BASED_OBJECT_CLIPBOARD_KIND),
         click: () => this.paste(),
         accelerator: 'CmdOrCtrl+V',
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Expand all sub folders`),
+        click: () =>
+          expandAllSubfolders(
+            this.getEventsFunctionsContainer().getRootFolder(),
+            this.props.expandFolders
+          ),
       },
     ].filter(Boolean);
   }

@@ -33,6 +33,7 @@ const gd: libGDevelop = global.gd;
 export const EVENTS_FUNCTION_CLIPBOARD_KIND = 'Events Function';
 
 export const pasteEventsFunction = (
+  project: gdProject,
   eventsFunctionsContainer: gdEventsFunctionsContainer,
   parentFolder: gdFunctionFolderOrFunction,
   insertionIndex: number
@@ -57,7 +58,12 @@ export const pasteEventsFunction = (
     insertionIndex
   );
   const groupPath = newEventsFunction.getGroup();
-  unserializeFromJSObject(newEventsFunction, copiedEventsFunction);
+  unserializeFromJSObject(
+    newEventsFunction,
+    copiedEventsFunction,
+    'unserializeFrom',
+    project
+  );
   newEventsFunction.setName(newName);
   newEventsFunction.setGroup(groupPath);
   return newEventsFunction;
@@ -493,6 +499,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
 
   paste(): void {
     const newEventsFunction = pasteEventsFunction(
+      this.props.project,
       this.props.eventsFunctionsContainer,
       this.functionFolderOrFunction.getParent(),
       this.getIndex() + 1
@@ -523,9 +530,19 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     );
     const newEventsFunction = eventsFunctionsContainer.insertEventsFunction(
       eventsFunction,
-      this.getIndex() + 1
+      eventsFunctionsContainer.getEventsFunctionsCount()
     );
     newEventsFunction.setName(newName);
+    const newFunctionFolderOrFunction = eventsFunctionsContainer
+      .getRootFolder()
+      .getFunctionNamed(newName);
+    eventsFunctionsContainer
+      .getRootFolder()
+      .moveFunctionFolderOrFunctionToAnotherFolder(
+        newFunctionFolderOrFunction,
+        this.functionFolderOrFunction.getParent(),
+        this.getIndex() + 1
+      );
     this.props.onEventsFunctionAdded(newEventsFunction);
 
     this._onEventsFunctionModified();

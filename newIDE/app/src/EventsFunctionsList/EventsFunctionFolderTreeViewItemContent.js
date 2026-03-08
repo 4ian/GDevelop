@@ -456,6 +456,7 @@ export class EventsFunctionFolderTreeViewItemContent
 
   paste(): void {
     const newEventsFunction = pasteEventsFunction(
+      this.props.project,
       this.props.eventsFunctionsContainer,
       this.functionFolder,
       this.getIndex() + 1

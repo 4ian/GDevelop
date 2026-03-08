@@ -11,6 +11,60 @@ namespace gdjs {
     lom?: boolean;
   }
 
+  interface LightingPipelineState {
+    mode?: string;
+    realtimeWeight?: number;
+    bakedWeight?: number;
+  }
+
+  const lightingPipelineStateKey = '__gdScene3dLightingPipelineState';
+
+  const getLightingPipelineState = (
+    scene: THREE.Scene | null | undefined
+  ): LightingPipelineState | null => {
+    if (!scene) {
+      return null;
+    }
+    const state = (scene as THREE.Scene & {
+      userData?: { [key: string]: any };
+    }).userData?.[lightingPipelineStateKey] as LightingPipelineState | undefined;
+    return state || null;
+  };
+
+  const getRealtimeLightingMultiplier = (
+    state: LightingPipelineState | null
+  ): number => {
+    if (!state || !state.mode) {
+      return 1;
+    }
+    if (state.mode === 'realtime') {
+      return 1;
+    }
+    if (state.mode === 'baked') {
+      return 0;
+    }
+    return gdjs.evtTools.common.clamp(
+      0,
+      1,
+      state.realtimeWeight !== undefined ? state.realtimeWeight : 0.75
+    );
+  };
+
+  const getBakedLightingMultiplier = (
+    state: LightingPipelineState | null
+  ): number => {
+    if (!state || !state.mode) {
+      return 1;
+    }
+    if (state.mode === 'realtime') {
+      return 0;
+    }
+    if (state.mode === 'baked') {
+      return Math.max(0, state.bakedWeight !== undefined ? state.bakedWeight : 1);
+    }
+    return Math.max(0, state.bakedWeight !== undefined ? state.bakedWeight : 1);
+  };
+
   type LightMapCompatibleMaterial =
     | THREE.MeshBasicMaterial
     | THREE.MeshLambertMaterial
@@ -264,8 +318,17 @@ namespace gdjs {
               return;
             }
 
+            const pipelineState = getLightingPipelineState(scene);
+            const bakedMultiplier = getBakedLightingMultiplier(pipelineState);
+            if (bakedMultiplier <= 0.0001) {
+              this._restoreOriginalMaterials();
+              return;
+            }
+
             const effectiveIntensity =
-              this._lightMapIntensity * this._computeDynamicLightScale(scene);
+              this._lightMapIntensity *
+              bakedMultiplier *
+              this._computeDynamicLightScale(scene);
 
             scene.traverse((object: THREE.Object3D) => {
               const mesh = object as THREE.Mesh;
@@ -369,11 +432,17 @@ namespace gdjs {
             const runtimeScene = target.getRuntimeScene
               ? target.getRuntimeScene()
               : null;
+            const scene = this._getScene(target);
+            const realtimeMultiplier = getRealtimeLightingMultiplier(
+              getLightingPipelineState(scene)
+            );
+            const effectiveTargetIntensity =
+              this._targetIntensity * realtimeMultiplier;
             if (this._smoothing <= 0) {
-              this.light.intensity = this._targetIntensity;
+              this.light.intensity = effectiveTargetIntensity;
               this.light.color.copy(this._targetColor);
             } else if (!runtimeScene) {
-              this.light.intensity = this._targetIntensity;
+              this.light.intensity = effectiveTargetIntensity;
               this.light.color.copy(this._targetColor);
             } else {
               const deltaTime = Math.max(
@@ -383,7 +452,7 @@ namespace gdjs {
               if (deltaTime > 0) {
                 const alpha = 1 - Math.exp(-this._smoothing * deltaTime);
                 this.light.intensity +=
-                  (this._targetIntensity - this.light.intensity) * alpha;
+                  (effectiveTargetIntensity - this.light.intensity) * alpha;
                 this.light.color.lerp(this._targetColor, alpha);
               }
             }

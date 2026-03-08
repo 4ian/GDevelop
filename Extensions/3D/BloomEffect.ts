@@ -67,6 +67,9 @@ namespace gdjs {
             return true;
           }
           updatePreRender(target: gdjs.EffectsTarget): any {
+            if (!this._isEnabled) {
+              return;
+            }
             if (!(target instanceof gdjs.Layer)) {
               return;
             }
@@ -84,13 +87,19 @@ namespace gdjs {
               return;
             }
 
+            if (this.shaderPass.strength <= 0.0001) {
+              this.shaderPass.enabled = false;
+              return;
+            }
+
             gdjs.setScene3DPostProcessingEffectQualityMode(
               target,
               'BLOOM',
               this._qualityMode
             );
 
-            const quality = gdjs.getScene3DPostProcessingQualityProfileForMode(
+            const quality = gdjs.getScene3DPostProcessingQualityProfileForLayerMode(
+              target,
               this._qualityMode
             );
             threeRenderer.getDrawingBufferSize(this._renderSize);

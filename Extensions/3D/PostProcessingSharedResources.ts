@@ -29,6 +29,14 @@ namespace gdjs {
     stackEnabled: boolean;
     lastPassOrderSignature: string;
     effectQualityOverrides: Record<string, Scene3DPostProcessingQualityMode>;
+    adaptiveQualityEnabled: boolean;
+    adaptiveTargetFps: number;
+    adaptiveTargetFrameMs: number;
+    adaptiveQualityMode: Scene3DPostProcessingQualityMode;
+    adaptiveFrameTimeAverageMs: number;
+    lastFrameTimeFromStartMs: number;
+    lastAdaptiveQualityChangeTimeFromStartMs: number;
+    adaptiveCaptureScaleMultiplier: number;
   }
 
   const qualityProfiles: {
@@ -102,6 +110,42 @@ namespace gdjs {
       ? safeFirst
       : safeSecond;
   };
+  const getLowerQualityMode = (
+    first: Scene3DPostProcessingQualityMode,
+    second: Scene3DPostProcessingQualityMode
+  ): Scene3DPostProcessingQualityMode => {
+    const safeFirst = normalizeQualityMode(first);
+    const safeSecond = normalizeQualityMode(second);
+    return qualityRank[safeFirst] <= qualityRank[safeSecond]
+      ? safeFirst
+      : safeSecond;
+  };
+  const getNextLowerQualityMode = (
+    mode: Scene3DPostProcessingQualityMode
+  ): Scene3DPostProcessingQualityMode => {
+    if (mode === 'high') {
+      return 'medium';
+    }
+    if (mode === 'medium') {
+      return 'low';
+    }
+    return 'low';
+  };
+  const getNextHigherQualityMode = (
+    mode: Scene3DPostProcessingQualityMode
+  ): Scene3DPostProcessingQualityMode => {
+    if (mode === 'low') {
+      return 'medium';
+    }
+    if (mode === 'medium') {
+      return 'high';
+    }
+    return 'high';
+  };
+  const clampAdaptiveTargetFps = (value: number): number => {
+    const numericValue = Number.isFinite(value) ? value : 60;
+    return gdjs.evtTools.common.clamp(24, 144, numericValue);
+  };
 
   const getLayerRendererKey = (target: gdjs.Layer): object | null => {
     const renderer = target.getRenderer();
@@ -136,6 +180,14 @@ namespace gdjs {
       stackEnabled: true,
       lastPassOrderSignature: '',
       effectQualityOverrides: {},
+      adaptiveQualityEnabled: true,
+      adaptiveTargetFps: 60,
+      adaptiveTargetFrameMs: 1000 / 60,
+      adaptiveQualityMode: 'medium',
+      adaptiveFrameTimeAverageMs: -1,
+      lastFrameTimeFromStartMs: -1,
+      lastAdaptiveQualityChangeTimeFromStartMs: -1,
+      adaptiveCaptureScaleMultiplier: 1,
     };
   };
 
@@ -183,7 +235,9 @@ namespace gdjs {
   export const setScene3DPostProcessingStackConfig = function (
     target: gdjs.Layer,
     enabled: boolean,
-    qualityMode: string
+    qualityMode: string,
+    adaptiveQualityEnabled?: boolean,
+    adaptiveTargetFps?: number
   ): void {
     const state = getOrCreateSharedState(target);
     if (!state) {
@@ -193,6 +247,21 @@ namespace gdjs {
     state.hasStackController = true;
     state.stackEnabled = enabled;
     state.qualityMode = normalizeQualityMode(qualityMode);
+    state.adaptiveQualityEnabled =
+      adaptiveQualityEnabled === undefined ? true : !!adaptiveQualityEnabled;
+    state.adaptiveTargetFps = clampAdaptiveTargetFps(
+      adaptiveTargetFps === undefined ? state.adaptiveTargetFps : adaptiveTargetFps
+    );
+    state.adaptiveTargetFrameMs = 1000 / state.adaptiveTargetFps;
+    const requestedQualityMode = getRequestedScene3DQualityMode(state);
+    if (
+      !state.adaptiveQualityEnabled ||
+      state.adaptiveFrameTimeAverageMs < 0 ||
+      qualityRank[state.adaptiveQualityMode] > qualityRank[requestedQualityMode]
+    ) {
+      state.adaptiveQualityMode = requestedQualityMode;
+      state.adaptiveCaptureScaleMultiplier = 1;
+    }
   };
 
   export const setScene3DPostProcessingEffectQualityMode = function (
@@ -239,6 +308,14 @@ namespace gdjs {
     state.qualityMode = 'medium';
     state.lastPassOrderSignature = '';
     state.effectQualityOverrides = {};
+    state.adaptiveQualityEnabled = true;
+    state.adaptiveTargetFps = 60;
+    state.adaptiveTargetFrameMs = 1000 / 60;
+    state.adaptiveQualityMode = 'medium';
+    state.adaptiveFrameTimeAverageMs = -1;
+    state.lastFrameTimeFromStartMs = -1;
+    state.lastAdaptiveQualityChangeTimeFromStartMs = -1;
+    state.adaptiveCaptureScaleMultiplier = 1;
   };
 
   export const isScene3DPostProcessingEnabled = function (
@@ -251,7 +328,7 @@ namespace gdjs {
     return !state.hasStackController || state.stackEnabled;
   };
 
-  const getEffectiveScene3DQualityMode = (
+  const getRequestedScene3DQualityMode = (
     state: Scene3DSharedPostProcessingState
   ): Scene3DPostProcessingQualityMode => {
     let mode = normalizeQualityMode(state.qualityMode);
@@ -263,11 +340,120 @@ namespace gdjs {
     }
     return mode;
   };
+  const getEffectiveScene3DQualityMode = (
+    state: Scene3DSharedPostProcessingState
+  ): Scene3DPostProcessingQualityMode => {
+    const requestedMode = getRequestedScene3DQualityMode(state);
+    if (
+      !state.adaptiveQualityEnabled ||
+      !state.hasStackController ||
+      !state.stackEnabled
+    ) {
+      return requestedMode;
+    }
+    return getLowerQualityMode(requestedMode, state.adaptiveQualityMode);
+  };
+
+  const updateAdaptiveQualityState = (
+    state: Scene3DSharedPostProcessingState,
+    timeFromStartMs: number
+  ): void => {
+    const requestedMode = getRequestedScene3DQualityMode(state);
+    if (
+      !state.adaptiveQualityEnabled ||
+      !state.hasStackController ||
+      !state.stackEnabled
+    ) {
+      state.adaptiveQualityMode = requestedMode;
+      state.adaptiveCaptureScaleMultiplier = 1;
+      state.lastFrameTimeFromStartMs = timeFromStartMs;
+      return;
+    }
+
+    if (
+      state.lastFrameTimeFromStartMs >= 0 &&
+      timeFromStartMs > state.lastFrameTimeFromStartMs
+    ) {
+      const frameDeltaMs = Math.max(
+        1,
+        Math.min(120, timeFromStartMs - state.lastFrameTimeFromStartMs)
+      );
+      state.adaptiveFrameTimeAverageMs =
+        state.adaptiveFrameTimeAverageMs < 0
+          ? frameDeltaMs
+          : state.adaptiveFrameTimeAverageMs * 0.9 + frameDeltaMs * 0.1;
+    }
+    state.lastFrameTimeFromStartMs = timeFromStartMs;
+
+    if (qualityRank[state.adaptiveQualityMode] > qualityRank[requestedMode]) {
+      state.adaptiveQualityMode = requestedMode;
+      state.lastAdaptiveQualityChangeTimeFromStartMs = timeFromStartMs;
+    }
+
+    const averageFrameTimeMs = state.adaptiveFrameTimeAverageMs;
+    if (averageFrameTimeMs > 0) {
+      const targetFrameMs = Math.max(1, state.adaptiveTargetFrameMs);
+      const timeSinceLastSwitchMs =
+        state.lastAdaptiveQualityChangeTimeFromStartMs < 0
+          ? Number.POSITIVE_INFINITY
+          : timeFromStartMs - state.lastAdaptiveQualityChangeTimeFromStartMs;
+      const canSwitchQuality = timeSinceLastSwitchMs >= 600;
+      const shouldDecreaseQuality = averageFrameTimeMs > targetFrameMs * 1.18;
+      const shouldIncreaseQuality = averageFrameTimeMs < targetFrameMs * 0.82;
+
+      if (shouldDecreaseQuality && canSwitchQuality) {
+        const nextMode = getNextLowerQualityMode(state.adaptiveQualityMode);
+        if (nextMode !== state.adaptiveQualityMode) {
+          state.adaptiveQualityMode = nextMode;
+          state.lastAdaptiveQualityChangeTimeFromStartMs = timeFromStartMs;
+        }
+      } else if (
+        shouldIncreaseQuality &&
+        canSwitchQuality &&
+        qualityRank[state.adaptiveQualityMode] < qualityRank[requestedMode]
+      ) {
+        const nextMode = getNextHigherQualityMode(state.adaptiveQualityMode);
+        state.adaptiveQualityMode = getLowerQualityMode(nextMode, requestedMode);
+        state.lastAdaptiveQualityChangeTimeFromStartMs = timeFromStartMs;
+      }
+
+      const frameBudgetRatio = targetFrameMs / Math.max(1, averageFrameTimeMs);
+      state.adaptiveCaptureScaleMultiplier = gdjs.evtTools.common.clamp(
+        0.7,
+        1,
+        frameBudgetRatio
+      );
+    } else {
+      state.adaptiveCaptureScaleMultiplier = 1;
+    }
+  };
 
   export const getScene3DPostProcessingQualityProfileForMode = function (
     qualityMode: string
   ): Scene3DPostProcessingQualityProfile {
     return qualityProfiles[normalizeQualityMode(qualityMode)];
+  };
+  export const getScene3DPostProcessingQualityProfileForLayerMode = function (
+    target: gdjs.Layer,
+    preferredQualityMode: string
+  ): Scene3DPostProcessingQualityProfile {
+    const state = getOrCreateSharedState(target);
+    if (!state) {
+      return qualityProfiles[normalizeQualityMode(preferredQualityMode)];
+    }
+    const preferredMode = normalizeQualityMode(preferredQualityMode);
+    if (
+      !state.adaptiveQualityEnabled ||
+      !state.hasStackController ||
+      !state.stackEnabled
+    ) {
+      return qualityProfiles[preferredMode];
+    }
+    const effectiveMode = getLowerQualityMode(
+      preferredMode,
+      state.adaptiveQualityMode
+    );
+    return qualityProfiles[effectiveMode];
   };
 
   export const getScene3DPostProcessingQualityProfile = function (
@@ -291,20 +477,32 @@ namespace gdjs {
       return null;
     }
 
+    const timeFromStart = getTimeFromStartMs(target);
+    updateAdaptiveQualityState(state, timeFromStart);
+
     const quality = getScene3DPostProcessingQualityProfile(target);
+    const captureScale = gdjs.evtTools.common.clamp(
+      0.35,
+      1,
+      quality.captureScale * state.adaptiveCaptureScaleMultiplier
+    );
+    const effectiveQuality: Scene3DPostProcessingQualityProfile = {
+      ...quality,
+      captureScale,
+    };
     const renderTarget = state.renderTarget;
 
     threeRenderer.getDrawingBufferSize(state.renderSize);
     const width = Math.max(
       1,
       Math.round(
-        (state.renderSize.x || target.getWidth()) * quality.captureScale
+        (state.renderSize.x || target.getWidth()) * effectiveQuality.captureScale
       )
     );
     const height = Math.max(
       1,
       Math.round(
-        (state.renderSize.y || target.getHeight()) * quality.captureScale
+        (state.renderSize.y || target.getHeight()) * effectiveQuality.captureScale
       )
     );
 
@@ -316,7 +514,6 @@ namespace gdjs {
     }
     renderTarget.texture.colorSpace = threeRenderer.outputColorSpace;
 
-    const timeFromStart = getTimeFromStartMs(target);
     if (state.lastCaptureTimeFromStartMs !== timeFromStart) {
       const previousRenderTarget = threeRenderer.getRenderTarget();
       const previousAutoClear = threeRenderer.autoClear;
@@ -349,7 +546,7 @@ namespace gdjs {
       depthTexture: renderTarget.depthTexture,
       width,
       height,
-      quality,
+      quality: effectiveQuality,
     };
   };
 

@@ -8,6 +8,40 @@ namespace gdjs {
     t: string;
     sm?: number;
   }
+  interface LightingPipelineState {
+    mode?: string;
+    realtimeWeight?: number;
+  }
+  const lightingPipelineStateKey = '__gdScene3dLightingPipelineState';
+  const getLightingPipelineState = (
+    scene: THREE.Scene | null | undefined
+  ): LightingPipelineState | null => {
+    if (!scene) {
+      return null;
+    }
+    const state = (scene as THREE.Scene & {
+      userData?: { [key: string]: any };
+    }).userData?.[lightingPipelineStateKey] as LightingPipelineState | undefined;
+    return state || null;
+  };
+  const getRealtimeLightingMultiplier = (
+    state: LightingPipelineState | null
+  ): number => {
+    if (!state || !state.mode) {
+      return 1;
+    }
+    if (state.mode === 'realtime') {
+      return 1;
+    }
+    if (state.mode === 'baked') {
+      return 0;
+    }
+    return gdjs.evtTools.common.clamp(
+      0,
+      1,
+      state.realtimeWeight !== undefined ? state.realtimeWeight : 0.75
+    );
+  };
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::HemisphereLight',
     new (class implements gdjs.PixiFiltersTools.FilterCreator {
@@ -98,8 +132,18 @@ namespace gdjs {
             return true;
           }
           updatePreRender(target: gdjs.EffectsTarget): any {
+            const scene = target.get3DRendererObject() as
+              | THREE.Scene
+              | null
+              | undefined;
+            const realtimeMultiplier = getRealtimeLightingMultiplier(
+              getLightingPipelineState(scene)
+            );
+            const effectiveTargetIntensity =
+              this._targetIntensity * realtimeMultiplier;
+
             if (this._smoothing <= 0) {
-              this._light.intensity = this._targetIntensity;
+              this._light.intensity = effectiveTargetIntensity;
               this._light.color.copy(this._targetSkyColor);
               this._light.groundColor.copy(this._targetGroundColor);
               return;
@@ -109,7 +153,7 @@ namespace gdjs {
               ? target.getRuntimeScene()
               : null;
             if (!runtimeScene) {
-              this._light.intensity = this._targetIntensity;
+              this._light.intensity = effectiveTargetIntensity;
               this._light.color.copy(this._targetSkyColor);
               this._light.groundColor.copy(this._targetGroundColor);
               return;
@@ -121,7 +165,7 @@ namespace gdjs {
             }
             const alpha = 1 - Math.exp(-this._smoothing * deltaTime);
             this._light.intensity +=
-              (this._targetIntensity - this._light.intensity) * alpha;
+              (effectiveTargetIntensity - this._light.intensity) * alpha;
             this._light.color.lerp(this._targetSkyColor, alpha);
             this._light.groundColor.lerp(this._targetGroundColor, alpha);
           }

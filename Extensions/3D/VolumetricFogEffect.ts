@@ -36,6 +36,7 @@ namespace gdjs {
       lightScatter: { value: 1.0 },
       maxDistance: { value: 1200.0 },
       stepCount: { value: 36.0 },
+      frameJitter: { value: 0.0 },
       lightCount: { value: 0 },
       lightPositions: { value: makeVector3Array(MAX_VOLUMETRIC_LIGHTS) },
       lightColors: { value: makeVector3Array(MAX_VOLUMETRIC_LIGHTS) },
@@ -64,6 +65,7 @@ namespace gdjs {
       uniform float lightScatter;
       uniform float maxDistance;
       uniform float stepCount;
+      uniform float frameJitter;
       uniform int lightCount;
       uniform vec3 lightPositions[MAX_VOLUMETRIC_LIGHTS];
       uniform vec3 lightColors[MAX_VOLUMETRIC_LIGHTS];
@@ -75,6 +77,12 @@ namespace gdjs {
         vec4 clip = vec4(uv * 2.0 - 1.0, depth * 2.0 - 1.0, 1.0);
         vec4 view = cameraProjectionMatrixInverse * clip;
         return view.xyz / max(view.w, 0.00001);
+      }
+
+      float hash12(vec2 p) {
+        vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+        p3 += dot(p3, p3.yzx + 33.33);
+        return fract((p3.x + p3.y) * p3.z);
       }
 
       void main() {
@@ -99,15 +107,31 @@ namespace gdjs {
         }
 
         float clampedStepCount = clamp(stepCount, 8.0, float(MAX_VOLUMETRIC_STEPS));
-        float stepLength = rayLength / clampedStepCount;
+        float densityStepFactor = clamp(density * 120.0, 0.45, 1.0);
+        float adaptiveStepCount = max(
+          8.0,
+          floor(clampedStepCount * densityStepFactor + 0.5)
+        );
+        float stepLength = rayLength / adaptiveStepCount;
+
+        if (lightCount == 0 || lightScatter <= 0.0001) {
+          float opticalDepth = density * rayLength * 0.01;
+          float transmittance = exp(-opticalDepth);
+          vec3 fogContribution = fogColor * (1.0 - transmittance);
+          vec3 finalNoLightColor = baseColor.rgb * transmittance + fogContribution;
+          gl_FragColor = vec4(finalNoLightColor, baseColor.a);
+          return;
+        }
+
         float transmittance = 1.0;
         vec3 accumulatedFog = vec3(0.0);
+        float pixelJitter = hash12(vUv * resolution + vec2(frameJitter * 91.7));
 
         for (int step = 0; step < MAX_VOLUMETRIC_STEPS; step++) {
-          if (float(step) >= clampedStepCount) {
+          if (float(step) >= adaptiveStepCount) {
             break;
           }
-          float sampleDistance = (float(step) + 0.5) * stepLength;
+          float sampleDistance = (float(step) + pixelJitter) * stepLength;
           vec3 samplePosition = rayDirection * sampleDistance;
 
           float localDensity = density;
@@ -169,6 +193,9 @@ namespace gdjs {
           _lightRanges: number[];
           _tempWorldPosition: THREE.Vector3;
           _tempViewPosition: THREE.Vector3;
+          _frameIndex: number;
+          _framesSinceLightRefresh: number;
+          _lightRefreshIntervalFrames: number;
 
           constructor() {
             this.shaderPass = new THREE_ADDONS.ShaderPass(volumetricFogShader);
@@ -203,6 +230,9 @@ namespace gdjs {
             this._lightRanges = makeNumberArray(MAX_VOLUMETRIC_LIGHTS);
             this._tempWorldPosition = new THREE.Vector3();
             this._tempViewPosition = new THREE.Vector3();
+            this._frameIndex = 0;
+            this._framesSinceLightRefresh = 999;
+            this._lightRefreshIntervalFrames = 1;
 
             this.shaderPass.uniforms.fogColor.value.set(
               this._fogColor.r,
@@ -216,6 +246,7 @@ namespace gdjs {
               this._lightPositions;
             this.shaderPass.uniforms.lightColors.value = this._lightColors;
             this.shaderPass.uniforms.lightRanges.value = this._lightRanges;
+            this.shaderPass.uniforms.frameJitter.value = 0;
             this.shaderPass.enabled = true;
           }
 
@@ -238,6 +269,7 @@ namespace gdjs {
             }
             target.getRenderer().addPostProcessingPass(this.shaderPass);
             gdjs.reorderScene3DPostProcessingPasses(target);
+            this._framesSinceLightRefresh = this._lightRefreshIntervalFrames;
             this._isEnabled = true;
             return true;
           }
@@ -304,6 +336,21 @@ namespace gdjs {
             this.shaderPass.uniforms.lightRanges.value = this._lightRanges;
           }
 
+          private _adaptQuality(target: gdjs.Layer): gdjs.Scene3DPostProcessingQualityProfile {
+            const quality = gdjs.getScene3DPostProcessingQualityProfileForLayerMode(
+              target,
+              this._qualityMode
+            );
+            if (quality.fogSteps <= 14) {
+              this._lightRefreshIntervalFrames = 3;
+            } else if (quality.fogSteps <= 22) {
+              this._lightRefreshIntervalFrames = 2;
+            } else {
+              this._lightRefreshIntervalFrames = 1;
+            }
+            return quality;
+          }
+
           updatePreRender(target: gdjs.EffectsTarget): any {
             if (!this._isEnabled) {
               return;
@@ -340,6 +387,7 @@ namespace gdjs {
               'FOG',
               this._qualityMode
             );
+            const quality = this._adaptQuality(target);
 
             const sharedCapture = gdjs.captureScene3DSharedTextures(
               target,
@@ -377,12 +425,18 @@ namespace gdjs {
             this.shaderPass.uniforms.density.value = this._density;
             this.shaderPass.uniforms.lightScatter.value = this._lightScatter;
             this.shaderPass.uniforms.maxDistance.value = this._maxDistance;
-            const quality = gdjs.getScene3DPostProcessingQualityProfileForMode(
-              this._qualityMode
-            );
             this.shaderPass.uniforms.stepCount.value = quality.fogSteps;
+            this._frameIndex = (this._frameIndex + 1) % 4096;
+            this.shaderPass.uniforms.frameJitter.value =
+              (this._frameIndex * 0.61803398875) % 1;
 
-            this._updateLightsUniforms(threeScene, threeCamera);
+            this._framesSinceLightRefresh++;
+            if (
+              this._framesSinceLightRefresh >= this._lightRefreshIntervalFrames
+            ) {
+              this._updateLightsUniforms(threeScene, threeCamera);
+              this._framesSinceLightRefresh = 0;
+            }
           }
 
           updateDoubleParameter(parameterName: string, value: number): void {

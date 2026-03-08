@@ -42,7 +42,101 @@ namespace gdjs {
     fa?: string;
     fy?: number;
     fp?: number;
+    cs?: boolean;
   }
+
+  interface LightingPipelineState {
+    mode?: string;
+    realtimeWeight?: number;
+    attenuationModel?: string;
+    attenuationDistanceScale?: number;
+    attenuationDecayScale?: number;
+    realtimeShadowsOnly?: boolean;
+    physicallyCorrectLights?: boolean;
+  }
+
+  const lightingPipelineStateKey = '__gdScene3dLightingPipelineState';
+
+  const getLightingPipelineState = (
+    scene: THREE.Scene | null | undefined
+  ): LightingPipelineState | null => {
+    if (!scene) {
+      return null;
+    }
+    const state = (scene as THREE.Scene & {
+      userData?: { [key: string]: any };
+    }).userData?.[lightingPipelineStateKey] as LightingPipelineState | undefined;
+    return state || null;
+  };
+
+  const getRealtimeLightingMultiplier = (
+    state: LightingPipelineState | null
+  ): number => {
+    if (!state || !state.mode) {
+      return 1;
+    }
+    if (state.mode === 'realtime') {
+      return 1;
+    }
+    if (state.mode === 'baked') {
+      return 0;
+    }
+    return gdjs.evtTools.common.clamp(
+      0,
+      1,
+      state.realtimeWeight !== undefined ? state.realtimeWeight : 0.75
+    );
+  };
+
+  const shouldUseRealtimeShadows = (
+    state: LightingPipelineState | null,
+    realtimeMultiplier: number
+  ): boolean => {
+    if (!state || state.realtimeShadowsOnly === undefined) {
+      return true;
+    }
+    if (!state.realtimeShadowsOnly) {
+      return true;
+    }
+    return realtimeMultiplier > 0.02;
+  };
+
+  const getAttenuationModelMultipliers = (
+    model: string
+  ): { distanceScale: number; decayScale: number } => {
+    if (model === 'cinematic') {
+      return { distanceScale: 1.35, decayScale: 0.75 };
+    }
+    if (model === 'stylized') {
+      return { distanceScale: 1.6, decayScale: 0.55 };
+    }
+    if (model === 'physical') {
+      return { distanceScale: 1, decayScale: 1 };
+    }
+    return { distanceScale: 1.12, decayScale: 0.9 };
+  };
+
+  const computePipelineAttenuation = (
+    distance: number,
+    decay: number,
+    state: LightingPipelineState | null
+  ): { distance: number; decay: number } => {
+    if (!state) {
+      return { distance: Math.max(0, distance), decay: Math.max(0, decay) };
+    }
+    const modelMultipliers = getAttenuationModelMultipliers(
+      state.attenuationModel || 'balanced'
+    );
+    const distanceScale =
+      Math.max(0, state.attenuationDistanceScale ?? 1) *
+      modelMultipliers.distanceScale;
+    const decayScale =
+      Math.max(0, state.attenuationDecayScale ?? 1) * modelMultipliers.decayScale;
+    return {
+      distance: distance > 0 ? Math.max(0, distance * distanceScale) : 0,
+      decay: Math.max(0, decay * decayScale),
+    };
+  };
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::SpotLight',
     new (class implements gdjs.PixiFiltersTools.FilterCreator {
@@ -62,6 +156,7 @@ namespace gdjs {
           private _targetY: float = 0;
           private _targetZ: float = 0;
           private _distance: float = 0;
+          private _intensity: float = 1;
           private _angle: float = 45;
           private _penumbra: float = 0.1;
           private _decay: float = 2;
@@ -112,6 +207,8 @@ namespace gdjs {
           };
 
           private _isEnabled: boolean = false;
+          private _isCastingShadow: boolean = false;
+          private _pipelineAllowsRealtimeShadows: boolean = true;
           private _light: THREE.SpotLight;
           private _bounceLight: THREE.SpotLight;
           private _shadowMapDirty = true;
@@ -123,10 +220,34 @@ namespace gdjs {
 
           constructor() {
             this._light = new THREE.SpotLight();
+            this._intensity = Math.max(
+              0,
+              effectData.doubleParameters.intensity !== undefined
+                ? effectData.doubleParameters.intensity
+                : this._light.intensity
+            );
+            this._distance = Math.max(
+              0,
+              effectData.doubleParameters.distance !== undefined
+                ? effectData.doubleParameters.distance
+                : this._distance
+            );
+            this._decay = Math.max(
+              0,
+              effectData.doubleParameters.decay !== undefined
+                ? effectData.doubleParameters.decay
+                : this._decay
+            );
+            this._isCastingShadow =
+              effectData.booleanParameters.isCastingShadow === undefined
+                ? false
+                : !!effectData.booleanParameters.isCastingShadow;
+            this._light.intensity = this._intensity;
             this._light.distance = this._distance;
             this._light.angle = gdjs.toRad(this._angle);
             this._light.penumbra = this._penumbra;
             this._light.decay = this._decay;
+            this._light.castShadow = this._isCastingShadow;
             this._updatePosition();
             this._updateTarget();
 
@@ -141,6 +262,73 @@ namespace gdjs {
             this._light.shadow.camera.near = this._shadowNear;
             this._light.shadow.camera.far = this._shadowFar;
             this._light.shadow.camera.updateProjectionMatrix();
+          }
+
+          private _applyLightingPipeline(target: gdjs.EffectsTarget): void {
+            const scene = target.get3DRendererObject() as
+              | THREE.Scene
+              | null
+              | undefined;
+            const pipelineState = getLightingPipelineState(scene);
+            const realtimeMultiplier =
+              getRealtimeLightingMultiplier(pipelineState);
+
+            this._light.intensity = this._intensity * realtimeMultiplier;
+            const attenuation = computePipelineAttenuation(
+              this._distance,
+              this._decay,
+              pipelineState
+            );
+            this._light.distance = attenuation.distance;
+            this._light.decay = attenuation.decay;
+
+            this._pipelineAllowsRealtimeShadows = shouldUseRealtimeShadows(
+              pipelineState,
+              realtimeMultiplier
+            );
+            const shouldCastShadow =
+              this._isCastingShadow && this._pipelineAllowsRealtimeShadows;
+            if (this._light.castShadow !== shouldCastShadow) {
+              this._light.castShadow = shouldCastShadow;
+              if (shouldCastShadow) {
+                this._shadowMapDirty = true;
+                this._shadowCameraDirty = true;
+                this._light.shadow.needsUpdate = true;
+              }
+            }
+
+            this._bounceLight.castShadow =
+              this._physicsBounceCastShadow && this._pipelineAllowsRealtimeShadows;
+
+            if (pipelineState) {
+              const runtimeScene = target.getRuntimeScene
+                ? target.getRuntimeScene()
+                : null;
+              if (runtimeScene && runtimeScene.getGame) {
+                const gameRenderer = runtimeScene.getGame().getRenderer();
+                if (gameRenderer && (gameRenderer as any).getThreeRenderer) {
+                  const threeRenderer = (gameRenderer as any).getThreeRenderer() as
+                    | THREE.WebGLRenderer
+                    | null;
+                  if (threeRenderer) {
+                    const rendererWithLightingMode = threeRenderer as
+                      | (THREE.WebGLRenderer & {
+                          physicallyCorrectLights?: boolean;
+                        })
+                      | null;
+                    if (
+                      rendererWithLightingMode &&
+                      typeof rendererWithLightingMode.physicallyCorrectLights ===
+                        'boolean' &&
+                      pipelineState.physicallyCorrectLights !== undefined
+                    ) {
+                      rendererWithLightingMode.physicallyCorrectLights =
+                        !!pipelineState.physicallyCorrectLights;
+                    }
+                  }
+                }
+              }
+            }
           }
 
           private _clampShadowMapSizeToRenderer(size: integer): integer {
@@ -456,7 +644,8 @@ namespace gdjs {
             this._bounceLight.angle = this._light.angle;
             this._bounceLight.penumbra = this._light.penumbra;
             this._bounceLight.decay = this._light.decay;
-            this._bounceLight.castShadow = this._physicsBounceCastShadow;
+            this._bounceLight.castShadow =
+              this._physicsBounceCastShadow && this._pipelineAllowsRealtimeShadows;
             if (this._bounceLight.castShadow) {
               this._applySpotShadowTuning(
                 this._bounceLight,
@@ -794,6 +983,7 @@ namespace gdjs {
             scene.add(this._bounceLight);
             scene.add(this._bounceLight.target);
             this._isEnabled = true;
+            this._applyLightingPipeline(target);
             return true;
           }
           removeEffect(target: EffectsTarget): boolean {
@@ -832,6 +1022,7 @@ namespace gdjs {
               }
             }
 
+            this._applyLightingPipeline(target);
             this._ensureSoftShadowRenderer(target);
             const shouldUpdateShadows =
               this._light.castShadow ||
@@ -847,7 +1038,8 @@ namespace gdjs {
           }
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
-              this._light.intensity = Math.max(0, value);
+              this._intensity = Math.max(0, value);
+              this._light.intensity = this._intensity;
             } else if (parameterName === 'positionX') {
               this._positionX = value;
               this._updatePosition();
@@ -925,7 +1117,7 @@ namespace gdjs {
           }
           getDoubleParameter(parameterName: string): number {
             if (parameterName === 'intensity') {
-              return this._light.intensity;
+              return this._intensity;
             } else if (parameterName === 'positionX') {
               return this._positionX;
             } else if (parameterName === 'positionY') {
@@ -1041,6 +1233,7 @@ namespace gdjs {
           }
           updateBooleanParameter(parameterName: string, value: boolean): void {
             if (parameterName === 'isCastingShadow') {
+              this._isCastingShadow = value;
               this._light.castShadow = value;
               if (value) {
                 this._shadowMapDirty = true;
@@ -1079,7 +1272,7 @@ namespace gdjs {
           }
           getNetworkSyncData(): SpotLightFilterNetworkSyncData {
             return {
-              i: this._light.intensity,
+              i: this._intensity,
               c: this._light.color.getHex(),
               px: this._positionX,
               py: this._positionY,
@@ -1121,12 +1314,13 @@ namespace gdjs {
               fa: this._flashlightForwardAxis,
               fy: this._flashlightYawOffset,
               fp: this._flashlightPitchOffset,
+              cs: this._isCastingShadow,
             };
           }
           updateFromNetworkSyncData(
             syncData: SpotLightFilterNetworkSyncData
           ): void {
-            this._light.intensity = syncData.i;
+            this._intensity = Math.max(0, syncData.i);
             this._light.color.setHex(syncData.c);
             this._positionX = syncData.px;
             this._positionY = syncData.py;
@@ -1170,11 +1364,15 @@ namespace gdjs {
             this._setFlashlightForwardAxis(syncData.fa ?? 'X+');
             this._flashlightYawOffset = syncData.fy ?? 0;
             this._flashlightPitchOffset = syncData.fp ?? 0;
+            this._isCastingShadow = syncData.cs ?? this._isCastingShadow;
             this._light.distance = this._distance;
             this._light.angle = gdjs.toRad(this._angle);
             this._light.penumbra = this._penumbra;
             this._light.decay = this._decay;
-            this._bounceLight.castShadow = this._physicsBounceCastShadow;
+            this._light.castShadow = this._isCastingShadow;
+            this._light.intensity = this._intensity;
+            this._bounceLight.castShadow =
+              this._physicsBounceCastShadow && this._pipelineAllowsRealtimeShadows;
             if (!this._physicsBounceEnabled) {
               this._hideBounceLight();
             }

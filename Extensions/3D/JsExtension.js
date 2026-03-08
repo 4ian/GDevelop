@@ -2799,6 +2799,166 @@ module.exports = {
     }
     {
       const effect = extension
+        .addEffect('LightingPipeline')
+        .setFullName(_('Lighting pipeline'))
+        .setDescription(
+          _(
+            'Global lighting orchestration for 3D scenes: blend realtime and baked lighting, enable probe-based fill light, and tune attenuation behavior for local lights.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/LightingPipeline.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('mode')
+        .setValue('hybrid')
+        .addChoice('realtime', _('Realtime only'))
+        .addChoice('baked', _('Baked + probes'))
+        .addChoice('hybrid', _('Hybrid (realtime + baked + probes)'))
+        .setLabel(_('Lighting mode'))
+        .setType('choice');
+      properties
+        .getOrCreate('realtimeWeight')
+        .setValue('0.75')
+        .setLabel(_('Realtime weight'))
+        .setDescription(
+          _(
+            'Weight of realtime lighting contribution in hybrid mode (0 to 1).'
+          )
+        )
+        .setType('number')
+        .setAdvanced(true);
+      properties
+        .getOrCreate('bakedWeight')
+        .setValue('1')
+        .setLabel(_('Baked lightmap weight'))
+        .setDescription(
+          _(
+            'Multiplier applied to baked lightmaps in baked/hybrid modes. Higher values make baked lighting more dominant.'
+          )
+        )
+        .setType('number')
+        .setAdvanced(true);
+      properties
+        .getOrCreate('probeEnabled')
+        .setValue('true')
+        .setLabel(_('Enable probes'))
+        .setType('boolean')
+        .setGroup(_('Probes'));
+      properties
+        .getOrCreate('probeIntensity')
+        .setValue('0.35')
+        .setLabel(_('Probe intensity'))
+        .setDescription(
+          _('Intensity of probe-based indirect fill lighting.')
+        )
+        .setType('number')
+        .setGroup(_('Probes'));
+      properties
+        .getOrCreate('probeSmoothing')
+        .setValue('2.5')
+        .setLabel(_('Probe smoothing'))
+        .setDescription(
+          _(
+            'How quickly probe lighting adapts to scene changes. Higher values react faster.'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Probes'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('probeUseSceneColors')
+        .setValue('true')
+        .setLabel(_('Probe colors from scene'))
+        .setDescription(
+          _(
+            'If enabled, probe colors are sampled from scene background/hemisphere lighting. Disable to use custom probe colors.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Probes'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('probeSkyColor')
+        .setValue('191;215;255')
+        .setLabel(_('Custom probe sky color'))
+        .setType('color')
+        .setGroup(_('Probes'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('probeGroundColor')
+        .setValue('109;115;86')
+        .setLabel(_('Custom probe ground color'))
+        .setType('color')
+        .setGroup(_('Probes'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('attenuationModel')
+        .setValue('balanced')
+        .addChoice('physical', _('Physical'))
+        .addChoice('balanced', _('Balanced'))
+        .addChoice('cinematic', _('Cinematic'))
+        .addChoice('stylized', _('Stylized'))
+        .setLabel(_('Attenuation model'))
+        .setDescription(
+          _(
+            'Controls default falloff style used by point and spot lights.'
+          )
+        )
+        .setType('choice')
+        .setGroup(_('Attenuation'));
+      properties
+        .getOrCreate('attenuationDistanceScale')
+        .setValue('1')
+        .setLabel(_('Distance scale'))
+        .setDescription(
+          _(
+            'Global distance multiplier for local-light attenuation (point/spot).'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Attenuation'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('attenuationDecayScale')
+        .setValue('1')
+        .setLabel(_('Decay scale'))
+        .setDescription(
+          _(
+            'Global decay multiplier for local-light attenuation (point/spot).'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Attenuation'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('realtimeShadowsOnly')
+        .setValue('true')
+        .setLabel(_('Disable shadows in baked mode'))
+        .setDescription(
+          _(
+            'When enabled, realtime shadow maps are turned off automatically if realtime lighting contribution becomes negligible.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Performance'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('physicallyCorrectLights')
+        .setValue('true')
+        .setLabel(_('Physically correct light units'))
+        .setDescription(
+          _(
+            'Enable physically-correct renderer light response for better consistency across PBR materials.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Performance'))
+        .setAdvanced(true);
+    }
+    {
+      const effect = extension
         .addEffect('DirectionalLight')
         .setFullName(_('Directional light'))
         .setDescription(
@@ -3748,6 +3908,27 @@ module.exports = {
         .setLabel(_('Quality mode'))
         .setType('string')
         .setDescription(_('Use: low, medium, or high.'));
+      properties
+        .getOrCreate('adaptiveQuality')
+        .setValue('true')
+        .setLabel(_('Adaptive quality'))
+        .setType('boolean')
+        .setDescription(
+          _(
+            'Automatically adjusts post-processing quality based on frame time to stabilize performance.'
+          )
+        );
+      properties
+        .getOrCreate('targetFps')
+        .setValue('60')
+        .setLabel(_('Adaptive target FPS'))
+        .setType('number')
+        .setDescription(
+          _(
+            'Performance target used by adaptive quality (recommended between 30 and 120).'
+          )
+        )
+        .setAdvanced(true);
     }
     {
       const effect = extension

@@ -275,6 +275,24 @@ namespace gdjs {
             }
           }
 
+          private _applyQualityPresetFromProfile(
+            quality: gdjs.Scene3DPostProcessingQualityProfile
+          ): void {
+            if (this._qualityMode === 'custom') {
+              return;
+            }
+            if (quality.ssrSteps <= 10) {
+              this._dropCount = 8;
+              this._streakCount = 12;
+            } else if (quality.ssrSteps <= 16) {
+              this._dropCount = 24;
+              this._streakCount = 32;
+            } else {
+              this._dropCount = 48;
+              this._streakCount = 64;
+            }
+          }
+
           private _updateShaderUniforms(): void {
             this.shaderPass.uniforms.time.value = this._time;
             this.shaderPass.uniforms.intensity.value = this._intensity;
@@ -358,6 +376,11 @@ namespace gdjs {
               return;
             }
 
+            if (this._intensity <= 0.0001) {
+              this.shaderPass.enabled = false;
+              return;
+            }
+
             if (this._qualityMode === 'custom') {
               gdjs.clearScene3DPostProcessingEffectQualityMode(target, 'RAIN');
             } else {
@@ -366,7 +389,12 @@ namespace gdjs {
                 'RAIN',
                 this._qualityMode
               );
-              this._applyQualityPreset(this._qualityMode);
+              const quality =
+                gdjs.getScene3DPostProcessingQualityProfileForLayerMode(
+                  target,
+                  this._qualityMode
+                );
+              this._applyQualityPresetFromProfile(quality);
             }
 
             const deltaTime = Math.max(0, runtimeScene.getElapsedTime() / 1000);

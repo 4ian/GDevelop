@@ -1,7 +1,16 @@
 namespace gdjs {
+  const clampPostProcessingTargetFps = (value: number): number =>
+    gdjs.evtTools.common.clamp(
+      24,
+      144,
+      Number.isFinite(value) ? value : 60
+    );
+
   interface PostProcessingStackNetworkSyncData {
     q: string;
     e: boolean;
+    aq?: boolean;
+    tf?: number;
   }
 
   gdjs.PixiFiltersTools.registerFilterCreator(
@@ -19,11 +28,24 @@ namespace gdjs {
           _isEnabled: boolean;
           _stackEnabled: boolean;
           _qualityMode: string;
+          _adaptiveQualityEnabled: boolean;
+          _targetFps: number;
 
           constructor() {
             this._isEnabled = false;
-            this._stackEnabled = true;
-            this._qualityMode = 'medium';
+            this._stackEnabled =
+              effectData.booleanParameters.enabled === undefined
+                ? true
+                : !!effectData.booleanParameters.enabled;
+            this._qualityMode =
+              effectData.stringParameters.qualityMode || 'medium';
+            this._adaptiveQualityEnabled =
+              effectData.booleanParameters.adaptiveQuality === undefined
+                ? true
+                : !!effectData.booleanParameters.adaptiveQuality;
+            this._targetFps = clampPostProcessingTargetFps(
+              effectData.doubleParameters.targetFps
+            );
           }
 
           isEnabled(target: EffectsTarget): boolean {
@@ -49,7 +71,9 @@ namespace gdjs {
             gdjs.setScene3DPostProcessingStackConfig(
               target,
               this._stackEnabled,
-              this._qualityMode
+              this._qualityMode,
+              this._adaptiveQualityEnabled,
+              this._targetFps
             );
             gdjs.reorderScene3DPostProcessingPasses(target);
             return true;
@@ -75,7 +99,9 @@ namespace gdjs {
             gdjs.setScene3DPostProcessingStackConfig(
               target,
               this._stackEnabled,
-              this._qualityMode
+              this._qualityMode,
+              this._adaptiveQualityEnabled,
+              this._targetFps
             );
             gdjs.reorderScene3DPostProcessingPasses(target);
 
@@ -107,9 +133,16 @@ namespace gdjs {
             );
           }
 
-          updateDoubleParameter(parameterName: string, value: number): void {}
+          updateDoubleParameter(parameterName: string, value: number): void {
+            if (parameterName === 'targetFps') {
+              this._targetFps = clampPostProcessingTargetFps(value);
+            }
+          }
 
           getDoubleParameter(parameterName: string): number {
+            if (parameterName === 'targetFps') {
+              return this._targetFps;
+            }
             return 0;
           }
 
@@ -128,6 +161,8 @@ namespace gdjs {
           updateBooleanParameter(parameterName: string, value: boolean): void {
             if (parameterName === 'enabled') {
               this._stackEnabled = value;
+            } else if (parameterName === 'adaptiveQuality') {
+              this._adaptiveQualityEnabled = value;
             }
           }
 
@@ -135,6 +170,8 @@ namespace gdjs {
             return {
               q: this._qualityMode,
               e: this._stackEnabled,
+              aq: this._adaptiveQualityEnabled,
+              tf: this._targetFps,
             };
           }
 
@@ -143,6 +180,9 @@ namespace gdjs {
           ): void {
             this._qualityMode = syncData.q || 'medium';
             this._stackEnabled = !!syncData.e;
+            this._adaptiveQualityEnabled =
+              syncData.aq === undefined ? true : !!syncData.aq;
+            this._targetFps = clampPostProcessingTargetFps(syncData.tf || 60);
           }
         })();
       }

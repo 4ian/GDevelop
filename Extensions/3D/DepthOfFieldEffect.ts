@@ -55,6 +55,11 @@ namespace gdjs {
         return length(viewPositionFromDepth(uv, depth));
       }
 
+      float getPixelDistanceFromUv(vec2 uv) {
+        float sampleDepth = texture2D(tDepth, uv).x;
+        return getPixelDistance(sampleDepth, uv);
+      }
+
       float getBlurFactor(float distanceToCamera) {
         float safeRange = max(focusRange, 0.0001);
         float distanceFromFocus = abs(distanceToCamera - focusDistance);
@@ -80,25 +85,36 @@ namespace gdjs {
         float blurRadius = maxBlur * blurFactor;
         vec2 texel = 1.0 / resolution;
         float count = clamp(sampleCount, 2.0, float(MAX_DOF_SAMPLES));
+        float adaptiveCount = max(
+          2.0,
+          floor(mix(2.0, count, blurFactor) + 0.5)
+        );
+        float bokehRotation = 2.39996322973;
 
         vec3 accumColor = baseColor.rgb;
         float accumWeight = 1.0;
 
         for (int i = 0; i < MAX_DOF_SAMPLES; i++) {
-          if (float(i) >= count) {
+          if (float(i) >= adaptiveCount) {
             break;
           }
-          float t = (float(i) + 0.5) / count;
-          float angle = 6.28318530718 * t;
+          float t = (float(i) + 0.5) / adaptiveCount;
+          float angle = bokehRotation * float(i);
+          float ring = mix(0.45, 1.0, sqrt(t));
           vec2 direction = vec2(cos(angle), sin(angle));
           vec2 sampleUv = clamp(
-            vUv + direction * texel * blurRadius,
+            vUv + direction * texel * blurRadius * ring,
             vec2(0.0),
             vec2(1.0)
           );
           vec3 sampleColor = texture2D(tDiffuse, sampleUv).rgb;
-          accumColor += sampleColor;
-          accumWeight += 1.0;
+          float sampleDistance = getPixelDistanceFromUv(sampleUv);
+          float sampleBlur = getBlurFactor(sampleDistance);
+          float cocDifference = abs(sampleBlur - blurFactor);
+          float depthWeight = 1.0 - smoothstep(0.15, 0.9, cocDifference);
+          float sampleWeight = max(depthWeight, 0.05);
+          accumColor += sampleColor * sampleWeight;
+          accumWeight += sampleWeight;
         }
 
         vec3 blurredColor = accumColor / max(accumWeight, 0.00001);
@@ -205,7 +221,8 @@ namespace gdjs {
             if (!(target instanceof gdjs.Layer)) {
               return;
             }
-            const quality = gdjs.getScene3DPostProcessingQualityProfileForMode(
+            const quality = gdjs.getScene3DPostProcessingQualityProfileForLayerMode(
+              target,
               this._qualityMode
             );
             this._effectiveSamples = Math.max(

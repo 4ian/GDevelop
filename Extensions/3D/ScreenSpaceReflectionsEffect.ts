@@ -245,9 +245,19 @@ namespace gdjs {
         return vec4(hitColor * normalAlignment, hitDistance);
       }
 
-      vec4 traceReflection(vec3 originVS, vec3 reflectedDirVS, float roughness) {
-        float clampedSteps = clamp(maxSteps, 8.0, float(SSR_STEPS));
-        float stepSize = maxDistance / clampedSteps;
+      vec4 traceReflection(
+        vec3 originVS,
+        vec3 reflectedDirVS,
+        float roughness,
+        float traceDistance
+      ) {
+        float roughnessStepScale = mix(1.0, 0.45, roughness);
+        float clampedSteps = clamp(
+          maxSteps * roughnessStepScale,
+          6.0,
+          float(SSR_STEPS)
+        );
+        float stepSize = traceDistance / clampedSteps;
         vec3 rayPos = originVS;
         vec3 previousRayPos = rayPos;
         vec4 hit = vec4(0.0);
@@ -312,7 +322,11 @@ namespace gdjs {
         vec3 reflectedDir = normalize(reflect(normalize(viewPos), normal));
 
         float roughness = sampleSceneRoughness(vUv, normal, viewPos);
-        vec4 hit = traceReflection(viewPos, reflectedDir, roughness);
+        float traceDistance = mix(maxDistance, maxDistance * 0.42, roughness);
+        vec4 hit =
+          roughness >= 0.94
+            ? vec4(0.0)
+            : traceReflection(viewPos, reflectedDir, roughness, traceDistance);
         vec3 reflectionColor = hit.rgb;
         float rayDistance = hit.a;
 
@@ -323,12 +337,16 @@ namespace gdjs {
             vec2(1.0)
           );
           reflectionColor = sampleReflectionColor(fallbackUv, roughness);
-          rayDistance = maxDistance * 0.45;
+          rayDistance = traceDistance * 0.45;
         }
 
         float fresnel = pow(1.0 - max(dot(normal, -normalize(viewPos)), 0.0), 4.0);
         float viewFacing = clamp(dot(normal, -normalize(viewPos)), 0.0, 1.0);
-        float distanceFade = clamp(1.0 - rayDistance / maxDistance, 0.0, 1.0);
+        float distanceFade = clamp(
+          1.0 - rayDistance / max(traceDistance, 0.0001),
+          0.0,
+          1.0
+        );
         float edgeFade =
           smoothstep(0.02, 0.16, vUv.x) *
           smoothstep(0.02, 0.16, vUv.y) *
@@ -388,6 +406,8 @@ namespace gdjs {
           _roughnessPreviousViewport: THREE.Vector4;
           _roughnessPreviousScissor: THREE.Vector4;
           _roughnessPreviousClearColor: THREE.Color;
+          _auxiliaryCaptureIntervalFrames: number;
+          _framesSinceAuxiliaryCapture: number;
 
           constructor() {
             this.shaderPass = new THREE_ADDONS.ShaderPass(
@@ -463,6 +483,8 @@ namespace gdjs {
             this._roughnessPreviousViewport = new THREE.Vector4();
             this._roughnessPreviousScissor = new THREE.Vector4();
             this._roughnessPreviousClearColor = new THREE.Color(0, 0, 0);
+            this._auxiliaryCaptureIntervalFrames = 1;
+            this._framesSinceAuxiliaryCapture = 999;
           }
 
           isEnabled(target: EffectsTarget): boolean {
@@ -484,6 +506,8 @@ namespace gdjs {
             }
             target.getRenderer().addPostProcessingPass(this.shaderPass);
             gdjs.reorderScene3DPostProcessingPasses(target);
+            this._framesSinceAuxiliaryCapture =
+              this._auxiliaryCaptureIntervalFrames;
             this._isEnabled = true;
             return true;
           }
@@ -507,10 +531,18 @@ namespace gdjs {
             if (!(target instanceof gdjs.Layer)) {
               return;
             }
-            const quality = gdjs.getScene3DPostProcessingQualityProfileForMode(
+            const quality = gdjs.getScene3DPostProcessingQualityProfileForLayerMode(
+              target,
               this._qualityMode
             );
             this._raySteps = quality.ssrSteps;
+            if (quality.ssrSteps <= 10) {
+              this._auxiliaryCaptureIntervalFrames = 3;
+            } else if (quality.ssrSteps <= 16) {
+              this._auxiliaryCaptureIntervalFrames = 2;
+            } else {
+              this._auxiliaryCaptureIntervalFrames = 1;
+            }
           }
 
           private _isSSRExcludedMesh(object3D: THREE.Object3D): boolean {
@@ -964,17 +996,33 @@ namespace gdjs {
             if (!sharedCapture || !sharedCapture.depthTexture) {
               return;
             }
+            this._framesSinceAuxiliaryCapture++;
+            const refreshAuxiliaryTextures =
+              this._framesSinceAuxiliaryCapture >=
+              this._auxiliaryCaptureIntervalFrames;
+            if (refreshAuxiliaryTextures) {
+              this._framesSinceAuxiliaryCapture = 0;
+            }
 
             let ssrExcludeMaskTexture: THREE.Texture =
               this._excludeMaskFallbackTexture;
             if (this._sceneHasSSRExcludedMeshes(threeScene)) {
-              ssrExcludeMaskTexture = this._captureSSRExcludeMask(
-                threeRenderer,
-                threeScene,
-                threeCamera,
-                sharedCapture.width,
-                sharedCapture.height
-              );
+              const shouldCaptureExcludeMask =
+                refreshAuxiliaryTextures ||
+                !this._excludeMaskRenderTarget ||
+                this._excludeMaskRenderTarget.width !== sharedCapture.width ||
+                this._excludeMaskRenderTarget.height !== sharedCapture.height;
+              if (shouldCaptureExcludeMask) {
+                ssrExcludeMaskTexture = this._captureSSRExcludeMask(
+                  threeRenderer,
+                  threeScene,
+                  threeCamera,
+                  sharedCapture.width,
+                  sharedCapture.height
+                );
+              } else if (this._excludeMaskRenderTarget) {
+                ssrExcludeMaskTexture = this._excludeMaskRenderTarget.texture;
+              }
             } else {
               this._disposeSSRExcludeMaskResources();
             }
@@ -982,13 +1030,22 @@ namespace gdjs {
             let ssrRoughnessTexture: THREE.Texture =
               this._roughnessFallbackTexture;
             if (this._sceneHasPBRManagedMeshes(threeScene)) {
-              ssrRoughnessTexture = this._captureSSRoughnessTexture(
-                threeRenderer,
-                threeScene,
-                threeCamera,
-                sharedCapture.width,
-                sharedCapture.height
-              );
+              const shouldCaptureRoughness =
+                refreshAuxiliaryTextures ||
+                !this._roughnessRenderTarget ||
+                this._roughnessRenderTarget.width !== sharedCapture.width ||
+                this._roughnessRenderTarget.height !== sharedCapture.height;
+              if (shouldCaptureRoughness) {
+                ssrRoughnessTexture = this._captureSSRoughnessTexture(
+                  threeRenderer,
+                  threeScene,
+                  threeCamera,
+                  sharedCapture.width,
+                  sharedCapture.height
+                );
+              } else if (this._roughnessRenderTarget) {
+                ssrRoughnessTexture = this._roughnessRenderTarget.texture;
+              }
             } else {
               this._disposeSSRoughnessResources();
             }

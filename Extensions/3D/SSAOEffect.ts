@@ -77,11 +77,16 @@ namespace gdjs {
         return fract((p3.x + p3.y) * p3.z);
       }
 
-      vec3 randomHemisphereDirection(vec2 uv, vec3 normal, float index) {
+      vec3 randomHemisphereDirection(
+        vec2 uv,
+        vec3 normal,
+        float index,
+        float rotationOffset
+      ) {
         float u = hash12(uv * vec2(173.3, 157.7) + vec2(index, index * 1.37));
         float v = hash12(uv.yx * vec2(149.1, 181.9) + vec2(index * 2.11, index * 0.73));
 
-        float phi = 6.28318530718 * u;
+        float phi = 6.28318530718 * u + rotationOffset;
         float cosTheta = 1.0 - v;
         float sinTheta = sqrt(max(0.0, 1.0 - cosTheta * cosTheta));
 
@@ -99,9 +104,19 @@ namespace gdjs {
         );
       }
 
+      float computeAdaptiveSampleCount(vec3 originVS, float requestedCount) {
+        float viewDepth = abs(originVS.z);
+        float depthFactor = clamp(radius / (radius + viewDepth), 0.45, 1.0);
+        float adaptiveCount = floor(requestedCount * depthFactor + 0.5);
+        return clamp(adaptiveCount, 4.0, requestedCount);
+      }
+
       float computeAO(vec3 originVS, vec3 normal, vec2 uv) {
-        float count = clamp(sampleCount, 4.0, float(MAX_SSAO_SAMPLES));
+        float requestedCount = clamp(sampleCount, 4.0, float(MAX_SSAO_SAMPLES));
+        float count = computeAdaptiveSampleCount(originVS, requestedCount);
         float occlusion = 0.0;
+        float kernelRotation =
+          hash12(uv * resolution + originVS.xy * 0.01) * 6.28318530718;
 
         for (int i = 0; i < MAX_SSAO_SAMPLES; i++) {
           if (float(i) >= count) {
@@ -110,7 +125,12 @@ namespace gdjs {
 
           float scale = (float(i) + 0.5) / count;
           scale = mix(0.1, 1.0, scale * scale);
-          vec3 sampleDir = randomHemisphereDirection(uv, normal, float(i));
+          vec3 sampleDir = randomHemisphereDirection(
+            uv,
+            normal,
+            float(i),
+            kernelRotation
+          );
           vec3 samplePos = originVS + sampleDir * radius * scale;
           vec2 sampleUv = projectToUv(samplePos);
 
@@ -133,8 +153,13 @@ namespace gdjs {
             1.0,
             radius / (abs(originVS.z - geometryPos.z) + 0.0001)
           );
+          float distanceWeight = 1.0 - smoothstep(
+            radius * 0.2,
+            radius * 1.5,
+            length(samplePos - originVS)
+          );
           float isOccluded = signedDepth > bias ? 1.0 : 0.0;
-          occlusion += isOccluded * rangeWeight;
+          occlusion += isOccluded * rangeWeight * distanceWeight;
         }
 
         float ao = 1.0 - (occlusion / count) * intensity;
@@ -252,7 +277,8 @@ namespace gdjs {
             if (!(target instanceof gdjs.Layer)) {
               return;
             }
-            const quality = gdjs.getScene3DPostProcessingQualityProfileForMode(
+            const quality = gdjs.getScene3DPostProcessingQualityProfileForLayerMode(
+              target,
               this._qualityMode
             );
             this._effectiveSamples = Math.max(

@@ -30,6 +30,59 @@ namespace gdjs {
     deo?: number;
   }
 
+  interface LightingPipelineState {
+    mode?: string;
+    realtimeWeight?: number;
+    realtimeShadowsOnly?: boolean;
+    physicallyCorrectLights?: boolean;
+  }
+
+  const lightingPipelineStateKey = '__gdScene3dLightingPipelineState';
+
+  const getLightingPipelineState = (
+    scene: THREE.Scene | null | undefined
+  ): LightingPipelineState | null => {
+    if (!scene) {
+      return null;
+    }
+    const state = (scene as THREE.Scene & {
+      userData?: { [key: string]: any };
+    }).userData?.[lightingPipelineStateKey] as LightingPipelineState | undefined;
+    return state || null;
+  };
+
+  const getRealtimeLightingMultiplier = (
+    state: LightingPipelineState | null
+  ): number => {
+    if (!state || !state.mode) {
+      return 1;
+    }
+    if (state.mode === 'realtime') {
+      return 1;
+    }
+    if (state.mode === 'baked') {
+      return 0;
+    }
+    return gdjs.evtTools.common.clamp(
+      0,
+      1,
+      state.realtimeWeight !== undefined ? state.realtimeWeight : 0.75
+    );
+  };
+
+  const shouldUseRealtimeShadows = (
+    state: LightingPipelineState | null,
+    realtimeMultiplier: number
+  ): boolean => {
+    if (!state || state.realtimeShadowsOnly === undefined) {
+      return true;
+    }
+    if (!state.realtimeShadowsOnly) {
+      return true;
+    }
+    return realtimeMultiplier > 0.02;
+  };
+
   const shadowHelper = false;
   const csmCascadeCount = 3;
   const csmIntensityWeights = [0.5, 0.3, 0.2];
@@ -76,6 +129,8 @@ namespace gdjs {
           private _colorHex: number = 0xffffff;
           private _shadowCastingEnabled: boolean = false;
           private _isEnabled: boolean = false;
+          private _pipelineRealtimeMultiplier: float = 1;
+          private _pipelineAllowsRealtimeShadows: boolean = true;
 
           private _lights: THREE.DirectionalLight[] = [];
           private _shadowCameraHelpers: Array<THREE.CameraHelper | null> = [];
@@ -138,7 +193,8 @@ namespace gdjs {
                 csmIntensityWeights[i] !== undefined
                   ? csmIntensityWeights[i]
                   : 1 / csmCascadeCount;
-              this._lights[i].intensity = this._intensity * weight;
+              this._lights[i].intensity =
+                this._intensity * this._pipelineRealtimeMultiplier * weight;
             }
           }
 
@@ -147,13 +203,15 @@ namespace gdjs {
               return;
             }
             this._shadowCastingEnabled = enabled;
+            const shouldCastShadow =
+              enabled && this._pipelineAllowsRealtimeShadows;
             for (const light of this._lights) {
-              light.castShadow = enabled;
-              if (enabled) {
+              light.castShadow = shouldCastShadow;
+              if (shouldCastShadow) {
                 light.shadow.needsUpdate = true;
               }
             }
-            if (enabled) {
+            if (shouldCastShadow) {
               this._updateShadowCameraDirtyState();
             }
           }
@@ -874,7 +932,10 @@ namespace gdjs {
               rendererMaxTextureSize
             );
 
-            if (!this._shadowCastingEnabled) {
+            if (
+              !this._shadowCastingEnabled ||
+              !this._pipelineAllowsRealtimeShadows
+            ) {
               return;
             }
 
@@ -885,6 +946,62 @@ namespace gdjs {
               this._shadowRadius > 1
                 ? THREE.PCFShadowMap
                 : THREE.PCFSoftShadowMap;
+          }
+
+          private _applyLightingPipeline(target: gdjs.EffectsTarget): void {
+            const scene = target.get3DRendererObject() as
+              | THREE.Scene
+              | null
+              | undefined;
+            const pipelineState = getLightingPipelineState(scene);
+            this._pipelineRealtimeMultiplier =
+              getRealtimeLightingMultiplier(pipelineState);
+            this._pipelineAllowsRealtimeShadows = shouldUseRealtimeShadows(
+              pipelineState,
+              this._pipelineRealtimeMultiplier
+            );
+            this._setAllLightsIntensity(this._intensity);
+
+            const shouldCastShadow =
+              this._shadowCastingEnabled && this._pipelineAllowsRealtimeShadows;
+            for (const light of this._lights) {
+              if (light.castShadow !== shouldCastShadow) {
+                light.castShadow = shouldCastShadow;
+                if (shouldCastShadow) {
+                  light.shadow.needsUpdate = true;
+                }
+              }
+            }
+
+            if (pipelineState) {
+              const runtimeScene = target.getRuntimeScene
+                ? target.getRuntimeScene()
+                : null;
+              if (runtimeScene && runtimeScene.getGame) {
+                const gameRenderer = runtimeScene.getGame().getRenderer();
+                if (gameRenderer && (gameRenderer as any).getThreeRenderer) {
+                  const threeRenderer = (gameRenderer as any).getThreeRenderer() as
+                    | THREE.WebGLRenderer
+                    | null;
+                  if (threeRenderer) {
+                    const rendererWithLightingMode = threeRenderer as
+                      | (THREE.WebGLRenderer & {
+                          physicallyCorrectLights?: boolean;
+                        })
+                      | null;
+                    if (
+                      rendererWithLightingMode &&
+                      typeof rendererWithLightingMode.physicallyCorrectLights ===
+                        'boolean' &&
+                      pipelineState.physicallyCorrectLights !== undefined
+                    ) {
+                      rendererWithLightingMode.physicallyCorrectLights =
+                        !!pipelineState.physicallyCorrectLights;
+                    }
+                  }
+                }
+              }
+            }
           }
 
           isEnabled(target: EffectsTarget): boolean {
@@ -922,6 +1039,7 @@ namespace gdjs {
             this._hadPreviousCameraPosition = false;
             this._staticAnchorInitialized = false;
             this._isEnabled = true;
+            this._applyLightingPipeline(target);
             return true;
           }
           removeEffect(target: EffectsTarget): boolean {
@@ -950,6 +1068,7 @@ namespace gdjs {
             if (!target.getRuntimeLayer) {
               return;
             }
+            this._applyLightingPipeline(target);
             const layer = target.getRuntimeLayer();
             const cameraX = layer.getCameraX();
             const cameraY = layer.getCameraY();
@@ -1002,7 +1121,10 @@ namespace gdjs {
                 attachedObjectForDirection
               );
 
-              if (this._shadowCastingEnabled) {
+              if (
+                this._shadowCastingEnabled &&
+                this._pipelineAllowsRealtimeShadows
+              ) {
                 if (this._shadowAutoTuningEnabled) {
                   this._applyCascadeShadowTuning(cascadeIndex);
                 } else {

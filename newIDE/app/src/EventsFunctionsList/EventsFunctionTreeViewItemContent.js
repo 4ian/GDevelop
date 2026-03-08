@@ -22,7 +22,11 @@ import {
 import Tooltip from '@material-ui/core/Tooltip';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 import AsyncIcon from '@material-ui/icons/SyncAlt';
-import { moveFunctionFolderOrFunction } from './EventsFunctionFolderTreeViewItemContent';
+import {
+  moveFunctionFolderOrFunction,
+  buildMoveToMenu,
+} from './EventsFunctionFolderTreeViewItemContent';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -100,6 +104,14 @@ export type EventsFunctionCallbacks = {|
 export type EventFunctionCommonProps = {|
   ...TreeItemProps,
   ...EventsFunctionCallbacks,
+  addFolder: (
+    items: Array<gdFunctionFolderOrFunction>,
+    eventsBasedBehavior?: ?gdEventsBasedBehavior,
+    eventsBasedObject?: ?gdEventsBasedObject
+  ) => void,
+  onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer: (
+    functionFolderOrFunction: gdFunctionFolderOrFunction
+  ) => void,
 |};
 
 export type EventsFunctionProps = {|
@@ -287,15 +299,17 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     );
   }
 
-  buildMenuTemplate(i18n: I18nType, index: number): any {
+  buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate> {
     const eventsFunction = this.functionFolderOrFunction.getFunction();
+    const {
+      eventsFunctionsContainer,
+      eventsBasedBehavior,
+      eventsBasedObject,
+      addFolder,
+      onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
+    } = this.props;
+
     return [
-      {
-        label: i18n._(t`Rename`),
-        click: () => this.edit(),
-        enabled: this.canBeRenamed(),
-        accelerator: 'F2',
-      },
       {
         label: eventsFunction.isPrivate()
           ? i18n._(t`Make public`)
@@ -308,6 +322,24 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
           : i18n._(t`Make asynchronous`),
         click: () => this._toggleAsync(),
       },
+      {
+        type: 'separator',
+      },
+      {
+        label: i18n._(t`Rename`),
+        click: () => this.edit(),
+        enabled: this.canBeRenamed(),
+        accelerator: 'F2',
+      },
+      buildMoveToMenu({
+        functionFolderOrFunction: this.functionFolderOrFunction,
+        i18n,
+        eventsFunctionsContainer,
+        eventsBasedBehavior,
+        eventsBasedObject,
+        addFolder,
+        onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
+      }),
       {
         label: i18n._(t`Delete`),
         click: () => this.delete(),

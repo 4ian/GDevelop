@@ -24,6 +24,7 @@ import {
 } from './EventsFunctionTreeViewItemContent';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 
 export const moveFunctionFolderOrFunction = (
   selectedItemContent: TreeViewItemContent,
@@ -91,6 +92,73 @@ export const expandAllSubfolders = (
     folderAndPath => folderAndPath.folder
   );
   expandFolders([functionFolder, ...subFolders].map(folder => folder));
+};
+
+export const buildMoveToMenu = ({
+  functionFolderOrFunction,
+  i18n,
+  eventsFunctionsContainer,
+  eventsBasedBehavior,
+  eventsBasedObject,
+  addFolder,
+  onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
+}: {|
+  functionFolderOrFunction: gdFunctionFolderOrFunction,
+  i18n: I18nType,
+  eventsFunctionsContainer: gdEventsFunctionsContainer,
+  eventsBasedBehavior?: ?gdEventsBasedBehavior,
+  eventsBasedObject?: ?gdEventsBasedObject,
+  addFolder: (
+    items: Array<gdFunctionFolderOrFunction>,
+    eventsBasedBehavior?: ?gdEventsBasedBehavior,
+    eventsBasedObject?: ?gdEventsBasedObject
+  ) => void,
+  onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer: (
+    functionFolderOrFunction: gdFunctionFolderOrFunction
+  ) => void,
+|}): MenuItemTemplate => {
+  const folderAndPathsInContainer = enumerateFoldersInContainer(
+    eventsFunctionsContainer
+  );
+  folderAndPathsInContainer.unshift({
+    path: i18n._(t`Root folder`),
+    folder: eventsFunctionsContainer.getRootFolder(),
+  });
+  const filteredFolderAndPathsInContainer = folderAndPathsInContainer.filter(
+    folderAndPath =>
+      !folderAndPath.folder.isADescendantOf(functionFolderOrFunction) &&
+      folderAndPath.folder !== functionFolderOrFunction
+  );
+  return {
+    label: i18n._('Move to folder'),
+    submenu: [
+      ...filteredFolderAndPathsInContainer.map(({ folder, path }) => ({
+        label: path,
+        enabled: folder !== functionFolderOrFunction.getParent(),
+        click: () => {
+          if (folder === functionFolderOrFunction.getParent()) return;
+          functionFolderOrFunction
+            .getParent()
+            .moveFunctionFolderOrFunctionToAnotherFolder(
+              functionFolderOrFunction,
+              folder,
+              0
+            );
+          onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer(folder);
+        },
+      })),
+      { type: 'separator' },
+      {
+        label: i18n._(t`Create new folder...`),
+        click: () =>
+          addFolder(
+            [functionFolderOrFunction.getParent()],
+            eventsBasedBehavior,
+            eventsBasedObject
+          ),
+      },
+    ],
+  };
 };
 
 export type EventFunctionFolderCommonProps = {|
@@ -266,7 +334,7 @@ export class EventsFunctionFolderTreeViewItemContent
     return i18n._(translation);
   }
 
-  buildMenuTemplate(i18n: I18nType, index: number): any {
+  buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate> {
     const {
       eventsFunctionsContainer,
       eventsBasedBehavior,
@@ -277,67 +345,30 @@ export class EventsFunctionFolderTreeViewItemContent
       onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
     } = this.props;
 
-    const folderAndPathsInContainer = enumerateFoldersInContainer(
-      eventsFunctionsContainer
-    );
-    folderAndPathsInContainer.unshift({
-      path: i18n._(t`Root folder`),
-      folder: eventsFunctionsContainer.getRootFolder(),
-    });
-
-    const filteredFolderAndPathsInContainer = folderAndPathsInContainer.filter(
-      folderAndPath =>
-        !folderAndPath.folder.isADescendantOf(this.functionFolder) &&
-        folderAndPath.folder !== this.functionFolder
-    );
     return [
-      {
-        label: this._getPasteLabel(i18n),
-        enabled: Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND),
-        click: () => this.paste(),
-      },
       {
         label: i18n._(t`Rename`),
         click: () => this.props.editName(this.getId()),
         accelerator: 'F2',
       },
+      buildMoveToMenu({
+        functionFolderOrFunction: this.functionFolder,
+        i18n,
+        eventsFunctionsContainer,
+        eventsBasedBehavior,
+        eventsBasedObject,
+        addFolder,
+        onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
+      }),
       {
         label: i18n._(t`Delete`),
         click: () => this.delete(),
         accelerator: 'Backspace',
       },
       {
-        label: i18n._('Move to folder'),
-        submenu: [
-          ...filteredFolderAndPathsInContainer.map(({ folder, path }) => ({
-            label: path,
-            enabled: folder !== this.functionFolder.getParent(),
-            click: () => {
-              if (folder === this.functionFolder.getParent()) return;
-              this.functionFolder
-                .getParent()
-                .moveFunctionFolderOrFunctionToAnotherFolder(
-                  this.functionFolder,
-                  folder,
-                  0
-                );
-              onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer(
-                folder
-              );
-            },
-          })),
-
-          { type: 'separator' },
-          {
-            label: i18n._(t`Create new folder...`),
-            click: () =>
-              addFolder(
-                [this.functionFolder.getParent()],
-                eventsBasedBehavior,
-                eventsBasedObject
-              ),
-          },
-        ],
+        label: this._getPasteLabel(i18n),
+        enabled: Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND),
+        click: () => this.paste(),
       },
       { type: 'separator' },
       {

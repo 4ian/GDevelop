@@ -617,7 +617,7 @@ const getTreeViewItemData = (item: TreeViewItem) => item.content.getDataset();
 const buildMenuTemplate = (i18n: I18nType) => (
   item: TreeViewItem,
   index: number
-) => item.content.buildMenuTemplate(i18n, index);
+): Array<MenuItemTemplate> => item.content.buildMenuTemplate(i18n, index);
 const renderTreeViewItemRightComponent = (i18n: I18nType) => (
   item: TreeViewItem
 ) => item.content.renderRightComponent(i18n);
@@ -1096,25 +1096,6 @@ const EventsFunctionsList = React.forwardRef<
       ]
     );
 
-    const eventFunctionCommonProps = React.useMemo<EventFunctionCommonProps>(
-      () => ({
-        ...treeItemProps,
-        onSelectEventsFunction,
-        onDeleteEventsFunction,
-        onRenameEventsFunction,
-        onAddEventsFunction,
-        onEventsFunctionAdded,
-      }),
-      [
-        treeItemProps,
-        onSelectEventsFunction,
-        onDeleteEventsFunction,
-        onRenameEventsFunction,
-        onAddEventsFunction,
-        onEventsFunctionAdded,
-      ]
-    );
-
     const getClosestVisibleParentId = (
       functionFolderOrFunction: gdFunctionFolderOrFunction
     ): ?string => {
@@ -1227,6 +1208,29 @@ const EventsFunctionsList = React.forwardRef<
         }
       },
       []
+    );
+
+    const eventFunctionCommonProps = React.useMemo<EventFunctionCommonProps>(
+      () => ({
+        ...treeItemProps,
+        onSelectEventsFunction,
+        onDeleteEventsFunction,
+        onRenameEventsFunction,
+        onAddEventsFunction,
+        onEventsFunctionAdded,
+        addFolder,
+        onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
+      }),
+      [
+        treeItemProps,
+        onSelectEventsFunction,
+        onDeleteEventsFunction,
+        onRenameEventsFunction,
+        onAddEventsFunction,
+        onEventsFunctionAdded,
+        addFolder,
+        onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer,
+      ]
     );
 
     const eventFunctionFolderCommonProps = React.useMemo<EventFunctionFolderCommonProps>(

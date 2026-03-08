@@ -1088,6 +1088,666 @@ module.exports = {
     }
 
     {
+      const behavior = new gd.BehaviorJsImplementation();
+
+      const ensureLODDefaults = function (behaviorContent) {
+        if (!behaviorContent.hasChild('enabled')) {
+          behaviorContent.addChild('enabled').setBoolValue(true);
+        }
+        if (!behaviorContent.hasChild('lod1Distance')) {
+          behaviorContent.addChild('lod1Distance').setDoubleValue(900);
+        }
+        if (!behaviorContent.hasChild('lod2Distance')) {
+          behaviorContent.addChild('lod2Distance').setDoubleValue(1800);
+        }
+        if (!behaviorContent.hasChild('cullDistance')) {
+          behaviorContent.addChild('cullDistance').setDoubleValue(3200);
+        }
+        if (!behaviorContent.hasChild('hysteresis')) {
+          behaviorContent.addChild('hysteresis').setDoubleValue(120);
+        }
+        if (!behaviorContent.hasChild('updateIntervalFrames')) {
+          behaviorContent.addChild('updateIntervalFrames').setDoubleValue(2);
+        }
+        if (!behaviorContent.hasChild('lod1AnimationSpeed')) {
+          behaviorContent.addChild('lod1AnimationSpeed').setDoubleValue(0.65);
+        }
+        if (!behaviorContent.hasChild('lod2AnimationSpeed')) {
+          behaviorContent.addChild('lod2AnimationSpeed').setDoubleValue(0);
+        }
+        if (!behaviorContent.hasChild('lod1CastShadows')) {
+          behaviorContent.addChild('lod1CastShadows').setBoolValue(true);
+        }
+        if (!behaviorContent.hasChild('lod2CastShadows')) {
+          behaviorContent.addChild('lod2CastShadows').setBoolValue(false);
+        }
+        if (!behaviorContent.hasChild('lod1ReceiveShadows')) {
+          behaviorContent.addChild('lod1ReceiveShadows').setBoolValue(true);
+        }
+        if (!behaviorContent.hasChild('lod2ReceiveShadows')) {
+          behaviorContent.addChild('lod2ReceiveShadows').setBoolValue(false);
+        }
+        if (!behaviorContent.hasChild('lod1ModelResource')) {
+          behaviorContent.addChild('lod1ModelResource').setStringValue('');
+        }
+        if (!behaviorContent.hasChild('lod2ModelResource')) {
+          behaviorContent.addChild('lod2ModelResource').setStringValue('');
+        }
+        if (!behaviorContent.hasChild('forceLevel')) {
+          behaviorContent.addChild('forceLevel').setDoubleValue(-1);
+        }
+        if (!behaviorContent.hasChild('modelSwitchCooldownMs')) {
+          behaviorContent
+            .addChild('modelSwitchCooldownMs')
+            .setDoubleValue(250);
+        }
+        if (!behaviorContent.hasChild('useBoundingRadius')) {
+          behaviorContent.addChild('useBoundingRadius').setBoolValue(true);
+        }
+      };
+
+      const clampNumber = function (value, min, max) {
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue)) {
+          return min;
+        }
+        return Math.max(min, Math.min(max, numericValue));
+      };
+
+      const clampInteger = function (value, min, max) {
+        return Math.round(clampNumber(value, min, max));
+      };
+
+      behavior.updateProperty = function (
+        behaviorContent,
+        propertyName,
+        newValue
+      ) {
+        ensureLODDefaults(behaviorContent);
+
+        if (propertyName === 'enabled') {
+          behaviorContent
+            .getChild('enabled')
+            .setBoolValue(newValue === '1' || newValue === 'true');
+          return true;
+        }
+        if (propertyName === 'lod1Distance') {
+          behaviorContent
+            .getChild('lod1Distance')
+            .setDoubleValue(clampNumber(newValue, 0, 10000000));
+          return true;
+        }
+        if (propertyName === 'lod2Distance') {
+          behaviorContent
+            .getChild('lod2Distance')
+            .setDoubleValue(clampNumber(newValue, 0, 10000000));
+          return true;
+        }
+        if (propertyName === 'cullDistance') {
+          behaviorContent
+            .getChild('cullDistance')
+            .setDoubleValue(clampNumber(newValue, 0, 10000000));
+          return true;
+        }
+        if (propertyName === 'hysteresis') {
+          behaviorContent
+            .getChild('hysteresis')
+            .setDoubleValue(clampNumber(newValue, 0, 100000));
+          return true;
+        }
+        if (propertyName === 'updateIntervalFrames') {
+          behaviorContent
+            .getChild('updateIntervalFrames')
+            .setDoubleValue(clampInteger(newValue, 1, 30));
+          return true;
+        }
+        if (propertyName === 'lod1AnimationSpeed') {
+          behaviorContent
+            .getChild('lod1AnimationSpeed')
+            .setDoubleValue(clampNumber(newValue, 0, 10));
+          return true;
+        }
+        if (propertyName === 'lod2AnimationSpeed') {
+          behaviorContent
+            .getChild('lod2AnimationSpeed')
+            .setDoubleValue(clampNumber(newValue, 0, 10));
+          return true;
+        }
+        if (propertyName === 'lod1CastShadows') {
+          behaviorContent
+            .getChild('lod1CastShadows')
+            .setBoolValue(newValue === '1' || newValue === 'true');
+          return true;
+        }
+        if (propertyName === 'lod2CastShadows') {
+          behaviorContent
+            .getChild('lod2CastShadows')
+            .setBoolValue(newValue === '1' || newValue === 'true');
+          return true;
+        }
+        if (propertyName === 'lod1ReceiveShadows') {
+          behaviorContent
+            .getChild('lod1ReceiveShadows')
+            .setBoolValue(newValue === '1' || newValue === 'true');
+          return true;
+        }
+        if (propertyName === 'lod2ReceiveShadows') {
+          behaviorContent
+            .getChild('lod2ReceiveShadows')
+            .setBoolValue(newValue === '1' || newValue === 'true');
+          return true;
+        }
+        if (propertyName === 'lod1ModelResource') {
+          behaviorContent.getChild('lod1ModelResource').setStringValue(newValue);
+          return true;
+        }
+        if (propertyName === 'lod2ModelResource') {
+          behaviorContent.getChild('lod2ModelResource').setStringValue(newValue);
+          return true;
+        }
+        if (propertyName === 'forceLevel') {
+          behaviorContent
+            .getChild('forceLevel')
+            .setDoubleValue(clampInteger(newValue, -1, 3));
+          return true;
+        }
+        if (propertyName === 'modelSwitchCooldownMs') {
+          behaviorContent
+            .getChild('modelSwitchCooldownMs')
+            .setDoubleValue(clampNumber(newValue, 0, 5000));
+          return true;
+        }
+        if (propertyName === 'useBoundingRadius') {
+          behaviorContent
+            .getChild('useBoundingRadius')
+            .setBoolValue(newValue === '1' || newValue === 'true');
+          return true;
+        }
+
+        return false;
+      };
+
+      behavior.getProperties = function (behaviorContent) {
+        const behaviorProperties = new gd.MapStringPropertyDescriptor();
+        ensureLODDefaults(behaviorContent);
+
+        behaviorProperties
+          .getOrCreate('enabled')
+          .setValue(
+            behaviorContent.getChild('enabled').getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setType('Boolean')
+          .setLabel(_('Enabled'));
+        behaviorProperties
+          .getOrCreate('lod1Distance')
+          .setValue(
+            behaviorContent.getChild('lod1Distance').getDoubleValue().toString()
+          )
+          .setType('number')
+          .setLabel(_('LOD1 distance'));
+        behaviorProperties
+          .getOrCreate('lod2Distance')
+          .setValue(
+            behaviorContent.getChild('lod2Distance').getDoubleValue().toString()
+          )
+          .setType('number')
+          .setLabel(_('LOD2 distance'));
+        behaviorProperties
+          .getOrCreate('cullDistance')
+          .setValue(
+            behaviorContent.getChild('cullDistance').getDoubleValue().toString()
+          )
+          .setType('number')
+          .setLabel(_('Cull distance'));
+
+        behaviorProperties
+          .getOrCreate('hysteresis')
+          .setValue(
+            behaviorContent.getChild('hysteresis').getDoubleValue().toString()
+          )
+          .setType('number')
+          .setLabel(_('Hysteresis'))
+          .setGroup(_('Advanced'))
+          .setAdvanced(true);
+        behaviorProperties
+          .getOrCreate('updateIntervalFrames')
+          .setValue(
+            behaviorContent
+              .getChild('updateIntervalFrames')
+              .getDoubleValue()
+              .toString()
+          )
+          .setType('number')
+          .setLabel(_('Update every N frames'))
+          .setGroup(_('Advanced'))
+          .setAdvanced(true);
+        behaviorProperties
+          .getOrCreate('lod1AnimationSpeed')
+          .setValue(
+            behaviorContent
+              .getChild('lod1AnimationSpeed')
+              .getDoubleValue()
+              .toString()
+          )
+          .setType('number')
+          .setLabel(_('LOD1 animation speed'))
+          .setGroup(_('Animation'))
+          .setAdvanced(true);
+        behaviorProperties
+          .getOrCreate('lod2AnimationSpeed')
+          .setValue(
+            behaviorContent
+              .getChild('lod2AnimationSpeed')
+              .getDoubleValue()
+              .toString()
+          )
+          .setType('number')
+          .setLabel(_('LOD2 animation speed'))
+          .setGroup(_('Animation'))
+          .setAdvanced(true);
+        behaviorProperties
+          .getOrCreate('lod1CastShadows')
+          .setValue(
+            behaviorContent.getChild('lod1CastShadows').getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setType('Boolean')
+          .setLabel(_('LOD1 cast shadows'))
+          .setGroup(_('Shadows'))
+          .setAdvanced(true);
+        behaviorProperties
+          .getOrCreate('lod2CastShadows')
+          .setValue(
+            behaviorContent.getChild('lod2CastShadows').getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setType('Boolean')
+          .setLabel(_('LOD2 cast shadows'))
+          .setGroup(_('Shadows'))
+          .setAdvanced(true);
+        behaviorProperties
+          .getOrCreate('lod1ReceiveShadows')
+          .setValue(
+            behaviorContent.getChild('lod1ReceiveShadows').getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setType('Boolean')
+          .setLabel(_('LOD1 receive shadows'))
+          .setGroup(_('Shadows'))
+          .setAdvanced(true);
+        behaviorProperties
+          .getOrCreate('lod2ReceiveShadows')
+          .setValue(
+            behaviorContent.getChild('lod2ReceiveShadows').getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setType('Boolean')
+          .setLabel(_('LOD2 receive shadows'))
+          .setGroup(_('Shadows'))
+          .setAdvanced(true);
+        behaviorProperties
+          .getOrCreate('lod1ModelResource')
+          .setValue(behaviorContent.getChild('lod1ModelResource').getStringValue())
+          .setType('string')
+          .setLabel(_('LOD1 model resource'))
+          .setGroup(_('Model swap'))
+          .setAdvanced(true);
+        behaviorProperties
+          .getOrCreate('lod2ModelResource')
+          .setValue(behaviorContent.getChild('lod2ModelResource').getStringValue())
+          .setType('string')
+          .setLabel(_('LOD2 model resource'))
+          .setGroup(_('Model swap'))
+          .setAdvanced(true);
+        behaviorProperties
+          .getOrCreate('modelSwitchCooldownMs')
+          .setValue(
+            behaviorContent
+              .getChild('modelSwitchCooldownMs')
+              .getDoubleValue()
+              .toString()
+          )
+          .setType('number')
+          .setLabel(_('Model switch cooldown (ms)'))
+          .setGroup(_('Model swap'))
+          .setAdvanced(true);
+        behaviorProperties
+          .getOrCreate('useBoundingRadius')
+          .setValue(
+            behaviorContent.getChild('useBoundingRadius').getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setType('Boolean')
+          .setLabel(_('Use object radius'))
+          .setGroup(_('Advanced'))
+          .setAdvanced(true);
+        behaviorProperties
+          .getOrCreate('forceLevel')
+          .setValue(
+            behaviorContent.getChild('forceLevel').getDoubleValue().toString()
+          )
+          .setType('number')
+          .setLabel(_('Force level (-1 auto)'))
+          .setGroup(_('Debug'))
+          .setAdvanced(true);
+
+        return behaviorProperties;
+      };
+
+      behavior.initializeContent = function (behaviorContent) {
+        behaviorContent.addChild('enabled').setBoolValue(true);
+        behaviorContent.addChild('lod1Distance').setDoubleValue(900);
+        behaviorContent.addChild('lod2Distance').setDoubleValue(1800);
+        behaviorContent.addChild('cullDistance').setDoubleValue(3200);
+        behaviorContent.addChild('hysteresis').setDoubleValue(120);
+        behaviorContent.addChild('updateIntervalFrames').setDoubleValue(2);
+        behaviorContent.addChild('lod1AnimationSpeed').setDoubleValue(0.65);
+        behaviorContent.addChild('lod2AnimationSpeed').setDoubleValue(0);
+        behaviorContent.addChild('lod1CastShadows').setBoolValue(true);
+        behaviorContent.addChild('lod2CastShadows').setBoolValue(false);
+        behaviorContent.addChild('lod1ReceiveShadows').setBoolValue(true);
+        behaviorContent.addChild('lod2ReceiveShadows').setBoolValue(false);
+        behaviorContent.addChild('lod1ModelResource').setStringValue('');
+        behaviorContent.addChild('lod2ModelResource').setStringValue('');
+        behaviorContent.addChild('forceLevel').setDoubleValue(-1);
+        behaviorContent.addChild('modelSwitchCooldownMs').setDoubleValue(250);
+        behaviorContent.addChild('useBoundingRadius').setBoolValue(true);
+      };
+
+      const lod = extension
+        .addBehavior(
+          'LOD',
+          _('3D LOD'),
+          'LOD',
+          _(
+            'Distance-based Level of Detail for 3D objects: automatic quality tiers, culling, shadow reduction, optional model swapping, and animation cost reduction.'
+          ),
+          '',
+          'res/conditions/3d_box.svg',
+          'LOD',
+          // @ts-ignore
+          behavior,
+          new gd.BehaviorsSharedData()
+        )
+        .setIncludeFile('Extensions/3D/LODBehavior.js');
+
+      lod
+        .addScopedAction(
+          'SetEnabled',
+          _('Enable/disable LOD'),
+          _('Enable or disable the LOD system for this object.'),
+          _('Set LOD of _PARAM0_ to _PARAM2_'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .addParameter('yesorno', _('Enabled'))
+        .setFunctionName('setEnabled');
+
+      lod
+        .addScopedCondition(
+          'IsEnabled',
+          _('LOD enabled'),
+          _('Check if LOD is enabled for this object.'),
+          _('LOD is enabled for _PARAM0_'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .setFunctionName('isEnabled');
+
+      lod
+        .addExpressionAndCondition(
+          'number',
+          'CurrentLevel',
+          _('Current LOD level'),
+          _('the current LOD level (0 near, 1 medium, 2 far, 3 culled)'),
+          _('the current LOD level'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions()
+        )
+        .setFunctionName('getCurrentLevel');
+
+      lod
+        .addExpressionAndConditionAndAction(
+          'number',
+          'LOD1Distance',
+          _('LOD1 distance'),
+          _('the distance where LOD1 starts'),
+          _('the LOD1 distance'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Distance where the object enters LOD1.')
+          )
+        )
+        .setFunctionName('setLod1Distance')
+        .setGetter('getLod1Distance');
+
+      lod
+        .addExpressionAndConditionAndAction(
+          'number',
+          'LOD2Distance',
+          _('LOD2 distance'),
+          _('the distance where LOD2 starts'),
+          _('the LOD2 distance'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Distance where the object enters LOD2.')
+          )
+        )
+        .setFunctionName('setLod2Distance')
+        .setGetter('getLod2Distance');
+
+      lod
+        .addExpressionAndConditionAndAction(
+          'number',
+          'CullDistance',
+          _('Cull distance'),
+          _('the distance where object rendering is culled'),
+          _('the cull distance'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Distance where the object becomes invisible.')
+          )
+        )
+        .setFunctionName('setCullDistance')
+        .setGetter('getCullDistance');
+
+      lod
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Hysteresis',
+          _('Hysteresis'),
+          _('the hysteresis distance used to stabilize level switching'),
+          _('the hysteresis'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Distance margin preventing rapid LOD flickering.')
+          )
+        )
+        .setFunctionName('setHysteresis')
+        .setGetter('getHysteresis');
+
+      lod
+        .addExpressionAndConditionAndAction(
+          'number',
+          'UpdateIntervalFrames',
+          _('Update interval (frames)'),
+          _('the number of frames between LOD updates'),
+          _('the update interval'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('How often LOD is recomputed (in frames).')
+          )
+        )
+        .setFunctionName('setUpdateIntervalFrames')
+        .setGetter('getUpdateIntervalFrames');
+
+      lod
+        .addExpressionAndConditionAndAction(
+          'number',
+          'LOD1AnimationSpeed',
+          _('LOD1 animation speed'),
+          _('the animation speed multiplier in LOD1'),
+          _('the LOD1 animation speed'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setLod1AnimationSpeed')
+        .setGetter('getLod1AnimationSpeed');
+
+      lod
+        .addExpressionAndConditionAndAction(
+          'number',
+          'LOD2AnimationSpeed',
+          _('LOD2 animation speed'),
+          _('the animation speed multiplier in LOD2'),
+          _('the LOD2 animation speed'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setLod2AnimationSpeed')
+        .setGetter('getLod2AnimationSpeed');
+
+      lod
+        .addExpressionAndConditionAndAction(
+          'number',
+          'ForceLevel',
+          _('Force LOD level'),
+          _('the forced LOD level (-1 means automatic)'),
+          _('the forced LOD level'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('-1 = automatic, 0 = LOD0, 1 = LOD1, 2 = LOD2, 3 = culled')
+          )
+        )
+        .setFunctionName('setForceLevel')
+        .setGetter('getForceLevel');
+
+      lod
+        .addExpressionAndConditionAndAction(
+          'number',
+          'ModelSwitchCooldownMs',
+          _('Model switch cooldown (ms)'),
+          _('the cooldown between model resource switches'),
+          _('the model switch cooldown'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setModelSwitchCooldownMs')
+        .setGetter('getModelSwitchCooldownMs');
+
+      lod
+        .addScopedAction(
+          'SetLod1ModelResource',
+          _('Set LOD1 model resource'),
+          _('Set optional LOD1 model resource name for Model3D objects.'),
+          _('Set LOD1 model resource of _PARAM0_ to _PARAM2_'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .addParameter('string', _('Model resource name'), '', false)
+        .setFunctionName('setLod1ModelResource');
+
+      lod
+        .addScopedAction(
+          'SetLod2ModelResource',
+          _('Set LOD2 model resource'),
+          _('Set optional LOD2 model resource name for Model3D objects.'),
+          _('Set LOD2 model resource of _PARAM0_ to _PARAM2_'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .addParameter('string', _('Model resource name'), '', false)
+        .setFunctionName('setLod2ModelResource');
+
+      lod
+        .addScopedAction(
+          'SetUseBoundingRadius',
+          _('Use object radius'),
+          _(
+            'Enable or disable radius-based distance correction for more stable LOD decisions on large objects.'
+          ),
+          _('Set object radius usage for LOD of _PARAM0_ to _PARAM2_'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .addParameter('yesorno', _('Enabled'))
+        .setFunctionName('setUseBoundingRadius');
+    }
+
+    {
       const object = extension
         .addObject(
           'Model3DObject',

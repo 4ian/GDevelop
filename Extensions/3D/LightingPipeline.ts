@@ -110,16 +110,6 @@ namespace gdjs {
     return defaultState;
   };
 
-  const getRealtimeMultiplier = (state: SceneLightingPipelineState): number => {
-    if (state.mode === 'realtime') {
-      return 1;
-    }
-    if (state.mode === 'baked') {
-      return 0;
-    }
-    return clamp01(state.realtimeWeight);
-  };
-
   const getProbeMultiplier = (state: SceneLightingPipelineState): number => {
     if (state.mode === 'realtime') {
       return 0.2;
@@ -211,9 +201,10 @@ namespace gdjs {
     });
 
     if (sampledHemisphere) {
+      const hemisphere = sampledHemisphere as THREE.HemisphereLight;
       return {
-        skyColor: sampledHemisphere.color.clone(),
-        groundColor: sampledHemisphere.groundColor.clone(),
+        skyColor: hemisphere.color.clone(),
+        groundColor: hemisphere.groundColor.clone(),
       };
     }
 

@@ -826,7 +826,7 @@ const EventsFunctionsList = React.forwardRef<
                   ) + 1;
               }
             }
-            const eventsFunction = eventsFunctionsContainer.insertNewFunctionInFolder(
+            const eventsFunction = eventsFunctionsContainer.insertNewEventsFunctionInFolder(
               eventsFunctionName,
               insertionParentFolder,
               insertionIndex

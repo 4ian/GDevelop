@@ -2414,7 +2414,7 @@ export class EventsFunctionsContainer extends EmscriptenObject {
   moveEventsFunction(oldIndex: number, newIndex: number): void;
   getEventsFunctionsCount(): number;
   getEventsFunctionPosition(eventsFunction: EventsFunction): number;
-  insertNewFunctionInFolder(name: string, folder: FunctionFolderOrFunction, pos: number): EventsFunction;
+  insertNewEventsFunctionInFolder(name: string, folder: FunctionFolderOrFunction, pos: number): EventsFunction;
   getRootFolder(): FunctionFolderOrFunction;
   getAllFunctionFolderOrFunction(): VectorFunctionFolderOrFunction;
   addMissingFunctionsInRootFolder(): void;

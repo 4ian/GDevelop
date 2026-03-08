@@ -3335,7 +3335,7 @@ interface EventsFunctionsContainer {
     unsigned long GetEventsFunctionsCount();
     unsigned long GetEventsFunctionPosition([Const, Ref] EventsFunction eventsFunction);
 
-    [Ref] EventsFunction InsertNewFunctionInFolder(
+    [Ref] EventsFunction InsertNewEventsFunctionInFolder(
         [Const] DOMString name,
         [Ref] FunctionFolderOrFunction folder,
         unsigned long pos);

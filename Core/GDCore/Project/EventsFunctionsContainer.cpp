@@ -7,12 +7,12 @@
 
 namespace gd {
 
-gd::EventsFunction &EventsFunctionsContainer::InsertNewFunctionInFolder(
+gd::EventsFunction &EventsFunctionsContainer::InsertNewEventsFunctionInFolder(
     const gd::String &name,
     gd::FunctionFolderOrFunction &functionFolderOrFunction,
     std::size_t position) {
   gd::EventsFunction &newlyCreatedFunction =
-      InsertNewEventsFunction(name, GetEventsFunctionsCount());
+      InsertNew(name, GetEventsFunctionsCount());
   functionFolderOrFunction.InsertFunction(&newlyCreatedFunction, position);
   return newlyCreatedFunction;
 }

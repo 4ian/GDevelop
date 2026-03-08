@@ -116,14 +116,21 @@ public:
    */
   std::size_t GetEventsFunctionsCount() const { return GetCount(); }
 
-  gd::EventsFunction& InsertNewEventsFunction(const gd::String& name,
+  gd::EventsFunction &InsertNewEventsFunction(const gd::String &name,
                                               std::size_t position) {
-    return InsertNew(name, position);
+    auto &newlyCreatedFunction = InsertNew(name, position);
+    rootFolder->InsertFunction(&newlyCreatedFunction);
+    return newlyCreatedFunction;
   }
-  gd::EventsFunction& InsertEventsFunction(const gd::EventsFunction& object,
-                                           std::size_t position) {
-    return Insert(object, position);
+
+  gd::EventsFunction &
+  InsertEventsFunction(const gd::EventsFunction &eventFunction,
+                       std::size_t position) {
+    auto &newlyCreatedFunction = Insert(eventFunction, position);
+    rootFolder->InsertFunction(&newlyCreatedFunction);
+    return newlyCreatedFunction;
   }
+
   void RemoveEventsFunction(const gd::String& name) { return Remove(name); }
   void ClearEventsFunctions() { return Clear(); }
   void MoveEventsFunction(std::size_t oldIndex, std::size_t newIndex) {
@@ -158,7 +165,7 @@ public:
    *
    * \return A reference to the function in the list.
    */
-  gd::EventsFunction &InsertNewFunctionInFolder(
+  gd::EventsFunction &InsertNewEventsFunctionInFolder(
       const gd::String &name,
       gd::FunctionFolderOrFunction &functionFolderOrFunction,
       std::size_t position);

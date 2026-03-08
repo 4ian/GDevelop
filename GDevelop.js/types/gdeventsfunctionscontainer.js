@@ -9,7 +9,7 @@ declare class gdEventsFunctionsContainer {
   moveEventsFunction(oldIndex: number, newIndex: number): void;
   getEventsFunctionsCount(): number;
   getEventsFunctionPosition(eventsFunction: gdEventsFunction): number;
-  insertNewFunctionInFolder(name: string, folder: gdFunctionFolderOrFunction, pos: number): gdEventsFunction;
+  insertNewEventsFunctionInFolder(name: string, folder: gdFunctionFolderOrFunction, pos: number): gdEventsFunction;
   getRootFolder(): gdFunctionFolderOrFunction;
   getAllFunctionFolderOrFunction(): gdVectorFunctionFolderOrFunction;
   addMissingFunctionsInRootFolder(): void;

@@ -51,7 +51,7 @@ export const pasteEventsFunction = (
     eventsFunctionsContainer.hasEventsFunctionNamed(name)
   );
 
-  const newEventsFunction = eventsFunctionsContainer.insertNewFunctionInFolder(
+  const newEventsFunction = eventsFunctionsContainer.insertNewEventsFunctionInFolder(
     newName,
     parentFolder,
     insertionIndex

@@ -4386,4 +4386,6 @@ interface MemoryTrackedRegistry {
     boolean STATIC_isDead(long ptr, DOMString className);
     long STATIC_deadCount();
     void STATIC_pruneDead(long maxSize);
+    long STATIC_aliveCount(DOMString className);
+    long STATIC_deadCountForClass(DOMString className);
 };

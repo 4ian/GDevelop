@@ -5,6 +5,8 @@ declare class gdMemoryTrackedRegistry {
   static isDead(ptr: number, className: string): boolean;
   static deadCount(): number;
   static pruneDead(maxSize: number): void;
+  static aliveCount(className: string): number;
+  static deadCountForClass(className: string): number;
   delete(): void;
   ptr: number;
 };

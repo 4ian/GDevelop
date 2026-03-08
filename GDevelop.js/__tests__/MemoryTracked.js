@@ -78,6 +78,55 @@ describe('Use-after-free detection (MemoryTracked)', function () {
     });
   });
 
+  describe('Per-class stats', function () {
+    it('reports per-class alive and dead counts', function () {
+      const aliveBefore = gd.MemoryTrackedRegistry.aliveCount('Layout');
+      const layout1 = new gd.Layout();
+      const layout2 = new gd.Layout();
+      expect(gd.MemoryTrackedRegistry.aliveCount('Layout')).toBe(
+        aliveBefore + 2
+      );
+
+      layout1.delete();
+      expect(gd.MemoryTrackedRegistry.aliveCount('Layout')).toBe(
+        aliveBefore + 1
+      );
+      expect(
+        gd.MemoryTrackedRegistry.deadCountForClass('Layout')
+      ).toBeGreaterThan(0);
+
+      layout2.delete();
+      expect(gd.MemoryTrackedRegistry.aliveCount('Layout')).toBe(aliveBefore);
+    });
+
+    it('returns 0 for unknown classes', function () {
+      expect(gd.MemoryTrackedRegistry.aliveCount('NonExistent')).toBe(0);
+      expect(gd.MemoryTrackedRegistry.deadCountForClass('NonExistent')).toBe(0);
+    });
+
+    it('returns totals when given empty string', function () {
+      const totalAlive = gd.MemoryTrackedRegistry.aliveCount('');
+      expect(totalAlive).toBeGreaterThan(0);
+      const totalDead = gd.MemoryTrackedRegistry.deadCountForClass('');
+      expect(typeof totalDead).toBe('number');
+    });
+
+    it('tracks different classes independently', function () {
+      const layoutAliveBefore = gd.MemoryTrackedRegistry.aliveCount('Layout');
+      const projectAliveBefore = gd.MemoryTrackedRegistry.aliveCount('Project');
+
+      const layout = new gd.Layout();
+      expect(gd.MemoryTrackedRegistry.aliveCount('Layout')).toBe(
+        layoutAliveBefore + 1
+      );
+      expect(gd.MemoryTrackedRegistry.aliveCount('Project')).toBe(
+        projectAliveBefore
+      );
+
+      layout.delete();
+    });
+  });
+
   describe('Tracked class (Project)', function () {
     it('throws UseAfterFreeError after delete()', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();

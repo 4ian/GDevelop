@@ -131,7 +131,10 @@ public:
     return newlyCreatedFunction;
   }
 
-  void RemoveEventsFunction(const gd::String& name) { return Remove(name); }
+  void RemoveEventsFunction(const gd::String& name) {
+    rootFolder->RemoveRecursivelyFunctionNamed(name);
+    return Remove(name);
+  }
   void ClearEventsFunctions() { return Clear(); }
   void MoveEventsFunction(std::size_t oldIndex, std::size_t newIndex) {
     return Move(oldIndex, newIndex);

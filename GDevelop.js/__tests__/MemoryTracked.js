@@ -15,12 +15,12 @@ describe('Use-after-free detection (MemoryTracked)', function () {
       vec.delete();
     });
 
-    it('throws MemoryTrackedError after delete()', function () {
+    it('throws UseAfterFreeError after delete()', function () {
       const vec = new gd.VectorString();
       vec.push_back('hello');
       vec.delete();
 
-      expect(() => vec.size()).toThrow(gd.MemoryTrackedError);
+      expect(() => vec.size()).toThrow(gd.UseAfterFreeError);
     });
   });
 
@@ -32,17 +32,17 @@ describe('Use-after-free detection (MemoryTracked)', function () {
       layout.delete();
     });
 
-    it('throws MemoryTrackedError after delete()', function () {
+    it('throws UseAfterFreeError after delete()', function () {
       const layout = new gd.Layout();
       layout.setName('TestScene');
       layout.delete();
 
-      expect(() => layout.getName()).toThrow(gd.MemoryTrackedError);
+      expect(() => layout.getName()).toThrow(gd.UseAfterFreeError);
     });
   });
 
   describe('Tracked class (Layout) - C++ deletion', function () {
-    it('throws MemoryTrackedError when C++ deletes the underlying object', function () {
+    it('throws UseAfterFreeError when C++ deletes the underlying object', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
       project.insertNewLayout('MyScene', 0);
 
@@ -54,7 +54,7 @@ describe('Use-after-free detection (MemoryTracked)', function () {
       project.removeLayout('MyScene');
 
       // The JS wrapper still has a non-zero ptr, but the object is dead.
-      expect(() => layout.getName()).toThrow(gd.MemoryTrackedError);
+      expect(() => layout.getName()).toThrow(gd.UseAfterFreeError);
 
       project.delete();
     });
@@ -79,13 +79,13 @@ describe('Use-after-free detection (MemoryTracked)', function () {
   });
 
   describe('Tracked class (Project)', function () {
-    it('throws MemoryTrackedError after delete()', function () {
+    it('throws UseAfterFreeError after delete()', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
       project.setName('Test');
       expect(project.getName()).toBe('Test');
       project.delete();
 
-      expect(() => project.getName()).toThrow(gd.MemoryTrackedError);
+      expect(() => project.getName()).toThrow(gd.UseAfterFreeError);
     });
   });
 
@@ -111,17 +111,17 @@ describe('Use-after-free detection (MemoryTracked)', function () {
 
       // A and C still alive, B is dead.
       expect(layoutA.getName()).toBe('SceneA');
-      expect(() => layoutB.getName()).toThrow(gd.MemoryTrackedError);
+      expect(() => layoutB.getName()).toThrow(gd.UseAfterFreeError);
       expect(layoutC.getName()).toBe('SceneC');
 
       // Now kill A too.
       project.removeLayout('SceneA');
-      expect(() => layoutA.getName()).toThrow(gd.MemoryTrackedError);
+      expect(() => layoutA.getName()).toThrow(gd.UseAfterFreeError);
       expect(layoutC.getName()).toBe('SceneC');
 
       // C survives until project deletion.
       project.delete();
-      expect(() => layoutC.getName()).toThrow(gd.MemoryTrackedError);
+      expect(() => layoutC.getName()).toThrow(gd.UseAfterFreeError);
     });
 
     it('handles interleaved JS and C++ deletions', function () {
@@ -140,12 +140,12 @@ describe('Use-after-free detection (MemoryTracked)', function () {
 
       // Delete standalone via JS.
       standaloneLayout.delete();
-      expect(() => standaloneLayout.getName()).toThrow(gd.MemoryTrackedError);
+      expect(() => standaloneLayout.getName()).toThrow(gd.UseAfterFreeError);
       expect(ownedLayout.getName()).toBe('Owned');
 
       // Delete owned via C++.
       project.removeLayout('Owned');
-      expect(() => ownedLayout.getName()).toThrow(gd.MemoryTrackedError);
+      expect(() => ownedLayout.getName()).toThrow(gd.UseAfterFreeError);
 
       project.delete();
     });
@@ -165,11 +165,11 @@ describe('Use-after-free detection (MemoryTracked)', function () {
 
       // Delete project1 entirely - layout1 dies, layout2 survives.
       project1.delete();
-      expect(() => layout1.getName()).toThrow(gd.MemoryTrackedError);
+      expect(() => layout1.getName()).toThrow(gd.UseAfterFreeError);
       expect(layout2.getName()).toBe('Scene2');
 
       project2.delete();
-      expect(() => layout2.getName()).toThrow(gd.MemoryTrackedError);
+      expect(() => layout2.getName()).toThrow(gd.UseAfterFreeError);
     });
 
     it('re-adding a layout after removal gives a working fresh reference', function () {
@@ -216,12 +216,12 @@ describe('Use-after-free detection (MemoryTracked)', function () {
 
       // Remove only Player.
       layout.getObjects().removeObject('Player');
-      expect(() => player.getName()).toThrow(gd.MemoryTrackedError);
+      expect(() => player.getName()).toThrow(gd.UseAfterFreeError);
       expect(enemy.getName()).toBe('Enemy');
 
       // Removing the layout kills the enemy too.
       project.removeLayout('Scene');
-      expect(() => enemy.getName()).toThrow(gd.MemoryTrackedError);
+      expect(() => enemy.getName()).toThrow(gd.UseAfterFreeError);
 
       project.delete();
     });
@@ -242,7 +242,7 @@ describe('Use-after-free detection (MemoryTracked)', function () {
 
         project.removeLayout('TempScene');
         // Old reference is dead.
-        expect(() => layout.getName()).toThrow(gd.MemoryTrackedError);
+        expect(() => layout.getName()).toThrow(gd.UseAfterFreeError);
       }
 
       // Project itself should still be alive after all that.
@@ -262,7 +262,7 @@ describe('Use-after-free detection (MemoryTracked)', function () {
 
       // All should be detected as dead.
       for (const ref of deadRefs) {
-        expect(() => ref.getName()).toThrow(gd.MemoryTrackedError);
+        expect(() => ref.getName()).toThrow(gd.UseAfterFreeError);
       }
 
       // New objects created after should work fine.
@@ -302,7 +302,7 @@ describe('Use-after-free detection (MemoryTracked)', function () {
 
       // All references should be dead.
       for (let i = 0; i < COUNT; i++) {
-        expect(() => refs[i].getName()).toThrow(gd.MemoryTrackedError);
+        expect(() => refs[i].getName()).toThrow(gd.UseAfterFreeError);
       }
 
       project.delete();
@@ -326,7 +326,7 @@ describe('Use-after-free detection (MemoryTracked)', function () {
         // Verify still alive before removal.
         expect(refs[i].getName()).toBe('Scene_' + i);
         project.removeLayout('Scene_' + i);
-        expect(() => refs[i].getName()).toThrow(gd.MemoryTrackedError);
+        expect(() => refs[i].getName()).toThrow(gd.UseAfterFreeError);
       }
 
       project.delete();
@@ -354,12 +354,12 @@ describe('Use-after-free detection (MemoryTracked)', function () {
 
         project.removeLayout(name);
         allDeadRefs.push(layout);
-        expect(() => layout.getName()).toThrow(gd.MemoryTrackedError);
+        expect(() => layout.getName()).toThrow(gd.UseAfterFreeError);
       }
 
       // Verify all accumulated dead refs are still detected.
       for (const ref of allDeadRefs) {
-        expect(() => ref.getName()).toThrow(gd.MemoryTrackedError);
+        expect(() => ref.getName()).toThrow(gd.UseAfterFreeError);
       }
 
       project.delete();
@@ -390,7 +390,7 @@ describe('Use-after-free detection (MemoryTracked)', function () {
 
       // Verify dead ones throw.
       for (const ref of dead) {
-        expect(() => ref.getName()).toThrow(gd.MemoryTrackedError);
+        expect(() => ref.getName()).toThrow(gd.UseAfterFreeError);
       }
 
       // Clean up alive ones.
@@ -400,7 +400,7 @@ describe('Use-after-free detection (MemoryTracked)', function () {
 
       // Now they're dead too.
       for (const ref of alive) {
-        expect(() => ref.getName()).toThrow(gd.MemoryTrackedError);
+        expect(() => ref.getName()).toThrow(gd.UseAfterFreeError);
       }
     });
 
@@ -428,11 +428,11 @@ describe('Use-after-free detection (MemoryTracked)', function () {
 
         // All layout refs dead.
         for (const ref of layoutRefs) {
-          expect(() => ref.getName()).toThrow(gd.MemoryTrackedError);
+          expect(() => ref.getName()).toThrow(gd.UseAfterFreeError);
         }
 
         // Project itself is dead.
-        expect(() => project.getName()).toThrow(gd.MemoryTrackedError);
+        expect(() => project.getName()).toThrow(gd.UseAfterFreeError);
       }
     });
 

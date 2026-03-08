@@ -325,20 +325,23 @@ adaptNamingConventions(Module);
 // --- Use-after-free detection ---
 
 /**
- * Custom error class for use-after-free detection.
+ * Error thrown when code attempts to use a C++/WebIDL object after it has
+ * been destroyed (use-after-free). This can happen when:
+ * - JS calls a method on a wrapper whose delete() was already called (ptr is 0)
+ * - C++ internally deleted the object but a JS wrapper still references it
  */
-class MemoryTrackedError extends Error {
+class UseAfterFreeError extends Error {
   constructor(message) {
     super(message);
-    this.name = 'MemoryTrackedError';
+    this.name = 'UseAfterFreeError';
   }
 }
 
-Module.MemoryTrackedError = MemoryTrackedError;
+Module.UseAfterFreeError = UseAfterFreeError;
 
 /**
  * Check that an Emscripten WebIDL object is still alive.
- * Throws MemoryTrackedError if the object has been destroyed.
+ * Throws UseAfterFreeError if the object has been destroyed.
  *
  * @param {object} obj - The WebIDL wrapper object.
  * @param {string} label - Method name for the error message.
@@ -347,7 +350,7 @@ Module.MemoryTrackedError = MemoryTrackedError;
  */
 function assertAlive(obj, label, gd, className) {
   if (!obj.ptr) {
-    throw new MemoryTrackedError(
+    throw new UseAfterFreeError(
       label + ': object was already destroyed (ptr is 0)'
     );
   }
@@ -355,7 +358,7 @@ function assertAlive(obj, label, gd, className) {
     className !== null &&
     gd.MemoryTrackedRegistry.isDead(obj.ptr, className)
   ) {
-    throw new MemoryTrackedError(
+    throw new UseAfterFreeError(
       label +
         ': C++ object (' +
         className +
@@ -427,7 +430,7 @@ function patchAllWebIDLClasses(gd, options) {
 
   if (!quiet) {
     console.log(
-      '[MemoryTracked] Patched ' +
+      '[UseAfterFreeDetection] Patched ' +
         patchedCount +
         ' classes (' +
         trackedList.length +

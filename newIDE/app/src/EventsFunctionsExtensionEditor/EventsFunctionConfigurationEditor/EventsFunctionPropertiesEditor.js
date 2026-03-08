@@ -17,7 +17,6 @@ import { ParametersIndexOffsets } from '../../EventsFunctionsExtensionsLoader';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
-import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 import ValueTypeEditor from './ValueTypeEditor';
 import AlertMessage from '../../UI/AlertMessage';
 import useForceUpdate from '../../Utils/UseForceUpdate';
@@ -366,41 +365,6 @@ export const EventsFunctionPropertiesEditor = ({
                             forceUpdate();
                           }}
                           fullWidth
-                        />
-                      )}
-                    </Column>
-                    <Column expand noMargin>
-                      {type === gd.EventsFunction.ActionWithOperator ? (
-                        <SemiControlledTextField
-                          disabled
-                          floatingLabelText={<Trans>Group name</Trans>}
-                          fullWidth
-                          value={
-                            getterFunction ? getterFunction.getGroup() : ''
-                          }
-                          onChange={text => {}}
-                        />
-                      ) : (
-                        <SemiControlledAutoComplete
-                          floatingLabelText={<Trans>Group name</Trans>}
-                          hintText={t`Leave it empty to use the default group for this extension.`}
-                          fullWidth
-                          value={eventsFunction.getGroup()}
-                          onChange={text => {
-                            eventsFunction.setGroup(text);
-                            if (onConfigurationUpdated)
-                              onConfigurationUpdated();
-                            forceUpdate();
-                          }}
-                          dataSource={
-                            getFunctionGroupNames
-                              ? getFunctionGroupNames().map(name => ({
-                                  text: name,
-                                  value: name,
-                                }))
-                              : []
-                          }
-                          openOnFocus={true}
                         />
                       )}
                     </Column>

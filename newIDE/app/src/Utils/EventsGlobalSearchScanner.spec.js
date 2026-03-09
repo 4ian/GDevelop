@@ -1,18 +1,21 @@
 // @flow
 import { scanProjectForGlobalEventsSearch } from './EventsGlobalSearchScanner';
 import { makeTestProject } from '../fixtures/TestProject';
+import { type GlobalSearchInputs } from './EventsGlobalSearchScanner';
 
 const gd: libGDevelop = global.gd;
 
-const makeInputs = (overrides: Object) => ({
-  searchText: '',
-  matchCase: false,
-  searchInConditions: true,
-  searchInActions: true,
-  searchInEventStrings: true,
-  searchInEventSentences: true,
-  includeStoreExtensions: false,
-  ...overrides,
+const makeInputs = (overrides: { searchText: string }): GlobalSearchInputs => ({
+  searchText: overrides.searchText,
+  searchFilterParams: {
+    matchCase: false,
+    includeStoreExtensions: false,
+    searchInConditions: true,
+    searchInActions: true,
+    searchInEventStrings: true,
+    searchInEventSentences: true,
+    searchInInstructionNames: false,
+  },
 });
 
 describe('EventsGlobalSearchScanner', () => {

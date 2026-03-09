@@ -77,9 +77,7 @@ const getPropertyMappingRules = (
   if (!properties.has('_PropertyMapping')) {
     return [];
   }
-  // $FlowFixMe[incompatible-exact]
   return mapVector(properties.get('_PropertyMapping').getChoices(), choice => {
-    // $FlowFixMe[incompatible-use]
     const mapping = choice.getValue().split('=');
     if (mapping.length < 2) {
       return null;

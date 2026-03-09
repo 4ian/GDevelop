@@ -24,10 +24,9 @@ type Props = {|
   getLastObjectParameterObjectType: () => string,
 |};
 
-const getExtraInfoArray = (type: gdValueTypeMetadata) => {
+const getExtraInfoArray = (type: gdValueTypeMetadata): Array<string> => {
   const extraInfoJson = type.getExtraInfo();
-  // $FlowFixMe[missing-empty-array-annot]
-  let array = [];
+  let array: Array<string> = [];
   try {
     if (extraInfoJson !== '') array = JSON.parse(extraInfoJson);
     if (!Array.isArray(array)) array = [];

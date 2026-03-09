@@ -522,11 +522,11 @@ const InstructionOrObjectSelector: React.ComponentType<{
 
     const isSearching = !!searchText;
 
-    // $FlowFixMe[missing-empty-array-annot]
-    let filteredInstructionsList = [];
+    let filteredInstructionsList: Array<
+      SearchResult<EnumeratedInstructionMetadata>
+    > = [];
 
     if (isSearching) {
-      // $FlowFixMe[incompatible-type]
       filteredInstructionsList = searchResults.instructions;
     }
     const displayedInstructionsList = filteredInstructionsList.slice(

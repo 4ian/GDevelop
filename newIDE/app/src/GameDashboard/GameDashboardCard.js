@@ -433,8 +433,7 @@ const GameDashboardCard = ({
   const buildOpenProjectContextMenu = (
     i18n: I18nType
   ): Array<MenuItemTemplate> => {
-    // $FlowFixMe[missing-empty-array-annot]
-    const actions = [];
+    const actions: Array<MenuItemTemplate> = [];
     if (projectsList.length > 1) {
       actions.push(
         ...projectsList.slice(0, 3).map(fileMetadataAndStorageProviderName => {

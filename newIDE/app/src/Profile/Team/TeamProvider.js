@@ -26,6 +26,7 @@ import {
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { listOtherUserCloudProjects } from '../../Utils/GDevelopServices/Project';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
+import { type CloudProjectWithUserAccessInfo } from '../../Utils/GDevelopServices/Project';
 
 type Props = {| children: React.Node |};
 
@@ -285,8 +286,7 @@ const TeamProvider = ({ children }: Props): React.Node => {
   );
 
   const onListUserProjects = React.useCallback(
-    async (user: User) => {
-      // $FlowFixMe[missing-empty-array-annot]
+    async (user: User): Promise<Array<CloudProjectWithUserAccessInfo>> => {
       if (!adminUserId) return [];
       return listOtherUserCloudProjects(
         getAuthorizationHeader,

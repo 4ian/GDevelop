@@ -110,11 +110,10 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? parameterMetadata.getExtraInfo()
       : undefined;
 
-    const requiredCapabilitiesBehaviorTypes = React.useMemo(
+    const requiredCapabilitiesBehaviorTypes = React.useMemo<Array<string>>(
       () => {
         const functionMetadata = instructionMetadata || expressionMetadata;
         if (!project || !functionMetadata || parameterIndex === undefined) {
-          // $FlowFixMe[missing-empty-array-annot]
           return [];
         }
         return getRequiredCapabilitiesBehaviorTypes(

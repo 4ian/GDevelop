@@ -30,6 +30,9 @@ void AbstractEventsBasedEntity::SerializeTo(SerializerElement& element) const {
   gd::SerializerElement& eventsFunctionsElement =
       element.AddChild("eventsFunctions");
   eventsFunctionsContainer.SerializeEventsFunctionsTo(eventsFunctionsElement);
+eventsFunctionsContainer.SerializeFoldersTo(
+    element.AddChild("eventsFunctionsFolderStructure"));
+  
   propertyDescriptors.SerializeElementsTo(
       "propertyDescriptor", element.AddChild("propertyDescriptors"));
   propertyDescriptors.SerializeFoldersTo(
@@ -47,6 +50,14 @@ void AbstractEventsBasedEntity::UnserializeFrom(
       element.GetChild("eventsFunctions");
   eventsFunctionsContainer.UnserializeEventsFunctionsFrom(
       project, eventsFunctionsElement);
+  if (element.HasChild("eventsFunctionsFolderStructure")) {
+    eventsFunctionsContainer.UnserializeFoldersFrom(
+        element.GetChild("eventsFunctionsFolderStructure", 0));
+  }
+  // Compatibility with GD <= 5.6.261
+  eventsFunctionsContainer.AddMissingFunctionsInRootFolder();
+  // end of compatibility code
+
   propertyDescriptors.UnserializeElementsFrom(
       "propertyDescriptor", element.GetChild("propertyDescriptors"));
   if (element.HasChild("propertiesFolderStructure")) {

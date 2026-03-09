@@ -76,6 +76,7 @@
 #include <GDCore/Project/EventsFunctionsExtension.h>
 #include <GDCore/Project/ExternalEvents.h>
 #include <GDCore/Project/ExternalLayout.h>
+#include <GDCore/Project/FunctionFolderOrFunction.h>
 #include <GDCore/Project/InitialInstance.h>
 #include <GDCore/Project/InitialInstancesContainer.h>
 #include <GDCore/Project/Layout.h>
@@ -512,6 +513,7 @@ typedef std::vector<UnfilledRequiredBehaviorPropertyProblem>
     VectorUnfilledRequiredBehaviorPropertyProblem;
 typedef std::vector<const gd::ObjectFolderOrObject*> VectorObjectFolderOrObject;
 typedef std::vector<const gd::PropertyFolderOrProperty*> VectorPropertyFolderOrProperty;
+typedef std::vector<const gd::FunctionFolderOrFunction*> VectorFunctionFolderOrFunction;
 typedef std::vector<gd::Screenshot> VectorScreenshot;
 typedef QuickCustomization::Visibility
     QuickCustomization_Visibility;

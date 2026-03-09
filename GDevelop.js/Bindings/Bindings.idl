@@ -64,6 +64,11 @@ interface VectorPropertyFolderOrProperty {
     [Const] PropertyFolderOrProperty at(unsigned long index);
 };
 
+interface VectorFunctionFolderOrFunction {
+    unsigned long size();
+    [Const] FunctionFolderOrFunction at(unsigned long index);
+};
+
 interface VectorScreenshot {
     unsigned long size();
     [Const, Ref] Screenshot at(unsigned long index);
@@ -3291,6 +3296,28 @@ interface EventsFunction {
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
 
+interface FunctionFolderOrFunction {
+    void FunctionFolderOrFunction();
+    boolean IsFolder();
+    boolean IsRootFolder();
+    [Ref] EventsFunction GetFunction();
+    [Const, Ref] DOMString GetFolderName();
+    void SetFolderName([Const] DOMString name);
+    boolean HasFunctionNamed([Const] DOMString name);
+    [Ref] FunctionFolderOrFunction GetFunctionNamed([Const] DOMString name);
+    unsigned long GetChildrenCount();
+    [Ref] FunctionFolderOrFunction GetChildAt(unsigned long pos);
+    [Ref] FunctionFolderOrFunction GetFunctionChild([Const] DOMString name);
+    [Ref] FunctionFolderOrFunction GetOrCreateChildFolder([Const] DOMString name);
+    unsigned long GetChildPosition([Const, Ref] FunctionFolderOrFunction child);
+    [Ref] FunctionFolderOrFunction GetParent();
+    [Ref] FunctionFolderOrFunction InsertNewFolder([Const] DOMString name, unsigned long newPosition);
+    void MoveFunctionFolderOrFunctionToAnotherFolder([Ref] FunctionFolderOrFunction functionFolderOrFunction, [Ref] FunctionFolderOrFunction newParentFolder, unsigned long newPosition);
+    void MoveChild(unsigned long oldIndex, unsigned long newIndex);
+    void RemoveFolderChild([Const, Ref] FunctionFolderOrFunction childToRemove);
+    boolean IsADescendantOf([Const, Ref] FunctionFolderOrFunction otherFunctionFolderOrFunction);
+};
+
 enum EventsFunctionsContainer_FunctionOwner {
     "EventsFunctionsContainer::Extension",
     "EventsFunctionsContainer::Behavior",
@@ -3307,6 +3334,14 @@ interface EventsFunctionsContainer {
     void MoveEventsFunction(unsigned long oldIndex, unsigned long newIndex);
     unsigned long GetEventsFunctionsCount();
     unsigned long GetEventsFunctionPosition([Const, Ref] EventsFunction eventsFunction);
+
+    [Ref] EventsFunction InsertNewEventsFunctionInFolder(
+        [Const] DOMString name,
+        [Ref] FunctionFolderOrFunction folder,
+        unsigned long pos);
+    [Ref] FunctionFolderOrFunction GetRootFolder();
+    [Value] VectorFunctionFolderOrFunction GetAllFunctionFolderOrFunction();
+    void AddMissingFunctionsInRootFolder();
 };
 
 interface AbstractEventsBasedEntity {

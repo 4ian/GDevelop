@@ -369,11 +369,10 @@ function assertAlive(obj, label, gd, className) {
  * @param {object} gd - The Module/gd object (after adaptNamingConventions).
  * @param {{skipped: Set<string>, tracked: Set<string>, verbose: boolean}}
  */
-function patchClassesForUseAfterFreeDetection(gd, {
-  skippedClassNames,
-  trackedClassNames,
-  verbose,
-}) {
+function patchClassesForUseAfterFreeDetection(
+  gd,
+  { skippedClassNames, trackedClassNames, verbose }
+) {
   let patchedCount = 0;
 
   for (const gdClass in gd) {
@@ -422,6 +421,7 @@ function patchClassesForUseAfterFreeDetection(gd, {
 
 patchClassesForUseAfterFreeDetection(Module, {
   skippedClassNames: new Set([]),
+  // If adding new classes, also add them to `MemoryTrackerRegistryDialog`.
   trackedClassNames: new Set(['Project', 'Layout', 'gdObject', 'Behavior']),
-  verbose: true,
+  verbose: false,
 });

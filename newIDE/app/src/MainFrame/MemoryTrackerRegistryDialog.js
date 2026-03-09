@@ -15,6 +15,7 @@ import {
 
 const gd: libGDevelop = global.gd;
 
+// If adding new classes, also add them to `patchClassesForUseAfterFreeDetection`.
 const trackedClasses = ['Project', 'Layout', 'gdObject', 'Behavior'];
 
 type Stats = {|

@@ -642,19 +642,6 @@ if os.path.isfile(pm_file):
             f.write(updated)
         fixed += 1
 
-# Fix CollisionMasksPreview.js - use type cast for inexact/exact mismatch
-cmp_file = os.path.join(app_dir, 'src/ObjectEditor/Editors/SpriteEditor/CollisionMasksEditor/CollisionMasksPreview.js')
-if os.path.isfile(cmp_file):
-    with open(cmp_file) as f:
-        content = f.read()
-    # Cast polygons to any to bypass inexact/exact mismatch
-    updated = content.replace(
-        'mapVector(polygons,',
-        'mapVector((polygons: any),')
-    if updated != content:
-        with open(cmp_file, 'w') as f:
-            f.write(updated)
-        fixed += 1
 
 print(f"  Fixed {fixed} known annotate-exports signature gaps and type issues")
 PYEOF

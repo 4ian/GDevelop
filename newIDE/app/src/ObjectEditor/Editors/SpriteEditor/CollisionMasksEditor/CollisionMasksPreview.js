@@ -315,7 +315,7 @@ const CollisionMasksPreview = (props: Props): React.MixedElement => {
   const renderPolygons = () => {
     return (
       <React.Fragment>
-        {mapVector((polygons: any), (polygon, i) => {
+        {mapVector(polygons, (polygon, i) => {
           const vertices = polygon.getVertices();
           return (
             <polygon
@@ -335,7 +335,7 @@ const CollisionMasksPreview = (props: Props): React.MixedElement => {
           );
         })}
         {!hideControls &&
-          mapVector((polygons: any), (polygon, polygonIndex) => {
+          mapVector(polygons, (polygon, polygonIndex) => {
             const vertices = polygon.getVertices();
             return mapVector(vertices, (vertex, vertexIndex) => (
               <circle

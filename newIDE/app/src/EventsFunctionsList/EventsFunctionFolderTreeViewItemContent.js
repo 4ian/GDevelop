@@ -315,10 +315,11 @@ export class EventsFunctionFolderTreeViewItemContent
   onClick(): void {}
 
   rename(newName: string): void {
-    if (this.getName() === newName) {
+    const safeNewName = newName.replaceAll('/', '-');
+    if (this.getName() === safeNewName) {
       return;
     }
-    this.functionFolder.setFolderName(newName);
+    this.functionFolder.setFolderName(safeNewName);
   }
 
   edit(): void {}

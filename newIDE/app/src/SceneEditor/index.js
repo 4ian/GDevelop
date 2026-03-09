@@ -1710,6 +1710,10 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     this.props.onObjectListsModified({ isNewObjectTypeUsed: false });
 
+    // Clear the selection state before destroying the C++ objects, so that
+    // any re-render triggered by done() won't try to access destroyed objects.
+    this.setState({ selectedObjectFolderOrObjectsWithContext: [] });
+
     // Note: done() actually does the deletion of the objects,
     // so ensure objectsWithContext are not used after this call.
     done(true);

@@ -235,9 +235,8 @@ var adaptNamingConventions = function (gd) {
       const childrenCount = children.size();
       for (let i = 0; i < childrenCount; ++i) {
         // TODO: double check usage of shared_ptr
-        const sharedPtrSerializerElement = children.getSharedPtrSerializerElement(
-          i
-        );
+        const sharedPtrSerializerElement =
+          children.getSharedPtrSerializerElement(i);
         const serializerElement = sharedPtrSerializerElement.get();
         array.push(gd.Serializer.toJSObject(serializerElement));
         sharedPtrSerializerElement.reset();
@@ -261,9 +260,8 @@ var adaptNamingConventions = function (gd) {
       for (let i = 0; i < childrenCount; ++i) {
         // TODO: double check usage of shared_ptr
         const name = children.getString(i);
-        const sharedPtrSerializerElement = children.getSharedPtrSerializerElement(
-          i
-        );
+        const sharedPtrSerializerElement =
+          children.getSharedPtrSerializerElement(i);
         const serializerElement = sharedPtrSerializerElement.get();
         object[name] = gd.Serializer.toJSObject(serializerElement);
         sharedPtrSerializerElement.reset();
@@ -305,7 +303,8 @@ var adaptNamingConventions = function (gd) {
     // Handle Objects
     const clonedObj = {};
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) { // Ensure key is directly on obj
+      if (obj.hasOwnProperty(key)) {
+        // Ensure key is directly on obj
         clonedObj[key] = deepClone(obj[key]);
       }
     }
@@ -315,7 +314,7 @@ var adaptNamingConventions = function (gd) {
 
   gd._deepCloneForObjectJsImplementationContent = function (obj) {
     return deepClone(obj);
-  }
+  };
 
   return gd;
 };
@@ -351,7 +350,7 @@ Module.UseAfterFreeError = UseAfterFreeError;
 function assertAlive(obj, label, gd, className) {
   if (!obj.ptr) {
     throw new UseAfterFreeError(
-      label + ': object was already destroyed from JavaScript (ptr is 0)'
+      `${label}: object was already destroyed from JavaScript (ptr is 0).`
     );
   }
   if (
@@ -359,10 +358,7 @@ function assertAlive(obj, label, gd, className) {
     gd.MemoryTrackedRegistry.isDead(obj.ptr, className)
   ) {
     throw new UseAfterFreeError(
-      label +
-        ': C++ object (' +
-        className +
-        ') was deleted but JS wrapper still exists'
+      `${label}: C++ object (${className}) was deleted but JavaScript wrapper still exists and was about to be used (this exception was thrown instead).`
     );
   }
 }
@@ -371,39 +367,28 @@ function assertAlive(obj, label, gd, className) {
  * Patch all WebIDL classes to check for use-after-free before every method call.
  *
  * @param {object} gd - The Module/gd object (after adaptNamingConventions).
- * @param {object} [options]
- * @param {string[]} [options.skip] - Class names to leave unpatched.
- * @param {string[]} [options.tracked] - Class names that have MemoryTracked in C++.
- * @param {boolean} [options.quiet] - Suppress the startup log.
+ * @param {{skipped: Set<string>, tracked: Set<string>, verbose: boolean}}
  */
-function patchAllWebIDLClasses(gd, options) {
-  var skip = (options && options.skip) || [];
-  var trackedList = (options && options.tracked) || [];
-  var quiet = (options && options.quiet) || false;
+function patchClassesForUseAfterFreeDetection(gd, {
+  skippedClassNames,
+  trackedClassNames,
+  verbose,
+}) {
+  let patchedCount = 0;
 
-  var trackedSet = {};
-  for (var i = 0; i < trackedList.length; i++) {
-    trackedSet[trackedList[i]] = true;
-  }
-
-  var patchedCount = 0;
-
-  for (var gdClass in gd) {
+  for (const gdClass in gd) {
     if (!gd.hasOwnProperty(gdClass)) continue;
     if (typeof gd[gdClass] !== 'function') continue;
     if (!gd[gdClass].prototype) continue;
     if (!gd[gdClass].prototype.hasOwnProperty('__class__')) continue;
-    if (skip.indexOf(gdClass) !== -1) continue;
+    if (skippedClassNames.has(gdClass)) continue;
 
-    var proto = gd[gdClass].prototype;
+    const proto = gd[gdClass].prototype;
 
     // Determine if this class is tracked in C++.
-    var className = trackedSet[gdClass] ? gdClass : null;
+    const className = trackedClassNames.has(gdClass) ? gdClass : null;
 
-    var methodNames = Object.getOwnPropertyNames(proto);
-    for (var j = 0; j < methodNames.length; j++) {
-      var methodName = methodNames[j];
-
+    Object.getOwnPropertyNames(proto).forEach((methodName) => {
       // Skip special methods.
       if (
         methodName === 'constructor' ||
@@ -411,34 +396,32 @@ function patchAllWebIDLClasses(gd, options) {
         methodName === '__class__' ||
         methodName === 'delete'
       )
-        continue;
+        return;
 
-      var desc = Object.getOwnPropertyDescriptor(proto, methodName);
-      if (!desc || typeof desc.value !== 'function') continue;
+      const desc = Object.getOwnPropertyDescriptor(proto, methodName);
+      if (!desc || typeof desc.value !== 'function') return;
 
       // Wrap the method with a liveness check.
       proto[methodName] = (function (original, mName, cName) {
-        return function () {
+        return function useAfterFreeDetectionWrapper() {
           assertAlive(this, cName ? cName + '.' + mName : mName, gd, cName);
           return original.apply(this, arguments);
         };
       })(desc.value, methodName, className);
-    }
+    });
 
     patchedCount++;
   }
 
-  if (!quiet) {
+  if (verbose) {
     console.log(
-      '[UseAfterFreeDetection] Patched ' +
-        patchedCount +
-        ' classes (' +
-        trackedList.length +
-        ' tracked in C++).'
+      `[UseAfterFreeDetection] Patched ${patchedCount} classes (${trackedClassNames.size} tracked in C++).`
     );
   }
 }
 
-patchAllWebIDLClasses(Module, {
-  tracked: ['Project', 'Layout', 'gdObject', 'Behavior'],
+patchClassesForUseAfterFreeDetection(Module, {
+  skippedClassNames: new Set([]),
+  trackedClassNames: new Set(['Project', 'Layout', 'gdObject', 'Behavior']),
+  verbose: true,
 });

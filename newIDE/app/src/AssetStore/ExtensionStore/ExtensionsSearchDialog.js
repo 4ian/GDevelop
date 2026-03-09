@@ -28,6 +28,9 @@ import ErrorBoundary from '../../UI/ErrorBoundary';
 import { checkRequiredExtensionsUpdate } from '../../AssetStore/ExtensionStore/InstallExtension';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { ExtensionStoreContext } from './ExtensionStoreContext';
+import ShareExternalIcon from '../../UI/CustomSvgIcons/ShareExternal';
+import Window from '../../Utils/Window';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 
 type Props = {|
   project: gdProject,
@@ -47,6 +50,7 @@ const ExtensionsSearchDialog = ({
   onExtensionInstalled,
   onCreateNew,
 }: Props) => {
+  const preferences = React.useContext(PreferencesContext);
   const { isMobile } = useResponsiveWindowSize();
   const installExtension = useInstallExtension();
   const {
@@ -198,6 +202,18 @@ const ExtensionsSearchDialog = ({
                   )
                 }
                 leftIcon={<Add />}
+              />
+            ) : null,
+            preferences.values.showExperimentalExtensions ? (
+              <FlatButton
+                leftIcon={<ShareExternalIcon />}
+                key="open-community-list"
+                label={<Trans>Community list</Trans>}
+                onClick={() => {
+                  Window.openExternalURL(
+                    'https://github.com/GDevelopApp/GDevelop-community-list'
+                  );
+                }}
               />
             ) : null,
           ]}

@@ -35,7 +35,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const MemoryTrackerRegistryDialog = ({ onClose }: Props) => {
+const MemoryTrackerRegistryDialog = ({ onClose }: Props): React.Node => {
   const [stats, setStats] = React.useState<Array<Stats>>(getStats);
 
   React.useEffect(() => {

@@ -4811,8 +4811,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenProfile: onOpenProfileDialog,
     onRestartInGameEditor,
     onOpenGlobalSearch: openGlobalSearch,
-    onOpenMemoryTrackerRegistry: () =>
-      setMemoryTrackerRegistryDialogOpen(true),
+    onOpenMemoryTrackerRegistry: () => setMemoryTrackerRegistryDialogOpen(true),
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(

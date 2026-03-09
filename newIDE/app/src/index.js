@@ -2,7 +2,8 @@
 import 'element-closest';
 // $FlowFixMe[missing-export]
 import React, { Component, type Element } from 'react';
-import ReactDOM from 'react-dom';
+// $FlowFixMe[cannot-resolve-module] - react-dom/client is available in React 18
+import { createRoot } from 'react-dom/client';
 import Authentication from './Utils/GDevelopServices/Authentication';
 import {
   sendProgramOpening,
@@ -170,7 +171,7 @@ class Bootstrapper extends Component<{}, State> {
 const rootElement = document.getElementById('root');
 if (rootElement) {
   GD_STARTUP_TIMES.push(['reactDOMRenderCall', performance.now()]);
-  ReactDOM.render(<Bootstrapper />, rootElement);
+  createRoot(rootElement).render(<Bootstrapper />);
 } else console.error('No root element defined in index.html');
 
 registerServiceWorker();

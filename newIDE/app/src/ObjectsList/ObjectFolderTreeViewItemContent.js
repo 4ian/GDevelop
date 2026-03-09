@@ -165,13 +165,14 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   onClick(): void {}
 
   rename(newName: string): void {
-    if (this.getName() === newName) {
+    const safeNewName = newName.replaceAll('/', '-');
+    if (this.getName() === safeNewName) {
       return;
     }
 
     this.props.onRenameObjectFolderOrObjectWithContextFinish(
       { objectFolderOrObject: this.objectFolder, global: this._isGlobal },
-      newName,
+      safeNewName,
       doRename => {
         if (!doRename) return;
 

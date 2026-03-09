@@ -94,11 +94,8 @@ const getValidatedPropertyName = (
 const getChoicesArray = (
   property: gdNamedPropertyDescriptor
 ): Array<Choice> => {
-  // $FlowFixMe[incompatible-exact]
   return mapVector(property.getChoices(), choice => ({
-    // $FlowFixMe[incompatible-use]
     value: choice.getValue(),
-    // $FlowFixMe[incompatible-use]
     label: choice.getLabel(),
   }));
 };
@@ -239,7 +236,6 @@ export const EventsBasedBehaviorPropertiesEditor: React.ComponentType<{
             {properties.getCount() > 0 ? (
               <Column noMargin expand>
                 {mapVector(
-                  // $FlowFixMe[incompatible-exact]
                   properties.getAllPropertyFolderOrProperty(),
                   (
                     propertyFolderOrProperty: gdPropertyFolderOrProperty,

@@ -77,10 +77,8 @@ const VerticesTable = (props: VerticesTableProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {/* $FlowFixMe[incompatible-exact] */}
           {mapVector(props.vertices, (vertice, verticeIndex) => (
             <VerticeRow
-              // $FlowFixMe[incompatible-use]
               key={vertice.ptr}
               parentVerticeId={props.vertices.ptr.toString()}
               // $FlowFixMe[incompatible-use]
@@ -267,11 +265,9 @@ const PolygonsList = (props: PolygonsListProps): React.Node => {
     <React.Fragment>
       <Column noMargin expand useFullHeight>
         <ScrollView>
-          {/* $FlowFixMe[incompatible-exact] */}
           {mapVector(polygons, (polygon, i) => (
             <PolygonSection
               key={`polygon-${i}`}
-              // $FlowFixMe[incompatible-type]
               polygon={polygon}
               onUpdated={onPolygonsUpdated}
               onRemove={() => onRemovePolygon(i)}

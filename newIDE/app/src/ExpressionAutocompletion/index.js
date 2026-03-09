@@ -180,11 +180,9 @@ const getAutocompletionsForObjectExpressions = function(
   const behaviorNames = projectScopedContainers
     .getObjectsContainersList()
     .getBehaviorsOfObject(objectName, true);
-  // $FlowFixMe[incompatible-exact]
   mapVector(behaviorNames, behaviorName => {
     const behaviorType = projectScopedContainers
       .getObjectsContainersList()
-      // $FlowFixMe[incompatible-type]
       .getTypeOfBehaviorInObjectOrGroup(objectName, behaviorName, true);
     if (!behaviorType) {
       return;
@@ -448,9 +446,7 @@ export const getAutocompletionsFromDescriptions = (
   const { gd } = expressionAutocompletionContext;
 
   return flatten(
-    // $FlowFixMe[incompatible-exact]
     mapVector(expressionCompletionDescriptions, completionDescription => {
-      // $FlowFixMe[incompatible-use]
       const completionKind = completionDescription.getCompletionKind();
 
       if (

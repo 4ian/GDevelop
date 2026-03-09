@@ -432,9 +432,7 @@ export const makeSimplifiedProjectBuilder = (
       })
     );
 
-    // $FlowFixMe[incompatible-type]
     const projectSpecificExtensions: Array<gdPlatformExtension> = mapVector(
-      // $FlowFixMe[incompatible-exact]
       allExtensions,
       extension => {
         // $FlowFixMe[incompatible-use]

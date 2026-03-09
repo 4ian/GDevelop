@@ -302,7 +302,6 @@ const convertVariableToJsObject = (variable: gdVariable) => {
     return object;
   } else if (variable.getType() === gd.Variable.Array) {
     const children = variable.getAllChildrenArray();
-    // $FlowFixMe[incompatible-exact]
     return mapVector(children, child => convertVariableToJsObject(child));
   }
 

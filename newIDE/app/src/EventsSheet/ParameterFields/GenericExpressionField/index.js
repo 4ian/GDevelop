@@ -156,10 +156,7 @@ const extractErrors = (
   const fatalErrors = expressionValidator.getFatalErrors();
   const hasFatalErrors = fatalErrors.size() > 0;
 
-  // $FlowFixMe[incompatible-type]
-  // $FlowFixMe[incompatible-exact]
   const errorHighlights: Array<Highlight> = mapVector(errors, error => {
-    // $FlowFixMe[incompatible-use]
     const errorType = error.getType();
     const isDeprecated =
       errorType === gd.ExpressionParserError.DeprecatedExpression;

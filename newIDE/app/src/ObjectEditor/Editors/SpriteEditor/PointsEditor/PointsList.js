@@ -80,9 +80,7 @@ const PointsListBody = (props: PointsListBodyProps) => {
   ]);
 
   const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();
-  // $FlowFixMe[incompatible-exact]
   const pointsRows = mapVector(nonDefaultPoints, (point, i) => {
-    // $FlowFixMe[incompatible-use]
     const pointName = point.getName();
 
     return (

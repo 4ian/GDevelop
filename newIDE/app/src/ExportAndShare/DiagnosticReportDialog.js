@@ -245,13 +245,12 @@ export default function DiagnosticReportDialog({
   const preferences = React.useContext(PreferencesContext);
 
   // Scan project for validation errors (missing instructions, invalid parameters)
-  const validationErrors = React.useMemo(
+  const validationErrors = React.useMemo<Array<ValidationError>>(
     () => {
       try {
         return scanProjectForValidationErrors(project);
       } catch (error) {
         console.error('Error scanning project for validation errors:', error);
-        // $FlowFixMe[missing-empty-array-annot]
         return [];
       }
     },

@@ -207,8 +207,7 @@ const getSearchMatches = ({
   searchQuery?: any,
 }) => {
   if (!searchMethod || !searchQuery) {
-    // $FlowFixMe[underconstrained-implicit-instantiation]
-    return { matchIndexes: [], matchIndexSet: new Set() };
+    return { matchIndexes: [], matchIndexSet: new Set<number>() };
   }
 
   const matchIndexes = [];

@@ -850,10 +850,8 @@ const EventsTree: React.ComponentType<{
           ? isElseEventValid(eventsList, i)
           : false;
 
-      // $FlowFixMe[missing-empty-array-annot]
-      const childrenTreeData = [];
+      const childrenTreeData: Array<SortableTreeNode> = [];
       buildEventsTreeData(
-        // $FlowFixMe[incompatible-type]
         childrenTreeData,
         projectScopedContainersAccessor,
         event.getSubEvents(),

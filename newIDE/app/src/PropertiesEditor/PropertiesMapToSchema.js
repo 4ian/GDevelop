@@ -174,17 +174,12 @@ const createField = (
     };
   } else if (valueType === 'choice' || valueType === 'numberwithchoices') {
     // Choice is a "string" (with a selector for the user in the UI)
-    // $FlowFixMe[incompatible-exact]
     const choices = mapVector(property.getChoices(), choice => ({
-      // $FlowFixMe[incompatible-use]
       value: choice.getValue(),
       label:
-        // $FlowFixMe[incompatible-use]
         choice.getValue() +
-        // $FlowFixMe[incompatible-use]
         (choice.getLabel() && choice.getLabel() !== choice.getValue()
-          ? // $FlowFixMe[incompatible-use]
-            ` — ${choice.getLabel()}`
+          ? ` — ${choice.getLabel()}`
           : ''),
     }));
     // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.

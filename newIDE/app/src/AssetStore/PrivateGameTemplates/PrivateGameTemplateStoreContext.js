@@ -21,10 +21,8 @@ import { PRIVATE_GAME_TEMPLATES_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTim
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 
 const defaultSearchText = '';
-// $FlowFixMe[underconstrained-implicit-instantiation]
-const excludedTiers = new Set(); // No tiers for game templates.
-// $FlowFixMe[missing-empty-array-annot]
-const firstGameTemplateIds = [];
+const excludedTiers = new Set<string>(); // No tiers for game templates.
+const firstGameTemplateIds: Array<string> = [];
 
 const getPrivateGameTemplateListingDataSearchTerms = (
   privateGameTemplate: PrivateGameTemplateListingData

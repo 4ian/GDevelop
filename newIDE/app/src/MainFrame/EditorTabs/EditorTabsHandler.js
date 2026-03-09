@@ -666,14 +666,11 @@ export const getOpenedAskAiEditor = (
 };
 
 export const getAllEditorTabs = (state: EditorTabsState): Array<EditorTab> => {
-  // $FlowFixMe[missing-empty-array-annot]
-  const allEditors = [];
+  const allEditors: Array<EditorTab> = [];
   for (const paneIdentifier in state.panes) {
     const pane = state.panes[paneIdentifier];
-    // $FlowFixMe[incompatible-type]
     allEditors.push(...pane.editors);
   }
-  // $FlowFixMe[incompatible-type]
   return allEditors;
 };
 

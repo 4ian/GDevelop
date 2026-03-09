@@ -562,8 +562,6 @@ const makeShortTextForNamedProperty = (
   const choices =
     type.toLowerCase() === 'choice'
       ? [
-          // $FlowFixMe[incompatible-use]
-          // $FlowFixMe[incompatible-exact]
           ...mapVector(property.getChoices(), choice => choice.getValue()),
           // TODO Remove this once we made sure no built-in extension still use `addExtraInfo` instead of `addChoice`.
           ...property.getExtraInfo().toJSArray(),
@@ -2382,8 +2380,10 @@ const describeInstances: EditorFunction = {
   },
 };
 
-// $FlowFixMe[missing-local-annot]
-const iterateOnInstances = (initialInstances, callback) => {
+const iterateOnInstances = (
+  initialInstances: gdInitialInstancesContainer,
+  callback: gdInitialInstance => void
+) => {
   const instanceGetter = new gd.InitialInstanceJSFunctor();
   // $FlowFixMe[cannot-write]
   instanceGetter.invoke = instancePtr => {
@@ -2394,6 +2394,7 @@ const iterateOnInstances = (initialInstances, callback) => {
     );
     callback(instance);
   };
+  // $FlowFixMe[incompatible-type]
   initialInstances.iterateOverInstances(instanceGetter);
   instanceGetter.delete();
 };
@@ -2560,8 +2561,7 @@ const put2dInstances: EditorFunction = {
       const brushSize = brush_size || 0;
 
       // Iterate on existing instances and remove them, and/or those inside the brush radius.
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      const instancesToDelete = new Set();
+      const instancesToDelete = new Set<gdInitialInstance>();
       const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
 
       iterateOnInstances(initialInstances, instance => {
@@ -3106,8 +3106,7 @@ const put3dInstances: EditorFunction = {
       const brushSize = brush_size || 0;
 
       // Iterate on existing instances and remove them, and/or those inside the brush radius.
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      const instancesToDelete = new Set();
+      const instancesToDelete = new Set<gdInitialInstance>();
       const notFoundExistingInstanceIds = new Set<string>(existingInstanceIds);
 
       iterateOnInstances(initialInstances, instance => {
@@ -3766,8 +3765,7 @@ const addSceneEvents: EditorFunction = {
       }
 
       try {
-        // $FlowFixMe[underconstrained-implicit-instantiation]
-        const extensionNames = new Set();
+        const extensionNames = new Set<string>();
         for (const change of changes) {
           for (const extensionName of change.extensionNames || []) {
             extensionNames.add(extensionName);

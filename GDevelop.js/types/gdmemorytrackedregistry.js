@@ -3,7 +3,8 @@ declare class gdMemoryTrackedRegistry {
   static add(ptr: number, className: string): void;
   static remove(ptr: number, className: string): void;
   static isDead(ptr: number, className: string): boolean;
-  static deadCount(): number;
+  static getDeadCount(): number;
+  static getAliveCount(): number;
   static pruneDead(maxSize: number): void;
   static getAliveCountForClass(className: string): number;
   static getDeadCountForClass(className: string): number;

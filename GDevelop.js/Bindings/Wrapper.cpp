@@ -909,8 +909,9 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_add add
 #define STATIC_remove remove
 #define STATIC_isDead isDead
-#define STATIC_deadCount deadCount
+#define STATIC_getDeadCount getDeadCount
 #define STATIC_pruneDead pruneDead
+#define STATIC_getAliveCount getAliveCount
 #define STATIC_getAliveCountForClass getAliveCountForClass
 #define STATIC_getDeadCountForClass getDeadCountForClass
 

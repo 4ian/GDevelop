@@ -61,31 +61,30 @@ class MemoryTrackedRegistry {
         className.c_str());
   }
 
-  static long deadCount() {
+  static long getDeadCount() {
     long total = 0;
     for (auto& kv : dead()) total += static_cast<long>(kv.second.size());
     return total;
   }
 
   static void pruneDead(long maxSize) {
-    if (deadCount() > maxSize) {
+    if (getDeadCount() > maxSize) {
       dead().clear();
     }
   }
 
-  // Per-class stats. Pass empty string for totals.
+  static long getAliveCount() {
+    long total = 0;
+    for (auto& kv : alive()) total += static_cast<long>(kv.second.size());
+    return total;
+  }
+
   static long getAliveCountForClass(const gd::String& className) {
-    if (className.empty()) {
-      long total = 0;
-      for (auto& kv : alive()) total += static_cast<long>(kv.second.size());
-      return total;
-    }
     auto it = alive().find(className.c_str());
     return it != alive().end() ? static_cast<long>(it->second.size()) : 0;
   }
 
   static long getDeadCountForClass(const gd::String& className) {
-    if (className.empty()) return deadCount();
     auto it = dead().find(className.c_str());
     return it != dead().end() ? static_cast<long>(it->second.size()) : 0;
   }

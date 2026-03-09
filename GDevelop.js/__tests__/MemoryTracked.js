@@ -62,19 +62,19 @@ describe('Use-after-free detection (MemoryTracked)', function () {
 
   describe('MemoryTrackedRegistry API', function () {
     it('reports dead objects correctly', function () {
-      const count = gd.MemoryTrackedRegistry.deadCount();
+      const count = gd.MemoryTrackedRegistry.getDeadCount();
       expect(typeof count).toBe('number');
     });
 
     it('pruneDead clears dead set when over limit', function () {
-      const countBefore = gd.MemoryTrackedRegistry.deadCount();
+      const countBefore = gd.MemoryTrackedRegistry.getDeadCount();
       // Pruning with a high limit should not clear.
       gd.MemoryTrackedRegistry.pruneDead(countBefore + 1000);
-      expect(gd.MemoryTrackedRegistry.deadCount()).toBe(countBefore);
+      expect(gd.MemoryTrackedRegistry.getDeadCount()).toBe(countBefore);
 
       // Pruning with 0 should clear everything.
       gd.MemoryTrackedRegistry.pruneDead(0);
-      expect(gd.MemoryTrackedRegistry.deadCount()).toBe(0);
+      expect(gd.MemoryTrackedRegistry.getDeadCount()).toBe(0);
     });
   });
 
@@ -105,9 +105,9 @@ describe('Use-after-free detection (MemoryTracked)', function () {
     });
 
     it('returns totals when given empty string', function () {
-      const totalAlive = gd.MemoryTrackedRegistry.getAliveCountForClass('');
+      const totalAlive = gd.MemoryTrackedRegistry.getAliveCount();
       expect(totalAlive).toBeGreaterThan(0);
-      const totalDead = gd.MemoryTrackedRegistry.getDeadCountForClass('');
+      const totalDead = gd.MemoryTrackedRegistry.getDeadCount();
       expect(typeof totalDead).toBe('number');
     });
 
@@ -493,11 +493,11 @@ describe('Use-after-free detection (MemoryTracked)', function () {
         project.insertNewLayout('Prunable_' + i, 0);
         project.removeLayout('Prunable_' + i);
       }
-      expect(gd.MemoryTrackedRegistry.deadCount()).toBeGreaterThan(0);
+      expect(gd.MemoryTrackedRegistry.getDeadCount()).toBeGreaterThan(0);
 
       // Prune the dead set.
       gd.MemoryTrackedRegistry.pruneDead(0);
-      expect(gd.MemoryTrackedRegistry.deadCount()).toBe(0);
+      expect(gd.MemoryTrackedRegistry.getDeadCount()).toBe(0);
 
       // Living objects must still work — no false positives.
       project.insertNewLayout('Alive', 0);

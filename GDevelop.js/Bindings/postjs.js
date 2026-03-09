@@ -421,7 +421,7 @@ function patchClassesForUseAfterFreeDetection(
 
 patchClassesForUseAfterFreeDetection(Module, {
   skippedClassNames: new Set([]),
-  // If adding new classes, also add them to `MemoryTrackerRegistryDialog`.
+  // If adding new classes, also add them to `MemoryTrackedRegistryDialog`.
   trackedClassNames: new Set(['Project', 'Layout', 'gdObject', 'Behavior']),
   verbose: false,
 });

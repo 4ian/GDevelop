@@ -19,6 +19,7 @@
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/VariablesContainer.h"
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/String.h"
 
 namespace gd {
@@ -397,6 +398,8 @@ class GD_CORE_API Layout {
   ///@}
 
  private:
+  gd::MemoryTracked _memoryTracked{this, "Layout"};
+
   gd::String name;         ///< Scene name
   gd::String mangledName;  ///< The scene name mangled by SceneNameMangler
   unsigned int backgroundColorR = 0;     ///< Background color Red component

@@ -68,6 +68,7 @@
 #include <GDCore/IDE/VariableInstructionSwitcher.h>
 #include <GDCore/IDE/WholeProjectRefactorer.h>
 #include <GDCore/Project/Behavior.h>
+#include <GDCore/Project/MemoryTrackedRegistry.h>
 #include <GDCore/Project/CustomObjectConfiguration.h>
 #include <GDCore/Project/Effect.h>
 #include <GDCore/Project/EventsBasedBehavior.h>
@@ -905,6 +906,16 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_GetLastBinarySnapshotSize GetLastBinarySnapshotSize
 #define STATIC_FreeBinarySnapshot FreeBinarySnapshot
 #define STATIC_DeserializeBinarySnapshot DeserializeBinarySnapshot
+
+// MemoryTrackedRegistry
+#define STATIC_add add
+#define STATIC_remove remove
+#define STATIC_isDead isDead
+#define STATIC_getDeadCount getDeadCount
+#define STATIC_pruneDead pruneDead
+#define STATIC_getAliveCount getAliveCount
+#define STATIC_getAliveCountForClass getAliveCountForClass
+#define STATIC_getDeadCountForClass getDeadCountForClass
 
 // We postfix some methods with "At" as Javascript does not support overloading
 #define GetLayoutAt GetLayout

@@ -196,6 +196,7 @@ import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
 import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
+import MemoryTrackedRegistryDialog from './MemoryTrackedRegistryDialog';
 import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
 import useSaveReminder from './UseSaveReminder';
 import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
@@ -465,6 +466,10 @@ const MainFrame = (props: Props): React.MixedElement => {
   const [
     diagnosticReportDialogOpen,
     setDiagnosticReportDialogOpen,
+  ] = React.useState<boolean>(false);
+  const [
+    memoryTrackerRegistryDialogOpen,
+    setMemoryTrackedRegistryDialogOpen,
   ] = React.useState<boolean>(false);
 
   /**
@@ -4806,6 +4811,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenProfile: onOpenProfileDialog,
     onRestartInGameEditor,
     onOpenGlobalSearch: openGlobalSearch,
+    onOpenMemoryTrackerRegistry: () => setMemoryTrackedRegistryDialogOpen(true),
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -5517,6 +5523,11 @@ const MainFrame = (props: Props): React.MixedElement => {
           onScreenshotsClaimed={onGameScreenshotsClaimed}
           onWillInstallExtension={onWillInstallExtension}
           onExtensionInstalled={onExtensionInstalled}
+        />
+      )}
+      {memoryTrackerRegistryDialogOpen && (
+        <MemoryTrackedRegistryDialog
+          onClose={() => setMemoryTrackedRegistryDialogOpen(false)}
         />
       )}
       <CustomDragLayer />

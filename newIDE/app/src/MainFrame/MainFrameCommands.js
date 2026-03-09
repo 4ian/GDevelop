@@ -68,6 +68,7 @@ type CommandHandlers = {|
   onOpenProfile: () => void,
   onRestartInGameEditor: (reason: string) => void,
   onOpenGlobalSearch: () => void,
+  onOpenMemoryTrackerRegistry: () => void,
 |};
 
 const useMainFrameCommands = (handlers: CommandHandlers) => {
@@ -171,6 +172,10 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
       () => onRestartInGameEditor('relaunched-manually'),
       [onRestartInGameEditor]
     ),
+  });
+
+  useCommand('OPEN_MEMORY_TRACKER_REGISTRY', true, {
+    handler: handlers.onOpenMemoryTrackerRegistry,
   });
 
   useCommandWithOptions('OPEN_LAYOUT', !!handlers.project, {

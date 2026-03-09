@@ -308,4 +308,5 @@ declare class libGDevelop {
   Exporter: Class<gdExporter>;
   JsCodeEvent: Class<gdJsCodeEvent>;
   MetadataDeclarationHelper: Class<gdMetadataDeclarationHelper>;
+  MemoryTrackedRegistry: Class<gdMemoryTrackedRegistry>;
 };

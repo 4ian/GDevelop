@@ -67,7 +67,8 @@ export type CommandName =
   | 'DELETE_SELECTION'
   | 'SEARCH_EVENTS'
   | 'OPEN_EXTENSION_SETTINGS'
-  | 'OPEN_PROFILE';
+  | 'OPEN_PROFILE'
+  | 'OPEN_MEMORY_TRACKER_REGISTRY';
 
 export const commandAreas = {
   GENERAL: (t`General`: any),
@@ -347,6 +348,12 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   OPEN_EXTENSION_SETTINGS: {
     area: 'EVENTS',
     displayText: t`Open extension settings`,
+  },
+
+  // Debug commands
+  OPEN_MEMORY_TRACKER_REGISTRY: {
+    area: 'IDE',
+    displayText: t`Open memory tracker registry`,
   },
 };
 

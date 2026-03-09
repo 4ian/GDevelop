@@ -3258,6 +3258,17 @@ export class MetadataDeclarationHelper extends EmscriptenObject {
   static shiftSentenceParamIndexes(sentence: string, offset: number): string;
 }
 
+export class MemoryTrackedRegistry extends EmscriptenObject {
+  static add(ptr: number, className: string): void;
+  static remove(ptr: number, className: string): void;
+  static isDead(ptr: number, className: string): boolean;
+  static getDeadCount(): number;
+  static getAliveCount(): number;
+  static pruneDead(maxSize: number): void;
+  static getAliveCountForClass(className: string): number;
+  static getDeadCountForClass(className: string): number;
+}
+
 export function toNewVectorString(): VectorString;
 
 export function getTypeOfBehavior(layout: ObjectsContainer, name: string, searchInGroups: boolean): string;

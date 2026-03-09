@@ -16,6 +16,7 @@
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/IDE/Events/InstructionSentenceFormatter.h"
 #include "GDCore/Project/ObjectsContainer.h"
@@ -945,12 +946,9 @@ bool EventsRefactorer::SearchStringInFormattedText(const gd::Platform& platform,
   if (foundPosition != gd::String::npos) return true;
 
   if (inInstructionNames) {
-    const gd::String& instructionType = instruction.GetType();
-    size_t lastSeparator = instructionType.find_last_of("::");
     gd::String instructionName =
-        lastSeparator != gd::String::npos
-            ? instructionType.substr(lastSeparator + 1)
-            : instructionType;
+        PlatformExtension::GetInstructionNameFromFullType(
+            instruction.GetType());
     size_t nameFoundPosition =
         matchCase ? instructionName.find(search)
                   : instructionName.FindCaseInsensitive(search);

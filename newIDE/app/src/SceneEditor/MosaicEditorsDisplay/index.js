@@ -265,8 +265,11 @@ const MosaicEditorsDisplay: React.ComponentType<{
       .map(objectFolderOrObjectWithContext => {
         const { objectFolderOrObject } = objectFolderOrObjectWithContext;
         if (!objectFolderOrObject) return null; // Protect ourselves from an unexpected null value.
+        if (!objectFolderOrObject.ptr) return null; // Object may have been destroyed.
         if (objectFolderOrObject.isFolder()) return null;
-        return objectFolderOrObject.getObject();
+        const object = objectFolderOrObject.getObject();
+        if (!object.ptr) return null; // Underlying gdObject may have been destroyed.
+        return object;
       })
       .filter(Boolean);
 

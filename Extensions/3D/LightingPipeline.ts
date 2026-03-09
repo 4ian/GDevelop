@@ -12,6 +12,8 @@ namespace gdjs {
     am: string;
     ads: number;
     acs: number;
+    sqs?: number;
+    lds?: number;
     rso: boolean;
     pcl: boolean;
   }
@@ -36,6 +38,8 @@ namespace gdjs {
     attenuationModel: LightingAttenuationModel;
     attenuationDistanceScale: number;
     attenuationDecayScale: number;
+    shadowQualityScale: number;
+    lodDistanceScale: number;
     realtimeShadowsOnly: boolean;
     physicallyCorrectLights: boolean;
     probeLight: THREE.LightProbe | null;
@@ -99,6 +103,8 @@ namespace gdjs {
       attenuationModel: 'balanced',
       attenuationDistanceScale: 1,
       attenuationDecayScale: 1,
+      shadowQualityScale: 1,
+      lodDistanceScale: 1,
       realtimeShadowsOnly: true,
       physicallyCorrectLights: true,
       probeLight: null,
@@ -322,6 +328,8 @@ namespace gdjs {
           private _attenuationModel: LightingAttenuationModel;
           private _attenuationDistanceScale: number;
           private _attenuationDecayScale: number;
+          private _shadowQualityScale: number;
+          private _lodDistanceScale: number;
           private _realtimeShadowsOnly: boolean;
           private _physicallyCorrectLights: boolean;
 
@@ -374,6 +382,20 @@ namespace gdjs {
                 ? effectData.doubleParameters.attenuationDecayScale
                 : 1
             );
+            this._shadowQualityScale = gdjs.evtTools.common.clamp(
+              0.35,
+              2,
+              effectData.doubleParameters.shadowQualityScale !== undefined
+                ? effectData.doubleParameters.shadowQualityScale
+                : 1
+            );
+            this._lodDistanceScale = gdjs.evtTools.common.clamp(
+              0.25,
+              4,
+              effectData.doubleParameters.lodDistanceScale !== undefined
+                ? effectData.doubleParameters.lodDistanceScale
+                : 1
+            );
             this._realtimeShadowsOnly =
               effectData.booleanParameters.realtimeShadowsOnly === undefined
                 ? true
@@ -408,6 +430,8 @@ namespace gdjs {
             state.attenuationModel = this._attenuationModel;
             state.attenuationDistanceScale = this._attenuationDistanceScale;
             state.attenuationDecayScale = this._attenuationDecayScale;
+            state.shadowQualityScale = this._shadowQualityScale;
+            state.lodDistanceScale = this._lodDistanceScale;
             state.realtimeShadowsOnly = this._realtimeShadowsOnly;
             state.physicallyCorrectLights = this._physicallyCorrectLights;
 
@@ -489,6 +513,18 @@ namespace gdjs {
               this._attenuationDistanceScale = clampNonNegative(value);
             } else if (parameterName === 'attenuationDecayScale') {
               this._attenuationDecayScale = clampNonNegative(value);
+            } else if (parameterName === 'shadowQualityScale') {
+              this._shadowQualityScale = gdjs.evtTools.common.clamp(
+                0.35,
+                2,
+                value
+              );
+            } else if (parameterName === 'lodDistanceScale') {
+              this._lodDistanceScale = gdjs.evtTools.common.clamp(
+                0.25,
+                4,
+                value
+              );
             }
           }
 
@@ -510,6 +546,12 @@ namespace gdjs {
             }
             if (parameterName === 'attenuationDecayScale') {
               return this._attenuationDecayScale;
+            }
+            if (parameterName === 'shadowQualityScale') {
+              return this._shadowQualityScale;
+            }
+            if (parameterName === 'lodDistanceScale') {
+              return this._lodDistanceScale;
             }
             return 0;
           }
@@ -570,6 +612,8 @@ namespace gdjs {
               am: this._attenuationModel,
               ads: this._attenuationDistanceScale,
               acs: this._attenuationDecayScale,
+              sqs: this._shadowQualityScale,
+              lds: this._lodDistanceScale,
               rso: this._realtimeShadowsOnly,
               pcl: this._physicallyCorrectLights,
             };
@@ -590,6 +634,16 @@ namespace gdjs {
             this._attenuationModel = parseAttenuationModel(syncData.am);
             this._attenuationDistanceScale = clampNonNegative(syncData.ads);
             this._attenuationDecayScale = clampNonNegative(syncData.acs);
+            this._shadowQualityScale = gdjs.evtTools.common.clamp(
+              0.35,
+              2,
+              syncData.sqs !== undefined ? syncData.sqs : 1
+            );
+            this._lodDistanceScale = gdjs.evtTools.common.clamp(
+              0.25,
+              4,
+              syncData.lds !== undefined ? syncData.lds : 1
+            );
             this._realtimeShadowsOnly = !!syncData.rso;
             this._physicallyCorrectLights = !!syncData.pcl;
           }

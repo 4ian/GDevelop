@@ -32,6 +32,7 @@ namespace gdjs {
     attenuationDecayScale?: number;
     realtimeShadowsOnly?: boolean;
     physicallyCorrectLights?: boolean;
+    shadowQualityScale?: number;
   }
 
   const lightingPipelineStateKey = '__gdScene3dLightingPipelineState';
@@ -152,15 +153,32 @@ namespace gdjs {
 
           private _isEnabled: boolean = false;
           private _isCastingShadow: boolean = false;
+          private _pipelineRealtimeMultiplier: float = 1;
+          private _pipelineAllowsRealtimeShadows: boolean = true;
+          private _pipelineShadowQualityScale: float = 1;
           private _light: THREE.PointLight;
           private _shadowMapDirty = true;
           private _shadowCameraDirty = true;
+          private _effectiveShadowMapSize: integer = 1024;
           private _maxRendererShadowMapSize: integer = 2048;
           private _temporaryOffsetVector = new THREE.Vector3();
           private _temporaryEuler = new THREE.Euler(0, 0, 0, 'ZYX');
 
           constructor() {
             this._light = new THREE.PointLight();
+            this._top = effectData.stringParameters.top || this._top;
+            this._positionX =
+              effectData.doubleParameters.positionX !== undefined
+                ? effectData.doubleParameters.positionX
+                : this._positionX;
+            this._positionY =
+              effectData.doubleParameters.positionY !== undefined
+                ? effectData.doubleParameters.positionY
+                : this._positionY;
+            this._positionZ =
+              effectData.doubleParameters.positionZ !== undefined
+                ? effectData.doubleParameters.positionZ
+                : this._positionZ;
             this._intensity = Math.max(
               0,
               effectData.doubleParameters.intensity !== undefined
@@ -179,10 +197,54 @@ namespace gdjs {
                 ? effectData.doubleParameters.decay
                 : this._decay
             );
+            this._shadowBias = -Math.max(
+              0,
+              effectData.doubleParameters.shadowBias !== undefined
+                ? effectData.doubleParameters.shadowBias
+                : -this._shadowBias
+            );
+            this._shadowNormalBias = Math.max(
+              0,
+              effectData.doubleParameters.shadowNormalBias !== undefined
+                ? effectData.doubleParameters.shadowNormalBias
+                : this._shadowNormalBias
+            );
+            this._shadowRadius = Math.max(
+              0,
+              effectData.doubleParameters.shadowRadius !== undefined
+                ? effectData.doubleParameters.shadowRadius
+                : this._shadowRadius
+            );
+            this._shadowNear = Math.max(
+              0.01,
+              effectData.doubleParameters.shadowNear !== undefined
+                ? effectData.doubleParameters.shadowNear
+                : this._shadowNear
+            );
+            this._shadowFar = Math.max(
+              this._shadowNear + 1,
+              effectData.doubleParameters.shadowFar !== undefined
+                ? effectData.doubleParameters.shadowFar
+                : this._shadowFar
+            );
             this._isCastingShadow =
               effectData.booleanParameters.isCastingShadow === undefined
                 ? false
                 : !!effectData.booleanParameters.isCastingShadow;
+            this._shadowAutoTuningEnabled =
+              effectData.booleanParameters.shadowAutoTuning === undefined
+                ? true
+                : !!effectData.booleanParameters.shadowAutoTuning;
+
+            if (effectData.stringParameters.shadowQuality) {
+              this._applyShadowQualityPreset(
+                effectData.stringParameters.shadowQuality
+              );
+            } else if (effectData.doubleParameters.shadowMapSize !== undefined) {
+              this._shadowMapSize = this._getClosestShadowMapSize(
+                effectData.doubleParameters.shadowMapSize
+              );
+            }
             this._light.position.set(
               this._positionX,
               this._positionY,
@@ -191,6 +253,11 @@ namespace gdjs {
             this._light.intensity = this._intensity;
             this._light.distance = this._distance;
             this._light.decay = this._decay;
+            this._light.color.setHex(
+              gdjs.rgbOrHexStringToNumber(
+                effectData.stringParameters.color || '255;255;255'
+              )
+            );
             this._light.castShadow = this._isCastingShadow;
 
             // Configure shadow defaults
@@ -208,10 +275,11 @@ namespace gdjs {
               | null
               | undefined;
             const pipelineState = getLightingPipelineState(scene);
-            const realtimeMultiplier =
+            this._pipelineRealtimeMultiplier =
               getRealtimeLightingMultiplier(pipelineState);
 
-            this._light.intensity = this._intensity * realtimeMultiplier;
+            this._light.intensity =
+              this._intensity * this._pipelineRealtimeMultiplier;
             const attenuation = computePipelineAttenuation(
               this._distance,
               this._decay,
@@ -220,9 +288,39 @@ namespace gdjs {
             this._light.distance = attenuation.distance;
             this._light.decay = attenuation.decay;
 
+            this._pipelineAllowsRealtimeShadows = shouldUseRealtimeShadows(
+              pipelineState,
+              this._pipelineRealtimeMultiplier
+            );
+            let targetShadowQualityScale = 1;
+            if (pipelineState) {
+              const baseScale = Math.max(
+                0.35,
+                Math.min(2, pipelineState.shadowQualityScale ?? 1)
+              );
+              if (pipelineState.mode === 'baked') {
+                targetShadowQualityScale = baseScale * 0.45;
+              } else if (pipelineState.mode === 'hybrid') {
+                targetShadowQualityScale =
+                  baseScale * (0.6 + 0.4 * this._pipelineRealtimeMultiplier);
+              } else {
+                targetShadowQualityScale = baseScale;
+              }
+            }
+            targetShadowQualityScale = Math.max(
+              0.35,
+              Math.min(2, targetShadowQualityScale)
+            );
+            if (
+              Math.abs(targetShadowQualityScale - this._pipelineShadowQualityScale) >
+              0.001
+            ) {
+              this._pipelineShadowQualityScale = targetShadowQualityScale;
+              this._shadowMapDirty = true;
+            }
+
             const shouldCastShadow =
-              this._isCastingShadow &&
-              shouldUseRealtimeShadows(pipelineState, realtimeMultiplier);
+              this._isCastingShadow && this._pipelineAllowsRealtimeShadows;
             if (this._light.castShadow !== shouldCastShadow) {
               this._light.castShadow = shouldCastShadow;
               if (shouldCastShadow) {
@@ -288,6 +386,20 @@ namespace gdjs {
             return this._clampShadowMapSizeToRenderer(closestSize);
           }
 
+          private _applyShadowQualityPreset(quality: string): void {
+            if (quality === 'low') {
+              this._shadowMapSize = this._getClosestShadowMapSize(512);
+              return;
+            }
+            if (quality === 'medium') {
+              this._shadowMapSize = this._getClosestShadowMapSize(1024);
+              return;
+            }
+            if (quality === 'high') {
+              this._shadowMapSize = this._getClosestShadowMapSize(2048);
+            }
+          }
+
           private _ensureSoftShadowRenderer(target: gdjs.EffectsTarget): void {
             const runtimeScene = target.getRuntimeScene();
             if (!runtimeScene || !runtimeScene.getGame) {
@@ -318,10 +430,16 @@ namespace gdjs {
 
             threeRenderer.shadowMap.enabled = true;
             threeRenderer.shadowMap.autoUpdate = true;
-            threeRenderer.shadowMap.type =
+            const preferredShadowType =
               this._shadowRadius > 1
                 ? THREE.PCFShadowMap
                 : THREE.PCFSoftShadowMap;
+            if (
+              preferredShadowType === THREE.PCFShadowMap ||
+              threeRenderer.shadowMap.type !== THREE.PCFShadowMap
+            ) {
+              threeRenderer.shadowMap.type = preferredShadowType;
+            }
           }
 
           private _updateShadowMapSize(): void {
@@ -330,12 +448,21 @@ namespace gdjs {
             }
             this._shadowMapDirty = false;
 
-            this._shadowMapSize = this._getClosestShadowMapSize(
-              this._shadowMapSize
+            const rendererCappedPointMax = this._clampShadowMapSizeToRenderer(
+              2048
+            );
+            this._effectiveShadowMapSize = Math.max(
+              512,
+              Math.min(
+                rendererCappedPointMax,
+                this._getClosestShadowMapSize(
+                  this._shadowMapSize * this._pipelineShadowQualityScale
+                )
+              )
             );
             this._light.shadow.mapSize.set(
-              this._shadowMapSize,
-              this._shadowMapSize
+              this._effectiveShadowMapSize,
+              this._effectiveShadowMapSize
             );
 
             // Force the recreation of the shadow map texture:
@@ -375,7 +502,7 @@ namespace gdjs {
 
             const shadowFar = Math.max(1, this._light.shadow.camera.far);
             const texelWorldSize =
-              (shadowFar * 2) / Math.max(1, this._shadowMapSize);
+              (shadowFar * 2) / Math.max(1, this._effectiveShadowMapSize);
             const automaticBias = Math.max(0.00005, texelWorldSize * 0.0008);
             const automaticNormalBias = texelWorldSize * 0.03;
 
@@ -708,18 +835,8 @@ namespace gdjs {
               this._attachedObjectName = value;
             }
             if (parameterName === 'shadowQuality') {
-              if (value === 'low' && this._shadowMapSize !== 512) {
-                this._shadowMapSize = this._getClosestShadowMapSize(512);
-                this._shadowMapDirty = true;
-              }
-              if (value === 'medium' && this._shadowMapSize !== 1024) {
-                this._shadowMapSize = this._getClosestShadowMapSize(1024);
-                this._shadowMapDirty = true;
-              }
-              if (value === 'high' && this._shadowMapSize !== 2048) {
-                this._shadowMapSize = this._getClosestShadowMapSize(2048);
-                this._shadowMapDirty = true;
-              }
+              this._applyShadowQualityPreset(value);
+              this._shadowMapDirty = true;
             }
             if (parameterName === 'shadowMapSize') {
               const parsedValue = parseFloat(value);
@@ -744,7 +861,8 @@ namespace gdjs {
           updateBooleanParameter(parameterName: string, value: boolean): void {
             if (parameterName === 'isCastingShadow') {
               this._isCastingShadow = value;
-              this._light.castShadow = value;
+              this._light.castShadow =
+                value && this._pipelineAllowsRealtimeShadows;
               if (value) {
                 this._shadowMapDirty = true;
                 this._shadowCameraDirty = true;
@@ -812,7 +930,8 @@ namespace gdjs {
             this._inheritAttachedObjectScale = syncData.ia ?? false;
             this._shadowAutoTuningEnabled = syncData.sat ?? true;
             this._isCastingShadow = syncData.cs ?? this._isCastingShadow;
-            this._light.castShadow = this._isCastingShadow;
+            this._light.castShadow =
+              this._isCastingShadow && this._pipelineAllowsRealtimeShadows;
             this._light.intensity = this._intensity;
             this._light.distance = this._distance;
             this._light.decay = this._decay;

@@ -1,6 +1,13 @@
 namespace gdjs {
   const lodOriginalCastShadowKey = '__gdScene3dLodOriginalCastShadow';
   const lodOriginalReceiveShadowKey = '__gdScene3dLodOriginalReceiveShadow';
+  const lightingPipelineStateKey = '__gdScene3dLightingPipelineState';
+
+  interface LightingPipelineState {
+    mode?: string;
+    realtimeWeight?: number;
+    lodDistanceScale?: number;
+  }
 
   type RuntimeObjectWith3DRenderer = gdjs.RuntimeObject & {
     get3DRendererObject?: () => THREE.Object3D | null;
@@ -39,9 +46,11 @@ namespace gdjs {
     private _forceLevel: number;
     private _modelSwitchCooldownMs: number;
     private _useBoundingRadius: boolean;
+    private _distanceScale: number;
 
     private _frameCounter: number;
     private _currentLevel: number;
+    private _lastComputedDistanceToCamera: number;
     private _baseAnimationSpeed: number;
     private _hasBaseAnimationSpeed: boolean;
     private _tempObjectPosition: THREE.Vector3;
@@ -122,9 +131,15 @@ namespace gdjs {
         behaviorData.useBoundingRadius === undefined
           ? true
           : !!behaviorData.useBoundingRadius;
+      this._distanceScale = this._clamp(
+        behaviorData.distanceScale !== undefined ? behaviorData.distanceScale : 1,
+        0.1,
+        8
+      );
 
       this._frameCounter = 0;
       this._currentLevel = -1;
+      this._lastComputedDistanceToCamera = 0;
       this._baseAnimationSpeed = 1;
       this._hasBaseAnimationSpeed = false;
       this._tempObjectPosition = new THREE.Vector3();
@@ -171,6 +186,8 @@ namespace gdjs {
         this.setModelSwitchCooldownMs(behaviorData.modelSwitchCooldownMs);
       if (behaviorData.useBoundingRadius !== undefined)
         this.setUseBoundingRadius(behaviorData.useBoundingRadius);
+      if (behaviorData.distanceScale !== undefined)
+        this.setDistanceScale(behaviorData.distanceScale);
       return true;
     }
 
@@ -211,7 +228,10 @@ namespace gdjs {
       }
 
       const distance = this._computeDistanceToCamera(object3D, camera);
-      const nextLevel = this._computeNextLevel(distance);
+      this._lastComputedDistanceToCamera = distance;
+      const effectiveScale = this._getEffectiveDistanceScale();
+      const scaledDistance = distance / effectiveScale;
+      const nextLevel = this._computeNextLevel(scaledDistance);
       const levelChanged = nextLevel !== this._currentLevel;
 
       if (levelChanged) {
@@ -371,6 +391,22 @@ namespace gdjs {
       this._useBoundingRadius = !!value;
     }
 
+    getDistanceScale(): number {
+      return this._distanceScale;
+    }
+
+    setDistanceScale(value: number): void {
+      this._distanceScale = this._clamp(value, 0.1, 8);
+    }
+
+    getLastDistanceToCamera(): number {
+      return this._lastComputedDistanceToCamera;
+    }
+
+    isCulled(): boolean {
+      return this.getCurrentLevel() >= 3;
+    }
+
     private _clamp(value: number, min: number, max: number): number {
       const numericValue = Number(value);
       if (!Number.isFinite(numericValue)) {
@@ -421,6 +457,62 @@ namespace gdjs {
         return null;
       }
       return layerRenderer.getThreeCamera() as THREE.Camera | null;
+    }
+
+    private _getLightingPipelineState(): LightingPipelineState | null {
+      const runtimeScene = this.owner.getRuntimeScene();
+      if (!runtimeScene) {
+        return null;
+      }
+      const runtimeLayer = runtimeScene.getLayer(this.owner.getLayer());
+      if (!runtimeLayer) {
+        return null;
+      }
+      const layerRenderer = runtimeLayer.getRenderer() as any;
+      if (
+        !layerRenderer ||
+        typeof layerRenderer.getThreeScene !== 'function'
+      ) {
+        return null;
+      }
+      const threeScene = layerRenderer.getThreeScene() as
+        | THREE.Scene
+        | null
+        | undefined;
+      if (!threeScene) {
+        return null;
+      }
+      const state = (threeScene as THREE.Scene & {
+        userData?: { [key: string]: any };
+      }).userData?.[lightingPipelineStateKey] as LightingPipelineState | undefined;
+      return state || null;
+    }
+
+    private _getEffectiveDistanceScale(): number {
+      const pipelineState = this._getLightingPipelineState();
+      let pipelineDistanceScale = 1;
+      if (pipelineState) {
+        pipelineDistanceScale = this._clamp(
+          pipelineState.lodDistanceScale !== undefined
+            ? pipelineState.lodDistanceScale
+            : 1,
+          0.25,
+          4
+        );
+        if (pipelineState.mode === 'baked') {
+          pipelineDistanceScale *= 0.9;
+        } else if (pipelineState.mode === 'hybrid') {
+          const realtimeWeight = this._clamp(
+            pipelineState.realtimeWeight !== undefined
+              ? pipelineState.realtimeWeight
+              : 0.75,
+            0,
+            1
+          );
+          pipelineDistanceScale *= 0.85 + realtimeWeight * 0.3;
+        }
+      }
+      return this._clamp(this._distanceScale * pipelineDistanceScale, 0.1, 16);
     }
 
     private _computeDistanceToCamera(

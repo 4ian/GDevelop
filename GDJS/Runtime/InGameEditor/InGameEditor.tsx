@@ -322,6 +322,12 @@ namespace gdjs {
   const ROTATION_SNAP_DEGREES = 15;
   const SCALE_SNAP_STEP = 0.1;
   const DEFAULT_TRANSLATION_SNAP_STEP = 16;
+  const TRANSLATION_SNAP_STEP_MIN = 0.1;
+  const TRANSLATION_SNAP_STEP_MAX = 4096;
+  const ROTATION_SNAP_DEGREES_MIN = 1;
+  const ROTATION_SNAP_DEGREES_MAX = 180;
+  const SCALE_SNAP_STEP_MIN = 0.01;
+  const SCALE_SNAP_STEP_MAX = 10;
 
   const exceptionallyGetKeyCodeFromLocationAwareKeyCode = (
     locationAwareKeyCode: number
@@ -812,8 +818,17 @@ namespace gdjs {
     private _isRotationSnapEnabled = false;
     private _isScaleSnapEnabled = false;
     private _translationSnapStep = DEFAULT_TRANSLATION_SNAP_STEP;
+    private _isTranslationSnapStepManuallyChanged = false;
     private _rotationSnapDegrees = ROTATION_SNAP_DEGREES;
     private _scaleSnapStep = SCALE_SNAP_STEP;
+    private _lastAppliedTransformControlsSettings: {
+      controls: THREE_ADDONS.TransformControls;
+      mode: 'translate' | 'rotate' | 'scale';
+      space: 'local' | 'world';
+      translationSnap: number | null;
+      rotationSnap: number | null;
+      scaleSnap: number | null;
+    } | null = null;
     private _skipCameraMovementThisFrame = false;
     private _editorGrid: EditorGrid;
     private _selectionControlsMovementTotalDelta: {
@@ -1461,7 +1476,10 @@ namespace gdjs {
       this._instancesEditorSettings = instancesEditorSettings;
       this._isTranslationSnapEnabled = !!instancesEditorSettings.snap;
       this._editorGrid.setSettings(instancesEditorSettings);
-      this._translationSnapStep = this._editorGrid.getSmallestSnapStep();
+      this._setTranslationSnapStep(
+        this._editorGrid.getSmallestSnapStep(),
+        true
+      );
       if (this._selectionControls) {
         this._applyTransformControlsSettings(
           this._selectionControls.threeTransformControls
@@ -1481,7 +1499,12 @@ namespace gdjs {
         this._isTranslationSnapEnabled = !!instancesEditorSettings.snap;
       }
       this._editorGrid.setSettings(instancesEditorSettings);
-      this._translationSnapStep = this._editorGrid.getSmallestSnapStep();
+      if (!this._isTranslationSnapStepManuallyChanged) {
+        this._setTranslationSnapStep(
+          this._editorGrid.getSmallestSnapStep(),
+          true
+        );
+      }
       if (this._selectionControls) {
         this._applyTransformControlsSettings(
           this._selectionControls.threeTransformControls
@@ -2176,6 +2199,9 @@ namespace gdjs {
     }
 
     private _setTransformControlsSpace(space: 'local' | 'world'): void {
+      if (this._transformControlsSpace === space) {
+        return;
+      }
       this._transformControlsSpace = space;
       if (!this._selectionControls) {
         return;
@@ -2195,12 +2221,23 @@ namespace gdjs {
       snapType: 'translation' | 'rotation' | 'scale',
       isEnabled: boolean
     ): void {
+      const normalizedIsEnabled = !!isEnabled;
+      const currentValue =
+        snapType === 'translation'
+          ? this._isTranslationSnapEnabled
+          : snapType === 'rotation'
+            ? this._isRotationSnapEnabled
+            : this._isScaleSnapEnabled;
+      if (currentValue === normalizedIsEnabled) {
+        return;
+      }
+
       if (snapType === 'translation') {
-        this._isTranslationSnapEnabled = isEnabled;
+        this._isTranslationSnapEnabled = normalizedIsEnabled;
       } else if (snapType === 'rotation') {
-        this._isRotationSnapEnabled = isEnabled;
+        this._isRotationSnapEnabled = normalizedIsEnabled;
       } else {
-        this._isScaleSnapEnabled = isEnabled;
+        this._isScaleSnapEnabled = normalizedIsEnabled;
       }
       if (!this._selectionControls) {
         return;
@@ -2231,9 +2268,24 @@ namespace gdjs {
       return Math.round(value * factor) / factor;
     }
 
-    private _setTranslationSnapStep(step: number): void {
-      this._translationSnapStep = this._round(this._clamp(step, 0.1, 4096), 2);
-      if (this._selectionControls) {
+    private _setTranslationSnapStep(step: number, fromGrid = false): void {
+      const nextStep = this._round(
+        this._clamp(step, TRANSLATION_SNAP_STEP_MIN, TRANSLATION_SNAP_STEP_MAX),
+        2
+      );
+      const nextIsManuallyChanged = !fromGrid;
+      const hasStepChanged =
+        Math.abs(nextStep - this._translationSnapStep) > 0.0001;
+      const hasManualFlagChanged =
+        this._isTranslationSnapStepManuallyChanged !== nextIsManuallyChanged;
+
+      if (!hasStepChanged && !hasManualFlagChanged) {
+        return;
+      }
+
+      this._translationSnapStep = nextStep;
+      this._isTranslationSnapStepManuallyChanged = nextIsManuallyChanged;
+      if (hasStepChanged && this._selectionControls) {
         this._applyTransformControlsSettings(
           this._selectionControls.threeTransformControls
         );
@@ -2253,7 +2305,19 @@ namespace gdjs {
     }
 
     private _setRotationSnapDegrees(degrees: number): void {
-      this._rotationSnapDegrees = this._round(this._clamp(degrees, 1, 180), 1);
+      const nextDegrees = this._round(
+        this._clamp(
+          degrees,
+          ROTATION_SNAP_DEGREES_MIN,
+          ROTATION_SNAP_DEGREES_MAX
+        ),
+        1
+      );
+      if (Math.abs(nextDegrees - this._rotationSnapDegrees) <= 0.0001) {
+        return;
+      }
+
+      this._rotationSnapDegrees = nextDegrees;
       if (this._selectionControls) {
         this._applyTransformControlsSettings(
           this._selectionControls.threeTransformControls
@@ -2269,7 +2333,15 @@ namespace gdjs {
     }
 
     private _setScaleSnapStep(step: number): void {
-      this._scaleSnapStep = this._round(this._clamp(step, 0.01, 10), 2);
+      const nextStep = this._round(
+        this._clamp(step, SCALE_SNAP_STEP_MIN, SCALE_SNAP_STEP_MAX),
+        2
+      );
+      if (Math.abs(nextStep - this._scaleSnapStep) <= 0.0001) {
+        return;
+      }
+
+      this._scaleSnapStep = nextStep;
       if (this._selectionControls) {
         this._applyTransformControlsSettings(
           this._selectionControls.threeTransformControls
@@ -2303,52 +2375,92 @@ namespace gdjs {
       threeTransformControls: THREE_ADDONS.TransformControls,
       inputManager?: gdjs.InputManager
     ): void {
-      threeTransformControls.mode = this._transformControlsMode;
-      if (typeof (threeTransformControls as any).setSpace === 'function') {
-        (threeTransformControls as any).setSpace(this._transformControlsSpace);
-      } else {
-        (threeTransformControls as any).space = this._transformControlsSpace;
-      }
-
       const activeInputManager =
         inputManager || this._runtimeGame.getInputManager();
       const shouldSnapRotation = this._isSnapEnabledForCurrentFrame(
         this._isRotationSnapEnabled,
         activeInputManager
       );
-      threeTransformControls.setRotationSnap(
+      const rotationSnap =
         this._transformControlsMode === 'rotate' && shouldSnapRotation
           ? gdjs.toRad(this._rotationSnapDegrees)
-          : null
-      );
+          : null;
 
       const shouldSnapScale = this._isSnapEnabledForCurrentFrame(
         this._isScaleSnapEnabled,
         activeInputManager
       );
-      if (typeof (threeTransformControls as any).setScaleSnap === 'function') {
-        (threeTransformControls as any).setScaleSnap(
-          this._transformControlsMode === 'scale' && shouldSnapScale
-            ? this._scaleSnapStep
-            : null
-        );
-      }
+      const scaleSnap =
+        this._transformControlsMode === 'scale' && shouldSnapScale
+          ? this._scaleSnapStep
+          : null;
 
       const shouldSnapTranslation =
         this._isTranslationSnapEnabledForCurrentFrame(activeInputManager);
       const translationSnapStep = shouldSnapTranslation
         ? this._translationSnapStep
         : null;
+
+      const lastAppliedSettings = this._lastAppliedTransformControlsSettings;
       if (
-        typeof (threeTransformControls as any).setTranslationSnap === 'function'
+        lastAppliedSettings &&
+        lastAppliedSettings.controls === threeTransformControls &&
+        lastAppliedSettings.mode === this._transformControlsMode &&
+        lastAppliedSettings.space === this._transformControlsSpace &&
+        lastAppliedSettings.translationSnap === translationSnapStep &&
+        lastAppliedSettings.rotationSnap === rotationSnap &&
+        lastAppliedSettings.scaleSnap === scaleSnap
       ) {
-        (threeTransformControls as any).setTranslationSnap(translationSnapStep);
+        return;
       }
+
+      const transformControls = threeTransformControls as any;
+      if (typeof transformControls.setMode === 'function') {
+        transformControls.setMode(this._transformControlsMode);
+      } else {
+        threeTransformControls.mode = this._transformControlsMode;
+      }
+
+      if (typeof transformControls.setSpace === 'function') {
+        transformControls.setSpace(this._transformControlsSpace);
+      } else {
+        transformControls.space = this._transformControlsSpace;
+      }
+
+      if (typeof transformControls.setRotationSnap === 'function') {
+        transformControls.setRotationSnap(rotationSnap);
+      } else {
+        transformControls.rotationSnap = rotationSnap;
+      }
+
+      if (typeof transformControls.setScaleSnap === 'function') {
+        transformControls.setScaleSnap(scaleSnap);
+      } else {
+        transformControls.scaleSnap = scaleSnap;
+      }
+
+      if (typeof transformControls.setTranslationSnap === 'function') {
+        transformControls.setTranslationSnap(translationSnapStep);
+      } else {
+        transformControls.translationSnap = translationSnapStep;
+      }
+
+      this._lastAppliedTransformControlsSettings = {
+        controls: threeTransformControls,
+        mode: this._transformControlsMode,
+        space: this._transformControlsSpace,
+        translationSnap: translationSnapStep,
+        rotationSnap,
+        scaleSnap,
+      };
     }
 
     private _setTransformControlsMode(
       mode: 'translate' | 'rotate' | 'scale'
     ): void {
+      if (this._transformControlsMode === mode) {
+        return;
+      }
       this._transformControlsMode = mode;
       if (!this._selectionControls) {
         return;
@@ -2732,6 +2844,7 @@ namespace gdjs {
       this._selectionControls.dummyThreeObject.removeFromParent();
       this._editorGrid.setVisible(false);
       this._selectionControls = null;
+      this._lastAppliedTransformControlsSettings = null;
     }
 
     activate(enable: boolean) {
@@ -3861,11 +3974,18 @@ namespace gdjs {
       spaceButton: HTMLButtonElement;
       spaceButtonLabel: HTMLSpanElement;
       translationSnapButton: HTMLButtonElement;
+      translationSnapDecreaseButton: HTMLButtonElement;
+      translationSnapIncreaseButton: HTMLButtonElement;
       translationSnapValueLabel: HTMLSpanElement;
       rotationSnapButton: HTMLButtonElement;
+      rotationSnapDecreaseButton: HTMLButtonElement;
+      rotationSnapIncreaseButton: HTMLButtonElement;
       rotationSnapValueLabel: HTMLSpanElement;
       scaleSnapButton: HTMLButtonElement;
+      scaleSnapDecreaseButton: HTMLButtonElement;
+      scaleSnapIncreaseButton: HTMLButtonElement;
       scaleSnapValueLabel: HTMLSpanElement;
+      focusButton: HTMLButtonElement;
       freeCameraButton: HTMLButtonElement;
       orbitCameraButton: HTMLButtonElement;
     } | null = null;
@@ -3910,40 +4030,58 @@ namespace gdjs {
 
       styleElement.textContent = `
         .InGameEditor-Toolbar-Centering-Container {
-          position: fixed;
+          position: absolute;
           left: 0;
           right: 0;
+          top: max(4px, env(safe-area-inset-top));
+          z-index: 15;
+          width: 100%;
+          padding: 0 6px;
           display: flex;
           flex-direction: row;
           align-items: center;
           justify-content: center;
-
+          pointer-events: none;
           transition: transform 0.1s ease-in-out;
         }
         .InGameEditor-Toolbar-Container {
-          --in-game-editor-toolbar-icon-size: 20px;
+          --in-game-editor-toolbar-scale: 0.88;
+          --in-game-editor-toolbar-button-size: calc(28px * var(--in-game-editor-toolbar-scale));
+          --in-game-editor-toolbar-icon-size: calc(18px * var(--in-game-editor-toolbar-scale));
+          --in-game-editor-toolbar-step-button-width: calc(17px * var(--in-game-editor-toolbar-scale));
+          --in-game-editor-toolbar-text-button-min-width: calc(38px * var(--in-game-editor-toolbar-scale));
+          --in-game-editor-toolbar-snap-button-min-width: calc(48px * var(--in-game-editor-toolbar-scale));
           position: relative;
-          pointer-events: all;
+          pointer-events: auto;
           display: flex;
           flex-direction: row;
           align-items: center;
           justify-content: center;
-          top: 8px;
-          border-radius: 12px;
-          padding: 6px 10px;
-          gap: 8px;
+          max-width: min(calc(100% - 10px), 1120px);
+          width: fit-content;
+          overflow-x: auto;
+          overflow-y: hidden;
+          scrollbar-width: none;
+          top: 0;
+          border-radius: calc(12px * var(--in-game-editor-toolbar-scale));
+          padding: calc(5px * var(--in-game-editor-toolbar-scale))
+            calc(8px * var(--in-game-editor-toolbar-scale));
+          gap: calc(7px * var(--in-game-editor-toolbar-scale));
           box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+        .InGameEditor-Toolbar-Container::-webkit-scrollbar {
+          display: none;
         }
         .InGameEditor-Toolbar-Group {
           display: flex;
           flex-direction: row;
           align-items: center;
-          gap: 6px;
+          gap: calc(6px * var(--in-game-editor-toolbar-scale));
         }
         .InGameEditor-Toolbar-Group-Label {
           color: var(--in-game-editor-theme-text-color-primary);
           opacity: 0.76;
-          font-size: 10px;
+          font-size: calc(10px * var(--in-game-editor-toolbar-scale));
           font-weight: 700;
           letter-spacing: 0.06em;
           text-transform: uppercase;
@@ -3961,14 +4099,14 @@ namespace gdjs {
             rgba(0, 0, 0, 0.14)
           ), var(--in-game-editor-theme-toolbar-background-color);
           border: 1px solid rgba(255, 255, 255, 0.18);
-          border-radius: 12px;
+          border-radius: calc(12px * var(--in-game-editor-toolbar-scale));
           backdrop-filter: blur(6px);
           z-index: -1;
         }
         .InGameEditor-Toolbar-Button {
-          width: 30px;
-          height: 30px;
-          border-radius: 8px;
+          width: var(--in-game-editor-toolbar-button-size);
+          height: var(--in-game-editor-toolbar-button-size);
+          border-radius: calc(8px * var(--in-game-editor-toolbar-scale));
           border: 1px solid transparent;
           padding: 0;
           display: flex;
@@ -3985,33 +4123,34 @@ namespace gdjs {
         }
         .InGameEditor-Toolbar-Button-Text {
           width: auto;
-          min-width: 40px;
-          padding: 0 8px;
+          min-width: var(--in-game-editor-toolbar-text-button-min-width);
+          padding: 0 calc(8px * var(--in-game-editor-toolbar-scale));
         }
         .InGameEditor-Toolbar-SnapControl {
           display: flex;
           flex-direction: row;
           align-items: center;
-          gap: 2px;
+          gap: calc(2px * var(--in-game-editor-toolbar-scale));
         }
         .InGameEditor-Toolbar-Button-Step {
-          width: 18px;
-          height: 30px;
-          border-radius: 6px;
-          font-size: 11px;
+          width: var(--in-game-editor-toolbar-step-button-width);
+          height: var(--in-game-editor-toolbar-button-size);
+          border-radius: calc(6px * var(--in-game-editor-toolbar-scale));
+          font-size: calc(11px * var(--in-game-editor-toolbar-scale));
           font-weight: 700;
           color: var(--in-game-editor-theme-text-color-primary);
         }
         .InGameEditor-Toolbar-Button-Snap {
-          min-width: 52px;
-          height: 30px;
-          padding: 2px 7px;
+          min-width: var(--in-game-editor-toolbar-snap-button-min-width);
+          height: var(--in-game-editor-toolbar-button-size);
+          padding: calc(2px * var(--in-game-editor-toolbar-scale))
+            calc(7px * var(--in-game-editor-toolbar-scale));
           flex-direction: column;
-          gap: 2px;
+          gap: calc(2px * var(--in-game-editor-toolbar-scale));
         }
         .InGameEditor-Toolbar-Button-Label {
           color: var(--in-game-editor-theme-text-color-primary);
-          font-size: 10px;
+          font-size: calc(10px * var(--in-game-editor-toolbar-scale));
           font-weight: 700;
           letter-spacing: 0.02em;
           text-transform: uppercase;
@@ -4022,7 +4161,7 @@ namespace gdjs {
         }
         .InGameEditor-Toolbar-Button-Value {
           color: var(--in-game-editor-theme-text-color-primary);
-          font-size: 9px;
+          font-size: calc(9px * var(--in-game-editor-toolbar-scale));
           opacity: 0.85;
           font-weight: 700;
           line-height: 1;
@@ -4048,11 +4187,47 @@ namespace gdjs {
           color: var(--in-game-editor-theme-icon-button-selected-color);
           opacity: 1;
         }
+        .InGameEditor-Toolbar-Button:focus-visible {
+          outline: 2px solid rgba(255, 255, 255, 0.85);
+          outline-offset: 1px;
+        }
+        .InGameEditor-Toolbar-Button-Disabled,
+        .InGameEditor-Toolbar-Button:disabled {
+          opacity: 0.45;
+          border-color: transparent;
+          cursor: default;
+          transform: none;
+        }
+        .InGameEditor-Toolbar-Button-Disabled:hover,
+        .InGameEditor-Toolbar-Button:disabled:hover {
+          background-color: transparent;
+        }
         .InGameEditor-Toolbar-Divider {
           width: 1px;
-          height: 28px;
+          height: calc(28px * var(--in-game-editor-toolbar-scale));
           opacity: 0.7;
           background-color: var(--in-game-editor-theme-toolbar-separator-color);
+        }
+        @media (max-width: 1320px) {
+          .InGameEditor-Toolbar-Container {
+            --in-game-editor-toolbar-scale: 0.82;
+          }
+        }
+        @media (max-width: 1080px) {
+          .InGameEditor-Toolbar-Container {
+            --in-game-editor-toolbar-scale: 0.76;
+          }
+        }
+        @media (max-width: 840px) {
+          .InGameEditor-Toolbar-Container {
+            --in-game-editor-toolbar-scale: 0.7;
+          }
+          .InGameEditor-Toolbar-Centering-Container {
+            padding: 0 3px;
+          }
+          .InGameEditor-Toolbar-Group-Label {
+            display: none;
+          }
         }
       `;
     }
@@ -4063,6 +4238,14 @@ namespace gdjs {
         return String(Math.round(value));
       }
       return value.toFixed(2).replace(/\.?0+$/, '');
+    }
+
+    private _setButtonDisabled(
+      button: HTMLButtonElement,
+      disabled: boolean
+    ): void {
+      button.disabled = disabled;
+      button.classList.toggle('InGameEditor-Toolbar-Button-Disabled', disabled);
     }
 
     constructor({
@@ -4301,7 +4484,7 @@ namespace gdjs {
                       class="InGameEditor-Toolbar-Button-Value"
                       id="rotation-snap-value"
                     >
-                      15°
+                      15 deg
                     </span>
                   </button>
                   <button
@@ -4377,29 +4560,100 @@ namespace gdjs {
           translationSnapButton: container.querySelector(
             '#translation-snap-button'
           )!,
+          translationSnapDecreaseButton: container.querySelector(
+            '#translation-snap-decrease-button'
+          )!,
+          translationSnapIncreaseButton: container.querySelector(
+            '#translation-snap-increase-button'
+          )!,
           translationSnapValueLabel: container.querySelector(
             '#translation-snap-value'
           )!,
           rotationSnapButton: container.querySelector('#rotation-snap-button')!,
+          rotationSnapDecreaseButton: container.querySelector(
+            '#rotation-snap-decrease-button'
+          )!,
+          rotationSnapIncreaseButton: container.querySelector(
+            '#rotation-snap-increase-button'
+          )!,
           rotationSnapValueLabel: container.querySelector(
             '#rotation-snap-value'
           )!,
           scaleSnapButton: container.querySelector('#scale-snap-button')!,
+          scaleSnapDecreaseButton: container.querySelector(
+            '#scale-snap-decrease-button'
+          )!,
+          scaleSnapIncreaseButton: container.querySelector(
+            '#scale-snap-increase-button'
+          )!,
           scaleSnapValueLabel: container.querySelector('#scale-snap-value')!,
+          focusButton: container.querySelector('#focus-button')!,
           freeCameraButton: container.querySelector('#free-camera-button')!,
           orbitCameraButton: container.querySelector('#orbit-camera-button')!,
         };
       }
 
-      const displayed = this._hasSelectionControlsShown();
+      const hasSelectionControls = this._hasSelectionControlsShown();
 
-      this._renderedElements.container.tabIndex = displayed ? 0 : -1;
-      this._renderedElements.container.style.transform = displayed
-        ? 'translateY(0)'
-        : 'translateY(-50px)';
+      this._renderedElements.container.tabIndex = 0;
+      this._renderedElements.container.style.transform = 'translateY(0)';
 
       const transformControlsMode = this._getTransformControlsMode();
       const transformControlsSpace = this._getTransformControlsSpace();
+      const translationSnapStep = this._getTranslationSnapStep();
+      const rotationSnapDegrees = this._getRotationSnapDegrees();
+      const scaleSnapStep = this._getScaleSnapStep();
+      const canDecreaseTranslationSnap =
+        translationSnapStep > TRANSLATION_SNAP_STEP_MIN + 0.0001;
+      const canIncreaseTranslationSnap =
+        translationSnapStep < TRANSLATION_SNAP_STEP_MAX - 0.0001;
+      const canDecreaseRotationSnap =
+        rotationSnapDegrees > ROTATION_SNAP_DEGREES_MIN + 0.0001;
+      const canIncreaseRotationSnap =
+        rotationSnapDegrees < ROTATION_SNAP_DEGREES_MAX - 0.0001;
+      const canDecreaseScaleSnap = scaleSnapStep > SCALE_SNAP_STEP_MIN + 0.0001;
+      const canIncreaseScaleSnap = scaleSnapStep < SCALE_SNAP_STEP_MAX - 0.0001;
+
+      this._setButtonDisabled(this._renderedElements.freeCameraButton, false);
+      this._setButtonDisabled(this._renderedElements.orbitCameraButton, false);
+      this._setButtonDisabled(this._renderedElements.moveButton, false);
+      this._setButtonDisabled(this._renderedElements.rotateButton, false);
+      this._setButtonDisabled(this._renderedElements.scaleButton, false);
+      this._setButtonDisabled(this._renderedElements.spaceButton, false);
+      this._setButtonDisabled(
+        this._renderedElements.translationSnapButton,
+        false
+      );
+      this._setButtonDisabled(this._renderedElements.rotationSnapButton, false);
+      this._setButtonDisabled(this._renderedElements.scaleSnapButton, false);
+      this._setButtonDisabled(
+        this._renderedElements.focusButton,
+        !hasSelectionControls
+      );
+      this._setButtonDisabled(
+        this._renderedElements.translationSnapDecreaseButton,
+        !canDecreaseTranslationSnap
+      );
+      this._setButtonDisabled(
+        this._renderedElements.translationSnapIncreaseButton,
+        !canIncreaseTranslationSnap
+      );
+      this._setButtonDisabled(
+        this._renderedElements.rotationSnapDecreaseButton,
+        !canDecreaseRotationSnap
+      );
+      this._setButtonDisabled(
+        this._renderedElements.rotationSnapIncreaseButton,
+        !canIncreaseRotationSnap
+      );
+      this._setButtonDisabled(
+        this._renderedElements.scaleSnapDecreaseButton,
+        !canDecreaseScaleSnap
+      );
+      this._setButtonDisabled(
+        this._renderedElements.scaleSnapIncreaseButton,
+        !canIncreaseScaleSnap
+      );
       this._renderedElements.freeCameraButton.classList.toggle(
         'InGameEditor-Toolbar-Button-Active',
         this._isFreeCamera()
@@ -4438,20 +4692,57 @@ namespace gdjs {
       );
       this._renderedElements.spaceButtonLabel.textContent =
         transformControlsSpace === 'local' ? 'Local' : 'World';
-      const translationSnapText = this._formatSnapValue(
-        this._getTranslationSnapStep()
+      const translationSnapText = this._formatSnapValue(translationSnapStep);
+      const rotationSnapText = this._formatSnapValue(rotationSnapDegrees);
+      const scaleSnapText = this._formatSnapValue(scaleSnapStep);
+      const translationSnapMinText = this._formatSnapValue(
+        TRANSLATION_SNAP_STEP_MIN
       );
-      const rotationSnapText = this._formatSnapValue(
-        this._getRotationSnapDegrees()
+      const translationSnapMaxText = this._formatSnapValue(
+        TRANSLATION_SNAP_STEP_MAX
       );
-      const scaleSnapText = this._formatSnapValue(this._getScaleSnapStep());
+      const rotationSnapMinText = this._formatSnapValue(
+        ROTATION_SNAP_DEGREES_MIN
+      );
+      const rotationSnapMaxText = this._formatSnapValue(
+        ROTATION_SNAP_DEGREES_MAX
+      );
+      const scaleSnapMinText = this._formatSnapValue(SCALE_SNAP_STEP_MIN);
+      const scaleSnapMaxText = this._formatSnapValue(SCALE_SNAP_STEP_MAX);
       this._renderedElements.translationSnapValueLabel.textContent =
         translationSnapText;
-      this._renderedElements.rotationSnapValueLabel.textContent = `${rotationSnapText}°`;
+      this._renderedElements.rotationSnapValueLabel.textContent = `${rotationSnapText} deg`;
       this._renderedElements.scaleSnapValueLabel.textContent = scaleSnapText;
       this._renderedElements.translationSnapButton.title = `Toggle position snap (G) - Step: ${translationSnapText}`;
-      this._renderedElements.rotationSnapButton.title = `Toggle rotation snap (H) - Step: ${rotationSnapText}°`;
+      this._renderedElements.rotationSnapButton.title = `Toggle rotation snap (H) - Step: ${rotationSnapText} deg`;
       this._renderedElements.scaleSnapButton.title = `Toggle scale snap (J) - Step: ${scaleSnapText}`;
+      this._renderedElements.focusButton.title = hasSelectionControls
+        ? 'Focus on selection (F)'
+        : 'Select an object to enable focus';
+      this._renderedElements.translationSnapDecreaseButton.title =
+        canDecreaseTranslationSnap
+          ? `Decrease position snap step (current: ${translationSnapText})`
+          : `Position snap step is already at minimum (${translationSnapMinText})`;
+      this._renderedElements.translationSnapIncreaseButton.title =
+        canIncreaseTranslationSnap
+          ? `Increase position snap step (current: ${translationSnapText})`
+          : `Position snap step is already at maximum (${translationSnapMaxText})`;
+      this._renderedElements.rotationSnapDecreaseButton.title =
+        canDecreaseRotationSnap
+          ? `Decrease rotation snap step (current: ${rotationSnapText} deg)`
+          : `Rotation snap step is already at minimum (${rotationSnapMinText} deg)`;
+      this._renderedElements.rotationSnapIncreaseButton.title =
+        canIncreaseRotationSnap
+          ? `Increase rotation snap step (current: ${rotationSnapText} deg)`
+          : `Rotation snap step is already at maximum (${rotationSnapMaxText} deg)`;
+      this._renderedElements.scaleSnapDecreaseButton.title =
+        canDecreaseScaleSnap
+          ? `Decrease scale snap step (current: ${scaleSnapText})`
+          : `Scale snap step is already at minimum (${scaleSnapMinText})`;
+      this._renderedElements.scaleSnapIncreaseButton.title =
+        canIncreaseScaleSnap
+          ? `Increase scale snap step (current: ${scaleSnapText})`
+          : `Scale snap step is already at maximum (${scaleSnapMaxText})`;
     }
   }
 

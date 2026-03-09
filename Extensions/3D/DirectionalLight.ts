@@ -28,6 +28,8 @@ namespace gdjs {
     fdr?: boolean;
     dro?: number;
     deo?: number;
+    cc?: number;
+    acc?: boolean;
   }
 
   interface LightingPipelineState {
@@ -35,6 +37,7 @@ namespace gdjs {
     realtimeWeight?: number;
     realtimeShadowsOnly?: boolean;
     physicallyCorrectLights?: boolean;
+    shadowQualityScale?: number;
   }
 
   const lightingPipelineStateKey = '__gdScene3dLightingPipelineState';
@@ -85,7 +88,11 @@ namespace gdjs {
 
   const shadowHelper = false;
   const csmCascadeCount = 3;
-  const csmIntensityWeights = [0.5, 0.3, 0.2];
+  const csmIntensityWeightsByCount: { [key: number]: number[] } = {
+    1: [1],
+    2: [0.62, 0.38],
+    3: [0.5, 0.3, 0.2],
+  };
 
   gdjs.PixiFiltersTools.registerFilterCreator(
     'Scene3D::DirectionalLight',
@@ -131,6 +138,10 @@ namespace gdjs {
           private _isEnabled: boolean = false;
           private _pipelineRealtimeMultiplier: float = 1;
           private _pipelineAllowsRealtimeShadows: boolean = true;
+          private _pipelineShadowQualityScale: float = 1;
+          private _desiredCascadeCount: integer = csmCascadeCount;
+          private _adaptiveCascadeCount: boolean = true;
+          private _activeCascadeCount: integer = csmCascadeCount;
 
           private _lights: THREE.DirectionalLight[] = [];
           private _shadowCameraHelpers: Array<THREE.CameraHelper | null> = [];
@@ -169,14 +180,194 @@ namespace gdjs {
                 this._shadowCameraHelpers.push(null);
               }
             }
+            this._top = effectData.stringParameters.top || this._top;
+            this._elevation =
+              effectData.doubleParameters.elevation !== undefined
+                ? effectData.doubleParameters.elevation
+                : this._elevation;
+            this._rotation =
+              effectData.doubleParameters.rotation !== undefined
+                ? effectData.doubleParameters.rotation
+                : this._rotation;
+            this._intensity = Math.max(
+              0,
+              effectData.doubleParameters.intensity !== undefined
+                ? effectData.doubleParameters.intensity
+                : this._intensity
+            );
+            this._distanceFromCamera = Math.max(
+              10,
+              effectData.doubleParameters.distanceFromCamera !== undefined
+                ? effectData.doubleParameters.distanceFromCamera
+                : this._distanceFromCamera
+            );
+            this._frustumSize = Math.max(
+              64,
+              effectData.doubleParameters.frustumSize !== undefined
+                ? effectData.doubleParameters.frustumSize
+                : this._frustumSize
+            );
+            this._maxShadowDistance = Math.max(
+              64,
+              effectData.doubleParameters.maxShadowDistance !== undefined
+                ? effectData.doubleParameters.maxShadowDistance
+                : this._maxShadowDistance
+            );
+            this._minimumShadowBias = Math.max(
+              0,
+              effectData.doubleParameters.minimumShadowBias !== undefined
+                ? effectData.doubleParameters.minimumShadowBias
+                : this._minimumShadowBias
+            );
+            this._shadowNormalBias = Math.max(
+              0,
+              effectData.doubleParameters.shadowNormalBias !== undefined
+                ? effectData.doubleParameters.shadowNormalBias
+                : this._shadowNormalBias
+            );
+            this._shadowRadius = Math.max(
+              0,
+              effectData.doubleParameters.shadowRadius !== undefined
+                ? effectData.doubleParameters.shadowRadius
+                : this._shadowRadius
+            );
+            this._shadowStabilizationStep = Math.max(
+              0,
+              effectData.doubleParameters.shadowStabilizationStep !== undefined
+                ? effectData.doubleParameters.shadowStabilizationStep
+                : this._shadowStabilizationStep
+            );
+            this._cascadeSplitLambda = gdjs.evtTools.common.clamp(
+              0,
+              1,
+              effectData.doubleParameters.cascadeSplitLambda !== undefined
+                ? effectData.doubleParameters.cascadeSplitLambda
+                : this._cascadeSplitLambda
+            );
+            this._shadowFollowLead = gdjs.evtTools.common.clamp(
+              0,
+              2,
+              effectData.doubleParameters.shadowFollowLead !== undefined
+                ? effectData.doubleParameters.shadowFollowLead
+                : this._shadowFollowLead
+            );
+            this._desiredCascadeCount = this._clampCascadeCount(
+              effectData.doubleParameters.cascadeCount !== undefined
+                ? effectData.doubleParameters.cascadeCount
+                : this._desiredCascadeCount
+            );
+            this._adaptiveCascadeCount =
+              effectData.booleanParameters.adaptiveCascadeCount === undefined
+                ? true
+                : !!effectData.booleanParameters.adaptiveCascadeCount;
+            this._shadowCastingEnabled =
+              effectData.booleanParameters.isCastingShadow === undefined
+                ? false
+                : !!effectData.booleanParameters.isCastingShadow;
+            this._shadowStabilizationEnabled =
+              effectData.booleanParameters.shadowStabilization === undefined
+                ? true
+                : !!effectData.booleanParameters.shadowStabilization;
+            this._shadowFollowCamera =
+              effectData.booleanParameters.shadowFollowCamera === undefined
+                ? false
+                : !!effectData.booleanParameters.shadowFollowCamera;
+            this._shadowAutoTuningEnabled =
+              effectData.booleanParameters.shadowAutoTuning === undefined
+                ? true
+                : !!effectData.booleanParameters.shadowAutoTuning;
+
+            this._colorHex = gdjs.rgbOrHexStringToNumber(
+              effectData.stringParameters.color || '255;255;255'
+            );
+            this._attachedObjectName =
+              effectData.stringParameters.attachedObject || '';
+
+            if (effectData.stringParameters.shadowQuality) {
+              this._applyShadowQualityPreset(
+                effectData.stringParameters.shadowQuality
+              );
+            } else if (effectData.doubleParameters.shadowMapSize !== undefined) {
+              this._shadowMapSize = this._getClosestShadowMapSize(
+                effectData.doubleParameters.shadowMapSize
+              );
+            }
+
+            this._refreshActiveCascadeCount();
             this._setAllLightsColor(this._colorHex);
             this._setAllLightsIntensity(this._intensity);
+            this._setShadowCastingEnabled(this._shadowCastingEnabled);
             this._updateShadowCameraDirtyState();
           }
 
           private _updateShadowCameraDirtyState(): void {
             this._shadowCameraDirty = true;
             this._shadowMapDirty = true;
+          }
+
+          private _clampCascadeCount(value: number): integer {
+            return Math.max(
+              1,
+              Math.min(csmCascadeCount, Math.round(Number(value) || 0))
+            );
+          }
+
+          private _getCascadeIntensityWeights(count: integer): number[] {
+            const clampedCount = this._clampCascadeCount(count);
+            const weights =
+              csmIntensityWeightsByCount[clampedCount] ||
+              csmIntensityWeightsByCount[csmCascadeCount];
+            if (!weights || weights.length === 0) {
+              return [1];
+            }
+            return weights;
+          }
+
+          private _computeEffectiveCascadeCount(): integer {
+            let targetCascadeCount = this._clampCascadeCount(
+              this._desiredCascadeCount
+            );
+            if (!this._adaptiveCascadeCount) {
+              return targetCascadeCount;
+            }
+
+            if (this._pipelineRealtimeMultiplier < 0.35) {
+              targetCascadeCount = Math.min(targetCascadeCount, 1);
+            } else if (this._pipelineRealtimeMultiplier < 0.68) {
+              targetCascadeCount = Math.min(targetCascadeCount, 2);
+            }
+
+            if (this._maxShadowDistance < 900) {
+              targetCascadeCount = Math.min(targetCascadeCount, 1);
+            } else if (this._maxShadowDistance < 1700) {
+              targetCascadeCount = Math.min(targetCascadeCount, 2);
+            }
+
+            return this._clampCascadeCount(targetCascadeCount);
+          }
+
+          private _refreshActiveCascadeCount(): void {
+            const nextCascadeCount = this._computeEffectiveCascadeCount();
+            if (nextCascadeCount === this._activeCascadeCount) {
+              return;
+            }
+            this._activeCascadeCount = nextCascadeCount;
+            this._updateShadowCameraDirtyState();
+          }
+
+          private _applyShadowQualityPreset(quality: string): void {
+            if (quality === 'low') {
+              this._shadowMapSize = this._getClosestShadowMapSize(512);
+              this._desiredCascadeCount = 1;
+            } else if (quality === 'medium') {
+              this._shadowMapSize = this._getClosestShadowMapSize(1024);
+              this._desiredCascadeCount = 2;
+            } else if (quality === 'high') {
+              this._shadowMapSize = this._getClosestShadowMapSize(2048);
+              this._desiredCascadeCount = 3;
+            }
+            this._refreshActiveCascadeCount();
+            this._updateShadowCameraDirtyState();
           }
 
           private _setAllLightsColor(colorHex: number): void {
@@ -188,13 +379,19 @@ namespace gdjs {
 
           private _setAllLightsIntensity(intensity: float): void {
             this._intensity = Math.max(0, intensity);
+            const weights = this._getCascadeIntensityWeights(
+              this._activeCascadeCount
+            );
             for (let i = 0; i < this._lights.length; i++) {
+              const isCascadeActive = i < this._activeCascadeCount;
               const weight =
-                csmIntensityWeights[i] !== undefined
-                  ? csmIntensityWeights[i]
-                  : 1 / csmCascadeCount;
+                isCascadeActive && weights[i] !== undefined
+                  ? weights[i]
+                  : 0;
               this._lights[i].intensity =
                 this._intensity * this._pipelineRealtimeMultiplier * weight;
+              this._lights[i].visible = isCascadeActive;
+              this._lights[i].target.visible = isCascadeActive;
             }
           }
 
@@ -205,8 +402,9 @@ namespace gdjs {
             this._shadowCastingEnabled = enabled;
             const shouldCastShadow =
               enabled && this._pipelineAllowsRealtimeShadows;
-            for (const light of this._lights) {
-              light.castShadow = shouldCastShadow;
+            for (let i = 0; i < this._lights.length; i++) {
+              const light = this._lights[i];
+              light.castShadow = shouldCastShadow && i < this._activeCascadeCount;
               if (shouldCastShadow) {
                 light.shadow.needsUpdate = true;
               }
@@ -245,7 +443,30 @@ namespace gdjs {
           }
 
           private _computeCascadeMapSize(cascadeIndex: integer): integer {
-            const baseSize = this._getClosestShadowMapSize(this._shadowMapSize);
+            const baseSize = this._getClosestShadowMapSize(
+              this._shadowMapSize * this._pipelineShadowQualityScale
+            );
+            if (this._activeCascadeCount <= 1) {
+              if (cascadeIndex === 0) {
+                return this._clampShadowMapSizeToRenderer(baseSize * 2);
+              }
+              return this._clampShadowMapSizeToRenderer(
+                Math.max(512, Math.floor(baseSize / 2))
+              );
+            }
+            if (this._activeCascadeCount === 2) {
+              if (cascadeIndex === 0) {
+                return this._clampShadowMapSizeToRenderer(
+                  Math.floor(baseSize * 1.75)
+                );
+              }
+              if (cascadeIndex === 1) {
+                return this._clampShadowMapSizeToRenderer(baseSize);
+              }
+              return this._clampShadowMapSizeToRenderer(
+                Math.max(512, Math.floor(baseSize / 2))
+              );
+            }
             if (cascadeIndex === 0) {
               return this._clampShadowMapSizeToRenderer(baseSize * 2);
             }
@@ -290,33 +511,44 @@ namespace gdjs {
               cameraNear + 1,
               Math.min(this._maxShadowDistance, cameraFar)
             );
+            let previousSplit = cameraNear;
+            for (
+              let cascadeIndex = 0;
+              cascadeIndex < this._activeCascadeCount;
+              cascadeIndex++
+            ) {
+              const splitFactor = (cascadeIndex + 1) / this._activeCascadeCount;
+              const computedSplit =
+                cascadeIndex === this._activeCascadeCount - 1
+                  ? safeMaxShadowDistance
+                  : this._computePracticalSplit(
+                      splitFactor,
+                      cameraNear,
+                      safeMaxShadowDistance
+                    );
+              const minimumSplit = previousSplit + 0.01;
+              const remainingCascades =
+                this._activeCascadeCount - cascadeIndex - 1;
+              const maximumSplit =
+                safeMaxShadowDistance - Math.max(0, remainingCascades) * 0.01;
+              const safeSplit = Math.max(
+                minimumSplit,
+                Math.min(maximumSplit, computedSplit)
+              );
+              this._cascadeRanges[cascadeIndex].near =
+                cascadeIndex === 0 ? cameraNear : previousSplit;
+              this._cascadeRanges[cascadeIndex].far = safeSplit;
+              previousSplit = safeSplit;
+            }
 
-            const practicalSplit1 = this._computePracticalSplit(
-              1 / csmCascadeCount,
-              cameraNear,
-              safeMaxShadowDistance
-            );
-            const practicalSplit2 = this._computePracticalSplit(
-              2 / csmCascadeCount,
-              cameraNear,
-              safeMaxShadowDistance
-            );
-
-            const safeSplit1 = Math.max(
-              cameraNear + 0.01,
-              Math.min(safeMaxShadowDistance - 0.02, practicalSplit1)
-            );
-            const safeSplit2 = Math.max(
-              safeSplit1 + 0.01,
-              Math.min(safeMaxShadowDistance - 0.01, practicalSplit2)
-            );
-
-            this._cascadeRanges[0].near = cameraNear;
-            this._cascadeRanges[0].far = safeSplit1;
-            this._cascadeRanges[1].near = safeSplit1;
-            this._cascadeRanges[1].far = safeSplit2;
-            this._cascadeRanges[2].near = safeSplit2;
-            this._cascadeRanges[2].far = safeMaxShadowDistance;
+            for (
+              let cascadeIndex = this._activeCascadeCount;
+              cascadeIndex < csmCascadeCount;
+              cascadeIndex++
+            ) {
+              this._cascadeRanges[cascadeIndex].near = safeMaxShadowDistance;
+              this._cascadeRanges[cascadeIndex].far = safeMaxShadowDistance;
+            }
           }
 
           private _computeCascadeFrustumSize(
@@ -344,8 +576,15 @@ namespace gdjs {
 
             // Keep compatibility with the legacy "frustumSize" parameter as a global multiplier.
             const frustumScale = Math.max(0.25, this._frustumSize / 4000);
-            const cascadeScale =
-              cascadeIndex === 0 ? 0.85 : cascadeIndex === 1 ? 1 : 1.2;
+            let cascadeScale = 1;
+            if (this._activeCascadeCount === 1) {
+              cascadeScale = 1;
+            } else if (this._activeCascadeCount === 2) {
+              cascadeScale = cascadeIndex === 0 ? 0.88 : 1.12;
+            } else {
+              cascadeScale =
+                cascadeIndex === 0 ? 0.85 : cascadeIndex === 1 ? 1 : 1.2;
+            }
 
             return Math.max(
               64,
@@ -376,7 +615,7 @@ namespace gdjs {
 
             for (
               let cascadeIndex = 0;
-              cascadeIndex < this._lights.length;
+              cascadeIndex < this._activeCascadeCount;
               cascadeIndex++
             ) {
               const light = this._lights[cascadeIndex];
@@ -406,6 +645,14 @@ namespace gdjs {
               light.shadow.camera.updateProjectionMatrix();
               light.shadow.needsUpdate = true;
             }
+
+            for (
+              let cascadeIndex = this._activeCascadeCount;
+              cascadeIndex < this._lights.length;
+              cascadeIndex++
+            ) {
+              this._cascadeFrustumSizes[cascadeIndex] = 64;
+            }
           }
 
           private _updateShadowMapSize(): void {
@@ -416,7 +663,7 @@ namespace gdjs {
 
             for (
               let cascadeIndex = 0;
-              cascadeIndex < this._lights.length;
+              cascadeIndex < this._activeCascadeCount;
               cascadeIndex++
             ) {
               const light = this._lights[cascadeIndex];
@@ -429,6 +676,14 @@ namespace gdjs {
               light.shadow.map?.dispose();
               light.shadow.map = null;
               light.shadow.needsUpdate = true;
+            }
+
+            for (
+              let cascadeIndex = this._activeCascadeCount;
+              cascadeIndex < this._lights.length;
+              cascadeIndex++
+            ) {
+              this._cascadeMapSizes[cascadeIndex] = 512;
             }
           }
 
@@ -942,10 +1197,16 @@ namespace gdjs {
             threeRenderer.shadowMap.enabled = true;
             threeRenderer.shadowMap.autoUpdate = true;
             // `radius` has effect with PCFShadowMap, while PCFSoftShadowMap gives built-in soft filtering.
-            threeRenderer.shadowMap.type =
+            const preferredShadowType =
               this._shadowRadius > 1
                 ? THREE.PCFShadowMap
                 : THREE.PCFSoftShadowMap;
+            if (
+              preferredShadowType === THREE.PCFShadowMap ||
+              threeRenderer.shadowMap.type !== THREE.PCFShadowMap
+            ) {
+              threeRenderer.shadowMap.type = preferredShadowType;
+            }
           }
 
           private _applyLightingPipeline(target: gdjs.EffectsTarget): void {
@@ -956,18 +1217,49 @@ namespace gdjs {
             const pipelineState = getLightingPipelineState(scene);
             this._pipelineRealtimeMultiplier =
               getRealtimeLightingMultiplier(pipelineState);
+            let targetShadowQualityScale = 1;
+            if (pipelineState) {
+              const baseScale = Math.max(
+                0.35,
+                Math.min(2, pipelineState.shadowQualityScale ?? 1)
+              );
+              if (pipelineState.mode === 'baked') {
+                targetShadowQualityScale = baseScale * 0.45;
+              } else if (pipelineState.mode === 'hybrid') {
+                targetShadowQualityScale =
+                  baseScale * (0.6 + 0.4 * this._pipelineRealtimeMultiplier);
+              } else {
+                targetShadowQualityScale = baseScale;
+              }
+            }
+            targetShadowQualityScale = Math.max(
+              0.35,
+              Math.min(2, targetShadowQualityScale)
+            );
+            if (
+              Math.abs(targetShadowQualityScale - this._pipelineShadowQualityScale) >
+              0.001
+            ) {
+              this._pipelineShadowQualityScale = targetShadowQualityScale;
+              this._shadowMapDirty = true;
+            }
             this._pipelineAllowsRealtimeShadows = shouldUseRealtimeShadows(
               pipelineState,
               this._pipelineRealtimeMultiplier
             );
+            this._refreshActiveCascadeCount();
             this._setAllLightsIntensity(this._intensity);
 
             const shouldCastShadow =
               this._shadowCastingEnabled && this._pipelineAllowsRealtimeShadows;
-            for (const light of this._lights) {
-              if (light.castShadow !== shouldCastShadow) {
-                light.castShadow = shouldCastShadow;
-                if (shouldCastShadow) {
+            for (let i = 0; i < this._lights.length; i++) {
+              const light = this._lights[i];
+              const isCascadeActive = i < this._activeCascadeCount;
+              const shouldCascadeCastShadow =
+                shouldCastShadow && isCascadeActive;
+              if (light.castShadow !== shouldCascadeCastShadow) {
+                light.castShadow = shouldCascadeCastShadow;
+                if (shouldCascadeCastShadow) {
                   light.shadow.needsUpdate = true;
                 }
               }
@@ -1097,7 +1389,7 @@ namespace gdjs {
 
             for (
               let cascadeIndex = 0;
-              cascadeIndex < this._lights.length;
+              cascadeIndex < this._activeCascadeCount;
               cascadeIndex++
             ) {
               const light = this._lights[cascadeIndex];
@@ -1171,9 +1463,15 @@ namespace gdjs {
               this._shadowStabilizationStep = Math.max(0, value);
             } else if (parameterName === 'maxShadowDistance') {
               this._maxShadowDistance = Math.max(64, value);
+              this._refreshActiveCascadeCount();
               this._shadowCameraDirty = true;
             } else if (parameterName === 'cascadeSplitLambda') {
               this._cascadeSplitLambda = Math.max(0, Math.min(1, value));
+              this._shadowCameraDirty = true;
+            } else if (parameterName === 'cascadeCount') {
+              this._desiredCascadeCount = this._clampCascadeCount(value);
+              this._refreshActiveCascadeCount();
+              this._shadowMapDirty = true;
               this._shadowCameraDirty = true;
             } else if (parameterName === 'shadowMapSize') {
               this._shadowMapSize = this._getClosestShadowMapSize(value);
@@ -1216,6 +1514,8 @@ namespace gdjs {
               return this._maxShadowDistance;
             } else if (parameterName === 'cascadeSplitLambda') {
               return this._cascadeSplitLambda;
+            } else if (parameterName === 'cascadeCount') {
+              return this._desiredCascadeCount;
             } else if (parameterName === 'shadowMapSize') {
               return this._shadowMapSize;
             } else if (parameterName === 'shadowFollowLead') {
@@ -1236,21 +1536,7 @@ namespace gdjs {
               this._staticAnchorInitialized = false;
             }
             if (parameterName === 'shadowQuality') {
-              if (value === 'low' && this._shadowMapSize !== 512) {
-                this._shadowMapSize = this._getClosestShadowMapSize(512);
-                this._shadowMapDirty = true;
-                this._shadowCameraDirty = true;
-              }
-              if (value === 'medium' && this._shadowMapSize !== 1024) {
-                this._shadowMapSize = this._getClosestShadowMapSize(1024);
-                this._shadowMapDirty = true;
-                this._shadowCameraDirty = true;
-              }
-              if (value === 'high' && this._shadowMapSize !== 2048) {
-                this._shadowMapSize = this._getClosestShadowMapSize(2048);
-                this._shadowMapDirty = true;
-                this._shadowCameraDirty = true;
-              }
+              this._applyShadowQualityPreset(value);
             }
             if (parameterName === 'shadowMapSize') {
               const parsedValue = parseFloat(value);
@@ -1294,6 +1580,11 @@ namespace gdjs {
               this._staticAnchorInitialized = false;
             } else if (parameterName === 'shadowAutoTuning') {
               this._shadowAutoTuningEnabled = value;
+            } else if (parameterName === 'adaptiveCascadeCount') {
+              this._adaptiveCascadeCount = value;
+              this._refreshActiveCascadeCount();
+              this._shadowMapDirty = true;
+              this._shadowCameraDirty = true;
             }
           }
           getNetworkSyncData(): DirectionalLightFilterNetworkSyncData {
@@ -1326,6 +1617,8 @@ namespace gdjs {
               fdr: this._followDirectionWithAttachedObjectRotation3D,
               dro: this._directionRotationOffset,
               deo: this._directionElevationOffset,
+              cc: this._desiredCascadeCount,
+              acc: this._adaptiveCascadeCount,
             };
           }
           updateFromNetworkSyncData(
@@ -1368,6 +1661,11 @@ namespace gdjs {
               syncData.fdr ?? false;
             this._directionRotationOffset = syncData.dro ?? 0;
             this._directionElevationOffset = syncData.deo ?? 0;
+            this._desiredCascadeCount = this._clampCascadeCount(
+              syncData.cc ?? csmCascadeCount
+            );
+            this._adaptiveCascadeCount = syncData.acc ?? true;
+            this._refreshActiveCascadeCount();
             this._hadPreviousCameraPosition = false;
             this._staticAnchorInitialized = false;
             this._shadowMapDirty = true;

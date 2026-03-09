@@ -1144,6 +1144,9 @@ module.exports = {
         if (!behaviorContent.hasChild('useBoundingRadius')) {
           behaviorContent.addChild('useBoundingRadius').setBoolValue(true);
         }
+        if (!behaviorContent.hasChild('distanceScale')) {
+          behaviorContent.addChild('distanceScale').setDoubleValue(1);
+        }
       };
 
       const clampNumber = function (value, min, max) {
@@ -1261,6 +1264,12 @@ module.exports = {
           behaviorContent
             .getChild('useBoundingRadius')
             .setBoolValue(newValue === '1' || newValue === 'true');
+          return true;
+        }
+        if (propertyName === 'distanceScale') {
+          behaviorContent
+            .getChild('distanceScale')
+            .setDoubleValue(clampNumber(newValue, 0.1, 8));
           return true;
         }
 
@@ -1429,6 +1438,20 @@ module.exports = {
           .setGroup(_('Advanced'))
           .setAdvanced(true);
         behaviorProperties
+          .getOrCreate('distanceScale')
+          .setValue(
+            behaviorContent.getChild('distanceScale').getDoubleValue().toString()
+          )
+          .setType('number')
+          .setLabel(_('Distance scale'))
+          .setDescription(
+            _(
+              'Per-object LOD distance multiplier. Values > 1 keep higher detail farther away.'
+            )
+          )
+          .setGroup(_('Advanced'))
+          .setAdvanced(true);
+        behaviorProperties
           .getOrCreate('forceLevel')
           .setValue(
             behaviorContent.getChild('forceLevel').getDoubleValue().toString()
@@ -1459,6 +1482,7 @@ module.exports = {
         behaviorContent.addChild('forceLevel').setDoubleValue(-1);
         behaviorContent.addChild('modelSwitchCooldownMs').setDoubleValue(250);
         behaviorContent.addChild('useBoundingRadius').setBoolValue(true);
+        behaviorContent.addChild('distanceScale').setDoubleValue(1);
       };
 
       const lod = extension
@@ -1524,6 +1548,40 @@ module.exports = {
           gd.ParameterOptions.makeNewOptions()
         )
         .setFunctionName('getCurrentLevel');
+
+      lod
+        .addScopedCondition(
+          'IsCulled',
+          _('LOD is culled'),
+          _('Check if this object is currently culled by LOD.'),
+          _('LOD culls _PARAM0_'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .setFunctionName('isCulled');
+
+      lod
+        .addExpressionAndCondition(
+          'number',
+          'DistanceToCamera',
+          _('Distance to camera'),
+          _('the last computed object-to-camera distance'),
+          _('the distance to camera'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Distance in scene units from object center to active 3D camera.')
+          )
+        )
+        .setFunctionName('getLastDistanceToCamera');
 
       lod
         .addExpressionAndConditionAndAction(
@@ -1633,6 +1691,29 @@ module.exports = {
       lod
         .addExpressionAndConditionAndAction(
           'number',
+          'DistanceScale',
+          _('Distance scale'),
+          _('the per-object LOD distance scale'),
+          _('the LOD distance scale'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _(
+              'Per-object LOD distance multiplier. Values > 1 keep higher detail farther away.'
+            )
+          )
+        )
+        .setFunctionName('setDistanceScale')
+        .setGetter('getDistanceScale');
+
+      lod
+        .addExpressionAndConditionAndAction(
+          'number',
           'LOD1AnimationSpeed',
           _('LOD1 animation speed'),
           _('the animation speed multiplier in LOD1'),
@@ -1661,6 +1742,66 @@ module.exports = {
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
         .setFunctionName('setLod2AnimationSpeed')
         .setGetter('getLod2AnimationSpeed');
+
+      lod
+        .addScopedAction(
+          'SetLod1CastShadows',
+          _('Set LOD1 cast shadows'),
+          _('Enable or disable shadow casting at LOD1.'),
+          _('Set LOD1 cast shadows of _PARAM0_ to _PARAM2_'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .addParameter('yesorno', _('Enabled'))
+        .setFunctionName('setLod1CastShadows');
+
+      lod
+        .addScopedAction(
+          'SetLod2CastShadows',
+          _('Set LOD2 cast shadows'),
+          _('Enable or disable shadow casting at LOD2.'),
+          _('Set LOD2 cast shadows of _PARAM0_ to _PARAM2_'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .addParameter('yesorno', _('Enabled'))
+        .setFunctionName('setLod2CastShadows');
+
+      lod
+        .addScopedAction(
+          'SetLod1ReceiveShadows',
+          _('Set LOD1 receive shadows'),
+          _('Enable or disable shadow receiving at LOD1.'),
+          _('Set LOD1 receive shadows of _PARAM0_ to _PARAM2_'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .addParameter('yesorno', _('Enabled'))
+        .setFunctionName('setLod1ReceiveShadows');
+
+      lod
+        .addScopedAction(
+          'SetLod2ReceiveShadows',
+          _('Set LOD2 receive shadows'),
+          _('Enable or disable shadow receiving at LOD2.'),
+          _('Set LOD2 receive shadows of _PARAM0_ to _PARAM2_'),
+          _('3D LOD'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'LOD')
+        .addParameter('yesorno', _('Enabled'))
+        .setFunctionName('setLod2ReceiveShadows');
 
       lod
         .addExpressionAndConditionAndAction(
@@ -1763,6 +1904,7 @@ module.exports = {
         .addDefaultBehavior('FlippableCapability::FlippableBehavior')
         .addDefaultBehavior('AnimatableCapability::AnimatableBehavior')
         .addDefaultBehavior('Scene3D::Base3DBehavior')
+        .addDefaultBehavior('Scene3D::LOD')
         .markAsRenderedIn3D()
         .setIncludeFile('Extensions/3D/A_RuntimeObject3D.js')
         .addIncludeFile('Extensions/3D/A_RuntimeObject3DRenderer.js')
@@ -2714,6 +2856,7 @@ module.exports = {
       .addDefaultBehavior('ScalableCapability::ScalableBehavior')
       .addDefaultBehavior('FlippableCapability::FlippableBehavior')
       .addDefaultBehavior('Scene3D::Base3DBehavior')
+      .addDefaultBehavior('Scene3D::LOD')
       .markAsRenderedIn3D()
       .setIncludeFile('Extensions/3D/A_RuntimeObject3D.js')
       .addIncludeFile('Extensions/3D/A_RuntimeObject3DRenderer.js')
@@ -3593,6 +3736,30 @@ module.exports = {
         .setGroup(_('Attenuation'))
         .setAdvanced(true);
       properties
+        .getOrCreate('shadowQualityScale')
+        .setValue('1')
+        .setLabel(_('Shadow quality scale'))
+        .setDescription(
+          _(
+            'Global multiplier for realtime shadow-map quality across Directional, Spot, and Point lights.'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Performance'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('lodDistanceScale')
+        .setValue('1')
+        .setLabel(_('LOD distance scale'))
+        .setDescription(
+          _(
+            'Global multiplier for LOD distances. Values > 1 keep higher detail farther from camera.'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Performance'))
+        .setAdvanced(true);
+      properties
         .getOrCreate('realtimeShadowsOnly')
         .setValue('true')
         .setLabel(_('Disable shadows in baked mode'))
@@ -3793,6 +3960,30 @@ module.exports = {
         .setGroup(_('Shadows'))
         .setAdvanced(true);
       properties
+        .getOrCreate('cascadeCount')
+        .setValue('3')
+        .setLabel(_('Cascade count'))
+        .setDescription(
+          _(
+            'Maximum number of cascades for directional shadows (1 to 3). Higher values improve detail but cost more.'
+          )
+        )
+        .setType('number')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('adaptiveCascadeCount')
+        .setValue('true')
+        .setLabel(_('Adaptive cascade count'))
+        .setDescription(
+          _(
+            'Automatically reduces active cascades when realtime lighting contribution is low to improve performance.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
         .getOrCreate('shadowFollowLead')
         .setValue('0.45')
         .setLabel(_('Shadow follow lead'))
@@ -3810,6 +4001,18 @@ module.exports = {
         .setLabel(_("Distance from layer's camera"))
         .setType('number')
         .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
+      properties
+        .getOrCreate('shadowAutoTuning')
+        .setValue('true')
+        .setLabel(_('Auto shadow tuning'))
+        .setDescription(
+          _(
+            'Automatically adjusts directional shadow bias/normal-bias per cascade for cleaner and more stable results.'
+          )
+        )
+        .setType('boolean')
         .setGroup(_('Shadows'))
         .setAdvanced(true);
     }
@@ -4098,6 +4301,18 @@ module.exports = {
         .setDescription(_('Softness radius for point-light shadow filtering.'))
         .setType('number')
         .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowAutoTuning')
+        .setValue('true')
+        .setLabel(_('Auto shadow tuning'))
+        .setDescription(
+          _(
+            'Automatically adjusts point-light shadow bias to reduce acne and peter-panning artifacts.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
       properties
         .getOrCreate('shadowNear')
         .setValue('1')
@@ -4398,6 +4613,18 @@ module.exports = {
         .setDescription(_('Softness radius for spot-light shadow filtering.'))
         .setType('number')
         .setGroup(_('Shadows'));
+      properties
+        .getOrCreate('shadowAutoTuning')
+        .setValue('true')
+        .setLabel(_('Auto shadow tuning'))
+        .setDescription(
+          _(
+            'Automatically adjusts spot-light shadow bias and normal-bias for cleaner contact shadows.'
+          )
+        )
+        .setType('boolean')
+        .setGroup(_('Shadows'))
+        .setAdvanced(true);
       properties
         .getOrCreate('shadowNear')
         .setValue('1')

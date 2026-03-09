@@ -840,6 +840,19 @@ gd::String PlatformExtension::GetObjectNameFromFullObjectType(
   return type.substr(separatorIndex + 2);
 }
 
+gd::String PlatformExtension::GetInstructionNameFromFullType(
+    const gd::String& type) {
+  const auto separatorPosition =
+      type.rfind(PlatformExtension::GetNamespaceSeparator());
+  if (separatorPosition == gd::String::npos) {
+    return type;
+  }
+  if (separatorPosition + 2 >= type.size()) {
+    return type;
+  }
+  return type.substr(separatorPosition + 2);
+}
+
 PlatformExtension::PlatformExtension()
     : deprecated(false), category("General") {}
 

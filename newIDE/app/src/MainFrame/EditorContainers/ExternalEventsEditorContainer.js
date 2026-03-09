@@ -33,6 +33,7 @@ import {
 } from '../../EmbeddedGame/EmbeddedGameFrame';
 import Background from '../../UI/Background';
 import type { EventPath } from '../../Utils/EventPath';
+import type { SearchFilterParams } from '../../Utils/Search';
 
 const styles = {
   container: {
@@ -103,14 +104,14 @@ export class ExternalEventsEditorContainer extends React.Component<
     eventPaths: Array<EventPath>,
     focusedEventPath: EventPath,
     searchText: string,
-    matchCase: boolean
+    searchFilters?: SearchFilterParams
   ) {
     if (this.editor) {
       this.editor.setGlobalSearchResults(
         eventPaths,
         focusedEventPath,
         searchText,
-        matchCase
+        searchFilters
       );
     }
   }

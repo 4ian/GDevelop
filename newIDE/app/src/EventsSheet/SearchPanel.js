@@ -33,6 +33,16 @@ import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 
 type SearchTypeTab = 'search-and-replace' | 'search-in-event-sentences';
 
+export type InitialSearchFilterParams = {|
+  initialSearchText?: string,
+  initialMatchCase?: boolean,
+  initialTab?: SearchTypeTab,
+  initialSearchInConditions?: boolean,
+  initialSearchInActions?: boolean,
+  initialSearchInEventStrings?: boolean,
+  initialSearchInInstructionNames?: boolean,
+|};
+
 type Props = {|
   onSearchInEvents: SearchInEventsInputs => void,
   onReplaceInEvents: ReplaceInEventsInputs => void,
@@ -42,9 +52,7 @@ type Props = {|
   onGoToPreviousSearchResult: () => ?gdBaseEvent,
   onGoToNextSearchResult: () => ?gdBaseEvent,
   searchFocusOffset: ?number,
-  initialSearchText?: string,
-  initialMatchCase?: boolean,
-  initialTab?: SearchTypeTab,
+  initialSearchFilterParams: InitialSearchFilterParams,
 |};
 
 export type SearchPanelInterface = {|
@@ -63,13 +71,20 @@ const SearchPanel = (
     onGoToPreviousSearchResult,
     onGoToNextSearchResult,
     searchFocusOffset,
-    initialSearchText,
-    initialMatchCase,
-    initialTab,
+    initialSearchFilterParams,
   }: Props,
   // $FlowFixMe[missing-local-annot]
   ref
 ) => {
+  const {
+    initialSearchText,
+    initialMatchCase,
+    initialTab,
+    initialSearchInConditions,
+    initialSearchInActions,
+    initialSearchInEventStrings,
+    initialSearchInInstructionNames,
+  } = initialSearchFilterParams;
   const { isMobile } = useResponsiveWindowSize();
   const searchTextField = React.useRef<?TextFieldInterface>(null);
   const replaceTextField = React.useRef<?TextFieldInterface>(null);
@@ -85,6 +100,10 @@ const SearchPanel = (
     searchInEventStrings,
     setSearchInEventStrings,
   ] = React.useState<boolean>(true);
+  const [
+    searchInInstructionNames,
+    setSearchInInstructionNames,
+  ] = React.useState<boolean>(false);
   // eslint-disable-next-line no-unused-vars
   const [searchInSelection, setSearchInSelection] = React.useState<boolean>(
     false
@@ -131,6 +150,7 @@ const SearchPanel = (
       searchInActions,
       searchInConditions,
       searchInEventStrings,
+      searchInInstructionNames,
       matchCase,
     ]
   );
@@ -156,19 +176,42 @@ const SearchPanel = (
       if (initialTab !== undefined) {
         setCurrentTab(initialTab);
       }
+      if (initialSearchInConditions !== undefined) {
+        setSearchInConditions(initialSearchInConditions);
+      }
+      if (initialSearchInActions !== undefined) {
+        setSearchInActions(initialSearchInActions);
+      }
+      if (initialSearchInEventStrings !== undefined) {
+        setSearchInEventStrings(initialSearchInEventStrings);
+      }
+      if (initialSearchInInstructionNames !== undefined) {
+        setSearchInInstructionNames(initialSearchInInstructionNames);
+      }
     },
-    [initialSearchText, initialMatchCase, initialTab]
+    [
+      initialSearchText,
+      initialMatchCase,
+      initialTab,
+      initialSearchInConditions,
+      initialSearchInActions,
+      initialSearchInEventStrings,
+      initialSearchInInstructionNames,
+    ]
   );
 
   const launchSearch = () => {
     onSearchInEvents({
       searchInSelection,
       searchText,
-      matchCase,
-      searchInActions,
-      searchInConditions,
-      searchInEventStrings,
-      searchInEventSentences: !isSearchAndReplaceTab(),
+      searchFilterParams: {
+        matchCase,
+        searchInActions,
+        searchInConditions,
+        searchInEventStrings,
+        searchInInstructionNames,
+        searchInEventSentences: !isSearchAndReplaceTab(),
+      },
     });
   };
 
@@ -373,6 +416,13 @@ const SearchPanel = (
                       checked: searchInEventStrings,
                       click: () =>
                         setSearchInEventStrings(!searchInEventStrings),
+                    },
+                    {
+                      type: 'checkbox',
+                      label: i18n._(t`Internal instruction names`),
+                      checked: searchInInstructionNames,
+                      click: () =>
+                        setSearchInInstructionNames(!searchInInstructionNames),
                     },
                   ]}
                 />

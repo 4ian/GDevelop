@@ -126,6 +126,8 @@ import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariab
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { useHighlightedAiGeneratedEvent } from './UseHighlightedAiGeneratedEvent';
 import { findEventByPath } from '../Utils/EventsValidationScanner';
+import type { SearchFilterParams } from '../Utils/Search';
+import type { InitialSearchFilterParams } from './SearchPanel';
 
 const gd: libGDevelop = global.gd;
 
@@ -182,6 +184,13 @@ type ComponentProps = {|
   highlightedAiGeneratedEventIds: Set<string>,
 |};
 
+type SearchHighlight = {|
+  results: Array<gdBaseEvent>,
+  focusOffset: number,
+  text: string,
+  searchFilterParams: SearchFilterParams,
+|};
+
 type State = {|
   eventsHistory: HistoryState,
 
@@ -222,12 +231,7 @@ type State = {|
   textEditedEvent: ?gdBaseEvent,
 
   showSearchPanel: boolean,
-  searchHighlight: ?{|
-    results: Array<gdBaseEvent>,
-    focusOffset: number,
-    text: string,
-    matchCase: boolean,
-  |},
+  searchHighlight: ?SearchHighlight,
   localSearchText: string,
   localSearchMatchCase: boolean,
   navigationHighlightEvent: ?gdBaseEvent,
@@ -437,7 +441,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     eventPaths: Array<EventPath>,
     focusedEventPath: EventPath,
     searchText: string,
-    matchCase: boolean
+    searchFilters?: SearchFilterParams
   ) => {
     const eventsTree = this._eventsTree;
     const eventsByPtr = new Map<number, gdBaseEvent>();
@@ -462,11 +466,17 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       }
     }
 
-    const searchHighlight = {
+    const searchHighlight: SearchHighlight = {
       results: resultEvents,
       focusOffset,
       text: searchText || '',
-      matchCase,
+      searchFilterParams: {
+        matchCase: searchFilters?.matchCase,
+        searchInConditions: searchFilters?.searchInConditions,
+        searchInActions: searchFilters?.searchInActions,
+        searchInEventStrings: searchFilters?.searchInEventStrings,
+        searchInInstructionNames: searchFilters?.searchInInstructionNames,
+      },
     };
 
     this.setState(
@@ -475,7 +485,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         navigationHighlightEvent: null,
         showSearchPanel: true,
         localSearchText: searchText || '',
-        localSearchMatchCase: matchCase,
+        localSearchMatchCase: searchFilters?.matchCase,
       },
       () => {
         if (!eventsTree) return;
@@ -2143,7 +2153,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   ) => {
     this.setState({
       localSearchText: inputs.searchText || '',
-      localSearchMatchCase: inputs.matchCase,
+      localSearchMatchCase: !!inputs.searchFilterParams.matchCase,
       searchHighlight: null, // Switch from global to local search
     });
     doSearchInEvents(inputs, () => {
@@ -2375,6 +2385,26 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       }
     }
 
+    const initialSearchFilterParams: InitialSearchFilterParams = {
+      initialSearchText: this.state.searchHighlight
+        ? this.state.searchHighlight.text || undefined
+        : undefined,
+      initialMatchCase: this.state.searchHighlight
+        ? this.state.searchHighlight?.searchFilterParams?.matchCase
+        : undefined,
+      initialTab: this.state.searchHighlight
+        ? 'search-in-event-sentences'
+        : undefined,
+      initialSearchInConditions: this.state.searchHighlight?.searchFilterParams
+        ?.searchInConditions,
+      initialSearchInActions: this.state.searchHighlight?.searchFilterParams
+        ?.searchInActions,
+      initialSearchInEventStrings: this.state.searchHighlight
+        ?.searchFilterParams?.searchInEventStrings,
+      initialSearchInInstructionNames: this.state.searchHighlight
+        ?.searchFilterParams?.searchInInstructionNames,
+    };
+
     return (
       <>
         <EventsSearcher
@@ -2570,21 +2600,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                           ? this.state.searchHighlight.focusOffset
                           : searchFocusOffset
                       }
-                      initialSearchText={
-                        this.state.searchHighlight
-                          ? this.state.searchHighlight.text || undefined
-                          : undefined
-                      }
-                      initialMatchCase={
-                        this.state.searchHighlight
-                          ? this.state.searchHighlight.matchCase
-                          : undefined
-                      }
-                      initialTab={
-                        this.state.searchHighlight
-                          ? 'search-in-event-sentences'
-                          : undefined
-                      }
+                      initialSearchFilterParams={initialSearchFilterParams}
                     />
                   </ErrorBoundary>
                 )}
@@ -2782,7 +2798,7 @@ export type EventsSheetInterface = {|
     eventPaths: Array<EventPath>,
     focusedEventPath: EventPath,
     searchText: string,
-    matchCase: boolean
+    searchFilters?: SearchFilterParams
   ) => void,
   clearGlobalSearchResults: () => void,
 |};
@@ -2824,14 +2840,14 @@ const EventsSheet = (props, ref) => {
     eventPaths: Array<EventPath>,
     focusedEventPath: EventPath,
     searchText: string,
-    matchCase: boolean
+    searchFilters?: SearchFilterParams
   ) => {
     if (component.current)
       component.current.setGlobalSearchResults(
         eventPaths,
         focusedEventPath,
         searchText,
-        matchCase
+        searchFilters
       );
   };
   const clearGlobalSearchResults = () => {

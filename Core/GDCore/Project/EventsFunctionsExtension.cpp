@@ -139,7 +139,10 @@ void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
   extensionNamespace = element.GetStringAttribute("extensionNamespace");
   shortDescription = element.GetStringAttribute("shortDescription");
   dimension = element.GetStringAttribute("dimension");
-  description = element.GetChild("description").GetMultilineStringValue();
+  description = (element.HasChild("description")
+                     ? element.GetChild("description")
+                     : SerializerElement::nullElement)
+                    .GetMultilineStringValue();
   name = element.GetStringAttribute("name");
   fullName = element.GetStringAttribute("fullName");
   category = element.GetStringAttribute("category");
@@ -161,7 +164,9 @@ void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
   }
 
   tags.clear();
-  auto& tagsElement = element.GetChild("tags");
+  auto& tagsElement = element.HasChild("tags")
+                          ? element.GetChild("tags")
+                          : SerializerElement::nullElement;
   if (!tagsElement.IsValueUndefined()) {
     // Compatibility with GD <= 5.0.0-beta102
     gd::String tagsAsString = tagsElement.GetStringValue();
@@ -178,14 +183,18 @@ void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
   }
 
   authorIds.clear();
-  auto& authorIdsElement = element.GetChild("authorIds");
+  auto& authorIdsElement = element.HasChild("authorIds")
+                               ? element.GetChild("authorIds")
+                               : SerializerElement::nullElement;
   authorIdsElement.ConsiderAsArray();
   for (std::size_t i = 0; i < authorIdsElement.GetChildrenCount(); ++i) {
     authorIds.push_back(authorIdsElement.GetChild(i).GetStringValue());
   }
 
   dependencies.clear();
-  const auto& dependenciesElement = element.GetChild("dependencies");
+  const auto& dependenciesElement = element.HasChild("dependencies")
+                                        ? element.GetChild("dependencies")
+                                        : SerializerElement::nullElement;
   dependenciesElement.ConsiderAsArray();
   for (size_t i = 0; i < dependenciesElement.GetChildrenCount(); ++i)
     dependencies.push_back(
@@ -202,15 +211,21 @@ void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
     }
   }
 
-  globalVariables.UnserializeFrom(element.GetChild("globalVariables"));
-  sceneVariables.UnserializeFrom(element.GetChild("sceneVariables"));
+  globalVariables.UnserializeFrom(element.HasChild("globalVariables")
+                                      ? element.GetChild("globalVariables")
+                                      : SerializerElement::nullElement);
+  sceneVariables.UnserializeFrom(element.HasChild("sceneVariables")
+                                     ? element.GetChild("sceneVariables")
+                                     : SerializerElement::nullElement);
 
   // Only unserialize behaviors and objects names.
   // As event based objects can contains objects using CustomBehavior and/or
   // CustomObject, this allows them to reference EventBasedBehavior and
   // EventBasedObject respectively.
   eventsBasedBehaviors.Clear();
-  auto &behaviorsElement = element.GetChild("eventsBasedBehaviors");
+  auto &behaviorsElement = element.HasChild("eventsBasedBehaviors")
+                               ? element.GetChild("eventsBasedBehaviors")
+                               : SerializerElement::nullElement;
   behaviorsElement.ConsiderAsArrayOf("eventsBasedBehavior");
   for (std::size_t i = 0; i < behaviorsElement.GetChildrenCount(); ++i) {
     const gd::String &behaviorName =
@@ -218,7 +233,9 @@ void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
     eventsBasedBehaviors.InsertNew(behaviorName, eventsBasedBehaviors.GetCount());
   }
   eventsBasedObjects.Clear();
-  auto &objectsElement = element.GetChild("eventsBasedObjects");
+  auto &objectsElement = element.HasChild("eventsBasedObjects")
+                             ? element.GetChild("eventsBasedObjects")
+                             : SerializerElement::nullElement;
   objectsElement.ConsiderAsArrayOf("eventsBasedObject");
   for (std::size_t i = 0; i < objectsElement.GetChildrenCount(); ++i) {
     const gd::String &objectName =
@@ -231,7 +248,10 @@ void EventsFunctionsExtension::UnserializeExtensionImplementationFrom(
     gd::Project& project,
     const SerializerElement& element) {
   eventsFunctionsContainer.UnserializeEventsFunctionsFrom(
-      project, element.GetChild("eventsFunctions"));
+      project,
+      element.HasChild("eventsFunctions")
+          ? element.GetChild("eventsFunctions")
+          : SerializerElement::nullElement);
   if (element.HasChild("eventsFunctionsFolderStructure")) {
     eventsFunctionsContainer.UnserializeFoldersFrom(
         element.GetChild("eventsFunctionsFolderStructure", 0));
@@ -241,9 +261,16 @@ void EventsFunctionsExtension::UnserializeExtensionImplementationFrom(
   // end of compatibility code
 
   eventsBasedBehaviors.UnserializeElementsFrom(
-      "eventsBasedBehavior", project, element.GetChild("eventsBasedBehaviors"));
+      "eventsBasedBehavior",
+      project,
+      element.HasChild("eventsBasedBehaviors")
+          ? element.GetChild("eventsBasedBehaviors")
+          : SerializerElement::nullElement);
 
-  auto &eventsBasedObjectsElement = element.GetChild("eventsBasedObjects");
+  auto &eventsBasedObjectsElement =
+      element.HasChild("eventsBasedObjects")
+          ? element.GetChild("eventsBasedObjects")
+          : SerializerElement::nullElement;
   eventsBasedObjectsElement.ConsiderAsArrayOf("eventsBasedObject");
   for (gd::String &eventsBasedObjectName :
        GetUnserializingOrderEventsBasedObjectNames(eventsBasedObjectsElement)) {

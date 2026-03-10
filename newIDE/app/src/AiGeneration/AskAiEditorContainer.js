@@ -617,12 +617,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           editorFunctionCallResults: Array<EditorFunctionCallResult>,
           mode?: 'chat' | 'agent' | 'orchestrator',
         |}) => {
-          if (
-            !profile ||
-            !selectedAiRequestId ||
-            !selectedAiRequest
-          )
-            return;
+          if (!profile || !selectedAiRequestId || !selectedAiRequest) return;
 
           if (isSendingAiRequest(selectedAiRequestId)) {
             console.info(
@@ -783,10 +778,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               });
             }
           } catch (error) {
-            console.error(
-              'Error while sending AI request message:',
-              error
-            );
+            console.error('Error while sending AI request message:', error);
             // TODO: update the label of the button to send again.
             setLastSendError(selectedAiRequestId, error);
             setIsSendingUserMessage(false);

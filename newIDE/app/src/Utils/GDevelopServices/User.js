@@ -183,6 +183,12 @@ export type User = {|
 
 export type Team = {| id: string, createdAt: number, seats: number |};
 export type TeamGroup = {| id: string, name: string |};
+export type TeamInvitation = {|
+  teamId: string,
+  userId: string,
+  email: string,
+  createdAt: number,
+|};
 export type TeamMembership = {|
   userId: string,
   teamId: string,
@@ -527,6 +533,61 @@ export const createTeamMembers = async (
     data: response.data,
     endpointName: '/team/{id}/action/batch-create-users of User API',
   });
+};
+
+export const listTeamInvitations = async (
+  getAuthorizationHeader: () => Promise<string>,
+  { userId, teamId }: {| userId: string, teamId: string |}
+): Promise<Array<TeamInvitation>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.get(`/team/${teamId}/invitation`, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/team/{id}/invitation of User API',
+  });
+};
+
+export const acceptTeamInvitation = async (
+  getAuthorizationHeader: () => Promise<string>,
+  { userId, teamId }: {| userId: string, teamId: string |}
+): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    `/team/${teamId}/action/accept-invitation`,
+    {},
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+};
+
+export const setUserAsMember = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    email,
+    activate,
+    teamId,
+    adminUserId,
+  }: {|
+    email: string,
+    activate: boolean,
+    teamId: string,
+    adminUserId: string,
+  |}
+) => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    `/team/${teamId}/action/set-member`,
+    { email, activate },
+    {
+      params: { userId: adminUserId },
+      headers: { Authorization: authorizationHeader },
+    }
+  );
 };
 
 export const setUserAsAdmin = async (

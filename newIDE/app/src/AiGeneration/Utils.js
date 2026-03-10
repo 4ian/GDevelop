@@ -185,7 +185,12 @@ export const useProcessFunctionCalls = ({
             `${selectedAiRequest.id}:${functionCall.call_id}`
           )
       );
-      if (functionCallsToProcess.length === 0) return;
+      if (functionCallsToProcess.length === 0) {
+        console.info(
+          'All function calls are already being processed (in-flight guard), skipping.'
+        );
+        return;
+      }
 
       // Lock these call IDs so concurrent invocations skip them.
       functionCallsToProcess.forEach(functionCall => {
@@ -237,6 +242,9 @@ export const useProcessFunctionCalls = ({
         // results — we don't want to re-populate the cleared results or send
         // anything to a suspended request.
         if (results.some(r => r.status === 'aborted')) {
+          console.info(
+            'Some function call results were aborted (request was likely suspended during processing), discarding all results.'
+          );
           return;
         }
 

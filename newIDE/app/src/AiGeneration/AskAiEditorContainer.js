@@ -768,6 +768,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             }
           } catch (error) {
             // TODO: update the label of the button to send again.
+            setSendingAiRequest(selectedAiRequestId, false);
             setLastSendError(selectedAiRequestId, error);
             setIsSendingUserMessage(false);
           }

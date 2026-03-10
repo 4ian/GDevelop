@@ -271,6 +271,58 @@ export const useProcessFunctionCalls = ({
     [selectedAiRequest, onProcessFunctionCalls, allFunctionCallsToProcess]
   );
 
+  // Safety net: if all function call results are finished but haven't been sent
+  // (e.g. because a previous onSendMessage attempt returned early or errored),
+  // retry sending them. This prevents the conversation from getting permanently
+  // stuck when function call results are computed but never uploaded.
+  React.useEffect(
+    () => {
+      if (!selectedAiRequest) return;
+      if (selectedAiRequest.status === 'suspended') return;
+      if (allFunctionCallsToProcess.length > 0) return;
+
+      const editorFunctionCallResults = getEditorFunctionCallResults(
+        selectedAiRequest.id
+      );
+      if (!editorFunctionCallResults || editorFunctionCallResults.length === 0)
+        return;
+
+      const {
+        hasUnfinishedResult,
+        functionCallOutputs,
+      } = getFunctionCallOutputsFromEditorFunctionCallResults(
+        editorFunctionCallResults
+      );
+      if (hasUnfinishedResult || functionCallOutputs.length === 0) return;
+
+      // All results are finished, none are pending processing, but they
+      // haven't been cleared yet (which means they were never sent).
+      // Schedule a retry after a short delay to avoid racing with the
+      // normal send path.
+      const timeoutId = setTimeout(async () => {
+        // Re-read the results to make sure they haven't been cleared
+        // in the meantime (which would mean they were sent successfully).
+        const currentResults = getEditorFunctionCallResults(
+          selectedAiRequest.id
+        );
+        if (!currentResults || currentResults.length === 0) return;
+
+        console.info(
+          'Safety net: retrying send of finished function call results that were not sent.'
+        );
+        await onSendEditorFunctionCallResults(currentResults, {});
+      }, 2000);
+
+      return () => clearTimeout(timeoutId);
+    },
+    [
+      selectedAiRequest,
+      allFunctionCallsToProcess,
+      getEditorFunctionCallResults,
+      onSendEditorFunctionCallResults,
+    ]
+  );
+
   return {
     onProcessFunctionCalls,
   };

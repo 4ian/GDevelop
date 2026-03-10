@@ -19,6 +19,7 @@ import { allResourceKindsAndMetadata } from '../ResourcesList/ResourceSource';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { type ExtensionDependency } from '../Utils/GDevelopServices/Extension';
 import semverGreaterThan from 'semver/functions/gt';
+import semverValid from 'semver/functions/valid';
 import { addSerializedExtensionsToProject } from '../AssetStore/ExtensionStore/InstallExtension';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import LoaderModal from '../UI/LoaderModal';
@@ -276,7 +277,7 @@ const ExtensionAndVariantChooser = ({
       {conflictedExtensions.map(extensionUpdate => (
         <Checkbox
           key={extensionUpdate.name}
-          label={extensionUpdate.label}
+          label={extensionUpdate.label || extensionUpdate.name}
           checked={extensionUpdate.isSelected}
           onCheck={(e, checked) => {
             extensionUpdate.isSelected = checked;
@@ -597,12 +598,14 @@ const ObjectImporterDialog = ({
           const eventsFunctionsExtension = project.getEventsFunctionsExtension(
             extensionName
           );
-          if (
+          const isExtensionUpdate =
+            semverValid(extensionVersion) &&
+            semverValid(eventsFunctionsExtension.getVersion()) &&
             semverGreaterThan(
               extensionVersion,
               eventsFunctionsExtension.getVersion()
-            )
-          ) {
+            );
+          if (isExtensionUpdate) {
             conflictedExtensions.push({
               name: extensionName,
               label: `${eventsFunctionsExtension.getFullName()} (${eventsFunctionsExtension.getVersion()} → ${extensionVersion})`,

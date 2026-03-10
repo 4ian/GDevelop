@@ -2,6 +2,7 @@
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import semverGreaterThan from 'semver/functions/gt';
+import semverValid from 'semver/functions/valid';
 import SearchBar from '../../UI/SearchBar';
 import {
   getBreakingChanges,
@@ -168,6 +169,14 @@ export const BehaviorStore = ({
         const installedVersion = project
           .getEventsFunctionsExtension(behaviorShortHeader.extensionName)
           .getVersion();
+        if (
+          !semverValid(behaviorShortHeader.version) ||
+          !semverValid(installedVersion)
+        ) {
+          // Don't try to update the extension if we don't know which one is more recent.
+          onChoose(behaviorShortHeader.type);
+          return;
+        }
         // repository version <= installed version
         if (!semverGreaterThan(behaviorShortHeader.version, installedVersion)) {
           // The extension is already up to date.

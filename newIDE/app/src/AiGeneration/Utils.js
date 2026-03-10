@@ -161,12 +161,17 @@ export const useProcessFunctionCalls = ({
     resourceManagementProps,
   });
   const { generateEvents } = useGenerateEvents({ project });
-  // Additional in-memory protection against duplicate processing.
+  // In-memory guard against duplicate processing of the same function call.
   //
-  // We already mark calls as "working" in persisted results, but React 18
-  // effect re-entrancy (including StrictMode double-invocations) can briefly
-  // re-run processing before that state is visible to all checks.
-  // This set blocks concurrent processing of the same call_id per request.
+  // The main protection is marking calls as "working" in the ref-backed
+  // results store (see useEditorFunctionCallResultsStorage).  However,
+  // React 18 can re-run an effect before a forceUpdate() re-render has
+  // propagated (e.g. StrictMode double-invocations in development, or a
+  // polling update to selectedAiRequest that recreates onProcessFunctionCalls
+  // while the previous invocation is still awaiting).
+  // This Set acts as an immediate, synchronous lock keyed by
+  // "<requestId>:<callId>" so a call that is already being processed is
+  // never started a second time.
   const inFlightFunctionCallIdsRef = React.useRef<Set<string>>(new Set());
 
   const onProcessFunctionCalls = React.useCallback(
@@ -182,6 +187,7 @@ export const useProcessFunctionCalls = ({
       );
       if (functionCallsToProcess.length === 0) return;
 
+      // Lock these call IDs so concurrent invocations skip them.
       functionCallsToProcess.forEach(functionCall => {
         inFlightFunctionCallIdsRef.current.add(
           `${selectedAiRequest.id}:${functionCall.call_id}`
@@ -246,6 +252,8 @@ export const useProcessFunctionCalls = ({
           createdProject,
         });
       } finally {
+        // Release the lock so these calls can be retried if needed
+        // (e.g. after an error or a suspension).
         functionCallsToProcess.forEach(functionCall => {
           inFlightFunctionCallIdsRef.current.delete(
             `${selectedAiRequest.id}:${functionCall.call_id}`

@@ -67,8 +67,13 @@ const useEditorFunctionCallResultsStorage = (): EditorFunctionCallResultsStorage
           ...editorFunctionCallResults,
         ];
 
-        // Use the ref as source of truth so reads/writes are synchronous.
-        // We force a re-render for UI updates.
+        // Store results in the ref so that they are visible immediately
+        // to any code that calls getEditorFunctionCallResults — even within
+        // the same async tick.  Without this, React 18 automatic batching
+        // would defer the state update, causing other callbacks (e.g. the
+        // processing effect) to read stale data and potentially re-process
+        // the same function calls.
+        // forceUpdate() schedules a re-render so the UI stays in sync.
         editorFunctionCallResultsPerRequestRef.current = {
           ...editorFunctionCallResultsPerRequestRef.current,
           [aiRequestId]: computedResults,

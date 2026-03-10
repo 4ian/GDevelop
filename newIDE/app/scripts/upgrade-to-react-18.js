@@ -14,6 +14,10 @@
  *    The old native-value-setter + blur/input event trick no longer works in
  *    React 18. Replaced with focus + select + document.execCommand('insertText')
  *    which goes through the browser's native input path.
+ * 6. Fixes ClickAwayListener in GenericExpressionField/index.js:
+ *    MUI v4's ClickAwayListener defaults to onClick/onTouchEnd, which in React 18
+ *    causes the popper to close immediately when opened. Using onMouseDown/onTouchStart
+ *    avoids the race condition with React 18's event delegation.
  *
  * What it does NOT do (deprecated but still functional in React 18):
  * - ReactDOM.findDOMNode: deprecated, warns in StrictMode, but still works.
@@ -283,6 +287,42 @@ function fixGetFillAutomaticallyFunction() {
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
+// 6. Fix ClickAwayListener in GenericExpressionField for React 18
+//    MUI v4's ClickAwayListener defaults to onClick/onTouchEnd for detecting
+//    clicks outside. In React 18 (with createRoot), the event delegation moved
+//    from document to the React root container. This causes the ClickAwayListener's
+//    document-level handler to fire on the same click that opened the popper,
+//    immediately closing it. Using onMouseDown/onTouchStart avoids this.
+// ──────────────────────────────────────────────────────────────────────────────
+function fixClickAwayListenerInGenericExpressionField() {
+  const filePath = 'src/EventsSheet/ParameterFields/GenericExpressionField/index.js';
+  let content = readFile(filePath);
+
+  // Already upgraded?
+  if (content.includes('mouseEvent="onMouseDown"')) {
+    console.log('[GenericExpressionField] ClickAwayListener already fixed.');
+    return;
+  }
+
+  const oldPattern = '<ClickAwayListener onClickAway={this._handleRequestClose}>';
+  if (!content.includes(oldPattern)) {
+    console.log('[GenericExpressionField] Could not find ClickAwayListener pattern (may need manual update).');
+    return;
+  }
+
+  const newCode = `<ClickAwayListener
+                      onClickAway={this._handleRequestClose}
+                      // Needed since React 18 to avoid what seems to be the immediate closing of the popper.
+                      mouseEvent="onMouseDown"
+                      touchEvent="onTouchStart"
+                    >`;
+
+  content = content.replace(oldPattern, newCode);
+  writeFile(filePath, content);
+  console.log('[GenericExpressionField] Fixed ClickAwayListener for React 18.');
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
 // Run all steps
 // ──────────────────────────────────────────────────────────────────────────────
 console.log('Upgrading newIDE/app to React 18...\n');
@@ -291,4 +331,5 @@ updateIndexJs();
 updateFlowTypes();
 renameUnsafeLifecycleMethods();
 fixGetFillAutomaticallyFunction();
+fixClickAwayListenerInGenericExpressionField();
 console.log('\nDone. Run `npm install` to apply dependency changes.');

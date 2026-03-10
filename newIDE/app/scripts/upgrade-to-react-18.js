@@ -10,6 +10,10 @@
  *    - componentWillMount -> UNSAFE_componentWillMount
  *    - componentWillReceiveProps -> UNSAFE_componentWillReceiveProps
  *    - componentWillUpdate -> UNSAFE_componentWillUpdate
+ * 5. Fixes getFillAutomaticallyFunction in InAppTutorialStepDisplayer.js:
+ *    The old native-value-setter + blur/input event trick no longer works in
+ *    React 18. Replaced with focus + select + document.execCommand('insertText')
+ *    which goes through the browser's native input path.
  *
  * What it does NOT do (deprecated but still functional in React 18):
  * - ReactDOM.findDOMNode: deprecated, warns in StrictMode, but still works.
@@ -238,6 +242,47 @@ function renameUnsafeLifecycleMethods() {
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
+// 5. Fix getFillAutomaticallyFunction for React 18
+//    The old approach used the native value setter + dispatchEvent('blur'/'input')
+//    to programmatically fill React-controlled inputs. This no longer triggers
+//    React 18's onChange. Replace with execCommand('insertText') which goes
+//    through the browser's native input path.
+// ──────────────────────────────────────────────────────────────────────────────
+function fixGetFillAutomaticallyFunction() {
+  const filePath = 'src/InAppTutorial/InAppTutorialStepDisplayer.js';
+  let content = readFile(filePath);
+
+  // Already upgraded?
+  if (content.includes("document.execCommand('insertText'")) {
+    console.log('[InAppTutorialStepDisplayer] getFillAutomaticallyFunction already fixed.');
+    return;
+  }
+
+  // Match the old native-value-setter pattern (handles both 'blur' and 'input' event variants).
+  // Uses [\s\S]*? instead of [^}]* to handle nested braces (e.g. { bubbles: true }).
+  const oldPattern =
+    /const valuePropertyDescriptor = Object\.getOwnPropertyDescriptor\(\s*elementWithId\.constructor\.prototype,\s*'value'\s*\);\s*if \(!valuePropertyDescriptor\) return undefined;\s*const valueSetter = valuePropertyDescriptor\.set;\s*if \(!valueSetter\) return undefined;\s*return \(\) => \{[\s\S]*?\n\s*\};/;
+
+  if (!oldPattern.test(content)) {
+    console.log('[InAppTutorialStepDisplayer] Could not find old getFillAutomaticallyFunction pattern (may need manual update).');
+    return;
+  }
+
+  const newCode = `return () => {
+        // Focus the element, select all existing content, then use
+        // execCommand to insert text. This goes through the browser's
+        // native input path, which React 18 correctly picks up.
+        elementWithId.focus();
+        elementWithId.select();
+        document.execCommand('insertText', false, valueEquals);
+      };`;
+
+  content = content.replace(oldPattern, newCode);
+  writeFile(filePath, content);
+  console.log('[InAppTutorialStepDisplayer] Fixed getFillAutomaticallyFunction for React 18.');
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
 // Run all steps
 // ──────────────────────────────────────────────────────────────────────────────
 console.log('Upgrading newIDE/app to React 18...\n');
@@ -245,4 +290,5 @@ updatePackageJson();
 updateIndexJs();
 updateFlowTypes();
 renameUnsafeLifecycleMethods();
+fixGetFillAutomaticallyFunction();
 console.log('\nDone. Run `npm install` to apply dependency changes.');

@@ -16,6 +16,7 @@ import { useAsyncLazyMemo } from '../Utils/UseLazyMemo';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { useInterval } from '../Utils/UseInterval';
+import useForceUpdate from '../Utils/UseForceUpdate';
 
 type EditorFunctionCallResultsStorage = {|
   getEditorFunctionCallResults: (
@@ -28,62 +29,66 @@ type EditorFunctionCallResultsStorage = {|
   clearEditorFunctionCallResults: (aiRequestId: string) => void,
 |};
 
+type EditorFunctionCallResultsPerRequest = {
+  [aiRequestId: string]: ?Array<EditorFunctionCallResult>,
+};
+
 const useEditorFunctionCallResultsStorage = (): EditorFunctionCallResultsStorage => {
-  const [
-    editorFunctionCallResultsPerRequest,
-    setEditorFunctionCallResultsPerRequest,
-  ] = React.useState<{
-    [aiRequestId: string]: Array<EditorFunctionCallResult>,
-  }>({});
+  const editorFunctionCallResultsPerRequestRef = React.useRef<EditorFunctionCallResultsPerRequest>(
+    {}
+  );
+  const forceUpdate = useForceUpdate();
 
   return {
     getEditorFunctionCallResults: React.useCallback(
       (aiRequestId: string): Array<EditorFunctionCallResult> | null =>
-        editorFunctionCallResultsPerRequest[aiRequestId] || null,
-      [editorFunctionCallResultsPerRequest]
+        editorFunctionCallResultsPerRequestRef.current[aiRequestId] || null,
+      []
     ),
     addEditorFunctionCallResults: React.useCallback(
       (
         aiRequestId: string,
         editorFunctionCallResults: EditorFunctionCallResult[]
       ) => {
-        let computedResults: EditorFunctionCallResult[] = [];
-        setEditorFunctionCallResultsPerRequest(prevState => {
-          const existingEditorFunctionCallResults = (
-            prevState[aiRequestId] || []
-          ).filter(existingEditorFunctionCallResult => {
-            return !editorFunctionCallResults.some(editorFunctionCallResult => {
-              return (
-                editorFunctionCallResult.call_id ===
-                existingEditorFunctionCallResult.call_id
-              );
-            });
+        const previousState = editorFunctionCallResultsPerRequestRef.current;
+        const existingEditorFunctionCallResults = (
+          previousState[aiRequestId] || []
+        ).filter(existingEditorFunctionCallResult => {
+          return !editorFunctionCallResults.some(editorFunctionCallResult => {
+            return (
+              editorFunctionCallResult.call_id ===
+              existingEditorFunctionCallResult.call_id
+            );
           });
-
-          computedResults = [
-            ...existingEditorFunctionCallResults,
-            ...editorFunctionCallResults,
-          ];
-
-          return {
-            ...prevState,
-            [aiRequestId]: computedResults,
-          };
         });
+
+        const computedResults = [
+          ...existingEditorFunctionCallResults,
+          ...editorFunctionCallResults,
+        ];
+
+        // Use the ref as source of truth so reads/writes are synchronous.
+        // We force a re-render for UI updates.
+        editorFunctionCallResultsPerRequestRef.current = {
+          ...editorFunctionCallResultsPerRequestRef.current,
+          [aiRequestId]: computedResults,
+        };
+        forceUpdate();
 
         return computedResults;
       },
-      []
+      [forceUpdate]
     ),
-    clearEditorFunctionCallResults: React.useCallback((aiRequestId: string) => {
-      setEditorFunctionCallResultsPerRequest(
-        editorFunctionCallResultsPerRequest => ({
-          ...editorFunctionCallResultsPerRequest,
-          // $FlowFixMe[incompatible-type]
+    clearEditorFunctionCallResults: React.useCallback(
+      (aiRequestId: string) => {
+        editorFunctionCallResultsPerRequestRef.current = {
+          ...editorFunctionCallResultsPerRequestRef.current,
           [aiRequestId]: null,
-        })
-      );
-    }, []),
+        };
+        forceUpdate();
+      },
+      [forceUpdate]
+    ),
   };
 };
 

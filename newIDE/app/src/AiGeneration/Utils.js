@@ -161,68 +161,97 @@ export const useProcessFunctionCalls = ({
     resourceManagementProps,
   });
   const { generateEvents } = useGenerateEvents({ project });
+  // Additional in-memory protection against duplicate processing.
+  //
+  // We already mark calls as "working" in persisted results, but React 18
+  // effect re-entrancy (including StrictMode double-invocations) can briefly
+  // re-run processing before that state is visible to all checks.
+  // This set blocks concurrent processing of the same call_id per request.
+  const inFlightFunctionCallIdsRef = React.useRef<Set<string>>(new Set());
 
   const onProcessFunctionCalls = React.useCallback(
     async (functionCalls: Array<AiRequestMessageAssistantFunctionCall>) => {
       if (!selectedAiRequest || !isReadyToProcessFunctionCalls) return;
       if (selectedAiRequest.status === 'suspended') return;
 
+      const functionCallsToProcess = functionCalls.filter(
+        functionCall =>
+          !inFlightFunctionCallIdsRef.current.has(
+            `${selectedAiRequest.id}:${functionCall.call_id}`
+          )
+      );
+      if (functionCallsToProcess.length === 0) return;
+
+      functionCallsToProcess.forEach(functionCall => {
+        inFlightFunctionCallIdsRef.current.add(
+          `${selectedAiRequest.id}:${functionCall.call_id}`
+        );
+      });
+
       addEditorFunctionCallResults(
         selectedAiRequest.id,
-        functionCalls.map(functionCall => ({
+        functionCallsToProcess.map(functionCall => ({
           status: 'working',
           call_id: functionCall.call_id,
         }))
       );
 
-      const {
-        results,
-        createdSceneNames,
-        createdProject,
-      } = await processEditorFunctionCalls({
-        project,
-        editorCallbacks,
-        // $FlowFixMe[incompatible-type]
-        toolOptions: selectedAiRequest.toolOptions || null,
-        i18n,
-        functionCalls: functionCalls.map(functionCall => ({
-          name: functionCall.name,
-          arguments: functionCall.arguments,
-          call_id: functionCall.call_id,
-        })),
-        relatedAiRequestId: selectedAiRequest.id,
-        getRelatedAiRequestLastMessages: () =>
-          getLastMessagesFromAiRequestOutput(selectedAiRequest.output),
-        generateEvents,
-        onSceneEventsModifiedOutsideEditor,
-        onInstancesModifiedOutsideEditor,
-        onObjectsModifiedOutsideEditor,
-        onObjectGroupsModifiedOutsideEditor,
-        ensureExtensionInstalled,
-        onWillInstallExtension,
-        onExtensionInstalled,
-        searchAndInstallAsset,
-        searchAndInstallResources,
-      });
+      try {
+        const {
+          results,
+          createdSceneNames,
+          createdProject,
+        } = await processEditorFunctionCalls({
+          project,
+          editorCallbacks,
+          // $FlowFixMe[incompatible-type]
+          toolOptions: selectedAiRequest.toolOptions || null,
+          i18n,
+          functionCalls: functionCallsToProcess.map(functionCall => ({
+            name: functionCall.name,
+            arguments: functionCall.arguments,
+            call_id: functionCall.call_id,
+          })),
+          relatedAiRequestId: selectedAiRequest.id,
+          getRelatedAiRequestLastMessages: () =>
+            getLastMessagesFromAiRequestOutput(selectedAiRequest.output),
+          generateEvents,
+          onSceneEventsModifiedOutsideEditor,
+          onInstancesModifiedOutsideEditor,
+          onObjectsModifiedOutsideEditor,
+          onObjectGroupsModifiedOutsideEditor,
+          ensureExtensionInstalled,
+          onWillInstallExtension,
+          onExtensionInstalled,
+          searchAndInstallAsset,
+          searchAndInstallResources,
+        });
 
-      // If the request was suspended while we were processing, discard the
-      // results — we don't want to re-populate the cleared results or send
-      // anything to a suspended request.
-      if (results.some(r => r.status === 'aborted')) {
-        return;
+        // If the request was suspended while we were processing, discard the
+        // results — we don't want to re-populate the cleared results or send
+        // anything to a suspended request.
+        if (results.some(r => r.status === 'aborted')) {
+          return;
+        }
+
+        const newResults = addEditorFunctionCallResults(
+          selectedAiRequest.id,
+          results
+        );
+
+        // We may have processed everything, so try to send the results
+        // to the backend.
+        await onSendEditorFunctionCallResults(newResults, {
+          createdSceneNames,
+          createdProject,
+        });
+      } finally {
+        functionCallsToProcess.forEach(functionCall => {
+          inFlightFunctionCallIdsRef.current.delete(
+            `${selectedAiRequest.id}:${functionCall.call_id}`
+          );
+        });
       }
-
-      const newResults = addEditorFunctionCallResults(
-        selectedAiRequest.id,
-        results
-      );
-
-      // We may have processed everything, so try to send the results
-      // to the backend.
-      await onSendEditorFunctionCallResults(newResults, {
-        createdSceneNames,
-        createdProject,
-      });
     },
     [
       i18n,

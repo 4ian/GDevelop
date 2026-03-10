@@ -6,6 +6,18 @@
  *    and adds npm overrides so third-party packages accept React 18
  * 2. Updates src/index.js: ReactDOM.render() -> createRoot().render()
  * 3. Adds Flow type declaration for react-dom/client in flow-libs/react-dom.js
+ * 4. Renames deprecated lifecycle methods to UNSAFE_ prefix (React 17 requirement):
+ *    - componentWillMount -> UNSAFE_componentWillMount
+ *    - componentWillReceiveProps -> UNSAFE_componentWillReceiveProps
+ *    - componentWillUpdate -> UNSAFE_componentWillUpdate
+ *
+ * What it does NOT do (deprecated but still functional in React 18):
+ * - ReactDOM.findDOMNode: deprecated, warns in StrictMode, but still works.
+ *   Replacing it requires significant refactoring (forwardRef/callback refs).
+ * - UNSAFE_ lifecycle methods themselves: they work in React 18, just with
+ *   StrictMode warnings. Migrating them to getDerivedStateFromProps/
+ *   componentDidMount is a separate task.
+ * - e.persist() removal: no calls found in the codebase.
  *
  * Re-running this script on an already-upgraded codebase is a no-op.
  */
@@ -149,10 +161,88 @@ declare module 'react-dom/client' {
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
+// 4. Rename deprecated lifecycle methods to UNSAFE_ prefix
+//    React 17 removed the non-prefixed versions of these methods.
+//    See: https://legacy.reactjs.org/blog/2018/03/27/update-on-async-rendering.html
+// ──────────────────────────────────────────────────────────────────────────────
+function renameUnsafeLifecycleMethods() {
+  const srcDir = path.join(appRoot, 'src');
+  const deprecatedMethods = [
+    'componentWillMount',
+    'componentWillReceiveProps',
+    'componentWillUpdate',
+  ];
+
+  // Build regex that matches the method name NOT already preceded by UNSAFE_
+  // Matches patterns like:
+  //   componentWillMount() {
+  //   componentWillMount () {
+  //   componentWillMount= ...  (arrow function assignment, unlikely but safe)
+  const patterns = deprecatedMethods.map(method => ({
+    method,
+    // Negative lookbehind ensures we don't double-prefix UNSAFE_
+    regex: new RegExp(`(?<!UNSAFE_)\\b(${method})\\b`, 'g'),
+    replacement: `UNSAFE_${method}`,
+  }));
+
+  let totalReplacements = 0;
+
+  function processFile(filePath) {
+    const ext = path.extname(filePath);
+    if (ext !== '.js' && ext !== '.jsx' && ext !== '.ts' && ext !== '.tsx') return;
+
+    let content;
+    try {
+      content = fs.readFileSync(filePath, 'utf8');
+    } catch {
+      return;
+    }
+
+    let fileChanged = false;
+    for (const { method, regex, replacement } of patterns) {
+      const matches = content.match(regex);
+      if (matches) {
+        content = content.replace(regex, replacement);
+        fileChanged = true;
+        totalReplacements += matches.length;
+        const relPath = path.relative(appRoot, filePath);
+        console.log(`  ${relPath}: ${method} -> UNSAFE_${method} (${matches.length}x)`);
+      }
+    }
+
+    if (fileChanged) {
+      fs.writeFileSync(filePath, content, 'utf8');
+    }
+  }
+
+  function walkDir(dir) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (entry.name === 'node_modules' || entry.name === '.git') continue;
+        walkDir(fullPath);
+      } else {
+        processFile(fullPath);
+      }
+    }
+  }
+
+  walkDir(srcDir);
+
+  if (totalReplacements === 0) {
+    console.log('[lifecycle methods] No deprecated lifecycle methods found (already renamed).');
+  } else {
+    console.log(`[lifecycle methods] Renamed ${totalReplacements} deprecated lifecycle method(s) to UNSAFE_ prefix.`);
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
 // Run all steps
 // ──────────────────────────────────────────────────────────────────────────────
 console.log('Upgrading newIDE/app to React 18...\n');
 updatePackageJson();
 updateIndexJs();
 updateFlowTypes();
+renameUnsafeLifecycleMethods();
 console.log('\nDone. Run `npm install` to apply dependency changes.');

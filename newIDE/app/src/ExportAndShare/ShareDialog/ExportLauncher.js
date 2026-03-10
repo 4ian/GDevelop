@@ -138,7 +138,7 @@ export default class ExportLauncher extends Component<Props, State> {
     payWithCredits?: boolean,
   |}) => Promise<void>;
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     // Fetch limits when the export launcher is opened, to ensure we display the
     // latest limits.
     this.props.authenticatedUser.onRefreshLimits();

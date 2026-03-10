@@ -617,13 +617,14 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           editorFunctionCallResults: Array<EditorFunctionCallResult>,
           mode?: 'chat' | 'agent' | 'orchestrator',
         |}) => {
-          if (
-            !profile ||
-            !selectedAiRequestId ||
-            !selectedAiRequest ||
-            isSendingAiRequest(selectedAiRequestId)
-          )
+          if (!profile || !selectedAiRequestId || !selectedAiRequest) return;
+
+          if (isSendingAiRequest(selectedAiRequestId)) {
+            console.info(
+              'Skipping send for AI request: another send is already in progress.'
+            );
             return;
+          }
 
           // Read the results from the editor that applied the function calls.
           // and transform them into the output that will be stored on the AI request.
@@ -642,8 +643,18 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
 
           // If anything is not finished yet, stop there (we only send all
           // results at once, AI do not support partial results).
-          if (hasUnfinishedResult) return;
-          if (hasFunctionsCallsToProcess) return;
+          if (hasUnfinishedResult) {
+            console.info(
+              'Skipping send for AI request: some function call results are not finished yet.'
+            );
+            return;
+          }
+          if (hasFunctionsCallsToProcess) {
+            console.info(
+              'Skipping send for AI request: there are still function calls to process.'
+            );
+            return;
+          }
 
           // If nothing to send, stop there.
           if (functionCallOutputs.length === 0 && !userMessage) return;
@@ -767,6 +778,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               });
             }
           } catch (error) {
+            console.error('Error while sending AI request message:', error);
             // TODO: update the label of the button to send again.
             setLastSendError(selectedAiRequestId, error);
             setIsSendingUserMessage(false);

@@ -161,6 +161,7 @@ export const AskAiStandAloneForm = ({
     getEditorFunctionCallResults,
     addEditorFunctionCallResults,
     clearEditorFunctionCallResults,
+    resultsVersion,
   } = editorFunctionCallResultsStorage;
   const {
     aiRequests,
@@ -526,6 +527,7 @@ export const AskAiStandAloneForm = ({
     onSendEditorFunctionCallResults,
     getEditorFunctionCallResults,
     addEditorFunctionCallResults,
+    resultsVersion,
     i18n,
     onSceneEventsModifiedOutsideEditor: () => {},
     onInstancesModifiedOutsideEditor: () => {},

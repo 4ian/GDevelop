@@ -26,64 +26,76 @@ type EditorFunctionCallResultsStorage = {|
     editorFunctionCallResults: EditorFunctionCallResult[]
   ) => EditorFunctionCallResult[],
   clearEditorFunctionCallResults: (aiRequestId: string) => void,
+  /**
+   * A monotonically-increasing counter that changes every time results are
+   * added or cleared. Effects can depend on this to re-run when the
+   * underlying data changes, without depending on the (now stable)
+   * getEditorFunctionCallResults callback.
+   */
+  resultsVersion: number,
 |};
 
 const useEditorFunctionCallResultsStorage = (): EditorFunctionCallResultsStorage => {
-  const [
-    editorFunctionCallResultsPerRequest,
-    setEditorFunctionCallResultsPerRequest,
-  ] = React.useState<{
+  // We keep a ref as the source of truth so that getEditorFunctionCallResults
+  // always returns the latest data synchronously (even within the same async
+  // flow, before React re-renders). A state counter (`resultsVersion`) is
+  // bumped on every mutation to trigger re-renders and let effects react.
+  const editorFunctionCallResultsPerRequestRef = React.useRef<{
     [aiRequestId: string]: Array<EditorFunctionCallResult>,
   }>({});
+  const [resultsVersion, setResultsVersion] = React.useState<number>(0);
 
   return {
+    resultsVersion,
     getEditorFunctionCallResults: React.useCallback(
       (aiRequestId: string): Array<EditorFunctionCallResult> | null =>
-        editorFunctionCallResultsPerRequest[aiRequestId] || null,
-      [editorFunctionCallResultsPerRequest]
+        editorFunctionCallResultsPerRequestRef.current[aiRequestId] || null,
+      []
     ),
     addEditorFunctionCallResults: React.useCallback(
       (
         aiRequestId: string,
         editorFunctionCallResults: EditorFunctionCallResult[]
       ) => {
-        let computedResults: EditorFunctionCallResult[] = [];
-        setEditorFunctionCallResultsPerRequest(prevState => {
-          const existingEditorFunctionCallResults = (
-            prevState[aiRequestId] || []
-          ).filter(existingEditorFunctionCallResult => {
-            return !editorFunctionCallResults.some(editorFunctionCallResult => {
-              return (
-                editorFunctionCallResult.call_id ===
-                existingEditorFunctionCallResult.call_id
-              );
-            });
+        const previousState =
+          editorFunctionCallResultsPerRequestRef.current;
+        const existingEditorFunctionCallResults = (
+          previousState[aiRequestId] || []
+        ).filter(existingEditorFunctionCallResult => {
+          return !editorFunctionCallResults.some(editorFunctionCallResult => {
+            return (
+              editorFunctionCallResult.call_id ===
+              existingEditorFunctionCallResult.call_id
+            );
           });
-
-          computedResults = [
-            ...existingEditorFunctionCallResults,
-            ...editorFunctionCallResults,
-          ];
-
-          return {
-            ...prevState,
-            [aiRequestId]: computedResults,
-          };
         });
+
+        const computedResults = [
+          ...existingEditorFunctionCallResults,
+          ...editorFunctionCallResults,
+        ];
+
+        editorFunctionCallResultsPerRequestRef.current = {
+          ...previousState,
+          [aiRequestId]: computedResults,
+        };
+        setResultsVersion(v => v + 1);
 
         return computedResults;
       },
       []
     ),
-    clearEditorFunctionCallResults: React.useCallback((aiRequestId: string) => {
-      setEditorFunctionCallResultsPerRequest(
-        editorFunctionCallResultsPerRequest => ({
-          ...editorFunctionCallResultsPerRequest,
+    clearEditorFunctionCallResults: React.useCallback(
+      (aiRequestId: string) => {
+        editorFunctionCallResultsPerRequestRef.current = {
+          ...editorFunctionCallResultsPerRequestRef.current,
           // $FlowFixMe[incompatible-type]
           [aiRequestId]: null,
-        })
-      );
-    }, []),
+        };
+        setResultsVersion(v => v + 1);
+      },
+      []
+    ),
   };
 };
 
@@ -461,6 +473,7 @@ export const initialAiRequestContextState: AiRequestContextState = {
     getEditorFunctionCallResults: () => [],
     addEditorFunctionCallResults: () => [],
     clearEditorFunctionCallResults: () => {},
+    resultsVersion: 0,
   },
   getAiSettings: () => null,
   isFetchingSuggestions: false,

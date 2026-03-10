@@ -101,6 +101,7 @@ export const useProcessFunctionCalls = ({
   onSendEditorFunctionCallResults,
   getEditorFunctionCallResults,
   addEditorFunctionCallResults,
+  resultsVersion,
   onSceneEventsModifiedOutsideEditor,
   onInstancesModifiedOutsideEditor,
   onObjectsModifiedOutsideEditor,
@@ -126,6 +127,7 @@ export const useProcessFunctionCalls = ({
     string,
     Array<EditorFunctionCallResult>
   ) => Array<EditorFunctionCallResult>,
+  resultsVersion: number,
   onSceneEventsModifiedOutsideEditor: (
     changes: SceneEventsOutsideEditorChanges
   ) => void,
@@ -255,7 +257,10 @@ export const useProcessFunctionCalls = ({
             ),
           })
         : [],
-    [selectedAiRequest, getEditorFunctionCallResults]
+    // `resultsVersion` is used instead of `getEditorFunctionCallResults`
+    // (which is now stable/ref-based) to recompute when results change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedAiRequest, resultsVersion]
   );
 
   React.useEffect(
@@ -315,10 +320,13 @@ export const useProcessFunctionCalls = ({
 
       return () => clearTimeout(timeoutId);
     },
+    // `resultsVersion` is used instead of `getEditorFunctionCallResults`
+    // (which is now stable/ref-based) to re-run when results change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       selectedAiRequest,
       allFunctionCallsToProcess,
-      getEditorFunctionCallResults,
+      resultsVersion,
       onSendEditorFunctionCallResults,
     ]
   );

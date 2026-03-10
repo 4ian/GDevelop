@@ -385,6 +385,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         getEditorFunctionCallResults,
         addEditorFunctionCallResults,
         clearEditorFunctionCallResults,
+        resultsVersion,
       } = editorFunctionCallResultsStorage;
       const {
         updateAiRequest,
@@ -846,6 +847,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onSendEditorFunctionCallResults,
         getEditorFunctionCallResults,
         addEditorFunctionCallResults,
+        resultsVersion,
         onSceneEventsModifiedOutsideEditor,
         onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor,

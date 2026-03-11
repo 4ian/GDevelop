@@ -30,7 +30,10 @@ public:
                                     const gd::String &extensionName);
 
 private:
-  std::map<gd::String, std::unique_ptr<std::set<gd::String>>> dependencies;
+  std::set<gd::String> &
+  InsertAndGetNewDependencies(const gd::String &extensionName);
+
+  std::map<gd::String, std::set<gd::String>> dependenciesByExtension;
 };
 
 }; // namespace gd

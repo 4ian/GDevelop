@@ -7,14 +7,13 @@ namespace gd {
 const std::set<gd::String> &
 ExtensionDependencyCache::FindRequiredExtensionsRecursively(
     gd::Project &project, const gd::String &extensionName) {
-  auto itr = dependencies.find(extensionName);
-  if (itr != dependencies.end()) {
-    return *itr->second;
+  auto itr = dependenciesByExtension.find(extensionName);
+  if (itr != dependenciesByExtension.end()) {
+    return itr->second;
   }
   if (!project.HasEventsFunctionsExtensionNamed(extensionName)) {
     // This can't happen.
-    dependencies[extensionName] = gd::make_unique<std::set<gd::String>>();
-    return *dependencies[extensionName];
+    return InsertAndGetNewDependencies(extensionName);
   }
   auto &eventsFunctionsExtension =
       project.GetEventsFunctionsExtension(extensionName);
@@ -24,19 +23,26 @@ ExtensionDependencyCache::FindRequiredExtensionsRecursively(
           project, eventsFunctionsExtension);
   const auto &directlyRequiredExtension =
       usedExtensionsResult.GetUsedExtensions();
-  auto requiredExtensions = gd::make_unique<std::set<gd::String>>();
+  auto &requiredExtensions = InsertAndGetNewDependencies(extensionName);
   for (const gd::String &requiredExtensionName : directlyRequiredExtension) {
     if (!project.HasEventsFunctionsExtensionNamed(requiredExtensionName)) {
       continue;
     }
-    requiredExtensions->insert(requiredExtensionName);
+    requiredExtensions.insert(requiredExtensionName);
     auto &transitivelyRequiredExtensions =
         FindRequiredExtensionsRecursively(project, requiredExtensionName);
     for (auto &&requiredExtensionName : transitivelyRequiredExtensions) {
-      requiredExtensions->insert(requiredExtensionName);
+      requiredExtensions.insert(requiredExtensionName);
     }
   }
-  dependencies[extensionName] = std::move(requiredExtensions);
-  return *dependencies[extensionName];
+  return requiredExtensions;
 };
+
+std::set<gd::String> &ExtensionDependencyCache::InsertAndGetNewDependencies(
+    const gd::String &extensionName) {
+  std::set<gd::String> dependencies;
+  dependenciesByExtension[extensionName] = dependencies;
+  return dependenciesByExtension[extensionName];
+}
+
 } // namespace gd

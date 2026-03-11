@@ -54,7 +54,9 @@ export const QuickCustomizationGameTiles = ({
 
   const displayedExampleShortHeaders = React.useMemo(
     () => {
-      const allQuickCustomizationExampleShortHeaders = exampleShortHeaders
+      const allQuickCustomizationExampleShortHeaders = Array.isArray(
+        exampleShortHeaders
+      )
         ? quickCustomizationRecommendation.list
             .map(({ type, exampleSlug, thumbnailTitleByLocale }) => {
               if (type !== 'example') {

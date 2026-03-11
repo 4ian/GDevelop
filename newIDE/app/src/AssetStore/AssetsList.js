@@ -630,7 +630,7 @@ const AssetsList: React.ComponentType<{
 
     const publicAssetPackAuthors: ?Array<Author> = React.useMemo(
       () =>
-        openedAssetPack && authors && openedAssetPack.authors
+        openedAssetPack && Array.isArray(authors) && openedAssetPack.authors
           ? openedAssetPack.authors
               .map(author => {
                 return authors.find(({ name }) => name === author.name);
@@ -642,7 +642,7 @@ const AssetsList: React.ComponentType<{
 
     const publicAssetPackLicenses: ?Array<License> = React.useMemo(
       () =>
-        openedAssetPack && licenses && openedAssetPack.licenses
+        openedAssetPack && Array.isArray(licenses) && openedAssetPack.licenses
           ? openedAssetPack.licenses
               .map(license => {
                 return licenses.find(({ name }) => name === license.name);

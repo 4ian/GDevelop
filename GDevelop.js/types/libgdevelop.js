@@ -154,6 +154,7 @@ declare class libGDevelop {
   Serializer: Class<gdSerializer>;
   BinarySerializer: Class<gdBinarySerializer>;
   ObjectAssetSerializer: Class<gdObjectAssetSerializer>;
+  ExtensionDependencyCache: Class<gdExtensionDependencyCache>;
   InstructionsList: Class<gdInstructionsList>;
   Instruction: Class<gdInstruction>;
   Expression: Class<gdExpression>;

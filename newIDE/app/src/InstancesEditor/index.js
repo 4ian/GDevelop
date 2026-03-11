@@ -204,7 +204,7 @@ export default class InstancesEditor extends Component<Props, State> {
   componentDidMount() {
     // Initialize the PIXI renderer, if possible
     if (this.canvasArea && !this.pixiRenderer) {
-      this._initializeCanvasAndRenderer();
+      this._safelyInitializeCanvasAndRenderer();
     }
   }
 
@@ -213,7 +213,7 @@ export default class InstancesEditor extends Component<Props, State> {
     // This can happen if canvasArea was not rendered
     // just after the mount (depends on react-dnd versions?).
     if (this.canvasArea && !this.pixiRenderer) {
-      this._initializeCanvasAndRenderer();
+      this._safelyInitializeCanvasAndRenderer();
     }
 
     // Track previous tool before picker is activated
@@ -231,6 +231,20 @@ export default class InstancesEditor extends Component<Props, State> {
     } else if (!isPickerActive && wasPickerActive) {
       // Picker just deactivated, clear the stored previous tool
       this._previousToolBeforePicker = null;
+    }
+  }
+
+  _safelyInitializeCanvasAndRenderer() {
+    try {
+      this._initializeCanvasAndRenderer();
+    } catch (error) {
+      console.error(
+        'Exception caught while initializing the canvas and renderer:',
+        error
+      );
+      this.setState({
+        renderingError: { error, uniqueErrorId: generateUUID() },
+      });
     }
   }
 

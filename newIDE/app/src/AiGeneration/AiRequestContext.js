@@ -279,47 +279,57 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
     [profile]
   );
 
-  const [aiRequestSendStates, setAiRequestSendStates] = React.useState<{
+  // Store send states in a ref so that isSendingAiRequest reads are
+  // immediately consistent — even within the same async tick.
+  // Without this, React 18 automatic batching would defer the state
+  // update from setSendingAiRequest, causing guards (e.g. in
+  // onSendMessage) to read stale data and potentially trigger
+  // duplicate API calls.
+  // forceUpdate() schedules a re-render so the UI stays in sync.
+  const aiRequestSendStatesRef = React.useRef<{
     [string]: AiRequestSendState,
   }>({});
+  const forceUpdateForSendStates = useForceUpdate();
   const isSendingAiRequest = React.useCallback(
     (aiRequestId: string | null) =>
-      !!aiRequestSendStates[aiRequestId || ''] &&
-      aiRequestSendStates[aiRequestId || ''].isSending,
-    [aiRequestSendStates]
+      !!aiRequestSendStatesRef.current[aiRequestId || ''] &&
+      aiRequestSendStatesRef.current[aiRequestId || ''].isSending,
+    []
   );
   const getLastSendError = React.useCallback(
     (aiRequestId: string | null) =>
-      (aiRequestSendStates[aiRequestId || ''] &&
-        aiRequestSendStates[aiRequestId || ''].lastSendError) ||
+      (aiRequestSendStatesRef.current[aiRequestId || ''] &&
+        aiRequestSendStatesRef.current[aiRequestId || ''].lastSendError) ||
       null,
-    [aiRequestSendStates]
+    []
   );
   const setSendingAiRequest = React.useCallback(
     (aiRequestId: string | null, isSending: boolean) => {
       const aiRequestIdToSet: string = aiRequestId || '';
-      setAiRequestSendStates(aiRequestSendStates => ({
-        ...aiRequestSendStates,
+      aiRequestSendStatesRef.current = {
+        ...aiRequestSendStatesRef.current,
         [aiRequestIdToSet]: {
           isSending,
           lastSendError: null,
         },
-      }));
+      };
+      forceUpdateForSendStates();
     },
-    [setAiRequestSendStates]
+    [forceUpdateForSendStates]
   );
   const setLastSendError = React.useCallback(
     (aiRequestId: string | null, lastSendError: ?Error) => {
       const aiRequestIdToSet: string = aiRequestId || '';
-      setAiRequestSendStates(aiRequestSendStates => ({
-        ...aiRequestSendStates,
+      aiRequestSendStatesRef.current = {
+        ...aiRequestSendStatesRef.current,
         [aiRequestIdToSet]: {
           isSending: false,
           lastSendError,
         },
-      }));
+      };
+      forceUpdateForSendStates();
     },
-    [setAiRequestSendStates]
+    [forceUpdateForSendStates]
   );
 
   return {

@@ -962,6 +962,7 @@ namespace gdjs {
           this._getEditorCamera().switchToOrbitAroundZ0(4000),
         isFreeCamera: () => this._getEditorCamera().isFreeCamera(),
         getSvgIconUrl: (iconName: string) => getSvgIconUrl(game, iconName),
+        hasSelection: () => this._selection.getSelectedObjects().length > 0,
         hasSelectionControlsShown: () => !!this._selectionControls,
         hasEditableSelection: () => this._hasEditableSelection(),
         getSelectionTransformValues: () => this._getSelectionTransformValues(),
@@ -4248,6 +4249,7 @@ namespace gdjs {
     private _switchToOrbitCamera: () => void;
     private _isFreeCamera: () => boolean;
     private _getSvgIconUrl: (iconName: string) => string;
+    private _hasSelection: () => boolean;
     private _hasSelectionControlsShown: () => boolean;
     private _hasEditableSelection: () => boolean;
     private _getSelectionTransformValues: () => SelectionTransformValues | null;
@@ -4529,6 +4531,7 @@ namespace gdjs {
       switchToOrbitCamera,
       isFreeCamera,
       getSvgIconUrl,
+      hasSelection,
       hasSelectionControlsShown,
       hasEditableSelection,
       getSelectionTransformValues,
@@ -4559,6 +4562,7 @@ namespace gdjs {
       switchToOrbitCamera: () => void;
       isFreeCamera: () => boolean;
       getSvgIconUrl: (iconName: string) => string;
+      hasSelection: () => boolean;
       hasSelectionControlsShown: () => boolean;
       hasEditableSelection: () => boolean;
       getSelectionTransformValues: () => SelectionTransformValues | null;
@@ -4587,6 +4591,7 @@ namespace gdjs {
       this._switchToOrbitCamera = switchToOrbitCamera;
       this._isFreeCamera = isFreeCamera;
       this._getSvgIconUrl = getSvgIconUrl;
+      this._hasSelection = hasSelection;
       this._hasSelectionControlsShown = hasSelectionControlsShown;
       this._hasEditableSelection = hasEditableSelection;
       this._getSelectionTransformValues = getSelectionTransformValues;
@@ -4858,6 +4863,14 @@ namespace gdjs {
           freeCameraButton: container.querySelector('#free-camera-button')!,
           orbitCameraButton: container.querySelector('#orbit-camera-button')!,
         };
+      }
+
+      const hasSelection = this._hasSelection();
+      this._renderedElements.container.style.display = hasSelection
+        ? 'flex'
+        : 'none';
+      if (!hasSelection) {
+        return;
       }
 
       const hasSelectionControls = this._hasSelectionControlsShown();

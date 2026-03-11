@@ -2,6 +2,9 @@
 
 import { type InstancesEditorSettings } from '../InstancesEditor/InstancesEditorSettings';
 
+const sanitizeGridValue = (value: number, fallback: number = 0): number =>
+  Number.isFinite(value) ? value : fallback;
+
 export const roundPositionsToGrid = (
   pos: [number, number],
   instancesEditorSettings: InstancesEditorSettings,
@@ -10,8 +13,7 @@ export const roundPositionsToGrid = (
   const newPos = pos;
 
   if (
-    instancesEditorSettings.grid &&
-    instancesEditorSettings.snap &&
+    (instancesEditorSettings.grid || instancesEditorSettings.snap) &&
     !noGridSnap
   ) {
     roundPosition(
@@ -40,8 +42,13 @@ export const roundPosition = (
   gridOffsetY: number,
   gridType: string
 ) => {
+  const safeGridWidth = sanitizeGridValue(gridWidth);
+  const safeGridHeight = sanitizeGridValue(gridHeight);
+  const safeGridOffsetX = sanitizeGridValue(gridOffsetX);
+  const safeGridOffsetY = sanitizeGridValue(gridOffsetY);
+
   if (gridType === 'isometric') {
-    if (gridWidth <= 0 || gridHeight <= 0) {
+    if (safeGridWidth <= 0 || safeGridHeight <= 0) {
       pos[0] = Math.round(pos[0]);
       pos[1] = Math.round(pos[1]);
       return;
@@ -54,15 +61,21 @@ export const roundPosition = (
     // o-o-o-
     // -o-o-o
     // o-o-o-
-    let cellX = Math.round(((pos[0] - gridOffsetX) * 2) / gridWidth);
-    let cellY = Math.round(((pos[1] - gridOffsetY) * 2) / gridHeight);
+    let cellX = Math.round(
+      ((pos[0] - safeGridOffsetX) * 2) / safeGridWidth
+    );
+    let cellY = Math.round(
+      ((pos[1] - safeGridOffsetY) * 2) / safeGridHeight
+    );
 
     if ((((cellX + cellY) % 2) + 2) % 2 === 1) {
       // This cell should not be used, find the nearest one
       const deltaX =
-        (pos[0] - ((cellX / 2) * gridWidth + gridOffsetX)) / gridWidth;
+        (pos[0] - ((cellX / 2) * safeGridWidth + safeGridOffsetX)) /
+        safeGridWidth;
       const deltaY =
-        (pos[1] - ((cellY / 2) * gridHeight + gridOffsetY)) / gridHeight;
+        (pos[1] - ((cellY / 2) * safeGridHeight + safeGridOffsetY)) /
+        safeGridHeight;
 
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
         if (deltaX > 0) {
@@ -79,23 +92,25 @@ export const roundPosition = (
       }
     }
     // magnet to the half cell
-    pos[0] = (cellX / 2) * gridWidth + gridOffsetX;
-    pos[1] = (cellY / 2) * gridHeight + gridOffsetY;
+    pos[0] = (cellX / 2) * safeGridWidth + safeGridOffsetX;
+    pos[1] = (cellY / 2) * safeGridHeight + safeGridOffsetY;
   } else {
-    if (gridWidth <= 0) {
+    if (safeGridWidth <= 0) {
       pos[0] = Math.round(pos[0]);
     } else {
       pos[0] =
-        Math.round((pos[0] - gridOffsetX) / gridWidth) * gridWidth +
-        gridOffsetX;
+        Math.round((pos[0] - safeGridOffsetX) / safeGridWidth) *
+          safeGridWidth +
+        safeGridOffsetX;
     }
 
-    if (gridHeight <= 0) {
+    if (safeGridHeight <= 0) {
       pos[1] = Math.round(pos[1]);
     } else {
       pos[1] =
-        Math.round((pos[1] - gridOffsetY) / gridHeight) * gridHeight +
-        gridOffsetY;
+        Math.round((pos[1] - safeGridOffsetY) / safeGridHeight) *
+          safeGridHeight +
+        safeGridOffsetY;
     }
   }
 };
@@ -108,24 +123,31 @@ export const roundPositionForResizing = (
   gridOffsetY: number,
   gridType: string
 ): void => {
+  const safeGridWidth = sanitizeGridValue(gridWidth);
+  const safeGridHeight = sanitizeGridValue(gridHeight);
+  const safeGridOffsetX = sanitizeGridValue(gridOffsetX);
+  const safeGridOffsetY = sanitizeGridValue(gridOffsetY);
+
   if (gridType === 'isometric') {
     // There is no point to align on the isometric grid when resizing.
     // Use half cells to give a bit more of freedom than for positioning.
     return roundPosition(
       pos,
-      gridWidth / 2,
-      gridHeight / 2,
-      gridOffsetX,
-      gridOffsetY,
+      safeGridWidth / 2,
+      safeGridHeight / 2,
+      safeGridOffsetX,
+      safeGridOffsetY,
       'rectangular'
     );
   }
   return roundPosition(
     pos,
-    gridWidth,
-    gridHeight,
-    gridOffsetX,
-    gridOffsetY,
+    safeGridWidth,
+    safeGridHeight,
+    safeGridOffsetX,
+    safeGridOffsetY,
     gridType
   );
 };
+
+

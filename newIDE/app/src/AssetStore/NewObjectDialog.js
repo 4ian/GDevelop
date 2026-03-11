@@ -5,14 +5,9 @@ import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import HelpButton from '../UI/HelpButton';
-import { Tabs } from '../UI/Tabs';
-import { AssetStore, type AssetStoreInterface } from '.';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { sendAssetAddedToProject } from '../Utils/Analytics/EventSender';
-import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-import RaisedButton from '../UI/RaisedButton';
 import { AssetStoreContext } from './AssetStoreContext';
-import AssetPackInstallDialog from './AssetPackInstallDialog';
 import {
   installPublicAsset,
   checkRequiredExtensionsUpdateForAssets,
@@ -26,16 +21,10 @@ import {
   getPublicAsset,
   isPrivateAsset,
 } from '../Utils/GDevelopServices/Asset';
-import Window from '../Utils/Window';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
-import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
-import { enumerateAssetStoreIds } from './EnumerateAssetStoreIds';
 import PromisePool from '@supercharge/promise-pool';
-import NewObjectFromScratch, {
-  CustomObjectPackResults,
-} from './NewObjectFromScratch';
-import { getAssetShortHeadersToDisplay } from './AssetsList';
+import NewObjectFromScratch from './NewObjectFromScratch';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import type { ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateObjectFolderOrObject';
 import LoaderModal from '../UI/LoaderModal';
@@ -46,8 +35,6 @@ import { ExtensionStoreContext } from './ExtensionStore/ExtensionStoreContext';
 import { type ObjectShortHeader } from '../Utils/GDevelopServices/Extension';
 
 const gd: libGDevelop = global.gd;
-
-const isDev = Window.isDev();
 
 export const useProjectNeedToBeSavedAlertDialog = (
   canInstallPrivateAsset: () => boolean
@@ -270,95 +257,23 @@ type Props = {|
 
 function NewObjectDialog({
   project,
-  layout,
   eventsFunctionsExtension,
   eventsBasedObject,
-  objectsContainer,
-  resourceManagementProps,
   onClose,
   onCreateNewObject,
-  onObjectsAddedFromAssets,
-  targetObjectFolderOrObjectWithContext,
   onWillInstallExtension,
   onExtensionInstalled,
 }: Props) {
-  const { isMobile } = useResponsiveWindowSize();
-  const {
-    setNewObjectDialogDefaultTab,
-    getNewObjectDialogDefaultTab,
-  } = React.useContext(PreferencesContext);
-  const [currentTab, setCurrentTab] = React.useState(
-    getNewObjectDialogDefaultTab()
-  );
-
-  React.useEffect(() => setNewObjectDialogDefaultTab(currentTab), [
-    setNewObjectDialogDefaultTab,
-    currentTab,
-  ]);
-
-  const {
-    assetShortHeadersSearchResults,
-    environment,
-    setEnvironment,
-  } = React.useContext(AssetStoreContext);
-  const shopNavigationState = React.useContext(AssetStoreNavigatorContext);
-  const {
-    openedAssetPack,
-    openedAssetShortHeader,
-    selectedFolders,
-  } = shopNavigationState.getCurrentPage();
-  const [
-    isAssetPackDialogInstallOpen,
-    setIsAssetPackDialogInstallOpen,
-  ] = React.useState(false);
-  // Avoid memoizing the result of enumerateAssetStoreIds, as it does not get updated
-  // when adding assets.
-  const existingAssetStoreIds = enumerateAssetStoreIds(
-    project,
-    objectsContainer
-  );
   const [
     isAssetBeingInstalled,
     setIsAssetBeingInstalled,
   ] = React.useState<boolean>(false);
-  const [
-    selectedCustomObjectEnumeratedMetadata,
-    setSelectedCustomObjectEnumeratedMetadata,
-  ] = React.useState<?ObjectShortHeader>(null);
-  const isAssetAddedToScene =
-    openedAssetShortHeader &&
-    existingAssetStoreIds.has(openedAssetShortHeader.id);
   const { showAlert } = useAlertDialog();
 
-  const installAsset = useInstallAsset({
-    project,
-    resourceManagementProps,
-    targetObjectFolderOrObjectWithContext,
-    onWillInstallExtension,
-    onExtensionInstalled,
-  });
   const {
     translatedExtensionShortHeadersByName: extensionShortHeadersByName,
   } = React.useContext(ExtensionStoreContext);
   const installExtension = useInstallExtension();
-
-  const onInstallAsset = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    async (assetShortHeader): Promise<boolean> => {
-      if (!assetShortHeader) return false;
-
-      setIsAssetBeingInstalled(true);
-      const installAssetOutput = await installAsset({
-        assetShortHeader,
-        objectsContainer,
-        setIsAssetBeingInstalled,
-      });
-      setIsAssetBeingInstalled(false);
-      if (installAssetOutput) onObjectsAddedFromAssets(installAssetOutput);
-      return !!installAssetOutput;
-    },
-    [installAsset, onObjectsAddedFromAssets, objectsContainer]
-  );
 
   const onInstallEmptyCustomObject = React.useCallback(
     async (enumeratedObjectMetadata: ObjectShortHeader) => {
@@ -411,96 +326,8 @@ function NewObjectDialog({
     ]
   );
 
-  const displayedAssetShortHeaders = React.useMemo(
-    () => {
-      return assetShortHeadersSearchResults
-        ? getAssetShortHeadersToDisplay(
-            assetShortHeadersSearchResults,
-            selectedFolders
-          )
-        : [];
-    },
-    [assetShortHeadersSearchResults, selectedFolders]
-  );
-
-  const mainAction =
-    currentTab === 'asset-store' ? (
-      openedAssetPack ? (
-        <RaisedButton
-          key="add-all-assets"
-          primary
-          label={
-            displayedAssetShortHeaders.length === 1 ? (
-              <Trans>Add this asset to my scene</Trans>
-            ) : (
-              <Trans>Add these assets to my scene</Trans>
-            )
-          }
-          onClick={() => setIsAssetPackDialogInstallOpen(true)}
-          disabled={
-            !displayedAssetShortHeaders ||
-            displayedAssetShortHeaders.length === 0
-          }
-        />
-      ) : openedAssetShortHeader ? (
-        <RaisedButton
-          key="add-asset"
-          primary={!isAssetAddedToScene}
-          label={
-            isAssetBeingInstalled ? (
-              <Trans>Adding...</Trans>
-            ) : isAssetAddedToScene ? (
-              <Trans>Add again</Trans>
-            ) : (
-              <Trans>Add to the scene</Trans>
-            )
-          }
-          onClick={async () => {
-            onInstallAsset(openedAssetShortHeader);
-          }}
-          disabled={isAssetBeingInstalled}
-          id="add-asset-button"
-        />
-      ) : isDev ? (
-        <RaisedButton
-          key="show-dev-assets"
-          label={
-            environment === 'staging' ? (
-              <Trans>Show live assets</Trans>
-            ) : (
-              <Trans>Show staging assets</Trans>
-            )
-          }
-          onClick={() => {
-            setEnvironment(environment === 'staging' ? 'live' : 'staging');
-          }}
-        />
-      ) : null
-    ) : !!selectedCustomObjectEnumeratedMetadata &&
-      currentTab === 'new-object' ? (
-      <RaisedButton
-        key="skip-and-create"
-        label={
-          isAssetBeingInstalled ? (
-            <Trans>Adding...</Trans>
-          ) : (
-            <Trans>Skip and create from scratch</Trans>
-          )
-        }
-        primary
-        onClick={() =>
-          selectedCustomObjectEnumeratedMetadata &&
-          onInstallEmptyCustomObject(selectedCustomObjectEnumeratedMetadata)
-        }
-        id="skip-and-create-button"
-        disabled={isAssetBeingInstalled}
-      />
-    ) : null;
-
-  const assetStore = React.useRef<?AssetStoreInterface>(null);
   const handleClose = React.useCallback(
     () => {
-      assetStore.current && assetStore.current.onClose();
       onClose();
     },
     [onClose]
@@ -508,11 +335,10 @@ function NewObjectDialog({
 
   const onObjectTypeSelected = React.useCallback(
     (enumeratedObjectMetadata: ObjectShortHeader) => {
-      if (enumeratedObjectMetadata.assetStoreTag) {
-        // When the object is from an asset store, display the objects from the pack
-        // so that the user can either pick a similar object or skip to create a new one.
-        setSelectedCustomObjectEnumeratedMetadata(enumeratedObjectMetadata);
-      } else if (enumeratedObjectMetadata.requiredExtensions) {
+      if (
+        enumeratedObjectMetadata.requiredExtensions &&
+        enumeratedObjectMetadata.requiredExtensions.length
+      ) {
         onInstallEmptyCustomObject(enumeratedObjectMetadata);
       } else {
         onCreateNewObject(enumeratedObjectMetadata.name);
@@ -538,93 +364,22 @@ function NewObjectDialog({
                 onClick={handleClose}
                 id="close-button"
               />,
-              mainAction,
             ]}
             onRequestClose={handleClose}
-            onApply={
-              openedAssetPack
-                ? () => setIsAssetPackDialogInstallOpen(true)
-                : openedAssetShortHeader
-                ? async () => {
-                    await onInstallAsset(openedAssetShortHeader);
-                  }
-                : undefined
-            }
             open
             flexBody
             fullHeight
             id="new-object-dialog"
-            fixedContent={
-              <Tabs
-                value={currentTab}
-                onChange={setCurrentTab}
-                options={[
-                  {
-                    label: <Trans>Asset Store</Trans>,
-                    value: 'asset-store',
-                    id: 'asset-store-tab',
-                  },
-                  {
-                    label: <Trans>New object from scratch</Trans>,
-                    value: 'new-object',
-                    id: 'new-object-from-scratch-tab',
-                  },
-                ]}
-                // Enforce scroll on mobile, because the tabs have long names.
-                variant={isMobile ? 'scrollable' : undefined}
-              />
-            }
           >
-            {currentTab === 'asset-store' && (
-              <AssetStore ref={assetStore} onlyShowAssets />
-            )}
-            {currentTab === 'new-object' &&
-              (selectedCustomObjectEnumeratedMetadata &&
-              selectedCustomObjectEnumeratedMetadata.assetStoreTag ? (
-                <CustomObjectPackResults
-                  packTag={selectedCustomObjectEnumeratedMetadata.assetStoreTag}
-                  onAssetSelect={async assetShortHeader => {
-                    const result = await onInstallAsset(assetShortHeader);
-                    if (result) {
-                      handleClose();
-                    }
-                  }}
-                  isAssetBeingInstalled={isAssetBeingInstalled}
-                  onBack={() => setSelectedCustomObjectEnumeratedMetadata(null)}
-                />
-              ) : (
-                <NewObjectFromScratch
-                  project={project}
-                  eventsFunctionsExtension={eventsFunctionsExtension}
-                  eventsBasedObject={eventsBasedObject}
-                  onObjectTypeSelected={onObjectTypeSelected}
-                  i18n={i18n}
-                />
-              ))}
+            <NewObjectFromScratch
+              project={project}
+              eventsFunctionsExtension={eventsFunctionsExtension}
+              eventsBasedObject={eventsBasedObject}
+              onObjectTypeSelected={onObjectTypeSelected}
+              i18n={i18n}
+            />
           </Dialog>
           {isAssetBeingInstalled && <LoaderModal showImmediately />}
-          {isAssetPackDialogInstallOpen &&
-            displayedAssetShortHeaders &&
-            openedAssetPack && (
-              <AssetPackInstallDialog
-                assetPack={openedAssetPack}
-                assetShortHeaders={displayedAssetShortHeaders}
-                addedAssetIds={existingAssetStoreIds}
-                onClose={() => setIsAssetPackDialogInstallOpen(false)}
-                onAssetsAdded={installAssetOutput => {
-                  setIsAssetPackDialogInstallOpen(false);
-                  onObjectsAddedFromAssets(installAssetOutput);
-                }}
-                project={project}
-                objectsContainer={objectsContainer}
-                resourceManagementProps={resourceManagementProps}
-                targetObjectFolderOrObjectWithContext={
-                  targetObjectFolderOrObjectWithContext
-                }
-                onWillInstallExtension={onWillInstallExtension}
-                onExtensionInstalled={onExtensionInstalled}
-              />
-            )}
         </>
       )}
     </I18n>

@@ -131,6 +131,71 @@ namespace gdjs {
           this.enableEffect(effectData.name, false);
         }
       }
+
+      this._ensureDefault3DLighting(layerData);
+    }
+
+    private _ensureDefault3DLighting(layerData: LayerData): void {
+      if (this._renderingType === RuntimeLayerRenderingType.TWO_D) return;
+      if (!(this._runtimeScene instanceof gdjs.RuntimeScene)) return;
+
+      const effects = layerData.effects || [];
+      const hasDirectionalLight = effects.some(
+        effect => effect.effectType === 'Scene3D::DirectionalLight'
+      );
+      const hasHemisphereLight = effects.some(
+        effect => effect.effectType === 'Scene3D::HemisphereLight'
+      );
+      if (hasDirectionalLight && hasHemisphereLight) return;
+
+      const existingNames = new Set(effects.map(effect => effect.name));
+      if (!hasDirectionalLight) {
+        const sunLightName = existingNames.has('3D Sun Light')
+          ? '__auto_3d_sun_light'
+          : '3D Sun Light';
+        existingNames.add(sunLightName);
+        this.addEffect({
+          effectType: 'Scene3D::DirectionalLight',
+          name: sunLightName,
+          doubleParameters: {
+            intensity: 0.75,
+            elevation: 40,
+            rotation: 300,
+            minimumShadowBias: 0,
+            distanceFromCamera: 1500,
+            frustumSize: 4000,
+          },
+          stringParameters: {
+            color: '255;255;255',
+            top: 'Z+',
+            shadowQuality: 'medium',
+          },
+          booleanParameters: {
+            isCastingShadow: true,
+          },
+        });
+      }
+
+      if (!hasHemisphereLight) {
+        const skyLightName = existingNames.has('3D Ambient Hemisphere Light')
+          ? '__auto_3d_sky_light'
+          : '3D Ambient Hemisphere Light';
+        this.addEffect({
+          effectType: 'Scene3D::HemisphereLight',
+          name: skyLightName,
+          doubleParameters: {
+            intensity: 0.33,
+            elevation: 40,
+            rotation: 300,
+          },
+          stringParameters: {
+            skyColor: '255;255;255',
+            groundColor: '127;127;127',
+            top: 'Z+',
+          },
+          booleanParameters: {},
+        });
+      }
     }
 
     getNetworkSyncData(): LayerNetworkSyncData {

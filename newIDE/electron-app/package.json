@@ -1,12 +1,15 @@
 {
-  "name": "gdevelop",
+  "name": "carrots-engine",
   "productName": "Carrots Engine",
   "description": "Carrots Engine IDE running on the Electron runtime",
   "version": "1.0.0",
-  "author": "Florian Rival",
+  "author": "islam ibrahim",
   "license": "MIT",
-  "homepage": "http://gdevelop.io",
-  "repository": "github:4ian/GDevelop",
+  "homepage": "https://carrots.odoo.com/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Carrotstudio0/Carrots-Engine"
+  },
   "private": true,
   "scripts": {
     "postinstall": "npm run import-zipped-electron-extensions && cd app && npm install && cd .. && npm run copy-electron-remote-to-app-resources",

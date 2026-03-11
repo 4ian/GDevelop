@@ -1,8 +1,8 @@
 {
-  "name": "gdevelop",
+  "name": "carrots-engine",
   "productName": "Carrots Engine",
   "description": "Carrots Engine IDE - the open-source, cross-platform game engine designed for everyone",
-  "version": "5.7.0",
+  "version": "1.0.0",
   "author": "GDevelop Team <hello@gdevelop.io>",
   "license": "MIT",
   "homepage": "https://gdevelop.io",

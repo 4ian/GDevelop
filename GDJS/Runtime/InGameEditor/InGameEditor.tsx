@@ -9,7 +9,7 @@ namespace gdjs {
     tag: K,
     attrs: {
       style?: Partial<CSSStyleDeclaration>;
-      onClick?: () => void;
+      onClick?: (event?: MouseEvent) => void;
     },
     ...nodes: (HTMLElement | string)[]
   ): HTMLElement {
@@ -411,6 +411,14 @@ namespace gdjs {
     max: Point3D;
   };
 
+  type SelectionTransformValues = {
+    axis: string | null;
+    is3D: boolean;
+    position: { x: float; y: float; z: float };
+    rotation: { x: float; y: float; z: float };
+    scale: { x: float; y: float; z: float };
+  };
+
   const defaultEffectsData: EffectData[] = [
     {
       effectType: 'Scene3D::HemisphereLight',
@@ -636,10 +644,10 @@ namespace gdjs {
       }
     > = new Map();
 
-    startMove() {
+    startMove({ skipClickGuard = false }: { skipClickGuard?: boolean } = {}) {
       this._changeHappened = false;
       this._objectInitialPositions.clear();
-      this.startTime = Date.now();
+      this.startTime = skipClickGuard ? 0 : Date.now();
     }
 
     endMove(): boolean {
@@ -710,10 +718,6 @@ namespace gdjs {
                 depth: 0,
               };
           this._objectInitialPositions.set(object, initialPosition);
-        }
-        // TODO Remove this when we handle 2D instances controls
-        if (!is3D(object)) {
-          return;
         }
         object.setX(Math.round(initialPosition.x + movement.translationX));
         object.setY(Math.round(initialPosition.y + movement.translationY));
@@ -821,6 +825,7 @@ namespace gdjs {
     private _isTranslationSnapStepManuallyChanged = false;
     private _rotationSnapDegrees = ROTATION_SNAP_DEGREES;
     private _scaleSnapStep = SCALE_SNAP_STEP;
+    private _lastSelectedTransformAxis: string | null = null;
     private _lastAppliedTransformControlsSettings: {
       controls: THREE_ADDONS.TransformControls;
       mode: 'translate' | 'rotate' | 'scale';
@@ -939,12 +944,18 @@ namespace gdjs {
         toggleTranslationSnap: () => this._toggleTransformSnap('translation'),
         toggleRotationSnap: () => this._toggleTransformSnap('rotation'),
         toggleScaleSnap: () => this._toggleTransformSnap('scale'),
-        decreaseTranslationSnapStep: () => this._changeTranslationSnapStep(-1),
-        increaseTranslationSnapStep: () => this._changeTranslationSnapStep(1),
-        decreaseRotationSnapDegrees: () => this._changeRotationSnapDegrees(-1),
-        increaseRotationSnapDegrees: () => this._changeRotationSnapDegrees(1),
-        decreaseScaleSnapStep: () => this._changeScaleSnapStep(-1),
-        increaseScaleSnapStep: () => this._changeScaleSnapStep(1),
+        decreaseTranslationSnapStep: (event?: MouseEvent) =>
+          this._handleTranslationStepButtonClick(-1, event),
+        increaseTranslationSnapStep: (event?: MouseEvent) =>
+          this._handleTranslationStepButtonClick(1, event),
+        decreaseRotationSnapDegrees: (event?: MouseEvent) =>
+          this._handleRotationStepButtonClick(-1, event),
+        increaseRotationSnapDegrees: (event?: MouseEvent) =>
+          this._handleRotationStepButtonClick(1, event),
+        decreaseScaleSnapStep: (event?: MouseEvent) =>
+          this._handleScaleStepButtonClick(-1, event),
+        increaseScaleSnapStep: (event?: MouseEvent) =>
+          this._handleScaleStepButtonClick(1, event),
         focusOnSelection: () => this._focusOnSelection(),
         switchToFreeCamera: () => this._getEditorCamera().switchToFreeCamera(),
         switchToOrbitCamera: () =>
@@ -952,6 +963,8 @@ namespace gdjs {
         isFreeCamera: () => this._getEditorCamera().isFreeCamera(),
         getSvgIconUrl: (iconName: string) => getSvgIconUrl(game, iconName),
         hasSelectionControlsShown: () => !!this._selectionControls,
+        hasEditableSelection: () => this._hasEditableSelection(),
+        getSelectionTransformValues: () => this._getSelectionTransformValues(),
       });
 
       this._applyInGameEditorSettings();
@@ -1850,14 +1863,25 @@ namespace gdjs {
           this._editorGrid.setTreeScene(threeScene);
         }
         this._editorGrid.setVisible(true);
-        if (this._editorGrid.isSpanningEnabled(inputManager)) {
-          intersectionX = this._editorGrid.getSnappedX(intersectionX);
-          intersectionY = this._editorGrid.getSnappedY(intersectionY);
+        if (this._editorGrid.isSnappingEnabled(inputManager)) {
+          // Snap the resulting object position, not the cursor, to preserve
+          // the click offset and avoid objects jumping to the cursor.
+          const newObjX = this._draggedSelectedObjectInitialX +
+            (intersectionX - this._draggedSelectedObjectInitialX);
+          const newObjY = this._draggedSelectedObjectInitialY +
+            (intersectionY - this._draggedSelectedObjectInitialY);
+          const snappedX = this._editorGrid.getSnappedX(newObjX);
+          const snappedY = this._editorGrid.getSnappedY(newObjY);
+          this._draggedSelectedObjectTotalDelta.translationX =
+            snappedX - this._draggedSelectedObjectInitialX;
+          this._draggedSelectedObjectTotalDelta.translationY =
+            snappedY - this._draggedSelectedObjectInitialY;
+        } else {
+          this._draggedSelectedObjectTotalDelta.translationX =
+            intersectionX - this._draggedSelectedObjectInitialX;
+          this._draggedSelectedObjectTotalDelta.translationY =
+            intersectionY - this._draggedSelectedObjectInitialY;
         }
-        this._draggedSelectedObjectTotalDelta.translationX =
-          intersectionX - this._draggedSelectedObjectInitialX;
-        this._draggedSelectedObjectTotalDelta.translationY =
-          intersectionY - this._draggedSelectedObjectInitialY;
         this._draggedSelectedObjectTotalDelta.translationZ =
           intersectionZ - this._draggedSelectedObjectInitialZ;
       } else {
@@ -2354,6 +2378,210 @@ namespace gdjs {
       this._setScaleSnapStep(this._scaleSnapStep + direction * increment);
     }
 
+    private _hasEditableSelection(): boolean {
+      return this._selection
+        .getSelectedObjects()
+        .some(
+          (object) =>
+            !this.isInstanceLocked(object) && !this.isInstanceSealed(object)
+        );
+    }
+
+    private _shouldAdjustSnapStepFromToolbar(event?: MouseEvent): boolean {
+      if (event && event.shiftKey) return true;
+      return !this._hasEditableSelection();
+    }
+
+    private _getNudgeAxis(defaultAxis: string): string {
+      const axis =
+        (this._selectionControls &&
+          this._selectionControls.threeTransformControls.axis) ||
+        this._lastSelectedTransformAxis;
+      if (
+        axis &&
+        (axis.includes('X') || axis.includes('Y') || axis.includes('Z'))
+      ) {
+        return axis;
+      }
+      return defaultAxis;
+    }
+
+    private _applyNudgeMovement(movement: {
+      translationX: float;
+      translationY: float;
+      translationZ: float;
+      rotationX: float;
+      rotationY: float;
+      rotationZ: float;
+      scaleX: float;
+      scaleY: float;
+      scaleZ: float;
+    }): void {
+      const selectedObjects = this._selection
+        .getSelectedObjects()
+        .filter(
+          (object) =>
+            !this.isInstanceLocked(object) && !this.isInstanceSealed(object)
+        );
+      if (!selectedObjects.length) return;
+
+      this._objectMover.startMove({ skipClickGuard: true });
+      this._objectMover.move(selectedObjects, movement);
+      const changeHappened = this._objectMover.endMove();
+      if (changeHappened) {
+        this._sendSelectionUpdate({ hasSelectedObjectBeenModified: true });
+      }
+    }
+
+    private _nudgeSelectionTranslation(direction: -1 | 1): void {
+      const axis = this._getNudgeAxis('X');
+      let isMovingOnX = axis.includes('X');
+      let isMovingOnY = axis.includes('Y');
+      let isMovingOnZ = axis.includes('Z');
+      if (!isMovingOnX && !isMovingOnY && !isMovingOnZ) {
+        isMovingOnX = true;
+      }
+
+      const step = this._translationSnapStep;
+      this._applyNudgeMovement({
+        translationX: isMovingOnX ? step * direction : 0,
+        translationY: isMovingOnY ? step * direction : 0,
+        translationZ: isMovingOnZ ? step * direction : 0,
+        rotationX: 0,
+        rotationY: 0,
+        rotationZ: 0,
+        scaleX: 1,
+        scaleY: 1,
+        scaleZ: 1,
+      });
+    }
+
+    private _nudgeSelectionRotation(direction: -1 | 1): void {
+      const axis = this._getNudgeAxis('Z');
+      let rotateX = axis.includes('X');
+      let rotateY = axis.includes('Y');
+      let rotateZ = axis.includes('Z');
+      if (!rotateX && !rotateY && !rotateZ) {
+        rotateZ = true;
+      }
+
+      const step = this._rotationSnapDegrees;
+      this._applyNudgeMovement({
+        translationX: 0,
+        translationY: 0,
+        translationZ: 0,
+        rotationX: rotateX ? step * direction : 0,
+        rotationY: rotateY ? step * direction : 0,
+        rotationZ: rotateZ ? step * direction : 0,
+        scaleX: 1,
+        scaleY: 1,
+        scaleZ: 1,
+      });
+    }
+
+    private _nudgeSelectionScale(direction: -1 | 1): void {
+      const axis = this._getNudgeAxis('XYZ');
+      let scaleX = axis.includes('X');
+      let scaleY = axis.includes('Y');
+      let scaleZ = axis.includes('Z');
+      if (!scaleX && !scaleY && !scaleZ) {
+        scaleX = true;
+        scaleY = true;
+        scaleZ = true;
+      }
+
+      const factor = Math.max(0.01, 1 + direction * this._scaleSnapStep);
+      this._applyNudgeMovement({
+        translationX: 0,
+        translationY: 0,
+        translationZ: 0,
+        rotationX: 0,
+        rotationY: 0,
+        rotationZ: 0,
+        scaleX: scaleX ? factor : 1,
+        scaleY: scaleY ? factor : 1,
+        scaleZ: scaleZ ? factor : 1,
+      });
+    }
+
+    private _handleTranslationStepButtonClick(
+      direction: -1 | 1,
+      event?: MouseEvent
+    ): void {
+      if (this._shouldAdjustSnapStepFromToolbar(event)) {
+        this._changeTranslationSnapStep(direction);
+        return;
+      }
+      this._nudgeSelectionTranslation(direction);
+    }
+
+    private _handleRotationStepButtonClick(
+      direction: -1 | 1,
+      event?: MouseEvent
+    ): void {
+      if (this._shouldAdjustSnapStepFromToolbar(event)) {
+        this._changeRotationSnapDegrees(direction);
+        return;
+      }
+      this._nudgeSelectionRotation(direction);
+    }
+
+    private _handleScaleStepButtonClick(
+      direction: -1 | 1,
+      event?: MouseEvent
+    ): void {
+      if (this._shouldAdjustSnapStepFromToolbar(event)) {
+        this._changeScaleSnapStep(direction);
+        return;
+      }
+      this._nudgeSelectionScale(direction);
+    }
+
+    private _getSelectionTransformValues(): SelectionTransformValues | null {
+      const selectedObject = this._selection.getLastSelectedObject({
+        ignoreIf: (object) =>
+          this.isInstanceLocked(object) || this.isInstanceSealed(object),
+      });
+      if (!selectedObject) return null;
+
+      const isObject3D = is3D(selectedObject);
+      const x = selectedObject.getX();
+      const y = selectedObject.getY();
+      const z = isObject3D ? selectedObject.getZ() : 0;
+      const rotationX = isObject3D ? selectedObject.getRotationX() : 0;
+      const rotationY = isObject3D ? selectedObject.getRotationY() : 0;
+      const rotationZ = selectedObject.getAngle();
+      const width = selectedObject.getWidth();
+      const height = selectedObject.getHeight();
+      const depth = isObject3D ? selectedObject.getDepth() : 0;
+      const defaultWidth = selectedObject.getOriginalWidth() || 1;
+      const defaultHeight = selectedObject.getOriginalHeight() || 1;
+      const defaultDepth = isObject3D
+        ? selectedObject.getOriginalDepth() || 1
+        : 1;
+
+      const scaleX = defaultWidth ? width / defaultWidth : 1;
+      const scaleY = defaultHeight ? height / defaultHeight : 1;
+      const scaleZ = isObject3D
+        ? defaultDepth
+          ? depth / defaultDepth
+          : 1
+        : 1;
+
+      const axis =
+        (this._selectionControls &&
+          this._selectionControls.threeTransformControls.axis) ||
+        this._lastSelectedTransformAxis;
+
+      return {
+        axis,
+        is3D: isObject3D,
+        position: { x, y, z },
+        rotation: { x: rotationX, y: rotationY, z: rotationZ },
+        scale: { x: scaleX, y: scaleY, z: scaleZ },
+      };
+    }
+
     private _isSnapEnabledForCurrentFrame(
       isEnabledByDefault: boolean,
       inputManager: gdjs.InputManager
@@ -2753,6 +2981,9 @@ namespace gdjs {
         // Update the grid.
         const axis = threeTransformControls.axis;
         if (axis) {
+          this._lastSelectedTransformAxis = axis;
+        }
+        if (axis) {
           const isMovingOnX = axis ? axis.includes('X') : false;
           const isMovingOnY = axis ? axis.includes('Y') : false;
           const isMovingOnZ = axis ? axis.includes('Z') : false;
@@ -2845,6 +3076,7 @@ namespace gdjs {
       this._editorGrid.setVisible(false);
       this._selectionControls = null;
       this._lastAppliedTransformControlsSettings = null;
+      this._lastSelectedTransformAxis = null;
     }
 
     activate(enable: boolean) {
@@ -3334,7 +3566,7 @@ namespace gdjs {
             this._editorGrid.setTreeScene(threeScene);
           }
           this._editorGrid.setVisible(true);
-          if (this._editorGrid.isSpanningEnabled(inputManager, isAltPressed)) {
+          if (this._editorGrid.isSnappingEnabled(inputManager, isAltPressed)) {
             cursorX = this._editorGrid.getSnappedX(cursorX);
             cursorY = this._editorGrid.getSnappedY(cursorY);
           }
@@ -4005,18 +4237,20 @@ namespace gdjs {
     private _toggleTranslationSnap: () => void;
     private _toggleRotationSnap: () => void;
     private _toggleScaleSnap: () => void;
-    private _decreaseTranslationSnapStep: () => void;
-    private _increaseTranslationSnapStep: () => void;
-    private _decreaseRotationSnapDegrees: () => void;
-    private _increaseRotationSnapDegrees: () => void;
-    private _decreaseScaleSnapStep: () => void;
-    private _increaseScaleSnapStep: () => void;
+    private _decreaseTranslationSnapStep: (event?: MouseEvent) => void;
+    private _increaseTranslationSnapStep: (event?: MouseEvent) => void;
+    private _decreaseRotationSnapDegrees: (event?: MouseEvent) => void;
+    private _increaseRotationSnapDegrees: (event?: MouseEvent) => void;
+    private _decreaseScaleSnapStep: (event?: MouseEvent) => void;
+    private _increaseScaleSnapStep: (event?: MouseEvent) => void;
     private _focusOnSelection: () => void;
     private _switchToFreeCamera: () => void;
     private _switchToOrbitCamera: () => void;
     private _isFreeCamera: () => boolean;
     private _getSvgIconUrl: (iconName: string) => string;
     private _hasSelectionControlsShown: () => boolean;
+    private _hasEditableSelection: () => boolean;
+    private _getSelectionTransformValues: () => SelectionTransformValues | null;
 
     private addOrUpdateToolbarStyle() {
       const id = 'InGameEditor-Toolbar-Style';
@@ -4174,8 +4408,9 @@ namespace gdjs {
         }
         .InGameEditor-Toolbar-Button-Active {
           background-color: var(--in-game-editor-theme-icon-button-selected-background-color);
-          border-color: rgba(255, 255, 255, 0.28);
-          box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+          border-color: rgba(255, 255, 255, 0.32);
+          box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+                      0 0 8px 0 rgba(100, 180, 255, 0.15);
         }
         .InGameEditor-Toolbar-Button-Active .InGameEditor-Toolbar-Button-Icon {
           background-color: var(--in-game-editor-theme-icon-button-selected-color);
@@ -4186,6 +4421,27 @@ namespace gdjs {
         .InGameEditor-Toolbar-Button-Active .InGameEditor-Toolbar-Button-Value {
           color: var(--in-game-editor-theme-icon-button-selected-color);
           opacity: 1;
+        }
+        .InGameEditor-Toolbar-Button-Shortcut {
+          position: absolute;
+          bottom: calc(1px * var(--in-game-editor-toolbar-scale));
+          right: calc(1px * var(--in-game-editor-toolbar-scale));
+          font-size: calc(8px * var(--in-game-editor-toolbar-scale));
+          font-weight: 700;
+          line-height: 1;
+          color: rgba(255, 255, 255, 0.45);
+          background: rgba(0, 0, 0, 0.35);
+          border-radius: calc(3px * var(--in-game-editor-toolbar-scale));
+          padding: calc(1px * var(--in-game-editor-toolbar-scale)) calc(3px * var(--in-game-editor-toolbar-scale));
+          pointer-events: none;
+          user-select: none;
+        }
+        .InGameEditor-Toolbar-Button-Active .InGameEditor-Toolbar-Button-Shortcut {
+          color: rgba(255, 255, 255, 0.7);
+          background: rgba(0, 0, 0, 0.5);
+        }
+        .InGameEditor-Toolbar-Button {
+          position: relative;
         }
         .InGameEditor-Toolbar-Button:focus-visible {
           outline: 2px solid rgba(255, 255, 255, 0.85);
@@ -4274,6 +4530,8 @@ namespace gdjs {
       isFreeCamera,
       getSvgIconUrl,
       hasSelectionControlsShown,
+      hasEditableSelection,
+      getSelectionTransformValues,
     }: {
       getTransformControlsMode: () => 'translate' | 'rotate' | 'scale';
       setTransformControlsMode: (
@@ -4290,18 +4548,20 @@ namespace gdjs {
       toggleTranslationSnap: () => void;
       toggleRotationSnap: () => void;
       toggleScaleSnap: () => void;
-      decreaseTranslationSnapStep: () => void;
-      increaseTranslationSnapStep: () => void;
-      decreaseRotationSnapDegrees: () => void;
-      increaseRotationSnapDegrees: () => void;
-      decreaseScaleSnapStep: () => void;
-      increaseScaleSnapStep: () => void;
+      decreaseTranslationSnapStep: (event?: MouseEvent) => void;
+      increaseTranslationSnapStep: (event?: MouseEvent) => void;
+      decreaseRotationSnapDegrees: (event?: MouseEvent) => void;
+      increaseRotationSnapDegrees: (event?: MouseEvent) => void;
+      decreaseScaleSnapStep: (event?: MouseEvent) => void;
+      increaseScaleSnapStep: (event?: MouseEvent) => void;
       focusOnSelection: () => void;
       switchToFreeCamera: () => void;
       switchToOrbitCamera: () => void;
       isFreeCamera: () => boolean;
       getSvgIconUrl: (iconName: string) => string;
       hasSelectionControlsShown: () => boolean;
+      hasEditableSelection: () => boolean;
+      getSelectionTransformValues: () => SelectionTransformValues | null;
     }) {
       this._getTransformControlsMode = getTransformControlsMode;
       this._setTransformControlsMode = setTransformControlsMode;
@@ -4328,6 +4588,8 @@ namespace gdjs {
       this._isFreeCamera = isFreeCamera;
       this._getSvgIconUrl = getSvgIconUrl;
       this._hasSelectionControlsShown = hasSelectionControlsShown;
+      this._hasEditableSelection = hasEditableSelection;
+      this._getSelectionTransformValues = getSelectionTransformValues;
 
       this.addOrUpdateToolbarStyle();
     }
@@ -4399,6 +4661,7 @@ namespace gdjs {
                   {makeIcon({
                     svgIconUrl: this._getSvgIconUrl('InGameEditor-MoveIcon'),
                   })}
+                  <span class="InGameEditor-Toolbar-Button-Shortcut">W</span>
                 </button>
                 <button
                   class="InGameEditor-Toolbar-Button"
@@ -4409,6 +4672,7 @@ namespace gdjs {
                   {makeIcon({
                     svgIconUrl: this._getSvgIconUrl('InGameEditor-RotateIcon'),
                   })}
+                  <span class="InGameEditor-Toolbar-Button-Shortcut">E</span>
                 </button>
                 <button
                   class="InGameEditor-Toolbar-Button"
@@ -4419,6 +4683,7 @@ namespace gdjs {
                   {makeIcon({
                     svgIconUrl: this._getSvgIconUrl('InGameEditor-ResizeIcon'),
                   })}
+                  <span class="InGameEditor-Toolbar-Button-Shortcut">R</span>
                 </button>
               </div>
               <div class="InGameEditor-Toolbar-Divider" />
@@ -4431,6 +4696,7 @@ namespace gdjs {
                   title="Toggle Local/World transform space (L)"
                 >
                   <span class="InGameEditor-Toolbar-Button-Label">Local</span>
+                  <span class="InGameEditor-Toolbar-Button-Shortcut">L</span>
                 </button>
                 <div class="InGameEditor-Toolbar-SnapControl">
                   <button
@@ -4541,6 +4807,7 @@ namespace gdjs {
                   {makeIcon({
                     svgIconUrl: this._getSvgIconUrl('InGameEditor-FocusIcon'),
                   })}
+                  <span class="InGameEditor-Toolbar-Button-Shortcut">F</span>
                 </button>
               </div>
             </div>
@@ -4594,6 +4861,7 @@ namespace gdjs {
       }
 
       const hasSelectionControls = this._hasSelectionControlsShown();
+      const hasEditableSelection = this._hasEditableSelection();
 
       this._renderedElements.container.tabIndex = 0;
       this._renderedElements.container.style.transform = 'translateY(0)';
@@ -4604,15 +4872,23 @@ namespace gdjs {
       const rotationSnapDegrees = this._getRotationSnapDegrees();
       const scaleSnapStep = this._getScaleSnapStep();
       const canDecreaseTranslationSnap =
+        hasEditableSelection ||
         translationSnapStep > TRANSLATION_SNAP_STEP_MIN + 0.0001;
       const canIncreaseTranslationSnap =
+        hasEditableSelection ||
         translationSnapStep < TRANSLATION_SNAP_STEP_MAX - 0.0001;
       const canDecreaseRotationSnap =
+        hasEditableSelection ||
         rotationSnapDegrees > ROTATION_SNAP_DEGREES_MIN + 0.0001;
       const canIncreaseRotationSnap =
+        hasEditableSelection ||
         rotationSnapDegrees < ROTATION_SNAP_DEGREES_MAX - 0.0001;
-      const canDecreaseScaleSnap = scaleSnapStep > SCALE_SNAP_STEP_MIN + 0.0001;
-      const canIncreaseScaleSnap = scaleSnapStep < SCALE_SNAP_STEP_MAX - 0.0001;
+      const canDecreaseScaleSnap =
+        hasEditableSelection ||
+        scaleSnapStep > SCALE_SNAP_STEP_MIN + 0.0001;
+      const canIncreaseScaleSnap =
+        hasEditableSelection ||
+        scaleSnapStep < SCALE_SNAP_STEP_MAX - 0.0001;
 
       this._setButtonDisabled(this._renderedElements.freeCameraButton, false);
       this._setButtonDisabled(this._renderedElements.orbitCameraButton, false);
@@ -4695,6 +4971,51 @@ namespace gdjs {
       const translationSnapText = this._formatSnapValue(translationSnapStep);
       const rotationSnapText = this._formatSnapValue(rotationSnapDegrees);
       const scaleSnapText = this._formatSnapValue(scaleSnapStep);
+      const selectionValues = this._getSelectionTransformValues();
+      const formatValues = (values: number[]) =>
+        values.map((value) => this._formatSnapValue(value)).join(',');
+      const getAxisForDisplay = (axis: string | null, fallback: string) => {
+        if (
+          axis &&
+          (axis.includes('X') || axis.includes('Y') || axis.includes('Z'))
+        ) {
+          return axis;
+        }
+        return fallback;
+      };
+      const getDisplayedPositionText = () => {
+        if (!selectionValues) return translationSnapText;
+        const axis = getAxisForDisplay(selectionValues.axis, 'X');
+        const values: number[] = [];
+        if (axis.includes('X')) values.push(selectionValues.position.x);
+        if (axis.includes('Y')) values.push(selectionValues.position.y);
+        if (axis.includes('Z')) values.push(selectionValues.position.z);
+        if (!values.length) values.push(selectionValues.position.x);
+        return formatValues(values);
+      };
+      const getDisplayedRotationText = () => {
+        if (!selectionValues) return rotationSnapText;
+        const axis = getAxisForDisplay(selectionValues.axis, 'Z');
+        const values: number[] = [];
+        if (axis.includes('X')) values.push(selectionValues.rotation.x);
+        if (axis.includes('Y')) values.push(selectionValues.rotation.y);
+        if (axis.includes('Z')) values.push(selectionValues.rotation.z);
+        if (!values.length) values.push(selectionValues.rotation.z);
+        return formatValues(values);
+      };
+      const getDisplayedScaleText = () => {
+        if (!selectionValues) return scaleSnapText;
+        const fallbackAxis = selectionValues.is3D ? 'XYZ' : 'XY';
+        const axis = getAxisForDisplay(selectionValues.axis, fallbackAxis);
+        const values: number[] = [];
+        if (axis.includes('X')) values.push(selectionValues.scale.x);
+        if (axis.includes('Y')) values.push(selectionValues.scale.y);
+        if (selectionValues.is3D && axis.includes('Z')) {
+          values.push(selectionValues.scale.z);
+        }
+        if (!values.length) values.push(selectionValues.scale.x);
+        return formatValues(values);
+      };
       const translationSnapMinText = this._formatSnapValue(
         TRANSLATION_SNAP_STEP_MIN
       );
@@ -4710,39 +5031,49 @@ namespace gdjs {
       const scaleSnapMinText = this._formatSnapValue(SCALE_SNAP_STEP_MIN);
       const scaleSnapMaxText = this._formatSnapValue(SCALE_SNAP_STEP_MAX);
       this._renderedElements.translationSnapValueLabel.textContent =
-        translationSnapText;
-      this._renderedElements.rotationSnapValueLabel.textContent = `${rotationSnapText} deg`;
-      this._renderedElements.scaleSnapValueLabel.textContent = scaleSnapText;
+        getDisplayedPositionText();
+      this._renderedElements.rotationSnapValueLabel.textContent = `${getDisplayedRotationText()} deg`;
+      this._renderedElements.scaleSnapValueLabel.textContent =
+        getDisplayedScaleText();
       this._renderedElements.translationSnapButton.title = `Toggle position snap (G) - Step: ${translationSnapText}`;
       this._renderedElements.rotationSnapButton.title = `Toggle rotation snap (H) - Step: ${rotationSnapText} deg`;
       this._renderedElements.scaleSnapButton.title = `Toggle scale snap (J) - Step: ${scaleSnapText}`;
       this._renderedElements.focusButton.title = hasSelectionControls
         ? 'Focus on selection (F)'
         : 'Select an object to enable focus';
-      this._renderedElements.translationSnapDecreaseButton.title =
-        canDecreaseTranslationSnap
-          ? `Decrease position snap step (current: ${translationSnapText})`
-          : `Position snap step is already at minimum (${translationSnapMinText})`;
-      this._renderedElements.translationSnapIncreaseButton.title =
-        canIncreaseTranslationSnap
-          ? `Increase position snap step (current: ${translationSnapText})`
-          : `Position snap step is already at maximum (${translationSnapMaxText})`;
-      this._renderedElements.rotationSnapDecreaseButton.title =
-        canDecreaseRotationSnap
-          ? `Decrease rotation snap step (current: ${rotationSnapText} deg)`
-          : `Rotation snap step is already at minimum (${rotationSnapMinText} deg)`;
-      this._renderedElements.rotationSnapIncreaseButton.title =
-        canIncreaseRotationSnap
-          ? `Increase rotation snap step (current: ${rotationSnapText} deg)`
-          : `Rotation snap step is already at maximum (${rotationSnapMaxText} deg)`;
-      this._renderedElements.scaleSnapDecreaseButton.title =
-        canDecreaseScaleSnap
-          ? `Decrease scale snap step (current: ${scaleSnapText})`
-          : `Scale snap step is already at minimum (${scaleSnapMinText})`;
-      this._renderedElements.scaleSnapIncreaseButton.title =
-        canIncreaseScaleSnap
-          ? `Increase scale snap step (current: ${scaleSnapText})`
-          : `Scale snap step is already at maximum (${scaleSnapMaxText})`;
+      if (hasEditableSelection) {
+        this._renderedElements.translationSnapDecreaseButton.title = `Nudge position by -${translationSnapText}. Shift+click to decrease snap step.`;
+        this._renderedElements.translationSnapIncreaseButton.title = `Nudge position by +${translationSnapText}. Shift+click to increase snap step.`;
+        this._renderedElements.rotationSnapDecreaseButton.title = `Nudge rotation by -${rotationSnapText} deg. Shift+click to decrease snap step.`;
+        this._renderedElements.rotationSnapIncreaseButton.title = `Nudge rotation by +${rotationSnapText} deg. Shift+click to increase snap step.`;
+        this._renderedElements.scaleSnapDecreaseButton.title = `Nudge scale by -${scaleSnapText}. Shift+click to decrease snap step.`;
+        this._renderedElements.scaleSnapIncreaseButton.title = `Nudge scale by +${scaleSnapText}. Shift+click to increase snap step.`;
+      } else {
+        this._renderedElements.translationSnapDecreaseButton.title =
+          canDecreaseTranslationSnap
+            ? `Decrease position snap step (current: ${translationSnapText})`
+            : `Position snap step is already at minimum (${translationSnapMinText})`;
+        this._renderedElements.translationSnapIncreaseButton.title =
+          canIncreaseTranslationSnap
+            ? `Increase position snap step (current: ${translationSnapText})`
+            : `Position snap step is already at maximum (${translationSnapMaxText})`;
+        this._renderedElements.rotationSnapDecreaseButton.title =
+          canDecreaseRotationSnap
+            ? `Decrease rotation snap step (current: ${rotationSnapText} deg)`
+            : `Rotation snap step is already at minimum (${rotationSnapMinText} deg)`;
+        this._renderedElements.rotationSnapIncreaseButton.title =
+          canIncreaseRotationSnap
+            ? `Increase rotation snap step (current: ${rotationSnapText} deg)`
+            : `Rotation snap step is already at maximum (${rotationSnapMaxText} deg)`;
+        this._renderedElements.scaleSnapDecreaseButton.title =
+          canDecreaseScaleSnap
+            ? `Decrease scale snap step (current: ${scaleSnapText})`
+            : `Scale snap step is already at minimum (${scaleSnapMinText})`;
+        this._renderedElements.scaleSnapIncreaseButton.title =
+          canIncreaseScaleSnap
+            ? `Increase scale snap step (current: ${scaleSnapText})`
+            : `Scale snap step is already at maximum (${scaleSnapMaxText})`;
+      }
     }
   }
 
@@ -4907,7 +5238,7 @@ namespace gdjs {
         : DEFAULT_TRANSLATION_SNAP_STEP;
     }
 
-    isSpanningEnabled(
+    isSnappingEnabled(
       inputManager: gdjs.InputManager,
       considerAltPressed?: boolean
     ): boolean {

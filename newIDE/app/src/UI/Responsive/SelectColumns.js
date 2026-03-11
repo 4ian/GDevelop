@@ -6,6 +6,8 @@ import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 const styles = {
   columnContainer: {
     display: 'flex',
+    minHeight: 0,
+    minWidth: 0,
   },
 };
 
@@ -23,7 +25,7 @@ export const SelectColumns = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const columns = getColumns();
   return (
-    <Line noMargin expand>
+    <Line noMargin expand useFullHeight>
       {columns.map(({ columnName }, index) => {
         const columnRenderer = columnsRenderer[columnName];
         const columnRatio = columns[index].ratio || 1;

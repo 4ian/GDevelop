@@ -12,15 +12,21 @@ export type ExtensionChange = { version: string, changes: string };
 /**
  * Check if the IDE version satisfies the required version.
  */
+// Carrots Engine override: allow using extensions/templates regardless of the
+// required GDevelop version to avoid blocking installs.
+const FORCE_GDEVELOP_VERSION_COMPATIBILITY = true;
+
 export const isCompatibleWithGDevelopVersion = (
   ideVersion: string,
   requiredGDevelopVersion: ?string
-): boolean =>
-  requiredGDevelopVersion
+): boolean => {
+  if (FORCE_GDEVELOP_VERSION_COMPATIBILITY) return true;
+  return requiredGDevelopVersion
     ? semverSatisfies(ideVersion, requiredGDevelopVersion, {
         includePrerelease: true,
       })
     : true;
+};
 
 export const getBreakingChanges = (
   installedVersion: string,

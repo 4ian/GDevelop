@@ -131,7 +131,7 @@ const InstructionOrExpressionSelector = <
       backgroundColor: gdevelopTheme.paper.backgroundColor.light,
       border: `1px solid ${gdevelopTheme.dialog.separator}`,
       borderRadius: 10,
-      overflow: 'hidden',
+      overflowX: 'hidden',
       minHeight: 0,
     }),
     [gdevelopTheme.dialog.separator, gdevelopTheme.paper.backgroundColor.light]
@@ -256,3 +256,4 @@ const InstructionOrExpressionSelector = <
 };
 
 export default InstructionOrExpressionSelector;
+

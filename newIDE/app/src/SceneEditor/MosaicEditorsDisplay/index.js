@@ -344,6 +344,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 onEventsBasedObjectChildrenEdited={
                   props.onEventsBasedObjectChildrenEdited
                 }
+                onBackgroundColorChanged={props.onBackgroundColorChanged}
               />
             )}
           </I18n>

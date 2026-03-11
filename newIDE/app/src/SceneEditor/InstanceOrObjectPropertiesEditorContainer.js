@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import Paper from '../UI/Paper';
-import EmptyMessage from '../UI/EmptyMessage';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { CompactInstancePropertiesEditor } from '../InstancesEditor/CompactInstancePropertiesEditor';
 import { Trans } from '@lingui/macro';
@@ -15,6 +14,7 @@ import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { CompactLayerPropertiesEditor } from '../LayersList/CompactLayerPropertiesEditor';
 import { CompactEventsBasedObjectVariantPropertiesEditor } from '../SceneEditor/CompactEventsBasedObjectVariantPropertiesEditor';
+import { CompactScenePropertiesEditor } from './CompactScenePropertiesEditor';
 import Rectangle from '../Utils/Rectangle';
 
 export const styles = {
@@ -83,6 +83,9 @@ type Props = {|
   onEventsBasedObjectChildrenEdited: (
     eventsBasedObject: gdEventsBasedObject
   ) => void,
+
+  // For scenes
+  onBackgroundColorChanged: () => void,
 |};
 
 export type InstanceOrObjectPropertiesEditorInterface = {|
@@ -156,6 +159,9 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
       layout,
       objectsContainer,
       globalObjectsContainer,
+
+      // For scenes
+      onBackgroundColorChanged,
     } = props;
 
     return (
@@ -233,14 +239,19 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             unsavedChanges={unsavedChanges}
             i18n={i18n}
           />
-        ) : (
-          <EmptyMessage>
-            <Trans>
-              Click on an instance on the canvas or an object in the list to
-              display their properties.
-            </Trans>
-          </EmptyMessage>
-        )}
+        ) : layout ? (
+          <CompactScenePropertiesEditor
+            scene={layout}
+            resourceManagementProps={resourceManagementProps}
+            project={project}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            unsavedChanges={unsavedChanges}
+            i18n={i18n}
+            onBackgroundColorChanged={onBackgroundColorChanged}
+            onUpdateBehaviorsSharedData={() => {}}
+            onEditSceneVariables={() => {}}
+          />
+        ) : null}
       </Paper>
     );
   }

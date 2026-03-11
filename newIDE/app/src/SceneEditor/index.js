@@ -1608,6 +1608,8 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _sendSetBackgroundColor = () => {
+    this.forceUpdatePropertiesEditor();
+    this.forceUpdateLayersList();
     const { previewDebuggerServer, layout } = this.props;
     if (!layout) {
       return;

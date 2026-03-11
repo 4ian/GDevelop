@@ -846,6 +846,9 @@ interface BehaviorsSharedData {
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
     void InitializeContent();
 
+    boolean IsFolded();
+    void SetFolded(boolean folded);
+
     [Ref] QuickCustomizationVisibilitiesContainer GetPropertiesQuickCustomizationVisibilities();
 };
 

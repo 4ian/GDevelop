@@ -124,8 +124,6 @@ export const CompactBehaviorPropertiesEditor = ({
   onBehaviorUpdated,
   resourceManagementProps,
 }: CompactBehaviorPropertiesEditorProps): React.Node => {
-  const fullEditorLabel = behaviorMetadata.getOpenFullEditorLabel();
-
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
 
   const propertiesSchema = React.useMemo(
@@ -194,7 +192,7 @@ export const CompactBehaviorPropertiesEditor = ({
             ? schema =>
                 getSchemaWithOpenFullEditorButton({
                   schema,
-                  fullEditorLabel,
+                  fullEditorLabel: behaviorMetadata.getOpenFullEditorLabel(),
                   behavior,
                   onOpenFullEditor,
                 })

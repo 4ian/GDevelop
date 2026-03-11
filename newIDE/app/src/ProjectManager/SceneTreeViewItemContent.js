@@ -15,6 +15,8 @@ import { TreeViewItemContent, type TreeItemProps, scenesRootFolderId } from '.';
 import Tooltip from '@material-ui/core/Tooltip';
 import Flag from '@material-ui/icons/Flag';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
+import { rgbStringToHexString } from '../Utils/ColorTransformer';
+import { getSceneFolderIdFromTreeViewItemId } from './SceneFolderUtils';
 
 const SCENE_CLIPBOARD_KIND = 'Layout';
 
@@ -48,8 +50,20 @@ export type SceneTreeViewItemCommonProps = {|
 export type SceneTreeViewItemProps = {|
   ...SceneTreeViewItemCommonProps,
   project: gdProject,
+  onSceneCreated: (scene: gdLayout, sourceSceneName?: ?string) => void,
   onOpenLayoutProperties: (layout: ?gdLayout) => void,
   onOpenLayoutVariables: (layout: ?gdLayout) => void,
+  getSceneFoldersForMenu: () => Array<{| id: string, path: string |}>,
+  getSceneFolderId: (sceneName: string) => ?string,
+  onMoveSceneToFolder: (sceneName: string, folderId: ?string) => void,
+  onCreateSceneFolderWithScene: (
+    sceneName: string,
+    defaultFolderName: string
+  ) => void,
+  getSceneWorkflowColumn: (
+    sceneName: string
+  ) => ?{| name: string, color: string |},
+  isSceneInFolder: (sceneName: string, folderId: string) => boolean,
 |};
 
 export const getSceneTreeViewItemId = (scene: gdLayout): string => {
@@ -68,6 +82,9 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
+    const ancestorId = getSceneFolderIdFromTreeViewItemId(itemContent.getId());
+    if (ancestorId)
+      return this.props.isSceneInFolder(this.scene.getName(), ancestorId);
     return itemContent.getId() === scenesRootFolderId;
   }
 
@@ -118,6 +135,40 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   buildMenuTemplate(i18n: I18nType, index: number): any {
+    const sceneName = this.scene.getName();
+    const currentFolderId = this.props.getSceneFolderId(sceneName);
+    const folders = this.props.getSceneFoldersForMenu();
+    const moveToFolderSubmenu = [
+      {
+        label: i18n._(t`Root folder`),
+        type: 'checkbox',
+        checked: !currentFolderId,
+        click: () => {
+          if (currentFolderId)
+            this.props.onMoveSceneToFolder(sceneName, null);
+        },
+      },
+      ...folders.map(folder => ({
+        label: folder.path,
+        type: 'checkbox',
+        checked: currentFolderId === folder.id,
+        click: () => {
+          if (currentFolderId !== folder.id)
+            this.props.onMoveSceneToFolder(sceneName, folder.id);
+        },
+      })),
+      {
+        type: 'separator',
+      },
+      {
+        label: i18n._(t`Move to new folder`),
+        click: () =>
+          this.props.onCreateSceneFolderWithScene(
+            sceneName,
+            i18n._(t`New folder`)
+          ),
+      },
+    ];
     return [
       {
         label: i18n._(t`Open scene editor`),
@@ -156,6 +207,10 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
         label: i18n._(t`Set as start scene`),
         enabled: !this._isFirstScene(),
         click: () => this._setProjectFirstScene(this.scene.getName()),
+      },
+      {
+        label: i18n._(t`Move to folder`),
+        submenu: moveToFolderSubmenu,
       },
       {
         type: 'separator',
@@ -202,6 +257,31 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
 
   renderRightComponent(i18n: I18nType): ?React.Node {
     const icons = [];
+
+    const workflowColumn = this.props.getSceneWorkflowColumn(
+      this.scene.getName()
+    );
+    if (workflowColumn) {
+      const color = rgbStringToHexString(workflowColumn.color);
+      icons.push(
+        <Tooltip
+          key="workflow"
+          title={`${i18n._(t`Workflow`)}: ${workflowColumn.name}`}
+        >
+          <span
+            style={{
+              display: 'inline-block',
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              backgroundColor: color,
+              marginRight: 6,
+              border: `1px solid ${this.props.gdevelopTheme.text.color.disabled}`,
+            }}
+          />
+        </Tooltip>
+      );
+    }
 
     if (this._isFirstScene()) {
       icons.push(
@@ -278,6 +358,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     newScene.updateBehaviorsSharedData(project);
 
     this._onProjectItemModified();
+    this.props.onSceneCreated(newScene, this.scene.getName());
     this.props.editName(getSceneTreeViewItemId(newScene));
     this.props.onSceneAdded();
   }
@@ -301,6 +382,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     newScene.updateBehaviorsSharedData(project);
 
     this._onProjectItemModified();
+    this.props.onSceneCreated(newScene, this.scene.getName());
     this.props.editName(getSceneTreeViewItemId(newScene));
     this.props.onSceneAdded();
   }

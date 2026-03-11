@@ -666,7 +666,12 @@ export default class ExpressionField extends React.Component<Props, State> {
                     />
                   </div>
                   {this._inputElement && this.state.popoverOpen && (
-                    <ClickAwayListener onClickAway={this._handleRequestClose}>
+                    <ClickAwayListener
+                      onClickAway={this._handleRequestClose}
+                      // Needed since React 18 to avoid what seems to be the immediate closing of the popper.
+                      mouseEvent="onMouseDown"
+                      touchEvent="onTouchStart"
+                    >
                       <Popper
                         style={popoverStyle}
                         open={this.state.popoverOpen}

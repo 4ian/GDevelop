@@ -16,6 +16,7 @@ import { useAsyncLazyMemo } from '../Utils/UseLazyMemo';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { useInterval } from '../Utils/UseInterval';
+import useForceUpdate from '../Utils/UseForceUpdate';
 
 type EditorFunctionCallResultsStorage = {|
   getEditorFunctionCallResults: (
@@ -28,62 +29,71 @@ type EditorFunctionCallResultsStorage = {|
   clearEditorFunctionCallResults: (aiRequestId: string) => void,
 |};
 
+type EditorFunctionCallResultsPerRequest = {
+  [aiRequestId: string]: ?Array<EditorFunctionCallResult>,
+};
+
 const useEditorFunctionCallResultsStorage = (): EditorFunctionCallResultsStorage => {
-  const [
-    editorFunctionCallResultsPerRequest,
-    setEditorFunctionCallResultsPerRequest,
-  ] = React.useState<{
-    [aiRequestId: string]: Array<EditorFunctionCallResult>,
-  }>({});
+  const editorFunctionCallResultsPerRequestRef = React.useRef<EditorFunctionCallResultsPerRequest>(
+    {}
+  );
+  const forceUpdate = useForceUpdate();
 
   return {
     getEditorFunctionCallResults: React.useCallback(
       (aiRequestId: string): Array<EditorFunctionCallResult> | null =>
-        editorFunctionCallResultsPerRequest[aiRequestId] || null,
-      [editorFunctionCallResultsPerRequest]
+        editorFunctionCallResultsPerRequestRef.current[aiRequestId] || null,
+      []
     ),
     addEditorFunctionCallResults: React.useCallback(
       (
         aiRequestId: string,
         editorFunctionCallResults: EditorFunctionCallResult[]
       ) => {
-        let computedResults: EditorFunctionCallResult[] = [];
-        setEditorFunctionCallResultsPerRequest(prevState => {
-          const existingEditorFunctionCallResults = (
-            prevState[aiRequestId] || []
-          ).filter(existingEditorFunctionCallResult => {
-            return !editorFunctionCallResults.some(editorFunctionCallResult => {
-              return (
-                editorFunctionCallResult.call_id ===
-                existingEditorFunctionCallResult.call_id
-              );
-            });
+        const previousState = editorFunctionCallResultsPerRequestRef.current;
+        const existingEditorFunctionCallResults = (
+          previousState[aiRequestId] || []
+        ).filter(existingEditorFunctionCallResult => {
+          return !editorFunctionCallResults.some(editorFunctionCallResult => {
+            return (
+              editorFunctionCallResult.call_id ===
+              existingEditorFunctionCallResult.call_id
+            );
           });
-
-          computedResults = [
-            ...existingEditorFunctionCallResults,
-            ...editorFunctionCallResults,
-          ];
-
-          return {
-            ...prevState,
-            [aiRequestId]: computedResults,
-          };
         });
+
+        const computedResults = [
+          ...existingEditorFunctionCallResults,
+          ...editorFunctionCallResults,
+        ];
+
+        // Store results in the ref so that they are visible immediately
+        // to any code that calls getEditorFunctionCallResults — even within
+        // the same async tick.  Without this, React 18 automatic batching
+        // would defer the state update, causing other callbacks (e.g. the
+        // processing effect) to read stale data and potentially re-process
+        // the same function calls.
+        // forceUpdate() schedules a re-render so the UI stays in sync.
+        editorFunctionCallResultsPerRequestRef.current = {
+          ...editorFunctionCallResultsPerRequestRef.current,
+          [aiRequestId]: computedResults,
+        };
+        forceUpdate();
 
         return computedResults;
       },
-      []
+      [forceUpdate]
     ),
-    clearEditorFunctionCallResults: React.useCallback((aiRequestId: string) => {
-      setEditorFunctionCallResultsPerRequest(
-        editorFunctionCallResultsPerRequest => ({
-          ...editorFunctionCallResultsPerRequest,
-          // $FlowFixMe[incompatible-type]
+    clearEditorFunctionCallResults: React.useCallback(
+      (aiRequestId: string) => {
+        editorFunctionCallResultsPerRequestRef.current = {
+          ...editorFunctionCallResultsPerRequestRef.current,
           [aiRequestId]: null,
-        })
-      );
-    }, []),
+        };
+        forceUpdate();
+      },
+      [forceUpdate]
+    ),
   };
 };
 
@@ -269,47 +279,57 @@ export const useAiRequestsStorage = (): AiRequestStorage => {
     [profile]
   );
 
-  const [aiRequestSendStates, setAiRequestSendStates] = React.useState<{
+  // Store send states in a ref so that isSendingAiRequest reads are
+  // immediately consistent — even within the same async tick.
+  // Without this, React 18 automatic batching would defer the state
+  // update from setSendingAiRequest, causing guards (e.g. in
+  // onSendMessage) to read stale data and potentially trigger
+  // duplicate API calls.
+  // forceUpdate() schedules a re-render so the UI stays in sync.
+  const aiRequestSendStatesRef = React.useRef<{
     [string]: AiRequestSendState,
   }>({});
+  const forceUpdateForSendStates = useForceUpdate();
   const isSendingAiRequest = React.useCallback(
     (aiRequestId: string | null) =>
-      !!aiRequestSendStates[aiRequestId || ''] &&
-      aiRequestSendStates[aiRequestId || ''].isSending,
-    [aiRequestSendStates]
+      !!aiRequestSendStatesRef.current[aiRequestId || ''] &&
+      aiRequestSendStatesRef.current[aiRequestId || ''].isSending,
+    []
   );
   const getLastSendError = React.useCallback(
     (aiRequestId: string | null) =>
-      (aiRequestSendStates[aiRequestId || ''] &&
-        aiRequestSendStates[aiRequestId || ''].lastSendError) ||
+      (aiRequestSendStatesRef.current[aiRequestId || ''] &&
+        aiRequestSendStatesRef.current[aiRequestId || ''].lastSendError) ||
       null,
-    [aiRequestSendStates]
+    []
   );
   const setSendingAiRequest = React.useCallback(
     (aiRequestId: string | null, isSending: boolean) => {
       const aiRequestIdToSet: string = aiRequestId || '';
-      setAiRequestSendStates(aiRequestSendStates => ({
-        ...aiRequestSendStates,
+      aiRequestSendStatesRef.current = {
+        ...aiRequestSendStatesRef.current,
         [aiRequestIdToSet]: {
           isSending,
           lastSendError: null,
         },
-      }));
+      };
+      forceUpdateForSendStates();
     },
-    [setAiRequestSendStates]
+    [forceUpdateForSendStates]
   );
   const setLastSendError = React.useCallback(
     (aiRequestId: string | null, lastSendError: ?Error) => {
       const aiRequestIdToSet: string = aiRequestId || '';
-      setAiRequestSendStates(aiRequestSendStates => ({
-        ...aiRequestSendStates,
+      aiRequestSendStatesRef.current = {
+        ...aiRequestSendStatesRef.current,
         [aiRequestIdToSet]: {
           isSending: false,
           lastSendError,
         },
-      }));
+      };
+      forceUpdateForSendStates();
     },
-    [setAiRequestSendStates]
+    [forceUpdateForSendStates]
   );
 
   return {

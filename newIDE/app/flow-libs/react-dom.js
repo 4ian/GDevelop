@@ -690,3 +690,26 @@ type ReactDOM$SVGElementJSXIntrinsic = {
   },
   ...
 };
+
+// React 18 createRoot API
+declare module 'react-dom/client' {
+  declare type RootOptions = {
+    onRecoverableError?: (error: mixed) => void,
+    identifierPrefix?: string,
+    ...
+  };
+  declare type Root = {
+    render(children: React$Node): void,
+    unmount(): void,
+    ...
+  };
+  declare function createRoot(
+    container: Element | Document | DocumentFragment,
+    options?: RootOptions
+  ): Root;
+  declare function hydrateRoot(
+    container: Document | Element,
+    initialChildren: React$Node,
+    options?: RootOptions
+  ): Root;
+}

@@ -170,8 +170,6 @@ Carrots Engine is composed of an editor, a game engine, and a set of extensions.
 
 Games exported with Carrots Engine are based on the Carrots Engine game engine (see `Core` and `GDJS` folders): this engine is distributed under the MIT license so that you can distribute, sell or do anything with the games you create. In particular, you are not forced to make your game open-source.
 
-## Star History
-
 Help us spread the word about Carrots Engine by starring the repository on GitHub.
 
 [![Star History Chart](https://api.star-history.com/svg?repos=Carrotstudio0/Carrots-Engine&type=Date)](https://star-history.com/#Carrotstudio0/Carrots-Engine&Date)

@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
+import { exceptionallyGuardAgainstNullPtr } from '../Utils/IsNullPtr';
 import { I18n } from '@lingui/react';
 import {
   type RenderEditorContainerPropsWithRef,
@@ -222,7 +223,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
       {
         isActive,
         setToolbar,
-        project,
+        project: nullableProject,
         resourceManagementProps,
         fileMetadata,
         storageProvider,
@@ -246,6 +247,8 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
       }: Props,
       ref
     ) => {
+      const project = exceptionallyGuardAgainstNullPtr(nullableProject);
+
       const onCreateProject = React.useCallback(
         async ({
           name,

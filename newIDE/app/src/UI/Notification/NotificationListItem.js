@@ -11,6 +11,7 @@ import Annotation from '../CustomSvgIcons/Annotation';
 import Tag from '../CustomSvgIcons/Tag';
 import Gaming from '../CustomSvgIcons/Gaming';
 import Cart from '../CustomSvgIcons/Cart';
+import Users from '../CustomSvgIcons/Users';
 import { shortenString } from '../../Utils/StringHelpers';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import RouterContext, {
@@ -24,6 +25,7 @@ const notificationTypeToIcon = {
   'multiple-game-feedback-received': <Annotation />,
   'claimable-asset-pack': <Cart />,
   'game-sessions-achievement': <Gaming />,
+  'team-invitation': <Users />,
 };
 
 const getNotificationPrimaryTextByType = (
@@ -92,6 +94,13 @@ const getNotificationPrimaryTextByType = (
       </Trans>
     );
   }
+  if (notification.type === 'team-invitation') {
+    return (
+      <Trans>
+        {notification.data.inviterEmail} invited you to join a team.
+      </Trans>
+    );
+  }
   if (notification.type === 'game-sessions-achievement') {
     if (notification.data.gameCount === 1) {
       if (notification.data.gameId && notification.data.gameName) {
@@ -129,17 +138,34 @@ const getNotificationClickCallback = ({
   addRouteArguments,
   onCloseNotificationList,
   onMarkNotificationAsSeen,
+  onOpenTeamInvitationDialog,
 }: {
   notification: Notification,
   addRouteArguments: RouteArguments => void,
   onCloseNotificationList: () => void,
   onMarkNotificationAsSeen: () => void,
+  onOpenTeamInvitationDialog?: (
+    teamId: string,
+    notificationId: string,
+    inviterEmail: string
+  ) => void,
 }): (() => void) | null => {
   if (
     notification.type === 'credits-drop' ||
     notification.type === 'free-trial-about-to-expire'
   ) {
     return null;
+  }
+  if (notification.type === 'team-invitation') {
+    if (!onOpenTeamInvitationDialog) return null;
+    return () => {
+      onOpenTeamInvitationDialog(
+        notification.data.teamId,
+        notification.id,
+        notification.data.inviterEmail
+      );
+      onCloseNotificationList();
+    };
   }
   if (
     notification.type === 'one-game-feedback-received' ||
@@ -203,12 +229,18 @@ type Props = {|
   notification: Notification,
   onCloseNotificationList: () => void,
   onMarkNotificationAsSeen: () => void,
+  onOpenTeamInvitationDialog?: (
+    teamId: string,
+    notificationId: string,
+    inviterEmail: string
+  ) => void,
 |};
 
 const NotificationListItem = ({
   notification,
   onCloseNotificationList,
   onMarkNotificationAsSeen,
+  onOpenTeamInvitationDialog,
 }: Props): null | React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { addRouteArguments } = React.useContext(RouterContext);
@@ -217,6 +249,7 @@ const NotificationListItem = ({
     addRouteArguments,
     onMarkNotificationAsSeen,
     onCloseNotificationList,
+    onOpenTeamInvitationDialog,
   });
   const primaryText = getNotificationPrimaryTextByType(notification);
   if (!primaryText) return null;

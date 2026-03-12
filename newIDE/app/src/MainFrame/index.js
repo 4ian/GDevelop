@@ -614,9 +614,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   // });
 
   const { currentFileMetadata, updateStatus } = state;
-  const currentProject = exceptionallyGuardAgainstNullPtr(
-    state.currentProject
-  );
+  const currentProject = exceptionallyGuardAgainstNullPtr(state.currentProject);
   const {
     renderShareDialog,
     resourceSources,
@@ -823,9 +821,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     hasAPreviousSaveForEditorTabsState,
     openEditorTabsFromPersistedState,
   } = useEditorTabsStateSaving({
-    currentProjectId: currentProject
-      ? currentProject.getProjectUuid()
-      : null,
+    currentProjectId: currentProject ? currentProject.getProjectUuid() : null,
     editorTabs: state.editorTabs,
     setEditorTabs: setEditorTabs,
     // $FlowFixMe[incompatible-type]
@@ -5142,9 +5138,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       // in what to display (ex: Loader of play section)
       gamesPlatformFrameTools.renderGamesPlatformFrame()}
       <LeaderboardProvider
-        gameId={
-          currentProject ? currentProject.getProjectUuid() : ''
-        }
+        gameId={currentProject ? currentProject.getProjectUuid() : ''}
       >
         <PanesContainer
           hasEditorsInLeftPane={hasEditorsInLeftPane}

@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { safeGetProjectUuid } from './SafeProjectAccess';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { type ScrollViewInterface } from '../UI/ScrollView';
 
@@ -25,7 +24,7 @@ export const usePersistedScrollPosition = ({
     getEditorStateForProject,
     setEditorStateForProject,
   } = React.useContext(PreferencesContext);
-  const projectId = safeGetProjectUuid(project);
+  const projectId = project.getProjectUuid();
 
   const saveScrollTimeoutId = React.useRef<?TimeoutID>(null);
   React.useEffect(

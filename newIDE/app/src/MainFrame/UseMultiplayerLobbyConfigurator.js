@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import { safeGetProjectUuid } from '../Utils/SafeProjectAccess';
 import { duplicateLobbyConfiguration } from '../Utils/GDevelopServices/Play';
 import { registerGame } from '../Utils/GDevelopServices/Game';
 import { getDefaultRegisterGameProperties } from '../Utils/UseGameAndBuildsManager';
@@ -49,7 +48,7 @@ export const useMultiplayerLobbyConfigurator = (): UseMultiplayerLobbyConfigurat
             profile.id,
             // $FlowFixMe[incompatible-type]
             getDefaultRegisterGameProperties({
-              projectId: safeGetProjectUuid(project) || '',
+              projectId: project.getProjectUuid(),
               projectName: project.getName(),
               projectAuthor: project.getAuthor(),
               // Assume the project is not saved at this stage.
@@ -65,7 +64,7 @@ export const useMultiplayerLobbyConfigurator = (): UseMultiplayerLobbyConfigurat
         await duplicateLobbyConfiguration({
           userId: profile.id,
           getAuthorizationHeader,
-          gameId: safeGetProjectUuid(project) || '',
+          gameId: project.getProjectUuid(),
           sourceGameId,
         });
       } catch (error) {

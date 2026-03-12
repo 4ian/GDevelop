@@ -2,7 +2,6 @@
 import * as React from 'react';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { getPlayerToken } from '../Utils/GDevelopServices/Play';
-import { safeGetProjectUuid } from '../Utils/SafeProjectAccess';
 import PreferencesContext from './Preferences/PreferencesContext';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { type GamesList } from '../GameDashboard/UseGamesList';
@@ -36,7 +35,7 @@ export const useAuthenticatedPlayer = ({
   const { values: preferencesValues } = React.useContext(PreferencesContext);
   const playerTokensForPreview = React.useRef<PlayerTokensDict>({});
   const tokenFetchingPromise = React.useRef<?Promise<any>>(null);
-  const gameId = safeGetProjectUuid(project);
+  const gameId = project ? project.getProjectUuid() : null;
   // We find the game in the list of games the user owns, as a token cannot be
   // generated if it does not exist.
   // (This can happen if the game is registered too late, or cannot be registered)

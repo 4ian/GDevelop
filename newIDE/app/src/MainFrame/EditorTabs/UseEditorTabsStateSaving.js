@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { safeGetProjectUuid } from '../../Utils/SafeProjectAccess';
 
 import {
   type EditorTabsState,
@@ -128,8 +127,7 @@ const useEditorTabsStateSaving = ({
 
   const hasAPreviousSaveForEditorTabsState = React.useCallback(
     (project: gdProject) => {
-      const projectId = safeGetProjectUuid(project);
-      if (!projectId) return false;
+      const projectId = project.getProjectUuid();
       const editorState = getEditorStateForProject(projectId);
       return !!(editorState && editorState.editorTabs);
     },
@@ -138,8 +136,7 @@ const useEditorTabsStateSaving = ({
 
   const openEditorTabsFromPersistedState = React.useCallback(
     (project: gdProject): number => {
-      const projectId = safeGetProjectUuid(project);
-      if (!projectId) return 0;
+      const projectId = project.getProjectUuid();
       const editorState = getEditorStateForProject(projectId);
       if (!editorState || !editorState.editorTabs) return 0;
       let shouldOpenSavedCurrentTab = true;

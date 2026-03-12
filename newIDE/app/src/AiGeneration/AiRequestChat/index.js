@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import useStableValue from '../../Utils/useStableValue';
-import { safeGetProjectUuid } from '../../Utils/SafeProjectAccess';
 import type { I18n as I18nType } from '@lingui/core';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
@@ -628,7 +627,7 @@ export const AiRequestChat: React.ComponentType<{
 
     const isForAnotherProject =
       !!requiredGameId &&
-      (!project || requiredGameId !== safeGetProjectUuid(project));
+      (!project || requiredGameId !== project.getProjectUuid());
     const isForking =
       forkingState && aiRequest && forkingState.aiRequestId === aiRequest.id;
     const shouldDisableButton =

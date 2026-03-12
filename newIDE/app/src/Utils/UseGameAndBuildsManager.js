@@ -1,7 +1,6 @@
 // @flow
 import { t } from '@lingui/macro';
 import * as React from 'react';
-import { safeGetProjectUuid } from './SafeProjectAccess';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { getBuilds, type Build } from './GDevelopServices/Build';
@@ -76,7 +75,7 @@ export const useGameManager = ({
   } = useMultiplayerLobbyConfigurator();
 
   const [game, setGame] = React.useState<?Game>(null);
-  const projectId = safeGetProjectUuid(project);
+  const projectId = project ? project.getProjectUuid() : null;
   const projectFiles = useProjectsListFor(projectId);
   const [
     gameAvailabilityError,
@@ -85,8 +84,7 @@ export const useGameManager = ({
 
   const refreshGame = React.useCallback(
     async (): Promise<void> => {
-      const gameId = safeGetProjectUuid(project);
-      if (!profile || !gameId) return;
+      if (!profile || !project) return;
 
       const { id } = profile;
       try {
@@ -94,7 +92,7 @@ export const useGameManager = ({
         const game = await getGame(
           getAuthorizationHeader,
           id,
-          gameId
+          project.getProjectUuid()
         );
         setGame(game);
       } catch (error) {
@@ -128,8 +126,7 @@ export const useGameManager = ({
 
   const tryUpdateAuthors = React.useCallback(
     async () => {
-      const gameId = safeGetProjectUuid(project);
-      if (!profile || !gameId) return;
+      if (!profile || !project) return;
 
       const authorAcls = getAclsFromUserIds(project.getAuthorIds().toJSArray());
 
@@ -137,7 +134,7 @@ export const useGameManager = ({
         await setGameUserAcls(
           getAuthorizationHeader,
           profile.id,
-          gameId,
+          project.getProjectUuid(),
           { author: authorAcls }
         );
       } catch (e) {
@@ -151,10 +148,11 @@ export const useGameManager = ({
   const registerGameIfNeeded = React.useCallback(
     async () => {
       const { profile, getAuthorizationHeader } = authenticatedUser;
-      const gameId = safeGetProjectUuid(project);
-      if (!gameId || !profile) {
+      if (!project || !profile) {
         return;
       }
+
+      const gameId = project.getProjectUuid();
       const userId = profile.id;
       try {
         // Try to fetch the game to see if it's registered but do not do anything with it.

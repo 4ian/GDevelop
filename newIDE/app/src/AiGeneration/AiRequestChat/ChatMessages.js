@@ -3,7 +3,6 @@ import * as React from 'react';
 import useStableValue from '../../Utils/useStableValue';
 import { ChatBubble } from './ChatBubble';
 import { Column, Line, Spacer } from '../../UI/Grid';
-import { safeGetProjectUuid } from '../../Utils/SafeProjectAccess';
 import { ChatMarkdownText } from './ChatMarkdownText';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { getFunctionCallToFunctionCallOutputMap } from '../AiRequestUtils';
@@ -811,7 +810,8 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                       message.projectVersionIdBeforeMessage));
 
               const shouldShowRestore =
-                safeGetProjectUuid(project) === aiRequest.gameId &&
+                project &&
+                project.getProjectUuid() === aiRequest.gameId &&
                 hasVersionToRestore &&
                 !previousMessageHasSameVersionId;
 

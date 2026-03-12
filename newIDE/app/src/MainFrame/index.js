@@ -59,7 +59,6 @@ import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainer
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
-import { safeGetProjectUuid } from '../Utils/SafeProjectAccess';
 import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
@@ -613,7 +612,14 @@ const MainFrame = (props: Props): React.MixedElement => {
   //   console.log(state);
   // });
 
-  const { currentProject, currentFileMetadata, updateStatus } = state;
+  const { currentFileMetadata, updateStatus } = state;
+  // Guard against use-after-free: if the C++ project object was already
+  // destroyed (.delete() sets ptr to 0), treat it as null so that no
+  // child component ever receives a dangling wrapper.
+  const currentProject: ?gdProject =
+    state.currentProject && state.currentProject.ptr !== 0
+      ? state.currentProject
+      : null;
   const {
     renderShareDialog,
     resourceSources,
@@ -820,7 +826,9 @@ const MainFrame = (props: Props): React.MixedElement => {
     hasAPreviousSaveForEditorTabsState,
     openEditorTabsFromPersistedState,
   } = useEditorTabsStateSaving({
-    currentProjectId: safeGetProjectUuid(state.currentProject),
+    currentProjectId: currentProject
+      ? currentProject.getProjectUuid()
+      : null,
     editorTabs: state.editorTabs,
     setEditorTabs: setEditorTabs,
     // $FlowFixMe[incompatible-type]
@@ -5138,7 +5146,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       gamesPlatformFrameTools.renderGamesPlatformFrame()}
       <LeaderboardProvider
         gameId={
-          safeGetProjectUuid(state.currentProject) || ''
+          currentProject ? currentProject.getProjectUuid() : ''
         }
       >
         <PanesContainer

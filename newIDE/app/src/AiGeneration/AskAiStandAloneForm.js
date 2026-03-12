@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
-import { safeGetProjectUuid } from '../Utils/SafeProjectAccess';
 import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
 import {
   addMessageToAiRequest,
@@ -452,7 +451,9 @@ export const AskAiStandAloneForm = ({
               preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
             projectSpecificExtensionsSummaryJson:
               preparedAiUserContent.projectSpecificExtensionsSummaryJson,
-            gameId: safeGetProjectUuid(upToDateProject) || undefined,
+            gameId: upToDateProject
+              ? upToDateProject.getProjectUuid()
+              : undefined,
             payWithCredits: false,
             userMessage: '', // No user message when sending only function call outputs.
             // We don't pause when creating the request as we are in orchestrator mode.

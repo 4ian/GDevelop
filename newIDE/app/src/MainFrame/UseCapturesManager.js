@@ -1,7 +1,6 @@
 // @flow
 
 import * as React from 'react';
-import { safeGetProjectUuid } from '../Utils/SafeProjectAccess';
 import {
   type LaunchCaptureOptions,
   type CaptureOptions,
@@ -102,8 +101,8 @@ const useCapturesManager = ({
 
   const onCaptureFinished = React.useCallback(
     async (captureOptions: CaptureOptions) => {
-      const projectId = safeGetProjectUuid(project);
-      if (!projectId) return;
+      if (!project) return;
+      const projectId = project.getProjectUuid();
 
       try {
         const screenshots = captureOptions.screenshots;
@@ -197,12 +196,11 @@ const useCapturesManager = ({
   const onGameScreenshotsClaimed = React.useCallback(
     () => {
       // Assume the current project is the one that screenshots were taken for.
-      const projectUuid = safeGetProjectUuid(project);
-      if (!projectUuid) return;
+      if (!project) return;
 
       setUnverifiedGameScreenshots(unverifiedScreenshots =>
         unverifiedScreenshots.filter(
-          screenshot => screenshot.projectUuid !== projectUuid
+          screenshot => screenshot.projectUuid !== project.getProjectUuid()
         )
       );
     },

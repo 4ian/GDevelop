@@ -44,7 +44,6 @@ import {
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import Refresh from '../UI/CustomSvgIcons/Refresh';
 import optionalRequire from '../Utils/OptionalRequire';
-import { safeGetProjectUuid } from '../Utils/SafeProjectAccess';
 import TextButton from '../UI/TextButton';
 import Skeleton from '@material-ui/lab/Skeleton';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
@@ -173,8 +172,8 @@ const getDashboardItemsToDisplay = ({
 
     // If a project is opened, no search is done, and sorted by last modified date,
     // then the opened project should be displayed first.
-    const currentProjectId = safeGetProjectUuid(project);
-    if (currentProjectId && orderBy === 'lastModifiedAt') {
+    if (project && orderBy === 'lastModifiedAt') {
+      const currentProjectId = project.getProjectUuid();
       const currentFileIdentifier = currentFileMetadata
         ? currentFileMetadata.fileIdentifier
         : null;
@@ -207,7 +206,7 @@ const getDashboardItemsToDisplay = ({
         const fileMetadata: FileMetadata = currentFileMetadata || {
           fileIdentifier: 'unsaved-project',
           name: project.getName(),
-          gameId: currentProjectId,
+          gameId: project.getProjectUuid(),
         };
         const openedProjectDashboardItem: DashboardItem = {
           projectFiles: [
@@ -333,7 +332,7 @@ const GamesList = ({
             item.game &&
             item.game.savedStatus === 'draft' &&
             (!item.projectFiles || !item.projectFiles.length) &&
-            (!project || item.game.id !== safeGetProjectUuid(project))
+            (!project || item.game.id !== project.getProjectUuid())
           )
       );
     },
@@ -421,7 +420,7 @@ const GamesList = ({
     ]
   );
 
-  const projectUuid = safeGetProjectUuid(project);
+  const projectUuid = project ? project.getProjectUuid() : null;
 
   const [isRefreshing, setIsRefreshing] = React.useState(false);
   const refreshGamesList = React.useCallback(

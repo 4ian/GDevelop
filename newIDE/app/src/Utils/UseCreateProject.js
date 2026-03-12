@@ -48,6 +48,7 @@ type Props = {|
     project: gdProject,
     editorTabs: EditorTabsState,
     oldProjectId: string,
+    fileMetadata: ?FileMetadata,
     options: {
       openAllScenes: boolean,
       openQuickCustomizationDialog: boolean,
@@ -231,6 +232,7 @@ const useCreateProject = ({
 
         const { onSaveProjectAs } = destinationStorageProviderOperations;
 
+        let savedFileMetadata: ?FileMetadata = null;
         if (onSaveProjectAs) {
           const { wasSaved, fileMetadata } = await onSaveProjectAs(
             currentProject,
@@ -274,6 +276,7 @@ const useCreateProject = ({
             return { createdProject: null };
           }
 
+          savedFileMetadata = fileMetadata;
           onProjectSaved(fileMetadata);
           unsavedChanges.sealUnsavedChanges();
           if (newProjectSetup.storageProvider.internalName === 'LocalFile') {
@@ -297,6 +300,7 @@ const useCreateProject = ({
           project: currentProject,
           editorTabs,
           oldProjectId,
+          fileMetadata: savedFileMetadata,
           options: {
             openAllScenes: !!options && options.openAllScenes,
             openQuickCustomizationDialog: !!newProjectSetup.openQuickCustomizationDialog,

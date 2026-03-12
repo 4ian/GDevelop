@@ -1418,26 +1418,27 @@ const MainFrame = (props: Props): React.MixedElement => {
       project,
       editorTabs,
       oldProjectId,
+      fileMetadata,
       options,
     }) => {
       // Update the currentFileMetadata based on the updated project, as
       // it can have been updated in the meantime (gameId, project name, etc...).
-      // Use a functional setState to read the latest pending state, as a previous
-      // setState (from onProjectSaved) may have updated currentFileMetadata
-      // but React 18 batching means it hasn't been applied to a render yet,
-      // so currentFileMetadataRef would still be stale.
-      setState(state => {
-        if (!state.currentFileMetadata) return state;
+      // Use the fileMetadata passed from createProject when available (after a
+      // save), as currentFileMetadataRef may be stale due to React 18 batching
+      // (onProjectSaved's setState hasn't been applied to a render yet).
+      const baseFileMetadata =
+        fileMetadata || currentFileMetadataRef.current;
+      if (baseFileMetadata) {
         // $FlowFixMe[incompatible-type]
         const newFileMetadata: FileMetadata = updateFileMetadataWithOpenedProject(
-          state.currentFileMetadata,
+          baseFileMetadata,
           project
         );
-        return {
+        setState(state => ({
           ...state,
           currentFileMetadata: newFileMetadata,
-        };
-      });
+        }));
+      }
       setNewProjectSetupDialogOpen(false);
       if (options.openQuickCustomizationDialog) {
         setQuickCustomizationDialogOpenedFromGameId(oldProjectId);

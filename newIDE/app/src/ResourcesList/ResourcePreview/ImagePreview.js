@@ -318,7 +318,10 @@ const ImagePreview = ({
               zoomState.yOffset + (newCenter[1] - previousTouchInfo.center[1]),
           }));
 
-          zoomAroundPointBy(newDistance / previousTouchInfo.distance, newCenter);
+          zoomAroundPointBy(
+            newDistance / previousTouchInfo.distance,
+            newCenter
+          );
         }
         previousDoubleTouchInfo.current = {
           distance: newDistance,

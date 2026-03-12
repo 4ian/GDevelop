@@ -93,6 +93,7 @@ import { type GDevelopTheme } from '../UI/Theme';
 import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import RouterContext from '../MainFrame/RouterContext';
+import { type FileMetadata, type StorageProvider } from '../ProjectsStorage';
 import {
   type MainMenuCallbacks,
   type BuildMainMenuProps,
@@ -104,8 +105,12 @@ import { isMacLike } from '../Utils/Platform';
 import optionalRequire from '../Utils/OptionalRequire';
 import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import { getSlugifiedUniqueNameFromProperty } from '../Utils/ObjectSplitter';
+import { localFileStorageProviderInternalName } from '../ProjectsStorage/LocalFileStorageProvider/LocalFileStorageProviderInternalName';
 
 const electron = optionalRequire('electron');
+const childProcess = optionalRequire('child_process');
+const path = optionalRequire('path');
 
 export const getProjectManagerItemId = (identifier: string): string =>
   `project-manager-tab-${identifier}`;
@@ -141,6 +146,67 @@ const styles = {
   autoSizerContainer: { flex: 1 },
   autoSizer: { width: '100%' },
 };
+
+type SceneVersionControlStatus = 'new' | 'modified';
+
+const normalizeGitPath = (filePath: string): string =>
+  filePath.replace(/\\/g, '/');
+
+const parseGitStatusOutput = (
+  output: string
+): Map<string, SceneVersionControlStatus> => {
+  const statusByPath = new Map();
+  if (!output) return statusByPath;
+
+  output.split(/\r?\n/).forEach(line => {
+    if (!line || line.length < 4) return;
+    const status = line.slice(0, 2);
+    if (status === '!!') return;
+
+    let filePath = line.slice(3).trim();
+    if (!filePath) return;
+    if (filePath.includes('->')) {
+      filePath = filePath.split('->').pop().trim();
+    }
+
+    const indexStatus = status[0];
+    const worktreeStatus = status[1];
+    let sceneStatus = null;
+    if (status === '??' || indexStatus === 'A' || worktreeStatus === 'A') {
+      sceneStatus = 'new';
+    } else if (indexStatus !== ' ' || worktreeStatus !== ' ') {
+      sceneStatus = 'modified';
+    }
+
+    if (sceneStatus) statusByPath.set(filePath, sceneStatus);
+  });
+
+  return statusByPath;
+};
+
+const execFilePromise = (
+  command: string,
+  args: Array<string>,
+  options: { cwd: string }
+): Promise<{ error: ?Error, stdout: string, stderr: string }> =>
+  new Promise(resolve => {
+    if (!childProcess || !childProcess.execFile) {
+      resolve({
+        error: new Error('child_process not available'),
+        stdout: '',
+        stderr: '',
+      });
+      return;
+    }
+
+    childProcess.execFile(command, args, options, (error, stdout, stderr) => {
+      resolve({
+        error,
+        stdout: stdout || '',
+        stderr: stderr || '',
+      });
+    });
+  });
 
 const extensionItemReactDndType = 'GD_EXTENSION_ITEM';
 
@@ -443,6 +509,8 @@ export type ProjectManagerInterface = {|
 
 type Props = {|
   project: ?gdProject,
+  fileMetadata: ?FileMetadata,
+  storageProvider: ?StorageProvider,
   onChangeProjectName: string => Promise<void>,
   onSaveProjectProperties: (options: { newName?: string }) => Promise<boolean>,
   ...SceneTreeViewItemCallbacks,
@@ -478,6 +546,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
   (
     {
       project,
+      fileMetadata,
+      storageProvider,
       onChangeProjectName,
       onSaveProjectProperties,
       onDeleteLayout,
@@ -534,6 +604,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       sceneWorkflowMetadata,
       setSceneWorkflowMetadata,
     ] = React.useState<?SceneWorkflowMetadata>(null);
+    const [
+      sceneVersionControlStatusByName,
+      setSceneVersionControlStatusByName,
+    ] = React.useState<{ [string]: SceneVersionControlStatus }>({});
+    const sceneVersionControlRefreshInFlight = React.useRef(false);
 
     const forceUpdateList = React.useCallback(
       () => {
@@ -678,6 +753,126 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         );
       },
       [project]
+    );
+
+    const computeSceneVersionControlStatusByName = React.useCallback(
+      async (): Promise<{ [string]: SceneVersionControlStatus }> => {
+        if (!project || !fileMetadata || !storageProvider) return {};
+        if (!childProcess || !path) return {};
+        if (
+          storageProvider.internalName !== localFileStorageProviderInternalName
+        )
+          return {};
+
+        const projectFilePath = fileMetadata.fileIdentifier;
+        if (!projectFilePath) return {};
+
+        const projectFolderPath = path.dirname(projectFilePath);
+        const repoRootResult = await execFilePromise(
+          'git',
+          ['rev-parse', '--show-toplevel'],
+          { cwd: projectFolderPath }
+        );
+        if (repoRootResult.error) return {};
+
+        const repoRoot = repoRootResult.stdout.trim();
+        if (!repoRoot) return {};
+
+        const sceneNames = getProjectSceneNames();
+        if (!sceneNames.length) return {};
+
+        const scenePathByName = {};
+        let uniquePaths = [];
+        if (project.isFolderProject()) {
+          const slugifyLayoutName = getSlugifiedUniqueNameFromProperty('name');
+          const allPaths = sceneNames.map(sceneName => {
+            const slug = slugifyLayoutName({ name: sceneName }, '/layouts');
+            const absolutePath = path.join(
+              projectFolderPath,
+              'layouts',
+              `${slug}.json`
+            );
+            const relativePath = normalizeGitPath(
+              path.relative(repoRoot, absolutePath)
+            );
+            scenePathByName[sceneName] = relativePath;
+            return relativePath;
+          });
+          uniquePaths = Array.from(
+            new Set(allPaths.filter(path => path))
+          );
+        } else {
+          const relativeProjectPath = normalizeGitPath(
+            path.relative(repoRoot, projectFilePath)
+          );
+          if (!relativeProjectPath) return {};
+          sceneNames.forEach(sceneName => {
+            scenePathByName[sceneName] = relativeProjectPath;
+          });
+          uniquePaths = [relativeProjectPath];
+        }
+
+        if (!uniquePaths.length) return {};
+
+        const statusResult = await execFilePromise(
+          'git',
+          [
+            'status',
+            '--porcelain=v1',
+            '--untracked-files=all',
+            '--',
+            ...uniquePaths,
+          ],
+          { cwd: repoRoot }
+        );
+        if (statusResult.error) return {};
+
+        const statusByPath = parseGitStatusOutput(statusResult.stdout);
+        if (!statusByPath.size) return {};
+
+        const statusBySceneName = {};
+        sceneNames.forEach(sceneName => {
+          const scenePath = scenePathByName[sceneName];
+          const status = scenePath ? statusByPath.get(scenePath) : null;
+          if (status) statusBySceneName[sceneName] = status;
+        });
+
+        return statusBySceneName;
+      },
+      [project, fileMetadata, storageProvider, getProjectSceneNames]
+    );
+
+    React.useEffect(
+      () => {
+        let isDisposed = false;
+        const refresh = async () => {
+          if (sceneVersionControlRefreshInFlight.current) return;
+          sceneVersionControlRefreshInFlight.current = true;
+          try {
+            const statusBySceneName =
+              await computeSceneVersionControlStatusByName();
+            if (!isDisposed) {
+              setSceneVersionControlStatusByName(statusBySceneName);
+            }
+          } finally {
+            sceneVersionControlRefreshInFlight.current = false;
+          }
+        };
+
+        refresh();
+        const intervalId = setInterval(refresh, 8000);
+        return () => {
+          isDisposed = true;
+          clearInterval(intervalId);
+        };
+      },
+      [computeSceneVersionControlStatusByName]
+    );
+
+    const getSceneVersionControlStatus = React.useCallback(
+      (sceneName: string): ?SceneVersionControlStatus =>
+        sceneVersionControlStatusByName[sceneName] || null,
+      [sceneVersionControlStatusByName]
     );
 
     const normalizeSceneWorkflowMetadataForProject = React.useCallback(
@@ -1712,6 +1907,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               onMoveSceneToFolder,
               onCreateSceneFolderWithScene,
               getSceneWorkflowColumn,
+              getSceneVersionControlStatus,
               isSceneInFolder,
             }
           : null,
@@ -1737,6 +1933,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         onMoveSceneToFolder,
         onCreateSceneFolderWithScene,
         getSceneWorkflowColumn,
+        getSceneVersionControlStatus,
         isSceneInFolder,
       ]
     );

@@ -1,5 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import InlineCheckbox from '../UI/InlineCheckbox';
@@ -77,6 +79,22 @@ const styles = {
   subHeader: {
     paddingLeft: 0,
   },
+};
+
+const normalizeLabel = (i18n: I18nType, label: any): any => {
+  if (label === null || label === undefined) return label;
+  if (typeof label === 'string' || typeof label === 'number') return label;
+  if (React.isValidElement(label)) return label;
+  if (typeof label === 'object' && label.id) return i18n._(label);
+  return label;
+};
+
+const normalizeText = (i18n: I18nType, text: any): any => {
+  if (text === null || text === undefined) return text;
+  if (typeof text === 'string') return text;
+  if (typeof text === 'number') return String(text);
+  if (typeof text === 'object' && text.id) return i18n._(text);
+  return text;
 };
 
 const getDisabled = ({
@@ -225,21 +243,25 @@ const PropertiesEditor = ({
   );
 
   const renderInputField = React.useCallback(
-    (field: ValueField) => {
+    (field: ValueField, i18n: I18nType) => {
       if (field.name === 'PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS') return null; // This special property was used in GDevelop 4 IDE to ask for a Edit button to be shown, ignore it.
 
       if (field.valueType === 'boolean') {
         const { setValue } = field;
-        const description = getFieldDescription(field);
+        const description = normalizeText(i18n, getFieldDescription(field));
+        const fieldLabel = normalizeLabel(
+          i18n,
+          getFieldLabel({ instances, field })
+        );
 
         return (
           <InlineCheckbox
             label={
               !description ? (
-                getFieldLabel({ instances, field })
+                fieldLabel
               ) : (
                 <React.Fragment>
-                  <Line noMargin>{getFieldLabel({ instances, field })}</Line>
+                  <Line noMargin>{fieldLabel}</Line>
                   <FormHelperText style={{ display: 'inline' }}>
                     <MarkdownText source={description} />
                   </FormHelperText>
@@ -264,9 +286,15 @@ const PropertiesEditor = ({
             value={getFieldValue({ instances, field })}
             key={field.name}
             id={field.name}
-            floatingLabelText={getFieldLabel({ instances, field })}
+            floatingLabelText={normalizeLabel(
+              i18n,
+              getFieldLabel({ instances, field })
+            )}
             floatingLabelFixed
-            helperMarkdownText={getFieldDescription(field)}
+            helperMarkdownText={normalizeText(
+              i18n,
+              getFieldDescription(field)
+            )}
             onChange={newValue => {
               const newNumberValue = parseFloat(newValue);
               // If the value is not a number, the user is probably still typing, adding a dot or a comma.
@@ -280,9 +308,11 @@ const PropertiesEditor = ({
             disabled={getDisabled({ instances, field })}
             endAdornment={
               endAdornment && (
-                <Tooltip title={endAdornment.tooltipContent}>
+                <Tooltip
+                  title={normalizeLabel(i18n, endAdornment.tooltipContent)}
+                >
                   <InputAdornment position="end">
-                    {endAdornment.label}
+                    {normalizeLabel(i18n, endAdornment.label)}
                   </InputAdornment>
                 </Tooltip>
               )
@@ -295,8 +325,14 @@ const PropertiesEditor = ({
           <Column key={field.name} expand noMargin>
             <ColorField
               id={field.name}
-              floatingLabelText={getFieldLabel({ instances, field })}
-              helperMarkdownText={getFieldDescription(field)}
+              floatingLabelText={normalizeLabel(
+                i18n,
+                getFieldLabel({ instances, field })
+              )}
+              helperMarkdownText={normalizeText(
+                i18n,
+                getFieldDescription(field)
+              )}
               disableAlpha
               fullWidth
               color={getFieldValue({ instances, field })}
@@ -320,9 +356,15 @@ const PropertiesEditor = ({
               _onInstancesModified(instances);
             }}
             value={getFieldValue({ instances, field })}
-            floatingLabelText={getFieldLabel({ instances, field })}
+            floatingLabelText={normalizeLabel(
+              i18n,
+              getFieldLabel({ instances, field })
+            )}
             floatingLabelFixed
-            helperMarkdownText={getFieldDescription(field)}
+            helperMarkdownText={normalizeText(
+              i18n,
+              getFieldDescription(field)
+            )}
             multiline
             style={styles.field}
           />
@@ -344,9 +386,15 @@ const PropertiesEditor = ({
                   mixedValueFallback: '(Multiple values)',
                 })}
                 id={field.name}
-                floatingLabelText={getFieldLabel({ instances, field })}
+                floatingLabelText={normalizeLabel(
+                  i18n,
+                  getFieldLabel({ instances, field })
+                )}
                 floatingLabelFixed
-                helperMarkdownText={getFieldDescription(field)}
+                helperMarkdownText={normalizeText(
+                  i18n,
+                  getFieldDescription(field)
+                )}
                 onChange={newValue => {
                   instances.forEach(i => setValue(i, newValue || ''));
                   _onInstancesModified(instances);
@@ -385,7 +433,7 @@ const PropertiesEditor = ({
   );
 
   const renderSelectField = React.useCallback(
-    (field: ValueField) => {
+    (field: ValueField, i18n: I18nType) => {
       if (!field.getChoices || !field.getValue) return;
 
       const choices = field.getChoices();
@@ -397,7 +445,9 @@ const PropertiesEditor = ({
         <SelectOption
           key={value}
           value={value}
-          label={label}
+          label={
+            labelIsUserDefined ? normalizeLabel(i18n, label) : label
+          }
           shouldNotTranslate={labelIsUserDefined}
         />
       ));
@@ -409,8 +459,14 @@ const PropertiesEditor = ({
             value={'' + getFieldValue({ instances, field })}
             key={field.name}
             id={field.name}
-            floatingLabelText={getFieldLabel({ instances, field })}
-            helperMarkdownText={getFieldDescription(field)}
+            floatingLabelText={normalizeLabel(
+              i18n,
+              getFieldLabel({ instances, field })
+            )}
+            helperMarkdownText={normalizeText(
+              i18n,
+              getFieldDescription(field)
+            )}
             onChange={(event, index, newValue: string) => {
               instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
               _onInstancesModified(instances);
@@ -433,8 +489,14 @@ const PropertiesEditor = ({
             })}
             key={field.name}
             id={field.name}
-            floatingLabelText={getFieldLabel({ instances, field })}
-            helperMarkdownText={getFieldDescription(field)}
+            floatingLabelText={normalizeLabel(
+              i18n,
+              getFieldLabel({ instances, field })
+            )}
+            helperMarkdownText={normalizeText(
+              i18n,
+              getFieldDescription(field)
+            )}
             onChange={(event, index, newValue: string) => {
               instances.forEach(i => setValue(i, newValue || ''));
               _onInstancesModified(instances);
@@ -452,7 +514,7 @@ const PropertiesEditor = ({
   );
 
   const renderAutocompletionField = React.useCallback(
-    (field: ValueField) => {
+    (field: ValueField, i18n: I18nType) => {
       if (!field.getChoices || !field.getValue || field.valueType !== 'string')
         return;
 
@@ -469,8 +531,14 @@ const PropertiesEditor = ({
           value={value}
           key={field.name}
           id={field.name}
-          floatingLabelText={getFieldLabel({ instances, field })}
-          helperMarkdownText={getFieldDescription(field)}
+          floatingLabelText={normalizeLabel(
+            i18n,
+            getFieldLabel({ instances, field })
+          )}
+          helperMarkdownText={normalizeText(
+            i18n,
+            getFieldDescription(field)
+          )}
           onChange={(newValue: string) => {
             instances.forEach(i => setValue(i, newValue || ''));
             _onInstancesModified(instances);
@@ -500,7 +568,7 @@ const PropertiesEditor = ({
   );
 
   const renderButton = React.useCallback(
-    (field: ActionButton) => {
+    (field: ActionButton, i18n: I18nType) => {
       let disabled = false;
       if (field.disabled === 'onValuesDifferent') {
         disabled = hasMixedValues({
@@ -515,7 +583,7 @@ const PropertiesEditor = ({
           primary
           icon={<Edit />}
           disabled={disabled}
-          label={field.label}
+          label={normalizeLabel(i18n, field.label)}
           onClick={() => {
             field.onClick(instances[0]);
           }}
@@ -525,7 +593,7 @@ const PropertiesEditor = ({
     [instances]
   );
 
-  const renderResourceField = (field: ResourceField) => {
+  const renderResourceField = (field: ResourceField, i18n: I18nType) => {
     if (
       !project ||
       !resourceManagementProps ||
@@ -554,13 +622,22 @@ const PropertiesEditor = ({
           instances.forEach(i => setValue(i, newValue));
           _onInstancesModified(instances);
         }}
-        floatingLabelText={getFieldLabel({ instances, field })}
-        helperMarkdownText={getFieldDescription(field)}
+        floatingLabelText={normalizeLabel(
+          i18n,
+          getFieldLabel({ instances, field })
+        )}
+        helperMarkdownText={normalizeText(
+          i18n,
+          getFieldDescription(field)
+        )}
       />
     );
   };
 
-  const renderLeaderboardField = (field: LeaderboardIdField) => {
+  const renderLeaderboardField = (
+    field: LeaderboardIdField,
+    i18n: I18nType
+  ) => {
     if (!project) {
       return null;
     }
@@ -579,8 +656,14 @@ const PropertiesEditor = ({
           instances.forEach(i => setValue(i, newValue));
           _onInstancesModified(instances);
         }}
-        floatingLabelText={getFieldLabel({ instances, field })}
-        helperMarkdownText={getFieldDescription(field)}
+        floatingLabelText={normalizeLabel(
+          i18n,
+          getFieldLabel({ instances, field })
+        )}
+        helperMarkdownText={normalizeText(
+          i18n,
+          getFieldDescription(field)
+        )}
         fieldStyle={styles.field}
       />
     );
@@ -600,91 +683,102 @@ const PropertiesEditor = ({
           <ColumnStackLayout noMargin>{fields}</ColumnStackLayout>
         );
 
-  const renderSectionTitle = React.useCallback((field: SectionTitle) => {
-    return (
-      <Line key={`section-title-${field.name}`}>
-        <Text displayInlineAsSpan>{field.name}</Text>
-      </Line>
-    );
-  }, []);
+  const renderSectionTitle = React.useCallback(
+    (field: SectionTitle, i18n: I18nType) => {
+      return (
+        <Line key={`section-title-${field.name}`}>
+          <Text displayInlineAsSpan>
+            {normalizeLabel(i18n, field.name)}
+          </Text>
+        </Line>
+      );
+    },
+    []
+  );
 
-  return renderContainer(
-    schema.map(field => {
-      if (!!field.nonFieldType) {
-        if (field.nonFieldType === 'sectionTitle') {
-          return renderSectionTitle(field);
-        } else if (field.nonFieldType === 'button') {
-          return renderButton(field);
-        }
-        return null;
-      } else if (field.children) {
-        if (field.type === 'row') {
-          const contentView = (
-            <UnsavedChangesContext.Consumer key={field.name}>
-              {unsavedChanges => (
-                <PropertiesEditor
-                  project={project}
-                  resourceManagementProps={resourceManagementProps}
-                  projectScopedContainersAccessor={
-                    projectScopedContainersAccessor
-                  }
-                  schema={field.children}
-                  instances={instances}
-                  mode="row"
-                  unsavedChanges={unsavedChanges}
-                  onInstancesModified={onInstancesModified}
-                />
-              )}
-            </UnsavedChangesContext.Consumer>
-          );
-          if (field.title) {
-            return [
-              <Text key={field.name + '-title'} size="block-title">
-                {field.title}
-              </Text>,
-              contentView,
-            ];
-          }
-          return contentView;
-        }
+  return (
+    <I18n>
+      {({ i18n }) =>
+        renderContainer(
+          schema.map(field => {
+            if (!!field.nonFieldType) {
+              if (field.nonFieldType === 'sectionTitle') {
+                return renderSectionTitle(field, i18n);
+              } else if (field.nonFieldType === 'button') {
+                return renderButton(field, i18n);
+              }
+              return null;
+            } else if (field.children) {
+              if (field.type === 'row') {
+                const contentView = (
+                  <UnsavedChangesContext.Consumer key={field.name}>
+                    {unsavedChanges => (
+                      <PropertiesEditor
+                        project={project}
+                        resourceManagementProps={resourceManagementProps}
+                        projectScopedContainersAccessor={
+                          projectScopedContainersAccessor
+                        }
+                        schema={field.children}
+                        instances={instances}
+                        mode="row"
+                        unsavedChanges={unsavedChanges}
+                        onInstancesModified={onInstancesModified}
+                      />
+                    )}
+                  </UnsavedChangesContext.Consumer>
+                );
+                if (field.title) {
+                  return [
+                    <Text key={field.name + '-title'} size="block-title">
+                      {normalizeLabel(i18n, field.title)}
+                    </Text>,
+                    contentView,
+                  ];
+                }
+                return contentView;
+              }
 
-        return (
-          <div key={field.name}>
-            <Subheader>{field.name}</Subheader>
-            <UnsavedChangesContext.Consumer key={field.name}>
-              {unsavedChanges => (
-                <PropertiesEditor
-                  project={project}
-                  resourceManagementProps={resourceManagementProps}
-                  projectScopedContainersAccessor={
-                    projectScopedContainersAccessor
-                  }
-                  schema={field.children}
-                  instances={instances}
-                  mode="column"
-                  unsavedChanges={unsavedChanges}
-                  onInstancesModified={onInstancesModified}
-                />
-              )}
-            </UnsavedChangesContext.Consumer>
-          </div>
-        );
-      } else if (field.valueType === 'resource') {
-        return renderResourceField(field);
-      } else if (field.valueType === 'leaderboardId') {
-        return renderLeaderboardField(field);
-      } else {
-        if (field.getChoices && field.getValue) {
-          if (field.isAutocompleted) {
-            return renderAutocompletionField(field);
-          } else {
-            return renderSelectField(field);
-          }
-        }
-        if (field.getValue) return renderInputField(field);
+              return (
+                <div key={field.name}>
+                  <Subheader>{normalizeLabel(i18n, field.name)}</Subheader>
+                  <UnsavedChangesContext.Consumer key={field.name}>
+                    {unsavedChanges => (
+                      <PropertiesEditor
+                        project={project}
+                        resourceManagementProps={resourceManagementProps}
+                        projectScopedContainersAccessor={
+                          projectScopedContainersAccessor
+                        }
+                        schema={field.children}
+                        instances={instances}
+                        mode="column"
+                        unsavedChanges={unsavedChanges}
+                        onInstancesModified={onInstancesModified}
+                      />
+                    )}
+                  </UnsavedChangesContext.Consumer>
+                </div>
+              );
+            } else if (field.valueType === 'resource') {
+              return renderResourceField(field, i18n);
+            } else if (field.valueType === 'leaderboardId') {
+              return renderLeaderboardField(field, i18n);
+            } else {
+              if (field.getChoices && field.getValue) {
+                if (field.isAutocompleted) {
+                  return renderAutocompletionField(field, i18n);
+                } else {
+                  return renderSelectField(field, i18n);
+                }
+              }
+              if (field.getValue) return renderInputField(field, i18n);
+            }
+            return null;
+          })
+        )
       }
-      return null;
-    })
+    </I18n>
   );
 };
 

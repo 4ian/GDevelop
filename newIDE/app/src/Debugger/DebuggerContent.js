@@ -235,15 +235,15 @@ export default class DebuggerContent extends React.Component<Props, State> {
           />
         ),
       },
-      console: {
-        type: 'secondary',
-        title: t`Console`,
-        renderEditor: () => (
-          <Background>
-            <DebuggerConsole logsManager={logsManager || []} />
-          </Background>
-        ),
-      },
+        console: {
+          type: 'secondary',
+          title: t`Console`,
+          renderEditor: () => (
+            <Background>
+              <DebuggerConsole logsManager={logsManager} />
+            </Background>
+          ),
+        },
     };
 
     return (

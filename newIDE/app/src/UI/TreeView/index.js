@@ -67,8 +67,16 @@ export type ItemData<Item> = {|
     y: number,
   |}) => void,
   renamedItemId: ?string,
-  canDrop?: ?(Item, where: 'before' | 'inside' | 'after') => boolean,
-  onDrop: (Item, where: 'before' | 'inside' | 'after') => void | Promise<void>,
+  canDrop?: ?(
+    Item,
+    where: 'before' | 'inside' | 'after',
+    draggedItem?: any
+  ) => boolean,
+  onDrop: (
+    Item,
+    where: 'before' | 'inside' | 'after',
+    draggedItem?: any
+  ) => void | Promise<void>,
   onEditItem?: Item => void,
   isMobile: boolean,
   DragSourceAndDropTarget: any => React.Node,
@@ -92,10 +100,15 @@ const getItemProps = memoizeOne(
       x: number,
       y: number,
     |}) => void,
-    canDrop?: ?(Item, where: 'before' | 'inside' | 'after') => boolean,
+    canDrop?: ?(
+      Item,
+      where: 'before' | 'inside' | 'after',
+      draggedItem?: any
+    ) => boolean,
     onDrop: (
       Item,
-      where: 'before' | 'inside' | 'after'
+      where: 'before' | 'inside' | 'after',
+      draggedItem?: any
     ) => void | Promise<void>,
     onEditItem?: Item => void,
     isMobile: boolean,
@@ -163,13 +176,16 @@ type Props<Item> = {|
   onRenameItem: (Item, newName: string) => void,
   onMoveSelectionToItem: (
     destinationItem: Item,
-    where: 'before' | 'inside' | 'after'
+    where: 'before' | 'inside' | 'after',
+    draggedItem?: any
   ) => void | Promise<void>,
   canMoveSelectionToItem?: ?(
     destinationItem: Item,
-    where: 'before' | 'inside' | 'after'
+    where: 'before' | 'inside' | 'after',
+    draggedItem?: any
   ) => boolean,
   reactDndType: string,
+  dropTypes?: string | Array<string>,
   forceAllOpened?: boolean,
   initiallyOpenedNodeIds?: string[],
   arrowKeyNavigationProps?: {|
@@ -206,6 +222,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     onMoveSelectionToItem,
     canMoveSelectionToItem,
     reactDndType,
+    dropTypes,
     forceAllOpened,
     initiallyOpenedNodeIds,
     arrowKeyNavigationProps,
@@ -560,8 +577,8 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
       // $FlowFixMe[underconstrained-implicit-instantiation]
       makeDragSourceAndDropTarget(reactDndType, {
         vibrate: 100,
-      }),
-    [reactDndType]
+      }, dropTypes),
+    [reactDndType, dropTypes]
   );
 
   const openContextMenu = React.useCallback(

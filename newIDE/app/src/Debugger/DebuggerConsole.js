@@ -126,8 +126,10 @@ const iconMap = {
 
 export const DebuggerConsole = ({
   logsManager,
+  filterLog,
 }: {
   logsManager: LogsManager,
+  filterLog?: ?(Log => boolean),
 }): React.Node => {
   const forceUpdate = useForceUpdate();
 
@@ -189,7 +191,8 @@ export const DebuggerConsole = ({
 
   const filteredLogs = logs
     .filter(({ internal }) => !(hideInternal && internal))
-    .filter(({ group }) => !hiddenGroups.has(group));
+    .filter(({ group }) => !hiddenGroups.has(group))
+    .filter(log => (filterLog ? filterLog(log) : true));
 
   return (
     <Column noMargin noOverflowParent expand>

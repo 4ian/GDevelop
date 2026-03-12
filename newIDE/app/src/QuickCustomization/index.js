@@ -1,19 +1,17 @@
 // @flow
 import * as React from 'react';
-import { QuickObjectReplacer } from './QuickObjectReplacer';
 import { QuickBehaviorsTweaker } from './QuickBehaviorsTweaker';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { QuickPublish } from './QuickPublish';
 import { Trans } from '@lingui/macro';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
 import { mapFor } from '../Utils/MapFor';
-import { canSwapAssetOfObject } from '../AssetStore/AssetSwapper';
 import { type GameAndBuildsManager } from '../Utils/UseGameAndBuildsManager';
 import { QuickTitleTweaker } from './QuickTitleTweaker';
 
 const gd: libGDevelop = global.gd;
 
-type StepName = 'replace-objects' | 'tweak-behaviors' | 'game-logo' | 'publish';
+type StepName = 'tweak-behaviors' | 'game-logo' | 'publish';
 type Step = {|
   name: StepName,
   canPreview: boolean,
@@ -22,12 +20,6 @@ type Step = {|
 |};
 
 const steps: Array<Step> = [
-  {
-    name: 'replace-objects',
-    canPreview: true,
-    title: <Trans>Choose your game art</Trans>,
-    nextLabel: <Trans>Next: Tweak Gameplay</Trans>,
-  },
   {
     name: 'tweak-behaviors',
     canPreview: true,
@@ -122,8 +114,7 @@ export const enumerateObjectFolderOrObjects = (
       );
     } else {
       const object = child.getObject();
-      if (canSwapAssetOfObject(object))
-        folderObjects[''].push(child.getObject());
+      folderObjects[''].push(object);
     }
   });
 
@@ -174,14 +165,7 @@ export const renderQuickCustomization = ({
     title: quickCustomizationState.step.title,
     content: (
       <>
-        {quickCustomizationState.step.name === 'replace-objects' ? (
-          <QuickObjectReplacer
-            project={project}
-            resourceManagementProps={resourceManagementProps}
-            onWillInstallExtension={onWillInstallExtension}
-            onExtensionInstalled={onExtensionInstalled}
-          />
-        ) : quickCustomizationState.step.name === 'tweak-behaviors' ? (
+        {quickCustomizationState.step.name === 'tweak-behaviors' ? (
           <QuickBehaviorsTweaker
             project={project}
             resourceManagementProps={resourceManagementProps}

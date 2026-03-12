@@ -15,6 +15,9 @@ import ExtensionIcon from '../../UI/CustomSvgIcons/Extension';
 import EditIcon from '../../UI/CustomSvgIcons/Edit';
 import InstancesListIcon from '../../UI/CustomSvgIcons/InstancesList';
 import LayersIcon from '../../UI/CustomSvgIcons/Layers';
+import ProjectResourcesIcon from '../../UI/CustomSvgIcons/ProjectResources';
+import ConsoleIcon from '../../UI/CustomSvgIcons/Console';
+import BuildIcon from '../../UI/CustomSvgIcons/Hammer';
 import UndoIcon from '../../UI/CustomSvgIcons/Undo';
 import RedoIcon from '../../UI/CustomSvgIcons/Redo';
 import TrashIcon from '../../UI/CustomSvgIcons/Trash';
@@ -24,6 +27,9 @@ import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
 import {
   OPEN_INSTANCES_PANEL_BUTTON_ID,
   OPEN_LAYERS_PANEL_BUTTON_ID,
+  OPEN_PROJECT_PANEL_BUTTON_ID,
+  OPEN_CONSOLE_PANEL_BUTTON_ID,
+  OPEN_BUILD_PANEL_BUTTON_ID,
   OPEN_SCENES_MANAGER_BUTTON_ID,
   OPEN_EXTENSIONS_MANAGER_BUTTON_ID,
   OPEN_OBJECT_GROUPS_PANEL_BUTTON_ID,
@@ -55,6 +61,12 @@ type Props = {|
   isInstancesListShown: boolean,
   toggleLayersList: () => void,
   isLayersListShown: boolean,
+  toggleProjectPanel: () => void,
+  isProjectPanelShown: boolean,
+  toggleConsolePanel: () => void,
+  isConsolePanelShown: boolean,
+  toggleBuildPanel: () => void,
+  isBuildPanelShown: boolean,
   isWindowMaskShown: boolean,
   toggleWindowMask: () => void,
   isGridShown: boolean,
@@ -78,6 +90,9 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
         togglePropertiesPanel={props.toggleProperties}
         toggleInstancesList={props.toggleInstancesList}
         toggleLayersList={props.toggleLayersList}
+        toggleProjectPanel={props.toggleProjectPanel}
+        toggleConsolePanel={props.toggleConsolePanel}
+        toggleBuildPanel={props.toggleBuildPanel}
         undo={props.undo}
         canUndo={props.canUndo}
         redo={props.redo}
@@ -124,8 +139,8 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
           selected={props.isInstancesListShown}
           tooltip={
             props.isInstancesListShown
-              ? t`Close Instances List Panel`
-              : t`Open Instances List Panel`
+              ? t`Close Scene Objects Panel`
+              : t`Open Scene Objects Panel`
           }
         >
           <InstancesListIcon />
@@ -144,6 +159,48 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
         >
           <LayersIcon />
         </IconButton>
+        <IconButton
+          size="small"
+          color="default"
+          id={OPEN_PROJECT_PANEL_BUTTON_ID}
+          onClick={props.toggleProjectPanel}
+          selected={props.isProjectPanelShown}
+          tooltip={
+            props.isProjectPanelShown
+              ? t`Close Project Panel`
+              : t`Open Project Panel`
+          }
+        >
+          <ProjectResourcesIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
+          id={OPEN_CONSOLE_PANEL_BUTTON_ID}
+          onClick={props.toggleConsolePanel}
+          selected={props.isConsolePanelShown}
+          tooltip={
+            props.isConsolePanelShown
+              ? t`Close Console Panel`
+              : t`Open Console Panel`
+          }
+        >
+          <ConsoleIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
+          id={OPEN_BUILD_PANEL_BUTTON_ID}
+          onClick={props.toggleBuildPanel}
+          selected={props.isBuildPanelShown}
+          tooltip={
+            props.isBuildPanelShown
+              ? t`Close Build Panel`
+              : t`Open Build Panel`
+          }
+        >
+          <BuildIcon />
+        </IconButton>
         <ToolbarSeparator />
       </ToolbarGroup>
       <ToolbarGroup lastChild>
@@ -155,8 +212,8 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
           selected={props.isObjectsListShown}
           tooltip={
             props.isObjectsListShown
-              ? t`Close Objects Panel`
-              : t`Open Objects Panel`
+              ? t`Close Hierarchy Panel`
+              : t`Open Hierarchy Panel`
           }
         >
           <ObjectIcon />
@@ -201,8 +258,8 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
           selected={props.isPropertiesShown}
           tooltip={
             props.isPropertiesShown
-              ? t`Close Properties Panel`
-              : t`Open Properties Panel`
+              ? t`Close Inspector Panel`
+              : t`Open Inspector Panel`
           }
         >
           <EditIcon />

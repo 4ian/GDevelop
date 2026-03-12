@@ -249,7 +249,6 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   onClose: () => void,
   onCreateNewObject: (type: string) => void,
-  onObjectsAddedFromAssets: InstallAssetOutput => void,
   targetObjectFolderOrObjectWithContext?: ?ObjectFolderOrObjectWithContext,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,

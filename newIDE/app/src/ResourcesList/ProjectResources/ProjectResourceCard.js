@@ -35,12 +35,22 @@ const styles = {
     left: 0,
     right: 0,
     color: '#fff',
+    overflow: 'hidden',
+    background:
+      'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 60%)',
+    padding: '8px 8px 6px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 2,
+  },
+  title: {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    backgroundColor: 'rgb(0,0,0,0.5)',
   },
-  title: {
+  subtitle: {
+    opacity: 0.8,
+    fontSize: 12,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -56,8 +66,9 @@ const styles = {
 type ImagePreviewProps = {|
   resource: gdResource,
   project: gdProject,
+  size: number,
 |};
-const ImagePreview = ({ resource, project }: ImagePreviewProps) => {
+const ImagePreview = ({ resource, project, size }: ImagePreviewProps) => {
   const resourceName = resource.getName();
   const resourceThumbnail = ResourcesLoader.getResourceFullUrl(
     project,
@@ -68,6 +79,7 @@ const ImagePreview = ({ resource, project }: ImagePreviewProps) => {
     project,
     resourceName
   );
+  const maxSize = Math.max(40, size - 2 * paddingSize);
   return (
     <>
       <CheckeredBackground />
@@ -75,8 +87,8 @@ const ImagePreview = ({ resource, project }: ImagePreviewProps) => {
         key={resourceName}
         style={{
           ...styles.previewImage,
-          maxWidth: 128 - 2 * paddingSize,
-          maxHeight: 128 - 2 * paddingSize,
+          maxWidth: maxSize,
+          maxHeight: maxSize,
           ...(!isImageResourceSmooth
             ? styles.previewImagePixelated
             : undefined),
@@ -121,11 +133,14 @@ export const ProjectResourceCard = ({
 }: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const resourceName = resource.getName();
+  const resourceKind = resource.getKind();
 
   const renderResourcePreview = () => {
     switch (resource.getKind()) {
       case 'image':
-        return <ImagePreview resource={resource} project={project} />;
+        return (
+          <ImagePreview resource={resource} project={project} size={size} />
+        );
       case 'model3D':
         return (
           <Model3DPreview
@@ -159,6 +174,9 @@ export const ProjectResourceCard = ({
           {/* $FlowFixMe[incompatible-type] */}
           <Text noMargin style={styles.title} color="inherit">
             {resourceName}
+          </Text>
+          <Text noMargin style={styles.subtitle} color="inherit">
+            {resourceKind}
           </Text>
         </div>
       </div>

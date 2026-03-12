@@ -143,6 +143,8 @@ import { delay } from '../Utils/Delay';
 import useNewProjectDialog from './UseNewProjectDialog';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
+import { ensureProjectResourcesHaveGuids } from '../ResourcesList/AssetDatabase';
+import { ensureProjectResourcesHaveImportSettings } from '../ResourcesList/AssetImportPipeline';
 import { NewResourceDialog } from '../ResourcesList/NewResourceDialog';
 import {
   addCreateBadgePreHookIfNotClaimed,
@@ -191,6 +193,7 @@ import useResourcesWatcher from './ResourcesWatcher';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
+import { localFileStorageProviderInternalName } from '../ProjectsStorage/LocalFileStorageProvider/LocalFileStorageProviderInternalName';
 import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
 import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
@@ -1179,6 +1182,17 @@ const MainFrame = (props: Props): React.MixedElement => {
           storageProviderOperations,
           authenticatedUser,
         }));
+
+        const shouldWriteMetaFiles =
+          storageProvider.internalName === localFileStorageProviderInternalName;
+        await ensureProjectResourcesHaveGuids(project, {
+          projectFilePath: updatedFileMetadata.fileIdentifier,
+          shouldWriteMetaFiles,
+        }).catch(error =>
+          console.warn('[AssetDatabase] Failed to ensure GUIDs:', error)
+        );
+
+        ensureProjectResourcesHaveImportSettings(project);
 
         // Read and apply project settings from gdevelop-settings.yaml if it exists
         try {
@@ -4611,8 +4625,29 @@ const MainFrame = (props: Props): React.MixedElement => {
         shouldHardReload: false,
         reasons: ['added-new-resources'],
       });
+
+      const project = currentProjectRef.current;
+      const fileMetadata = currentFileMetadataRef.current;
+      if (!project || !fileMetadata) return;
+
+      const storageProvider = getStorageProvider();
+      const shouldWriteMetaFiles =
+        storageProvider.internalName === localFileStorageProviderInternalName;
+      ensureProjectResourcesHaveGuids(project, {
+        projectFilePath: fileMetadata.fileIdentifier,
+        shouldWriteMetaFiles,
+      }).catch(error =>
+        console.warn('[AssetDatabase] Failed to ensure GUIDs:', error)
+      );
+
+      ensureProjectResourcesHaveImportSettings(project);
     },
-    [notifyChangesToInGameEditor]
+    [
+      notifyChangesToInGameEditor,
+      currentProjectRef,
+      currentFileMetadataRef,
+      getStorageProvider,
+    ]
   );
 
   useKeyboardShortcuts({
@@ -5051,6 +5086,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       >
         <ProjectManager
           project={currentProject}
+          fileMetadata={currentFileMetadata}
+          storageProvider={getStorageProvider()}
           onChangeProjectName={onChangeProjectName}
           onSaveProjectProperties={onSaveProjectProperties}
           onOpenExternalEvents={openExternalEvents}

@@ -28,7 +28,7 @@ const stopPropagation = e => e.stopPropagation();
 
 const DELAY_BEFORE_OPENING_FOLDER_ON_DRAG_HOVER = 800;
 const DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE = 1000;
-export const TREE_VIEW_ROW_HEIGHT = 32;
+export const TREE_VIEW_ROW_HEIGHT = 36;
 const COLLAPSABLE_LINE_SIDE_DROP_ZONE_HEIGHT = 6;
 
 const onInputKeyDown = (event: KeyboardEvent) => {
@@ -280,12 +280,13 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                 !!node.item.content.is3D &&
                 // $FlowFixMe[incompatible-type]
                 node.item.content.is3D(),
+              treeItemId: node.id,
             };
             return draggedItem;
           }
 
           // Otherwise, we let the default drag preview be displayed.
-          return {};
+          return { treeItemId: node.id };
         }}
         canDrag={() =>
           // Prevent dragging of root folder or placeholder.
@@ -294,9 +295,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           // Prevent dragging of item whose name is edited, allowing to select text with click and drag on text.
           renamedItemId !== node.id
         }
-        canDrop={canDrop ? () => canDrop(node.item, whereToDrop) : () => true}
-        drop={() => {
-          onDrop(node.item, whereToDrop);
+        canDrop={canDrop ? draggedItem => canDrop(node.item, whereToDrop, draggedItem) : () => true}
+        drop={draggedItem => {
+          onDrop(node.item, whereToDrop, draggedItem);
         }}
         hover={monitor => {
           if (node.item.isRoot) {

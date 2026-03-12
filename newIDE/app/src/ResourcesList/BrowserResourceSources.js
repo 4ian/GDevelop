@@ -7,9 +7,7 @@ import {
   type ResourceSource,
   type ResourceStoreChooserProps,
   allResourceKindsAndMetadata,
-  resourcesKindSupportedByResourceStore,
 } from './ResourceSource';
-import { ResourceStore } from '../AssetStore/ResourceStore';
 import path from 'path-browserify';
 import { Line } from '../UI/Grid';
 import { ColumnStackLayout, TextFieldWithButtonLayout } from '../UI/Layout';
@@ -19,36 +17,8 @@ import { useDebounce } from '../Utils/UseDebounce';
 import axios from 'axios';
 import AlertMessage from '../UI/AlertMessage';
 import { FileToCloudProjectResourceUploader } from './FileToCloudProjectResourceUploader';
-import {
-  extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl,
-  isPublicAssetResourceUrl,
-} from '../Utils/GDevelopServices/Asset';
 import { DialogPrimaryButton } from '../UI/Dialog';
 import ProjectResourcesChooser from './ProjectResources/ProjectResourcesChooser';
-
-const ResourceStoreChooser = ({
-  options,
-  selectedResourceIndex,
-  onSelectResource,
-}: ResourceStoreChooserProps) => {
-  if (!onSelectResource) return null;
-  const { resourceKind } = options;
-  if (!resourcesKindSupportedByResourceStore.includes(resourceKind)) {
-    return null;
-  }
-
-  return (
-    <ResourceStore
-      selectedResourceIndex={selectedResourceIndex}
-      onSelectResource={onSelectResource}
-      resourceKind={
-        // $FlowIgnore - Flow does not understand the check above restricts the resource kind.
-        // $FlowFixMe[incompatible-type]
-        resourceKind
-      }
-    />
-  );
-};
 
 export const UrlChooser = ({
   options,
@@ -206,69 +176,6 @@ const browserResourceSources: Array<ResourceSource> = [
       ),
     };
   }),
-  ...resourcesKindSupportedByResourceStore
-    .map(kind => {
-      const source = allResourceKindsAndMetadata.find(
-        resourceSource => resourceSource.kind === kind
-      );
-      if (!source) return null;
-      const sourceName = `resource-store-${kind}`;
-      // $FlowFixMe[incompatible-type]
-      return {
-        name: sourceName,
-        displayName: t`Choose from asset store`,
-        displayTab: 'standalone',
-        shouldCreateResource: true,
-        shouldGuessAnimationsFromName: false,
-        kind,
-        renderComponent: (props: ResourceSourceComponentProps) => (
-          <ResourceStoreChooser
-            selectedResourceIndex={props.selectedResourceIndex}
-            onSelectResource={props.onSelectResource}
-            options={props.options}
-            key={`resource-store-${kind}`}
-          />
-        ),
-        renderPrimaryAction: ({
-          resource,
-          onChooseResources,
-        }: ResourceSourceComponentPrimaryActionProps) => (
-          <DialogPrimaryButton
-            primary
-            key="add-resource"
-            label={
-              kind === 'font' ? (
-                <Trans>Install font</Trans>
-              ) : (
-                <Trans>Add to project</Trans>
-              )
-            }
-            disabled={!resource}
-            onClick={() => {
-              if (!resource) return;
-              const chosenResourceUrl = resource.url;
-              const newResource = source.createNewResource();
-              newResource.setFile(chosenResourceUrl);
-              const resourceCleanedName = isPublicAssetResourceUrl(
-                chosenResourceUrl
-              )
-                ? extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl(
-                    chosenResourceUrl
-                  )
-                : path.basename(chosenResourceUrl);
-              newResource.setName(resourceCleanedName);
-              newResource.setOrigin('gdevelop-asset-store', chosenResourceUrl);
-
-              onChooseResources({
-                selectedResources: [newResource],
-                selectedSourceName: sourceName,
-              });
-            }}
-          />
-        ),
-      };
-    })
-    .filter(Boolean),
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => {
     const sourceName = `project-resources-${kind}`;
     // $FlowFixMe[incompatible-type]

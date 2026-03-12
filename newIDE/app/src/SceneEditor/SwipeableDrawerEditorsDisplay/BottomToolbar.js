@@ -7,6 +7,9 @@ import ObjectGroupIcon from '../../UI/CustomSvgIcons/ObjectGroup';
 import EditIcon from '../../UI/CustomSvgIcons/Edit';
 import InstancesListIcon from '../../UI/CustomSvgIcons/InstancesList';
 import LayersIcon from '../../UI/CustomSvgIcons/Layers';
+import ProjectResourcesIcon from '../../UI/CustomSvgIcons/ProjectResources';
+import ConsoleIcon from '../../UI/CustomSvgIcons/Console';
+import BuildIcon from '../../UI/CustomSvgIcons/Hammer';
 import IconButton from '../../UI/IconButton';
 import {
   OPEN_INSTANCES_PANEL_BUTTON_ID,
@@ -14,6 +17,9 @@ import {
   OPEN_OBJECT_GROUPS_PANEL_BUTTON_ID,
   OPEN_OBJECTS_PANEL_BUTTON_ID,
   OPEN_PROPERTIES_PANEL_BUTTON_ID,
+  OPEN_PROJECT_PANEL_BUTTON_ID,
+  OPEN_CONSOLE_PANEL_BUTTON_ID,
+  OPEN_BUILD_PANEL_BUTTON_ID,
   type EditorId,
 } from '../utils';
 import Paper from '../../UI/Paper';
@@ -48,8 +54,28 @@ type Props = {|
 
 const editors = {
   'objects-list': {
-    buttonId: OPEN_OBJECTS_PANEL_BUTTON_ID, // ???
+    buttonId: OPEN_OBJECTS_PANEL_BUTTON_ID,
     icon: <ObjectIcon fontSize="inherit" />,
+  },
+  properties: {
+    buttonId: OPEN_PROPERTIES_PANEL_BUTTON_ID,
+    icon: <EditIcon fontSize="inherit" />,
+  },
+  'project-resources': {
+    buttonId: OPEN_PROJECT_PANEL_BUTTON_ID,
+    icon: <ProjectResourcesIcon fontSize="inherit" />,
+  },
+  console: {
+    buttonId: OPEN_CONSOLE_PANEL_BUTTON_ID,
+    icon: <ConsoleIcon fontSize="inherit" />,
+  },
+  build: {
+    buttonId: OPEN_BUILD_PANEL_BUTTON_ID,
+    icon: <BuildIcon fontSize="inherit" />,
+  },
+  'instances-list': {
+    buttonId: OPEN_INSTANCES_PANEL_BUTTON_ID,
+    icon: <InstancesListIcon fontSize="inherit" />,
   },
   'layers-list': {
     buttonId: OPEN_LAYERS_PANEL_BUTTON_ID,
@@ -58,14 +84,6 @@ const editors = {
   'object-groups-list': {
     buttonId: OPEN_OBJECT_GROUPS_PANEL_BUTTON_ID,
     icon: <ObjectGroupIcon fontSize="inherit" />,
-  },
-  properties: {
-    buttonId: OPEN_PROPERTIES_PANEL_BUTTON_ID,
-    icon: <EditIcon fontSize="inherit" />,
-  },
-  'instances-list': {
-    buttonId: OPEN_INSTANCES_PANEL_BUTTON_ID,
-    icon: <InstancesListIcon fontSize="inherit" />,
   },
 };
 

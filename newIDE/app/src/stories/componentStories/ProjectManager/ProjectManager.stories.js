@@ -54,6 +54,8 @@ export const NoProjectOpen = (): React.Node => {
               <FixedWidthFlexContainer width={320}>
                 <ProjectManager
                   project={null}
+                  fileMetadata={null}
+                  storageProvider={null}
                   onSaveProjectProperties={async () => true}
                   onChangeProjectName={action('onChangeProjectName')}
                   onOpenExternalEvents={action('onOpenExternalEvents')}
@@ -130,6 +132,8 @@ export const ProjectOpen = (): React.Node => {
               <FixedWidthFlexContainer width={320}>
                 <ProjectManager
                   project={testProject.project}
+                  fileMetadata={null}
+                  storageProvider={null}
                   onSaveProjectProperties={async () => true}
                   onChangeProjectName={action('onChangeProjectName')}
                   onOpenExternalEvents={action('onOpenExternalEvents')}

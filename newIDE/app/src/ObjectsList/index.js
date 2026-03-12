@@ -9,7 +9,6 @@ import { AutoSizer } from 'react-virtualized';
 import Background from '../UI/Background';
 import CompactSearchBar from '../UI/CompactSearchBar';
 import NewObjectDialog from '../AssetStore/NewObjectDialog';
-import AssetSwappingDialog from '../AssetStore/AssetSwappingDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import Window from '../Utils/Window';
 import { showWarningBox } from '../UI/Messages/MessageBox';
@@ -55,7 +54,6 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { EventsScope } from '../InstructionOrExpression/EventsScope';
-import { type InstallAssetOutput } from '../AssetStore/InstallAsset';
 
 const gd: libGDevelop = global.gd;
 
@@ -590,11 +588,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       },
     }));
 
-    const [
-      objectAssetSwappingDialogOpen,
-      setObjectAssetSwappingDialogOpen,
-    ] = React.useState<{ objectWithContext: ObjectWithContext } | null>(null);
-
     // Initialize keyboard shortcuts as empty.
     // onDelete, onDuplicate and onRename callbacks are set in an effect because it applies
     // to the selected item (that is a props). As it is stored in a ref, the keyboard shortcut
@@ -710,54 +703,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onObjectCreated,
         onObjectFolderOrObjectWithContextSelected,
       ]
-    );
-
-    const onObjectsAddedFromAssets = React.useCallback(
-      ({
-        createdObjects: objects,
-        isTheFirstOfItsTypeInProject,
-      }: InstallAssetOutput) => {
-        if (objects.length === 0) return;
-
-        onObjectCreated(objects, isTheFirstOfItsTypeInProject);
-
-        // Here, the last object in the array might not be the last object
-        // in the tree view, given the fact that assets are added in parallel
-        // See (AssetPackInstallDialog.onInstallAssets).
-        const lastObject = objects[objects.length - 1];
-
-        if (newObjectDialogOpen && newObjectDialogOpen.from) {
-          const {
-            objectFolderOrObject: selectedObjectFolderOrObject,
-          } = newObjectDialogOpen.from;
-          if (treeViewRef.current) {
-            treeViewRef.current.openItems(
-              getFoldersAscendanceWithoutRootFolder(
-                selectedObjectFolderOrObject
-              ).map(folder => getObjectFolderTreeViewItemId(folder))
-            );
-          }
-        } else {
-          if (treeViewRef.current) {
-            treeViewRef.current.openItems([sceneObjectsRootFolderId]);
-          }
-        }
-        // Scroll to the new object.
-        // Ideally, we'd wait for the list to be updated to scroll, but
-        // to simplify the code, we just wait a few ms for a new render
-        // to be done.
-        setTimeout(() => {
-          scrollToItem(getObjectTreeViewItemId(lastObject));
-        }, 100); // A few ms is enough for a new render to be done.
-      },
-      [onObjectCreated, scrollToItem, newObjectDialogOpen]
-    );
-
-    const swapObjectAsset = React.useCallback(
-      (objectWithContext: ObjectWithContext) => {
-        setObjectAssetSwappingDialogOpen({ objectWithContext });
-      },
-      []
     );
 
     const onAddNewObject = React.useCallback(
@@ -1038,7 +983,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onRenameObjectFolderOrObjectWithContextFinish,
         onObjectModified,
         onObjectCreated,
-        swapObjectAsset,
         onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
         canSetAsGlobalObject,
         setAsGlobalObject,
@@ -1067,7 +1011,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onRenameObjectFolderOrObjectWithContextFinish,
         onObjectModified,
         onObjectCreated,
-        swapObjectAsset,
         onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
         canSetAsGlobalObject,
         setAsGlobalObject,
@@ -1235,15 +1178,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       false,
                       expandFolders
                     ),
-                },
-                { type: 'separator' },
-                {
-                  label: i18n._(t`Export as assets`),
-                  click: () => onExportAssets(),
-                },
-                {
-                  label: i18n._(t`Import assets`),
-                  click: () => onImportAssets(),
                 },
               ]
             ),
@@ -1639,7 +1573,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           <NewObjectDialog
             onClose={() => setNewObjectDialogOpen(null)}
             onCreateNewObject={addObject}
-            onObjectsAddedFromAssets={onObjectsAddedFromAssets}
             project={project}
             layout={layout}
             eventsFunctionsExtension={eventsFunctionsExtension}
@@ -1647,26 +1580,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             objectsContainer={objectsContainer}
             resourceManagementProps={resourceManagementProps}
             targetObjectFolderOrObjectWithContext={newObjectDialogOpen.from}
-            onWillInstallExtension={onWillInstallExtension}
-            onExtensionInstalled={onExtensionInstalled}
-          />
-        )}
-        {objectAssetSwappingDialogOpen && (
-          <AssetSwappingDialog
-            onClose={({ swappingDone }) => {
-              setObjectAssetSwappingDialogOpen(null);
-              if (swappingDone)
-                onObjectEdited(
-                  objectAssetSwappingDialogOpen.objectWithContext,
-                  true
-                );
-            }}
-            project={project}
-            layout={layout}
-            eventsBasedObject={eventsBasedObject}
-            objectsContainer={objectsContainer}
-            object={objectAssetSwappingDialogOpen.objectWithContext.object}
-            resourceManagementProps={resourceManagementProps}
             onWillInstallExtension={onWillInstallExtension}
             onExtensionInstalled={onExtensionInstalled}
           />

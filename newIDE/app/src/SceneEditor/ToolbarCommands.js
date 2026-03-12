@@ -7,6 +7,9 @@ type Props = {|
   togglePropertiesPanel: () => void,
   toggleInstancesList: () => void,
   toggleLayersList: () => void,
+  toggleProjectPanel: () => void,
+  toggleConsolePanel: () => void,
+  toggleBuildPanel: () => void,
   undo: () => void,
   canUndo: boolean,
   redo: () => void,
@@ -38,6 +41,18 @@ const ToolbarCommands = (props: Props): null => {
 
   useCommand('TOGGLE_LAYERS_PANEL', true, {
     handler: props.toggleLayersList,
+  });
+
+  useCommand('TOGGLE_PROJECT_PANEL', true, {
+    handler: props.toggleProjectPanel,
+  });
+
+  useCommand('TOGGLE_CONSOLE_PANEL', true, {
+    handler: props.toggleConsolePanel,
+  });
+
+  useCommand('TOGGLE_BUILD_PANEL', true, {
+    handler: props.toggleBuildPanel,
   });
 
   useCommand('SCENE_EDITOR_UNDO', props.canUndo, {

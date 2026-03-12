@@ -20,6 +20,9 @@ import InstancesList, {
   type InstancesListInterface,
 } from '../../InstancesEditor/InstancesList';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
+import ProjectResourcesPanel from '../ProjectResourcesPanel';
+import EditorConsolePanel from '../EditorConsolePanel';
+import BuildPanel from '../BuildPanel';
 
 import Rectangle from '../../Utils/Rectangle';
 import { type EditorId } from '../utils';
@@ -37,29 +40,29 @@ import { EmbeddedGameFrameHole } from '../../EmbeddedGame/EmbeddedGameFrameHole'
 
 const initialMosaicEditorNodes = {
   direction: 'column',
-  splitPercentage: 79,
+  splitPercentage: 72,
   first: {
     direction: 'row',
-    splitPercentage: 23,
-    first: {
-      direction: 'column',
-      splitPercentage: 46,
-      first: 'objects-list',
-      second: {
-        direction: 'column',
-        splitPercentage: 52,
-        first: 'layers-list',
-        second: 'object-groups-list',
-      },
-    },
+    splitPercentage: 18,
+    first: 'objects-list',
     second: {
       direction: 'row',
-      splitPercentage: 72,
+      splitPercentage: 76,
       first: 'instances-editor',
       second: 'properties',
     },
   },
-  second: 'instances-list',
+  second: {
+    direction: 'row',
+    splitPercentage: 65,
+    first: 'project-resources',
+    second: {
+      direction: 'row',
+      splitPercentage: 55,
+      first: 'console',
+      second: 'build',
+    },
+  },
 };
 
 const noop = () => {};
@@ -79,6 +82,15 @@ const defaultPanelConfigByEditor = {
   },
   'layers-list': {
     position: 'left',
+  },
+  'project-resources': {
+    position: 'bottom',
+  },
+  console: {
+    position: 'bottom',
+  },
+  build: {
+    position: 'bottom',
   },
 };
 
@@ -294,7 +306,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
     const editors = {
       properties: {
         type: 'secondary',
-        title: t`Properties`,
+        title: t`Inspector`,
         renderEditor: () => (
           <I18n>
             {({ i18n }) => (
@@ -387,7 +399,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
       },
       'instances-list': {
         type: 'secondary',
-        title: t`Instances List`,
+        title: t`Scene Objects`,
         renderEditor: () => (
           <InstancesList
             instances={initialInstances}
@@ -458,7 +470,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
             },
       'objects-list': {
         type: 'secondary',
-        title: t`Objects`,
+        title: t`Hierarchy`,
         toolbarControls: [<CloseButton key="close" />],
         renderEditor: () => (
           <I18n>
@@ -523,6 +535,28 @@ const MosaicEditorsDisplay: React.ComponentType<{
             )}
           </I18n>
         ),
+      },
+      'project-resources': {
+        type: 'secondary',
+        title: t`Project`,
+        renderEditor: () => (
+          <ProjectResourcesPanel
+            project={project}
+            resourceManagementProps={resourceManagementProps}
+            fileMetadata={null}
+            unsavedChanges={props.unsavedChanges}
+          />
+        ),
+      },
+      console: {
+        type: 'secondary',
+        title: t`Console`,
+        renderEditor: () => <EditorConsolePanel />,
+      },
+      build: {
+        type: 'secondary',
+        title: t`Build`,
+        renderEditor: () => <BuildPanel />,
       },
       'object-groups-list': {
         type: 'secondary',

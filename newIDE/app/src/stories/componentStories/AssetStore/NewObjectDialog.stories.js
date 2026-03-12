@@ -31,7 +31,6 @@ export const Default = (): React.Node => {
                 eventsBasedObject={null}
                 onClose={action('onClose')}
                 onCreateNewObject={action('onCreateNewObject')}
-                onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
                 objectsContainer={testProject.testLayout.getObjects()}
                 resourceManagementProps={fakeResourceManagementProps}
                 onWillInstallExtension={action('extension will be installed')}

@@ -173,7 +173,10 @@ export type EditorId =
   | 'properties'
   | 'object-groups-list'
   | 'instances-list'
-  | 'layers-list';
+  | 'layers-list'
+  | 'project-resources'
+  | 'console'
+  | 'build';
 
 const styles = {
   container: {
@@ -700,6 +703,14 @@ export default class SceneEditor extends React.Component<Props, State> {
           isInstancesListShown={editorDisplay.isEditorVisible('instances-list')}
           toggleLayersList={this.toggleLayersList}
           isLayersListShown={editorDisplay.isEditorVisible('layers-list')}
+          toggleProjectPanel={this.toggleProjectPanel}
+          isProjectPanelShown={editorDisplay.isEditorVisible(
+            'project-resources'
+          )}
+          toggleConsolePanel={this.toggleConsolePanel}
+          isConsolePanelShown={editorDisplay.isEditorVisible('console')}
+          toggleBuildPanel={this.toggleBuildPanel}
+          isBuildPanelShown={editorDisplay.isEditorVisible('build')}
           toggleWindowMask={this.toggleWindowMask}
           isWindowMaskShown={!!this.state.instancesEditorSettings.windowMask}
           toggleGrid={this.toggleGrid}
@@ -730,6 +741,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           deleteSelection={this.deleteSelection}
           toggleInstancesList={this.toggleInstancesList}
           toggleLayersList={this.toggleLayersList}
+          toggleProjectPanel={this.toggleProjectPanel}
+          toggleConsolePanel={this.toggleConsolePanel}
+          toggleBuildPanel={this.toggleBuildPanel}
           toggleWindowMask={this.toggleWindowMask}
           isWindowMaskShown={!!this.state.instancesEditorSettings.windowMask}
           toggleGrid={this.toggleGrid}
@@ -832,6 +846,21 @@ export default class SceneEditor extends React.Component<Props, State> {
   toggleLayersList = () => {
     if (!this.editorDisplay) return;
     this.editorDisplay.toggleEditorView('layers-list');
+  };
+
+  toggleProjectPanel = () => {
+    if (!this.editorDisplay) return;
+    this.editorDisplay.toggleEditorView('project-resources');
+  };
+
+  toggleConsolePanel = () => {
+    if (!this.editorDisplay) return;
+    this.editorDisplay.toggleEditorView('console');
+  };
+
+  toggleBuildPanel = () => {
+    if (!this.editorDisplay) return;
+    this.editorDisplay.toggleEditorView('build');
   };
 
   toggleWindowMask = () => {

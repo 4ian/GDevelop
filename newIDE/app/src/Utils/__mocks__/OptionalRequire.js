@@ -16,7 +16,26 @@ const mockFs = {
     readFile: jest.fn(filePath =>
       Promise.resolve('Fake content for file with path:' + filePath)
     ),
+    writeFile: jest.fn(() => Promise.resolve()),
+    mkdir: jest.fn(() => Promise.resolve()),
+    readdir: jest.fn(() => Promise.resolve([])),
   },
+  statSync: jest.fn(() => ({
+    isDirectory: () => false,
+    size: 0,
+    mtimeMs: 0,
+    mtime: new Date(0),
+  })),
+};
+const mockChildProcess = {
+  execFile: jest.fn((command, args, options, callback) => {
+    if (typeof options === 'function') {
+      callback = options;
+    }
+    if (callback) {
+      callback(new Error('child_process not available in tests'), '', '');
+    }
+  }),
 };
 const mockProcess = {};
 const mockOs = {
@@ -38,6 +57,9 @@ const mockOptionalRequire = jest.fn(
     }
     if (moduleName === 'fs') {
       return mockFs;
+    }
+    if (moduleName === 'child_process') {
+      return mockChildProcess;
     }
     if (moduleName === 'process') {
       return mockProcess;
@@ -61,5 +83,6 @@ const mockOptionalRequire = jest.fn(
 mockOptionalRequire.mockElectron = mockElectron;
 mockOptionalRequire.mockFsExtra = mockFsExtra;
 mockOptionalRequire.mockFs = mockFs;
+mockOptionalRequire.mockChildProcess = mockChildProcess;
 
 module.exports = mockOptionalRequire;

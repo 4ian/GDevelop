@@ -14,6 +14,9 @@ import InstancesList, {
   type InstancesListInterface,
 } from '../../InstancesEditor/InstancesList';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
+import ProjectResourcesPanel from '../ProjectResourcesPanel';
+import EditorConsolePanel from '../EditorConsolePanel';
+import BuildPanel from '../BuildPanel';
 
 import Rectangle from '../../Utils/Rectangle';
 import SwipeableDrawer from './SwipeableDrawer';
@@ -38,11 +41,14 @@ import { EmbeddedGameFrameHole } from '../../EmbeddedGame/EmbeddedGameFrameHole'
 export const swipeableDrawerContainerId = 'swipeable-drawer-container';
 
 const editorTitleById = {
-  'objects-list': <Trans>Objects</Trans>,
-  properties: <Trans>Instance properties</Trans>,
+  'objects-list': <Trans>Hierarchy</Trans>,
+  properties: <Trans>Inspector</Trans>,
   'object-groups-list': <Trans>Objects groups</Trans>,
-  'instances-list': <Trans>Instances</Trans>,
+  'instances-list': <Trans>Scene Objects</Trans>,
   'layers-list': <Trans>Layers</Trans>,
+  'project-resources': <Trans>Project</Trans>,
+  console: <Trans>Console</Trans>,
+  build: <Trans>Build</Trans>,
 };
 
 const noop = () => {};
@@ -582,6 +588,16 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                     gameEditorMode={props.gameEditorMode}
                   />
                 )}
+                {selectedEditorId === 'project-resources' && (
+                  <ProjectResourcesPanel
+                    project={project}
+                    resourceManagementProps={resourceManagementProps}
+                    fileMetadata={null}
+                    unsavedChanges={props.unsavedChanges}
+                  />
+                )}
+                {selectedEditorId === 'console' && <EditorConsolePanel />}
+                {selectedEditorId === 'build' && <BuildPanel />}
               </SwipeableDrawer>
               <BottomToolbar
                 selectedEditorId={

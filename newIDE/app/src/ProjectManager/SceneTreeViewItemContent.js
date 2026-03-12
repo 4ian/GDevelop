@@ -63,6 +63,9 @@ export type SceneTreeViewItemProps = {|
   getSceneWorkflowColumn: (
     sceneName: string
   ) => ?{| name: string, color: string |},
+  getSceneVersionControlStatus?: (
+    sceneName: string
+  ) => ?('new' | 'modified'),
   isSceneInFolder: (sceneName: string, folderId: string) => boolean,
 |};
 
@@ -257,6 +260,38 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
 
   renderRightComponent(i18n: I18nType): ?React.Node {
     const icons = [];
+
+    const versionControlStatus = this.props.getSceneVersionControlStatus
+      ? this.props.getSceneVersionControlStatus(this.scene.getName())
+      : null;
+    if (versionControlStatus) {
+      const isNew = versionControlStatus === 'new';
+      const color = isNew
+        ? this.props.gdevelopTheme.message.valid
+        : this.props.gdevelopTheme.message.warning;
+      icons.push(
+        <Tooltip
+          key="version-control"
+          title={
+            isNew
+              ? i18n._(t`Git: new scene (not committed)`)
+              : i18n._(t`Git: modified scene (not committed)`)
+          }
+        >
+          <span
+            style={{
+              display: 'inline-block',
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              backgroundColor: color,
+              marginRight: 6,
+              border: `1px solid ${this.props.gdevelopTheme.text.color.disabled}`,
+            }}
+          />
+        </Tooltip>
+      );
+    }
 
     const workflowColumn = this.props.getSceneWorkflowColumn(
       this.scene.getName()

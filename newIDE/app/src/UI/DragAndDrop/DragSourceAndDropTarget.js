@@ -24,8 +24,8 @@ type Props<DraggedItemType> = {|
   |}) => ?React.Node,
   beginDrag: () => DraggedItemType,
   canDrag?: (item: DraggedItemType) => boolean,
-  canDrop: (item: DraggedItemType) => boolean,
-  drop: () => void,
+  canDrop: (item?: DraggedItemType) => boolean,
+  drop: (item?: DraggedItemType) => void,
   endDrag?: () => void,
   hover?: (monitor: DropTargetMonitor) => void,
 |};
@@ -55,13 +55,15 @@ export type DraggedItem = {|
   name: string,
   thumbnail?: string,
   is3D?: boolean,
+  treeItemId?: string,
 |};
 
 type Options = {| vibrate?: number |};
 
 export const makeDragSourceAndDropTarget = <DraggedItemType>(
   reactDndType: string,
-  options: ?Options
+  options: ?Options,
+  dropTypes?: string | Array<string>
 ): ((Props<DraggedItemType>) => React.Node) => {
   const sourceSpec = {
     canDrag(props: Props<DraggedItemType>, monitor: DragSourceMonitor) {
@@ -95,13 +97,15 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
   const targetSpec = {
     canDrop(props: Props<DraggedItemType>, monitor: DropTargetMonitor) {
       const item = monitor.getItem();
-      return item && props.canDrop(item);
+      if (!item) return false;
+      return props.canDrop(item);
     },
     drop(props: Props<DraggedItemType>, monitor: DropTargetMonitor) {
       if (monitor.didDrop()) {
         return; // Drop already handled by another target
       }
-      props.drop();
+      const item = monitor.getItem();
+      props.drop(item);
     },
     hover(props: Props<DraggedItemType>, monitor: DropTargetMonitor) {
       if (props.hover) props.hover(monitor);
@@ -130,7 +134,7 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
   )(
     // $FlowFixMe[incompatible-variance]
     // $FlowFixMe[incompatible-type]
-    DropTarget(reactDndType, targetSpec, targetCollect)(
+    DropTarget(dropTypes || reactDndType, targetSpec, targetCollect)(
       // $FlowFixMe[missing-local-annot]
       ({
         children,

@@ -4,8 +4,6 @@ import { ObjectPreview } from './ObjectPreview';
 import { mapFor } from '../Utils/MapFor';
 import { ColumnStackLayout } from '../UI/Layout';
 import FlatButton from '../UI/FlatButton';
-import AssetSwappingDialog from '../AssetStore/AssetSwappingDialog';
-import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
 import { enumerateObjectFolderOrObjects } from '.';
@@ -13,9 +11,6 @@ import TipCard from './TipCard';
 
 type Props = {|
   project: gdProject,
-  resourceManagementProps: ResourceManagementProps,
-  onWillInstallExtension: (extensionNames: Array<string>) => void,
-  onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
 const styles = {
@@ -30,12 +25,7 @@ const styles = {
 
 export const QuickObjectReplacer = ({
   project,
-  resourceManagementProps,
-  onWillInstallExtension,
-  onExtensionInstalled,
 }: Props): React.Node => {
-  const [selectedObjectToSwap, setSelectedObjectToSwap] = React.useState(null);
-
   return (
     <ColumnStackLayout noMargin expand>
       <TipCard
@@ -75,10 +65,7 @@ export const QuickObjectReplacer = ({
                         <FlatButton
                           primary
                           label={<Trans>Replace</Trans>}
-                          onClick={() => {
-                            // $FlowFixMe[incompatible-type]
-                            setSelectedObjectToSwap({ object, layout });
-                          }}
+                          disabled
                         />
                       </ColumnStackLayout>
                     ))}
@@ -89,23 +76,6 @@ export const QuickObjectReplacer = ({
           </ColumnStackLayout>
         );
       })}
-      {/* $FlowFixMe[constant-condition] */}
-      {selectedObjectToSwap && (
-        <AssetSwappingDialog
-          project={project}
-          layout={selectedObjectToSwap.layout}
-          eventsBasedObject={null}
-          objectsContainer={selectedObjectToSwap.layout.getObjects()}
-          object={selectedObjectToSwap.object}
-          resourceManagementProps={resourceManagementProps}
-          onClose={() => {
-            setSelectedObjectToSwap(null);
-          }}
-          minimalUI
-          onWillInstallExtension={onWillInstallExtension}
-          onExtensionInstalled={onExtensionInstalled}
-        />
-      )}
     </ColumnStackLayout>
   );
 };

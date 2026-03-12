@@ -46,8 +46,8 @@ const AuthenticatedUserProfileDetails = ({
           )}
         >
           <Trans>
-            You are missing out on asset store discounts and other benefits!
-            Verify your email address. Didn't receive it?
+            Verify your email address to unlock all account benefits. Didn't
+            receive it?
           </Trans>
         </AlertMessage>
       )}

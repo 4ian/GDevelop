@@ -6,12 +6,9 @@ import {
   type ResourceSourceComponentProps,
   type ResourceSourceComponentPrimaryActionProps,
   type ResourceSource,
-  type ResourceStoreChooserProps,
   allResourceKindsAndMetadata,
-  resourcesKindSupportedByResourceStore,
 } from './ResourceSource';
 import {} from '../Utils/GDevelopServices/Asset';
-import { ResourceStore } from '../AssetStore/ResourceStore';
 import { isPathInProjectFolder, copyAllToProjectFolder } from './ResourceUtils';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
@@ -31,29 +28,6 @@ import ProjectResourcesChooser from './ProjectResources/ProjectResourcesChooser'
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
 const path = optionalRequire('path');
-
-const ResourceStoreChooser = ({
-  options,
-  selectedResourceIndex,
-  onSelectResource,
-}: ResourceStoreChooserProps) => {
-  if (!onSelectResource) return null;
-  const { resourceKind } = options;
-  if (!resourcesKindSupportedByResourceStore.includes(resourceKind)) {
-    return null;
-  }
-  return (
-    <ResourceStore
-      selectedResourceIndex={selectedResourceIndex}
-      onSelectResource={onSelectResource}
-      resourceKind={
-        // $FlowIgnore - Flow does not understand the check above restricts the resource kind.
-        // $FlowFixMe[incompatible-type]
-        resourceKind
-      }
-    />
-  );
-};
 
 const localResourceSources: Array<ResourceSource> = [
   // Have the local resource sources first, so they are used by default/shown first when
@@ -290,62 +264,6 @@ const localResourceSources: Array<ResourceSource> = [
       ),
     };
   }),
-  ...resourcesKindSupportedByResourceStore
-    .map(kind => {
-      const source = allResourceKindsAndMetadata.find(
-        resourceSource => resourceSource.kind === kind
-      );
-      if (!source) return null;
-      const sourceName = 'resource-store-' + kind;
-      // $FlowFixMe[incompatible-type]
-      return {
-        name: sourceName,
-        displayName: t`Choose from asset store`,
-        displayTab: 'standalone',
-        kind,
-        shouldCreateResource: true,
-        shouldGuessAnimationsFromName: false,
-        renderComponent: (props: ResourceSourceComponentProps) => (
-          <ResourceStoreChooser
-            selectedResourceIndex={props.selectedResourceIndex}
-            onSelectResource={props.onSelectResource}
-            options={props.options}
-            key={`resource-store-${kind}`}
-          />
-        ),
-        renderPrimaryAction: ({
-          resource,
-          onChooseResources,
-        }: ResourceSourceComponentPrimaryActionProps) => (
-          <DialogPrimaryButton
-            primary
-            key="add-resource"
-            label={
-              kind === 'font' ? (
-                <Trans>Install font</Trans>
-              ) : (
-                <Trans>Add to project</Trans>
-              )
-            }
-            disabled={!resource}
-            onClick={() => {
-              if (!resource) return;
-              const chosenResourceUrl = resource.url;
-              const newResource = source.createNewResource();
-              newResource.setFile(chosenResourceUrl);
-              newResource.setName(path.basename(chosenResourceUrl));
-              newResource.setOrigin('gdevelop-asset-store', chosenResourceUrl);
-
-              onChooseResources({
-                selectedResources: [newResource],
-                selectedSourceName: sourceName,
-              });
-            }}
-          />
-        ),
-      };
-    })
-    .filter(Boolean),
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => {
     const sourceName = `project-resources-${kind}`;
     // $FlowFixMe[incompatible-type]

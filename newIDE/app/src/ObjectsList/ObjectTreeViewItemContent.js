@@ -12,7 +12,6 @@ import {
 } from '../Utils/Serializer';
 // $FlowFixMe[import-type-as-value]
 import { TreeViewItemContent } from '.';
-import { canSwapAssetOfObject } from '../AssetStore/AssetSwapper';
 import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
 import {
   enumerateFoldersInContainer,
@@ -69,7 +68,6 @@ export type ObjectTreeViewItemProps = {|
   project: gdProject,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
-  swapObjectAsset: (objectWithContext: ObjectWithContext) => void,
   initialInstances?: gdInitialInstancesContainer,
   editName: (itemId: string) => void,
   onObjectModified: (shouldForceUpdateList: boolean) => void,
@@ -303,7 +301,6 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       onEditObject,
       onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
       onAddObjectInstance,
-      swapObjectAsset,
       canSetAsGlobalObject,
       setAsGlobalObject,
       onOpenEventBasedObjectVariantEditor,
@@ -420,16 +417,6 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
             },
           }
         : null,
-      { type: 'separator' },
-      {
-        label: i18n._(t`Swap assets`),
-        click: () =>
-          swapObjectAsset({
-            object: this.object.getObject(),
-            global: this._isGlobal,
-          }),
-        enabled: canSwapAssetOfObject(object),
-      },
       { type: 'separator' },
       globalObjectsContainer && {
         label: i18n._(t`Set as global object`),

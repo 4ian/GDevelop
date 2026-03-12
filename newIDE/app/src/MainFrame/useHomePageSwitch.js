@@ -9,8 +9,6 @@ const homePageRoutes: Route[] = [
   'build',
   'create',
   'games-dashboard',
-  'asset-store',
-  'store',
   'education',
 ];
 

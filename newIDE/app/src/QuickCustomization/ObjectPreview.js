@@ -1,11 +1,9 @@
 // @flow
 import * as React from 'react';
-import { AssetStoreContext } from '../AssetStore/AssetStoreContext';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import Text from '../UI/Text';
-import { AssetPreviewImage } from '../AssetStore/AssetPreviewImage';
 import CheckeredBackground from '../ResourcesList/CheckeredBackground';
 
 type Props = {|
@@ -55,33 +53,23 @@ export const ObjectPreview = ({
   object,
 }: Props): React.MixedElement => {
   const size = 128;
-  const { getAssetShortHeaderFromId } = React.useContext(AssetStoreContext);
-  const assetStoreId = object.getAssetStoreId();
-  const assetShortHeader = getAssetShortHeaderFromId(assetStoreId);
 
   return (
     <div style={{ ...styles.cardContainer, width: size, height: size }}>
       <div style={{ ...styles.previewContainer, width: size, height: size }}>
         <CheckeredBackground />
-        {assetShortHeader ? (
-          <AssetPreviewImage
-            assetShortHeader={assetShortHeader}
-            maxSize={128}
-          />
-        ) : (
-          <CorsAwareImage
-            alt=""
-            src={ObjectsRenderingService.getThumbnail(
-              project,
-              object.getConfiguration()
-            )}
-            style={{
-              ...styles.previewImage,
-              maxWidth: 128 - 2 * paddingSize,
-              maxHeight: 128 - 2 * paddingSize,
-            }}
-          />
-        )}
+        <CorsAwareImage
+          alt=""
+          src={ObjectsRenderingService.getThumbnail(
+            project,
+            object.getConfiguration()
+          )}
+          style={{
+            ...styles.previewImage,
+            maxWidth: 128 - 2 * paddingSize,
+            maxHeight: 128 - 2 * paddingSize,
+          }}
+        />
       </div>
       <div style={styles.titleContainer}>
         <Text noMargin style={styles.title} color="inherit">

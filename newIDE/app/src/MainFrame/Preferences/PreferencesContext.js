@@ -409,9 +409,7 @@ export const initialPreferences = {
     autoOpenMostRecentProject: true,
     hasProjectOpened: false,
     userShortcutMap: {},
-    newObjectDialogDefaultTab: ((electron
-      ? 'new-object'
-      : 'asset-store'): string),
+    newObjectDialogDefaultTab: 'new-object',
     shareDialogDefaultTab: 'publish',
     isMenuBarHiddenInPreview: true,
     isAlwaysOnTopInPreview: false,
@@ -485,7 +483,7 @@ export const initialPreferences = {
   setHasProjectOpened: () => {},
   resetShortcutsToDefault: () => {},
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => {},
-  getNewObjectDialogDefaultTab: (): string => 'asset-store',
+  getNewObjectDialogDefaultTab: (): string => 'new-object',
   setNewObjectDialogDefaultTab: () => {},
   getShareDialogDefaultTab: (): string => 'invite',
   setShareDialogDefaultTab: () => {},

@@ -39,6 +39,9 @@ export type CommandName =
   | 'OPEN_PROPERTIES_PANEL'
   | 'TOGGLE_INSTANCES_PANEL'
   | 'TOGGLE_LAYERS_PANEL'
+  | 'TOGGLE_PROJECT_PANEL'
+  | 'TOGGLE_CONSOLE_PANEL'
+  | 'TOGGLE_BUILD_PANEL'
   | 'SCENE_EDITOR_UNDO'
   | 'SCENE_EDITOR_REDO'
   | 'DELETE_INSTANCES'
@@ -224,7 +227,7 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   // Scene editor toolbar commands
   OPEN_OBJECTS_PANEL: {
     area: 'SCENE',
-    displayText: t`Toggle Objects Panel`,
+    displayText: t`Toggle Hierarchy Panel`,
   },
   OPEN_OBJECT_GROUPS_PANEL: {
     area: 'SCENE',
@@ -232,15 +235,27 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   },
   OPEN_PROPERTIES_PANEL: {
     area: 'SCENE',
-    displayText: t`Toggle Properties Panel`,
+    displayText: t`Toggle Inspector Panel`,
   },
   TOGGLE_INSTANCES_PANEL: {
     area: 'SCENE',
-    displayText: t`Toggle Instances List Panel`,
+    displayText: t`Toggle Scene Objects Panel`,
   },
   TOGGLE_LAYERS_PANEL: {
     area: 'SCENE',
     displayText: t`Toggle Layers Panel`,
+  },
+  TOGGLE_PROJECT_PANEL: {
+    area: 'SCENE',
+    displayText: t`Toggle Project Panel`,
+  },
+  TOGGLE_CONSOLE_PANEL: {
+    area: 'SCENE',
+    displayText: t`Toggle Console Panel`,
+  },
+  TOGGLE_BUILD_PANEL: {
+    area: 'SCENE',
+    displayText: t`Toggle Build Panel`,
   },
   SCENE_EDITOR_UNDO: {
     area: 'SCENE',

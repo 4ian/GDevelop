@@ -1,8 +1,13 @@
 // @flow
 import { addGDevelopResourceTokenIfRequired } from '../Utils/CrossOrigin';
 import optionalRequire from '../Utils/OptionalRequire';
+import {
+  getRelativePathForGuid,
+  getResourceGuidFromResource,
+} from '../ResourcesList/AssetDatabase';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
+const fs = optionalRequire('fs');
 
 class UrlsCache {
   projectCache: { [number]: { [string]: string } } = {};
@@ -192,10 +197,34 @@ export default class ResourcesLoader {
     options: LoadingOptions
   ): any {
     if (project.getResourcesManager().hasResource(resourceName)) {
-      const resourceRelativePath = project
-        .getResourcesManager()
-        .getResource(resourceName)
-        .getFile();
+      const resource = project.getResourcesManager().getResource(resourceName);
+      let resourceRelativePath = resource.getFile();
+
+      if (
+        electron &&
+        fs &&
+        fs.existsSync &&
+        resourceRelativePath &&
+        isLocalFile(resourceRelativePath)
+      ) {
+        const projectPath = path.dirname(project.getProjectFile());
+        const resourceAbsolutePath = path.resolve(
+          projectPath,
+          resourceRelativePath.replace(/^file:\/\//, '')
+        );
+
+        if (!fs.existsSync(resourceAbsolutePath)) {
+          const guid = getResourceGuidFromResource(resource);
+          if (guid) {
+            const guidRelativePath = getRelativePathForGuid(project, guid);
+            if (guidRelativePath) {
+              resource.setFile(guidRelativePath);
+              resourceRelativePath = guidRelativePath;
+            }
+          }
+        }
+      }
+
       return ResourcesLoader.getFullUrl(project, resourceRelativePath, options);
     }
 

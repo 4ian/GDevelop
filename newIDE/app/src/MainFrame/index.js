@@ -1423,15 +1423,13 @@ const MainFrame = (props: Props): React.MixedElement => {
     }) => {
       // Update the currentFileMetadata based on the updated project, as
       // it can have been updated in the meantime (gameId, project name, etc...).
-      // Use the fileMetadata passed from createProject when available (after a
-      // save), as currentFileMetadataRef may be stale due to React 18 batching
-      // (onProjectSaved's setState hasn't been applied to a render yet).
-      const baseFileMetadata =
-        fileMetadata || currentFileMetadataRef.current;
-      if (baseFileMetadata) {
+      // The fileMetadata is passed explicitly from createProject to avoid relying
+      // on currentFileMetadataRef which can be stale due to React 18 batching
+      // (onProjectSaved's setState may not have been applied to a render yet).
+      if (fileMetadata) {
         // $FlowFixMe[incompatible-type]
         const newFileMetadata: FileMetadata = updateFileMetadataWithOpenedProject(
-          baseFileMetadata,
+          fileMetadata,
           project
         );
         setState(state => ({

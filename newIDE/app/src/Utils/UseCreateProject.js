@@ -300,7 +300,7 @@ const useCreateProject = ({
           project: currentProject,
           editorTabs,
           oldProjectId,
-          fileMetadata: savedFileMetadata,
+          fileMetadata: savedFileMetadata || state.currentFileMetadata,
           options: {
             openAllScenes: !!options && options.openAllScenes,
             openQuickCustomizationDialog: !!newProjectSetup.openQuickCustomizationDialog,

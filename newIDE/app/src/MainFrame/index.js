@@ -59,6 +59,7 @@ import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainer
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
+import { safeGetProjectUuid } from '../Utils/SafeProjectAccess';
 import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
@@ -819,9 +820,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     hasAPreviousSaveForEditorTabsState,
     openEditorTabsFromPersistedState,
   } = useEditorTabsStateSaving({
-    currentProjectId: state.currentProject
-      ? state.currentProject.getProjectUuid()
-      : null,
+    currentProjectId: safeGetProjectUuid(state.currentProject),
     editorTabs: state.editorTabs,
     setEditorTabs: setEditorTabs,
     // $FlowFixMe[incompatible-type]
@@ -5139,7 +5138,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       gamesPlatformFrameTools.renderGamesPlatformFrame()}
       <LeaderboardProvider
         gameId={
-          state.currentProject ? state.currentProject.getProjectUuid() : ''
+          safeGetProjectUuid(state.currentProject) || ''
         }
       >
         <PanesContainer

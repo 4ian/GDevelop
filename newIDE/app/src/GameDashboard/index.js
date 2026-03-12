@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { safeGetProjectUuid } from '../Utils/SafeProjectAccess';
 import { t, Trans } from '@lingui/macro';
 import Grid from '@material-ui/core/Grid';
 import { I18n } from '@lingui/react';
@@ -209,7 +210,7 @@ const GameDashboard = ({
     updatedGame: Game,
     properties: PublicGameAndProjectEditableProperties
   ) => {
-    if (!project || project.getProjectUuid() !== updatedGame.id) return;
+    if (!project || safeGetProjectUuid(project) !== updatedGame.id) return;
 
     // Get this information from the updated game object (maybe modified by the
     // the backend).

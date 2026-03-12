@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
+import { safeGetProjectUuid } from '../Utils/SafeProjectAccess';
 import {
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
@@ -519,7 +520,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 projectSpecificExtensionsSummaryJson:
                   preparedAiUserContent.projectSpecificExtensionsSummaryJson,
                 payWithCredits,
-                gameId: project ? project.getProjectUuid() : null,
+                gameId: safeGetProjectUuid(project),
                 // $FlowFixMe[incompatible-type]
                 fileMetadata,
                 storageProviderName,
@@ -740,9 +741,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                   preparedAiUserContent.projectSpecificExtensionsSummaryJsonUserRelativeKey,
                 projectSpecificExtensionsSummaryJson:
                   preparedAiUserContent.projectSpecificExtensionsSummaryJson,
-                gameId: upToDateProject
-                  ? upToDateProject.getProjectUuid()
-                  : undefined,
+                gameId: safeGetProjectUuid(upToDateProject) || undefined,
                 payWithCredits,
                 userMessage,
                 paused:
@@ -1109,7 +1108,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             });
             return;
           }
-          if (project.getProjectUuid() !== aiRequest.gameId) {
+          if (safeGetProjectUuid(project) !== aiRequest.gameId) {
             await showAlert({
               title: t`Project mismatch`,
               message: t`The project associated with this AI request does not match the current project. Open the correct project to restore to this state.`,

@@ -232,7 +232,7 @@ const useCreateProject = ({
 
         const { onSaveProjectAs } = destinationStorageProviderOperations;
 
-        let savedFileMetadata: ?FileMetadata = null;
+        let updatedFileMetadata: ?FileMetadata = state.currentFileMetadata;
         if (onSaveProjectAs) {
           const { wasSaved, fileMetadata } = await onSaveProjectAs(
             currentProject,
@@ -276,7 +276,7 @@ const useCreateProject = ({
             return { createdProject: null };
           }
 
-          savedFileMetadata = fileMetadata;
+          updatedFileMetadata = fileMetadata;
           onProjectSaved(fileMetadata);
           unsavedChanges.sealUnsavedChanges();
           if (newProjectSetup.storageProvider.internalName === 'LocalFile') {
@@ -300,7 +300,7 @@ const useCreateProject = ({
           project: currentProject,
           editorTabs,
           oldProjectId,
-          fileMetadata: savedFileMetadata || state.currentFileMetadata,
+          fileMetadata: updatedFileMetadata,
           options: {
             openAllScenes: !!options && options.openAllScenes,
             openQuickCustomizationDialog: !!newProjectSetup.openQuickCustomizationDialog,

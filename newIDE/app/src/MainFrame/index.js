@@ -679,11 +679,6 @@ const MainFrame = (props: Props): React.MixedElement => {
    */
   const currentProjectRef = useStableUpToDateRef(currentProject);
 
-  /**
-   * Similar to `currentProjectRef`, an always fresh reference to the latest `currentFileMetadata`.
-   */
-  const currentFileMetadataRef = useStableUpToDateRef(currentFileMetadata);
-
   const getEditorOpeningOptions = React.useCallback(
     ({
       kind,
@@ -1423,9 +1418,6 @@ const MainFrame = (props: Props): React.MixedElement => {
     }) => {
       // Update the currentFileMetadata based on the updated project, as
       // it can have been updated in the meantime (gameId, project name, etc...).
-      // The fileMetadata is passed explicitly from createProject to avoid relying
-      // on currentFileMetadataRef which can be stale due to React 18 batching
-      // (onProjectSaved's setState may not have been applied to a render yet).
       if (fileMetadata) {
         // $FlowFixMe[incompatible-type]
         const newFileMetadata: FileMetadata = updateFileMetadataWithOpenedProject(
@@ -4617,6 +4609,12 @@ const MainFrame = (props: Props): React.MixedElement => {
     ]
   );
 
+  /**
+   * Similar to `currentProjectRef`, a fresh reference (fresh=value of the last render)
+   * to the latest `currentFileMetadata`. Only use this reference in fetchNewlyAddedResources.
+   * Anywhere else, pass the currentFileMetadata directly as argument.
+   */
+  const currentFileMetadataRef = useStableUpToDateRef(currentFileMetadata);
   const fetchNewlyAddedResources = React.useCallback(
     async (): Promise<void> => {
       if (!currentProjectRef.current || !currentFileMetadataRef.current) return;

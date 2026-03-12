@@ -40,8 +40,8 @@ const generateUnusedFilepath = (
   alreadyUsedFilePaths: Set<string>,
   filename: string
 ) => {
+  const directory = path.dirname(filename);
   const extension = path.extname(filename);
-  const directory = path.dirname(filename, extension);
   const filenameWithoutExtension = path.basename(filename, extension);
   const name = newNameGenerator(filenameWithoutExtension, name => {
     const tentativePath = path.join(basePath, directory, name) + extension;

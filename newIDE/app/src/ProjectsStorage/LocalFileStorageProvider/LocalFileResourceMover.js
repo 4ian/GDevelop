@@ -19,7 +19,7 @@ import {
   isURL,
   parseLocalFilePathOrExtensionFromMetadata,
 } from '../../ResourcesList/ResourceUtils';
-import { sanitizeFilename } from '../../Utils/Filename';
+import { sanitizeFilePath } from '../../Utils/Filename';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { extractDecodedFilenameFromProjectResourceUrl } from '../../Utils/GDevelopServices/Project';
 import axios from 'axios';
@@ -41,14 +41,15 @@ const generateUnusedFilepath = (
   filename: string
 ) => {
   const extension = path.extname(filename);
+  const directory = path.dirname(filename, extension);
   const filenameWithoutExtension = path.basename(filename, extension);
   const name = newNameGenerator(filenameWithoutExtension, name => {
-    const tentativePath = path.join(basePath, name) + extension;
+    const tentativePath = path.join(basePath, directory, name) + extension;
     return (
       fs.existsSync(tentativePath) || alreadyUsedFilePaths.has(tentativePath)
     );
   });
-  return path.join(basePath, name) + extension;
+  return path.join(basePath, directory, name) + extension;
 };
 
 const downloadBlobToLocalFile = async (
@@ -124,10 +125,11 @@ export const moveUrlResourcesToLocalFiles = async ({
               : generateUnusedFilepath(
                   baseAssetsPath,
                   downloadedFilePaths,
-                  sanitizeFilename(resource.getName() + (extension || ''))
+                  sanitizeFilePath(resource.getName() + (extension || ''))
                 );
 
             await fs.ensureDir(baseAssetsPath);
+            await fs.ensureDir(path.dirname(downloadedFilePath));
             await downloadBlobToLocalFile(resourceFile, downloadedFilePath);
             resource.setFile(
               path.relative(projectPath, downloadedFilePath).replace(/\\/g, '/')

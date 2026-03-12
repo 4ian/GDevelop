@@ -379,19 +379,22 @@ export function AutoScroll({
         if (isOverLazy) {
           onHover();
         }
-        const dropTarget = (
+        return connectDropTarget(
           <div
-            style={{
-              ...sharedStyles.autoScroll,
-              ...(direction === 'top' ? { top: 0 } : { bottom: 0 }),
+            style={
+              show
+                ? {
+                    ...sharedStyles.autoScroll,
+                    ...(direction === 'top' ? { top: 0 } : { bottom: 0 }),
 
-              // Uncomment for debugging purposes.
-              // backgroundColor: 'black',
-              // opacity: isOverLazy ? 1 : 0,
-            }}
+                    // Uncomment for debugging purposes.
+                    // backgroundColor: 'black',
+                    // opacity: isOverLazy ? 1 : 0,
+                  }
+                : { display: 'none' }
+            }
           />
         );
-        return show ? connectDropTarget(dropTarget) : null;
       }}
     </DnDComponent>
   );

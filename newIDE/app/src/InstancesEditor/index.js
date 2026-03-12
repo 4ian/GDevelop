@@ -682,19 +682,34 @@ export default class InstancesEditor extends Component<Props, State> {
       nextProps.width !== this.props.width ||
       nextProps.height !== this.props.height
     ) {
-      this.pixiRenderer.resize(nextProps.width, nextProps.height);
-      if (this.threeRenderer) {
-        this.threeRenderer.setSize(nextProps.width, nextProps.height);
+      // Ensure we don't resize to 0, which is invalid for PixiJS/WebGL.
+      const width = nextProps.width || 1;
+      const height = nextProps.height || 1;
+
+      try {
+        this.pixiRenderer.resize(width, height);
+      } catch (error) {
+        // When PixiJS and Three.js share the same WebGL context, the resize
+        // can fail because Three.js may have modified WebGL state, leaving
+        // PixiJS's cached shader uniform locations stale. This is recoverable
+        // as the uniforms will be re-synced on the next successful render.
+        console.warn(
+          'PixiJS renderer resize failed, will retry on next render:',
+          error
+        );
       }
-      this.viewPosition.resize(nextProps.width, nextProps.height);
-      this.statusBar.resize(nextProps.width, nextProps.height);
+      if (this.threeRenderer) {
+        this.threeRenderer.setSize(width, height);
+      }
+      this.viewPosition.resize(width, height);
+      this.statusBar.resize(width, height);
       this.backgroundArea.hitArea = new PIXI.Rectangle(
         0,
         0,
-        nextProps.width,
-        nextProps.height
+        width,
+        height
       );
-      this.background.resize(nextProps.width, nextProps.height);
+      this.background.resize(width, height);
 
       // Avoid flickering that could happen while waiting for next animation frame.
       this.fpsLimiter.forceNextUpdate();

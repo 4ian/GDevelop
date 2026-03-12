@@ -780,10 +780,21 @@ export default class LayerRenderer {
       this._oldHeight !== pixiRenderer.screen.height
     ) {
       // A size of 0 is forbidden by Pixi.
-      this._renderTexture.resize(
-        pixiRenderer.screen.width || 100,
-        pixiRenderer.screen.height || 100
-      );
+      try {
+        this._renderTexture.resize(
+          pixiRenderer.screen.width || 100,
+          pixiRenderer.screen.height || 100
+        );
+      } catch (error) {
+        // When PixiJS and Three.js share the same WebGL context, resize can
+        // fail due to stale shader uniform locations. Skip this frame and
+        // retry on the next render cycle.
+        console.warn(
+          'RenderTexture resize failed, will retry on next render:',
+          error
+        );
+        return;
+      }
       this._oldWidth = pixiRenderer.screen.width;
       this._oldHeight = pixiRenderer.screen.height;
     }

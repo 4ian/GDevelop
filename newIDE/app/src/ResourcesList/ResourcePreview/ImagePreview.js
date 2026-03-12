@@ -309,20 +309,17 @@ const ImagePreview = ({
           }
         );
         if (previousDoubleTouchInfo.current) {
+          const previousCenter = previousDoubleTouchInfo.current.center;
+          const previousDistance = previousDoubleTouchInfo.current.distance;
           setZoomState(zoomState => ({
             ...zoomState,
             xOffset:
-              zoomState.xOffset +
-              (newCenter[0] - previousDoubleTouchInfo.current.center[0]),
+              zoomState.xOffset + (newCenter[0] - previousCenter[0]),
             yOffset:
-              zoomState.yOffset +
-              (newCenter[1] - previousDoubleTouchInfo.current.center[1]),
+              zoomState.yOffset + (newCenter[1] - previousCenter[1]),
           }));
 
-          zoomAroundPointBy(
-            newDistance / previousDoubleTouchInfo.current.distance,
-            newCenter
-          );
+          zoomAroundPointBy(newDistance / previousDistance, newCenter);
         }
         previousDoubleTouchInfo.current = {
           distance: newDistance,

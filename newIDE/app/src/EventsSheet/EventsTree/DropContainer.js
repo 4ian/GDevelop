@@ -379,11 +379,18 @@ export function AutoScroll({
         if (isOverLazy) {
           onHover();
         }
-        const dropTarget = (
+        // Always render the DOM element and use CSS to hide it rather than
+        // returning null. Returning null removes the DOM node while react-dnd
+        // still holds a reference to it, causing a crash when it tries to
+        // call removeEventListener on the unmounted node during cleanup.
+        return connectDropTarget(
           <div
             style={{
               ...sharedStyles.autoScroll,
               ...(direction === 'top' ? { top: 0 } : { bottom: 0 }),
+              ...(!show
+                ? { visibility: 'hidden', pointerEvents: 'none' }
+                : undefined),
 
               // Uncomment for debugging purposes.
               // backgroundColor: 'black',
@@ -391,7 +398,6 @@ export function AutoScroll({
             }}
           />
         );
-        return show ? connectDropTarget(dropTarget) : null;
       }}
     </DnDComponent>
   );

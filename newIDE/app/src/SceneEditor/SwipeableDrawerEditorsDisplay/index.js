@@ -286,8 +286,19 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
       .map(objectFolderOrObjectWithContext => {
         const { objectFolderOrObject } = objectFolderOrObjectWithContext;
         if (!objectFolderOrObject) return null; // Protect ourselves from an unexpected null value.
-        if (objectFolderOrObject.isFolder()) return null;
-        return objectFolderOrObject.getObject();
+        try {
+          if (objectFolderOrObject.isFolder()) return null;
+          const object = objectFolderOrObject.getObject();
+          // Verify the C++ gdObject is still alive by calling a cheap method.
+          // This avoids passing a freed object to child components where
+          // it would cause a UseAfterFreeError.
+          object.getName();
+          return object;
+        } catch (e) {
+          // The C++ object may have been freed (e.g., after a deletion).
+          // Skip it to avoid a UseAfterFreeError.
+          return null;
+        }
       })
       .filter(Boolean);
 

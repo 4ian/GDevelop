@@ -1710,6 +1710,14 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     this.props.onObjectListsModified({ isNewObjectTypeUsed: false });
 
+    // /!\ Clear the selected objects before actually deleting them to prevent
+    // stale references. If a forceUpdate is triggered after deletion (e.g.,
+    // forceUpdatePropertiesEditor), the properties editor could try to access
+    // the freed C++ object, causing a UseAfterFreeError.
+    this.setState({
+      selectedObjectFolderOrObjectsWithContext: [],
+    });
+
     // Note: done() actually does the deletion of the objects,
     // so ensure objectsWithContext are not used after this call.
     done(true);

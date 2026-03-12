@@ -29,9 +29,8 @@ export const isNullPtr = (
  * can be applied at the point where a value is derived from state,
  * protecting every downstream consumer without per-call-site checks.
  */
-export const exceptionallyGuardAgainstNullPtr = <T: { ptr: number }>(
-  obj: ?T
-): ?T => {
+export const exceptionallyGuardAgainstNullPtr = <T>(obj: ?T): ?T => {
+  // $FlowFixMe[prop-missing] - ptr is an Emscripten internal property present on all WebIDL wrappers.
   if (obj && obj.ptr === 0) return null;
   return obj;
 };

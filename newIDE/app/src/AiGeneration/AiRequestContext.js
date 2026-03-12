@@ -378,7 +378,9 @@ export const useAiRequestHistory = (
             .map(
               // $FlowFixMe[cannot-resolve-name]
               (message: AiRequestUserMessage) => {
-                const userRequest = message.content.find(
+                const content = message.content;
+                if (!Array.isArray(content)) return '';
+                const userRequest = content.find(
                   item => item.type === 'user_request'
                 );
                 return userRequest ? userRequest.text : '';

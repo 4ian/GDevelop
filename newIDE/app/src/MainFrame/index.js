@@ -59,6 +59,7 @@ import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainer
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
+import { exceptionallyGuardAgainstNullPtr } from '../Utils/IsNullPtr';
 import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
@@ -613,13 +614,9 @@ const MainFrame = (props: Props): React.MixedElement => {
   // });
 
   const { currentFileMetadata, updateStatus } = state;
-  // Guard against use-after-free: if the C++ project object was already
-  // destroyed (.delete() sets ptr to 0), treat it as null so that no
-  // child component ever receives a dangling wrapper.
-  const currentProject: ?gdProject =
-    state.currentProject && state.currentProject.ptr !== 0
-      ? state.currentProject
-      : null;
+  const currentProject = exceptionallyGuardAgainstNullPtr(
+    state.currentProject
+  );
   const {
     renderShareDialog,
     resourceSources,

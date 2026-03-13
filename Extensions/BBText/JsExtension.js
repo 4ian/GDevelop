@@ -563,8 +563,9 @@ module.exports = {
         // in BBCode tags (e.g. [color=blues] instead of [color=blue]).
         // Without this, PixiJS Color.normalize throws "Unable to convert color"
         // which propagates to _renderScene and crashes the entire editor.
-        const originalUpdateText =
-          this._pixiObject.updateText.bind(this._pixiObject);
+        const originalUpdateText = this._pixiObject.updateText.bind(
+          this._pixiObject
+        );
         this._pixiObject.updateText = (...args) => {
           try {
             originalUpdateText(...args);

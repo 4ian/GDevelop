@@ -19,7 +19,7 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Sprite2d = (): React.Node => (
+export const Default = (): React.Node => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (

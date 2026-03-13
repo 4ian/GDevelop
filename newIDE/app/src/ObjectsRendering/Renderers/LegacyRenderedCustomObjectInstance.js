@@ -208,57 +208,66 @@ export default class LegacyRenderedCustomObjectInstance
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
   ): any {
-    const customObjectConfiguration = gd.asCustomObjectConfiguration(
-      objectConfiguration
-    );
-
-    const eventBasedObject = project.hasEventsBasedObject(
-      customObjectConfiguration.getType()
-    )
-      ? project.getEventsBasedObject(customObjectConfiguration.getType())
-      : null;
-    if (!eventBasedObject) {
-      return 'res/unknown32.png';
-    }
-    if (eventBasedObject.isAnimatable()) {
-      const animations = customObjectConfiguration.getAnimations();
-
-      if (
-        animations.getAnimationsCount() > 0 &&
-        animations.getAnimation(0).getDirectionsCount() > 0 &&
-        animations
-          .getAnimation(0)
-          .getDirection(0)
-          .getSpritesCount() > 0
-      ) {
-        const imageName = animations
-          .getAnimation(0)
-          .getDirection(0)
-          .getSprite(0)
-          .getImageName();
-        return resourcesLoader.getResourceFullUrl(project, imageName, {});
-      }
-      return 'res/unknown32.png';
-    }
-    const childObjects = eventBasedObject.getObjects();
-    for (let i = 0; i < childObjects.getObjectsCount(); i++) {
-      const childObject = childObjects.getObjectAt(i);
-      const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
-        childObject.getName()
+    try {
+      const customObjectConfiguration = gd.asCustomObjectConfiguration(
+        objectConfiguration
       );
-      const childType = childObjectConfiguration.getType();
-      if (
-        childType === 'Sprite' ||
-        childType === 'TiledSpriteObject::TiledSprite' ||
-        childType === 'PanelSpriteObject::PanelSprite' ||
-        childType === 'Scene3D::Cube3DObject'
-      ) {
-        const thumbnail = ObjectsRenderingService.getThumbnail(
-          project,
-          childObjectConfiguration
-        );
-        if (thumbnail) return thumbnail;
+
+      const eventBasedObject = project.hasEventsBasedObject(
+        customObjectConfiguration.getType()
+      )
+        ? project.getEventsBasedObject(customObjectConfiguration.getType())
+        : null;
+      if (!eventBasedObject) {
+        return 'res/unknown32.png';
       }
+      if (eventBasedObject.isAnimatable()) {
+        const animations = customObjectConfiguration.getAnimations();
+
+        if (
+          animations.getAnimationsCount() > 0 &&
+          animations.getAnimation(0).getDirectionsCount() > 0 &&
+          animations
+            .getAnimation(0)
+            .getDirection(0)
+            .getSpritesCount() > 0
+        ) {
+          const imageName = animations
+            .getAnimation(0)
+            .getDirection(0)
+            .getSprite(0)
+            .getImageName();
+          return resourcesLoader.getResourceFullUrl(project, imageName, {});
+        }
+        return 'res/unknown32.png';
+      }
+      const childObjects = eventBasedObject.getObjects();
+      for (let i = 0; i < childObjects.getObjectsCount(); i++) {
+        const childObject = childObjects.getObjectAt(i);
+        const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
+          childObject.getName()
+        );
+        const childType = childObjectConfiguration.getType();
+        if (
+          childType === 'Sprite' ||
+          childType === 'TiledSpriteObject::TiledSprite' ||
+          childType === 'PanelSpriteObject::PanelSprite' ||
+          childType === 'Scene3D::Cube3DObject'
+        ) {
+          const thumbnail = ObjectsRenderingService.getThumbnail(
+            project,
+            childObjectConfiguration
+          );
+          if (thumbnail) return thumbnail;
+        }
+      }
+    } catch (error) {
+      // The object configuration may have been freed by the C++ side while
+      // React still holds a stale reference during re-rendering.
+      console.warn(
+        'Could not get thumbnail for custom object, the configuration may have been freed:',
+        error
+      );
     }
     return 'res/unknown32.png';
   }

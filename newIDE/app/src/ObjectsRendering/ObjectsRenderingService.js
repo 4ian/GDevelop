@@ -58,25 +58,35 @@ const ObjectsRenderingService = {
     project: gdProject,
     objectConfiguration: gdObjectConfiguration
   ): any {
-    const objectType = objectConfiguration.getType();
-    if (this.renderers.hasOwnProperty(objectType))
-      return this.renderers[objectType].getThumbnail(
-        project,
-        ResourcesLoader,
-        objectConfiguration
+    try {
+      const objectType = objectConfiguration.getType();
+      if (this.renderers.hasOwnProperty(objectType))
+        return this.renderers[objectType].getThumbnail(
+          project,
+          ResourcesLoader,
+          objectConfiguration
+        );
+      else if (project.hasEventsBasedObject(objectType)) {
+        return RenderedCustomObjectInstance.getThumbnail(
+          project,
+          ResourcesLoader,
+          objectConfiguration
+        );
+      } else {
+        return this.renderers['unknownObjectType'].getThumbnail(
+          project,
+          ResourcesLoader,
+          objectConfiguration
+        );
+      }
+    } catch (error) {
+      // The object configuration may have been freed by the C++ side while
+      // the UI still holds a stale reference (e.g., during React re-renders).
+      console.warn(
+        'Could not get thumbnail for object, the configuration may have been freed:',
+        error
       );
-    else if (project.hasEventsBasedObject(objectType)) {
-      return RenderedCustomObjectInstance.getThumbnail(
-        project,
-        ResourcesLoader,
-        objectConfiguration
-      );
-    } else {
-      return this.renderers['unknownObjectType'].getThumbnail(
-        project,
-        ResourcesLoader,
-        objectConfiguration
-      );
+      return 'res/unknown32.png';
     }
   },
   // $FlowFixMe[missing-this-annot]

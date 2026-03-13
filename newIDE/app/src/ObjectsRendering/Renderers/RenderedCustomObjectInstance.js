@@ -48,14 +48,25 @@ const getChildObjectConfiguration = (
   // In this case, the editor doesn't allow to choose a variant, but a
   // variant may have stayed after a user rolled back the extension.
   // This variant must be ignored to match what the editor shows.
-  if (
-    customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() ||
-    (variant === eventBasedObject.getDefaultVariant() &&
-      customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration())
-  ) {
-    return customObjectConfiguration.getChildObjectConfiguration(
-      childObjectName
+  try {
+    if (
+      customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() ||
+      (variant === eventBasedObject.getDefaultVariant() &&
+        customObjectConfiguration.isMarkedAsOverridingEventsBasedObjectChildrenConfiguration())
+    ) {
+      return customObjectConfiguration.getChildObjectConfiguration(
+        childObjectName
+      );
+    }
+  } catch (error) {
+    // The custom object configuration may have been freed by the C++ side
+    // while the JavaScript side still holds a reference to it.
+    // In this case, return null to gracefully handle the stale reference.
+    console.warn(
+      'Could not access custom object configuration, it may have been freed:',
+      error
     );
+    return null;
   }
   const childObjects = variant.getObjects();
   return childObjects.hasObjectNamed(childObjectName)
@@ -385,63 +396,72 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
   ): any {
-    const customObjectConfiguration = gd.asCustomObjectConfiguration(
-      objectConfiguration
-    );
-    const eventBasedObject = getEventBasedObject(
-      project,
-      customObjectConfiguration
-    );
-    if (!eventBasedObject) {
-      return 'res/unknown32.png';
-    }
-    if (eventBasedObject.isAnimatable()) {
-      const animations = customObjectConfiguration.getAnimations();
-
-      if (
-        animations.getAnimationsCount() > 0 &&
-        animations.getAnimation(0).getDirectionsCount() > 0 &&
-        animations
-          .getAnimation(0)
-          .getDirection(0)
-          .getSpritesCount() > 0
-      ) {
-        const imageName = animations
-          .getAnimation(0)
-          .getDirection(0)
-          .getSprite(0)
-          .getImageName();
-        return resourcesLoader.getResourceFullUrl(project, imageName, {});
-      }
-      return 'res/unknown32.png';
-    }
-    const variant = getVariant(eventBasedObject, customObjectConfiguration);
-    const childObjects = variant.getObjects();
-    for (let i = 0; i < childObjects.getObjectsCount(); i++) {
-      const childObject = childObjects.getObjectAt(i);
-
-      const childObjectConfiguration = getChildObjectConfiguration(
-        childObject.getName(),
-        eventBasedObject,
-        customObjectConfiguration,
-        variant
+    try {
+      const customObjectConfiguration = gd.asCustomObjectConfiguration(
+        objectConfiguration
       );
-      if (!childObjectConfiguration) {
-        continue;
+      const eventBasedObject = getEventBasedObject(
+        project,
+        customObjectConfiguration
+      );
+      if (!eventBasedObject) {
+        return 'res/unknown32.png';
       }
-      const childType = childObjectConfiguration.getType();
-      if (
-        childType === 'Sprite' ||
-        childType === 'TiledSpriteObject::TiledSprite' ||
-        childType === 'PanelSpriteObject::PanelSprite' ||
-        childType === 'Scene3D::Cube3DObject'
-      ) {
-        const thumbnail = ObjectsRenderingService.getThumbnail(
-          project,
-          childObjectConfiguration
+      if (eventBasedObject.isAnimatable()) {
+        const animations = customObjectConfiguration.getAnimations();
+
+        if (
+          animations.getAnimationsCount() > 0 &&
+          animations.getAnimation(0).getDirectionsCount() > 0 &&
+          animations
+            .getAnimation(0)
+            .getDirection(0)
+            .getSpritesCount() > 0
+        ) {
+          const imageName = animations
+            .getAnimation(0)
+            .getDirection(0)
+            .getSprite(0)
+            .getImageName();
+          return resourcesLoader.getResourceFullUrl(project, imageName, {});
+        }
+        return 'res/unknown32.png';
+      }
+      const variant = getVariant(eventBasedObject, customObjectConfiguration);
+      const childObjects = variant.getObjects();
+      for (let i = 0; i < childObjects.getObjectsCount(); i++) {
+        const childObject = childObjects.getObjectAt(i);
+
+        const childObjectConfiguration = getChildObjectConfiguration(
+          childObject.getName(),
+          eventBasedObject,
+          customObjectConfiguration,
+          variant
         );
-        if (thumbnail) return thumbnail;
+        if (!childObjectConfiguration) {
+          continue;
+        }
+        const childType = childObjectConfiguration.getType();
+        if (
+          childType === 'Sprite' ||
+          childType === 'TiledSpriteObject::TiledSprite' ||
+          childType === 'PanelSpriteObject::PanelSprite' ||
+          childType === 'Scene3D::Cube3DObject'
+        ) {
+          const thumbnail = ObjectsRenderingService.getThumbnail(
+            project,
+            childObjectConfiguration
+          );
+          if (thumbnail) return thumbnail;
+        }
       }
+    } catch (error) {
+      // The object configuration may have been freed by the C++ side while
+      // React still holds a stale reference during re-rendering.
+      console.warn(
+        'Could not get thumbnail for custom object, the configuration may have been freed:',
+        error
+      );
     }
     return 'res/unknown32.png';
   }

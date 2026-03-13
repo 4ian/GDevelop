@@ -35,6 +35,25 @@ namespace gdjs {
           align: runtimeObject._textAlign as PIXI.TextStyleAlign | undefined,
         },
       });
+
+      // Override updateText to catch errors from invalid color values
+      // in BBCode tags (e.g. [color=blues] instead of [color=blue]).
+      // Without this, PixiJS Color.normalize throws and crashes the game.
+      const originalUpdateText = this._pixiObject.updateText.bind(
+        this._pixiObject
+      );
+      this._pixiObject.updateText = (...args: any) => {
+        try {
+          originalUpdateText(...args);
+        } catch (error) {
+          console.warn(
+            'Error rendering BBText (invalid color or style in BBCode):',
+            error
+          );
+          this._pixiObject.dirty = false;
+        }
+      };
+
       instanceContainer
         .getLayer('')
         .getRenderer()

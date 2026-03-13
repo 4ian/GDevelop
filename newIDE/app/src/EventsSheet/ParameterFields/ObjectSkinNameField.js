@@ -46,9 +46,8 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const [skinNames, setSkinNames] = React.useState<Array<string>>([]);
     const [isExpressionField, setIsExpressionField] = React.useState<boolean>(
-      true
+      false
     );
-    const canAutocomplete = skinNames.length > 0;
 
     const objectName = getLastObjectParameterValue({
       instructionMetadata,
@@ -104,13 +103,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         };
       },
       [project, objectName, globalObjectsContainer, objectsContainer]
-    );
-
-    React.useEffect(
-      () => {
-        setIsExpressionField(!canAutocomplete);
-      },
-      [canAutocomplete]
     );
 
     const switchFieldType = () => {
@@ -184,27 +176,25 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           )
         }
         renderButton={style =>
-          canAutocomplete ? (
-            isExpressionField ? (
-              <FlatButton
-                id="switch-expression-select"
-                leftIcon={<TypeCursorSelect />}
-                style={style}
-                primary
-                label={<Trans>Select</Trans>}
-                onClick={switchFieldType}
-              />
-            ) : (
-              <RaisedButton
-                id="switch-expression-select"
-                icon={<Functions />}
-                style={style}
-                primary
-                label={<Trans>Use an expression</Trans>}
-                onClick={switchFieldType}
-              />
-            )
-          ) : null
+          isExpressionField ? (
+            <FlatButton
+              id="switch-expression-select"
+              leftIcon={<TypeCursorSelect />}
+              style={style}
+              primary
+              label={<Trans>Select</Trans>}
+              onClick={switchFieldType}
+            />
+          ) : (
+            <RaisedButton
+              id="switch-expression-select"
+              icon={<Functions />}
+              style={style}
+              primary
+              label={<Trans>Use an expression</Trans>}
+              onClick={switchFieldType}
+            />
+          )
         }
       />
     );

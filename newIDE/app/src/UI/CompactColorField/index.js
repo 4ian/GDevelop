@@ -9,6 +9,7 @@ import {
   rgbColorToRGBString,
   rgbStringAndAlphaToRGBColor,
 } from '../../Utils/ColorTransformer';
+import CompactTextField from '../CompactTextField';
 
 export type CompactColorFieldProps = {|
   color: string,
@@ -32,6 +33,7 @@ export const CompactColorField = ({
   placeholder,
 }: CompactColorFieldProps): React.MixedElement => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
+  const [focused, setFocused] = React.useState<boolean>(false);
   const [colorValue, setColorValue] = React.useState<string>(color);
   // alpha can be equal to 0, so we have to check if it is not undefined
   const [alphaValue, setAlphaValue] = React.useState<number>(
@@ -62,6 +64,8 @@ export const CompactColorField = ({
     onChange(rgbString, newAlpha);
   };
 
+  console.log('CompactColorField update', color);
+
   return (
     <div
       className={classNames({
@@ -75,20 +79,31 @@ export const CompactColorField = ({
           [classes.compactColorField]: true,
         })}
       >
-        <input
+        <CompactTextField
           id={idToUse.current}
           type="text"
-          disabled={disabled}
-          value={colorValue}
-          onChange={e => handleChange(e.currentTarget.value, alphaValue)}
-          placeholder={placeholder}
-          onBlur={handleBlur}
+          value={focused ? colorValue : color}
+          onFocus={event => {
+            setFocused(true);
+            setColorValue(color);
+          }}
+          onChange={newColor => handleChange(newColor, alphaValue)}
+          onBlur={event => {
+            if (color !== event.currentTarget.value) {
+              handleChange(event.currentTarget.value, alphaValue);
+            }
+            setFocused(false);
+            handleBlur();
+          }}
         />
         <ColorPicker
           size="compact"
           disableAlpha={disableAlpha}
           onChangeComplete={handlePickerChange}
-          color={rgbStringAndAlphaToRGBColor(colorValue, alphaValue)}
+          color={rgbStringAndAlphaToRGBColor(
+            focused ? colorValue : color,
+            alpha
+          )}
           disabled={disabled}
         />
       </div>

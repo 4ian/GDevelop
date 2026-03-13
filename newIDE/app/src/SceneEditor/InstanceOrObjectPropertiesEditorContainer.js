@@ -99,16 +99,22 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
 }> = React.forwardRef<Props, InstanceOrObjectPropertiesEditorInterface>(
   (props, ref) => {
     const forceUpdate = useForceUpdate();
-    // $FlowFixMe[incompatible-type]
-    React.useImperativeHandle(ref, () => ({
-      forceUpdate,
-      getEditorTitle: () =>
-        lastSelectionType === 'instance' ? (
-          <Trans>Instance properties</Trans>
-        ) : (
-          <Trans>Object properties</Trans>
-        ),
-    }));
+    React.useImperativeHandle<InstanceOrObjectPropertiesEditorInterface>(
+      ref,
+      () => ({
+        forceUpdate,
+        getEditorTitle: () =>
+          lastSelectionType === 'instance' ? (
+            <Trans>Instance properties</Trans>
+          ) : lastSelectionType === 'object' ? (
+            <Trans>Object properties</Trans>
+          ) : lastSelectionType === 'layer' ? (
+            <Trans>Layer properties</Trans>
+          ) : (
+            <Trans>Scene properties</Trans>
+          ),
+      })
+    );
 
     const {
       project,

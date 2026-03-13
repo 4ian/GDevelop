@@ -9,7 +9,7 @@ import VariablesList, {
 import { type ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
-import { Column, marginsSize } from '../../UI/Grid';
+import { Column, Line, marginsSize } from '../../UI/Grid';
 import Text from '../../UI/Text';
 import { Trans } from '@lingui/macro';
 import IconButton from '../../UI/IconButton';
@@ -58,7 +58,6 @@ export const styles = {
   },
 };
 
-const behaviorsHelpLink = getHelpLink('/behaviors');
 const sceneVariablesHelpLink = getHelpLink(
   '/all-features/variables/scene-variables'
 );
@@ -147,13 +146,7 @@ export const CompactScenePropertiesEditor = ({
         key={scrollKey}
         onScroll={onScroll}
       >
-        <Column
-          expand
-          noMargin
-          id="scene-properties-editor"
-          noOverflowParent
-          useFullHeight
-        >
+        <Column expand noMargin id="scene-properties-editor" noOverflowParent>
           <ColumnStackLayout expand noOverflowParent>
             <LineStackLayout
               noMargin
@@ -163,7 +156,7 @@ export const CompactScenePropertiesEditor = ({
               <LineStackLayout noMargin alignItems="center">
                 <SceneIcon style={styles.icon} />
                 <Text size="body" noMargin>
-                  <Trans>{scene.getName()}</Trans>
+                  {scene.getName()}
                 </Text>
                 {helpLink && (
                   <IconButton
@@ -193,76 +186,61 @@ export const CompactScenePropertiesEditor = ({
                   }}
                   resourceManagementProps={resourceManagementProps}
                   placeholder=""
-                  // $FlowFixMe[incompatible-type]
                   onRefreshAllFields={forceRecomputeSchema}
                 />
               </ColumnStackLayout>
             )}
           />
-          <TopLevelCollapsibleSection
-            title={<Trans>Behaviors</Trans>}
-            isFolded={isBehaviorsFolded}
-            toggleFolded={() => setIsBehaviorsFolded(!isBehaviorsFolded)}
-            renderContent={() => (
-              <ColumnStackLayout noMargin>
-                {!allVisibleBehaviors.length && (
-                  <Text size="body2" align="center" color="secondary">
-                    <Trans>
-                      There are no{' '}
-                      <Link
-                        href={behaviorsHelpLink}
-                        onClick={() =>
-                          Window.openExternalURL(behaviorsHelpLink)
-                        }
-                      >
-                        behaviors
-                      </Link>{' '}
-                      with scene properties.
-                    </Trans>
-                  </Text>
-                )}
-                {allVisibleBehaviors.map(behaviorSharedData => {
-                  const behaviorTypeName = behaviorSharedData.getTypeName();
-                  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-                    gd.JsPlatform.get(),
-                    behaviorTypeName
-                  );
-                  const iconUrl = behaviorMetadata.getIconFilename();
-                  return (
-                    <CollapsibleSubPanel
-                      key={behaviorSharedData.ptr}
-                      renderContent={() => (
-                        <CompactBehaviorSharedDataPropertiesEditor
-                          project={project}
-                          behaviorMetadata={behaviorMetadata}
-                          behaviorSharedData={behaviorSharedData}
-                          onBehaviorUpdated={() => {}}
-                          resourceManagementProps={resourceManagementProps}
-                        />
-                      )}
-                      isFolded={behaviorSharedData.isFolded()}
-                      toggleFolded={() => {
-                        behaviorSharedData.setFolded(
-                          !behaviorSharedData.isFolded()
-                        );
-                        forceUpdate();
-                      }}
-                      titleIcon={
-                        iconUrl ? (
-                          <IconContainer
-                            src={iconUrl}
-                            alt={behaviorMetadata.getFullName()}
-                            size={16}
+          {allVisibleBehaviors.length > 0 && (
+            <TopLevelCollapsibleSection
+              title={<Trans>Behaviors</Trans>}
+              isFolded={isBehaviorsFolded}
+              toggleFolded={() => setIsBehaviorsFolded(!isBehaviorsFolded)}
+              renderContent={() => (
+                <ColumnStackLayout noMargin>
+                  {allVisibleBehaviors.map(behaviorSharedData => {
+                    const behaviorTypeName = behaviorSharedData.getTypeName();
+                    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+                      gd.JsPlatform.get(),
+                      behaviorTypeName
+                    );
+                    const iconUrl = behaviorMetadata.getIconFilename();
+                    return (
+                      <CollapsibleSubPanel
+                        key={behaviorSharedData.ptr}
+                        renderContent={() => (
+                          <CompactBehaviorSharedDataPropertiesEditor
+                            project={project}
+                            behaviorMetadata={behaviorMetadata}
+                            behaviorSharedData={behaviorSharedData}
+                            onBehaviorUpdated={() => {}}
+                            resourceManagementProps={resourceManagementProps}
                           />
-                        ) : null
-                      }
-                      title={behaviorSharedData.getName()}
-                    />
-                  );
-                })}
-              </ColumnStackLayout>
-            )}
-          />
+                        )}
+                        isFolded={behaviorSharedData.isFolded()}
+                        toggleFolded={() => {
+                          behaviorSharedData.setFolded(
+                            !behaviorSharedData.isFolded()
+                          );
+                          forceUpdate();
+                        }}
+                        titleIcon={
+                          iconUrl ? (
+                            <IconContainer
+                              src={iconUrl}
+                              alt={behaviorMetadata.getFullName()}
+                              size={16}
+                            />
+                          ) : null
+                        }
+                        title={behaviorSharedData.getName()}
+                      />
+                    );
+                  })}
+                </ColumnStackLayout>
+              )}
+            />
+          )}
           <TopLevelCollapsibleSection
             title={<Trans>Scene Variables</Trans>}
             isFolded={isVariablesFolded}
@@ -315,14 +293,16 @@ export const CompactScenePropertiesEditor = ({
               />
             )}
           />
-          <Column noMargin expand justifyContent="center" useFullHeight>
-            <EmptyMessage>
-              <Trans>
-                Click on an instance on the canvas or an object in the list to
-                display their properties.
-              </Trans>
-            </EmptyMessage>
-          </Column>
+          {scene.getVariables().count() === 0 && (
+            <Line>
+              <EmptyMessage>
+                <Trans>
+                  Click on an instance on the canvas or an object in the list to
+                  display their properties.
+                </Trans>
+              </EmptyMessage>
+            </Line>
+          )}
         </Column>
       </ScrollView>
     </ErrorBoundary>

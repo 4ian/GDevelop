@@ -1,4 +1,6 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('BBText renderer');
+
   /**
    * The PIXI.js renderer for the BBCode Text runtime object.
    * @category Renderers > BBText
@@ -46,9 +48,9 @@ namespace gdjs {
         try {
           originalUpdateText(...args);
         } catch (error) {
-          console.warn(
-            'Error rendering BBText (invalid color or style in BBCode):',
-            error
+          logger.warn(
+            'Error rendering BBText (invalid color or style in BBCode): ' +
+              error
           );
           this._pixiObject.dirty = false;
         }

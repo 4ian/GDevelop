@@ -256,7 +256,6 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             unsavedChanges={unsavedChanges}
             i18n={i18n}
             onBackgroundColorChanged={onBackgroundColorChanged}
-            onUpdateBehaviorsSharedData={() => {}}
             openSceneVariables={openSceneVariables}
           />
         ) : null}

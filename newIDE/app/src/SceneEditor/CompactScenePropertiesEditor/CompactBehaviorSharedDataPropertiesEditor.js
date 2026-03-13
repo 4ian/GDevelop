@@ -11,7 +11,6 @@ type CompactBehaviorPropertiesEditorProps = {|
   project: gdProject,
   behaviorMetadata: gdBehaviorMetadata,
   behaviorSharedData: gdBehaviorsSharedData,
-  onBehaviorUpdated: () => void,
   resourceManagementProps: ResourceManagementProps,
   isAdvancedSectionInitiallyUncollapsed?: boolean,
 |};
@@ -20,7 +19,6 @@ export const CompactBehaviorSharedDataPropertiesEditor = ({
   project,
   behaviorMetadata,
   behaviorSharedData,
-  onBehaviorUpdated,
   resourceManagementProps,
 }: CompactBehaviorPropertiesEditorProps): React.Node => {
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
@@ -56,10 +54,8 @@ export const CompactBehaviorSharedDataPropertiesEditor = ({
         object={null}
         schema={propertiesSchema}
         instances={[behaviorSharedData]}
-        onInstancesModified={onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
         placeholder={<Trans>Nothing to configure for this behavior.</Trans>}
-        // $FlowFixMe[incompatible-type]
         onRefreshAllFields={forceRecomputeSchema}
       />
     </ColumnStackLayout>

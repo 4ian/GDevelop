@@ -202,7 +202,6 @@ export const CompactBehaviorPropertiesEditor = ({
                 })
             : null
         }
-        // $FlowFixMe[incompatible-type]
         onRefreshAllFields={forceRecomputeSchema}
       />
     </ColumnStackLayout>

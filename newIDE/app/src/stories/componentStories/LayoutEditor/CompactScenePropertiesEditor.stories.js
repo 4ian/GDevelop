@@ -23,9 +23,32 @@ export const Default = (): React.Node => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (
-        <SerializedObjectDisplay object={testProject.testSpriteObjectInstance}>
+        <SerializedObjectDisplay object={testProject.testLayout}>
           <CompactScenePropertiesEditor
             scene={testProject.testLayout}
+            resourceManagementProps={fakeResourceManagementProps}
+            project={testProject.project}
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
+            }
+            i18n={i18n}
+            onBackgroundColorChanged={action('onBackgroundColorChanged')}
+            onUpdateBehaviorsSharedData={action('onUpdateBehaviorsSharedData')}
+            onEditSceneVariables={action('onEditSceneVariables')}
+          />
+        </SerializedObjectDisplay>
+      )}
+    </I18n>
+  </DragAndDropContextProvider>
+);
+
+export const Empty = (): React.Node => (
+  <DragAndDropContextProvider>
+    <I18n>
+      {({ i18n }) => (
+        <SerializedObjectDisplay object={testProject.emptyLayout}>
+          <CompactScenePropertiesEditor
+            scene={testProject.emptyLayout}
             resourceManagementProps={fakeResourceManagementProps}
             project={testProject.project}
             projectScopedContainersAccessor={

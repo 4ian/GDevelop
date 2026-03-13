@@ -46,7 +46,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const [skinNames, setSkinNames] = React.useState<Array<string>>([]);
     const [isExpressionField, setIsExpressionField] = React.useState<boolean>(
-      false
+      true
     );
     const canAutocomplete = skinNames.length > 0;
 
@@ -129,6 +129,8 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? props.parameterMetadata.getDescription()
       : undefined;
 
+    const marginValue = props.isInline ? 'none' : 'dense';
+
     const selectOptions = skinNames.map(skinName => {
       return (
         <SelectOption
@@ -142,6 +144,8 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     return (
       <TextFieldWithButtonLayout
+        margin={marginValue}
+        noFloatingLabelText={!fieldLabel}
         renderTextField={() =>
           !isExpressionField ? (
             <SelectField
@@ -153,7 +157,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               }
               value={props.value}
               onChange={onChangeSelectValue}
-              margin={props.isInline ? 'none' : 'dense'}
+              margin={marginValue}
               fullWidth
               floatingLabelText={fieldLabel}
               translatableHintText={t`Choose a skin`}

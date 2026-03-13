@@ -86,6 +86,7 @@ type Props = {|
 
   // For scenes
   onBackgroundColorChanged: () => void,
+  openSceneVariables: () => void,
 |};
 
 export type InstanceOrObjectPropertiesEditorInterface = {|
@@ -168,6 +169,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
 
       // For scenes
       onBackgroundColorChanged,
+      openSceneVariables,
     } = props;
 
     return (
@@ -255,7 +257,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             i18n={i18n}
             onBackgroundColorChanged={onBackgroundColorChanged}
             onUpdateBehaviorsSharedData={() => {}}
-            onEditSceneVariables={() => {}}
+            openSceneVariables={openSceneVariables}
           />
         ) : null}
       </Paper>

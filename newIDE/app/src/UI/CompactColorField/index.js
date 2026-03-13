@@ -64,8 +64,6 @@ export const CompactColorField = ({
     onChange(rgbString, newAlpha);
   };
 
-  console.log('CompactColorField update', color);
-
   return (
     <div
       className={classNames({

@@ -67,7 +67,7 @@ type Props = {|
   scene: gdLayout,
   resourceManagementProps: ResourceManagementProps,
   onUpdateBehaviorsSharedData: () => void,
-  onEditSceneVariables: () => void,
+  openSceneVariables: () => void,
   onBackgroundColorChanged: () => void,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   unsavedChanges?: ?UnsavedChanges,
@@ -80,7 +80,7 @@ export const CompactScenePropertiesEditor = ({
   resourceManagementProps,
   scene,
   onUpdateBehaviorsSharedData,
-  onEditSceneVariables,
+  openSceneVariables,
   onBackgroundColorChanged,
   projectScopedContainersAccessor,
   unsavedChanges,
@@ -245,7 +245,7 @@ export const CompactScenePropertiesEditor = ({
             title={<Trans>Scene Variables</Trans>}
             isFolded={isVariablesFolded}
             toggleFolded={() => setIsVariablesFolded(!isVariablesFolded)}
-            onOpenFullEditor={() => onEditSceneVariables()}
+            onOpenFullEditor={() => openSceneVariables()}
             onAdd={() => {
               if (variablesListRef.current) {
                 variablesListRef.current.addVariable();

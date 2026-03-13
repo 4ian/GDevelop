@@ -66,7 +66,6 @@ type Props = {|
   project: gdProject,
   scene: gdLayout,
   resourceManagementProps: ResourceManagementProps,
-  onUpdateBehaviorsSharedData: () => void,
   openSceneVariables: () => void,
   onBackgroundColorChanged: () => void,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
@@ -79,7 +78,6 @@ export const CompactScenePropertiesEditor = ({
   project,
   resourceManagementProps,
   scene,
-  onUpdateBehaviorsSharedData,
   openSceneVariables,
   onBackgroundColorChanged,
   projectScopedContainersAccessor,
@@ -213,7 +211,6 @@ export const CompactScenePropertiesEditor = ({
                             project={project}
                             behaviorMetadata={behaviorMetadata}
                             behaviorSharedData={behaviorSharedData}
-                            onBehaviorUpdated={() => {}}
                             resourceManagementProps={resourceManagementProps}
                           />
                         )}

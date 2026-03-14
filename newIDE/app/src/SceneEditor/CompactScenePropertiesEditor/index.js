@@ -9,7 +9,7 @@ import VariablesList, {
 import { type ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
-import { Column, Line, marginsSize } from '../../UI/Grid';
+import { Column, LargeSpacer, Line, marginsSize } from '../../UI/Grid';
 import Text from '../../UI/Text';
 import { Trans } from '@lingui/macro';
 import IconButton from '../../UI/IconButton';
@@ -290,16 +290,15 @@ export const CompactScenePropertiesEditor = ({
               />
             )}
           />
-          {scene.getVariables().count() === 0 && (
-            <Line>
-              <EmptyMessage>
-                <Trans>
-                  Click on an instance on the canvas or an object in the list to
-                  display their properties.
-                </Trans>
-              </EmptyMessage>
-            </Line>
-          )}
+          <LargeSpacer />
+          <Line>
+            <EmptyMessage>
+              <Trans>
+                Click on an instance on the canvas or an object in the list to
+                display their properties.
+              </Trans>
+            </EmptyMessage>
+          </Line>
         </Column>
       </ScrollView>
     </ErrorBoundary>

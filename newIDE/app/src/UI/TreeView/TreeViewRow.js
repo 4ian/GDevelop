@@ -295,7 +295,11 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           // Prevent dragging of item whose name is edited, allowing to select text with click and drag on text.
           renamedItemId !== node.id
         }
-        canDrop={canDrop ? draggedItem => canDrop(node.item, whereToDrop, draggedItem) : () => true}
+        canDrop={
+          canDrop
+            ? draggedItem => canDrop(node.item, whereToDrop, draggedItem)
+            : () => true
+        }
         drop={draggedItem => {
           onDrop(node.item, whereToDrop, draggedItem);
         }}

@@ -76,8 +76,9 @@ export const addSerializedInstances = ({
         parentPersistentUuid &&
         oldToNewPersistentUuid.has(parentPersistentUuid)
       ) {
-        const newParentPersistentUuid =
-          oldToNewPersistentUuid.get(parentPersistentUuid);
+        const newParentPersistentUuid = oldToNewPersistentUuid.get(
+          parentPersistentUuid
+        );
         if (newParentPersistentUuid) {
           instance.setParentPersistentUuid(newParentPersistentUuid);
         }

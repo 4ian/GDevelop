@@ -75,7 +75,11 @@ export const buildInstancesIndex = (
     children.push(instance);
   });
 
-  return { instances, instancesByPersistentUuid, childrenByParentPersistentUuid };
+  return {
+    instances,
+    instancesByPersistentUuid,
+    childrenByParentPersistentUuid,
+  };
 };
 
 export const getParentInstanceFromIndex = (
@@ -84,7 +88,9 @@ export const getParentInstanceFromIndex = (
 ): gdInitialInstance | null => {
   const parentPersistentUuid = getParentPersistentUuid(instance);
   if (!parentPersistentUuid) return null;
-  return instancesIndex.instancesByPersistentUuid.get(parentPersistentUuid) || null;
+  return (
+    instancesIndex.instancesByPersistentUuid.get(parentPersistentUuid) || null
+  );
 };
 
 export const getParentInstance = (
@@ -125,7 +131,9 @@ const setLocalScaleY = (instance: gdInitialInstance, value: number) => {
 
 const getInheritRotation = (instance: gdInitialInstance): boolean =>
   // $FlowFixMe[prop-missing]
-  typeof instance.inheritRotation === 'function' ? instance.inheritRotation() : true;
+  typeof instance.inheritRotation === 'function'
+    ? instance.inheritRotation()
+    : true;
 
 const getInheritScale = (instance: gdInitialInstance): boolean =>
   // $FlowFixMe[prop-missing]
@@ -149,8 +157,11 @@ export const getInstanceWorldScaleX = (
   if (!parentInstance) return localScaleX;
 
   return (
-    getInstanceWorldScaleX(parentInstance, instancesByPersistentUuid, nextVisited) *
-    localScaleX
+    getInstanceWorldScaleX(
+      parentInstance,
+      instancesByPersistentUuid,
+      nextVisited
+    ) * localScaleX
   );
 };
 
@@ -172,8 +183,11 @@ export const getInstanceWorldScaleY = (
   if (!parentInstance) return localScaleY;
 
   return (
-    getInstanceWorldScaleY(parentInstance, instancesByPersistentUuid, nextVisited) *
-    localScaleY
+    getInstanceWorldScaleY(
+      parentInstance,
+      instancesByPersistentUuid,
+      nextVisited
+    ) * localScaleY
   );
 };
 
@@ -188,8 +202,14 @@ export const setLocalToWorld = (
   instance.setLocalAngle(instance.getAngle());
   instance.setLocalRotationX(instance.getRotationX());
   instance.setLocalRotationY(instance.getRotationY());
-  setLocalScaleX(instance, worldScaleX !== undefined ? worldScaleX : getLocalScaleX(instance));
-  setLocalScaleY(instance, worldScaleY !== undefined ? worldScaleY : getLocalScaleY(instance));
+  setLocalScaleX(
+    instance,
+    worldScaleX !== undefined ? worldScaleX : getLocalScaleX(instance)
+  );
+  setLocalScaleY(
+    instance,
+    worldScaleY !== undefined ? worldScaleY : getLocalScaleY(instance)
+  );
 };
 
 export const applyLocalToWorld = (instance: gdInitialInstance) => {
@@ -266,12 +286,8 @@ export const recomputeLocalFromWorld = (
 
   if (inheritRotation) {
     instance.setLocalAngle(instance.getAngle() - parent.getAngle());
-    instance.setLocalRotationX(
-      instance.getRotationX() - parent.getRotationX()
-    );
-    instance.setLocalRotationY(
-      instance.getRotationY() - parent.getRotationY()
-    );
+    instance.setLocalRotationX(instance.getRotationX() - parent.getRotationX());
+    instance.setLocalRotationY(instance.getRotationY() - parent.getRotationY());
   } else {
     instance.setLocalAngle(instance.getAngle());
     instance.setLocalRotationX(instance.getRotationX());
@@ -382,8 +398,10 @@ export const applyParentTransformToDescendants = (
   parentInstance: gdInitialInstance,
   instancesIndex: InstancesIndex
 ) => {
-  const { childrenByParentPersistentUuid, instancesByPersistentUuid } =
-    instancesIndex;
+  const {
+    childrenByParentPersistentUuid,
+    instancesByPersistentUuid,
+  } = instancesIndex;
   const visited = new Set();
 
   const applyRecursively = (instance: gdInitialInstance) => {

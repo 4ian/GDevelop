@@ -109,13 +109,19 @@ const rootId = 'scene-objects-root';
 const emptyId = 'scene-objects-empty';
 
 const InstancesList = (props: Props): React.Node => {
-  const { instances, selectedInstances, onSelectInstances, onInstancesModified } =
-    props;
+  const {
+    instances,
+    selectedInstances,
+    onSelectInstances,
+    onInstancesModified,
+  } = props;
   const [searchText, setSearchText] = React.useState<string>('');
 
   const instancesIndex = buildInstancesIndex(instances);
-  const { instancesByPersistentUuid, childrenByParentPersistentUuid } =
-    instancesIndex;
+  const {
+    instancesByPersistentUuid,
+    childrenByParentPersistentUuid,
+  } = instancesIndex;
 
   const createItem = (
     instance: gdInitialInstance,
@@ -204,15 +210,12 @@ const InstancesList = (props: Props): React.Node => {
     []
   );
 
-  const getItemName = React.useCallback(
-    (item: InstanceTreeItem) => {
-      if (item.isRoot) return <Trans>Scene Objects</Trans>;
-      if (item.isPlaceholder) return item.label || <Trans>No instances</Trans>;
-      if (!item.instance) return '';
-      return item.instance.getObjectName();
-    },
-    []
-  );
+  const getItemName = React.useCallback((item: InstanceTreeItem) => {
+    if (item.isRoot) return <Trans>Scene Objects</Trans>;
+    if (item.isPlaceholder) return item.label || <Trans>No instances</Trans>;
+    if (!item.instance) return '';
+    return item.instance.getObjectName();
+  }, []);
 
   const renderRightComponent = React.useCallback(
     (item: InstanceTreeItem) => {
@@ -235,9 +238,7 @@ const InstancesList = (props: Props): React.Node => {
           <div style={styles.hierarchyBadges}>
             {parentName && (
               <Tooltip
-                title={
-                  <Trans>Parent: {parentName}</Trans>
-                }
+                title={<Trans>Parent: {parentName}</Trans>}
                 enterDelay={tooltipEnterDelay}
               >
                 <div>
@@ -399,7 +400,8 @@ const InstancesList = (props: Props): React.Node => {
         if (currentParentPersistentUuid === parentPersistentUuid) return;
         if (
           destinationInstance &&
-          instance.getPersistentUuid() === destinationInstance.getPersistentUuid()
+          instance.getPersistentUuid() ===
+            destinationInstance.getPersistentUuid()
         )
           return;
 

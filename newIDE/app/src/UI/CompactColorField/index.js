@@ -9,7 +9,6 @@ import {
   rgbColorToRGBString,
   rgbStringAndAlphaToRGBColor,
 } from '../../Utils/ColorTransformer';
-import CompactTextField from '../CompactTextField';
 
 export type CompactColorFieldProps = {|
   color: string,
@@ -33,12 +32,29 @@ export const CompactColorField = ({
   placeholder,
 }: CompactColorFieldProps): React.MixedElement => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
-  const [focused, setFocused] = React.useState<boolean>(false);
+
   const [colorValue, setColorValue] = React.useState<string>(color);
-  // alpha can be equal to 0, so we have to check if it is not undefined
   const [alphaValue, setAlphaValue] = React.useState<number>(
+    // alpha can be equal to 0, so we have to check if it is not undefined
     // $FlowFixMe[constant-condition]
     !disableAlpha && alpha !== undefined ? alpha : 1
+  );
+
+  React.useEffect(
+    () => {
+      setColorValue(color);
+    },
+    [color]
+  );
+
+  React.useEffect(
+    () => {
+      // $FlowFixMe[constant-condition]
+      if (!disableAlpha && alpha !== undefined) {
+        setAlphaValue(alpha);
+      }
+    },
+    [alpha, disableAlpha]
   );
 
   const handleChange = (newColor: string, newAlpha: number) => {
@@ -60,7 +76,7 @@ export const CompactColorField = ({
     // $FlowFixMe[constant-condition]
     const newAlpha = disableAlpha ? 1 : color.rgb.a;
     setColorValue(rgbString);
-    if (newAlpha) setAlphaValue(newAlpha);
+    if (newAlpha !== undefined) setAlphaValue(newAlpha);
     onChange(rgbString, newAlpha);
   };
 
@@ -77,31 +93,20 @@ export const CompactColorField = ({
           [classes.compactColorField]: true,
         })}
       >
-        <CompactTextField
+        <input
           id={idToUse.current}
           type="text"
-          value={focused ? colorValue : color}
-          onFocus={event => {
-            setFocused(true);
-            setColorValue(color);
-          }}
-          onChange={newColor => handleChange(newColor, alphaValue)}
-          onBlur={event => {
-            if (color !== event.currentTarget.value) {
-              handleChange(event.currentTarget.value, alphaValue);
-            }
-            setFocused(false);
-            handleBlur();
-          }}
+          disabled={disabled}
+          value={colorValue}
+          onChange={e => handleChange(e.currentTarget.value, alphaValue)}
+          placeholder={placeholder}
+          onBlur={handleBlur}
         />
         <ColorPicker
           size="compact"
           disableAlpha={disableAlpha}
           onChangeComplete={handlePickerChange}
-          color={rgbStringAndAlphaToRGBColor(
-            focused ? colorValue : color,
-            alpha
-          )}
+          color={rgbStringAndAlphaToRGBColor(colorValue, alphaValue)}
           disabled={disabled}
         />
       </div>

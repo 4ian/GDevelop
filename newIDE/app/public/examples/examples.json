@@ -9,7 +9,7 @@
       "license": "MIT",
       "tags": ["Starting point", "3D", "Movement", "Platformer"],
       "authorIds": [],
-      "previewImageUrls": ["/examples/3d-wall-sliding/preview.jpg"],
+      "previewImageUrls": ["examples/3d-wall-sliding/preview.jpg"],
       "gdevelopVersion": "5.6.0",
       "codeSizeLevel": "medium",
       "difficultyLevel": "intermediate"
@@ -30,11 +30,11 @@
       "license": "MIT",
       "tags": ["Starting point", "3D", "Movement", "Platformer"],
       "authorIds": [],
-      "previewImageUrls": ["/examples/3d-wall-sliding/preview.jpg"],
+      "previewImageUrls": ["examples/3d-wall-sliding/preview.jpg"],
       "gdevelopVersion": "5.6.0",
       "codeSizeLevel": "medium",
       "difficultyLevel": "intermediate",
-      "projectFileUrl": "/examples/3d-wall-sliding/game.json",
+      "projectFileUrl": "examples/3d-wall-sliding/game.json",
       "authors": []
     }
   }

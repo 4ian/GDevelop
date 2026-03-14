@@ -239,6 +239,9 @@ export const updateResourceJsonMetadata = (
   resource.setMetadata(JSON.stringify(newMetadata));
 };
 
+const hasUrlScheme = (value: string): boolean =>
+  /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(value);
+
 export const isFetchableUrl = (url: string): boolean => {
   return (
     url.startsWith('http://') ||
@@ -249,9 +252,7 @@ export const isFetchableUrl = (url: string): boolean => {
 
 export const isURL = (filename: string): boolean => {
   return (
-    filename.startsWith('http://') ||
-    filename.startsWith('https://') ||
-    filename.startsWith('ftp://') ||
+    hasUrlScheme(filename) ||
     filename.startsWith('blob:') ||
     filename.startsWith('data:')
   );

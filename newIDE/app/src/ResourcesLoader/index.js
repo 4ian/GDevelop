@@ -74,11 +74,12 @@ const addSearchParameterToUrl = (
   return url + separator + urlEncodedParameterName + '=' + urlEncodedValue;
 };
 
+const hasUrlScheme = (value: string): boolean =>
+  /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(value);
+
 const isLocalFile = (urlOrFilename: string) => {
   return !(
-    urlOrFilename.startsWith('http://') ||
-    urlOrFilename.startsWith('https://') ||
-    urlOrFilename.startsWith('ftp://') ||
+    hasUrlScheme(urlOrFilename) ||
     urlOrFilename.startsWith('blob:') ||
     urlOrFilename.startsWith('data:')
   );

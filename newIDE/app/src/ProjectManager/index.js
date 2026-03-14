@@ -57,9 +57,7 @@ import {
   type SceneFolderTreeViewItemProps,
   type SceneFolder,
 } from './SceneFolderTreeViewItemContent';
-import {
-  getSceneFolderIdFromTreeViewItemId,
-} from './SceneFolderUtils';
+import { getSceneFolderIdFromTreeViewItemId } from './SceneFolderUtils';
 import {
   loadSceneWorkflowMetadata,
   saveSceneWorkflowMetadata,
@@ -117,7 +115,6 @@ export const getProjectManagerItemId = (identifier: string): string =>
 
 const gameSettingsRootFolderId = getProjectManagerItemId('game-settings');
 const gamePropertiesItemId = getProjectManagerItemId('game-properties');
-const gameDashboardItemId = 'manage';
 const globalVariablesItemId = getProjectManagerItemId('global-variables');
 const gameResourcesItemId = getProjectManagerItemId('game-resources');
 export const scenesRootFolderId: string = getProjectManagerItemId('scenes');
@@ -166,7 +163,10 @@ const parseGitStatusOutput = (
     let filePath = line.slice(3).trim();
     if (!filePath) return;
     if (filePath.includes('->')) {
-      filePath = filePath.split('->').pop().trim();
+      filePath = filePath
+        .split('->')
+        .pop()
+        .trim();
     }
 
     const indexStatus = status[0];
@@ -597,9 +597,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const { showDeleteConfirmation } = useAlertDialog();
     const { fetchGames } = gamesList;
     const { navigateToRoute } = React.useContext(RouterContext);
-    const [sceneWorkflowDialogOpen, setSceneWorkflowDialogOpen] = React.useState(
-      false
-    );
+    const [
+      sceneWorkflowDialogOpen,
+      setSceneWorkflowDialogOpen,
+    ] = React.useState(false);
     const [
       sceneWorkflowMetadata,
       setSceneWorkflowMetadata,
@@ -665,28 +666,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         fetchGames();
       },
       [fetchGames, userId]
-    );
-    const onOpenGamesDashboardDialog = React.useCallback(
-      () => {
-        if (!project) return;
-
-        navigateToRoute('games-dashboard', {
-          'game-id': project.getProjectUuid(),
-          'games-dashboard-tab': 'details',
-        });
-        onOpenHomePage();
-        toggleProjectManager();
-        // Refresh the games as it could have been modified using the game dashboard
-        // in the "Manage" tab from the home page.
-        fetchGames();
-      },
-      [
-        fetchGames,
-        navigateToRoute,
-        onOpenHomePage,
-        toggleProjectManager,
-        project,
-      ]
     );
 
     const [
@@ -798,9 +777,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
             scenePathByName[sceneName] = relativePath;
             return relativePath;
           });
-          uniquePaths = Array.from(
-            new Set(allPaths.filter(path => path))
-          );
+          uniquePaths = Array.from(new Set(allPaths.filter(path => path)));
         } else {
           const relativeProjectPath = normalizeGitPath(
             path.relative(repoRoot, projectFilePath)
@@ -849,8 +826,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           if (sceneVersionControlRefreshInFlight.current) return;
           sceneVersionControlRefreshInFlight.current = true;
           try {
-            const statusBySceneName =
-              await computeSceneVersionControlStatusByName();
+            const statusBySceneName = await computeSceneVersionControlStatusByName();
             if (!isDisposed) {
               setSceneVersionControlStatusByName(statusBySceneName);
             }
@@ -1027,15 +1003,12 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const projectSceneNamesKey = projectSceneNames.join('|');
 
     const sceneWorkflowMetadataValue = React.useMemo(
-      () =>
-        sceneWorkflowMetadata || createDefaultSceneWorkflowMetadata(),
+      () => sceneWorkflowMetadata || createDefaultSceneWorkflowMetadata(),
       [sceneWorkflowMetadata]
     );
 
     const updateSceneWorkflowMetadata = React.useCallback(
-      (
-        updater: SceneWorkflowMetadata => SceneWorkflowMetadata
-      ) => {
+      (updater: SceneWorkflowMetadata => SceneWorkflowMetadata) => {
         if (!project) return;
         setSceneWorkflowMetadata(previous => {
           const base = previous || createDefaultSceneWorkflowMetadata();
@@ -1060,11 +1033,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     React.useEffect(
       () => {
         if (!project || !sceneWorkflowMetadata) return;
+        const currentSceneNames = getProjectSceneNames();
         const normalized = normalizeSceneWorkflowMetadataForProject(
           sceneWorkflowMetadata,
-          projectSceneNames
+          currentSceneNames
         );
-        if (JSON.stringify(normalized) !== JSON.stringify(sceneWorkflowMetadata)) {
+        if (
+          JSON.stringify(normalized) !== JSON.stringify(sceneWorkflowMetadata)
+        ) {
           updateSceneWorkflowMetadata(() => normalized);
         }
       },
@@ -1074,51 +1050,64 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         sceneWorkflowMetadata,
         normalizeSceneWorkflowMetadataForProject,
         updateSceneWorkflowMetadata,
+        getProjectSceneNames,
       ]
     );
 
-    const sceneFoldersById = React.useMemo(() => {
-      const map = new Map();
-      sceneWorkflowMetadataValue.sceneFolders.folders.forEach(folder => {
-        map.set(folder.id, folder);
-      });
-      return map;
-    }, [sceneWorkflowMetadataValue]);
-
-    const sceneFolderParentById = React.useMemo(() => {
-      const parentById = {};
-      sceneWorkflowMetadataValue.sceneFolders.folders.forEach(folder => {
-        folder.childFolderIds.forEach(childId => {
-          if (!parentById[childId]) parentById[childId] = folder.id;
+    const sceneFoldersById = React.useMemo(
+      () => {
+        const map = new Map();
+        sceneWorkflowMetadataValue.sceneFolders.folders.forEach(folder => {
+          map.set(folder.id, folder);
         });
-      });
-      return parentById;
-    }, [sceneWorkflowMetadataValue]);
+        return map;
+      },
+      [sceneWorkflowMetadataValue]
+    );
 
-    const sceneFolderPathsForMenu = React.useMemo(() => {
-      const paths = [];
-      const visitFolder = (folderId: string, prefix: string) => {
-        const folder = sceneFoldersById.get(folderId);
-        if (!folder) return;
-        const path = prefix ? `${prefix}/${folder.name}` : folder.name;
-        paths.push({ id: folder.id, path });
-        folder.childFolderIds.forEach(childId => visitFolder(childId, path));
-      };
-      sceneWorkflowMetadataValue.sceneFolders.rootFolderIds.forEach(folderId =>
-        visitFolder(folderId, '')
-      );
-      return paths;
-    }, [sceneFoldersById, sceneWorkflowMetadataValue.sceneFolders.rootFolderIds]);
-
-    const sceneFolderIdBySceneName = React.useMemo(() => {
-      const map = {};
-      sceneWorkflowMetadataValue.sceneFolders.folders.forEach(folder => {
-        folder.sceneNames.forEach(sceneName => {
-          if (!map[sceneName]) map[sceneName] = folder.id;
+    const sceneFolderParentById = React.useMemo(
+      () => {
+        const parentById = {};
+        sceneWorkflowMetadataValue.sceneFolders.folders.forEach(folder => {
+          folder.childFolderIds.forEach(childId => {
+            if (!parentById[childId]) parentById[childId] = folder.id;
+          });
         });
-      });
-      return map;
-    }, [sceneWorkflowMetadataValue]);
+        return parentById;
+      },
+      [sceneWorkflowMetadataValue]
+    );
+
+    const sceneFolderPathsForMenu = React.useMemo(
+      () => {
+        const paths = [];
+        const visitFolder = (folderId: string, prefix: string) => {
+          const folder = sceneFoldersById.get(folderId);
+          if (!folder) return;
+          const path = prefix ? `${prefix}/${folder.name}` : folder.name;
+          paths.push({ id: folder.id, path });
+          folder.childFolderIds.forEach(childId => visitFolder(childId, path));
+        };
+        sceneWorkflowMetadataValue.sceneFolders.rootFolderIds.forEach(
+          folderId => visitFolder(folderId, '')
+        );
+        return paths;
+      },
+      [sceneFoldersById, sceneWorkflowMetadataValue.sceneFolders.rootFolderIds]
+    );
+
+    const sceneFolderIdBySceneName = React.useMemo(
+      () => {
+        const map = {};
+        sceneWorkflowMetadataValue.sceneFolders.folders.forEach(folder => {
+          folder.sceneNames.forEach(sceneName => {
+            if (!map[sceneName]) map[sceneName] = folder.id;
+          });
+        });
+        return map;
+      },
+      [sceneWorkflowMetadataValue]
+    );
 
     const getSceneFolderId = React.useCallback(
       (sceneName: string): ?string =>
@@ -1361,7 +1350,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           return nextMetadata;
         });
       },
-      [updateSceneWorkflowMetadata, applySceneOrderToProject]
+      [
+        updateSceneWorkflowMetadata,
+        applySceneOrderToProject,
+        updateSceneFoldersForFolderMove,
+      ]
     );
 
     const onCreateSceneFolderWithScene = React.useCallback(
@@ -1401,7 +1394,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           return nextMetadata;
         });
       },
-      [updateSceneWorkflowMetadata, applySceneOrderToProject]
+      [
+        updateSceneWorkflowMetadata,
+        applySceneOrderToProject,
+        updateSceneFoldersForSceneMove,
+      ]
     );
 
     const onRenameSceneFolder = React.useCallback(
@@ -1494,7 +1491,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           return nextMetadata;
         });
       },
-      [updateSceneWorkflowMetadata, applySceneOrderToProject]
+      [
+        updateSceneWorkflowMetadata,
+        applySceneOrderToProject,
+        updateSceneFoldersForSceneMove,
+      ]
     );
 
     const onSceneCreated = React.useCallback(
@@ -1548,7 +1549,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           return nextMetadata;
         });
       },
-      [updateSceneWorkflowMetadata, applySceneOrderToProject]
+      [
+        updateSceneWorkflowMetadata,
+        applySceneOrderToProject,
+        updateSceneFoldersForSceneMove,
+      ]
     );
 
     const scenePtrNameMapRef = React.useRef<?Map<string, string>>(null);
@@ -1563,8 +1568,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           const ptrKey = String(layout.ptr);
           const name = layout.getName();
           nextMap.set(ptrKey, name);
-          if (scenePtrNameMapRef.current &&
-            scenePtrNameMapRef.current.has(ptrKey)) {
+          if (
+            scenePtrNameMapRef.current &&
+            scenePtrNameMapRef.current.has(ptrKey)
+          ) {
             const previousName = scenePtrNameMapRef.current.get(ptrKey);
             if (previousName && previousName !== name) {
               renames.push({ oldName: previousName, newName: name });
@@ -1579,10 +1586,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           renames.forEach(({ oldName, newName }) => {
             if (oldName === newName) return;
             const updatedSceneStatus = { ...nextMetadata.sceneStatus };
-            if (
-              updatedSceneStatus[oldName] &&
-              !updatedSceneStatus[newName]
-            ) {
+            if (updatedSceneStatus[oldName] && !updatedSceneStatus[newName]) {
               updatedSceneStatus[newName] = updatedSceneStatus[oldName];
             }
             delete updatedSceneStatus[oldName];
@@ -2126,14 +2130,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         'res/icons_default/project_resources_black.svg'
                       )
                     ),
-                    new LeafTreeViewItem(
-                      new ActionTreeViewItemContent(
-                        gameDashboardItemId,
-                        i18n._(t`Game Dashboard`),
-                        onOpenGamesDashboardDialog,
-                        'res/icons_default/graphs_black.svg'
-                      )
-                    ),
                   ];
                 },
               },
@@ -2157,7 +2153,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     {
                       icon: <CreateNewFolder />,
                       label: i18n._(t`Add a folder`),
-                      click: () => onAddSceneFolder(null, i18n._(t`New folder`)),
+                      click: () =>
+                        onAddSceneFolder(null, i18n._(t`New folder`)),
                       id: 'add-new-scene-folder-button',
                     },
                     {
@@ -2348,7 +2345,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         extensionTreeViewItemProps,
         externalEventsTreeViewItemProps,
         externalLayoutTreeViewItemProps,
-        onOpenGamesDashboardDialog,
         onOpenResources,
         openProjectProperties,
         openProjectVariables,
@@ -2459,11 +2455,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                 destinationParentFolder && destinationParentFolderId
                   ? destinationParentFolder.sceneNames
                   : sceneWorkflowMetadataValue.sceneFolders.rootSceneNames;
-              const destinationIndex =
-                destinationList.indexOf(destinationSceneName);
+              const destinationIndex = destinationList.indexOf(
+                destinationSceneName
+              );
               targetFolderId = destinationParentFolderId;
-              targetIndex =
-                destinationIndex + (where === 'after' ? 1 : 0);
+              targetIndex = destinationIndex + (where === 'after' ? 1 : 0);
               const selectedIndex = destinationList.indexOf(selectedSceneName);
               if (selectedIndex !== -1 && selectedIndex < destinationIndex) {
                 targetIndex -= 1;
@@ -2512,15 +2508,15 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                 destinationParentFolder && destinationParentId
                   ? destinationParentFolder.childFolderIds
                   : sceneWorkflowMetadataValue.sceneFolders.rootFolderIds;
-              const destinationIndex =
-                destinationList.indexOf(destinationFolderId);
+              const destinationIndex = destinationList.indexOf(
+                destinationFolderId
+              );
               targetFolderId =
                 where === 'inside' ? destinationFolderId : destinationParentId;
               if (where === 'inside') {
                 targetIndex = null;
               } else {
-                targetIndex =
-                  destinationIndex + (where === 'after' ? 1 : 0);
+                targetIndex = destinationIndex + (where === 'after' ? 1 : 0);
                 const selectedIndex = destinationList.indexOf(selectedFolderId);
                 if (selectedIndex !== -1 && selectedIndex < destinationIndex) {
                   targetIndex -= 1;
@@ -2563,6 +2559,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         sceneFoldersById,
         sceneWorkflowMetadataValue,
         sceneFolderParentById,
+        updateSceneFoldersForSceneMove,
+        updateSceneFoldersForFolderMove,
         updateSceneWorkflowMetadata,
         applySceneOrderToProject,
         onTreeModified,

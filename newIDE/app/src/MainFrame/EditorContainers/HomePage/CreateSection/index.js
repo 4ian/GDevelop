@@ -318,7 +318,7 @@ const CreateSection = ({
 
   const [templateCategory, setTemplateCategory] = React.useState<
     'games' | '2d' | '3d'
-  >(ONLINE_SERVICES_ENABLED ? 'games' : '2d');
+  >('games');
 
   const onUnregisterGame = React.useCallback(
     async (
@@ -665,20 +665,18 @@ const CreateSection = ({
                   />
                 </Line>
                 <div style={styles.filtersRow}>
-                  {ONLINE_SERVICES_ENABLED && (
-                    <button
-                      type="button"
-                      style={{
-                        ...styles.filterChip,
-                        ...(templateCategory === 'games'
-                          ? styles.filterChipActive
-                          : {}),
-                      }}
-                      onClick={() => setTemplateCategory('games')}
-                    >
-                      <Trans>Games</Trans>
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    style={{
+                      ...styles.filterChip,
+                      ...(templateCategory === 'games'
+                        ? styles.filterChipActive
+                        : {}),
+                    }}
+                    onClick={() => setTemplateCategory('games')}
+                  >
+                    <Trans>Games</Trans>
+                  </button>
                   <button
                     type="button"
                     style={{

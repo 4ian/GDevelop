@@ -18,6 +18,8 @@ export type FlatButtonProps = {|
   fullWidth?: boolean,
   leftIcon?: React.Node,
   rightIcon?: React.Node,
+  className?: string,
+  buttonClassName?: string,
   style?: {|
     marginTop?: number,
     marginBottom?: number,
@@ -25,7 +27,11 @@ export type FlatButtonProps = {|
     marginRight?: number,
     margin?: number,
     flexShrink?: 0,
+    flex?: number,
+    minWidth?: number,
+    height?: number,
   |},
+  buttonStyle?: Object,
   noBackground?: boolean,
   size?: 'medium' | 'large',
   target?: '_blank',
@@ -46,11 +52,14 @@ const FlatButton: React.ComponentType<{
       color,
       leftIcon,
       rightIcon,
+      className,
+      buttonClassName,
       keyboardFocused,
       disabled,
       size,
       id,
       style,
+      buttonStyle,
       noBackground,
       ...otherProps
     }: FlatButtonProps,
@@ -64,16 +73,19 @@ const FlatButton: React.ComponentType<{
 
     return (
       <div
-        className={classNames({
-          [classes.buttonContainer]: true,
-          [classes.backgroundButtonContainer]: !noBackground,
-          [classes.fullWidthButtonContainer]: !!otherProps.fullWidth,
-          [classes.coloredButtonContainer]: !!color,
-          [classes.buttonContainerSuccess]: color === 'success',
-          [classes.buttonContainerDanger]: color === 'danger',
-          [classes.buttonContainerPremium]: color === 'premium',
-          [classes.buttonContainerAi]: color === 'ai',
-        })}
+        className={classNames(
+          {
+            [classes.buttonContainer]: true,
+            [classes.backgroundButtonContainer]: !noBackground,
+            [classes.fullWidthButtonContainer]: !!otherProps.fullWidth,
+            [classes.coloredButtonContainer]: !!color,
+            [classes.buttonContainerSuccess]: color === 'success',
+            [classes.buttonContainerDanger]: color === 'danger',
+            [classes.buttonContainerPremium]: color === 'premium',
+            [classes.buttonContainerAi]: color === 'ai',
+          },
+          className
+        )}
         style={style}
       >
         <Button
@@ -84,6 +96,8 @@ const FlatButton: React.ComponentType<{
           focusRipple={focusRipple}
           disabled={disabled}
           id={id}
+          className={buttonClassName}
+          style={buttonStyle}
           {...otherProps}
           ref={ref}
         >

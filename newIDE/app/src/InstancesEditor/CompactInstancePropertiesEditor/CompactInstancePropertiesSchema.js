@@ -740,6 +740,27 @@ const withParentInstance = ({
   if (onInstancesModified) onInstancesModified([instance]);
 };
 
+const hierarchyActionButtonContainerStyle = {
+  flex: 1,
+  minWidth: 0,
+  height: 56,
+};
+
+const hierarchyActionButtonStyle = {
+  borderColor: 'var(--theme-success-color)',
+  borderWidth: 1.5,
+  borderStyle: 'solid',
+  borderRadius: 12,
+  color: 'var(--theme-success-color)',
+  textTransform: 'none',
+  fontWeight: 600,
+  lineHeight: 1.2,
+  whiteSpace: 'normal',
+  textAlign: 'center',
+  padding: '8px 12px',
+  justifyContent: 'center',
+};
+
 const getHierarchyActionButtons = ({
   i18n,
   initialInstancesContainer,
@@ -752,12 +773,17 @@ const getHierarchyActionButtons = ({
   name: 'Hierarchy actions',
   type: 'row',
   preventWrap: true,
-  removeSpacers: true,
   children: [
     {
+      id: 'hierarchy-center-child',
       label: i18n._(t`Center child`),
       disabled: 'onValuesDifferent',
       nonFieldType: 'button',
+      primary: false,
+      size: 'large',
+      fullWidth: true,
+      style: hierarchyActionButtonContainerStyle,
+      buttonStyle: hierarchyActionButtonStyle,
       // $FlowFixMe[missing-local-annot]
       getIcon: props => <CenterAlignment {...props} />,
       getValue: (instance: gdInitialInstance) => instance.getObjectName(),
@@ -780,9 +806,15 @@ const getHierarchyActionButtons = ({
         }),
     },
     {
+      id: 'hierarchy-match-parent',
       label: i18n._(t`Match parent`),
       disabled: 'onValuesDifferent',
       nonFieldType: 'button',
+      primary: false,
+      size: 'large',
+      fullWidth: true,
+      style: hierarchyActionButtonContainerStyle,
+      buttonStyle: hierarchyActionButtonStyle,
       // $FlowFixMe[missing-local-annot]
       getIcon: props => <Copy {...props} />,
       getValue: (instance: gdInitialInstance) => instance.getObjectName(),

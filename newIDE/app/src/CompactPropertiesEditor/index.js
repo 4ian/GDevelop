@@ -564,25 +564,42 @@ const CompactPropertiesEditor = ({
           field,
         });
       }
+
+      const leftIcon = field.leftIcon ? (
+        field.leftIcon
+      ) : field.showRightIcon ? null : field.getIcon ? (
+        field.getIcon({ fontSize: 'small' })
+      ) : (
+        <Edit fontSize="small" />
+      );
+      const rightIcon = field.rightIcon ? (
+        field.rightIcon
+      ) : !field.showRightIcon ? null : field.getIcon ? (
+        field.getIcon({ fontSize: 'small' })
+      ) : (
+        <Edit fontSize="small" />
+      );
+      const fullWidth =
+        typeof field.fullWidth === 'boolean' ? field.fullWidth : true;
+      const primary = typeof field.primary === 'boolean' ? field.primary : true;
+      const keySuffix =
+        field.id || (typeof field.label === 'string' ? field.label : 'button');
+
       return (
         <FlatButton
-          key={`button-${field.label}`}
-          fullWidth
-          primary
-          leftIcon={
-            field.showRightIcon ? null : field.getIcon ? (
-              field.getIcon({ fontSize: 'small' })
-            ) : (
-              <Edit fontSize="small" />
-            )
-          }
-          rightIcon={
-            !field.showRightIcon ? null : field.getIcon ? (
-              field.getIcon({ fontSize: 'small' })
-            ) : (
-              <Edit fontSize="small" />
-            )
-          }
+          key={`button-${keySuffix}`}
+          id={field.id}
+          fullWidth={fullWidth}
+          primary={primary}
+          color={field.color}
+          size={field.size}
+          noBackground={field.noBackground}
+          style={field.style}
+          className={field.className}
+          buttonStyle={field.buttonStyle}
+          buttonClassName={field.buttonClassName}
+          leftIcon={leftIcon}
+          rightIcon={rightIcon}
           disabled={disabled}
           label={field.label}
           onClick={() => {

@@ -136,13 +136,35 @@ type VerticalCenterWithBar = {|
 |};
 
 export type ActionButton = {|
-  label: string,
+  label: React.Node,
   disabled: 'onValuesDifferent',
   getValue: Instance => string,
   nonFieldType: 'button',
   getIcon?: ({| fontSize: string |}) => React.Node,
   showRightIcon?: boolean,
   onClick: (instance: Instance) => void,
+  id?: string,
+  fullWidth?: boolean,
+  primary?: boolean,
+  color?: 'primary' | 'success' | 'danger' | 'premium' | 'ai',
+  size?: 'medium' | 'large',
+  noBackground?: boolean,
+  style?: {|
+    marginTop?: number,
+    marginBottom?: number,
+    marginLeft?: number,
+    marginRight?: number,
+    margin?: number,
+    flexShrink?: 0,
+    flex?: number,
+    minWidth?: number,
+    height?: number,
+  |},
+  className?: string,
+  buttonStyle?: Object,
+  buttonClassName?: string,
+  leftIcon?: React.Node,
+  rightIcon?: React.Node,
 |};
 
 export type ToggleButtons = {|
